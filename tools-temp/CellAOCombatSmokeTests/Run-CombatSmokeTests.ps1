@@ -15,6 +15,26 @@ function Assert-True {
     }
 }
 
+function Assert-SourceMatch {
+    param(
+        [string]$Text,
+        [string]$Pattern,
+        [string]$Message
+    )
+
+    Assert-True ([System.Text.RegularExpressions.Regex]::IsMatch($Text, $Pattern, [System.Text.RegularExpressions.RegexOptions]::Singleline)) $Message
+}
+
+function Assert-SourceNoMatch {
+    param(
+        [string]$Text,
+        [string]$Pattern,
+        [string]$Message
+    )
+
+    Assert-True (-not [System.Text.RegularExpressions.Regex]::IsMatch($Text, $Pattern, [System.Text.RegularExpressions.RegexOptions]::Singleline)) $Message
+}
+
 function Get-RequiredType {
     param(
         [System.Reflection.Assembly]$Assembly,
@@ -63,6 +83,23 @@ $zoneProject = Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ZoneEngine.csproj'
 $builtDir = Join-Path $repoRoot 'CellAO\Built\Debug'
 $zoneEngine = Join-Path $builtDir 'ZoneEngine.exe'
 $msbuild = 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe'
+
+$fullCharacterSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\FullCharacterMessageHandler.cs')
+$clientConnectedSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs')
+
+Assert-SourceMatch $fullCharacterSource 'MsgVersion\s*=\s*26\s*;' 'FullCharacter login packet must stay on live-compatible MsgVersion 26.'
+Assert-SourceMatch $clientConnectedSource 'InitializeActionableState\s*\(\s*client\s*\)\s*;' 'ClientConnected must initialize the live-style actionable login state.'
+Assert-SourceNoMatch $clientConnectedSource 'new\s+ActionMessage\b' 'ClientConnected should not send fake server-side Action bootstrap packets.'
+Assert-SourceMatch $clientConnectedSource 'SetStat\s*\(\s*client\s*,\s*StatIds\.state\s*,\s*0\s*\)\s*;' 'Login state should stay 0.'
+Assert-SourceMatch $clientConnectedSource 'SetStat\s*\(\s*client\s*,\s*StatIds\.currentmovementmode\s*,\s*\(int\)\s*MoveModes\.Run\s*\)\s*;' 'CurrentMovementMode should initialize to Run.'
+Assert-SourceMatch $clientConnectedSource 'SetStat\s*\(\s*client\s*,\s*StatIds\.prevmovementmode\s*,\s*\(int\)\s*MoveModes\.Run\s*\)\s*;' 'PrevMovementMode should initialize to Run.'
+Assert-SourceMatch $clientConnectedSource 'SetStat\s*\(\s*client\s*,\s*StatIds\.currentstate\s*,\s*0\s*\)\s*;' 'CurrentState should initialize to 0.'
+Assert-SourceMatch $clientConnectedSource 'SetStat\s*\(\s*client\s*,\s*StatIds\.waitstate\s*,\s*0\s*\)\s*;' 'WaitState should initialize to 0.'
+Assert-SourceMatch $clientConnectedSource 'SetStat\s*\(\s*client\s*,\s*StatIds\.socialstatus\s*,\s*4\s*\)\s*;' 'SocialStatus should initialize to 4.'
+Assert-SourceMatch $clientConnectedSource 'SetStat\s*\(\s*client\s*,\s*StatIds\.specialcondition\s*,\s*3\s*\)\s*;' 'SpecialCondition should initialize to 3.'
+Assert-SourceMatch $clientConnectedSource 'SetStat\s*\(\s*client\s*,\s*StatIds\.actioncategory\s*,\s*0\s*\)\s*;' 'ActionCategory should initialize to 0.'
+Assert-SourceMatch $clientConnectedSource 'Stats\s*\[\s*stat\s*\]\.Value\s*=\s*value\s*;' 'Login SetStat helper should update the live stat value.'
+Assert-SourceMatch $clientConnectedSource 'Stats\s*\[\s*stat\s*\]\.BaseValue\s*=\s*\(uint\)\s*value\s*;' 'Login SetStat helper should update the live stat base value.'
 
 if (-not $SkipBuild) {
     Assert-True (Test-Path $msbuild) "MSBuild was not found at $msbuild"
