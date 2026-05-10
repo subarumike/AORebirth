@@ -128,29 +128,18 @@ namespace CellAO.Core.Playfields
 
         private const int DefaultNpcDeathAnimationKey = 0x1F7;
 
-        private const int CorpseInventorySlots = 21;
-
-        private const int MoveToInventoryPlacement = 0x6f;
-
         private static readonly TimeSpan DeadNpcDespawnDelay = TimeSpan.FromSeconds(10);
 
         private static readonly TimeSpan CorpseSpawnDelay = TimeSpan.FromMilliseconds(600);
-
-        private static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromMilliseconds(750);
-
-        private static readonly TimeSpan CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30);
-
-        private static readonly TimeSpan ItemLootCorpseLifetime = TimeSpan.FromSeconds(60);
-
-        private static readonly TimeSpan MajorBossCorpseLifetime = TimeSpan.FromMinutes(30);
 
         private static readonly Random LootRandom = new Random();
 
         private static readonly object LootRandomLock = new object();
 
-        private static readonly DebugLootTableEntry[] DebugLootTable = BuildDebugLootTable();
+        private static readonly CombatLootTableEntry[] DebugLootTable = CombatTestLootCatalog.BuildEntries();
 
-        private static readonly Dictionary<int, int> MonsterDataToCorpseCatMesh = BuildMonsterDataToCorpseCatMeshMap();
+        private static readonly Dictionary<int, int> MonsterDataToCorpseCatMesh =
+            CombatCorpseVisuals.BuildMonsterDataToCorpseCatMeshMap();
 
         /// <summary>
         /// </summary>
@@ -1201,7 +1190,7 @@ namespace CellAO.Core.Playfields
 
             if (corpse.HasUnlootedItems)
             {
-                this.ExtendDebugCorpseLifetime(corpse, ItemLootCorpseLifetime, "corpse-use");
+                this.ExtendDebugCorpseLifetime(corpse, CombatCorpseRules.ItemLootCorpseLifetime, "corpse-use");
                 if (corpse.NextUseSendsAccessActionOnly)
                 {
                     this.SendCorpseLootAccessAction(looter, corpse);
@@ -1227,7 +1216,7 @@ namespace CellAO.Core.Playfields
             {
                 this.ScheduleDebugCorpseDespawn(
                     corpse,
-                    EmptyCorpseCleanupAfterOpenedDelay,
+                    CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay,
                     "opened-empty");
             }
 
@@ -1414,18 +1403,20 @@ namespace CellAO.Core.Playfields
             ContainerAddItemMessageHandler.Default.Send(
                 looter,
                 sourceContainer,
-                targetPlacement == MoveToInventoryPlacement ? MoveToInventoryPlacement : targetSlot);
+                targetPlacement == CombatCorpseRules.MoveToInventoryPlacement
+                    ? CombatCorpseRules.MoveToInventoryPlacement
+                    : targetSlot);
 
             if (!corpse.HasUnlootedItems)
             {
                 this.ScheduleDebugCorpseDespawn(
                     corpse,
-                    EmptyCorpseCleanupAfterOpenedDelay,
+                    CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay,
                     "looted-empty");
             }
             else
             {
-                this.ExtendDebugCorpseLifetime(corpse, ItemLootCorpseLifetime, "loot-remaining");
+                this.ExtendDebugCorpseLifetime(corpse, CombatCorpseRules.ItemLootCorpseLifetime, "loot-remaining");
             }
 
             LogUtil.Debug(
@@ -1575,32 +1566,15 @@ namespace CellAO.Core.Playfields
             }
         }
 
-        private static TimeSpan CorpseLifetimeFor(CorpseLootClass lootClass)
+        private static TimeSpan CorpseLifetimeFor(CombatCorpseLootClass lootClass)
         {
-            switch (lootClass)
-            {
-                case CorpseLootClass.MajorBoss:
-                    return MajorBossCorpseLifetime;
-
-                case CorpseLootClass.ItemLoot:
-                    return ItemLootCorpseLifetime;
-
-                default:
-                    return CreditsOnlyCorpseLifetime;
-            }
+            return CombatCorpseRules.LifetimeFor(lootClass);
         }
 
-        private static CorpseLootClass CorpseLootClassFor(ICharacter target, IList<DebugCorpseLootItem> lootItems)
+        private static CombatCorpseLootClass CorpseLootClassFor(ICharacter target, IList<DebugCorpseLootItem> lootItems)
         {
             // TODO: Add boss classification when real mob templates/loot tables are wired in.
-            return lootItems.Count > 0 ? CorpseLootClass.ItemLoot : CorpseLootClass.CreditsOnly;
-        }
-
-        private enum CorpseLootClass
-        {
-            CreditsOnly,
-            ItemLoot,
-            MajorBoss
+            return CombatCorpseRules.LootClassFor(lootItems.Count, false);
         }
 
         private void ProcessDebugCorpseDespawns()
@@ -1649,7 +1623,7 @@ namespace CellAO.Core.Playfields
                     CorpseIdentity = corpseIdentity,
                     DeadNpcIdentity = target.Identity,
                     Name = "Remains of " + target.Name,
-                    LootClass = CorpseLootClass.CreditsOnly,
+                    LootClass = CombatCorpseLootClass.CreditsOnly,
                     SpawnsAtUtc = spawnsAtUtc
                 };
 
@@ -1665,7 +1639,7 @@ namespace CellAO.Core.Playfields
         private void RegisterDebugCorpse(ICharacter target, Identity corpseIdentity)
         {
             List<DebugCorpseLootItem> lootItems = RollDebugCorpseLootItems(target);
-            CorpseLootClass lootClass = CorpseLootClassFor(target, lootItems);
+            CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems);
             TimeSpan lifetime = CorpseLifetimeFor(lootClass);
             DateTime expiresAtUtc = DateTime.UtcNow + lifetime;
             var state = new DebugCorpseState
@@ -1746,7 +1720,7 @@ namespace CellAO.Core.Playfields
 
             public string Name { get; set; }
 
-            public CorpseLootClass LootClass { get; set; }
+            public CombatCorpseLootClass LootClass { get; set; }
 
             public DateTime SpawnsAtUtc { get; set; }
 
@@ -1776,98 +1750,6 @@ namespace CellAO.Core.Playfields
             public Item Item { get; set; }
 
             public bool Looted { get; set; }
-        }
-
-        private class DebugLootTableEntry
-        {
-            public string ExactName { get; set; }
-
-            public int MonsterData { get; set; }
-
-            public int NpcFamily { get; set; }
-
-            public int DropChancePercent { get; set; }
-
-            public int Quality { get; set; }
-
-            public int[] ItemTemplateIds { get; set; }
-
-            public bool Matches(ICharacter target)
-            {
-                if (!string.IsNullOrEmpty(this.ExactName)
-                    && !string.Equals(target.Name, this.ExactName, StringComparison.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-
-                if (this.MonsterData != 0 && target.Stats[StatIds.monsterdata].Value != this.MonsterData)
-                {
-                    return false;
-                }
-
-                if (this.NpcFamily != 0 && target.Stats[StatIds.npcfamily].Value != this.NpcFamily)
-                {
-                    return false;
-                }
-
-                return true;
-            }
-        }
-
-        private static DebugLootTableEntry[] BuildDebugLootTable()
-        {
-            var entries = new List<DebugLootTableEntry>();
-            foreach (CombatTestMobArchetype.Entry archetype in CombatTestMobArchetype.All)
-            {
-                entries.Add(
-                    new DebugLootTableEntry
-                    {
-                        ExactName = archetype.DisplayName,
-                        MonsterData = archetype.MonsterData,
-                        DropChancePercent = 100,
-                        Quality = 1,
-                        ItemTemplateIds = new[] { 0x4545F, 0x4545A }
-                    });
-
-                entries.Add(
-                    new DebugLootTableEntry
-                    {
-                        ExactName = archetype.DisplayName,
-                        MonsterData = archetype.MonsterData,
-                        DropChancePercent = 100,
-                        Quality = 1,
-                        ItemTemplateIds = new[] { 27350, 85534, 85521, 273496, 273500 }
-                    });
-
-                entries.Add(
-                    new DebugLootTableEntry
-                    {
-                        ExactName = archetype.DisplayName,
-                        MonsterData = archetype.MonsterData,
-                        DropChancePercent = 100,
-                        Quality = 1,
-                        ItemTemplateIds = new[] { 27350 }
-                    });
-            }
-
-            return entries.ToArray();
-        }
-
-        private static Dictionary<int, int> BuildMonsterDataToCorpseCatMeshMap()
-        {
-            var map = new Dictionary<int, int>
-            {
-                { 247831, 247826 },
-                { 247832, 247821 },
-                { 31114, 31102 }
-            };
-
-            foreach (KeyValuePair<int, int> mapping in CombatTestMobArchetype.CorpseVisualMappings())
-            {
-                map[mapping.Key] = mapping.Value;
-            }
-
-            return map;
         }
 
         private Identity AllocateDebugCorpseIdentity()
@@ -1962,59 +1844,31 @@ namespace CellAO.Core.Playfields
 
         private bool CanBuildKnownCorpseVisual(ICharacter target)
         {
-            return IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
+            return CombatCorpseVisuals.IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
                    || MonsterDataToCorpseCatMesh.ContainsKey(target.Stats[StatIds.monsterdata].Value);
         }
 
         private static int CorpseCatMeshFor(ICharacter target)
         {
-            int catMesh = target.Stats[StatIds.catmesh].Value;
-            if (IsUsableVisualId(catMesh))
-            {
-                return catMesh;
-            }
-
-            int monsterData = target.Stats[StatIds.monsterdata].Value;
-            int mappedCatMesh;
-            if (MonsterDataToCorpseCatMesh.TryGetValue(monsterData, out mappedCatMesh))
-            {
-                return mappedCatMesh;
-            }
-
-            return monsterData;
+            return CombatCorpseVisuals.CorpseCatMeshFor(
+                target.Stats[StatIds.catmesh].Value,
+                target.Stats[StatIds.monsterdata].Value,
+                MonsterDataToCorpseCatMesh);
         }
 
         private static int DeathAnimationKeyFor(ICharacter target)
         {
-            int corpseAnimationKey = target.Stats[StatIds.corpseanimkey].Value;
-            if (IsUsableVisualId(corpseAnimationKey))
-            {
-                return corpseAnimationKey;
-            }
-
-            int itemAnimation = target.Stats[StatIds.itemanim].Value;
-            if (IsUsableVisualId(itemAnimation))
-            {
-                return itemAnimation;
-            }
-
-            return DefaultNpcDeathAnimationKey;
+            return CombatCorpseVisuals.DeathAnimationKeyFor(
+                target.Stats[StatIds.corpseanimkey].Value,
+                target.Stats[StatIds.itemanim].Value,
+                DefaultNpcDeathAnimationKey);
         }
 
         private static int CorpseMonsterDataFor(ICharacter target)
         {
-            int monsterData = target.Stats[StatIds.monsterdata].Value;
-            if (IsUsableVisualId(monsterData))
-            {
-                return monsterData;
-            }
-
-            return CorpseCatMeshFor(target);
-        }
-
-        private static bool IsUsableVisualId(int value)
-        {
-            return value > 0 && value != 1234567890;
+            return CombatCorpseVisuals.CorpseMonsterDataFor(
+                target.Stats[StatIds.monsterdata].Value,
+                CorpseCatMeshFor(target));
         }
 
         private static byte[] HexToBytes(string hex)
@@ -2090,7 +1944,11 @@ namespace CellAO.Core.Playfields
         {
             var lootItems = new List<DebugCorpseLootItem>();
 
-            foreach (DebugLootTableEntry entry in DebugLootTable.Where(x => x.Matches(target)))
+            foreach (CombatLootTableEntry entry in DebugLootTable.Where(
+                x => x.Matches(
+                    target.Name,
+                    target.Stats[StatIds.monsterdata].Value,
+                    target.Stats[StatIds.npcfamily].Value)))
             {
                 if (!RollLootChance(entry.DropChancePercent))
                 {
@@ -2139,7 +1997,7 @@ namespace CellAO.Core.Playfields
 
             lock (LootRandomLock)
             {
-                return LootRandom.Next(100) < dropChancePercent;
+                return CombatCorpseRules.ShouldDrop(dropChancePercent, max => LootRandom.Next(max));
             }
         }
 
@@ -2185,32 +2043,11 @@ namespace CellAO.Core.Playfields
 
         private static DebugCorpseLootItem FindCorpseLootItem(DebugCorpseState corpse, int requestedLootSlot)
         {
-            if (corpse.LootItems == null)
-            {
-                return null;
-            }
-
-            DebugCorpseLootItem exactMatch = corpse.LootItems.FirstOrDefault(
-                x => !x.Looted && x.Slot == requestedLootSlot);
-            if (exactMatch != null)
-            {
-                return exactMatch;
-            }
-
-            DebugCorpseLootItem oneBasedMatch = corpse.LootItems.FirstOrDefault(
-                x => !x.Looted && x.Slot + 1 == requestedLootSlot);
-            if (oneBasedMatch != null)
-            {
-                return oneBasedMatch;
-            }
-
-            List<DebugCorpseLootItem> remaining = corpse.LootItems.Where(x => !x.Looted).ToList();
-            if (remaining.Count == 1 && requestedLootSlot <= 1)
-            {
-                return remaining[0];
-            }
-
-            return null;
+            return CombatCorpseRules.FindLootItem(
+                corpse.LootItems,
+                requestedLootSlot,
+                x => x.Slot,
+                x => x.Looted);
         }
 
         private bool TryResolveLootTargetSlot(
@@ -2222,7 +2059,7 @@ namespace CellAO.Core.Playfields
             targetPageNumber = -1;
             targetSlot = -1;
 
-            if (targetPlacement == MoveToInventoryPlacement)
+            if (targetPlacement == CombatCorpseRules.MoveToInventoryPlacement)
             {
                 targetPageNumber = looter.BaseInventory.StandardPage;
                 IInventoryPage targetPage = looter.BaseInventory.Pages[targetPageNumber];
@@ -2276,13 +2113,7 @@ namespace CellAO.Core.Playfields
 
         private static short InventoryEntryCountFor(Item item)
         {
-            int count = item.MultipleCount;
-            if (count <= 0 || count == 1234567890)
-            {
-                return 1;
-            }
-
-            return count > short.MaxValue ? short.MaxValue : (short)count;
+            return CombatCorpseRules.InventoryEntryCountFor(item.MultipleCount);
         }
 
         private void SendCorpseInventoryUpdate(ICharacter looter, DebugCorpseState corpse)
@@ -2303,7 +2134,7 @@ namespace CellAO.Core.Playfields
                 {
                     Identity = looter.Identity,
                     Unknown = 1,
-                    NumberOfSlots = CorpseInventorySlots,
+                    NumberOfSlots = CombatCorpseRules.CorpseInventorySlots,
                     Unknown1 = 2,
                     Entries = entries,
                     BagIdentity = corpse.CorpseIdentity,
@@ -2317,7 +2148,7 @@ namespace CellAO.Core.Playfields
                     "Corpse InventoryUpdate sent looter={0} corpse={1} slots={2} unknown1=2 slot={3} unknown2=1 entries={4}",
                     looter.Identity,
                     corpse.CorpseIdentity,
-                    CorpseInventorySlots,
+                    CombatCorpseRules.CorpseInventorySlots,
                     corpse.InventorySlot,
                     entries.Length));
         }

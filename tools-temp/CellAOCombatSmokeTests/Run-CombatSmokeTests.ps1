@@ -58,48 +58,24 @@ function Get-PropertyValue {
     return (Get-RequiredProperty $Object.GetType() $Name).GetValue($Object, $null)
 }
 
-function Set-PropertyValue {
-    param(
-        [object]$Object,
-        [string]$Name,
-        [object]$Value
-    )
-
-    (Get-RequiredProperty $Object.GetType() $Name).SetValue($Object, $Value, $null)
-}
-
-function New-PrivateObject {
-    param(
-        [System.Type]$Type
-    )
-
-    return [System.Activator]::CreateInstance($Type, $true)
-}
-
-function New-LootItemState {
-    param(
-        [System.Type]$LootItemType,
-        [int]$Slot,
-        [bool]$Looted = $false
-    )
-
-    $item = New-PrivateObject $LootItemType
-    Set-PropertyValue $item 'Slot' $Slot
-    Set-PropertyValue $item 'Looted' $Looted
-    return $item
-}
-
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
-$solution = Join-Path $repoRoot 'CellAO\CellAO.sln'
+$zoneProject = Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ZoneEngine.csproj'
 $builtDir = Join-Path $repoRoot 'CellAO\Built\Debug'
 $zoneEngine = Join-Path $builtDir 'ZoneEngine.exe'
 $msbuild = 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe'
 
 if (-not $SkipBuild) {
     Assert-True (Test-Path $msbuild) "MSBuild was not found at $msbuild"
-    & $msbuild $solution /t:Build /p:Configuration=Debug /m
+    # Roslyn on older project graphs can throw MSB3883 when both Path and PATH
+    # exist in process environment with different casing. Keep only Path.
+    if ($env:Path) {
+        [System.Environment]::SetEnvironmentVariable('Path', $env:Path, 'Process')
+    }
+    [System.Environment]::SetEnvironmentVariable('PATH', $null, 'Process')
+
+    & $msbuild $zoneProject /t:Build /p:Configuration=Debug /p:Platform='AnyCPU' /m:1
     if ($LASTEXITCODE -ne 0) {
-        throw "CellAO solution build failed with exit code $LASTEXITCODE."
+        throw "ZoneEngine project build failed with exit code $LASTEXITCODE."
     }
 }
 
@@ -145,7 +121,9 @@ try {
 
     $zoneAssembly = [System.Reflection.Assembly]::LoadFrom($zoneEngine)
     $archetypeType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatTestMobArchetype'
-    $playfieldType = Get-RequiredType $zoneAssembly 'CellAO.Core.Playfields.Playfield'
+    $rulesType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatCorpseRules'
+    $visualsType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatCorpseVisuals'
+    $lootCatalogType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatTestLootCatalog'
 
     $allField = $archetypeType.GetField('All', [System.Reflection.BindingFlags]'Public, Static')
     Assert-True ($null -ne $allField) 'CombatTestMobArchetype.All is missing.'
@@ -201,17 +179,39 @@ try {
     $corpseMappings = @($corpseMappingsMethod.Invoke($null, @()))
     Assert-True ($corpseMappings.Count -eq $entries.Count) 'Corpse visual mapping count must match the combat test catalog count.'
 
-    $buildMap = Get-RequiredMethod $playfieldType 'BuildMonsterDataToCorpseCatMeshMap' ([System.Reflection.BindingFlags]'NonPublic, Static')
+    $buildMap = Get-RequiredMethod $visualsType 'BuildMonsterDataToCorpseCatMeshMap' ([System.Reflection.BindingFlags]'Public, Static')
     $monsterToCorpseMap = $buildMap.Invoke($null, @())
     foreach ($entry in $entries) {
         $monsterData = [int](Get-PropertyValue $entry 'MonsterData')
         $corpseCatMesh = [int](Get-PropertyValue $entry 'CorpseCatMesh')
-        Assert-True ([bool]$monsterToCorpseMap.ContainsKey($monsterData)) "MonsterData $monsterData is missing from the Playfield corpse visual map."
+        Assert-True ([bool]$monsterToCorpseMap.ContainsKey($monsterData)) "MonsterData $monsterData is missing from the corpse visual map."
         Assert-True ([int]$monsterToCorpseMap[$monsterData] -eq $corpseCatMesh) "MonsterData $monsterData maps to the wrong corpse CATMesh."
     }
 
-    $lifetimeMethod = Get-RequiredMethod $playfieldType 'CorpseLifetimeFor' ([System.Reflection.BindingFlags]'NonPublic, Static')
-    $lootClassType = $playfieldType.GetNestedType('CorpseLootClass', [System.Reflection.BindingFlags]'NonPublic')
+    $buildLootEntries = Get-RequiredMethod $lootCatalogType 'BuildEntries' ([System.Reflection.BindingFlags]'Public, Static')
+    $lootEntries = @($buildLootEntries.Invoke($null, @()))
+    Assert-True ($lootEntries.Count -eq ($entries.Count * 3)) 'Combat test loot catalog should have three entries per test mob.'
+
+    foreach ($entry in $entries) {
+        $displayName = Get-PropertyValue $entry 'DisplayName'
+        $monsterData = [int](Get-PropertyValue $entry 'MonsterData')
+        $npcFamily = [int](Get-PropertyValue $entry 'NpcFamily')
+        $matches = @($lootEntries | Where-Object {
+            $_.Matches($displayName, $monsterData, $npcFamily)
+        })
+        Assert-True ($matches.Count -eq 3) "Expected three loot table matches for $displayName, found $($matches.Count)."
+
+        foreach ($lootEntry in $matches) {
+            Assert-True (-not $lootEntry.Matches('Wrong Mob', $monsterData, $npcFamily)) "Loot entry for $displayName matched a wrong name."
+            Assert-True (-not $lootEntry.Matches($displayName, $monsterData + 1, $npcFamily)) "Loot entry for $displayName matched wrong MonsterData."
+            Assert-True ([int]$lootEntry.DropChancePercent -eq 100) "Test loot entry for $displayName must stay deterministic at 100 percent."
+            Assert-True ([int]$lootEntry.Quality -eq 1) "Test loot entry for $displayName should use quality 1."
+            Assert-True (@($lootEntry.ItemTemplateIds).Count -gt 0) "Test loot entry for $displayName has no item templates."
+        }
+    }
+
+    $lifetimeMethod = Get-RequiredMethod $rulesType 'LifetimeFor' ([System.Reflection.BindingFlags]'Public, Static')
+    $lootClassType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatCorpseLootClass'
     Assert-True ($null -ne $lootClassType) 'CorpseLootClass enum is missing.'
     $creditsOnly = [System.Enum]::Parse($lootClassType, 'CreditsOnly')
     $itemLoot = [System.Enum]::Parse($lootClassType, 'ItemLoot')
@@ -220,35 +220,68 @@ try {
     Assert-True ($lifetimeMethod.Invoke($null, @($itemLoot)).TotalSeconds -eq 60) 'Item-loot corpses should live for 60 seconds.'
     Assert-True ($lifetimeMethod.Invoke($null, @($majorBoss)).TotalMinutes -eq 30) 'Major boss corpses should live for 30 minutes.'
 
-    $rollLootChance = Get-RequiredMethod $playfieldType 'RollLootChance' ([System.Reflection.BindingFlags]'NonPublic, Static')
-    Assert-True (-not [bool]$rollLootChance.Invoke($null, @(0))) '0 percent loot chance should never roll true.'
-    Assert-True ([bool]$rollLootChance.Invoke($null, @(100))) '100 percent loot chance should always roll true.'
+    $lootClassFor = Get-RequiredMethod $rulesType 'LootClassFor' ([System.Reflection.BindingFlags]'Public, Static')
+    Assert-True ($lootClassFor.Invoke($null, @(0, $false)).Equals($creditsOnly)) 'No item loot should classify as CreditsOnly.'
+    Assert-True ($lootClassFor.Invoke($null, @(1, $false)).Equals($itemLoot)) 'Unlooted items should classify as ItemLoot.'
+    Assert-True ($lootClassFor.Invoke($null, @(0, $true)).Equals($majorBoss)) 'Boss corpses should classify as MajorBoss.'
 
-    $corpseStateType = $playfieldType.GetNestedType('DebugCorpseState', [System.Reflection.BindingFlags]'NonPublic')
-    $lootItemType = $playfieldType.GetNestedType('DebugCorpseLootItem', [System.Reflection.BindingFlags]'NonPublic')
-    Assert-True ($null -ne $corpseStateType) 'DebugCorpseState type is missing.'
-    Assert-True ($null -ne $lootItemType) 'DebugCorpseLootItem type is missing.'
+    $shouldDrop = Get-RequiredMethod $rulesType 'ShouldDrop' ([System.Reflection.BindingFlags]'Public, Static')
+    $lowRoll = [System.Func[int,int]]{ param([int]$max) 0 }
+    $highRoll = [System.Func[int,int]]{ param([int]$max) $max - 1 }
+    Assert-True (-not [bool]$shouldDrop.Invoke($null, @(0, $lowRoll))) '0 percent loot chance should never roll true.'
+    Assert-True ([bool]$shouldDrop.Invoke($null, @(100, $highRoll))) '100 percent loot chance should always roll true.'
+    Assert-True ([bool]$shouldDrop.Invoke($null, @(50, $lowRoll))) 'Low random roll should pass a 50 percent drop.'
+    Assert-True (-not [bool]$shouldDrop.Invoke($null, @(50, $highRoll))) 'High random roll should fail a 50 percent drop.'
 
-    $lootListType = ([System.Collections.Generic.List``1]).MakeGenericType($lootItemType)
-    $lootList = [System.Activator]::CreateInstance($lootListType)
-    [void]$lootList.Add((New-LootItemState $lootItemType 0))
-    [void]$lootList.Add((New-LootItemState $lootItemType 1))
+    $isUsableVisual = Get-RequiredMethod $visualsType 'IsUsableVisualId' ([System.Reflection.BindingFlags]'Public, Static')
+    Assert-True (-not [bool]$isUsableVisual.Invoke($null, @(0))) 'Zero is not a usable visual id.'
+    Assert-True (-not [bool]$isUsableVisual.Invoke($null, @(1234567890))) 'AO sentinel value is not a usable visual id.'
+    Assert-True ([bool]$isUsableVisual.Invoke($null, @(1))) 'Positive visual ids should be usable.'
 
-    $corpseState = New-PrivateObject $corpseStateType
-    Set-PropertyValue $corpseState 'LootItems' $lootList
+    $corpseCatMeshFor = Get-RequiredMethod $visualsType 'CorpseCatMeshFor' ([System.Reflection.BindingFlags]'Public, Static')
+    $corpseMonsterDataFor = Get-RequiredMethod $visualsType 'CorpseMonsterDataFor' ([System.Reflection.BindingFlags]'Public, Static')
+    $deathAnimationKeyFor = Get-RequiredMethod $visualsType 'DeathAnimationKeyFor' ([System.Reflection.BindingFlags]'Public, Static')
+    $firstEntry = $entries[0]
+    $firstMonsterData = [int](Get-PropertyValue $firstEntry 'MonsterData')
+    $firstCorpseCatMesh = [int](Get-PropertyValue $firstEntry 'CorpseCatMesh')
+    Assert-True ([int]$corpseCatMeshFor.Invoke($null, @(999, $firstMonsterData, $monsterToCorpseMap)) -eq 999) 'Usable CATMesh should win over MonsterData mapping.'
+    Assert-True ([int]$corpseCatMeshFor.Invoke($null, @(0, $firstMonsterData, $monsterToCorpseMap)) -eq $firstCorpseCatMesh) 'MonsterData mapping should provide corpse CATMesh fallback.'
+    Assert-True ([int]$corpseMonsterDataFor.Invoke($null, @(0, $firstCorpseCatMesh)) -eq $firstCorpseCatMesh) 'Corpse monster data should fall back to CATMesh.'
+    Assert-True ([int]$deathAnimationKeyFor.Invoke($null, @(777, 888, 0x1F7)) -eq 777) 'Corpse animation key should win over item animation.'
+    Assert-True ([int]$deathAnimationKeyFor.Invoke($null, @(0, 888, 0x1F7)) -eq 888) 'Item animation should be the second death animation choice.'
+    Assert-True ([int]$deathAnimationKeyFor.Invoke($null, @(0, 0, 0x1F7)) -eq 0x1F7) 'Default death animation should be used when no visual keys exist.'
 
-    $findCorpseLootItem = Get-RequiredMethod $playfieldType 'FindCorpseLootItem' ([System.Reflection.BindingFlags]'NonPublic, Static')
-    $exactSlot = $findCorpseLootItem.Invoke($null, @($corpseState, 0))
-    Assert-True ((Get-PropertyValue $exactSlot 'Slot') -eq 0) 'Exact corpse loot slot lookup failed.'
-    $oneBasedSlot = $findCorpseLootItem.Invoke($null, @($corpseState, 2))
-    Assert-True ((Get-PropertyValue $oneBasedSlot 'Slot') -eq 1) 'One-based corpse loot slot lookup failed.'
+    $findLootItemGeneric = Get-RequiredMethod $rulesType 'FindLootItem' ([System.Reflection.BindingFlags]'Public, Static')
+    $findLootItem = $findLootItemGeneric.MakeGenericMethod([object])
+    $slotSelector = [System.Func[object,int]]{ param($x) [int]$x.Slot }
+    $lootedSelector = [System.Func[object,bool]]{ param($x) [bool]$x.Looted }
 
-    $singleLootList = [System.Activator]::CreateInstance($lootListType)
-    [void]$singleLootList.Add((New-LootItemState $lootItemType 0 $true))
-    $singleCorpseState = New-PrivateObject $corpseStateType
-    Set-PropertyValue $singleCorpseState 'LootItems' $singleLootList
-    $missingLooted = $findCorpseLootItem.Invoke($null, @($singleCorpseState, 0))
+    $lootItems = [object[]]@(
+        [pscustomobject]@{ Slot = 0; Looted = $false },
+        [pscustomobject]@{ Slot = 1; Looted = $false }
+    )
+    $exactSlot = $findLootItem.Invoke($null, @($lootItems, 0, $slotSelector, $lootedSelector))
+    Assert-True ([int]$exactSlot.Slot -eq 0) 'Exact corpse loot slot lookup failed.'
+    $oneBasedSlot = $findLootItem.Invoke($null, @($lootItems, 2, $slotSelector, $lootedSelector))
+    Assert-True ([int]$oneBasedSlot.Slot -eq 1) 'One-based corpse loot slot lookup failed.'
+
+    $singleRemaining = [object[]]@(
+        [pscustomobject]@{ Slot = 5; Looted = $false }
+    )
+    $singleFallback = $findLootItem.Invoke($null, @($singleRemaining, 1, $slotSelector, $lootedSelector))
+    Assert-True ([int]$singleFallback.Slot -eq 5) 'Single remaining corpse loot fallback failed.'
+
+    $allLooted = [object[]]@(
+        [pscustomobject]@{ Slot = 0; Looted = $true }
+    )
+    $missingLooted = $findLootItem.Invoke($null, @($allLooted, 0, $slotSelector, $lootedSelector))
     Assert-True ($null -eq $missingLooted) 'Looted corpse item should not be returned.'
+
+    $entryCountFor = Get-RequiredMethod $rulesType 'InventoryEntryCountFor' ([System.Reflection.BindingFlags]'Public, Static')
+    Assert-True ([int]$entryCountFor.Invoke($null, @(0)) -eq 1) 'Zero stack count should display as one.'
+    Assert-True ([int]$entryCountFor.Invoke($null, @(1234567890)) -eq 1) 'AO sentinel stack count should display as one.'
+    Assert-True ([int]$entryCountFor.Invoke($null, @(7)) -eq 7) 'Normal stack count should be preserved.'
+    Assert-True ([int]$entryCountFor.Invoke($null, @(40000)) -eq [System.Int16]::MaxValue) 'Large stack count should clamp to Int16 max.'
 
     Write-Host '[PASS] Combat smoke tests passed.'
 }
