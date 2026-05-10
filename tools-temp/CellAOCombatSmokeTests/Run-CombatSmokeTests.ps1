@@ -122,6 +122,7 @@ try {
     $zoneAssembly = [System.Reflection.Assembly]::LoadFrom($zoneEngine)
     $archetypeType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatTestMobArchetype'
     $rulesType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatCorpseRules'
+    $damageRulesType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatDamageRules'
     $visualsType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatCorpseVisuals'
     $lootCatalogType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatTestLootCatalog'
 
@@ -282,6 +283,15 @@ try {
     Assert-True ([int]$entryCountFor.Invoke($null, @(1234567890)) -eq 1) 'AO sentinel stack count should display as one.'
     Assert-True ([int]$entryCountFor.Invoke($null, @(7)) -eq 7) 'Normal stack count should be preserved.'
     Assert-True ([int]$entryCountFor.Invoke($null, @(40000)) -eq [System.Int16]::MaxValue) 'Large stack count should clamp to Int16 max.'
+
+    $calculateDamage = Get-RequiredMethod $damageRulesType 'Calculate' ([System.Reflection.BindingFlags]'Public, Static')
+    Assert-True ([int]$calculateDamage.Invoke($null, @(0, 0, 0, 1, $true)) -eq 15) 'Player fallback damage should prevent 1-damage regressions.'
+    Assert-True ([int]$calculateDamage.Invoke($null, @(0, 0, 0, 1, $false)) -eq 1) 'Level 1 NPC fallback damage should be 1.'
+    Assert-True ([int]$calculateDamage.Invoke($null, @(0, 0, 0, 4, $false)) -eq 4) 'NPC level should drive fallback damage above level 1.'
+    Assert-True ([int]$calculateDamage.Invoke($null, @(0, 5, 0, 1, $true)) -eq 15) 'Player fallback should still beat weak max damage.'
+    Assert-True ([int]$calculateDamage.Invoke($null, @(0, 20, 3, 1, $true)) -eq 23) 'Max damage plus bonus should beat player fallback.'
+    Assert-True ([int]$calculateDamage.Invoke($null, @(10, 5, 2, 1, $false)) -eq 12) 'Min damage should raise lower max damage before bonus.'
+    Assert-True ([int]$calculateDamage.Invoke($null, @(-10, -5, -3, 1, $true)) -eq 15) 'Negative combat stats should not lower player fallback damage.'
 
     Write-Host '[PASS] Combat smoke tests passed.'
 }

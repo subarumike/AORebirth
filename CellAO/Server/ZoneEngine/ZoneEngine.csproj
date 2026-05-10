@@ -108,6 +108,7 @@
     <Compile Include="Core\Controllers\NPCController.cs" />
     <Compile Include="Core\Controllers\PlayerController.cs" />
     <Compile Include="Core\CombatCorpseRules.cs" />
+    <Compile Include="Core\CombatDamageRules.cs" />
     <Compile Include="Core\CombatTestMobArchetype.cs" />
     <Compile Include="Core\Functions\FunctionCollection.cs" />
     <Compile Include="Core\Functions\FunctionPrototype.cs" />

@@ -1104,18 +1104,12 @@ namespace CellAO.Core.Playfields
 
         private int CalculateCombatDamage(ICharacter attacker)
         {
-            int minDamage = Math.Max(0, attacker.Stats[StatIds.mindamage].Value);
-            int maxDamage = Math.Max(minDamage, attacker.Stats[StatIds.maxdamage].Value);
-            int damageBonus = Math.Max(0, attacker.Stats[StatIds.damagebonus].Value);
-
-            int fallbackDamage = attacker.Controller is PlayerController ? 15 : 1;
-
-            if (maxDamage > 0)
-            {
-                return Math.Max(fallbackDamage, maxDamage + damageBonus);
-            }
-
-            return Math.Max(fallbackDamage, attacker.Stats[StatIds.level].Value + damageBonus);
+            return CombatDamageRules.Calculate(
+                attacker.Stats[StatIds.mindamage].Value,
+                attacker.Stats[StatIds.maxdamage].Value,
+                attacker.Stats[StatIds.damagebonus].Value,
+                attacker.Stats[StatIds.level].Value,
+                attacker.Controller is PlayerController);
         }
 
         private void KillNpcTarget(ICharacter target)
