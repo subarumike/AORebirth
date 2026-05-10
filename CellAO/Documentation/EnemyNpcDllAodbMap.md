@@ -114,6 +114,20 @@ Useful conclusion:
 - Key `6000` is the reliable AODB death animation mapping for these creature records.
 - Current hardcoded `MonsterDataToCorpseCatMesh` can become data-driven from AODB-derived mappings later. For now, do not add a runtime dependency on the model-viewer DLLs inside ZoneEngine.
 
+## Client RDB Zone Enemy Hints
+
+Generated evidence files:
+- `Documentation\ClientRdbZoneEnemyHints.csv`
+- `Documentation\ClientRdbNpcTemplateHints.csv`
+
+Extractor:
+- `tools-temp\ao-client-rdb-hints\Export-AOClientZoneEnemyHints.ps1`
+
+Useful interpretation:
+- Client RDB type `1040023` gives NPC/monster template-name hints, including `17655=leet`, `17687=rollerrat`, `30252=giant snake`, and `31114=rhinoman female`.
+- Client RDB type `1000014` gives playfield district names with enemy-family hints. Example: playfield `565` Newland Desert includes `Rhinoman Camp`, `Dynacamp3 30-35 Leets`, `Dynacamp11 30-35 Snakes`, and related creature-family districts.
+- These are good for choosing which enemy families belong in a zone. They are not exact spawn position/count/timer tables.
+
 ## Action and Animation Hints
 
 CellAO docs:

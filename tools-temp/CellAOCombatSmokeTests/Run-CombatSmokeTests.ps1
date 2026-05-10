@@ -88,6 +88,8 @@ $fullCharacterSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\Zone
 $clientConnectedSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs')
 $baseInventorySource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\CellAO.Core\Inventory\BaseInventoryPages.cs')
 $playfieldSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\Playfields\Playfield.cs')
+$zoneEnemyHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbZoneEnemyHints.csv'
+$npcTemplateHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbNpcTemplateHints.csv'
 
 Assert-SourceMatch $fullCharacterSource 'MsgVersion\s*=\s*26\s*;' 'FullCharacter login packet must stay on live-compatible MsgVersion 26.'
 Assert-SourceMatch $clientConnectedSource 'InitializeActionableState\s*\(\s*client\s*\)\s*;' 'ClientConnected must initialize the live-style actionable login state.'
@@ -104,6 +106,20 @@ Assert-SourceMatch $clientConnectedSource 'Stats\s*\[\s*stat\s*\]\.Value\s*=\s*v
 Assert-SourceMatch $clientConnectedSource 'Stats\s*\[\s*stat\s*\]\.BaseValue\s*=\s*\(uint\)\s*value\s*;' 'Login SetStat helper should update the live stat base value.'
 Assert-SourceMatch $baseInventorySource 'InventoryItemRules\.HasSameUniqueItem' 'Inventory add path must use shared unique-item rules.'
 Assert-SourceMatch $playfieldSource 'InventoryItemRules\.HasSameUniqueItem' 'Corpse loot path must use shared unique-item rules.'
+Assert-True (Test-Path $zoneEnemyHintsPath) 'Client RDB zone enemy hint catalog is missing.'
+Assert-True (Test-Path $npcTemplateHintsPath) 'Client RDB NPC template hint catalog is missing.'
+
+$zoneEnemyHints = @(Import-Csv $zoneEnemyHintsPath)
+$npcTemplateHints = @(Import-Csv $npcTemplateHintsPath)
+$newlandDesertHints = $zoneEnemyHints | Where-Object { [int]$_.PlayfieldId -eq 565 } | Select-Object -First 1
+Assert-True ($null -ne $newlandDesertHints) 'Client RDB hints should include Newland Desert playfield 565.'
+Assert-True ($newlandDesertHints.EnemyKeywords -match 'rhinoman') 'Newland Desert hints should include rhinoman.'
+Assert-True ($newlandDesertHints.EnemyKeywords -match 'leet') 'Newland Desert hints should include leet.'
+Assert-True ($newlandDesertHints.EnemyKeywords -match 'snake') 'Newland Desert hints should include snake.'
+Assert-True ($null -ne ($npcTemplateHints | Where-Object { [int]$_.TemplateId -eq 17655 -and $_.Name -eq 'leet' } | Select-Object -First 1)) 'Client RDB NPC hints should include leet template 17655.'
+Assert-True ($null -ne ($npcTemplateHints | Where-Object { [int]$_.TemplateId -eq 17687 -and $_.Name -eq 'rollerrat' } | Select-Object -First 1)) 'Client RDB NPC hints should include rollerrat template 17687.'
+Assert-True ($null -ne ($npcTemplateHints | Where-Object { [int]$_.TemplateId -eq 30252 -and $_.Name -eq 'giant snake' } | Select-Object -First 1)) 'Client RDB NPC hints should include giant snake template 30252.'
+Assert-True ($null -ne ($npcTemplateHints | Where-Object { [int]$_.TemplateId -eq 31114 -and $_.Name -eq 'rhinoman female' } | Select-Object -First 1)) 'Client RDB NPC hints should include rhinoman female template 31114.'
 
 if (-not $SkipBuild) {
     Assert-True (Test-Path $msbuild) "MSBuild was not found at $msbuild"

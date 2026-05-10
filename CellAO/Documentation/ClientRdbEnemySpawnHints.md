@@ -1,0 +1,57 @@
+# Client RDB Enemy Spawn Hints
+
+The AO client does not appear to contain exact live spawn tables, but it does contain useful evidence for which enemy families belong to which playfields and districts.
+
+Generated files:
+
+- `ClientRdbZoneEnemyHints.csv`: playfield-level enemy hints from client district, area, and statel records.
+- `ClientRdbNpcTemplateHints.csv`: NPC/monster template-name hints from client RDB type `1040023`.
+
+Extractor:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools-temp\ao-client-rdb-hints\Export-AOClientZoneEnemyHints.ps1
+```
+
+Default client input:
+
+- `C:\Funcom\Anarchy Online\cd_image\data\db\ResourceDatabase.idx`
+
+Default AODB reader input:
+
+- `C:\Users\Mike\Documents\AO programs\aodb-master\AODB\bin\Debug`
+
+## Record Types
+
+| Type | Meaning |
+| ---: | --- |
+| `1000001` | Playfield name records |
+| `1000014` | Playfield district records |
+| `1000029` | Area description records |
+| `1000026` | Statel/door/object text records |
+| `1040023` | NPC/monster template-name records |
+
+## Useful Early Rows
+
+| Playfield | Name | Enemy hints |
+| ---: | --- | --- |
+| `952` | Clan Training | monster-level district hints |
+| `954` | Neutral Training | monster/MOB district hints |
+| `565` | Newland Desert | rhinoman, leet, snake, lizard, bronto, flea, scorpiod, salamander |
+| `585` | Aegean | snake, rhinoman, hound, mechdog, anun, leet, flea, rollerrat |
+| `600` | Varmint Woods | rhinoman, bronto, lizard, spider, leet |
+
+## Useful NPC Template Rows
+
+| TemplateId | Name |
+| ---: | --- |
+| `17655` | leet |
+| `17687` | rollerrat |
+| `30252` | giant snake |
+| `31114` | rhinoman female |
+| `32419` | sewer snake |
+| `40063` | rollerrat queen |
+
+## How To Use This
+
+Use this as a source-of-truth hint layer when choosing what enemy families to seed into a playfield. Do not treat it as final spawn truth for position, density, respawn timers, or pathing; those still need live packet evidence, server-side data, or explicit design choices.

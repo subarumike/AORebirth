@@ -35,6 +35,10 @@
 
 [N3 Message IDs](./N3MessageIDs.md)
 
+[Enemy/NPC DLL and AODB Map](./EnemyNpcDllAodbMap.md)
+
+[Client RDB Enemy Spawn Hints](./ClientRdbEnemySpawnHints.md)
+
 
 
 ----------
