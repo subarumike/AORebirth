@@ -62,5 +62,7 @@ The GM combat-test spawn path now uses these hints for supported low-level test 
 
 - `/command spawn hints`: lists the supported combat test mobs mapped to the current playfield by the client hint catalog.
 - `/command spawn zone`: spawns one of each supported mapped test mob near the GM for the current playfield.
+- `/command spawn status`: shows live combat test mobs in the current playfield.
+- `/command spawn clear`: despawns live combat test mobs and their test corpses in the current playfield without changing DB rows.
 
 This is intentionally a test harness, not a final world-population system. It lets us quickly validate client-visible mob families in the right zones while we continue mapping real spawn positions, density, pathing, and respawn rules.

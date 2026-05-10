@@ -407,6 +407,47 @@ namespace CellAO.Core.Playfields
             this.Announce(DespawnMessageHandler.Default.Create(identity));
         }
 
+        public void DespawnNpcImmediately(ICharacter target)
+        {
+            if (target == null || target.Identity.Type != IdentityType.CanbeAffected)
+            {
+                return;
+            }
+
+            this.StopFightingDeadTarget(target.Identity);
+            this.pendingDebugCorpseSpawns.Remove(target.Identity.Instance);
+            this.FinalizeNpcDespawn(target);
+        }
+
+        public int DespawnDebugCorpses(Func<string, Identity, bool> shouldDespawn)
+        {
+            if (shouldDespawn == null)
+            {
+                return 0;
+            }
+
+            int removed = 0;
+            foreach (DebugCorpseState corpse in this.pendingDebugCorpseSpawns
+                .Where(x => shouldDespawn(x.Value.Name, x.Value.DeadNpcIdentity))
+                .Select(x => x.Value)
+                .ToList())
+            {
+                this.pendingDebugCorpseSpawns.Remove(corpse.DeadNpcIdentity.Instance);
+                removed++;
+            }
+
+            foreach (int corpseInstance in this.debugCorpses
+                .Where(x => shouldDespawn(x.Value.Name, x.Value.DeadNpcIdentity))
+                .Select(x => x.Key)
+                .ToList())
+            {
+                this.DespawnDebugCorpse(corpseInstance);
+                removed++;
+            }
+
+            return removed;
+        }
+
         /// <summary>
         /// </summary>
         public void DisconnectAllClients()

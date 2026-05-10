@@ -40,6 +40,7 @@ namespace ZoneEngine.ChatCommands
 
     using CellAO.Core.Entities;
     using CellAO.Core.NPCHandler;
+    using CellAO.Core.Playfields;
     using CellAO.Core.Vector;
     using CellAO.Database.Dao;
     using CellAO.Enums;
@@ -84,7 +85,9 @@ namespace ZoneEngine.ChatCommands
 
             if ((args.Length == 2)
                 && ((string.Compare(args[1], "hints", true) == 0)
-                    || (string.Compare(args[1], "zone", true) == 0)))
+                    || (string.Compare(args[1], "zone", true) == 0)
+                    || (string.Compare(args[1], "status", true) == 0)
+                    || (string.Compare(args[1], "clear", true) == 0)))
             {
                 return true;
             }
@@ -127,6 +130,8 @@ Spawn the current combat test mob: /command spawnleet
 Spawn combat test mob aliases: /command spawn testmobs
 List client-hinted test mobs for this playfield: /command spawn hints
 Spawn client-hinted test mobs for this playfield: /command spawn zone
+Show live combat test mobs for this playfield: /command spawn status
+Clear live combat test mobs/corpses for this playfield: /command spawn clear
 Filter will be applied to mob name"));
         }
 
@@ -200,6 +205,18 @@ Filter will be applied to mob name"));
             if ((args.Length == 2) && (string.Compare(args[1], "hints", true) == 0))
             {
                 this.ListClientHintedMobs(character);
+                return;
+            }
+
+            if ((args.Length == 2) && (string.Compare(args[1], "status", true) == 0))
+            {
+                this.ShowCombatTestMobStatus(character);
+                return;
+            }
+
+            if ((args.Length == 2) && (string.Compare(args[1], "clear", true) == 0))
+            {
+                this.ClearCombatTestMobs(character);
                 return;
             }
 
@@ -328,6 +345,13 @@ Filter will be applied to mob name"));
             character.Playfield.Publish(ChatTextMessageHandler.Default.CreateIM(character, "Spawncount on this PF: "+Pool.Instance.GetAll<ICharacter>(character.Playfield.Identity).Count(x => x.Controller is NPCController)));
         }
 
+        private static List<ICharacter> GetLiveCombatTestMobs(ICharacter character)
+        {
+            return Pool.Instance.GetAll<ICharacter>(character.Playfield.Identity, (int)IdentityType.CanbeAffected)
+                .Where(CombatTestMobArchetype.IsCombatTestMob)
+                .ToList();
+        }
+
         private static bool TryResolveCombatTestMob(string[] args, out CombatTestMobArchetype.Entry combatTestMob)
         {
             combatTestMob = null;
@@ -361,6 +385,68 @@ Filter will be applied to mob name"));
             }
 
             character.Playfield.Publish(ChatTextMessageHandler.Default.CreateIM(character, text.ToString()));
+        }
+
+        private void ShowCombatTestMobStatus(ICharacter character)
+        {
+            List<ICharacter> liveTestMobs = GetLiveCombatTestMobs(character);
+            List<CombatTestMobArchetype.Entry> hintedEntries =
+                CombatTestMobArchetype.ForPlayfield(character.Playfield.Identity.Instance).ToList();
+
+            var text = new StringBuilder();
+            text.AppendLine(
+                string.Format(
+                    "Combat test mob status for playfield {0}:",
+                    character.Playfield.Identity.Instance));
+            text.AppendLine(string.Format("Live test mobs: {0}", liveTestMobs.Count));
+            foreach (ICharacter mob in liveTestMobs)
+            {
+                text.AppendLine(string.Format("- {0} {1}", mob.Name, mob.Identity.ToString(true)));
+            }
+
+            text.AppendLine(
+                string.Format(
+                    "Client-hinted supported mobs: {0}",
+                    hintedEntries.Count == 0
+                        ? "none"
+                        : string.Join(", ", hintedEntries.Select(x => x.DisplayName))));
+
+            character.Playfield.Publish(ChatTextMessageHandler.Default.CreateIM(character, text.ToString()));
+        }
+
+        private void ClearCombatTestMobs(ICharacter character)
+        {
+            List<ICharacter> liveTestMobs = GetLiveCombatTestMobs(character);
+            Playfield playfield = character.Playfield as Playfield;
+
+            foreach (ICharacter mob in liveTestMobs)
+            {
+                if (playfield != null)
+                {
+                    playfield.DespawnNpcImmediately(mob);
+                }
+                else
+                {
+                    character.Playfield.Despawn(mob.Identity);
+                    Pool.Instance.RemoveObject((Character)mob);
+                }
+            }
+
+            int corpseCount = 0;
+            if (playfield != null)
+            {
+                corpseCount = playfield.DespawnDebugCorpses(
+                    (name, deadNpc) => CombatTestMobArchetype.IsCombatTestCorpseName(name));
+            }
+
+            character.Playfield.Publish(
+                ChatTextMessageHandler.Default.CreateIM(
+                    character,
+                    string.Format(
+                        "Cleared {0} live combat test mobs and {1} combat test corpses from playfield {2}.",
+                        liveTestMobs.Count,
+                        corpseCount,
+                        character.Playfield.Identity.Instance)));
         }
 
         private void ListClientHintedMobs(ICharacter character)

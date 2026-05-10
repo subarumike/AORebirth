@@ -91,6 +91,35 @@ function Convert-EnumerableToArray {
     return @($items)
 }
 
+function Stop-BuiltOutputProcesses {
+    param(
+        [string]$BuiltDirectory
+    )
+
+    $normalizedBuiltDir = ([System.IO.Path]::GetFullPath($BuiltDirectory)).TrimEnd('\') + '\'
+    $staleProcesses = Get-Process -ErrorAction SilentlyContinue | Where-Object {
+        try {
+            if (-not $_.Path) {
+                return $false
+            }
+
+            $processPath = [System.IO.Path]::GetFullPath($_.Path)
+            return $processPath.StartsWith($normalizedBuiltDir, [System.StringComparison]::OrdinalIgnoreCase)
+        }
+        catch {
+            return $false
+        }
+    }
+
+    if ($staleProcesses) {
+        $staleProcesses | ForEach-Object {
+            Write-Host "Stopping stale built-output process $($_.ProcessName) (pid=$($_.Id))"
+        }
+        $staleProcesses | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Milliseconds 500
+    }
+}
+
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 $zoneProject = Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ZoneEngine.csproj'
 $builtDir = Join-Path $repoRoot 'CellAO\Built\Debug'
@@ -101,6 +130,7 @@ $fullCharacterSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\Zone
 $clientConnectedSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs')
 $baseInventorySource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\CellAO.Core\Inventory\BaseInventoryPages.cs')
 $playfieldSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\Playfields\Playfield.cs')
+$spawnCommandSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ChatCommands\Spawn.cs')
 $zoneEnemyHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbZoneEnemyHints.csv'
 $npcTemplateHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbNpcTemplateHints.csv'
 
@@ -119,6 +149,10 @@ Assert-SourceMatch $clientConnectedSource 'Stats\s*\[\s*stat\s*\]\.Value\s*=\s*v
 Assert-SourceMatch $clientConnectedSource 'Stats\s*\[\s*stat\s*\]\.BaseValue\s*=\s*\(uint\)\s*value\s*;' 'Login SetStat helper should update the live stat base value.'
 Assert-SourceMatch $baseInventorySource 'InventoryItemRules\.HasSameUniqueItem' 'Inventory add path must use shared unique-item rules.'
 Assert-SourceMatch $playfieldSource 'InventoryItemRules\.HasSameUniqueItem' 'Corpse loot path must use shared unique-item rules.'
+Assert-SourceMatch $playfieldSource 'DespawnNpcImmediately\s*\(' 'Playfield should expose immediate NPC despawn for controlled GM test cleanup.'
+Assert-SourceMatch $playfieldSource 'DespawnDebugCorpses\s*\(' 'Playfield should expose debug corpse cleanup for controlled GM test cleanup.'
+Assert-SourceMatch $spawnCommandSource '"status"' 'Spawn command should support combat test status.'
+Assert-SourceMatch $spawnCommandSource '"clear"' 'Spawn command should support combat test cleanup.'
 Assert-True (Test-Path $zoneEnemyHintsPath) 'Client RDB zone enemy hint catalog is missing.'
 Assert-True (Test-Path $npcTemplateHintsPath) 'Client RDB NPC template hint catalog is missing.'
 
@@ -136,6 +170,7 @@ Assert-True ($null -ne ($npcTemplateHints | Where-Object { [int]$_.TemplateId -e
 
 if (-not $SkipBuild) {
     Assert-True (Test-Path $msbuild) "MSBuild was not found at $msbuild"
+    Stop-BuiltOutputProcesses -BuiltDirectory $builtDir
     # Roslyn on older project graphs can throw MSB3883 when both Path and PATH
     # exist in process environment with different casing. Keep only Path.
     if ($env:Path) {
@@ -219,6 +254,7 @@ try {
     $tryGetByAlias = Get-RequiredMethod $archetypeType 'TryGetByAlias' ([System.Reflection.BindingFlags]'Public, Static')
     $tryGetByName = Get-RequiredMethod $archetypeType 'TryGetByName' ([System.Reflection.BindingFlags]'Public, Static')
     $forPlayfield = Get-RequiredMethod $archetypeType 'ForPlayfield' ([System.Reflection.BindingFlags]'Public, Static')
+    $isCombatTestCorpseName = Get-RequiredMethod $archetypeType 'IsCombatTestCorpseName' ([System.Reflection.BindingFlags]'Public, Static')
 
     $seenKeys = @{}
     $seenAliases = @{}
@@ -268,6 +304,9 @@ try {
     Assert-True (($hintedAegean | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'rollerrat' }).Count -eq 1) 'Aegean should map to the client-hinted test rollerrat.'
     Assert-True ($hintedWailingWastes.Count -eq 1 -and (Get-PropertyValue $hintedWailingWastes[0] 'Key') -eq 'rollerrat') 'Wailing Wastes should map to only the supported test rollerrat.'
     Assert-True ($hintedUnknown.Count -eq 0) 'Unknown playfields should not invent client-hinted test mobs.'
+    Assert-True ([bool]$isCombatTestCorpseName.Invoke($null, @('Remains of Codex Test Beach Leet'))) 'Combat test corpse names should be recognized for cleanup.'
+    Assert-True (-not [bool]$isCombatTestCorpseName.Invoke($null, @('Remains of Random Live Mob'))) 'Non-test corpse names should not be recognized for cleanup.'
+    Assert-True (-not [bool]$isCombatTestCorpseName.Invoke($null, @('Codex Test Beach Leet'))) 'Live mob names should not be treated as corpse names.'
 
     $corpseMappingsMethod = Get-RequiredMethod $archetypeType 'CorpseVisualMappings' ([System.Reflection.BindingFlags]'Public, Static')
     $corpseMappings = @($corpseMappingsMethod.Invoke($null, @()))

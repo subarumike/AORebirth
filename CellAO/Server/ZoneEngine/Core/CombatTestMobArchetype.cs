@@ -138,6 +138,23 @@ namespace ZoneEngine.Core
             return false;
         }
 
+        public static bool IsCombatTestCorpseName(string corpseName)
+        {
+            if (string.IsNullOrWhiteSpace(corpseName))
+            {
+                return false;
+            }
+
+            const string Prefix = "Remains of ";
+            if (!corpseName.StartsWith(Prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            Entry ignored;
+            return TryGetByName(corpseName.Substring(Prefix.Length), out ignored);
+        }
+
         public static IEnumerable<Entry> ForPlayfield(int playfieldId)
         {
             foreach (Entry entry in All)
