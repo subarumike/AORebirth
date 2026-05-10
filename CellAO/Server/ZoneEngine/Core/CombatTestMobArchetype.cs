@@ -80,12 +80,76 @@ namespace ZoneEngine.Core
             5,
             new[] { 551, 585 });
 
+        public static readonly Entry DuneFlea = new Entry(
+            "duneflea",
+            new[] { "duneflea", "flea" },
+            "A096",
+            "Codex Test Dune Flea",
+            4,
+            58,
+            17657,
+            15231,
+            93,
+            25,
+            6,
+            5,
+            new[] { 565, 585, 716 });
+
+        public static readonly Entry SurfLizard = new Entry(
+            "surflizard",
+            new[] { "surflizard", "lizard" },
+            "A000",
+            "Codex Test Surf Lizard",
+            1,
+            25,
+            22794,
+            22773,
+            90,
+            37,
+            6,
+            5,
+            new[] { 565, 600, 605 });
+
+        public static readonly Entry CliffMalle = new Entry(
+            "cliffmalle",
+            new[] { "cliffmalle", "malle" },
+            "A035",
+            "Codex Test Cliff Malle",
+            2,
+            70,
+            17660,
+            15239,
+            69,
+            38,
+            6,
+            5,
+            new[] { 716 });
+
+        public static readonly Entry ReefSalamander = new Entry(
+            "reefsalamander",
+            new[] { "reefsalamander", "salamander" },
+            "A034",
+            "Codex Test Reef Salamander",
+            3,
+            70,
+            30354,
+            23344,
+            92,
+            57,
+            6,
+            5,
+            new[] { 565 });
+
         public static readonly Entry[] All =
         {
             BeachLeet,
             IslandReet,
             ShoreSnake,
-            StowawayRollerrat
+            StowawayRollerrat,
+            DuneFlea,
+            SurfLizard,
+            CliffMalle,
+            ReefSalamander
         };
 
         private const int LiveObservedDeathActionKey = 0x1F7;

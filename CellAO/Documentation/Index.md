@@ -39,6 +39,8 @@
 
 [Client RDB Enemy Spawn Hints](./ClientRdbEnemySpawnHints.md)
 
+[Enemy Spawn Coverage](./EnemySpawnCoverage.md)
+
 
 
 ----------

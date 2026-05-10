@@ -6,6 +6,8 @@ Generated files:
 
 - `ClientRdbZoneEnemyHints.csv`: playfield-level enemy hints from client district, area, and statel records.
 - `ClientRdbNpcTemplateHints.csv`: NPC/monster template-name hints from client RDB type `1040023`.
+- `ClientHintedEnemyCoverage.csv`: client-hinted enemy families compared against the current supported combat test catalog.
+- `MonsterDataCorpseVisualHints.csv`: CellAO mob templates matched to local model-viewer `MonsterData -> CatMesh` data.
 
 Extractor:
 
@@ -64,5 +66,7 @@ The GM combat-test spawn path now uses these hints for supported low-level test 
 - `/command spawn zone`: spawns one of each supported mapped test mob near the GM for the current playfield.
 - `/command spawn status`: shows live combat test mobs in the current playfield.
 - `/command spawn clear`: despawns live combat test mobs and their test corpses in the current playfield without changing DB rows.
+
+Currently supported families: leet, reet, snake, rollerrat, flea, lizard, malle, salamander.
 
 This is intentionally a test harness, not a final world-population system. It lets us quickly validate client-visible mob families in the right zones while we continue mapping real spawn positions, density, pathing, and respawn rules.

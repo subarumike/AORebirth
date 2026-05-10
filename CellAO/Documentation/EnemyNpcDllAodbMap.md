@@ -36,7 +36,7 @@ Spawn/load:
   - `InstantiateMobSpawn` creates persistent DB spawns from explicit stat rows.
 - `Server\ZoneEngine\Core\CombatTestMobArchetype.cs`
   - Current debug enemy path owns a small combat test mob catalog, starting with `Codex Test Beach Leet` from template `A004`.
-  - GM aliases can spawn tested low-level mobs without DB changes: `beachleet`, `reet`, `snake`, `rollerrat`.
+  - GM aliases can spawn tested low-level mobs without DB changes: `beachleet`, `reet`, `snake`, `rollerrat`, `flea`, `lizard`, `malle`, `salamander`.
   - `/command spawn hints` lists supported test mobs mapped from the client RDB enemy hint catalog for the current playfield.
   - `/command spawn zone` spawns one of each supported client-hinted test mob near the GM for the current playfield.
   - `/command spawn status` and `/command spawn clear` keep repeated combat/corpse testing from requiring engine restarts or DB cleanup.
@@ -107,6 +107,10 @@ Queried through `AODB.RdbController("C:\Funcom\Anarchy Online")`.
 | Island Reet `A001` | `30365` | `25733` | local CatMesh map | test catalog entry |
 | Shore Snake `A003` | `30252` | `23353` | local CatMesh map | test catalog entry |
 | Stowaway Rollerrat `A012` | `17687` | `15272` | local CatMesh map | test catalog entry |
+| Dune Flea `A096` | `17657` | `15231` | local CatMesh map | test catalog entry |
+| Surf Lizard `A000` | `22794` | `22773` | local CatMesh map | test catalog entry |
+| Cliff Malle `A035` | `17660` | `15239` | local CatMesh map | test catalog entry |
+| Reef Salamander `A034` | `30354` | `23344` | local CatMesh map | test catalog entry |
 | Cheerleet `EERL` | `247832` | `247821` | `ai_cutecreature_cheerleetr.cir` | same cutecreature anim set, `6000 -> 18107:cutecreature_die-pain_01_01.ani` |
 | Masculeet `ASCU` | `247831` | `247826` | `ai_cutecreature_mascu-leet.cir` | same cutecreature anim set, `6000 -> 18107:cutecreature_die-pain_01_01.ani` |
 | Rhinoman test | `31114` | `31102` | `rhinoman_female.cir` | `1030 -> unarmed-start`, `1031 -> idle-unarmed`, `1032 -> unarmed-stop`, `1034 -> attack-teeth`, `1037 -> attack-head`, `6000 -> 15397:rhinoman_die-pain_01_01.ani` |
@@ -122,6 +126,8 @@ Useful conclusion:
 Generated evidence files:
 - `Documentation\ClientRdbZoneEnemyHints.csv`
 - `Documentation\ClientRdbNpcTemplateHints.csv`
+- `Documentation\ClientHintedEnemyCoverage.csv`
+- `Documentation\MonsterDataCorpseVisualHints.csv`
 
 Extractor:
 - `tools-temp\ao-client-rdb-hints\Export-AOClientZoneEnemyHints.ps1`
@@ -310,8 +316,9 @@ Server implication:
    - Do not guess the loot window protocol from vendor trade unless capture evidence matches.
 
 5. Move creature visual mapping out of hardcoded one-offs.
-   - Short term: extend a small static map for tested MonsterData ids (`17655`, `30365`, `30252`, `17687`, `247832`, `247831`, `31114`).
-   - Medium term: generate a checked-in data file from AODB for `MonsterData -> CatMesh -> death anim key/resource`.
+   - Short term: extend a small static map for tested MonsterData ids.
+   - Current checked-in coverage file: `Documentation\MonsterDataCorpseVisualHints.csv`.
+   - Medium term: generate a runtime-safe data file from AODB for `MonsterData -> CatMesh -> death anim key/resource`.
 
 ## Suggested Morning Test Target
 
@@ -323,4 +330,4 @@ Use the same Rhinoman test mob until corpse identity/use is stable:
 - Press Use/Open on the corpse.
 - Server log should show `GenericCmd Use target=Corpse:<new corpse id>` and match the visible corpse, not a stale/other corpse.
 
-The active combat test catalog now covers leet/cutecreature, reet, snake, and rollerrat families. The runtime death action still uses the live-observed `0x1F7` action key until we have a packet capture proving a better per-family value.
+The active combat test catalog now covers leet/cutecreature, reet, snake, rollerrat, flea, lizard, malle, and salamander families. The runtime death action still uses the live-observed `0x1F7` action key until we have a packet capture proving a better per-family value.

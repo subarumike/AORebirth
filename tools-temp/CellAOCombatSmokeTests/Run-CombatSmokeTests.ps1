@@ -133,6 +133,8 @@ $playfieldSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngi
 $spawnCommandSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ChatCommands\Spawn.cs')
 $zoneEnemyHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbZoneEnemyHints.csv'
 $npcTemplateHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbNpcTemplateHints.csv'
+$enemyCoveragePath = Join-Path $repoRoot 'CellAO\Documentation\ClientHintedEnemyCoverage.csv'
+$visualHintsPath = Join-Path $repoRoot 'CellAO\Documentation\MonsterDataCorpseVisualHints.csv'
 
 Assert-SourceMatch $fullCharacterSource 'MsgVersion\s*=\s*26\s*;' 'FullCharacter login packet must stay on live-compatible MsgVersion 26.'
 Assert-SourceMatch $clientConnectedSource 'InitializeActionableState\s*\(\s*client\s*\)\s*;' 'ClientConnected must initialize the live-style actionable login state.'
@@ -155,18 +157,38 @@ Assert-SourceMatch $spawnCommandSource '"status"' 'Spawn command should support 
 Assert-SourceMatch $spawnCommandSource '"clear"' 'Spawn command should support combat test cleanup.'
 Assert-True (Test-Path $zoneEnemyHintsPath) 'Client RDB zone enemy hint catalog is missing.'
 Assert-True (Test-Path $npcTemplateHintsPath) 'Client RDB NPC template hint catalog is missing.'
+Assert-True (Test-Path $enemyCoveragePath) 'Client hinted enemy coverage catalog is missing.'
+Assert-True (Test-Path $visualHintsPath) 'MonsterData corpse visual hint catalog is missing.'
 
 $zoneEnemyHints = @(Import-Csv $zoneEnemyHintsPath)
 $npcTemplateHints = @(Import-Csv $npcTemplateHintsPath)
+$enemyCoverage = @(Import-Csv $enemyCoveragePath)
+$visualHints = @(Import-Csv $visualHintsPath)
 $newlandDesertHints = $zoneEnemyHints | Where-Object { [int]$_.PlayfieldId -eq 565 } | Select-Object -First 1
 Assert-True ($null -ne $newlandDesertHints) 'Client RDB hints should include Newland Desert playfield 565.'
 Assert-True ($newlandDesertHints.EnemyKeywords -match 'rhinoman') 'Newland Desert hints should include rhinoman.'
 Assert-True ($newlandDesertHints.EnemyKeywords -match 'leet') 'Newland Desert hints should include leet.'
 Assert-True ($newlandDesertHints.EnemyKeywords -match 'snake') 'Newland Desert hints should include snake.'
+Assert-True ($newlandDesertHints.EnemyKeywords -match 'flea') 'Newland Desert hints should include flea.'
+Assert-True ($newlandDesertHints.EnemyKeywords -match 'lizard') 'Newland Desert hints should include lizard.'
+Assert-True ($newlandDesertHints.EnemyKeywords -match 'salamander') 'Newland Desert hints should include salamander.'
 Assert-True ($null -ne ($npcTemplateHints | Where-Object { [int]$_.TemplateId -eq 17655 -and $_.Name -eq 'leet' } | Select-Object -First 1)) 'Client RDB NPC hints should include leet template 17655.'
 Assert-True ($null -ne ($npcTemplateHints | Where-Object { [int]$_.TemplateId -eq 17687 -and $_.Name -eq 'rollerrat' } | Select-Object -First 1)) 'Client RDB NPC hints should include rollerrat template 17687.'
 Assert-True ($null -ne ($npcTemplateHints | Where-Object { [int]$_.TemplateId -eq 30252 -and $_.Name -eq 'giant snake' } | Select-Object -First 1)) 'Client RDB NPC hints should include giant snake template 30252.'
 Assert-True ($null -ne ($npcTemplateHints | Where-Object { [int]$_.TemplateId -eq 31114 -and $_.Name -eq 'rhinoman female' } | Select-Object -First 1)) 'Client RDB NPC hints should include rhinoman female template 31114.'
+
+$newlandCoverage = $enemyCoverage | Where-Object { [int]$_.PlayfieldId -eq 565 } | Select-Object -First 1
+Assert-True ($null -ne $newlandCoverage) 'Enemy coverage should include Newland Desert playfield 565.'
+Assert-True ($newlandCoverage.SupportedTestMobKeys -match 'beachleet') 'Newland Desert coverage should include beachleet.'
+Assert-True ($newlandCoverage.SupportedTestMobKeys -match 'shoresnake') 'Newland Desert coverage should include shoresnake.'
+Assert-True ($newlandCoverage.SupportedTestMobKeys -match 'duneflea') 'Newland Desert coverage should include duneflea.'
+Assert-True ($newlandCoverage.SupportedTestMobKeys -match 'surflizard') 'Newland Desert coverage should include surflizard.'
+Assert-True ($newlandCoverage.SupportedTestMobKeys -match 'reefsalamander') 'Newland Desert coverage should include reefsalamander.'
+Assert-True ($newlandCoverage.MissingTemplateOrVisualKeywords -match 'rhinoman') 'Newland Desert coverage should keep unsupported rhinoman visible.'
+Assert-True ($null -ne ($visualHints | Where-Object { $_.FamilyKeyword -eq 'flea' -and [int]$_.MonsterData -eq 17657 -and [int]$_.CatMesh -eq 15231 } | Select-Object -First 1)) 'Visual hints should map flea MonsterData 17657 to CATMesh 15231.'
+Assert-True ($null -ne ($visualHints | Where-Object { $_.FamilyKeyword -eq 'lizard' -and [int]$_.MonsterData -eq 22794 -and [int]$_.CatMesh -eq 22773 } | Select-Object -First 1)) 'Visual hints should map lizard MonsterData 22794 to CATMesh 22773.'
+Assert-True ($null -ne ($visualHints | Where-Object { $_.FamilyKeyword -eq 'malle' -and [int]$_.MonsterData -eq 17660 -and [int]$_.CatMesh -eq 15239 } | Select-Object -First 1)) 'Visual hints should map malle MonsterData 17660 to CATMesh 15239.'
+Assert-True ($null -ne ($visualHints | Where-Object { $_.FamilyKeyword -eq 'salamander' -and [int]$_.MonsterData -eq 30354 -and [int]$_.CatMesh -eq 23344 } | Select-Object -First 1)) 'Visual hints should map salamander MonsterData 30354 to CATMesh 23344.'
 
 if (-not $SkipBuild) {
     Assert-True (Test-Path $msbuild) "MSBuild was not found at $msbuild"
@@ -244,7 +266,7 @@ try {
     $allField = $archetypeType.GetField('All', [System.Reflection.BindingFlags]'Public, Static')
     Assert-True ($null -ne $allField) 'CombatTestMobArchetype.All is missing.'
     $entries = @($allField.GetValue($null))
-    Assert-True ($entries.Count -ge 4) "Expected at least 4 combat test mobs, found $($entries.Count)."
+    Assert-True ($entries.Count -ge 8) "Expected at least 8 combat test mobs, found $($entries.Count)."
 
     $defaultProperty = $archetypeType.GetProperty('Default', [System.Reflection.BindingFlags]'Public, Static')
     Assert-True ($null -ne $defaultProperty) 'CombatTestMobArchetype.Default is missing.'
@@ -298,11 +320,19 @@ try {
     $hintedNewlandDesert = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(565)))
     $hintedAegean = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(585)))
     $hintedWailingWastes = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(551)))
+    $hintedBelialForest = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(605)))
+    $hintedOmniForest = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(716)))
     $hintedUnknown = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(999999)))
     Assert-True (($hintedNewlandDesert | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'beachleet' }).Count -eq 1) 'Newland Desert should map to the client-hinted test leet.'
     Assert-True (($hintedNewlandDesert | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'shoresnake' }).Count -eq 1) 'Newland Desert should map to the client-hinted test snake.'
+    Assert-True (($hintedNewlandDesert | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'duneflea' }).Count -eq 1) 'Newland Desert should map to the client-hinted test flea.'
+    Assert-True (($hintedNewlandDesert | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'surflizard' }).Count -eq 1) 'Newland Desert should map to the client-hinted test lizard.'
+    Assert-True (($hintedNewlandDesert | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'reefsalamander' }).Count -eq 1) 'Newland Desert should map to the client-hinted test salamander.'
     Assert-True (($hintedAegean | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'rollerrat' }).Count -eq 1) 'Aegean should map to the client-hinted test rollerrat.'
+    Assert-True (($hintedAegean | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'duneflea' }).Count -eq 1) 'Aegean should map to the client-hinted test flea.'
     Assert-True ($hintedWailingWastes.Count -eq 1 -and (Get-PropertyValue $hintedWailingWastes[0] 'Key') -eq 'rollerrat') 'Wailing Wastes should map to only the supported test rollerrat.'
+    Assert-True (($hintedBelialForest | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'surflizard' }).Count -eq 1) 'Belial Forest should map to the client-hinted test lizard.'
+    Assert-True (($hintedOmniForest | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'cliffmalle' }).Count -eq 1) 'Omni Forest should map to the client-hinted test malle.'
     Assert-True ($hintedUnknown.Count -eq 0) 'Unknown playfields should not invent client-hinted test mobs.'
     Assert-True ([bool]$isCombatTestCorpseName.Invoke($null, @('Remains of Codex Test Beach Leet'))) 'Combat test corpse names should be recognized for cleanup.'
     Assert-True (-not [bool]$isCombatTestCorpseName.Invoke($null, @('Remains of Random Live Mob'))) 'Non-test corpse names should not be recognized for cleanup.'
