@@ -257,9 +257,21 @@ namespace ZoneEngine.Core.MessageHandlers
                                 int nextSlot = issuer.BaseInventory[issuer.BaseInventory.StandardPage].FindFreeSlot();
                                 if (nextSlot != -1)
                                 {
-                                    issuer.BaseInventory[issuer.BaseInventory.StandardPage].Add(nextSlot, item);
-                                    AddTemplateMessageHandler.Default.Send(client.Controller.Character, (Item)item);
-                                    cash += (int)Math.Round(CLFactor * item.GetAttribute(74));
+                                    InventoryError err = issuer.BaseInventory.AddToPage(
+                                        issuer.BaseInventory.StandardPage,
+                                        nextSlot,
+                                        item);
+                                    if (err == InventoryError.OK)
+                                    {
+                                        AddTemplateMessageHandler.Default.Send(client.Controller.Character, (Item)item);
+                                        cash += (int)Math.Round(CLFactor * item.GetAttribute(74));
+                                    }
+                                    else
+                                    {
+                                        ChatTextMessageHandler.Default.Send(
+                                            client.Controller.Character,
+                                            "Could not add item to inventory. (" + err + ")");
+                                    }
                                 }
                             }
 

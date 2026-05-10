@@ -112,36 +112,6 @@ namespace Utility.Config
         /// <summary>
         /// 
         /// </summary>
-        IRCServer,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        RelayBotNick,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        RelayBotIdent,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        IRCChannel,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        RelayIngameChannel,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        UseIRCRelay,
-
-        /// <summary>
-        /// 
-        /// </summary>
         WebHostName,
 
         /// <summary>
@@ -197,16 +167,6 @@ namespace Utility.Config
         public int CommPort { get; set; }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public string IRCChannel { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string IRCServer { get; set; }
-
-        /// <summary>
         /// Gets or sets Local ISComm IP address
         /// </summary>
         public string ISCommLocalIP { get; set; }
@@ -252,21 +212,6 @@ namespace Utility.Config
         public string PostgreConnection { get; set; }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public string RelayBotIdent { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string RelayBotNick { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string RelayIngameChannel { get; set; }
-
-        /// <summary>
         /// Gets or sets Your SQL Type
         /// </summary>
         public string SQLType { get; set; }
@@ -275,11 +220,6 @@ namespace Utility.Config
         /// Gets or sets a value indicating whether to enable Sql Logging
         /// </summary>
         public bool SqlLog { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public bool UseIRCRelay { get; set; }
 
         /// <summary>
         /// Gets or sets Zone server IP

@@ -45,6 +45,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using Utility;
 
+    using ZoneEngine.Core.InternalMessages;
+    using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.PacketHandlers;
 
     #endregion
@@ -55,6 +57,9 @@ namespace ZoneEngine.Core.MessageHandlers
     public class CharacterActionMessageHandler :
         BaseMessageHandler<CharacterActionMessage, CharacterActionMessageHandler>
     {
+        private const int CompatSitDownActionCode = 0x0000011E;
+        private const int CompatStandUpActionCode = 0x00000057;
+
         /// <summary>
         /// </summary>
         public CharacterActionMessageHandler()
@@ -73,6 +78,21 @@ namespace ZoneEngine.Core.MessageHandlers
         protected override void Read(CharacterActionMessage message, IZoneClient client)
         {
             LogUtil.Debug(DebugInfoDetail.NetworkMessages, "Reading CharacterActionMessage");
+            client.Server.Info(
+                client,
+                "CharacterAction action={0}({1}) target={2} p1={3} p2={4} u1={5} u2={6}",
+                message.Action,
+                (int)message.Action,
+                message.Target,
+                message.Parameter1,
+                message.Parameter2,
+                message.Unknown1,
+                message.Unknown2);
+
+            if (this.TryHandleCompatPostureAction(message, client))
+            {
+                return;
+            }
 
             // var actionNum = (int)characterAction.Action;
             // int unknown1 = message.Unknown1;
@@ -171,6 +191,8 @@ namespace ZoneEngine.Core.MessageHandlers
                 case CharacterActionType.Logout:
 
                     // If action == Logout
+                    this.ApplySit(client);
+
                     // Start 30 second logout timer if client is not a GM (statid 215)
                     if (client.Controller.Character.Stats[StatIds.gmlevel].Value == 0)
                     {
@@ -187,17 +209,13 @@ namespace ZoneEngine.Core.MessageHandlers
                 case CharacterActionType.StopLogout:
 
                     // If action == Stop Logout
-                    // Stop current logout timer and send stop logout packet
-                    client.Controller.Character.StopLogoutTimer();
-                    client.Controller.Character.UpdateMoveType((byte)client.Controller.Character.PreviousMoveMode);
-                    client.Controller.Character.Playfield.Announce(message);
+                    this.ApplyStand(client);
                     break;
 
                 case CharacterActionType.StandUp:
                 {
                     // If action == Stand
-                    client.Controller.Character.UpdateMoveType(37);
-                    client.Controller.Character.Playfield.Announce(message);
+                    this.ApplyStand(client);
 
                     if (client.Controller.Character.InLogoutTimerPeriod())
                     {
@@ -207,6 +225,36 @@ namespace ZoneEngine.Core.MessageHandlers
 
                     // Send stand up packet, and cancel timer/send stop logout packet if timer is enabled
                     // ((ZoneClient)client).StandCancelLogout();
+                }
+
+                    break;
+
+                case CharacterActionType.SitDown:
+                {
+                    if ((client.Controller.Character.MoveMode == MoveModes.Sit)
+                        || (client.Controller.Character.MoveMode == MoveModes.Sleep)
+                        || (client.Controller.Character.MoveMode == MoveModes.Lounge))
+                    {
+                        this.ApplyStand(client);
+                    }
+                    else
+                    {
+                        this.ApplySit(client);
+                    }
+                }
+
+                    break;
+
+                case CharacterActionType.ChangeAnimationAndStance:
+                {
+                    if (message.Parameter1 == 0)
+                    {
+                        this.ApplySit(client);
+                    }
+                    else
+                    {
+                        this.ApplyStand(client);
+                    }
                 }
 
                     break;
@@ -610,6 +658,97 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.Unknown2 = message.Unknown2;
                 x.Unknown = message.Unknown;
             };
+        }
+
+        private bool TryHandleCompatPostureAction(CharacterActionMessage message, IZoneClient client)
+        {
+            int action = (int)message.Action;
+            bool looksLikeSit = action == CompatSitDownActionCode
+                                || message.Parameter1 == CompatSitDownActionCode
+                                || message.Parameter2 == CompatSitDownActionCode;
+            bool looksLikeStand = action == CompatStandUpActionCode
+                                  || message.Parameter1 == CompatStandUpActionCode
+                                  || message.Parameter2 == CompatStandUpActionCode;
+
+            if (looksLikeSit)
+            {
+                this.ApplySit(client);
+                return true;
+            }
+
+            if (looksLikeStand)
+            {
+                this.ApplyStand(client);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void ApplySit(IZoneClient client)
+        {
+            ICharacter character = client.Controller.Character;
+            character.StopMovement();
+            client.Controller.State = CharacterState.Idle;
+            character.UpdateMoveType(30);
+            this.SendPostureMove(character, 30);
+            SimpleCharFullUpdate.SendToPlayfield(client.Controller.Client);
+        }
+
+        private void ApplyStand(IZoneClient client)
+        {
+            ICharacter character = client.Controller.Character;
+            character.UpdateMoveType(37);
+            character.Playfield.Announce(
+                new CharacterActionMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 0x00,
+                    Action = CharacterActionType.StandUp,
+                    Unknown1 = 0,
+                    Target = Identity.None,
+                    Parameter1 = 0,
+                    Parameter2 = 0,
+                    Unknown2 = 0
+                });
+
+            this.SendPostureMove(character, 37);
+
+            if (character.InLogoutTimerPeriod())
+            {
+                this.Send(character, this.StopLogout(character), true);
+                character.StopLogoutTimer();
+            }
+        }
+
+        private void SendPostureMove(ICharacter character, byte moveType)
+        {
+            var postureUpdate = new CharDCMoveMessage
+                                {
+                                    Identity = character.Identity,
+                                    Unknown = 0x00,
+                                    MoveType = moveType,
+                                    Heading =
+                                        new Quaternion
+                                        {
+                                            X = character.Heading.xf,
+                                            Y = character.Heading.yf,
+                                            Z = character.Heading.zf,
+                                            W = character.Heading.wf
+                                        },
+                                    Coordinates =
+                                        new Vector3
+                                        {
+                                            X = character.RawCoordinates.X,
+                                            Y = character.RawCoordinates.Y,
+                                            Z = character.RawCoordinates.Z
+                                        },
+                                    Unknown1 = 0,
+                                    Unknown2 = 0,
+                                    Unknown3 = 0
+                                };
+
+            character.Playfield.Publish(new IMSendAOtomationMessageToPlayfield { Body = postureUpdate });
         }
 
         /// <summary>

@@ -38,6 +38,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.ChatCommands;
     using ZoneEngine.Script;
 
     #endregion
@@ -76,8 +77,18 @@ namespace ZoneEngine.Core.MessageHandlers
 
             string[] cmdArgs = fullArgs.Trim().Split(' ');
 
+            string commandName = cmdArgs[0].ToLower();
+            if ((commandName == "sit") || (commandName == "stand"))
+            {
+                new Posture().ExecuteCommand(
+                    client.Controller.Character,
+                    client.Controller.Character.SelectedTarget,
+                    cmdArgs);
+                return;
+            }
+
             ScriptCompiler.Instance.CallChatCommand(
-                cmdArgs[0].ToLower(),
+                commandName,
                 client,
                 client.Controller.Character.SelectedTarget,
                 cmdArgs);

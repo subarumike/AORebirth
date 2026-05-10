@@ -139,7 +139,6 @@ namespace ZoneEngine
                         if (args[0].ToLower() == "/autostart")
                         {
                             Console.WriteLine(locales.ServerConsoleAutostart);
-                            ScriptCompiler.Instance.Compile(false);
                             StartTheServer();
                         }
                     }
@@ -288,6 +287,9 @@ namespace ZoneEngine
                 Colouring.Pop();
                 return false;
             }
+
+            // Local debug restarts can kill ZoneEngine before player logout saves the offline flag.
+            Misc.LogOffAll();
 
             Colouring.Push(ConsoleColor.Green);
             if (!LoadItemsAndNanos())
@@ -709,7 +711,6 @@ namespace ZoneEngine
             else
             {
                 // TODO: Add Sql Check.
-                ScriptCompiler.Instance.Compile(false);
                 StartTheServer();
             }
         }
@@ -730,7 +731,6 @@ namespace ZoneEngine
             else
             {
                 // TODO: Add Sql Check.
-                ScriptCompiler.Instance.Compile(true);
                 StartTheServer();
             }
         }

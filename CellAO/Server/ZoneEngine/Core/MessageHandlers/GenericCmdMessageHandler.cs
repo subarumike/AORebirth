@@ -69,6 +69,22 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </exception>
         protected override void Read(GenericCmdMessage message, IZoneClient client)
         {
+            Identity target = message.Target != null && message.Target.Length > 0
+                                  ? message.Target[0]
+                                  : Identity.None;
+            Identity routedCorpseIdentity;
+
+            client.Server.Info(
+                client,
+                "GenericCmd action={0}({1}) temp1={2} count={3} temp4={4} user={5} target={6}",
+                message.Action,
+                (int)message.Action,
+                message.Temp1,
+                message.Count,
+                message.Temp4,
+                message.User,
+                target);
+
             switch (message.Action)
             {
                 case GenericCmdAction.Get:
@@ -76,16 +92,38 @@ namespace ZoneEngine.Core.MessageHandlers
                 case GenericCmdAction.Drop:
                     break;
                 case GenericCmdAction.Use:
-                    if (message.Target[0].Type == IdentityType.Inventory)
+                    if (target.Type == IdentityType.Inventory)
                     {
-                        client.Controller.UseItem(message.Target[0]);
+                        client.Controller.UseItem(target);
 
                         // Acknowledge action
                         this.Acknowledge(client.Controller.Character, message);
                     }
+                    else if (target.Type == IdentityType.Corpse)
+                    {
+                        bool used = client.Controller.Character.Playfield.TryUseCorpse(
+                            client.Controller.Character,
+                            target);
+
+                        client.Server.Info(
+                            client,
+                            "CorpseUse direct target={0} used={1}",
+                            target,
+                            used);
+
+                        if (used)
+                        {
+                            this.AcknowledgeCorpseUse(client.Controller.Character, message, target);
+                        }
+                    }
+                    else if (target.Type == IdentityType.CanbeAffected
+                             && this.TryRouteDeadNpcCorpseUse(client, target, out routedCorpseIdentity))
+                    {
+                        this.AcknowledgeCorpseUse(client.Controller.Character, message, routedCorpseIdentity);
+                    }
                     else
                     {
-                        if (Pool.Instance.Contains(message.Target[0]))
+                        if (Pool.Instance.Contains(target))
                         {
                             // TODO: Call OnUse of the targets controller
                             // Static dynels first
@@ -95,7 +133,7 @@ namespace ZoneEngine.Core.MessageHandlers
                                 temp =
                                     Pool.Instance.GetObject<IEventHolder>(
                                         client.Controller.Character.Playfield.Identity,
-                                        message.Target[0]);
+                                        target);
                             }
                             catch (Exception)
                             {
@@ -124,12 +162,12 @@ namespace ZoneEngine.Core.MessageHandlers
                                                 {
                                                     Type = IdentityType.TempBag,
                                                     Instance =
-                                                        Pool.Instance.GetFreeInstance<TemporaryBag>(
-                                                            0,
-                                                            IdentityType.TempBag)
+                                                Pool.Instance.GetFreeInstance<TemporaryBag>(
+                                                    0,
+                                                    IdentityType.TempBag)
                                                 },
                                                 client.Controller.Character.Identity,
-                                                message.Target[0]);
+                                                target);
                                             client.Controller.Character.ShoppingBag = tempBag;
                                             TradeMessageHandler.Default.Send(client.Controller.Character, tempBag);
                                             this.Acknowledge(client.Controller.Character, message);
@@ -147,11 +185,11 @@ namespace ZoneEngine.Core.MessageHandlers
                                 message.Action,
                                 (int)message.Action,
                                 Environment.NewLine,
-                                message.Target[0].Type,
-                                message.Target[0].ToString(true));
+                                target.Type,
+                                target.ToString(true));
                             ChatTextMessageHandler.Default.Send(client.Controller.Character, s);
 #endif
-                            client.Controller.UseStatel(message.Target[0]);
+                            client.Controller.UseStatel(target);
                         }
                     }
 
@@ -189,6 +227,26 @@ namespace ZoneEngine.Core.MessageHandlers
             }
         }
 
+        private bool TryRouteDeadNpcCorpseUse(
+            IZoneClient client,
+            Identity target,
+            out Identity routedCorpseIdentity)
+        {
+            bool routed = client.Controller.Character.Playfield.TryUseDeadNpcCorpse(
+                client.Controller.Character,
+                target,
+                out routedCorpseIdentity);
+
+            client.Server.Info(
+                client,
+                "CorpseUse deadNpc target={0} routed={1} corpse={2}",
+                target,
+                routed,
+                routedCorpseIdentity);
+
+            return routed;
+        }
+
         #endregion
 
         #region Outbound
@@ -206,6 +264,24 @@ namespace ZoneEngine.Core.MessageHandlers
             this.Send(character, this.Reply(character, message), announceToPlayfield);
         }
 
+        public void AcknowledgeWithTarget(
+            ICharacter character,
+            GenericCmdMessage message,
+            Identity target,
+            bool announceToPlayfield = false)
+        {
+            this.Send(character, this.Reply(character, message, target), announceToPlayfield);
+        }
+
+        public void AcknowledgeCorpseUse(
+            ICharacter character,
+            GenericCmdMessage message,
+            Identity corpse,
+            bool announceToPlayfield = false)
+        {
+            this.Send(character, this.Reply(character, message, corpse, 1), announceToPlayfield);
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="character">
@@ -216,13 +292,35 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </returns>
         private MessageDataFiller Reply(ICharacter character, GenericCmdMessage message)
         {
+            return this.Reply(character, message, Identity.None);
+        }
+
+        private MessageDataFiller Reply(ICharacter character, GenericCmdMessage message, Identity targetOverride)
+        {
+            return this.Reply(character, message, targetOverride, message.Temp4);
+        }
+
+        private MessageDataFiller Reply(
+            ICharacter character,
+            GenericCmdMessage message,
+            Identity targetOverride,
+            int temp4)
+        {
             return x =>
             {
+                Identity[] targets = message.Target.ToList().ToArray();
+                if (targetOverride != Identity.None && targets.Length > 0)
+                {
+                    targets[0] = targetOverride;
+                }
+
                 x.Identity = message.Identity;
                 x.N3MessageType = message.N3MessageType;
-                x.Target = message.Target.ToList().ToArray();
+                x.Target = targets;
                 x.Temp1 = 1;
-                x.Temp4 = message.Temp4;
+                x.Count = message.Count;
+                x.Action = message.Action;
+                x.Temp4 = temp4;
                 x.User = message.User;
                 x.Unknown = 0;
             };

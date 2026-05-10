@@ -60,6 +60,15 @@ namespace ZoneEngine.Core.MessageHandlers
         {
             SocialActionCmdMessage socialActionCmdMessage = body;
 
+            client.Server.Info(
+                client,
+                "SocialActionCmd action={0} unknown1={1} unknown2={2} unknown3={3} unknown5={4}",
+                socialActionCmdMessage.Action,
+                socialActionCmdMessage.Unknown1,
+                socialActionCmdMessage.Unknown2,
+                socialActionCmdMessage.Unknown3,
+                socialActionCmdMessage.Unknown5);
+
             var announce = new SocialActionCmdMessage
                            {
                                Identity = socialActionCmdMessage.Identity,

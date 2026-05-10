@@ -90,10 +90,8 @@ namespace LoginEngine.MessageHandlers
             {
                 Console.WriteLine(
                     "Client '" + client.AccountName
-                    + "' is trying to login, but the requested character is already logged in.");
-                client.Send(0x00001F83, new LoginErrorMessage { Error = LoginError.AlreadyLoggedIn });
-                client.Server.DisconnectClient(client);
-                return;
+                    + "' is reclaiming stale online state for character " + selectCharacterMessage.CharacterId + ".");
+                CharacterDao.Instance.SetOffline(selectCharacterMessage.CharacterId);
             }
 
             CharacterDao.Instance.SetOnline(selectCharacterMessage.CharacterId);

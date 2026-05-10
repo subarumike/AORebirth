@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Config>
   <!-- Ports for the Game Engines -->
   <ListenIP>0.0.0.0</ListenIP>
@@ -17,18 +17,11 @@
   <!-- Choose your SQL Databse Type here, MySql, MsSql, PostgreSQL-->
   <SQLType>MySql</SQLType>
   <!-- Sql Connection Setup Area -->
-  <MysqlConnection>Database=cellao;Data Source=localhost;User ID=cellaodbuser;Password=password</MysqlConnection>
+  <MysqlConnection>Server=localhost;Database=cellao_codex_clean;Uid=cellaodbuser;Pwd=password</MysqlConnection>
   <MsSqlConnection>Data Source=localhost;Inital Catalog=cellao;UserID=cellaodbuser;Password=password;Trusted_Connection=false</MsSqlConnection>
   <PostgreConnection>Server=localhost;User Id=cellaodbuser;Password=password;Database=cellao</PostgreConnection>
   <!-- This area is for Locale Settings, en = english, gr = german, ro = Romanian more languages will be supported later, Default = en-->
   <Locale>en</Locale>
-  <!-- IRC Config-->
-  <UseIRCRelay>true</UseIRCRelay>
-  <IRCServer>irc.aocell.info</IRCServer>
-  <RelayBotNick>CellAO</RelayBotNick>
-  <RelayBotIdent>CellAO</RelayBotIdent>
-  <IRCChannel>#CellAORelay</IRCChannel>
-  <RelayIngameChannel>CellAO-Relay</RelayIngameChannel>
   <!-- WebEngine Setup -->
   <WebHostName>test.aocell.info</WebHostName>
   <WebHostPort>8181</WebHostPort>

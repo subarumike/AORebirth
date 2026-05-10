@@ -40,6 +40,7 @@ namespace ZoneEngine.ChatCommands
     using CellAO.Core.Vector;
     using CellAO.Database.Dao;
     using CellAO.Database.Entities;
+    using CellAO.Enums;
     using CellAO.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -56,7 +57,7 @@ namespace ZoneEngine.ChatCommands
     {
         public override bool CheckCommandArguments(string[] args)
         {
-            return args.Length <= 3;
+            return (args.Length >= 2) && (args.Length <= 3);
         }
 
         public override void CommandHelp(ICharacter character)
@@ -69,8 +70,15 @@ namespace ZoneEngine.ChatCommands
 
         public override void ExecuteCommand(ICharacter character, Identity target, string[] args)
         {
-            if (args[1].ToLower() == "save")
+            string subCommand = args[1].ToLower();
+            if (subCommand == "save")
             {
+                if (target.Type != IdentityType.CanbeAffected)
+                {
+                    character.Playfield.Publish(ChatTextMessageHandler.Default.CreateIM(character, "Target a mob first."));
+                    return;
+                }
+
                 Character mob = Pool.Instance.GetObject<Character>(character.Playfield.Identity, target);
                 if (mob == null)
                 {
@@ -84,6 +92,16 @@ namespace ZoneEngine.ChatCommands
                         ChatTextMessageHandler.Default.CreateIM(
                             character,
                             "Don't try to remove/save other players please."));
+                    return;
+                }
+
+                if ((mob.Identity.Instance < 1000000) || (CharacterDao.Instance.Get(mob.Identity.Instance) != null))
+                {
+                    character.Playfield.Publish(
+                        ChatTextMessageHandler.Default.CreateIM(
+                            character,
+                            "Refusing to save a mob spawn with a player/low-range identity."));
+                    return;
                 }
 
                 DBMobSpawn mobdbo = new DBMobSpawn();
@@ -128,16 +146,47 @@ namespace ZoneEngine.ChatCommands
                             Playfield = mob.Playfield.Identity.Instance,
                             Stat = kv.Key,
                             Value = (int)kv.Value
-                        });
+                    });
                 }
             }
-            if (args[1].ToLower() == "remove")
+            if (subCommand == "remove")
             {
+                if (target.Type != IdentityType.CanbeAffected)
+                {
+                    character.Playfield.Publish(ChatTextMessageHandler.Default.CreateIM(character, "Target a mob first."));
+                    return;
+                }
+
+                ICharacter targetCharacter = Pool.Instance.GetObject<ICharacter>(character.Playfield.Identity, target);
+                if ((targetCharacter != null) && !(targetCharacter.Controller is NPCController))
+                {
+                    character.Playfield.Publish(
+                        ChatTextMessageHandler.Default.CreateIM(
+                            character,
+                            "Refusing to remove a mob spawn using a player target."));
+                    return;
+                }
+
+                if (CharacterDao.Instance.Get(target.Instance) != null)
+                {
+                    character.Playfield.Publish(
+                        ChatTextMessageHandler.Default.CreateIM(
+                            character,
+                            "Refusing to remove a mob spawn with a player character id."));
+                    return;
+                }
+
                 MobSpawnDao.Instance.Delete(target.Instance);
             }
 
-            if (args[1].ToLower() == "knubot")
+            if (subCommand == "knubot")
             {
+                if (args.Length < 3)
+                {
+                    this.CommandHelp(character);
+                    return;
+                }
+
                 ICharacter cmob = Pool.Instance.GetObject<ICharacter>(character.Playfield.Identity, target);
                 if (cmob == null)
                 {
@@ -145,6 +194,24 @@ namespace ZoneEngine.ChatCommands
                         ChatTextMessageHandler.Default.CreateIM(
                             character,
                             string.Format("Target {0} is no npc.", target.ToString(true))));
+                    return;
+                }
+
+                if (!(cmob.Controller is NPCController))
+                {
+                    character.Playfield.Publish(
+                        ChatTextMessageHandler.Default.CreateIM(
+                            character,
+                            "Don't try to attach NPC scripts to players please."));
+                    return;
+                }
+
+                if ((cmob.Identity.Instance < 1000000) || (CharacterDao.Instance.Get(cmob.Identity.Instance) != null))
+                {
+                    character.Playfield.Publish(
+                        ChatTextMessageHandler.Default.CreateIM(
+                            character,
+                            "Refusing to script a mob spawn with a player/low-range identity."));
                     return;
                 }
 

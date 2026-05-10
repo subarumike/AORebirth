@@ -55,6 +55,7 @@ namespace ZoneEngine.Core
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
 
+    using ZoneEngine.ChatCommands;
     using ZoneEngine.Script;
 
     using IBus = MemBus.IBus;
@@ -360,7 +361,7 @@ namespace ZoneEngine.Core
                     new Identity { Type = IdentityType.CanbeAffected, Instance = chatCommand.CharacterId });
             if (character != null)
             {
-                string fullArgs = chatCommand.ChatCommandString.TrimEnd(char.MinValue).TrimStart('.');
+                string fullArgs = chatCommand.ChatCommandString.TrimEnd(char.MinValue).TrimStart('.').TrimStart('/');
 
                 string temp = string.Empty;
                 do
@@ -372,8 +373,18 @@ namespace ZoneEngine.Core
 
                 string[] cmdArgs = fullArgs.Trim().Split(' ');
 
+                string commandName = cmdArgs[0].ToLower();
+                if ((commandName == "sit") || (commandName == "stand"))
+                {
+                    new Posture().ExecuteCommand(
+                        character,
+                        character.SelectedTarget,
+                        cmdArgs);
+                    return;
+                }
+
                 ScriptCompiler.Instance.CallChatCommand(
-                    cmdArgs[0].ToLower(),
+                    commandName,
                     character.Controller.Client,
                     character.SelectedTarget,
                     cmdArgs);

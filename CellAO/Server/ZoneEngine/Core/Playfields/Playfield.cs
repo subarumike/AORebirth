@@ -38,11 +38,13 @@ namespace CellAO.Core.Playfields
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
+    using System.Text;
     using System.Threading;
 
     using CellAO.Core.Entities;
     using CellAO.Core.Events;
     using CellAO.Core.Functions;
+    using CellAO.Core.Inventory;
     using CellAO.Core.Items;
     using CellAO.Core.Network;
     using CellAO.Core.NPCHandler;
@@ -109,6 +111,75 @@ namespace CellAO.Core.Playfields
         /// <summary>
         /// </summary>
         private readonly Timer heartBeat;
+
+        private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
+
+        private readonly Dictionary<int, DateTime> deadNpcDespawnTicks = new Dictionary<int, DateTime>();
+
+        private readonly Dictionary<int, DateTime> debugCorpseDespawnTicks = new Dictionary<int, DateTime>();
+
+        private readonly Dictionary<int, DebugCorpseState> debugCorpses = new Dictionary<int, DebugCorpseState>();
+
+        private readonly Dictionary<int, DebugCorpseState> pendingDebugCorpseSpawns = new Dictionary<int, DebugCorpseState>();
+
+        private int nextDebugCorpseInstance = 0x00F0F000;
+
+        private int nextDebugCorpseInventorySlot = 0x78;
+
+        private const int DefaultNpcDeathAnimationKey = 0x1F7;
+
+        private const int CorpseInventorySlots = 21;
+
+        private const int MoveToInventoryPlacement = 0x6f;
+
+        private static readonly TimeSpan DeadNpcDespawnDelay = TimeSpan.FromSeconds(10);
+
+        private static readonly TimeSpan CorpseSpawnDelay = TimeSpan.FromMilliseconds(600);
+
+        private static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromMilliseconds(750);
+
+        private static readonly TimeSpan CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30);
+
+        private static readonly TimeSpan ItemLootCorpseLifetime = TimeSpan.FromSeconds(60);
+
+        private static readonly TimeSpan MajorBossCorpseLifetime = TimeSpan.FromMinutes(30);
+
+        private static readonly Random LootRandom = new Random();
+
+        private static readonly object LootRandomLock = new object();
+
+        private static readonly DebugLootTableEntry[] DebugLootTable =
+        {
+            new DebugLootTableEntry
+            {
+                ExactName = "Codex Test Cheerleet",
+                MonsterData = 247832,
+                DropChancePercent = 100,
+                Quality = 1,
+                ItemTemplateIds = new[] { 0x4545F, 0x4545A }
+            },
+            new DebugLootTableEntry
+            {
+                ExactName = "Codex Test Cheerleet",
+                MonsterData = 247832,
+                DropChancePercent = 100,
+                Quality = 1,
+                ItemTemplateIds = new[] { 27350, 85534, 85521, 273496, 273500 }
+            },
+            new DebugLootTableEntry
+            {
+                ExactName = "Codex Test Cheerleet",
+                MonsterData = 247832,
+                DropChancePercent = 100,
+                Quality = 1,
+                ItemTemplateIds = new[] { 27350 }
+            }
+        };
+
+        private static readonly Dictionary<int, int> MonsterDataToCorpseCatMesh = new Dictionary<int, int>
+        {
+            { 31114, 31102 }
+        };
 
         /// <summary>
         /// </summary>
@@ -798,15 +869,15 @@ namespace CellAO.Core.Playfields
         public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)
         {
             Identity dontSendTo = sendSCFUs.toClient.Controller.Character.Identity;
+            Identity playfieldIdentity = sendSCFUs.toClient.Controller.Character.Playfield.Identity;
             foreach (IEntity entity in
-                Pool.Instance.GetAll<IPacketReceivingEntity>((int)IdentityType.CanbeAffected))
+                Pool.Instance.GetAll<ICharacter>(playfieldIdentity, (int)IdentityType.CanbeAffected))
             {
                 if (entity.Identity != dontSendTo)
                 {
                     var temp = entity as Character;
                     if (temp != null)
                     {
-                        // TODO: make it NPC-safe
                         SimpleCharFullUpdateMessage simpleCharFullUpdate = SimpleCharFullUpdate.ConstructMessage(temp);
                         sendSCFUs.toClient.SendCompressed(simpleCharFullUpdate);
 
@@ -892,16 +963,32 @@ namespace CellAO.Core.Playfields
         /// </param>
         private void HeartBeatTimer(object sender)
         {
+            this.ProcessPendingDebugCorpseSpawns();
+            this.ProcessDebugCorpseDespawns();
+
             IEnumerable<IEntity> dynels = null;
             dynels =
                 Pool.Instance.GetAll<ICharacter>((int)IdentityType.CanbeAffected)
-                    .Where(xx => !xx.DoNotDoTimers && xx.InPlayfield(this.Identity));
+                    .Where(
+                        xx =>
+                            xx.InPlayfield(this.Identity)
+                            && (!xx.DoNotDoTimers || this.deadNpcDespawnTicks.ContainsKey(xx.Identity.Instance)));
 
             foreach (ICharacter dynel in dynels)
             {
                 if (dynel != null)
                 {
-                    if (dynel.DoNotDoTimers || dynel.Starting)
+                    if (dynel.Starting)
+                    {
+                        continue;
+                    }
+
+                    if (this.ProcessDeadNpc(dynel))
+                    {
+                        continue;
+                    }
+
+                    if (dynel.DoNotDoTimers)
                     {
                         continue;
                     }
@@ -912,7 +999,8 @@ namespace CellAO.Core.Playfields
                     {
                         int interval = healInterval.Value;
                         int delta = dynel.Stats[StatIds.healdelta].Value;
-                        dynel.Stats[StatIds.health].Value += delta;
+                        dynel.Stats[StatIds.health].Value =
+                            Math.Min(dynel.Stats[StatIds.life].Value, dynel.Stats[StatIds.health].Value + delta);
                         healInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(interval);
                         changed = true;
                     }
@@ -931,6 +1019,8 @@ namespace CellAO.Core.Playfields
                     {
                         dynel.SendChangedStats();
                     }
+
+                    this.DoCombatTick(dynel);
 
                     if (dynel.Controller.IsFollowing())
                     {
@@ -961,6 +1051,1344 @@ namespace CellAO.Core.Playfields
             catch (ObjectDisposedException)
             {
             }
+        }
+
+        private void DoCombatTick(ICharacter attacker)
+        {
+            if (attacker.FightingTarget.Instance == 0)
+            {
+                this.nextCombatTicks.Remove(attacker.Identity.Instance);
+                return;
+            }
+
+            DateTime nextTick;
+            if (this.nextCombatTicks.TryGetValue(attacker.Identity.Instance, out nextTick)
+                && nextTick > DateTime.UtcNow)
+            {
+                return;
+            }
+
+            ICharacter target = this.FindByIdentity<ICharacter>(attacker.FightingTarget);
+            if (target == null || !target.InPlayfield(this.Identity) || target.Stats[StatIds.health].Value <= 0)
+            {
+                attacker.SetFightingTarget(Identity.None);
+                this.nextCombatTicks.Remove(attacker.Identity.Instance);
+                return;
+            }
+
+            int currentHealth = target.Stats[StatIds.health].Value;
+            int damage = this.CalculateCombatDamage(attacker);
+            int newHealth = Math.Max(0, currentHealth - damage);
+            bool killingHit = newHealth == 0;
+
+            target.Stats[StatIds.health].Value = newHealth;
+            if (!killingHit)
+            {
+                target.SendChangedStats();
+            }
+
+            this.Announce(
+                new AttackInfoMessage
+                {
+                    Identity = attacker.Identity,
+                    Target = target.Identity,
+                    Unknown1 = damage,
+                    Unknown2 = killingHit ? 40 : 1,
+                    Unknown3 = killingHit ? 8 : 0,
+                    Unknown4 = killingHit ? 4 : 0,
+                    Unknown5 = killingHit ? 3 : 0,
+                    Unknown6 = 0
+                });
+            if (!killingHit)
+            {
+                this.Announce(
+                    new HealthDamageMessage
+                    {
+                        Identity = target.Identity,
+                        Target = attacker.Identity,
+                        Unknown1 = newHealth,
+                        Unknown2 = damage,
+                        Unknown3 = (int)StatIds.health,
+                        Unknown4 = 0,
+                        Unknown5 = 0
+                    });
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "Combat hit attacker={0} target={1} damage={2} health={3}/{4}",
+                    attacker.Identity,
+                    target.Identity,
+                    damage,
+                    newHealth,
+                    target.Stats[StatIds.life].Value));
+
+            if (killingHit)
+            {
+                if (target.Controller is NPCController)
+                {
+                    this.KillNpcTarget(target);
+                }
+                else
+                {
+                    attacker.SetFightingTarget(Identity.None);
+                    this.nextCombatTicks.Remove(attacker.Identity.Instance);
+                }
+
+                return;
+            }
+
+            this.nextCombatTicks[attacker.Identity.Instance] = DateTime.UtcNow + TimeSpan.FromSeconds(2);
+        }
+
+        private int CalculateCombatDamage(ICharacter attacker)
+        {
+            int minDamage = Math.Max(0, attacker.Stats[StatIds.mindamage].Value);
+            int maxDamage = Math.Max(minDamage, attacker.Stats[StatIds.maxdamage].Value);
+            int damageBonus = Math.Max(0, attacker.Stats[StatIds.damagebonus].Value);
+
+            int fallbackDamage = attacker.Controller is PlayerController ? 15 : 1;
+
+            if (maxDamage > 0)
+            {
+                return Math.Max(fallbackDamage, maxDamage + damageBonus);
+            }
+
+            return Math.Max(fallbackDamage, attacker.Stats[StatIds.level].Value + damageBonus);
+        }
+
+        private void KillNpcTarget(ICharacter target)
+        {
+            if (!(target.Controller is NPCController))
+            {
+                return;
+            }
+
+            Identity corpseIdentity = Identity.None;
+            if (this.CanBuildKnownCorpseVisual(target))
+            {
+                corpseIdentity = this.AllocateDebugCorpseIdentity();
+            }
+
+            this.MarkNpcDead(target);
+            this.StopFightingDeadTarget(target.Identity);
+            this.SendNpcDeathAnimation(target);
+            if (corpseIdentity != Identity.None)
+            {
+                this.ScheduleDebugCorpseSpawn(target, corpseIdentity);
+            }
+            else
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format("Skipping raw CorpseFullUpdate for {0}; no known MonsterData-to-CATMesh mapping.", target.Identity));
+            }
+
+            this.deadNpcDespawnTicks[target.Identity.Instance] = DateTime.UtcNow + DeadNpcDespawnDelay;
+
+            LogUtil.Debug(DebugInfoDetail.Network, string.Format("NPC died target={0}", target.Identity));
+        }
+
+        public bool TryUseCorpse(ICharacter looter, Identity corpseIdentity)
+        {
+            if (looter == null || corpseIdentity.Type != IdentityType.Corpse)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        "CorpseUse reject invalid looter={0} corpse={1}",
+                        looter == null ? Identity.None : looter.Identity,
+                        corpseIdentity));
+                return false;
+            }
+
+            DebugCorpseState corpse;
+            if (!this.debugCorpses.TryGetValue(corpseIdentity.Instance, out corpse))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        "CorpseUse reject unknown corpse={0} looter={1} registeredCount={2}",
+                        corpseIdentity,
+                        looter.Identity,
+                        this.debugCorpses.Count));
+                return false;
+            }
+
+            if (corpse.ExpiresAtUtc <= DateTime.UtcNow)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format("CorpseUse reject expired corpse={0} looter={1}", corpseIdentity, looter.Identity));
+                this.DespawnDebugCorpse(corpseIdentity.Instance);
+                return false;
+            }
+
+            bool wasOpened = corpse.Opened;
+            corpse.Opened = true;
+
+            if (corpse.HasUnlootedItems)
+            {
+                this.ExtendDebugCorpseLifetime(corpse, ItemLootCorpseLifetime, "corpse-use");
+                if (corpse.NextUseSendsAccessActionOnly)
+                {
+                    this.SendCorpseLootAccessAction(looter, corpse);
+                    this.SendUseActionFinished(looter);
+                    corpse.NextUseSendsAccessActionOnly = false;
+                }
+                else
+                {
+                    this.SendCorpseInventoryUpdate(looter, corpse);
+                    corpse.NextUseSendsAccessActionOnly = true;
+                }
+            }
+            else if (!wasOpened)
+            {
+                this.SendCorpseInventoryUpdate(looter, corpse);
+            }
+            else
+            {
+                this.SendUseActionFinished(looter);
+            }
+
+            if (!corpse.HasUnlootedItems)
+            {
+                this.ScheduleDebugCorpseDespawn(
+                    corpse,
+                    EmptyCorpseCleanupAfterOpenedDelay,
+                    "opened-empty");
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    "CorpseUse accepted corpse={0} deadNpc={1} looter={2} opened={3} lootClass={4}",
+                    corpseIdentity,
+                    corpse.DeadNpcIdentity,
+                    looter.Identity,
+                    corpse.Opened,
+                    corpse.LootClass));
+
+            return true;
+        }
+
+        public bool TryUseDeadNpcCorpse(ICharacter looter, Identity deadNpcIdentity, out Identity corpseIdentity)
+        {
+            corpseIdentity = Identity.None;
+
+            if (looter == null || deadNpcIdentity.Type != IdentityType.CanbeAffected)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        "DeadNpcCorpseUse reject invalid looter={0} deadNpc={1}",
+                        looter == null ? Identity.None : looter.Identity,
+                        deadNpcIdentity));
+                return false;
+            }
+
+            DebugCorpseState corpse = this.debugCorpses.Values.FirstOrDefault(
+                x => x.DeadNpcIdentity.Type == deadNpcIdentity.Type
+                     && x.DeadNpcIdentity.Instance == deadNpcIdentity.Instance);
+
+            if (corpse == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        "DeadNpcCorpseUse reject unknown deadNpc={0} looter={1} registeredCount={2}",
+                        deadNpcIdentity,
+                        looter.Identity,
+                        this.debugCorpses.Count));
+                return false;
+            }
+
+            corpseIdentity = corpse.CorpseIdentity;
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    "DeadNpcCorpseUse route deadNpc={0} corpse={1} looter={2}",
+                    deadNpcIdentity,
+                    corpseIdentity,
+                    looter.Identity));
+            return this.TryUseCorpse(looter, corpse.CorpseIdentity);
+        }
+
+        public bool TryLootCorpseItem(ICharacter looter, Identity sourceContainer, Identity target, int targetPlacement)
+        {
+            if (looter == null || sourceContainer.Type != IdentityType.Backpack)
+            {
+                return false;
+            }
+
+            int corpseInventorySlot = (sourceContainer.Instance >> 16) & 0xffff;
+            DebugCorpseState corpse = this.debugCorpses.Values.FirstOrDefault(
+                x => x.InventorySlot == corpseInventorySlot);
+
+            if (corpse == null)
+            {
+                return false;
+            }
+
+            if (corpse.ExpiresAtUtc <= DateTime.UtcNow)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format("CorpseLoot reject expired corpse={0} looter={1}", corpse.CorpseIdentity, looter.Identity));
+                this.DespawnDebugCorpse(corpse.CorpseIdentity.Instance);
+                return true;
+            }
+
+            if (target != looter.Identity)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        "CorpseLoot reject target mismatch source={0} target={1} looter={2}",
+                        sourceContainer,
+                        target,
+                        looter.Identity));
+                this.SendUseActionFinished(looter);
+                return true;
+            }
+
+            int requestedLootSlot = sourceContainer.Instance & 0xffff;
+            DebugCorpseLootItem lootItem = FindCorpseLootItem(corpse, requestedLootSlot);
+            if (lootItem == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        "CorpseLoot reject missing item corpse={0} source={1} requestedSlot={2}",
+                        corpse.CorpseIdentity,
+                        sourceContainer,
+                        requestedLootSlot));
+                this.SendUseActionFinished(looter);
+                return true;
+            }
+
+            if (CharacterHasUniqueItemAlready(looter, lootItem.Item))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        "CorpseLoot reject duplicate unique corpse={0} looter={1} source={2} item={3}/{4}",
+                        corpse.CorpseIdentity,
+                        looter.Identity,
+                        sourceContainer,
+                        lootItem.Item.LowID,
+                        lootItem.Item.HighID));
+                ChatTextMessageHandler.Default.Send(looter, "You already have this unique item.");
+                this.SendUseActionFinished(looter);
+                return true;
+            }
+
+            int targetPageNumber;
+            int targetSlot;
+            if (!this.TryResolveLootTargetSlot(looter, targetPlacement, out targetPageNumber, out targetSlot))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        "CorpseLoot reject no free inventory slot corpse={0} looter={1}",
+                        corpse.CorpseIdentity,
+                        looter.Identity));
+                this.SendUseActionFinished(looter);
+                return true;
+            }
+
+            InventoryError inventoryError;
+            try
+            {
+                inventoryError = looter.BaseInventory.AddToPage(targetPageNumber, targetSlot, lootItem.Item);
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "CorpseLoot inventory add failed corpse={0} looter={1} targetSlot={2} error={3}",
+                        corpse.CorpseIdentity,
+                        looter.Identity,
+                        targetSlot,
+                        e.Message));
+                this.SendUseActionFinished(looter);
+                return true;
+            }
+
+            if (inventoryError != InventoryError.OK)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        "CorpseLoot inventory add rejected corpse={0} looter={1} targetPage={2} targetSlot={3} error={4}",
+                        corpse.CorpseIdentity,
+                        looter.Identity,
+                        targetPageNumber,
+                        targetSlot,
+                        inventoryError));
+
+                if (inventoryError == InventoryError.HaveUniqueAlready)
+                {
+                    ChatTextMessageHandler.Default.Send(looter, "You already have this unique item.");
+                }
+
+                this.SendUseActionFinished(looter);
+                return true;
+            }
+
+            lootItem.Looted = true;
+            corpse.Opened = true;
+            ContainerAddItemMessageHandler.Default.Send(
+                looter,
+                sourceContainer,
+                targetPlacement == MoveToInventoryPlacement ? MoveToInventoryPlacement : targetSlot);
+
+            if (!corpse.HasUnlootedItems)
+            {
+                this.ScheduleDebugCorpseDespawn(
+                    corpse,
+                    EmptyCorpseCleanupAfterOpenedDelay,
+                    "looted-empty");
+            }
+            else
+            {
+                this.ExtendDebugCorpseLifetime(corpse, ItemLootCorpseLifetime, "loot-remaining");
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    "CorpseLoot accepted corpse={0} looter={1} source={2} lootSlot={3} targetSlot={4} remaining={5}",
+                    corpse.CorpseIdentity,
+                    looter.Identity,
+                    sourceContainer,
+                    lootItem.Slot,
+                    targetSlot,
+                    corpse.LootItems.Count(x => !x.Looted)));
+
+            return true;
+        }
+
+        private static bool CharacterHasUniqueItemAlready(ICharacter character, IItem item)
+        {
+            if (character == null || character.BaseInventory == null || !IsUniqueItem(item))
+            {
+                return false;
+            }
+
+            foreach (IInventoryPage page in character.BaseInventory.Pages.Values)
+            {
+                foreach (KeyValuePair<int, IItem> existing in page.List())
+                {
+                    if (existing.Value != null
+                        && !object.ReferenceEquals(existing.Value, item)
+                        && existing.Value.LowID == item.LowID
+                        && existing.Value.HighID == item.HighID)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsUniqueItem(IItem item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+
+            ItemTemplate lowTemplate;
+            if (ItemLoader.ItemList.TryGetValue(item.LowID, out lowTemplate)
+                && lowTemplate.Stats.ContainsKey(0)
+                && lowTemplate.IsUnique())
+            {
+                return true;
+            }
+
+            ItemTemplate highTemplate;
+            if (ItemLoader.ItemList.TryGetValue(item.HighID, out highTemplate)
+                && highTemplate.Stats.ContainsKey(0)
+                && highTemplate.IsUnique())
+            {
+                return true;
+            }
+
+            return (item.GetAttribute(0) & (int)ItemFlags.Unique) != 0;
+        }
+
+        private bool ProcessDeadNpc(ICharacter character)
+        {
+            if (!(character.Controller is NPCController)
+                || character.Stats[StatIds.health].Value > 0)
+            {
+                return false;
+            }
+
+            DateTime despawnTick;
+            if (!this.deadNpcDespawnTicks.TryGetValue(character.Identity.Instance, out despawnTick))
+            {
+                this.deadNpcDespawnTicks[character.Identity.Instance] = DateTime.UtcNow + DeadNpcDespawnDelay;
+                return true;
+            }
+
+            if (despawnTick > DateTime.UtcNow)
+            {
+                return true;
+            }
+
+            this.FinalizeNpcDespawn(character);
+            return true;
+        }
+
+        private void MarkNpcDead(ICharacter target)
+        {
+            target.Stats[StatIds.health].Value = 0;
+            target.Stats[StatIds.state].Value = 0;
+            target.Stats[StatIds.currentstate].Value = 0;
+            target.Stats[StatIds.actioncategory].Value = 0;
+            target.Stats[StatIds.deadtimer].Value = 1;
+            target.Stats[StatIds.itemanim].Value = DeathAnimationKeyFor(target);
+            target.Stats[StatIds.corpseanimkey].Value = DeathAnimationKeyFor(target);
+            target.Stats[StatIds.dieanim].Value = DeathAnimationKeyFor(target);
+            target.Stats[StatIds.healdelta].Value = 0;
+            target.Stats[StatIds.nanodelta].Value = 0;
+            target.DoNotDoTimers = true;
+
+            // TODO: Roll this NPC's loot table here, then keep/convert the dead dynel into a lootable corpse.
+        }
+
+        private void SendNpcDeathAnimation(ICharacter target)
+        {
+            this.Announce(
+                new CharacterActionMessage
+                {
+                    Identity = target.Identity,
+                    Unknown = 0,
+                    Action = CharacterActionType.Death,
+                    Unknown1 = 0,
+                    Target = Identity.None,
+                    Parameter1 = 0,
+                    Parameter2 = DeathAnimationKeyFor(target),
+                    Unknown2 = 0
+                });
+        }
+
+        private void FinalizeNpcDespawn(ICharacter target)
+        {
+            target.DoNotDoTimers = true;
+            this.nextCombatTicks.Remove(target.Identity.Instance);
+            this.deadNpcDespawnTicks.Remove(target.Identity.Instance);
+            this.Despawn(target.Identity);
+            Pool.Instance.RemoveObject((Character)target);
+
+            LogUtil.Debug(DebugInfoDetail.Network, string.Format("NPC despawned target={0}", target.Identity));
+        }
+
+        private void SendDebugCorpseFullUpdate(ICharacter target, Identity corpseIdentity)
+        {
+            foreach (ICharacter character in
+                Pool.Instance.GetAll<ICharacter>(this.Identity, (int)IdentityType.CanbeAffected))
+            {
+                ZoneClient client = character.Controller.Client as ZoneClient;
+                if (client == null)
+                {
+                    continue;
+                }
+
+                client.SendCompressed(this.BuildDebugCorpseFullUpdate(target, corpseIdentity, character.Identity));
+            }
+        }
+
+        private static TimeSpan CorpseLifetimeFor(CorpseLootClass lootClass)
+        {
+            switch (lootClass)
+            {
+                case CorpseLootClass.MajorBoss:
+                    return MajorBossCorpseLifetime;
+
+                case CorpseLootClass.ItemLoot:
+                    return ItemLootCorpseLifetime;
+
+                default:
+                    return CreditsOnlyCorpseLifetime;
+            }
+        }
+
+        private static CorpseLootClass CorpseLootClassFor(ICharacter target, IList<DebugCorpseLootItem> lootItems)
+        {
+            // TODO: Add boss classification when real mob templates/loot tables are wired in.
+            return lootItems.Count > 0 ? CorpseLootClass.ItemLoot : CorpseLootClass.CreditsOnly;
+        }
+
+        private enum CorpseLootClass
+        {
+            CreditsOnly,
+            ItemLoot,
+            MajorBoss
+        }
+
+        private void ProcessDebugCorpseDespawns()
+        {
+            foreach (int corpseInstance in this.debugCorpseDespawnTicks
+                .Where(x => x.Value <= DateTime.UtcNow)
+                .Select(x => x.Key)
+                .ToList())
+            {
+                this.DespawnDebugCorpse(corpseInstance);
+            }
+        }
+
+        private void ProcessPendingDebugCorpseSpawns()
+        {
+            foreach (DebugCorpseState corpse in this.pendingDebugCorpseSpawns
+                .Where(x => x.Value.SpawnsAtUtc <= DateTime.UtcNow)
+                .Select(x => x.Value)
+                .ToList())
+            {
+                this.pendingDebugCorpseSpawns.Remove(corpse.DeadNpcIdentity.Instance);
+
+                ICharacter target = this.FindByIdentity<ICharacter>(corpse.DeadNpcIdentity);
+                if (target == null)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Network,
+                        string.Format(
+                            "Skipping corpse spawn corpse={0}; dead NPC no longer exists deadNpc={1}",
+                            corpse.CorpseIdentity,
+                            corpse.DeadNpcIdentity));
+                    continue;
+                }
+
+                this.RegisterDebugCorpse(target, corpse.CorpseIdentity);
+                this.SendDebugCorpseFullUpdate(target, corpse.CorpseIdentity);
+            }
+        }
+
+        private void ScheduleDebugCorpseSpawn(ICharacter target, Identity corpseIdentity)
+        {
+            DateTime spawnsAtUtc = DateTime.UtcNow + CorpseSpawnDelay;
+            this.pendingDebugCorpseSpawns[target.Identity.Instance] =
+                new DebugCorpseState
+                {
+                    CorpseIdentity = corpseIdentity,
+                    DeadNpcIdentity = target.Identity,
+                    Name = "Remains of " + target.Name,
+                    LootClass = CorpseLootClass.CreditsOnly,
+                    SpawnsAtUtc = spawnsAtUtc
+                };
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "Corpse scheduled corpse={0} deadNpc={1} delayMs={2}",
+                    corpseIdentity,
+                    target.Identity,
+                    (int)CorpseSpawnDelay.TotalMilliseconds));
+        }
+
+        private void RegisterDebugCorpse(ICharacter target, Identity corpseIdentity)
+        {
+            List<DebugCorpseLootItem> lootItems = RollDebugCorpseLootItems(target);
+            CorpseLootClass lootClass = CorpseLootClassFor(target, lootItems);
+            TimeSpan lifetime = CorpseLifetimeFor(lootClass);
+            DateTime expiresAtUtc = DateTime.UtcNow + lifetime;
+            var state = new DebugCorpseState
+            {
+                CorpseIdentity = corpseIdentity,
+                DeadNpcIdentity = target.Identity,
+                Name = "Remains of " + target.Name,
+                LootClass = lootClass,
+                LootItems = lootItems,
+                InventorySlot = this.AllocateDebugCorpseInventorySlot(),
+                ExpiresAtUtc = expiresAtUtc
+            };
+
+            this.debugCorpses[corpseIdentity.Instance] = state;
+            this.debugCorpseDespawnTicks[corpseIdentity.Instance] = expiresAtUtc;
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    "Corpse registered corpse={0} deadNpc={1} lifetimeSeconds={2} lootClass={3}",
+                    corpseIdentity,
+                    target.Identity,
+                    (int)lifetime.TotalSeconds,
+                    state.LootClass));
+        }
+
+        private void DespawnDebugCorpse(int corpseInstance)
+        {
+            Identity corpseIdentity = new Identity { Type = IdentityType.Corpse, Instance = corpseInstance };
+            this.Despawn(corpseIdentity);
+            this.debugCorpseDespawnTicks.Remove(corpseInstance);
+            this.debugCorpses.Remove(corpseInstance);
+            LogUtil.Debug(DebugInfoDetail.Engine, string.Format("Corpse despawned corpse={0}", corpseIdentity));
+        }
+
+        private void ScheduleDebugCorpseDespawn(DebugCorpseState corpse, TimeSpan delay, string reason)
+        {
+            DateTime expiresAtUtc = DateTime.UtcNow + delay;
+            corpse.ExpiresAtUtc = expiresAtUtc;
+            this.debugCorpseDespawnTicks[corpse.CorpseIdentity.Instance] = expiresAtUtc;
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    "Corpse despawn scheduled corpse={0} delaySeconds={1} reason={2} remainingLoot={3}",
+                    corpse.CorpseIdentity,
+                    delay.TotalSeconds,
+                    reason,
+                    corpse.LootItems == null ? 0 : corpse.LootItems.Count(x => !x.Looted)));
+        }
+
+        private void ExtendDebugCorpseLifetime(DebugCorpseState corpse, TimeSpan minimumRemaining, string reason)
+        {
+            DateTime expiresAtUtc = DateTime.UtcNow + minimumRemaining;
+            if (corpse.ExpiresAtUtc >= expiresAtUtc)
+            {
+                return;
+            }
+
+            corpse.ExpiresAtUtc = expiresAtUtc;
+            this.debugCorpseDespawnTicks[corpse.CorpseIdentity.Instance] = expiresAtUtc;
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    "Corpse lifetime extended corpse={0} minimumRemainingSeconds={1} reason={2} remainingLoot={3}",
+                    corpse.CorpseIdentity,
+                    minimumRemaining.TotalSeconds,
+                    reason,
+                    corpse.LootItems == null ? 0 : corpse.LootItems.Count(x => !x.Looted)));
+        }
+
+        private class DebugCorpseState
+        {
+            public Identity CorpseIdentity { get; set; }
+
+            public Identity DeadNpcIdentity { get; set; }
+
+            public string Name { get; set; }
+
+            public CorpseLootClass LootClass { get; set; }
+
+            public DateTime SpawnsAtUtc { get; set; }
+
+            public DateTime ExpiresAtUtc { get; set; }
+
+            public int InventorySlot { get; set; }
+
+            public List<DebugCorpseLootItem> LootItems { get; set; }
+
+            public bool Opened { get; set; }
+
+            public bool NextUseSendsAccessActionOnly { get; set; }
+
+            public bool HasUnlootedItems
+            {
+                get
+                {
+                    return this.LootItems != null && this.LootItems.Any(x => !x.Looted);
+                }
+            }
+        }
+
+        private class DebugCorpseLootItem
+        {
+            public int Slot { get; set; }
+
+            public Item Item { get; set; }
+
+            public bool Looted { get; set; }
+        }
+
+        private class DebugLootTableEntry
+        {
+            public string ExactName { get; set; }
+
+            public int MonsterData { get; set; }
+
+            public int NpcFamily { get; set; }
+
+            public int DropChancePercent { get; set; }
+
+            public int Quality { get; set; }
+
+            public int[] ItemTemplateIds { get; set; }
+
+            public bool Matches(ICharacter target)
+            {
+                if (!string.IsNullOrEmpty(this.ExactName)
+                    && !string.Equals(target.Name, this.ExactName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+
+                if (this.MonsterData != 0 && target.Stats[StatIds.monsterdata].Value != this.MonsterData)
+                {
+                    return false;
+                }
+
+                if (this.NpcFamily != 0 && target.Stats[StatIds.npcfamily].Value != this.NpcFamily)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        private Identity AllocateDebugCorpseIdentity()
+        {
+            this.nextDebugCorpseInstance++;
+            if (this.nextDebugCorpseInstance > 0x00F0FFFF)
+            {
+                this.nextDebugCorpseInstance = 0x00F0F001;
+            }
+
+            return new Identity
+            {
+                Type = IdentityType.Corpse,
+                Instance = this.nextDebugCorpseInstance
+            };
+        }
+
+        private int AllocateDebugCorpseInventorySlot()
+        {
+            int slot = this.nextDebugCorpseInventorySlot++;
+            if (this.nextDebugCorpseInventorySlot > 0xff)
+            {
+                this.nextDebugCorpseInventorySlot = 0x78;
+            }
+
+            return slot;
+        }
+
+        private byte[] BuildDebugCorpseFullUpdate(ICharacter target, Identity corpseIdentity, Identity receiver)
+        {
+            const int originalEncodedNameLength = 27;
+            const int nameOffset = 231;
+            const int nameLengthOffset = 227;
+            const int originalSuffixOffset = nameOffset + originalEncodedNameLength;
+
+            byte[] template = HexToBytes(
+                "0000000a0001019e000000003cac6f144f474e050000c76a00f0f00100000000080000000b00000000000000004504a4df41c5ea1244cb530d000000003e8fb30a000000003f75b5e0000002350000000000000000006f000046f200000000001818050000001700000000000002bd00000000000002be00000000000002bf000000000000019c000000010000016800000062000000df000000000000003b00000003000000040000000700000059000000010000019f0000c350000001a0776b95780000002a0000797e0000003d0000006f0000000800004650000000220000003c0000001b52656d61696e73206f66205268696e6f6d616e204d6f74686572000000000200000032000003f100000003000007e20000cf2738f46cbe0000000400000000000000010000000000000000000000000000000000000000000001f700000001000000040000798a000000000000c350776b9578000017a600000000000000000000000000000001000000000000000000000002000000000000000000000003000000000000000000000004000000000000000000000000");
+            string corpseName = "Remains of " + target.Name;
+            byte[] nameBytes = Encoding.ASCII.GetBytes(corpseName);
+            int encodedNameLength = nameBytes.Length + 1;
+            // CorpseFullUpdate resumes immediately after the encoded string's trailing null.
+            // Padding this to four bytes shifts the animation/identity tail and the client
+            // never registers the spawned corpse dynel.
+            int newSuffixOffset = nameOffset + encodedNameLength;
+            int afterNameDelta = newSuffixOffset - originalSuffixOffset;
+            byte[] buffer = new byte[template.Length + afterNameDelta];
+
+            Buffer.BlockCopy(template, 0, buffer, 0, nameOffset);
+            Buffer.BlockCopy(nameBytes, 0, buffer, nameOffset, nameBytes.Length);
+            Buffer.BlockCopy(
+                template,
+                originalSuffixOffset,
+                buffer,
+                newSuffixOffset,
+                template.Length - originalSuffixOffset);
+
+            WritePacketLength(buffer, buffer.Length);
+            WriteInt32(buffer, 8, this.server.Id);
+            WriteInt32(buffer, 12, receiver.Instance);
+            WriteInt32(buffer, 24, corpseIdentity.Instance);
+            WriteSingle(buffer, 45, target.RawCoordinates.X);
+            WriteSingle(buffer, 49, target.RawCoordinates.Y);
+            WriteSingle(buffer, 53, target.RawCoordinates.Z);
+            WriteInt32(buffer, 73, target.Playfield.Identity.Instance);
+            WriteInt32(buffer, 143, target.Stats[StatIds.monsterscale].Value);
+            WriteInt32(buffer, 159, target.Stats[StatIds.sex].Value);
+            WriteInt32(buffer, 167, target.Stats[StatIds.breed].Value);
+            WriteInt32(buffer, 175, target.Stats[StatIds.race].Value);
+            int corpseCatMesh = CorpseCatMeshFor(target);
+            int corpseMonsterData = CorpseMonsterDataFor(target);
+            WriteInt32(buffer, 191, target.Identity.Instance);
+            WriteInt32(buffer, 199, corpseCatMesh);
+            WriteInt32(buffer, nameLengthOffset, encodedNameLength);
+            WriteInt32(buffer, 330 + afterNameDelta, corpseMonsterData);
+            WriteInt32(buffer, 342 + afterNameDelta, target.Identity.Instance);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "CorpseFullUpdate visual target={0} corpse={1} catMesh={2} monsterData={3} scale={4} sex={5} breed={6} race={7}",
+                    target.Identity,
+                    corpseIdentity,
+                    corpseCatMesh,
+                    corpseMonsterData,
+                    target.Stats[StatIds.monsterscale].Value,
+                    target.Stats[StatIds.sex].Value,
+                    target.Stats[StatIds.breed].Value,
+                    target.Stats[StatIds.race].Value));
+
+            return buffer;
+        }
+
+        private bool CanBuildKnownCorpseVisual(ICharacter target)
+        {
+            return IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
+                   || MonsterDataToCorpseCatMesh.ContainsKey(target.Stats[StatIds.monsterdata].Value);
+        }
+
+        private static int CorpseCatMeshFor(ICharacter target)
+        {
+            int catMesh = target.Stats[StatIds.catmesh].Value;
+            if (IsUsableVisualId(catMesh))
+            {
+                return catMesh;
+            }
+
+            int monsterData = target.Stats[StatIds.monsterdata].Value;
+            int mappedCatMesh;
+            if (MonsterDataToCorpseCatMesh.TryGetValue(monsterData, out mappedCatMesh))
+            {
+                return mappedCatMesh;
+            }
+
+            return monsterData;
+        }
+
+        private static int DeathAnimationKeyFor(ICharacter target)
+        {
+            int corpseAnimationKey = target.Stats[StatIds.corpseanimkey].Value;
+            if (IsUsableVisualId(corpseAnimationKey))
+            {
+                return corpseAnimationKey;
+            }
+
+            int itemAnimation = target.Stats[StatIds.itemanim].Value;
+            if (IsUsableVisualId(itemAnimation))
+            {
+                return itemAnimation;
+            }
+
+            return DefaultNpcDeathAnimationKey;
+        }
+
+        private static int CorpseMonsterDataFor(ICharacter target)
+        {
+            int monsterData = target.Stats[StatIds.monsterdata].Value;
+            if (IsUsableVisualId(monsterData))
+            {
+                return monsterData;
+            }
+
+            return CorpseCatMeshFor(target);
+        }
+
+        private static bool IsUsableVisualId(int value)
+        {
+            return value > 0 && value != 1234567890;
+        }
+
+        private static byte[] HexToBytes(string hex)
+        {
+            byte[] bytes = new byte[hex.Length / 2];
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
+            }
+
+            return bytes;
+        }
+
+        private static void WriteInt32(byte[] buffer, int offset, int value)
+        {
+            byte[] bytes = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(value));
+            Buffer.BlockCopy(bytes, 0, buffer, offset, bytes.Length);
+        }
+
+        private static void WritePacketLength(byte[] buffer, int length)
+        {
+            buffer[6] = (byte)((length >> 8) & 0xff);
+            buffer[7] = (byte)(length & 0xff);
+        }
+
+        private static void WriteSingle(byte[] buffer, int offset, float value)
+        {
+            byte[] bytes = BitConverter.GetBytes(value);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
+
+            Buffer.BlockCopy(bytes, 0, buffer, offset, bytes.Length);
+        }
+
+        private static void WriteFixedAscii(byte[] buffer, int offset, int length, string value)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                buffer[offset + i] = 0;
+            }
+
+            int count = Math.Min(value.Length, length - 1);
+            for (int i = 0; i < count; i++)
+            {
+                buffer[offset + i] = (byte)value[i];
+            }
+        }
+
+        private void StopFightingDeadTarget(Identity deadTarget)
+        {
+            foreach (ICharacter character in
+                Pool.Instance.GetAll<ICharacter>(this.Identity, (int)IdentityType.CanbeAffected))
+            {
+                if (character.FightingTarget == deadTarget)
+                {
+                    character.SetFightingTarget(Identity.None);
+                    this.nextCombatTicks.Remove(character.Identity.Instance);
+                    this.SendCombatStopMessage(character);
+                }
+            }
+        }
+
+        private void SendCombatStopMessage(ICharacter character)
+        {
+            var stopFight = new StopFightMessage { Identity = character.Identity, Unknown1 = 1 };
+
+            this.Announce(stopFight);
+        }
+
+        private static List<DebugCorpseLootItem> RollDebugCorpseLootItems(ICharacter target)
+        {
+            var lootItems = new List<DebugCorpseLootItem>();
+
+            foreach (DebugLootTableEntry entry in DebugLootTable.Where(x => x.Matches(target)))
+            {
+                if (!RollLootChance(entry.DropChancePercent))
+                {
+                    continue;
+                }
+
+                Item item = CreateLootItem(entry.ItemTemplateIds, entry.Quality);
+                if (item == null)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        string.Format(
+                            "Loot roll skipped invalid item target={0} name={1}",
+                            target.Identity,
+                            target.Name));
+                    continue;
+                }
+
+                lootItems.Add(new DebugCorpseLootItem { Slot = lootItems.Count, Item = item });
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    "Loot rolled target={0} name={1} monsterData={2} npcFamily={3} items={4}",
+                    target.Identity,
+                    target.Name,
+                    target.Stats[StatIds.monsterdata].Value,
+                    target.Stats[StatIds.npcfamily].Value,
+                    lootItems.Count));
+
+            return lootItems;
+        }
+
+        private static bool RollLootChance(int dropChancePercent)
+        {
+            if (dropChancePercent <= 0)
+            {
+                return false;
+            }
+
+            if (dropChancePercent >= 100)
+            {
+                return true;
+            }
+
+            lock (LootRandomLock)
+            {
+                return LootRandom.Next(100) < dropChancePercent;
+            }
+        }
+
+        private static Item CreateLootItem(IEnumerable<int> templateIds, int requestedQuality)
+        {
+            if (templateIds == null)
+            {
+                return null;
+            }
+
+            int quality = Math.Max(1, requestedQuality);
+            foreach (int templateId in templateIds)
+            {
+                ItemTemplate template;
+                if (!ItemLoader.ItemList.TryGetValue(templateId, out template))
+                {
+                    continue;
+                }
+
+                int lowId = template.GetLowId(quality);
+                if (lowId == -1)
+                {
+                    lowId = templateId;
+                }
+
+                int highId = template.GetHighId(quality);
+                if (highId == 1234567890)
+                {
+                    highId = lowId;
+                }
+
+                if (!ItemLoader.ItemList.ContainsKey(lowId) || !ItemLoader.ItemList.ContainsKey(highId))
+                {
+                    continue;
+                }
+
+                var item = new Item(quality, lowId, highId) { MultipleCount = 1 };
+                return item;
+            }
+
+            return null;
+        }
+
+        private static DebugCorpseLootItem FindCorpseLootItem(DebugCorpseState corpse, int requestedLootSlot)
+        {
+            if (corpse.LootItems == null)
+            {
+                return null;
+            }
+
+            DebugCorpseLootItem exactMatch = corpse.LootItems.FirstOrDefault(
+                x => !x.Looted && x.Slot == requestedLootSlot);
+            if (exactMatch != null)
+            {
+                return exactMatch;
+            }
+
+            DebugCorpseLootItem oneBasedMatch = corpse.LootItems.FirstOrDefault(
+                x => !x.Looted && x.Slot + 1 == requestedLootSlot);
+            if (oneBasedMatch != null)
+            {
+                return oneBasedMatch;
+            }
+
+            List<DebugCorpseLootItem> remaining = corpse.LootItems.Where(x => !x.Looted).ToList();
+            if (remaining.Count == 1 && requestedLootSlot <= 1)
+            {
+                return remaining[0];
+            }
+
+            return null;
+        }
+
+        private bool TryResolveLootTargetSlot(
+            ICharacter looter,
+            int targetPlacement,
+            out int targetPageNumber,
+            out int targetSlot)
+        {
+            targetPageNumber = -1;
+            targetSlot = -1;
+
+            if (targetPlacement == MoveToInventoryPlacement)
+            {
+                targetPageNumber = looter.BaseInventory.StandardPage;
+                IInventoryPage targetPage = looter.BaseInventory.Pages[targetPageNumber];
+                targetSlot = targetPage.FindFreeSlot();
+                return targetSlot >= 0;
+            }
+
+            try
+            {
+                IInventoryPage targetPage = looter.BaseInventory.PageFromSlot(targetPlacement);
+                if (targetPage == null)
+                {
+                    return false;
+                }
+
+                foreach (KeyValuePair<int, IInventoryPage> page in looter.BaseInventory.Pages)
+                {
+                    if (object.ReferenceEquals(page.Value, targetPage))
+                    {
+                        targetPageNumber = page.Key;
+                        targetSlot = targetPlacement;
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                targetPageNumber = looter.BaseInventory.StandardPage;
+                IInventoryPage targetPage = looter.BaseInventory.Pages[targetPageNumber];
+                targetSlot = targetPage.FindFreeSlot();
+                return targetSlot >= 0;
+            }
+        }
+
+        private static InventoryEntry CreateCorpseInventoryEntry(DebugCorpseLootItem lootItem)
+        {
+            return new InventoryEntry
+            {
+                Slotnumber = lootItem.Slot,
+                UnknownFlags = 0x00A1,
+                Unknown1 = InventoryEntryCountFor(lootItem.Item),
+                Identity = Identity.None,
+                LowId = lootItem.Item.LowID,
+                HighId = lootItem.Item.HighID,
+                Quality = lootItem.Item.Quality,
+                Unknown2 = 0
+            };
+        }
+
+        private static short InventoryEntryCountFor(Item item)
+        {
+            int count = item.MultipleCount;
+            if (count <= 0 || count == 1234567890)
+            {
+                return 1;
+            }
+
+            return count > short.MaxValue ? short.MaxValue : (short)count;
+        }
+
+        private void SendCorpseInventoryUpdate(ICharacter looter, DebugCorpseState corpse)
+        {
+            if (looter.Controller.Client == null)
+            {
+                return;
+            }
+
+            InventoryEntry[] entries = corpse.LootItems == null
+                ? new InventoryEntry[0]
+                : corpse.LootItems.Where(x => !x.Looted).Select(CreateCorpseInventoryEntry).ToArray();
+
+            corpse.InventorySlot = this.AllocateDebugCorpseInventorySlot();
+
+            looter.Controller.Client.SendCompressed(
+                new InventoryUpdateMessage
+                {
+                    Identity = looter.Identity,
+                    Unknown = 1,
+                    NumberOfSlots = CorpseInventorySlots,
+                    Unknown1 = 2,
+                    Entries = entries,
+                    BagIdentity = corpse.CorpseIdentity,
+                    SlotnumberInMainInventory = corpse.InventorySlot,
+                    Unknown2 = 1
+                });
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    "Corpse InventoryUpdate sent looter={0} corpse={1} slots={2} unknown1=2 slot={3} unknown2=1 entries={4}",
+                    looter.Identity,
+                    corpse.CorpseIdentity,
+                    CorpseInventorySlots,
+                    corpse.InventorySlot,
+                    entries.Length));
+        }
+
+        private void SendCorpseLootAccessAction(ICharacter looter, DebugCorpseState corpse)
+        {
+            if (looter.Controller.Client == null)
+            {
+                return;
+            }
+
+            looter.Controller.Client.SendCompressed(
+                new ActionMessage
+                {
+                    Identity = corpse.CorpseIdentity,
+                    Unknown = 1,
+                    ActionCode = 1,
+                    ActionIdentity = 0x66,
+                    Target = looter.Identity
+                });
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    "Corpse loot access Action sent looter={0} corpse={1} action=0x66",
+                    looter.Identity,
+                    corpse.CorpseIdentity));
+        }
+
+        private void SendUseActionFinished(ICharacter character)
+        {
+            if (character.Controller.Client == null)
+            {
+                return;
+            }
+
+            character.Controller.Client.SendCompressed(
+                new CharacterActionMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 0,
+                    Action = CharacterActionType.UseActionFinished,
+                    Unknown1 = 0,
+                    Target = Identity.None,
+                    Parameter1 = 0,
+                    Parameter2 = 0,
+                    Unknown2 = 0
+                });
+        }
+
+        private void SendTargetClearMessage(ICharacter character)
+        {
+            var lookAt = new LookAtMessage { Identity = character.Identity, Target = Identity.None };
+
+            if (character.Controller.Client != null)
+            {
+                character.Controller.Client.SendCompressed(lookAt);
+            }
+
+            this.Announce(lookAt);
+        }
+
+        private void SendCombatIdleState(ICharacter character)
+        {
+            character.Stats[StatIds.state].Value = 0;
+            character.Stats[StatIds.currentstate].Value = 0;
+            character.Stats[StatIds.actioncategory].Value = 0;
+
+            if (character.Controller.Client == null)
+            {
+                return;
+            }
+
+            character.Controller.Client.SendCompressed(
+                new StatMessage
+                {
+                    Identity = character.Identity,
+                    Stats =
+                        new[]
+                        {
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = (CharacterStat)StatIds.state,
+                                Value2 = 0
+                            },
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = (CharacterStat)StatIds.currentstate,
+                                Value2 = 0
+                            },
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = (CharacterStat)StatIds.actioncategory,
+                                Value2 = 0
+                            }
+                        }
+                });
+            character.Controller.Client.SendCompressed(SimpleCharFullUpdate.ConstructMessage((Character)character));
         }
 
         #endregion

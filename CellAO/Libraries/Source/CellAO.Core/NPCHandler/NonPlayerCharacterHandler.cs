@@ -152,6 +152,15 @@ namespace CellAO.Core.NPCHandler
         {
             if (playfield != null)
             {
+                if (mob.Id < 1000000 || CharacterDao.Instance.Get(mob.Id) != null)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        "Skipping mob spawn " + mob.Id + " (" + mob.Name
+                        + ") because it collides with the player/low CanbeAffected id range.");
+                    return null;
+                }
+
                 Identity mobId = new Identity() { Type = IdentityType.CanbeAffected, Instance = mob.Id };
                 if (Pool.Instance.GetObject(playfield.Identity, mobId) != null)
                 {

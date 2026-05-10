@@ -495,14 +495,29 @@ namespace ZoneEngine.Script
                 return false;
             }
 
+            this.p.ReferencedAssemblies.Clear();
+            this.multipleDllList.Clear();
+            this.scriptList.Clear();
+            this.chatCommands.Clear();
+
             // Add all loaded assemblies to the Referenced assemblies list
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies().Where(x=>x.IsDynamic==false))
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies().Where(x => x.IsDynamic == false))
             {
-                this.p.ReferencedAssemblies.Add(assembly.Location);
+                string assemblyLocation = assembly.Location;
+                if (string.IsNullOrEmpty(assemblyLocation) || IsGeneratedScriptAssembly(assemblyLocation))
+                {
+                    continue;
+                }
+
+                this.p.ReferencedAssemblies.Add(assemblyLocation);
             }
 
             if (multipleFiles)
             {
+                string scriptOutputDirectory = Path.Combine(
+                    "tmp",
+                    "run-" + DateTime.UtcNow.ToString("yyyyMMddHHmmssfff", CultureInfo.InvariantCulture));
+
                 LogScriptAction(
                     "ScriptCompiler:",
                     ConsoleColor.Yellow,
@@ -510,12 +525,13 @@ namespace ZoneEngine.Script
                     ConsoleColor.Magenta);
                 foreach (string scriptFile in this.ScriptsList)
                 {
+                    string outputAssembly = Path.Combine(scriptOutputDirectory, DllName(scriptFile));
                     this.p.OutputAssembly = string.Format(
                         CultureInfo.CurrentCulture,
-                        Path.Combine("tmp", DllName(scriptFile)));
+                        outputAssembly);
 
                     // CreateIM the directory if it doesnt exist
-                    FileInfo file = new FileInfo(Path.Combine("tmp", DllName(scriptFile)));
+                    FileInfo file = new FileInfo(outputAssembly);
                     if (file.Directory != null)
                     {
                         file.Directory.Create();
@@ -742,6 +758,47 @@ namespace ZoneEngine.Script
                         }
                     }
                 }
+            }
+        }
+
+        private static bool IsGeneratedScriptAssembly(string assemblyLocation)
+        {
+            string fullPath = Path.GetFullPath(assemblyLocation);
+            string fileName = Path.GetFileName(fullPath);
+            string tmpPath = Path.GetFullPath("tmp") + Path.DirectorySeparatorChar;
+
+            return string.Equals(fileName, "Scripts.dll", StringComparison.OrdinalIgnoreCase)
+                   || fullPath.StartsWith(tmpPath, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void CleanTemporaryScriptAssemblies()
+        {
+            string tmpPath = Path.GetFullPath("tmp");
+
+            if (!Directory.Exists(tmpPath))
+            {
+                return;
+            }
+
+            try
+            {
+                Directory.Delete(tmpPath, true);
+            }
+            catch (IOException)
+            {
+                LogScriptAction(
+                    "ScriptCompiler:",
+                    ConsoleColor.Yellow,
+                    "Could not clean tmp script assemblies; another ZoneEngine process may still be running.",
+                    ConsoleColor.Red);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                LogScriptAction(
+                    "ScriptCompiler:",
+                    ConsoleColor.Yellow,
+                    "Could not clean tmp script assemblies due to file permissions.",
+                    ConsoleColor.Red);
             }
         }
 

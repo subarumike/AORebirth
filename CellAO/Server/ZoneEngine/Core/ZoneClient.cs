@@ -57,6 +57,8 @@ namespace ZoneEngine.Core
 
     using Utility;
 
+    using ZoneEngine.Core.Controllers;
+
     using IBus = MemBus.IBus;
 
     #endregion
@@ -207,21 +209,29 @@ namespace ZoneEngine.Core
                 this.server.PlayfieldById(
                     new Identity() { Type = IdentityType.Playfield, Instance = character.Playfield });
 
-            if (
-                Pool.Instance.GetObject<Character>(
-                    new Identity() { Type = IdentityType.CanbeAffected, Instance = charId }) == null)
+            Identity characterIdentity = new Identity { Type = IdentityType.CanbeAffected, Instance = charId };
+            Character pooledCharacter = Pool.Instance.GetObject<Character>(characterIdentity);
+            if ((pooledCharacter != null) && (pooledCharacter.Controller is NPCController))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Removing NPC/player identity collision for " + characterIdentity.ToString(true)
+                    + " while logging in character " + charId + ".");
+                Pool.Instance.RemoveObject(pooledCharacter);
+                pooledCharacter = null;
+            }
+
+            if (pooledCharacter == null)
             {
                 this.Controller.Character = new Character(
                     pf.Identity,
-                    new Identity { Type = IdentityType.CanbeAffected, Instance = charId },
+                    characterIdentity,
                     this.Controller);
                 this.controller.Character.Read();
             }
             else
             {
-                this.Controller.Character =
-                    Pool.Instance.GetObject<Character>(
-                        new Identity() { Type = IdentityType.CanbeAffected, Instance = charId });
+                this.Controller.Character = pooledCharacter;
                 this.Controller.Character.Reconnect(this);
                 LogUtil.Debug(DebugInfoDetail.Engine, "Reconnected to Character " + charId);
             }
@@ -361,7 +371,7 @@ namespace ZoneEngine.Core
                     }
 
                     // Remove reference of character
-                    if (this.Controller.Character != null)
+                    if ((this.Controller != null) && (this.Controller.Character != null))
                     {
                         // Commenting this for now, since no logouttimer should occur on zoning, only on a network disconnect (like a client crash)
                         // only how should i find out..... - Algorithman
@@ -444,6 +454,13 @@ namespace ZoneEngine.Core
             var packet = new byte[this._remainingLength];
             Array.Copy(buffer.SegmentData, packet, this._remainingLength);
 
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Zone receive: {0} bytes, message {1}",
+                    packet.Length,
+                    this.GetMessageNumber(packet)));
             LogUtil.Debug(DebugInfoDetail.Network, "\r\nReceived: \r\n" + HexOutput.Output(packet));
 
             this._remainingLength = 0;
@@ -451,13 +468,14 @@ namespace ZoneEngine.Core
             {
                 message = this.messageSerializer.Deserialize(packet);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 uint messageNumber = this.GetMessageNumber(packet);
                 this.Server.Warning(
                     this,
                     "Client sent malformed message {0}",
                     messageNumber.ToString(CultureInfo.InvariantCulture));
+                LogUtil.ErrorException(e, false, "Zone deserialize failed for message {0}", messageNumber);
                 LogUtil.Debug(DebugInfoDetail.Error, HexOutput.Output(packet));
                 return false;
             }
@@ -473,6 +491,8 @@ namespace ZoneEngine.Core
                     messageNumber.ToString(CultureInfo.InvariantCulture));
                 return false;
             }
+
+            LogUtil.Debug(DebugInfoDetail.Engine, "Zone message decoded: " + message.Body.GetType().FullName);
 
             // FUUUUUGLY
 

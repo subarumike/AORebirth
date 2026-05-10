@@ -110,3 +110,17 @@ UpgradeLog*.XML
 /CellAO/Built
 CellAO/_dotMemory.CellAO/
 CellAO/CellAO.sln.DotSettings
+
+# Local external research clones; use the forked submodules above for committed dependencies.
+tools-temp/external/aosharp/
+tools-temp/external/aosharp-github/
+tools-temp/external/easyhook/
+
+# Local/generated investigation artifacts that can contain credentials, captures, or copied binaries.
+build-verify/
+tools-temp/live-pcaps/
+tools-temp/fusion-logs/
+tools-temp/ao-dir-quarantine/
+tools-temp/ao-dll-function-map/ghidra-work/
+tools-temp/live_stream5_decompressed.bin
+tools-temp/nuget.exe

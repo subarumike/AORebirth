@@ -107,7 +107,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 }
 
                 fullCharacterMessage.Identity = character.Identity;
-                fullCharacterMessage.MsgVersion = 25;
+                fullCharacterMessage.MsgVersion = 26;
                 fullCharacterMessage.InventorySlots = inventory.ToArray();
 
                 /* part 2 of data */

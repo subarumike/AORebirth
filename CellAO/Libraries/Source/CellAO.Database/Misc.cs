@@ -392,7 +392,9 @@ namespace CellAO.Database
             switch (Config.Instance.CurrentConfig.SQLType)
             {
                 case "MySql":
-                    return conn.Query<string>("show tables").Contains(fName);
+                    return conn.Query<string>(
+                        "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()")
+                        .Contains(fName);
                 case "MsSql":
                     return conn.Query<string>("SELECT table_name FROM INFORMATION_SCHEMA.TABLES").Contains(fName);
                 case "PostgreSQL":

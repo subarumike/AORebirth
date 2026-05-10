@@ -36,8 +36,11 @@ namespace ZoneEngine.Core.MessageHandlers
     using CellAO.Core.Components;
     using CellAO.Core.Network;
     using CellAO.Core.Vector;
+    using CellAO.Enums;
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+
+    using Utility;
 
     using ZoneEngine.Core.InternalMessages;
 
@@ -73,7 +76,8 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            byte moveType = message.MoveType;
+            byte rawMoveType = message.MoveType;
+            byte moveType = NormalizeMoveTypeForServer(rawMoveType, client);
             var heading = new Quaternion(message.Heading.X, message.Heading.Y, message.Heading.Z, message.Heading.W);
             Coordinate coordinates = new Coordinate(message.Coordinates);
 
@@ -81,6 +85,16 @@ namespace ZoneEngine.Core.MessageHandlers
             int tmpInt1 = message.Unknown1;
             int tmpInt2 = message.Unknown2;
             int tmpInt3 = message.Unknown3;
+
+            client.Server.Info(
+                client,
+                "CharDCMove moveTypeRaw={0} moveTypeNormalized={1} coords={2} u1={3} u2={4} u3={5}",
+                rawMoveType,
+                moveType,
+                coordinates,
+                tmpInt1,
+                tmpInt2,
+                tmpInt3);
 
             /*
             if (!client.Character.DoNotDoTimers)
@@ -144,7 +158,7 @@ namespace ZoneEngine.Core.MessageHandlers
                         {
                             Identity = client.Controller.Character.Identity,
                             Unknown = 0x00,
-                            MoveType = moveType,
+                            MoveType = rawMoveType,
                             Heading =
                                 new SmokeLounge.AOtomation.Messaging.GameData.Quaternion
                                 {
@@ -192,6 +206,28 @@ namespace ZoneEngine.Core.MessageHandlers
                 }
             }
              */
+        }
+
+        private static byte NormalizeMoveTypeForServer(byte moveType, IZoneClient client)
+        {
+            switch (moveType)
+            {
+                case 0x24:
+                    return 37;
+                case 0x2B:
+                    return 0x16;
+                case 0x16:
+                    if ((client.Controller.Character.MoveMode == MoveModes.Sit)
+                        || (client.Controller.Character.MoveMode == MoveModes.Sleep)
+                        || (client.Controller.Character.MoveMode == MoveModes.Lounge))
+                    {
+                        return 37;
+                    }
+
+                    return moveType;
+                default:
+                    return moveType;
+            }
         }
 
         #endregion

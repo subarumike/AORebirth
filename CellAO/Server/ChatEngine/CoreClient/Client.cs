@@ -160,19 +160,6 @@ namespace ChatEngine.CoreClient
 
         #region Methods
 
-        /// <summary>
-        /// </summary>
-        /// <param name="channel">
-        /// </param>
-        /// <param name="characterName">
-        /// </param>
-        /// <param name="text">
-        /// </param>
-        internal void ChannelMessageReceived(ChannelBase channel, string characterName, string text)
-        {
-            channel.ChannelMessageToIRC(characterName, text);
-        }
-
         // NV: Should this be here or inside Character...
 
         /// <summary>

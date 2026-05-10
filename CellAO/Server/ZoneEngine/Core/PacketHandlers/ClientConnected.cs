@@ -33,19 +33,28 @@ namespace ZoneEngine.Core.PacketHandlers
 {
     #region Usings ...
 
+    using System;
+    using System.Linq;
     using System.Text;
 
     using CellAO.Core.Entities;
+    using CellAO.Core.Network;
+    using CellAO.Core.NPCHandler;
     using CellAO.Core.Playfields;
+    using CellAO.Core.Vector;
+    using CellAO.Enums;
     using CellAO.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Script;
+
+    using Utility;
 
     #endregion
 
@@ -111,26 +120,17 @@ client.Controller.Character.Playfield.Identity,
                 VendingMachineFullUpdateMessageHandler.Default.Send(client.Controller.Character, vendor);
             }
 
+            EnsureDebugEnemySpawn(client);
+
             var sendSCFUs = new IMSendPlayerSCFUs { toClient = client };
             ((Playfield)client.Playfield).SendSCFUsToClient(sendSCFUs);
 
-            /* set SocialStatus to 0 */
-            client.Controller.Character.Stats[521].BaseValue = 0;
+            /* Live login advertises the character as socially/action-ready. */
+            client.Controller.Character.Stats[StatIds.socialstatus].BaseValue = 4;
 
             // Stat.SendDirect(client, 521, 0, false);
 
             var identity = new Identity { Type = IdentityType.CanbeAffected, Instance = charID };
-
-            /* Action 167 Animation and Stance Data maybe? */
-            var message = new CharacterActionMessage
-                          {
-                              Identity = identity,
-                              Action = CharacterActionType.ChangeAnimationAndStance,
-                              Target = Identity.None,
-                              Parameter1 = 0x00000000,
-                              Parameter2 = 0x00000001
-                          };
-            client.SendCompressed(message);
 
             var gameTimeMessage = new GameTimeMessage
                                   {
@@ -140,6 +140,22 @@ client.Controller.Character.Playfield.Identity,
                                       Unknown4 = 80183.3125f
                                   };
             client.SendCompressed(gameTimeMessage);
+
+            InitializeActionableState(client);
+            client.SendCompressed(
+                new StatMessage
+                {
+                    Identity = identity,
+                    Stats =
+                        new[]
+                        {
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = CharacterStat.SocialStatus,
+                                Value2 = (uint)client.Controller.Character.Stats[StatIds.socialstatus].Value
+                            }
+                        }
+                });
 
 
             /* set SocialStatus to 0 */
@@ -211,6 +227,144 @@ client.Controller.Character.Playfield.Identity,
 
             // Timers are allowed to update client stats now.
             client.Controller.Character.DoNotDoTimers = false;
+        }
+
+        private static void InitializeActionableState(ZoneClient client)
+        {
+            // Match the live client's login baseline so the client enables its built-in normal action table.
+            SetStat(client, StatIds.state, 0);
+            SetStat(client, StatIds.currentmovementmode, (int)MoveModes.Run);
+            SetStat(client, StatIds.prevmovementmode, (int)MoveModes.Run);
+            SetStat(client, StatIds.currentstate, 0);
+            SetStat(client, StatIds.waitstate, 0);
+            SetStat(client, StatIds.socialstatus, 4);
+            SetStat(client, StatIds.specialcondition, 3);
+            SetStat(client, StatIds.actioncategory, 0);
+        }
+
+        private static void SetStat(ZoneClient client, StatIds stat, int value)
+        {
+            client.Controller.Character.Stats[stat].Value = value;
+            client.Controller.Character.Stats[stat].BaseValue = (uint)value;
+        }
+
+        private static void EnsureDebugEnemySpawn(ZoneClient client)
+        {
+            const string testMobName = "Codex Test Cheerleet";
+            const string testMobTemplateHash = "EERL";
+
+            ICharacter character = client.Controller.Character;
+            if (character.Playfield == null)
+            {
+                LogUtil.Debug(DebugInfoDetail.Error, "Debug enemy spawn skipped: character has no playfield.");
+                return;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "Debug enemy spawn check player={0} playfield={1} template={2} name={3}",
+                    character.Identity.ToString(true),
+                    character.Playfield.Identity.ToString(true),
+                    testMobTemplateHash,
+                    testMobName));
+
+            bool alreadySpawned =
+                Pool.Instance.GetAll<ICharacter>(character.Playfield.Identity, (int)IdentityType.CanbeAffected)
+                    .Any(x => x.Controller is NPCController && x.Name == testMobName);
+            if (alreadySpawned)
+            {
+                foreach (ICharacter existingMob in
+                    Pool.Instance.GetAll<ICharacter>(character.Playfield.Identity, (int)IdentityType.CanbeAffected)
+                        .Where(x => x.Controller is NPCController && x.Name == testMobName))
+                {
+                    PrepareDebugEnemy(existingMob);
+                    existingMob.DoNotDoTimers = false;
+                    SendDebugEnemyToClient(client, existingMob);
+                }
+                return;
+            }
+
+            Coordinate spawnCoordinate = new Coordinate(character.Coordinates());
+            spawnCoordinate.z += 5.0f;
+
+            var npcController = new NPCController();
+            Character mobCharacter = NonPlayerCharacterHandler.SpawnMobFromTemplate(
+                testMobTemplateHash,
+                character.Playfield.Identity,
+                spawnCoordinate,
+                character.Heading,
+                npcController,
+                1);
+
+            if (mobCharacter == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format("Debug enemy spawn failed: SpawnMobFromTemplate returned null for {0}.", testMobTemplateHash));
+                return;
+            }
+
+            mobCharacter.Name = testMobName;
+            mobCharacter.Playfield = character.Playfield;
+            PrepareDebugEnemy(mobCharacter);
+            mobCharacter.DoNotDoTimers = false;
+            SendDebugEnemyToClient(client, mobCharacter);
+        }
+
+        private static void SendDebugEnemyToClient(ZoneClient client, ICharacter mobCharacter)
+        {
+            SimpleCharFullUpdateMessage simpleCharFullUpdate =
+                SimpleCharFullUpdate.ConstructMessage((Character)mobCharacter);
+            client.SendCompressed(simpleCharFullUpdate);
+            client.SendCompressed(new CharInPlayMessage { Identity = mobCharacter.Identity, Unknown = 0x00 });
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "Debug enemy sent to client mob={0} name={1} pf={2} pos={3:0.00},{4:0.00},{5:0.00} hp={6}/{7} monsterData={8} catMesh={9}",
+                    mobCharacter.Identity.ToString(true),
+                    mobCharacter.Name,
+                    mobCharacter.Playfield.Identity.ToString(true),
+                    mobCharacter.RawCoordinates.X,
+                    mobCharacter.RawCoordinates.Y,
+                    mobCharacter.RawCoordinates.Z,
+                    mobCharacter.Stats[StatIds.health].Value,
+                    mobCharacter.Stats[StatIds.life].Value,
+                    mobCharacter.Stats[StatIds.monsterdata].Value,
+                    mobCharacter.Stats[StatIds.catmesh].Value));
+        }
+
+        private static void PrepareDebugEnemy(ICharacter mobCharacter)
+        {
+            SetMobStat(mobCharacter, StatIds.monsterdata, 247832);
+            SetMobStat(mobCharacter, StatIds.catmesh, 247821);
+            SetMobStat(mobCharacter, StatIds.displaycatmesh, 247821);
+            SetMobStat(mobCharacter, StatIds.monsterscale, 117);
+            SetMobStat(mobCharacter, StatIds.visualflags, 0x1F);
+            SetMobStat(mobCharacter, StatIds.side, 3);
+            SetMobStat(mobCharacter, StatIds.fatness, 1);
+            SetMobStat(mobCharacter, StatIds.breed, 6);
+            SetMobStat(mobCharacter, StatIds.sex, 1);
+            SetMobStat(mobCharacter, StatIds.race, 1);
+            SetMobStat(mobCharacter, StatIds.npcfamily, 221);
+            SetMobStat(mobCharacter, StatIds.itemanim, 0x1F7);
+            SetMobStat(mobCharacter, StatIds.corpseanimkey, 0x1F7);
+            SetMobStat(mobCharacter, StatIds.dieanim, 0x1F7);
+            mobCharacter.Stats[StatIds.life].Value = 5;
+            mobCharacter.Stats[StatIds.health].Value = Math.Min(mobCharacter.Stats[StatIds.health].Value, 5);
+            if (mobCharacter.Stats[StatIds.health].Value <= 0)
+            {
+                mobCharacter.Stats[StatIds.health].Value = 5;
+            }
+            mobCharacter.Stats[StatIds.healdelta].Value = 0;
+            mobCharacter.Stats[StatIds.healinterval].Value = 600;
+        }
+
+        private static void SetMobStat(ICharacter mobCharacter, StatIds stat, int value)
+        {
+            mobCharacter.Stats[stat].Value = value;
+            mobCharacter.Stats[stat].BaseValue = (uint)value;
         }
 
         #endregion

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ZoneEngine</RootNamespace>
     <AssemblyName>ZoneEngine</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -104,6 +104,7 @@
     <Compile Include="ChatCommands\tptoproxy.cs" />
     <Compile Include="ChatCommands\WalkingTest.cs" />
     <Compile Include="ChatCommands\Weather.cs" />
+    <Compile Include="ChatCommands\Posture.cs" />
     <Compile Include="Core\Controllers\NPCController.cs" />
     <Compile Include="Core\Controllers\PlayerController.cs" />
     <Compile Include="Core\Functions\FunctionCollection.cs" />
@@ -141,6 +142,7 @@
     <Compile Include="Core\KnuBot\KnuBotDialogTree.cs" />
     <Compile Include="Core\MessageHandlers\AddTemplateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\AppearanceUpdateMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\AttackMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\BankMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\CastNanoMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\CharacterActionMessageHandler.cs" />
@@ -150,6 +152,7 @@
     <Compile Include="Core\MessageHandlers\ChatCmdMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ChatServerInfoMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ChatTextMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ContainerAddItemMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\DespawnMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\FeedbackMessageHandler.cs" />
@@ -176,6 +179,7 @@
     <Compile Include="Core\MessageHandlers\SkillMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\SocialActionCmdMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\StatMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\StopFightMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\TeleportMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\TemplateActionMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\TradeMessageHandler.cs" />

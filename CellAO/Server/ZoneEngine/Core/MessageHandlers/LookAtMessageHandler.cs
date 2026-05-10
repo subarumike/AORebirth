@@ -38,6 +38,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using Utility;
+
     #endregion
 
     /// <summary>
@@ -62,6 +64,13 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         protected override void Read(LookAtMessage message, IZoneClient client)
         {
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "LookAt target={0} returnInfo={1}",
+                    message.Target.ToString(true),
+                    message.ReturnInfo));
+
             if (client.Controller.LookAt(message.Target))
             {
                 if (message.ReturnInfo != 1)

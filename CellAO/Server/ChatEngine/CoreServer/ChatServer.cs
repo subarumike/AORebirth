@@ -47,10 +47,6 @@ namespace ChatEngine.CoreServer
     using ChatEngine.CoreClient;
     using ChatEngine.Packets;
 
-    using Chatengine.Relay;
-
-    using ChatEngine.Relay.Common;
-
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using Utility;
@@ -98,17 +94,6 @@ namespace ChatEngine.CoreServer
             this.Channels.Add(new RestrictedChannel(Side.Clan, ChannelFlags.None, ChannelType.General));
             this.Channels.Add(new RestrictedChannel(Side.Omni, ChannelFlags.None, ChannelType.General));
             this.Channels.Add(new RestrictedChannel(Side.Neutral, ChannelFlags.None, ChannelType.General));
-
-            // Add a relay channel if needed
-            if (ConfigReadWrite.Instance.CurrentConfig.UseIRCRelay)
-            {
-                this.Channels.Add(
-                    new GlobalChannel(
-                        ChannelFlags.None,
-                        ChannelType.General,
-                        5,
-                        ConfigReadWrite.Instance.CurrentConfig.RelayIngameChannel));
-            }
 
             this.ClientConnected += this.ClientConnectedToChat;
             this.ClientDisconnected += this.OnClientDisconnect;
@@ -219,20 +204,6 @@ namespace ChatEngine.CoreServer
             if (message != null)
             {
                 this.DistributeVicinityChat(message);
-            }
-            var requestPlayfieldList = messageObject.DataObject as RequestPlayfieldList;
-            if (requestPlayfieldList != null)
-            {
-                this.PushRequestPlayfieldListReply(requestPlayfieldList);
-            }
-        }
-
-        private void PushRequestPlayfieldListReply(RequestPlayfieldList requestPlayfieldList)
-        {
-            lock (Program.Ircbot.replyQueuePlayfieldList)
-            {
-                LogUtil.Debug(DebugInfoDetail.ISComm,"RequestPlayfieldList Answer received");
-                Program.Ircbot.replyQueuePlayfieldList.Enqueue(requestPlayfieldList);
             }
         }
 

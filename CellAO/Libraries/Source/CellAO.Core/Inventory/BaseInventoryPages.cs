@@ -137,8 +137,12 @@ namespace CellAO.Core.Inventory
                 throw new ArgumentOutOfRangeException("There is no inventorypage #" + pageNum);
             }
 
-            this.Pages[pageNum].Add(slotNum, item);
-            return InventoryError.OK;
+            if (this.HasUniqueItemAlready(item))
+            {
+                return InventoryError.HaveUniqueAlready;
+            }
+
+            return this.Pages[pageNum].Add(slotNum, item);
         }
 
         /// <summary>
@@ -302,14 +306,19 @@ namespace CellAO.Core.Inventory
         {
             try
             {
-                this.AddToPage(this.StandardPage, this.Pages[this.StandardPage].FindFreeSlot(), item);
+                int freeSlot = this.Pages[this.StandardPage].FindFreeSlot();
+                if (freeSlot == -1)
+                {
+                    return InventoryError.InventoryIsFull;
+                }
+
+                return this.AddToPage(this.StandardPage, freeSlot, item);
             }
             catch
             {
                 return InventoryError.InventoryIsFull;
             }
 
-            return InventoryError.OK;
         }
 
         /// <summary>
@@ -348,6 +357,56 @@ namespace CellAO.Core.Inventory
                 }
             }
             this.disposed = true;
+        }
+
+        private static bool IsUniqueItem(IItem item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+
+            ItemTemplate lowTemplate;
+            if (ItemLoader.ItemList.TryGetValue(item.LowID, out lowTemplate)
+                && lowTemplate.Stats.ContainsKey(0)
+                && lowTemplate.IsUnique())
+            {
+                return true;
+            }
+
+            ItemTemplate highTemplate;
+            if (ItemLoader.ItemList.TryGetValue(item.HighID, out highTemplate)
+                && highTemplate.Stats.ContainsKey(0)
+                && highTemplate.IsUnique())
+            {
+                return true;
+            }
+
+            return (item.GetAttribute(0) & (int)ItemFlags.Unique) != 0;
+        }
+
+        private bool HasUniqueItemAlready(IItem item)
+        {
+            if (!IsUniqueItem(item))
+            {
+                return false;
+            }
+
+            foreach (IInventoryPage page in this.Pages.Values)
+            {
+                foreach (KeyValuePair<int, IItem> existing in page.List())
+                {
+                    if (existing.Value != null
+                        && !object.ReferenceEquals(existing.Value, item)
+                        && existing.Value.LowID == item.LowID
+                        && existing.Value.HighID == item.HighID)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

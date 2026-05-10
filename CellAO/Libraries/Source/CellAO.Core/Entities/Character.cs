@@ -155,7 +155,9 @@ namespace CellAO.Core.Entities
 
             set
             {
-                this.Stats[StatIds.currentmovementmode].Value = (int)value;
+                int movementMode = (int)value;
+                this.Stats[StatIds.currentmovementmode].Value = movementMode;
+                this.Stats[StatIds.currentmovementmode].BaseValue = (uint)movementMode;
             }
         }
 
@@ -172,7 +174,9 @@ namespace CellAO.Core.Entities
 
             set
             {
-                this.Stats[StatIds.prevmovementmode].Value = (int)value;
+                int movementMode = (int)value;
+                this.Stats[StatIds.prevmovementmode].Value = movementMode;
+                this.Stats[StatIds.prevmovementmode].BaseValue = (uint)movementMode;
             }
         }
 
@@ -455,7 +459,8 @@ namespace CellAO.Core.Entities
         /// </exception>
         public bool SetFightingTarget(Identity identity)
         {
-            throw new NotImplementedException();
+            this.FightingTarget = identity;
+            return true;
         }
 
         /// <summary>
@@ -701,7 +706,11 @@ namespace CellAO.Core.Entities
                 case 29: // Switch To Fly Mode
                     break;
                 case 30: // Switch To Sit Ground Mode
-                    this.prevmovementmode = this.currentmovementmode;
+                    if (this.currentmovementmode != MoveModes.Sit)
+                    {
+                        this.prevmovementmode = this.currentmovementmode;
+                    }
+
                     this.currentmovementmode = MoveModes.Sit;
                     break;
 

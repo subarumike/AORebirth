@@ -127,6 +127,40 @@ namespace CellAO.Core.Playfields
 
         /// <summary>
         /// </summary>
+        /// <param name="looter">
+        /// </param>
+        /// <param name="corpseIdentity">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        bool TryUseCorpse(ICharacter looter, Identity corpseIdentity);
+
+        /// <summary>
+        /// </summary>
+        /// <param name="looter">
+        /// </param>
+        /// <param name="deadNpcIdentity">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        bool TryUseDeadNpcCorpse(ICharacter looter, Identity deadNpcIdentity, out Identity corpseIdentity);
+
+        /// <summary>
+        /// </summary>
+        /// <param name="looter">
+        /// </param>
+        /// <param name="sourceContainer">
+        /// </param>
+        /// <param name="target">
+        /// </param>
+        /// <param name="targetPlacement">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        bool TryLootCorpseItem(ICharacter looter, Identity sourceContainer, Identity target, int targetPlacement);
+
+        /// <summary>
+        /// </summary>
         void DisconnectAllClients();
 
         /// <summary>

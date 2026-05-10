@@ -41,10 +41,6 @@ namespace ChatEngine
 
     using ChatEngine.CoreServer;
 
-    using Chatengine.Relay;
-
-    using ChatEngine.Relay.Common;
-
     using locales;
 
     using NBug;
@@ -78,10 +74,6 @@ namespace ChatEngine
         /// <summary>
         /// </summary>
         private static ConsoleText ct = new ConsoleText();
-
-        /// <summary>
-        /// </summary>
-        public static RelayBot Ircbot;
 
         /// <summary>
         /// </summary>
@@ -223,21 +215,7 @@ namespace ChatEngine
                 Colouring.Pop();
             }
 
-            StartRelayBot();
             chatServer.Start(TcpEnable, UdpEnable);
-        }
-
-        private static void StartRelayBot()
-        {
-            if (Config.Instance.CurrentConfig.UseIRCRelay == true)
-            {
-                Console.WriteLine("Starting RelayBot. Version {0}", ProgramInfo.AssemblyVersion);
-
-                // Call the IRC Bot stuff here..
-                Ircbot = new RelayBot();
-
-                Ircbot.Run(chatServer);
-            }
         }
 
         /// <summary>

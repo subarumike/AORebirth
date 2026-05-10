@@ -88,6 +88,15 @@ namespace ZoneEngine.Core.MessageHandlers
              * DEAD Trade Window (incoming) It's bank now (when you put something into the bank)
              */
 
+            if (client.Controller.Character.Playfield.TryLootCorpseItem(
+                client.Controller.Character,
+                message.SourceContainer,
+                message.Target,
+                message.TargetPlacement))
+            {
+                return;
+            }
+
             IInventoryPage sendingPage = Pool.Instance.GetObject<IInventoryPage>(
                 message.Identity,
                 new Identity()

@@ -97,8 +97,6 @@ namespace ChatEngine.PacketHandlers
                         recipient.Send(newpacket);
                     }
                 }
-
-                client.ChannelMessageReceived(channel, client.Character.characterName, text);
             }
 
             ChatLogger.WriteString(channelName, text, client.Character.characterName);
@@ -118,7 +116,7 @@ namespace ChatEngine.PacketHandlers
         /// </returns>
         private static bool ProcessServerCommand(string text, Client client)
         {
-            if (text.StartsWith("."))
+            if (text.StartsWith(".") || text.StartsWith("/"))
             {
                 Program.ISCom.BroadCast(
                     new CellAO.Communication.Messages.ChatCommand

@@ -145,6 +145,7 @@ namespace ZoneEngine.ChatCommands
                 {
                     character.Playfield.Publish(
                         ChatTextMessageHandler.Default.CreateIM(character, "Could not add to inventory. (" + err + ")"));
+                    return;
                 }
 
                 if (targetEntity as Character != null)

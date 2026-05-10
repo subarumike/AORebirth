@@ -190,24 +190,6 @@ namespace ChatEngine.Channels
             }
         }
 
-        // The IRC Relay version
-        /// <summary>
-        /// </summary>
-        /// <param name="nameTag">
-        /// </param>
-        /// <param name="text">
-        /// </param>
-        /// <param name="blob">
-        /// </param>
-        public void ChannelMessage(string nameTag, string text, string blob = "")
-        {
-            byte[] channelMessageBytes = Packets.ChannelMessage.Create(this, 0, "[" + nameTag + "] " + text, blob);
-            foreach (IClient client in this.clients)
-            {
-                client.Send(channelMessageBytes);
-            }
-        }
-
         /// <summary>
         /// </summary>
         public void CloseChannel()
@@ -249,21 +231,6 @@ namespace ChatEngine.Channels
         #endregion
 
         #region Methods
-
-        /// <summary>
-        /// </summary>
-        /// <param name="characterName">
-        /// </param>
-        /// <param name="text">
-        /// </param>
-        internal void ChannelMessageToIRC(string characterName, string text)
-        {
-            if (this.OnChannelMessage != null)
-            {
-                this.OnChannelMessage(this, new ChannelMessageEventArgs() { PlayerName = characterName, Text = text });
-            }
-        }
-
         #endregion
     }
 }
