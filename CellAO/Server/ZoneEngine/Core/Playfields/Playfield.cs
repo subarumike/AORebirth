@@ -148,38 +148,9 @@ namespace CellAO.Core.Playfields
 
         private static readonly object LootRandomLock = new object();
 
-        private static readonly DebugLootTableEntry[] DebugLootTable =
-        {
-            new DebugLootTableEntry
-            {
-                ExactName = "Codex Test Cheerleet",
-                MonsterData = 247832,
-                DropChancePercent = 100,
-                Quality = 1,
-                ItemTemplateIds = new[] { 0x4545F, 0x4545A }
-            },
-            new DebugLootTableEntry
-            {
-                ExactName = "Codex Test Cheerleet",
-                MonsterData = 247832,
-                DropChancePercent = 100,
-                Quality = 1,
-                ItemTemplateIds = new[] { 27350, 85534, 85521, 273496, 273500 }
-            },
-            new DebugLootTableEntry
-            {
-                ExactName = "Codex Test Cheerleet",
-                MonsterData = 247832,
-                DropChancePercent = 100,
-                Quality = 1,
-                ItemTemplateIds = new[] { 27350 }
-            }
-        };
+        private static readonly DebugLootTableEntry[] DebugLootTable = BuildDebugLootTable();
 
-        private static readonly Dictionary<int, int> MonsterDataToCorpseCatMesh = new Dictionary<int, int>
-        {
-            { 31114, 31102 }
-        };
+        private static readonly Dictionary<int, int> MonsterDataToCorpseCatMesh = BuildMonsterDataToCorpseCatMeshMap();
 
         /// <summary>
         /// </summary>
@@ -1841,6 +1812,62 @@ namespace CellAO.Core.Playfields
 
                 return true;
             }
+        }
+
+        private static DebugLootTableEntry[] BuildDebugLootTable()
+        {
+            var entries = new List<DebugLootTableEntry>();
+            foreach (CombatTestMobArchetype.Entry archetype in CombatTestMobArchetype.All)
+            {
+                entries.Add(
+                    new DebugLootTableEntry
+                    {
+                        ExactName = archetype.DisplayName,
+                        MonsterData = archetype.MonsterData,
+                        DropChancePercent = 100,
+                        Quality = 1,
+                        ItemTemplateIds = new[] { 0x4545F, 0x4545A }
+                    });
+
+                entries.Add(
+                    new DebugLootTableEntry
+                    {
+                        ExactName = archetype.DisplayName,
+                        MonsterData = archetype.MonsterData,
+                        DropChancePercent = 100,
+                        Quality = 1,
+                        ItemTemplateIds = new[] { 27350, 85534, 85521, 273496, 273500 }
+                    });
+
+                entries.Add(
+                    new DebugLootTableEntry
+                    {
+                        ExactName = archetype.DisplayName,
+                        MonsterData = archetype.MonsterData,
+                        DropChancePercent = 100,
+                        Quality = 1,
+                        ItemTemplateIds = new[] { 27350 }
+                    });
+            }
+
+            return entries.ToArray();
+        }
+
+        private static Dictionary<int, int> BuildMonsterDataToCorpseCatMeshMap()
+        {
+            var map = new Dictionary<int, int>
+            {
+                { 247831, 247826 },
+                { 247832, 247821 },
+                { 31114, 31102 }
+            };
+
+            foreach (KeyValuePair<int, int> mapping in CombatTestMobArchetype.CorpseVisualMappings())
+            {
+                map[mapping.Key] = mapping.Value;
+            }
+
+            return map;
         }
 
         private Identity AllocateDebugCorpseIdentity()

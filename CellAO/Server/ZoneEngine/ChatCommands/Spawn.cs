@@ -48,6 +48,7 @@ namespace ZoneEngine.ChatCommands
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
@@ -70,12 +71,13 @@ namespace ZoneEngine.ChatCommands
         /// </returns>
         public override bool CheckCommandArguments(string[] args)
         {
-            if (string.Compare(args[0], "spawnleet", true) == 0)
+            CombatTestMobArchetype.Entry combatTestMob;
+            if (TryResolveCombatTestMob(args, out combatTestMob))
             {
                 return true;
             }
 
-            if ((args.Length == 2) && (string.Compare(args[1], "codexleet", true) == 0))
+            if ((args.Length == 2) && (string.Compare(args[1], "testmobs", true) == 0))
             {
                 return true;
             }
@@ -115,6 +117,7 @@ namespace ZoneEngine.ChatCommands
                 @"Usage: /command Spawn hash level
 For a list of available templates: /command spawn list [filter1,filter2...]
 Spawn the current combat test mob: /command spawnleet
+Spawn combat test mob aliases: /command spawn testmobs
 Filter will be applied to mob name"));
         }
 
@@ -166,10 +169,10 @@ Filter will be applied to mob name"));
         /// </param>
         public override void ExecuteCommand(ICharacter character, Identity target, string[] args)
         {
-            if ((string.Compare(args[0], "spawnleet", true) == 0)
-                || ((args.Length == 2) && (string.Compare(args[1], "codexleet", true) == 0)))
+            CombatTestMobArchetype.Entry combatTestMob;
+            if (TryResolveCombatTestMob(args, out combatTestMob))
             {
-                this.SpawnCodexTestCheerleet(character);
+                this.SpawnCombatTestMob(character, combatTestMob);
                 return;
             }
 
@@ -185,7 +188,13 @@ Filter will be applied to mob name"));
                 return;
             }
 
-            if (string.Compare(args[1], "list", true) == 0)
+            if ((args.Length == 2) && (string.Compare(args[1], "testmobs", true) == 0))
+            {
+                this.ListCombatTestMobs(character);
+                return;
+            }
+
+            if ((args.Length > 1) && (string.Compare(args[1], "list", true) == 0))
             {
                 // list templates
                 IEnumerable<DBMobTemplate> mobTemplates =
@@ -298,31 +307,53 @@ Filter will be applied to mob name"));
             character.Playfield.Publish(ChatTextMessageHandler.Default.CreateIM(character, "Spawncount on this PF: "+Pool.Instance.GetAll<ICharacter>(character.Playfield.Identity).Count(x => x.Controller is NPCController)));
         }
 
-        private void SpawnCodexTestCheerleet(ICharacter character)
+        private static bool TryResolveCombatTestMob(string[] args, out CombatTestMobArchetype.Entry combatTestMob)
         {
-            Coordinate spawnCoordinate = new Coordinate(character.Coordinates());
-            spawnCoordinate.z += 5.0f;
+            combatTestMob = null;
 
-            var npcController = new NPCController();
-            Character mobCharacter = NonPlayerCharacterHandler.SpawnMobFromTemplate(
-                "EERL",
-                character.Playfield.Identity,
-                spawnCoordinate,
-                character.Heading,
-                npcController,
-                1);
+            if (string.Compare(args[0], "spawnleet", true) == 0)
+            {
+                combatTestMob = CombatTestMobArchetype.Default;
+                return true;
+            }
+
+            if (args.Length == 2)
+            {
+                return CombatTestMobArchetype.TryGetByAlias(args[1], out combatTestMob);
+            }
+
+            return false;
+        }
+
+        private void ListCombatTestMobs(ICharacter character)
+        {
+            var text = new StringBuilder("Combat test mobs:");
+            foreach (CombatTestMobArchetype.Entry entry in CombatTestMobArchetype.All)
+            {
+                text.AppendLine(
+                    string.Format(
+                        "{0}: /command spawn {1} ({2}, template {3})",
+                        entry.DisplayName,
+                        entry.Key,
+                        string.Join(", ", entry.Aliases),
+                        entry.TemplateHash));
+            }
+
+            character.Playfield.Publish(ChatTextMessageHandler.Default.CreateIM(character, text.ToString()));
+        }
+
+        private void SpawnCombatTestMob(ICharacter character, CombatTestMobArchetype.Entry entry)
+        {
+            Character mobCharacter = CombatTestMobArchetype.SpawnNear(character, entry, 5.0f);
 
             if (mobCharacter == null)
             {
                 character.Playfield.Publish(
-                    ChatTextMessageHandler.Default.CreateIM(character, "Debug Cheerleet spawn failed."));
+                    ChatTextMessageHandler.Default.CreateIM(
+                        character,
+                        string.Format("Combat test mob spawn failed for {0}.", entry.DisplayName)));
                 return;
             }
-
-            mobCharacter.Name = "Codex Test Cheerleet";
-            mobCharacter.Playfield = character.Playfield;
-            PrepareCodexTestCheerleet(mobCharacter);
-            mobCharacter.DoNotDoTimers = false;
 
             character.Playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));
             character.Playfield.Announce(new CharInPlayMessage { Identity = mobCharacter.Identity, Unknown = 0x00 });
@@ -332,36 +363,9 @@ Filter will be applied to mob name"));
                 ChatTextMessageHandler.Default.CreateIM(
                     character,
                     string.Format(
-                        "Spawned Codex Test Cheerleet {0}.",
+                        "Spawned {0} {1}.",
+                        entry.DisplayName,
                         mobCharacter.Identity.ToString(true))));
-        }
-
-        private static void PrepareCodexTestCheerleet(ICharacter mobCharacter)
-        {
-            SetMobStat(mobCharacter, StatIds.monsterdata, 247832);
-            SetMobStat(mobCharacter, StatIds.catmesh, 247821);
-            SetMobStat(mobCharacter, StatIds.displaycatmesh, 247821);
-            SetMobStat(mobCharacter, StatIds.monsterscale, 117);
-            SetMobStat(mobCharacter, StatIds.visualflags, 0x1F);
-            SetMobStat(mobCharacter, StatIds.side, 3);
-            SetMobStat(mobCharacter, StatIds.fatness, 1);
-            SetMobStat(mobCharacter, StatIds.breed, 6);
-            SetMobStat(mobCharacter, StatIds.sex, 1);
-            SetMobStat(mobCharacter, StatIds.race, 1);
-            SetMobStat(mobCharacter, StatIds.npcfamily, 221);
-            SetMobStat(mobCharacter, StatIds.itemanim, 0x1F7);
-            SetMobStat(mobCharacter, StatIds.corpseanimkey, 0x1F7);
-            SetMobStat(mobCharacter, StatIds.dieanim, 0x1F7);
-            mobCharacter.Stats[StatIds.life].Value = 5;
-            mobCharacter.Stats[StatIds.health].Value = 5;
-            mobCharacter.Stats[StatIds.healdelta].Value = 0;
-            mobCharacter.Stats[StatIds.healinterval].Value = 600;
-        }
-
-        private static void SetMobStat(ICharacter mobCharacter, StatIds stat, int value)
-        {
-            mobCharacter.Stats[stat].Value = value;
-            mobCharacter.Stats[stat].BaseValue = (uint)value;
         }
 
         /// <summary>

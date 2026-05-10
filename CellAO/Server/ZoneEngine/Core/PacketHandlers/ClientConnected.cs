@@ -34,6 +34,7 @@ namespace ZoneEngine.Core.PacketHandlers
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
 
@@ -48,6 +49,7 @@ namespace ZoneEngine.Core.PacketHandlers
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.MessageHandlers;
@@ -250,9 +252,6 @@ client.Controller.Character.Playfield.Identity,
 
         private static void EnsureDebugEnemySpawn(ZoneClient client)
         {
-            const string testMobName = "Codex Test Cheerleet";
-            const string testMobTemplateHash = "EERL";
-
             ICharacter character = client.Controller.Character;
             if (character.Playfield == null)
             {
@@ -266,49 +265,38 @@ client.Controller.Character.Playfield.Identity,
                     "Debug enemy spawn check player={0} playfield={1} template={2} name={3}",
                     character.Identity.ToString(true),
                     character.Playfield.Identity.ToString(true),
-                    testMobTemplateHash,
-                    testMobName));
+                    CombatTestMobArchetype.Default.TemplateHash,
+                    CombatTestMobArchetype.Default.DisplayName));
 
-            bool alreadySpawned =
+            List<ICharacter> existingTestMobs =
                 Pool.Instance.GetAll<ICharacter>(character.Playfield.Identity, (int)IdentityType.CanbeAffected)
-                    .Any(x => x.Controller is NPCController && x.Name == testMobName);
-            if (alreadySpawned)
+                    .Where(CombatTestMobArchetype.IsCombatTestMob)
+                    .ToList();
+
+            foreach (ICharacter existingMob in existingTestMobs)
             {
-                foreach (ICharacter existingMob in
-                    Pool.Instance.GetAll<ICharacter>(character.Playfield.Identity, (int)IdentityType.CanbeAffected)
-                        .Where(x => x.Controller is NPCController && x.Name == testMobName))
-                {
-                    PrepareDebugEnemy(existingMob);
-                    existingMob.DoNotDoTimers = false;
-                    SendDebugEnemyToClient(client, existingMob);
-                }
+                CombatTestMobArchetype.Prepare(existingMob);
+                existingMob.DoNotDoTimers = false;
+                SendDebugEnemyToClient(client, existingMob);
+            }
+
+            if (existingTestMobs.Any(x => x.Name == CombatTestMobArchetype.Default.DisplayName))
+            {
                 return;
             }
 
-            Coordinate spawnCoordinate = new Coordinate(character.Coordinates());
-            spawnCoordinate.z += 5.0f;
-
-            var npcController = new NPCController();
-            Character mobCharacter = NonPlayerCharacterHandler.SpawnMobFromTemplate(
-                testMobTemplateHash,
-                character.Playfield.Identity,
-                spawnCoordinate,
-                character.Heading,
-                npcController,
-                1);
+            Character mobCharacter = CombatTestMobArchetype.SpawnNear(character, 5.0f);
 
             if (mobCharacter == null)
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
-                    string.Format("Debug enemy spawn failed: SpawnMobFromTemplate returned null for {0}.", testMobTemplateHash));
+                    string.Format(
+                        "Debug enemy spawn failed: SpawnMobFromTemplate returned null for {0}.",
+                        CombatTestMobArchetype.Default.TemplateHash));
                 return;
             }
 
-            mobCharacter.Name = testMobName;
-            mobCharacter.Playfield = character.Playfield;
-            PrepareDebugEnemy(mobCharacter);
-            mobCharacter.DoNotDoTimers = false;
             SendDebugEnemyToClient(client, mobCharacter);
         }
 
@@ -333,38 +321,6 @@ client.Controller.Character.Playfield.Identity,
                     mobCharacter.Stats[StatIds.life].Value,
                     mobCharacter.Stats[StatIds.monsterdata].Value,
                     mobCharacter.Stats[StatIds.catmesh].Value));
-        }
-
-        private static void PrepareDebugEnemy(ICharacter mobCharacter)
-        {
-            SetMobStat(mobCharacter, StatIds.monsterdata, 247832);
-            SetMobStat(mobCharacter, StatIds.catmesh, 247821);
-            SetMobStat(mobCharacter, StatIds.displaycatmesh, 247821);
-            SetMobStat(mobCharacter, StatIds.monsterscale, 117);
-            SetMobStat(mobCharacter, StatIds.visualflags, 0x1F);
-            SetMobStat(mobCharacter, StatIds.side, 3);
-            SetMobStat(mobCharacter, StatIds.fatness, 1);
-            SetMobStat(mobCharacter, StatIds.breed, 6);
-            SetMobStat(mobCharacter, StatIds.sex, 1);
-            SetMobStat(mobCharacter, StatIds.race, 1);
-            SetMobStat(mobCharacter, StatIds.npcfamily, 221);
-            SetMobStat(mobCharacter, StatIds.itemanim, 0x1F7);
-            SetMobStat(mobCharacter, StatIds.corpseanimkey, 0x1F7);
-            SetMobStat(mobCharacter, StatIds.dieanim, 0x1F7);
-            mobCharacter.Stats[StatIds.life].Value = 5;
-            mobCharacter.Stats[StatIds.health].Value = Math.Min(mobCharacter.Stats[StatIds.health].Value, 5);
-            if (mobCharacter.Stats[StatIds.health].Value <= 0)
-            {
-                mobCharacter.Stats[StatIds.health].Value = 5;
-            }
-            mobCharacter.Stats[StatIds.healdelta].Value = 0;
-            mobCharacter.Stats[StatIds.healinterval].Value = 600;
-        }
-
-        private static void SetMobStat(ICharacter mobCharacter, StatIds stat, int value)
-        {
-            mobCharacter.Stats[stat].Value = value;
-            mobCharacter.Stats[stat].BaseValue = (uint)value;
         }
 
         #endregion

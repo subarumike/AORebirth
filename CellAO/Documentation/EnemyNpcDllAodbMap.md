@@ -34,8 +34,9 @@ Spawn/load:
 - `Libraries\Source\CellAO.Core\NPCHandler\NonPlayerCharacterHandler.cs`
   - `SpawnMobFromTemplate` reads `mobtemplate` and creates a `Character` with `NPCController`.
   - `InstantiateMobSpawn` creates persistent DB spawns from explicit stat rows.
-- `Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs`
-  - Current debug enemy path spawns `Codex Test Rhinoman` from template `A004`, then overrides visual/stats.
+- `Server\ZoneEngine\Core\CombatTestMobArchetype.cs`
+  - Current debug enemy path owns a small combat test mob catalog, starting with `Codex Test Beach Leet` from template `A004`.
+  - GM aliases can spawn tested low-level mobs without DB changes: `beachleet`, `reet`, `snake`, `rollerrat`.
 
 Client visibility:
 - `Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs`
@@ -100,6 +101,9 @@ Queried through `AODB.RdbController("C:\Funcom\Anarchy Online")`.
 | Mob/source | MonsterData | CatMesh stat 12 | CatMesh name | useful anim keys |
 | --- | ---: | ---: | --- | --- |
 | Beach Leet `A004` | `17655` | `15222` | `cutecreature.cir` | `120 -> idle-stand`, `1034 -> attack-push`, `1037 -> attack-push2`, `6000 -> 18107:cutecreature_die-pain_01_01.ani` |
+| Island Reet `A001` | `30365` | `25733` | local CatMesh map | test catalog entry |
+| Shore Snake `A003` | `30252` | `23353` | local CatMesh map | test catalog entry |
+| Stowaway Rollerrat `A012` | `17687` | `15272` | local CatMesh map | test catalog entry |
 | Cheerleet `EERL` | `247832` | `247821` | `ai_cutecreature_cheerleetr.cir` | same cutecreature anim set, `6000 -> 18107:cutecreature_die-pain_01_01.ani` |
 | Masculeet `ASCU` | `247831` | `247826` | `ai_cutecreature_mascu-leet.cir` | same cutecreature anim set, `6000 -> 18107:cutecreature_die-pain_01_01.ani` |
 | Rhinoman test | `31114` | `31102` | `rhinoman_female.cir` | `1030 -> unarmed-start`, `1031 -> idle-unarmed`, `1032 -> unarmed-stop`, `1034 -> attack-teeth`, `1037 -> attack-head`, `6000 -> 15397:rhinoman_die-pain_01_01.ani` |
@@ -289,7 +293,7 @@ Server implication:
    - Do not guess the loot window protocol from vendor trade unless capture evidence matches.
 
 5. Move creature visual mapping out of hardcoded one-offs.
-   - Short term: extend a small static map for tested MonsterData ids (`17655`, `247832`, `247831`, `31114`).
+   - Short term: extend a small static map for tested MonsterData ids (`17655`, `30365`, `30252`, `17687`, `247832`, `247831`, `31114`).
    - Medium term: generate a checked-in data file from AODB for `MonsterData -> CatMesh -> death anim key/resource`.
 
 ## Suggested Morning Test Target
@@ -302,4 +306,4 @@ Use the same Rhinoman test mob until corpse identity/use is stable:
 - Press Use/Open on the corpse.
 - Server log should show `GenericCmd Use target=Corpse:<new corpse id>` and match the visible corpse, not a stale/other corpse.
 
-Once this is stable, switch back to a leet/cutecreature test to confirm the AODB-driven mapping handles `MonsterData 17655` and death anim key `6000`.
+The active combat test catalog now covers leet/cutecreature, reet, snake, and rollerrat families. The runtime death action still uses the live-observed `0x1F7` action key until we have a packet capture proving a better per-family value.
