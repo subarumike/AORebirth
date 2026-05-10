@@ -1429,52 +1429,14 @@ namespace CellAO.Core.Playfields
 
         private static bool CharacterHasUniqueItemAlready(ICharacter character, IItem item)
         {
-            if (character == null || character.BaseInventory == null || !IsUniqueItem(item))
+            if (character == null || character.BaseInventory == null)
             {
                 return false;
             }
 
-            foreach (IInventoryPage page in character.BaseInventory.Pages.Values)
-            {
-                foreach (KeyValuePair<int, IItem> existing in page.List())
-                {
-                    if (existing.Value != null
-                        && !object.ReferenceEquals(existing.Value, item)
-                        && existing.Value.LowID == item.LowID
-                        && existing.Value.HighID == item.HighID)
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        private static bool IsUniqueItem(IItem item)
-        {
-            if (item == null)
-            {
-                return false;
-            }
-
-            ItemTemplate lowTemplate;
-            if (ItemLoader.ItemList.TryGetValue(item.LowID, out lowTemplate)
-                && lowTemplate.Stats.ContainsKey(0)
-                && lowTemplate.IsUnique())
-            {
-                return true;
-            }
-
-            ItemTemplate highTemplate;
-            if (ItemLoader.ItemList.TryGetValue(item.HighID, out highTemplate)
-                && highTemplate.Stats.ContainsKey(0)
-                && highTemplate.IsUnique())
-            {
-                return true;
-            }
-
-            return (item.GetAttribute(0) & (int)ItemFlags.Unique) != 0;
+            return InventoryItemRules.HasSameUniqueItem(
+                item,
+                character.BaseInventory.Pages.Values.SelectMany(page => page.List()).Select(existing => existing.Value));
         }
 
         private bool ProcessDeadNpc(ICharacter character)
