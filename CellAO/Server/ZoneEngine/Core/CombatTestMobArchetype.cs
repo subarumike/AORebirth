@@ -32,7 +32,8 @@ namespace ZoneEngine.Core
             90,
             36,
             6,
-            5);
+            5,
+            new[] { 540, 545, 565, 585, 600, 655, 716, 730, 800 });
 
         public static readonly Entry IslandReet = new Entry(
             "islandreet",
@@ -46,7 +47,8 @@ namespace ZoneEngine.Core
             90,
             53,
             6,
-            5);
+            5,
+            new int[0]);
 
         public static readonly Entry ShoreSnake = new Entry(
             "shoresnake",
@@ -60,7 +62,8 @@ namespace ZoneEngine.Core
             36,
             27,
             6,
-            5);
+            5,
+            new[] { 565, 585, 590, 605, 655, 790, 791 });
 
         public static readonly Entry StowawayRollerrat = new Entry(
             "rollerrat",
@@ -74,7 +77,8 @@ namespace ZoneEngine.Core
             65,
             55,
             6,
-            5);
+            5,
+            new[] { 551, 585 });
 
         public static readonly Entry[] All =
         {
@@ -132,6 +136,17 @@ namespace ZoneEngine.Core
             }
 
             return false;
+        }
+
+        public static IEnumerable<Entry> ForPlayfield(int playfieldId)
+        {
+            foreach (Entry entry in All)
+            {
+                if (entry.IsHintedForPlayfield(playfieldId))
+                {
+                    yield return entry;
+                }
+            }
         }
 
         public static bool IsCombatTestMob(ICharacter character)
@@ -234,7 +249,8 @@ namespace ZoneEngine.Core
                 int monsterScale,
                 int npcFamily,
                 int breed,
-                int sex)
+                int sex,
+                int[] clientHintPlayfieldIds)
             {
                 this.Key = key;
                 this.Aliases = aliases;
@@ -248,6 +264,7 @@ namespace ZoneEngine.Core
                 this.NpcFamily = npcFamily;
                 this.Breed = breed;
                 this.Sex = sex;
+                this.ClientHintPlayfieldIds = clientHintPlayfieldIds ?? new int[0];
             }
 
             public string Key { get; private set; }
@@ -274,6 +291,8 @@ namespace ZoneEngine.Core
 
             public int Sex { get; private set; }
 
+            public int[] ClientHintPlayfieldIds { get; private set; }
+
             public bool MatchesAlias(string alias)
             {
                 if (string.Equals(this.Key, alias, StringComparison.OrdinalIgnoreCase))
@@ -284,6 +303,19 @@ namespace ZoneEngine.Core
                 foreach (string candidate in this.Aliases)
                 {
                     if (string.Equals(candidate, alias, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            public bool IsHintedForPlayfield(int playfieldId)
+            {
+                foreach (int candidate in this.ClientHintPlayfieldIds)
+                {
+                    if (candidate == playfieldId)
                     {
                         return true;
                     }

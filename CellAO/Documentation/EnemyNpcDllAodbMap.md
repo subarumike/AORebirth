@@ -37,6 +37,8 @@ Spawn/load:
 - `Server\ZoneEngine\Core\CombatTestMobArchetype.cs`
   - Current debug enemy path owns a small combat test mob catalog, starting with `Codex Test Beach Leet` from template `A004`.
   - GM aliases can spawn tested low-level mobs without DB changes: `beachleet`, `reet`, `snake`, `rollerrat`.
+  - `/command spawn hints` lists supported test mobs mapped from the client RDB enemy hint catalog for the current playfield.
+  - `/command spawn zone` spawns one of each supported client-hinted test mob near the GM for the current playfield.
 
 Client visibility:
 - `Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs`

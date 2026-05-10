@@ -82,6 +82,13 @@ namespace ZoneEngine.ChatCommands
                 return true;
             }
 
+            if ((args.Length == 2)
+                && ((string.Compare(args[1], "hints", true) == 0)
+                    || (string.Compare(args[1], "zone", true) == 0)))
+            {
+                return true;
+            }
+
             if (args[0] == "spawnrandom")
             {
                 return true;
@@ -118,6 +125,8 @@ namespace ZoneEngine.ChatCommands
 For a list of available templates: /command spawn list [filter1,filter2...]
 Spawn the current combat test mob: /command spawnleet
 Spawn combat test mob aliases: /command spawn testmobs
+List client-hinted test mobs for this playfield: /command spawn hints
+Spawn client-hinted test mobs for this playfield: /command spawn zone
 Filter will be applied to mob name"));
         }
 
@@ -185,6 +194,18 @@ Filter will be applied to mob name"));
             if (string.Compare(args[0], "spawncount", true) == 0)
             {
                 this.SpawnCount(character);
+                return;
+            }
+
+            if ((args.Length == 2) && (string.Compare(args[1], "hints", true) == 0))
+            {
+                this.ListClientHintedMobs(character);
+                return;
+            }
+
+            if ((args.Length == 2) && (string.Compare(args[1], "zone", true) == 0))
+            {
+                this.SpawnClientHintedMobs(character);
                 return;
             }
 
@@ -342,9 +363,77 @@ Filter will be applied to mob name"));
             character.Playfield.Publish(ChatTextMessageHandler.Default.CreateIM(character, text.ToString()));
         }
 
+        private void ListClientHintedMobs(ICharacter character)
+        {
+            List<CombatTestMobArchetype.Entry> entries =
+                CombatTestMobArchetype.ForPlayfield(character.Playfield.Identity.Instance).ToList();
+
+            if (entries.Count == 0)
+            {
+                character.Playfield.Publish(
+                    ChatTextMessageHandler.Default.CreateIM(
+                        character,
+                        string.Format(
+                            "No supported combat test mobs are mapped from client hints for playfield {0}.",
+                            character.Playfield.Identity.Instance)));
+                return;
+            }
+
+            character.Playfield.Publish(
+                ChatTextMessageHandler.Default.CreateIM(
+                    character,
+                    string.Format(
+                        "Client-hinted combat test mobs for playfield {0}: {1}.",
+                        character.Playfield.Identity.Instance,
+                        string.Join(", ", entries.Select(x => x.DisplayName)))));
+        }
+
+        private void SpawnClientHintedMobs(ICharacter character)
+        {
+            List<CombatTestMobArchetype.Entry> entries =
+                CombatTestMobArchetype.ForPlayfield(character.Playfield.Identity.Instance).ToList();
+
+            if (entries.Count == 0)
+            {
+                character.Playfield.Publish(
+                    ChatTextMessageHandler.Default.CreateIM(
+                        character,
+                        string.Format(
+                            "No supported combat test mobs are mapped from client hints for playfield {0}.",
+                            character.Playfield.Identity.Instance)));
+                return;
+            }
+
+            var spawnedNames = new List<string>();
+            float zOffset = 5.0f;
+            foreach (CombatTestMobArchetype.Entry entry in entries)
+            {
+                Character mobCharacter = this.SpawnCombatTestMob(character, entry, zOffset);
+                if (mobCharacter != null)
+                {
+                    spawnedNames.Add(entry.DisplayName);
+                    zOffset += 3.0f;
+                }
+            }
+
+            character.Playfield.Publish(
+                ChatTextMessageHandler.Default.CreateIM(
+                    character,
+                    string.Format(
+                        "Spawned {0} client-hinted combat test mobs for playfield {1}: {2}.",
+                        spawnedNames.Count,
+                        character.Playfield.Identity.Instance,
+                        string.Join(", ", spawnedNames))));
+        }
+
         private void SpawnCombatTestMob(ICharacter character, CombatTestMobArchetype.Entry entry)
         {
-            Character mobCharacter = CombatTestMobArchetype.SpawnNear(character, entry, 5.0f);
+            this.SpawnCombatTestMob(character, entry, 5.0f);
+        }
+
+        private Character SpawnCombatTestMob(ICharacter character, CombatTestMobArchetype.Entry entry, float zOffset)
+        {
+            Character mobCharacter = CombatTestMobArchetype.SpawnNear(character, entry, zOffset);
 
             if (mobCharacter == null)
             {
@@ -352,7 +441,7 @@ Filter will be applied to mob name"));
                     ChatTextMessageHandler.Default.CreateIM(
                         character,
                         string.Format("Combat test mob spawn failed for {0}.", entry.DisplayName)));
-                return;
+                return null;
             }
 
             character.Playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));
@@ -366,6 +455,8 @@ Filter will be applied to mob name"));
                         "Spawned {0} {1}.",
                         entry.DisplayName,
                         mobCharacter.Identity.ToString(true))));
+
+            return mobCharacter;
         }
 
         /// <summary>

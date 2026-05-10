@@ -78,6 +78,19 @@ function Get-PropertyValue {
     return (Get-RequiredProperty $Object.GetType() $Name).GetValue($Object, $null)
 }
 
+function Convert-EnumerableToArray {
+    param(
+        [object]$Enumerable
+    )
+
+    $items = @()
+    foreach ($item in ([System.Collections.IEnumerable]$Enumerable)) {
+        $items += $item
+    }
+
+    return @($items)
+}
+
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 $zoneProject = Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ZoneEngine.csproj'
 $builtDir = Join-Path $repoRoot 'CellAO\Built\Debug'
@@ -205,6 +218,7 @@ try {
 
     $tryGetByAlias = Get-RequiredMethod $archetypeType 'TryGetByAlias' ([System.Reflection.BindingFlags]'Public, Static')
     $tryGetByName = Get-RequiredMethod $archetypeType 'TryGetByName' ([System.Reflection.BindingFlags]'Public, Static')
+    $forPlayfield = Get-RequiredMethod $archetypeType 'ForPlayfield' ([System.Reflection.BindingFlags]'Public, Static')
 
     $seenKeys = @{}
     $seenAliases = @{}
@@ -213,12 +227,14 @@ try {
         $key = Get-PropertyValue $entry 'Key'
         $displayName = Get-PropertyValue $entry 'DisplayName'
         $aliases = @(Get-PropertyValue $entry 'Aliases')
+        $clientHintPlayfieldIds = @(Get-PropertyValue $entry 'ClientHintPlayfieldIds')
         $monsterData = [int](Get-PropertyValue $entry 'MonsterData')
         $corpseCatMesh = [int](Get-PropertyValue $entry 'CorpseCatMesh')
 
         Assert-True (-not [string]::IsNullOrWhiteSpace($key)) 'Combat test mob key is blank.'
         Assert-True (-not [string]::IsNullOrWhiteSpace($displayName)) "DisplayName is blank for $key."
         Assert-True ($aliases.Count -gt 0) "No aliases configured for $displayName."
+        Assert-True (($clientHintPlayfieldIds | Select-Object -Unique).Count -eq $clientHintPlayfieldIds.Count) "Duplicate client hint playfield mapping for $displayName."
         Assert-True ($monsterData -gt 0) "MonsterData must be positive for $displayName."
         Assert-True ($corpseCatMesh -gt 0) "CorpseCatMesh must be positive for $displayName."
         Assert-True (-not $seenKeys.ContainsKey($key.ToLowerInvariant())) "Duplicate combat test mob key $key."
@@ -242,6 +258,16 @@ try {
             Assert-True ([object]::ReferenceEquals($entry, $aliasArgs[1])) "TryGetByAlias returned the wrong entry for $alias."
         }
     }
+
+    $hintedNewlandDesert = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(565)))
+    $hintedAegean = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(585)))
+    $hintedWailingWastes = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(551)))
+    $hintedUnknown = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(999999)))
+    Assert-True (($hintedNewlandDesert | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'beachleet' }).Count -eq 1) 'Newland Desert should map to the client-hinted test leet.'
+    Assert-True (($hintedNewlandDesert | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'shoresnake' }).Count -eq 1) 'Newland Desert should map to the client-hinted test snake.'
+    Assert-True (($hintedAegean | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'rollerrat' }).Count -eq 1) 'Aegean should map to the client-hinted test rollerrat.'
+    Assert-True ($hintedWailingWastes.Count -eq 1 -and (Get-PropertyValue $hintedWailingWastes[0] 'Key') -eq 'rollerrat') 'Wailing Wastes should map to only the supported test rollerrat.'
+    Assert-True ($hintedUnknown.Count -eq 0) 'Unknown playfields should not invent client-hinted test mobs.'
 
     $corpseMappingsMethod = Get-RequiredMethod $archetypeType 'CorpseVisualMappings' ([System.Reflection.BindingFlags]'Public, Static')
     $corpseMappings = @($corpseMappingsMethod.Invoke($null, @()))

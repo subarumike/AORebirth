@@ -55,3 +55,12 @@ Default AODB reader input:
 ## How To Use This
 
 Use this as a source-of-truth hint layer when choosing what enemy families to seed into a playfield. Do not treat it as final spawn truth for position, density, respawn timers, or pathing; those still need live packet evidence, server-side data, or explicit design choices.
+
+## Current Server Use
+
+The GM combat-test spawn path now uses these hints for supported low-level test mobs:
+
+- `/command spawn hints`: lists the supported combat test mobs mapped to the current playfield by the client hint catalog.
+- `/command spawn zone`: spawns one of each supported mapped test mob near the GM for the current playfield.
+
+This is intentionally a test harness, not a final world-population system. It lets us quickly validate client-visible mob families in the right zones while we continue mapping real spawn positions, density, pathing, and respawn rules.
