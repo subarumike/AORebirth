@@ -54,26 +54,29 @@ Combat:
   - Clears `FightingTarget`.
 - `Server\ZoneEngine\Core\Playfields\Playfield.cs`
   - `DoCombatTick` applies simple damage and sends `AttackInfo`.
-  - `KillNpcTarget` currently sends live-like death sequence and a raw corpse full update.
+  - `KillNpcTarget` sends the live-like death sequence, schedules a debug corpse spawn, registers in-memory corpse state, rolls debug loot, and schedules corpse/despawn cleanup.
 
 Use/loot:
 - `Server\ZoneEngine\Core\MessageHandlers\GenericCmdMessageHandler.cs`
   - `GenericCmdAction.Use = 3`.
   - Inventory target uses item.
+  - Corpse target routes to `Playfield.TryUseCorpse`.
+  - Dead NPC target can route to the registered corpse through `TryUseDeadNpcCorpse`.
   - Pooled target can run `OnUse` or `OnTrade`.
   - Non-pooled target falls through to `UseStatel`.
-  - There is no corpse-specific path yet.
+- `Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs`
+  - Routes corpse loot movement into `Playfield.TryLootCorpseItem`.
 - `Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs`
-  - Existing inventory move/add packet path.
+  - Existing inventory move/add packet path; corpse loot movement is intercepted before the normal inventory move path.
 - `Server\ZoneEngine\Core\MessageHandlers\TradeMessageHandler.cs`
   - Existing temporary-bag/vendor trade flow.
 - `Libraries\Source\AOtomation\AOtomation.Messaging\Messages\N3Messages\CorpseFullUpdateMessage.cs`
-  - Stub only, no real serializer.
+  - Stub only, no real serializer; the current debug path still builds the corpse full update manually.
 
 Database loot:
 - `mobtemplate` has `DropHashes`, `DropSlots`, `DropRates`.
 - `mobdroptable` has `Hash`, `LowId`, `HighId`, `MinQl`, `MaxQl`, `RangeCheck`.
-- `MobDroptableDao` exists, but runtime corpse loot rolling is not implemented.
+- `MobDroptableDao` exists, but real DB-backed corpse loot rolling is not wired yet. The current runtime path uses `CombatTestLootCatalog` for deterministic test loot.
 
 ## Live Death and Corpse Sequence
 
@@ -270,36 +273,46 @@ The analyzer summary currently prints some fields byte-swapped, for example `act
 
 Server implication:
 - A live/usable corpse should be addressable by `IdentityType.Corpse`.
-- `GenericCmdMessageHandler` needs a corpse branch before the `UseStatel` fallback.
-- The corpse identity must map to a server-side corpse/loot state. Right now raw corpse ids are not registered in `Pool`.
+- `GenericCmdMessageHandler` now has a corpse branch before the `UseStatel` fallback.
+- The debug corpse identity maps to server-side in-memory corpse/loot state in `Playfield`.
 
-## Current Likely Failure Points
+## Current Debug Corpse Path
 
-1. Corpse identity is visual-only.
-   - `Playfield.SendDebugCorpseFullUpdate` sends a raw corpse packet and schedules a despawn.
-   - It does not add a corpse object/state to `Pool`.
-   - `GenericCmd Use` on the corpse cannot resolve to an entity, so it falls through as a statel.
+1. Corpse identity is registered in playfield memory.
+   - `Playfield.RegisterDebugCorpse` stores corpse identity, dead NPC identity, name, loot class, rolled loot, inventory slot, and expiry.
+   - `GenericCmd Use` on `IdentityType.Corpse` calls `TryUseCorpse`.
+   - `GenericCmd Use` on the dead NPC identity can route to the registered corpse through `TryUseDeadNpcCorpse`.
 
-2. Corpse state is not modeled as first-class data.
+2. Corpse state is modeled enough for controlled testing.
    - Relevant stats exist: `Corpse_Hash` 398, `CorpseType` 415, `CorpseInstance` 416, `CorpseAnimKey` 417, `HasAlwaysLootable` 345.
-   - Current dead NPC code only sets health/state/deadtimer/itemanim/corpseanimkey/dieanim.
-   - Current raw `CorpseFullUpdate` may make the client briefly create a corpse, then discard it because the surrounding corpse/loot access state is inconsistent.
+   - The debug path keeps state in memory instead of adding SQL schema.
+   - The raw `CorpseFullUpdate` remains manual until the AOtomation corpse serializer is implemented.
 
-3. Loot tables exist but are unused.
+3. Test loot is live enough for client workflow testing.
+   - `CombatTestLootCatalog` creates deterministic test entries for each combat-test mob.
+   - `Playfield.TryLootCorpseItem` moves unlooted corpse items into inventory and respects unique-item checks.
+   - Empty opened corpses despawn quickly; credits-only corpses last 30 seconds if unopened; item-loot corpses last 60 seconds; major-boss lifetime is reserved at 30 minutes.
+
+## Remaining Gaps
+
+1. Real loot tables exist but are unused.
    - `mobtemplate.DropHashes/DropSlots/DropRates` describes roll groups.
    - `mobdroptable` describes possible item records.
-   - No runtime path rolls loot on death or ties rolled items to a corpse identity.
+   - The next non-test loot step is translating those rows into the same corpse loot state that the debug path now exercises.
 
-4. Death animation should stay packet-faithful, but visual data should be data-driven.
+2. Death animation should stay packet-faithful, but visual data should be data-driven.
    - Keep live observed `CharacterAction(99, param2=503)` for Rhinoman death unless a capture proves another value.
    - Use MonsterData key `6000` to find which actual AODB animation a creature owns, especially when moving away from one hardcoded Rhinoman.
 
-## Smallest Useful Next Implementation Path
+3. `CorpseFullUpdate` should move out of raw packet assembly.
+   - Implement or verify the AOtomation `CorpseFullUpdateMessage` serializer before expanding this beyond controlled test mobs.
+
+## Completed Minimal Implementation Path
 
 1. Add a minimal in-memory corpse registry in the playfield.
    - Key: `IdentityType.Corpse` instance.
    - Value: original NPC identity, name, coordinates, MonsterData/CatMesh, lifetime, rolled credits/items.
-   - This can be local to `Playfield` at first. No schema change.
+   - This is local to `Playfield` at first. No schema change.
 
 2. Register the corpse before sending `CorpseFullUpdate`.
    - Allocate fresh corpse identity.
@@ -309,8 +322,8 @@ Server implication:
 
 3. Add a corpse branch in `GenericCmdMessageHandler`.
    - If `message.Action == Use` and target type is `Corpse`, call a playfield corpse-use method.
-   - For the first pass, log and acknowledge the correct corpse identity.
-   - Then open a minimal loot container only after the response packet is known.
+   - Log and acknowledge the correct corpse identity.
+   - Open a minimal loot container through the captured inventory/action response pattern.
 
 4. Use captures to identify the server response to corpse use/loot.
    - Look specifically for `BankCorpse`, `ContainerAddItem`, inventory/temp-bag packets, and any `SetLootAccess`-like action.
