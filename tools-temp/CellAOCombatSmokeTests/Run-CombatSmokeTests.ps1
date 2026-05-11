@@ -149,6 +149,8 @@ Assert-SourceMatch $clientConnectedSource 'SetStat\s*\(\s*client\s*,\s*StatIds\.
 Assert-SourceMatch $clientConnectedSource 'SetStat\s*\(\s*client\s*,\s*StatIds\.actioncategory\s*,\s*0\s*\)\s*;' 'ActionCategory should initialize to 0.'
 Assert-SourceMatch $clientConnectedSource 'Stats\s*\[\s*stat\s*\]\.Value\s*=\s*value\s*;' 'Login SetStat helper should update the live stat value.'
 Assert-SourceMatch $clientConnectedSource 'Stats\s*\[\s*stat\s*\]\.BaseValue\s*=\s*\(uint\)\s*value\s*;' 'Login SetStat helper should update the live stat base value.'
+Assert-SourceMatch $clientConnectedSource 'DefaultForPlayfield\s*\(' 'ClientConnected debug enemy spawn should choose a client-hinted default for the current playfield.'
+Assert-SourceMatch $clientConnectedSource 'existingTestMobs\.Count\s*>\s*0' 'ClientConnected debug enemy spawn should not add a default mob when any live test mob already exists.'
 Assert-SourceMatch $baseInventorySource 'InventoryItemRules\.HasSameUniqueItem' 'Inventory add path must use shared unique-item rules.'
 Assert-SourceMatch $playfieldSource 'InventoryItemRules\.HasSameUniqueItem' 'Corpse loot path must use shared unique-item rules.'
 Assert-SourceMatch $playfieldSource 'DespawnNpcImmediately\s*\(' 'Playfield should expose immediate NPC despawn for controlled GM test cleanup.'
@@ -276,6 +278,7 @@ try {
     $tryGetByAlias = Get-RequiredMethod $archetypeType 'TryGetByAlias' ([System.Reflection.BindingFlags]'Public, Static')
     $tryGetByName = Get-RequiredMethod $archetypeType 'TryGetByName' ([System.Reflection.BindingFlags]'Public, Static')
     $forPlayfield = Get-RequiredMethod $archetypeType 'ForPlayfield' ([System.Reflection.BindingFlags]'Public, Static')
+    $defaultForPlayfield = Get-RequiredMethod $archetypeType 'DefaultForPlayfield' ([System.Reflection.BindingFlags]'Public, Static')
     $isCombatTestCorpseName = Get-RequiredMethod $archetypeType 'IsCombatTestCorpseName' ([System.Reflection.BindingFlags]'Public, Static')
 
     $seenKeys = @{}
@@ -334,6 +337,9 @@ try {
     Assert-True (($hintedBelialForest | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'surflizard' }).Count -eq 1) 'Belial Forest should map to the client-hinted test lizard.'
     Assert-True (($hintedOmniForest | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'cliffmalle' }).Count -eq 1) 'Omni Forest should map to the client-hinted test malle.'
     Assert-True ($hintedUnknown.Count -eq 0) 'Unknown playfields should not invent client-hinted test mobs.'
+    Assert-True ((Get-PropertyValue ($defaultForPlayfield.Invoke($null, @(551))) 'Key') -eq 'rollerrat') 'Wailing Wastes login default should use its client-hinted rollerrat.'
+    Assert-True ((Get-PropertyValue ($defaultForPlayfield.Invoke($null, @(605))) 'Key') -eq 'shoresnake') 'Belial Forest login default should use the first client-hinted supported mob.'
+    Assert-True ([object]::ReferenceEquals($defaultForPlayfield.Invoke($null, @(999999)), $defaultEntry)) 'Unknown playfields should fall back to the global default combat test mob.'
     Assert-True ([bool]$isCombatTestCorpseName.Invoke($null, @('Remains of Codex Test Beach Leet'))) 'Combat test corpse names should be recognized for cleanup.'
     Assert-True (-not [bool]$isCombatTestCorpseName.Invoke($null, @('Remains of Random Live Mob'))) 'Non-test corpse names should not be recognized for cleanup.'
     Assert-True (-not [bool]$isCombatTestCorpseName.Invoke($null, @('Codex Test Beach Leet'))) 'Live mob names should not be treated as corpse names.'

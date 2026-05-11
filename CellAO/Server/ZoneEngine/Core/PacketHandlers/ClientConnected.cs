@@ -259,18 +259,22 @@ client.Controller.Character.Playfield.Identity,
                 return;
             }
 
+            CombatTestMobArchetype.Entry spawnEntry =
+                CombatTestMobArchetype.DefaultForPlayfield(character.Playfield.Identity.Instance);
+
             LogUtil.Debug(
                 DebugInfoDetail.Error,
                 string.Format(
                     "Debug enemy spawn check player={0} playfield={1} template={2} name={3}",
                     character.Identity.ToString(true),
                     character.Playfield.Identity.ToString(true),
-                    CombatTestMobArchetype.Default.TemplateHash,
-                    CombatTestMobArchetype.Default.DisplayName));
+                    spawnEntry.TemplateHash,
+                    spawnEntry.DisplayName));
 
             List<ICharacter> existingTestMobs =
                 Pool.Instance.GetAll<ICharacter>(character.Playfield.Identity, (int)IdentityType.CanbeAffected)
                     .Where(CombatTestMobArchetype.IsCombatTestMob)
+                    .Where(x => x.Stats[StatIds.health].Value > 0)
                     .ToList();
 
             foreach (ICharacter existingMob in existingTestMobs)
@@ -280,12 +284,12 @@ client.Controller.Character.Playfield.Identity,
                 SendDebugEnemyToClient(client, existingMob);
             }
 
-            if (existingTestMobs.Any(x => x.Name == CombatTestMobArchetype.Default.DisplayName))
+            if (existingTestMobs.Count > 0)
             {
                 return;
             }
 
-            Character mobCharacter = CombatTestMobArchetype.SpawnNear(character, 5.0f);
+            Character mobCharacter = CombatTestMobArchetype.SpawnNear(character, spawnEntry, 5.0f);
 
             if (mobCharacter == null)
             {
@@ -293,7 +297,7 @@ client.Controller.Character.Playfield.Identity,
                     DebugInfoDetail.Error,
                     string.Format(
                         "Debug enemy spawn failed: SpawnMobFromTemplate returned null for {0}.",
-                        CombatTestMobArchetype.Default.TemplateHash));
+                        spawnEntry.TemplateHash));
                 return;
             }
 

@@ -162,6 +162,16 @@ namespace ZoneEngine.Core
             }
         }
 
+        public static Entry DefaultForPlayfield(int playfieldId)
+        {
+            foreach (Entry entry in ForPlayfield(playfieldId))
+            {
+                return entry;
+            }
+
+            return Default;
+        }
+
         public static bool TryGetByAlias(string alias, out Entry entry)
         {
             entry = null;
