@@ -53,6 +53,7 @@ Default AODB reader input:
 | `31114` | rhinoman female |
 | `32419` | sewer snake |
 | `40063` | rollerrat queen |
+| `247728` | alien_spider |
 
 ## How To Use This
 
@@ -69,6 +70,6 @@ The GM combat-test spawn path now uses these hints for supported low-level test 
 
 The login debug enemy path uses the same playfield hint selector. If no live test mob already exists in the playfield, it spawns the first supported client-hinted test mob for that playfield, falling back to the global beach leet only when the playfield has no supported hints yet.
 
-Currently supported families: leet, reet, snake, rollerrat, flea, lizard, malle, salamander.
+Currently supported families: leet, reet, snake, rollerrat, flea, lizard, malle, salamander, spider.
 
 This is intentionally a test harness, not a final world-population system. It lets us quickly validate client-visible mob families in the right zones while we continue mapping real spawn positions, density, pathing, and respawn rules.

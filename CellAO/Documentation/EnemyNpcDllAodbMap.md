@@ -36,7 +36,7 @@ Spawn/load:
   - `InstantiateMobSpawn` creates persistent DB spawns from explicit stat rows.
 - `Server\ZoneEngine\Core\CombatTestMobArchetype.cs`
   - Current debug enemy path owns a small combat test mob catalog, starting with `Codex Test Beach Leet` from template `A004`.
-  - GM aliases can spawn tested low-level mobs without DB changes: `beachleet`, `reet`, `snake`, `rollerrat`, `flea`, `lizard`, `malle`, `salamander`.
+  - GM aliases can spawn tested low-level mobs without DB changes: `beachleet`, `reet`, `snake`, `rollerrat`, `flea`, `lizard`, `malle`, `salamander`, `spider`.
   - `/command spawn hints` lists supported test mobs mapped from the client RDB enemy hint catalog for the current playfield.
   - `/command spawn zone` spawns one of each supported client-hinted test mob near the GM for the current playfield.
   - `/command spawn status` and `/command spawn clear` keep repeated combat/corpse testing from requiring engine restarts or DB cleanup.
@@ -111,6 +111,7 @@ Queried through `AODB.RdbController("C:\Funcom\Anarchy Online")`.
 | Surf Lizard `A000` | `22794` | `22773` | local CatMesh map | test catalog entry |
 | Cliff Malle `A035` | `17660` | `15239` | local CatMesh map | test catalog entry |
 | Reef Salamander `A034` | `30354` | `23344` | local CatMesh map | test catalog entry |
+| Alien Spider - Zix `A026` | `247728` | `31774` | local CatMesh map | test catalog entry; current CellAO spider stand-in |
 | Cheerleet `EERL` | `247832` | `247821` | `ai_cutecreature_cheerleetr.cir` | same cutecreature anim set, `6000 -> 18107:cutecreature_die-pain_01_01.ani` |
 | Masculeet `ASCU` | `247831` | `247826` | `ai_cutecreature_mascu-leet.cir` | same cutecreature anim set, `6000 -> 18107:cutecreature_die-pain_01_01.ani` |
 | Rhinoman test | `31114` | `31102` | `rhinoman_female.cir` | `1030 -> unarmed-start`, `1031 -> idle-unarmed`, `1032 -> unarmed-stop`, `1034 -> attack-teeth`, `1037 -> attack-head`, `6000 -> 15397:rhinoman_die-pain_01_01.ani` |
@@ -330,4 +331,4 @@ Use the same Rhinoman test mob until corpse identity/use is stable:
 - Press Use/Open on the corpse.
 - Server log should show `GenericCmd Use target=Corpse:<new corpse id>` and match the visible corpse, not a stale/other corpse.
 
-The active combat test catalog now covers leet/cutecreature, reet, snake, rollerrat, flea, lizard, malle, and salamander families. The runtime death action still uses the live-observed `0x1F7` action key until we have a packet capture proving a better per-family value.
+The active combat test catalog now covers leet/cutecreature, reet, snake, rollerrat, flea, lizard, malle, salamander, and spider families. The runtime death action still uses the live-observed `0x1F7` action key until we have a packet capture proving a better per-family value.

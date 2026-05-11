@@ -140,6 +140,21 @@ namespace ZoneEngine.Core
             5,
             new[] { 565 });
 
+        public static readonly Entry AlienSpiderZix = new Entry(
+            "alienspider",
+            new[] { "alienspider", "spider", "zix" },
+            "A026",
+            "Codex Test Alien Spider - Zix",
+            2,
+            34,
+            247728,
+            31774,
+            119,
+            220,
+            6,
+            4,
+            new[] { 346, 551, 590, 600, 655, 4542, 4544 });
+
         public static readonly Entry[] All =
         {
             BeachLeet,
@@ -149,7 +164,8 @@ namespace ZoneEngine.Core
             DuneFlea,
             SurfLizard,
             CliffMalle,
-            ReefSalamander
+            ReefSalamander,
+            AlienSpiderZix
         };
 
         private const int LiveObservedDeathActionKey = 0x1F7;

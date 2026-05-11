@@ -23,15 +23,17 @@ Current supported combat-test families:
 | lizard | `surflizard` |
 | malle | `cliffmalle` |
 | salamander | `reefsalamander` |
+| spider | `alienspider` |
 
 Useful early-zone coverage:
 
 | Playfield | Supported | Still missing |
 | ---: | --- | --- |
 | `565` Newland Desert | lizard, leet, snake, salamander, flea | rhinoman, mutant, bronto, scorpiod, buzzsaw, minibull |
+| `551` Wailing Wastes | rollerrat, spider | biofreak, scorpiod, hound, mutant |
 | `585` Aegean | snake, leet, flea, rollerrat | rhinoman, hound, mechdog, anun |
-| `600` Varmint Woods | lizard, leet | rhinoman, bronto |
+| `600` Varmint Woods | lizard, spider, leet | rhinoman, bronto |
 | `605` Belial Forest | snake, lizard | none from concrete hints |
 | `716` Omni Forest | leet, malle, flea | mutant, biofreak, rhinoman, bronto |
 
-This is a coverage map for controlled testing, not a final spawn table. It deliberately separates supported test families from enemy names that still need DB templates, visual/corpse proof, or live packet evidence.
+This is a coverage map for controlled testing, not a final spawn table. It deliberately separates supported test families from enemy names that still need DB templates, visual/corpse proof, or live packet evidence. Statel-only text such as descriptive item/object copy is tracked as weak evidence instead of spawn coverage.

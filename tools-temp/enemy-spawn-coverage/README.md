@@ -18,3 +18,4 @@ Outputs:
 - `CellAO\Documentation\ClientHintedEnemyCoverage.csv`
 
 These reports are advisory. They help pick safe next enemy families for the test catalog without touching SQL schemas or depending on live-client play tests.
+Rows backed only by statel/object text are tracked as weak evidence so descriptive strings do not accidentally become spawn coverage.

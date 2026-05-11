@@ -147,6 +147,7 @@ $supportedTestMobs = [ordered]@{
     lizard = 'surflizard'
     malle = 'cliffmalle'
     salamander = 'reefsalamander'
+    spider = 'alienspider'
 }
 
 $genericKeywords = @('dynacamp', 'mob', 'monster', 'creature', 'npc')
@@ -172,10 +173,17 @@ foreach ($zone in Import-Csv $ZoneHintsPath) {
     $candidateUnsupported = @()
     $missing = @()
     $ignored = @()
+    $ignoredWeakEvidence = @()
+    $hasSpawnEvidence = $zone.SourceRecordTypes -match 'District:1000014|Area:1000029'
 
     foreach ($keyword in $keywords) {
         if ($genericKeywords -contains $keyword) {
             $ignored += $keyword
+            continue
+        }
+
+        if (-not $hasSpawnEvidence) {
+            $ignoredWeakEvidence += $keyword
             continue
         }
 
@@ -202,6 +210,7 @@ foreach ($zone in Import-Csv $ZoneHintsPath) {
         UnsupportedEnemyKeywords = (($unsupported | Select-Object -Unique) -join '; ')
         UnsupportedWithMappedTemplateCandidates = (($candidateUnsupported | Select-Object -Unique) -join '; ')
         MissingTemplateOrVisualKeywords = (($missing | Select-Object -Unique) -join '; ')
+        IgnoredWeakEvidenceKeywords = (($ignoredWeakEvidence | Select-Object -Unique) -join '; ')
         IgnoredGenericKeywords = (($ignored | Select-Object -Unique) -join '; ')
     }
 }
