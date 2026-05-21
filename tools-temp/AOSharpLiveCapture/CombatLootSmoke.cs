@@ -19,12 +19,14 @@ namespace AOSharpLiveCapture
 {
     internal sealed class CombatLootSmoke
     {
-        private const string MobName = "Codex Test Cheerleet";
+        private const string DefaultMobAlias = "beachleet";
+        private const string DefaultMobName = "Codex Test Beach Leet";
         private const string RequestFileName = "run-combat-loot-smoke.txt";
         private const string ResultFileName = "last-combat-loot-smoke.result";
         private const int MoveToInventoryPlacement = 0x6F;
         private const int UniqueTestLowId = 0x4545F;
         private const int UniqueTestHighId = 0x4545A;
+        private const int CleanupBatchSize = 40;
 
         private readonly string pluginDirectory;
         private readonly string requestFilePath;
@@ -43,16 +45,54 @@ namespace AOSharpLiveCapture
         private DateTime lastCorpseInventorySignalUtc;
         private DateTime lastCorpseAccessSignalUtc;
         private DateTime lastLootMoveSignalUtc;
+        private int cleanupAttemptCount;
         private Identity targetIdentity = Identity.None;
         private Identity corpseIdentity = Identity.None;
         private string expectedCharacterName = string.Empty;
+        private string mobAlias = DefaultMobAlias;
+        private string mobName = DefaultMobName;
         private int itemCountBeforeMove;
         private int reopenUseCount;
         private int lootAttemptCount;
         private bool closeIssued;
         private bool closeConfirmed;
         private bool closeHookCalled;
+        private bool requireReopen = true;
         private string lastCloseWindowName = string.Empty;
+
+        private static readonly Dictionary<string, string> KnownMobNames =
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "beachleet", "Codex Test Beach Leet" },
+                { "leet", "Codex Test Beach Leet" },
+                { "codexleet", "Codex Test Beach Leet" },
+                { "islandreet", "Codex Test Island Reet" },
+                { "reet", "Codex Test Island Reet" },
+                { "shoresnake", "Codex Test Shore Snake" },
+                { "snake", "Codex Test Shore Snake" },
+                { "rollerrat", "Codex Test Stowaway Rollerrat" },
+                { "stowawayrollerrat", "Codex Test Stowaway Rollerrat" },
+                { "rat", "Codex Test Stowaway Rollerrat" },
+                { "duneflea", "Codex Test Dune Flea" },
+                { "flea", "Codex Test Dune Flea" },
+                { "surflizard", "Codex Test Surf Lizard" },
+                { "lizard", "Codex Test Surf Lizard" },
+                { "cliffmalle", "Codex Test Cliff Malle" },
+                { "malle", "Codex Test Cliff Malle" },
+                { "reefsalamander", "Codex Test Reef Salamander" },
+                { "salamander", "Codex Test Reef Salamander" },
+                { "alienspider", "Codex Test Alien Spider - Zix" },
+                { "spider", "Codex Test Alien Spider - Zix" },
+                { "zix", "Codex Test Alien Spider - Zix" },
+                { "a004", "Beach Leet" }
+            };
+
+        private static readonly HashSet<int> TestLootCleanupItemIds = new HashSet<int>
+        {
+            27350,
+            27351,
+            27352
+        };
 
         public CombatLootSmoke(string pluginDirectory, Action<string> captureLog)
         {
@@ -69,6 +109,7 @@ namespace AOSharpLiveCapture
             Idle,
             WaitingForPlayer,
             SpawnMob,
+            CleanupInventory,
             WaitMob,
             StartAttack,
             WaitCorpse,
@@ -93,8 +134,13 @@ namespace AOSharpLiveCapture
             switch (subCommand)
             {
                 case "start":
-                    this.Start("chat command", string.Empty);
-                    chatWindow.WriteLine("Combat loot smoke started.", ChatColor.Gold);
+                    string requestedAlias = args.Length > 1 ? args[1] : string.Empty;
+                    bool requestedRequireReopen = args.Length <= 2
+                        || !string.Equals(args[2], "basic", StringComparison.OrdinalIgnoreCase);
+                    this.Start("chat command", string.Empty, requestedAlias, string.Empty, requestedRequireReopen);
+                    chatWindow.WriteLine(
+                        "Combat loot smoke started for " + this.mobName + " (" + this.mobAlias + ").",
+                        ChatColor.Gold);
                     break;
 
                 case "stop":
@@ -252,10 +298,20 @@ namespace AOSharpLiveCapture
                 reason += ": " + OneLine(requested.Trim());
             }
 
-            this.Start(reason, this.ParseRequestValue(requested, "character"));
+            this.Start(
+                reason,
+                this.ParseRequestValue(requested, "character"),
+                this.ParseRequestValue(requested, "mobAlias"),
+                this.ParseRequestValue(requested, "mobName"),
+                this.ParseRequestBool(requested, "requireReopen", true));
         }
 
-        private void Start(string reason, string expectedCharacter)
+        private void Start(
+            string reason,
+            string expectedCharacter,
+            string requestedMobAlias,
+            string requestedMobName,
+            bool requestedRequireReopen)
         {
             this.CloseLog();
 
@@ -281,11 +337,15 @@ namespace AOSharpLiveCapture
             this.itemCountBeforeMove = 0;
             this.reopenUseCount = 0;
             this.lootAttemptCount = 0;
+            this.cleanupAttemptCount = 0;
             this.closeIssued = false;
             this.closeConfirmed = false;
             this.closeHookCalled = false;
+            this.requireReopen = requestedRequireReopen;
             this.lastCloseWindowName = string.Empty;
             this.expectedCharacterName = expectedCharacter ?? string.Empty;
+            this.mobAlias = NormalizeMobAlias(requestedMobAlias);
+            this.mobName = ResolveMobName(this.mobAlias, requestedMobName);
             this.lastCorpseInventorySignalUtc = DateTime.MinValue;
             this.lastCorpseAccessSignalUtc = DateTime.MinValue;
             this.lastLootMoveSignalUtc = DateTime.MinValue;
@@ -298,8 +358,10 @@ namespace AOSharpLiveCapture
                 this.Write("Expected character: " + this.expectedCharacterName);
             }
 
+            this.Write("Mob under test: alias=" + this.mobAlias + " name=" + this.mobName);
+            this.Write("Require reopen: " + this.requireReopen);
             this.Write("Known corpses before run: " + this.knownCorpses.Count.ToString(CultureInfo.InvariantCulture));
-            Chat.WriteLine("Combat loot smoke started. Log: " + this.logPath, ChatColor.Gold);
+            Chat.WriteLine("Combat loot smoke started for " + this.mobName + ". Log: " + this.logPath, ChatColor.Gold);
             this.Transition(SmokeState.WaitingForPlayer, "start");
         }
 
@@ -326,6 +388,10 @@ namespace AOSharpLiveCapture
 
                 case SmokeState.SpawnMob:
                     this.SpawnMob();
+                    break;
+
+                case SmokeState.CleanupInventory:
+                    this.CleanupInventory();
                     break;
 
                 case SmokeState.WaitMob:
@@ -395,13 +461,37 @@ namespace AOSharpLiveCapture
                 }
 
                 this.Write("Local player: " + this.DescribeCharacter(DynelManager.LocalPlayer));
-                this.Transition(SmokeState.SpawnMob, "player ready");
+                this.Transition(SmokeState.CleanupInventory, "player ready");
                 return;
             }
 
             if (this.TimedOut(30))
             {
                 this.Fail("Timed out waiting for local player.");
+            }
+        }
+
+        private void CleanupInventory()
+        {
+            List<Item> testItems = this.GetInventoryCleanupItems();
+            if (testItems.Count == 0)
+            {
+                this.Transition(SmokeState.SpawnMob, "test loot inventory clean");
+                return;
+            }
+
+            if (DateTime.UtcNow >= this.nextActionUtc)
+            {
+                this.cleanupAttemptCount++;
+                this.DeleteInventoryTestLoot(testItems, "pre-run cleanup");
+                this.nextActionUtc = DateTime.UtcNow.AddSeconds(1);
+            }
+
+            if (this.TimedOut(12))
+            {
+                this.Fail(
+                    "Timed out cleaning test loot before run. Remaining="
+                    + this.DescribeItems(this.GetInventoryCleanupItems()));
             }
         }
 
@@ -427,10 +517,10 @@ namespace AOSharpLiveCapture
             {
                 Identity = player.Identity,
                 Target = player.Identity,
-                Command = "spawnleet"
+                Command = "spawn " + this.mobAlias
             });
 
-            this.Write("Sent ChatCmd spawnleet.");
+            this.Write("Sent ChatCmd spawn " + this.mobAlias + ".");
             this.Transition(SmokeState.WaitMob, "spawn sent");
         }
 
@@ -447,7 +537,7 @@ namespace AOSharpLiveCapture
 
             if (this.TimedOut(12))
             {
-                this.Fail("Timed out waiting for spawned " + MobName + ".");
+                this.Fail("Timed out waiting for spawned " + this.mobName + " (" + this.mobAlias + ").");
             }
         }
 
@@ -527,7 +617,7 @@ namespace AOSharpLiveCapture
             }
 
             List<Item> items = this.GetCorpseItems();
-            if (items.Count >= 2)
+            if (items.Count >= 2 || (!this.requireReopen && items.Count > 0))
             {
                 this.Write("Corpse first open has " + items.Count.ToString(CultureInfo.InvariantCulture) + " items: " + this.DescribeItems(items));
                 this.Transition(SmokeState.LootFirst, "first loot list ready");
@@ -549,9 +639,12 @@ namespace AOSharpLiveCapture
         private void LootFirst()
         {
             List<Item> items = this.GetCorpseItems();
-            if (items.Count < 2)
+            int minimumItems = this.requireReopen ? 2 : 1;
+            if (items.Count < minimumItems)
             {
-                this.Fail("Expected at least two corpse items before first loot; found " + items.Count.ToString(CultureInfo.InvariantCulture));
+                this.Fail("Expected at least " + minimumItems.ToString(CultureInfo.InvariantCulture)
+                    + " corpse item(s) before first loot; found "
+                    + items.Count.ToString(CultureInfo.InvariantCulture));
                 return;
             }
 
@@ -573,10 +666,19 @@ namespace AOSharpLiveCapture
         private void WaitFirstMoved()
         {
             List<Item> items = this.GetCorpseItems();
-            if (items.Count < this.itemCountBeforeMove && items.Count > 0)
+            if (items.Count < this.itemCountBeforeMove)
             {
                 this.Write("First item moved. Remaining items=" + this.DescribeItems(items));
-                this.Transition(SmokeState.CloseLootWindow, "first move observed");
+                if (!this.requireReopen)
+                {
+                    this.attemptedLootSlots.Clear();
+                    this.Transition(items.Count == 0 ? SmokeState.WaitCorpseGone : SmokeState.LootRemaining, "basic first move observed");
+                }
+                else
+                {
+                    this.Transition(SmokeState.CloseLootWindow, "first move observed");
+                }
+
                 return;
             }
 
@@ -758,6 +860,12 @@ namespace AOSharpLiveCapture
             Corpse corpse = this.GetCorpse();
             if (corpse == null)
             {
+                if (!this.requireReopen)
+                {
+                    this.Pass("Spawned, killed, opened, looted DB/basic item(s), and corpse despawned.");
+                    return;
+                }
+
                 string closeText = this.closeConfirmed
                     ? "closed corpse container through client hook"
                     : (this.closeHookCalled ? "called client close hook" : "close not confirmed");
@@ -797,13 +905,15 @@ namespace AOSharpLiveCapture
                 .Where(corpse => corpse != null && !this.knownCorpses.Contains(corpse.Identity))
                 .OrderBy(corpse => this.DistanceFromPlayer(corpse));
 
-            Corpse named = candidates.FirstOrDefault(corpse => Safe(() => corpse.Name).IndexOf(MobName, StringComparison.OrdinalIgnoreCase) >= 0);
+            string expectedCorpseName = "Remains of " + this.mobName;
+            Corpse named = candidates.FirstOrDefault(
+                corpse => string.Equals(Safe(() => corpse.Name), expectedCorpseName, StringComparison.OrdinalIgnoreCase));
             if (named != null)
             {
                 return named;
             }
 
-            return candidates.FirstOrDefault(corpse => this.DistanceFromPlayer(corpse) <= 40f);
+            return null;
         }
 
         private Corpse GetCorpse()
@@ -879,7 +989,7 @@ namespace AOSharpLiveCapture
 
         private bool IsTestMob(SimpleChar character)
         {
-            return Safe(() => character.Name).IndexOf(MobName, StringComparison.OrdinalIgnoreCase) >= 0;
+            return string.Equals(Safe(() => character.Name), this.mobName, StringComparison.OrdinalIgnoreCase);
         }
 
         private bool IsUniqueTestItem(Item item)
@@ -922,6 +1032,59 @@ namespace AOSharpLiveCapture
                 || existing.HighId == item.HighId);
         }
 
+        private List<Item> GetInventoryCleanupItems()
+        {
+            return SafeArray(() => Inventory.Items.ToArray())
+                .Where(this.IsCleanupTestLootItem)
+                .OrderBy(item => Safe(() => item.Name))
+                .ThenBy(item => ItemSlotKey(item))
+                .ToList();
+        }
+
+        private bool IsCleanupTestLootItem(Item item)
+        {
+            return item != null
+                && (TestLootCleanupItemIds.Contains(item.Id)
+                    || TestLootCleanupItemIds.Contains(item.HighId));
+        }
+
+        private void DeleteInventoryTestLoot(string reason)
+        {
+            this.DeleteInventoryTestLoot(this.GetInventoryCleanupItems(), reason);
+        }
+
+        private void DeleteInventoryTestLoot(List<Item> items, string reason)
+        {
+            if (items == null || items.Count == 0)
+            {
+                return;
+            }
+
+            int deleted = 0;
+            foreach (Item item in items.Take(CleanupBatchSize))
+            {
+                try
+                {
+                    item.Delete();
+                    deleted++;
+                    this.Write("Deleted test loot from inventory for " + reason + ": " + this.DescribeItem(item));
+                }
+                catch (Exception ex)
+                {
+                    this.Write("Delete test loot failed for " + reason + ": " + ex.Message + " item=" + this.DescribeItem(item));
+                }
+            }
+
+            this.Write(
+                "Test loot cleanup sent "
+                + deleted.ToString(CultureInfo.InvariantCulture)
+                + "/"
+                + items.Count.ToString(CultureInfo.InvariantCulture)
+                + " delete request(s) for "
+                + reason
+                + ".");
+        }
+
         private void Transition(SmokeState nextState, string reason)
         {
             this.state = nextState;
@@ -942,6 +1105,7 @@ namespace AOSharpLiveCapture
         private void Pass(string message)
         {
             this.WriteResult("PASS", message);
+            this.DeleteInventoryTestLoot("pass");
             Chat.WriteLine("Combat loot smoke PASS: " + message, ChatColor.Green);
             this.Transition(SmokeState.Passed, "pass");
             this.CloseLog();
@@ -950,6 +1114,7 @@ namespace AOSharpLiveCapture
         private void Fail(string message)
         {
             this.WriteResult("FAIL", message);
+            this.DeleteInventoryTestLoot("fail");
             Chat.WriteLine("Combat loot smoke FAIL: " + message, ChatColor.Red);
             this.Transition(SmokeState.Failed, "fail");
             this.CloseLog();
@@ -982,10 +1147,12 @@ namespace AOSharpLiveCapture
         {
             return string.Format(
                 CultureInfo.InvariantCulture,
-                "Combat loot smoke state={0} running={1} expected={2} target={3} corpse={4} log={5}",
+                "Combat loot smoke state={0} running={1} expected={2} mob={3}/{4} target={5} corpse={6} log={7}",
                 this.state,
                 this.IsRunning,
                 string.IsNullOrWhiteSpace(this.expectedCharacterName) ? "(any)" : this.expectedCharacterName,
+                this.mobAlias,
+                this.mobName,
                 this.targetIdentity,
                 this.corpseIdentity,
                 this.logPath ?? "(none)");
@@ -1295,6 +1462,48 @@ namespace AOSharpLiveCapture
             }
 
             return string.Empty;
+        }
+
+        private bool ParseRequestBool(string request, string key, bool defaultValue)
+        {
+            string value = this.ParseRequestValue(request, key);
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return defaultValue;
+            }
+
+            bool parsed;
+            if (bool.TryParse(value, out parsed))
+            {
+                return parsed;
+            }
+
+            return string.Equals(value, "1", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(value, "on", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string NormalizeMobAlias(string requestedMobAlias)
+        {
+            return string.IsNullOrWhiteSpace(requestedMobAlias)
+                ? DefaultMobAlias
+                : requestedMobAlias.Trim();
+        }
+
+        private static string ResolveMobName(string requestedMobAlias, string requestedMobName)
+        {
+            if (!string.IsNullOrWhiteSpace(requestedMobName))
+            {
+                return requestedMobName.Trim();
+            }
+
+            string knownName;
+            if (KnownMobNames.TryGetValue(NormalizeMobAlias(requestedMobAlias), out knownName))
+            {
+                return knownName;
+            }
+
+            return DefaultMobName;
         }
 
         private static class InventoryGuiModuleNative

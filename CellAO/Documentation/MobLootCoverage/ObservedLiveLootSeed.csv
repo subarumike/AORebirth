@@ -1,0 +1,46 @@
+enemy_name,template_hash,template_found,template_min_level,template_max_level,template_health,template_monster_data,observed_body_count,observed_min_level,observed_max_level,observed_min_health,observed_max_health,credits_min,credits_max,credits_average,drop_group_hash,item_name,low_id,high_id,min_ql,max_ql,observed_item_bodies,observed_drop_rate_basis_points,sql_ready
+Beach Leet,A004,True,1,1,12,17655,8,1,1,12,12,1,1,1.00,OBSA00400,Battered Low-Tech Armor Gloves,70562,70562,1,1,1,1250,True
+Beach Leet,A004,True,1,1,12,17655,8,1,1,12,12,1,1,1.00,OBSA00401,Monster Parts,42640,42640,1,1,4,5000,True
+Beach Leet,A004,True,1,1,12,17655,8,1,1,12,12,1,1,1.00,OBSA00402,Perfectly Formed Seashell,259990,259990,1,1,2,2500,True
+Beach Leet,A004,True,1,1,12,17655,8,1,1,12,12,1,1,1.00,OBSA00403,Spinal Section,248323,248323,1,1,4,5000,True
+Burneye the Blazing Mudpuppy,,False,,,,,1,2,2,190,190,33,33,33.00,,Battered Flak Armor Pants,85517,27360,2,2,1,10000,False
+Burneye the Blazing Mudpuppy,,False,,,,,1,2,2,190,190,33,33,33.00,,Battered Flak Armor Sleeves,85746,27391,2,2,1,10000,False
+Burneye the Blazing Mudpuppy,,False,,,,,1,2,2,190,190,33,33,33.00,,Golden Sphere,136642,136643,2,2,1,10000,False
+Burneye the Blazing Mudpuppy,,False,,,,,1,2,2,190,190,33,33,33.00,,Pearl of Rubi-Ka,136646,136647,2,2,1,10000,False
+Burneye the Blazing Mudpuppy,,False,,,,,1,2,2,190,190,33,33,33.00,,Snake Ring,136610,136611,2,2,1,10000,False
+Burneye the Blazing Mudpuppy,,False,,,,,1,2,2,190,190,33,33,33.00,,Standard Bureaucrat Suit,160707,160708,2,2,1,10000,False
+Cliff Malle,A035,True,2,3,70,17660,1,3,3,70,70,3,3,3.00,OBSA03500,Battered Light Combat Armor Pants,85533,85532,4,4,1,10000,True
+Island Reet,A001,True,1,1,12,30365,11,1,1,12,12,5,5,5.00,OBSA00100,Monster Parts,42640,42640,1,1,8,7273,True
+Island Reet,A001,True,1,1,12,30365,11,1,1,12,12,5,5,5.00,OBSA00101,Perfectly Formed Seashell,259990,259990,1,1,4,3636,True
+Island Reet,A001,True,1,1,12,30365,11,1,1,12,12,5,5,5.00,OBSA00102,Reet Beak,248328,248328,1,1,3,2727,True
+Reef Salamander,A034,True,3,4,93,30354,2,4,5,92,115,23,29,26.00,OBSA03400,Battered Flak Body Armor,85693,27389,3,3,1,5000,True
+Reef Salamander,A034,True,3,4,93,30354,2,4,5,92,115,23,29,26.00,OBSA03401,Battered Low-Tech Armor Helmet,70563,85558,5,5,1,5000,True
+Reef Salamander,A034,True,3,4,93,30354,2,4,5,92,115,23,29,26.00,OBSA03402,Monster Parts,42640,42641,4,4,1,5000,True
+Rollerrat,,False,,,,,1,2,2,38,38,11,11,11.00,,Battered Light Combat Armor Sleeves,85761,85760,2,2,1,10000,False
+Rollerrat,,False,,,,,1,2,2,38,38,11,11,11.00,,Monster Parts,42640,42641,2,2,1,10000,False
+Shore Snake,A003,True,1,1,25,30252,1,1,1,25,25,5,5,5.00,OBSA00300,Battered Light Combat Body Armor,85714,85714,1,1,1,10000,True
+Slithertongue the Constrictortwister,,False,,,,,1,2,2,190,190,17,17,17.00,,Battered Light Combat Armor Pants,85533,85532,2,2,1,10000,False
+Slithertongue the Constrictortwister,,False,,,,,1,2,2,190,190,17,17,17.00,,Battered Low-Tech Armor Gloves,70562,85597,2,2,1,10000,False
+Slithertongue the Constrictortwister,,False,,,,,1,2,2,190,190,17,17,17.00,,Ember,136628,136629,2,2,1,10000,False
+Slithertongue the Constrictortwister,,False,,,,,1,2,2,190,190,17,17,17.00,,Glow Art,136654,136655,2,2,1,10000,False
+Slithertongue the Constrictortwister,,False,,,,,1,2,2,190,190,17,17,17.00,,Pink Ring,136614,136615,2,2,1,10000,False
+Slithertongue the Constrictortwister,,False,,,,,1,2,2,190,190,17,17,17.00,,Ring of Power - Projectiles,84148,84147,2,2,1,10000,False
+Slithertongue the Constrictortwister,,False,,,,,1,2,2,190,190,17,17,17.00,,Senior Omni Intern-Op Coat,160926,160927,2,2,1,10000,False
+Surf Lizard,A000,True,1,1,25,22794,7,1,1,25,25,1,1,1.00,OBSA00000,Battered Flak Armor Pants,85517,85517,1,1,1,1429,True
+Surf Lizard,A000,True,1,1,25,22794,7,1,1,25,25,1,1,1.00,OBSA00001,Battered Flak Armor Sleeves,85746,85746,1,1,1,1429,True
+Surf Lizard,A000,True,1,1,25,22794,7,1,1,25,25,1,1,1.00,OBSA00002,Battered Light Combat Body Armor,85714,85714,1,1,1,1429,True
+Surf Lizard,A000,True,1,1,25,22794,7,1,1,25,25,1,1,1.00,OBSA00003,Battered Low-Tech Armor Helmet,70563,70563,1,1,1,1429,True
+Surf Lizard,A000,True,1,1,25,22794,7,1,1,25,25,1,1,1.00,OBSA00004,Battered Low-Tech Female Body Armor,70560,70560,1,1,1,1429,True
+Surf Lizard,A000,True,1,1,25,22794,7,1,1,25,25,1,1,1.00,OBSA00005,Monster Parts,42640,42640,1,1,2,2857,True
+Surf Lizard,A000,True,1,1,25,22794,7,1,1,25,25,1,1,1.00,OBSA00006,Yellow Corundum,259987,259987,1,1,4,5714,True
+Tropical Stalker,A033,True,4,5,115,17708,3,5,5,115,115,29,29,29.00,OBSA03300,Battered Flak Armor Sleeves,85746,27391,5,5,1,3333,True
+Tropical Stalker,A033,True,4,5,115,17708,3,5,5,115,115,29,29,29.00,OBSA03301,Battered Low-Tech Female Body Armor,70560,85688,4,4,1,3333,True
+Tropical Stalker,A033,True,4,5,115,17708,3,5,5,115,115,29,29,29.00,OBSA03302,Blue Corundum,259989,259989,1,1,1,3333,True
+Tropical Stalker,A033,True,4,5,115,17708,3,5,5,115,115,29,29,29.00,OBSA03303,Monster Parts,42640,42641,4,4,1,3333,True
+Writhetongue the Envenomedscale,,False,,,,,1,2,2,190,190,17,17,17.00,,Battered Flak Body Armor,85693,27389,2,2,1,10000,False
+Writhetongue the Envenomedscale,,False,,,,,1,2,2,190,190,17,17,17.00,,Battered Low-Tech Armor Sleeves,70561,85744,2,2,1,10000,False
+Writhetongue the Envenomedscale,,False,,,,,1,2,2,190,190,17,17,17.00,,Bracelet of Ka,136618,136619,2,2,1,10000,False
+Writhetongue the Envenomedscale,,False,,,,,1,2,2,190,190,17,17,17.00,,Ember,136628,136629,2,2,1,10000,False
+Writhetongue the Envenomedscale,,False,,,,,1,2,2,190,190,17,17,17.00,,Padded Love Shirt,160831,160832,2,2,1,10000,False
+Writhetongue the Envenomedscale,,False,,,,,1,2,2,190,190,17,17,17.00,,Ring of Luck - Offensive,84144,84143,2,2,1,10000,False
+Writhetongue the Envenomedscale,,False,,,,,1,2,2,190,190,17,17,17.00,,Ruby,136626,136627,2,2,1,10000,False

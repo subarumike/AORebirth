@@ -4,6 +4,9 @@ namespace ZoneEngine.Core
     using System.Collections.Generic;
     using System.Linq;
 
+    using CellAO.Database.Dao;
+    using CellAO.Database.Entities;
+
     public enum CombatCorpseLootClass
     {
         CreditsOnly,
@@ -15,15 +18,36 @@ namespace ZoneEngine.Core
     {
         public string ExactName { get; set; }
 
+        public string MobTemplateHash { get; set; }
+
         public int MonsterData { get; set; }
 
         public int NpcFamily { get; set; }
 
+        public int Slot { get; set; }
+
         public int DropChancePercent { get; set; }
+
+        public int DropChanceBasisPoints { get; set; }
 
         public int Quality { get; set; }
 
         public int[] ItemTemplateIds { get; set; }
+
+        public CombatLootItemTemplate[] ItemTemplates { get; set; }
+
+        public int EffectiveDropChanceBasisPoints
+        {
+            get
+            {
+                if (this.DropChanceBasisPoints > 0)
+                {
+                    return this.DropChanceBasisPoints;
+                }
+
+                return this.DropChancePercent * 100;
+            }
+        }
 
         public bool Matches(string targetName, int monsterData, int npcFamily)
         {
@@ -47,6 +71,21 @@ namespace ZoneEngine.Core
         }
     }
 
+    public sealed class CombatLootItemTemplate
+    {
+        public int LowId { get; set; }
+
+        public int HighId { get; set; }
+
+        public int MinQuality { get; set; }
+
+        public int MaxQuality { get; set; }
+
+        public int RangeCheck { get; set; }
+
+        public string DropGroupHash { get; set; }
+    }
+
     public static class CombatTestLootCatalog
     {
         public static CombatLootTableEntry[] BuildEntries()
@@ -61,31 +100,153 @@ namespace ZoneEngine.Core
                         MonsterData = archetype.MonsterData,
                         DropChancePercent = 100,
                         Quality = 1,
-                        ItemTemplateIds = new[] { 0x4545F, 0x4545A }
-                    });
-
-                entries.Add(
-                    new CombatLootTableEntry
-                    {
-                        ExactName = archetype.DisplayName,
-                        MonsterData = archetype.MonsterData,
-                        DropChancePercent = 100,
-                        Quality = 1,
-                        ItemTemplateIds = new[] { 27350, 85534, 85521, 273496, 273500 }
-                    });
-
-                entries.Add(
-                    new CombatLootTableEntry
-                    {
-                        ExactName = archetype.DisplayName,
-                        MonsterData = archetype.MonsterData,
-                        DropChancePercent = 100,
-                        Quality = 1,
                         ItemTemplateIds = new[] { 27350 }
+                    });
+
+                entries.Add(
+                    new CombatLootTableEntry
+                    {
+                        ExactName = archetype.DisplayName,
+                        MonsterData = archetype.MonsterData,
+                        DropChancePercent = 100,
+                        Quality = 1,
+                        ItemTemplateIds = new[] { 27351, 85534, 85521, 273496, 273500 }
+                    });
+
+                entries.Add(
+                    new CombatLootTableEntry
+                    {
+                        ExactName = archetype.DisplayName,
+                        MonsterData = archetype.MonsterData,
+                        DropChancePercent = 100,
+                        Quality = 1,
+                        ItemTemplateIds = new[] { 27352 }
                     });
             }
 
             return entries.ToArray();
+        }
+    }
+
+    public static class CombatMobLootCatalog
+    {
+        public static CombatLootTableEntry[] BuildEntries(
+            IEnumerable<DBMobTemplate> mobTemplates,
+            IEnumerable<DBMobDroptable> dropTable)
+        {
+            if (mobTemplates == null || dropTable == null)
+            {
+                return new CombatLootTableEntry[0];
+            }
+
+            Dictionary<string, List<DBMobDroptable>> dropsByHash =
+                dropTable
+                    .Where(x => x != null && !string.IsNullOrWhiteSpace(x.Hash))
+                    .GroupBy(x => x.Hash.Trim(), StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(x => x.Key, x => x.ToList(), StringComparer.OrdinalIgnoreCase);
+
+            var entries = new List<CombatLootTableEntry>();
+            foreach (DBMobTemplate template in mobTemplates.Where(HasDropHashes))
+            {
+                string[] hashExpressions = SplitLootField(template.DropHashes, ',');
+                string[] slotValues = SplitLootField(template.DropSlots, ',');
+                string[] rateValues = SplitLootField(template.DropRates, ',');
+
+                for (int i = 0; i < hashExpressions.Length; i++)
+                {
+                    CombatLootItemTemplate[] itemTemplates =
+                        ExpandDropHashExpression(hashExpressions[i], dropsByHash).ToArray();
+
+                    if (itemTemplates.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    int basisPoints = ParseDropRateBasisPoints(rateValues, i);
+                    entries.Add(
+                        new CombatLootTableEntry
+                        {
+                            ExactName = template.Name,
+                            MobTemplateHash = template.Hash,
+                            MonsterData = template.MonsterData,
+                            NpcFamily = template.NPCFamily,
+                            Slot = ParseIntAt(slotValues, i, i),
+                            DropChanceBasisPoints = basisPoints,
+                            DropChancePercent = basisPoints / 100,
+                            ItemTemplates = itemTemplates
+                        });
+                }
+            }
+
+            return entries.ToArray();
+        }
+
+        private static bool HasDropHashes(DBMobTemplate template)
+        {
+            return template != null && !string.IsNullOrWhiteSpace(template.DropHashes);
+        }
+
+        private static IEnumerable<CombatLootItemTemplate> ExpandDropHashExpression(
+            string expression,
+            IDictionary<string, List<DBMobDroptable>> dropsByHash)
+        {
+            foreach (string dropHash in SplitLootField(expression, '+'))
+            {
+                List<DBMobDroptable> rows;
+                if (!dropsByHash.TryGetValue(dropHash, out rows))
+                {
+                    continue;
+                }
+
+                foreach (DBMobDroptable row in rows)
+                {
+                    yield return new CombatLootItemTemplate
+                    {
+                        LowId = row.LowId,
+                        HighId = row.HighId,
+                        MinQuality = row.MinQl,
+                        MaxQuality = row.MaxQl,
+                        RangeCheck = row.RangeCheck,
+                        DropGroupHash = row.Hash
+                    };
+                }
+            }
+        }
+
+        private static string[] SplitLootField(string value, char separator)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return new string[0];
+            }
+
+            return value
+                .Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .Where(x => x.Length > 0)
+                .ToArray();
+        }
+
+        private static int ParseDropRateBasisPoints(string[] values, int index)
+        {
+            int result = ParseIntAt(values, index, 10000);
+            if (result < 0)
+            {
+                return 0;
+            }
+
+            return result > 10000 ? 10000 : result;
+        }
+
+        private static int ParseIntAt(string[] values, int index, int defaultValue)
+        {
+            if (values == null || index < 0 || index >= values.Length)
+            {
+                return defaultValue;
+            }
+
+            int result;
+            return int.TryParse(values[index], out result) ? result : defaultValue;
         }
     }
 
@@ -148,6 +309,26 @@ namespace ZoneEngine.Core
             }
 
             return nextRandom(100) < dropChancePercent;
+        }
+
+        public static bool ShouldDropBasisPoints(int dropChanceBasisPoints, Func<int, int> nextRandom)
+        {
+            if (dropChanceBasisPoints <= 0)
+            {
+                return false;
+            }
+
+            if (dropChanceBasisPoints >= 10000)
+            {
+                return true;
+            }
+
+            if (nextRandom == null)
+            {
+                throw new ArgumentNullException("nextRandom");
+            }
+
+            return nextRandom(10000) < dropChanceBasisPoints;
         }
 
         public static T FindLootItem<T>(

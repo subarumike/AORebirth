@@ -1,5 +1,6 @@
 param(
-    [switch]$SkipBuild
+    [switch]$SkipBuild,
+    [string]$BuiltDir
 )
 
 $ErrorActionPreference = 'Stop'
@@ -78,6 +79,16 @@ function Get-PropertyValue {
     return (Get-RequiredProperty $Object.GetType() $Name).GetValue($Object, $null)
 }
 
+function Set-PropertyValue {
+    param(
+        [object]$Object,
+        [string]$Name,
+        [object]$Value
+    )
+
+    (Get-RequiredProperty $Object.GetType() $Name).SetValue($Object, $Value, $null)
+}
+
 function Convert-EnumerableToArray {
     param(
         [object]$Enumerable
@@ -122,7 +133,12 @@ function Stop-BuiltOutputProcesses {
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 $zoneProject = Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ZoneEngine.csproj'
-$builtDir = Join-Path $repoRoot 'CellAO\Built\Debug'
+if ([string]::IsNullOrWhiteSpace($BuiltDir)) {
+    $builtDir = Join-Path $repoRoot 'CellAO\Built\Debug'
+}
+else {
+    $builtDir = (Resolve-Path $BuiltDir).Path
+}
 $zoneEngine = Join-Path $builtDir 'ZoneEngine.exe'
 $msbuild = 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe'
 
@@ -155,8 +171,32 @@ Assert-SourceMatch $baseInventorySource 'InventoryItemRules\.HasSameUniqueItem' 
 Assert-SourceMatch $playfieldSource 'InventoryItemRules\.HasSameUniqueItem' 'Corpse loot path must use shared unique-item rules.'
 Assert-SourceMatch $playfieldSource 'DespawnNpcImmediately\s*\(' 'Playfield should expose immediate NPC despawn for controlled GM test cleanup.'
 Assert-SourceMatch $playfieldSource 'DespawnDebugCorpses\s*\(' 'Playfield should expose debug corpse cleanup for controlled GM test cleanup.'
+Assert-SourceMatch $playfieldSource 'target\.Stats\s*\[\s*StatIds\.health\s*\]\.Value\s*=\s*newHealth\s*;\s*target\.SendChangedStats\s*\(\s*\)\s*;.*?new\s+AttackInfoMessage.*?new\s+HealthDamageMessage\s*\{.*?Unknown1\s*=\s*newHealth' 'Combat hits, including killing hits, should send the zero-health update before death cleanup.'
+Assert-SourceMatch $playfieldSource 'KillNpcTarget\s*\(ICharacter\s+target\).*?MarkNpcDead\s*\(\s*target\s*\).*?StopFightingDeadTarget\s*\(\s*target\.Identity\s*\).*?SendNpcDeathAnimation\s*\(\s*target\s*\).*?ScheduleDebugCorpseSpawn\s*\(\s*target\s*,\s*corpseIdentity\s*\).*?deadNpcDespawnTicks\s*\[\s*target\.Identity\.Instance\s*\]\s*=\s*DateTime\.UtcNow\s*\+\s*DeadNpcDespawnDelay\s*;' 'NPC death should mark dead, stop fighting, play death, schedule corpse, and delay despawn.'
+Assert-SourceMatch $playfieldSource 'MarkNpcDead\s*\(ICharacter\s+target\).*?Stats\s*\[\s*StatIds\.deadtimer\s*\]\.Value\s*=\s*1\s*;.*?Stats\s*\[\s*StatIds\.corpseanimkey\s*\]\.Value\s*=\s*DeathAnimationKeyFor\s*\(\s*target\s*\)\s*;.*?Stats\s*\[\s*StatIds\.dieanim\s*\]\.Value\s*=\s*DeathAnimationKeyFor\s*\(\s*target\s*\)\s*;.*?Stats\s*\[\s*StatIds\.healdelta\s*\]\.Value\s*=\s*0\s*;.*?DoNotDoTimers\s*=\s*true\s*;' 'NPC death stats should disable healing/timers and expose death animation keys.'
+Assert-SourceMatch $playfieldSource 'TryUseDeadNpcCorpse\s*\(ICharacter\s+looter,\s*Identity\s+deadNpcIdentity,\s*out\s+Identity\s+corpseIdentity\).*?DeadNpcIdentity\.Instance\s*==\s*deadNpcIdentity\.Instance.*?corpseIdentity\s*=\s*corpse\.CorpseIdentity\s*;.*?return\s+this\.TryUseCorpse\s*\(\s*looter\s*,\s*corpse\.CorpseIdentity\s*\)\s*;' 'Using a dead NPC dynel should route to its registered corpse identity.'
+Assert-SourceMatch $playfieldSource 'TryUseCorpse\s*\(ICharacter\s+looter,\s*Identity\s+corpseIdentity\).*?corpse\.Opened\s*=\s*true\s*;.*?corpse\.HasUnlootedItems.*?ExtendDebugCorpseLifetime\s*\(\s*corpse\s*,\s*CombatCorpseRules\.ItemLootCorpseLifetime\s*,\s*"corpse-use"\s*\).*?NextUseSendsAccessActionOnly.*?SendCorpseLootAccessAction\s*\(\s*looter\s*,\s*corpse\s*\).*?SendUseActionFinished\s*\(\s*looter\s*\).*?NextUseSendsAccessActionOnly\s*=\s*false\s*;.*?SendCorpseInventoryUpdate\s*\(\s*looter\s*,\s*corpse\s*\).*?NextUseSendsAccessActionOnly\s*=\s*true\s*;' 'Corpse reopen with remaining loot should alternate access action and inventory update packets.'
+Assert-SourceMatch $playfieldSource 'TryUseCorpse\s*\(ICharacter\s+looter,\s*Identity\s+corpseIdentity\).*?!corpse\.HasUnlootedItems.*?ScheduleDebugCorpseDespawn\s*\(\s*corpse\s*,\s*CombatCorpseRules\.EmptyCorpseCleanupAfterOpenedDelay\s*,\s*"opened-empty"\s*\)' 'Opening an empty corpse should schedule the short cleanup timer.'
+Assert-SourceMatch $playfieldSource 'TryLootCorpseItem\s*\(ICharacter\s+looter,\s*Identity\s+sourceContainer,\s*Identity\s+target,\s*int\s+targetPlacement\).*?sourceContainer\.Type\s*!=\s*IdentityType\.Backpack.*?int\s+corpseInventorySlot\s*=\s*\(sourceContainer\.Instance\s*>>\s*16\)\s*&\s*0xffff\s*;.*?int\s+requestedLootSlot\s*=\s*sourceContainer\.Instance\s*&\s*0xffff\s*;' 'Corpse item moves should decode the Backpack source container into corpse inventory and loot slots.'
+Assert-SourceMatch $playfieldSource 'TryLootCorpseItem\s*\(ICharacter\s+looter,\s*Identity\s+sourceContainer,\s*Identity\s+target,\s*int\s+targetPlacement\).*?target\s*!=\s*looter\.Identity.*?SendUseActionFinished\s*\(\s*looter\s*\)' 'Corpse item moves should reject target mismatches without falling through to normal inventory moves.'
+Assert-SourceMatch $playfieldSource 'TryLootCorpseItem\s*\(ICharacter\s+looter,\s*Identity\s+sourceContainer,\s*Identity\s+target,\s*int\s+targetPlacement\).*?CharacterHasUniqueItemAlready\s*\(\s*looter\s*,\s*lootItem\.Item\s*\).*?You already have this unique item\.' 'Corpse loot should reject duplicate UNIQUE items before adding to inventory.'
+Assert-SourceMatch $playfieldSource 'TryLootCorpseItem\s*\(ICharacter\s+looter,\s*Identity\s+sourceContainer,\s*Identity\s+target,\s*int\s+targetPlacement\).*?lootItem\.Looted\s*=\s*true\s*;.*?ContainerAddItemMessageHandler\.Default\.Send\s*\(.*?!corpse\.HasUnlootedItems.*?ScheduleDebugCorpseDespawn\s*\(\s*corpse\s*,\s*CombatCorpseRules\.EmptyCorpseCleanupAfterOpenedDelay\s*,\s*"looted-empty"\s*\).*?ExtendDebugCorpseLifetime\s*\(\s*corpse\s*,\s*CombatCorpseRules\.ItemLootCorpseLifetime\s*,\s*"loot-remaining"\s*\)' 'Successful corpse loot should mark the item, notify the client, despawn empty corpses, and keep corpses with remaining loot alive.'
+Assert-SourceMatch $playfieldSource 'CharacterHasUniqueItemAlready\s*\(ICharacter\s+character,\s*IItem\s+item\).*?InventoryItemRules\.HasSameUniqueItem.*?BaseInventory.*?Pages\.Values' 'Corpse unique checks should inspect existing inventory items through shared rules.'
+Assert-SourceMatch $playfieldSource 'ProcessPendingDebugCorpseSpawns\s*\(\s*\).*?pendingDebugCorpseSpawns\.Remove\s*\(\s*corpse\.DeadNpcIdentity\.Instance\s*\).*?RegisterDebugCorpse\s*\(\s*target\s*,\s*corpse\.CorpseIdentity\s*\).*?SendDebugCorpseFullUpdate\s*\(\s*target\s*,\s*corpse\.CorpseIdentity\s*\)' 'Pending corpse spawns should register state before sending CorpseFullUpdate.'
+Assert-SourceMatch $playfieldSource 'ProcessDebugCorpseDespawns\s*\(\s*\).*?debugCorpseDespawnTicks.*?Where\s*\(x\s*=>\s*x\.Value\s*<=\s*DateTime\.UtcNow\).*?DespawnDebugCorpse\s*\(\s*corpseInstance\s*\)' 'Expired debug corpses should be despawned by the playfield timer.'
+Assert-SourceMatch $playfieldSource 'RegisterDebugCorpse\s*\(ICharacter\s+target,\s*Identity\s+corpseIdentity\).*?RollDebugCorpseLootItems\s*\(\s*target\s*\).*?CorpseLootClassFor\s*\(\s*target\s*,\s*lootItems\s*\).*?CorpseLifetimeFor\s*\(\s*lootClass\s*\).*?debugCorpses\s*\[\s*corpseIdentity\.Instance\s*\]\s*=\s*state\s*;.*?debugCorpseDespawnTicks\s*\[\s*corpseIdentity\.Instance\s*\]\s*=\s*expiresAtUtc\s*;' 'Registered corpses should roll loot, choose a lifetime, and register the despawn tick.'
+Assert-SourceMatch $playfieldSource 'RollDebugCorpseLootItems\s*\(ICharacter\s+target\).*?DebugLootTable.*?matchingEntries\.Count\s*==\s*0.*?GetDatabaseLootTable\s*\(\s*\)' 'Corpse loot should keep deterministic test loot first and fall back to DB-backed loot for real configured mobs.'
+Assert-SourceMatch $playfieldSource 'GetDatabaseLootTable\s*\(\s*\).*?MobTemplateDao\.Instance\.GetAll\s*\(\s*\).*?MobDroptableDao\.Instance\.GetAll\s*\(\s*\).*?CombatMobLootCatalog\.BuildEntries' 'DB-backed mob loot should load through the existing mobtemplate/mobdroptable DAOs.'
+Assert-SourceMatch $playfieldSource 'CreateLootItem\s*\(CombatLootTableEntry\s+entry,\s*int\s+targetLevel\).*?entry\.ItemTemplates.*?CreateLootItem\s*\(entry\.ItemTemplates,\s*targetLevel\).*?CreateLootItem\s*\(entry\.ItemTemplateIds,\s*entry\.Quality\)' 'Loot item creation should support DB drop candidates and existing deterministic template fallback.'
+Assert-SourceMatch $playfieldSource 'StopFightingDeadTarget\s*\(Identity\s+deadTarget\).*?character\.FightingTarget\s*==\s*deadTarget.*?SetFightingTarget\s*\(\s*Identity\.None\s*\).*?nextCombatTicks\.Remove\s*\(\s*character\.Identity\.Instance\s*\).*?SendCombatStopMessage\s*\(\s*character\s*\)' 'Killing an NPC should clear attackers from fight stance and stop their combat tick.'
+Assert-SourceMatch $playfieldSource 'SendCorpseInventoryUpdate\s*\(ICharacter\s+looter,\s*DebugCorpseState\s+corpse\).*?Where\s*\(x\s*=>\s*!x\.Looted\).*?NumberOfSlots\s*=\s*CombatCorpseRules\.CorpseInventorySlots.*?BagIdentity\s*=\s*corpse\.CorpseIdentity.*?SlotnumberInMainInventory\s*=\s*corpse\.InventorySlot' 'Corpse InventoryUpdate should expose only unlooted items on the corpse bag identity.'
 Assert-SourceMatch $spawnCommandSource '"status"' 'Spawn command should support combat test status.'
 Assert-SourceMatch $spawnCommandSource '"clear"' 'Spawn command should support combat test cleanup.'
+Assert-SourceMatch $spawnCommandSource 'if\s*\(\s*args\.Length\s*==\s*2\s*\).*?return\s+true\s*;' 'Spawn command should accept DB template hash-only commands like /command spawn A004.'
+Assert-SourceMatch $spawnCommandSource 'mobCharacter\.Stats\s*\[\s*StatIds\.health\s*\]\.Value\s*=\s*mobCharacter\.Stats\s*\[\s*StatIds\.life\s*\]\.Value\s*;.*?SimpleCharFullUpdate\.ConstructMessage\s*\(\s*mobCharacter\s*\)' 'DB-spawned mobs should have current health populated before SimpleCharFullUpdate is sent.'
+Assert-SourceMatch $spawnCommandSource 'new\s+CharInPlayMessage\s*\{\s*Identity\s*=\s*mobCharacter\.Identity\s*,\s*Unknown\s*=\s*0x00\s*\}' 'DB-spawned mobs should send CharInPlay after SimpleCharFullUpdate.'
+Assert-SourceMatch $spawnCommandSource 'SpawnClientHintedMobs\s*\(ICharacter\s+character\).*?SpawnPopulationMob\s*\(.*?ZonePopulationOffsets.*?Spawned\s*\{0\}\s*DB population mobs' 'Spawn zone should create a DB-backed population pack rather than another single test mob.'
+Assert-SourceMatch $spawnCommandSource 'SpawnPopulationMob\s*\(.*?NonPlayerCharacterHandler\.SpawnMobFromTemplate.*?CombatTestMobArchetype\.Prepare\s*\(\s*mobCharacter,\s*entry\s*\).*?SimpleCharFullUpdate\.ConstructMessage\s*\(\s*mobCharacter\s*\).*?DB population mob spawned' 'Population mobs should use real DB templates, prepared combat/death stats, and visible client spawn packets.'
 Assert-True (Test-Path $zoneEnemyHintsPath) 'Client RDB zone enemy hint catalog is missing.'
 Assert-True (Test-Path $npcTemplateHintsPath) 'Client RDB NPC template hint catalog is missing.'
 Assert-True (Test-Path $enemyCoveragePath) 'Client hinted enemy coverage catalog is missing.'
@@ -255,12 +295,16 @@ try {
 
     $zoneAssembly = [System.Reflection.Assembly]::LoadFrom($zoneEngine)
     $coreAssembly = [System.Reflection.Assembly]::LoadFrom((Join-Path $builtDir 'CellAO.Core.dll'))
+    $databaseAssembly = [System.Reflection.Assembly]::LoadFrom((Join-Path $builtDir 'CellAO.Database.dll'))
     $archetypeType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatTestMobArchetype'
     $rulesType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatCorpseRules'
     $damageRulesType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatDamageRules'
     $visualsType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatCorpseVisuals'
     $lootCatalogType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatTestLootCatalog'
+    $mobLootCatalogType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatMobLootCatalog'
     $inventoryRulesType = Get-RequiredType $coreAssembly 'CellAO.Core.Inventory.InventoryItemRules'
+    $mobTemplateType = Get-RequiredType $databaseAssembly 'CellAO.Database.Dao.DBMobTemplate'
+    $mobDropType = Get-RequiredType $databaseAssembly 'CellAO.Database.Entities.DBMobDroptable'
 
     $isUniqueFlags = Get-RequiredMethod $inventoryRulesType 'IsUniqueFlags' ([System.Reflection.BindingFlags]'Public, Static')
     $isSameTemplateIds = Get-RequiredMethod $inventoryRulesType 'IsSameTemplateIdPair' ([System.Reflection.BindingFlags]'Public, Static')
@@ -292,6 +336,7 @@ try {
     foreach ($entry in $entries) {
         $key = Get-PropertyValue $entry 'Key'
         $displayName = Get-PropertyValue $entry 'DisplayName'
+        $runtimeName = Get-PropertyValue $entry 'RuntimeName'
         $aliases = @(Get-PropertyValue $entry 'Aliases')
         $clientHintPlayfieldIds = @(Get-PropertyValue $entry 'ClientHintPlayfieldIds')
         $monsterData = [int](Get-PropertyValue $entry 'MonsterData')
@@ -299,6 +344,8 @@ try {
 
         Assert-True (-not [string]::IsNullOrWhiteSpace($key)) 'Combat test mob key is blank.'
         Assert-True (-not [string]::IsNullOrWhiteSpace($displayName)) "DisplayName is blank for $key."
+        Assert-True (-not [string]::IsNullOrWhiteSpace($runtimeName)) "RuntimeName is blank for $key."
+        Assert-True (-not $runtimeName.StartsWith('Codex Test ')) "RuntimeName should be the real DB mob name for $displayName."
         Assert-True ($aliases.Count -gt 0) "No aliases configured for $displayName."
         Assert-True (($clientHintPlayfieldIds | Select-Object -Unique).Count -eq $clientHintPlayfieldIds.Count) "Duplicate client hint playfield mapping for $displayName."
         Assert-True ($monsterData -gt 0) "MonsterData must be positive for $displayName."
@@ -312,6 +359,10 @@ try {
         $nameArgs = @($displayName, $null)
         Assert-True ([bool]$tryGetByName.Invoke($null, $nameArgs)) "TryGetByName failed for $displayName."
         Assert-True ([object]::ReferenceEquals($entry, $nameArgs[1])) "TryGetByName returned the wrong entry for $displayName."
+
+        $runtimeNameArgs = @($runtimeName, $null)
+        Assert-True ([bool]$tryGetByName.Invoke($null, $runtimeNameArgs)) "TryGetByName failed for runtime name $runtimeName."
+        Assert-True ([object]::ReferenceEquals($entry, $runtimeNameArgs[1])) "TryGetByName returned the wrong entry for runtime name $runtimeName."
 
         foreach ($alias in $aliases) {
             Assert-True (-not [string]::IsNullOrWhiteSpace($alias)) "Blank alias configured for $displayName."
@@ -332,6 +383,7 @@ try {
     $hintedVarmintWoods = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(600)))
     $hintedBelialForest = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(605)))
     $hintedOmniForest = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(716)))
+    $hintedShuttleport = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(4582)))
     $hintedUnknown = Convert-EnumerableToArray ($forPlayfield.Invoke($null, @(999999)))
     Assert-True (($hintedNewlandDesert | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'beachleet' }).Count -eq 1) 'Newland Desert should map to the client-hinted test leet.'
     Assert-True (($hintedNewlandDesert | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'shoresnake' }).Count -eq 1) 'Newland Desert should map to the client-hinted test snake.'
@@ -346,11 +398,16 @@ try {
     Assert-True (($hintedVarmintWoods | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'alienspider' }).Count -eq 1) 'Varmint Woods should map to the client-hinted test spider.'
     Assert-True (($hintedBelialForest | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'surflizard' }).Count -eq 1) 'Belial Forest should map to the client-hinted test lizard.'
     Assert-True (($hintedOmniForest | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'cliffmalle' }).Count -eq 1) 'Omni Forest should map to the client-hinted test malle.'
+    Assert-True (($hintedShuttleport | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'beachleet' }).Count -eq 1) 'ICC Shuttleport should map to a real Beach Leet population mob.'
+    Assert-True (($hintedShuttleport | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'islandreet' }).Count -eq 1) 'ICC Shuttleport should map to a real Island Reet population mob.'
+    Assert-True (($hintedShuttleport | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'shoresnake' }).Count -eq 1) 'ICC Shuttleport should map to a real Shore Snake population mob.'
+    Assert-True (($hintedShuttleport | Where-Object { (Get-PropertyValue $_ 'Key') -eq 'surflizard' }).Count -eq 1) 'ICC Shuttleport should map to a real Surf Lizard population mob.'
     Assert-True ($hintedUnknown.Count -eq 0) 'Unknown playfields should not invent client-hinted test mobs.'
     Assert-True ((Get-PropertyValue ($defaultForPlayfield.Invoke($null, @(551))) 'Key') -eq 'rollerrat') 'Wailing Wastes login default should use its client-hinted rollerrat.'
     Assert-True ((Get-PropertyValue ($defaultForPlayfield.Invoke($null, @(605))) 'Key') -eq 'shoresnake') 'Belial Forest login default should use the first client-hinted supported mob.'
     Assert-True ([object]::ReferenceEquals($defaultForPlayfield.Invoke($null, @(999999)), $defaultEntry)) 'Unknown playfields should fall back to the global default combat test mob.'
     Assert-True ([bool]$isCombatTestCorpseName.Invoke($null, @('Remains of Codex Test Beach Leet'))) 'Combat test corpse names should be recognized for cleanup.'
+    Assert-True ([bool]$isCombatTestCorpseName.Invoke($null, @('Remains of Beach Leet'))) 'Real DB population corpse names should be recognized for cleanup.'
     Assert-True (-not [bool]$isCombatTestCorpseName.Invoke($null, @('Remains of Random Live Mob'))) 'Non-test corpse names should not be recognized for cleanup.'
     Assert-True (-not [bool]$isCombatTestCorpseName.Invoke($null, @('Codex Test Beach Leet'))) 'Live mob names should not be treated as corpse names.'
 
@@ -370,6 +427,7 @@ try {
     $buildLootEntries = Get-RequiredMethod $lootCatalogType 'BuildEntries' ([System.Reflection.BindingFlags]'Public, Static')
     $lootEntries = @($buildLootEntries.Invoke($null, @()))
     Assert-True ($lootEntries.Count -eq ($entries.Count * 3)) 'Combat test loot catalog should have three entries per test mob.'
+    $cleanupLootTemplateIds = @(27350, 27351, 27352)
 
     foreach ($entry in $entries) {
         $displayName = Get-PropertyValue $entry 'DisplayName'
@@ -387,6 +445,12 @@ try {
             Assert-True ([int]$lootEntry.Quality -eq 1) "Test loot entry for $displayName should use quality 1."
             Assert-True (@($lootEntry.ItemTemplateIds).Count -gt 0) "Test loot entry for $displayName has no item templates."
         }
+
+        foreach ($templateId in $cleanupLootTemplateIds) {
+            Assert-True (($matches | Where-Object { @($_.ItemTemplateIds) -contains $templateId }).Count -gt 0) "Test loot for $displayName should include non-unique cleanup template $templateId."
+        }
+
+        Assert-True (($matches | Where-Object { @($_.ItemTemplateIds) -contains 0x4545F -or @($_.ItemTemplateIds) -contains 0x4545A }).Count -eq 0) "Broad cleanup test loot for $displayName should not include duplicate UNIQUE templates."
     }
 
     $lifetimeMethod = Get-RequiredMethod $rulesType 'LifetimeFor' ([System.Reflection.BindingFlags]'Public, Static')
@@ -405,12 +469,62 @@ try {
     Assert-True ($lootClassFor.Invoke($null, @(0, $true)).Equals($majorBoss)) 'Boss corpses should classify as MajorBoss.'
 
     $shouldDrop = Get-RequiredMethod $rulesType 'ShouldDrop' ([System.Reflection.BindingFlags]'Public, Static')
+    $shouldDropBasisPoints = Get-RequiredMethod $rulesType 'ShouldDropBasisPoints' ([System.Reflection.BindingFlags]'Public, Static')
     $lowRoll = [System.Func[int,int]]{ param([int]$max) 0 }
     $highRoll = [System.Func[int,int]]{ param([int]$max) $max - 1 }
     Assert-True (-not [bool]$shouldDrop.Invoke($null, @(0, $lowRoll))) '0 percent loot chance should never roll true.'
     Assert-True ([bool]$shouldDrop.Invoke($null, @(100, $highRoll))) '100 percent loot chance should always roll true.'
     Assert-True ([bool]$shouldDrop.Invoke($null, @(50, $lowRoll))) 'Low random roll should pass a 50 percent drop.'
     Assert-True (-not [bool]$shouldDrop.Invoke($null, @(50, $highRoll))) 'High random roll should fail a 50 percent drop.'
+    Assert-True (-not [bool]$shouldDropBasisPoints.Invoke($null, @(0, $lowRoll))) '0 basis-point loot chance should never roll true.'
+    Assert-True ([bool]$shouldDropBasisPoints.Invoke($null, @(10000, $highRoll))) '10000 basis points should always roll true.'
+    Assert-True ([bool]$shouldDropBasisPoints.Invoke($null, @(1250, $lowRoll))) 'Low random roll should pass a 12.50 percent drop.'
+    Assert-True (-not [bool]$shouldDropBasisPoints.Invoke($null, @(1250, $highRoll))) 'High random roll should fail a 12.50 percent drop.'
+
+    $mobTemplate = [System.Activator]::CreateInstance($mobTemplateType)
+    Set-PropertyValue $mobTemplate 'Hash' 'TST1'
+    Set-PropertyValue $mobTemplate 'Name' 'Parser Test Leet'
+    Set-PropertyValue $mobTemplate 'MonsterData' 17655
+    Set-PropertyValue $mobTemplate 'NPCFamily' 42
+    Set-PropertyValue $mobTemplate 'DropHashes' 'A001+B002,EMPTY'
+    Set-PropertyValue $mobTemplate 'DropSlots' '7,8'
+    Set-PropertyValue $mobTemplate 'DropRates' '1250,10000'
+
+    $dropOne = [System.Activator]::CreateInstance($mobDropType)
+    Set-PropertyValue $dropOne 'Hash' 'A001'
+    Set-PropertyValue $dropOne 'LowId' 259990
+    Set-PropertyValue $dropOne 'HighId' 259990
+    Set-PropertyValue $dropOne 'MinQl' 1
+    Set-PropertyValue $dropOne 'MaxQl' 1
+    Set-PropertyValue $dropOne 'RangeCheck' 0
+
+    $dropTwo = [System.Activator]::CreateInstance($mobDropType)
+    Set-PropertyValue $dropTwo 'Hash' 'B002'
+    Set-PropertyValue $dropTwo 'LowId' 42640
+    Set-PropertyValue $dropTwo 'HighId' 42640
+    Set-PropertyValue $dropTwo 'MinQl' 1
+    Set-PropertyValue $dropTwo 'MaxQl' 5
+    Set-PropertyValue $dropTwo 'RangeCheck' 1
+
+    $templateArray = [System.Array]::CreateInstance($mobTemplateType, 1)
+    $templateArray.SetValue($mobTemplate, 0)
+    $dropArray = [System.Array]::CreateInstance($mobDropType, 2)
+    $dropArray.SetValue($dropOne, 0)
+    $dropArray.SetValue($dropTwo, 1)
+
+    $buildMobLootEntries = Get-RequiredMethod $mobLootCatalogType 'BuildEntries' ([System.Reflection.BindingFlags]'Public, Static')
+    $dbLootEntries = Convert-EnumerableToArray ($buildMobLootEntries.Invoke($null, @($templateArray, $dropArray)))
+    Assert-True ($dbLootEntries.Count -eq 1) "Expected one parsed DB loot entry, found $($dbLootEntries.Count)."
+    $dbLootEntry = $dbLootEntries[0]
+    Assert-True ($dbLootEntry.Matches('Parser Test Leet', 17655, 42)) 'Parsed DB loot entry should match the source template.'
+    Assert-True (-not $dbLootEntry.Matches('Parser Test Leet', 17656, 42)) 'Parsed DB loot entry should not match the wrong MonsterData.'
+    Assert-True ([int](Get-PropertyValue $dbLootEntry 'Slot') -eq 7) 'Parsed DB loot entry should preserve DropSlots.'
+    Assert-True ([int](Get-PropertyValue $dbLootEntry 'DropChanceBasisPoints') -eq 1250) 'Parsed DB loot entry should preserve DropRates basis points.'
+    Assert-True ([int](Get-PropertyValue $dbLootEntry 'EffectiveDropChanceBasisPoints') -eq 1250) 'Parsed DB loot entry should expose effective basis points.'
+    $dbItemTemplates = @(Get-PropertyValue $dbLootEntry 'ItemTemplates')
+    Assert-True ($dbItemTemplates.Count -eq 2) 'Hash unions should produce candidate items from both drop groups.'
+    Assert-True (($dbItemTemplates | Where-Object { [int](Get-PropertyValue $_ 'LowId') -eq 259990 }).Count -eq 1) 'First drop group item is missing.'
+    Assert-True (($dbItemTemplates | Where-Object { [int](Get-PropertyValue $_ 'LowId') -eq 42640 -and [int](Get-PropertyValue $_ 'RangeCheck') -eq 1 }).Count -eq 1) 'Second drop group range-checked item is missing.'
 
     $isUsableVisual = Get-RequiredMethod $visualsType 'IsUsableVisualId' ([System.Reflection.BindingFlags]'Public, Static')
     Assert-True (-not [bool]$isUsableVisual.Invoke($null, @(0))) 'Zero is not a usable visual id.'
@@ -443,20 +557,29 @@ try {
     Assert-True ([int]$exactSlot.Slot -eq 0) 'Exact corpse loot slot lookup failed.'
     $oneBasedSlot = $findLootItem.Invoke($null, @($lootItems, 2, $slotSelector, $lootedSelector))
     Assert-True ([int]$oneBasedSlot.Slot -eq 1) 'One-based corpse loot slot lookup failed.'
+    $missingSlot = $findLootItem.Invoke($null, @($lootItems, 99, $slotSelector, $lootedSelector))
+    Assert-True ($null -eq $missingSlot) 'Unknown corpse loot slot should not return an item when multiple choices remain.'
 
     $singleRemaining = [object[]]@(
         [pscustomobject]@{ Slot = 5; Looted = $false }
     )
     $singleFallback = $findLootItem.Invoke($null, @($singleRemaining, 1, $slotSelector, $lootedSelector))
     Assert-True ([int]$singleFallback.Slot -eq 5) 'Single remaining corpse loot fallback failed.'
+    $singleZeroFallback = $findLootItem.Invoke($null, @($singleRemaining, 0, $slotSelector, $lootedSelector))
+    Assert-True ([int]$singleZeroFallback.Slot -eq 5) 'Single remaining corpse loot zero-slot fallback failed.'
+    $singleTooHigh = $findLootItem.Invoke($null, @($singleRemaining, 2, $slotSelector, $lootedSelector))
+    Assert-True ($null -eq $singleTooHigh) 'Single remaining corpse loot fallback should only apply to low requested slots.'
 
     $allLooted = [object[]]@(
         [pscustomobject]@{ Slot = 0; Looted = $true }
     )
     $missingLooted = $findLootItem.Invoke($null, @($allLooted, 0, $slotSelector, $lootedSelector))
     Assert-True ($null -eq $missingLooted) 'Looted corpse item should not be returned.'
+    $nullLootItems = $findLootItem.Invoke($null, @($null, 0, $slotSelector, $lootedSelector))
+    Assert-True ($null -eq $nullLootItems) 'Null corpse loot item collections should return null.'
 
     $entryCountFor = Get-RequiredMethod $rulesType 'InventoryEntryCountFor' ([System.Reflection.BindingFlags]'Public, Static')
+    Assert-True ([int]$entryCountFor.Invoke($null, @(-5)) -eq 1) 'Negative stack count should display as one.'
     Assert-True ([int]$entryCountFor.Invoke($null, @(0)) -eq 1) 'Zero stack count should display as one.'
     Assert-True ([int]$entryCountFor.Invoke($null, @(1234567890)) -eq 1) 'AO sentinel stack count should display as one.'
     Assert-True ([int]$entryCountFor.Invoke($null, @(7)) -eq 7) 'Normal stack count should be preserved.'

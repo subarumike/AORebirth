@@ -87,7 +87,7 @@ namespace AOSharpLiveCapture
 
             this.LogEvent("PLUGIN", "AOSharpLiveCapture loaded. session=" + this.sessionDirectory);
             this.LogEvent("PLUGIN", "Commands: /aocap start | stop | mark <text> | status | flush | snapshot");
-            this.LogEvent("PLUGIN", "Smoke commands: /aosmoke start | stop | status | log");
+            this.LogEvent("PLUGIN", "Smoke commands: /aosmoke start [mobAlias] | stop | status | log");
             this.LogSnapshot("initial");
             Chat.WriteLine("AOSharpLiveCapture logging to " + this.sessionDirectory, ChatColor.Gold);
         }

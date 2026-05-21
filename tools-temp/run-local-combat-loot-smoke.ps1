@@ -1,9 +1,12 @@
 param(
     [string]$Title = "",
+    [string]$MobAlias = "beachleet",
+    [string]$MobName = "",
     [int]$TargetPid = 0,
     [int]$TimeoutSeconds = 90,
     [switch]$NoBuild,
     [switch]$NoInject,
+    [switch]$BasicLoot,
     [switch]$AllowAnyTarget
 )
 
@@ -18,6 +21,35 @@ $pluginDir = Split-Path -Parent $pluginDll
 $requestFile = Join-Path $pluginDir "run-combat-loot-smoke.txt"
 $resultFile = Join-Path $pluginDir "last-combat-loot-smoke.result"
 $startCapture = Join-Path $repo "tools-temp\start-local-ao-capture.ps1"
+$knownMobNames = @{
+    beachleet = "Codex Test Beach Leet"
+    leet = "Codex Test Beach Leet"
+    islandreet = "Codex Test Island Reet"
+    reet = "Codex Test Island Reet"
+    shoresnake = "Codex Test Shore Snake"
+    snake = "Codex Test Shore Snake"
+    rollerrat = "Codex Test Stowaway Rollerrat"
+    duneflea = "Codex Test Dune Flea"
+    flea = "Codex Test Dune Flea"
+    surflizard = "Codex Test Surf Lizard"
+    lizard = "Codex Test Surf Lizard"
+    cliffmalle = "Codex Test Cliff Malle"
+    malle = "Codex Test Cliff Malle"
+    reefsalamander = "Codex Test Reef Salamander"
+    salamander = "Codex Test Reef Salamander"
+    alienspider = "Codex Test Alien Spider - Zix"
+    spider = "Codex Test Alien Spider - Zix"
+    zix = "Codex Test Alien Spider - Zix"
+    a004 = "Beach Leet"
+}
+
+if ([string]::IsNullOrWhiteSpace($MobAlias)) {
+    $MobAlias = "beachleet"
+}
+
+if ([string]::IsNullOrWhiteSpace($MobName) -and $knownMobNames.ContainsKey($MobAlias.ToLowerInvariant())) {
+    $MobName = $knownMobNames[$MobAlias.ToLowerInvariant()]
+}
 
 if (-not $NoBuild) {
     & $msbuild $captureProject /t:Build /p:Configuration=Debug /m | Write-Host
@@ -70,6 +102,11 @@ $requestLines = @("requested={0:o}" -f [DateTime]::UtcNow)
 if (-not [string]::IsNullOrWhiteSpace($Title)) {
     $requestLines += "character=$Title"
 }
+$requestLines += "mobAlias=$MobAlias"
+if (-not [string]::IsNullOrWhiteSpace($MobName)) {
+    $requestLines += "mobName=$MobName"
+}
+$requestLines += "requireReopen=$(-not $BasicLoot)"
 
 $requestTempFile = "$requestFile.$PID.tmp"
 Set-Content -LiteralPath $requestTempFile -Value $requestLines -Encoding UTF8

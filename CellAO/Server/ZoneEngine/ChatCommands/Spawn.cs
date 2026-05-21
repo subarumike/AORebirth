@@ -54,6 +54,8 @@ namespace ZoneEngine.ChatCommands
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
 
+    using Utility;
+
     using Vector3 = CellAO.Core.Vector.Vector3;
 
     #endregion
@@ -62,6 +64,18 @@ namespace ZoneEngine.ChatCommands
     /// </summary>
     public class ChatCommandSpawn : AOChatCommand
     {
+        private static readonly float[,] ZonePopulationOffsets =
+        {
+            { 4.0f, 5.0f },
+            { -4.0f, 6.5f },
+            { 7.0f, 0.0f },
+            { -7.0f, 0.0f },
+            { 4.0f, -5.0f },
+            { -4.0f, -6.5f },
+            { 0.0f, 9.0f },
+            { 9.0f, 5.0f }
+        };
+
         #region Public Methods and Operators
 
         /// <summary>
@@ -104,6 +118,12 @@ namespace ZoneEngine.ChatCommands
             {
                 return true;
             }
+
+            if (args.Length == 2)
+            {
+                return true;
+            }
+
             if (args.Length > 1)
             {
                 if (args[1].ToLower() != "list")
@@ -128,10 +148,10 @@ namespace ZoneEngine.ChatCommands
 For a list of available templates: /command spawn list [filter1,filter2...]
 Spawn the current combat test mob: /command spawnleet
 Spawn combat test mob aliases: /command spawn testmobs
-List client-hinted test mobs for this playfield: /command spawn hints
-Spawn client-hinted test mobs for this playfield: /command spawn zone
-Show live combat test mobs for this playfield: /command spawn status
-Clear live combat test mobs/corpses for this playfield: /command spawn clear
+List supported population mobs for this playfield: /command spawn hints
+Spawn supported DB population mobs for this playfield: /command spawn zone
+Show live spawned mobs for this playfield: /command spawn status
+Clear live spawned mobs/corpses for this playfield: /command spawn clear
 Filter will be applied to mob name"));
         }
 
@@ -250,6 +270,7 @@ Filter will be applied to mob name"));
             {
                 // try spawning mob
                 Character mobCharacter = null;
+                string templateHash = args.Length > 1 ? args[1] : string.Empty;
                 if (args.Length == 3)
                 {
                     // DBMobTemplate mt = MobTemplateDao.GetMobTemplateByHash(args[1])
@@ -268,7 +289,7 @@ Filter will be applied to mob name"));
                 {
                     NPCController npcController = new NPCController();
                     mobCharacter = NonPlayerCharacterHandler.SpawnMobFromTemplate(
-                        args[1],
+                        templateHash,
                         character.Playfield.Identity,
                         character.Coordinates(),
                         character.RawHeading,
@@ -277,12 +298,46 @@ Filter will be applied to mob name"));
                 if (mobCharacter != null)
                 {
                     mobCharacter.Playfield = character.Playfield;
+                    mobCharacter.Stats[StatIds.health].Value = mobCharacter.Stats[StatIds.life].Value;
+                    mobCharacter.Stats[StatIds.health].BaseValue = (uint)mobCharacter.Stats[StatIds.life].Value;
+                    mobCharacter.DoNotDoTimers = false;
+
                     SimpleCharFullUpdateMessage mess = SimpleCharFullUpdate.ConstructMessage(mobCharacter);
                     character.Playfield.Announce(mess);
+                    character.Playfield.Announce(new CharInPlayMessage { Identity = mobCharacter.Identity, Unknown = 0x00 });
                     AppearanceUpdateMessageHandler.Default.Send(mobCharacter);
-                    // HEAL!!!!
-                    mobCharacter.Stats[StatIds.health].Value = mobCharacter.Stats[StatIds.life].Value;
-                    mobCharacter.DoNotDoTimers = false;
+
+                    character.Playfield.Publish(
+                        ChatTextMessageHandler.Default.CreateIM(
+                            character,
+                            string.Format(
+                                "Spawned {0} {1}.",
+                                mobCharacter.Name,
+                                mobCharacter.Identity.ToString(true))));
+
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        string.Format(
+                            "DB mob spawned template={0} name={1} identity={2} pf={3} hp={4}/{5} monsterData={6} catMesh={7}",
+                            templateHash,
+                            mobCharacter.Name,
+                            mobCharacter.Identity.ToString(true),
+                            character.Playfield.Identity.ToString(true),
+                            mobCharacter.Stats[StatIds.health].Value,
+                            mobCharacter.Stats[StatIds.life].Value,
+                            mobCharacter.Stats[StatIds.monsterdata].Value,
+                            mobCharacter.Stats[StatIds.catmesh].Value));
+                }
+                else if (args.Length == 2 || args.Length == 3)
+                {
+                    character.Playfield.Publish(
+                        ChatTextMessageHandler.Default.CreateIM(
+                            character,
+                            string.Format("No mob template found for hash '{0}'.", templateHash)));
+
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        string.Format("DB mob spawn failed: no template for hash {0}.", templateHash));
                 }
             }
 
@@ -406,10 +461,10 @@ Filter will be applied to mob name"));
 
             text.AppendLine(
                 string.Format(
-                    "Client-hinted supported mobs: {0}",
+                    "Supported population mobs: {0}",
                     hintedEntries.Count == 0
                         ? "none"
-                        : string.Join(", ", hintedEntries.Select(x => x.DisplayName))));
+                        : string.Join(", ", hintedEntries.Select(x => x.RuntimeName))));
 
             character.Playfield.Publish(ChatTextMessageHandler.Default.CreateIM(character, text.ToString()));
         }
@@ -469,9 +524,9 @@ Filter will be applied to mob name"));
                 ChatTextMessageHandler.Default.CreateIM(
                     character,
                     string.Format(
-                        "Client-hinted combat test mobs for playfield {0}: {1}.",
+                        "Supported population mobs for playfield {0}: {1}.",
                         character.Playfield.Identity.Instance,
-                        string.Join(", ", entries.Select(x => x.DisplayName)))));
+                        string.Join(", ", entries.Select(x => x.RuntimeName + " [" + x.TemplateHash + "]")))));
         }
 
         private void SpawnClientHintedMobs(ICharacter character)
@@ -485,20 +540,24 @@ Filter will be applied to mob name"));
                     ChatTextMessageHandler.Default.CreateIM(
                         character,
                         string.Format(
-                            "No supported combat test mobs are mapped from client hints for playfield {0}.",
+                            "No supported population mobs are mapped for playfield {0}.",
                             character.Playfield.Identity.Instance)));
                 return;
             }
 
             var spawnedNames = new List<string>();
-            float zOffset = 5.0f;
-            foreach (CombatTestMobArchetype.Entry entry in entries)
+            for (int index = 0; index < entries.Count; index++)
             {
-                Character mobCharacter = this.SpawnCombatTestMob(character, entry, zOffset);
+                CombatTestMobArchetype.Entry entry = entries[index];
+                int offsetIndex = index % ZonePopulationOffsets.GetLength(0);
+                Character mobCharacter = this.SpawnPopulationMob(
+                    character,
+                    entry,
+                    ZonePopulationOffsets[offsetIndex, 0],
+                    ZonePopulationOffsets[offsetIndex, 1]);
                 if (mobCharacter != null)
                 {
-                    spawnedNames.Add(entry.DisplayName);
-                    zOffset += 3.0f;
+                    spawnedNames.Add(mobCharacter.Name + " " + mobCharacter.Identity.ToString(true));
                 }
             }
 
@@ -506,10 +565,68 @@ Filter will be applied to mob name"));
                 ChatTextMessageHandler.Default.CreateIM(
                     character,
                     string.Format(
-                        "Spawned {0} client-hinted combat test mobs for playfield {1}: {2}.",
+                        "Spawned {0} DB population mobs for playfield {1}: {2}.",
                         spawnedNames.Count,
                         character.Playfield.Identity.Instance,
                         string.Join(", ", spawnedNames))));
+        }
+
+        private Character SpawnPopulationMob(
+            ICharacter character,
+            CombatTestMobArchetype.Entry entry,
+            float xOffset,
+            float zOffset)
+        {
+            Coordinate spawnCoordinate = new Coordinate(character.Coordinates());
+            spawnCoordinate.x += xOffset;
+            spawnCoordinate.z += zOffset;
+
+            var npcController = new NPCController();
+            Character mobCharacter = NonPlayerCharacterHandler.SpawnMobFromTemplate(
+                entry.TemplateHash,
+                character.Playfield.Identity,
+                spawnCoordinate,
+                character.RawHeading,
+                npcController,
+                entry.Level);
+
+            if (mobCharacter == null)
+            {
+                character.Playfield.Publish(
+                    ChatTextMessageHandler.Default.CreateIM(
+                        character,
+                        string.Format(
+                            "Population mob spawn failed for {0} [{1}].",
+                            entry.RuntimeName,
+                            entry.TemplateHash)));
+                return null;
+            }
+
+            mobCharacter.Playfield = character.Playfield;
+            CombatTestMobArchetype.Prepare(mobCharacter, entry);
+            mobCharacter.DoNotDoTimers = false;
+
+            character.Playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));
+            character.Playfield.Announce(new CharInPlayMessage { Identity = mobCharacter.Identity, Unknown = 0x00 });
+            AppearanceUpdateMessageHandler.Default.Send(mobCharacter);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "DB population mob spawned template={0} name={1} identity={2} pf={3} pos={4:0.00},{5:0.00},{6:0.00} hp={7}/{8} monsterData={9} catMesh={10}",
+                    entry.TemplateHash,
+                    mobCharacter.Name,
+                    mobCharacter.Identity.ToString(true),
+                    character.Playfield.Identity.ToString(true),
+                    mobCharacter.RawCoordinates.X,
+                    mobCharacter.RawCoordinates.Y,
+                    mobCharacter.RawCoordinates.Z,
+                    mobCharacter.Stats[StatIds.health].Value,
+                    mobCharacter.Stats[StatIds.life].Value,
+                    mobCharacter.Stats[StatIds.monsterdata].Value,
+                    mobCharacter.Stats[StatIds.catmesh].Value));
+
+            return mobCharacter;
         }
 
         private void SpawnCombatTestMob(ICharacter character, CombatTestMobArchetype.Entry entry)

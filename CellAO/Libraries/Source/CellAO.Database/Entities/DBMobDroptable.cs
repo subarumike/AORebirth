@@ -31,8 +31,11 @@
 
 namespace CellAO.Database.Entities
 {
+    using CellAO.Database.Dao;
+
     /// <summary>
     /// </summary>
+    [Tablename("mobdroptable")]
     public class DBMobDroptable : IDBEntity
     {
         /// <summary>

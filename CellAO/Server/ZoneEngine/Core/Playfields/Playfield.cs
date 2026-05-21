@@ -138,6 +138,12 @@ namespace CellAO.Core.Playfields
 
         private static readonly CombatLootTableEntry[] DebugLootTable = CombatTestLootCatalog.BuildEntries();
 
+        private static readonly object DatabaseLootTableLock = new object();
+
+        private static CombatLootTableEntry[] databaseLootTable = new CombatLootTableEntry[0];
+
+        private static bool databaseLootTableLoaded;
+
         private static readonly Dictionary<int, int> MonsterDataToCorpseCatMesh =
             CombatCorpseVisuals.BuildMonsterDataToCorpseCatMeshMap();
 
@@ -1083,10 +1089,7 @@ namespace CellAO.Core.Playfields
             bool killingHit = newHealth == 0;
 
             target.Stats[StatIds.health].Value = newHealth;
-            if (!killingHit)
-            {
-                target.SendChangedStats();
-            }
+            target.SendChangedStats();
 
             this.Announce(
                 new AttackInfoMessage
@@ -1100,20 +1103,17 @@ namespace CellAO.Core.Playfields
                     Unknown5 = killingHit ? 3 : 0,
                     Unknown6 = 0
                 });
-            if (!killingHit)
-            {
-                this.Announce(
-                    new HealthDamageMessage
-                    {
-                        Identity = target.Identity,
-                        Target = attacker.Identity,
-                        Unknown1 = newHealth,
-                        Unknown2 = damage,
-                        Unknown3 = (int)StatIds.health,
-                        Unknown4 = 0,
-                        Unknown5 = 0
-                    });
-            }
+            this.Announce(
+                new HealthDamageMessage
+                {
+                    Identity = target.Identity,
+                    Target = attacker.Identity,
+                    Unknown1 = newHealth,
+                    Unknown2 = damage,
+                    Unknown3 = (int)StatIds.health,
+                    Unknown4 = 0,
+                    Unknown5 = 0
+                });
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,
@@ -1941,18 +1941,28 @@ namespace CellAO.Core.Playfields
         {
             var lootItems = new List<DebugCorpseLootItem>();
 
-            foreach (CombatLootTableEntry entry in DebugLootTable.Where(
-                x => x.Matches(
-                    target.Name,
-                    target.Stats[StatIds.monsterdata].Value,
-                    target.Stats[StatIds.npcfamily].Value)))
+            int monsterData = target.Stats[StatIds.monsterdata].Value;
+            int npcFamily = target.Stats[StatIds.npcfamily].Value;
+            int level = target.Stats[StatIds.level].Value;
+            List<CombatLootTableEntry> matchingEntries = DebugLootTable.Where(
+                x => x.Matches(target.Name, monsterData, npcFamily)).ToList();
+            string lootSource = "debug";
+
+            if (matchingEntries.Count == 0)
             {
-                if (!RollLootChance(entry.DropChancePercent))
+                matchingEntries = GetDatabaseLootTable().Where(
+                    x => x.Matches(target.Name, monsterData, npcFamily)).ToList();
+                lootSource = "database";
+            }
+
+            foreach (CombatLootTableEntry entry in matchingEntries)
+            {
+                if (!RollLootChance(entry))
                 {
                     continue;
                 }
 
-                Item item = CreateLootItem(entry.ItemTemplateIds, entry.Quality);
+                Item item = CreateLootItem(entry, level);
                 if (item == null)
                 {
                     LogUtil.Debug(
@@ -1970,14 +1980,77 @@ namespace CellAO.Core.Playfields
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 string.Format(
-                    "Loot rolled target={0} name={1} monsterData={2} npcFamily={3} items={4}",
+                    "Loot rolled target={0} name={1} monsterData={2} npcFamily={3} items={4} source={5}",
                     target.Identity,
                     target.Name,
-                    target.Stats[StatIds.monsterdata].Value,
-                    target.Stats[StatIds.npcfamily].Value,
-                    lootItems.Count));
+                    monsterData,
+                    npcFamily,
+                    lootItems.Count,
+                    lootSource));
 
             return lootItems;
+        }
+
+        private static CombatLootTableEntry[] GetDatabaseLootTable()
+        {
+            if (databaseLootTableLoaded)
+            {
+                return databaseLootTable;
+            }
+
+            lock (DatabaseLootTableLock)
+            {
+                if (databaseLootTableLoaded)
+                {
+                    return databaseLootTable;
+                }
+
+                try
+                {
+                    DBMobTemplate[] mobTemplates = MobTemplateDao.Instance.GetAll().ToArray();
+                    DBMobDroptable[] dropTable = MobDroptableDao.Instance.GetAll().ToArray();
+                    databaseLootTable = CombatMobLootCatalog.BuildEntries(mobTemplates, dropTable);
+                    LogUtil.Debug(
+                        DebugInfoDetail.Engine,
+                        string.Format(
+                            "Loaded database mob loot entries={0} templates={1} drops={2}",
+                            databaseLootTable.Length,
+                            mobTemplates.Length,
+                            dropTable.Length));
+                }
+                catch (Exception e)
+                {
+                    databaseLootTable = new CombatLootTableEntry[0];
+                    LogUtil.Debug(DebugInfoDetail.Error, "Database mob loot load failed: " + e.Message);
+                }
+
+                databaseLootTableLoaded = true;
+                return databaseLootTable;
+            }
+        }
+
+        private static bool RollLootChance(CombatLootTableEntry entry)
+        {
+            if (entry == null)
+            {
+                return false;
+            }
+
+            int chance = entry.EffectiveDropChanceBasisPoints;
+            if (chance <= 0)
+            {
+                return false;
+            }
+
+            if (chance >= 10000)
+            {
+                return true;
+            }
+
+            lock (LootRandomLock)
+            {
+                return CombatCorpseRules.ShouldDropBasisPoints(chance, max => LootRandom.Next(max));
+            }
         }
 
         private static bool RollLootChance(int dropChancePercent)
@@ -1995,6 +2068,104 @@ namespace CellAO.Core.Playfields
             lock (LootRandomLock)
             {
                 return CombatCorpseRules.ShouldDrop(dropChancePercent, max => LootRandom.Next(max));
+            }
+        }
+
+        private static Item CreateLootItem(CombatLootTableEntry entry, int targetLevel)
+        {
+            if (entry == null)
+            {
+                return null;
+            }
+
+            if (entry.ItemTemplates != null && entry.ItemTemplates.Length > 0)
+            {
+                return CreateLootItem(entry.ItemTemplates, targetLevel);
+            }
+
+            return CreateLootItem(entry.ItemTemplateIds, entry.Quality);
+        }
+
+        private static Item CreateLootItem(IEnumerable<CombatLootItemTemplate> itemTemplates, int targetLevel)
+        {
+            if (itemTemplates == null)
+            {
+                return null;
+            }
+
+            List<CombatLootItemTemplate> candidates =
+                itemTemplates.Where(x => CanDropLootTemplate(x, targetLevel)).ToList();
+
+            while (candidates.Count > 0)
+            {
+                int index = NextLootRandom(candidates.Count);
+                CombatLootItemTemplate candidate = candidates[index];
+                candidates.RemoveAt(index);
+
+                Item item = CreateLootItem(candidate, targetLevel);
+                if (item != null)
+                {
+                    return item;
+                }
+            }
+
+            return null;
+        }
+
+        private static bool CanDropLootTemplate(CombatLootItemTemplate itemTemplate, int targetLevel)
+        {
+            if (itemTemplate == null || itemTemplate.LowId <= 0)
+            {
+                return false;
+            }
+
+            if (itemTemplate.RangeCheck == 0 || targetLevel <= 0)
+            {
+                return true;
+            }
+
+            int minQuality = Math.Max(1, itemTemplate.MinQuality);
+            int maxQuality = Math.Max(minQuality, itemTemplate.MaxQuality);
+            return targetLevel >= minQuality && targetLevel <= maxQuality;
+        }
+
+        private static Item CreateLootItem(CombatLootItemTemplate itemTemplate, int targetLevel)
+        {
+            int lowId = itemTemplate.LowId;
+            int highId = itemTemplate.HighId <= 0 ? lowId : itemTemplate.HighId;
+
+            if (!ItemLoader.ItemList.ContainsKey(lowId))
+            {
+                return null;
+            }
+
+            if (!ItemLoader.ItemList.ContainsKey(highId))
+            {
+                highId = lowId;
+            }
+
+            int quality = QualityForLootTemplate(itemTemplate, targetLevel);
+            return new Item(quality, lowId, highId) { MultipleCount = 1 };
+        }
+
+        private static int QualityForLootTemplate(CombatLootItemTemplate itemTemplate, int targetLevel)
+        {
+            int minQuality = Math.Max(1, itemTemplate.MinQuality);
+            int maxQuality = Math.Max(minQuality, itemTemplate.MaxQuality);
+
+            if (itemTemplate.RangeCheck != 0 && targetLevel > 0)
+            {
+                return Math.Min(maxQuality, Math.Max(minQuality, targetLevel));
+            }
+
+            return minQuality;
+        }
+
+        private static int NextLootRandom(int max)
+        {
+            lock (LootRandomLock)
+            {
+                return LootRandom.Next(max);
             }
         }
 

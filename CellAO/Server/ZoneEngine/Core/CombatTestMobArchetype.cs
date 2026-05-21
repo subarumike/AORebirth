@@ -33,7 +33,7 @@ namespace ZoneEngine.Core
             36,
             6,
             5,
-            new[] { 540, 545, 565, 585, 600, 655, 716, 730, 800 });
+            new[] { 540, 545, 565, 585, 600, 655, 716, 730, 800, 4582 });
 
         public static readonly Entry IslandReet = new Entry(
             "islandreet",
@@ -48,7 +48,7 @@ namespace ZoneEngine.Core
             53,
             6,
             5,
-            new int[0]);
+            new[] { 4582 });
 
         public static readonly Entry ShoreSnake = new Entry(
             "shoresnake",
@@ -63,7 +63,7 @@ namespace ZoneEngine.Core
             27,
             6,
             5,
-            new[] { 565, 585, 590, 605, 655, 790, 791 });
+            new[] { 565, 585, 590, 605, 655, 790, 791, 4582 });
 
         public static readonly Entry StowawayRollerrat = new Entry(
             "rollerrat",
@@ -78,7 +78,7 @@ namespace ZoneEngine.Core
             55,
             6,
             5,
-            new[] { 551, 585 });
+            new[] { 551, 585, 4582 });
 
         public static readonly Entry DuneFlea = new Entry(
             "duneflea",
@@ -108,7 +108,7 @@ namespace ZoneEngine.Core
             37,
             6,
             5,
-            new[] { 565, 600, 605 });
+            new[] { 565, 600, 605, 4582 });
 
         public static readonly Entry CliffMalle = new Entry(
             "cliffmalle",
@@ -123,7 +123,7 @@ namespace ZoneEngine.Core
             38,
             6,
             5,
-            new[] { 716 });
+            new[] { 716, 4582 });
 
         public static readonly Entry ReefSalamander = new Entry(
             "reefsalamander",
@@ -138,7 +138,7 @@ namespace ZoneEngine.Core
             57,
             6,
             5,
-            new[] { 565 });
+            new[] { 565, 4582 });
 
         public static readonly Entry AlienSpiderZix = new Entry(
             "alienspider",
@@ -219,6 +219,12 @@ namespace ZoneEngine.Core
             foreach (Entry candidate in All)
             {
                 if (string.Equals(candidate.DisplayName, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    entry = candidate;
+                    return true;
+                }
+
+                if (string.Equals(candidate.RuntimeName, name, StringComparison.OrdinalIgnoreCase))
                 {
                     entry = candidate;
                     return true;
@@ -381,6 +387,20 @@ namespace ZoneEngine.Core
             public string TemplateHash { get; private set; }
 
             public string DisplayName { get; private set; }
+
+            public string RuntimeName
+            {
+                get
+                {
+                    const string Prefix = "Codex Test ";
+                    if (this.DisplayName.StartsWith(Prefix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return this.DisplayName.Substring(Prefix.Length);
+                    }
+
+                    return this.DisplayName;
+                }
+            }
 
             public int Level { get; private set; }
 
