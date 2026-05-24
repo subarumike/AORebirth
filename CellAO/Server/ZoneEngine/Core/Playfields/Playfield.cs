@@ -116,6 +116,8 @@ namespace CellAO.Core.Playfields
 
         private readonly Dictionary<int, DateTime> deadNpcDespawnTicks = new Dictionary<int, DateTime>();
 
+        private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
+
         private readonly Dictionary<int, DateTime> debugCorpseDespawnTicks = new Dictionary<int, DateTime>();
 
         private readonly Dictionary<int, DebugCorpseState> debugCorpses = new Dictionary<int, DebugCorpseState>();
@@ -133,6 +135,8 @@ namespace CellAO.Core.Playfields
         private static readonly TimeSpan CorpseSpawnDelay = TimeSpan.FromMilliseconds(600);
 
         private const double MaxMeleeCombatDistance = 8.0;
+
+        private const double MaxNpcLeashDistance = 40.0;
 
         private static readonly Random LootRandom = new Random();
 
@@ -425,6 +429,20 @@ namespace CellAO.Core.Playfields
             this.StopFightingDeadTarget(target.Identity);
             this.pendingDebugCorpseSpawns.Remove(target.Identity.Instance);
             this.FinalizeNpcDespawn(target);
+        }
+
+        public void RegisterNpcHome(ICharacter character)
+        {
+            if (character == null || !(character.Controller is NPCController))
+            {
+                return;
+            }
+
+            this.npcHomeStates[character.Identity.Instance] =
+                new NpcHomeState
+                {
+                    Coordinates = new Coordinate(character.Coordinates())
+                };
         }
 
         public int DespawnDebugCorpses(Func<string, Identity, bool> shouldDespawn)
@@ -1085,6 +1103,11 @@ namespace CellAO.Core.Playfields
                 return;
             }
 
+            if (this.TryLeashNpcAttacker(attacker))
+            {
+                return;
+            }
+
             if (!this.IsInMeleeCombatRange(attacker, target))
             {
                 this.TryMoveNpcIntoCombatRange(attacker, target);
@@ -1175,6 +1198,51 @@ namespace CellAO.Core.Playfields
             }
 
             attacker.Controller.Follow(target.Identity);
+        }
+
+        private bool TryLeashNpcAttacker(ICharacter attacker)
+        {
+            NPCController npcController = attacker.Controller as NPCController;
+            if (npcController == null)
+            {
+                return false;
+            }
+
+            NpcHomeState homeState;
+            if (!this.npcHomeStates.TryGetValue(attacker.Identity.Instance, out homeState))
+            {
+                this.RegisterNpcHome(attacker);
+                return false;
+            }
+
+            if (attacker.Coordinates().coordinate.Distance2D(homeState.Coordinates.coordinate) <= MaxNpcLeashDistance)
+            {
+                return false;
+            }
+
+            attacker.SetTarget(Identity.None);
+            attacker.SetFightingTarget(Identity.None);
+            this.nextCombatTicks.Remove(attacker.Identity.Instance);
+            this.StopFightingDeadTarget(attacker.Identity);
+            npcController.StopFollow();
+            npcController.MoveTo(
+                new Vector3
+                {
+                    X = homeState.Coordinates.x,
+                    Y = homeState.Coordinates.y,
+                    Z = homeState.Coordinates.z
+                });
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "NPC leashed home npc={0} home={1:0.00},{2:0.00},{3:0.00}",
+                    attacker.Identity.ToString(true),
+                    homeState.Coordinates.x,
+                    homeState.Coordinates.y,
+                    homeState.Coordinates.z));
+
+            return true;
         }
 
         private void KillNpcTarget(ICharacter target)
@@ -1566,6 +1634,7 @@ namespace CellAO.Core.Playfields
             target.DoNotDoTimers = true;
             this.nextCombatTicks.Remove(target.Identity.Instance);
             this.deadNpcDespawnTicks.Remove(target.Identity.Instance);
+            this.npcHomeStates.Remove(target.Identity.Instance);
             this.Despawn(target.Identity);
             Pool.Instance.RemoveObject((Character)target);
 
@@ -2464,6 +2533,11 @@ namespace CellAO.Core.Playfields
             this.disposed = true;
 
             base.Dispose(disposing);
+        }
+
+        private class NpcHomeState
+        {
+            public Coordinate Coordinates { get; set; }
         }
     }
 }

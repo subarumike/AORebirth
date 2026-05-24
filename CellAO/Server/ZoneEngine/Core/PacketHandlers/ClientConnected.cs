@@ -281,6 +281,7 @@ client.Controller.Character.Playfield.Identity,
             {
                 CombatTestMobArchetype.Prepare(existingMob);
                 existingMob.DoNotDoTimers = false;
+                (existingMob.Playfield as Playfield)?.RegisterNpcHome(existingMob);
                 SendDebugEnemyToClient(client, existingMob);
             }
 
@@ -301,6 +302,7 @@ client.Controller.Character.Playfield.Identity,
                 return;
             }
 
+            (mobCharacter.Playfield as Playfield)?.RegisterNpcHome(mobCharacter);
             SendDebugEnemyToClient(client, mobCharacter);
         }
 

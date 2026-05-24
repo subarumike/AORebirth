@@ -173,6 +173,7 @@ Filter will be applied to mob name"));
                 character.RawHeading,
                 npcController);
             mobCharacter.Playfield = character.Playfield;
+            (mobCharacter.Playfield as Playfield)?.RegisterNpcHome(mobCharacter);
             SimpleCharFullUpdateMessage mess = SimpleCharFullUpdate.ConstructMessage(mobCharacter);
             character.Playfield.Announce(mess);
             AppearanceUpdateMessageHandler.Default.Send(mobCharacter);
@@ -298,6 +299,7 @@ Filter will be applied to mob name"));
                 if (mobCharacter != null)
                 {
                     mobCharacter.Playfield = character.Playfield;
+                    (mobCharacter.Playfield as Playfield)?.RegisterNpcHome(mobCharacter);
                     mobCharacter.Stats[StatIds.health].Value = mobCharacter.Stats[StatIds.life].Value;
                     mobCharacter.Stats[StatIds.health].BaseValue = (uint)mobCharacter.Stats[StatIds.life].Value;
                     mobCharacter.DoNotDoTimers = false;
@@ -603,6 +605,7 @@ Filter will be applied to mob name"));
             }
 
             mobCharacter.Playfield = character.Playfield;
+            (mobCharacter.Playfield as Playfield)?.RegisterNpcHome(mobCharacter);
             CombatTestMobArchetype.Prepare(mobCharacter, entry);
             mobCharacter.DoNotDoTimers = false;
 
@@ -647,6 +650,7 @@ Filter will be applied to mob name"));
                 return null;
             }
 
+            (mobCharacter.Playfield as Playfield)?.RegisterNpcHome(mobCharacter);
             character.Playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));
             character.Playfield.Announce(new CharInPlayMessage { Identity = mobCharacter.Identity, Unknown = 0x00 });
             AppearanceUpdateMessageHandler.Default.Send(mobCharacter);
