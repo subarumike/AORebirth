@@ -132,6 +132,8 @@ namespace CellAO.Core.Playfields
 
         private static readonly TimeSpan CorpseSpawnDelay = TimeSpan.FromMilliseconds(600);
 
+        private const double MaxMeleeCombatDistance = 8.0;
+
         private static readonly Random LootRandom = new Random();
 
         private static readonly object LootRandomLock = new object();
@@ -1083,6 +1085,13 @@ namespace CellAO.Core.Playfields
                 return;
             }
 
+            if (!this.IsInMeleeCombatRange(attacker, target))
+            {
+                this.TryMoveNpcIntoCombatRange(attacker, target);
+                this.nextCombatTicks[attacker.Identity.Instance] = DateTime.UtcNow + TimeSpan.FromSeconds(1);
+                return;
+            }
+
             int currentHealth = target.Stats[StatIds.health].Value;
             int damage = this.CalculateCombatDamage(attacker);
             int newHealth = Math.Max(0, currentHealth - damage);
@@ -1151,6 +1160,21 @@ namespace CellAO.Core.Playfields
                 attacker.Stats[StatIds.damagebonus].Value,
                 attacker.Stats[StatIds.level].Value,
                 attacker.Controller is PlayerController);
+        }
+
+        private bool IsInMeleeCombatRange(ICharacter attacker, ICharacter target)
+        {
+            return attacker.Coordinates().coordinate.Distance2D(target.Coordinates().coordinate) <= MaxMeleeCombatDistance;
+        }
+
+        private void TryMoveNpcIntoCombatRange(ICharacter attacker, ICharacter target)
+        {
+            if (!(attacker.Controller is NPCController) || attacker.Controller.IsFollowing())
+            {
+                return;
+            }
+
+            attacker.Controller.Follow(target.Identity);
         }
 
         private void KillNpcTarget(ICharacter target)

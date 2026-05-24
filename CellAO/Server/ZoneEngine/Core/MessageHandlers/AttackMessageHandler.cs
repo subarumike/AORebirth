@@ -36,12 +36,15 @@ namespace ZoneEngine.Core.MessageHandlers
     using CellAO.Core.Components;
     using CellAO.Core.Entities;
     using CellAO.Core.Network;
+    using CellAO.Enums;
     using CellAO.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using Utility;
+
+    using ZoneEngine.Core.Controllers;
 
     #endregion
 
@@ -72,7 +75,30 @@ namespace ZoneEngine.Core.MessageHandlers
 
             character.SetTarget(message.Target);
             character.SetFightingTarget(message.Target);
+            this.EngageNpcTarget(character, target);
             this.SendAttackState(character, message.Target, message.Action);
+        }
+
+        private void EngageNpcTarget(ICharacter character, ICharacter target)
+        {
+            NPCController npcController = target.Controller as NPCController;
+            if (npcController == null
+                || npcController.KnuBot != null
+                || target.Stats[StatIds.health].Value <= 0
+                || target.FightingTarget.Instance != 0)
+            {
+                return;
+            }
+
+            target.SetTarget(character.Identity);
+            target.SetFightingTarget(character.Identity);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "NPC combat engaged attacker={0} npc={1}",
+                    character.Identity.ToString(true),
+                    target.Identity.ToString(true)));
         }
 
         private void SendAttackState(ICharacter character, Identity target, byte action)
