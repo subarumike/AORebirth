@@ -148,6 +148,9 @@ $baseInventorySource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\S
 $playfieldSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\Playfields\Playfield.cs')
 $spawnCommandSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ChatCommands\Spawn.cs')
 $attackMessageSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\AttackMessageHandler.cs')
+$npcControllerSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\Controllers\NPCController.cs')
+$npcAiProfileSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\NpcAiProfile.cs')
+$zoneProjectSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ZoneEngine.csproj')
 $zoneEnemyHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbZoneEnemyHints.csv'
 $npcTemplateHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbNpcTemplateHints.csv'
 $enemyCoveragePath = Join-Path $repoRoot 'CellAO\Documentation\ClientHintedEnemyCoverage.csv'
@@ -169,7 +172,13 @@ Assert-SourceMatch $clientConnectedSource 'Stats\s*\[\s*stat\s*\]\.BaseValue\s*=
 Assert-SourceMatch $clientConnectedSource 'DefaultForPlayfield\s*\(' 'ClientConnected debug enemy spawn should choose a client-hinted default for the current playfield.'
 Assert-SourceMatch $clientConnectedSource 'existingTestMobs\.Count\s*>\s*0' 'ClientConnected debug enemy spawn should not add a default mob when any live test mob already exists.'
 Assert-SourceMatch $attackMessageSource 'EngageNpcTarget\s*\(character,\s*target\)' 'Starting an attack against an NPC should engage server-side retaliation.'
-Assert-SourceMatch $attackMessageSource 'EngageNpcTarget\s*\(ICharacter\s+character,\s*ICharacter\s+target\).*?target\.Controller\s+as\s+NPCController.*?npcController\.KnuBot\s*!=\s*null.*?target\.Stats\s*\[\s*StatIds\.health\s*\]\.Value\s*<=\s*0.*?target\.FightingTarget\.Instance\s*!=\s*0.*?target\.SetTarget\s*\(\s*character\.Identity\s*\).*?target\.SetFightingTarget\s*\(\s*character\.Identity\s*\)' 'NPC retaliation should only engage live non-KnuBot NPCs that are not already fighting.'
+Assert-SourceMatch $zoneProjectSource 'Core\\NpcAiProfile\.cs' 'ZoneEngine project should compile the NPC AI profile helper.'
+Assert-SourceMatch $npcAiProfileSource 'enum\s+NpcAiProfile.*?Passive.*?Aggressive.*?Social' 'NPC AI profiles should distinguish passive, aggressive, and social NPCs.'
+Assert-SourceMatch $npcAiProfileSource 'CanRetaliate\s*\(NpcAiProfile\s+profile\).*?NpcAiProfile\.Passive.*?NpcAiProfile\.Aggressive' 'Passive and aggressive NPCs should be allowed to retaliate.'
+Assert-SourceMatch $npcAiProfileSource 'CanProximityAggro\s*\(NpcAiProfile\s+profile\).*?NpcAiProfile\.Aggressive' 'Only aggressive NPCs should be eligible for future proximity aggro.'
+Assert-SourceMatch $npcControllerSource 'AiProfile\s*\{\s*get;\s*set;\s*\}\s*=\s*NpcAiProfile\.Passive' 'NPC controllers should default to passive behavior.'
+Assert-SourceMatch $npcControllerSource 'SetKnuBot\s*\(BaseKnuBot\s+knubot\).*?AiProfile\s*=\s*NpcAiProfile\.Social' 'KnuBot/dialog NPCs should be marked social.'
+Assert-SourceMatch $attackMessageSource 'EngageNpcTarget\s*\(ICharacter\s+character,\s*ICharacter\s+target\).*?target\.Controller\s+as\s+NPCController.*?npcController\.KnuBot\s*!=\s*null.*?!NpcAiProfiles\.CanRetaliate\s*\(\s*npcController\.AiProfile\s*\).*?target\.Stats\s*\[\s*StatIds\.health\s*\]\.Value\s*<=\s*0.*?target\.FightingTarget\.Instance\s*!=\s*0.*?target\.SetTarget\s*\(\s*character\.Identity\s*\).*?target\.SetFightingTarget\s*\(\s*character\.Identity\s*\)' 'NPC retaliation should be gated by AI profile and only engage live non-KnuBot NPCs that are not already fighting.'
 Assert-SourceMatch $clientConnectedSource 'RegisterNpcHome\s*\(\s*existingMob\s*\)' 'Existing login debug mobs should have home positions registered for leash behavior.'
 Assert-SourceMatch $clientConnectedSource 'RegisterNpcHome\s*\(\s*mobCharacter\s*\)' 'New login debug mobs should have home positions registered for leash behavior.'
 Assert-SourceMatch $baseInventorySource 'InventoryItemRules\.HasSameUniqueItem' 'Inventory add path must use shared unique-item rules.'
@@ -312,6 +321,8 @@ try {
     $archetypeType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatTestMobArchetype'
     $rulesType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatCorpseRules'
     $damageRulesType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatDamageRules'
+    $npcAiProfileType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.NpcAiProfile'
+    $npcAiProfilesType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.NpcAiProfiles'
     $visualsType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatCorpseVisuals'
     $lootCatalogType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatTestLootCatalog'
     $mobLootCatalogType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatMobLootCatalog'
@@ -326,6 +337,18 @@ try {
     Assert-True ([bool]$isSameTemplateIds.Invoke($null, @(100, 101, 100, 101))) 'Matching low/high template ids should be treated as the same item.'
     Assert-True (-not [bool]$isSameTemplateIds.Invoke($null, @(100, 101, 100, 102))) 'Different high template ids should not be treated as the same item.'
     Assert-True (-not [bool]$isSameTemplateIds.Invoke($null, @(100, 101, 102, 101))) 'Different low template ids should not be treated as the same item.'
+
+    $passiveProfile = [System.Enum]::Parse($npcAiProfileType, 'Passive')
+    $aggressiveProfile = [System.Enum]::Parse($npcAiProfileType, 'Aggressive')
+    $socialProfile = [System.Enum]::Parse($npcAiProfileType, 'Social')
+    $canRetaliate = Get-RequiredMethod $npcAiProfilesType 'CanRetaliate' ([System.Reflection.BindingFlags]'Public, Static')
+    $canProximityAggro = Get-RequiredMethod $npcAiProfilesType 'CanProximityAggro' ([System.Reflection.BindingFlags]'Public, Static')
+    Assert-True ([bool]$canRetaliate.Invoke($null, @($passiveProfile))) 'Passive NPCs should retaliate when attacked.'
+    Assert-True ([bool]$canRetaliate.Invoke($null, @($aggressiveProfile))) 'Aggressive NPCs should retaliate when attacked.'
+    Assert-True (-not [bool]$canRetaliate.Invoke($null, @($socialProfile))) 'Social NPCs should not enter normal combat.'
+    Assert-True (-not [bool]$canProximityAggro.Invoke($null, @($passiveProfile))) 'Passive NPCs should not proximity aggro.'
+    Assert-True ([bool]$canProximityAggro.Invoke($null, @($aggressiveProfile))) 'Aggressive NPCs should be eligible for proximity aggro.'
+    Assert-True (-not [bool]$canProximityAggro.Invoke($null, @($socialProfile))) 'Social NPCs should not proximity aggro.'
 
     $allField = $archetypeType.GetField('All', [System.Reflection.BindingFlags]'Public, Static')
     Assert-True ($null -ne $allField) 'CombatTestMobArchetype.All is missing.'
@@ -354,6 +377,7 @@ try {
         $clientHintPlayfieldIds = @(Get-PropertyValue $entry 'ClientHintPlayfieldIds')
         $monsterData = [int](Get-PropertyValue $entry 'MonsterData')
         $corpseCatMesh = [int](Get-PropertyValue $entry 'CorpseCatMesh')
+        $aiProfile = Get-PropertyValue $entry 'AiProfile'
 
         Assert-True (-not [string]::IsNullOrWhiteSpace($key)) 'Combat test mob key is blank.'
         Assert-True (-not [string]::IsNullOrWhiteSpace($displayName)) "DisplayName is blank for $key."
@@ -363,6 +387,7 @@ try {
         Assert-True (($clientHintPlayfieldIds | Select-Object -Unique).Count -eq $clientHintPlayfieldIds.Count) "Duplicate client hint playfield mapping for $displayName."
         Assert-True ($monsterData -gt 0) "MonsterData must be positive for $displayName."
         Assert-True ($corpseCatMesh -gt 0) "CorpseCatMesh must be positive for $displayName."
+        Assert-True ($aiProfile.Equals($passiveProfile)) "Current test mob $displayName should stay passive until proximity aggro is explicitly mapped."
         Assert-True (-not $seenKeys.ContainsKey($key.ToLowerInvariant())) "Duplicate combat test mob key $key."
         Assert-True (-not $seenMonsterData.ContainsKey($monsterData)) "Duplicate MonsterData $monsterData."
 

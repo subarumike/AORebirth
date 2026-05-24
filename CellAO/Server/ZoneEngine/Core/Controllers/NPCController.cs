@@ -75,6 +75,8 @@ namespace ZoneEngine.Core.Controllers
 
         private int activeWaypoint = 0;
 
+        public NpcAiProfile AiProfile { get; set; } = NpcAiProfile.Passive;
+
         public CharacterState State
         {
             get
@@ -541,6 +543,7 @@ namespace ZoneEngine.Core.Controllers
         public void SetKnuBot(BaseKnuBot knubot)
         {
             this.KnuBot = knubot;
+            this.AiProfile = NpcAiProfile.Social;
         }
     }
 }

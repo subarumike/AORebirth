@@ -84,6 +84,7 @@ namespace ZoneEngine.Core.MessageHandlers
             NPCController npcController = target.Controller as NPCController;
             if (npcController == null
                 || npcController.KnuBot != null
+                || !NpcAiProfiles.CanRetaliate(npcController.AiProfile)
                 || target.Stats[StatIds.health].Value <= 0
                 || target.FightingTarget.Instance != 0)
             {

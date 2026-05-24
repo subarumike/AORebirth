@@ -33,7 +33,8 @@ namespace ZoneEngine.Core
             36,
             6,
             5,
-            new[] { 540, 545, 565, 585, 600, 655, 716, 730, 800, 4582 });
+            new[] { 540, 545, 565, 585, 600, 655, 716, 730, 800, 4582 },
+            NpcAiProfile.Passive);
 
         public static readonly Entry IslandReet = new Entry(
             "islandreet",
@@ -48,7 +49,8 @@ namespace ZoneEngine.Core
             53,
             6,
             5,
-            new[] { 4582 });
+            new[] { 4582 },
+            NpcAiProfile.Passive);
 
         public static readonly Entry ShoreSnake = new Entry(
             "shoresnake",
@@ -63,7 +65,8 @@ namespace ZoneEngine.Core
             27,
             6,
             5,
-            new[] { 565, 585, 590, 605, 655, 790, 791, 4582 });
+            new[] { 565, 585, 590, 605, 655, 790, 791, 4582 },
+            NpcAiProfile.Passive);
 
         public static readonly Entry StowawayRollerrat = new Entry(
             "rollerrat",
@@ -78,7 +81,8 @@ namespace ZoneEngine.Core
             55,
             6,
             5,
-            new[] { 551, 585, 4582 });
+            new[] { 551, 585, 4582 },
+            NpcAiProfile.Passive);
 
         public static readonly Entry DuneFlea = new Entry(
             "duneflea",
@@ -93,7 +97,8 @@ namespace ZoneEngine.Core
             25,
             6,
             5,
-            new[] { 565, 585, 716 });
+            new[] { 565, 585, 716 },
+            NpcAiProfile.Passive);
 
         public static readonly Entry SurfLizard = new Entry(
             "surflizard",
@@ -108,7 +113,8 @@ namespace ZoneEngine.Core
             37,
             6,
             5,
-            new[] { 565, 600, 605, 4582 });
+            new[] { 565, 600, 605, 4582 },
+            NpcAiProfile.Passive);
 
         public static readonly Entry CliffMalle = new Entry(
             "cliffmalle",
@@ -123,7 +129,8 @@ namespace ZoneEngine.Core
             38,
             6,
             5,
-            new[] { 716, 4582 });
+            new[] { 716, 4582 },
+            NpcAiProfile.Passive);
 
         public static readonly Entry ReefSalamander = new Entry(
             "reefsalamander",
@@ -138,7 +145,8 @@ namespace ZoneEngine.Core
             57,
             6,
             5,
-            new[] { 565, 4582 });
+            new[] { 565, 4582 },
+            NpcAiProfile.Passive);
 
         public static readonly Entry AlienSpiderZix = new Entry(
             "alienspider",
@@ -153,7 +161,8 @@ namespace ZoneEngine.Core
             220,
             6,
             4,
-            new[] { 346, 551, 590, 600, 655, 4542, 4544 });
+            new[] { 346, 551, 590, 600, 655, 4542, 4544 },
+            NpcAiProfile.Passive);
 
         public static readonly Entry[] All =
         {
@@ -340,6 +349,12 @@ namespace ZoneEngine.Core
             SetMobStat(mobCharacter, StatIds.health, entry.Health);
             SetMobStat(mobCharacter, StatIds.healdelta, 0);
             SetMobStat(mobCharacter, StatIds.healinterval, 600);
+
+            NPCController npcController = mobCharacter.Controller as NPCController;
+            if (npcController != null)
+            {
+                npcController.AiProfile = entry.AiProfile;
+            }
         }
 
         private static void SetMobStat(ICharacter mobCharacter, StatIds stat, int value)
@@ -363,7 +378,8 @@ namespace ZoneEngine.Core
                 int npcFamily,
                 int breed,
                 int sex,
-                int[] clientHintPlayfieldIds)
+                int[] clientHintPlayfieldIds,
+                NpcAiProfile aiProfile)
             {
                 this.Key = key;
                 this.Aliases = aliases;
@@ -378,6 +394,7 @@ namespace ZoneEngine.Core
                 this.Breed = breed;
                 this.Sex = sex;
                 this.ClientHintPlayfieldIds = clientHintPlayfieldIds ?? new int[0];
+                this.AiProfile = aiProfile;
             }
 
             public string Key { get; private set; }
@@ -419,6 +436,8 @@ namespace ZoneEngine.Core
             public int Sex { get; private set; }
 
             public int[] ClientHintPlayfieldIds { get; private set; }
+
+            public NpcAiProfile AiProfile { get; private set; }
 
             public bool MatchesAlias(string alias)
             {
