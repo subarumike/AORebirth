@@ -144,6 +144,7 @@ $msbuild = 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Curren
 
 $fullCharacterSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\FullCharacterMessageHandler.cs')
 $clientConnectedSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs')
+$clientMoveItemSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs')
 $baseInventorySource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\CellAO.Core\Inventory\BaseInventoryPages.cs')
 $playfieldSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\Playfields\Playfield.cs')
 $spawnCommandSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ChatCommands\Spawn.cs')
@@ -169,6 +170,8 @@ Assert-SourceMatch $clientConnectedSource 'SetStat\s*\(\s*client\s*,\s*StatIds\.
 Assert-SourceMatch $clientConnectedSource 'SetStat\s*\(\s*client\s*,\s*StatIds\.actioncategory\s*,\s*0\s*\)\s*;' 'ActionCategory should initialize to 0.'
 Assert-SourceMatch $clientConnectedSource 'Stats\s*\[\s*stat\s*\]\.Value\s*=\s*value\s*;' 'Login SetStat helper should update the live stat value.'
 Assert-SourceMatch $clientConnectedSource 'Stats\s*\[\s*stat\s*\]\.BaseValue\s*=\s*\(uint\)\s*value\s*;' 'Login SetStat helper should update the live stat base value.'
+Assert-SourceMatch $clientConnectedSource 'CalculateSkills\s*\(\s*\)\s*;\s*ClientMoveItemToInventoryMessageHandler\.EnsureWeaponVisualMeshes\s*\(\s*client\.Controller\.Character\s*,\s*false\s*\)\s*;\s*AppearanceUpdateMessageHandler\.Default\.Send' 'Login should restore equipped weapon hand meshes before sending the login appearance update.'
+Assert-SourceMatch $clientMoveItemSource 'public\s+static\s+void\s+EnsureWeaponVisualMeshes\s*\(\s*ICharacter\s+character\s*,\s*bool\s+announceAppearanceUpdate\s*\)' 'Weapon mesh repair should be reusable by login and manual equip paths.'
 Assert-SourceMatch $clientConnectedSource 'DefaultForPlayfield\s*\(' 'ClientConnected debug enemy spawn should choose a client-hinted default for the current playfield.'
 Assert-SourceMatch $clientConnectedSource 'existingTestMobs\.Count\s*>\s*0' 'ClientConnected debug enemy spawn should not add a default mob when any live test mob already exists.'
 Assert-SourceMatch $attackMessageSource 'EngageNpcTarget\s*\(character,\s*target\)' 'Starting an attack against an NPC should engage server-side retaliation.'
@@ -185,7 +188,8 @@ Assert-SourceMatch $baseInventorySource 'InventoryItemRules\.HasSameUniqueItem' 
 Assert-SourceMatch $playfieldSource 'InventoryItemRules\.HasSameUniqueItem' 'Corpse loot path must use shared unique-item rules.'
 Assert-SourceMatch $playfieldSource 'DespawnNpcImmediately\s*\(' 'Playfield should expose immediate NPC despawn for controlled GM test cleanup.'
 Assert-SourceMatch $playfieldSource 'DespawnDebugCorpses\s*\(' 'Playfield should expose debug corpse cleanup for controlled GM test cleanup.'
-Assert-SourceMatch $playfieldSource 'target\.Stats\s*\[\s*StatIds\.health\s*\]\.Value\s*=\s*newHealth\s*;\s*target\.SendChangedStats\s*\(\s*\)\s*;.*?new\s+AttackInfoMessage.*?new\s+HealthDamageMessage\s*\{.*?Unknown1\s*=\s*newHealth' 'Combat hits, including killing hits, should send the zero-health update before death cleanup.'
+Assert-SourceMatch $playfieldSource 'target\.Stats\s*\[\s*StatIds\.health\s*\]\.Value\s*=\s*newHealth\s*;\s*target\.SendChangedStats\s*\(\s*\)\s*;.*?new\s+AttackInfoMessage' 'Combat hits, including killing hits, should send the zero-health stat update before death cleanup.'
+Assert-True (-not ($playfieldSource -match 'DoCombatTick\s*\(ICharacter\s+attacker\).*?new\s+HealthDamageMessage')) 'Normal auto-attacks should not send HealthDamage; live captures use AttackInfo for weapon hit text.'
 Assert-SourceMatch $playfieldSource 'MaxMeleeCombatDistance\s*=\s*8\.0' 'Combat ticks should use a conservative melee range gate.'
 Assert-SourceMatch $playfieldSource 'MaxNpcLeashDistance\s*=\s*40\.0' 'NPC combat should have a conservative home leash distance.'
 Assert-SourceMatch $playfieldSource 'RegisterNpcHome\s*\(ICharacter\s+character\).*?npcHomeStates\s*\[\s*character\.Identity\.Instance\s*\].*?new\s+Coordinate\s*\(\s*character\.Coordinates\s*\(\s*\)\s*\)' 'Playfield should track spawned NPC home coordinates.'

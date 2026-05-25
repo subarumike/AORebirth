@@ -180,7 +180,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 this.SendMoveAck(character, message.SourceContainer, toPlacement);
                 Equip.Send(client, receivingPage, toPlacement);
                 character.CalculateSkills();
-                this.EnsureWeaponVisualMeshes(character);
+                EnsureWeaponVisualMeshes(character, true);
                 return true;
             }
 
@@ -195,7 +195,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 unequipFrom.Unequip(fromPlacement, receivingPage, toPlacement);
                 this.SendMoveAck(character, message.SourceContainer, toPlacement);
                 character.CalculateSkills();
-                this.EnsureWeaponVisualMeshes(character);
+                EnsureWeaponVisualMeshes(character, true);
                 return true;
             }
 
@@ -303,7 +303,7 @@ namespace ZoneEngine.Core.MessageHandlers
             return delay == 1234567890 ? 20 : delay;
         }
 
-        private void EnsureWeaponVisualMeshes(ICharacter character)
+        public static void EnsureWeaponVisualMeshes(ICharacter character, bool announceAppearanceUpdate)
         {
             IInventoryPage weaponPage;
             if (!character.BaseInventory.Pages.TryGetValue((int)IdentityType.WeaponPage, out weaponPage))
@@ -312,14 +312,14 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             bool changed = false;
-            changed |= this.EnsureWeaponMesh(
+            changed |= EnsureWeaponMesh(
                 character,
                 weaponPage,
                 (int)WeaponSlots.Righthand,
                 1,
                 StatIds.weaponmeshright,
                 StatIds.overridetextureweaponright);
-            changed |= this.EnsureWeaponMesh(
+            changed |= EnsureWeaponMesh(
                 character,
                 weaponPage,
                 (int)WeaponSlots.LeftHand,
@@ -330,11 +330,14 @@ namespace ZoneEngine.Core.MessageHandlers
             if (changed)
             {
                 character.ChangedAppearance = true;
-                character.Playfield.AnnounceAppearanceUpdate(character);
+                if (announceAppearanceUpdate)
+                {
+                    character.Playfield.AnnounceAppearanceUpdate(character);
+                }
             }
         }
 
-        private bool EnsureWeaponMesh(
+        private static bool EnsureWeaponMesh(
             ICharacter character,
             IInventoryPage weaponPage,
             int slot,
@@ -350,10 +353,10 @@ namespace ZoneEngine.Core.MessageHandlers
 
             AOMeshs existing = character.MeshLayer.GetMeshAtPosition(meshPosition);
 
-            int meshId = this.NormalizeItemVisualValue(equippedItem.GetAttribute((int)meshStat));
+            int meshId = NormalizeItemVisualValue(equippedItem.GetAttribute((int)meshStat));
             if (meshId <= 0)
             {
-                meshId = this.NormalizeItemVisualValue(equippedItem.GetAttribute(209));
+                meshId = NormalizeItemVisualValue(equippedItem.GetAttribute(209));
             }
 
             if (meshId <= 0)
@@ -399,7 +402,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 character.MeshLayer.RemoveMesh(existing.Position, existing.Mesh, existing.OverrideTexture, existing.Layer);
             }
 
-            int overrideTexture = this.NormalizeItemVisualValue(equippedItem.GetAttribute((int)overrideTextureStat));
+            int overrideTexture = NormalizeItemVisualValue(equippedItem.GetAttribute((int)overrideTextureStat));
             int layer = MeshLayers.GetLayer(slot);
             character.MeshLayer.AddMesh(meshPosition, meshId, overrideTexture, layer);
             character.Stats[meshStat].Value = meshId;
@@ -417,7 +420,7 @@ namespace ZoneEngine.Core.MessageHandlers
             return true;
         }
 
-        private int NormalizeItemVisualValue(int value)
+        private static int NormalizeItemVisualValue(int value)
         {
             if (value <= 0 || value == 1234567890)
             {
@@ -447,9 +450,9 @@ namespace ZoneEngine.Core.MessageHandlers
             int equippedWeapons = currentEquippedWeapons;
             if (equippedWeapon != null)
             {
-                int itemWeaponType = this.NormalizeItemVisualValue(equippedWeapon.GetAttribute((int)StatIds.weapontype));
+                int itemWeaponType = NormalizeItemVisualValue(equippedWeapon.GetAttribute((int)StatIds.weapontype));
                 int itemDefaultAttackType =
-                    this.NormalizeItemVisualValue(equippedWeapon.GetAttribute((int)StatIds.defaultattacktype));
+                    NormalizeItemVisualValue(equippedWeapon.GetAttribute((int)StatIds.defaultattacktype));
 
                 if (itemWeaponType > 0)
                 {

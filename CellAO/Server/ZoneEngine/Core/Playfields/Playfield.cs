@@ -1143,18 +1143,6 @@ namespace CellAO.Core.Playfields
                     Unknown5 = attackSource.AttackInfoHitType,
                     Unknown6 = 0
                 });
-            this.Announce(
-                new HealthDamageMessage
-                {
-                    Identity = target.Identity,
-                    Target = attacker.Identity,
-                    Unknown1 = newHealth,
-                    Unknown2 = damage,
-                    Unknown3 = (int)StatIds.health,
-                    Unknown4 = 0,
-                    Unknown5 = 0
-                });
-
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
@@ -1209,6 +1197,7 @@ namespace CellAO.Core.Playfields
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     string.Format("CombatAttackSource unarmed attacker={0}", attacker.Identity));
+                bool isNpcAttacker = attacker.Controller is NPCController;
                 return new CombatAttackSource
                        {
                            MinDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.mindamage].Value, 0),
@@ -1218,10 +1207,10 @@ namespace CellAO.Core.Playfields
                            RechargeSeconds = DefaultCombatTickSeconds,
                            UsesEquippedWeapon = false,
                            AttackInfoAmmoCount = 1,
-                           AttackInfoWeaponSlot = 0,
+                           AttackInfoWeaponSlot = isNpcAttacker ? 1 : 0,
                            AttackInfoUnk1 = 0,
-                           AttackInfoHitType = 0
-                       };
+                           AttackInfoHitType = isNpcAttacker ? 3 : 0
+                        };
             }
 
             IItem weapon = equippedWeapon.Item;
@@ -1255,7 +1244,7 @@ namespace CellAO.Core.Playfields
                        AttackInfoWeaponSlot = equippedWeapon.Slot,
                        AttackInfoUnk1 = 4,
                        AttackInfoHitType = 3
-                   };
+                    };
         }
 
         private EquippedCombatWeapon GetEquippedCombatWeapon(ICharacter attacker)
