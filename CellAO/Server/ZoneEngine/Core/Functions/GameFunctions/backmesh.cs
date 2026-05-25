@@ -34,12 +34,16 @@ namespace ZoneEngine.Core.Functions.GameFunctions
     #region Usings ...
 
     using System;
+    using System.Text;
 
     using CellAO.Core.Entities;
+    using CellAO.Core.Textures;
     using CellAO.Enums;
     using CellAO.Interfaces;
 
     using MsgPack;
+
+    using Utility;
 
     #endregion
 
@@ -113,26 +117,125 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             IInstancedEntity Target,
             MessagePackObject[] Arguments)
         {
-            if (Arguments.Length == 2)
+            Character character = Self as Character;
+            if (character == null || Arguments == null || Arguments.Length == 0)
             {
-                ((Character)Self).Stats[StatIds.backmesh].Value = Arguments[0].AsInt32();
-                ((Character)Self).MeshLayer.AddMesh(5, (Int32)Arguments[1], (Int32)Arguments[0], 0);
+                return false;
             }
-            else
+
+            int placement;
+            int meshId;
+            int overrideTexture;
+            if (this.TryGetPlacement(Arguments, out placement))
             {
-                int placement = (Int32)Arguments[Arguments.Length - 1];
-                if (placement == 51)
+                if (Arguments.Length >= 3)
                 {
-                    ((Character)Self).SocialMeshLayer.AddMesh(5, (Int32)Arguments[1], (Int32)Arguments[0], 0);
+                    // Expected form after inventory appends the equipment slot:
+                    // overrideTexture, meshId, slot
+                    overrideTexture = Arguments[0].AsInt32();
+                    meshId = Arguments[1].AsInt32();
                 }
                 else
                 {
-                    ((Character)Self).Stats[StatIds.backmesh].Value = Arguments[0].AsInt32();
-                    ((Character)Self).MeshLayer.AddMesh(5, (Int32)Arguments[1], (Int32)Arguments[0], 0);
+                    // Expected form after inventory appends the equipment slot:
+                    // meshId, slot
+                    overrideTexture = 0;
+                    meshId = Arguments[0].AsInt32();
+                }
+            }
+            else if (Arguments.Length >= 2)
+            {
+                // Legacy form without an appended slot: overrideTexture, meshId
+                placement = 19;
+                overrideTexture = Arguments[0].AsInt32();
+                meshId = Arguments[1].AsInt32();
+            }
+            else
+            {
+                // Legacy form without an appended slot: meshId
+                placement = 19;
+                overrideTexture = 0;
+                meshId = Arguments[0].AsInt32();
+            }
+
+            bool social = placement == 51;
+            int layer = MeshLayers.GetLayer(placement);
+            if (social)
+            {
+                character.SocialMeshLayer.AddMesh(5, meshId, overrideTexture, layer);
+            }
+            else
+            {
+                character.Stats[StatIds.backmesh].Value = meshId;
+                character.MeshLayer.AddMesh(5, meshId, overrideTexture, layer);
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "Function_backmesh char={0} placement={1} position=5 layer={2} social={3} mesh={4} override={5} args={6}",
+                    character.Identity,
+                    placement,
+                    layer,
+                    social ? 1 : 0,
+                    meshId,
+                    overrideTexture,
+                    this.FormatArguments(Arguments)));
+
+            character.ChangedAppearance = true;
+            return true;
+        }
+
+        private bool TryGetPlacement(MessagePackObject[] arguments, out int placement)
+        {
+            placement = 0;
+            if (arguments.Length < 2)
+            {
+                return false;
+            }
+
+            int candidate;
+            try
+            {
+                candidate = arguments[arguments.Length - 1].AsInt32();
+            }
+            catch
+            {
+                return false;
+            }
+
+            if (candidate >= 1 && candidate <= 100)
+            {
+                placement = candidate;
+                return true;
+            }
+
+            return false;
+        }
+
+        private string FormatArguments(MessagePackObject[] arguments)
+        {
+            var sb = new StringBuilder();
+            sb.Append("[");
+            for (int i = 0; i < arguments.Length; i++)
+            {
+                if (i > 0)
+                {
+                    sb.Append(", ");
+                }
+
+                try
+                {
+                    sb.Append(arguments[i].AsInt32());
+                }
+                catch
+                {
+                    sb.Append(arguments[i].ToString());
                 }
             }
 
-            return true;
+            sb.Append("]");
+            return sb.ToString();
         }
 
         #endregion
