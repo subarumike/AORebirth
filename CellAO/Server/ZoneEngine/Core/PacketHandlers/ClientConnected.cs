@@ -170,6 +170,7 @@ client.Controller.Character.Playfield.Identity,
             SimpleCharFullUpdate.SendToPlayfield(client);
 
             /* inventory, items and all that */
+            Packets.WeaponItemFullUpdate.SendWeaponDefinitions(client.Controller.Character);
             FullCharacterMessageHandler.Default.Send(client.Controller.Character);
 
             var specials = new[]
@@ -214,8 +215,7 @@ client.Controller.Character.Playfield.Identity,
             // VendorHandler.GetVendorsInPF(client);
             // }
 
-            // WeaponItemFullCharUpdate  Maybe the right location , First Check if weapons present usually in equipment
-            // Packets.WeaponItemFullUpdate.Send(client, client.Character);
+            // Weapon item full updates are sent above immediately after full character sync.
 
             // TODO: create a better alternative to ProcessTimers
             // client.Character.ProcessTimers(DateTime.Now + TimeSpan.FromMilliseconds(200));

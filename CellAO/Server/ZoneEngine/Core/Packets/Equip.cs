@@ -33,9 +33,13 @@ namespace ZoneEngine.Core.Packets
 {
     #region Usings ...
 
+    using System.Collections.Generic;
+    using System.Threading;
+
     using CellAO.Core.Inventory;
     using CellAO.Core.Items;
     using CellAO.Core.Network;
+    using CellAO.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -44,9 +48,56 @@ namespace ZoneEngine.Core.Packets
 
     /// <summary>
     /// </summary>
+    internal static class WeaponItemIdentity
+    {
+        private static readonly object SyncRoot = new object();
+        private static readonly Dictionary<IItem, int> WeaponInstances = new Dictionary<IItem, int>();
+        private static int nextWeaponInstance = 0x25000000;
+
+        public static Identity GetOrCreate(IItem item)
+        {
+            int instance = GetOrCreateInstance(item);
+            return new Identity { Type = IdentityType.WeaponInstance, Instance = instance };
+        }
+
+        public static int GetOrCreateInstance(IItem item)
+        {
+            if (item == null)
+            {
+                return 0;
+            }
+
+            if (item.Identity.Type == IdentityType.WeaponInstance && item.Identity.Instance != 0)
+            {
+                return item.Identity.Instance;
+            }
+
+            lock (SyncRoot)
+            {
+                int existing;
+                if (WeaponInstances.TryGetValue(item, out existing))
+                {
+                    return existing;
+                }
+
+                int created = Interlocked.Increment(ref nextWeaponInstance);
+                WeaponInstances[item] = created;
+                return created;
+            }
+        }
+    }
+
+    /// <summary>
+    /// </summary>
     public static class Equip
     {
         #region Public Methods and Operators
+
+        private static bool IsWeaponHandSlot(IInventoryPage page, int slotNumber)
+        {
+            return page is WeaponInventoryPage
+                   && (slotNumber == (int)WeaponSlots.Righthand || slotNumber == (int)WeaponSlots.LeftHand);
+        }
 
         /// <summary>
         /// </summary>
@@ -58,28 +109,61 @@ namespace ZoneEngine.Core.Packets
         /// </param>
         public static void Send(IZoneClient client, IInventoryPage page, int slotNumber)
         {
+            if (IsWeaponHandSlot(page, slotNumber))
+            {
+                IItem weapon = page[slotNumber];
+                var action167Message = new CharacterActionMessage
+                                       {
+                                           Identity = client.Controller.Character.Identity,
+                                           Action = CharacterActionType.ChangeAnimationAndStance,
+                                           Unknown = 0
+                                       };
+                client.Controller.Character.Send(action167Message);
+
+                var equipMessage = new CharacterActionMessage
+                                   {
+                                       Identity = client.Controller.Character.Identity,
+                                       Action = CharacterActionType.Equip,
+                                       Target = WeaponItemIdentity.GetOrCreate(weapon),
+                                       Parameter1 = 0,
+                                       Parameter2 = slotNumber,
+                                       Unknown = 0
+                                   };
+                client.Controller.Character.Send(equipMessage);
+
+                client.Controller.Character.Playfield.AnnounceOthers(
+                    action167Message,
+                    client.Controller.Character.Identity);
+                client.Controller.Character.Playfield.AnnounceOthers(
+                    equipMessage,
+                    client.Controller.Character.Identity);
+                return;
+            }
+
             switch (slotNumber)
             {
                 case 6:
-                    var action167Message = new CharacterActionMessage()
-                                           {
-                                               Identity =
-                                                   client.Controller.Character.Identity,
-                                               Action =
-                                                   CharacterActionType
-                                                   .ChangeAnimationAndStance,
-                                           };
-                    client.Controller.Character.Playfield.Announce(action167Message);
-
-                    var equipMessage = new CharacterActionMessage()
-                                       {
-                                           Identity = client.Controller.Character.Identity,
-                                           Action = CharacterActionType.Equip,
-                                           Target = page.Identity,
-                                           Parameter1 = 0,
-                                           Parameter2 = 6,
-                                       };
-                    client.Controller.Character.Send(equipMessage);
+                    IItem rightHandItem = page[slotNumber];
+                    if (rightHandItem != null)
+                    {
+                        var rightHandTemplateActionMessage = new TemplateActionMessage()
+                                                             {
+                                                                 Identity = client.Controller.Character.Identity,
+                                                                 ItemHighId = rightHandItem.HighID,
+                                                                 ItemLowId = rightHandItem.LowID,
+                                                                 Quality = rightHandItem.Quality,
+                                                                 Unknown1 = 1,
+                                                                 Unknown2 = 6,
+                                                                 Placement =
+                                                                     new Identity()
+                                                                     {
+                                                                         Type = page.Identity.Type,
+                                                                         Instance = slotNumber
+                                                                     },
+                                                                 Unknown = 0,
+                                                             };
+                        client.Controller.Character.Send(rightHandTemplateActionMessage);
+                    }
                     break;
                 default:
                     IItem item = page[slotNumber];

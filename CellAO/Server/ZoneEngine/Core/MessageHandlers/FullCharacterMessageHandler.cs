@@ -42,9 +42,12 @@ namespace ZoneEngine.Core.MessageHandlers
     using CellAO.Core.Inventory;
     using CellAO.Core.Items;
     using CellAO.Core.Network;
+    using CellAO.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+
+    using ZoneEngine.Core.Packets;
 
     #endregion
 
@@ -96,7 +99,7 @@ namespace ZoneEngine.Core.MessageHandlers
                                        Placement = kv.Key,
                                        Flags = (short)kv.Value.Flags,
                                        Count = (short)kv.Value.MultipleCount,
-                                       Identity = kv.Value.Identity,
+                                       Identity = GetInventorySlotIdentity(ivp, kv.Value),
                                        ItemLowId = kv.Value.LowID,
                                        ItemHighId = kv.Value.HighID,
                                        Quality = kv.Value.Quality,
@@ -878,6 +881,26 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         /// <param name="statId">
         /// </param>
+        private static Identity GetInventorySlotIdentity(IInventoryPage page, IItem item)
+        {
+            if (item == null)
+            {
+                return Identity.None;
+            }
+
+            if (IsWeaponItem(page, item))
+            {
+                return WeaponItemIdentity.GetOrCreate(item);
+            }
+
+            return item.Identity;
+        }
+
+        private static bool IsWeaponItem(IInventoryPage page, IItem item)
+        {
+            return page is WeaponInventoryPage || item.ItemActions.Any(x => x.ActionType == ActionType.ToWield);
+        }
+
         private static void AddStat3232(IZoneClient client, IList<GameTuple<int, uint>> list, int statId)
         {
             var tuple = new GameTuple<int, uint>

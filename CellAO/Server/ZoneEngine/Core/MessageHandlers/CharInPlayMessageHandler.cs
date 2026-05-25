@@ -45,6 +45,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using Utility;
+    using ZoneEngine.Core.Packets;
 
     #endregion
 
@@ -123,6 +124,8 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 SimpleItemFullUpdateMessageHandler.Default.Send(client.Controller.Character, sd);
             }
+
+            WeaponItemFullUpdate.SendWeaponDefinitions(client.Controller.Character);
             client.Controller.Character.DoNotDoTimers = false;
         }
 

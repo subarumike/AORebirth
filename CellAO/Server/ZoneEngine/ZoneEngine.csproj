@@ -90,6 +90,7 @@
     <Compile Include="ChatCommands\ChatCommandGiveItem.cs" />
     <Compile Include="ChatCommands\ChatCommandSet.cs" />
     <Compile Include="ChatCommands\DebugItem.cs" />
+    <Compile Include="ChatCommands\FindWeaponVisual.cs" />
     <Compile Include="ChatCommands\InstaGrid.cs" />
     <Compile Include="ChatCommands\MakeShop.cs" />
     <Compile Include="ChatCommands\Npc.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="Core\Functions\GameFunctions\headmesh.cs" />
     <Compile Include="Core\Functions\GameFunctions\hit.cs" />
     <Compile Include="Core\Functions\GameFunctions\lineteleport.cs" />
+    <Compile Include="Core\Functions\GameFunctions\mesh.cs" />
     <Compile Include="Core\Functions\GameFunctions\modify.cs" />
     <Compile Include="Core\Functions\GameFunctions\modifypercentage.cs" />
     <Compile Include="Core\Functions\GameFunctions\openbank.cs" />
@@ -200,6 +202,7 @@
     <Compile Include="Core\Packets\Stat.cs" />
     <Compile Include="Core\Packets\TradeSkillPacket.cs" />
     <Compile Include="Core\Packets\UnEquip.cs" />
+    <Compile Include="Core\Packets\WeaponItemFullUpdate.cs" />
     <Compile Include="Core\Playfields\Playfield.cs" />
     <Compile Include="Core\Playfields\Playfields.cs" />
     <Compile Include="Core\Playfields\WallCollision.cs" />

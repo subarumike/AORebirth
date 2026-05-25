@@ -136,6 +136,12 @@ namespace CellAO.Core.Playfields
 
         private const double MaxMeleeCombatDistance = 8.0;
 
+        private const int MissingItemStatValue = 1234567890;
+
+        private const double DefaultCombatTickSeconds = 2.0;
+
+        private const double OutOfRangeRetrySeconds = 1.0;
+
         private const double MaxNpcLeashDistance = 40.0;
 
         private static readonly Random LootRandom = new Random();
@@ -1108,15 +1114,17 @@ namespace CellAO.Core.Playfields
                 return;
             }
 
-            if (!this.IsInMeleeCombatRange(attacker, target))
+            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
+            if (!this.IsInCombatRange(attacker, target, attackSource.Range))
             {
                 this.TryMoveNpcIntoCombatRange(attacker, target);
-                this.nextCombatTicks[attacker.Identity.Instance] = DateTime.UtcNow + TimeSpan.FromSeconds(1);
+                this.nextCombatTicks[attacker.Identity.Instance] =
+                    DateTime.UtcNow + TimeSpan.FromSeconds(OutOfRangeRetrySeconds);
                 return;
             }
 
             int currentHealth = target.Stats[StatIds.health].Value;
-            int damage = this.CalculateCombatDamage(attacker);
+            int damage = this.CalculateCombatDamage(attacker, attackSource);
             int newHealth = Math.Max(0, currentHealth - damage);
             bool killingHit = newHealth == 0;
 
@@ -1129,10 +1137,10 @@ namespace CellAO.Core.Playfields
                     Identity = attacker.Identity,
                     Target = target.Identity,
                     Unknown1 = damage,
-                    Unknown2 = killingHit ? 40 : 1,
-                    Unknown3 = killingHit ? 8 : 0,
-                    Unknown4 = killingHit ? 4 : 0,
-                    Unknown5 = killingHit ? 3 : 0,
+                    Unknown2 = attackSource.AttackInfoAmmoCount,
+                    Unknown3 = attackSource.AttackInfoWeaponSlot,
+                    Unknown4 = attackSource.AttackInfoUnk1,
+                    Unknown5 = attackSource.AttackInfoHitType,
                     Unknown6 = 0
                 });
             this.Announce(
@@ -1150,12 +1158,14 @@ namespace CellAO.Core.Playfields
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
-                    "Combat hit attacker={0} target={1} damage={2} health={3}/{4}",
+                    "Combat hit attacker={0} target={1} damage={2} health={3}/{4} weaponBased={5} slot={6}",
                     attacker.Identity,
                     target.Identity,
                     damage,
                     newHealth,
-                    target.Stats[StatIds.life].Value));
+                    target.Stats[StatIds.life].Value,
+                    attackSource.UsesEquippedWeapon ? 1 : 0,
+                    attackSource.AttackInfoWeaponSlot));
 
             if (killingHit)
             {
@@ -1172,22 +1182,155 @@ namespace CellAO.Core.Playfields
                 return;
             }
 
-            this.nextCombatTicks[attacker.Identity.Instance] = DateTime.UtcNow + TimeSpan.FromSeconds(2);
+            this.nextCombatTicks[attacker.Identity.Instance] =
+                DateTime.UtcNow + TimeSpan.FromSeconds(attackSource.RechargeSeconds);
         }
 
-        private int CalculateCombatDamage(ICharacter attacker)
+        private int CalculateCombatDamage(ICharacter attacker, CombatAttackSource attackSource)
         {
             return CombatDamageRules.Calculate(
-                attacker.Stats[StatIds.mindamage].Value,
-                attacker.Stats[StatIds.maxdamage].Value,
-                attacker.Stats[StatIds.damagebonus].Value,
+                attackSource.MinDamage,
+                attackSource.MaxDamage,
+                attackSource.DamageBonus,
                 attacker.Stats[StatIds.level].Value,
                 attacker.Controller is PlayerController);
         }
 
-        private bool IsInMeleeCombatRange(ICharacter attacker, ICharacter target)
+        private bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)
         {
-            return attacker.Coordinates().coordinate.Distance2D(target.Coordinates().coordinate) <= MaxMeleeCombatDistance;
+            return attacker.Coordinates().coordinate.Distance2D(target.Coordinates().coordinate) <= range;
+        }
+
+        private CombatAttackSource GetCombatAttackSource(ICharacter attacker)
+        {
+            EquippedCombatWeapon equippedWeapon = this.GetEquippedCombatWeapon(attacker);
+            if (equippedWeapon == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format("CombatAttackSource unarmed attacker={0}", attacker.Identity));
+                return new CombatAttackSource
+                       {
+                           MinDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.mindamage].Value, 0),
+                           MaxDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.maxdamage].Value, 0),
+                           DamageBonus = NormalizeCombatItemStat(attacker.Stats[StatIds.damagebonus].Value, 0),
+                           Range = MaxMeleeCombatDistance,
+                           RechargeSeconds = DefaultCombatTickSeconds,
+                           UsesEquippedWeapon = false,
+                           AttackInfoAmmoCount = 1,
+                           AttackInfoWeaponSlot = 0,
+                           AttackInfoUnk1 = 0,
+                           AttackInfoHitType = 0
+                       };
+            }
+
+            IItem weapon = equippedWeapon.Item;
+            int minDamage = NormalizeCombatItemStat(weapon.GetAttribute((int)StatIds.mindamage), 0);
+            int maxDamage = NormalizeCombatItemStat(weapon.GetAttribute((int)StatIds.maxdamage), 0);
+            int damageBonus = NormalizeCombatItemStat(weapon.GetAttribute((int)StatIds.damagebonus), 0);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "CombatAttackSource weapon attacker={0} item={1}/{2} slot={3} min={4} max={5} rangeRaw={6}",
+                    attacker.Identity,
+                    weapon.LowID,
+                    weapon.HighID,
+                    equippedWeapon.Slot,
+                    minDamage,
+                    maxDamage,
+                    weapon.GetAttribute((int)StatIds.attackrange)));
+
+            return new CombatAttackSource
+                   {
+                       MinDamage = minDamage,
+                       MaxDamage = maxDamage,
+                       DamageBonus = damageBonus,
+                       Range = NormalizeCombatRange(weapon.GetAttribute((int)StatIds.attackrange)),
+                       RechargeSeconds = NormalizeCombatDelaySeconds(
+                           weapon.GetAttribute((int)StatIds.itemdelay),
+                           weapon.GetAttribute((int)StatIds.rechargedelay)),
+                       UsesEquippedWeapon = true,
+                       AttackInfoAmmoCount = 40,
+                       AttackInfoWeaponSlot = equippedWeapon.Slot,
+                       AttackInfoUnk1 = 4,
+                       AttackInfoHitType = 3
+                   };
+        }
+
+        private EquippedCombatWeapon GetEquippedCombatWeapon(ICharacter attacker)
+        {
+            if (attacker.BaseInventory == null
+                || !attacker.BaseInventory.Pages.ContainsKey((int)IdentityType.WeaponPage))
+            {
+                return null;
+            }
+
+            IInventoryPage weaponPage = attacker.BaseInventory.Pages[(int)IdentityType.WeaponPage];
+            IItem rightHand = weaponPage[(int)WeaponSlots.Righthand];
+            if (this.IsWieldableCombatWeapon(rightHand))
+            {
+                return new EquippedCombatWeapon { Item = rightHand, Slot = (int)WeaponSlots.Righthand };
+            }
+
+            IItem leftHand = weaponPage[(int)WeaponSlots.LeftHand];
+            if (this.IsWieldableCombatWeapon(leftHand))
+            {
+                return new EquippedCombatWeapon { Item = leftHand, Slot = (int)WeaponSlots.LeftHand };
+            }
+
+            return null;
+        }
+
+        private static int NormalizeCombatItemStat(int value, int fallback)
+        {
+            return value == MissingItemStatValue ? fallback : value;
+        }
+
+        private bool IsWieldableCombatWeapon(IItem item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+
+            if (item.ItemActions != null && item.ItemActions.Any(x => x.ActionType == ActionType.ToWield))
+            {
+                return true;
+            }
+
+            // Some valid hand weapons in stripped/incomplete datasets are missing explicit ToWield actions.
+            // Fall back to combat-bearing item stats to keep equipped hand weapons from being treated as fists.
+            return NormalizeCombatItemStat(item.GetAttribute((int)StatIds.mindamage), 0) > 0
+                   || NormalizeCombatItemStat(item.GetAttribute((int)StatIds.maxdamage), 0) > 0
+                   || NormalizeCombatItemStat(item.GetAttribute((int)StatIds.attackrange), 0) > 0
+                   || NormalizeCombatItemStat(item.GetAttribute((int)StatIds.itemdelay), 0) > 0
+                   || NormalizeCombatItemStat(item.GetAttribute((int)StatIds.rechargedelay), 0) > 0;
+        }
+
+        private static double NormalizeCombatRange(int range)
+        {
+            int normalizedRange = NormalizeCombatItemStat(range, 0);
+            if (normalizedRange <= 0)
+            {
+                return MaxMeleeCombatDistance;
+            }
+
+            return normalizedRange > 1000 ? normalizedRange / 100.0 : normalizedRange;
+        }
+
+        private static double NormalizeCombatDelaySeconds(int attackDelay, int rechargeDelay)
+        {
+            int normalizedAttackDelay = NormalizeCombatItemStat(attackDelay, 0);
+            int normalizedRechargeDelay = NormalizeCombatItemStat(rechargeDelay, 0);
+            int totalCentiseconds = normalizedAttackDelay + normalizedRechargeDelay;
+
+            if (totalCentiseconds <= 0)
+            {
+                return DefaultCombatTickSeconds;
+            }
+
+            return Math.Max(0.25, totalCentiseconds / 100.0);
         }
 
         private void TryMoveNpcIntoCombatRange(ICharacter attacker, ICharacter target)
@@ -2538,6 +2681,36 @@ namespace CellAO.Core.Playfields
         private class NpcHomeState
         {
             public Coordinate Coordinates { get; set; }
+        }
+
+        private class CombatAttackSource
+        {
+            public int MinDamage { get; set; }
+
+            public int MaxDamage { get; set; }
+
+            public int DamageBonus { get; set; }
+
+            public double Range { get; set; }
+
+            public double RechargeSeconds { get; set; }
+
+            public bool UsesEquippedWeapon { get; set; }
+
+            public int AttackInfoAmmoCount { get; set; }
+
+            public int AttackInfoWeaponSlot { get; set; }
+
+            public int AttackInfoUnk1 { get; set; }
+
+            public int AttackInfoHitType { get; set; }
+        }
+
+        private class EquippedCombatWeapon
+        {
+            public IItem Item { get; set; }
+
+            public int Slot { get; set; }
         }
     }
 }

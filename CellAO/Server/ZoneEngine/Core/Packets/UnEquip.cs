@@ -36,6 +36,7 @@ namespace ZoneEngine.Core.Packets
     using CellAO.Core.Inventory;
     using CellAO.Core.Items;
     using CellAO.Core.Network;
+    using CellAO.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -48,6 +49,12 @@ namespace ZoneEngine.Core.Packets
     {
         #region Public Methods and Operators
 
+        private static bool IsWeaponHandSlot(IInventoryPage page, int slotNumber)
+        {
+            return page is WeaponInventoryPage
+                   && (slotNumber == (int)WeaponSlots.Righthand || slotNumber == (int)WeaponSlots.LeftHand);
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="client">
@@ -58,16 +65,43 @@ namespace ZoneEngine.Core.Packets
         /// </param>
         public static void Send(IZoneClient client, IInventoryPage page, int slotNumber)
         {
+            if (IsWeaponHandSlot(page, slotNumber))
+            {
+                var action97Message = new CharacterActionMessage
+                                      {
+                                          Identity = client.Controller.Character.Identity,
+                                          Action = CharacterActionType.Unknown3,
+                                          Parameter2 = slotNumber,
+                                          Unknown = 0
+                                      };
+                client.Controller.Character.Send(action97Message);
+                return;
+            }
+
             switch (slotNumber)
             {
                 case 6:
-                    var action97Message = new CharacterActionMessage()
-                                          {
-                                              Identity = client.Controller.Character.Identity,
-                                              Action = CharacterActionType.Unknown3,
-                                              Parameter2 = 6
-                                          };
-                    client.Controller.Character.Send(action97Message);
+                    IItem rightHandItem = page[slotNumber];
+                    if (rightHandItem != null)
+                    {
+                        var rightHandTemplateActionMessage = new TemplateActionMessage()
+                                                             {
+                                                                 Identity = client.Controller.Character.Identity,
+                                                                 ItemHighId = rightHandItem.HighID,
+                                                                 ItemLowId = rightHandItem.LowID,
+                                                                 Quality = rightHandItem.Quality,
+                                                                 Unknown1 = 1,
+                                                                 Unknown2 = 7,
+                                                                 Placement =
+                                                                     new Identity()
+                                                                     {
+                                                                         Type = page.Identity.Type,
+                                                                         Instance = slotNumber
+                                                                     },
+                                                                 Unknown = 0,
+                                                             };
+                        client.Controller.Character.Send(rightHandTemplateActionMessage);
+                    }
                     break;
                 default:
                     IItem item = page[slotNumber];

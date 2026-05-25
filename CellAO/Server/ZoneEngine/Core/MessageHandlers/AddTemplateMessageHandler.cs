@@ -39,6 +39,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Packets;
+
     #endregion
 
     /// <summary>
@@ -56,6 +58,7 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public void Send(ICharacter character, Item item)
         {
+            WeaponItemFullUpdate.SendWeaponDefinition(character, item);
             this.Send(character, AddItem(character, item), false);
         }
 
