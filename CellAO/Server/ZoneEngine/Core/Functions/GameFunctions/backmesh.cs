@@ -166,7 +166,11 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             }
             else
             {
-                character.Stats[StatIds.backmesh].Value = meshId;
+                if (placement == 19)
+                {
+                    character.Stats[StatIds.backmesh].Value = meshId;
+                }
+
                 character.MeshLayer.AddMesh(5, meshId, overrideTexture, layer);
             }
 

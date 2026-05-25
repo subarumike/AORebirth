@@ -353,6 +353,11 @@ namespace ZoneEngine.Core.MessageHandlers
             int meshId = this.NormalizeItemVisualValue(equippedItem.GetAttribute((int)meshStat));
             if (meshId <= 0)
             {
+                meshId = this.NormalizeItemVisualValue(equippedItem.GetAttribute(209));
+            }
+
+            if (meshId <= 0)
+            {
                 bool hasToWieldAction = equippedItem.ItemActions.Any(x => x.ActionType == ActionType.ToWield);
                 string wearFunctions = string.Join(
                     ",",
@@ -365,7 +370,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     string.Format(
-                        "EnsureWeaponMesh skipped: item has no valid mesh stat char={0} slot={1} meshStat={2} raw={3} item={4}/{5} ql={6} hasToWield={7} wearFuncs=[{8}] meshR={9} meshL={10} ovR={11} ovL={12}",
+                        "EnsureWeaponMesh skipped: item has no valid mesh stat char={0} slot={1} meshStat={2} raw={3} item={4}/{5} ql={6} hasToWield={7} wearFuncs=[{8}] meshR={9} meshL={10} ovR={11} ovL={12} weaponMeshHolder={13}",
                         character.Identity,
                         slot,
                         meshStat,
@@ -378,7 +383,8 @@ namespace ZoneEngine.Core.MessageHandlers
                         equippedItem.GetAttribute((int)StatIds.weaponmeshright),
                         equippedItem.GetAttribute((int)StatIds.weaponmeshleft),
                         equippedItem.GetAttribute((int)StatIds.overridetextureweaponright),
-                        equippedItem.GetAttribute((int)StatIds.overridetextureweaponleft)));
+                        equippedItem.GetAttribute((int)StatIds.overridetextureweaponleft),
+                        equippedItem.GetAttribute(209)));
                 return false;
             }
 
