@@ -898,7 +898,28 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private static bool IsWeaponItem(IInventoryPage page, IItem item)
         {
-            return page is WeaponInventoryPage || item.ItemActions.Any(x => x.ActionType == ActionType.ToWield);
+            return page is WeaponInventoryPage
+                   || item.ItemActions.Any(x => x.ActionType == ActionType.ToWield)
+                   || HasWeaponStats(item);
+        }
+
+        private static bool HasWeaponStats(IItem item)
+        {
+            return NormalizeWeaponValue(item.GetAttribute((int)StatIds.mindamage)) > 0
+                   || NormalizeWeaponValue(item.GetAttribute((int)StatIds.maxdamage)) > 0
+                   || NormalizeWeaponValue(item.GetAttribute((int)StatIds.attackrange)) > 0
+                   || NormalizeWeaponValue(item.GetAttribute((int)StatIds.itemdelay)) > 0
+                   || NormalizeWeaponValue(item.GetAttribute((int)StatIds.rechargedelay)) > 0;
+        }
+
+        private static int NormalizeWeaponValue(int value)
+        {
+            if (value <= 0 || value == 1234567890)
+            {
+                return 0;
+            }
+
+            return value;
         }
 
         private static void AddStat3232(IZoneClient client, IList<GameTuple<int, uint>> list, int statId)

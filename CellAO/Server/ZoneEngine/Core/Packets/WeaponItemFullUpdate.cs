@@ -193,7 +193,18 @@ namespace ZoneEngine.Core.Packets
 
         private static bool IsWeaponItem(IInventoryPage page, IItem item)
         {
-            return page is WeaponInventoryPage || item.ItemActions.Any(x => x.ActionType == ActionType.ToWield);
+            return page is WeaponInventoryPage
+                   || item.ItemActions.Any(x => x.ActionType == ActionType.ToWield)
+                   || HasWeaponStats(item);
+        }
+
+        private static bool HasWeaponStats(IItem item)
+        {
+            return NormalizeValue(item.GetAttribute((int)StatIds.mindamage)) > 0
+                   || NormalizeValue(item.GetAttribute((int)StatIds.maxdamage)) > 0
+                   || NormalizeValue(item.GetAttribute((int)StatIds.attackrange)) > 0
+                   || NormalizeValue(item.GetAttribute((int)StatIds.itemdelay)) > 0
+                   || NormalizeValue(item.GetAttribute((int)StatIds.rechargedelay)) > 0;
         }
 
         private static int NormalizeFlags(int flags)
