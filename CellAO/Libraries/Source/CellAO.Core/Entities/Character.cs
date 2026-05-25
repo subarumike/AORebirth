@@ -488,6 +488,7 @@ namespace CellAO.Core.Entities
             // TODO: Reintroduce skill calculation (walk inventory and active nanos)
 
             // First, walk inventory and get buffs from there
+            string appearanceBefore = this.GetAppearanceSignature();
             bool oldsend = this.DoNotDoTimers;
             this.DoNotDoTimers = true;
             this.Stats.ClearModifiers();
@@ -515,7 +516,7 @@ namespace CellAO.Core.Entities
 
             this.BaseInventory.CalculateModifiers(this);
 
-            if (this.ChangedAppearance)
+            if (this.ChangedAppearance || appearanceBefore != this.GetAppearanceSignature())
             {
                 this.Playfield.AnnounceAppearanceUpdate(this);
                 this.ChangedAppearance = false;
@@ -524,6 +525,22 @@ namespace CellAO.Core.Entities
             {
                 this.DoNotDoTimers = oldsend;
             }
+        }
+
+        private string GetAppearanceSignature()
+        {
+            List<string> parts = new List<string>();
+
+            parts.AddRange(
+                this.meshLayer.GetMeshs().Select(
+                    x => "m:" + x.Position + ":" + x.Layer + ":" + x.Mesh + ":" + x.OverrideTexture));
+            parts.AddRange(
+                this.socialMeshLayer.GetMeshs().Select(
+                    x => "s:" + x.Position + ":" + x.Layer + ":" + x.Mesh + ":" + x.OverrideTexture));
+            parts.AddRange(
+                this.Textures.OrderBy(x => x.place).Select(x => "t:" + x.place + ":" + x.Texture));
+
+            return string.Join("|", parts.ToArray());
         }
 
         /// <summary>
