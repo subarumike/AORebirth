@@ -38,7 +38,6 @@ namespace CellAO.Core.Playfields
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
-    using System.Text;
     using System.Threading;
 
     using CellAO.Core.Entities;
@@ -1775,6 +1774,9 @@ namespace CellAO.Core.Playfields
 
         private void SendDebugCorpseFullUpdate(ICharacter target, Identity corpseIdentity)
         {
+            int corpseCatMesh = CorpseCatMeshFor(target);
+            int corpseMonsterData = CorpseMonsterDataFor(target);
+
             foreach (ICharacter character in
                 Pool.Instance.GetAll<ICharacter>(this.Identity, (int)IdentityType.CanbeAffected))
             {
@@ -1784,8 +1786,28 @@ namespace CellAO.Core.Playfields
                     continue;
                 }
 
-                client.SendCompressed(this.BuildDebugCorpseFullUpdate(target, corpseIdentity, character.Identity));
+                client.SendCompressed(
+                    CorpseFullUpdate.Build(
+                        target,
+                        corpseIdentity,
+                        character.Identity,
+                        this.server.Id,
+                        corpseCatMesh,
+                        corpseMonsterData));
             }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "CorpseFullUpdate visual target={0} corpse={1} catMesh={2} monsterData={3} scale={4} sex={5} breed={6} race={7}",
+                    target.Identity,
+                    corpseIdentity,
+                    corpseCatMesh,
+                    corpseMonsterData,
+                    target.Stats[StatIds.monsterscale].Value,
+                    target.Stats[StatIds.sex].Value,
+                    target.Stats[StatIds.breed].Value,
+                    target.Stats[StatIds.race].Value));
         }
 
         private static TimeSpan CorpseLifetimeFor(CombatCorpseLootClass lootClass)
@@ -2000,70 +2022,6 @@ namespace CellAO.Core.Playfields
             return slot;
         }
 
-        private byte[] BuildDebugCorpseFullUpdate(ICharacter target, Identity corpseIdentity, Identity receiver)
-        {
-            const int originalEncodedNameLength = 27;
-            const int nameOffset = 231;
-            const int nameLengthOffset = 227;
-            const int originalSuffixOffset = nameOffset + originalEncodedNameLength;
-
-            byte[] template = HexToBytes(
-                "0000000a0001019e000000003cac6f144f474e050000c76a00f0f00100000000080000000b00000000000000004504a4df41c5ea1244cb530d000000003e8fb30a000000003f75b5e0000002350000000000000000006f000046f200000000001818050000001700000000000002bd00000000000002be00000000000002bf000000000000019c000000010000016800000062000000df000000000000003b00000003000000040000000700000059000000010000019f0000c350000001a0776b95780000002a0000797e0000003d0000006f0000000800004650000000220000003c0000001b52656d61696e73206f66205268696e6f6d616e204d6f74686572000000000200000032000003f100000003000007e20000cf2738f46cbe0000000400000000000000010000000000000000000000000000000000000000000001f700000001000000040000798a000000000000c350776b9578000017a600000000000000000000000000000001000000000000000000000002000000000000000000000003000000000000000000000004000000000000000000000000");
-            string corpseName = "Remains of " + target.Name;
-            byte[] nameBytes = Encoding.ASCII.GetBytes(corpseName);
-            int encodedNameLength = nameBytes.Length + 1;
-            // CorpseFullUpdate resumes immediately after the encoded string's trailing null.
-            // Padding this to four bytes shifts the animation/identity tail and the client
-            // never registers the spawned corpse dynel.
-            int newSuffixOffset = nameOffset + encodedNameLength;
-            int afterNameDelta = newSuffixOffset - originalSuffixOffset;
-            byte[] buffer = new byte[template.Length + afterNameDelta];
-
-            Buffer.BlockCopy(template, 0, buffer, 0, nameOffset);
-            Buffer.BlockCopy(nameBytes, 0, buffer, nameOffset, nameBytes.Length);
-            Buffer.BlockCopy(
-                template,
-                originalSuffixOffset,
-                buffer,
-                newSuffixOffset,
-                template.Length - originalSuffixOffset);
-
-            WritePacketLength(buffer, buffer.Length);
-            WriteInt32(buffer, 8, this.server.Id);
-            WriteInt32(buffer, 12, receiver.Instance);
-            WriteInt32(buffer, 24, corpseIdentity.Instance);
-            WriteSingle(buffer, 45, target.RawCoordinates.X);
-            WriteSingle(buffer, 49, target.RawCoordinates.Y);
-            WriteSingle(buffer, 53, target.RawCoordinates.Z);
-            WriteInt32(buffer, 73, target.Playfield.Identity.Instance);
-            WriteInt32(buffer, 143, target.Stats[StatIds.monsterscale].Value);
-            WriteInt32(buffer, 159, target.Stats[StatIds.sex].Value);
-            WriteInt32(buffer, 167, target.Stats[StatIds.breed].Value);
-            WriteInt32(buffer, 175, target.Stats[StatIds.race].Value);
-            int corpseCatMesh = CorpseCatMeshFor(target);
-            int corpseMonsterData = CorpseMonsterDataFor(target);
-            WriteInt32(buffer, 191, target.Identity.Instance);
-            WriteInt32(buffer, 199, corpseCatMesh);
-            WriteInt32(buffer, nameLengthOffset, encodedNameLength);
-            WriteInt32(buffer, 330 + afterNameDelta, corpseMonsterData);
-            WriteInt32(buffer, 342 + afterNameDelta, target.Identity.Instance);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Error,
-                string.Format(
-                    "CorpseFullUpdate visual target={0} corpse={1} catMesh={2} monsterData={3} scale={4} sex={5} breed={6} race={7}",
-                    target.Identity,
-                    corpseIdentity,
-                    corpseCatMesh,
-                    corpseMonsterData,
-                    target.Stats[StatIds.monsterscale].Value,
-                    target.Stats[StatIds.sex].Value,
-                    target.Stats[StatIds.breed].Value,
-                    target.Stats[StatIds.race].Value));
-
-            return buffer;
-        }
-
         private bool CanBuildKnownCorpseVisual(ICharacter target)
         {
             return CombatCorpseVisuals.IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
@@ -2091,54 +2049,6 @@ namespace CellAO.Core.Playfields
             return CombatCorpseVisuals.CorpseMonsterDataFor(
                 target.Stats[StatIds.monsterdata].Value,
                 CorpseCatMeshFor(target));
-        }
-
-        private static byte[] HexToBytes(string hex)
-        {
-            byte[] bytes = new byte[hex.Length / 2];
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
-            }
-
-            return bytes;
-        }
-
-        private static void WriteInt32(byte[] buffer, int offset, int value)
-        {
-            byte[] bytes = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(value));
-            Buffer.BlockCopy(bytes, 0, buffer, offset, bytes.Length);
-        }
-
-        private static void WritePacketLength(byte[] buffer, int length)
-        {
-            buffer[6] = (byte)((length >> 8) & 0xff);
-            buffer[7] = (byte)(length & 0xff);
-        }
-
-        private static void WriteSingle(byte[] buffer, int offset, float value)
-        {
-            byte[] bytes = BitConverter.GetBytes(value);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes);
-            }
-
-            Buffer.BlockCopy(bytes, 0, buffer, offset, bytes.Length);
-        }
-
-        private static void WriteFixedAscii(byte[] buffer, int offset, int length, string value)
-        {
-            for (int i = 0; i < length; i++)
-            {
-                buffer[offset + i] = 0;
-            }
-
-            int count = Math.Min(value.Length, length - 1);
-            for (int i = 0; i < count; i++)
-            {
-                buffer[offset + i] = (byte)value[i];
-            }
         }
 
         private void StopFightingDeadTarget(Identity deadTarget)

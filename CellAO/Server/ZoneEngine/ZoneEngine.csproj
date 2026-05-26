@@ -197,6 +197,7 @@
     <Compile Include="Core\PacketHandlers\OrgClient.cs" />
     <Compile Include="Core\PacketHandlers\TradeSkillReceiver.cs" />
     <Compile Include="Core\Packets\Bulk.cs" />
+    <Compile Include="Core\Packets\CorpseFullUpdate.cs" />
     <Compile Include="Core\Packets\Equip.cs" />
     <Compile Include="Core\Packets\SimpleCharFullUpdate.cs" />
     <Compile Include="Core\Packets\Stat.cs" />
