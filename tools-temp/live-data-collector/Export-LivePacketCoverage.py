@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -54,6 +55,16 @@ def read_csv(path: Path) -> list[dict[str, Any]]:
         return list(csv.DictReader(handle))
 
 
+def read_capture_meta(capture_dir: Path) -> dict[str, Any]:
+    path = capture_dir / "capture_meta.json"
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8-sig"))
+    except json.JSONDecodeError:
+        return {}
+
+
 def collect_counts(capture_dir: Path) -> dict[str, Counter[str]]:
     counts: dict[str, Counter[str]] = {}
     for direction, filename in (("c2s", "ao_frames.csv"), ("s2c", "s2c_frames.csv")):
@@ -63,6 +74,42 @@ def collect_counts(capture_dir: Path) -> dict[str, Counter[str]]:
                 continue
             counts.setdefault(name, Counter())[direction] += 1
     return counts
+
+
+def classify_capture(capture_dir: Path, counts: dict[str, Counter[str]]) -> dict[str, str]:
+    meta = read_capture_meta(capture_dir)
+    label = str(meta.get("label") or meta.get("capture_type") or "").lower()
+    filter_mode = str(meta.get("filter_mode_used") or "").lower()
+    server_host = str(meta.get("server_host") or meta.get("server_ip") or "").lower()
+    path_text = str(capture_dir).lower()
+    c2s_total = sum(counter["c2s"] for counter in counts.values())
+    s2c_total = sum(counter["s2c"] for counter in counts.values())
+
+    if "live-official" in label or "live-official" in filter_mode or "37.18." in server_host:
+        source = "official_live"
+    elif "private" in label or "private" in path_text or "199.241.136.157" in server_host:
+        source = "private_server_199"
+    else:
+        source = "unknown"
+
+    if s2c_total == 0 and c2s_total > 0:
+        authority = "c2s_only_request_flow"
+        note = "Use this capture for client request/order evidence only; absence of S2C packets is not evidence that a server packet is missing or unused."
+    elif source == "official_live":
+        authority = "official_live_full_duplex"
+        note = "Use this capture as official live evidence for both client requests and server responses."
+    elif source == "private_server_199":
+        authority = "private_server_response_flow"
+        note = "Use this capture for rich S2C response shape/timing, but keep it labeled as private-server evidence."
+    else:
+        authority = "unclassified_capture"
+        note = "Capture source is not classified; verify server and direction coverage before using it as source-of-truth evidence."
+
+    return {
+        "capture_source": source,
+        "coverage_authority": authority,
+        "authority_note": note,
+    }
 
 
 def implementation_lookup(repo_root: Path) -> tuple[dict[str, Path], dict[str, Path], dict[str, Path]]:
@@ -110,6 +157,7 @@ def relative(path: Path | None, repo_root: Path) -> str:
 
 def build_rows(capture_dir: Path, repo_root: Path) -> list[dict[str, Any]]:
     counts = collect_counts(capture_dir)
+    capture_authority = classify_capture(capture_dir, counts)
     handlers, builders, message_models = implementation_lookup(repo_root)
     rows: list[dict[str, Any]] = []
 
@@ -142,6 +190,8 @@ def build_rows(capture_dir: Path, repo_root: Path) -> list[dict[str, Any]]:
                 "packet_builder_file": relative(builder_path, repo_root),
                 "message_model_file": relative(message_model_path, repo_root),
                 "notes": IMPORTANT_PACKET_NOTES.get(name, ""),
+                "capture_source": capture_authority["capture_source"],
+                "coverage_authority": capture_authority["coverage_authority"],
             }
         )
 
@@ -160,6 +210,8 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "packet_builder_file",
         "message_model_file",
         "notes",
+        "capture_source",
+        "coverage_authority",
     ]
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
@@ -168,6 +220,8 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
 
 
 def write_markdown(path: Path, rows: list[dict[str, Any]], capture_dir: Path) -> None:
+    counts = collect_counts(capture_dir)
+    capture_authority = classify_capture(capture_dir, counts)
     missing = [row for row in rows if row["status"] == "missing"]
     partial = [row for row in rows if row["status"] in {"handler", "packet_builder"}]
     message_model_only = [row for row in rows if row["status"] == "message_model_only"]
@@ -178,11 +232,20 @@ def write_markdown(path: Path, rows: list[dict[str, Any]], capture_dir: Path) ->
         "# Live Packet Coverage",
         "",
         f"- Capture: `{capture_dir}`",
+        f"- Capture source: **{capture_authority['capture_source']}**",
+        f"- Coverage authority: **{capture_authority['coverage_authority']}**",
+        f"- Authority note: {capture_authority['authority_note']}",
         f"- Observed packet families: **{len(rows)}**",
         f"- Handler and packet builder: **{len(implemented)}**",
         f"- Partial server implementation: **{len(partial)}**",
         f"- Message model only: **{len(message_model_only)}**",
         f"- No local model/server match: **{len(missing)}**",
+        "",
+        "## Interpretation Guardrails",
+        "",
+        "- `official_live` captures are official-client/server evidence, but only for directions that decoded into frames.",
+        "- `c2s_only_request_flow` captures prove client request order and payloads; do not use them to mark S2C packet families as absent or unnecessary.",
+        "- `private_server_199` captures are useful for rich S2C packet shape and timing, but keep that source label attached when turning observations into CellAO changes.",
         "",
         "## Important Missing Or Externalized Packets",
     ]

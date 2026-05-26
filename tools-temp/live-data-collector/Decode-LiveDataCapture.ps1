@@ -63,6 +63,8 @@ $packetCoverageRows = @((Import-Csv -LiteralPath (Join-Path $CaptureDir "live_pa
 $packetCoverageRowCount = $packetCoverageRows.Count
 $packetCoverageMissingCount = @($packetCoverageRows | Where-Object { $_.status -eq "missing" }).Count
 $packetCoverageModelOnlyCount = @($packetCoverageRows | Where-Object { $_.status -eq "message_model_only" }).Count
+$packetCoverageSource = if ($packetCoverageRows.Count -gt 0) { [string]$packetCoverageRows[0].capture_source } else { "none" }
+$packetCoverageAuthority = if ($packetCoverageRows.Count -gt 0) { [string]$packetCoverageRows[0].coverage_authority } else { "none" }
 $combatLootTimelineRowCount = @((Import-Csv -LiteralPath (Join-Path $CaptureDir "live_combat_loot_timeline.csv") -ErrorAction SilentlyContinue)).Count
 $corpseSessionRowCount = @((Import-Csv -LiteralPath (Join-Path $CaptureDir "live_corpse_sessions.csv") -ErrorAction SilentlyContinue)).Count
 
@@ -84,6 +86,8 @@ $lines = @(
     "- Packet coverage rows: $packetCoverageRowCount",
     "- Packet coverage missing: $packetCoverageMissingCount",
     "- Packet coverage message-model-only: $packetCoverageModelOnlyCount",
+    "- Packet coverage source: $packetCoverageSource",
+    "- Packet coverage authority: $packetCoverageAuthority",
     "- Combat/loot timeline rows: $combatLootTimelineRowCount",
     "- Corpse session rows: $corpseSessionRowCount",
     "",
@@ -121,6 +125,8 @@ $meta | Add-Member -NotePropertyName decode_counts -NotePropertyValue ([pscustom
     packet_coverage_rows = $packetCoverageRowCount
     packet_coverage_missing = $packetCoverageMissingCount
     packet_coverage_message_model_only = $packetCoverageModelOnlyCount
+    packet_coverage_source = $packetCoverageSource
+    packet_coverage_authority = $packetCoverageAuthority
     combat_loot_timeline_rows = $combatLootTimelineRowCount
     corpse_session_rows = $corpseSessionRowCount
 }) -Force

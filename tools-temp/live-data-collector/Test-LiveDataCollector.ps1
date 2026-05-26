@@ -2,6 +2,7 @@ param(
     [string]$RepoRoot = "C:\Users\Mike\Documents\Cellao-Clean",
     [string]$Python = "python",
     [string]$KnownCaptureDir = "C:\Users\Mike\Documents\Cellao-Clean\tools-temp\live-pcaps\private-server-quest-batch\2026-05-10_23-44-53",
+    [string]$OfficialC2SOnlyCaptureDir = "C:\Users\Mike\Documents\Cellao-Clean\tools-temp\live-pcaps\live-official-weapon-equip\2026-05-24_22-09-21",
     [switch]$SkipKnownCapture
 )
 
@@ -70,6 +71,7 @@ if (-not $SkipKnownCapture) {
         Assert-True ($s2cRows.Count -ge 1000) "Expected at least 1000 S2C rows from known capture"
         Assert-True ($c2sRows.Count -ge 100) "Expected at least 100 C2S rows from known capture"
         Assert-True ($coverageRows.Count -ge 30) "Expected at least 30 packet coverage rows from known capture"
+        Assert-True ($null -ne ($coverageRows | Where-Object { $_.capture_source -eq "private_server_199" -and $_.coverage_authority -eq "private_server_response_flow" } | Select-Object -First 1)) "Expected known private-server capture to be labeled as private-server response-flow evidence"
         Assert-True ($null -ne ($coverageRows | Where-Object { $_.packet_name -eq "AttackInfo" -and $_.status -eq "message_model_only" -and $_.message_model_file -match "AttackInfoMessage.cs" } | Select-Object -First 1)) "Expected AttackInfo coverage to find its AOtomation message model"
         Assert-True ($null -ne ($coverageRows | Where-Object { $_.packet_name -eq "CorpseFullUpdate" -and $_.status -eq "message_model_only" -and $_.message_model_file -match "CorpseFullUpdateMessage.cs" } | Select-Object -First 1)) "Expected CorpseFullUpdate coverage to find its AOtomation message model"
         Assert-True ($timelineRows.Count -ge 300) "Expected at least 300 combat/loot timeline rows from known capture"
@@ -82,6 +84,14 @@ if (-not $SkipKnownCapture) {
     }
     else {
         Write-Warning "Known capture not found, skipping replay test: $KnownCaptureDir"
+    }
+
+    if (Test-Path -LiteralPath $OfficialC2SOnlyCaptureDir) {
+        & $Python (Join-Path $collectorRoot "Export-LivePacketCoverage.py") $OfficialC2SOnlyCaptureDir --repo-root $RepoRoot
+        Assert-True ($LASTEXITCODE -eq 0) "Official C2S-only coverage export failed"
+        $officialCoverageRows = @((Import-Csv -LiteralPath (Join-Path $OfficialC2SOnlyCaptureDir "live_packet_coverage.csv")))
+        Assert-True ($null -ne ($officialCoverageRows | Where-Object { $_.capture_source -eq "official_live" -and $_.coverage_authority -eq "c2s_only_request_flow" } | Select-Object -First 1)) "Expected official weapon capture to be labeled as C2S-only request-flow evidence"
+        Assert-True ($null -eq ($officialCoverageRows | Where-Object { [int]$_.s2c_count -gt 0 } | Select-Object -First 1)) "Official C2S-only capture should not claim decoded S2C coverage"
     }
 }
 

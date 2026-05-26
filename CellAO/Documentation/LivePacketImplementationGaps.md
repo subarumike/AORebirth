@@ -8,13 +8,25 @@ Capture used:
 - Decoded counts: 5812 packets, 536 C2S frames, 1498 S2C frames, 5 clean quest rows.
 - Loot-focused comparison capture: `tools-temp\live-pcaps\private-server-loot\2026-05-10_22-35-30`
 - Loot capture counts: 7377 packets, 846 C2S frames, 6839 S2C frames, 26 loot body rows, 72 loot drop rows.
+- Official weapon equip request-flow capture: `tools-temp\live-pcaps\live-official-weapon-equip\2026-05-24_22-09-21`
+- Official weapon capture counts: 195 packets, 14 decoded C2S frames, 0 decoded S2C frames.
+
+## Source Authority
+
+Treat capture authority as part of every packet observation:
+
+- `official_live` + `c2s_only_request_flow` proves official client request order/payloads only. It must not be used to claim that server-to-client packets are absent, missing, or unnecessary.
+- `private_server_199` + `private_server_response_flow` is useful for rich server-response shapes and timing, but keep it labeled as private-server evidence before changing CellAO behavior.
+- Only an `official_live_full_duplex` capture should settle both official C2S request flow and official S2C response flow in one pass.
 
 ## Capture Pattern
 
-The useful live quest/combat/loot packet families from this capture are:
+The useful private-server quest/combat/loot packet families from the rich S2C captures are:
 
 - C2S: `Attack`, `LookAt`, `CharacterAction`, `GenericCmd`, `ClientMoveItemToInventory`, `KnuBotOpenChatWindow`, `KnuBotAnswer`, `KnuBotCloseChatWindow`, `StopFight`.
 - S2C: `SimpleCharFullUpdate`, `Stat`, `Despawn`, `AttackInfo`, `StopFight`, `Attack`, `CorpseFullUpdate`, `HealthDamage`, `QuestFullUpdate`, `Quest`, `Feedback`, `ChatText`, `ContainerAddItem`, `InventoryUpdate`, `NewLevel`, `KnuBot*`.
+
+The official weapon equip capture currently proves only C2S order: corpse `GenericCmd Use`, `ClientMoveItemToInventory` equip to slot 6, `CharacterAction`, `LookAt`, `Attack`, then unequip from weapon page slot 6 to inventory placement 111. It does not provide official S2C response evidence.
 
 The first clean `QuestFullUpdate` after login replayed active one-shot missions already in the mission window. It should not be treated as a quest-start packet. Later clean `QuestFullUpdate` rows are objective progress or completion updates.
 
@@ -70,4 +82,4 @@ The decode pipeline also writes:
 - `live_corpse_sessions.csv`
 - `live_combat_loot_timeline.md`
 
-The current known capture reports 44 observed packet families. Use `live_packet_coverage.md` to split those into full server matches, partial server matches, message-model-only packets, and packets with no local model/server match.
+The current known private-server capture reports 44 observed packet families. Use `live_packet_coverage.md` to split those into full server matches, partial server matches, message-model-only packets, and packets with no local model/server match. Also check `capture_source` and `coverage_authority` before deciding whether a row is official request evidence, private-server response evidence, or full-duplex official evidence.
