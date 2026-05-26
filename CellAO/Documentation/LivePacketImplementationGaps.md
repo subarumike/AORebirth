@@ -35,6 +35,7 @@ The first clean `QuestFullUpdate` after login replayed active one-shot missions 
 - `Attack`: `Core\MessageHandlers\AttackMessageHandler.cs` accepts the Q attack toggle, sets target/fighting target, and echoes attack state to the playfield. It does not itself perform swing timing or damage.
 - `GenericCmd Use`: `Core\MessageHandlers\GenericCmdMessageHandler.cs` now routes corpse use through `TryUseCorpse` / `TryUseDeadNpcCorpse` and acknowledges corpse use with the routed corpse identity.
 - `ClientMoveItemToInventory`: `Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs` routes loot-window item moves through `TryLootCorpseItem`.
+- Empty opened/looted corpse cleanup now uses the capture-backed short delay of roughly three seconds after the last open or item move.
 - `SimpleCharFullUpdate`: `Core\Packets\SimpleCharFullUpdate.cs` is the main visible NPC/mob spawn packet. NPC data depends on `NPCFamily`, `LosHeight`, `MonsterData`, health, level, and movement bytes.
 - `Stat`, `ChatText`, `Feedback`, `ContainerAddItem`, `InventoryUpdate`, `Despawn`, `StopFight`, and `KnuBot*` have message-handler classes present.
 
