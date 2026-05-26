@@ -373,14 +373,13 @@ namespace ZoneEngine.Core
                     // Remove reference of character
                     if ((this.Controller != null) && (this.Controller.Character != null))
                     {
-                        // Commenting this for now, since no logouttimer should occur on zoning, only on a network disconnect (like a client crash)
-                        // only how should i find out..... - Algorithman
-                        /*
-                    if (this.character.Stats[StatIds.gmlevel].Value == 0)
-                    {
-                        this.character.StartLogoutTimer();
-                    }
-                     */
+                        if (!this.Controller.Character.InLogoutTimerPeriod())
+                        {
+                            this.Controller.Character.EnterLogoutSitPosture();
+                            this.Controller.State = CharacterState.Idle;
+                            this.Controller.Character.StartLogoutTimer();
+                        }
+
                         //if (this == this.character.Client)
                         // {
                         //this.character.Client = null;

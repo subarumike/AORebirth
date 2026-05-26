@@ -192,6 +192,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
                     // If action == Logout
                     this.ApplySit(client);
+                    this.SendStartLogout(client.Controller.Character);
 
                     // Start 30 second logout timer if client is not a GM (statid 215)
                     if (client.Controller.Character.Stats[StatIds.gmlevel].Value == 0)
@@ -688,9 +689,8 @@ namespace ZoneEngine.Core.MessageHandlers
         private void ApplySit(IZoneClient client)
         {
             ICharacter character = client.Controller.Character;
-            character.StopMovement();
+            character.EnterLogoutSitPosture();
             client.Controller.State = CharacterState.Idle;
-            character.UpdateMoveType(30);
             this.SendPostureMove(character, 30);
             SimpleCharFullUpdate.SendToPlayfield(client.Controller.Client);
         }
@@ -716,9 +716,28 @@ namespace ZoneEngine.Core.MessageHandlers
 
             if (character.InLogoutTimerPeriod())
             {
+                this.SendStopLogout(character);
                 this.Send(character, this.StopLogout(character), true);
                 character.StopLogoutTimer();
             }
+        }
+
+        private void SendStartLogout(ICharacter character)
+        {
+            character.Controller.Client.SendCompressed(
+                new StartLogoutMessage
+                    {
+                        Identity = character.Identity
+                    });
+        }
+
+        private void SendStopLogout(ICharacter character)
+        {
+            character.Controller.Client.SendCompressed(
+                new StopLogoutMessage
+                    {
+                        Identity = character.Identity
+                    });
         }
 
         private void SendPostureMove(ICharacter character, byte moveType)

@@ -38,6 +38,7 @@ The first clean `QuestFullUpdate` after login replayed active one-shot missions 
 - Empty opened/looted corpse cleanup now uses the capture-backed short delay of roughly three seconds after the last open or item move.
 - `SimpleCharFullUpdate`: `Core\Packets\SimpleCharFullUpdate.cs` is the main visible NPC/mob spawn packet. NPC data depends on `NPCFamily`, `LosHeight`, `MonsterData`, health, level, and movement bytes.
 - `Stat`, `ChatText`, `Feedback`, `ContainerAddItem`, `InventoryUpdate`, `Despawn`, `StopFight`, and `KnuBot*` have message-handler classes present.
+- Timed logout now uses the recovered identity-only `StartLogout` / `StopLogout` N3 packet models from the local AO stripdown evidence. The first close-box logout path sits the character, sends `StartLogout`, and starts the 30-second server timer; a hard socket close preserves/enters the same seated logout posture if normal logout did not already start.
 
 ## Important Gaps
 

@@ -119,6 +119,8 @@ namespace CellAO.Core.Entities
         /// </summary>
         void UpdateMoveType(byte moveType);
 
+        void EnterLogoutSitPosture();
+
         /// <summary>
         /// </summary>
         bool InLogoutTimerPeriod();

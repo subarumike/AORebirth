@@ -771,6 +771,16 @@ namespace CellAO.Core.Entities
             // Console.WriteLine((moveDirection != 0 ? moveMode.ToString() : "Stand") + "ing in the direction " + moveDirection.ToString() + (spinDirection != 0 ? " while spinning " + spinDirection.ToString() : "") + (strafeDirection != 0 ? " and strafing " + strafeDirection.ToString() : ""));
         }
 
+        public void EnterLogoutSitPosture()
+        {
+            this.StopMovement();
+            this.UpdateMoveType(30);
+            this.Stats[StatIds.state].Value = 0;
+            this.Stats[StatIds.state].BaseValue = 0;
+            this.Stats[StatIds.currentstate].Value = 0;
+            this.Stats[StatIds.currentstate].BaseValue = 0;
+        }
+
         /// <summary>
         /// </summary>
         public void StopMovement()

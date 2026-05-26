@@ -155,10 +155,14 @@ $baseInventorySource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\S
 $playfieldSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\Playfields\Playfield.cs')
 $spawnCommandSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ChatCommands\Spawn.cs')
 $attackMessageSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\AttackMessageHandler.cs')
+$characterActionSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\CharacterActionMessageHandler.cs')
+$zoneClientSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\ZoneClient.cs')
 $npcControllerSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\Controllers\NPCController.cs')
 $npcAiProfileSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\NpcAiProfile.cs')
 $giveItemCommandSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ChatCommands\ChatCommandGiveItem.cs')
 $zoneProjectSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ZoneEngine.csproj')
+$messagingProjectSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\SmokeLounge.AOtomation.Messaging.csproj')
+$messagingSerializerSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\Serialization\SerializerResolverBuilder.cs')
 $zoneEnemyHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbZoneEnemyHints.csv'
 $npcTemplateHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbNpcTemplateHints.csv'
 $enemyCoveragePath = Join-Path $repoRoot 'CellAO\Documentation\ClientHintedEnemyCoverage.csv'
@@ -180,6 +184,13 @@ Assert-SourceMatch $clientConnectedSource 'Stats\s*\[\s*stat\s*\]\.Value\s*=\s*v
 Assert-SourceMatch $clientConnectedSource 'Stats\s*\[\s*stat\s*\]\.BaseValue\s*=\s*\(uint\)\s*value\s*;' 'Login SetStat helper should update the live stat base value.'
 Assert-SourceMatch $characterSource 'Read\s*\(\s*\).*?this\.BaseInventory\.Read\s*\(\s*\)\s*;\s*base\.Read\s*\(\s*\)' 'Character login should reload persisted inventory before derived stats and appearance are rebuilt.'
 Assert-SourceMatch $characterSource 'Write\s*\(\s*\).*?this\.BaseInventory\.Write\s*\(\s*\)' 'Character logout/save should persist equipped inventory pages.'
+Assert-SourceMatch $characterSource 'EnterLogoutSitPosture\s*\(\s*\).*?StopMovement\s*\(\s*\).*?UpdateMoveType\s*\(\s*30\s*\).*?StatIds\.state.*?StatIds\.currentstate' 'Logout posture should use the same sit move type and reset actionable state before saving or timer logout.'
+Assert-SourceMatch $characterActionSource 'case\s+CharacterActionType\.Logout:.*?ApplySit\s*\(\s*client\s*\).*?SendStartLogout\s*\(\s*client\.Controller\.Character\s*\).*?StartLogoutTimer\s*\(\s*\)' 'First X/logout should sit the character, send StartLogout, and start the timed logout.'
+Assert-SourceMatch $characterActionSource 'SendStartLogout\s*\(ICharacter\s+character\).*?new\s+StartLogoutMessage.*?Identity\s*=\s*character\.Identity' 'Timed logout start should send the recovered identity-only StartLogout N3 packet.'
+Assert-SourceMatch $characterActionSource 'SendStopLogout\s*\(ICharacter\s+character\).*?new\s+StopLogoutMessage.*?Identity\s*=\s*character\.Identity' 'Logout cancel should send the recovered identity-only StopLogout N3 packet.'
+Assert-SourceMatch $zoneClientSource 'Dispose\s*\(bool\s+disposing\).*?!this\.Controller\.Character\.InLogoutTimerPeriod\s*\(\s*\).*?EnterLogoutSitPosture\s*\(\s*\).*?StartLogoutTimer\s*\(\s*\)' 'Hard network disconnect should enter seated logout state and start the timer when normal logout did not already do it.'
+Assert-SourceMatch $messagingProjectSource 'Messages\\N3Messages\\StartLogoutMessage\.cs.*?Messages\\N3Messages\\StopLogoutMessage\.cs.*?Serialization\\Serializers\\Custom\\IdentityOnlyN3MessageSerializer\.cs' 'Messaging project should compile the recovered identity-only logout packet models and serializer.'
+Assert-SourceMatch $messagingSerializerSource 'typeof\s*\(\s*StartLogoutMessage\s*\).*?IdentityOnlyN3MessageSerializer.*?typeof\s*\(\s*StopLogoutMessage\s*\).*?IdentityOnlyN3MessageSerializer' 'StartLogout/StopLogout should use the identity-only serializer instead of the generic N3 unknown-byte layout.'
 Assert-SourceMatch $clientConnectedSource 'Packets\.WeaponItemFullUpdate\.SendWeaponDefinitions\s*\(\s*client\.Controller\.Character\s*\)\s*;\s*FullCharacterMessageHandler\.Default\.Send' 'Login should send persisted equipped weapon definitions before FullCharacter.'
 Assert-SourceMatch $clientConnectedSource 'CalculateSkills\s*\(\s*\)\s*;\s*ClientMoveItemToInventoryMessageHandler\.EnsureWeaponVisualMeshes\s*\(\s*client\.Controller\.Character\s*,\s*false\s*\)\s*;\s*AppearanceUpdateMessageHandler\.Default\.Send' 'Login should follow persisted equipment -> CalculateSkills -> EnsureWeaponVisualMeshes(false) -> AppearanceUpdate.'
 Assert-SourceMatch $clientMoveItemSource 'public\s+static\s+void\s+EnsureWeaponVisualMeshes\s*\(\s*ICharacter\s+character\s*,\s*bool\s+announceAppearanceUpdate\s*\)' 'Weapon mesh repair should be reusable by login and manual equip paths.'
