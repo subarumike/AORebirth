@@ -492,7 +492,7 @@ Filter will be applied to mob name"));
             int corpseCount = 0;
             if (playfield != null)
             {
-                corpseCount = playfield.DespawnDebugCorpses(
+                corpseCount = playfield.DespawnCorpses(
                     (name, deadNpc) => CombatTestMobArchetype.IsCombatTestCorpseName(name));
             }
 

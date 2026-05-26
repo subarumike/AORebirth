@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2014, CellAO Team
 // 
@@ -117,15 +117,15 @@ namespace CellAO.Core.Playfields
 
         private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
 
-        private readonly Dictionary<int, DateTime> debugCorpseDespawnTicks = new Dictionary<int, DateTime>();
+        private readonly Dictionary<int, DateTime> corpseDespawnTicks = new Dictionary<int, DateTime>();
 
-        private readonly Dictionary<int, DebugCorpseState> debugCorpses = new Dictionary<int, DebugCorpseState>();
+        private readonly Dictionary<int, CorpseState> corpses = new Dictionary<int, CorpseState>();
 
-        private readonly Dictionary<int, DebugCorpseState> pendingDebugCorpseSpawns = new Dictionary<int, DebugCorpseState>();
+        private readonly Dictionary<int, CorpseState> pendingCorpseSpawns = new Dictionary<int, CorpseState>();
 
-        private int nextDebugCorpseInstance = 0x00F0F000;
+        private int nextCorpseInstance = 0x00F0F000;
 
-        private int nextDebugCorpseInventorySlot = 0x78;
+        private int nextCorpseInventorySlot = 0x78;
 
         private const int DefaultNpcDeathAnimationKey = 0x1F7;
 
@@ -432,7 +432,7 @@ namespace CellAO.Core.Playfields
             }
 
             this.StopFightingDeadTarget(target.Identity);
-            this.pendingDebugCorpseSpawns.Remove(target.Identity.Instance);
+            this.pendingCorpseSpawns.Remove(target.Identity.Instance);
             this.FinalizeNpcDespawn(target);
         }
 
@@ -450,7 +450,7 @@ namespace CellAO.Core.Playfields
                 };
         }
 
-        public int DespawnDebugCorpses(Func<string, Identity, bool> shouldDespawn)
+        public int DespawnCorpses(Func<string, Identity, bool> shouldDespawn)
         {
             if (shouldDespawn == null)
             {
@@ -458,21 +458,21 @@ namespace CellAO.Core.Playfields
             }
 
             int removed = 0;
-            foreach (DebugCorpseState corpse in this.pendingDebugCorpseSpawns
+            foreach (CorpseState corpse in this.pendingCorpseSpawns
                 .Where(x => shouldDespawn(x.Value.Name, x.Value.DeadNpcIdentity))
                 .Select(x => x.Value)
                 .ToList())
             {
-                this.pendingDebugCorpseSpawns.Remove(corpse.DeadNpcIdentity.Instance);
+                this.pendingCorpseSpawns.Remove(corpse.DeadNpcIdentity.Instance);
                 removed++;
             }
 
-            foreach (int corpseInstance in this.debugCorpses
+            foreach (int corpseInstance in this.corpses
                 .Where(x => shouldDespawn(x.Value.Name, x.Value.DeadNpcIdentity))
                 .Select(x => x.Key)
                 .ToList())
             {
-                this.DespawnDebugCorpse(corpseInstance);
+                this.DespawnCorpse(corpseInstance);
                 removed++;
             }
 
@@ -995,8 +995,8 @@ namespace CellAO.Core.Playfields
         /// </param>
         private void HeartBeatTimer(object sender)
         {
-            this.ProcessPendingDebugCorpseSpawns();
-            this.ProcessDebugCorpseDespawns();
+            this.ProcessPendingCorpseSpawns();
+            this.ProcessCorpseDespawns();
 
             IEnumerable<IEntity> dynels = null;
             dynels =
@@ -1386,7 +1386,7 @@ namespace CellAO.Core.Playfields
             Identity corpseIdentity = Identity.None;
             if (this.CanBuildKnownCorpseVisual(target))
             {
-                corpseIdentity = this.AllocateDebugCorpseIdentity();
+                corpseIdentity = this.AllocateCorpseIdentity();
             }
 
             this.MarkNpcDead(target);
@@ -1394,7 +1394,7 @@ namespace CellAO.Core.Playfields
             this.SendNpcDeathAnimation(target);
             if (corpseIdentity != Identity.None)
             {
-                this.ScheduleDebugCorpseSpawn(target, corpseIdentity);
+                this.ScheduleCorpseSpawn(target, corpseIdentity);
             }
             else
             {
@@ -1421,8 +1421,8 @@ namespace CellAO.Core.Playfields
                 return false;
             }
 
-            DebugCorpseState corpse;
-            if (!this.debugCorpses.TryGetValue(corpseIdentity.Instance, out corpse))
+            CorpseState corpse;
+            if (!this.corpses.TryGetValue(corpseIdentity.Instance, out corpse))
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
@@ -1430,7 +1430,7 @@ namespace CellAO.Core.Playfields
                         "CorpseUse reject unknown corpse={0} looter={1} registeredCount={2}",
                         corpseIdentity,
                         looter.Identity,
-                        this.debugCorpses.Count));
+                        this.corpses.Count));
                 return false;
             }
 
@@ -1439,7 +1439,7 @@ namespace CellAO.Core.Playfields
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
                     string.Format("CorpseUse reject expired corpse={0} looter={1}", corpseIdentity, looter.Identity));
-                this.DespawnDebugCorpse(corpseIdentity.Instance);
+                this.DespawnCorpse(corpseIdentity.Instance);
                 return false;
             }
 
@@ -1448,7 +1448,7 @@ namespace CellAO.Core.Playfields
 
             if (corpse.HasUnlootedItems)
             {
-                this.ExtendDebugCorpseLifetime(corpse, CombatCorpseRules.ItemLootCorpseLifetime, "corpse-use");
+                this.ExtendCorpseLifetime(corpse, CombatCorpseRules.ItemLootCorpseLifetime, "corpse-use");
                 if (corpse.NextUseSendsAccessActionOnly)
                 {
                     this.SendCorpseLootAccessAction(looter, corpse);
@@ -1472,7 +1472,7 @@ namespace CellAO.Core.Playfields
 
             if (!corpse.HasUnlootedItems)
             {
-                this.ScheduleDebugCorpseDespawn(
+                this.ScheduleCorpseDespawn(
                     corpse,
                     CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay,
                     "opened-empty");
@@ -1506,7 +1506,7 @@ namespace CellAO.Core.Playfields
                 return false;
             }
 
-            DebugCorpseState corpse = this.debugCorpses.Values.FirstOrDefault(
+            CorpseState corpse = this.corpses.Values.FirstOrDefault(
                 x => x.DeadNpcIdentity.Type == deadNpcIdentity.Type
                      && x.DeadNpcIdentity.Instance == deadNpcIdentity.Instance);
 
@@ -1518,7 +1518,7 @@ namespace CellAO.Core.Playfields
                         "DeadNpcCorpseUse reject unknown deadNpc={0} looter={1} registeredCount={2}",
                         deadNpcIdentity,
                         looter.Identity,
-                        this.debugCorpses.Count));
+                        this.corpses.Count));
                 return false;
             }
 
@@ -1541,7 +1541,7 @@ namespace CellAO.Core.Playfields
             }
 
             int corpseInventorySlot = (sourceContainer.Instance >> 16) & 0xffff;
-            DebugCorpseState corpse = this.debugCorpses.Values.FirstOrDefault(
+            CorpseState corpse = this.corpses.Values.FirstOrDefault(
                 x => x.InventorySlot == corpseInventorySlot);
 
             if (corpse == null)
@@ -1554,7 +1554,7 @@ namespace CellAO.Core.Playfields
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
                     string.Format("CorpseLoot reject expired corpse={0} looter={1}", corpse.CorpseIdentity, looter.Identity));
-                this.DespawnDebugCorpse(corpse.CorpseIdentity.Instance);
+                this.DespawnCorpse(corpse.CorpseIdentity.Instance);
                 return true;
             }
 
@@ -1572,7 +1572,7 @@ namespace CellAO.Core.Playfields
             }
 
             int requestedLootSlot = sourceContainer.Instance & 0xffff;
-            DebugCorpseLootItem lootItem = FindCorpseLootItem(corpse, requestedLootSlot);
+            CorpseLootItem lootItem = FindCorpseLootItem(corpse, requestedLootSlot);
             if (lootItem == null)
             {
                 LogUtil.Debug(
@@ -1668,14 +1668,14 @@ namespace CellAO.Core.Playfields
 
             if (!corpse.HasUnlootedItems)
             {
-                this.ScheduleDebugCorpseDespawn(
+                this.ScheduleCorpseDespawn(
                     corpse,
                     CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay,
                     "looted-empty");
             }
             else
             {
-                this.ExtendDebugCorpseLifetime(corpse, CombatCorpseRules.ItemLootCorpseLifetime, "loot-remaining");
+                this.ExtendCorpseLifetime(corpse, CombatCorpseRules.ItemLootCorpseLifetime, "loot-remaining");
             }
 
             LogUtil.Debug(
@@ -1773,7 +1773,7 @@ namespace CellAO.Core.Playfields
             LogUtil.Debug(DebugInfoDetail.Network, string.Format("NPC despawned target={0}", target.Identity));
         }
 
-        private void SendDebugCorpseFullUpdate(ICharacter target, Identity corpseIdentity)
+        private void SendCorpseFullUpdate(ICharacter target, Identity corpseIdentity)
         {
             int corpseCatMesh = CorpseCatMeshFor(target);
             int corpseMonsterData = CorpseMonsterDataFor(target);
@@ -1816,31 +1816,31 @@ namespace CellAO.Core.Playfields
             return CombatCorpseRules.LifetimeFor(lootClass);
         }
 
-        private static CombatCorpseLootClass CorpseLootClassFor(ICharacter target, IList<DebugCorpseLootItem> lootItems)
+        private static CombatCorpseLootClass CorpseLootClassFor(ICharacter target, IList<CorpseLootItem> lootItems)
         {
             // TODO: Add boss classification when real mob templates/loot tables are wired in.
             return CombatCorpseRules.LootClassFor(lootItems.Count, false);
         }
 
-        private void ProcessDebugCorpseDespawns()
+        private void ProcessCorpseDespawns()
         {
-            foreach (int corpseInstance in this.debugCorpseDespawnTicks
+            foreach (int corpseInstance in this.corpseDespawnTicks
                 .Where(x => x.Value <= DateTime.UtcNow)
                 .Select(x => x.Key)
                 .ToList())
             {
-                this.DespawnDebugCorpse(corpseInstance);
+                this.DespawnCorpse(corpseInstance);
             }
         }
 
-        private void ProcessPendingDebugCorpseSpawns()
+        private void ProcessPendingCorpseSpawns()
         {
-            foreach (DebugCorpseState corpse in this.pendingDebugCorpseSpawns
+            foreach (CorpseState corpse in this.pendingCorpseSpawns
                 .Where(x => x.Value.SpawnsAtUtc <= DateTime.UtcNow)
                 .Select(x => x.Value)
                 .ToList())
             {
-                this.pendingDebugCorpseSpawns.Remove(corpse.DeadNpcIdentity.Instance);
+                this.pendingCorpseSpawns.Remove(corpse.DeadNpcIdentity.Instance);
 
                 ICharacter target = this.FindByIdentity<ICharacter>(corpse.DeadNpcIdentity);
                 if (target == null)
@@ -1854,16 +1854,16 @@ namespace CellAO.Core.Playfields
                     continue;
                 }
 
-                this.RegisterDebugCorpse(target, corpse.CorpseIdentity);
-                this.SendDebugCorpseFullUpdate(target, corpse.CorpseIdentity);
+                this.RegisterCorpse(target, corpse.CorpseIdentity);
+                this.SendCorpseFullUpdate(target, corpse.CorpseIdentity);
             }
         }
 
-        private void ScheduleDebugCorpseSpawn(ICharacter target, Identity corpseIdentity)
+        private void ScheduleCorpseSpawn(ICharacter target, Identity corpseIdentity)
         {
             DateTime spawnsAtUtc = DateTime.UtcNow + CorpseSpawnDelay;
-            this.pendingDebugCorpseSpawns[target.Identity.Instance] =
-                new DebugCorpseState
+            this.pendingCorpseSpawns[target.Identity.Instance] =
+                new CorpseState
                 {
                     CorpseIdentity = corpseIdentity,
                     DeadNpcIdentity = target.Identity,
@@ -1881,25 +1881,25 @@ namespace CellAO.Core.Playfields
                     (int)CorpseSpawnDelay.TotalMilliseconds));
         }
 
-        private void RegisterDebugCorpse(ICharacter target, Identity corpseIdentity)
+        private void RegisterCorpse(ICharacter target, Identity corpseIdentity)
         {
-            List<DebugCorpseLootItem> lootItems = RollDebugCorpseLootItems(target);
+            List<CorpseLootItem> lootItems = RollCorpseLootItems(target);
             CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems);
             TimeSpan lifetime = CorpseLifetimeFor(lootClass);
             DateTime expiresAtUtc = DateTime.UtcNow + lifetime;
-            var state = new DebugCorpseState
+            var state = new CorpseState
             {
                 CorpseIdentity = corpseIdentity,
                 DeadNpcIdentity = target.Identity,
                 Name = "Remains of " + target.Name,
                 LootClass = lootClass,
                 LootItems = lootItems,
-                InventorySlot = this.AllocateDebugCorpseInventorySlot(),
+                InventorySlot = this.AllocateCorpseInventorySlot(),
                 ExpiresAtUtc = expiresAtUtc
             };
 
-            this.debugCorpses[corpseIdentity.Instance] = state;
-            this.debugCorpseDespawnTicks[corpseIdentity.Instance] = expiresAtUtc;
+            this.corpses[corpseIdentity.Instance] = state;
+            this.corpseDespawnTicks[corpseIdentity.Instance] = expiresAtUtc;
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
@@ -1911,20 +1911,20 @@ namespace CellAO.Core.Playfields
                     state.LootClass));
         }
 
-        private void DespawnDebugCorpse(int corpseInstance)
+        private void DespawnCorpse(int corpseInstance)
         {
             Identity corpseIdentity = new Identity { Type = IdentityType.Corpse, Instance = corpseInstance };
             this.Despawn(corpseIdentity);
-            this.debugCorpseDespawnTicks.Remove(corpseInstance);
-            this.debugCorpses.Remove(corpseInstance);
+            this.corpseDespawnTicks.Remove(corpseInstance);
+            this.corpses.Remove(corpseInstance);
             LogUtil.Debug(DebugInfoDetail.Engine, string.Format("Corpse despawned corpse={0}", corpseIdentity));
         }
 
-        private void ScheduleDebugCorpseDespawn(DebugCorpseState corpse, TimeSpan delay, string reason)
+        private void ScheduleCorpseDespawn(CorpseState corpse, TimeSpan delay, string reason)
         {
             DateTime expiresAtUtc = DateTime.UtcNow + delay;
             corpse.ExpiresAtUtc = expiresAtUtc;
-            this.debugCorpseDespawnTicks[corpse.CorpseIdentity.Instance] = expiresAtUtc;
+            this.corpseDespawnTicks[corpse.CorpseIdentity.Instance] = expiresAtUtc;
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
@@ -1936,7 +1936,7 @@ namespace CellAO.Core.Playfields
                     corpse.LootItems == null ? 0 : corpse.LootItems.Count(x => !x.Looted)));
         }
 
-        private void ExtendDebugCorpseLifetime(DebugCorpseState corpse, TimeSpan minimumRemaining, string reason)
+        private void ExtendCorpseLifetime(CorpseState corpse, TimeSpan minimumRemaining, string reason)
         {
             DateTime expiresAtUtc = DateTime.UtcNow + minimumRemaining;
             if (corpse.ExpiresAtUtc >= expiresAtUtc)
@@ -1945,7 +1945,7 @@ namespace CellAO.Core.Playfields
             }
 
             corpse.ExpiresAtUtc = expiresAtUtc;
-            this.debugCorpseDespawnTicks[corpse.CorpseIdentity.Instance] = expiresAtUtc;
+            this.corpseDespawnTicks[corpse.CorpseIdentity.Instance] = expiresAtUtc;
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
@@ -1957,7 +1957,7 @@ namespace CellAO.Core.Playfields
                     corpse.LootItems == null ? 0 : corpse.LootItems.Count(x => !x.Looted)));
         }
 
-        private class DebugCorpseState
+        private class CorpseState
         {
             public Identity CorpseIdentity { get; set; }
 
@@ -1973,7 +1973,7 @@ namespace CellAO.Core.Playfields
 
             public int InventorySlot { get; set; }
 
-            public List<DebugCorpseLootItem> LootItems { get; set; }
+            public List<CorpseLootItem> LootItems { get; set; }
 
             public bool Opened { get; set; }
 
@@ -1988,7 +1988,7 @@ namespace CellAO.Core.Playfields
             }
         }
 
-        private class DebugCorpseLootItem
+        private class CorpseLootItem
         {
             public int Slot { get; set; }
 
@@ -1997,27 +1997,27 @@ namespace CellAO.Core.Playfields
             public bool Looted { get; set; }
         }
 
-        private Identity AllocateDebugCorpseIdentity()
+        private Identity AllocateCorpseIdentity()
         {
-            this.nextDebugCorpseInstance++;
-            if (this.nextDebugCorpseInstance > 0x00F0FFFF)
+            this.nextCorpseInstance++;
+            if (this.nextCorpseInstance > 0x00F0FFFF)
             {
-                this.nextDebugCorpseInstance = 0x00F0F001;
+                this.nextCorpseInstance = 0x00F0F001;
             }
 
             return new Identity
             {
                 Type = IdentityType.Corpse,
-                Instance = this.nextDebugCorpseInstance
+                Instance = this.nextCorpseInstance
             };
         }
 
-        private int AllocateDebugCorpseInventorySlot()
+        private int AllocateCorpseInventorySlot()
         {
-            int slot = this.nextDebugCorpseInventorySlot++;
-            if (this.nextDebugCorpseInventorySlot > 0xff)
+            int slot = this.nextCorpseInventorySlot++;
+            if (this.nextCorpseInventorySlot > 0xff)
             {
-                this.nextDebugCorpseInventorySlot = 0x78;
+                this.nextCorpseInventorySlot = 0x78;
             }
 
             return slot;
@@ -2073,9 +2073,9 @@ namespace CellAO.Core.Playfields
             this.Announce(stopFight);
         }
 
-        private static List<DebugCorpseLootItem> RollDebugCorpseLootItems(ICharacter target)
+        private static List<CorpseLootItem> RollCorpseLootItems(ICharacter target)
         {
-            var lootItems = new List<DebugCorpseLootItem>();
+            var lootItems = new List<CorpseLootItem>();
 
             int monsterData = target.Stats[StatIds.monsterdata].Value;
             int npcFamily = target.Stats[StatIds.npcfamily].Value;
@@ -2110,7 +2110,7 @@ namespace CellAO.Core.Playfields
                     continue;
                 }
 
-                lootItems.Add(new DebugCorpseLootItem { Slot = lootItems.Count, Item = item });
+                lootItems.Add(new CorpseLootItem { Slot = lootItems.Count, Item = item });
             }
 
             LogUtil.Debug(
@@ -2345,7 +2345,7 @@ namespace CellAO.Core.Playfields
             return null;
         }
 
-        private static DebugCorpseLootItem FindCorpseLootItem(DebugCorpseState corpse, int requestedLootSlot)
+        private static CorpseLootItem FindCorpseLootItem(CorpseState corpse, int requestedLootSlot)
         {
             return CombatCorpseRules.FindLootItem(
                 corpse.LootItems,
@@ -2400,7 +2400,7 @@ namespace CellAO.Core.Playfields
             }
         }
 
-        private static InventoryEntry CreateCorpseInventoryEntry(DebugCorpseLootItem lootItem)
+        private static InventoryEntry CreateCorpseInventoryEntry(CorpseLootItem lootItem)
         {
             return new InventoryEntry
             {
@@ -2420,7 +2420,7 @@ namespace CellAO.Core.Playfields
             return CombatCorpseRules.InventoryEntryCountFor(item.MultipleCount);
         }
 
-        private void SendCorpseInventoryUpdate(ICharacter looter, DebugCorpseState corpse)
+        private void SendCorpseInventoryUpdate(ICharacter looter, CorpseState corpse)
         {
             if (looter.Controller.Client == null)
             {
@@ -2431,7 +2431,7 @@ namespace CellAO.Core.Playfields
                 ? new InventoryEntry[0]
                 : corpse.LootItems.Where(x => !x.Looted).Select(CreateCorpseInventoryEntry).ToArray();
 
-            corpse.InventorySlot = this.AllocateDebugCorpseInventorySlot();
+            corpse.InventorySlot = this.AllocateCorpseInventorySlot();
 
             looter.Controller.Client.SendCompressed(
                 new InventoryUpdateMessage
@@ -2457,7 +2457,7 @@ namespace CellAO.Core.Playfields
                     entries.Length));
         }
 
-        private void SendCorpseLootAccessAction(ICharacter looter, DebugCorpseState corpse)
+        private void SendCorpseLootAccessAction(ICharacter looter, CorpseState corpse)
         {
             if (looter.Controller.Client == null)
             {
