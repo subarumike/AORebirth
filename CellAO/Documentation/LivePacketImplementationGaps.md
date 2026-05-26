@@ -51,6 +51,42 @@ The first clean `QuestFullUpdate` after login replayed active one-shot missions 
 - The S2C stat parser must keep using the live layout: identity, one unknown/flags byte, count, then `count * (stat,value)`. Older offset assumptions decode reward and quest state incorrectly.
 - The live loot capture confirms the corpse-open path is corpse-session based: `CorpseFullUpdate`, C2S `GenericCmd Use` against the corpse identity, S2C `InventoryUpdate`, C2S `ClientMoveItemToInventory`, then later corpse `Despawn`.
 
+## AttackInfo Weapon Hit Values
+
+Do not change the local working combat packet fields just to chase these values. Current local weapon combat is visibly working, equips/fires correctly, and no duplicate `HealthDamage` text is present. Treat this section as comparison evidence for future visible/text combat bugs.
+
+Source authority:
+
+- Official weapon equip capture `tools-temp\live-pcaps\live-official-weapon-equip\2026-05-24_22-09-21`: `official_live` + `c2s_only_request_flow`, 0 decoded S2C `AttackInfo` rows.
+- Private-server loot/quest captures: `private_server_199` + `private_server_response_flow`, 190 decoded S2C `AttackInfo` rows.
+
+Observed private-server `AttackInfo` field combinations:
+
+| Rows | unknown2 | unknown3 | unknown4 | unknown5 | unknown6 | Notes |
+| ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 74 | -1 | 6 | 0 | 3 | 0 | Common player right-hand weapon hit. |
+| 18 | -1 | 6 | 4 | 3 | 0 | Player right-hand weapon hit variant. |
+| 2 | -1 | 6 | 0 | 4 | 0 | Player right-hand weapon hit variant, likely alternate hit result/crit text. |
+| 11 | -1 | 8 | 0 | 3 | 0 | Player left-hand or alternating dual-wield-style weapon hit. |
+| 1 | -1 | 8 | 4 | 3 | 0 | Left-hand/alternate weapon hit variant. |
+| 21 | -1 | 0 | 0 | 3 | 0 | Weapon/combat result with no hand slot in decoded field. |
+| 2 | -1 | 0 | 4 | 3 | 0 | No-slot variant. |
+| 1 | -1 | 0 | 0 | 4 | 0 | No-slot alternate hit result. |
+| 38 | 0 | 0 | 0 | 3 | 0 | NPC or non-player attack result. |
+| 17 | 0 | 1 | 0 | 3 | 0 | NPC or alternate attack result. |
+| 3 | 0 | 1 | 4 | 3 | 0 | NPC/alternate variant. |
+| 1 | 0 | 1 | 4 | 4 | 0 | NPC/alternate variant. |
+| 1 | 0 | 0 | 0 | 4 | 0 | NPC/alternate variant. |
+
+Current CellAO local sender in `Core\Playfields\Playfield.cs`:
+
+- `Unknown1`: calculated damage.
+- Equipped weapon: `Unknown2=40`, `Unknown3=<weapon page slot>`, `Unknown4=4`, `Unknown5=3`, `Unknown6=0`.
+- Unarmed/player fallback: `Unknown2=1`, `Unknown3=0`, `Unknown4=0`, `Unknown5=0`, `Unknown6=0`.
+- Unarmed/NPC fallback: `Unknown2=1`, `Unknown3=1`, `Unknown4=0`, `Unknown5=3`, `Unknown6=0`.
+
+Known difference: private-server player weapon hits commonly use `unknown2=-1`, `unknown3=6` or `8`, `unknown4=0` or `4`, and `unknown5=3` or `4`. Local still uses simplified values, especially `unknown2=40` for equipped weapons. Leave it alone unless a visible animation, hit text, crit text, miss text, or combat log bug appears.
+
 ## Safest Next Code Path
 
 1. Keep the capture tooling as source-of-truth validation: `tools-temp\live-data-collector\Test-LiveDataCollector.ps1`.
