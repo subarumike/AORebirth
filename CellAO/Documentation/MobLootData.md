@@ -20,17 +20,28 @@ Live captures are useful for validating the corpse and loot protocol, but they a
 
 ## Current Coverage
 
-The checked-in seed data and the local `cellao_codex_clean` database currently agree:
+The checked-in SQL seed currently has:
 
 - 168 mob templates exist.
-- 0 mob templates have configured `DropHashes`, `DropSlots`, or `DropRates`.
-- 25 `mobdroptable` rows exist.
-- 15 distinct drop group hashes exist.
+- 0 mob templates with configured `DropHashes`, `DropSlots`, or `DropRates`.
+- 25 `mobdroptable` rows.
+- 15 distinct drop group hashes.
 - All current `mobdroptable` item ids resolve through `itemnames` in `cellao_codex_clean`.
 
+The local `cellao_codex_clean` database currently has one extra reviewed low-level
+assignment:
+
+- 168 mob templates.
+- 1 mob template with configured drops: `A004` Beach Leet.
+- 29 `mobdroptable` rows.
+- 19 distinct drop group hashes.
+- `A004` points to `OBSA00400,OBSA00401,OBSA00402,OBSA00403` at rates
+  `1250,5000,2500,5000`.
+
 That means real DB-backed mob loot is modeled and now wired into the combat
-corpse roller, but the checked-in mob templates are still not populated with
-drop assignments. The working combat test path still uses deterministic
+corpse roller. The checked-in mob templates are still not populated with drop
+assignments, while the local DB can now exercise the fallback path through
+`A004`. The working combat test path still uses deterministic
 `CombatTestLootCatalog` entries first so corpse/loot behavior can be tested
 without random data.
 
@@ -39,6 +50,8 @@ Runtime behavior:
 - `CombatTestLootCatalog` remains the first match for Codex test mobs.
 - If no deterministic test entry matches, the corpse roller falls back to
   parsed `mobtemplate`/`mobdroptable` entries.
+- `/command spawn lootstatus` reports DB loot coverage and whether supported
+  population mob hashes have configured drops.
 - `DropRates` are interpreted as basis points (`10000` = 100.00%).
 - A comma-delimited `DropHashes` slot may use `+` to form a candidate union;
   one candidate item from that slot is chosen when the slot roll succeeds.
@@ -76,6 +89,7 @@ do not yet map cleanly to `mobtemplate`.
 
 ## Next Implementation Step
 
-Review the observed seed rows for low-level ICC Shuttleport mobs, choose a small
-approved set of drop assignments, then update only `cellao_codex_clean` or the
-checked-in SQL seed after explicit approval.
+Use `/command spawn lootstatus` before playtesting DB-backed loot. Then review
+the remaining observed seed rows for low-level ICC Shuttleport mobs, choose a
+small approved set of drop assignments, and update only `cellao_codex_clean` or
+the checked-in SQL seed after explicit approval.

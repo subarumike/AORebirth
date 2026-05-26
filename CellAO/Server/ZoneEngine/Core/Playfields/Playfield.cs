@@ -2091,6 +2091,18 @@ namespace CellAO.Core.Playfields
                 lootSource = "database";
             }
 
+            if (matchingEntries.Count == 0)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        "Loot roll found no configured table entries target={0} name={1} monsterData={2} npcFamily={3}",
+                        target.Identity,
+                        target.Name,
+                        monsterData,
+                        npcFamily));
+            }
+
             foreach (CombatLootTableEntry entry in matchingEntries)
             {
                 if (!RollLootChance(entry))

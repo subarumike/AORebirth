@@ -43,6 +43,7 @@ namespace ZoneEngine.ChatCommands
     using CellAO.Core.Playfields;
     using CellAO.Core.Vector;
     using CellAO.Database.Dao;
+    using CellAO.Database.Entities;
     using CellAO.Enums;
     using CellAO.ObjectManager;
 
@@ -101,6 +102,7 @@ namespace ZoneEngine.ChatCommands
                 && ((string.Compare(args[1], "hints", true) == 0)
                     || (string.Compare(args[1], "zone", true) == 0)
                     || (string.Compare(args[1], "status", true) == 0)
+                    || (string.Compare(args[1], "lootstatus", true) == 0)
                     || (string.Compare(args[1], "clear", true) == 0)))
             {
                 return true;
@@ -151,6 +153,7 @@ Spawn combat test mob aliases: /command spawn testmobs
 List supported population mobs for this playfield: /command spawn hints
 Spawn supported DB population mobs for this playfield: /command spawn zone
 Show live spawned mobs for this playfield: /command spawn status
+Show DB loot coverage for supported mobs: /command spawn lootstatus
 Clear live spawned mobs/corpses for this playfield: /command spawn clear
 Filter will be applied to mob name"));
         }
@@ -232,6 +235,12 @@ Filter will be applied to mob name"));
             if ((args.Length == 2) && (string.Compare(args[1], "status", true) == 0))
             {
                 this.ShowCombatTestMobStatus(character);
+                return;
+            }
+
+            if ((args.Length == 2) && (string.Compare(args[1], "lootstatus", true) == 0))
+            {
+                this.ShowLootStatus(character);
                 return;
             }
 
@@ -442,6 +451,75 @@ Filter will be applied to mob name"));
             }
 
             character.Playfield.Publish(ChatTextMessageHandler.Default.CreateIM(character, text.ToString()));
+        }
+
+        private void ShowLootStatus(ICharacter character)
+        {
+            DBMobTemplate[] templates = MobTemplateDao.Instance.GetAll().ToArray();
+            DBMobDroptable[] dropTable = MobDroptableDao.Instance.GetAll().ToArray();
+            CombatLootTableEntry[] lootEntries = CombatMobLootCatalog.BuildEntries(templates, dropTable);
+            Dictionary<string, DBMobTemplate> templatesByHash =
+                templates
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Hash))
+                    .GroupBy(x => x.Hash, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
+
+            int configuredTemplates = templates.Count(HasDropConfiguration);
+            int distinctDropHashes = dropTable.Select(x => x.Hash).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.OrdinalIgnoreCase).Count();
+            List<CombatTestMobArchetype.Entry> hintedEntries =
+                CombatTestMobArchetype.ForPlayfield(character.Playfield.Identity.Instance).ToList();
+
+            var text = new StringBuilder();
+            text.AppendLine(
+                string.Format(
+                    "DB loot status for playfield {0}:",
+                    character.Playfield.Identity.Instance));
+            text.AppendLine(
+                string.Format(
+                    "Mob templates: {0}, configured: {1}, drop rows: {2}, distinct hashes: {3}, parsed entries: {4}",
+                    templates.Length,
+                    configuredTemplates,
+                    dropTable.Length,
+                    distinctDropHashes,
+                    lootEntries.Length));
+
+            if (hintedEntries.Count == 0)
+            {
+                text.AppendLine("Supported population mobs: none");
+            }
+            else
+            {
+                foreach (CombatTestMobArchetype.Entry entry in hintedEntries)
+                {
+                    DBMobTemplate template;
+                    if (!templatesByHash.TryGetValue(entry.TemplateHash, out template))
+                    {
+                        text.AppendLine(string.Format("- {0} [{1}]: missing mobtemplate", entry.RuntimeName, entry.TemplateHash));
+                        continue;
+                    }
+
+                    bool configured = HasDropConfiguration(template);
+                    int matchingLootEntries = lootEntries.Count(x => x.Matches(template.Name, template.MonsterData, template.NPCFamily));
+                    text.AppendLine(
+                        string.Format(
+                            "- {0} [{1}] DB name='{2}': {3}, parsed entries={4}",
+                            entry.RuntimeName,
+                            entry.TemplateHash,
+                            template.Name,
+                            configured ? "configured" : "no DropHashes",
+                            matchingLootEntries));
+                }
+            }
+
+            character.Playfield.Publish(ChatTextMessageHandler.Default.CreateIM(character, text.ToString()));
+        }
+
+        private static bool HasDropConfiguration(DBMobTemplate template)
+        {
+            return template != null
+                   && (!string.IsNullOrWhiteSpace(template.DropHashes)
+                       || !string.IsNullOrWhiteSpace(template.DropSlots)
+                       || !string.IsNullOrWhiteSpace(template.DropRates));
         }
 
         private void ShowCombatTestMobStatus(ICharacter character)
