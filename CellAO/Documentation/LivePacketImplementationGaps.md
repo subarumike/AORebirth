@@ -87,6 +87,14 @@ Current CellAO local sender in `Core\Playfields\Playfield.cs`:
 
 Known difference: private-server player weapon hits commonly use `unknown2=-1`, `unknown3=6` or `8`, `unknown4=0` or `4`, and `unknown5=3` or `4`. Local still uses simplified values, especially `unknown2=40` for equipped weapons. Leave it alone unless a visible animation, hit text, crit text, miss text, or combat log bug appears.
 
+## HealthDamage Policy
+
+Normal weapon and unarmed auto-attacks must remain `AttackInfo` only. Do not send `HealthDamage` from `DoCombatTick`; local testing already showed duplicate combat text when weapon hits sent both packets.
+
+Live captures prove `HealthDamage` exists for some combat/status flows, but the official weapon capture is `official_live` + `c2s_only_request_flow` and has no S2C response evidence. Treat private-server `HealthDamage` rows as useful structure evidence, not permission to add it to normal weapon hits.
+
+Later `HealthDamage` work should start from a targeted capture and stay outside the normal weapon-hit path. Candidate cases are DoT ticks, HoT ticks, nano damage/heals, environmental damage, and other status-style health changes where live evidence shows the exact packet fields and client text behavior.
+
 ## Safest Next Code Path
 
 1. Keep the capture tooling as source-of-truth validation: `tools-temp\live-data-collector\Test-LiveDataCollector.ps1`.

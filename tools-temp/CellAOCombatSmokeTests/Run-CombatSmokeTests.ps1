@@ -161,6 +161,7 @@ $zoneEnemyHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbZoneEne
 $npcTemplateHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbNpcTemplateHints.csv'
 $enemyCoveragePath = Join-Path $repoRoot 'CellAO\Documentation\ClientHintedEnemyCoverage.csv'
 $visualHintsPath = Join-Path $repoRoot 'CellAO\Documentation\MonsterDataCorpseVisualHints.csv'
+$livePacketGapsSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Documentation\LivePacketImplementationGaps.md')
 
 Assert-SourceMatch $fullCharacterSource 'MsgVersion\s*=\s*26\s*;' 'FullCharacter login packet must stay on live-compatible MsgVersion 26.'
 Assert-SourceMatch $clientConnectedSource 'InitializeActionableState\s*\(\s*client\s*\)\s*;' 'ClientConnected must initialize the live-style actionable login state.'
@@ -209,7 +210,8 @@ Assert-SourceMatch $playfieldSource 'DespawnNpcImmediately\s*\(' 'Playfield shou
 Assert-SourceMatch $playfieldSource 'DespawnDebugCorpses\s*\(' 'Playfield should expose debug corpse cleanup for controlled GM test cleanup.'
 Assert-SourceMatch $zoneProjectSource 'Core\\Packets\\CorpseFullUpdate\.cs' 'ZoneEngine project should compile the dedicated CorpseFullUpdate packet builder.'
 Assert-SourceMatch $playfieldSource 'target\.Stats\s*\[\s*StatIds\.health\s*\]\.Value\s*=\s*newHealth\s*;\s*target\.SendChangedStats\s*\(\s*\)\s*;.*?new\s+AttackInfoMessage' 'Combat hits, including killing hits, should send the zero-health stat update before death cleanup.'
-Assert-True (-not ($playfieldSource -match 'DoCombatTick\s*\(ICharacter\s+attacker\).*?new\s+HealthDamageMessage')) 'Normal auto-attacks should not send HealthDamage; live captures use AttackInfo for weapon hit text.'
+Assert-SourceNoMatch $playfieldSource 'DoCombatTick\s*\(ICharacter\s+attacker\).*?HealthDamage' 'Normal auto-attacks must stay AttackInfo-only; HealthDamage belongs only in capture-backed non-weapon damage/heal/status paths.'
+Assert-SourceMatch $livePacketGapsSource '## HealthDamage Policy.*?auto-attacks must remain `AttackInfo` only.*?DoCombatTick.*?duplicate combat text.*?targeted capture.*?DoT.*?HoT.*?nano.*?environmental' 'HealthDamage packet policy should document why normal weapon hits stay AttackInfo-only and which future paths need targeted capture evidence.'
 Assert-SourceMatch $playfieldSource 'MaxMeleeCombatDistance\s*=\s*8\.0' 'Combat ticks should use a conservative melee range gate.'
 Assert-SourceMatch $playfieldSource 'MaxNpcLeashDistance\s*=\s*40\.0' 'NPC combat should have a conservative home leash distance.'
 Assert-SourceMatch $playfieldSource 'RegisterNpcHome\s*\(ICharacter\s+character\).*?npcHomeStates\s*\[\s*character\.Identity\.Instance\s*\].*?new\s+Coordinate\s*\(\s*character\.Coordinates\s*\(\s*\)\s*\)' 'Playfield should track spawned NPC home coordinates.'
