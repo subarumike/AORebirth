@@ -1656,6 +1656,7 @@ namespace CellAO.Core.Playfields
                 return true;
             }
 
+            looter.BaseInventory.Write();
             lootItem.Looted = true;
             corpse.Opened = true;
             ContainerAddItemMessageHandler.Default.Send(

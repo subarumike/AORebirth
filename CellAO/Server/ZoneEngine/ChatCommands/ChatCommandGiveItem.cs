@@ -148,6 +148,8 @@ namespace ZoneEngine.ChatCommands
                     return;
                 }
 
+                container.BaseInventory.Write();
+
                 if (targetEntity as Character != null)
                 {
                     AddTemplateMessageHandler.Default.Send((ICharacter)targetEntity, item);

@@ -181,6 +181,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 Equip.Send(client, receivingPage, toPlacement);
                 character.CalculateSkills();
                 EnsureWeaponVisualMeshes(character, true);
+                this.PersistCharacterInventory(character, "equip");
                 return true;
             }
 
@@ -196,12 +197,14 @@ namespace ZoneEngine.Core.MessageHandlers
                 this.SendMoveAck(character, message.SourceContainer, toPlacement);
                 character.CalculateSkills();
                 EnsureWeaponVisualMeshes(character, true);
+                this.PersistCharacterInventory(character, "unequip");
                 return true;
             }
 
             sendingPage.Remove(fromPlacement);
             receivingPage.Add(toPlacement, itemFrom);
             this.SendMoveAck(character, message.SourceContainer, toPlacement);
+            this.PersistCharacterInventory(character, "move");
             return true;
         }
 
@@ -279,6 +282,14 @@ namespace ZoneEngine.Core.MessageHandlers
         private bool IsWeaponPage(IInventoryPage page)
         {
             return page is WeaponInventoryPage;
+        }
+
+        private void PersistCharacterInventory(ICharacter character, string reason)
+        {
+            character.BaseInventory.Write();
+            LogUtil.Debug(
+                DebugInfoDetail.Database,
+                string.Format("Persisted inventory after ClientMoveItemToInventory {0} char={1}", reason, character.Identity));
         }
 
         private void WaitForEquipVisualSync(IItem primary, IItem secondary, bool isSocial)
