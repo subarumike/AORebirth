@@ -1132,19 +1132,14 @@ namespace CellAO.Core.Playfields
 
             target.Stats[StatIds.health].Value = newHealth;
             target.SendChangedStats();
-
-            this.Announce(
-                new AttackInfoMessage
-                {
-                    Identity = attacker.Identity,
-                    Target = target.Identity,
-                    Unknown1 = damage,
-                    Unknown2 = attackSource.AttackInfoAmmoCount,
-                    Unknown3 = attackSource.AttackInfoWeaponSlot,
-                    Unknown4 = attackSource.AttackInfoUnk1,
-                    Unknown5 = attackSource.AttackInfoHitType,
-                    Unknown6 = 0
-                });
+            this.AnnounceCombatDamage(
+                attacker,
+                target,
+                damage,
+                attackSource,
+                attackSource.UsesEquippedWeapon
+                    ? CombatDamageSource.WeaponAutoAttack
+                    : CombatDamageSource.UnarmedAutoAttack);
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
@@ -1190,6 +1185,60 @@ namespace CellAO.Core.Playfields
         private bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)
         {
             return attacker.Coordinates().coordinate.Distance2D(target.Coordinates().coordinate) <= range;
+        }
+
+        private void AnnounceCombatDamage(
+            ICharacter attacker,
+            ICharacter target,
+            int damage,
+            CombatAttackSource attackSource,
+            CombatDamageSource source)
+        {
+            this.Announce(
+                new AttackInfoMessage
+                {
+                    Identity = attacker.Identity,
+                    Target = target.Identity,
+                    Unknown1 = damage,
+                    Unknown2 = attackSource.AttackInfoAmmoCount,
+                    Unknown3 = attackSource.AttackInfoWeaponSlot,
+                    Unknown4 = attackSource.AttackInfoUnk1,
+                    Unknown5 = attackSource.AttackInfoHitType,
+                    Unknown6 = 0
+                });
+
+            this.AnnounceHealthDamageIfNeeded(attacker, target, damage, source);
+        }
+
+        private void AnnounceHealthDamageIfNeeded(
+            ICharacter attacker,
+            ICharacter target,
+            int damage,
+            CombatDamageSource source)
+        {
+            if (!ShouldSendHealthDamage(source))
+            {
+                return;
+            }
+
+            this.Announce(
+                new HealthDamageMessage
+                {
+                    Identity = attacker.Identity,
+                    Unknown1 = damage,
+                    Unknown2 = 0,
+                    Unknown3 = 0,
+                    Unknown4 = 0,
+                    Target = target.Identity,
+                    Unknown5 = 0
+                });
+        }
+
+        private static bool ShouldSendHealthDamage(CombatDamageSource source)
+        {
+            // Keep normal weapon/unarmed auto-attacks as AttackInfo-only.
+            return source != CombatDamageSource.WeaponAutoAttack
+                   && source != CombatDamageSource.UnarmedAutoAttack;
         }
 
         private CombatAttackSource GetCombatAttackSource(ICharacter attacker)
@@ -2644,6 +2693,16 @@ namespace CellAO.Core.Playfields
             public int AttackInfoUnk1 { get; set; }
 
             public int AttackInfoHitType { get; set; }
+        }
+
+        private enum CombatDamageSource
+        {
+            WeaponAutoAttack,
+            UnarmedAutoAttack,
+            DamageOverTime,
+            HealOverTime,
+            Nano,
+            Environment
         }
 
         private class EquippedCombatWeapon
