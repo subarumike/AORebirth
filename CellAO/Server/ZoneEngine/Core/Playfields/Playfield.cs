@@ -112,6 +112,7 @@ namespace CellAO.Core.Playfields
         private readonly Timer heartBeat;
 
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
+        private readonly Dictionary<int, int> lastCombatWeaponSlots = new Dictionary<int, int>();
 
         private readonly Dictionary<int, DateTime> deadNpcDespawnTicks = new Dictionary<int, DateTime>();
 
@@ -1090,6 +1091,7 @@ namespace CellAO.Core.Playfields
             if (attacker.FightingTarget.Instance == 0)
             {
                 this.nextCombatTicks.Remove(attacker.Identity.Instance);
+                this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
                 return;
             }
 
@@ -1105,6 +1107,7 @@ namespace CellAO.Core.Playfields
             {
                 attacker.SetFightingTarget(Identity.None);
                 this.nextCombatTicks.Remove(attacker.Identity.Instance);
+                this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
                 return;
             }
 
@@ -1164,6 +1167,7 @@ namespace CellAO.Core.Playfields
                 {
                     attacker.SetFightingTarget(Identity.None);
                     this.nextCombatTicks.Remove(attacker.Identity.Instance);
+                    this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
                 }
 
                 return;
@@ -1251,22 +1255,44 @@ namespace CellAO.Core.Playfields
             if (attacker.BaseInventory == null
                 || !attacker.BaseInventory.Pages.ContainsKey((int)IdentityType.WeaponPage))
             {
+                this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
                 return null;
             }
 
             IInventoryPage weaponPage = attacker.BaseInventory.Pages[(int)IdentityType.WeaponPage];
             IItem rightHand = weaponPage[(int)WeaponSlots.Righthand];
-            if (this.IsWieldableCombatWeapon(rightHand))
+            IItem leftHand = weaponPage[(int)WeaponSlots.LeftHand];
+            bool rightHandUsable = this.IsWieldableCombatWeapon(rightHand);
+            bool leftHandUsable = this.IsWieldableCombatWeapon(leftHand);
+
+            if (rightHandUsable && leftHandUsable)
             {
+                int attackerInstance = attacker.Identity.Instance;
+                int lastSlot;
+                if (this.lastCombatWeaponSlots.TryGetValue(attackerInstance, out lastSlot)
+                    && lastSlot == (int)WeaponSlots.Righthand)
+                {
+                    this.lastCombatWeaponSlots[attackerInstance] = (int)WeaponSlots.LeftHand;
+                    return new EquippedCombatWeapon { Item = leftHand, Slot = (int)WeaponSlots.LeftHand };
+                }
+
+                this.lastCombatWeaponSlots[attackerInstance] = (int)WeaponSlots.Righthand;
                 return new EquippedCombatWeapon { Item = rightHand, Slot = (int)WeaponSlots.Righthand };
             }
 
-            IItem leftHand = weaponPage[(int)WeaponSlots.LeftHand];
-            if (this.IsWieldableCombatWeapon(leftHand))
+            if (rightHandUsable)
             {
+                this.lastCombatWeaponSlots[attacker.Identity.Instance] = (int)WeaponSlots.Righthand;
+                return new EquippedCombatWeapon { Item = rightHand, Slot = (int)WeaponSlots.Righthand };
+            }
+
+            if (leftHandUsable)
+            {
+                this.lastCombatWeaponSlots[attacker.Identity.Instance] = (int)WeaponSlots.LeftHand;
                 return new EquippedCombatWeapon { Item = leftHand, Slot = (int)WeaponSlots.LeftHand };
             }
 
+            this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
             return null;
         }
 
@@ -1354,6 +1380,7 @@ namespace CellAO.Core.Playfields
             attacker.SetTarget(Identity.None);
             attacker.SetFightingTarget(Identity.None);
             this.nextCombatTicks.Remove(attacker.Identity.Instance);
+            this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
             this.StopFightingDeadTarget(attacker.Identity);
             npcController.StopFollow();
             npcController.MoveTo(
@@ -1763,6 +1790,7 @@ namespace CellAO.Core.Playfields
         {
             target.DoNotDoTimers = true;
             this.nextCombatTicks.Remove(target.Identity.Instance);
+            this.lastCombatWeaponSlots.Remove(target.Identity.Instance);
             this.deadNpcDespawnTicks.Remove(target.Identity.Instance);
             this.npcHomeStates.Remove(target.Identity.Instance);
             this.Despawn(target.Identity);
@@ -2060,6 +2088,7 @@ namespace CellAO.Core.Playfields
                 {
                     character.SetFightingTarget(Identity.None);
                     this.nextCombatTicks.Remove(character.Identity.Instance);
+                    this.lastCombatWeaponSlots.Remove(character.Identity.Instance);
                     this.SendCombatStopMessage(character);
                 }
             }
