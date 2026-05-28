@@ -36,6 +36,22 @@ function Assert-SourceNoMatch {
     Assert-True (-not [System.Text.RegularExpressions.Regex]::IsMatch($Text, $Pattern, [System.Text.RegularExpressions.RegexOptions]::Singleline)) $Message
 }
 
+function Assert-SourceOrdered {
+    param(
+        [string]$Text,
+        [string[]]$Patterns,
+        [string]$Message
+    )
+
+    $offset = 0
+    foreach ($pattern in $Patterns) {
+        $remaining = $Text.Substring($offset)
+        $match = [System.Text.RegularExpressions.Regex]::Match($remaining, $pattern, [System.Text.RegularExpressions.RegexOptions]::Singleline)
+        Assert-True $match.Success "$Message Missing or out of order pattern: $pattern"
+        $offset += $match.Index + [Math]::Max($match.Length, 1)
+    }
+}
+
 function Get-RequiredType {
     param(
         [System.Reflection.Assembly]$Assembly,
@@ -155,6 +171,8 @@ $baseInventorySource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\S
 $playfieldSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\Playfields\Playfield.cs')
 $spawnCommandSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ChatCommands\Spawn.cs')
 $attackMessageSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\AttackMessageHandler.cs')
+$genericCmdSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\GenericCmdMessageHandler.cs')
+$containerAddItemSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs')
 $characterActionSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\CharacterActionMessageHandler.cs')
 $zoneClientSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\ZoneClient.cs')
 $npcControllerSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\Controllers\NPCController.cs')
@@ -269,6 +287,98 @@ Assert-SourceNoMatch $livePacketGapsSource 'working local loot path is determini
 Assert-SourceMatch $enemyNpcMapSource 'DB-backed corpse loot rolling is wired.*?CombatTestLootCatalog.*?falls back to parsed `mobtemplate`/`mobdroptable` entries' 'Enemy/NPC map should describe the current DB-backed corpse loot path.'
 Assert-SourceNoMatch $enemyNpcMapSource 'real DB-backed corpse loot rolling is not wired yet|Real loot tables exist but are unused|next non-test loot step is translating' 'Enemy/NPC map should not preserve stale DB-loot-unwired notes.'
 Assert-SourceMatch $mobLootDataSource 'local `cellao_codex_clean` database.*?`A004` Beach Leet.*?real DB-backed mob loot is modeled and now wired' 'Mob loot data docs should remain the detailed source for verified local DB loot coverage.'
+Assert-SourceOrdered $playfieldSource @(
+    'KillNpcTarget\s*\(ICharacter\s+target\)',
+    'CanBuildKnownCorpseVisual\s*\(\s*target\s*\)',
+    'AllocateCorpseIdentity\s*\(\s*\)',
+    'MarkNpcDead\s*\(\s*target\s*\)',
+    'StopFightingDeadTarget\s*\(\s*target\.Identity\s*\)',
+    'SendNpcDeathAnimation\s*\(\s*target\s*\)',
+    'ScheduleCorpseSpawn\s*\(\s*target\s*,\s*corpseIdentity\s*\)',
+    'deadNpcDespawnTicks\s*\[\s*target\.Identity\.Instance\s*\]'
+) 'Corpse flow regression: NPC death should allocate/register corpse work before delayed dead-NPC despawn.'
+Assert-SourceOrdered $playfieldSource @(
+    'ProcessPendingCorpseSpawns\s*\(\s*\)',
+    'pendingCorpseSpawns\.Remove\s*\(\s*corpse\.DeadNpcIdentity\.Instance\s*\)',
+    'FindByIdentity<ICharacter>\s*\(\s*corpse\.DeadNpcIdentity\s*\)',
+    'RegisterCorpse\s*\(\s*target\s*,\s*corpse\.CorpseIdentity\s*\)',
+    'SendCorpseFullUpdate\s*\(\s*target\s*,\s*corpse\.CorpseIdentity\s*\)'
+) 'Corpse flow regression: pending corpse processing should register server state before sending CorpseFullUpdate.'
+Assert-SourceOrdered $playfieldSource @(
+    'RegisterCorpse\s*\(ICharacter\s+target,\s*Identity\s+corpseIdentity\)',
+    'RollCorpseLootItems\s*\(\s*target\s*\)',
+    'CorpseLootClassFor\s*\(\s*target,\s*lootItems\s*\)',
+    'CorpseLifetimeFor\s*\(\s*lootClass\s*\)',
+    'InventorySlot\s*=\s*this\.AllocateCorpseInventorySlot\s*\(\s*\)',
+    'corpses\s*\[\s*corpseIdentity\.Instance\s*\]\s*=\s*state',
+    'corpseDespawnTicks\s*\[\s*corpseIdentity\.Instance\s*\]\s*=\s*expiresAtUtc'
+) 'Corpse flow regression: RegisterCorpse should roll loot, allocate a loot-window slot, and arm the despawn tick.'
+Assert-SourceOrdered $genericCmdSource @(
+    'case\s+GenericCmdAction\.Use',
+    'target\.Type\s*==\s*IdentityType\.Corpse',
+    'TryUseCorpse\s*\(',
+    'AcknowledgeCorpseUse\s*\(',
+    'target\.Type\s*==\s*IdentityType\.CanbeAffected',
+    'TryRouteDeadNpcCorpseUse\s*\(',
+    'AcknowledgeCorpseUse\s*\('
+) 'Corpse flow regression: GenericCmd Use should handle corpse identities and route dead NPC dynels before statel fallback.'
+Assert-SourceOrdered $playfieldSource @(
+    'TryUseCorpse\s*\(ICharacter\s+looter,\s*Identity\s+corpseIdentity\)',
+    'corpse\.Opened\s*=\s*true',
+    'corpse\.HasUnlootedItems',
+    'ExtendCorpseLifetime\s*\(\s*corpse,\s*CombatCorpseRules\.ItemLootCorpseLifetime,\s*"corpse-use"\s*\)',
+    'SendCorpseLootAccessAction\s*\(\s*looter,\s*corpse\s*\)',
+    'SendUseActionFinished\s*\(\s*looter\s*\)',
+    'SendCorpseInventoryUpdate\s*\(\s*looter,\s*corpse\s*\)',
+    'ScheduleCorpseDespawn\s*\(\s*corpse,\s*CombatCorpseRules\.EmptyCorpseCleanupAfterOpenedDelay,\s*"opened-empty"\s*\)'
+) 'Corpse flow regression: corpse use should open loot, alternate access/inventory responses, and short-despawn empty corpses.'
+Assert-SourceOrdered $playfieldSource @(
+    'SendCorpseInventoryUpdate\s*\(ICharacter\s+looter,\s*CorpseState\s+corpse\)',
+    'Where\s*\(x\s*=>\s*!x\.Looted\)',
+    'corpse\.InventorySlot\s*=\s*this\.AllocateCorpseInventorySlot\s*\(\s*\)',
+    'new\s+InventoryUpdateMessage',
+    'NumberOfSlots\s*=\s*CombatCorpseRules\.CorpseInventorySlots',
+    'Entries\s*=\s*entries',
+    'BagIdentity\s*=\s*corpse\.CorpseIdentity',
+    'SlotnumberInMainInventory\s*=\s*corpse\.InventorySlot'
+) 'Corpse flow regression: corpse use should send InventoryUpdate for only unlooted items on the corpse bag identity.'
+Assert-SourceOrdered $clientMoveItemSource @(
+    'Read\s*\(ClientMoveItemToInventoryMessage\s+message,\s*IZoneClient\s+client\)',
+    'TryLootCorpseItem\s*\(',
+    'return\s*;',
+    'TryMoveOwnedInventoryItem\s*\('
+) 'Corpse flow regression: ClientMoveItemToInventory should offer loot-window moves to corpse handling before normal inventory moves.'
+Assert-SourceOrdered $containerAddItemSource @(
+    'Read\s*\(ContainerAddItemMessage\s+message,\s*IZoneClient\s+client\)',
+    'TryLootCorpseItem\s*\(',
+    'return\s*;',
+    'Pool\.Instance\.GetObject<IInventoryPage>'
+) 'Corpse flow regression: ContainerAddItem should offer loot-window moves to corpse handling before normal inventory moves.'
+Assert-SourceOrdered $playfieldSource @(
+    'TryLootCorpseItem\s*\(ICharacter\s+looter,\s*Identity\s+sourceContainer,\s*Identity\s+target,\s*int\s+targetPlacement\)',
+    'sourceContainer\.Type\s*!=\s*IdentityType\.Backpack',
+    'corpseInventorySlot\s*=\s*\(sourceContainer\.Instance\s*>>\s*16\)\s*&\s*0xffff',
+    'requestedLootSlot\s*=\s*sourceContainer\.Instance\s*&\s*0xffff',
+    'FindCorpseLootItem\s*\(\s*corpse,\s*requestedLootSlot\s*\)',
+    'CharacterHasUniqueItemAlready\s*\(\s*looter,\s*lootItem\.Item\s*\)',
+    'TryResolveLootTargetSlot\s*\(',
+    'looter\.BaseInventory\.AddToPage\s*\(',
+    'looter\.BaseInventory\.Write\s*\(\s*\)',
+    'lootItem\.Looted\s*=\s*true',
+    'ContainerAddItemMessageHandler\.Default\.Send\s*\(',
+    'ScheduleCorpseDespawn\s*\(\s*corpse,\s*CombatCorpseRules\.EmptyCorpseCleanupAfterOpenedDelay,\s*"looted-empty"\s*\)',
+    'ExtendCorpseLifetime\s*\(\s*corpse,\s*CombatCorpseRules\.ItemLootCorpseLifetime,\s*"loot-remaining"\s*\)'
+) 'Corpse flow regression: corpse item moves should decode source slots, persist inventory before consuming loot, notify the client, and update corpse lifetime.'
+Assert-SourceOrdered $playfieldSource @(
+    'ProcessCorpseDespawns\s*\(\s*\)',
+    'corpseDespawnTicks',
+    'Where\s*\(x\s*=>\s*x\.Value\s*<=\s*DateTime\.UtcNow\)',
+    'DespawnCorpse\s*\(\s*corpseInstance\s*\)',
+    'DespawnCorpse\s*\(int\s+corpseInstance\)',
+    'this\.Despawn\s*\(\s*corpseIdentity\s*\)',
+    'corpseDespawnTicks\.Remove\s*\(\s*corpseInstance\s*\)',
+    'corpses\.Remove\s*\(\s*corpseInstance\s*\)'
+) 'Corpse flow regression: expired corpses should despawn and clear both corpse registries.'
 Assert-SourceMatch $playfieldSource 'StopFightingDeadTarget\s*\(Identity\s+deadTarget\).*?character\.FightingTarget\s*==\s*deadTarget.*?SetFightingTarget\s*\(\s*Identity\.None\s*\).*?nextCombatTicks\.Remove\s*\(\s*character\.Identity\.Instance\s*\).*?SendCombatStopMessage\s*\(\s*character\s*\)' 'Killing an NPC should clear attackers from fight stance and stop their combat tick.'
 Assert-SourceMatch $playfieldSource 'SendCorpseInventoryUpdate\s*\(ICharacter\s+looter,\s*CorpseState\s+corpse\).*?Where\s*\(x\s*=>\s*!x\.Looted\).*?NumberOfSlots\s*=\s*CombatCorpseRules\.CorpseInventorySlots.*?BagIdentity\s*=\s*corpse\.CorpseIdentity.*?SlotnumberInMainInventory\s*=\s*corpse\.InventorySlot' 'Corpse InventoryUpdate should expose only unlooted items on the corpse bag identity.'
 Assert-SourceMatch $spawnCommandSource '"status"' 'Spawn command should support combat test status.'
@@ -389,9 +499,18 @@ try {
     $visualsType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatCorpseVisuals'
     $lootCatalogType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatTestLootCatalog'
     $mobLootCatalogType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatMobLootCatalog'
+    $playfieldType = Get-RequiredType $zoneAssembly 'CellAO.Core.Playfields.Playfield'
     $inventoryRulesType = Get-RequiredType $coreAssembly 'CellAO.Core.Inventory.InventoryItemRules'
     $mobTemplateType = Get-RequiredType $databaseAssembly 'CellAO.Database.Dao.DBMobTemplate'
     $mobDropType = Get-RequiredType $databaseAssembly 'CellAO.Database.Entities.DBMobDroptable'
+
+    Get-RequiredMethod $playfieldType 'TryUseCorpse' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
+    Get-RequiredMethod $playfieldType 'TryUseDeadNpcCorpse' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
+    Get-RequiredMethod $playfieldType 'TryLootCorpseItem' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
+    Get-RequiredMethod $playfieldType 'RegisterCorpse' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
+    Get-RequiredMethod $playfieldType 'SendCorpseFullUpdate' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
+    Get-RequiredMethod $playfieldType 'SendCorpseInventoryUpdate' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
+    Get-RequiredMethod $playfieldType 'DespawnCorpse' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
 
     $isUniqueFlags = Get-RequiredMethod $inventoryRulesType 'IsUniqueFlags' ([System.Reflection.BindingFlags]'Public, Static')
     $isSameTemplateIds = Get-RequiredMethod $inventoryRulesType 'IsSameTemplateIdPair' ([System.Reflection.BindingFlags]'Public, Static')
