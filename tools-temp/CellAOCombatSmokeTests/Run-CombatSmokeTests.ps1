@@ -215,10 +215,9 @@ Assert-SourceOrdered $characterActionSource @(
     'case\s+CharacterActionType\.Logout',
     'ApplySit\s*\(\s*client\s*\)',
     'SendStartLogout\s*\(\s*client\.Controller\.Character\s*\)',
-    'Stats\s*\[\s*StatIds\.gmlevel\s*\]\.Value\s*==\s*0',
-    'StartLogoutTimer\s*\(\s*\)',
-    'StartLogoutTimer\s*\(\s*1000\s*\)'
-) 'Logout flow regression: first X/logout should sit, send StartLogout, and start a 30s normal timer or 1s GM timer.'
+    'StartLogoutTimer\s*\(\s*\)'
+) 'Logout flow regression: first X/logout should sit, send StartLogout, and start the normal 30s timer.'
+Assert-SourceNoMatch $characterActionSource 'CharacterActionType\.Logout:.*?StatIds\.gmlevel|CharacterActionType\.Logout:.*?StartLogoutTimer\s*\(\s*1000\s*\)' 'Logout flow should not use a GM/admin fast-disconnect shortcut.'
 Assert-SourceOrdered $characterActionSource @(
     'case\s+CharacterActionType\.StopLogout',
     'ApplyStand\s*\(\s*client\s*\)',

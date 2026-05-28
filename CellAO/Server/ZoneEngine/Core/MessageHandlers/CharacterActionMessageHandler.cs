@@ -193,17 +193,7 @@ namespace ZoneEngine.Core.MessageHandlers
                     // If action == Logout
                     this.ApplySit(client);
                     this.SendStartLogout(client.Controller.Character);
-
-                    // Start 30 second logout timer if client is not a GM (statid 215)
-                    if (client.Controller.Character.Stats[StatIds.gmlevel].Value == 0)
-                    {
-                        client.Controller.Character.StartLogoutTimer();
-                    }
-                    else
-                    {
-                        // If client is a GM, disconnect without timer
-                        client.Controller.Character.StartLogoutTimer(1000);
-                    }
+                    client.Controller.Character.StartLogoutTimer();
 
                     break;
 
