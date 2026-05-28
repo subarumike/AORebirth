@@ -211,6 +211,73 @@ Assert-SourceMatch $characterActionSource 'SendStopLogout\s*\(ICharacter\s+chara
 Assert-SourceMatch $zoneClientSource 'Dispose\s*\(bool\s+disposing\).*?!this\.Controller\.Character\.InLogoutTimerPeriod\s*\(\s*\).*?EnterLogoutSitPosture\s*\(\s*\).*?StartLogoutTimer\s*\(\s*\)' 'Hard network disconnect should enter seated logout state and start the timer when normal logout did not already do it.'
 Assert-SourceMatch $messagingProjectSource 'Messages\\N3Messages\\StartLogoutMessage\.cs.*?Messages\\N3Messages\\StopLogoutMessage\.cs.*?Serialization\\Serializers\\Custom\\IdentityOnlyN3MessageSerializer\.cs' 'Messaging project should compile the recovered identity-only logout packet models and serializer.'
 Assert-SourceMatch $messagingSerializerSource 'typeof\s*\(\s*StartLogoutMessage\s*\).*?IdentityOnlyN3MessageSerializer.*?typeof\s*\(\s*StopLogoutMessage\s*\).*?IdentityOnlyN3MessageSerializer' 'StartLogout/StopLogout should use the identity-only serializer instead of the generic N3 unknown-byte layout.'
+Assert-SourceOrdered $characterActionSource @(
+    'case\s+CharacterActionType\.Logout',
+    'ApplySit\s*\(\s*client\s*\)',
+    'SendStartLogout\s*\(\s*client\.Controller\.Character\s*\)',
+    'Stats\s*\[\s*StatIds\.gmlevel\s*\]\.Value\s*==\s*0',
+    'StartLogoutTimer\s*\(\s*\)',
+    'StartLogoutTimer\s*\(\s*1000\s*\)'
+) 'Logout flow regression: first X/logout should sit, send StartLogout, and start a 30s normal timer or 1s GM timer.'
+Assert-SourceOrdered $characterActionSource @(
+    'case\s+CharacterActionType\.StopLogout',
+    'ApplyStand\s*\(\s*client\s*\)',
+    'private\s+void\s+ApplyStand\s*\(IZoneClient\s+client\)',
+    'UpdateMoveType\s*\(\s*37\s*\)',
+    'CharacterActionType\.StandUp',
+    'SendPostureMove\s*\(\s*character,\s*37\s*\)',
+    'InLogoutTimerPeriod\s*\(\s*\)',
+    'SendStopLogout\s*\(\s*character\s*\)',
+    'this\.Send\s*\(\s*character,\s*this\.StopLogout\s*\(\s*character\s*\),\s*true\s*\)',
+    'StopLogoutTimer\s*\(\s*\)'
+) 'Logout flow regression: StopLogout/stand should stand the character, send StopLogout, and cancel the timer.'
+Assert-SourceOrdered $characterActionSource @(
+    'private\s+void\s+ApplySit\s*\(IZoneClient\s+client\)',
+    'character\.EnterLogoutSitPosture\s*\(\s*\)',
+    'client\.Controller\.State\s*=\s*CharacterState\.Idle',
+    'SendPostureMove\s*\(\s*character,\s*30\s*\)',
+    'SimpleCharFullUpdate\.SendToPlayfield\s*\(\s*client\.Controller\.Client\s*\)'
+) 'Logout flow regression: ApplySit should enter seated logout posture, idle the controller, broadcast posture movement, and refresh playfield appearance.'
+Assert-SourceOrdered $characterSource @(
+    'EnterLogoutSitPosture\s*\(\s*\)',
+    'StopMovement\s*\(\s*\)',
+    'UpdateMoveType\s*\(\s*30\s*\)',
+    'Stats\s*\[\s*StatIds\.state\s*\]\.Value\s*=\s*0',
+    'Stats\s*\[\s*StatIds\.state\s*\]\.BaseValue\s*=\s*0',
+    'Stats\s*\[\s*StatIds\.currentstate\s*\]\.Value\s*=\s*0',
+    'Stats\s*\[\s*StatIds\.currentstate\s*\]\.BaseValue\s*=\s*0'
+) 'Logout flow regression: seated logout posture should stop movement, apply sit move type, and clear action state values/base values.'
+Assert-SourceOrdered $characterSource @(
+    'StartLogoutTimer\s*\(int\s+time\s*=\s*30000\)',
+    'new\s+Timer\s*\(\s*this\.LogoutTimerCallback,\s*null,\s*time,\s*0\s*\)',
+    'StopLogoutTimer\s*\(\s*\)',
+    'logoutTimer\.Dispose\s*\(\s*\)',
+    'logoutTimer\s*=\s*null',
+    'InLogoutTimerPeriod\s*\(\s*\)',
+    'return\s+this\.logoutTimer\s*!=\s*null',
+    'LogoutTimerCallback\s*\(object\s+sender\)',
+    'if\s*\(\s*this\.logoutTimer\s*==\s*null\s*\)',
+    'this\.logoutTimer\.Dispose\s*\(\s*\)',
+    'this\.logoutTimer\s*=\s*null',
+    'this\.Dispose\s*\(\s*\)'
+) 'Logout flow regression: timer start/cancel/completion should use a nullable timer and dispose the character only after the timer expires.'
+Assert-SourceOrdered $zoneClientSource @(
+    'Dispose\s*\(bool\s+disposing\)',
+    'this\.Controller\s*!=\s*null',
+    'this\.Controller\.Character\s*!=\s*null',
+    '!this\.Controller\.Character\.InLogoutTimerPeriod\s*\(\s*\)',
+    'EnterLogoutSitPosture\s*\(\s*\)',
+    'this\.Controller\.State\s*=\s*CharacterState\.Idle',
+    'StartLogoutTimer\s*\(\s*\)',
+    'zStream\.Close\s*\(\s*\)',
+    'netStream\.Close\s*\(\s*\)'
+) 'Logout flow regression: hard socket close should only start seated timed logout when a normal logout is not already active, then close streams.'
+Assert-SourceOrdered $messagingSerializerSource @(
+    'typeof\s*\(\s*StartLogoutMessage\s*\)',
+    'new\s+IdentityOnlyN3MessageSerializer\s*\(\s*typeof\s*\(\s*StartLogoutMessage\s*\)\s*\)',
+    'typeof\s*\(\s*StopLogoutMessage\s*\)',
+    'new\s+IdentityOnlyN3MessageSerializer\s*\(\s*typeof\s*\(\s*StopLogoutMessage\s*\)\s*\)'
+) 'Logout flow regression: StartLogout and StopLogout should stay on the identity-only N3 serializer.'
 Assert-SourceMatch $clientConnectedSource 'Packets\.WeaponItemFullUpdate\.SendWeaponDefinitions\s*\(\s*client\.Controller\.Character\s*\)\s*;\s*FullCharacterMessageHandler\.Default\.Send' 'Login should send persisted equipped weapon definitions before FullCharacter.'
 Assert-SourceMatch $clientConnectedSource 'CalculateSkills\s*\(\s*\)\s*;\s*ClientMoveItemToInventoryMessageHandler\.EnsureWeaponVisualMeshes\s*\(\s*client\.Controller\.Character\s*,\s*false\s*\)\s*;\s*AppearanceUpdateMessageHandler\.Default\.Send' 'Login should follow persisted equipment -> CalculateSkills -> EnsureWeaponVisualMeshes(false) -> AppearanceUpdate.'
 Assert-SourceMatch $clientMoveItemSource 'public\s+static\s+void\s+EnsureWeaponVisualMeshes\s*\(\s*ICharacter\s+character\s*,\s*bool\s+announceAppearanceUpdate\s*\)' 'Weapon mesh repair should be reusable by login and manual equip paths.'
@@ -491,6 +558,7 @@ try {
     $zoneAssembly = [System.Reflection.Assembly]::LoadFrom($zoneEngine)
     $coreAssembly = [System.Reflection.Assembly]::LoadFrom((Join-Path $builtDir 'CellAO.Core.dll'))
     $databaseAssembly = [System.Reflection.Assembly]::LoadFrom((Join-Path $builtDir 'CellAO.Database.dll'))
+    $messagingAssembly = [System.Reflection.Assembly]::LoadFrom((Join-Path $builtDir 'SmokeLounge.AOtomation.Messaging.dll'))
     $archetypeType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatTestMobArchetype'
     $rulesType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatCorpseRules'
     $damageRulesType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatDamageRules'
@@ -500,9 +568,15 @@ try {
     $lootCatalogType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatTestLootCatalog'
     $mobLootCatalogType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatMobLootCatalog'
     $playfieldType = Get-RequiredType $zoneAssembly 'CellAO.Core.Playfields.Playfield'
+    $characterActionHandlerType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.MessageHandlers.CharacterActionMessageHandler'
+    $zoneClientType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.ZoneClient'
+    $characterType = Get-RequiredType $coreAssembly 'CellAO.Core.Entities.Character'
     $inventoryRulesType = Get-RequiredType $coreAssembly 'CellAO.Core.Inventory.InventoryItemRules'
     $mobTemplateType = Get-RequiredType $databaseAssembly 'CellAO.Database.Dao.DBMobTemplate'
     $mobDropType = Get-RequiredType $databaseAssembly 'CellAO.Database.Entities.DBMobDroptable'
+    $startLogoutType = Get-RequiredType $messagingAssembly 'SmokeLounge.AOtomation.Messaging.Messages.N3Messages.StartLogoutMessage'
+    $stopLogoutType = Get-RequiredType $messagingAssembly 'SmokeLounge.AOtomation.Messaging.Messages.N3Messages.StopLogoutMessage'
+    $identityOnlySerializerType = Get-RequiredType $messagingAssembly 'SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom.IdentityOnlyN3MessageSerializer'
 
     Get-RequiredMethod $playfieldType 'TryUseCorpse' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
     Get-RequiredMethod $playfieldType 'TryUseDeadNpcCorpse' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
@@ -511,6 +585,20 @@ try {
     Get-RequiredMethod $playfieldType 'SendCorpseFullUpdate' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
     Get-RequiredMethod $playfieldType 'SendCorpseInventoryUpdate' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
     Get-RequiredMethod $playfieldType 'DespawnCorpse' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
+    Get-RequiredMethod $characterActionHandlerType 'ApplySit' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
+    Get-RequiredMethod $characterActionHandlerType 'ApplyStand' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
+    Get-RequiredMethod $characterActionHandlerType 'SendStartLogout' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
+    Get-RequiredMethod $characterActionHandlerType 'SendStopLogout' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
+    Get-RequiredMethod $characterActionHandlerType 'StopLogout' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
+    Get-RequiredMethod $zoneClientType 'Dispose' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
+    Get-RequiredMethod $characterType 'EnterLogoutSitPosture' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
+    Get-RequiredMethod $characterType 'StartLogoutTimer' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
+    Get-RequiredMethod $characterType 'StopLogoutTimer' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
+    Get-RequiredMethod $characterType 'InLogoutTimerPeriod' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
+    Get-RequiredMethod $identityOnlySerializerType 'Serialize' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
+    Get-RequiredMethod $identityOnlySerializerType 'Deserialize' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
+    Assert-True ($startLogoutType.GetConstructor(@()) -ne $null) 'StartLogoutMessage should keep a public default constructor for serialization.'
+    Assert-True ($stopLogoutType.GetConstructor(@()) -ne $null) 'StopLogoutMessage should keep a public default constructor for serialization.'
 
     $isUniqueFlags = Get-RequiredMethod $inventoryRulesType 'IsUniqueFlags' ([System.Reflection.BindingFlags]'Public, Static')
     $isSameTemplateIds = Get-RequiredMethod $inventoryRulesType 'IsSameTemplateIdPair' ([System.Reflection.BindingFlags]'Public, Static')
