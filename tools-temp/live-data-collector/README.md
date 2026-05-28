@@ -43,6 +43,14 @@ Coverage authority labels:
 - `private_server_response_flow`: rich S2C response shape/timing evidence, but keep it labeled as private-server evidence.
 - `official_live_full_duplex`: official live capture with decoded C2S and S2C frames.
 
+Quick truth table:
+
+| Source label | Authority label | What it can prove | What it cannot prove |
+| --- | --- | --- | --- |
+| `official_live` | `c2s_only_request_flow` | Official request order/payloads | Any S2C absence/necessity claim |
+| `private_server_199` | `private_server_response_flow` | Rich response shapes/timing and comparative choreography | Official-live parity by itself |
+| `official_live` | `official_live_full_duplex` | Official request + response behavior | N/A (preferred parity evidence) |
+
 Smoke test the offline pipeline:
 
 ```powershell

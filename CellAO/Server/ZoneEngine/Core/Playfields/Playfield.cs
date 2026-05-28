@@ -1399,8 +1399,8 @@ namespace CellAO.Core.Playfields
             else
             {
                 LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    string.Format("Skipping raw CorpseFullUpdate for {0}; no known MonsterData-to-CATMesh mapping.", target.Identity));
+                    DebugInfoDetail.Engine,
+                    string.Format("Skipping corpse visual spawn for {0}; no known MonsterData-to-CATMesh mapping.", target.Identity));
             }
 
             this.deadNpcDespawnTicks[target.Identity.Instance] = DateTime.UtcNow + DeadNpcDespawnDelay;
@@ -1741,8 +1741,6 @@ namespace CellAO.Core.Playfields
             target.Stats[StatIds.healdelta].Value = 0;
             target.Stats[StatIds.nanodelta].Value = 0;
             target.DoNotDoTimers = true;
-
-            // TODO: Roll this NPC's loot table here, then keep/convert the dead dynel into a lootable corpse.
         }
 
         private void SendNpcDeathAnimation(ICharacter target)
@@ -1798,7 +1796,7 @@ namespace CellAO.Core.Playfields
             }
 
             LogUtil.Debug(
-                DebugInfoDetail.Error,
+                DebugInfoDetail.Network,
                 string.Format(
                     "CorpseFullUpdate visual target={0} corpse={1} catMesh={2} monsterData={3} scale={4} sex={5} breed={6} race={7}",
                     target.Identity,
@@ -1818,7 +1816,8 @@ namespace CellAO.Core.Playfields
 
         private static CombatCorpseLootClass CorpseLootClassFor(ICharacter target, IList<CorpseLootItem> lootItems)
         {
-            // TODO: Add boss classification when real mob templates/loot tables are wired in.
+            // Boss classification is intentionally conservative until we have capture-backed
+            // identification rules for major encounter tiers.
             return CombatCorpseRules.LootClassFor(lootItems.Count, false);
         }
 

@@ -19,6 +19,17 @@ Treat capture authority as part of every packet observation:
 - `private_server_199` + `private_server_response_flow` is useful for rich server-response shapes and timing, but keep it labeled as private-server evidence before changing CellAO behavior.
 - Only an `official_live_full_duplex` capture should settle both official C2S request flow and official S2C response flow in one pass.
 
+## Capture Truth Table
+
+Use this table before implementing packet behavior so evidence sources are never mixed:
+
+| Capture | `capture_source` | `coverage_authority` | Decoded direction confidence | Safe use | Unsafe use |
+| --- | --- | --- | --- | --- | --- |
+| `tools-temp\live-pcaps\live-official-weapon-equip\2026-05-24_22-09-21` | `official_live` | `c2s_only_request_flow` | Official C2S only | Request order, request payload fields, equip/unequip sequencing | Claiming S2C packets are missing, unused, or unnecessary |
+| `tools-temp\live-pcaps\private-server-loot\2026-05-10_22-35-30` | `private_server_199` | `private_server_response_flow` | Rich S2C + usable C2S | Response packet shapes/timing, corpse/loot choreography comparisons | Treating values as official-live truth without an official full-duplex capture |
+| `tools-temp\live-pcaps\private-server-quest-batch\2026-05-10_23-44-53` | `private_server_199` | `private_server_response_flow` | Rich S2C + usable C2S | Quest/combat/loot response structure, relative sequencing | Declaring official-live parity from private-server-only evidence |
+| Any future full official capture with both decoded directions | `official_live` | `official_live_full_duplex` | Official C2S + official S2C | Settling both request and response behavior for live parity | N/A (preferred evidence path) |
+
 ## Capture Pattern
 
 The useful private-server quest/combat/loot packet families from the rich S2C captures are:
