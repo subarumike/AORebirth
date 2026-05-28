@@ -168,6 +168,8 @@ $npcTemplateHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbNpcTe
 $enemyCoveragePath = Join-Path $repoRoot 'CellAO\Documentation\ClientHintedEnemyCoverage.csv'
 $visualHintsPath = Join-Path $repoRoot 'CellAO\Documentation\MonsterDataCorpseVisualHints.csv'
 $livePacketGapsSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Documentation\LivePacketImplementationGaps.md')
+$enemyNpcMapSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Documentation\EnemyNpcDllAodbMap.md')
+$mobLootDataSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Documentation\MobLootData.md')
 
 Assert-SourceMatch $fullCharacterSource 'MsgVersion\s*=\s*26\s*;' 'FullCharacter login packet must stay on live-compatible MsgVersion 26.'
 Assert-SourceMatch $clientConnectedSource 'InitializeActionableState\s*\(\s*client\s*\)\s*;' 'ClientConnected must initialize the live-style actionable login state.'
@@ -262,6 +264,11 @@ Assert-SourceMatch $playfieldSource 'RollCorpseLootItems\s*\(ICharacter\s+target
 Assert-SourceMatch $playfieldSource 'RollCorpseLootItems\s*\(ICharacter\s+target\).*?matchingEntries\.Count\s*==\s*0.*?Loot roll found no configured table entries' 'Corpse loot should log when neither deterministic nor DB-backed loot entries match a mob.'
 Assert-SourceMatch $playfieldSource 'GetDatabaseLootTable\s*\(\s*\).*?MobTemplateDao\.Instance\.GetAll\s*\(\s*\).*?MobDroptableDao\.Instance\.GetAll\s*\(\s*\).*?CombatMobLootCatalog\.BuildEntries' 'DB-backed mob loot should load through the existing mobtemplate/mobdroptable DAOs.'
 Assert-SourceMatch $playfieldSource 'CreateLootItem\s*\(CombatLootTableEntry\s+entry,\s*int\s+targetLevel\).*?entry\.ItemTemplates.*?CreateLootItem\s*\(entry\.ItemTemplates,\s*targetLevel\).*?CreateLootItem\s*\(entry\.ItemTemplateIds,\s*entry\.Quality\)' 'Loot item creation should support DB drop candidates and existing deterministic template fallback.'
+Assert-SourceMatch $livePacketGapsSource 'DB-backed corpse loot is now wired.*?CombatTestLootCatalog.*?falls back to parsed `mobtemplate`/`mobdroptable` entries.*?`A004` Beach Leet' 'Live packet gap docs should describe the current DB-backed loot fallback and the verified local Beach Leet setup.'
+Assert-SourceNoMatch $livePacketGapsSource 'working local loot path is deterministic test loot, not real mob drop tables|Only after corpse tests are stable, wire a DB-backed loot roller' 'Live packet gap docs should not claim DB-backed corpse loot is still unwired.'
+Assert-SourceMatch $enemyNpcMapSource 'DB-backed corpse loot rolling is wired.*?CombatTestLootCatalog.*?falls back to parsed `mobtemplate`/`mobdroptable` entries' 'Enemy/NPC map should describe the current DB-backed corpse loot path.'
+Assert-SourceNoMatch $enemyNpcMapSource 'real DB-backed corpse loot rolling is not wired yet|Real loot tables exist but are unused|next non-test loot step is translating' 'Enemy/NPC map should not preserve stale DB-loot-unwired notes.'
+Assert-SourceMatch $mobLootDataSource 'local `cellao_codex_clean` database.*?`A004` Beach Leet.*?real DB-backed mob loot is modeled and now wired' 'Mob loot data docs should remain the detailed source for verified local DB loot coverage.'
 Assert-SourceMatch $playfieldSource 'StopFightingDeadTarget\s*\(Identity\s+deadTarget\).*?character\.FightingTarget\s*==\s*deadTarget.*?SetFightingTarget\s*\(\s*Identity\.None\s*\).*?nextCombatTicks\.Remove\s*\(\s*character\.Identity\.Instance\s*\).*?SendCombatStopMessage\s*\(\s*character\s*\)' 'Killing an NPC should clear attackers from fight stance and stop their combat tick.'
 Assert-SourceMatch $playfieldSource 'SendCorpseInventoryUpdate\s*\(ICharacter\s+looter,\s*CorpseState\s+corpse\).*?Where\s*\(x\s*=>\s*!x\.Looted\).*?NumberOfSlots\s*=\s*CombatCorpseRules\.CorpseInventorySlots.*?BagIdentity\s*=\s*corpse\.CorpseIdentity.*?SlotnumberInMainInventory\s*=\s*corpse\.InventorySlot' 'Corpse InventoryUpdate should expose only unlooted items on the corpse bag identity.'
 Assert-SourceMatch $spawnCommandSource '"status"' 'Spawn command should support combat test status.'

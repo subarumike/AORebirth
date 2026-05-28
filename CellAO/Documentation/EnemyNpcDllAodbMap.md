@@ -76,7 +76,8 @@ Use/loot:
 Database loot:
 - `mobtemplate` has `DropHashes`, `DropSlots`, `DropRates`.
 - `mobdroptable` has `Hash`, `LowId`, `HighId`, `MinQl`, `MaxQl`, `RangeCheck`.
-- `MobDroptableDao` exists, but real DB-backed corpse loot rolling is not wired yet. The current runtime path uses `CombatTestLootCatalog` for deterministic test loot.
+- DB-backed corpse loot rolling is wired through the same corpse state used by deterministic test loot. Runtime checks `CombatTestLootCatalog` first for controlled Codex test mobs, then falls back to parsed `mobtemplate`/`mobdroptable` entries for configured population mobs.
+- Current detailed loot status and approved next steps live in `MobLootData.md`.
 
 ## Live Death and Corpse Sequence
 
@@ -288,17 +289,18 @@ Server implication:
    - The debug path keeps state in memory instead of adding SQL schema.
    - The raw `CorpseFullUpdate` remains manual until the AOtomation corpse serializer is implemented.
 
-3. Test loot is live enough for client workflow testing.
+3. Corpse loot is live enough for client workflow testing.
    - `CombatTestLootCatalog` creates deterministic test entries for each combat-test mob.
+   - If no deterministic entry matches, `Playfield.RollCorpseLootItems` falls back to DB-backed entries built from `mobtemplate` and `mobdroptable`.
    - `Playfield.TryLootCorpseItem` moves unlooted corpse items into inventory and respects unique-item checks.
    - Empty opened corpses despawn quickly; credits-only corpses last 30 seconds if unopened; item-loot corpses last 60 seconds; major-boss lifetime is reserved at 30 minutes.
 
 ## Remaining Gaps
 
-1. Real loot tables exist but are unused.
+1. Real loot tables need broader reviewed coverage.
    - `mobtemplate.DropHashes/DropSlots/DropRates` describes roll groups.
    - `mobdroptable` describes possible item records.
-   - The next non-test loot step is translating those rows into the same corpse loot state that the debug path now exercises.
+   - The runtime parser is wired, but the checked-in seed still has no broad mob drop assignments. Keep expanding low-level loot from reviewed capture data and Mike-approved SQL only.
 
 2. Death animation should stay packet-faithful, but visual data should be data-driven.
    - Keep live observed `CharacterAction(99, param2=503)` for Rhinoman death unless a capture proves another value.
