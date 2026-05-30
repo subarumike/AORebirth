@@ -49,9 +49,9 @@ namespace Utility
         /// </param>
         public static void PrintCellAOBanner(ConsoleColor titleColor)
         {
-            int consoleWidth = Console.WindowWidth;
-            bool sameWidth = consoleWidth == Console.BufferWidth;
-            Console.Clear();
+            int consoleWidth = GetConsoleWidth();
+            bool sameWidth = consoleWidth == GetConsoleBufferWidth(consoleWidth);
+            ClearConsole();
 
             Console.Write("**".PadRight(consoleWidth, '*'));
             if (!sameWidth)
@@ -110,7 +110,7 @@ namespace Utility
         /// </param>
         private static void CenteredString(string text, string boundary, ConsoleColor c = ConsoleColor.Black)
         {
-            int consoleWidth = Console.WindowWidth;
+            int consoleWidth = GetConsoleWidth();
 
             // Mono "fix"
             if (consoleWidth == 0)
@@ -130,6 +130,54 @@ namespace Utility
             Console.Write(text);
             Colouring.Pop();
             Console.Write(boundary.PadLeft(consoleWidth - (text.Length + centered), ' '));
+        }
+
+        private static int GetConsoleWidth()
+        {
+            try
+            {
+                int consoleWidth = Console.WindowWidth;
+                return consoleWidth == 0 ? 80 : consoleWidth;
+            }
+            catch (System.IO.IOException)
+            {
+                return 80;
+            }
+            catch (InvalidOperationException)
+            {
+                return 80;
+            }
+        }
+
+        private static int GetConsoleBufferWidth(int fallback)
+        {
+            try
+            {
+                int bufferWidth = Console.BufferWidth;
+                return bufferWidth == 0 ? fallback : bufferWidth;
+            }
+            catch (System.IO.IOException)
+            {
+                return fallback;
+            }
+            catch (InvalidOperationException)
+            {
+                return fallback;
+            }
+        }
+
+        private static void ClearConsole()
+        {
+            try
+            {
+                Console.Clear();
+            }
+            catch (System.IO.IOException)
+            {
+            }
+            catch (InvalidOperationException)
+            {
+            }
         }
 
         #endregion

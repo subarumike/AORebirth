@@ -349,6 +349,13 @@ namespace ZoneEngine.Core
             SetMobStat(mobCharacter, StatIds.health, entry.Health);
             SetMobStat(mobCharacter, StatIds.healdelta, 0);
             SetMobStat(mobCharacter, StatIds.healinterval, 600);
+            SetMobStat(mobCharacter, StatIds.mindamage, 1);
+            SetMobStat(mobCharacter, StatIds.maxdamage, 3);
+            SetMobStat(mobCharacter, StatIds.damagebonus, 0);
+            SetMobStat(mobCharacter, StatIds.defaultattacktype, 0);
+            SetMobStat(mobCharacter, StatIds.damagetype, 0);
+            SetMobStat(mobCharacter, StatIds.weapontype, 0);
+            SetMobStat(mobCharacter, StatIds.equippedweapons, 0);
 
             NPCController npcController = mobCharacter.Controller as NPCController;
             if (npcController != null)
