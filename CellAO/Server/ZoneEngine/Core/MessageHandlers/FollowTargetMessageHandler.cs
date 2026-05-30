@@ -41,6 +41,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.InternalMessages;
 
     #endregion
@@ -92,11 +93,22 @@ namespace ZoneEngine.Core.MessageHandlers
             this.SendToPlayfield(character, this.FillerFullStopAt(character, stopPosition));
         }
 
+        public void SendOfficialPositionStop(ICharacter character, Vector3 stopPosition)
+        {
+            this.SendToPlayfield(character, this.FillerOfficialPositionStop(character, stopPosition));
+        }
+
+        public void SendOfficialSettle(ICharacter character, Vector3 coordinates, Vector3 confirmCoordinates)
+        {
+            this.SendToPlayfield(character, this.FillerOfficialSettle(character, coordinates, confirmCoordinates));
+        }
+
         private MessageDataFiller FillerFullStopAt(ICharacter character, Vector3 stopPosition)
         {
             return x =>
             {
                 x.Identity = character.Identity;
+                x.Unknown = 0;
                 x.Info = new FollowTargetInfo()
                          {
                              Target = Identity.None,
@@ -105,7 +117,44 @@ namespace ZoneEngine.Core.MessageHandlers
                              Z = stopPosition.Z,
                              Dummy = 0,
                              Dummy1 = 0,
-                             MoveType = 21 // Magic number FULL STOP
+                             MoveType = EnemyBehaviorContract.FollowStopMoveType
+                         };
+            };
+        }
+
+        private MessageDataFiller FillerOfficialPositionStop(ICharacter character, Vector3 stopPosition)
+        {
+            return x =>
+            {
+                x.Identity = character.Identity;
+                x.Unknown = 0;
+                x.Info = new FollowPositionInfo()
+                         {
+                             MoveType = EnemyBehaviorContract.RunMoveMode,
+                             Unknown1 = 0,
+                             Unknown2 = 0,
+                             Unknown3 = 0x40000000,
+                             Coordinates = stopPosition,
+                             Unknown4 = 0
+                         };
+            };
+        }
+
+        private MessageDataFiller FillerOfficialSettle(ICharacter character, Vector3 coordinates, Vector3 confirmCoordinates)
+        {
+            return x =>
+            {
+                x.Identity = character.Identity;
+                x.Unknown = 0;
+                x.Info = new FollowStopInfo()
+                         {
+                             MoveType = EnemyBehaviorContract.FollowStopMoveType,
+                             Unknown1 = (int)character.Identity.Type,
+                             Unknown2 = character.Identity.Instance,
+                             Unknown3 = 0,
+                             Coordinates = coordinates,
+                             Flag = 1,
+                             ConfirmCoordinates = confirmCoordinates
                          };
             };
         }
@@ -174,22 +223,22 @@ namespace ZoneEngine.Core.MessageHandlers
                         movetype = 27;
                         break;
                     case MoveModes.Run:
-                        movetype = 25;
+                        movetype = EnemyBehaviorContract.RunMoveMode;
                         break;
                     case MoveModes.Walk:
                     default:
-                        movetype = 24;
+                        movetype = EnemyBehaviorContract.WalkMoveMode;
                         break;
                 }
                 x.Info = new FollowCoordinateInfo()
                          {
                              CurrentCoordinates = start,
                              EndCoordinates = end,
-                             CoordinateCount = 2,
+                             CoordinateCount = EnemyBehaviorContract.CoordinateFollowPointCount,
                              MoveMode = movetype,
-                             FollowInfoType = 1
+                             FollowInfoType = EnemyBehaviorContract.CoordinateFollowInfoType
                          };
-                x.Unknown = 1;
+                x.Unknown = EnemyBehaviorContract.OfficialFollowTargetUnknown;
             };
         }
 
