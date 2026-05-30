@@ -1,0 +1,15 @@
+case_id,step,time_ms,source,npc,target,distance,attack_range,attack_kind,event,expected_state,expected_action,packet_evidence
+official_melee_chase,1,0,official-live-20260529-212034,50000:788DA3B8,50000:77E458F5,14.2,8.0,melee,add_threat,Aggroed,AddThreat,Attack echo starts mob retaliation
+official_melee_chase,2,120,official-live-20260529-212034,50000:788DA3B8,50000:77E458F5,14.2,8.0,melee,target_valid,Chasing,FollowCoordinatePath,FollowTarget len56 coordinate chase header 00 01 19 02
+official_melee_chase,3,620,official-live-20260529-212034,50000:788DA3B8,50000:77E458F5,7.6,8.0,melee,target_valid,MeleeAttackingWhileMoving,AttackWithoutStop,Melee in range does not require StopMovingCmd
+official_melee_chase,4,950,official-live-20260529-212034,50000:788DA3B8,50000:77E458F5,9.8,8.0,melee,target_valid,Chasing,FollowCoordinatePath,Player moved out of range so NPC keeps chasing
+official_melee_chase,5,1200,official-live-20260529-212034,50000:788DA3B8,50000:77E458F5,9.8,8.0,melee,player_stopfight,Chasing,PreserveAggro,Live StopFight for player did not clear mob retaliation
+official_correction,1,0,official-live-20260529-212034,50000:788DA3B8,50000:77E458F5,18.0,8.0,melee,add_threat,Aggroed,AddThreat,Attack echo starts chase
+official_correction,2,100,official-live-20260529-212034,50000:788DA3B8,50000:77E458F5,18.0,8.0,melee,target_valid,Chasing,FollowCoordinatePath,Normal correction source state is active chase
+official_correction,3,650,official-live-20260529-212034,50000:788DA3B8,50000:77E458F5,18.0,8.0,melee,hard_correction,Chasing,CapturedCorrectionSequence,Captured correction sequence is type2 position stop then StopMovingCmd then SetPos then type2 settle
+ranged_stop,1,0,contract-fixture,50000:00000099,50000:00000012,24.0,20.0,ranged,add_threat,Aggroed,AddThreat,Ranged test starts with threat
+ranged_stop,2,100,contract-fixture,50000:00000099,50000:00000012,24.0,20.0,ranged,target_valid,Chasing,FollowCoordinatePath,Ranged target outside range still chases
+ranged_stop,3,500,contract-fixture,50000:00000099,50000:00000012,18.0,20.0,ranged,target_valid,RangedStopAndAttack,StopAndAttack,Ranged in range should stop before attacking
+ranged_stop,4,900,contract-fixture,50000:00000099,50000:00000012,23.0,20.0,ranged,target_valid,Chasing,FollowCoordinatePath,Ranged target leaves range so chase resumes
+target_lost,1,0,contract-fixture,50000:00000077,50000:00000012,5.0,8.0,melee,add_threat,Aggroed,AddThreat,Target exists
+target_lost,2,100,contract-fixture,50000:00000077,50000:00000012,5.0,8.0,melee,target_invalid,Idle,ClearTarget,Only invalid target death zone or hate wipe clears chase in this fixture
