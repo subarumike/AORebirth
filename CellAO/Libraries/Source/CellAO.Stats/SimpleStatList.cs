@@ -88,7 +88,11 @@ namespace CellAO.Stats
 
         public void AfterStatChangedEventHandler(StatChangedEventArgs e)
         {
-            throw new NotImplementedException();
+            EventHandler<StatChangedEventArgs> handler = this.AfterStatChangedEvent;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
         }
 
         public void ClearChangedFlags()

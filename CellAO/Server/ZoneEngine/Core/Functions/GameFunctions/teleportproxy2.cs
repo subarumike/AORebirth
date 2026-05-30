@@ -71,7 +71,8 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
             ICharacter character = (ICharacter)self;
 
-            int statelId = (int)((uint)0xC0000000 | arguments[1].AsInt32() | (arguments[2].AsInt32() << 16));
+            int statelId =
+                unchecked((int)(0xC0000000u | (uint)arguments[1].AsInt32() | ((uint)arguments[2].AsInt32() << 16)));
             character.Stats[StatIds.externaldoorinstance].BaseValue = 0;
             character.Stats[StatIds.externalplayfieldinstance].BaseValue = 0;
 
@@ -100,15 +101,6 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                     new Identity() { Type = (IdentityType)arguments[0].AsInt32(), Instance = arguments[1].AsInt32() });
             }
 
-            return true;
-            
-            self.Stats[StatIds.externalplayfieldinstance].Value = 0;
-            self.Stats[StatIds.externaldoorinstance].Value = 0;
-            self.Playfield.Teleport(
-                (Dynel)self,
-                new Coordinate(100, 10, 100),
-                ((ICharacter)self).Heading,
-                new Identity() { Type = (IdentityType)arguments[0].AsInt32(), Instance = arguments[1].AsInt32() });
             return true;
         }
     }

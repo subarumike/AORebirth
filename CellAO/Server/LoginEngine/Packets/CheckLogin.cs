@@ -62,7 +62,7 @@ namespace LoginEngine.Packets
 
         /// <summary>
         /// </summary>
-        private int IFalse;
+        private const int LoginAllowedFlag = 0;
 
         #endregion
 
@@ -102,7 +102,7 @@ namespace LoginEngine.Packets
             this.lf.GetLoginFlags(accountName);
 
             if (this.ln.LoginN != null && accountName.ToLower() == this.ln.LoginN.ToLower()
-                && this.lf.FlagsL == this.IFalse)
+                && this.lf.FlagsL == LoginAllowedFlag)
             {
                 return true; // Login OK
             }

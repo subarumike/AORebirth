@@ -239,10 +239,20 @@ namespace CellAO.Communication.ISComV2Client
             if (this.serverAddress == null)
             {
                 LogUtil.Debug(DebugInfoDetail.Error, "Could not reconnect to ChatEngine (no server address found)");
+                this.RaiseReallyDisconnected();
                 return;
             }
 
             LogUtil.Debug(DebugInfoDetail.ISComm, "Trying to reconnect to ChatEngine");
+        }
+
+        private void RaiseReallyDisconnected()
+        {
+            ReallyDisconnectedHandler handler = this.ReallyDisconnected;
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
+            }
         }
 
         /// <summary>

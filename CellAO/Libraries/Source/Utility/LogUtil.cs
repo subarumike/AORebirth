@@ -37,7 +37,6 @@ namespace Utility
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Reflection;
-    using System.Threading;
 
     using NLog;
     using NLog.Config;
@@ -344,7 +343,7 @@ namespace Utility
         /// </param>
         public static void LogStacktrace(Action<string> logger)
         {
-            StackTrace stackTrace = new StackTrace(Thread.CurrentThread, true);
+            StackTrace stackTrace = new StackTrace(true);
             string temp = string.Empty;
             foreach (StackFrame stackFrame in stackTrace.GetFrames())
             {

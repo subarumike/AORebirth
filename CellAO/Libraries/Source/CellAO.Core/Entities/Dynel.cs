@@ -50,8 +50,6 @@ namespace CellAO.Core.Entities
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
 
-    using Utility;
-
     using Quaternion = CellAO.Core.Vector.Quaternion;
     using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
@@ -66,10 +64,6 @@ namespace CellAO.Core.Entities
         /// <summary>
         /// </summary>
         private Identity playfieldIdentity;
-
-        /// <summary>
-        /// </summary>
-        private Utility.WeakReference<IController> controller;
 
         /// <summary>
         /// </summary>
