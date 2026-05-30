@@ -15,6 +15,7 @@ The sample CSV uses:
 
 - Official live chase evidence from `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260529-212034`.
 - The correction sequence documented in `tools-temp/live-combat-chase-observations/README.md`.
+- One mined private-server S2C chase window from `tools-temp/live-pcaps/private-server-loot/2026-05-10_22-35-30`, using `50000:000F66D9` follow/correction packets around `t=63.482-69.937`.
 - Contract-only rows for ranged-vs-melee behavior until a focused ranged enemy capture is converted.
 
 Run it from repo root:

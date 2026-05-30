@@ -74,6 +74,28 @@ namespace CellAO.Tools.EnemyMovementReplay
             {
                 decision = new ReplayDecision(current, ReplayEnemyAction.CapturedCorrectionSequence, "captured-correction-preserves-chase");
             }
+            else if (normalizedEvent == "coordinate_follow")
+            {
+                decision = new ReplayDecision(ReplayEnemyState.Chasing, ReplayEnemyAction.FollowCoordinatePath, "captured-coordinate-follow");
+            }
+            else if ((normalizedEvent == "attack_info") || (normalizedEvent == "missed_attack_info") ||
+                     (normalizedEvent == "health_damage"))
+            {
+                if (normalizedAttackKind == "melee")
+                {
+                    decision = new ReplayDecision(
+                        ReplayEnemyState.MeleeAttackingWhileMoving,
+                        ReplayEnemyAction.AttackWithoutStop,
+                        "captured-melee-result");
+                }
+                else
+                {
+                    decision = new ReplayDecision(
+                        ReplayEnemyState.RangedStopAndAttack,
+                        ReplayEnemyAction.StopAndAttack,
+                        "captured-ranged-result");
+                }
+            }
             else if (distance > attackRange)
             {
                 decision = new ReplayDecision(ReplayEnemyState.Chasing, ReplayEnemyAction.FollowCoordinatePath, "target-out-of-range");
