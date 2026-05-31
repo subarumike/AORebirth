@@ -257,7 +257,8 @@ for now but not full live parity.
 
 ### Combat event packet shapes
 
-Status: wire layouts mostly match; semantics remain partially unresolved.
+Status: captured runtime envelope shapes are locked; semantics remain partially
+unresolved.
 
 Current-client evidence:
 
@@ -271,10 +272,19 @@ are still not fully assigned by the reverse-engineered client files. Keep normal
 weapon/unarmed hits as `AttackInfo` only unless a targeted capture proves a
 specific `HealthDamage` use case.
 
+Capture note:
+
+The stripdown IIR docs list the subclass body sizes. Runtime captures for
+`Attack`, `AttackInfo`, `StopFight`, `HealthDamage`, `MissedAttackInfo`, and
+`SpecialAttackInfo` show the standard AOtomation/N3 envelope on the wire:
+`key + Identity + Unknown + subclass fields`. Tests now lock representative
+captured byte bodies so these packets are not accidentally shortened to the
+source-only subclass shape.
+
 ### Inventory update packet shapes
 
-Status: basic wire shapes match recovered structures; semantics remain partly
-unresolved.
+Status: captured runtime envelope shapes are locked where captures exist;
+semantics remain partly unresolved.
 
 Current-client evidence:
 
@@ -284,9 +294,11 @@ Current-client evidence:
 - `rebuild\docs\n3_client_move_item_to_inventory_iir.md`
 
 Current CellAO/AOtomation structures match the recovered field counts/order for
-the basic inventory/container packets. The exact role names remain partially
-unknown in the reverse-engineered files, so avoid renaming semantics as fact
-until capture-backed.
+the basic inventory/container packets, but captured `ContainerAddItem` and
+`ClientMoveItemToInventory` runtime bodies include the standard
+`key + Identity + Unknown` envelope before the recovered subclass fields. Tests
+now lock those captured envelope bodies. `InventoryUpdated` still needs a
+targeted runtime capture before changing its serializer from current behavior.
 
 ## Repair Priority
 

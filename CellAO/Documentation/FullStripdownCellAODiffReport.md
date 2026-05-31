@@ -258,7 +258,7 @@ These classes exist in CellAO, but stripdown has enough body detail that they de
 ## Recommended Repair Order From This Full Diff
 
 1. Keep `ToClientQuit`/captured `Despawn`/`DropDynel` separated by evidence: key-only quit, runtime removal, source-backed test-only dynel-drop.
-2. Add source assertions for known fixed-size packets, starting with death/logout/movement/combat/inventory packets.
+2. Add assertions for known packet contracts, keeping stripdown IIR subclass sizes separate from captured runtime envelope bodies.
 3. Correct enum-only key mismatches for `TeamInvite` and `UpdateClientVisual`, but do not wire behavior until those systems are tested.
 4. Add decode/test-only classes for `RelocateDynels`, `LocalityUpdate`, `ClientContainerAddItem`, and `ClientGetItem`.
 5. Audit `CharDCMoveMessage` field names/types against stripdown and live captures before further NPC movement edits.

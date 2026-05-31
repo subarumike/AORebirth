@@ -105,28 +105,37 @@ Risk:
 
 ## Direct Test Repairs
 
-Add serializer-size/source assertions for recovered fixed-size packets. These are low-risk because they do not change runtime behavior unless a test exposes a bad serializer.
+Add serializer-size/source assertions for recovered fixed-size packets, but keep
+the stripdown IIR subclass size separate from captured runtime envelope size.
+The captured combat/container packets use:
 
-High-value assertions:
+`IIR key + Identity + Unknown + recovered subclass fields`
+
+Captured runtime envelope assertions now locked in AOtomation tests:
+- `Attack`: 22-byte body.
+- `AttackInfo`: 45-byte body.
+- `HealthDamage`: 41-byte body.
+- `MissedAttackInfo`: 41-byte body.
+- `SpecialAttackInfo`: 41-byte body.
+- `StopFight`: 17-byte body.
+- `ContainerAddItem`: 33-byte body.
+- `ClientMoveItemToInventory`: 25-byte body.
+
+Source-only/custom assertions already locked:
 - `DropDynel`: 24 bytes including IIR key.
 - `ToClientQuit`: 4 bytes including IIR key.
+- captured runtime `Despawn`: 13-byte `0x36510078 + Identity + Unknown` body.
 - `RelocateDynels`: `16 + identity_count * 8` bytes; encoded count must be `(identity_count + 1) * 0x3F1`.
-- `CharInPlay`: 4 bytes including key.
-- `SetWantedDirection`: 16 bytes.
-- `InventoryUpdated`: 8 bytes.
-- `ContainerAddItem`: 24 bytes.
-- `ClientMoveItemToInventory`: 16 bytes.
-- `Resurrect`: 12 bytes.
-- `Attack`: 13 bytes.
-- `AttackInfo`: 36 bytes.
-- `HealthDamage`: 32 bytes.
-- `MissedAttackInfo`: 32 bytes.
-- `SpecialAttackInfo`: 32 bytes.
 - `StartLogout`: 12 bytes.
 - `StopLogout`: 12 bytes.
-- `StopFight`: 8 bytes.
+- `Resurrect`: 12 bytes.
 - `Teleport`: custom live-shaped serializer already verified by playtest; keep this locked.
 - `FullCharacter`: version gate must remain `26`.
+
+Pending targeted capture before changing serializer behavior:
+- `InventoryUpdated`: stripdown subclass body is 8 bytes, but no runtime capture
+  has proven whether the current server should send the standard N3 envelope or
+  source-only subclass body.
 
 ## Missing Message Classes With Recovered Fixed Layouts
 
@@ -154,8 +163,9 @@ Do not wire these into runtime paths just because they exist. Add classes/tests 
 - `CharInPlay`: stripdown says key-only subclass body; CellAO class has no subclass members, which matches.
 - `CharDCMove`: tail fields now match stripdown as `float` aux values after the tick/int field. Source assertions also lock official/private `FollowTarget` coordinate and type-2 settle packet shapes.
 - `PlayfieldAllCities`: current uint16-sized opaque payload matches recovered fixed prefix shape.
-- `InventoryUpdated`, `ContainerAddItem`, `ClientMoveItemToInventory`: basic fixed wire sizes and field counts match stripdown.
-- `AttackInfo`, `HealthDamage`, `MissedAttackInfo`, `SpecialAttackInfo`: fixed field count/order appears aligned, but field semantics still need targeted capture before changing combat text/damage behavior.
+- `ContainerAddItem`, `ClientMoveItemToInventory`: captured runtime envelope bodies are now locked with exact byte assertions.
+- `Attack`, `AttackInfo`, `HealthDamage`, `MissedAttackInfo`, `SpecialAttackInfo`, `StopFight`: captured runtime envelope bodies are now locked with exact byte assertions.
+- `InventoryUpdated`: source subclass size is known, but runtime envelope behavior is still pending targeted capture.
 
 ## Do Not Repair From Stripdown Alone
 
