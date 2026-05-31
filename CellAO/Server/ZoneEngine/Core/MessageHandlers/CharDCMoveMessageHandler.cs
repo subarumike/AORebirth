@@ -83,18 +83,18 @@ namespace ZoneEngine.Core.MessageHandlers
 
             // TODO: Find out what these (tmpInt) are and name them
             int tmpInt1 = message.Unknown1;
-            int tmpInt2 = message.Unknown2;
-            int tmpInt3 = message.Unknown3;
+            float auxA = message.AuxA;
+            float auxB = message.AuxB;
 
             client.Server.Info(
                 client,
-                "CharDCMove moveTypeRaw={0} moveTypeNormalized={1} coords={2} u1={3} u2={4} u3={5}",
+                "CharDCMove moveTypeRaw={0} moveTypeNormalized={1} coords={2} tick={3} auxA={4} auxB={5}",
                 rawMoveType,
                 moveType,
                 coordinates,
                 tmpInt1,
-                tmpInt2,
-                tmpInt3);
+                auxA,
+                auxB);
 
             /*
             if (!client.Character.DoNotDoTimers)
@@ -183,8 +183,8 @@ namespace ZoneEngine.Core.MessageHandlers
                                     Z = coordinates.z
                                 },
                             Unknown1 = tmpInt1,
-                            Unknown2 = tmpInt2,
-                            Unknown3 = tmpInt3
+                            AuxA = auxA,
+                            AuxB = auxB
                         };
             client.Controller.Character.Playfield.Publish(new IMSendAOtomationMessageToPlayfield { Body = reply });
 

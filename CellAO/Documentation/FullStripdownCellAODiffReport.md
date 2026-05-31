@@ -27,7 +27,7 @@ Recovered stripdown N3 IIR contracts compared: 79
 
 These are definite differences between current-client stripdown evidence and CellAO code.
 
-### 1. `ToClientQuit` is named and used as `Despawn`
+### 1. `ToClientQuit`, captured `Despawn`, and source `DropDynel` share lifecycle territory
 
 Stripdown:
 - `n3ToClientQuitIIR_t`
@@ -35,10 +35,11 @@ Stripdown:
 - key-only, fixed wire size 4
 
 CellAO:
+- `N3MessageType.ToClientQuit = 0x36510078`
 - `N3MessageType.Despawn = 0x36510078`
-- `DespawnMessage.cs` has no subclass fields
+- `ToClientQuitMessage` is key-only
 - `DespawnMessageHandler` fills `Identity`/`Unknown`
-- `Playfield.Despawn(...)` uses it for NPC/corpse/world dynel removal
+- `Playfield.Despawn(...)` uses captured `Despawn` for NPC/corpse/world dynel removal
 
 Correct stripdown dynel-removal packet:
 - `DropDynelIIR_t`
@@ -46,10 +47,16 @@ Correct stripdown dynel-removal packet:
 - fixed wire size 24
 - fields: `Identity_t` plus three floats
 
+Runtime capture correction:
+- Visible corpse/NPC cleanup in local/private captures uses
+  `0x36510078 + Identity + Unknown=1`.
+- Example corpse body: `36510078 0000C76A 00F0F002 01`.
+- A local playtest with runtime `DropDynel` left looted corpses visible.
+
 Repair:
-- Keep or rename `0x36510078` as `ToClientQuit`.
-- Add/serialize `DropDynel = 0x47483633`.
-- Use `DropDynel` for NPC/corpse/entity removal.
+- Keep `ToClientQuit` key-only.
+- Use captured `Despawn` for current visible runtime removal.
+- Keep `DropDynel = 0x47483633` as source-backed model/test coverage until a capture proves its runtime side effect.
 
 ### 2. `TeamInvite` key mismatch
 
@@ -171,8 +178,8 @@ These are known keys in CellAO, but there is no AOtomation N3 message class to s
 | `TrapDisarmed` | `0x2A253F5F` | key-only 4 |
 | `Visibility` | `0x49222612` | fixed 5 |
 
-Highest-value missing classes:
-- `DropDynel`: current despawn path is wrong.
+Highest-value missing/classes to keep covered:
+- `DropDynel`: source-backed layout exists; keep test-only until runtime use is captured.
 - `RelocateDynels`: movement/lifecycle-adjacent; add test-only first.
 - `LocalityUpdate`: no enum/class yet, movement-adjacent.
 - `ClientContainerAddItem`/`ClientGetItem`: item/loot-adjacent.
@@ -182,7 +189,7 @@ Highest-value missing classes:
 
 | Stripdown name | Key | CellAO name | Assessment |
 | --- | ---: | --- | --- |
-| `ToClientQuit` | `0x36510078` | `Despawn` | Bad semantic mismatch; repair. |
+| `ToClientQuit` | `0x36510078` | `ToClientQuit`/`Despawn` | Same key has key-only source packet and captured identity-bearing runtime removal frame. |
 | `Teleport` | `0x43197D22` | `N3Teleport` | Acceptable alias; custom serializer already fixed death/white screen. |
 | `PlayfieldFullUpdate` | `0x30161355` | `N3PlayfieldFullUpdate` | Acceptable alias, but no class. |
 | `GiveQuestToMembers` | `0x77230927` | `GiveQuestToMember` | Naming singular/plural mismatch; no class. |
@@ -250,7 +257,7 @@ These classes exist in CellAO, but stripdown has enough body detail that they de
 
 ## Recommended Repair Order From This Full Diff
 
-1. Repair `DropDynel`/`ToClientQuit` naming and runtime use.
+1. Keep `ToClientQuit`/captured `Despawn`/`DropDynel` separated by evidence: key-only quit, runtime removal, source-backed test-only dynel-drop.
 2. Add source assertions for known fixed-size packets, starting with death/logout/movement/combat/inventory packets.
 3. Correct enum-only key mismatches for `TeamInvite` and `UpdateClientVisual`, but do not wire behavior until those systems are tested.
 4. Add decode/test-only classes for `RelocateDynels`, `LocalityUpdate`, `ClientContainerAddItem`, and `ClientGetItem`.

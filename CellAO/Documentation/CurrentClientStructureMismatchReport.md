@@ -79,9 +79,9 @@ Repair path:
 5. Verify with a login/respawn capture that the local packet length and decoded
    body class match live.
 
-### 2. CellAO uses `n3ToClientQuitIIR_t` as dynel despawn
+### 2. Runtime dynel despawn uses the captured `Despawn` frame
 
-Status: definite mismatch.
+Status: repaired after corpse-cleanup playtest regression.
 
 Current-client evidence:
 
@@ -99,31 +99,40 @@ Recovered client structures:
   - recovered body: identity plus three floats
   - fixed wire size: 24 bytes including key
 
+Capture evidence:
+
+- Local/private corpse and NPC cleanup captures show visible dynel removal as
+  `0x36510078 + Identity + Unknown=1`.
+- Example observed corpse removal body:
+  `36510078 0000C76A 00F0F002 01`.
+- Switching runtime removal to `DropDynel` left looted corpses visible in the
+  current client.
+
 Current CellAO structure:
 
-- AOtomation names `0x36510078` as `Despawn`
-- `DespawnMessage` is key-only
-- `Playfield.Despawn(...)` announces that message for NPC/corpse/world dynel
-  removal
-- There is no `DropDynelMessage` class despite `N3MessageType.DropDynel`
-  existing
+- AOtomation names `0x36510078` as both key-only `ToClientQuit` and runtime
+  `Despawn`
+- AOtomation names `0x47483633` as `DropDynel`
+- `ToClientQuitMessage` remains key-only
+- `DespawnMessage` serializes the normal N3 identity/unknown frame
+- `DropDynelMessage` serializes identity plus three floats
+- `Playfield.Despawn(...)`, NPC cleanup, corpse cleanup, and teleport cleanup
+  announce capture-backed `Despawn` for visible runtime removal
 
-Why this is bad:
+Why this mattered:
 
-CellAO is using a key-only current-client quit packet where the current client
-has a recovered dynel-drop packet with an identity and vector payload. That is
-a concrete structural mismatch for entity lifecycle traffic. It can affect mob
-despawn, corpse cleanup, stale visuals, and any world object removal that should
-be identity-driven.
+Static stripdown evidence proves `DropDynelIIR_t` exists, but runtime capture
+evidence proves the current visible corpse/NPC cleanup path still uses the
+identity-bearing `0x36510078` frame. Treating `DropDynel` as the runtime removal
+packet made the client keep looted corpses visible.
 
-Repair path:
+Repair notes:
 
-1. Rename/mentally treat `DespawnMessage` as `ToClientQuit`, not dynel removal.
-2. Add `DropDynelMessage` with identity plus three floats.
-3. Update NPC/corpse removal paths to use `DropDynel` for dynel removal.
-4. Keep `ToClientQuit` only for the session/client-quit use case.
-5. Capture one mob death/corpse despawn locally and compare packet class/length
-   against current-client decode expectations.
+1. `ToClientQuitMessage` stays key-only for the source-backed quit packet.
+2. `DespawnMessage` is restored for runtime visible dynel removal using the
+   captured identity/unknown body.
+3. `DropDynelMessage` stays modeled and source-tested, but should remain
+   test-only until a capture proves its runtime side effect.
 
 ### 3. `RelocateDynels` is recovered in the client but not implemented in CellAO
 
@@ -214,6 +223,25 @@ Current-client evidence:
 Recovered subclass body after the N3 base is key-only. The current
 `CharInPlayMessage` has no subclass fields. The `Unknown` seen in code is the
 base `N3Message.Unknown` byte, not a recovered `CharInPlay` subclass field.
+
+### `CharDCMove`
+
+Status: repaired and locked with source assertions.
+
+Current-client evidence:
+
+- `rebuild\docs\n3_movement_iir.md`
+- `rebuild\include\ao\n3_message.h`
+
+Recovered structure:
+
+- IIR key: `0x54111123`
+- Fixed body size: 54 bytes including key
+- Tail after position is one int/tick field followed by two `float` aux fields
+
+CellAO/AOtomation now models the tail as `Unknown1`, `AuxA`, and `AuxB`.
+Compatibility `Unknown2`/`Unknown3` wrappers remain for old call sites, but the
+wire serializer now emits floats in the recovered current-client layout.
 
 ### `PlayfieldAllCities`
 

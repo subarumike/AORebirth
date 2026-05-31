@@ -26,37 +26,37 @@ This report only lists differences that have a concrete static source in stripdo
 
 ## Direct Code Repairs
 
-### 1. Dynel despawn is using the wrong IIR key
+### 1. Runtime dynel despawn uses captured identity-bearing `Despawn`
 
-Definite mismatch:
+Status: repaired after a local corpse-cleanup regression.
+
+Original mismatch:
 - Stripdown: `0x36510078` is `n3ToClientQuitIIR_t`, key-only, total body size 4 bytes.
 - Stripdown: real dynel removal is `DropDynelIIR_t`, key `0x47483633`, total body size 24 bytes.
-- CellAO: `N3MessageType.Despawn = 0x36510078`.
-- CellAO: `DespawnMessageHandler` fills `Identity` and `Unknown = 1` on a key-only client quit packet.
-- CellAO: `Playfield.Despawn(...)`, NPC cleanup, and corpse cleanup announce this as entity removal.
+- Old CellAO state: `N3MessageType.Despawn = 0x36510078`.
+
+Runtime capture evidence:
+- Local/private captures show visible corpse/NPC removal as
+  `0x36510078 + Identity + Unknown=1`.
+- Example corpse body: `36510078 0000C76A 00F0F002 01`.
+- A playtest with runtime `DropDynel` left the looted corpse visible, so
+  `DropDynel` is not proven as the visible cleanup path.
 
 Stripdown source:
 - `rebuild\docs\n3_to_client_quit_iir.md`
 - `rebuild\docs\n3_drop_dynel_iir.md`
 
-CellAO files to repair:
-- `CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\Messages\N3MessageType.cs`
-- `CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\Messages\N3Messages\DespawnMessage.cs`
-- Add `DropDynelMessage.cs`
-- `CellAO\Server\ZoneEngine\Core\MessageHandlers\DespawnMessageHandler.cs`
-- `CellAO\Server\ZoneEngine\Core\InternalMessageHandler\DespawnMessageHandler.cs`
-- `CellAO\Server\ZoneEngine\Core\Playfields\Playfield.cs`
-
-Repair:
-- Preserve `0x36510078` as `ToClientQuit` or stop exposing it as `Despawn`.
-- Add `DropDynel = 0x47483633`.
-- Serialize `DropDynel` as `Identity + float + float + float`.
-- Use `DropDynel` for NPC/corpse/world-entity removal.
-- The three floats are proven fields but not proven semantics. For despawn use, start with the dynel's current coordinates and log the values.
+Implemented repair:
+- `0x36510078` remains `ToClientQuit` for the key-only source-backed packet.
+- `N3MessageType.Despawn` is also present as the capture-backed runtime removal alias.
+- `DespawnMessage` serializes the normal N3 body: key, identity, unknown byte.
+- `DropDynel = 0x47483633` is still serialized as `Identity + float + float + float`.
+- `Playfield.Despawn(...)`, NPC cleanup, corpse cleanup, and teleport cleanup use captured `Despawn`.
+- `DropDynel` remains model/test-only until a capture proves where the client expects it.
 
 Why this is safe:
-- The key and field layout are recovered from the current client.
-- Current CellAO is definitely writing entity-removal data on a packet stripdown proves has no subclass body.
+- The runtime path is backed by captured packets and playtest feedback.
+- Source assertions still lock `ToClientQuit` as four bytes and `DropDynel` as the distinct 24-byte source-backed body.
 
 ### 2. RelocateDynels exists in enum but has no message implementation
 
@@ -152,6 +152,7 @@ Do not wire these into runtime paths just because they exist. Add classes/tests 
 - `N3Teleport`: repaired to current-client shape and verified in playtest; this fixed the white death/respawn screen.
 - `FullCharacter`: message version `26` matches current client expectation; do not revert.
 - `CharInPlay`: stripdown says key-only subclass body; CellAO class has no subclass members, which matches.
+- `CharDCMove`: tail fields now match stripdown as `float` aux values after the tick/int field. Source assertions also lock official/private `FollowTarget` coordinate and type-2 settle packet shapes.
 - `PlayfieldAllCities`: current uint16-sized opaque payload matches recovered fixed prefix shape.
 - `InventoryUpdated`, `ContainerAddItem`, `ClientMoveItemToInventory`: basic fixed wire sizes and field counts match stripdown.
 - `AttackInfo`, `HealthDamage`, `MissedAttackInfo`, `SpecialAttackInfo`: fixed field count/order appears aligned, but field semantics still need targeted capture before changing combat text/damage behavior.

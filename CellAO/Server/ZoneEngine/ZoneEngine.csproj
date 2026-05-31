@@ -161,6 +161,7 @@
     <Compile Include="Core\MessageHandlers\ChatTextMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ContainerAddItemMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\DespawnMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\DropDynelMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\FeedbackMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\FollowTargetMessageHandler.cs" />
