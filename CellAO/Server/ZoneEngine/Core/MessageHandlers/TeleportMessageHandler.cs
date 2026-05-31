@@ -33,6 +33,8 @@ namespace ZoneEngine.Core.MessageHandlers
 {
     #region Usings ...
 
+    using System;
+
     using CellAO.Core.Components;
     using CellAO.Core.Entities;
 
@@ -49,6 +51,8 @@ namespace ZoneEngine.Core.MessageHandlers
     [MessageHandler(MessageHandlerDirection.OutboundOnly)]
     public class TeleportMessageHandler : BaseMessageHandler<N3TeleportMessage, TeleportMessageHandler>
     {
+        private const IdentityType LivePlayfieldProxyType = (IdentityType)0x0000C79E;
+
         /// <summary>
         /// </summary>
         /// <param name="character">
@@ -139,6 +143,7 @@ namespace ZoneEngine.Core.MessageHandlers
             return x =>
             {
                 x.Identity = character.Identity;
+                x.Unknown = 0;
                 x.Destination = new SmokeLounge.AOtomation.Messaging.GameData.Vector3()
                                 {
                                     X = (float)destination.x,
@@ -161,6 +166,7 @@ namespace ZoneEngine.Core.MessageHandlers
                     ? new Identity { Type = IdentityType.Playfield2, Instance = playfield }
                     : Identity.None;
                 x.Playfield2 = destinationidentity;
+                x.Payload = BuildDestinationPayload(destination);
             };
         }
 
@@ -185,6 +191,7 @@ namespace ZoneEngine.Core.MessageHandlers
             return x =>
             {
                 x.Identity = character.Identity;
+                x.Unknown = 0;
                 x.Destination = new SmokeLounge.AOtomation.Messaging.GameData.Vector3()
                                 {
                                     X = (float)destination.x,
@@ -194,18 +201,36 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.Heading = new SmokeLounge.AOtomation.Messaging.GameData.Quaternion()
                             {
                                 X = (float)heading.x,
-                                Y = (float)heading.x,
-                                Z = (float)heading.y,
+                                Y = (float)heading.y,
+                                Z = (float)heading.z,
                                 W = (float)heading.w
                             };
                 x.Unknown1 = 0x61;
-                x.Playfield = new Identity() { Type = IdentityType.Playfield1, Instance = playfield.Instance };
-                x.ChangePlayfield = ((playfield.Instance != character.Playfield.Identity.Instance)
-                                     || (playfield.Type != character.Playfield.Identity.Type))
-                    ? new Identity { Type = IdentityType.Playfield2, Instance = playfield.Instance }
-                    : Identity.None;
-                x.Playfield2 = new Identity() { Type = IdentityType.Playfield3, Instance = playfield.Instance };
+                x.Playfield = new Identity() { Type = LivePlayfieldProxyType, Instance = playfield.Instance };
+                x.GameServerId = 1;
+                x.SgId = 0;
+                x.ChangePlayfield = new Identity { Type = IdentityType.Playfield2, Instance = playfield.Instance };
+                x.Unknown4 = 0;
+                x.Unknown5 = 0;
+                x.Playfield2 = Identity.None;
+                x.Payload = BuildDestinationPayload(destination);
             };
+        }
+
+        private static byte[] BuildDestinationPayload(Vector3 destination)
+        {
+            var payload = new byte[12];
+            WriteSingle(payload, 0, (float)destination.x);
+            WriteSingle(payload, 4, (float)destination.y);
+            WriteSingle(payload, 8, (float)destination.z);
+            return payload;
+        }
+
+        private static void WriteSingle(byte[] buffer, int offset, float value)
+        {
+            var bytes = BitConverter.GetBytes(value);
+            Array.Reverse(bytes);
+            Buffer.BlockCopy(bytes, 0, buffer, offset, bytes.Length);
         }
     }
 }
