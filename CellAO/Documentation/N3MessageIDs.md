@@ -1,4 +1,4 @@
-# N3 Message IDs #
+﻿# N3 Message IDs #
 `SmokeLounge.AOtomation.Messaging.Messages.N3MessageType`   : `Int32`  
 
 ----------
@@ -62,7 +62,9 @@
 
 **CreateQuest** = 0x291F361B,
 
-**Despawn** = 0x36510078,
+**ToClientQuit** = 0x36510078,
+
+**Despawn** = 0x36510078, *(legacy CellAO alias; do not use for dynel removal)*
 
 **DoorFullUpdate** = 0x365A5071,
 
@@ -276,7 +278,7 @@
 
 **StopMovingCmd** = 0x742E2314,
 
-**TeamInvite** = 0x4D2A3A38,
+**TeamInvite** = 0x4D2A313B,
 
 **TeamMember** = 0x46312D2E,
 
@@ -290,7 +292,7 @@
 
 **TrapItemFullUpdate** = 0x59313928,
 
-**UpdateClientVisual** = 0x45072A0B,
+**UpdateClientVisual** = 0x45072A2D,
 
 **VendingMachineFullUpdate** = 0x7F544905
 

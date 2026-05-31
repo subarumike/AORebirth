@@ -445,7 +445,13 @@ namespace CellAO.Core.Playfields
         /// </param>
         public void Despawn(Identity identity)
         {
-            this.Announce(DespawnMessageHandler.Default.Create(identity));
+            this.Announce(DropDynelMessageHandler.Default.Create(identity, this.DynelDropPosition(identity)));
+        }
+
+        private Coordinate DynelDropPosition(Identity identity)
+        {
+            IDynel dynel = Pool.Instance.GetObject<IDynel>(identity);
+            return dynel != null ? dynel.Coordinates() : new Coordinate();
         }
 
         public void DespawnNpcImmediately(ICharacter target)
@@ -668,8 +674,8 @@ namespace CellAO.Core.Playfields
 
             // Send packet, disconnect, and other playfield waits for connect
 
-            DespawnMessage despawnMessage = DespawnMessageHandler.Default.Create(dynel.Identity);
-            this.AnnounceOthers(despawnMessage, dynel.Identity);
+            DropDynelMessage dropDynelMessage = DropDynelMessageHandler.Default.Create(dynel.Identity, dynel.Coordinates());
+            this.AnnounceOthers(dropDynelMessage, dynel.Identity);
             dynel.RawCoordinates = new Vector3() { X = destination.x, Y = destination.y, Z = destination.z };
             dynel.RawHeading = new Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
 
