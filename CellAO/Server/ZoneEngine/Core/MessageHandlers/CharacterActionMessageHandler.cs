@@ -33,10 +33,13 @@ namespace ZoneEngine.Core.MessageHandlers
 {
     #region Usings ...
 
+    using System.Threading;
+
     using CellAO.Core.Components;
     using CellAO.Core.Entities;
     using CellAO.Core.Items;
     using CellAO.Core.Network;
+    using CellAO.Core.Playfields;
     using CellAO.Database.Dao;
     using CellAO.Enums;
 
@@ -59,6 +62,7 @@ namespace ZoneEngine.Core.MessageHandlers
     {
         private const int CompatSitDownActionCode = 0x0000011E;
         private const int CompatStandUpActionCode = 0x00000057;
+        private const int LiveDeathRespawnDelayMilliseconds = 2700;
 
         /// <summary>
         /// </summary>
@@ -202,6 +206,35 @@ namespace ZoneEngine.Core.MessageHandlers
                     // If action == Stop Logout
                     this.ApplyStand(client);
                     break;
+
+                case CharacterActionType.Die:
+                {
+                    client.Server.Info(
+                        client,
+                        "Player death action received. character={0} controller={1} playfield={2}",
+                        client.Controller.Character.Identity,
+                        client.Controller.Character.Controller == null
+                            ? "null"
+                            : client.Controller.Character.Controller.GetType().FullName,
+                        client.Controller.Character.Playfield == null
+                            ? "null"
+                            : client.Controller.Character.Playfield.Identity.ToString());
+
+                    Playfield playfield = client.Controller.Character.Playfield as Playfield;
+                    if (playfield != null)
+                    {
+                        Thread.Sleep(LiveDeathRespawnDelayMilliseconds);
+                        playfield.RespawnPlayer(client.Controller.Character);
+                    }
+                    else
+                    {
+                        LogUtil.Debug(
+                            DebugInfoDetail.Network,
+                            "Player death respawn deferred because current playfield is not a ZoneEngine playfield.");
+                    }
+
+                    break;
+                }
 
                 case CharacterActionType.StandUp:
                 {

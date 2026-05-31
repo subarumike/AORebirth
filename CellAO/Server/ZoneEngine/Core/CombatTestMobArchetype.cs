@@ -338,6 +338,9 @@ namespace ZoneEngine.Core
             SetMobStat(mobCharacter, StatIds.visualflags, 0x1F);
             SetMobStat(mobCharacter, StatIds.side, 3);
             SetMobStat(mobCharacter, StatIds.fatness, 1);
+            SetMobStat(mobCharacter, StatIds.currentmovementmode, (int)MoveModes.Run);
+            SetMobStat(mobCharacter, StatIds.prevmovementmode, (int)MoveModes.Run);
+            SetMobStat(mobCharacter, StatIds.runspeed, EnemyBehaviorContract.NpcRunSpeedForMaxFollowSpeed);
             SetMobStat(mobCharacter, StatIds.breed, entry.Breed);
             SetMobStat(mobCharacter, StatIds.sex, entry.Sex);
             SetMobStat(mobCharacter, StatIds.race, 1);
@@ -353,7 +356,8 @@ namespace ZoneEngine.Core
             SetMobStat(mobCharacter, StatIds.maxdamage, 3);
             SetMobStat(mobCharacter, StatIds.damagebonus, 0);
             SetMobStat(mobCharacter, StatIds.defaultattacktype, 0);
-            SetMobStat(mobCharacter, StatIds.damagetype, 0);
+            SetMobStat(mobCharacter, StatIds.damageoverridetype, (int)StatIds.meleeac);
+            SetMobStat(mobCharacter, StatIds.damagetype, (int)StatIds.meleeac);
             SetMobStat(mobCharacter, StatIds.weapontype, 0);
             SetMobStat(mobCharacter, StatIds.equippedweapons, 0);
 

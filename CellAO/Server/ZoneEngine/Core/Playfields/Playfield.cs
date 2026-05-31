@@ -35,6 +35,7 @@ namespace CellAO.Core.Playfields
 
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
@@ -130,11 +131,19 @@ namespace CellAO.Core.Playfields
 
         private const int DefaultNpcDeathAnimationKey = 0x1F7;
 
+        private const int DefaultPlayerDeathAnimationKey = 500;
+
+        private const int DeathRespawnActionParameter1 = 1000020;
+
+        private const int DeathRespawnActionParameter2 = 295830;
+
         private static readonly TimeSpan DeadNpcDespawnDelay = TimeSpan.FromSeconds(10);
 
         private static readonly TimeSpan CorpseSpawnDelay = TimeSpan.FromMilliseconds(600);
 
         private const double MaxMeleeCombatDistance = 8.0;
+
+        private const double MaxMeleeFollowHoldDistance = 3.0;
 
         private const int MissingItemStatValue = 1234567890;
 
@@ -142,7 +151,21 @@ namespace CellAO.Core.Playfields
 
         private const double OutOfRangeRetrySeconds = 1.0;
 
-        private const double MaxNpcLeashDistance = 40.0;
+        private const int RubiKaStartPlayfield = 4582;
+
+        private const int RubiKaStartX = 939;
+
+        private const int RubiKaStartY = 20;
+
+        private const int RubiKaStartZ = 732;
+
+        private const int ShadowlandsStartPlayfield = 4001;
+
+        private const int ShadowlandsStartX = 850;
+
+        private const int ShadowlandsStartY = 43;
+
+        private const int ShadowlandsStartZ = 565;
 
         private static readonly Random LootRandom = new Random();
 
@@ -996,94 +1019,289 @@ namespace CellAO.Core.Playfields
         /// </param>
         private void HeartBeatTimer(object sender)
         {
-            this.ProcessPendingCorpseSpawns();
-            this.ProcessCorpseDespawns();
-
-            IEnumerable<IEntity> dynels = null;
-            dynels =
-                Pool.Instance.GetAll<ICharacter>((int)IdentityType.CanbeAffected)
-                    .Where(
-                        xx =>
-                            xx.InPlayfield(this.Identity)
-                            && (!xx.DoNotDoTimers || this.deadNpcDespawnTicks.ContainsKey(xx.Identity.Instance)));
-
-            foreach (ICharacter dynel in dynels)
+            try
             {
-                if (dynel != null)
+                this.ProcessPendingCorpseSpawns();
+                this.ProcessCorpseDespawns();
+
+                IEnumerable<IEntity> dynels = null;
+                dynels =
+                    Pool.Instance.GetAll<ICharacter>((int)IdentityType.CanbeAffected)
+                        .Where(
+                            xx =>
+                                xx.InPlayfield(this.Identity)
+                                && (!xx.DoNotDoTimers || this.deadNpcDespawnTicks.ContainsKey(xx.Identity.Instance)))
+                        .ToList();
+
+                foreach (ICharacter dynel in dynels)
                 {
-                    if (dynel.Starting)
+                    if (dynel != null)
                     {
-                        continue;
-                    }
-
-                    if (this.ProcessDeadNpc(dynel))
-                    {
-                        continue;
-                    }
-
-                    if (dynel.DoNotDoTimers)
-                    {
-                        continue;
-                    }
-
-                    bool changed = false;
-                    StatHealInterval healInterval = (StatHealInterval)dynel.Stats[StatIds.healinterval];
-                    if (healInterval.LastTick < DateTime.UtcNow)
-                    {
-                        int interval = healInterval.Value;
-                        int delta = dynel.Stats[StatIds.healdelta].Value;
-                        dynel.Stats[StatIds.health].Value =
-                            Math.Min(dynel.Stats[StatIds.life].Value, dynel.Stats[StatIds.health].Value + delta);
-                        healInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(interval);
-                        changed = true;
-                    }
-
-                    StatNanoInterval nanoInterval = (StatNanoInterval)dynel.Stats[StatIds.nanointerval];
-                    if (nanoInterval.LastTick < DateTime.UtcNow)
-                    {
-                        int interval = nanoInterval.Value;
-                        int delta = dynel.Stats[StatIds.nanodelta].Value;
-                        dynel.Stats[StatIds.currentnano].Value += delta;
-                        nanoInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(interval);
-                        changed = true;
-                    }
-
-                    if (changed)
-                    {
-                        dynel.SendChangedStats();
-                    }
-
-                    this.DoCombatTick(dynel);
-
-                    if (dynel.Controller.IsFollowing())
-                    {
-                        dynel.Controller.DoFollow();
-                    }
-                    else
-                    {
-                        if (dynel.Controller is NPCController)
+                        if (dynel.Starting)
                         {
-                            if (dynel.Controller.State == CharacterState.Patrolling)
+                            continue;
+                        }
+
+                        if (this.ProcessDeadNpc(dynel))
+                        {
+                            continue;
+                        }
+
+                        if (dynel.DoNotDoTimers)
+                        {
+                            continue;
+                        }
+
+                        bool changed = false;
+                        StatHealInterval healInterval = (StatHealInterval)dynel.Stats[StatIds.healinterval];
+                        int healIntervalSeconds = healInterval.Value;
+                        int healDelta = dynel.Stats[StatIds.healdelta].Value;
+                        if (healIntervalSeconds > 0
+                            && healDelta != 0
+                            && healInterval.LastTick < DateTime.UtcNow)
+                        {
+                            dynel.Stats[StatIds.health].Value =
+                                Math.Min(dynel.Stats[StatIds.life].Value, dynel.Stats[StatIds.health].Value + healDelta);
+                            healInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(healIntervalSeconds);
+                            changed = true;
+                        }
+
+                        StatNanoInterval nanoInterval = (StatNanoInterval)dynel.Stats[StatIds.nanointerval];
+                        int nanoIntervalSeconds = nanoInterval.Value;
+                        int nanoDelta = dynel.Stats[StatIds.nanodelta].Value;
+                        if (nanoIntervalSeconds > 0
+                            && nanoDelta != 0
+                            && nanoInterval.LastTick < DateTime.UtcNow)
+                        {
+                            dynel.Stats[StatIds.currentnano].Value += nanoDelta;
+                            nanoInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(nanoIntervalSeconds);
+                            changed = true;
+                        }
+
+                        if (changed)
+                        {
+                            dynel.SendChangedStats();
+                        }
+
+                        this.DoCombatTick(dynel);
+
+                        if (dynel.Controller.IsFollowing())
+                        {
+                            dynel.Controller.DoFollow();
+                        }
+                        else
+                        {
+                            if (dynel.Controller is NPCController)
                             {
-                                dynel.Controller.StartPatrolling();
+                                if (dynel.Controller.State == CharacterState.Patrolling)
+                                {
+                                    dynel.Controller.StartPatrolling();
+                                }
                             }
                         }
-                    }
 
-                    if (dynel.Controller is PlayerController)
-                    {
-                        this.CheckWallCollision(dynel);
-                        this.CheckStatelCollision(dynel);
+                        if (dynel.Controller is PlayerController)
+                        {
+                            this.CheckWallCollision(dynel);
+                            this.CheckStatelCollision(dynel);
+                        }
                     }
                 }
             }
-            try
+            catch (Exception e)
             {
-                this.heartBeat.Change(10, 0);
+                LogUtil.ErrorException(e, false, "Playfield heartbeat failed for {0}", this.Identity);
             }
-            catch (ObjectDisposedException)
+            finally
             {
+                try
+                {
+                    this.heartBeat.Change(10, 0);
+                }
+                catch (ObjectDisposedException)
+                {
+                }
             }
+        }
+
+        public void ResetCombatTick(Identity attacker)
+        {
+            this.nextCombatTicks.Remove(attacker.Instance);
+        }
+
+        public void RespawnPlayer(ICharacter character)
+        {
+            if (character == null)
+            {
+                LogUtil.Debug(DebugInfoDetail.Error, "Player death respawn skipped: character=null.");
+                return;
+            }
+
+            if (!(character.Controller is PlayerController))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Player death respawn skipped: controller={0} character={1}",
+                        character.Controller == null ? "null" : character.Controller.GetType().FullName,
+                        character.Identity));
+                return;
+            }
+
+            Dynel dynel = character as Dynel;
+            if (dynel == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Player death respawn skipped: character is not Dynel character={0}",
+                        character.Identity));
+                return;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Player death respawn entered target={0} pf={1}",
+                    character.Identity,
+                    this.Identity));
+
+            Coordinate destination;
+            Identity destinationPlayfield;
+            this.ResolvePlayerRespawnLocation(character, out destination, out destinationPlayfield);
+
+            Identity corpseIdentity = this.AllocateCorpseIdentity();
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Player corpse visual skipped target={0} corpse={1}; current CorpseFullUpdate template is NPC-loot oriented and breaks modern death teleport flow.",
+                    character.Identity,
+                    corpseIdentity));
+            this.SendDeathSocialStatus(character);
+            this.MarkPlayerRespawned(character);
+            this.SendDeathRespawnStateStats(character);
+            character.StopMovement();
+            character.SetTarget(Identity.None);
+            character.SetFightingTarget(Identity.None);
+            this.nextCombatTicks.Remove(character.Identity.Instance);
+            this.lastCombatWeaponSlots.Remove(character.Identity.Instance);
+            this.StopFightingDeadTarget(character.Identity);
+            this.SendCombatStopMessage(character);
+            character.SendChangedStats();
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Player death respawn requested target={0} corpse={1} destination={2}:{3} pos={4:0.00},{5:0.00},{6:0.00}",
+                    character.Identity,
+                    corpseIdentity,
+                    destinationPlayfield.Type,
+                    destinationPlayfield.Instance,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            character.DoNotDoTimers = false;
+            if (this.TryCompleteDeathRespawnInCurrentPlayfield(dynel, destination, character.RawHeading, destinationPlayfield))
+            {
+                return;
+            }
+
+            this.Teleport(dynel, destination, character.RawHeading, destinationPlayfield);
+        }
+
+        private bool TryCompleteDeathRespawnInCurrentPlayfield(
+            Dynel dynel,
+            Coordinate destination,
+            IQuaternion heading,
+            Identity destinationPlayfield)
+        {
+            if (destinationPlayfield.Type != this.Identity.Type || destinationPlayfield.Instance != this.Identity.Instance)
+            {
+                return false;
+            }
+
+            ICharacter character = dynel as ICharacter;
+            ZoneClient client = dynel.Controller == null ? null : dynel.Controller.Client as ZoneClient;
+            if (character == null || client == null)
+            {
+                return false;
+            }
+
+            TeleportMessageHandler.Default.Send(
+                character,
+                destination.coordinate,
+                new CellAO.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf),
+                destinationPlayfield);
+
+            dynel.RawCoordinates = new CellAO.Core.Vector.Vector3
+                                   {
+                                       x = destination.x,
+                                       y = destination.y,
+                                       z = destination.z
+                                   };
+            dynel.RawHeading = new CellAO.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
+
+            PlayfieldAnarchyFMessageHandler.Default.Send(character);
+            SimpleCharFullUpdate.SendToPlayfield(client);
+            this.SendDeathSocialStatus(character);
+            this.SendDeathRespawnStateStats(character);
+
+            var sendSCFUs = new IMSendPlayerSCFUs { toClient = client };
+            this.SendSCFUsToClient(sendSCFUs);
+
+            foreach (StaticDynel staticDynel in Pool.Instance.GetAll<StaticDynel>(this.Identity))
+            {
+                SimpleItemFullUpdateMessageHandler.Default.Send(character, staticDynel);
+            }
+
+            WeaponItemFullUpdate.SendWeaponDefinitions(character);
+            this.SendDeathRespawnGameTime(character);
+            this.SendDeathSocialStatus(character);
+            FullCharacterMessageHandler.Default.Send(character);
+            this.SendDeathRespawnPlayfieldReadyBlock(client, character);
+            this.SendDeathRespawnAction(character);
+            ClientMoveItemToInventoryMessageHandler.EnsureWeaponVisualMeshes(character, false);
+            AppearanceUpdateMessageHandler.Default.Send(character);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Player death respawn completed in current playfield target={0} destination={1}:{2} pos={3:0.00},{4:0.00},{5:0.00}",
+                    character.Identity,
+                    destinationPlayfield.Type,
+                    destinationPlayfield.Instance,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
+        }
+
+        private void SendDeathRespawnGameTime(ICharacter character)
+        {
+            character.Send(
+                new GameTimeMessage
+                {
+                    Identity = character.Identity,
+                    Unknown1 = 30024.0f,
+                    Unknown3 = 185408,
+                    Unknown4 = 80183.3125f
+                },
+                false);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Player death respawn game time target={0}",
+                    character.Identity));
         }
 
         private void DoCombatTick(ICharacter attacker)
@@ -1095,6 +1313,45 @@ namespace CellAO.Core.Playfields
                 return;
             }
 
+            ICharacter target = this.FindByIdentity<ICharacter>(attacker.FightingTarget);
+            if (target == null || !target.InPlayfield(this.Identity) || target.Stats[StatIds.health].Value <= 0)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "CombatTickTargetInvalid attacker={0} target={1} found={2} inPlayfield={3} health={4}",
+                        attacker.Identity,
+                        attacker.FightingTarget,
+                        target != null,
+                        target != null && target.InPlayfield(this.Identity),
+                        target == null ? 0 : target.Stats[StatIds.health].Value));
+                if (attacker.Controller is NPCController)
+                {
+                    double invalidDistance = target == null
+                                                 ? -1.0
+                                                 : GetCombatDistance(attacker, target);
+                    LogNpcBrain("Idle", "target-invalid", attacker, target, 0.0, invalidDistance);
+                }
+
+                attacker.SetFightingTarget(Identity.None);
+                this.nextCombatTicks.Remove(attacker.Identity.Instance);
+                this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
+                return;
+            }
+
+            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
+            if (attacker.Controller is NPCController
+                && !this.IsInCombatRange(attacker, target, attackSource.Range))
+            {
+                this.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
+                return;
+            }
+
+            if (attacker.Controller is NPCController && !ShouldNpcStopForCombatAttack(attackSource))
+            {
+                this.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);
+            }
+
             DateTime nextTick;
             if (this.nextCombatTicks.TryGetValue(attacker.Identity.Instance, out nextTick)
                 && nextTick > DateTime.UtcNow)
@@ -1102,27 +1359,17 @@ namespace CellAO.Core.Playfields
                 return;
             }
 
-            ICharacter target = this.FindByIdentity<ICharacter>(attacker.FightingTarget);
-            if (target == null || !target.InPlayfield(this.Identity) || target.Stats[StatIds.health].Value <= 0)
-            {
-                attacker.SetFightingTarget(Identity.None);
-                this.nextCombatTicks.Remove(attacker.Identity.Instance);
-                this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
-                return;
-            }
-
-            if (this.TryLeashNpcAttacker(attacker))
-            {
-                return;
-            }
-
-            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
             if (!this.IsInCombatRange(attacker, target, attackSource.Range))
             {
-                this.TryMoveNpcIntoCombatRange(attacker, target);
+                this.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
                 this.nextCombatTicks[attacker.Identity.Instance] =
                     DateTime.UtcNow + TimeSpan.FromSeconds(OutOfRangeRetrySeconds);
                 return;
+            }
+
+            if (attacker.Controller is NPCController && ShouldNpcStopForCombatAttack(attackSource))
+            {
+                this.StopNpcFollowIfInCombatRange(attacker, target, attackSource.Range);
             }
 
             int currentHealth = target.Stats[StatIds.health].Value;
@@ -1158,6 +1405,10 @@ namespace CellAO.Core.Playfields
                 {
                     this.KillNpcTarget(target);
                 }
+                else if (target.Controller is PlayerController)
+                {
+                    this.KillPlayerTarget(target);
+                }
                 else
                 {
                     attacker.SetFightingTarget(Identity.None);
@@ -1184,7 +1435,86 @@ namespace CellAO.Core.Playfields
 
         private bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)
         {
-            return attacker.Coordinates().coordinate.Distance2D(target.Coordinates().coordinate) <= range;
+            return GetCombatDistance(attacker, target) <= range;
+        }
+
+        private static CellAO.Core.Vector.Vector3 GetCombatPosition(ICharacter character)
+        {
+            if (character.Controller is PlayerController)
+            {
+                Vector3 raw = character.RawCoordinates;
+                CellAO.Core.Vector.Vector3 rawPosition =
+                    new CellAO.Core.Vector.Vector3(raw.X, raw.Y, raw.Z);
+                CellAO.Core.Vector.Vector3 predictedPosition = character.Coordinates().coordinate;
+                return MoveCombatPositionToward(
+                    rawPosition,
+                    predictedPosition,
+                    EnemyBehaviorContract.MaxPlayerChaseProjectionDistance);
+            }
+
+            return character.Coordinates().coordinate;
+        }
+
+        private static CellAO.Core.Vector.Vector3 MoveCombatPositionToward(
+            CellAO.Core.Vector.Vector3 start,
+            CellAO.Core.Vector.Vector3 destination,
+            double maxDistance)
+        {
+            double distance = start.Distance2D(destination);
+            if (distance < 0.001 || maxDistance <= 0)
+            {
+                return new CellAO.Core.Vector.Vector3(start.x, start.y, start.z);
+            }
+
+            double step = Math.Min(distance, maxDistance);
+            double factor = step / distance;
+            return new CellAO.Core.Vector.Vector3(
+                start.x + ((destination.x - start.x) * factor),
+                start.y + ((destination.y - start.y) * factor),
+                start.z + ((destination.z - start.z) * factor));
+        }
+
+        private static double GetCombatDistance(ICharacter attacker, ICharacter target)
+        {
+            return GetCombatPosition(attacker).Distance2D(GetCombatPosition(target));
+        }
+
+        private static void LogNpcBrain(string state, string reason, ICharacter attacker, ICharacter target, double range, double distance)
+        {
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "NPCBRAIN state={0} reason={1} npc={2} target={3} dist={4:0.00} range={5:0.00}",
+                    state,
+                    reason,
+                    attacker.Identity.ToString(true),
+                    target == null ? Identity.None.ToString(true) : target.Identity.ToString(true),
+                    distance,
+                    range));
+        }
+
+        private void StopNpcFollowIfInCombatRange(ICharacter attacker, ICharacter target, double range)
+        {
+            NPCController npcController = attacker.Controller as NPCController;
+            if (npcController == null || !npcController.IsFollowing())
+            {
+                return;
+            }
+
+            if (!this.IsInCombatRange(attacker, target, range))
+            {
+                return;
+            }
+
+            LogNpcBrain(
+                "InRangeAttacking",
+                "in-range",
+                attacker,
+                target,
+                range,
+                GetCombatDistance(attacker, target));
+            npcController.StopFollowForCombatRange(GetCombatPosition(target));
         }
 
         private void AnnounceCombatDamage(
@@ -1194,6 +1524,24 @@ namespace CellAO.Core.Playfields
             CombatAttackSource attackSource,
             CombatDamageSource source)
         {
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "CombatAttackInfoSend source={0} attacker={1} target={2} dmg={3} u2={4} u3={5} u4={6} u5={7} u6=0 weaponBased={8} atkDefault={9} atkDamageType={10} atkWeaponType={11} atkEquippedWeapons={12}",
+                    source,
+                    attacker.Identity,
+                    target.Identity,
+                    damage,
+                    attackSource.AttackInfoAmmoCount,
+                    attackSource.AttackInfoWeaponSlot,
+                    attackSource.AttackInfoUnk1,
+                    attackSource.AttackInfoHitType,
+                    attackSource.UsesEquippedWeapon ? 1 : 0,
+                    attacker.Stats[StatIds.defaultattacktype].Value,
+                    attacker.Stats[StatIds.damagetype].Value,
+                    attacker.Stats[StatIds.weapontype].Value,
+                    attacker.Stats[StatIds.equippedweapons].Value));
+
             this.Announce(
                 new AttackInfoMessage
                 {
@@ -1218,8 +1566,25 @@ namespace CellAO.Core.Playfields
         {
             if (!ShouldSendHealthDamage(source))
             {
+                LogUtil.Debug(
+                    DebugInfoDetail.Network,
+                    string.Format(
+                        "CombatHealthDamageSkip source={0} attacker={1} target={2} dmg={3}",
+                        source,
+                        attacker.Identity,
+                        target.Identity,
+                        damage));
                 return;
             }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "CombatHealthDamageSend source={0} attacker={1} target={2} dmg={3}",
+                    source,
+                    attacker.Identity,
+                    target.Identity,
+                    damage));
 
             this.Announce(
                 new HealthDamageMessage
@@ -1247,8 +1612,17 @@ namespace CellAO.Core.Playfields
             if (equippedWeapon == null)
             {
                 LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    string.Format("CombatAttackSource unarmed attacker={0}", attacker.Identity));
+                    DebugInfoDetail.Network,
+                    string.Format(
+                        "CombatAttackSource unarmed attacker={0} mindmg={1} maxdmg={2} bonus={3} defaultattack={4} damagetype={5} weapontype={6} equippedweapons={7}",
+                        attacker.Identity,
+                        attacker.Stats[StatIds.mindamage].Value,
+                        attacker.Stats[StatIds.maxdamage].Value,
+                        attacker.Stats[StatIds.damagebonus].Value,
+                        attacker.Stats[StatIds.defaultattacktype].Value,
+                        attacker.Stats[StatIds.damagetype].Value,
+                        attacker.Stats[StatIds.weapontype].Value,
+                        attacker.Stats[StatIds.equippedweapons].Value));
                 bool isNpcAttacker = attacker.Controller is NPCController;
                 return new CombatAttackSource
                        {
@@ -1258,8 +1632,8 @@ namespace CellAO.Core.Playfields
                            Range = MaxMeleeCombatDistance,
                            RechargeSeconds = DefaultCombatTickSeconds,
                            UsesEquippedWeapon = false,
-                           AttackInfoAmmoCount = 1,
-                           AttackInfoWeaponSlot = isNpcAttacker ? 1 : 0,
+                           AttackInfoAmmoCount = 0,
+                           AttackInfoWeaponSlot = 0,
                            AttackInfoUnk1 = 0,
                            AttackInfoHitType = isNpcAttacker ? 3 : 0
                         };
@@ -1271,7 +1645,7 @@ namespace CellAO.Core.Playfields
             int damageBonus = NormalizeCombatItemStat(weapon.GetAttribute((int)StatIds.damagebonus), 0);
 
             LogUtil.Debug(
-                DebugInfoDetail.Error,
+                DebugInfoDetail.Network,
                 string.Format(
                     "CombatAttackSource weapon attacker={0} item={1}/{2} slot={3} min={4} max={5} rangeRaw={6}",
                     attacker.Identity,
@@ -1396,60 +1770,64 @@ namespace CellAO.Core.Playfields
             return Math.Max(0.25, totalCentiseconds / 100.0);
         }
 
-        private void TryMoveNpcIntoCombatRange(ICharacter attacker, ICharacter target)
+        private static double BuildNpcCombatFollowStopDistance(double range)
         {
-            if (!(attacker.Controller is NPCController) || attacker.Controller.IsFollowing())
-            {
-                return;
-            }
-
-            attacker.Controller.Follow(target.Identity);
+            return range > MaxMeleeCombatDistance ? range : 0.0;
         }
 
-        private bool TryLeashNpcAttacker(ICharacter attacker)
+        private static bool ShouldNpcStopForCombatAttack(CombatAttackSource attackSource)
+        {
+            return attackSource.Range > MaxMeleeCombatDistance;
+        }
+
+        private void UpdateNpcMeleeFollowHold(ICharacter attacker, ICharacter target, double range)
         {
             NPCController npcController = attacker.Controller as NPCController;
             if (npcController == null)
             {
-                return false;
+                return;
             }
 
-            NpcHomeState homeState;
-            if (!this.npcHomeStates.TryGetValue(attacker.Identity.Instance, out homeState))
+            double distance = GetCombatDistance(attacker, target);
+            bool closeEnoughToHold = distance <= MaxMeleeFollowHoldDistance;
+            npcController.SuppressMotionSegmentUpdates(closeEnoughToHold);
+            if (closeEnoughToHold || npcController.IsFollowing())
             {
-                this.RegisterNpcHome(attacker);
-                return false;
+                return;
             }
 
-            if (attacker.Coordinates().coordinate.Distance2D(homeState.Coordinates.coordinate) <= MaxNpcLeashDistance)
+            LogNpcBrain(
+                "Chasing",
+                "melee-separated",
+                attacker,
+                target,
+                range,
+                distance);
+            npcController.Follow(target.Identity, BuildNpcCombatFollowStopDistance(range));
+        }
+
+        private void TryMoveNpcIntoCombatRange(ICharacter attacker, ICharacter target, double range)
+        {
+            NPCController npcController = attacker.Controller as NPCController;
+            if (npcController == null)
             {
-                return false;
+                return;
             }
 
-            attacker.SetTarget(Identity.None);
-            attacker.SetFightingTarget(Identity.None);
-            this.nextCombatTicks.Remove(attacker.Identity.Instance);
-            this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
-            this.StopFightingDeadTarget(attacker.Identity);
-            npcController.StopFollow();
-            npcController.MoveTo(
-                new Vector3
-                {
-                    X = homeState.Coordinates.x,
-                    Y = homeState.Coordinates.y,
-                    Z = homeState.Coordinates.z
-                });
+            npcController.SuppressMotionSegmentUpdates(false);
+            if (npcController.IsFollowing())
+            {
+                return;
+            }
 
-            LogUtil.Debug(
-                DebugInfoDetail.Network,
-                string.Format(
-                    "NPC leashed home npc={0} home={1:0.00},{2:0.00},{3:0.00}",
-                    attacker.Identity.ToString(true),
-                    homeState.Coordinates.x,
-                    homeState.Coordinates.y,
-                    homeState.Coordinates.z));
-
-            return true;
+            LogNpcBrain(
+                "Chasing",
+                "out-of-range",
+                attacker,
+                target,
+                range,
+                GetCombatDistance(attacker, target));
+            npcController.Follow(target.Identity, BuildNpcCombatFollowStopDistance(range));
         }
 
         private void KillNpcTarget(ICharacter target)
@@ -1482,6 +1860,26 @@ namespace CellAO.Core.Playfields
             this.deadNpcDespawnTicks[target.Identity.Instance] = DateTime.UtcNow + DeadNpcDespawnDelay;
 
             LogUtil.Debug(DebugInfoDetail.Network, string.Format("NPC died target={0}", target.Identity));
+        }
+
+        private void KillPlayerTarget(ICharacter target)
+        {
+            if (!(target.Controller is PlayerController))
+            {
+                return;
+            }
+
+            this.MarkPlayerDead(target);
+            target.SendChangedStats();
+            target.SetTarget(Identity.None);
+            target.SetFightingTarget(Identity.None);
+            this.nextCombatTicks.Remove(target.Identity.Instance);
+            this.lastCombatWeaponSlots.Remove(target.Identity.Instance);
+            this.StopFightingDeadTarget(target.Identity);
+            this.SendCombatStopMessage(target);
+            this.SendPlayerDeathAnimation(target);
+
+            LogUtil.Debug(DebugInfoDetail.Network, string.Format("Player died target={0}", target.Identity));
         }
 
         public bool TryUseCorpse(ICharacter looter, Identity corpseIdentity)
@@ -1819,6 +2217,210 @@ namespace CellAO.Core.Playfields
             target.DoNotDoTimers = true;
         }
 
+        private void MarkPlayerDead(ICharacter target)
+        {
+            target.Stats[StatIds.health].Value = 0;
+            target.Stats[StatIds.state].Value = 0;
+            target.Stats[StatIds.currentstate].Value = 0;
+            target.Stats[StatIds.actioncategory].Value = 0;
+            target.Stats[StatIds.deadtimer].Value = 1;
+            target.Stats[StatIds.healdelta].Value = 0;
+            target.Stats[StatIds.nanodelta].Value = 0;
+        }
+
+        private void MarkPlayerRespawned(ICharacter target)
+        {
+            target.CalculateSkills();
+            int maxHealth = Math.Max(1, target.Stats[StatIds.life].Value);
+            target.Stats[StatIds.health].Value = Math.Max(1, maxHealth / 3);
+            target.Stats[StatIds.state].Value = 0;
+            target.Stats[StatIds.currentstate].Value = 0;
+            target.Stats[StatIds.actioncategory].Value = 0;
+            target.Stats[StatIds.deadtimer].Value = 0;
+            target.Stats[StatIds.deadtimer].BaseValue = 0;
+            target.Stats[StatIds.currentmovementmode].Value = (int)MoveModes.Run;
+            target.Stats[StatIds.currentmovementmode].BaseValue = (uint)MoveModes.Run;
+            target.Stats[StatIds.prevmovementmode].Value = (int)MoveModes.Run;
+            target.Stats[StatIds.prevmovementmode].BaseValue = (uint)MoveModes.Run;
+            target.Stats[StatIds.specialcondition].Value = 3;
+            target.Stats[StatIds.specialcondition].BaseValue = 3;
+            target.Stats[StatIds.damageoverridetype].Value = 0;
+            target.Stats[StatIds.damageoverridetype].BaseValue = 0;
+            target.Stats[StatIds.deathreason].Value = 0;
+            target.Stats[StatIds.deathreason].BaseValue = 0;
+        }
+
+        private void SendDeathRespawnStateStats(ICharacter target)
+        {
+            target.Send(
+                new StatMessage
+                {
+                    Identity = target.Identity,
+                    Unknown = 0,
+                    Stats =
+                        new[]
+                        {
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = CharacterStat.Health,
+                                Value2 = (uint)Math.Max(0, target.Stats[StatIds.health].Value)
+                            },
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = CharacterStat.CurrentNano,
+                                Value2 = (uint)Math.Max(0, target.Stats[StatIds.currentnano].Value)
+                            },
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = CharacterStat.DeadTimer,
+                                Value2 = 0
+                            },
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = (CharacterStat)StatIds.state,
+                                Value2 = 0
+                            },
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = CharacterStat.CurrentState,
+                                Value2 = 0
+                            },
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = CharacterStat.ActionCategory,
+                                Value2 = 0
+                            },
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = (CharacterStat)StatIds.specialcondition,
+                                Value2 = 3
+                            },
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = (CharacterStat)StatIds.damageoverridetype,
+                                Value2 = 0
+                            },
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = (CharacterStat)StatIds.deathreason,
+                                Value2 = 0
+                            }
+                        }
+                },
+                false);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Player death respawn state stats target={0} hp={1}/{2} nano={3} deadTimer=0",
+                    target.Identity,
+                    target.Stats[StatIds.health].Value,
+                    target.Stats[StatIds.life].Value,
+                    target.Stats[StatIds.currentnano].Value));
+        }
+
+        private void SendDeathSocialStatus(ICharacter target)
+        {
+            target.Send(
+                new StatMessage
+                {
+                    Identity = target.Identity,
+                    Unknown = 1,
+                    Stats =
+                        new[]
+                        {
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = CharacterStat.SocialStatus,
+                                Value2 = 0
+                            }
+                        }
+                },
+                false);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Player death social status target={0} socialStatus=0 unknown=1",
+                    target.Identity));
+        }
+
+        private void ResolvePlayerRespawnLocation(
+            ICharacter character,
+            out Coordinate destination,
+            out Identity destinationPlayfield)
+        {
+            ResolveStarterRespawnLocation(character, out destination, out destinationPlayfield);
+
+            int savedPlayfield = character.Stats[StatIds.tempsaveplayfield].Value;
+            int savedX = character.Stats[StatIds.tempsavex].Value;
+            int savedY = character.Stats[StatIds.tempsavey].Value;
+            if (savedPlayfield <= 0 || savedX <= 0 || savedY <= 0)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Network,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Player respawn using starter fallback target={0} destination={1}:{2} pos={3:0.00},{4:0.00},{5:0.00}",
+                        character.Identity,
+                        destinationPlayfield.Type,
+                        destinationPlayfield.Instance,
+                        destination.x,
+                        destination.y,
+                        destination.z));
+                return;
+            }
+
+            destination = new Coordinate(savedX, character.RawCoordinates.Y, savedY);
+            destinationPlayfield = new Identity
+                                   {
+                                       Type = IdentityType.Playfield,
+                                       Instance = savedPlayfield
+                                   };
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Player respawn using temp save target={0} destination={1}:{2} pos={3:0.00},{4:0.00},{5:0.00}",
+                    character.Identity,
+                    destinationPlayfield.Type,
+                    destinationPlayfield.Instance,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+        }
+
+        private static void ResolveStarterRespawnLocation(
+            ICharacter character,
+            out Coordinate destination,
+            out Identity destinationPlayfield)
+        {
+            int startPlayfield = RubiKaStartPlayfield;
+            int startX = RubiKaStartX;
+            int startY = RubiKaStartY;
+            int startZ = RubiKaStartZ;
+
+            if ((character != null)
+                && (character.Playfield != null)
+                && (character.Playfield.Identity.Instance == ShadowlandsStartPlayfield))
+            {
+                startPlayfield = ShadowlandsStartPlayfield;
+                startX = ShadowlandsStartX;
+                startY = ShadowlandsStartY;
+                startZ = ShadowlandsStartZ;
+            }
+
+            destination = new Coordinate(startX, startY, startZ);
+            destinationPlayfield = new Identity
+                                   {
+                                       Type = IdentityType.Playfield,
+                                       Instance = startPlayfield
+                                   };
+        }
+
         private void SendNpcDeathAnimation(ICharacter target)
         {
             this.Announce(
@@ -1835,6 +2437,102 @@ namespace CellAO.Core.Playfields
                 });
         }
 
+        private void SendPlayerDeathAnimation(ICharacter target)
+        {
+            this.Announce(
+                new CharacterActionMessage
+                {
+                    Identity = target.Identity,
+                    Unknown = 0,
+                    Action = CharacterActionType.Death,
+                    Unknown1 = 0,
+                    Target = Identity.None,
+                    Parameter1 = 0,
+                    Parameter2 = DefaultPlayerDeathAnimationKey,
+                    Unknown2 = 0
+                });
+        }
+
+        private void SendDeathRespawnAction(ICharacter character)
+        {
+            character.Send(
+                new CharacterActionMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 0,
+                    Action = CharacterActionType.DeathRespawn,
+                    Unknown1 = 0,
+                    Target = Identity.None,
+                    Parameter1 = DeathRespawnActionParameter1,
+                    Parameter2 = DeathRespawnActionParameter2,
+                    Unknown2 = 0
+                },
+                false);
+        }
+
+        private void SendDeathRespawnPlayfieldReadyBlock(ZoneClient client, ICharacter character)
+        {
+            var playfieldIdentity = new Identity
+                                    {
+                                        Type = IdentityType.Playfield2,
+                                        Instance = this.Identity.Instance
+                                    };
+
+            client.SendCompressed(
+                new PlayfieldAllTowersMessage
+                {
+                    Identity = playfieldIdentity,
+                    Unknown1 = new TowerProxyBase[0]
+                });
+
+            client.SendCompressed(
+                new PlayfieldAllCitiesMessage
+                {
+                    Identity = playfieldIdentity,
+                    Payload = new byte[0]
+                });
+
+            client.SendCompressed(
+                new SpecialAttackWeaponMessage
+                {
+                    Identity = character.Identity,
+                    Specials = CreateDefaultPlayerSpecialAttacks(),
+                    Unknown1 = 6,
+                    Unknown2 = 6,
+                    Unknown3 = 6,
+                    Unknown4 = 6,
+                    Unknown5 = 100
+                });
+        }
+
+        private static SpecialAttack[] CreateDefaultPlayerSpecialAttacks()
+        {
+            return new[]
+                   {
+                       new SpecialAttack
+                       {
+                           Unknown1 = 0x0000AAC0,
+                           Unknown2 = 0x00023569,
+                           Unknown3 = 0x00000064,
+                           Unknown4 = "MAAT"
+                       },
+                       new SpecialAttack
+                       {
+                           Unknown1 = 0x0000A431,
+                           Unknown2 = 0x0000A430,
+                           Unknown3 = 0x00000090,
+                           Unknown4 = "DIIT"
+                       },
+                       new SpecialAttack
+                       {
+                           Unknown1 = 0x00011294,
+                           Unknown2 = 0x00011295,
+                           Unknown3 = 0x0000008E,
+                           Unknown4 = "BRAW"
+                       }
+                   };
+        }
+
         private void FinalizeNpcDespawn(ICharacter target)
         {
             target.DoNotDoTimers = true;
@@ -1846,6 +2544,19 @@ namespace CellAO.Core.Playfields
             Pool.Instance.RemoveObject((Character)target);
 
             LogUtil.Debug(DebugInfoDetail.Network, string.Format("NPC despawned target={0}", target.Identity));
+        }
+
+        private void SendPlayerCorpseFullUpdate(ICharacter target, Identity corpseIdentity)
+        {
+            this.SendCorpseFullUpdate(target, corpseIdentity);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Player corpse visual sent target={0} corpse={1}",
+                    target.Identity,
+                    corpseIdentity));
         }
 
         private void SendCorpseFullUpdate(ICharacter target, Identity corpseIdentity)

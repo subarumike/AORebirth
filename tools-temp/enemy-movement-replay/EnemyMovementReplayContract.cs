@@ -20,7 +20,7 @@ namespace CellAO.Tools.EnemyMovementReplay
         AttackWithoutStop,
         StopAndAttack,
         PreserveAggro,
-        CapturedCorrectionSequence,
+        CapturedPositionCorrection,
         ClearTarget
     }
 
@@ -72,7 +72,7 @@ namespace CellAO.Tools.EnemyMovementReplay
             }
             else if (normalizedEvent == "hard_correction")
             {
-                decision = new ReplayDecision(current, ReplayEnemyAction.CapturedCorrectionSequence, "captured-correction-preserves-chase");
+                decision = new ReplayDecision(current, ReplayEnemyAction.CapturedPositionCorrection, "captured-position-correction-preserves-chase");
             }
             else if (normalizedEvent == "coordinate_follow")
             {

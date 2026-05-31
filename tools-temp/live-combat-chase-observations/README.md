@@ -42,7 +42,7 @@ Observed combat mobs:
 - `SimpleChar:7888E568`
 - `SimpleChar:788DA3B8`
 
-Live sends NPC chase movement with coordinate `FollowTarget` packets. `SetPos` appears as a correction/settle packet in some captures; it is not sent before every moving-target repath.
+The decoded chase windows include coordinate `FollowTarget` packets. `SetPos` appears as a correction/settle packet in some captures; it is not sent before every moving-target update. Current CellAO runtime does not treat these rows as a license to stream coordinate repaths, because local playtests showed that model as visible hopping instead of smooth follow.
 
 Example, mob `7888E378` at `2026-05-29T00:11:47.9467311Z`:
 
@@ -54,7 +54,7 @@ Example, mob `788DA3B8` from capture `20260529-212034` while the player moved:
 
 - Repeated coordinate `FollowTarget` packets for `788DA3B8`, packet length 56
 - Follow coordinate header after identity is `00 01 19 02`
-- Occasional separate `SetPos` corrections, not a `SetPos` before every repath
+- Earlier broad capture notes showed occasional `SetPos` corrections on other mobs; do not apply those to this focused target unless the same target window shows them.
 
 Correction sequence observed for `788DA3B8` at `2026-05-30T02:21:01.5794475Z`:
 
@@ -63,7 +63,7 @@ Correction sequence observed for `788DA3B8` at `2026-05-30T02:21:01.5794475Z`:
 - `SetPos`, length 47, body after identity: `00 <Vector3> 01 00000000 00`
 - `FollowTarget`, length 68, type-2 settle body: `00 02 15 <mob identity> 00000000 <Vector3> 01 <Vector3>`
 
-CellAO must not send a bare `SetPos` as a chase repair. If a correction is needed, send the captured correction sequence above.
+That sequence is from a different official window and remains evidence, but the later focused killed-target window (`SimpleChar:788DA3BD`, `2026-05-30T21:42:23Z` to `21:43:19Z`) showed only short type-2 `FollowTarget` position correction before later coordinate rows. CellAO must not send a bare `SetPos` as a chase repair, and should not default local NPC chase to the full correction sequence without target-specific evidence.
 
 That means:
 
@@ -101,18 +101,24 @@ This confirms normal mob attacks should stay `AttackInfo`, while nano/caster dam
 
 - Official full-duplex captures are authoritative for the mobs listed above.
 - Official coordinate `FollowTarget` chase packets use `N3Unknown=0`, `FollowInfoType=1`, `MoveMode=24/25`, and `CoordinateCount=2`.
-- Official `SetPos` chase corrections use `N3Unknown=0`, coordinates, `Unknown1=1`, `Unknown2=0`, and `Unknown3=0`.
+- Official `SetPos` chase corrections in broad captures use `N3Unknown=0`, coordinates, `Unknown1=1`, `Unknown2=0`, and `Unknown3=0`; focused target samples should decide whether local runtime emits them.
 - Focused mob `SimpleChar:788DA3B9` chased for 78 seconds with 43 unique `FollowTarget` packets, all length 56 and all `N3Unknown=0`, `FollowInfoType=1`, `MoveMode=25`, `CoordinateCount=2`.
-- That same focused mob had 5 `SetPos` repaths with `N3Unknown=0`, `Unknown1=1`, `Unknown2=0`, and `Unknown3=0`.
-- Focused mob `SimpleChar:788DA3B8` in `20260529-212034` sent repeated coordinate `FollowTarget` packets while the player moved. It did not send `SetPos` before every moving-target repath.
+- That same focused mob had 5 `SetPos` correction rows with `N3Unknown=0`, `Unknown1=1`, `Unknown2=0`, and `Unknown3=0`.
+- Focused mob `SimpleChar:788DA3B8` in `20260529-212034` sent repeated coordinate `FollowTarget` packets while the player moved. It did not send `SetPos` before every moving-target row.
+- Existing chase fixtures include sub-second coordinate `FollowTarget` rows: official melee chase re-entered chase roughly 330ms after an in-range sample, and the private loot melee window has adjacent `FollowTarget` samples about 311ms and 412ms apart. These remain replay evidence, not a local repath-loop contract.
 - Focused mob `SimpleChar:788DA3B8` initial chase after player attack sent coordinate `FollowTarget` packets with `MoveMode=24`; later chase updates used `MoveMode=25`.
-- Focused mob `SimpleChar:788DA3B8` correction used `FollowTarget` type-2 position-stop, `StopMovingCmd`, `SetPos`, then `FollowTarget` type-2 settle. Local code should use that packet sequence instead of isolated `SetPos`.
+- Focused killed target `SimpleChar:788DA3BD` correction used short type-2 `FollowTarget` position frames (`00 02 19`, `0,0,0x40000000`, one coordinate, trailing `00`) before later coordinate rows. Keep that smaller shape as correction evidence first; keep the larger `StopMovingCmd`/`SetPos`/type-21 settle sequence as separate evidence until a matching target window requires it.
+- Current local normal chase does not inject the short type-2 position frame. Local circle tests showed that using a sharp-turn correction gate as a default chase repair caused visible snap/jitter.
+- Local test at `2026-05-31 00:45` showed SimpleChar NPC target-follow broke visible chase after one `target-follow` row. Treat target-follow as unproven for NPC chase unless a future official/source trace proves that exact SimpleChar use.
+- Current local melee chase is back on coordinate `FollowTarget` rows with `N3Unknown=0`, `FollowInfoType=1`, `MoveMode=25`, and `CoordinateCount=2`; the unresolved problem is how often and from which authoritative start/destination to send them.
 - The focused chase did not show mob-owned `CharDCMove`; player `CharDCMove` echo packets were separate from mob movement.
-- The focused chase did not show a full-stop `FollowTarget` before each repath. Local runtime should not inject a stop packet into normal chase repaths.
-- Local playtest rejected persisting predicted NPC coordinates before each new repath: it made chase warping worse. Keep this path out until a local packet/log trace proves the server coordinate model is correct.
+- The focused chase did not show a full-stop `FollowTarget` before each moving-target row. Local runtime should not inject a stop packet into normal chase.
+- Local playtest rejected persisting predicted NPC coordinates before each new coordinate update: it made chase warping worse. Keep this path out until a local packet/log trace proves the server coordinate model is correct.
+- Local playtest on 2026-05-30 showed `NPCCHASE dest` drifting away from the latest logged player `CharDCMove` when using full generic prediction. Raw-only sampling then showed the opposite failure: NPCs waited for the next client movement update before chasing a continuously moving player. NPC chase/range decisions should use a small bounded projection anchored to player `RawCoordinates`, not an unbounded `Character.Coordinates()` target.
+- Local playtest on 2026-05-30 also showed visible jitter from tiny melee repaths at about `1.50m` to `1.83m`, right on top of the melee follow stop distance. This is part of why normal chase moved away from coordinate repath packets.
 - Private-server coordinate `FollowTarget` packets that use `N3Unknown=1` are private-server evidence only and should not be copied into official-live parity changes without a matching official capture.
 - Official type-2 `FollowTarget` packets exist for longer path/settle updates, but the exact local runtime trigger is still pending targeted capture/playtest.
-- N3 decompile evidence in `C:\Users\Mike\Documents\AO stripdown\Anarchy Online\decompile_report\n3_enemy_movement_refs.txt` marks `SetWantedDirection` as a fixed three-float direction vector packet. Official capture `20260528-192819` shows S2C `SetWantedDirection` packets for `SimpleChar` mobs, including combat-adjacent packets. Use this packet to publish mob facing/direction changes; do not treat it as a replacement for `FollowTarget` path movement.
+- N3 decompile evidence in `C:\Users\Mike\Documents\AO stripdown\Anarchy Online\decompile_report\n3_enemy_movement_refs.txt` marks `SetWantedDirection` as a fixed three-float direction vector packet. Official capture `20260528-192819` shows S2C `SetWantedDirection` packets for `SimpleChar` mobs, including combat-adjacent packets, but the focused normal melee chase did not show this packet. Keep it out of normal melee chase until a target-specific capture proves the trigger.
 - N3 decompile evidence in `C:\Users\Mike\Documents\AO stripdown\Anarchy Online\decompile_report\n3_dynel_enemy_refs.txt` identifies `RelocateDynelsIIR_t` and `DropDynelIIR_t`, but the recovered notes still mark their relocation/lifecycle side effects as unresolved. Do not emit these from CellAO NPC chase until a targeted live trace proves exact semantics.
 
 ## Enemy Behavior Evidence Map
@@ -135,12 +141,20 @@ Current useful local/source-backed signals:
 
 - Do not clear NPC retaliation just because the player sends `StopFight`; official live keeps the mob attacking.
 - Keep normal weapon/mob hits as `AttackInfo` only.
-- NPC continuous chase repair should use coordinate `FollowTarget` for normal moving-target repaths. `SetPos` correction behavior must use the full captured correction sequence, not an isolated `SetPos`.
-- NPC facing updates should send `SetWantedDirection` with the normalized direction vector when CellAO changes NPC chase heading.
-- Local combat chase should not send target-follow packets or short endpoints that rotate around the player center. The current contract is: out-of-range NPCs start a coordinate `FollowTarget`, server-side position advances toward the live target for range math, coordinate repaths are throttled by time and target movement, melee NPCs keep follow state and attack while moving, and ranged/nano-style NPCs stop only when their ranged attack source is in range.
-- NPC coordinate chase should not also call generic forward-start/forward-stop movement prediction. The live-style `FollowTarget` packet is the movement instruction; CellAO's generic `UpdateMoveType(1/2)` prediction path double-applies movement and showed up locally as snapping/spiral jitter.
+- Coordinate chase evidence uses the captured coordinate `FollowTarget` shape: N3 unknown byte `0`, `FollowInfoType=1`, `MoveMode=25`, `CoordinateCount=2`, current NPC coordinate, and destination coordinate. Local melee chase no longer treats that as a license to redirect the visible path every tick.
+- Correction behavior must stay capture-specific until a targeted runtime trigger is proved; never send an isolated `SetPos` as a chase repair.
+- Normal melee chase currently uses coordinate `FollowTarget`; `SetWantedDirection` remains a decoded helper for capture-specific use, not a default normal chase side-channel.
+- Local combat chase should not send short endpoints that rotate around the player center. The current contract is: melee NPCs follow the player position without stop-distance destination shaping, keep attacking while moving, and ranged/nano-style NPCs stop only when their ranged attack source is in range.
+- NPC coordinate chase should not also call generic forward-start/forward-stop movement prediction. The `FollowTarget` packet is the visible movement instruction; CellAO's generic `UpdateMoveType(1/2)` prediction path double-applies movement and showed up locally as snapping/spiral jitter.
+- Player target sampling for NPC chase/range should stay anchored to the raw coordinate stored by incoming `CharDCMove`, with only a capped projection from the existing movement predictor. Raw-only sampling lagged until the player stopped; unbounded prediction made local NPCs chase projected points instead of the last authoritative client position.
 - Melee attacks do not require stopping. NPCs and players can attack while moving in melee range. Only ranged/nano-style attack sources should stop movement when they are in attack range.
-- Runtime chase constants for official `FollowTarget` unknown byte, follow info type, run/walk move modes, point count, and coordinate repath throttle are anchored in `EnemyBehaviorContract` and covered by the CellAO combat smoke test.
+- Runtime chase constants for official `FollowTarget` unknown byte, follow info type, run/walk move modes, point count, and server-side chase speed are anchored in `EnemyBehaviorContract` and covered by the CellAO combat smoke test.
+- The previous local throttle/visible-segment model is retired. Local `2026-05-30` logs showed that even slower coordinate repaths still hopped if packet starts came from a separate guessed-visible position instead of the same authoritative motion segment used by combat range.
+- Local `ao test 3` on `2026-05-30 23:31-23:32` showed the next concrete failure: while already inside the `8m` melee gate, CellAO still emitted about one `coordinate-update` every `0.36s`; `79/113` sampled updates reversed direction by more than `90` degrees as the player circled the mob. In-range melee now suppresses fresh motion-segment packets; out-of-range chase re-enables them.
+- Local `2026-05-31 00:04-00:05` playtest then showed the opposite edge: chase updates resumed mostly at `8m+`, so the mob waited too long before following. Melee attack validity and close visual follow hold are now split: `8m` remains the conservative hit gate, while `3m` is the local close-hold distance that suppresses tiny circling updates.
+- Local `ao test 4` / `2026-05-31 00:09-00:10` showed the `3m` hold by itself was too narrow: `70` chase rows, `62` under `8m`, `50` under `4m`, and `38/69` direction deltas over `90` degrees. The next local test at `00:37-00:38` still showed repeated `3m` coordinate redirects and heartbeat exceptions on stale follow-target lookup. The target-follow experiment after that evidence failed locally, so the remaining repair must compare official coordinate rows against local coordinate rows rather than switching packet families.
+- Nearby path reversals no longer use a default short type-2 `FollowTarget` correction gate. The captured correction packets remain replay evidence, but local video/logs showed the default gate made close circular movement visibly snap.
+- Combat test mobs explicitly advertise `Run` movement state and `runspeed=400`, matching CellAO's `6.0 m/s` server chase speed through the existing `Character` runspeed formula. This keeps the client's FollowTarget interpolation speed aligned with the server-authoritative chase position.
 - Local evidence from `2026-05-30 00:05` showed jitter from mismatched stop/attack thresholds and repeated follow resets. Keep the combat contract simple: out of range follows, in range stops and attacks; do not add separate hold/pending states without a targeted capture proving them.
 
 ## Private-Server Mob Capture Notes
@@ -192,4 +206,4 @@ Implemented packet-model repair:
 - `FollowCoordinateInfo` can now carry all captured coordinates in a path, while keeping the legacy current/end properties populated.
 - `FollowInfoSerializer` reads and writes the real coordinate count.
 - `FollowStopInfo` models the captured type-2 stop/settle payload.
-- Runtime `FillerFullStopAt` intentionally stays on the older stable target-follow payload shape until a type-2 stop/settle send is validated in-game.
+- Runtime melee combat chase currently uses coordinate `FollowTarget` with hidden server-authority position updates; type-2 stop/settle sends stay capture evidence until validated in-game.

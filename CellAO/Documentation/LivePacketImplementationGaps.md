@@ -48,6 +48,8 @@ The first clean `QuestFullUpdate` after login replayed active one-shot missions 
 - `ClientMoveItemToInventory`: `Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs` routes loot-window item moves through `TryLootCorpseItem`.
 - Empty opened/looted corpse cleanup now uses the capture-backed short delay of roughly three seconds after the last open or item move.
 - `SimpleCharFullUpdate`: `Core\Packets\SimpleCharFullUpdate.cs` is the main visible NPC/mob spawn packet. NPC data depends on `NPCFamily`, `LosHeight`, `MonsterData`, health, level, and movement bytes.
+- NPC combat follow uses the captured coordinate `FollowTarget` NPC movement shape: N3 unknown byte `0`, `FollowInfoType=1`, `MoveMode=25` for run, `CoordinateCount=2`, then current NPC coordinate and destination coordinate. A local target-follow test logged `NPCCHASE phase=target-follow` but the SimpleChar mob sat still, so target-follow remains player-follow only for this runtime path.
+- Type-2 position frames, `SetPos`, and `SetWantedDirection` remain correction evidence, not the default normal chase implementation. Coordinate `FollowTarget` updates are anchored from the estimated client-visible NPC position so CellAO does not use hidden server range coordinates as packet starts.
 - `Stat`, `ChatText`, `Feedback`, `ContainerAddItem`, `InventoryUpdate`, `Despawn`, `StopFight`, and `KnuBot*` have message-handler classes present.
 - Timed logout now uses the recovered identity-only `StartLogout` / `StopLogout` N3 packet models from the local AO stripdown evidence. The first close-box logout path sits the character, sends `StartLogout`, and starts the 30-second server timer; a hard socket close preserves/enters the same seated logout posture if normal logout did not already start.
 
@@ -56,6 +58,7 @@ The first clean `QuestFullUpdate` after login replayed active one-shot missions 
 - There is no dedicated `CorpseFullUpdateMessageHandler.cs` in `Core\MessageHandlers`. Corpse creation appears to be owned by playfield/corpse logic, but packet generation should be treated as a first-class server behavior because live death/loot depends on a distinct corpse dynel.
 - Combat is split across attack state, controller timers, and playfield death/corpse handling. The live packet sequence shows attack state and damage are separate from corpse creation. Avoid fixing corpse issues inside `AttackMessageHandler` unless the live packet evidence points there.
 - Live combat timeline decoding now maps the captured S2C `AttackInfo`, `HealthDamage`, `MissedAttackInfo`, `Attack`, and `StopFight` bodies against the existing AOtomation message classes. The common N3 body layout is identity, one base unknown byte, then message-specific fields. That base byte matters: C2S `Attack` target identities begin after it, and parsing one byte early produces bogus `195:*` targets.
+- Official full-duplex NPC chase captures include coordinate `FollowTarget` evidence with `N3Unknown=0`, and some correction/settle evidence. The current local chase path uses that coordinate packet family and keeps server-side range authority updated separately. Keep `SetPos`, type-2 correction frames, and `SetWantedDirection` capture-specific until a replayed target window proves the trigger.
 - Packet coverage now distinguishes ZoneEngine server implementation from AOtomation message models. `AttackInfo` and `HealthDamage` are no longer treated as unknown wire shapes, but they remain message-model-only coverage in the current exporter. `CorpseFullUpdate` has a working ZoneEngine packet builder. The AOtomation `CorpseFullUpdateMessage` class is explicitly marked as a placeholder and must not be used for generic sends until a first-class capture-backed serializer/lifecycle model exists.
 - Quest support is mostly packet-level/KnuBot-level. The capture proves live progress uses `QuestFullUpdate` plus `Quest`, `Feedback`, `ChatText`, `Stat`, and sometimes inventory/reward packets. CellAO needs a small quest-state service before these one-shot shuttleport missions can be represented cleanly.
 - Quest reward export now writes `quest_reward_events.csv`. The known quest batch shows a focused completion sequence around t+789.169: `QuestState` stat changes, `NewLevel`, `Feedback` with category/message ids, `Quest`, `ChatText` `Mission Complete.`, then a follow-up `Quest` packet. Future captures with reward text such as XP/cash chat should land in the same file as `mission_xp_chat` or `mission_reward_chat`.
@@ -95,10 +98,10 @@ Current CellAO local sender in `Core\Playfields\Playfield.cs`:
 
 - `Unknown1`: calculated damage.
 - Equipped weapon: `Unknown2=40`, `Unknown3=<weapon page slot>`, `Unknown4=4`, `Unknown5=3`, `Unknown6=0`.
-- Unarmed/player fallback: `Unknown2=1`, `Unknown3=0`, `Unknown4=0`, `Unknown5=0`, `Unknown6=0`.
-- Unarmed/NPC fallback: `Unknown2=1`, `Unknown3=1`, `Unknown4=0`, `Unknown5=3`, `Unknown6=0`.
+- Unarmed/player fallback: `Unknown2=0`, `Unknown3=0`, `Unknown4=0`, `Unknown5=0`, `Unknown6=0`.
+- Unarmed/NPC melee fallback: `Unknown2=0`, `Unknown3=0`, `Unknown4=0`, `Unknown5=3`, `Unknown6=0`, matching repeated private-server melee mob `AttackInfo` rows in `tools-temp\live-combat-chase-observations\private-server-loot-mob-movement-mining.md`. The official caster-mob normal-hit row with `Unknown2=13`, `Unknown3=6` is retained as caster/ranged evidence, not the default beach-leet melee shape.
 
-Known difference: private-server player weapon hits commonly use `unknown2=-1`, `unknown3=6` or `8`, `unknown4=0` or `4`, and `unknown5=3` or `4`. Local still uses simplified values, especially `unknown2=40` for equipped weapons. Leave it alone unless a visible animation, hit text, crit text, miss text, or combat log bug appears.
+Known difference: private-server player weapon hits commonly use `unknown2=-1`, `unknown3=6` or `8`, `unknown4=0` or `4`, and `unknown5=3` or `4`. Local still uses simplified values, especially `unknown2=40` for equipped weapons. Leave it alone unless a visible animation, hit text, crit text, miss text, or combat log bug appears. Test mobs must still advertise real damage-type stats such as `MeleeAC` instead of `0`. CellAO's local enum labels stat 339 as `DamageOverrideType`, while AOtomation/Demoder label the same id as `DamageType1`; controlled test mobs now set both stat 339 and stat 436 to `MeleeAC` so the live client does not fall back to unknown damage text.
 
 ## HealthDamage Policy
 
@@ -107,6 +110,12 @@ Normal weapon and unarmed auto-attacks must remain `AttackInfo` only. Do not sen
 Live captures prove `HealthDamage` exists for some combat/status flows, but the official weapon capture is `official_live` + `c2s_only_request_flow` and has no S2C response evidence. Treat private-server `HealthDamage` rows as useful structure evidence, not permission to add it to normal weapon hits.
 
 Later `HealthDamage` work should start from a targeted capture and stay outside the normal weapon-hit path. Candidate cases are DoT ticks, HoT ticks, nano damage/heals, environmental damage, and other status-style health changes where live evidence shows the exact packet fields and client text behavior.
+
+Heartbeat stat regen must also stay out of the spam path: `HealInterval`/`NanoInterval` only tick when both the interval is positive and the matching delta is nonzero. A zero interval is disabled, not "run every heartbeat."
+
+## Player Death/Respawn
+
+Official live capture `tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260531-023030` shows the modern client flow is not the old reclaim-booth path. The client sends outbound `CharacterAction Die(152)`. The server then sends player corpse visual data, `SocialStatus=0` with Stat `Unknown=1`, partial alive stats, and `N3Teleport`; the client performs a fresh playfield init/full world stream and the normal `CharInPlay` handshake. No `ResurrectIIR_t` was observed in this modern death/respawn capture, so CellAO keeps `ResurrectIIR_t` only as legacy/source evidence and does not use it in the current respawn path. Save-point stats (`TempSavePlayfield`, `TempSaveX`, `TempSaveY`) are still the preferred respawn location when present. If those stats are missing, respawn falls back to the source-backed character-creation start coordinates from `CharacterName.SendNameToStartPlayfield`: Rubi-Ka/new island `4582 @ 939,20,732` by default, or Shadowlands `4001 @ 850,43,565` only when the character has a source-backed Shadowlands start hint.
 
 ## Safest Next Code Path
 

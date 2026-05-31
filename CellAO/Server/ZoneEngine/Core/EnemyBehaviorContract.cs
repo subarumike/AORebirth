@@ -13,6 +13,7 @@ namespace ZoneEngine.Core
     public enum EnemyBehaviorSignal
     {
         AddThreat,
+        TargetFollow,
         TargetOutOfRange,
         CoordinateFollowTarget,
         TargetInRange,
@@ -59,9 +60,8 @@ namespace ZoneEngine.Core
         public const byte CoordinateFollowPointCount = 2;
 
         public const double MaxNpcFollowSpeedPerSecond = 6.0;
-        public const double MinCoordinateFollowRepathSeconds = 0.75;
-        public const double MinCoordinateFollowTargetDelta = 2.0;
-
+        public const int NpcRunSpeedForMaxFollowSpeed = 400;
+        public const double MaxPlayerChaseProjectionDistance = 3.0;
         public static EnemyBehaviorTransition Apply(EnemyBehaviorState current, EnemyBehaviorSignal signal)
         {
             switch (signal)
@@ -70,6 +70,9 @@ namespace ZoneEngine.Core
                     return current == EnemyBehaviorState.Idle
                                ? new EnemyBehaviorTransition(EnemyBehaviorState.Aggroed, "threat-added")
                                : new EnemyBehaviorTransition(current, "threat-kept");
+
+                case EnemyBehaviorSignal.TargetFollow:
+                    return new EnemyBehaviorTransition(EnemyBehaviorState.Chasing, "target-follow");
 
                 case EnemyBehaviorSignal.TargetOutOfRange:
                 case EnemyBehaviorSignal.CoordinateFollowTarget:

@@ -36,6 +36,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using CellAO.Core.Components;
     using CellAO.Core.Entities;
     using CellAO.Core.Network;
+    using CellAO.Core.Playfields;
     using CellAO.Enums;
     using CellAO.ObjectManager;
 
@@ -61,22 +62,34 @@ namespace ZoneEngine.Core.MessageHandlers
 
             client.Server.Info(
                 client,
-                "Attack action={0} target={1} targetFound={2}",
+                "Attack action={0} target={1} targetFound={2} targetHealth={3}",
                 message.Action,
                 message.Target,
-                target != null);
+                target != null,
+                target == null ? 0 : target.Stats[StatIds.health].Value);
 
             if (target == null)
             {
                 character.SetFightingTarget(Identity.None);
+                this.ResetCombatTick(character);
                 this.SendAttackState(character, Identity.None, 0);
                 return;
             }
 
             character.SetTarget(message.Target);
             character.SetFightingTarget(message.Target);
+            this.ResetCombatTick(character);
             this.EngageNpcTarget(character, target);
             this.SendAttackState(character, message.Target, message.Action);
+        }
+
+        private void ResetCombatTick(ICharacter character)
+        {
+            Playfield playfield = character.Playfield as Playfield;
+            if (playfield != null)
+            {
+                playfield.ResetCombatTick(character.Identity);
+            }
         }
 
         private void EngageNpcTarget(ICharacter character, ICharacter target)

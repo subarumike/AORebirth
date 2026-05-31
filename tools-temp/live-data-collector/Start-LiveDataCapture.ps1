@@ -31,7 +31,7 @@ $stdoutPath = Join-Path $captureDir "tshark_stdout.log"
 $stderrPath = Join-Path $captureDir "tshark_stderr.log"
 $filter = "host $ServerHost"
 
-$args = @("-i", $Interface, "-f", $filter, "-w", $rawPath, "-q")
+$args = @("-i", $Interface, "-f", ('"{0}"' -f $filter), "-w", ('"{0}"' -f $rawPath), "-q")
 $proc = Start-Process -FilePath $TsharkPath -ArgumentList $args -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
 
 $meta = [ordered]@{

@@ -124,3 +124,8 @@ tools-temp/ao-dir-quarantine/
 tools-temp/ao-dll-function-map/ghidra-work/
 tools-temp/live_stream5_decompressed.bin
 tools-temp/nuget.exe
+tools-temp/**/*.pyc
+tools-temp/**/__pycache__/
+tools-temp/*.png
+tools-temp/screen-captures/
+tools-temp/worktree-snapshots/

@@ -178,15 +178,24 @@ $characterActionSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\Zo
 $zoneClientSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\ZoneClient.cs')
 $npcControllerSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\Controllers\NPCController.cs')
 $npcAiProfileSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\NpcAiProfile.cs')
+$enemyBehaviorContractSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\EnemyBehaviorContract.cs')
+$combatTestMobArchetypeSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\CombatTestMobArchetype.cs')
 $giveItemCommandSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ChatCommands\ChatCommandGiveItem.cs')
 $zoneProjectSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\ZoneEngine.csproj')
 $messagingProjectSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\SmokeLounge.AOtomation.Messaging.csproj')
 $messagingSerializerSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\Serialization\SerializerResolverBuilder.cs')
+$resurrectSerializerSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\Serialization\Serializers\Custom\ResurrectMessageSerializer.cs')
+$followCoordinateInfoSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\GameData\FollowCoordinateInfo.cs')
+$followPositionInfoSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\GameData\FollowPositionInfo.cs')
+$followStopInfoSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\GameData\FollowStopInfo.cs')
+$followInfoSerializerSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\Serialization\Serializers\Custom\FollowInfoSerializer.cs')
+$followTargetHandlerSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\FollowTargetMessageHandler.cs')
 $zoneEnemyHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbZoneEnemyHints.csv'
 $npcTemplateHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbNpcTemplateHints.csv'
 $enemyCoveragePath = Join-Path $repoRoot 'CellAO\Documentation\ClientHintedEnemyCoverage.csv'
 $visualHintsPath = Join-Path $repoRoot 'CellAO\Documentation\MonsterDataCorpseVisualHints.csv'
 $livePacketGapsSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Documentation\LivePacketImplementationGaps.md')
+$chaseObservationSource = Get-Content -Raw (Join-Path $repoRoot 'tools-temp\live-combat-chase-observations\README.md')
 $enemyNpcMapSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Documentation\EnemyNpcDllAodbMap.md')
 $mobLootDataSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Documentation\MobLootData.md')
 
@@ -209,9 +218,54 @@ Assert-SourceMatch $characterSource 'EnterLogoutSitPosture\s*\(\s*\).*?StopMovem
 Assert-SourceMatch $characterActionSource 'case\s+CharacterActionType\.Logout:.*?ApplySit\s*\(\s*client\s*\).*?SendStartLogout\s*\(\s*client\.Controller\.Character\s*\).*?StartLogoutTimer\s*\(\s*\)' 'First X/logout should sit the character, send StartLogout, and start the timed logout.'
 Assert-SourceMatch $characterActionSource 'SendStartLogout\s*\(ICharacter\s+character\).*?new\s+StartLogoutMessage.*?Identity\s*=\s*character\.Identity' 'Timed logout start should send the recovered identity-only StartLogout N3 packet.'
 Assert-SourceMatch $characterActionSource 'SendStopLogout\s*\(ICharacter\s+character\).*?new\s+StopLogoutMessage.*?Identity\s*=\s*character\.Identity' 'Logout cancel should send the recovered identity-only StopLogout N3 packet.'
+Assert-SourceMatch $characterActionSource 'case\s+CharacterActionType\.Die:.*?RespawnPlayer\s*\(\s*client\.Controller\.Character\s*\)' 'Current live client Die(152) action should route into the server death/respawn flow instead of being rebroadcast as an unknown action.'
+Assert-SourceNoMatch $characterActionSource 'PendingReclaim' 'Modern death/respawn should not use the old pending reclaim experiment.'
+Assert-SourceMatch $playfieldSource 'RespawnPlayer\s*\(ICharacter\s+character\).*?ResolvePlayerRespawnLocation.*?SendPlayerCorpseFullUpdate.*?SendDeathSocialStatus.*?MarkPlayerRespawned.*?StopFightingDeadTarget\s*\(\s*character\.Identity\s*\).*?SendCombatStopMessage\s*\(\s*character\s*\).*?Teleport\s*\(\s*dynel,\s*destination,\s*character\.RawHeading,\s*destinationPlayfield\s*\)' 'Player respawn should follow the captured modern live sequence: corpse visual, SocialStatus=0, respawn stats, then N3Teleport.'
+Assert-SourceMatch $playfieldSource 'MarkPlayerRespawned\s*\(ICharacter\s+target\).*?CalculateSkills\s*\(\s*\).*?StatIds\.life.*?StatIds\.health.*?Math\.Max\s*\(\s*1,\s*maxHealth\s*/\s*3\s*\).*?StatIds\.deadtimer\]\.Value\s*=\s*75.*?StatIds\.currentmovementmode\]\.Value\s*=\s*\(int\)\s*MoveModes\.Run.*?StatIds\.specialcondition\]\.Value\s*=\s*3.*?StatIds\.deathreason\]\.Value\s*=\s*0' 'Player respawn should restore derived stats, partial live-style health, dead timer, run movement, and clear death reason.'
+Assert-SourceMatch $playfieldSource 'SendDeathSocialStatus\s*\(ICharacter\s+target\).*?new\s+StatMessage.*?Unknown\s*=\s*1.*?CharacterStat\.SocialStatus.*?Value2\s*=\s*0' 'Live death/respawn capture sends SocialStatus=0 with Stat unknown=1 before teleport.'
+Assert-SourceNoMatch $playfieldSource 'SendPlayerResurrect|PreparePlayerReclaimLogin|SendPlayerReclaimLogin|PendingReclaim' 'Modern live capture did not show ResurrectIIR or pending reclaim reconnect handling in the death/respawn path.'
+Assert-SourceMatch $playfieldSource 'ResolvePlayerRespawnLocation\s*\(.*?StatIds\.tempsaveplayfield.*?StatIds\.tempsavex.*?StatIds\.tempsavey.*?destinationPlayfield\s*=\s*new\s+Identity' 'Player respawn should prefer the AO save-point stats when they are present.'
+Assert-SourceMatch $playfieldSource 'private\s+const\s+int\s+RubiKaStartPlayfield\s*=\s*4582;.*?RubiKaStartX\s*=\s*939;.*?RubiKaStartY\s*=\s*20;.*?RubiKaStartZ\s*=\s*732;.*?ShadowlandsStartPlayfield\s*=\s*4001;.*?ShadowlandsStartX\s*=\s*850;.*?ShadowlandsStartY\s*=\s*43;.*?ShadowlandsStartZ\s*=\s*565;' 'Player respawn should keep the source-backed character-creation fallback locations in code.'
+Assert-SourceMatch $playfieldSource 'ResolvePlayerRespawnLocation\s*\(.*?ResolveStarterRespawnLocation\s*\(\s*character,\s*out\s+destination,\s*out\s+destinationPlayfield\s*\).*?StatIds\.tempsaveplayfield' 'Player respawn should resolve the starter fallback before checking optional save-point stats.'
+Assert-SourceNoMatch $playfieldSource 'ResolvePlayerRespawnLocation\s*\(.*?destination\s*=\s*new\s+Coordinate\s*\(\s*character\.RawCoordinates\s*\)' 'Player respawn must not fall back to the death position when no save-point stats are present.'
 Assert-SourceMatch $zoneClientSource 'Dispose\s*\(bool\s+disposing\).*?!this\.Controller\.Character\.InLogoutTimerPeriod\s*\(\s*\).*?EnterLogoutSitPosture\s*\(\s*\).*?StartLogoutTimer\s*\(\s*\)' 'Hard network disconnect should enter seated logout state and start the timer when normal logout did not already do it.'
+Assert-SourceNoMatch $zoneClientSource 'PendingReclaim|PreparePlayerReclaimLogin' 'Zone reconnect should not carry the removed pending reclaim experiment.'
+Assert-SourceNoMatch $clientConnectedSource 'SendPlayerReclaimLogin|PendingReclaim' 'Client reconnect should rely on the normal playfield/full-character stream after death teleport.'
 Assert-SourceMatch $messagingProjectSource 'Messages\\N3Messages\\StartLogoutMessage\.cs.*?Messages\\N3Messages\\StopLogoutMessage\.cs.*?Serialization\\Serializers\\Custom\\IdentityOnlyN3MessageSerializer\.cs' 'Messaging project should compile the recovered identity-only logout packet models and serializer.'
 Assert-SourceMatch $messagingSerializerSource 'typeof\s*\(\s*StartLogoutMessage\s*\).*?IdentityOnlyN3MessageSerializer.*?typeof\s*\(\s*StopLogoutMessage\s*\).*?IdentityOnlyN3MessageSerializer' 'StartLogout/StopLogout should use the identity-only serializer instead of the generic N3 unknown-byte layout.'
+Assert-SourceMatch $messagingProjectSource 'Messages\\N3Messages\\ResurrectMessage\.cs.*?Serialization\\Serializers\\Custom\\ResurrectMessageSerializer\.cs' 'Messaging project should compile the recovered ResurrectIIR packet model and serializer.'
+Assert-SourceMatch $messagingSerializerSource 'typeof\s*\(\s*ResurrectMessage\s*\).*?ResurrectMessageSerializer' 'Resurrect should use the fixed 12-byte serializer instead of the generic N3 identity/unknown-byte layout.'
+Assert-SourceMatch $resurrectSerializerSource 'WriteInt32\s*\(\s*\(int\)message\.N3MessageType\s*\).*?WriteInt32\s*\(\s*message\.Unknown1\s*\).*?WriteInt32\s*\(\s*message\.Unknown2\s*\)' 'Resurrect serializer should write exactly key plus two recovered int fields.'
+Assert-SourceNoMatch $resurrectSerializerSource 'WriteIdentity|WriteByte\s*\(' 'Resurrect serializer must not write generic N3 identity or unknown-byte fields.'
+Assert-SourceMatch $messagingProjectSource 'GameData\\FollowStopInfo\.cs' 'Messaging project should compile the capture-backed FollowTarget type-2 stop/settle payload model.'
+Assert-SourceMatch $messagingProjectSource 'GameData\\FollowPositionInfo\.cs' 'Messaging project should compile the captured 56-byte FollowTarget type-2 position-stop payload model.'
+Assert-SourceMatch $zoneProjectSource 'Core\\EnemyBehaviorContract\.cs' 'ZoneEngine project should compile the source-backed enemy behavior contract.'
+Assert-SourceMatch $enemyBehaviorContractSource 'enum\s+EnemyBehaviorState.*?Idle.*?Aggroed.*?Chasing.*?InRangeAttacking.*?Returning.*?Dead' 'Enemy behavior contract should expose the minimal AO-style enemy states.'
+Assert-SourceMatch $enemyBehaviorContractSource 'CharDcMoveIirKey\s*=\s*0x54111123.*?RelocateDynelsIirKey\s*=\s*0x264B514B.*?DropDynelIirKey\s*=\s*0x47483633' 'Enemy behavior contract should preserve recovered N3 dynel/movement IIR keys as labels, not guessed runtime packets.'
+Assert-SourceMatch $enemyBehaviorContractSource 'NpcMovementActionSpellId\s*=\s*53191.*?NpcWipeHatelistSpellId\s*=\s*53126' 'Enemy behavior contract should preserve Demoder NPC movement/hate semantic labels.'
+Assert-SourceMatch $enemyBehaviorContractSource 'OfficialFollowTargetUnknown\s*=\s*0.*?CoordinateFollowInfoType\s*=\s*1.*?RunMoveMode\s*=\s*25.*?CoordinateFollowPointCount\s*=\s*2' 'Enemy behavior contract should preserve official-live coordinate FollowTarget field values.'
+Assert-SourceMatch $enemyBehaviorContractSource 'NpcRunSpeedForMaxFollowSpeed\s*=\s*400' 'Enemy behavior contract should align advertised NPC runspeed with local chase speed.'
+Assert-SourceMatch $enemyBehaviorContractSource 'MaxPlayerChaseProjectionDistance\s*=\s*3\.0' 'Enemy behavior contract should cap player projection for server-side range authority.'
+Assert-SourceNoMatch $enemyBehaviorContractSource 'MinCoordinateFollowRepathSeconds|MinCoordinateFollowTargetDelta|NpcMeleeFollowReengageDistance' 'Enemy behavior contract should not preserve the failed coordinate-repath throttle model.'
+Assert-SourceMatch $enemyBehaviorContractSource 'StopFightFromPlayer:.*?HardCorrection:.*?new\s+EnemyBehaviorTransition\s*\(\s*current,\s*"state-preserved"\s*\)' 'Enemy behavior contract should preserve mob aggro across player StopFight and correction packets.'
+Assert-SourceNoMatch $enemyBehaviorContractSource 'NpcMeleeCorrectionDistance|MinCoordinateFollowCorrectionSeconds|NpcMeleeCorrectionDirectionDot' 'Normal NPC chase should not carry default sharp-turn correction gates; correction packets stay capture evidence until a targeted runtime trigger is proved.'
+Assert-SourceMatch $enemyBehaviorContractSource 'TargetFollow:.*?new\s+EnemyBehaviorTransition\s*\(\s*EnemyBehaviorState\.Chasing,\s*"target-follow"\s*\).*?CoordinateFollowTarget:.*?new\s+EnemyBehaviorTransition\s*\(\s*EnemyBehaviorState\.Chasing,\s*"coordinate-follow"\s*\)' 'Enemy behavior contract should map both target-follow runtime intent and coordinate FollowTarget evidence to chasing.'
+Assert-SourceMatch $enemyBehaviorContractSource 'AttackInfo:.*?MissedAttackInfo:.*?HealthDamage:.*?new\s+EnemyBehaviorTransition\s*\(\s*EnemyBehaviorState\.InRangeAttacking,\s*"combat-result"\s*\)' 'Enemy behavior contract should map combat result families to in-range attacking.'
+Assert-SourceMatch $enemyBehaviorContractSource 'WipeHatelist:.*?TargetInvalidOrZoned:.*?new\s+EnemyBehaviorTransition\s*\(\s*EnemyBehaviorState\.Idle,\s*"target-cleared"\s*\)' 'Enemy behavior contract should keep explicit target clear/reset conditions.'
+Assert-SourceMatch $followCoordinateInfoSource 'public\s+List<Vector3>\s+Coordinates\s*\{\s*get;\s*set;\s*\}' 'FollowCoordinateInfo should support capture-backed multi-point FollowTarget paths.'
+Assert-SourceMatch $followPositionInfoSource 'public\s+class\s+FollowPositionInfo\s*:\s*FollowInfo.*?MoveType\s*=\s*25.*?Unknown2\s*=\s*0x40.*?Vector3\s+Coordinates.*?byte\s+Unknown4' 'FollowPositionInfo should model the captured 56-byte type-2 position-stop payload.'
+Assert-SourceMatch $followInfoSerializerSource 'for\s*\(int\s+i\s*=\s*0;\s*i\s*<\s*followCoordinateInfo\.CoordinateCount;\s*i\+\+\).*?followCoordinateInfo\.Coordinates\.Add\s*\(\s*this\.ReadVector3\s*\(\s*streamReader\s*\)\s*\)' 'FollowInfoSerializer should deserialize every captured FollowTarget coordinate, not only start/end.'
+Assert-SourceMatch $followInfoSerializerSource 'IList<Vector3>\s+coordinates\s*=\s*this\.GetCoordinates\s*\(\s*fcinfo\s*\).*?streamWriter\.WriteByte\s*\(\s*\(byte\)coordinates\.Count\s*\).*?foreach\s*\(Vector3\s+coordinate\s+in\s+coordinates\)' 'FollowInfoSerializer should serialize the real coordinate count and all path points.'
+Assert-SourceMatch $followStopInfoSource 'public\s+class\s+FollowStopInfo\s*:\s*FollowInfo.*?MoveType\s*=\s*21.*?Flag\s*=\s*1.*?Vector3\s+Coordinates.*?Vector3\s+ConfirmCoordinates' 'FollowStopInfo should model the captured type-2 stop/settle payload defaults and duplicated coordinate tail.'
+Assert-SourceMatch $followInfoSerializerSource 'moveType\s*==\s*25.*?streamReader\.Length\s*-\s*streamReader\.Position\s*\)\s*>=\s*25.*?new\s+FollowPositionInfo.*?Unknown1\s*=\s*streamReader\.ReadInt32\s*\(\s*\).*?Unknown2\s*=\s*streamReader\.ReadInt32\s*\(\s*\).*?Unknown3\s*=\s*streamReader\.ReadInt32\s*\(\s*\).*?Coordinates\s*=\s*this\.ReadVector3\s*\(\s*streamReader\s*\).*?Unknown4\s*=\s*streamReader\.ReadByte\s*\(\s*\)' 'FollowInfoSerializer should deserialize the captured 56-byte type-2 position-stop shape.'
+Assert-SourceMatch $followInfoSerializerSource 'moveType\s*==\s*21.*?streamReader\.Length\s*-\s*streamReader\.Position\s*\)\s*>=\s*37.*?new\s+FollowStopInfo.*?Unknown1\s*=\s*streamReader\.ReadInt32\s*\(\s*\).*?Unknown2\s*=\s*streamReader\.ReadInt32\s*\(\s*\).*?Unknown3\s*=\s*streamReader\.ReadInt32\s*\(\s*\).*?Coordinates\s*=\s*this\.ReadVector3\s*\(\s*streamReader\s*\).*?Flag\s*=\s*streamReader\.ReadByte\s*\(\s*\).*?ConfirmCoordinates\s*=\s*this\.ReadVector3\s*\(\s*streamReader\s*\)' 'FollowInfoSerializer should deserialize the captured 68-byte type-2 stop/settle shape.'
+Assert-SourceMatch $followInfoSerializerSource 'var\s+fpinfo\s*=\s*value\s+as\s+FollowPositionInfo.*?streamWriter\.WriteByte\s*\(\s*fpinfo\.FollowInfoType\s*\).*?streamWriter\.WriteByte\s*\(\s*fpinfo\.MoveType\s*\).*?streamWriter\.WriteInt32\s*\(\s*fpinfo\.Unknown1\s*\).*?streamWriter\.WriteInt32\s*\(\s*fpinfo\.Unknown2\s*\).*?streamWriter\.WriteInt32\s*\(\s*fpinfo\.Unknown3\s*\).*?this\.WriteVector3\s*\(\s*streamWriter,\s*fpinfo\.Coordinates\s*\).*?streamWriter\.WriteByte\s*\(\s*fpinfo\.Unknown4\s*\)' 'FollowInfoSerializer should serialize the captured 56-byte type-2 position-stop shape.'
+Assert-SourceMatch $followInfoSerializerSource 'var\s+fsinfo\s*=\s*value\s+as\s+FollowStopInfo.*?streamWriter\.WriteByte\s*\(\s*fsinfo\.FollowInfoType\s*\).*?streamWriter\.WriteByte\s*\(\s*fsinfo\.MoveType\s*\).*?streamWriter\.WriteInt32\s*\(\s*fsinfo\.Unknown1\s*\).*?streamWriter\.WriteInt32\s*\(\s*fsinfo\.Unknown2\s*\).*?streamWriter\.WriteInt32\s*\(\s*fsinfo\.Unknown3\s*\).*?this\.WriteVector3\s*\(\s*streamWriter,\s*coordinates\s*\).*?streamWriter\.WriteByte\s*\(\s*fsinfo\.Flag\s*\).*?this\.WriteVector3\s*\(\s*streamWriter,\s*confirmCoordinates\s*\)' 'FollowInfoSerializer should serialize the captured type-2 stop/settle shape.'
+Assert-SourceMatch $followTargetHandlerSource 'public\s+void\s+Send\s*\(\s*ICharacter\s+character,\s*Vector3\s+stopPosition\s*\).*?this\.SendOfficialPositionStop\s*\(\s*character,\s*stopPosition\s*\)' 'Runtime position-stop FollowTarget packets should use the official-live short type-2 position shape.'
+Assert-SourceMatch $followTargetHandlerSource 'FillerOfficialPositionStop.*?new\s+FollowPositionInfo\s*\(\s*\).*?MoveType\s*=\s*EnemyBehaviorContract\.RunMoveMode.*?Unknown1\s*=\s*0.*?Unknown2\s*=\s*0.*?Unknown3\s*=\s*0x40000000.*?Unknown4\s*=\s*0' 'Official position-stop should send the captured 56-byte type-2 FollowTarget body.'
+Assert-SourceMatch $followTargetHandlerSource 'FillerCoordinates.*?new\s+FollowCoordinateInfo\s*\(\s*\).*?CoordinateCount\s*=\s*EnemyBehaviorContract\.CoordinateFollowPointCount.*?MoveMode\s*=\s*movetype.*?FollowInfoType\s*=\s*EnemyBehaviorContract\.CoordinateFollowInfoType.*?x\.Unknown\s*=\s*EnemyBehaviorContract\.OfficialFollowTargetUnknown\s*;' 'Runtime coordinate FollowTarget packets should use the official-live N3 unknown byte 0, not the private-capture value 1.'
+Assert-SourceMatch $followTargetHandlerSource 'FillerFollowTarget.*?new\s+FollowTargetInfo\s*\(\s*\).*?MoveType\s*=\s*0.*?Target\s*=\s*toFollow.*?Dummy\s*=\s*0x40.*?Dummy1\s*=\s*0x20000000.*?x\.Unknown\s*=\s*0' 'Runtime target-follow packets should use the same payload shape as the working player-follow broadcast.'
+Assert-SourceNoMatch ($npcControllerSource + $playfieldSource) 'new\s+CharDCMoveMessage' 'NPC chase should not synthesize mob-owned CharDCMove packets; focused official-live chase used FollowTarget for mobs.'
 Assert-SourceOrdered $characterActionSource @(
     'case\s+CharacterActionType\.Logout',
     'ApplySit\s*\(\s*client\s*\)',
@@ -309,8 +363,6 @@ Assert-SourceMatch $npcAiProfileSource 'CanProximityAggro\s*\(NpcAiProfile\s+pro
 Assert-SourceMatch $npcControllerSource 'AiProfile\s*\{\s*get;\s*set;\s*\}\s*=\s*NpcAiProfile\.Passive' 'NPC controllers should default to passive behavior.'
 Assert-SourceMatch $npcControllerSource 'SetKnuBot\s*\(BaseKnuBot\s+knubot\).*?AiProfile\s*=\s*NpcAiProfile\.Social' 'KnuBot/dialog NPCs should be marked social.'
 Assert-SourceMatch $attackMessageSource 'EngageNpcTarget\s*\(ICharacter\s+character,\s*ICharacter\s+target\).*?target\.Controller\s+as\s+NPCController.*?npcController\.KnuBot\s*!=\s*null.*?!NpcAiProfiles\.CanRetaliate\s*\(\s*npcController\.AiProfile\s*\).*?target\.Stats\s*\[\s*StatIds\.health\s*\]\.Value\s*<=\s*0.*?target\.FightingTarget\.Instance\s*!=\s*0.*?target\.SetTarget\s*\(\s*character\.Identity\s*\).*?target\.SetFightingTarget\s*\(\s*character\.Identity\s*\)' 'NPC retaliation should be gated by AI profile and only engage live non-KnuBot NPCs that are not already fighting.'
-Assert-SourceMatch $clientConnectedSource 'RegisterNpcHome\s*\(\s*existingMob\s*\)' 'Existing login debug mobs should have home positions registered for leash behavior.'
-Assert-SourceMatch $clientConnectedSource 'RegisterNpcHome\s*\(\s*mobCharacter\s*\)' 'New login debug mobs should have home positions registered for leash behavior.'
 Assert-SourceMatch $baseInventorySource 'InventoryItemRules\.HasSameUniqueItem' 'Inventory add path must use shared unique-item rules.'
 Assert-SourceMatch $playfieldSource 'InventoryItemRules\.HasSameUniqueItem' 'Corpse loot path must use shared unique-item rules.'
 Assert-SourceMatch $playfieldSource 'DespawnNpcImmediately\s*\(' 'Playfield should expose immediate NPC despawn for controlled GM test cleanup.'
@@ -319,19 +371,130 @@ Assert-SourceMatch $zoneProjectSource 'Core\\Packets\\CorpseFullUpdate\.cs' 'Zon
 Assert-SourceMatch $playfieldSource 'target\.Stats\s*\[\s*StatIds\.health\s*\]\.Value\s*=\s*newHealth\s*;\s*target\.SendChangedStats\s*\(\s*\)\s*;.*?new\s+AttackInfoMessage' 'Combat hits, including killing hits, should send the zero-health stat update before death cleanup.'
 Assert-SourceMatch $playfieldSource 'private\s+static\s+bool\s+ShouldSendHealthDamage\s*\(CombatDamageSource\s+source\).*?source\s*!=\s*CombatDamageSource\.WeaponAutoAttack.*?source\s*!=\s*CombatDamageSource\.UnarmedAutoAttack' 'HealthDamage gating should explicitly exclude weapon and unarmed auto-attacks.'
 Assert-SourceMatch $livePacketGapsSource '## HealthDamage Policy.*?auto-attacks must remain `AttackInfo` only.*?DoCombatTick.*?duplicate combat text.*?targeted capture.*?DoT.*?HoT.*?nano.*?environmental' 'HealthDamage packet policy should document why normal weapon hits stay AttackInfo-only and which future paths need targeted capture evidence.'
+Assert-SourceMatch $playfieldSource 'healIntervalSeconds\s*>\s*0.*?healDelta\s*!=\s*0.*?healInterval\.LastTick\s*<\s*DateTime\.UtcNow.*?nanoIntervalSeconds\s*>\s*0.*?nanoDelta\s*!=\s*0.*?nanoInterval\.LastTick\s*<\s*DateTime\.UtcNow' 'Heartbeat regen should treat zero interval or zero delta as disabled instead of spamming stat updates every heartbeat.'
+Assert-SourceMatch $livePacketGapsSource 'Heartbeat stat regen.*?HealInterval.*?NanoInterval.*?interval is positive.*?delta is nonzero.*?zero interval is disabled' 'Packet gap notes should document the regen-spam guard observed during player death testing.'
+Assert-SourceMatch $chaseObservationSource '## Enemy Behavior Evidence Map.*?Identity_t.*?CharDCMoveIIR_t.*?server-authoritative movement playback.*?not proof that CellAO should synthesize mob-owned `CharDCMove` chase packets.*?RelocateDynelsIIR_t.*?bulk reposition.*?DropDynelIIR_t.*?despawn/lifecycle.*?SetWantedDirectionIIR_t.*?n3LocalityUpdateIIR_t.*?n3TeleportIIR_t.*?Combat event families.*?sticky aggro/long pursuit.*?replay tests' 'Enemy chase notes should preserve the source-backed signal map and block decoded-but-unvalidated packet guesses.'
+Assert-SourceNoMatch ($npcControllerSource + $playfieldSource) 'RelocateDynels|DropDynel' 'NPC combat/chase should not emit RelocateDynels or DropDynel until targeted live traces prove exact runtime semantics.'
 Assert-SourceMatch $playfieldSource 'MaxMeleeCombatDistance\s*=\s*8\.0' 'Combat ticks should use a conservative melee range gate.'
-Assert-SourceMatch $playfieldSource 'MaxNpcLeashDistance\s*=\s*40\.0' 'NPC combat should have a conservative home leash distance.'
+Assert-SourceMatch $playfieldSource 'MaxMeleeFollowHoldDistance\s*=\s*3\.0' 'Melee chase should separate close visual hold spacing from the wider conservative hit range gate.'
 Assert-SourceMatch $playfieldSource 'RegisterNpcHome\s*\(ICharacter\s+character\).*?npcHomeStates\s*\[\s*character\.Identity\.Instance\s*\].*?new\s+Coordinate\s*\(\s*character\.Coordinates\s*\(\s*\)\s*\)' 'Playfield should track spawned NPC home coordinates.'
-Assert-SourceMatch $playfieldSource 'DoCombatTick\s*\(ICharacter\s+attacker\).*?TryLeashNpcAttacker\s*\(\s*attacker\s*\).*?return\s*;.*?!this\.IsInCombatRange' 'NPC leash checks should run before range-based pursuit/damage.'
-Assert-SourceMatch $playfieldSource 'DoCombatTick\s*\(ICharacter\s+attacker\).*?CombatAttackSource\s+attackSource\s*=\s*this\.GetCombatAttackSource\s*\(\s*attacker\s*\).*?!this\.IsInCombatRange\s*\(\s*attacker,\s*target,\s*attackSource\.Range\s*\).*?TryMoveNpcIntoCombatRange\s*\(\s*attacker,\s*target\s*\).*?nextCombatTicks\s*\[\s*attacker\.Identity\.Instance\s*\]\s*=\s*DateTime\.UtcNow\s*\+\s*TimeSpan\.FromSeconds\s*\(\s*OutOfRangeRetrySeconds\s*\).*?return\s*;.*?int\s+currentHealth' 'Combat ticks should use equipped weapon range and avoid dealing damage while attacker and target are out of range.'
+Assert-SourceNoMatch $playfieldSource 'DoCombatTick\s*\(ICharacter\s+attacker\).*?TryLeashNpcAttacker\s*\(\s*attacker\s*\)' 'Normal NPC combat should not leash mobs home; AO mobs can chase across the playfield.'
+Assert-SourceNoMatch $playfieldSource 'TryLeashNpcAttacker|MaxNpcLeashDistance|NPC leashed home' 'Leash enforcement should be removed from the normal NPC combat path.'
+Assert-SourceMatch $playfieldSource 'DoCombatTick\s*\(ICharacter\s+attacker\).*?CombatAttackSource\s+attackSource\s*=\s*this\.GetCombatAttackSource\s*\(\s*attacker\s*\).*?!this\.IsInCombatRange\s*\(\s*attacker,\s*target,\s*attackSource\.Range\s*\).*?TryMoveNpcIntoCombatRange\s*\(\s*attacker,\s*target,\s*attackSource\.Range\s*\).*?nextCombatTicks\s*\[\s*attacker\.Identity\.Instance\s*\]\s*=\s*DateTime\.UtcNow\s*\+\s*TimeSpan\.FromSeconds\s*\(\s*OutOfRangeRetrySeconds\s*\).*?return\s*;.*?int\s+currentHealth' 'Combat ticks should use equipped weapon range and avoid dealing damage while attacker and target are out of range.'
 Assert-SourceMatch $playfieldSource 'DoCombatTick\s*\(ICharacter\s+attacker\).*?AnnounceCombatDamage\s*\(\s*attacker,\s*target,\s*damage,\s*attackSource,\s*attackSource\.UsesEquippedWeapon\s*\?\s*CombatDamageSource\.WeaponAutoAttack\s*:\s*CombatDamageSource\.UnarmedAutoAttack\s*\)' 'Combat tick auto-attacks should publish through the source-gated damage announcer.'
+Assert-SourceMatch $playfieldSource 'GetCombatAttackSource\s*\(ICharacter\s+attacker\).*?if\s*\(\s*equippedWeapon\s*==\s*null\s*\).*?AttackInfoAmmoCount\s*=\s*0,\s*AttackInfoWeaponSlot\s*=\s*0,\s*AttackInfoUnk1\s*=\s*0,\s*AttackInfoHitType\s*=\s*isNpcAttacker\s*\?\s*3\s*:\s*0' 'Unarmed NPC melee AttackInfo metadata should match the captured melee mob rows and avoid caster-style nanobot text for beach-leet attacks.'
+Assert-SourceMatch $combatTestMobArchetypeSource 'Prepare\s*\(ICharacter\s+mobCharacter,\s*Entry\s+entry\).*?SetMobStat\s*\(\s*mobCharacter,\s*StatIds\.currentmovementmode,\s*\(int\)MoveModes\.Run\s*\).*?SetMobStat\s*\(\s*mobCharacter,\s*StatIds\.prevmovementmode,\s*\(int\)MoveModes\.Run\s*\).*?SetMobStat\s*\(\s*mobCharacter,\s*StatIds\.runspeed,\s*EnemyBehaviorContract\.NpcRunSpeedForMaxFollowSpeed\s*\).*?SetMobStat\s*\(\s*mobCharacter,\s*StatIds\.mindamage,\s*1\s*\).*?SetMobStat\s*\(\s*mobCharacter,\s*StatIds\.maxdamage,\s*3\s*\).*?SetMobStat\s*\(\s*mobCharacter,\s*StatIds\.damagebonus,\s*0\s*\).*?SetMobStat\s*\(\s*mobCharacter,\s*StatIds\.defaultattacktype,\s*0\s*\).*?SetMobStat\s*\(\s*mobCharacter,\s*StatIds\.damageoverridetype,\s*\(int\)StatIds\.meleeac\s*\).*?SetMobStat\s*\(\s*mobCharacter,\s*StatIds\.damagetype,\s*\(int\)StatIds\.meleeac\s*\)' 'Combat test mobs should explicitly set movement and both recovered melee damage-type stats instead of leaving sentinel/default values.'
 Assert-SourceMatch $playfieldSource 'GetEquippedCombatWeapon\s*\(ICharacter\s+attacker\).*?IdentityType\.WeaponPage.*?WeaponSlots\.Righthand.*?WeaponSlots\.LeftHand' 'Combat attack source should read equipped weapons from the weapon page right/left hand slots.'
 Assert-SourceMatch $playfieldSource 'private\s+readonly\s+Dictionary<int,\s*int>\s+lastCombatWeaponSlots\s*=\s*new\s+Dictionary<int,\s*int>\s*\(\s*\)\s*;' 'Dual-wield combat should keep per-attacker last-hand state so attack source alternation can be deterministic.'
 Assert-SourceMatch $playfieldSource 'GetEquippedCombatWeapon\s*\(ICharacter\s+attacker\).*?rightHandUsable\s*&&\s*leftHandUsable.*?lastCombatWeaponSlots\.TryGetValue\s*\(\s*attackerInstance,\s*out\s+lastSlot\s*\).*?lastSlot\s*==\s*\(int\)WeaponSlots\.Righthand.*?lastCombatWeaponSlots\s*\[\s*attackerInstance\s*\]\s*=\s*\(int\)WeaponSlots\.LeftHand.*?return\s+new\s+EquippedCombatWeapon\s*\{\s*Item\s*=\s*leftHand,\s*Slot\s*=\s*\(int\)WeaponSlots\.LeftHand\s*\}\s*;.*?lastCombatWeaponSlots\s*\[\s*attackerInstance\s*\]\s*=\s*\(int\)WeaponSlots\.Righthand.*?return\s+new\s+EquippedCombatWeapon\s*\{\s*Item\s*=\s*rightHand,\s*Slot\s*=\s*\(int\)WeaponSlots\.Righthand\s*\}\s*;' 'Dual-wield combat source should alternate between right and left hand slots instead of always preferring one hand.'
-Assert-SourceMatch $playfieldSource 'StopFightingDeadTarget\s*\(Identity\s+deadTarget\).*?nextCombatTicks\.Remove\s*\(\s*character\.Identity\.Instance\s*\)\s*;\s*this\.lastCombatWeaponSlots\.Remove\s*\(\s*character\.Identity\.Instance\s*\)\s*;' 'Combat stop cleanup should clear dual-wield alternation state when a target dies or combat is interrupted.'
+Assert-SourceMatch $playfieldSource 'StopFightingDeadTarget\s*\(Identity\s+deadTarget\).*?nextCombatTicks\.Remove\s*\(\s*character\.Identity\.Instance\s*\).*?lastCombatWeaponSlots\.Remove\s*\(\s*character\.Identity\.Instance\s*\)' 'Combat stop cleanup should clear dual-wield alternation state when a target dies or combat is interrupted.'
 Assert-SourceMatch $playfieldSource 'GetCombatAttackSource\s*\(ICharacter\s+attacker\).*?weapon\.GetAttribute\s*\(\s*\(int\)StatIds\.mindamage\s*\).*?weapon\.GetAttribute\s*\(\s*\(int\)StatIds\.maxdamage\s*\).*?weapon\.GetAttribute\s*\(\s*\(int\)StatIds\.damagebonus\s*\).*?NormalizeCombatRange\s*\(\s*weapon\.GetAttribute\s*\(\s*\(int\)StatIds\.attackrange\s*\)\s*\).*?NormalizeCombatDelaySeconds\s*\(\s*weapon\.GetAttribute\s*\(\s*\(int\)StatIds\.itemdelay\s*\).*?weapon\.GetAttribute\s*\(\s*\(int\)StatIds\.rechargedelay\s*\)' 'Equipped weapon combat should use item damage, range, attack delay, and recharge delay stats.'
-Assert-SourceMatch $playfieldSource 'TryMoveNpcIntoCombatRange\s*\(ICharacter\s+attacker,\s*ICharacter\s+target\).*?attacker\.Controller\s+is\s+NPCController.*?attacker\.Controller\.IsFollowing\s*\(\s*\).*?attacker\.Controller\.Follow\s*\(\s*target\.Identity\s*\)' 'Out-of-range NPC attackers should pursue their combat target instead of landing free hits.'
-Assert-SourceMatch $playfieldSource 'TryLeashNpcAttacker\s*\(ICharacter\s+attacker\).*?attacker\.Controller\s+as\s+NPCController.*?Distance2D\s*\(\s*homeState\.Coordinates\.coordinate\s*\).*?MaxNpcLeashDistance.*?attacker\.SetTarget\s*\(\s*Identity\.None\s*\).*?attacker\.SetFightingTarget\s*\(\s*Identity\.None\s*\).*?StopFightingDeadTarget\s*\(\s*attacker\.Identity\s*\).*?npcController\.MoveTo' 'NPC attackers should clear combat and return home after exceeding their leash distance.'
+Assert-SourceMatch $playfieldSource 'DoCombatTick\s*\(\s*dynel\s*\).*?if\s*\(\s*dynel\.Controller\.IsFollowing\s*\(\s*\)\s*\).*?dynel\.Controller\.DoFollow\s*\(\s*\)' 'NPC heartbeat should stay on the original combat-tick-then-follow order until a capture-backed movement repair replaces it.'
+Assert-SourceNoMatch $playfieldSource 'NpcMeleeFollowStopDistance' 'NPC melee follow should not use a calculated stop-distance ring around the player.'
+Assert-SourceMatch $playfieldSource 'BuildNpcCombatFollowStopDistance\s*\(double\s+range\s*\).*?range\s*>\s*MaxMeleeCombatDistance\s*\?\s*range\s*:\s*0\.0' 'NPC combat chase should send melee follow directly toward the target and reserve stop distance for ranged attacks.'
+Assert-SourceMatch $playfieldSource 'GetCombatPosition\s*\(ICharacter\s+character\).*?character\.Controller\s+is\s+PlayerController.*?character\.RawCoordinates.*?predictedPosition\s*=\s*character\.Coordinates\s*\(\s*\)\.coordinate.*?MoveCombatPositionToward\s*\(\s*rawPosition,\s*predictedPosition,\s*EnemyBehaviorContract\.MaxPlayerChaseProjectionDistance\s*\)' 'NPC combat range checks should use bounded player projection anchored to the raw CharDCMove coordinate.'
+Assert-SourceMatch $playfieldSource 'MoveCombatPositionToward\s*\(.*?double\s+step\s*=\s*Math\.Min\s*\(\s*distance,\s*maxDistance\s*\).*?return\s+new\s+CellAO\.Core\.Vector\.Vector3' 'NPC combat player projection should be clamped so prediction cannot drag mobs to an unbounded projected point.'
+Assert-SourceMatch $playfieldSource 'IsInCombatRange\s*\(ICharacter\s+attacker,\s*ICharacter\s+target,\s*double\s+range\s*\).*?GetCombatDistance\s*\(\s*attacker,\s*target\s*\)\s*<=\s*range' 'NPC combat range checks should flow through the raw-player combat distance helper.'
+Assert-SourceMatch $playfieldSource 'UpdateNpcMeleeFollowHold\s*\(ICharacter\s+attacker,\s*ICharacter\s+target,\s*double\s+range\s*\).*?double\s+distance\s*=\s*GetCombatDistance\s*\(\s*attacker,\s*target\s*\).*?distance\s*<=\s*MaxMeleeFollowHoldDistance.*?npcController\.SuppressMotionSegmentUpdates\s*\(\s*closeEnoughToHold\s*\)' 'Melee NPC attackers should suppress fresh chase packets only while visually close, not for the full hit range.'
+Assert-SourceMatch $playfieldSource 'UpdateNpcMeleeFollowHold\s*\(ICharacter\s+attacker,\s*ICharacter\s+target,\s*double\s+range\s*\).*?closeEnoughToHold\s*\|\|\s*npcController\.IsFollowing\s*\(\s*\).*?LogNpcBrain\s*\(\s*"Chasing"\s*,\s*"melee-separated".*?npcController\.Follow\s*\(\s*target\.Identity,\s*BuildNpcCombatFollowStopDistance\s*\(\s*range\s*\)\s*\)' 'Melee NPC attackers should resume follow before the full 8m attack gate when the target separates from close range.'
+Assert-SourceMatch $playfieldSource 'DoCombatTick\s*\(.*?attacker\.Controller\s+is\s+NPCController\s+&&\s*!ShouldNpcStopForCombatAttack\s*\(\s*attackSource\s*\).*?UpdateNpcMeleeFollowHold\s*\(\s*attacker,\s*target,\s*attackSource\.Range\s*\)' 'Melee NPC combat should update close-hold suppression while in range instead of waiting for the out-of-range gate.'
+Assert-SourceMatch $playfieldSource 'TryMoveNpcIntoCombatRange\s*\(ICharacter\s+attacker,\s*ICharacter\s+target,\s*double\s+range\s*\).*?npcController\.SuppressMotionSegmentUpdates\s*\(\s*false\s*\).*?npcController\.IsFollowing\s*\(\s*\)' 'Out-of-range NPC chase should re-enable motion segment updates before relying on existing follow state.'
+Assert-SourceMatch $playfieldSource 'TryMoveNpcIntoCombatRange\s*\(ICharacter\s+attacker,\s*ICharacter\s+target,\s*double\s+range\s*\).*?NPCController\s+npcController\s*=\s*attacker\.Controller\s+as\s+NPCController.*?npcController\s*==\s*null.*?npcController\.IsFollowing\s*\(\s*\).*?return\s*;.*?LogNpcBrain\s*\(\s*"Chasing"\s*,\s*"out-of-range".*?npcController\.Follow\s*\(\s*target\.Identity,\s*BuildNpcCombatFollowStopDistance\s*\(\s*range\s*\)\s*\)' 'Out-of-range NPC attackers should start one sticky follow and avoid restarting while already following.'
+Assert-SourceNoMatch $npcControllerSource 'AdvancePredictedPosition' 'NPC follow should not feed generic Character dead-reckoning back into RawCoordinates; playtest showed that compounds cross-playfield warps.'
+Assert-SourceMatch $npcControllerSource 'MaxNpcFollowSpeedPerSecond\s*=\s*EnemyBehaviorContract\.MaxNpcFollowSpeedPerSecond' 'NPC chase authority should be capped through the source-backed enemy behavior contract.'
+Assert-SourceNoMatch $npcControllerSource 'MinNpcCoordinateFollowSeconds|MinNpcCoordinateFollowDestinationDelta|NpcMeleeFollowReengageDistance|lastFollowPacket|hasFollowPacketDestination|ShouldSendCoordinateFollow|BuildPacketDestination|SendCoordinateFollow' 'NPC chase should not keep the failed coordinate-repath throttle/arrival model.'
+Assert-SourceNoMatch $npcControllerSource 'MaxNpcFollowSegmentDistance|MinNpcFollowRepathSeconds|followSegmentEndCoordinates|followDestinationCoordinates|targetOutranDestination' 'NPC chase should not keep the failed coordinate segment/destination state that caused visible spirals and snapping.'
+Assert-SourceMatch $npcControllerSource 'GetFollowTargetPosition\s*\(ICharacter\s+target\).*?target\.Controller\s+is\s+PlayerController.*?target\.RawCoordinates.*?predictedPosition\s*=\s*target\.Coordinates\s*\(\s*\)\.coordinate.*?MoveToward\s*\(\s*rawPosition,\s*predictedPosition,\s*MaxPlayerChaseProjectionDistance\s*\)' 'NPC server-side chase authority should use bounded player projection anchored to the raw CharDCMove coordinate.'
+Assert-SourceOrdered $npcControllerSource @(
+    'MoveToward\s*\(Vector3\s+start,\s*Vector3\s+destination,\s*double\s+maxDistance\s*\)',
+    'double\s+step\s*=\s*Math\.Min\s*\(\s*distance,\s*maxDistance\s*\)',
+    'double\s+factor\s*=\s*step\s*/\s*distance',
+    'return\s+new\s+Vector3'
+) 'NPC chase helper should clamp every server-side movement step.'
+Assert-SourceOrdered $npcControllerSource @(
+    'private\s+struct\s+NpcMotionSegment',
+    'public\s+Vector3\s+Start',
+    'public\s+Vector3\s+End',
+    'public\s+DateTime\s+StartedUtc',
+    'public\s+bool\s+Active'
+) 'NPC follow should keep one motion segment as the chase position contract.'
+Assert-SourceOrdered $npcControllerSource @(
+    'CurrentMotionSegmentPosition\s*\(DateTime\s+now\s*\)',
+    'this\.followMotionSegment\.Active',
+    'double\s+elapsedSeconds\s*=\s*Math\.Max\s*\(\s*0\.0,\s*\(now\s*-\s*this\.followMotionSegment\.StartedUtc\)\.TotalSeconds\s*\)',
+    'MoveToward\s*\(\s*this\.followMotionSegment\.Start,\s*this\.followMotionSegment\.End,\s*MaxNpcFollowSpeedPerSecond\s*\*\s*elapsedSeconds\s*\)',
+    'UpdateMotionSegmentPosition\s*\(DateTime\s+now\s*\)',
+    'this\.Character\.Coordinates\s*\(\s*position\s*\)'
+) 'NPC range authority should come from the same active motion segment used for visible chase packets.'
+Assert-SourceNoMatch $npcControllerSource 'AdvanceFollowPosition|EstimateVisibleFollowPosition|followStartCoordinates|lastVisibleFollowPacket|hasVisibleFollowPacket' 'NPC chase should not keep separate server-side and guessed-visible movement models.'
+Assert-SourceNoMatch $npcControllerSource 'SetFollowSegmentEnd|BuildFollowSegmentEnd|BuildFollowDestination|FollowDestinationStillReachesCombatRange|hasFollowSegmentEndCoordinates|hasFollowDestinationCoordinates' 'NPC follow should not use the failed destination/segment repath helpers.'
+Assert-SourceMatch $npcControllerSource 'FaceToward\s*\(Vector3\s+start,\s*Vector3\s+destination\s*\).*?start\.Distance2D\s*\(\s*destination\s*\)\s*<\s*0\.001.*?return;.*?Vector3\s+normalizedDirection\s*=\s*direction\.Normalize\s*\(\s*\).*?GenerateRotationFromDirectionVector\s*\(\s*normalizedDirection\s*\)' 'NPC chase heading should guard zero-length segments before normalizing.'
+Assert-SourceNoMatch $npcControllerSource 'this\.SendWantedDirection\s*\(' 'Normal melee chase should not inject SetWantedDirection; focused official chase used FollowTarget movement without that side-channel.'
+Assert-SourceMatch $npcControllerSource 'SendWantedDirection\s*\(Vector3\s+direction\s*\).*?new\s+SetWantedDirectionMessage.*?Identity\s*=\s*this\.Character\.Identity.*?Unknown\s*=\s*0.*?DirectinVector\s*=.*?X\s*=\s*direction\.xf.*?Y\s*=\s*direction\.yf.*?Z\s*=\s*direction\.zf' 'The recovered SetWantedDirection packet helper should remain available for capture-specific future use.'
+Assert-SourceNoMatch $npcControllerSource 'ShouldSendChaseCorrection|SendOfficialChaseCorrection|DirectionDot2D|lastFollowCorrectionUtc|lastFollowPacketStart|hasFollowPacketStart' 'Normal NPC chase should not inject sharp-turn correction packets; local playtest showed that path caused snap/jitter during circle movement.'
+Assert-SourceOrdered $npcControllerSource @(
+    'public\s+bool\s+Follow\s*\(\s*Identity\s+target\s*\)',
+    'return\s+this\.Follow\s*\(\s*target,\s*0\.0\s*\)',
+    'public\s+bool\s+Follow\s*\(\s*Identity\s+target,\s*double\s+stopDistance\s*\)',
+    'ICharacter\s+npc\s*=\s*GetCharacterFromPool\s*\(\s*this\.Character\.Playfield\.Identity,\s*target\s*\)',
+    'npc\s*==\s*null',
+    'this\.StopFollow\s*\(\s*\)',
+    'return\s+false',
+    'this\.ResetFollowPosition\s*\(\s*\)',
+    'this\.followStopDistance\s*=\s*Math\.Max\s*\(\s*0\.0,\s*stopDistance\s*\)',
+    'Vector3\s+targetPosition\s*=\s*GetFollowTargetPosition\s*\(\s*npc\s*\)',
+    'Vector3\s+start\s*=\s*this\.Character\.RawCoordinates',
+    'this\.followCoordinates\s*=\s*targetPosition',
+    'this\.followStopDistance\s*>\s*0\.0\s*&&\s*start\.Distance2D\s*\(\s*targetPosition\s*\)\s*<=\s*this\.followStopDistance',
+    'this\.FaceToward\s*\(\s*start,\s*targetPosition\s*\)',
+    'this\.Run\s*\(\s*\)',
+    'this\.FaceToward\s*\(\s*start,\s*targetPosition\s*\)',
+    'this\.SendMotionSegmentFollow\s*\(\s*"coordinate-follow",\s*start,\s*targetPosition,\s*now\s*\)'
+) 'NPC initial follow should use the validated coordinate FollowTarget payload and null-safe target lookup.'
+Assert-SourceMatch $npcControllerSource 'GetCharacterFromPool\s*\(Identity\s+parent,\s*Identity\s+identity\s*\).*?Pool\.Instance\.GetObject\s*\(\s*parent,\s*identity\s*\)\s+as\s+ICharacter' 'NPC follow target lookup should use the null-returning pool path instead of throwing heartbeat exceptions on stale targets.'
+Assert-SourceNoMatch $npcControllerSource 'targetFollowMovement|FollowTargetMessageHandler\.Default\.Send\s*\(\s*this\.Character,\s*target\s*\)' 'NPC chase should not use the unproven SimpleChar target-follow path; local test showed it broke visible chase.'
+Assert-SourceNoMatch $npcControllerSource 'this\.Walk\s*\(\s*\)\s*;\s*SendOfficialSetPos\s*\(' 'NPC initial follow should not send a bare SetPos before the first coordinate FollowTarget.'
+Assert-SourceNoMatch $npcControllerSource 'SendOfficialStopMovingCmd|SendOfficialSetPos|SendOfficialSettle|new\s+StopMovingCmdMessage|new\s+SetPosMessage' 'Official 20260529-212034 target chase sample did not justify StopMovingCmd/SetPos/type-21 settle in local NPC chase.'
+Assert-SourceOrdered $npcControllerSource @(
+    'public\s+void\s+DoFollow\s*\(\s*\)',
+    'Vector3\s+targetPosition\s*=\s*this\.followCoordinates',
+    'targetPosition\s*=\s*GetFollowTargetPosition\s*\(\s*targetChar\s*\)',
+    'DateTime\s+now\s*=\s*DateTime\.UtcNow',
+    'Vector3\s+current\s*=\s*this\.UpdateMotionSegmentPosition\s*\(\s*now\s*\)',
+    'this\.followCoordinates\s*=\s*targetPosition',
+    'this\.followStopDistance\s*>\s*0\.0\s*&&\s*current\.Distance2D\s*\(\s*targetPosition\s*\)\s*<=\s*this\.followStopDistance',
+    'this\.FaceToward\s*\(\s*current,\s*targetPosition\s*\)',
+    'this\.suppressMotionSegmentUpdates',
+    'return\s*;',
+    'this\.ShouldSendMotionSegmentUpdate\s*\(\s*current,\s*targetPosition,\s*now\s*\)',
+    'this\.SendMotionSegmentFollow\s*\(\s*"coordinate-update",\s*current,\s*targetPosition,\s*now\s*\)'
+) 'NPC continuous chase should advance server authority from the active motion segment and only send coordinate updates through the gated path.'
+Assert-SourceNoMatch $npcControllerSource 'Distance to target|bool\s+repathDue|targetMoved\s*\|\||FollowTargetMessageHandler\.Default\.Send\s*\(\s*this\.Character,\s*start,\s*segmentEnd\s*\)' 'NPC DoFollow should not emit per-heartbeat distance spam or failed segment-end repath packets during combat chase.'
+Assert-SourceNoMatch $npcControllerSource 'DoFollow\s*\(\s*\).*?StopFollowForCombatRange\s*\(\s*targetPosition\s*\)' 'NPC combat-range follow should not clear follow state; local logs showed that reset produced follow/stop/follow churn.'
+Assert-SourceNoMatch $npcControllerSource 'this\.FaceToward\s*\(\s*current,\s*targetPosition\s*\)\s*;\s*this\.StopMovement\s*\(\s*\)\s*;\s*this\.LogChase\s*\(\s*"combat-stop"' 'NPC combat-range stop should use the FollowTarget stop packet without generic forward-stop prediction.'
+Assert-SourceNoMatch $npcControllerSource 'PauseFollowForCombatRange|ResumeFollowFromCombatRange|followPausedForCombatRange' 'NPC combat movement should not keep pause/resume state; out of range follows, in range stops and attacks.'
+Assert-SourceMatch $npcControllerSource 'public\s+void\s+StopFollow\s*\(\s*\).*?this\.followIdentity\s*=\s*Identity\.None.*?this\.ResetFollowPosition\s*\(\s*\)' 'Full follow cleanup should clear follow position state.'
+Assert-SourceNoMatch $npcControllerSource 'targetMoved\s*\|\|\s*repathDue|targetPosition\.Distance2D\s*\(\s*this\.followCoordinates\s*\)\s*>\s*2\.0f' 'NPC target movement should not reintroduce per-move visible repath packets; local logs showed 48ms repaths caused visible snapping.'
+Assert-SourceOrdered $playfieldSource @(
+    'private\s+void\s+DoCombatTick\s*\(ICharacter\s+attacker\s*\)',
+    'ICharacter\s+target\s*=',
+    'CombatAttackSource\s+attackSource\s*=\s*this\.GetCombatAttackSource\s*\(\s*attacker\s*\)',
+    'attacker\.Controller\s+is\s+NPCController',
+    '!this\.IsInCombatRange\s*\(\s*attacker,\s*target,\s*attackSource\.Range\s*\)',
+    'this\.TryMoveNpcIntoCombatRange\s*\(\s*attacker,\s*target,\s*attackSource\.Range\s*\)',
+    'return\s*;',
+    'DateTime\s+nextTick'
+) 'NPC combat movement should start chasing before attack cooldown can delay movement state.'
+Assert-SourceMatch $playfieldSource 'ShouldNpcStopForCombatAttack\s*\(CombatAttackSource\s+attackSource\s*\).*?attackSource\.Range\s*>\s*MaxMeleeCombatDistance' 'NPCs should only stop movement for ranged combat sources; melee attacks are allowed while moving.'
+Assert-SourceMatch $playfieldSource 'attacker\.Controller\s+is\s+NPCController\s*&&\s*ShouldNpcStopForCombatAttack\s*\(\s*attackSource\s*\).*?this\.StopNpcFollowIfInCombatRange\s*\(\s*attacker,\s*target,\s*attackSource\.Range\s*\)' 'NPC combat tick should only clear follow state for ranged attacks, not melee.'
+Assert-SourceNoMatch $npcControllerSource 'public\s+void\s+DoFollow\s*\(\s*\).*?SendOfficialSetPos\s*\(' 'NPC DoFollow should not send SetPos on target movement.'
+Assert-SourceNoMatch $npcControllerSource 'new\s+SetPosMessage' 'NPC chase correction should not emit SetPos from the local runtime without a target-specific official capture proving that exact path.'
+Assert-SourceNoMatch $playfieldSource 'TryHoldNpcCombatMovementBeforeFollow|TryMaintainNpcCombatFacing|nextNpcCombatMoveTicks|NpcCombatMoveRefreshSeconds|NpcCombatReengageDistance' 'Speculative NPC chase/hold/repath helpers should stay out until backed by packet evidence.'
+Assert-SourceNoMatch $npcControllerSource 'MoveIntoCombatRange|HoldCombatPosition|FaceTarget|MoveToCombatPosition|NPC combat move' 'Speculative NPC controller combat movement helpers should stay out until backed by packet evidence.'
+Assert-SourceMatch $playfieldSource 'if\s*\(\s*killingHit\s*\).*?target\.Controller\s+is\s+NPCController.*?KillNpcTarget\s*\(\s*target\s*\).*?target\.Controller\s+is\s+PlayerController.*?KillPlayerTarget\s*\(\s*target\s*\)' 'Combat killing hits should route player targets through a real player death branch instead of only clearing the attacker timer.'
+Assert-SourceMatch $playfieldSource 'KillPlayerTarget\s*\(ICharacter\s+target\).*?MarkPlayerDead\s*\(\s*target\s*\).*?target\.SendChangedStats\s*\(\s*\).*?target\.SetTarget\s*\(\s*Identity\.None\s*\).*?target\.SetFightingTarget\s*\(\s*Identity\.None\s*\).*?StopFightingDeadTarget\s*\(\s*target\.Identity\s*\).*?SendCombatStopMessage\s*\(\s*target\s*\).*?SendPlayerDeathAnimation\s*\(\s*target\s*\)' 'Player death should mark dead stats, stop both sides of combat, and send the death action.'
+Assert-SourceMatch $playfieldSource 'MarkPlayerDead\s*\(ICharacter\s+target\).*?Stats\s*\[\s*StatIds\.health\s*\]\.Value\s*=\s*0.*?Stats\s*\[\s*StatIds\.deadtimer\s*\]\.Value\s*=\s*1.*?Stats\s*\[\s*StatIds\.healdelta\s*\]\.Value\s*=\s*0.*?Stats\s*\[\s*StatIds\.nanodelta\s*\]\.Value\s*=\s*0' 'Player death stats should keep the player dead at zero health and stop passive regen.'
+Assert-SourceMatch $playfieldSource 'SendPlayerDeathAnimation\s*\(ICharacter\s+target\).*?Action\s*=\s*CharacterActionType\.Death.*?Parameter2\s*=\s*DefaultNpcDeathAnimationKey' 'Player death should reuse the validated CharacterAction death packet shape until a player-death capture proves a different key.'
 Assert-SourceMatch $playfieldSource 'KillNpcTarget\s*\(ICharacter\s+target\).*?MarkNpcDead\s*\(\s*target\s*\).*?StopFightingDeadTarget\s*\(\s*target\.Identity\s*\).*?SendNpcDeathAnimation\s*\(\s*target\s*\).*?ScheduleCorpseSpawn\s*\(\s*target\s*,\s*corpseIdentity\s*\).*?deadNpcDespawnTicks\s*\[\s*target\.Identity\.Instance\s*\]\s*=\s*DateTime\.UtcNow\s*\+\s*DeadNpcDespawnDelay\s*;' 'NPC death should mark dead, stop fighting, play death, schedule corpse, and delay despawn.'
 Assert-SourceMatch $playfieldSource 'MarkNpcDead\s*\(ICharacter\s+target\).*?Stats\s*\[\s*StatIds\.deadtimer\s*\]\.Value\s*=\s*1\s*;.*?Stats\s*\[\s*StatIds\.corpseanimkey\s*\]\.Value\s*=\s*DeathAnimationKeyFor\s*\(\s*target\s*\)\s*;.*?Stats\s*\[\s*StatIds\.dieanim\s*\]\.Value\s*=\s*DeathAnimationKeyFor\s*\(\s*target\s*\)\s*;.*?Stats\s*\[\s*StatIds\.healdelta\s*\]\.Value\s*=\s*0\s*;.*?DoNotDoTimers\s*=\s*true\s*;' 'NPC death stats should disable healing/timers and expose death animation keys.'
 Assert-SourceMatch $playfieldSource 'TryUseDeadNpcCorpse\s*\(ICharacter\s+looter,\s*Identity\s+deadNpcIdentity,\s*out\s+Identity\s+corpseIdentity\).*?DeadNpcIdentity\.Instance\s*==\s*deadNpcIdentity\.Instance.*?corpseIdentity\s*=\s*corpse\.CorpseIdentity\s*;.*?return\s+this\.TryUseCorpse\s*\(\s*looter\s*,\s*corpse\.CorpseIdentity\s*\)\s*;' 'Using a dead NPC dynel should route to its registered corpse identity.'
@@ -464,7 +627,6 @@ Assert-SourceMatch $spawnCommandSource 'mobCharacter\.Stats\s*\[\s*StatIds\.heal
 Assert-SourceMatch $spawnCommandSource 'new\s+CharInPlayMessage\s*\{\s*Identity\s*=\s*mobCharacter\.Identity\s*,\s*Unknown\s*=\s*0x00\s*\}' 'DB-spawned mobs should send CharInPlay after SimpleCharFullUpdate.'
 Assert-SourceMatch $spawnCommandSource 'SpawnClientHintedMobs\s*\(ICharacter\s+character\).*?SpawnPopulationMob\s*\(.*?ZonePopulationOffsets.*?Spawned\s*\{0\}\s*DB population mobs' 'Spawn zone should create a DB-backed population pack rather than another single test mob.'
 Assert-SourceMatch $spawnCommandSource 'SpawnPopulationMob\s*\(.*?NonPlayerCharacterHandler\.SpawnMobFromTemplate.*?CombatTestMobArchetype\.Prepare\s*\(\s*mobCharacter,\s*entry\s*\).*?SimpleCharFullUpdate\.ConstructMessage\s*\(\s*mobCharacter\s*\).*?DB population mob spawned' 'Population mobs should use real DB templates, prepared combat/death stats, and visible client spawn packets.'
-Assert-SourceMatch $spawnCommandSource 'RegisterNpcHome\s*\(\s*mobCharacter\s*\)' 'GM-spawned test and DB mobs should register home positions for leash behavior.'
 Assert-SourceMatch $spawnCommandSource 'ShowLootStatus\s*\(ICharacter\s+character\).*?MobTemplateDao\.Instance\.GetAll\s*\(\s*\).*?MobDroptableDao\.Instance\.GetAll\s*\(\s*\).*?CombatMobLootCatalog\.BuildEntries.*?configuredTemplates.*?parsed entries' 'Spawn lootstatus should report mobtemplate/mobdroptable coverage and parsed DB loot entries.'
 Assert-SourceMatch $spawnCommandSource 'HasDropConfiguration\s*\(DBMobTemplate\s+template\).*?DropHashes.*?DropSlots.*?DropRates' 'Spawn lootstatus should treat any configured drop field as loot configuration.'
 Assert-True (Test-Path $zoneEnemyHintsPath) 'Client RDB zone enemy hint catalog is missing.'
@@ -572,6 +734,9 @@ try {
     $damageRulesType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatDamageRules'
     $npcAiProfileType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.NpcAiProfile'
     $npcAiProfilesType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.NpcAiProfiles'
+    $enemyBehaviorContractType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.EnemyBehaviorContract'
+    $enemyBehaviorStateType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.EnemyBehaviorState'
+    $enemyBehaviorSignalType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.EnemyBehaviorSignal'
     $visualsType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatCorpseVisuals'
     $lootCatalogType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatTestLootCatalog'
     $mobLootCatalogType = Get-RequiredType $zoneAssembly 'ZoneEngine.Core.CombatMobLootCatalog'
@@ -601,6 +766,32 @@ try {
     Get-RequiredMethod $zoneClientType 'Dispose' ([System.Reflection.BindingFlags]'NonPublic, Instance') | Out-Null
     Get-RequiredMethod $characterType 'EnterLogoutSitPosture' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
     Get-RequiredMethod $characterType 'StartLogoutTimer' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
+
+    $applyEnemyContract = Get-RequiredMethod $enemyBehaviorContractType 'Apply' ([System.Reflection.BindingFlags]'Public, Static')
+    $idleState = [System.Enum]::Parse($enemyBehaviorStateType, 'Idle')
+    $aggroedState = [System.Enum]::Parse($enemyBehaviorStateType, 'Aggroed')
+    $chasingState = [System.Enum]::Parse($enemyBehaviorStateType, 'Chasing')
+    $inRangeState = [System.Enum]::Parse($enemyBehaviorStateType, 'InRangeAttacking')
+    $deadState = [System.Enum]::Parse($enemyBehaviorStateType, 'Dead')
+    $addThreatSignal = [System.Enum]::Parse($enemyBehaviorSignalType, 'AddThreat')
+    $targetFollowSignal = [System.Enum]::Parse($enemyBehaviorSignalType, 'TargetFollow')
+    $coordinateFollowSignal = [System.Enum]::Parse($enemyBehaviorSignalType, 'CoordinateFollowTarget')
+    $attackInfoSignal = [System.Enum]::Parse($enemyBehaviorSignalType, 'AttackInfo')
+    $playerStopFightSignal = [System.Enum]::Parse($enemyBehaviorSignalType, 'StopFightFromPlayer')
+    $deathActionSignal = [System.Enum]::Parse($enemyBehaviorSignalType, 'DeathAction')
+
+    $transition = $applyEnemyContract.Invoke($null, @($idleState, $addThreatSignal))
+    Assert-True ((Get-PropertyValue $transition 'State').Equals($aggroedState)) 'Enemy contract should move Idle -> Aggroed on threat.'
+    $transition = $applyEnemyContract.Invoke($null, @($aggroedState, $targetFollowSignal))
+    Assert-True ((Get-PropertyValue $transition 'State').Equals($chasingState)) 'Enemy contract should map target-follow runtime intent to Chasing.'
+    $transition = $applyEnemyContract.Invoke($null, @($aggroedState, $coordinateFollowSignal))
+    Assert-True ((Get-PropertyValue $transition 'State').Equals($chasingState)) 'Enemy contract should map coordinate FollowTarget to Chasing.'
+    $transition = $applyEnemyContract.Invoke($null, @($chasingState, $attackInfoSignal))
+    Assert-True ((Get-PropertyValue $transition 'State').Equals($inRangeState)) 'Enemy contract should map combat results to InRangeAttacking.'
+    $transition = $applyEnemyContract.Invoke($null, @($inRangeState, $playerStopFightSignal))
+    Assert-True ((Get-PropertyValue $transition 'State').Equals($inRangeState)) 'Enemy contract should preserve mob state on player StopFight.'
+    $transition = $applyEnemyContract.Invoke($null, @($inRangeState, $deathActionSignal))
+    Assert-True ((Get-PropertyValue $transition 'State').Equals($deadState)) 'Enemy contract should map death action to Dead.'
     Get-RequiredMethod $characterType 'StopLogoutTimer' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
     Get-RequiredMethod $characterType 'InLogoutTimerPeriod' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
     Get-RequiredMethod $identityOnlySerializerType 'Serialize' ([System.Reflection.BindingFlags]'Public, Instance') | Out-Null
@@ -909,6 +1100,11 @@ try {
     Assert-True ([int]$calculateDamage.Invoke($null, @(0, 20, 3, 1, $true)) -eq 23) 'Max damage plus bonus should beat player fallback.'
     Assert-True ([int]$calculateDamage.Invoke($null, @(10, 5, 2, 1, $false)) -eq 12) 'Min damage should raise lower max damage before bonus.'
     Assert-True ([int]$calculateDamage.Invoke($null, @(-10, -5, -3, 1, $true)) -eq 15) 'Negative combat stats should not lower player fallback damage.'
+
+    $enemyMovementReplay = Join-Path $repoRoot 'tools-temp\enemy-movement-replay\Test-EnemyMovementReplay.ps1'
+    if (Test-Path $enemyMovementReplay) {
+        & $enemyMovementReplay
+    }
 
     Write-Host '[PASS] Combat smoke tests passed.'
 }

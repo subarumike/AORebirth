@@ -36,6 +36,7 @@ namespace ZoneEngine.Core.Controllers
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
 
     using CellAO.Core.Entities;
     using CellAO.Core.Functions;
@@ -51,6 +52,7 @@ namespace ZoneEngine.Core.Controllers
     using Utility;
 
     using ZoneEngine.Core.Functions;
+    using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.KnuBot;
     using ZoneEngine.Core.MessageHandlers;
 
@@ -65,17 +67,242 @@ namespace ZoneEngine.Core.Controllers
     {
         public BaseKnuBot KnuBot = null;
 
-        private double lastDistance = double.MaxValue;
-
         private Identity followIdentity = Identity.None;
 
         private Vector3 followCoordinates = new Vector3();
+
+        private NpcMotionSegment followMotionSegment;
+
+        private double followStopDistance;
+
+        private DateTime lastMotionPacketUtc = DateTime.MinValue;
+
+        private Vector3 lastMotionPacketDestination = new Vector3();
+
+        private bool hasMotionPacket;
+
+        private bool suppressMotionSegmentUpdates;
 
         private CharacterState state = CharacterState.Idle;
 
         private int activeWaypoint = 0;
 
+        private const double MaxNpcFollowSpeedPerSecond = EnemyBehaviorContract.MaxNpcFollowSpeedPerSecond;
+
+        private const double MaxPlayerChaseProjectionDistance = EnemyBehaviorContract.MaxPlayerChaseProjectionDistance;
+
+        private const double MinVisibleFollowUpdateSeconds = 0.35;
+
+        private const double MinVisibleFollowTargetDelta = 1.0;
+
         public NpcAiProfile AiProfile { get; set; } = NpcAiProfile.Passive;
+
+        private struct NpcMotionSegment
+        {
+            public Vector3 Start;
+
+            public Vector3 End;
+
+            public DateTime StartedUtc;
+
+            public bool Active;
+        }
+
+        private static string FormatVector(Vector3 vector)
+        {
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0:0.00},{1:0.00},{2:0.00}",
+                vector.x,
+                vector.y,
+                vector.z);
+        }
+
+        private static Vector3 GetFollowTargetPosition(ICharacter target)
+        {
+            if (target.Controller is PlayerController)
+            {
+                Vector3 rawPosition = target.RawCoordinates;
+                Vector3 predictedPosition = target.Coordinates().coordinate;
+                return MoveToward(rawPosition, predictedPosition, MaxPlayerChaseProjectionDistance);
+            }
+
+            return target.Coordinates().coordinate;
+        }
+
+        private void LogChase(string phase, Vector3 start, Vector3 destination)
+        {
+            Vector3 raw = this.Character.RawCoordinates;
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "NPCCHASE phase={0} npc={1} target={2} raw={3} start={4} dest={5} dist={6:0.00} stop={7:0.00} mode={8}",
+                    phase,
+                    this.Character.Identity.ToString(true),
+                    this.followIdentity.ToString(true),
+                    FormatVector(raw),
+                    FormatVector(start),
+                    FormatVector(destination),
+                    start.Distance2D(destination),
+                    this.followStopDistance,
+                    this.Character.MoveMode));
+        }
+
+        private static Vector3 MoveToward(Vector3 start, Vector3 destination, double maxDistance)
+        {
+            double distance = start.Distance2D(destination);
+            if (distance < 0.001 || maxDistance <= 0)
+            {
+                return new Vector3(start.x, start.y, start.z);
+            }
+
+            double step = Math.Min(distance, maxDistance);
+            double factor = step / distance;
+            return new Vector3(
+                start.x + ((destination.x - start.x) * factor),
+                start.y + ((destination.y - start.y) * factor),
+                start.z + ((destination.z - start.z) * factor));
+        }
+
+        private static ICharacter GetCharacterFromPool(Identity parent, Identity identity)
+        {
+            return Pool.Instance.GetObject(parent, identity) as ICharacter;
+        }
+
+        private void ResetFollowPosition()
+        {
+            this.followMotionSegment = new NpcMotionSegment();
+            this.followStopDistance = 0.0;
+            this.hasMotionPacket = false;
+            this.suppressMotionSegmentUpdates = false;
+            this.lastMotionPacketUtc = DateTime.MinValue;
+            this.lastMotionPacketDestination = new Vector3();
+        }
+
+        private Vector3 CurrentMotionSegmentPosition(DateTime now)
+        {
+            if (!this.followMotionSegment.Active)
+            {
+                return this.Character.RawCoordinates;
+            }
+
+            double elapsedSeconds = Math.Max(0.0, (now - this.followMotionSegment.StartedUtc).TotalSeconds);
+            return MoveToward(
+                this.followMotionSegment.Start,
+                this.followMotionSegment.End,
+                MaxNpcFollowSpeedPerSecond * elapsedSeconds);
+        }
+
+        private Vector3 UpdateMotionSegmentPosition(DateTime now)
+        {
+            Vector3 position = this.CurrentMotionSegmentPosition(now);
+            this.Character.Coordinates(position);
+            return position;
+        }
+
+        private void FaceToward(Vector3 start, Vector3 destination)
+        {
+            if (start.Distance2D(destination) < 0.001)
+            {
+                return;
+            }
+
+            Vector3 direction = destination - start;
+            direction.y = 0;
+            Vector3 normalizedDirection = direction.Normalize();
+            this.Character.Heading = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(normalizedDirection);
+        }
+
+        private Vector3 BuildVisibleFollowDestination(Vector3 start, Vector3 targetPosition)
+        {
+            if (this.followStopDistance <= 0.0)
+            {
+                return targetPosition;
+            }
+
+            double distance = start.Distance2D(targetPosition);
+            if (distance <= this.followStopDistance)
+            {
+                return start;
+            }
+
+            return MoveToward(start, targetPosition, distance - this.followStopDistance);
+        }
+
+        private void SetMotionSegment(Vector3 start, Vector3 destination, DateTime now)
+        {
+            this.followMotionSegment = new NpcMotionSegment
+                                       {
+                                           Start = start,
+                                           End = destination,
+                                           StartedUtc = now,
+                                           Active = true
+                                       };
+        }
+
+        private bool ShouldSendMotionSegmentUpdate(Vector3 currentPosition, Vector3 targetPosition, DateTime now)
+        {
+            if (!this.followMotionSegment.Active || !this.hasMotionPacket)
+            {
+                return true;
+            }
+
+            if ((now - this.lastMotionPacketUtc).TotalSeconds < MinVisibleFollowUpdateSeconds)
+            {
+                return false;
+            }
+
+            Vector3 destination = this.BuildVisibleFollowDestination(currentPosition, targetPosition);
+            if (this.lastMotionPacketDestination.Distance2D(destination) >= MinVisibleFollowTargetDelta)
+            {
+                return true;
+            }
+
+            double desiredSpacing = Math.Max(this.followStopDistance, 0.3);
+            return currentPosition.Distance2D(this.followMotionSegment.End) < 0.3
+                   && currentPosition.Distance2D(targetPosition) > desiredSpacing + MinVisibleFollowTargetDelta;
+        }
+
+        private void SendMotionSegmentFollow(string phase, Vector3 start, Vector3 targetPosition, DateTime now)
+        {
+            Vector3 destination = this.BuildVisibleFollowDestination(start, targetPosition);
+            this.Run();
+            this.Character.Coordinates(start);
+            this.FaceToward(start, destination);
+            this.LogChase(phase, start, destination);
+            FollowTargetMessageHandler.Default.Send(this.Character, start, destination);
+            this.SetMotionSegment(start, destination, now);
+            this.lastMotionPacketUtc = now;
+            this.lastMotionPacketDestination = destination;
+            this.hasMotionPacket = true;
+        }
+
+        public void SuppressMotionSegmentUpdates(bool suppress)
+        {
+            this.suppressMotionSegmentUpdates = suppress;
+        }
+
+        private void SendWantedDirection(Vector3 direction)
+        {
+            this.Character.Playfield.Publish(
+                new IMSendAOtomationMessageToPlayfield
+                {
+                    Body =
+                        new SetWantedDirectionMessage
+                        {
+                            Identity = this.Character.Identity,
+                            Unknown = 0,
+                            DirectinVector =
+                                new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                                {
+                                    X = direction.xf,
+                                    Y = direction.yf,
+                                    Z = direction.zf
+                                }
+                        }
+                });
+        }
 
         public CharacterState State
         {
@@ -159,20 +386,37 @@ namespace ZoneEngine.Core.Controllers
 
         public bool Follow(Identity target)
         {
+            return this.Follow(target, 0.0);
+        }
+
+        public bool Follow(Identity target, double stopDistance)
+        {
             this.followIdentity = target;
-            ICharacter npc = Pool.Instance.GetObject<ICharacter>(this.Character.Playfield.Identity, target);
-            if (npc != null)
+            ICharacter npc = GetCharacterFromPool(this.Character.Playfield.Identity, target);
+            if (npc == null)
             {
-                Vector3 temp = npc.Coordinates().coordinate - this.Character.Coordinates().coordinate;
-                temp.y = 0;
-                this.Character.Heading = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(temp).Normalize();
-                FollowTargetMessageHandler.Default.Send(
-                    this.Character,
-                    this.Character.Coordinates().coordinate,
-                    npc.Coordinates().coordinate);
-                this.Run();
-                this.StartMovement();
+                this.StopFollow();
+                return false;
             }
+
+            this.ResetFollowPosition();
+            this.followIdentity = target;
+            this.followStopDistance = Math.Max(0.0, stopDistance);
+            Vector3 targetPosition = GetFollowTargetPosition(npc);
+            Vector3 start = this.Character.RawCoordinates;
+            this.followCoordinates = targetPosition;
+            if (this.followStopDistance > 0.0 && start.Distance2D(targetPosition) <= this.followStopDistance)
+            {
+                this.Character.Coordinates(start);
+                this.FaceToward(start, targetPosition);
+                return true;
+            }
+
+            this.Run();
+            this.FaceToward(start, targetPosition);
+            DateTime now = DateTime.UtcNow;
+            this.SendMotionSegmentFollow("coordinate-follow", start, targetPosition, now);
+
             return true;
         }
 
@@ -335,49 +579,41 @@ namespace ZoneEngine.Core.Controllers
 
         public void MoveTo(SmokeLounge.AOtomation.Messaging.GameData.Vector3 destination)
         {
-            FollowTargetMessageHandler.Default.Send(this.Character, this.Character.RawCoordinates, destination);
             Vector3 dest = destination;
-            Vector3 start = this.Character.RawCoordinates;
-            dest = start - dest;
-            dest = dest.Normalize();
-            this.Character.Heading = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(dest);
-            this.Run();
+            Vector3 start = this.Character.Coordinates().coordinate;
+            DateTime now = DateTime.UtcNow;
+            if (start.Distance2D(dest) < 0.3f)
+            {
+                this.StopMovement();
+                this.StopFollow();
+                this.Character.RawCoordinates = destination;
+                FollowTargetMessageHandler.Default.Send(this.Character, destination);
+                return;
+            }
+
+            dest = dest - start;
+            dest.y = 0;
+            this.Character.Heading = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(dest.Normalize());
+            this.SendMotionSegmentFollow("moveto", start, destination, now);
 
             Coordinate c = new Coordinate(destination);
             this.followCoordinates = c.coordinate;
-            /*bool arrived = false;
-            double lastDistance = double.MaxValue;
-            while (!arrived)
-            {
-                Coordinate temp = this.Character.Coordinates;
-                double distance = this.Character.Coordinates.Distance2D(c);
-                arrived = (distance < 0.2f) || (lastDistance < distance);
-                lastDistance = distance;
-                // LogUtil.Debug(DebugInfoDetail.Movement,"Moving...");
-                Thread.Sleep(100);
-            }
-            LogUtil.Debug(DebugInfoDetail.Movement, "Arrived at "+this.Character.Coordinates.ToString());
-            this.StopMovement();*/
         }
 
         public void DoFollow()
         {
-            Coordinate sourceCoord = this.Character.Coordinates();
             Vector3 targetPosition = this.followCoordinates;
             if (!this.followIdentity.Equals(Identity.None))
             {
-                ICharacter targetChar = Pool.Instance.GetObject<ICharacter>(
-                    this.Character.Playfield.Identity,
-                    this.followIdentity);
+                ICharacter targetChar = GetCharacterFromPool(this.Character.Playfield.Identity, this.followIdentity);
                 if (targetChar == null)
                 {
                     // If target does not longer exist (death or zone or logoff) then stop following
-                    this.followIdentity = Identity.None;
-                    this.followCoordinates = new Vector3();
+                    this.StopFollow();
                     return;
                 }
 
-                targetPosition = targetChar.Coordinates().coordinate;
+                targetPosition = GetFollowTargetPosition(targetChar);
             }
 
             // Do we have coordinates to follow?
@@ -386,34 +622,26 @@ namespace ZoneEngine.Core.Controllers
                 return;
             }
 
-            // /!\ If target flies away, there has to be some kind of adjustment
-            Vector3 start = sourceCoord.coordinate;
-            Vector3 dest = targetPosition;
+            DateTime now = DateTime.UtcNow;
+            Vector3 current = this.UpdateMotionSegmentPosition(now);
+            this.followCoordinates = targetPosition;
 
-            // Check if we have arrived
-            if (start.Distance2D(dest) < 0.3f)
+            if (this.followStopDistance > 0.0 && current.Distance2D(targetPosition) <= this.followStopDistance)
             {
-                this.StopMovement();
-                this.Character.RawCoordinates = dest;
-                FollowTargetMessageHandler.Default.Send(this.Character, dest);
-                this.followCoordinates = new Vector3();
+                this.Character.Coordinates(current);
+                this.FaceToward(current, targetPosition);
                 return;
             }
 
-            LogUtil.Debug(DebugInfoDetail.Movement, "Distance to target: " + start.Distance2D(dest).ToString());
-
-            // If target moved or first call, then issue a new follow
-            if (targetPosition.Distance2D(this.followCoordinates) > 2.0f)
+            this.FaceToward(current, targetPosition);
+            if (this.suppressMotionSegmentUpdates)
             {
-                this.StopMovement();
-                this.Character.Coordinates(start);
-                FollowTargetMessageHandler.Default.Send(this.Character, start);
-                Vector3 temp = start - dest;
-                temp.y = 0;
-                this.Character.Heading = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(temp);
-                this.followCoordinates = dest;
-                FollowTargetMessageHandler.Default.Send(this.Character, start, dest);
-                this.StartMovement();
+                return;
+            }
+
+            if (this.ShouldSendMotionSegmentUpdate(current, targetPosition, now))
+            {
+                this.SendMotionSegmentFollow("coordinate-update", current, targetPosition, now);
             }
         }
 
@@ -450,6 +678,23 @@ namespace ZoneEngine.Core.Controllers
         {
             return ((!this.followIdentity.Equals(Identity.None)) || (this.followCoordinates.x != 0.0f)
                     || (this.followCoordinates.y != 0.0f) || (this.followCoordinates.z != 0.0f));
+        }
+
+        public void StopFollowForCombatRange(Vector3 targetPosition)
+        {
+            Vector3 current = this.UpdateMotionSegmentPosition(DateTime.UtcNow);
+
+            this.Character.Coordinates(current);
+            this.FaceToward(current, targetPosition);
+            this.LogChase("combat-stop", current, targetPosition);
+            FollowTargetMessageHandler.Default.Send(this.Character, current);
+            this.followIdentity = Identity.None;
+            lock (this.followCoordinates)
+            {
+                this.followCoordinates = new Vector3();
+            }
+
+            this.ResetFollowPosition();
         }
 
         public void Run()
@@ -534,6 +779,7 @@ namespace ZoneEngine.Core.Controllers
         public void StopFollow()
         {
             this.followIdentity = Identity.None;
+            this.ResetFollowPosition();
             lock (this.followCoordinates)
             {
                 this.followCoordinates = new Vector3();

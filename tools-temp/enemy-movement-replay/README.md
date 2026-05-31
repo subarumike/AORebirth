@@ -4,7 +4,7 @@ This is a small contract guard for the current enemy movement rule set. It is no
 
 It protects the behavior Mike called out during playtest:
 
-- If the target is out of attack range, keep chasing with coordinate `FollowTarget`.
+- Keep melee chase active with coordinate `FollowTarget`; melee attack range and melee follow spacing are separate.
 - If the target is in melee range, melee attacks can happen while moving.
 - If the target is in ranged or nano range, stop and attack.
 - Player `StopFight` does not clear NPC retaliation by itself.

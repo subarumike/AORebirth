@@ -90,36 +90,12 @@ namespace ZoneEngine.Core.MessageHandlers
 
         public void Send(ICharacter character, Vector3 stopPosition)
         {
-            this.SendToPlayfield(character, this.FillerFullStopAt(character, stopPosition));
+            this.SendOfficialPositionStop(character, stopPosition);
         }
 
         public void SendOfficialPositionStop(ICharacter character, Vector3 stopPosition)
         {
             this.SendToPlayfield(character, this.FillerOfficialPositionStop(character, stopPosition));
-        }
-
-        public void SendOfficialSettle(ICharacter character, Vector3 coordinates, Vector3 confirmCoordinates)
-        {
-            this.SendToPlayfield(character, this.FillerOfficialSettle(character, coordinates, confirmCoordinates));
-        }
-
-        private MessageDataFiller FillerFullStopAt(ICharacter character, Vector3 stopPosition)
-        {
-            return x =>
-            {
-                x.Identity = character.Identity;
-                x.Unknown = 0;
-                x.Info = new FollowTargetInfo()
-                         {
-                             Target = Identity.None,
-                             X = stopPosition.X,
-                             Y = stopPosition.Y,
-                             Z = stopPosition.Z,
-                             Dummy = 0,
-                             Dummy1 = 0,
-                             MoveType = EnemyBehaviorContract.FollowStopMoveType
-                         };
-            };
         }
 
         private MessageDataFiller FillerOfficialPositionStop(ICharacter character, Vector3 stopPosition)
@@ -136,25 +112,6 @@ namespace ZoneEngine.Core.MessageHandlers
                              Unknown3 = 0x40000000,
                              Coordinates = stopPosition,
                              Unknown4 = 0
-                         };
-            };
-        }
-
-        private MessageDataFiller FillerOfficialSettle(ICharacter character, Vector3 coordinates, Vector3 confirmCoordinates)
-        {
-            return x =>
-            {
-                x.Identity = character.Identity;
-                x.Unknown = 0;
-                x.Info = new FollowStopInfo()
-                         {
-                             MoveType = EnemyBehaviorContract.FollowStopMoveType,
-                             Unknown1 = (int)character.Identity.Type,
-                             Unknown2 = character.Identity.Instance,
-                             Unknown3 = 0,
-                             Coordinates = coordinates,
-                             Flag = 1,
-                             ConfirmCoordinates = confirmCoordinates
                          };
             };
         }
@@ -196,7 +153,13 @@ namespace ZoneEngine.Core.MessageHandlers
             return x =>
             {
                 x.Identity = character.Identity;
-                x.Info = new FollowTargetInfo() { Target = toFollow, Dummy1 = 0x20000000 };
+                x.Info = new FollowTargetInfo()
+                         {
+                             MoveType = 0,
+                             Target = toFollow,
+                             Dummy = 0x40,
+                             Dummy1 = 0x20000000
+                         };
                 x.Unknown = 0;
             };
         }

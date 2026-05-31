@@ -36,6 +36,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using CellAO.Core.Components;
     using CellAO.Core.Entities;
     using CellAO.Core.Network;
+    using CellAO.Core.Playfields;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -59,6 +60,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 character.FightingTarget);
 
             character.SetFightingTarget(Identity.None);
+            this.ResetCombatTick(character);
             this.SendToPlayfield(
                 character,
                 x =>
@@ -66,6 +68,15 @@ namespace ZoneEngine.Core.MessageHandlers
                     x.Identity = character.Identity;
                     x.Unknown1 = message.Unknown1;
                 });
+        }
+
+        private void ResetCombatTick(ICharacter character)
+        {
+            Playfield playfield = character.Playfield as Playfield;
+            if (playfield != null)
+            {
+                playfield.ResetCombatTick(character.Identity);
+            }
         }
     }
 }

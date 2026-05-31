@@ -144,6 +144,7 @@ client.Controller.Character.Playfield.Identity,
             client.SendCompressed(gameTimeMessage);
 
             InitializeActionableState(client);
+
             client.SendCompressed(
                 new StatMessage
                 {
@@ -223,6 +224,7 @@ client.Controller.Character.Playfield.Identity,
             ClientMoveItemToInventoryMessageHandler.EnsureWeaponVisualMeshes(client.Controller.Character, false);
 
             AppearanceUpdateMessageHandler.Default.Send(client.Controller.Character);
+            CompleteDeathRespawnCharInPlay(client);
 
             // done, so we call a hook.
             // Call all OnConnect script Methods
@@ -230,6 +232,26 @@ client.Controller.Character.Playfield.Identity,
 
             // Timers are allowed to update client stats now.
             client.Controller.Character.DoNotDoTimers = false;
+        }
+
+        private static void CompleteDeathRespawnCharInPlay(ZoneClient client)
+        {
+            ICharacter character = client.Controller.Character;
+            if (character.Stats[StatIds.health].Value <= 0 || character.Stats[StatIds.deadtimer].Value != 75)
+            {
+                return;
+            }
+
+            character.Starting = false;
+            client.SendCompressed(new CharInPlayMessage { Identity = character.Identity, Unknown = 0x00 });
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "Death respawn CharInPlay completion sent target={0} unknown=0 hp={1}/{2} deadTimer={3}",
+                    character.Identity,
+                    character.Stats[StatIds.health].Value,
+                    character.Stats[StatIds.life].Value,
+                    character.Stats[StatIds.deadtimer].Value));
         }
 
         private static void InitializeActionableState(ZoneClient client)

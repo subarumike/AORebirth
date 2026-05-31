@@ -71,7 +71,12 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         protected override void Read(CharInPlayMessage message, IZoneClient client)
         {
-            LogUtil.Debug(DebugInfoDetail.NetworkMessages, "Client connected...");
+            LogUtil.Debug(
+                DebugInfoDetail.NetworkMessages,
+                string.Format(
+                    "Client CharInPlay received character={0} unknown={1}",
+                    client.Controller.Character.Identity,
+                    message.Unknown));
             client.Controller.Character.DoNotDoTimers = true;
             Thread.Sleep(1000);
             // client got all the needed data and
