@@ -3315,14 +3315,22 @@ namespace CellAO.Core.Playfields
                 return;
             }
 
-            int cashBeforeVisible = looter.Stats[StatIds.cash].Value;
             uint cashBeforeBase = looter.Stats[StatIds.cash].BaseValue;
-            int cashBefore = cashBeforeVisible < 0 ? 0 : cashBeforeVisible;
+            int cashBefore = cashBeforeBase > int.MaxValue ? int.MaxValue : (int)cashBeforeBase;
             corpse.CreditsLooted = true;
-            int cashAfter = cashBefore + corpse.Credits;
-            if (cashAfter < 0)
+            long cashAfterLong = (long)cashBefore + corpse.Credits;
+            int cashAfter;
+            if (cashAfterLong < 0)
             {
                 cashAfter = 0;
+            }
+            else if (cashAfterLong > int.MaxValue)
+            {
+                cashAfter = int.MaxValue;
+            }
+            else
+            {
+                cashAfter = (int)cashAfterLong;
             }
 
             looter.Stats[StatIds.cash].Set((uint)cashAfter);
@@ -3335,11 +3343,10 @@ namespace CellAO.Core.Playfields
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 string.Format(
-                    "Corpse credits awarded corpse={0} looter={1} credits={2} cashBeforeVisible={3} cashBeforeBase={4} cashAfter={5} inventorySlot={6}",
+                    "Corpse credits awarded corpse={0} looter={1} credits={2} cashBeforeBase={3} cashAfter={4} inventorySlot={5}",
                     corpse.CorpseIdentity,
                     looter.Identity,
                     corpse.Credits,
-                    cashBefore,
                     cashBeforeBase,
                     cashAfter,
                     corpse.InventorySlot));

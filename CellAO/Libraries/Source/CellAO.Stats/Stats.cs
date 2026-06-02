@@ -2995,7 +2995,7 @@ namespace CellAO.Stats
             this.canChangeClothes = new Stat(this, 223, 1234567890, false, false, false);
             this.cardOwnerInstance = new Stat(this, 187, 1234567890, false, false, false);
             this.cardOwnerType = new Stat(this, 186, 1234567890, false, false, false);
-            this.cash = new Stat(this, 61, 0, false, false, false);
+            this.cash = new Stat(this, 61, 0, true, false, false);
             this.castEffectType = new Stat(this, 428, 1234567890, false, false, false);
             this.castSelfAbstractAnim = new Stat(this, 378, 1234567890, false, false, false);
             this.castSound = new Stat(this, 270, 1234567890, false, false, false);

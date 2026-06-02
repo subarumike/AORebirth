@@ -75,6 +75,9 @@ namespace ZoneEngine.Core.MessageHandlers
             uint clientCash;
             if (statsToClient.TryGetValue((int)StatIds.cash, out clientCash))
             {
+                clientCash = character.Stats[StatIds.cash].BaseValue;
+                statsToClient[(int)StatIds.cash] = clientCash;
+
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
                     string.Format(
@@ -93,6 +96,9 @@ namespace ZoneEngine.Core.MessageHandlers
             uint playfieldCash;
             if (statsToPlayfield.TryGetValue((int)StatIds.cash, out playfieldCash))
             {
+                playfieldCash = character.Stats[StatIds.cash].BaseValue;
+                statsToPlayfield[(int)StatIds.cash] = playfieldCash;
+
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
                     string.Format(
@@ -150,6 +156,8 @@ namespace ZoneEngine.Core.MessageHandlers
         {
             if (statId == (int)StatIds.cash)
             {
+                statValue = character.Stats[StatIds.cash].BaseValue;
+
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
                     string.Format(

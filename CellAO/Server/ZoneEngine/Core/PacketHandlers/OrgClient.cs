@@ -226,7 +226,14 @@ namespace ZoneEngine.Core.PacketHandlers
                     // Add Org Bank to prez
                     DBOrganization orgDisband =
                         OrganizationDao.Instance.Get((int)client.Controller.Character.Stats[StatIds.clan].BaseValue);
-                    client.Controller.Character.Stats[StatIds.cash].BaseValue += (uint)orgDisband.Bank;
+                    if ((orgDisband != null) && (orgDisband.Bank > 0))
+                    {
+                        ulong finalCash = client.Controller.Character.Stats[StatIds.cash].BaseValue + orgDisband.Bank;
+                        uint clampedCash = finalCash > int.MaxValue ? int.MaxValue : (uint)finalCash;
+                        client.Controller.Character.Stats[StatIds.cash].Set(clampedCash);
+                        client.Controller.SendChangedStats();
+                        client.Controller.Character.Stats.Write();
+                    }
 
                     // Clear stat 5 (Clan) from all chars where value=orgId
                     StatDao.DisbandOrganization((int)client.Controller.Character.Stats[StatIds.clan].BaseValue);

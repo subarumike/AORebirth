@@ -355,7 +355,9 @@ namespace ZoneEngine.Core.MessageHandlers
                                 cash -= (int)(CLFactor * item.GetAttribute(74));
                             }
 
-                            client.Controller.Character.Stats[StatIds.cash].Value -= cash;
+                            SetCash(
+                                client.Controller.Character,
+                                GetCash(client.Controller.Character) - cash);
 
                             this.Send(
                                 client.Controller.Character,
@@ -1198,7 +1200,7 @@ namespace ZoneEngine.Core.MessageHandlers
         private string GetPlayerTradeCreditFailure(ICharacter character, TemporaryBag shoppingBag)
         {
             int offeredCredits = shoppingBag.GetPlayerTradeCredits(character.Identity);
-            int availableCredits = character.Stats[StatIds.cash].Value;
+            int availableCredits = GetCash(character);
             if (offeredCredits <= 0 || availableCredits >= offeredCredits)
             {
                 return null;
