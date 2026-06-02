@@ -88,9 +88,9 @@ namespace ZoneEngine.Core.MessageHandlers
                 message.Container);
 
             IItemContainer target;
-            if ((message.Action != TradeAction.End)
+            if ((message.Action != TradeAction.Accept)
                 && (message.Action != TradeAction.Confirm)
-                && (message.Action != TradeAction.Credits)
+                && (message.Action != TradeAction.UpdateCredits)
                 && (message.Action != TradeAction.Decline))
             {
                 target = Pool.Instance.GetObject<IItemContainer>(
@@ -99,7 +99,7 @@ namespace ZoneEngine.Core.MessageHandlers
             }
             switch (message.Action)
             {
-                case TradeAction.None:
+                case TradeAction.Open:
                 {
                     if (this.TryStartPlayerTrade(client.Controller.Character, message.Target))
                     {
@@ -285,14 +285,14 @@ namespace ZoneEngine.Core.MessageHandlers
                     }
                     break;
                 }
-                case TradeAction.End:
+                case TradeAction.Accept:
                 case TradeAction.Confirm:
                 {
                     if (client.Controller.Character.ShoppingBag == null)
                     {
                         LogUtil.Debug(
                             DebugInfoDetail.Shopping,
-                            "Trade End ignored because character has no active trade bag.");
+                            "Trade Accept ignored because character has no active trade bag.");
                         ChatTextMessageHandler.Default.Send(
                             client.Controller.Character,
                             "No active trade session.");
@@ -359,7 +359,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
                             this.Send(
                                 client.Controller.Character,
-                                TradeAction.Unknown,
+                                TradeAction.Complete,
                                 shoppingBag.Vendor,
                                 shoppingBag.Vendor);
                             client.Controller.SendChangedStats();
@@ -368,13 +368,13 @@ namespace ZoneEngine.Core.MessageHandlers
                     }
                     break;
                 }
-                case TradeAction.Credits:
+                case TradeAction.UpdateCredits:
                 {
                     if (client.Controller.Character.ShoppingBag == null)
                     {
                         LogUtil.Debug(
                             DebugInfoDetail.Shopping,
-                            "Trade Credits ignored because character has no active trade bag.");
+                            "Trade UpdateCredits ignored because character has no active trade bag.");
                         ChatTextMessageHandler.Default.Send(
                             client.Controller.Character,
                             "No active trade session.");
@@ -574,7 +574,7 @@ namespace ZoneEngine.Core.MessageHandlers
         {
             return x =>
             {
-                x.Action = TradeAction.None;
+                x.Action = TradeAction.Open;
                 x.Container = Identity.None;
                 x.Identity = character.Identity;
                 x.Target = partner;
@@ -765,7 +765,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 if (!readyForEnd)
                 {
-                    this.SendPlayerTradeStatus(otherCharacter, TradeAction.End, otherCharacter.Identity);
+                    this.SendPlayerTradeStatus(otherCharacter, TradeAction.Accept, otherCharacter.Identity);
                     ChatTextMessageHandler.Default.Send(character, "Trade accepted. Waiting for other player.");
                     ChatTextMessageHandler.Default.Send(otherCharacter, character.Name + " accepted the trade.");
                     return true;
@@ -922,7 +922,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            this.Send(viewer, this.PlayerTradeClose(viewer.Identity, TradeAction.End, partner.Identity, partner.Identity));
+            this.Send(viewer, this.PlayerTradeClose(viewer.Identity, TradeAction.Accept, partner.Identity, partner.Identity));
         }
 
         private void SendPlayerTradeAction(
@@ -985,8 +985,8 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             // Live complete sends a pair of action-4 frames that clear both player panes.
-            this.Send(viewer, this.PlayerTradeClose(viewer.Identity, TradeAction.Unknown, partner.Identity, partner.Identity));
-            this.Send(viewer, this.PlayerTradeClose(partner.Identity, TradeAction.Unknown, viewer.Identity, viewer.Identity));
+            this.Send(viewer, this.PlayerTradeClose(viewer.Identity, TradeAction.Complete, partner.Identity, partner.Identity));
+            this.Send(viewer, this.PlayerTradeClose(partner.Identity, TradeAction.Complete, viewer.Identity, viewer.Identity));
         }
 
         private void SendPlayerTradeDeclineClose(ICharacter first, ICharacter second)
@@ -1064,7 +1064,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.Identity = offerOwner;
                 x.Unknown = 0;
                 x.Unknown1 = 2;
-                x.Action = TradeAction.Credits;
+                x.Action = TradeAction.UpdateCredits;
                 x.Param1 = credits;
                 x.Param2 = 0;
                 x.Param3 = 0;
@@ -1481,7 +1481,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.Identity = identity1;
                 x.Unknown = 0;
                 x.Unknown1 = 2;
-                x.Action = TradeAction.None;
+                x.Action = TradeAction.Open;
                 x.Target = identity2;
                 x.Container = bagIdentity;
             };
@@ -1500,7 +1500,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.Container = containerIdentity;
                 x.Target = targetIdentity;
                 x.Unknown1 = 2;
-                x.Action = TradeAction.None;
+                x.Action = TradeAction.Open;
             };
         }
     }
