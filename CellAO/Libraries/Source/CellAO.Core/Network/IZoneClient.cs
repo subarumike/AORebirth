@@ -61,6 +61,15 @@ namespace CellAO.Core.Network
         /// </param>
         void SendCompressed(MessageBody messageBody);
 
+        /// <summary>
+        /// Sends a compressed packet with an explicit AO header sender.
+        /// </summary>
+        /// <param name="messageBody">
+        /// </param>
+        /// <param name="sender">
+        /// </param>
+        void SendCompressed(MessageBody messageBody, int sender);
+
         #endregion
     }
 }

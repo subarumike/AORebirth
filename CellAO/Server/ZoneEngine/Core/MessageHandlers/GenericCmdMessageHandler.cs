@@ -36,6 +36,7 @@ namespace ZoneEngine.Core.MessageHandlers
     // TODO: Make this to EntityEnvent or something like this
     using System;
     using System.Linq;
+    using System.Threading;
 
     using CellAO.Core.Components;
     using CellAO.Core.Entities;
@@ -57,6 +58,8 @@ namespace ZoneEngine.Core.MessageHandlers
     [MessageHandler(MessageHandlerDirection.All)]
     public class GenericCmdMessageHandler : BaseMessageHandler<GenericCmdMessage, GenericCmdMessageHandler>
     {
+        private static readonly TimeSpan CorpseUseAcknowledgeDelay = TimeSpan.FromMilliseconds(550);
+
         #region Inbound
 
         /// <summary>
@@ -113,13 +116,13 @@ namespace ZoneEngine.Core.MessageHandlers
 
                         if (used)
                         {
-                            this.AcknowledgeCorpseUse(client.Controller.Character, message, target);
+                            this.AcknowledgeCorpseUseDelayed(client.Controller.Character, message, target);
                         }
                     }
                     else if (target.Type == IdentityType.CanbeAffected
                              && this.TryRouteDeadNpcCorpseUse(client, target, out routedCorpseIdentity))
                     {
-                        this.AcknowledgeCorpseUse(client.Controller.Character, message, routedCorpseIdentity);
+                        this.AcknowledgeCorpseUseDelayed(client.Controller.Character, message, routedCorpseIdentity);
                     }
                     else
                     {
@@ -280,6 +283,25 @@ namespace ZoneEngine.Core.MessageHandlers
             bool announceToPlayfield = false)
         {
             this.Send(character, this.Reply(character, message, corpse, 1), announceToPlayfield);
+        }
+
+        private void AcknowledgeCorpseUseDelayed(
+            ICharacter character,
+            GenericCmdMessage message,
+            Identity corpse,
+            bool announceToPlayfield = false)
+        {
+            ThreadPool.QueueUserWorkItem(
+                _ =>
+                {
+                    Thread.Sleep(CorpseUseAcknowledgeDelay);
+                    if (character == null || character.Controller == null || character.Controller.Client == null)
+                    {
+                        return;
+                    }
+
+                    this.AcknowledgeCorpseUse(character, message, corpse, announceToPlayfield);
+                });
         }
 
         /// <summary>

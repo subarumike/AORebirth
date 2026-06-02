@@ -167,6 +167,16 @@ namespace ZoneEngine.Core
             {
                 return;
             }
+            this.SendCompressed(messageBody, this.server.Id);
+        }
+
+        public void SendCompressed(MessageBody messageBody, int sender)
+        {
+            if ((this.controller == null) || (this.controller.Character == null))
+            {
+                return;
+            }
+
             var message = new Message
                           {
                               Body = messageBody,
@@ -176,7 +186,7 @@ namespace ZoneEngine.Core
                                       MessageId = BitConverter.ToUInt16(new byte[] { 0xDF, 0xDF }, 0),
                                       PacketType = messageBody.PacketType,
                                       Unknown = 0x0001,
-                                      Sender = this.server.Id,
+                                      Sender = sender,
                                       Receiver = this.Controller.Character.Identity.Instance
                                   }
                           };

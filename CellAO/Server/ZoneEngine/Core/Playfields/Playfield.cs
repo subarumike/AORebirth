@@ -125,9 +125,18 @@ namespace CellAO.Core.Playfields
 
         private readonly Dictionary<int, CorpseState> pendingCorpseSpawns = new Dictionary<int, CorpseState>();
 
+        private readonly Dictionary<int, PendingCorpseCreditAward> pendingCorpseCreditAwards =
+            new Dictionary<int, PendingCorpseCreditAward>();
+
         private int nextCorpseInstance = 0x00F0F000;
 
-        private int nextCorpseInventorySlot = 0x70;
+        private int nextCorpseInventoryHandle = 0x70;
+
+        private int nextCorpseLootItemInstance = 0x00200000;
+
+        private const int CorpseLootItemIdentityType = 0x09000001;
+
+        private static readonly TimeSpan CorpseCreditAwardDelay = TimeSpan.FromMilliseconds(500);
 
         private const int DefaultNpcDeathAnimationKey = 0x1F7;
 
@@ -1029,6 +1038,7 @@ namespace CellAO.Core.Playfields
             {
                 this.ProcessPendingCorpseSpawns();
                 this.ProcessCorpseDespawns();
+                this.ProcessPendingCorpseCreditAwards();
 
                 IEnumerable<IEntity> dynels = null;
                 dynels =
@@ -1409,7 +1419,7 @@ namespace CellAO.Core.Playfields
             {
                 if (target.Controller is NPCController)
                 {
-                    this.KillNpcTarget(target);
+                    this.KillNpcTarget(attacker, target);
                 }
                 else if (target.Controller is PlayerController)
                 {
@@ -1836,7 +1846,7 @@ namespace CellAO.Core.Playfields
             npcController.Follow(target.Identity, BuildNpcCombatFollowStopDistance(range));
         }
 
-        private void KillNpcTarget(ICharacter target)
+        private void KillNpcTarget(ICharacter attacker, ICharacter target)
         {
             if (!(target.Controller is NPCController))
             {
@@ -1852,6 +1862,7 @@ namespace CellAO.Core.Playfields
             this.MarkNpcDead(target);
             this.StopFightingDeadTarget(target.Identity);
             this.SendNpcDeathAnimation(target);
+            this.AwardCombatXp(attacker, target);
             if (corpseIdentity != Identity.None)
             {
                 this.ScheduleCorpseSpawn(target, corpseIdentity);
@@ -1866,6 +1877,69 @@ namespace CellAO.Core.Playfields
             this.deadNpcDespawnTicks[target.Identity.Instance] = DateTime.UtcNow + DeadNpcDespawnDelay;
 
             LogUtil.Debug(DebugInfoDetail.Network, string.Format("NPC died target={0}", target.Identity));
+        }
+
+        private void AwardCombatXp(ICharacter attacker, ICharacter target)
+        {
+            if (attacker == null || target == null || !(attacker.Controller is PlayerController))
+            {
+                return;
+            }
+
+            int xpReward = CalculateCombatXpReward(attacker, target);
+            if (xpReward <= 0)
+            {
+                return;
+            }
+
+            uint xpBeforeBase = attacker.Stats[StatIds.xp].BaseValue;
+            int xpBefore = xpBeforeBase > int.MaxValue ? int.MaxValue : (int)xpBeforeBase;
+            long xpAfterLong = (long)xpBefore + xpReward;
+            int xpAfter = xpAfterLong > int.MaxValue ? int.MaxValue : (int)xpAfterLong;
+
+            ulong unsavedXpAfter = (ulong)attacker.Stats[StatIds.unsavedxp].BaseValue + (uint)xpReward;
+            attacker.Stats[StatIds.xp].Set((uint)xpAfter);
+            attacker.Stats[StatIds.lastxp].Set((uint)xpReward);
+            attacker.Stats[StatIds.unsavedxp].Set((uint)Math.Min((ulong)int.MaxValue, unsavedXpAfter));
+
+            if (attacker.Controller != null && attacker.Controller.Client != null)
+            {
+                StatMessageHandler.Default.SendChanged(attacker);
+                this.SendRewardFeedback(
+                    attacker,
+                    string.Format(CultureInfo.InvariantCulture, "You received {0} xp.", xpReward));
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Combat XP awarded attacker={0} target={1} xp={2} xpBeforeBase={3} xpAfter={4}",
+                    attacker.Identity,
+                    target.Identity,
+                    xpReward,
+                    xpBeforeBase,
+                    xpAfter));
+
+            attacker.Stats.Write();
+        }
+
+        private static int CalculateCombatXpReward(ICharacter attacker, ICharacter target)
+        {
+            int targetXp = target.Stats[StatIds.xp].Value;
+            if (targetXp > 0)
+            {
+                return targetXp;
+            }
+
+            int targetLevel = Math.Max(1, target.Stats[StatIds.level].Value);
+            int attackerLevel = Math.Max(1, attacker.Stats[StatIds.level].Value);
+            if (targetLevel < Math.Max(1, attackerLevel - 10))
+            {
+                return 1;
+            }
+
+            return Math.Max(1, targetLevel);
         }
 
         private void KillPlayerTarget(ICharacter target)
@@ -2025,9 +2099,9 @@ namespace CellAO.Core.Playfields
                 return false;
             }
 
-            int corpseInventorySlot = (sourceContainer.Instance >> 16) & 0xffff;
+            int corpseInventoryHandle = (sourceContainer.Instance >> 16) & 0xffff;
             CorpseState corpse = this.corpses.Values.FirstOrDefault(
-                x => x.InventorySlot == corpseInventorySlot);
+                x => x.InventoryHandle == corpseInventoryHandle);
 
             if (corpse == null)
             {
@@ -2144,18 +2218,9 @@ namespace CellAO.Core.Playfields
             looter.BaseInventory.Write();
             lootItem.Looted = true;
             corpse.Opened = true;
-            // Ack the concrete destination slot. Echoing 0x6F here is interpreted by the
-            // current client as a credits amount side-effect in loot feedback text.
-            ContainerAddItemMessageHandler.Default.Send(
-                looter,
-                sourceContainer,
-                targetSlot);
-            if (looter.Controller != null)
-            {
-                uint authoritativeCash = looter.Stats[StatIds.cash].BaseValue;
-                StatMessageHandler.Default.SendSingle(looter, (int)StatIds.cash, authoritativeCash);
-                looter.Stats[StatIds.cash].Changed = false;
-            }
+            // Live corpse looting echoes the corpse/backpack source and original
+            // 0x6F target placement; the server-side resolved slot is only for DB state.
+            this.SendCorpseContainerAddItem(looter, sourceContainer, targetPlacement);
 
             if (!corpse.HasUnlootedItems)
             {
@@ -2195,6 +2260,25 @@ namespace CellAO.Core.Playfields
             return InventoryItemRules.HasSameUniqueItem(
                 item,
                 character.BaseInventory.Pages.Values.SelectMany(page => page.List()).Select(existing => existing.Value));
+        }
+
+        private void SendCorpseContainerAddItem(ICharacter looter, Identity sourceContainer, int targetPlacement)
+        {
+            if (looter.Controller == null || looter.Controller.Client == null)
+            {
+                return;
+            }
+
+            looter.Controller.Client.SendCompressed(
+                new ContainerAddItemMessage
+                {
+                    Identity = looter.Identity,
+                    SourceContainer = sourceContainer,
+                    TargetPlacement = targetPlacement,
+                    Target = looter.Identity,
+                    Unknown = 0
+                },
+                looter.Identity.Instance);
         }
 
         private bool ProcessDeadNpc(ICharacter character)
@@ -2599,21 +2683,31 @@ namespace CellAO.Core.Playfields
                         character.Identity,
                         this.server.Id,
                         corpseCatMesh,
-                        corpseMonsterData));
+                        corpseMonsterData,
+                        this.CorpseCreditsFor(corpseIdentity)));
             }
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
-                    "CorpseFullUpdate visual target={0} corpse={1} catMesh={2} monsterData={3} scale={4} sex={5} breed={6} race={7}",
+                    "CorpseFullUpdate visual target={0} corpse={1} catMesh={2} monsterData={3} credits={4} scale={5} sex={6} breed={7} race={8}",
                     target.Identity,
                     corpseIdentity,
                     corpseCatMesh,
                     corpseMonsterData,
+                    this.CorpseCreditsFor(corpseIdentity),
                     target.Stats[StatIds.monsterscale].Value,
                     target.Stats[StatIds.sex].Value,
                     target.Stats[StatIds.breed].Value,
                     target.Stats[StatIds.race].Value));
+        }
+
+        private int CorpseCreditsFor(Identity corpseIdentity)
+        {
+            CorpseState corpse;
+            return this.corpses.TryGetValue(corpseIdentity.Instance, out corpse)
+                       ? corpse.Credits
+                       : 0;
         }
 
         private static TimeSpan CorpseLifetimeFor(CombatCorpseLootClass lootClass)
@@ -2690,7 +2784,7 @@ namespace CellAO.Core.Playfields
 
         private void RegisterCorpse(ICharacter target, Identity corpseIdentity)
         {
-            List<CorpseLootItem> lootItems = RollCorpseLootItems(target);
+            List<CorpseLootItem> lootItems = this.RollCorpseLootItems(target);
             CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems);
             int credits = RollCorpseCredits(target);
             TimeSpan lifetime = CorpseLifetimeFor(lootClass);
@@ -2704,7 +2798,7 @@ namespace CellAO.Core.Playfields
                 CreatedAtUtc = DateTime.UtcNow,
                 LootItems = lootItems,
                 Credits = credits,
-                InventorySlot = this.AllocateCorpseInventorySlot(),
+                InventoryHandle = this.AllocateCorpseInventoryHandle(),
                 ExpiresAtUtc = expiresAtUtc
             };
 
@@ -2728,6 +2822,7 @@ namespace CellAO.Core.Playfields
             this.Despawn(corpseIdentity);
             this.corpseDespawnTicks.Remove(corpseInstance);
             this.corpses.Remove(corpseInstance);
+            this.pendingCorpseCreditAwards.Remove(corpseInstance);
             LogUtil.Debug(DebugInfoDetail.Engine, string.Format("Corpse despawned corpse={0}", corpseIdentity));
         }
 
@@ -2784,7 +2879,7 @@ namespace CellAO.Core.Playfields
 
             public DateTime ExpiresAtUtc { get; set; }
 
-            public int InventorySlot { get; set; }
+            public int InventoryHandle { get; set; }
 
             public List<CorpseLootItem> LootItems { get; set; }
 
@@ -2811,7 +2906,18 @@ namespace CellAO.Core.Playfields
 
             public Item Item { get; set; }
 
+            public Identity LootIdentity { get; set; }
+
             public bool Looted { get; set; }
+        }
+
+        private class PendingCorpseCreditAward
+        {
+            public Identity LooterIdentity { get; set; }
+
+            public int CorpseInstance { get; set; }
+
+            public DateTime DueAtUtc { get; set; }
         }
 
         private Identity AllocateCorpseIdentity()
@@ -2829,15 +2935,30 @@ namespace CellAO.Core.Playfields
             };
         }
 
-        private int AllocateCorpseInventorySlot()
+        private int AllocateCorpseInventoryHandle()
         {
-            int slot = this.nextCorpseInventorySlot++;
-            if (this.nextCorpseInventorySlot > 0xff)
+            int handle = this.nextCorpseInventoryHandle++;
+            if (this.nextCorpseInventoryHandle > 0xff)
             {
-                this.nextCorpseInventorySlot = 0x70;
+                this.nextCorpseInventoryHandle = 0x70;
             }
 
-            return slot;
+            return handle;
+        }
+
+        private Identity AllocateCorpseLootItemIdentity()
+        {
+            this.nextCorpseLootItemInstance++;
+            if (this.nextCorpseLootItemInstance > 0x00FFFFFF)
+            {
+                this.nextCorpseLootItemInstance = 0x00200001;
+            }
+
+            return new Identity
+            {
+                Type = (IdentityType)CorpseLootItemIdentityType,
+                Instance = this.nextCorpseLootItemInstance
+            };
         }
 
         private bool CanBuildKnownCorpseVisual(ICharacter target)
@@ -2891,7 +3012,7 @@ namespace CellAO.Core.Playfields
             this.Announce(stopFight);
         }
 
-        private static List<CorpseLootItem> RollCorpseLootItems(ICharacter target)
+        private List<CorpseLootItem> RollCorpseLootItems(ICharacter target)
         {
             var lootItems = new List<CorpseLootItem>();
 
@@ -2940,7 +3061,13 @@ namespace CellAO.Core.Playfields
                     continue;
                 }
 
-                lootItems.Add(new CorpseLootItem { Slot = lootItems.Count, Item = item });
+                lootItems.Add(
+                    new CorpseLootItem
+                    {
+                        Slot = lootItems.Count,
+                        Item = item,
+                        LootIdentity = this.AllocateCorpseLootItemIdentity()
+                    });
             }
 
             LogUtil.Debug(
@@ -3254,7 +3381,7 @@ namespace CellAO.Core.Playfields
                 Slotnumber = lootItem.Slot,
                 UnknownFlags = 0x00A1,
                 Unknown1 = InventoryEntryCountFor(lootItem.Item),
-                Identity = Identity.None,
+                Identity = lootItem.LootIdentity,
                 LowId = lootItem.Item.LowID,
                 HighId = lootItem.Item.HighID,
                 Quality = lootItem.Item.Quality,
@@ -3287,25 +3414,89 @@ namespace CellAO.Core.Playfields
                     Unknown1 = 2,
                     Entries = entries,
                     BagIdentity = corpse.CorpseIdentity,
-                    SlotnumberInMainInventory = corpse.InventorySlot,
+                    SlotnumberInMainInventory = corpse.InventoryHandle,
                     Unknown2 = 1
-                });
+                },
+                looter.Identity.Instance);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 string.Format(
-                    "Corpse InventoryUpdate sent looter={0} corpse={1} slots={2} unknown1=2 slot={3} unknown2=1 entries={4}",
+                    "Corpse InventoryUpdate sent looter={0} corpse={1} slots={2} unknown1=2 handle={3} unknown2=1 entries={4}",
                     looter.Identity,
                     corpse.CorpseIdentity,
                     CombatCorpseRules.CorpseInventorySlots,
-                    corpse.InventorySlot,
+                    corpse.InventoryHandle,
                     entries.Length));
         }
 
         private void SendCorpseInventoryUpdateAndCredits(ICharacter looter, CorpseState corpse)
         {
             this.SendCorpseInventoryUpdate(looter, corpse);
-            this.AwardCorpseCredits(looter, corpse);
+            this.ScheduleCorpseCreditAward(looter, corpse);
+        }
+
+        private void ScheduleCorpseCreditAward(ICharacter looter, CorpseState corpse)
+        {
+            if (looter == null || corpse == null || corpse.CreditsLooted || corpse.Credits <= 0)
+            {
+                return;
+            }
+
+            if (this.pendingCorpseCreditAwards.ContainsKey(corpse.CorpseIdentity.Instance))
+            {
+                return;
+            }
+
+            DateTime dueAtUtc = DateTime.UtcNow + CorpseCreditAwardDelay;
+            this.pendingCorpseCreditAwards[corpse.CorpseIdentity.Instance] =
+                new PendingCorpseCreditAward
+                {
+                    CorpseInstance = corpse.CorpseIdentity.Instance,
+                    LooterIdentity = looter.Identity,
+                    DueAtUtc = dueAtUtc
+                };
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Corpse credits scheduled corpse={0} looter={1} credits={2} delayMs={3}",
+                    corpse.CorpseIdentity,
+                    looter.Identity,
+                    corpse.Credits,
+                    (int)CorpseCreditAwardDelay.TotalMilliseconds));
+        }
+
+        private void ProcessPendingCorpseCreditAwards()
+        {
+            List<PendingCorpseCreditAward> dueAwards =
+                this.pendingCorpseCreditAwards.Values.Where(x => x.DueAtUtc <= DateTime.UtcNow).ToList();
+
+            foreach (PendingCorpseCreditAward award in dueAwards)
+            {
+                this.pendingCorpseCreditAwards.Remove(award.CorpseInstance);
+
+                CorpseState corpse;
+                if (!this.corpses.TryGetValue(award.CorpseInstance, out corpse))
+                {
+                    continue;
+                }
+
+                ICharacter looter = this.FindByIdentity<ICharacter>(award.LooterIdentity);
+                if (looter == null || !looter.InPlayfield(this.Identity))
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Engine,
+                        string.Format(
+                            "Corpse credits skipped; looter missing corpse={0} looter={1}",
+                            corpse.CorpseIdentity,
+                            award.LooterIdentity));
+                    continue;
+                }
+
+                this.AwardCorpseCredits(looter, corpse);
+            }
         }
 
         private void AwardCorpseCredits(ICharacter looter, CorpseState corpse)
@@ -3334,22 +3525,28 @@ namespace CellAO.Core.Playfields
             }
 
             looter.Stats[StatIds.cash].Set((uint)cashAfter);
-            if (looter.Controller != null)
+            if (looter.Controller != null && looter.Controller.Client != null)
             {
-                StatMessageHandler.Default.SendSingle(looter, (int)StatIds.cash, (uint)cashAfter);
+                StatMessageHandler.Default.SendChanged(looter);
+                this.SendCorpseCreditFeedback(
+                    looter,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "You received {0} {1} from the corpse.",
+                        corpse.Credits,
+                        corpse.Credits == 1 ? "credit" : "credits"));
             }
-            looter.Stats[StatIds.cash].Changed = false;
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 string.Format(
-                    "Corpse credits awarded corpse={0} looter={1} credits={2} cashBeforeBase={3} cashAfter={4} inventorySlot={5}",
+                    "Corpse credits awarded corpse={0} looter={1} credits={2} cashBeforeBase={3} cashAfter={4} inventoryHandle={5}",
                     corpse.CorpseIdentity,
                     looter.Identity,
                     corpse.Credits,
                     cashBeforeBase,
                     cashAfter,
-                    corpse.InventorySlot));
+                    corpse.InventoryHandle));
 
             looter.Stats.Write();
         }
@@ -3377,6 +3574,40 @@ namespace CellAO.Core.Playfields
                     "Corpse loot access Action sent looter={0} corpse={1} action=0x66",
                     looter.Identity,
                     corpse.CorpseIdentity));
+        }
+
+        private void SendRewardFeedback(ICharacter character, string text)
+        {
+            character.Controller.Client.SendCompressed(
+                new FormatFeedbackMessage
+                {
+                    Identity = character.Identity,
+                    Unknown1 = 0,
+                    FormattedMessage = text,
+                    Unknown2 = 0
+                },
+                character.Identity.Instance);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Reward feedback sent char={0} text={1}",
+                    character.Identity,
+                    text));
+        }
+
+        private void SendCorpseCreditFeedback(ICharacter character, string text)
+        {
+            ChatTextMessageHandler.Default.Send(character, text);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Corpse credit feedback sent char={0} text={1}",
+                    character.Identity,
+                    text));
         }
 
         private void SendUseActionFinished(ICharacter character)
