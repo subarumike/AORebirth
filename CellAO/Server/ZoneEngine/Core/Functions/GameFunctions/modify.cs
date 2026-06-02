@@ -36,6 +36,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
     using CellAO.Core.Entities;
     using CellAO.Enums;
     using CellAO.Interfaces;
+    using CellAO.Stats;
 
     using MsgPack;
 
@@ -111,7 +112,13 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             IInstancedEntity Target,
             MessagePackObject[] Arguments)
         {
-            ((Character)Self).Stats[Arguments[0].AsInt32()].Modifier += Arguments[1].AsInt32();
+            int statId = Arguments[0].AsInt32();
+            if (statId == (int)StatIds.cash)
+            {
+                return true;
+            }
+
+            ((Character)Self).Stats[statId].Modifier += Arguments[1].AsInt32();
             return true;
         }
 

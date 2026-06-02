@@ -252,6 +252,16 @@ namespace ZoneEngine.Core
 
     public static class CombatCorpseRules
     {
+        private static readonly ObservedCorpseCreditRule[] ObservedCreditRules =
+        {
+            new ObservedCorpseCreditRule("Beach Leet", 17655, 1, 1),
+            new ObservedCorpseCreditRule("Island Reet", 30365, 5, 5),
+            new ObservedCorpseCreditRule("Shore Snake", 30252, 5, 5),
+            new ObservedCorpseCreditRule("Surf Lizard", 22794, 1, 1),
+            new ObservedCorpseCreditRule("Cliff Malle", 17660, 3, 3),
+            new ObservedCorpseCreditRule("Reef Salamander", 30354, 23, 29)
+        };
+
         public const int CorpseInventorySlots = 21;
 
         public const int MoveToInventoryPlacement = 0x6f;
@@ -372,6 +382,74 @@ namespace ZoneEngine.Core
             }
 
             return multipleCount > short.MaxValue ? short.MaxValue : (short)multipleCount;
+        }
+
+        public static int RollObservedCredits(string targetName, int monsterData, Func<int, int> nextRandom)
+        {
+            ObservedCorpseCreditRule rule = ObservedCreditRules.FirstOrDefault(
+                x => x.Matches(targetName, monsterData));
+            if (rule == null)
+            {
+                return 0;
+            }
+
+            if (rule.MaxCredits <= rule.MinCredits)
+            {
+                return rule.MinCredits;
+            }
+
+            if (nextRandom == null)
+            {
+                throw new ArgumentNullException("nextRandom");
+            }
+
+            return rule.MinCredits + nextRandom(rule.MaxCredits - rule.MinCredits + 1);
+        }
+
+        private sealed class ObservedCorpseCreditRule
+        {
+            public ObservedCorpseCreditRule(string name, int monsterData, int minCredits, int maxCredits)
+            {
+                this.Name = name;
+                this.MonsterData = monsterData;
+                this.MinCredits = minCredits;
+                this.MaxCredits = maxCredits;
+            }
+
+            public string Name { get; private set; }
+
+            public int MonsterData { get; private set; }
+
+            public int MinCredits { get; private set; }
+
+            public int MaxCredits { get; private set; }
+
+            public bool Matches(string targetName, int monsterData)
+            {
+                if (monsterData != 0 && this.MonsterData == monsterData)
+                {
+                    return true;
+                }
+
+                return string.Equals(
+                    NormalizeName(targetName),
+                    this.Name,
+                    StringComparison.OrdinalIgnoreCase);
+            }
+
+            private static string NormalizeName(string targetName)
+            {
+                if (string.IsNullOrWhiteSpace(targetName))
+                {
+                    return string.Empty;
+                }
+
+                const string codexPrefix = "Codex Test ";
+                string normalized = targetName.Trim();
+                return normalized.StartsWith(codexPrefix, StringComparison.OrdinalIgnoreCase)
+                           ? normalized.Substring(codexPrefix.Length)
+                           : normalized;
+            }
         }
     }
 

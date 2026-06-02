@@ -34,12 +34,15 @@ namespace ZoneEngine.Core.MessageHandlers
     #region Usings ...
 
     using System.Collections.Generic;
+    using System.Globalization;
 
     using CellAO.Core.Components;
     using CellAO.Core.Entities;
+    using CellAO.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+    using Utility;
 
     #endregion
 
@@ -69,9 +72,35 @@ namespace ZoneEngine.Core.MessageHandlers
             Dictionary<int, uint> statsToClient,
             Dictionary<int, uint> statsToPlayfield)
         {
+            uint clientCash;
+            if (statsToClient.TryGetValue((int)StatIds.cash, out clientCash))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Cash stat bulk send (client) char={0} cash={1} statCount={2}",
+                        character.Identity,
+                        clientCash,
+                        statsToClient.Count));
+            }
+
             if (statsToClient.Count > 0)
             {
                 this.Send(character, this.FillerBulk(character, statsToClient));
+            }
+
+            uint playfieldCash;
+            if (statsToPlayfield.TryGetValue((int)StatIds.cash, out playfieldCash))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Cash stat bulk send (playfield) char={0} cash={1} statCount={2}",
+                        character.Identity,
+                        playfieldCash,
+                        statsToPlayfield.Count));
             }
 
             if (statsToPlayfield.Count > 0)
@@ -119,6 +148,17 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public void SendSingle(ICharacter character, int statId, uint statValue)
         {
+            if (statId == (int)StatIds.cash)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Cash stat single send char={0} cash={1}",
+                        character.Identity,
+                        statValue));
+            }
+
             this.Send(character, this.Filler(character, statId, statValue));
         }
 

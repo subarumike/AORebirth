@@ -286,6 +286,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 case CharacterActionType.TeamKickMember:
                 {
                     // Kick Team Member
+                    client.Controller.TeamKickMember(message.Target);
                 }
 
                     break;
@@ -293,16 +294,14 @@ namespace ZoneEngine.Core.MessageHandlers
                 case CharacterActionType.LeaveTeam:
                 {
                     // Leave Team
-                    /*
-                                                    var team = new TeamClass();
-                                                    team.LeaveTeam(client);
-                                                     */
+                    client.Controller.TeamLeave();
                 }
 
                     break;
                 case CharacterActionType.TransferLeader:
                 {
                     // Transfer Team Leadership
+                    client.Controller.TransferTeamLeadership(message.Target);
                 }
 
                     break;
@@ -311,55 +310,13 @@ namespace ZoneEngine.Core.MessageHandlers
                 {
                     // Team Join Request
                     // Send Team Invite Request To Target Player
-                    /*
-                                                    var team = new TeamClass();
-                                                    team.SendTeamRequest(client, packet.Target);
-                                                     */
+                    client.Controller.TeamJoinRequest(message.Target);
                 }
 
                     break;
                 case CharacterActionType.TeamRequestReply:
                 {
-                    /*
-                                                     Request Reply
-                                                     Check if positive or negative response
-
-                                                     if positive
-                                                    var team = new TeamClass();
-                                                    var teamID = TeamClass.GenerateNewTeamId(client, packet.Target);
-
-                                                     Destination Client 0 = Sender, 1 = Reciever
-
-                                                     Reciever Packets
-                                                    ///////////////////
-
-                                                     CharAction 15
-                                                    team.TeamRequestReply(client, packet.Target);
-
-                                                     CharAction 23
-                                                    team.TeamRequestReplyCharacterAction23(client, packet.Target);
-
-                                                     TeamMember Packet
-                                                    team.TeamReplyPacketTeamMember(1, client, packet.Target, "Member1");
-
-                                                     TeamMemberInfo Packet
-                                                    team.TeamReplyPacketTeamMemberInfo(1, client, packet.Target);
-
-                                                     TeamMember Packet
-                                                    team.TeamReplyPacketTeamMember(1, client, packet.Target, "Member2");
-
-                                                     Sender Packets
-                                                    /////////////////
-
-                                                     TeamMember Packet
-                                                    team.TeamReplyPacketTeamMember(0, client, packet.Target, "Member1");
-
-                                                     TeamMemberInfo Packet
-                                                    team.TeamReplyPacketTeamMemberInfo(0, client, packet.Target);
-
-                                                     TeamMember Packet
-                                                    team.TeamReplyPacketTeamMember(0, client, packet.Target, "Member2");
-                                                     */
+                    client.Controller.TeamJoinReply(message.Parameter1 != 0, message.Target);
                 }
 
                     break;

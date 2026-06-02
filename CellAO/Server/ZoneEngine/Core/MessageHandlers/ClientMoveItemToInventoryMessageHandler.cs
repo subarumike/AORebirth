@@ -267,8 +267,8 @@ namespace ZoneEngine.Core.MessageHandlers
                 new ContainerAddItemMessage
                 {
                     Identity = character.Identity,
-                    SourceContainer = sourceContainer,
-                    Target = character.Identity,
+                    SourceContainer = character.Identity,
+                    Target = sourceContainer,
                     TargetPlacement = targetPlacement,
                     Unknown = 0
                 });

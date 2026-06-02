@@ -33,11 +33,10 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 {
     #region Usings ...
 
-    using System;
-
     using CellAO.Core.Entities;
     using CellAO.Enums;
     using CellAO.Interfaces;
+    using CellAO.Stats;
 
     using MsgPack;
 
@@ -113,9 +112,14 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             IInstancedEntity Target,
             MessagePackObject[] Arguments)
         {
+            int statId = Arguments[0].AsInt32();
+            if (statId == (int)StatIds.cash)
+            {
+                return true;
+            }
+
             Character ch = (Character)Self;
-            ch.Stats[Arguments[0].AsInt32()].PercentageModifier += Arguments[1].AsInt32();
-            Console.WriteLine("percentage-modify stat " + Arguments[0].AsInt32());
+            ch.Stats[statId].PercentageModifier += Arguments[1].AsInt32();
             return true;
         }
 

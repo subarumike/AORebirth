@@ -161,6 +161,9 @@ $msbuild = 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Curren
 $fullCharacterSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\FullCharacterMessageHandler.cs')
 $clientConnectedSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs')
 $clientMoveItemSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs')
+$tradeMessageSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\Messages\N3Messages\TradeMessage.cs')
+$tradeActionSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\Messages\N3Messages\TradeAction.cs')
+$tradeHandlerSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\TradeMessageHandler.cs')
 $characterSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\CellAO.Core\Entities\Character.cs')
 $weaponItemFullUpdateSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\Packets\WeaponItemFullUpdate.cs')
 $corpseFullUpdateSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\Packets\CorpseFullUpdate.cs')
@@ -220,8 +223,8 @@ Assert-SourceMatch $characterActionSource 'SendStartLogout\s*\(ICharacter\s+char
 Assert-SourceMatch $characterActionSource 'SendStopLogout\s*\(ICharacter\s+character\).*?new\s+StopLogoutMessage.*?Identity\s*=\s*character\.Identity' 'Logout cancel should send the recovered identity-only StopLogout N3 packet.'
 Assert-SourceMatch $characterActionSource 'case\s+CharacterActionType\.Die:.*?RespawnPlayer\s*\(\s*client\.Controller\.Character\s*\)' 'Current live client Die(152) action should route into the server death/respawn flow instead of being rebroadcast as an unknown action.'
 Assert-SourceNoMatch $characterActionSource 'PendingReclaim' 'Modern death/respawn should not use the old pending reclaim experiment.'
-Assert-SourceMatch $playfieldSource 'RespawnPlayer\s*\(ICharacter\s+character\).*?ResolvePlayerRespawnLocation.*?SendPlayerCorpseFullUpdate.*?SendDeathSocialStatus.*?MarkPlayerRespawned.*?StopFightingDeadTarget\s*\(\s*character\.Identity\s*\).*?SendCombatStopMessage\s*\(\s*character\s*\).*?Teleport\s*\(\s*dynel,\s*destination,\s*character\.RawHeading,\s*destinationPlayfield\s*\)' 'Player respawn should follow the captured modern live sequence: corpse visual, SocialStatus=0, respawn stats, then N3Teleport.'
-Assert-SourceMatch $playfieldSource 'MarkPlayerRespawned\s*\(ICharacter\s+target\).*?CalculateSkills\s*\(\s*\).*?StatIds\.life.*?StatIds\.health.*?Math\.Max\s*\(\s*1,\s*maxHealth\s*/\s*3\s*\).*?StatIds\.deadtimer\]\.Value\s*=\s*75.*?StatIds\.currentmovementmode\]\.Value\s*=\s*\(int\)\s*MoveModes\.Run.*?StatIds\.specialcondition\]\.Value\s*=\s*3.*?StatIds\.deathreason\]\.Value\s*=\s*0' 'Player respawn should restore derived stats, partial live-style health, dead timer, run movement, and clear death reason.'
+Assert-SourceMatch $playfieldSource 'RespawnPlayer\s*\(ICharacter\s+character\).*?ResolvePlayerRespawnLocation.*?AllocateCorpseIdentity.*?Player corpse visual skipped.*?SendDeathSocialStatus.*?MarkPlayerRespawned.*?StopFightingDeadTarget\s*\(\s*character\.Identity\s*\).*?SendCombatStopMessage\s*\(\s*character\s*\).*?TryCompleteDeathRespawnInCurrentPlayfield.*?Teleport\s*\(\s*dynel,\s*destination,\s*character\.RawHeading,\s*destinationPlayfield\s*\)' 'Player respawn should keep the modern live sequence that fixed the white screen: skip stale corpse visual, send SocialStatus=0/respawn stats, then complete current-playfield teleport or N3Teleport fallback.'
+Assert-SourceMatch $playfieldSource 'MarkPlayerRespawned\s*\(ICharacter\s+target\).*?CalculateSkills\s*\(\s*\).*?StatIds\.life.*?StatIds\.health.*?Math\.Max\s*\(\s*1,\s*maxHealth\s*/\s*3\s*\).*?StatIds\.deadtimer\]\.Value\s*=\s*0.*?StatIds\.currentmovementmode\]\.Value\s*=\s*\(int\)\s*MoveModes\.Run.*?StatIds\.specialcondition\]\.Value\s*=\s*3.*?StatIds\.deathreason\]\.Value\s*=\s*0' 'Player respawn should restore derived stats, partial live-style health, no-reclaim dead timer, run movement, and clear death reason.'
 Assert-SourceMatch $playfieldSource 'SendDeathSocialStatus\s*\(ICharacter\s+target\).*?new\s+StatMessage.*?Unknown\s*=\s*1.*?CharacterStat\.SocialStatus.*?Value2\s*=\s*0' 'Live death/respawn capture sends SocialStatus=0 with Stat unknown=1 before teleport.'
 Assert-SourceNoMatch $playfieldSource 'SendPlayerResurrect|PreparePlayerReclaimLogin|SendPlayerReclaimLogin|PendingReclaim' 'Modern live capture did not show ResurrectIIR or pending reclaim reconnect handling in the death/respawn path.'
 Assert-SourceMatch $playfieldSource 'ResolvePlayerRespawnLocation\s*\(.*?StatIds\.tempsaveplayfield.*?StatIds\.tempsavex.*?StatIds\.tempsavey.*?destinationPlayfield\s*=\s*new\s+Identity' 'Player respawn should prefer the AO save-point stats when they are present.'
@@ -342,6 +345,15 @@ Assert-SourceMatch $clientMoveItemSource 'EnsureWeaponVisualMeshes\s*\(\s*charac
 Assert-SourceMatch $clientMoveItemSource 'EnsureWeaponVisualMeshes\s*\(\s*character,\s*true\s*\)\s*;\s*this\.PersistCharacterInventory\s*\(\s*character,\s*"unequip"\s*\)' 'Successful manual unequips should persist inventory immediately after the visual/stat update path.'
 Assert-SourceMatch $clientMoveItemSource 'sendingPage\.Remove\s*\(\s*fromPlacement\s*\)\s*;\s*receivingPage\.Add\s*\(\s*toPlacement,\s*itemFrom\s*\)\s*;\s*this\.SendMoveAck.*?this\.PersistCharacterInventory\s*\(\s*character,\s*"move"\s*\)' 'Successful plain inventory moves should persist inventory immediately after moving the item.'
 Assert-SourceMatch $clientMoveItemSource 'PersistCharacterInventory\s*\(ICharacter\s+character,\s*string\s+reason\).*?character\.BaseInventory\.Write\s*\(\s*\)' 'ClientMoveItemToInventory persistence helper should write the full character inventory.'
+Assert-SourceMatch $clientMoveItemSource 'SendMoveAck\s*\(ICharacter\s+character,\s*Identity\s+sourceContainer,\s*int\s+targetPlacement\).*?SourceContainer\s*=\s*character\.Identity.*?Target\s*=\s*sourceContainer.*?TargetPlacement\s*=\s*targetPlacement' 'ContainerAddItem move-ack should use live wire order: receiver identity first, source container identity second.'
+Assert-SourceMatch $containerAddItemSource 'FillContainerAddItem\s*\(ICharacter\s+character,\s*Identity\s+sourceContainer,\s*int\s+slot\).*?SourceContainer\s*=\s*character\.Identity.*?TargetPlacement\s*=\s*slot.*?Target\s*=\s*sourceContainer' 'ContainerAddItem helper should mirror live wire order for loot/inventory acknowledgements.'
+Assert-SourceMatch $tradeMessageSource 'AoMember\s*\(\s*2\s*\).*?int\s+Param1.*?AoMember\s*\(\s*3\s*\).*?int\s+Param2.*?AoMember\s*\(\s*4\s*\).*?int\s+Param3.*?AoMember\s*\(\s*5\s*\).*?int\s+Param4' 'TradeMessage should expose the live/AOSharp four-param body instead of forcing every action into two identities.'
+Assert-SourceMatch $tradeMessageSource 'public\s+Identity\s+Target\s*\{.*?get.*?Param1.*?Param2.*?set.*?Param1.*?value\.Type.*?Param2.*?value\.Instance.*?\}.*?public\s+Identity\s+Container\s*\{.*?get.*?Param3.*?Param4.*?set.*?Param3.*?value\.Type.*?Param4.*?value\.Instance' 'TradeMessage should keep Target/Container compatibility wrappers over raw params for item/open/remove actions.'
+Assert-SourceMatch $tradeActionSource 'Open\s*=\s*0x00.*?Accept\s*=\s*0x01.*?Complete\s*=\s*0x04.*?UpdateCredits\s*=\s*0x07.*?OtherPlayerAddItem\s*=\s*0x08' 'TradeAction should carry AOSharp/current-client semantic names for known player-trade actions.'
+Assert-SourceMatch $tradeActionSource 'None\s*=\s*Open.*?End\s*=\s*Accept.*?Unknown\s*=\s*Complete.*?Credits\s*=\s*UpdateCredits' 'TradeAction should keep legacy CellAO aliases while code is migrated to canonical names.'
+Assert-SourceMatch $tradeHandlerSource 'Trade action=.*?p1=\{5\} p2=\{6\} p3=\{7\} p4=\{8\}' 'Trade handler logging should expose raw params for packet evidence work.'
+Assert-SourceMatch $tradeHandlerSource 'int\s+credits\s*=\s*Math\.Max\s*\(\s*0,\s*message\.Param1\s*\)' 'Player trade credits should read the source-backed N3Msg_TradeSetCash(int) amount from Param1.'
+Assert-SourceMatch $tradeHandlerSource 'PlayerTradeCredits\s*\(Identity\s+offerOwner,\s*int\s+credits\).*?x\.Action\s*=\s*TradeAction\.Credits.*?x\.Param1\s*=\s*credits;.*?x\.Param2\s*=\s*0;.*?x\.Param3\s*=\s*0;.*?x\.Param4\s*=\s*0;' 'Player trade credit notification should write the amount as the raw Param1 value, not as Target.Instance.'
 Assert-SourceMatch $giveItemCommandSource 'InventoryError\s+err\s*=\s*container\.BaseInventory\.TryAdd\s*\(\s*item\s*\).*?if\s*\(\s*err\s*!=\s*InventoryError\.OK\s*\).*?container\.BaseInventory\.Write\s*\(\s*\)\s*;.*?AddTemplateMessageHandler\.Default\.Send' 'GM giveitem should persist the added item before notifying a character client.'
 Assert-SourceMatch $clientMoveItemSource 'EnsureWeaponVisualMeshes\s*\(ICharacter\s+character,\s*bool\s+announceAppearanceUpdate\).*?WeaponSlots\.Righthand.*?WeaponSlots\.LeftHand' 'Weapon visual repair should cover both right and left hand slots for dual wield.'
 Assert-SourceMatch $clientMoveItemSource 'EnsureWeaponMesh\s*\(.*?IItem\s+equippedItem\s*=\s*weaponPage\s*\[\s*slot\s*\]\s*;\s*if\s*\(\s*equippedItem\s*==\s*null\s*\)\s*\{\s*return\s+false\s*;' 'Weapon visual repair should not restore stale meshes for an unequipped hand.'
@@ -494,11 +506,11 @@ Assert-SourceNoMatch $npcControllerSource 'MoveIntoCombatRange|HoldCombatPositio
 Assert-SourceMatch $playfieldSource 'if\s*\(\s*killingHit\s*\).*?target\.Controller\s+is\s+NPCController.*?KillNpcTarget\s*\(\s*target\s*\).*?target\.Controller\s+is\s+PlayerController.*?KillPlayerTarget\s*\(\s*target\s*\)' 'Combat killing hits should route player targets through a real player death branch instead of only clearing the attacker timer.'
 Assert-SourceMatch $playfieldSource 'KillPlayerTarget\s*\(ICharacter\s+target\).*?MarkPlayerDead\s*\(\s*target\s*\).*?target\.SendChangedStats\s*\(\s*\).*?target\.SetTarget\s*\(\s*Identity\.None\s*\).*?target\.SetFightingTarget\s*\(\s*Identity\.None\s*\).*?StopFightingDeadTarget\s*\(\s*target\.Identity\s*\).*?SendCombatStopMessage\s*\(\s*target\s*\).*?SendPlayerDeathAnimation\s*\(\s*target\s*\)' 'Player death should mark dead stats, stop both sides of combat, and send the death action.'
 Assert-SourceMatch $playfieldSource 'MarkPlayerDead\s*\(ICharacter\s+target\).*?Stats\s*\[\s*StatIds\.health\s*\]\.Value\s*=\s*0.*?Stats\s*\[\s*StatIds\.deadtimer\s*\]\.Value\s*=\s*1.*?Stats\s*\[\s*StatIds\.healdelta\s*\]\.Value\s*=\s*0.*?Stats\s*\[\s*StatIds\.nanodelta\s*\]\.Value\s*=\s*0' 'Player death stats should keep the player dead at zero health and stop passive regen.'
-Assert-SourceMatch $playfieldSource 'SendPlayerDeathAnimation\s*\(ICharacter\s+target\).*?Action\s*=\s*CharacterActionType\.Death.*?Parameter2\s*=\s*DefaultNpcDeathAnimationKey' 'Player death should reuse the validated CharacterAction death packet shape until a player-death capture proves a different key.'
+Assert-SourceMatch $playfieldSource 'SendPlayerDeathAnimation\s*\(ICharacter\s+target\).*?Action\s*=\s*CharacterActionType\.Death.*?Parameter2\s*=\s*DefaultPlayerDeathAnimationKey' 'Player death should use the player-specific CharacterAction death packet key until a player-death capture proves a different key.'
 Assert-SourceMatch $playfieldSource 'KillNpcTarget\s*\(ICharacter\s+target\).*?MarkNpcDead\s*\(\s*target\s*\).*?StopFightingDeadTarget\s*\(\s*target\.Identity\s*\).*?SendNpcDeathAnimation\s*\(\s*target\s*\).*?ScheduleCorpseSpawn\s*\(\s*target\s*,\s*corpseIdentity\s*\).*?deadNpcDespawnTicks\s*\[\s*target\.Identity\.Instance\s*\]\s*=\s*DateTime\.UtcNow\s*\+\s*DeadNpcDespawnDelay\s*;' 'NPC death should mark dead, stop fighting, play death, schedule corpse, and delay despawn.'
 Assert-SourceMatch $playfieldSource 'MarkNpcDead\s*\(ICharacter\s+target\).*?Stats\s*\[\s*StatIds\.deadtimer\s*\]\.Value\s*=\s*1\s*;.*?Stats\s*\[\s*StatIds\.corpseanimkey\s*\]\.Value\s*=\s*DeathAnimationKeyFor\s*\(\s*target\s*\)\s*;.*?Stats\s*\[\s*StatIds\.dieanim\s*\]\.Value\s*=\s*DeathAnimationKeyFor\s*\(\s*target\s*\)\s*;.*?Stats\s*\[\s*StatIds\.healdelta\s*\]\.Value\s*=\s*0\s*;.*?DoNotDoTimers\s*=\s*true\s*;' 'NPC death stats should disable healing/timers and expose death animation keys.'
 Assert-SourceMatch $playfieldSource 'TryUseDeadNpcCorpse\s*\(ICharacter\s+looter,\s*Identity\s+deadNpcIdentity,\s*out\s+Identity\s+corpseIdentity\).*?DeadNpcIdentity\.Instance\s*==\s*deadNpcIdentity\.Instance.*?corpseIdentity\s*=\s*corpse\.CorpseIdentity\s*;.*?return\s+this\.TryUseCorpse\s*\(\s*looter\s*,\s*corpse\.CorpseIdentity\s*\)\s*;' 'Using a dead NPC dynel should route to its registered corpse identity.'
-Assert-SourceMatch $playfieldSource 'TryUseCorpse\s*\(ICharacter\s+looter,\s*Identity\s+corpseIdentity\).*?corpse\.Opened\s*=\s*true\s*;.*?corpse\.HasUnlootedItems.*?ExtendCorpseLifetime\s*\(\s*corpse\s*,\s*CombatCorpseRules\.ItemLootCorpseLifetime\s*,\s*"corpse-use"\s*\).*?NextUseSendsAccessActionOnly.*?SendCorpseLootAccessAction\s*\(\s*looter\s*,\s*corpse\s*\).*?SendUseActionFinished\s*\(\s*looter\s*\).*?NextUseSendsAccessActionOnly\s*=\s*false\s*;.*?SendCorpseInventoryUpdate\s*\(\s*looter\s*,\s*corpse\s*\).*?NextUseSendsAccessActionOnly\s*=\s*true\s*;' 'Corpse reopen with remaining loot should alternate access action and inventory update packets.'
+Assert-SourceMatch $playfieldSource 'TryUseCorpse\s*\(ICharacter\s+looter,\s*Identity\s+corpseIdentity\).*?corpse\.Opened\s*=\s*true\s*;.*?corpse\.HasUnlootedItems.*?ExtendCorpseLifetime\s*\(\s*corpse\s*,\s*CombatCorpseRules\.ItemLootCorpseLifetime\s*,\s*"corpse-use"\s*\).*?NextUseSendsAccessActionOnly.*?SendCorpseLootAccessAction\s*\(\s*looter\s*,\s*corpse\s*\).*?SendUseActionFinished\s*\(\s*looter\s*\).*?NextUseSendsAccessActionOnly\s*=\s*false\s*;.*?SendCorpseInventoryUpdateAndCredits\s*\(\s*looter\s*,\s*corpse\s*\).*?NextUseSendsAccessActionOnly\s*=\s*true\s*;' 'Corpse reopen with remaining loot should alternate access action and inventory/credit update packets.'
 Assert-SourceMatch $playfieldSource 'TryUseCorpse\s*\(ICharacter\s+looter,\s*Identity\s+corpseIdentity\).*?!corpse\.HasUnlootedItems.*?ScheduleCorpseDespawn\s*\(\s*corpse\s*,\s*CombatCorpseRules\.EmptyCorpseCleanupAfterOpenedDelay\s*,\s*"opened-empty"\s*\)' 'Opening an empty corpse should schedule the short cleanup timer.'
 Assert-SourceMatch $combatCorpseRulesSource 'EmptyCorpseCleanupAfterOpenedDelay\s*=\s*TimeSpan\.FromSeconds\s*\(\s*3\s*\)' 'Empty opened/looted corpses should use the capture-backed roughly three second cleanup delay.'
 Assert-SourceMatch $playfieldSource 'TryLootCorpseItem\s*\(ICharacter\s+looter,\s*Identity\s+sourceContainer,\s*Identity\s+target,\s*int\s+targetPlacement\).*?sourceContainer\.Type\s*!=\s*IdentityType\.Backpack.*?int\s+corpseInventorySlot\s*=\s*\(sourceContainer\.Instance\s*>>\s*16\)\s*&\s*0xffff\s*;.*?int\s+requestedLootSlot\s*=\s*sourceContainer\.Instance\s*&\s*0xffff\s*;' 'Corpse item moves should decode the Backpack source container into corpse inventory and loot slots.'
@@ -564,22 +576,22 @@ Assert-SourceOrdered $playfieldSource @(
     'TryUseCorpse\s*\(ICharacter\s+looter,\s*Identity\s+corpseIdentity\)',
     'corpse\.Opened\s*=\s*true',
     'corpse\.HasUnlootedItems',
-    'ExtendCorpseLifetime\s*\(\s*corpse,\s*CombatCorpseRules\.ItemLootCorpseLifetime,\s*"corpse-use"\s*\)',
-    'SendCorpseLootAccessAction\s*\(\s*looter,\s*corpse\s*\)',
+    'ExtendCorpseLifetime\s*\(\s*corpse\s*,\s*CombatCorpseRules\.ItemLootCorpseLifetime\s*,\s*"corpse-use"\s*\)',
+    'SendCorpseLootAccessAction\s*\(\s*looter\s*,\s*corpse\s*\)',
     'SendUseActionFinished\s*\(\s*looter\s*\)',
-    'SendCorpseInventoryUpdate\s*\(\s*looter,\s*corpse\s*\)',
-    'ScheduleCorpseDespawn\s*\(\s*corpse,\s*CombatCorpseRules\.EmptyCorpseCleanupAfterOpenedDelay,\s*"opened-empty"\s*\)'
+    'SendCorpseInventoryUpdateAndCredits\s*\(\s*looter\s*,\s*corpse\s*\)',
+    'ScheduleCorpseDespawn\s*\(\s*corpse\s*,\s*CombatCorpseRules\.EmptyCorpseCleanupAfterOpenedDelay\s*,\s*"opened-empty"\s*\)'
 ) 'Corpse flow regression: corpse use should open loot, alternate access/inventory responses, and short-despawn empty corpses.'
 Assert-SourceOrdered $playfieldSource @(
     'SendCorpseInventoryUpdate\s*\(ICharacter\s+looter,\s*CorpseState\s+corpse\)',
     'Where\s*\(x\s*=>\s*!x\.Looted\)',
-    'corpse\.InventorySlot\s*=\s*this\.AllocateCorpseInventorySlot\s*\(\s*\)',
     'new\s+InventoryUpdateMessage',
     'NumberOfSlots\s*=\s*CombatCorpseRules\.CorpseInventorySlots',
     'Entries\s*=\s*entries',
     'BagIdentity\s*=\s*corpse\.CorpseIdentity',
     'SlotnumberInMainInventory\s*=\s*corpse\.InventorySlot'
 ) 'Corpse flow regression: corpse use should send InventoryUpdate for only unlooted items on the corpse bag identity.'
+Assert-SourceMatch $playfieldSource 'RegisterCorpse\s*\(ICharacter\s+target,\s*Identity\s+corpseIdentity\).*?InventorySlot\s*=\s*this\.AllocateCorpseInventorySlot\s*\(\s*\)' 'Corpse inventory slot should be allocated once at corpse registration and reused for InventoryUpdate.'
 Assert-SourceOrdered $clientMoveItemSource @(
     'Read\s*\(ClientMoveItemToInventoryMessage\s+message,\s*IZoneClient\s+client\)',
     'TryLootCorpseItem\s*\(',
@@ -597,15 +609,15 @@ Assert-SourceOrdered $playfieldSource @(
     'sourceContainer\.Type\s*!=\s*IdentityType\.Backpack',
     'corpseInventorySlot\s*=\s*\(sourceContainer\.Instance\s*>>\s*16\)\s*&\s*0xffff',
     'requestedLootSlot\s*=\s*sourceContainer\.Instance\s*&\s*0xffff',
-    'FindCorpseLootItem\s*\(\s*corpse,\s*requestedLootSlot\s*\)',
-    'CharacterHasUniqueItemAlready\s*\(\s*looter,\s*lootItem\.Item\s*\)',
+    'FindCorpseLootItem\s*\(\s*corpse\s*,\s*requestedLootSlot\s*\)',
+    'CharacterHasUniqueItemAlready\s*\(\s*looter\s*,\s*lootItem\.Item\s*\)',
     'TryResolveLootTargetSlot\s*\(',
     'looter\.BaseInventory\.AddToPage\s*\(',
     'looter\.BaseInventory\.Write\s*\(\s*\)',
     'lootItem\.Looted\s*=\s*true',
     'ContainerAddItemMessageHandler\.Default\.Send\s*\(',
-    'ScheduleCorpseDespawn\s*\(\s*corpse,\s*CombatCorpseRules\.EmptyCorpseCleanupAfterOpenedDelay,\s*"looted-empty"\s*\)',
-    'ExtendCorpseLifetime\s*\(\s*corpse,\s*CombatCorpseRules\.ItemLootCorpseLifetime,\s*"loot-remaining"\s*\)'
+    'ScheduleCorpseDespawn\s*\(\s*corpse\s*,\s*CombatCorpseRules\.EmptyCorpseCleanupAfterOpenedDelay\s*,\s*"looted-empty"\s*\)',
+    'ExtendCorpseLifetime\s*\(\s*corpse\s*,\s*CombatCorpseRules\.ItemLootCorpseLifetime\s*,\s*"loot-remaining"\s*\)'
 ) 'Corpse flow regression: corpse item moves should decode source slots, persist inventory before consuming loot, notify the client, and update corpse lifetime.'
 Assert-SourceOrdered $playfieldSource @(
     'ProcessCorpseDespawns\s*\(\s*\)',

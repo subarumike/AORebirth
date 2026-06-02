@@ -801,7 +801,7 @@ namespace ZoneEngine.Core.Controllers
         /// </exception>
         public bool TeamInvite(Identity target)
         {
-            throw new NotImplementedException();
+            return TeamRuntime.Invite(this.Character, target);
         }
 
         /// <summary>
@@ -818,7 +818,7 @@ namespace ZoneEngine.Core.Controllers
             // 1. Kick Team member
             // 2. Send Team update message
 
-            throw new NotImplementedException();
+            return TeamRuntime.Kick(this.Character, target);
         }
 
         /// <summary>
@@ -833,7 +833,7 @@ namespace ZoneEngine.Core.Controllers
             // 1. Leave the team
             // 2. Send Team update message
 
-            throw new NotImplementedException();
+            return TeamRuntime.Leave(this.Character);
         }
 
         /// <summary>
@@ -850,7 +850,8 @@ namespace ZoneEngine.Core.Controllers
             // 1. Transfer Leadership
             // 2. Send Team update message
 
-            throw new NotImplementedException();
+            ChatTextMessageHandler.Default.Send(this.Character, "Team leadership transfer is not wired yet.");
+            return false;
         }
 
         /// <summary>
@@ -866,7 +867,7 @@ namespace ZoneEngine.Core.Controllers
             // Procedure:
             // 1. Send target the invite
 
-            throw new NotImplementedException();
+            return TeamRuntime.Invite(this.Character, target);
         }
 
         /// <summary>
@@ -887,7 +888,7 @@ namespace ZoneEngine.Core.Controllers
             // 3. else
             // 4.    Call requester's TeamJoinRejected
 
-            throw new NotImplementedException();
+            return TeamRuntime.Reply(this.Character, accept, requester);
         }
 
         /// <summary>
@@ -906,7 +907,7 @@ namespace ZoneEngine.Core.Controllers
             // 3. Add newTeamMember
             // 4. Send out TeamMemberInfo etc. to all team members
 
-            throw new NotImplementedException();
+            return TeamRuntime.AcceptDirect(this.Character, newTeamMember);
         }
 
         /// <summary>
@@ -922,7 +923,7 @@ namespace ZoneEngine.Core.Controllers
             // Procedure: 
             // 1. Send back negative reply
 
-            throw new NotImplementedException();
+            return TeamRuntime.RejectDirect(this.Character, rejectingIdentity);
         }
 
         /// <summary>
@@ -959,6 +960,311 @@ namespace ZoneEngine.Core.Controllers
                 }
             }
             this.disposed = true;
+        }
+    }
+
+    internal static class TeamRuntime
+    {
+        private static readonly object Sync = new object();
+
+        private static readonly Dictionary<int, Identity> PendingInvites = new Dictionary<int, Identity>();
+
+        private static readonly Dictionary<int, List<Identity>> TeamMembers = new Dictionary<int, List<Identity>>();
+
+        private static readonly Dictionary<int, int> CharacterTeams = new Dictionary<int, int>();
+
+        private static int nextTeamId = 1;
+
+        public static bool Invite(ICharacter inviter, Identity targetIdentity)
+        {
+            ICharacter target = ResolveOnlineCharacter(inviter, targetIdentity);
+            if (target == null || target.Identity.Equals(inviter.Identity))
+            {
+                ChatTextMessageHandler.Default.Send(inviter, "Team invite target is not available.");
+                return false;
+            }
+
+            lock (Sync)
+            {
+                PendingInvites[target.Identity.Instance] = inviter.Identity;
+            }
+
+            ChatTextMessageHandler.Default.Send(inviter, "Team invite sent to " + target.Name + ".");
+            ChatTextMessageHandler.Default.Send(
+                target,
+                inviter.Name + " invited you to a team. Use /team accept or /team decline.");
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                "Team invite pending inviter=" + inviter.Identity.ToString(true)
+                + " target=" + target.Identity.ToString(true));
+
+            return true;
+        }
+
+        public static bool Reply(ICharacter character, bool accept, Identity requester)
+        {
+            Identity inviterIdentity;
+            lock (Sync)
+            {
+                if (!PendingInvites.TryGetValue(character.Identity.Instance, out inviterIdentity))
+                {
+                    inviterIdentity = requester;
+                }
+
+                PendingInvites.Remove(character.Identity.Instance);
+            }
+
+            if (inviterIdentity == null || inviterIdentity.Equals(Identity.None))
+            {
+                ChatTextMessageHandler.Default.Send(character, "No pending team invite.");
+                return false;
+            }
+
+            ICharacter inviter = ResolveOnlineCharacter(character, inviterIdentity);
+            if (inviter == null)
+            {
+                ChatTextMessageHandler.Default.Send(character, "The team inviter is no longer available.");
+                return false;
+            }
+
+            if (!accept)
+            {
+                ChatTextMessageHandler.Default.Send(character, "Team invite declined.");
+                ChatTextMessageHandler.Default.Send(inviter, character.Name + " declined your team invite.");
+                return true;
+            }
+
+            Join(inviter, character);
+            return true;
+        }
+
+        public static bool AcceptDirect(ICharacter leader, Identity newMemberIdentity)
+        {
+            ICharacter newMember = ResolveOnlineCharacter(leader, newMemberIdentity);
+            if (newMember == null)
+            {
+                ChatTextMessageHandler.Default.Send(leader, "Team member is not available.");
+                return false;
+            }
+
+            Join(leader, newMember);
+            return true;
+        }
+
+        public static bool RejectDirect(ICharacter inviter, Identity rejectingIdentity)
+        {
+            ICharacter rejectingCharacter = ResolveOnlineCharacter(inviter, rejectingIdentity);
+            if (rejectingCharacter != null)
+            {
+                ChatTextMessageHandler.Default.Send(
+                    inviter,
+                    rejectingCharacter.Name + " declined your team invite.");
+            }
+
+            return true;
+        }
+
+        public static bool Leave(ICharacter character)
+        {
+            int teamId;
+            List<Identity> remainingMembers;
+            lock (Sync)
+            {
+                if (!CharacterTeams.TryGetValue(character.Identity.Instance, out teamId))
+                {
+                    ChatTextMessageHandler.Default.Send(character, "You are not in a team.");
+                    return false;
+                }
+
+                remainingMembers = TeamMembers[teamId];
+                remainingMembers.RemoveAll(x => x.Instance == character.Identity.Instance);
+                CharacterTeams.Remove(character.Identity.Instance);
+                if (remainingMembers.Count == 0)
+                {
+                    TeamMembers.Remove(teamId);
+                }
+            }
+
+            ApplyTeamStats(character, 0, 1);
+            ChatTextMessageHandler.Default.Send(character, "You left the team.");
+            NotifyMembers(remainingMembers, character.Name + " left the team.");
+            UpdateTeamMemberStats(teamId);
+            return true;
+        }
+
+        public static bool Kick(ICharacter leader, Identity targetIdentity)
+        {
+            ICharacter target = ResolveOnlineCharacter(leader, targetIdentity);
+            if (target == null)
+            {
+                ChatTextMessageHandler.Default.Send(leader, "Team kick target is not available.");
+                return false;
+            }
+
+            int teamId;
+            lock (Sync)
+            {
+                if (!CharacterTeams.TryGetValue(leader.Identity.Instance, out teamId)
+                    || !CharacterTeams.ContainsKey(target.Identity.Instance)
+                    || CharacterTeams[target.Identity.Instance] != teamId)
+                {
+                    ChatTextMessageHandler.Default.Send(leader, target.Name + " is not in your team.");
+                    return false;
+                }
+            }
+
+            Leave(target);
+            ChatTextMessageHandler.Default.Send(leader, target.Name + " was removed from the team.");
+            return true;
+        }
+
+        public static bool TryHandleChatCommand(ICharacter character, string[] args)
+        {
+            if (args == null || args.Length < 2)
+            {
+                ChatTextMessageHandler.Default.Send(
+                    character,
+                    "Team commands: /team invite <name>, /team accept, /team decline, /team leave.");
+                return true;
+            }
+
+            string action = args[1].ToLowerInvariant();
+            if (action == "accept")
+            {
+                return Reply(character, true, Identity.None);
+            }
+
+            if ((action == "decline") || (action == "reject"))
+            {
+                return Reply(character, false, Identity.None);
+            }
+
+            if (action == "leave")
+            {
+                return Leave(character);
+            }
+
+            if (action == "invite" && args.Length >= 3)
+            {
+                ICharacter target = FindOnlineCharacterByName(character, args[2]);
+                if (target == null)
+                {
+                    ChatTextMessageHandler.Default.Send(character, "Could not find online character " + args[2] + ".");
+                    return false;
+                }
+
+                return Invite(character, target.Identity);
+            }
+
+            ChatTextMessageHandler.Default.Send(character, "Unknown team command.");
+            return false;
+        }
+
+        private static void Join(ICharacter leader, ICharacter newMember)
+        {
+            int teamId;
+            List<Identity> members;
+            lock (Sync)
+            {
+                if (!CharacterTeams.TryGetValue(leader.Identity.Instance, out teamId))
+                {
+                    teamId = nextTeamId++;
+                    CharacterTeams[leader.Identity.Instance] = teamId;
+                    TeamMembers[teamId] = new List<Identity> { leader.Identity };
+                }
+
+                members = TeamMembers[teamId];
+                if (!members.Any(x => x.Instance == newMember.Identity.Instance))
+                {
+                    members.Add(newMember.Identity);
+                }
+
+                CharacterTeams[newMember.Identity.Instance] = teamId;
+            }
+
+            UpdateTeamMemberStats(teamId);
+            NotifyMembers(members, newMember.Name + " joined the team.");
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                "Team joined teamId=" + teamId
+                + " leader=" + leader.Identity.ToString(true)
+                + " member=" + newMember.Identity.ToString(true));
+        }
+
+        private static void UpdateTeamMemberStats(int teamId)
+        {
+            List<Identity> members;
+            lock (Sync)
+            {
+                if (!TeamMembers.TryGetValue(teamId, out members))
+                {
+                    return;
+                }
+
+                members = members.ToList();
+            }
+
+            int memberCount = members.Count;
+            foreach (Identity memberIdentity in members)
+            {
+                ICharacter member = Pool.Instance.GetObject<ICharacter>(memberIdentity);
+                if (member != null)
+                {
+                    ApplyTeamStats(member, teamId, memberCount);
+                }
+            }
+        }
+
+        private static void ApplyTeamStats(ICharacter character, int teamId, int memberCount)
+        {
+            character.Stats[StatIds.team].Value = teamId;
+            character.Stats[StatIds.team].BaseValue = (uint)teamId;
+            character.Stats[StatIds.numberofteammembers].Value = memberCount;
+            character.Stats[StatIds.numberofteammembers].BaseValue = (uint)memberCount;
+            character.Controller.SendChangedStats();
+        }
+
+        private static void NotifyMembers(List<Identity> members, string text)
+        {
+            if (members == null)
+            {
+                return;
+            }
+
+            foreach (Identity identity in members.ToList())
+            {
+                ICharacter member = Pool.Instance.GetObject<ICharacter>(identity);
+                if (member != null)
+                {
+                    ChatTextMessageHandler.Default.Send(member, text);
+                }
+            }
+        }
+
+        private static ICharacter ResolveOnlineCharacter(ICharacter reference, Identity identity)
+        {
+            if (reference == null || reference.Playfield == null || identity == null)
+            {
+                return null;
+            }
+
+            return Pool.Instance.GetObject<ICharacter>(reference.Playfield.Identity, identity)
+                   ?? Pool.Instance.GetObject<ICharacter>(identity);
+        }
+
+        private static ICharacter FindOnlineCharacterByName(ICharacter reference, string name)
+        {
+            if (reference == null || string.IsNullOrWhiteSpace(name))
+            {
+                return null;
+            }
+
+            return Pool.Instance.GetAll<ICharacter>((int)IdentityType.CanbeAffected)
+                .FirstOrDefault(
+                    x => x != null
+                         && x.Controller is PlayerController
+                         && string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

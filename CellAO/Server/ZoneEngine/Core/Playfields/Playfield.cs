@@ -127,7 +127,7 @@ namespace CellAO.Core.Playfields
 
         private int nextCorpseInstance = 0x00F0F000;
 
-        private int nextCorpseInventorySlot = 0x78;
+        private int nextCorpseInventorySlot = 0x70;
 
         private const int DefaultNpcDeathAnimationKey = 0x1F7;
 
@@ -1937,13 +1937,13 @@ namespace CellAO.Core.Playfields
                 }
                 else
                 {
-                    this.SendCorpseInventoryUpdate(looter, corpse);
+                    this.SendCorpseInventoryUpdateAndCredits(looter, corpse);
                     corpse.NextUseSendsAccessActionOnly = true;
                 }
             }
             else if (!wasOpened)
             {
-                this.SendCorpseInventoryUpdate(looter, corpse);
+                this.SendCorpseInventoryUpdateAndCredits(looter, corpse);
             }
             else
             {
@@ -1986,9 +1986,13 @@ namespace CellAO.Core.Playfields
                 return false;
             }
 
-            CorpseState corpse = this.corpses.Values.FirstOrDefault(
-                x => x.DeadNpcIdentity.Type == deadNpcIdentity.Type
-                     && x.DeadNpcIdentity.Instance == deadNpcIdentity.Instance);
+            CorpseState corpse = this.corpses.Values
+                .Where(
+                    x => x.DeadNpcIdentity.Type == deadNpcIdentity.Type
+                         && x.DeadNpcIdentity.Instance == deadNpcIdentity.Instance)
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .ThenByDescending(x => x.CorpseIdentity.Instance)
+                .FirstOrDefault();
 
             if (corpse == null)
             {
@@ -2006,10 +2010,11 @@ namespace CellAO.Core.Playfields
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 string.Format(
-                    "DeadNpcCorpseUse route deadNpc={0} corpse={1} looter={2}",
+                    "DeadNpcCorpseUse route deadNpc={0} corpse={1} looter={2} created={3:o}",
                     deadNpcIdentity,
                     corpseIdentity,
-                    looter.Identity));
+                    looter.Identity,
+                    corpse.CreatedAtUtc));
             return this.TryUseCorpse(looter, corpse.CorpseIdentity);
         }
 
@@ -2139,12 +2144,18 @@ namespace CellAO.Core.Playfields
             looter.BaseInventory.Write();
             lootItem.Looted = true;
             corpse.Opened = true;
+            // Ack the concrete destination slot. Echoing 0x6F here is interpreted by the
+            // current client as a credits amount side-effect in loot feedback text.
             ContainerAddItemMessageHandler.Default.Send(
                 looter,
                 sourceContainer,
-                targetPlacement == CombatCorpseRules.MoveToInventoryPlacement
-                    ? CombatCorpseRules.MoveToInventoryPlacement
-                    : targetSlot);
+                targetSlot);
+            if (looter.Controller != null)
+            {
+                uint authoritativeCash = looter.Stats[StatIds.cash].BaseValue;
+                StatMessageHandler.Default.SendSingle(looter, (int)StatIds.cash, authoritativeCash);
+                looter.Stats[StatIds.cash].Changed = false;
+            }
 
             if (!corpse.HasUnlootedItems)
             {
@@ -2161,12 +2172,14 @@ namespace CellAO.Core.Playfields
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 string.Format(
-                    "CorpseLoot accepted corpse={0} looter={1} source={2} lootSlot={3} targetSlot={4} remaining={5}",
+                    "CorpseLoot accepted corpse={0} looter={1} source={2} lootSlot={3} targetSlot={4} ackPlacement={5} cashResync={6} remaining={7}",
                     corpse.CorpseIdentity,
                     looter.Identity,
                     sourceContainer,
                     lootItem.Slot,
                     targetSlot,
+                    targetSlot,
+                    looter.Stats[StatIds.cash].BaseValue,
                     corpse.LootItems.Count(x => !x.Looted)));
 
             return true;
@@ -2662,6 +2675,7 @@ namespace CellAO.Core.Playfields
                     DeadNpcIdentity = target.Identity,
                     Name = "Remains of " + target.Name,
                     LootClass = CombatCorpseLootClass.CreditsOnly,
+                    CreatedAtUtc = DateTime.UtcNow,
                     SpawnsAtUtc = spawnsAtUtc
                 };
 
@@ -2678,6 +2692,7 @@ namespace CellAO.Core.Playfields
         {
             List<CorpseLootItem> lootItems = RollCorpseLootItems(target);
             CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems);
+            int credits = RollCorpseCredits(target);
             TimeSpan lifetime = CorpseLifetimeFor(lootClass);
             DateTime expiresAtUtc = DateTime.UtcNow + lifetime;
             var state = new CorpseState
@@ -2686,7 +2701,9 @@ namespace CellAO.Core.Playfields
                 DeadNpcIdentity = target.Identity,
                 Name = "Remains of " + target.Name,
                 LootClass = lootClass,
+                CreatedAtUtc = DateTime.UtcNow,
                 LootItems = lootItems,
+                Credits = credits,
                 InventorySlot = this.AllocateCorpseInventorySlot(),
                 ExpiresAtUtc = expiresAtUtc
             };
@@ -2697,11 +2714,12 @@ namespace CellAO.Core.Playfields
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 string.Format(
-                    "Corpse registered corpse={0} deadNpc={1} lifetimeSeconds={2} lootClass={3}",
+                    "Corpse registered corpse={0} deadNpc={1} lifetimeSeconds={2} lootClass={3} credits={4}",
                     corpseIdentity,
                     target.Identity,
                     (int)lifetime.TotalSeconds,
-                    state.LootClass));
+                    state.LootClass,
+                    state.Credits));
         }
 
         private void DespawnCorpse(int corpseInstance)
@@ -2760,6 +2778,8 @@ namespace CellAO.Core.Playfields
 
             public CombatCorpseLootClass LootClass { get; set; }
 
+            public DateTime CreatedAtUtc { get; set; }
+
             public DateTime SpawnsAtUtc { get; set; }
 
             public DateTime ExpiresAtUtc { get; set; }
@@ -2767,6 +2787,10 @@ namespace CellAO.Core.Playfields
             public int InventorySlot { get; set; }
 
             public List<CorpseLootItem> LootItems { get; set; }
+
+            public int Credits { get; set; }
+
+            public bool CreditsLooted { get; set; }
 
             public bool Opened { get; set; }
 
@@ -2810,7 +2834,7 @@ namespace CellAO.Core.Playfields
             int slot = this.nextCorpseInventorySlot++;
             if (this.nextCorpseInventorySlot > 0xff)
             {
-                this.nextCorpseInventorySlot = 0x78;
+                this.nextCorpseInventorySlot = 0x70;
             }
 
             return slot;
@@ -2931,6 +2955,23 @@ namespace CellAO.Core.Playfields
                     lootSource));
 
             return lootItems;
+        }
+
+        private static int RollCorpseCredits(ICharacter target)
+        {
+            if (target == null)
+            {
+                return 0;
+            }
+
+            int monsterData = target.Stats[StatIds.monsterdata].Value;
+            lock (LootRandomLock)
+            {
+                return CombatCorpseRules.RollObservedCredits(
+                    target.Name,
+                    monsterData,
+                    max => LootRandom.Next(max));
+            }
         }
 
         private static CombatLootTableEntry[] GetDatabaseLootTable()
@@ -3237,8 +3278,6 @@ namespace CellAO.Core.Playfields
                 ? new InventoryEntry[0]
                 : corpse.LootItems.Where(x => !x.Looted).Select(CreateCorpseInventoryEntry).ToArray();
 
-            corpse.InventorySlot = this.AllocateCorpseInventorySlot();
-
             looter.Controller.Client.SendCompressed(
                 new InventoryUpdateMessage
                 {
@@ -3261,6 +3300,51 @@ namespace CellAO.Core.Playfields
                     CombatCorpseRules.CorpseInventorySlots,
                     corpse.InventorySlot,
                     entries.Length));
+        }
+
+        private void SendCorpseInventoryUpdateAndCredits(ICharacter looter, CorpseState corpse)
+        {
+            this.SendCorpseInventoryUpdate(looter, corpse);
+            this.AwardCorpseCredits(looter, corpse);
+        }
+
+        private void AwardCorpseCredits(ICharacter looter, CorpseState corpse)
+        {
+            if (looter == null || corpse == null || corpse.CreditsLooted || corpse.Credits <= 0)
+            {
+                return;
+            }
+
+            int cashBeforeVisible = looter.Stats[StatIds.cash].Value;
+            uint cashBeforeBase = looter.Stats[StatIds.cash].BaseValue;
+            int cashBefore = cashBeforeVisible < 0 ? 0 : cashBeforeVisible;
+            corpse.CreditsLooted = true;
+            int cashAfter = cashBefore + corpse.Credits;
+            if (cashAfter < 0)
+            {
+                cashAfter = 0;
+            }
+
+            looter.Stats[StatIds.cash].Set((uint)cashAfter);
+            if (looter.Controller != null)
+            {
+                StatMessageHandler.Default.SendSingle(looter, (int)StatIds.cash, (uint)cashAfter);
+            }
+            looter.Stats[StatIds.cash].Changed = false;
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    "Corpse credits awarded corpse={0} looter={1} credits={2} cashBeforeVisible={3} cashBeforeBase={4} cashAfter={5} inventorySlot={6}",
+                    corpse.CorpseIdentity,
+                    looter.Identity,
+                    corpse.Credits,
+                    cashBefore,
+                    cashBeforeBase,
+                    cashAfter,
+                    corpse.InventorySlot));
+
+            looter.Stats.Write();
         }
 
         private void SendCorpseLootAccessAction(ICharacter looter, CorpseState corpse)

@@ -364,9 +364,11 @@ namespace ZoneEngine.Core.MessageHandlers
             return x =>
             {
                 x.Identity = character.Identity;
-                x.SourceContainer = sourceContainer;
+                // Stripdown/live wire evidence for ContainerAddItemIIR_t is:
+                // first identity = receiver character, second identity = source container.
+                x.SourceContainer = character.Identity;
                 x.TargetPlacement = slot;
-                x.Target = character.Identity;
+                x.Target = sourceContainer;
                 x.Unknown = 0;
             };
         }

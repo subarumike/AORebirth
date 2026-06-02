@@ -38,6 +38,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Controllers;
     using ZoneEngine.ChatCommands;
     using ZoneEngine.Script;
 
@@ -78,12 +79,33 @@ namespace ZoneEngine.Core.MessageHandlers
             string[] cmdArgs = fullArgs.Trim().Split(' ');
 
             string commandName = cmdArgs[0].ToLower();
+            client.Server.Info(
+                client,
+                "ChatCmd command={0} args={1} selectedTarget={2}",
+                commandName,
+                fullArgs,
+                client.Controller.Character.SelectedTarget);
+
             if ((commandName == "sit") || (commandName == "stand"))
             {
                 new Posture().ExecuteCommand(
                     client.Controller.Character,
                     client.Controller.Character.SelectedTarget,
                     cmdArgs);
+                return;
+            }
+
+            if (commandName == "team")
+            {
+                TeamRuntime.TryHandleChatCommand(client.Controller.Character, cmdArgs);
+                return;
+            }
+
+            if (commandName == "invite" && cmdArgs.Length >= 2)
+            {
+                TeamRuntime.TryHandleChatCommand(
+                    client.Controller.Character,
+                    new[] { "team", "invite", cmdArgs[1] });
                 return;
             }
 
