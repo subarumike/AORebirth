@@ -739,9 +739,10 @@ namespace ZoneEngine.Core.MessageHandlers
                 return false;
             }
 
-            int credits = Math.Max(0, message.Param1);
+            int credits = Math.Max(0, message.Param2);
             shoppingBag.SetPlayerTradeCredits(character.Identity, credits);
 
+            this.SendPlayerTradeCredits(character, character.Identity, credits);
             this.SendPlayerTradeCredits(otherCharacter, character.Identity, credits);
 
             LogUtil.Debug(
@@ -1067,8 +1068,8 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.Unknown = 0;
                 x.Unknown1 = 2;
                 x.Action = TradeAction.UpdateCredits;
-                x.Param1 = credits;
-                x.Param2 = 0;
+                x.Param1 = 0;
+                x.Param2 = credits;
                 x.Param3 = 0;
                 x.Param4 = 0;
             };
@@ -1288,8 +1289,6 @@ namespace ZoneEngine.Core.MessageHandlers
             SetCash(shopper, shopperFinalCash);
             SetCash(vendor, vendorFinalCash);
 
-            shopper.Controller.SendChangedStats();
-            vendor.Controller.SendChangedStats();
             shopper.Stats.Write();
             vendor.Stats.Write();
 
