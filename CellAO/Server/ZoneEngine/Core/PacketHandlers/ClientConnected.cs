@@ -34,8 +34,6 @@ namespace ZoneEngine.Core.PacketHandlers
     #region Usings ...
 
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Text;
 
     using CellAO.Core.Entities;
@@ -122,7 +120,8 @@ client.Controller.Character.Playfield.Identity,
                 VendingMachineFullUpdateMessageHandler.Default.Send(client.Controller.Character, vendor);
             }
 
-            EnsureDebugEnemySpawn(client);
+            // Debug-only combat test mob spawns are disabled on normal login.
+            // Use /command spawn / spawnleet for explicit test spawns.
 
             var sendSCFUs = new IMSendPlayerSCFUs { toClient = client };
             ((Playfield)client.Playfield).SendSCFUsToClient(sendSCFUs);
@@ -271,85 +270,6 @@ client.Controller.Character.Playfield.Identity,
         {
             client.Controller.Character.Stats[stat].Value = value;
             client.Controller.Character.Stats[stat].BaseValue = (uint)value;
-        }
-
-        private static void EnsureDebugEnemySpawn(ZoneClient client)
-        {
-            ICharacter character = client.Controller.Character;
-            if (character.Playfield == null)
-            {
-                LogUtil.Debug(DebugInfoDetail.Error, "Debug enemy spawn skipped: character has no playfield.");
-                return;
-            }
-
-            CombatTestMobArchetype.Entry spawnEntry =
-                CombatTestMobArchetype.DefaultForPlayfield(character.Playfield.Identity.Instance);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Error,
-                string.Format(
-                    "Debug enemy spawn check player={0} playfield={1} template={2} name={3}",
-                    character.Identity.ToString(true),
-                    character.Playfield.Identity.ToString(true),
-                    spawnEntry.TemplateHash,
-                    spawnEntry.DisplayName));
-
-            List<ICharacter> existingTestMobs =
-                Pool.Instance.GetAll<ICharacter>(character.Playfield.Identity, (int)IdentityType.CanbeAffected)
-                    .Where(CombatTestMobArchetype.IsCombatTestMob)
-                    .Where(x => x.Stats[StatIds.health].Value > 0)
-                    .ToList();
-
-            foreach (ICharacter existingMob in existingTestMobs)
-            {
-                CombatTestMobArchetype.Prepare(existingMob);
-                existingMob.DoNotDoTimers = false;
-                (existingMob.Playfield as Playfield)?.RegisterNpcHome(existingMob);
-                SendDebugEnemyToClient(client, existingMob);
-            }
-
-            if (existingTestMobs.Count > 0)
-            {
-                return;
-            }
-
-            Character mobCharacter = CombatTestMobArchetype.SpawnNear(character, spawnEntry, 5.0f);
-
-            if (mobCharacter == null)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    string.Format(
-                        "Debug enemy spawn failed: SpawnMobFromTemplate returned null for {0}.",
-                        spawnEntry.TemplateHash));
-                return;
-            }
-
-            (mobCharacter.Playfield as Playfield)?.RegisterNpcHome(mobCharacter);
-            SendDebugEnemyToClient(client, mobCharacter);
-        }
-
-        private static void SendDebugEnemyToClient(ZoneClient client, ICharacter mobCharacter)
-        {
-            SimpleCharFullUpdateMessage simpleCharFullUpdate =
-                SimpleCharFullUpdate.ConstructMessage((Character)mobCharacter);
-            client.SendCompressed(simpleCharFullUpdate);
-            client.SendCompressed(new CharInPlayMessage { Identity = mobCharacter.Identity, Unknown = 0x00 });
-
-            LogUtil.Debug(
-                DebugInfoDetail.Error,
-                string.Format(
-                    "Debug enemy sent to client mob={0} name={1} pf={2} pos={3:0.00},{4:0.00},{5:0.00} hp={6}/{7} monsterData={8} catMesh={9}",
-                    mobCharacter.Identity.ToString(true),
-                    mobCharacter.Name,
-                    mobCharacter.Playfield.Identity.ToString(true),
-                    mobCharacter.RawCoordinates.X,
-                    mobCharacter.RawCoordinates.Y,
-                    mobCharacter.RawCoordinates.Z,
-                    mobCharacter.Stats[StatIds.health].Value,
-                    mobCharacter.Stats[StatIds.life].Value,
-                    mobCharacter.Stats[StatIds.monsterdata].Value,
-                    mobCharacter.Stats[StatIds.catmesh].Value));
         }
 
         #endregion
