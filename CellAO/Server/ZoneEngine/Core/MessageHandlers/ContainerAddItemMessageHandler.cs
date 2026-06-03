@@ -364,11 +364,11 @@ namespace ZoneEngine.Core.MessageHandlers
             return x =>
             {
                 x.Identity = character.Identity;
-                // Stripdown/live wire evidence for ContainerAddItemIIR_t is:
-                // first identity = receiver character, second identity = source container.
-                x.SourceContainer = character.Identity;
+                // Live/clientless inventory evidence treats the first body identity as the source slot/container
+                // and the second body identity as the target character/container.
+                x.SourceContainer = sourceContainer;
                 x.TargetPlacement = slot;
-                x.Target = sourceContainer;
+                x.Target = character.Identity;
                 x.Unknown = 0;
             };
         }

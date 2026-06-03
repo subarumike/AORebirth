@@ -102,6 +102,7 @@ namespace ZoneEngine.Core.MessageHandlers
                     itemFrom.HighID,
                     itemFrom.Quality));
 
+            int ackTargetPlacement = message.TargetPlacement;
             int toPlacement = message.TargetPlacement;
             if (toPlacement == (int)IdentityType.TradeWindow)
             {
@@ -177,7 +178,7 @@ namespace ZoneEngine.Core.MessageHandlers
                     equipTo.Equip(sendingPage, fromPlacement, toPlacement);
                 }
 
-                this.SendMoveAck(character, message.SourceContainer, toPlacement);
+                this.SendMoveAck(character, message.SourceContainer, ackTargetPlacement);
                 Equip.Send(client, receivingPage, toPlacement);
                 character.CalculateSkills();
                 EnsureWeaponVisualMeshes(character, true);
@@ -194,7 +195,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 UnEquip.Send(client, sendingPage, fromPlacement);
                 unequipFrom.Unequip(fromPlacement, receivingPage, toPlacement);
-                this.SendMoveAck(character, message.SourceContainer, toPlacement);
+                this.SendMoveAck(character, message.SourceContainer, ackTargetPlacement);
                 character.CalculateSkills();
                 EnsureWeaponVisualMeshes(character, true);
                 this.PersistCharacterInventory(character, "unequip");
@@ -203,7 +204,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
             sendingPage.Remove(fromPlacement);
             receivingPage.Add(toPlacement, itemFrom);
-            this.SendMoveAck(character, message.SourceContainer, toPlacement);
+            this.SendMoveAck(character, message.SourceContainer, ackTargetPlacement);
             this.PersistCharacterInventory(character, "move");
             return true;
         }
@@ -267,8 +268,8 @@ namespace ZoneEngine.Core.MessageHandlers
                 new ContainerAddItemMessage
                 {
                     Identity = character.Identity,
-                    SourceContainer = character.Identity,
-                    Target = sourceContainer,
+                    SourceContainer = sourceContainer,
+                    Target = character.Identity,
                     TargetPlacement = targetPlacement,
                     Unknown = 0
                 });
