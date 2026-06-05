@@ -157,7 +157,8 @@ namespace ZoneEngine.Core.MessageHandlers
                         if (item != null)
                         {
                             TemporaryBag shoppingBag = client.Controller.Character.ShoppingBag;
-                            if (this.TryAddPlayerTradeItem(
+                            if (!(issuer is Vendor)
+                                && this.TryAddPlayerTradeItem(
                                 client.Controller.Character,
                                 issuer,
                                 shoppingBag,
@@ -170,9 +171,7 @@ namespace ZoneEngine.Core.MessageHandlers
                             {
                                 shoppingBag.Add(
                                     new Identity() { Instance = message.Container.Instance },
-                                    issuer.BaseInventory.RemoveItem(
-                                        (int)IdentityType.Inventory,
-                                        message.Container.Instance));
+                                    CloneShopItem(item));
                             }
                             else
                             {
@@ -300,7 +299,10 @@ namespace ZoneEngine.Core.MessageHandlers
                     }
 
                     TemporaryBag shoppingBag = client.Controller.Character.ShoppingBag;
-                    if (this.TryEndPlayerTrade(client.Controller.Character, shoppingBag, message))
+                    bool playerTradeBag =
+                        shoppingBag.Shopper.Type == IdentityType.CanbeAffected
+                        && shoppingBag.Vendor.Type == IdentityType.CanbeAffected;
+                    if (playerTradeBag && this.TryEndPlayerTrade(client.Controller.Character, shoppingBag, message))
                     {
                         break;
                     }
@@ -314,7 +316,17 @@ namespace ZoneEngine.Core.MessageHandlers
                     {
                         if (shoppingBag != null)
                         {
-                            IItem[] items = shoppingBag.GetBoughtItems();
+                            IItem[] items;
+                            try
+                            {
+                                items = shoppingBag.GetBoughtItems();
+                            }
+                            catch (Exception ex)
+                            {
+                                LogUtil.ErrorException(ex);
+                                break;
+                            }
+
                             double CLFactor = vendor.Stats[StatIds.sellmodifier].Value / 100.0f
                                               * (double)
                                                   (1
@@ -400,32 +412,36 @@ namespace ZoneEngine.Core.MessageHandlers
 
                     if (shoppingBag != null)
                     {
-                        if (this.TryDeclinePlayerTrade(client.Controller.Character, shoppingBag))
+                        bool playerTradeBag =
+                            shoppingBag.Shopper.Type == IdentityType.CanbeAffected
+                            && shoppingBag.Vendor.Type == IdentityType.CanbeAffected;
+                        if (playerTradeBag && this.TryDeclinePlayerTrade(client.Controller.Character, shoppingBag))
                         {
                             break;
                         }
 
-                        ICharacter otherCharacter = this.GetOtherPlayerTradeCharacter(
-                            client.Controller.Character,
-                            shoppingBag);
+                        this.SendVendorShopDeclineClose(client.Controller.Character);
 
-                        IItem[] items = shoppingBag.GetSoldItems();
-                        foreach (IItem item in items)
+                        try
                         {
-                            int nextSlot = issuer.BaseInventory[issuer.BaseInventory.StandardPage].FindFreeSlot();
-                            if (nextSlot != -1)
+                            IItem[] items = shoppingBag.GetSoldItems();
+                            foreach (IItem item in items)
                             {
-                                issuer.BaseInventory[issuer.BaseInventory.StandardPage].Add(nextSlot, item);
+                                int nextSlot = issuer.BaseInventory[issuer.BaseInventory.StandardPage].FindFreeSlot();
+                                if (nextSlot != -1)
+                                {
+                                    issuer.BaseInventory[issuer.BaseInventory.StandardPage].Add(nextSlot, item);
+                                }
                             }
                         }
-
-                        this.Send(client.Controller.Character, TradeAction.Decline, Identity.None, Identity.None);
-                        if (otherCharacter != null)
+                        finally
                         {
-                            this.Send(otherCharacter, TradeAction.Decline, Identity.None, Identity.None);
+                            shoppingBag.Dispose();
                         }
-
-                        shoppingBag.Dispose();
+                    }
+                    else
+                    {
+                        this.SendVendorShopDeclineClose(client.Controller.Character);
                     }
 
                     break;
@@ -1257,7 +1273,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
             int shopperCash = GetCash(shopper);
             int vendorCash = GetCash(vendor);
-            int startingTotalCash = shopperCash + vendorCash;
+            long startingTotalCash = (long)shopperCash + vendorCash;
 
             if (shopperCredits > shopperCash || vendorCredits > vendorCash)
             {
@@ -1272,9 +1288,27 @@ namespace ZoneEngine.Core.MessageHandlers
                 return false;
             }
 
-            int shopperFinalCash = shopperCash - shopperCredits + vendorCredits;
-            int vendorFinalCash = vendorCash - vendorCredits + shopperCredits;
-            int finalTotalCash = shopperFinalCash + vendorFinalCash;
+            long shopperFinalCashRaw = (long)shopperCash - shopperCredits + vendorCredits;
+            long vendorFinalCashRaw = (long)vendorCash - vendorCredits + shopperCredits;
+            if (shopperFinalCashRaw > CashStatRules.ClientSafeMaxCash
+                || vendorFinalCashRaw > CashStatRules.ClientSafeMaxCash
+                || shopperFinalCashRaw < 0
+                || vendorFinalCashRaw < 0)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Shopping,
+                    "Player trade credits rejected because cash cap would be exceeded shopper="
+                    + shopper.Identity.ToString(true)
+                    + " vendor=" + vendor.Identity.ToString(true)
+                    + " shopperFinalRaw=" + shopperFinalCashRaw
+                    + " vendorFinalRaw=" + vendorFinalCashRaw
+                    + " cap=" + CashStatRules.ClientSafeMaxCash);
+                return false;
+            }
+
+            int shopperFinalCash = CashStatRules.Clamp(shopperFinalCashRaw);
+            int vendorFinalCash = CashStatRules.Clamp(vendorFinalCashRaw);
+            long finalTotalCash = (long)shopperFinalCash + vendorFinalCash;
             if (finalTotalCash != startingTotalCash)
             {
                 LogUtil.Debug(
@@ -1308,17 +1342,12 @@ namespace ZoneEngine.Core.MessageHandlers
         private static int GetCash(ICharacter character)
         {
             uint value = character.Stats[StatIds.cash].BaseValue;
-            return value > int.MaxValue ? int.MaxValue : (int)value;
+            return CashStatRules.Clamp(value);
         }
 
         private static void SetCash(ICharacter character, int cash)
         {
-            if (cash < 0)
-            {
-                cash = 0;
-            }
-
-            character.Stats[StatIds.cash].Set((uint)cash);
+            character.Stats[StatIds.cash].Set((uint)CashStatRules.Clamp(cash));
         }
 
         private void ReturnPlayerTradeOffers(ICharacter owner, TemporaryBag shoppingBag)
@@ -1428,6 +1457,26 @@ namespace ZoneEngine.Core.MessageHandlers
         private void Send(ICharacter character, TradeAction tradeAction, Identity identity1, Identity identity2)
         {
             this.Send(character, this.EndTrade(character, tradeAction, identity1, identity2));
+        }
+
+        private static IItem CloneShopItem(IItem item)
+        {
+            Item concreteItem = item as Item;
+            if (concreteItem == null)
+            {
+                return item;
+            }
+
+            Item copy = new Item(concreteItem.Quality, concreteItem.LowID, concreteItem.HighID);
+            copy.MultipleCount = concreteItem.MultipleCount;
+            return copy;
+        }
+
+        private void SendVendorShopDeclineClose(ICharacter character)
+        {
+            this.Send(character, TradeAction.Decline, Identity.None, Identity.None);
+            StatMessageHandler.Default.SendSingle(character, (int)StatIds.socialstatus, 4);
+            CellAO.Core.Playfields.Playfield.ArmPostZoneCollisionGrace(character);
         }
 
         private MessageDataFiller EndTrade(
