@@ -114,11 +114,18 @@ namespace ZoneEngine.Core.Playfields
                                             (0xC0000000u | (uint)f.Arguments.Values[1].AsInt32()
                                              | ((uint)f.Arguments.Values[2].AsInt32() << 16)));
                                 DBTeleport teleporter =
-                                    TeleportDao.Instance.GetWhere(new { statelInstance = (uint)sd.Identity.Instance })
+                                    TeleportDao.Instance.GetWhere(
+                                        new
+                                        {
+                                            playfield = sd.PlayfieldId,
+                                            statelType = (int)sd.Identity.Type,
+                                            statelInstance = (uint)sd.Identity.Instance
+                                        })
                                         .FirstOrDefault();
                                 if (teleporter != null)
                                 {
                                     doorinstance = (int)teleporter.destinationInstance;
+                                    f.Arguments.Values[1] = new MessagePackObject(teleporter.destinationPlayfield);
                                     f.Arguments.Values[2] = new MessagePackObject(((doorinstance >> 16) & 0xff));
                                 }
                                 break;
@@ -132,11 +139,18 @@ namespace ZoneEngine.Core.Playfields
                                             (0xC0000000u | (uint)f.Arguments.Values[1].AsInt32()
                                              | ((uint)f.Arguments.Values[2].AsInt32() << 16)));
                                 DBTeleport teleporter =
-                                    TeleportDao.Instance.GetWhere(new { statelInstance = (uint)sd.Identity.Instance })
+                                    TeleportDao.Instance.GetWhere(
+                                        new
+                                        {
+                                            playfield = sd.PlayfieldId,
+                                            statelType = (int)sd.Identity.Type,
+                                            statelInstance = (uint)sd.Identity.Instance
+                                        })
                                         .FirstOrDefault();
                                 if (teleporter != null)
                                 {
                                     doorinstance = (int)teleporter.destinationInstance;
+                                    f.Arguments.Values[1] = new MessagePackObject(teleporter.destinationPlayfield);
                                     f.Arguments.Values[2] = new MessagePackObject(((doorinstance >> 16) & 0xff));
                                 }
                             }

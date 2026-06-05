@@ -45,6 +45,8 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using Utility;
+
     using ZoneEngine.Core.Playfields;
 
     using Quaternion = CellAO.Core.Vector.Quaternion;
@@ -96,6 +98,20 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
                 v.x += n.x * 2.5;
                 v.z += n.z * 2.5;
+                LogUtil.Debug(
+                    DebugInfoDetail.Zoning,
+                    string.Format(
+                        "TeleportProxy caller={0} fromPf={1} from=({2:F2},{3:F2},{4:F2}) destDoor={5} destPf={6} dest=({7:F2},{8:F2},{9:F2})",
+                        caller.Identity.ToString(true),
+                        character.Playfield.Identity.Instance,
+                        character.RawCoordinates.X,
+                        character.RawCoordinates.Y,
+                        character.RawCoordinates.Z,
+                        sd.Identity.ToString(true),
+                        arguments[1].AsInt32(),
+                        v.x,
+                        v.y,
+                        v.z));
                 character.Playfield.Teleport(
                     (Dynel)character,
                     new Coordinate(v),

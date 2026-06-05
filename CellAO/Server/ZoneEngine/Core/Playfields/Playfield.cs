@@ -121,6 +121,17 @@ namespace CellAO.Core.Playfields
 
         private readonly Dictionary<int, DateTime> corpseDespawnTicks = new Dictionary<int, DateTime>();
 
+        private readonly Dictionary<int, HashSet<string>> statelEnterContacts = new Dictionary<int, HashSet<string>>();
+
+        private readonly HashSet<int> statelCollisionInitializedCharacters = new HashSet<int>();
+
+        private static readonly Dictionary<int, DateTime> postZoneCollisionGraceUntil =
+            new Dictionary<int, DateTime>();
+
+        private static readonly object PostZoneCollisionGraceLock = new object();
+
+        private static readonly TimeSpan PostZoneCollisionGrace = TimeSpan.FromSeconds(3);
+
         private readonly Dictionary<int, CorpseState> corpses = new Dictionary<int, CorpseState>();
 
         private readonly Dictionary<int, CorpseState> pendingCorpseSpawns = new Dictionary<int, CorpseState>();
@@ -420,6 +431,19 @@ namespace CellAO.Core.Playfields
             AppearanceUpdateMessageHandler.Default.Send(character);
         }
 
+        public static void ArmPostZoneCollisionGrace(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            lock (PostZoneCollisionGraceLock)
+            {
+                postZoneCollisionGraceUntil[character.Identity.Instance] = DateTime.UtcNow + PostZoneCollisionGrace;
+            }
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="messageBody">
@@ -669,6 +693,8 @@ namespace CellAO.Core.Playfields
             }
             Thread.Sleep(200);
             int dynelId = dynel.Identity.Instance;
+            this.statelEnterContacts.Remove(dynelId);
+            this.statelCollisionInitializedCharacters.Remove(dynelId);
 
             // Disable sending stat changes and wait a bit to clear the queue
             dynel.DoNotDoTimers = true;
@@ -969,21 +995,72 @@ namespace CellAO.Core.Playfields
         /// </param>
         private void CheckStatelCollision(ICharacter dynel)
         {
+            if (IsPostZoneCollisionGraceActive(dynel))
+            {
+                return;
+            }
+
+            int dynelId = dynel.Identity.Instance;
+            bool initialized = this.statelCollisionInitializedCharacters.Contains(dynelId);
+            HashSet<string> activeEnterContacts;
+            if (!this.statelEnterContacts.TryGetValue(dynelId, out activeEnterContacts))
+            {
+                activeEnterContacts = new HashSet<string>();
+                this.statelEnterContacts[dynelId] = activeEnterContacts;
+            }
+
             foreach (StatelData sd in this.statels)
             {
+                string statelKey = ((int)sd.Identity.Type).ToString(CultureInfo.InvariantCulture) + ":"
+                    + sd.Identity.Instance.ToString(CultureInfo.InvariantCulture);
+                bool inRange = sd.Coord().Distance3D(dynel.Coordinates()) < 2.0f;
+                bool wasInRange = activeEnterContacts.Contains(statelKey);
+
+                if (!inRange)
+                {
+                    if (wasInRange)
+                    {
+                        activeEnterContacts.Remove(statelKey);
+                    }
+
+                    continue;
+                }
+
                 foreach (Event ev in
                     sd.Events.Where(
                         x =>
                             (x.EventType == EventType.OnCollide) || (x.EventType == EventType.OnEnter)
                             || (x.EventType == EventType.OnTargetInVicinity)))
                 {
-                    if (sd.Coord().Distance3D(dynel.Coordinates()) < 2.0f)
+                    if (ev.EventType == EventType.OnEnter)
                     {
-                        LogUtil.Debug(DebugInfoDetail.Statel, "Stepped on Statel " + sd.Identity.ToString(true));
-                        LogUtil.Debug(DebugInfoDetail.Statel, ev.ToString());
-                        ev.Perform(dynel, sd);
+                        if (!initialized)
+                        {
+                            activeEnterContacts.Add(statelKey);
+                            continue;
+                        }
+
+                        if (wasInRange)
+                        {
+                            continue;
+                        }
+
+                        activeEnterContacts.Add(statelKey);
                     }
+                    else if (!wasInRange)
+                    {
+                        activeEnterContacts.Add(statelKey);
+                    }
+
+                    LogUtil.Debug(DebugInfoDetail.Statel, "Stepped on Statel " + sd.Identity.ToString(true));
+                    LogUtil.Debug(DebugInfoDetail.Statel, ev.ToString());
+                    ev.Perform(dynel, sd);
                 }
+            }
+
+            if (!initialized)
+            {
+                this.statelCollisionInitializedCharacters.Add(dynelId);
             }
         }
 
@@ -993,6 +1070,11 @@ namespace CellAO.Core.Playfields
         /// </param>
         private void CheckWallCollision(ICharacter dynel)
         {
+            if (IsPostZoneCollisionGraceActive(dynel))
+            {
+                return;
+            }
+
             WallCollisionResult wcr = WallCollision.CheckCollision(
                 dynel.Coordinates(),
                 dynel.Playfield.Identity.Instance);
@@ -1137,6 +1219,31 @@ namespace CellAO.Core.Playfields
                 catch (ObjectDisposedException)
                 {
                 }
+            }
+        }
+
+        private static bool IsPostZoneCollisionGraceActive(ICharacter dynel)
+        {
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            lock (PostZoneCollisionGraceLock)
+            {
+                DateTime until;
+                if (!postZoneCollisionGraceUntil.TryGetValue(dynel.Identity.Instance, out until))
+                {
+                    return false;
+                }
+
+                if (DateTime.UtcNow < until)
+                {
+                    return true;
+                }
+
+                postZoneCollisionGraceUntil.Remove(dynel.Identity.Instance);
+                return false;
             }
         }
 

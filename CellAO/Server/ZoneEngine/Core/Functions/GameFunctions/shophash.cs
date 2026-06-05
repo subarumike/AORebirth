@@ -64,7 +64,8 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             Vendor temp = caller as Vendor;
             if (temp != null)
             {
-                if (temp.BaseInventory.Pages[temp.BaseInventory.StandardPage].List().Count == 0)
+                if ((temp.BaseInventory.Pages[temp.BaseInventory.StandardPage].List().Count == 0)
+                    && string.IsNullOrEmpty(temp.TemplateHash))
                 {
                     if (temp.OriginalIdentity.Equals(Identity.None))
                     {

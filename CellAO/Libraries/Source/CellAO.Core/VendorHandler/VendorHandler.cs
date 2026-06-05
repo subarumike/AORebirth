@@ -53,7 +53,7 @@ namespace CellAO.Core.VendorHandler
 
     public static class VendorHandler
     {
-        public static void SpawnVendorFromDatabaseTemplate(DBVendor vendor, IPlayfield playfield)
+        public static void SpawnVendorFromDatabaseTemplate(DBVendor vendor, IPlayfield playfield, StatelData statelData = null)
         {
             Identity pfIdentity = new Identity() { Type = IdentityType.Playfield, Instance = vendor.Playfield };
             Identity freeIdentity = new Identity()
@@ -67,8 +67,22 @@ namespace CellAO.Core.VendorHandler
 
             Vendor v = new Vendor(pfIdentity, freeIdentity, vendor.Hash);
 
-            v.RawCoordinates = new Vector3(vendor.X, vendor.Y, vendor.Z);
-            v.Heading = new Quaternion(vendor.HeadingX, vendor.HeadingY, vendor.HeadingZ, vendor.HeadingW);
+            if (statelData != null)
+            {
+                v.OriginalIdentity = statelData.Identity;
+                v.RawCoordinates = new Vector3(statelData.X, statelData.Y, statelData.Z);
+                v.Heading = new Quaternion(
+                    statelData.HeadingX,
+                    statelData.HeadingY,
+                    statelData.HeadingZ,
+                    statelData.HeadingW);
+            }
+            else
+            {
+                v.RawCoordinates = new Vector3(vendor.X, vendor.Y, vendor.Z);
+                v.Heading = new Quaternion(vendor.HeadingX, vendor.HeadingY, vendor.HeadingZ, vendor.HeadingW);
+            }
+
             v.Playfield = playfield;
         }
 
@@ -106,7 +120,7 @@ namespace CellAO.Core.VendorHandler
                 if (vendor != null)
                 {
                     LogUtil.Debug(DebugInfoDetail.Statel, sd.Identity.ToString(true) + " - DB " + vendor.TemplateId);
-                    SpawnVendorFromDatabaseTemplate(vendor, playfield);
+                    SpawnVendorFromDatabaseTemplate(vendor, playfield, sd);
                 }
                 else
                 {

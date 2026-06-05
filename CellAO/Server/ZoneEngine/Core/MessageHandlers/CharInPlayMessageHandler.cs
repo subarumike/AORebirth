@@ -39,6 +39,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using CellAO.Core.Components;
     using CellAO.Core.Entities;
     using CellAO.Core.Network;
+    using CellAO.Core.Playfields;
     using CellAO.Enums;
     using CellAO.ObjectManager;
 
@@ -131,6 +132,7 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             WeaponItemFullUpdate.SendWeaponDefinitions(client.Controller.Character);
+            Playfield.ArmPostZoneCollisionGrace(client.Controller.Character);
             client.Controller.Character.DoNotDoTimers = false;
         }
 
