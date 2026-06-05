@@ -97,7 +97,7 @@ namespace ZoneEngine.Core.MessageHandlers
                         var temp = new InventorySlot
                                    {
                                        Placement = kv.Key,
-                                       Flags = (short)kv.Value.Flags,
+                                       Flags = GetInventorySlotFlags(kv.Value),
                                        Count = (short)kv.Value.MultipleCount,
                                        Identity = GetInventorySlotIdentity(ivp, kv.Value),
                                        ItemLowId = kv.Value.LowID,
@@ -894,6 +894,27 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             return item.Identity;
+        }
+
+        private static short GetInventorySlotFlags(IItem item)
+        {
+            if (item == null)
+            {
+                return 0;
+            }
+
+            // Live FullCharacter inventory entries use packet slot flags, not the
+            // persisted Item.Flags value. DB reload currently reconstructs normal
+            // template items with only visibility bits, which leaves usable carried
+            // items visible but without client-side use actions after relog.
+            const int defaultTemplateItemSlotFlags = 0x00A1;
+            int flags = item.Flags;
+            if ((flags & 0x00A0) == 0)
+            {
+                flags = defaultTemplateItemSlotFlags;
+            }
+
+            return (short)flags;
         }
 
         private static bool IsWeaponItem(IInventoryPage page, IItem item)

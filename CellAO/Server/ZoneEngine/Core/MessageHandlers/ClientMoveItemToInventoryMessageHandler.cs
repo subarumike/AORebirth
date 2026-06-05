@@ -128,6 +128,12 @@ namespace ZoneEngine.Core.MessageHandlers
 
             if (equipTo != null)
             {
+                if (this.RequiresImplantAccess(receivingPage) && !this.HasImplantAccess(character))
+                {
+                    this.SendImplantAccessDenied(character);
+                    return true;
+                }
+
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     string.Format(
@@ -188,6 +194,12 @@ namespace ZoneEngine.Core.MessageHandlers
 
             if (unequipFrom != null)
             {
+                if (this.RequiresImplantAccess(sendingPage) && !this.HasImplantAccess(character))
+                {
+                    this.SendImplantAccessDenied(character);
+                    return true;
+                }
+
                 if (affectsAppearance)
                 {
                     this.WaitForEquipVisualSync(itemFrom, null, sendingPage is SocialArmorInventoryPage);
@@ -260,6 +272,22 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             return action == null || action.CheckRequirements(character);
+        }
+
+        private bool RequiresImplantAccess(IInventoryPage page)
+        {
+            return page is ImplantInventoryPage;
+        }
+
+        private bool HasImplantAccess(ICharacter character)
+        {
+            Character concreteCharacter = character as Character;
+            return concreteCharacter != null && concreteCharacter.HasImplantAccess();
+        }
+
+        private void SendImplantAccessDenied(ICharacter character)
+        {
+            ChatTextMessageHandler.Default.Send(character, "Accessing implants requires technical supervision.");
         }
 
         private void SendMoveAck(ICharacter character, Identity sourceContainer, int targetPlacement)

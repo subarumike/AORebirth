@@ -143,6 +143,9 @@ client.Controller.Character.Playfield.Identity,
             client.SendCompressed(gameTimeMessage);
 
             InitializeActionableState(client);
+            CharacterActionMessageHandler.Default.SendSkillAvailable(
+                client.Controller.Character,
+                (int)StatIds.treatment);
 
             client.SendCompressed(
                 new StatMessage

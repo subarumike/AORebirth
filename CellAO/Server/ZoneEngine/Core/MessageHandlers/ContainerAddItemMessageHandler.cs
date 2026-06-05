@@ -181,6 +181,13 @@ namespace ZoneEngine.Core.MessageHandlers
 
             if (equipTo != null)
             {
+                if (this.RequiresImplantAccess(receivingPage) && !this.HasImplantAccess(client.Controller.Character))
+                {
+                    this.SendImplantAccessDenied(client.Controller.Character);
+                    client.Controller.Character.DoNotDoTimers = false;
+                    return;
+                }
+
                 if (itemTo != null)
                 {
                     if (receivingPage.NeedsItemCheck)
@@ -257,6 +264,13 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 if (unequipFrom != null)
                 {
+                    if (this.RequiresImplantAccess(sendingPage) && !this.HasImplantAccess(client.Controller.Character))
+                    {
+                        this.SendImplantAccessDenied(client.Controller.Character);
+                        client.Controller.Character.DoNotDoTimers = false;
+                        return;
+                    }
+
                     // Send to client first
                     if (!noAppearanceUpdate)
                     {
@@ -352,6 +366,22 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             return action;
+        }
+
+        private bool RequiresImplantAccess(IInventoryPage page)
+        {
+            return page is ImplantInventoryPage;
+        }
+
+        private bool HasImplantAccess(ICharacter character)
+        {
+            Character concreteCharacter = character as Character;
+            return concreteCharacter != null && concreteCharacter.HasImplantAccess();
+        }
+
+        private void SendImplantAccessDenied(ICharacter character)
+        {
+            ChatTextMessageHandler.Default.Send(character, "Accessing implants requires technical supervision.");
         }
 
         public void Send(ICharacter character, Identity sourceContainer, int slot)

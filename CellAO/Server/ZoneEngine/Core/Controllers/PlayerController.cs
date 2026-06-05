@@ -45,6 +45,7 @@ namespace ZoneEngine.Core.Controllers
     using CellAO.Core.Items;
     using CellAO.Core.Nanos;
     using CellAO.Core.Network;
+    using CellAO.Core.Requirements;
     using CellAO.Core.Statels;
     using CellAO.Core.Vector;
     using CellAO.Database.Dao;
@@ -58,6 +59,7 @@ namespace ZoneEngine.Core.Controllers
     using Utility;
 
     using ZoneEngine.Core.Functions;
+    using ZoneEngine.Core.Functions.GameFunctions;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Playfields;
 
@@ -521,6 +523,11 @@ namespace ZoneEngine.Core.Controllers
                 throw new NullReferenceException("No item found at " + itemPosition);
             }
 
+            if (this.IsUseBlockedBySkillLock(item))
+            {
+                return false;
+            }
+
             TemplateActionMessageHandler.Default.Send(
                 this.Character,
                 item,
@@ -548,6 +555,60 @@ namespace ZoneEngine.Core.Controllers
 
             item.PerformAction(this.Character, EventType.OnUse, itemPosition.Instance);
             return true;
+        }
+
+        private bool IsUseBlockedBySkillLock(Item item)
+        {
+            Character character = this.Character as Character;
+            if (character == null)
+            {
+                return false;
+            }
+
+            foreach (Event itemEvent in item.Events.Where(x => x.EventType == EventType.OnUse))
+            {
+                foreach (Function itemFunction in itemEvent.Functions.Where(
+                    x => x.FunctionType == (int)FunctionType.LockSkill))
+                {
+                    if (!this.ItemFunctionRequirementsPass(itemFunction))
+                    {
+                        continue;
+                    }
+
+                    int statId;
+                    int durationSeconds;
+                    if (!lockskill.TryReadArguments(itemFunction.Arguments.Values.ToArray(), out statId, out durationSeconds))
+                    {
+                        continue;
+                    }
+
+                    int remainingSeconds = character.GetSkillLockRemainingSeconds(statId);
+                    if (remainingSeconds <= 0)
+                    {
+                        continue;
+                    }
+
+                    CharacterActionMessageHandler.Default.SendSkillUnavailable(character, statId, remainingSeconds);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool ItemFunctionRequirementsPass(Function itemFunction)
+        {
+            bool result = true;
+            foreach (Requirement requirement in itemFunction.Requirements)
+            {
+                result &= requirement.CheckRequirement(this.Character);
+                if (!result)
+                {
+                    break;
+                }
+            }
+
+            return result;
         }
 
         public bool UseStatel(Identity identity, EventType eventType = EventType.OnUse)

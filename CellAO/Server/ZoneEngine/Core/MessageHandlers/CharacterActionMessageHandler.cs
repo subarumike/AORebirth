@@ -535,6 +535,46 @@ namespace ZoneEngine.Core.MessageHandlers
             this.Send(character, this.ConstructSetNanoDuration(character, target, unknown1, duration));
         }
 
+        private MessageDataFiller SkillUnavailableAction(ICharacter character, int statId, int durationSeconds)
+        {
+            return x =>
+            {
+                x.Identity = character.Identity;
+                x.Unknown = 0x00;
+                x.Action = CharacterActionType.SpecialUnavailable;
+                x.Unknown1 = 0x00000000;
+                x.Target = Identity.None;
+                x.Parameter1 = statId;
+                x.Parameter2 = durationSeconds;
+                x.Unknown2 = 0x0000;
+            };
+        }
+
+        public void SendSkillUnavailable(ICharacter character, int statId, int durationSeconds)
+        {
+            this.Send(character, this.SkillUnavailableAction(character, statId, durationSeconds));
+        }
+
+        private MessageDataFiller SkillAvailableAction(ICharacter character, int statId)
+        {
+            return x =>
+            {
+                x.Identity = character.Identity;
+                x.Unknown = 0x00;
+                x.Action = CharacterActionType.SpecialAvailable;
+                x.Unknown1 = 0x00000000;
+                x.Target = Identity.None;
+                x.Parameter1 = 0;
+                x.Parameter2 = statId;
+                x.Unknown2 = 0x0000;
+            };
+        }
+
+        public void SendSkillAvailable(ICharacter character, int statId)
+        {
+            this.Send(character, this.SkillAvailableAction(character, statId));
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="character">

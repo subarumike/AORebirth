@@ -90,6 +90,13 @@ namespace CellAO.Core.Entities
 
         private bool disposed = false;
 
+        private DateTime implantAccessUntil = DateTime.MinValue;
+
+        private static readonly object SkillLockSync = new object();
+
+        private static readonly Dictionary<int, Dictionary<int, DateTime>> SkillLockUntilByCharacter =
+            new Dictionary<int, Dictionary<int, DateTime>>();
+
         public List<Waypoint> Waypoints { get; set; }
 
         #endregion
@@ -213,6 +220,97 @@ namespace CellAO.Core.Entities
         /// <summary>
         /// </summary>
         public TradeSkillInfo TradeSkillTarget { get; set; }
+
+        public void GrantImplantAccess(int durationSeconds)
+        {
+            if (durationSeconds < 0)
+            {
+                this.implantAccessUntil = DateTime.MinValue;
+                return;
+            }
+
+            if (durationSeconds == 0)
+            {
+                this.implantAccessUntil = DateTime.MaxValue;
+                return;
+            }
+
+            this.implantAccessUntil = DateTime.UtcNow.AddSeconds(durationSeconds);
+        }
+
+        public bool HasImplantAccess()
+        {
+            return this.implantAccessUntil > DateTime.UtcNow;
+        }
+
+        public void LockSkill(int statId, int durationSeconds)
+        {
+            lock (SkillLockSync)
+            {
+                int characterId = this.Identity.Instance;
+                if (durationSeconds <= 0)
+                {
+                    Dictionary<int, DateTime> existingSkillLocks;
+                    if (SkillLockUntilByCharacter.TryGetValue(characterId, out existingSkillLocks))
+                    {
+                        existingSkillLocks.Remove(statId);
+                        if (existingSkillLocks.Count == 0)
+                        {
+                            SkillLockUntilByCharacter.Remove(characterId);
+                        }
+                    }
+
+                    return;
+                }
+
+                Dictionary<int, DateTime> skillLocks;
+                if (!SkillLockUntilByCharacter.TryGetValue(characterId, out skillLocks))
+                {
+                    skillLocks = new Dictionary<int, DateTime>();
+                    SkillLockUntilByCharacter[characterId] = skillLocks;
+                }
+
+                skillLocks[statId] = DateTime.UtcNow.AddSeconds(durationSeconds);
+            }
+        }
+
+        public bool IsSkillLocked(int statId)
+        {
+            return this.GetSkillLockRemainingSeconds(statId) > 0;
+        }
+
+        public int GetSkillLockRemainingSeconds(int statId)
+        {
+            lock (SkillLockSync)
+            {
+                int characterId = this.Identity.Instance;
+                Dictionary<int, DateTime> skillLocks;
+                if (!SkillLockUntilByCharacter.TryGetValue(characterId, out skillLocks))
+                {
+                    return 0;
+                }
+
+                DateTime lockedUntil;
+                if (!skillLocks.TryGetValue(statId, out lockedUntil))
+                {
+                    return 0;
+                }
+
+                TimeSpan remaining = lockedUntil - DateTime.UtcNow;
+                if (remaining <= TimeSpan.Zero)
+                {
+                    skillLocks.Remove(statId);
+                    if (skillLocks.Count == 0)
+                    {
+                        SkillLockUntilByCharacter.Remove(characterId);
+                    }
+
+                    return 0;
+                }
+
+                return (int)Math.Ceiling(remaining.TotalSeconds);
+            }
+        }
 
         /// <summary>
         /// </summary>
