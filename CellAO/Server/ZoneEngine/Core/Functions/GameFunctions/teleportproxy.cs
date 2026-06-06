@@ -57,6 +57,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
     internal class teleportproxy : FunctionPrototype
     {
         private const FunctionType functionId = FunctionType.TeleportProxy;
+        private const float ProxyEntryDoorClearance = 5.0f;
 
         public override FunctionType FunctionId
         {
@@ -96,8 +97,8 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 Quaternion.Normalize(q);
                 Vector3 n = (Vector3)q.RotateVector3(Vector3.AxisZ);
 
-                v.x += n.x * 2.5;
-                v.z += n.z * 2.5;
+                v.x += n.x * ProxyEntryDoorClearance;
+                v.z += n.z * ProxyEntryDoorClearance;
                 LogUtil.Debug(
                     DebugInfoDetail.Zoning,
                     string.Format(

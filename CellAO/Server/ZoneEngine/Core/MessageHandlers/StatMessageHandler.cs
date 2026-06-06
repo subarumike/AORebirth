@@ -48,6 +48,40 @@ namespace ZoneEngine.Core.MessageHandlers
 
     /// <summary>
     /// </summary>
+    public static class CashStatRules
+    {
+        public const int ClientSafeMaxCash = 999999999;
+
+        public static int Clamp(long cash)
+        {
+            if (cash < 0)
+            {
+                return 0;
+            }
+
+            if (cash > ClientSafeMaxCash)
+            {
+                return ClientSafeMaxCash;
+            }
+
+            return (int)cash;
+        }
+
+        public static uint Normalize(ICharacter character)
+        {
+            uint current = character.Stats[StatIds.cash].BaseValue;
+            uint normalized = (uint)Clamp(current);
+            if (current != normalized)
+            {
+                character.Stats[StatIds.cash].Set(normalized);
+            }
+
+            return normalized;
+        }
+    }
+
+    /// <summary>
+    /// </summary>
     [MessageHandler(MessageHandlerDirection.OutboundOnly)]
     public class StatMessageHandler : BaseMessageHandler<StatMessage, StatMessageHandler>
     {
@@ -75,7 +109,7 @@ namespace ZoneEngine.Core.MessageHandlers
             uint clientCash;
             if (statsToClient.TryGetValue((int)StatIds.cash, out clientCash))
             {
-                clientCash = character.Stats[StatIds.cash].BaseValue;
+                clientCash = CashStatRules.Normalize(character);
                 statsToClient[(int)StatIds.cash] = clientCash;
 
                 LogUtil.Debug(
@@ -96,7 +130,7 @@ namespace ZoneEngine.Core.MessageHandlers
             uint playfieldCash;
             if (statsToPlayfield.TryGetValue((int)StatIds.cash, out playfieldCash))
             {
-                playfieldCash = character.Stats[StatIds.cash].BaseValue;
+                playfieldCash = CashStatRules.Normalize(character);
                 statsToPlayfield[(int)StatIds.cash] = playfieldCash;
 
                 LogUtil.Debug(
@@ -156,7 +190,7 @@ namespace ZoneEngine.Core.MessageHandlers
         {
             if (statId == (int)StatIds.cash)
             {
-                statValue = character.Stats[StatIds.cash].BaseValue;
+                statValue = CashStatRules.Normalize(character);
 
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,

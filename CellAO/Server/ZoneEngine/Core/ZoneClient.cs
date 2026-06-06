@@ -275,6 +275,13 @@ namespace ZoneEngine.Core
                     {
                         this.zStream.Write(buffer, 0, buffer.Length);
                         this.zStream.Flush();
+                        if (ContainsTradeOpcode(buffer))
+                        {
+                            LogUtil.Debug(
+                                DebugInfoDetail.Engine,
+                                "OUT Trade wire len=" + buffer.Length.ToString(CultureInfo.InvariantCulture)
+                                + " hex=" + BitConverter.ToString(buffer).Replace("-", string.Empty));
+                        }
                     }
                     catch (Exception e)
                     {
@@ -286,6 +293,24 @@ namespace ZoneEngine.Core
             }
 
             LogUtil.Debug(DebugInfoDetail.Network, HexOutput.Output(buffer));
+        }
+
+        private static bool ContainsTradeOpcode(byte[] buffer)
+        {
+            if (buffer == null || buffer.Length < 4)
+            {
+                return false;
+            }
+
+            for (int i = 0; i <= buffer.Length - 4; i++)
+            {
+                if (buffer[i] == 0x36 && buffer[i + 1] == 0x28 && buffer[i + 2] == 0x4F && buffer[i + 3] == 0x6E)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>

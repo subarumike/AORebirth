@@ -1,0 +1,6 @@
+capture=C:\Users\Mike\Documents\Cellao-Clean\tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260604-235530\packets.hex.log
+packets_length=23483442
+packets_lastwrite=2026-06-05T21:57:27.7039981Z
+events=C:\Users\Mike\Documents\Cellao-Clean\tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260604-235530\events.log
+events_length=17803998
+events_lastwrite=2026-06-05T21:57:17.6733940Z

@@ -997,6 +997,7 @@ namespace CellAO.Core.Playfields
         {
             if (IsPostZoneCollisionGraceActive(dynel))
             {
+                this.PrimeStatelCollisionContacts(dynel);
                 return;
             }
 
@@ -1013,7 +1014,7 @@ namespace CellAO.Core.Playfields
             {
                 string statelKey = ((int)sd.Identity.Type).ToString(CultureInfo.InvariantCulture) + ":"
                     + sd.Identity.Instance.ToString(CultureInfo.InvariantCulture);
-                bool inRange = sd.Coord().Distance3D(dynel.Coordinates()) < 2.0f;
+                bool inRange = sd.Coord().Distance3D(new Coordinate(dynel.RawCoordinates)) < 2.0f;
                 bool wasInRange = activeEnterContacts.Contains(statelKey);
 
                 if (!inRange)
@@ -1054,6 +1055,18 @@ namespace CellAO.Core.Playfields
 
                     LogUtil.Debug(DebugInfoDetail.Statel, "Stepped on Statel " + sd.Identity.ToString(true));
                     LogUtil.Debug(DebugInfoDetail.Statel, ev.ToString());
+                    LogUtil.Debug(
+                        DebugInfoDetail.Engine,
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Statel collision firing character={0} playfield={1} coords={2:F1},{3:F1},{4:F1} statel={5} event={6}",
+                            dynel.Identity.ToString(true),
+                            dynel.Playfield.Identity.Instance,
+                            dynel.RawCoordinates.X,
+                            dynel.RawCoordinates.Y,
+                            dynel.RawCoordinates.Z,
+                            sd.Identity.ToString(true),
+                            ev.EventType));
                     ev.Perform(dynel, sd);
                 }
             }
@@ -1062,6 +1075,36 @@ namespace CellAO.Core.Playfields
             {
                 this.statelCollisionInitializedCharacters.Add(dynelId);
             }
+        }
+
+        private void PrimeStatelCollisionContacts(ICharacter dynel)
+        {
+            int dynelId = dynel.Identity.Instance;
+            HashSet<string> activeEnterContacts;
+            if (!this.statelEnterContacts.TryGetValue(dynelId, out activeEnterContacts))
+            {
+                activeEnterContacts = new HashSet<string>();
+                this.statelEnterContacts[dynelId] = activeEnterContacts;
+            }
+
+            foreach (StatelData sd in this.statels)
+            {
+                bool handlesCollision =
+                    sd.Events.Any(
+                        x =>
+                            (x.EventType == EventType.OnCollide) || (x.EventType == EventType.OnEnter)
+                            || (x.EventType == EventType.OnTargetInVicinity));
+                if (!handlesCollision || sd.Coord().Distance3D(new Coordinate(dynel.RawCoordinates)) >= 2.0f)
+                {
+                    continue;
+                }
+
+                string statelKey = ((int)sd.Identity.Type).ToString(CultureInfo.InvariantCulture) + ":"
+                    + sd.Identity.Instance.ToString(CultureInfo.InvariantCulture);
+                activeEnterContacts.Add(statelKey);
+            }
+
+            this.statelCollisionInitializedCharacters.Add(dynelId);
         }
 
         /// <summary>
@@ -1099,6 +1142,20 @@ namespace CellAO.Core.Playfields
                     newZ += headDistX * 8;
 
                     Coordinate destinationCoordinate = new Coordinate(newX, dynel.RawCoordinates.Y, newZ);
+                    LogUtil.Debug(
+                        DebugInfoDetail.Engine,
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Wall collision zoning character={0} fromPlayfield={1} fromCoords={2:F1},{3:F1},{4:F1} toPlayfield={5} toCoords={6:F1},{7:F1},{8:F1}",
+                            dynel.Identity.ToString(true),
+                            dynel.Playfield.Identity.Instance,
+                            dynel.RawCoordinates.X,
+                            dynel.RawCoordinates.Y,
+                            dynel.RawCoordinates.Z,
+                            destPlayfield,
+                            destinationCoordinate.x,
+                            destinationCoordinate.y,
+                            destinationCoordinate.z));
 
                     this.Teleport(
                         (Character)dynel,
@@ -3614,22 +3671,9 @@ namespace CellAO.Core.Playfields
             }
 
             uint cashBeforeBase = looter.Stats[StatIds.cash].BaseValue;
-            int cashBefore = cashBeforeBase > int.MaxValue ? int.MaxValue : (int)cashBeforeBase;
+            int cashBefore = CashStatRules.Clamp(cashBeforeBase);
             corpse.CreditsLooted = true;
-            long cashAfterLong = (long)cashBefore + corpse.Credits;
-            int cashAfter;
-            if (cashAfterLong < 0)
-            {
-                cashAfter = 0;
-            }
-            else if (cashAfterLong > int.MaxValue)
-            {
-                cashAfter = int.MaxValue;
-            }
-            else
-            {
-                cashAfter = (int)cashAfterLong;
-            }
+            int cashAfter = CashStatRules.Clamp((long)cashBefore + corpse.Credits);
 
             looter.Stats[StatIds.cash].Set((uint)cashAfter);
             if (looter.Controller != null && looter.Controller.Client != null)

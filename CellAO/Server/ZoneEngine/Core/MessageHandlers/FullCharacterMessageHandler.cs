@@ -927,10 +927,7 @@ namespace ZoneEngine.Core.MessageHandlers
         private static bool HasWeaponStats(IItem item)
         {
             return NormalizeWeaponValue(item.GetAttribute((int)StatIds.mindamage)) > 0
-                   || NormalizeWeaponValue(item.GetAttribute((int)StatIds.maxdamage)) > 0
-                   || NormalizeWeaponValue(item.GetAttribute((int)StatIds.attackrange)) > 0
-                   || NormalizeWeaponValue(item.GetAttribute((int)StatIds.itemdelay)) > 0
-                   || NormalizeWeaponValue(item.GetAttribute((int)StatIds.rechargedelay)) > 0;
+                   || NormalizeWeaponValue(item.GetAttribute((int)StatIds.maxdamage)) > 0;
         }
 
         private static int NormalizeWeaponValue(int value)
