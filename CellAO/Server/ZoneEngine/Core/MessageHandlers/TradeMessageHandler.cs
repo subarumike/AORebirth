@@ -133,31 +133,45 @@ namespace ZoneEngine.Core.MessageHandlers
                         break;
                     }
 
-                    IItemContainer issuer =
-                        Pool.Instance.GetObject<IItemContainer>(
-                            client.Controller.Character.Playfield.Identity,
-                            message.Target);
+                    TemporaryBag shoppingBag = client.Controller.Character.ShoppingBag;
+                    bool vendorShopBag =
+                        shoppingBag.Vendor.Type == IdentityType.VendingMachine;
+
+                    IItemContainer issuer = this.ResolveTradeIssuer(client.Controller.Character, message.Target);
 
                     if (issuer != null)
                     {
                         IItem item;
 
-                        if (issuer is Vendor)
+                        try
                         {
-                            item = issuer.BaseInventory.GetItemInContainer(
-                                (int)IdentityType.Inventory,
-                                message.Container.Instance);
+                            if (issuer is Vendor)
+                            {
+                                item = issuer.BaseInventory.GetItemInContainer(
+                                    (int)IdentityType.Inventory,
+                                    message.Container.Instance);
+                            }
+                            else
+                            {
+                                item = issuer.BaseInventory.GetItemInContainer(
+                                    (int)message.Container.Type,
+                                    message.Container.Instance);
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            item = issuer.BaseInventory.GetItemInContainer(
-                                (int)message.Container.Type,
-                                message.Container.Instance);
+                            LogUtil.Debug(
+                                DebugInfoDetail.Shopping,
+                                "Trade AddItem lookup failed issuer=" + issuer.Identity.ToString(true)
+                                + " source=" + message.Container.ToString(true)
+                                + " error=" + ex.Message);
+                            break;
                         }
+
                         if (item != null)
                         {
-                            TemporaryBag shoppingBag = client.Controller.Character.ShoppingBag;
-                            if (!(issuer is Vendor)
+                            if (!vendorShopBag
+                                && !(issuer is Vendor)
                                 && this.TryAddPlayerTradeItem(
                                 client.Controller.Character,
                                 issuer,
@@ -199,10 +213,7 @@ namespace ZoneEngine.Core.MessageHandlers
                         break;
                     }
 
-                    IItemContainer issuer =
-                        Pool.Instance.GetObject<IItemContainer>(
-                            client.Controller.Character.Playfield.Identity,
-                            message.Target);
+                    IItemContainer issuer = this.ResolveTradeIssuer(client.Controller.Character, message.Target);
 
                     if (issuer != null)
                     {
@@ -327,13 +338,57 @@ namespace ZoneEngine.Core.MessageHandlers
                                 break;
                             }
 
-                            double CLFactor = vendor.Stats[StatIds.sellmodifier].Value / 100.0f
-                                              * (double)
-                                                  (1
-                                                   - (client.Controller.Character.Stats[StatIds.computerliteracy].Value
-                                                      / 40) / 100.0f);
-                            int cash = 0;
-                            foreach (IItem item in items)
+                            IItem[] boughtItems = items;
+                            IItem[] soldItems = shoppingBag.GetSoldItems();
+                            int buyTotal = this.CalculateVendorBuyTotal(
+                                client.Controller.Character,
+                                vendor,
+                                boughtItems);
+                            int sellTotal = this.CalculateVendorSellTotal(
+                                client.Controller.Character,
+                                vendor,
+                                soldItems);
+                            int cash = buyTotal - sellTotal;
+                            int currentCash = GetCash(client.Controller.Character);
+                            long finalCashRaw = (long)currentCash - cash;
+
+                            LogUtil.Debug(
+                                DebugInfoDetail.Shopping,
+                                "Vendor trade cash summary shopper=" + client.Controller.Character.Identity.ToString(true)
+                                + " vendor=" + vendor.Identity.ToString(true)
+                                + " boughtItems=" + boughtItems.Length
+                                + " soldItems=" + soldItems.Length
+                                + " buyTotal=" + buyTotal
+                                + " sellTotal=" + sellTotal
+                                + " cashDelta=" + cash
+                                + " cashBefore=" + currentCash
+                                + " cashAfterRaw=" + finalCashRaw);
+
+                            if (finalCashRaw < 0 || finalCashRaw > CashStatRules.ClientSafeMaxCash)
+                            {
+                                LogUtil.Debug(
+                                    DebugInfoDetail.Shopping,
+                                    "Vendor trade rejected because cash would be invalid shopper="
+                                    + client.Controller.Character.Identity.ToString(true)
+                                    + " cashBefore=" + currentCash
+                                    + " cashDelta=" + cash
+                                    + " cashAfterRaw=" + finalCashRaw
+                                    + " cap=" + CashStatRules.ClientSafeMaxCash);
+                                ChatTextMessageHandler.Default.Send(
+                                    client.Controller.Character,
+                                    "Trade failed: credits are missing or credit cap would be exceeded.");
+                                break;
+                            }
+
+                            if (!this.HasFreeInventorySlots(client.Controller.Character, boughtItems.Length))
+                            {
+                                ChatTextMessageHandler.Default.Send(
+                                    client.Controller.Character,
+                                    "Could not add item to inventory. (inventory is full)");
+                                break;
+                            }
+
+                            foreach (IItem item in boughtItems)
                             {
                                 int nextSlot = issuer.BaseInventory[issuer.BaseInventory.StandardPage].FindFreeSlot();
                                 if (nextSlot != -1)
@@ -345,7 +400,6 @@ namespace ZoneEngine.Core.MessageHandlers
                                     if (err == InventoryError.OK)
                                     {
                                         AddTemplateMessageHandler.Default.Send(client.Controller.Character, (Item)item);
-                                        cash += (int)Math.Round(CLFactor * item.GetAttribute(74));
                                     }
                                     else
                                     {
@@ -356,20 +410,9 @@ namespace ZoneEngine.Core.MessageHandlers
                                 }
                             }
 
-                            items = shoppingBag.GetSoldItems();
-                            CLFactor = vendor.Stats[StatIds.buymodifier].Value / 100.0f
-                                       + ((double)
-                                           ((int)
-                                               (client.Controller.Character.Stats[StatIds.computerliteracy].Value / 40))
-                                          / 2500.0f);
-                            foreach (IItem item in items)
-                            {
-                                cash -= (int)(CLFactor * item.GetAttribute(74));
-                            }
-
                             SetCash(
                                 client.Controller.Character,
-                                GetCash(client.Controller.Character) - cash);
+                                CashStatRules.Clamp(finalCashRaw));
 
                             this.Send(
                                 client.Controller.Character,
@@ -515,6 +558,21 @@ namespace ZoneEngine.Core.MessageHandlers
                 + " bag=" + bagIdentity.ToString(true));
 
             return true;
+        }
+
+        private IItemContainer ResolveTradeIssuer(ICharacter character, Identity target)
+        {
+            if (character != null && character.Identity.Equals(target))
+            {
+                return character;
+            }
+
+            if (character == null || character.Playfield == null)
+            {
+                return null;
+            }
+
+            return Pool.Instance.GetObject<IItemContainer>(character.Playfield.Identity, target);
         }
 
         private bool TryRefreshExistingPlayerTrade(ICharacter initiator, ICharacter target)
@@ -1337,6 +1395,138 @@ namespace ZoneEngine.Core.MessageHandlers
                 + " shopperCashAfter=" + shopperFinalCash
                 + " vendorCashAfter=" + vendorFinalCash);
             return true;
+        }
+
+        private int CalculateVendorBuyTotal(ICharacter shopper, Vendor vendor, IEnumerable<IItem> items)
+        {
+            int total = 0;
+            foreach (IItem item in items)
+            {
+                int price = this.CalculateVendorBuyPrice(shopper, vendor, item);
+                total = CashStatRules.Clamp((long)total + price);
+            }
+
+            return total;
+        }
+
+        private int CalculateVendorSellTotal(ICharacter shopper, Vendor vendor, IEnumerable<IItem> items)
+        {
+            int total = 0;
+            foreach (IItem item in items)
+            {
+                int price = this.CalculateVendorSellPrice(shopper, vendor, item);
+                total = CashStatRules.Clamp((long)total + price);
+            }
+
+            return total;
+        }
+
+        private int CalculateVendorBuyPrice(ICharacter shopper, Vendor vendor, IItem item)
+        {
+            int value = this.CalculateVendorItemValue(item);
+            int skillSteps = this.GetVendorPricingSkillSteps(shopper, vendor);
+            int sellModifier = (int)vendor.Stats[StatIds.sellmodifier].Value;
+            int discountSteps = Math.Max(0, 100 - skillSteps);
+            int price = Math.Max(
+                0,
+                (int)Math.Round(value * sellModifier * discountSteps / 10000.0d));
+
+            this.LogVendorPrice(
+                "buy-from-vendor",
+                shopper,
+                vendor,
+                item,
+                value,
+                sellModifier,
+                skillSteps,
+                price);
+            return price;
+        }
+
+        private int CalculateVendorSellPrice(ICharacter shopper, Vendor vendor, IItem item)
+        {
+            int value = this.CalculateVendorItemValue(item);
+            int skillSteps = this.GetVendorPricingSkillSteps(shopper, vendor);
+            int buyModifier = (int)vendor.Stats[StatIds.buymodifier].Value;
+
+            // Current-client tooling uses: value * BuyModifier * (100 + CL / 40) / 10000.
+            int price = Math.Max(
+                0,
+                (int)Math.Floor(value * buyModifier * (100 + skillSteps) / 10000.0d));
+
+            this.LogVendorPrice(
+                "sell-to-vendor",
+                shopper,
+                vendor,
+                item,
+                value,
+                buyModifier,
+                skillSteps,
+                price);
+            return price;
+        }
+
+        private int GetVendorPricingSkillSteps(ICharacter shopper, Vendor vendor)
+        {
+            return Math.Max(0, shopper.Stats[StatIds.computerliteracy].Value / 40);
+        }
+
+        private int CalculateVendorItemValue(IItem item)
+        {
+            ItemTemplate lowTemplate;
+            ItemTemplate highTemplate;
+            if (!ItemLoader.ItemList.TryGetValue(item.LowID, out lowTemplate)
+                || !ItemLoader.ItemList.TryGetValue(item.HighID, out highTemplate))
+            {
+                return Math.Max(0, item.GetAttribute((int)StatIds.price));
+            }
+
+            int lowQuality = lowTemplate.Quality;
+            int highQuality = highTemplate.Quality;
+            int lowValue = Math.Max(0, lowTemplate.getItemAttribute((int)StatIds.price));
+            int highValue = Math.Max(0, highTemplate.getItemAttribute((int)StatIds.price));
+
+            if (lowQuality == highQuality)
+            {
+                return lowValue;
+            }
+
+            if (highValue == 0)
+            {
+                return highValue;
+            }
+
+            double qualityDelta = item.Quality - lowQuality;
+            double qualityRange = highQuality - lowQuality;
+            double scaledValue =
+                lowValue
+                + Math.Pow(qualityDelta, 2.0d)
+                * (highValue - lowValue)
+                / Math.Pow(qualityRange, 2.0d);
+
+            return Math.Max(0, (int)Math.Round(scaledValue));
+        }
+
+        private void LogVendorPrice(
+            string direction,
+            ICharacter shopper,
+            Vendor vendor,
+            IItem item,
+            int value,
+            int modifier,
+            int skillSteps,
+            int price)
+        {
+            LogUtil.Debug(
+                DebugInfoDetail.Shopping,
+                "Vendor price " + direction
+                + " shopper=" + shopper.Identity.ToString(true)
+                + " vendor=" + vendor.Identity.ToString(true)
+                + " item=" + item.LowID + "/" + item.HighID + ":" + item.Quality
+                + " value=" + value
+                + " modifier=" + modifier
+                + " skillSteps=" + skillSteps
+                + " price=" + price);
         }
 
         private static int GetCash(ICharacter character)
