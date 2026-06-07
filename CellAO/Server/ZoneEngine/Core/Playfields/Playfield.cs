@@ -997,7 +997,6 @@ namespace CellAO.Core.Playfields
         {
             if (IsPostZoneCollisionGraceActive(dynel))
             {
-                this.PrimeStatelCollisionContacts(dynel);
                 return;
             }
 
@@ -1012,8 +1011,7 @@ namespace CellAO.Core.Playfields
 
             foreach (StatelData sd in this.statels)
             {
-                string statelKey = ((int)sd.Identity.Type).ToString(CultureInfo.InvariantCulture) + ":"
-                    + sd.Identity.Instance.ToString(CultureInfo.InvariantCulture);
+                string statelKey = BuildStatelContactKey(sd);
                 bool inRange = sd.Coord().Distance3D(new Coordinate(dynel.RawCoordinates)) < 2.0f;
                 bool wasInRange = activeEnterContacts.Contains(statelKey);
 
@@ -1099,12 +1097,23 @@ namespace CellAO.Core.Playfields
                     continue;
                 }
 
-                string statelKey = ((int)sd.Identity.Type).ToString(CultureInfo.InvariantCulture) + ":"
-                    + sd.Identity.Instance.ToString(CultureInfo.InvariantCulture);
+                string statelKey = BuildStatelContactKey(sd);
                 activeEnterContacts.Add(statelKey);
             }
 
             this.statelCollisionInitializedCharacters.Add(dynelId);
+        }
+
+        private static string BuildStatelContactKey(StatelData sd)
+        {
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}:{1}:{2:0.###}:{3:0.###}:{4:0.###}",
+                (int)sd.Identity.Type,
+                sd.Identity.Instance,
+                sd.X,
+                sd.Y,
+                sd.Z);
         }
 
         /// <summary>
