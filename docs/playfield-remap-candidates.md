@@ -1,6 +1,6 @@
 ﻿# Playfield Remap Candidates
 
-Generated: 2026-06-07 00:11:28
+Generated: 2026-06-07 00:15:35
 
 Source of truth used:
 - Current-client playfield data: C:\Users\Mike\Documents\Cellao-Clean\CellAO\Built\Debug\playfields.dat
@@ -19,9 +19,9 @@ This report identifies old CellAO mapping data that does not line up cleanly wit
 | Wall exit problems | 124 | Wall exit points at missing/null/invalid destination data |
 | Interior paired-door candidates | 11 | Current target has a nearby same-template sibling door that may be the real exit/entry |
 | Auto-fix safe candidates | 0 | Candidate matches a verified family pattern closely enough for a focused patch + spot-test |
-| Needs one live confirmation | 2 | Candidate has strong geometry but no direct verified family representative yet |
+| Needs one live confirmation | 1 | Candidate has strong geometry but no direct verified family representative yet |
 | Needs family review | 6 | Candidate is related to a known family but has weaker geometry than the verified pattern |
-| Verified fixed/reference candidates | 3 | Already-fixed pairs retained as evidence references |
+| Verified fixed/reference candidates | 4 | Already-fixed pairs retained as evidence references |
 
 ## Confirmed Pattern
 
@@ -32,6 +32,7 @@ The confirmed failures so far were stale destination-door mappings:
 | Neutral Supermarket Advanced / Superior-style interior 1187 | C00004A3 | C00204A3 | Old target was in/near main room; correct current-client exterior door is at 205,5,120 |
 | Neutral Basic Implant Shop 2064 | C0000810 | C0010810 | Old target was the inner-room doorway; real exterior exit is C0010810 at 191,5,164 |
 | Neutral Advanced Implant Shop 2073 | C0000819 | C0010819 | Same paired-door pattern as 2064; Borealis entrance playtested successfully after remap |
+| Tower Shop 4704 | C0001260 | C0001260 | Borealis tower shop entrance playtested successfully; nearby paired door is not a repair target |
 
 ## Ranked Repair Plan
 
@@ -46,7 +47,6 @@ No auto-fix-safe candidates found.
 | Destination | Inbound Teleport Ids | Current Target | Candidate Target | Distance | Next Action |
 | --- | --- | --- | --- | ---: | --- |
 | 1183 ord_smarket_omni_basic | 45, 61, 748, 763, 778, 790, 800, 806, 807, 808, 809, 810, 811, 812, 813, 828, 856, 870 | 0xC000049F | 0xC004049F | 4.244 | Confirm one matching supermarket/Fair Trade entrance-exit pair, then patch the family. |
-| 4704 Tower Shop (dungeon) | 79, 862, 966 | 0xC0001260 | 0xC0011260 | 16.479 | Capture or test one representative before patching this family. |
 
 ### Needs Family Review
 
@@ -66,6 +66,7 @@ No auto-fix-safe candidates found.
 | 2073 neut_advanced_implants_shop | 278, 633, 965 | 0xC0010819 | 0xC0000819 | 9.971 | No patch. Keep as reference evidence for this interior family. |
 | 2064 neut_basic_implants_shop | 126, 954 | 0xC0010810 | 0xC0000810 | 9.971 | No patch. Keep as reference evidence for this interior family. |
 | 1187 Neutral Supermarket Advanced | 116, 120, 122, 271, 923 | 0xC00204A3 | 0xC00404A3 | 20.224 | No patch. Keep as reference evidence for this interior family. |
+| 4704 Tower Shop (dungeon) | 79, 862, 966 | 0xC0001260 | 0xC0011260 | 16.479 | No patch. Keep as reference evidence for this interior family. |
 
 ## Definite Teleport Problems
 
