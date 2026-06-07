@@ -1012,7 +1012,7 @@ namespace CellAO.Core.Playfields
             foreach (StatelData sd in this.statels)
             {
                 string statelKey = BuildStatelContactKey(sd);
-                bool inRange = sd.Coord().Distance3D(new Coordinate(dynel.RawCoordinates)) < 2.0f;
+                bool inRange = IsInStatelCollisionRange(sd, dynel);
                 bool wasInRange = activeEnterContacts.Contains(statelKey);
 
                 if (!inRange)
@@ -1092,7 +1092,7 @@ namespace CellAO.Core.Playfields
                         x =>
                             (x.EventType == EventType.OnCollide) || (x.EventType == EventType.OnEnter)
                             || (x.EventType == EventType.OnTargetInVicinity));
-                if (!handlesCollision || sd.Coord().Distance3D(new Coordinate(dynel.RawCoordinates)) >= 2.0f)
+                if (!handlesCollision || !IsInStatelCollisionRange(sd, dynel))
                 {
                     continue;
                 }
@@ -1116,6 +1116,16 @@ namespace CellAO.Core.Playfields
                 sd.Z);
         }
 
+        private static bool IsInStatelCollisionRange(StatelData sd, ICharacter dynel)
+        {
+            float dx = sd.X - dynel.RawCoordinates.X;
+            float dz = sd.Z - dynel.RawCoordinates.Z;
+            float horizontalDistance = (float)Math.Sqrt((dx * dx) + (dz * dz));
+            float verticalDistance = Math.Abs(sd.Y - dynel.RawCoordinates.Y);
+
+            return horizontalDistance < 2.0f && verticalDistance <= 6.0f;
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="dynel">
@@ -1137,8 +1147,56 @@ namespace CellAO.Core.Playfields
                 {
                     LogUtil.Debug(DebugInfoDetail.Zoning, wcr.ToString());
 
-                    PlayfieldDestination dest =
-                        PlayfieldLoader.PFData[destPlayfield].Destinations[wcr.SecondWall.DestinationIndex];
+                    if (!PlayfieldLoader.PFData.ContainsKey(destPlayfield))
+                    {
+                        LogUtil.Debug(
+                            DebugInfoDetail.Engine,
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                "Wall collision ignored character={0} fromPlayfield={1} missingDestinationPlayfield={2}",
+                                dynel.Identity.ToString(true),
+                                dynel.Playfield.Identity.Instance,
+                                destPlayfield));
+                        return;
+                    }
+
+                    PlayfieldData destinationPlayfieldData = PlayfieldLoader.PFData[destPlayfield];
+                    byte destinationIndex = wcr.SecondWall.DestinationIndex;
+                    if (destinationIndex < 0 || destinationIndex >= destinationPlayfieldData.Destinations.Count)
+                    {
+                        LogUtil.Debug(
+                            DebugInfoDetail.Engine,
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                "Wall collision ignored character={0} fromPlayfield={1} fromCoords={2:F1},{3:F1},{4:F1} toPlayfield={5} invalidDestinationIndex={6} destinationCount={7}",
+                                dynel.Identity.ToString(true),
+                                dynel.Playfield.Identity.Instance,
+                                dynel.RawCoordinates.X,
+                                dynel.RawCoordinates.Y,
+                                dynel.RawCoordinates.Z,
+                                destPlayfield,
+                                destinationIndex,
+                                destinationPlayfieldData.Destinations.Count));
+                        return;
+                    }
+
+                    PlayfieldDestination dest = destinationPlayfieldData.Destinations[destinationIndex];
+                    if (dest == null)
+                    {
+                        LogUtil.Debug(
+                            DebugInfoDetail.Engine,
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                "Wall collision ignored character={0} fromPlayfield={1} fromCoords={2:F1},{3:F1},{4:F1} toPlayfield={5} nullDestinationIndex={6}",
+                                dynel.Identity.ToString(true),
+                                dynel.Playfield.Identity.Instance,
+                                dynel.RawCoordinates.X,
+                                dynel.RawCoordinates.Y,
+                                dynel.RawCoordinates.Z,
+                                destPlayfield,
+                                destinationIndex));
+                        return;
+                    }
 
                     LogUtil.Debug(DebugInfoDetail.Zoning, dest.ToString());
 
