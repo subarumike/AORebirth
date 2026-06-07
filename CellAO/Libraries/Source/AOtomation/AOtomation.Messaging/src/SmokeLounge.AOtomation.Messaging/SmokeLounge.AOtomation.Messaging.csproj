@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3CEAC898-BFCA-45EA-BF34-C4BBB85D2DA4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SmokeLounge.AOtomation.Messaging</RootNamespace>
+    <AssemblyName>SmokeLounge.AOtomation.Messaging</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <BaseOutputPath>$(SolutionDir)..\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(SolutionDir)..\obj\</BaseIntermediateOutputPath>
+    <CodeContractsAssemblyMode>0</CodeContractsAssemblyMode>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;CONTRACTS_FULL</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeContractsEnableRuntimeChecking>False</CodeContractsEnableRuntimeChecking>
+    <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
+    <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
+    <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
+    <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
+    <CodeContractsRunCodeAnalysis>False</CodeContractsRunCodeAnalysis>
+    <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
+    <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
+    <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
+    <CodeContractsEnumObligations>True</CodeContractsEnumObligations>
+    <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
+    <CodeContractsMissingPublicRequiresAsWarnings>True</CodeContractsMissingPublicRequiresAsWarnings>
+    <CodeContractsInferRequires>True</CodeContractsInferRequires>
+    <CodeContractsInferEnsures>True</CodeContractsInferEnsures>
+    <CodeContractsInferObjectInvariants>True</CodeContractsInferObjectInvariants>
+    <CodeContractsSuggestAssumptions>True</CodeContractsSuggestAssumptions>
+    <CodeContractsSuggestRequires>True</CodeContractsSuggestRequires>
+    <CodeContractsSuggestObjectInvariants>True</CodeContractsSuggestObjectInvariants>
+    <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
+    <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
+    <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
+    <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
+    <CodeContractsCustomRewriterAssembly />
+    <CodeContractsCustomRewriterClass />
+    <CodeContractsLibPaths />
+    <CodeContractsExtraRewriteOptions />
+    <CodeContractsExtraAnalysisOptions />
+    <CodeContractsSQLServerOption />
+    <CodeContractsBaseLineFile />
+    <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
+    <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
+    <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
+    <CodeContractsReferenceAssembly>DoNotBuild</CodeContractsReferenceAssembly>
+    <CodeContractsAnalysisWarningLevel>3</CodeContractsAnalysisWarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>TRACE;CONTRACTS_FULL</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeContractsEnableRuntimeChecking>False</CodeContractsEnableRuntimeChecking>
+    <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
+    <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
+    <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
+    <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
+    <CodeContractsRunCodeAnalysis>False</CodeContractsRunCodeAnalysis>
+    <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
+    <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
+    <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
+    <CodeContractsEnumObligations>True</CodeContractsEnumObligations>
+    <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
+    <CodeContractsMissingPublicRequiresAsWarnings>True</CodeContractsMissingPublicRequiresAsWarnings>
+    <CodeContractsInferRequires>True</CodeContractsInferRequires>
+    <CodeContractsInferEnsures>True</CodeContractsInferEnsures>
+    <CodeContractsInferObjectInvariants>True</CodeContractsInferObjectInvariants>
+    <CodeContractsSuggestAssumptions>True</CodeContractsSuggestAssumptions>
+    <CodeContractsSuggestRequires>True</CodeContractsSuggestRequires>
+    <CodeContractsSuggestObjectInvariants>True</CodeContractsSuggestObjectInvariants>
+    <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
+    <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
+    <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
+    <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
+    <CodeContractsCustomRewriterAssembly />
+    <CodeContractsCustomRewriterClass />
+    <CodeContractsLibPaths />
+    <CodeContractsExtraRewriteOptions />
+    <CodeContractsExtraAnalysisOptions />
+    <CodeContractsSQLServerOption />
+    <CodeContractsBaseLineFile />
+    <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
+    <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
+    <CodeContractsRuntimeCheckingLevel>ReleaseRequires</CodeContractsRuntimeCheckingLevel>
+    <CodeContractsReferenceAssembly>DoNotBuild</CodeContractsReferenceAssembly>
+    <CodeContractsAnalysisWarningLevel>3</CodeContractsAnalysisWarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\SmokeLounge.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CONTRACTS_FULL</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE;CONTRACTS_FULL</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="GameData\Appearance.cs" />
+    <Compile Include="GameData\BankSlot.cs" />
+    <Compile Include="GameData\Breed.cs" />
+    <Compile Include="GameData\CharacterFlags.cs" />
+    <Compile Include="GameData\CharacterInfoPacket.cs" />
+    <Compile Include="GameData\CharacterStatus.cs" />
+    <Compile Include="GameData\ChatMessage.cs" />
+    <Compile Include="GameData\ChatMessageType.cs" />
+    <Compile Include="GameData\Fatness.cs" />
+    <Compile Include="GameData\FightModeUpdateEntry.cs" />
+    <Compile Include="GameData\FollowCoordinateInfo.cs" />
+    <Compile Include="GameData\FollowPositionInfo.cs" />
+    <Compile Include="GameData\FollowInfo.cs" />
+    <Compile Include="GameData\FollowStopInfo.cs" />
+    <Compile Include="GameData\FollowTargetInfo.cs" />
+    <Compile Include="GameData\FullCharacterSub.cs" />
+    <Compile Include="GameData\FullCharacterSub2.cs" />
+    <Compile Include="GameData\GameTuple.cs" />
+    <Compile Include="GameData\InfoPacket.cs" />
+    <Compile Include="GameData\InventoryEntry.cs" />
+    <Compile Include="GameData\InventorySlot.cs" />
+    <Compile Include="GameData\KnuBotDialogOption.cs" />
+    <Compile Include="GameData\LoginCharacterInfo.cs" />
+    <Compile Include="GameData\CharacterStat.cs" />
+    <Compile Include="GameData\Gender.cs" />
+    <Compile Include="GameData\Identity.cs" />
+    <Compile Include="GameData\IdentityType.cs" />
+    <Compile Include="GameData\Mesh.cs" />
+    <Compile Include="GameData\ActiveNano.cs" />
+    <Compile Include="GameData\MonsterInfoPacket.cs" />
+    <Compile Include="GameData\NanoEffect.cs" />
+    <Compile Include="GameData\PlayfieldVendorInfo.cs" />
+    <Compile Include="GameData\Profession.cs" />
+    <Compile Include="GameData\Quaternion.cs" />
+    <Compile Include="GameData\KnuBotRejectedItem.cs" />
+    <Compile Include="GameData\QuestActionList.cs" />
+    <Compile Include="GameData\QuestCharInfo.cs" />
+    <Compile Include="GameData\QuestFaction.cs" />
+    <Compile Include="GameData\QuestIdentity.cs" />
+    <Compile Include="GameData\QuestInfo.cs" />
+    <Compile Include="GameData\QuestItemShort.cs" />
+    <Compile Include="GameData\ResearchUpdateEntry.cs" />
+    <Compile Include="GameData\Side.cs" />
+    <Compile Include="GameData\SimpleCharacterInfo.cs" />
+    <Compile Include="GameData\SimpleNpcInfo.cs" />
+    <Compile Include="GameData\SimplePcInfo.cs" />
+    <Compile Include="GameData\SpecialAttackInfo.cs" />
+    <Compile Include="GameData\Texture.cs" />
+    <Compile Include="GameData\Tower.cs" />
+    <Compile Include="GameData\TowerField.cs" />
+    <Compile Include="GameData\TowerInfoPacket.cs" />
+    <Compile Include="GameData\TowerProxyBase.cs" />
+    <Compile Include="GameData\Vector3.cs" />
+    <Compile Include="GameData\VendingMachineSlot.cs" />
+    <Compile Include="GameData\WeatherType.cs" />
+    <Compile Include="Messages\CharSecSpecAttackMessage.cs" />
+    <Compile Include="Messages\Header.cs" />
+    <Compile Include="Messages\N3Messages\ActionMessage.cs" />
+    <Compile Include="Messages\N3Messages\AddPetMessage.cs" />
+    <Compile Include="Messages\N3Messages\AreaFormulaMessage.cs" />
+    <Compile Include="Messages\N3Messages\AttackInfoMessage.cs" />
+    <Compile Include="Messages\N3Messages\AttackMessage.cs" />
+    <Compile Include="Messages\N3Messages\BuffMessage.cs" />
+    <Compile Include="Messages\N3Messages\ChestItemFullUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\CorpseFullUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\CreateQuestMessage.cs" />
+    <Compile Include="Messages\N3Messages\DoorFullUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\DoorStatusUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\FightModeUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\FullAutoMessage.cs" />
+    <Compile Include="Messages\N3Messages\HealthDamageMessage.cs" />
+    <Compile Include="Messages\N3Messages\InfoPacketType.cs" />
+    <Compile Include="Messages\InitiateCompressionMessage.cs" />
+    <Compile Include="Messages\N3Messages\AddTemplateMessage.cs" />
+    <Compile Include="Messages\N3Messages\AppearanceUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\BankMessage.cs" />
+    <Compile Include="Messages\N3Messages\CastNanoSpellMessage.cs" />
+    <Compile Include="Messages\N3Messages\ClientContainerAddItemMessage.cs" />
+    <Compile Include="Messages\N3Messages\ClientGetItemMessage.cs" />
+    <Compile Include="Messages\N3Messages\DespawnMessage.cs" />
+    <Compile Include="Messages\N3Messages\DropDynelMessage.cs" />
+    <Compile Include="Messages\N3Messages\LocalityUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\RelocateDynelsMessage.cs" />
+    <Compile Include="Messages\N3Messages\ToClientQuitMessage.cs" />
+    <Compile Include="Messages\N3Messages\ChatCmdMessage.cs" />
+    <Compile Include="Messages\N3Messages\ChatTextMessage.cs" />
+    <Compile Include="Messages\N3Messages\ClientMoveItemToInventoryMessage.cs" />
+    <Compile Include="Messages\N3Messages\FeedbackMessage.cs" />
+    <Compile Include="Messages\N3Messages\FormatFeedbackMessage.cs" />
+    <Compile Include="Messages\N3Messages\InfoPacketMessage.cs" />
+    <Compile Include="Messages\N3Messages\InventoryUpdatedMessage.cs" />
+    <Compile Include="Messages\N3Messages\InventoryUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\KnuBotAnswerListMessage.cs" />
+    <Compile Include="Messages\N3Messages\KnuBotAppendTextMessage.cs" />
+    <Compile Include="Messages\N3Messages\KnuBotFinishTradeMessage.cs" />
+    <Compile Include="Messages\N3Messages\CharDCMoveMessage.cs" />
+    <Compile Include="Messages\N3Messages\CharInPlayMessage.cs" />
+    <Compile Include="Messages\N3Messages\ContainerAddItemMessage.cs" />
+    <Compile Include="Messages\N3Messages\FollowTargetMessage.cs" />
+    <Compile Include="Messages\N3Messages\GenericCmdAction.cs" />
+    <Compile Include="Messages\N3Messages\GenericCmdMessage.cs" />
+    <Compile Include="Messages\N3Messages\KnuBotCloseChatWindowMessage.cs" />
+    <Compile Include="Messages\N3Messages\KnuBotNpcDescriptionMessage.cs" />
+    <Compile Include="Messages\N3Messages\KnuBotOpenChatWindowMessage.cs" />
+    <Compile Include="Messages\N3Messages\KnuBotRejectedItemsMessage.cs" />
+    <Compile Include="Messages\N3Messages\KnuBotStartTradeMessage.cs" />
+    <Compile Include="Messages\N3Messages\KnuBotTradeMessage.cs" />
+    <Compile Include="Messages\N3Messages\LookAtMessage.cs" />
+    <Compile Include="Messages\Message.cs" />
+    <Compile Include="Messages\MessageBody.cs" />
+    <Compile Include="Messages\N3Message.cs" />
+    <Compile Include="Messages\N3Messages\CharacterActionMessage.cs" />
+    <Compile Include="Messages\N3Messages\CharacterActionType.cs" />
+    <Compile Include="Messages\N3Messages\FullCharacterMessage.cs" />
+    <Compile Include="Messages\N3Messages\GameTimeMessage.cs" />
+    <Compile Include="Messages\N3Messages\KnuBotAnswerMessage.cs" />
+    <Compile Include="Messages\N3Messages\MechInfoMessage.cs" />
+    <Compile Include="Messages\N3Messages\MissedAttackInfoMessage.cs" />
+    <Compile Include="Messages\N3Messages\N3TeleportMessage.cs" />
+    <Compile Include="Messages\N3Messages\OrgClientCommand.cs" />
+    <Compile Include="Messages\N3Messages\OrgClientMessage.cs" />
+    <Compile Include="Messages\N3Messages\OrgInfoPacketMessage.cs" />
+    <Compile Include="Messages\N3Messages\OrgServerMessage.cs" />
+    <Compile Include="Messages\N3Messages\OrgServerMessages\OrgContractMessage.cs" />
+    <Compile Include="Messages\N3Messages\OrgServerMessages\OrgInfoMessage.cs" />
+    <Compile Include="Messages\N3Messages\OrgServerMessages\OrgInviteMessage.cs" />
+    <Compile Include="Messages\N3Messages\OrgServerMessageType.cs" />
+    <Compile Include="Messages\N3Messages\PerkUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\PetToMasterMessage.cs" />
+    <Compile Include="Messages\N3Messages\PlayfieldAllCitiesMessage.cs" />
+    <Compile Include="Messages\N3Messages\PlayfieldAllTowersMessage.cs" />
+    <Compile Include="Messages\N3Messages\PlayfieldAnarchyFMessage.cs" />
+    <Compile Include="Messages\N3Messages\PlaySoundMessage.cs" />
+    <Compile Include="Messages\N3Messages\QuestAlternativeMessage.cs" />
+    <Compile Include="Messages\N3Messages\QuestFullUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\RemovePetMessage.cs" />
+    <Compile Include="Messages\N3Messages\ResearchRequestMessage.cs" />
+    <Compile Include="Messages\N3Messages\ResearchUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\ResurrectMessage.cs" />
+    <Compile Include="Messages\N3Messages\SetPosMessage.cs" />
+    <Compile Include="Messages\N3Messages\SetWantedDirectionMessage.cs" />
+    <Compile Include="Messages\N3Messages\ShadowLevelMessage.cs" />
+    <Compile Include="Messages\N3Messages\ShieldAttackMessage.cs" />
+    <Compile Include="Messages\N3Messages\ShopUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\SimpleCharFullUpdateFlags.cs" />
+    <Compile Include="Messages\N3Messages\SimpleCharFullUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\SimpleItemFullUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\SkillMessage.cs" />
+    <Compile Include="Messages\N3Messages\SocialAction.cs" />
+    <Compile Include="Messages\N3Messages\SocialActionCmdMessage.cs" />
+    <Compile Include="Messages\N3Messages\SpecialAttackInfo.cs" />
+    <Compile Include="Messages\N3Messages\SpecialAttackWeaponMessage.cs" />
+    <Compile Include="Messages\N3Messages\SpellListMessage.cs" />
+    <Compile Include="Messages\N3Messages\StatMessage.cs" />
+    <Compile Include="Messages\N3Messages\StartLogoutMessage.cs" />
+    <Compile Include="Messages\N3Messages\StopFightMessage.cs" />
+    <Compile Include="Messages\N3Messages\StopLogoutMessage.cs" />
+    <Compile Include="Messages\N3Messages\StopMovingCmdMessage.cs" />
+    <Compile Include="Messages\N3Messages\TeamMemberInfoMessage.cs" />
+    <Compile Include="Messages\N3Messages\TeamMemberMessage.cs" />
+    <Compile Include="Messages\N3Messages\TemplateActionMessage.cs" />
+    <Compile Include="Messages\N3Messages\TradeAction.cs" />
+    <Compile Include="Messages\N3Messages\TradeMessage.cs" />
+    <Compile Include="Messages\N3Messages\VendingMachineFullUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\WeaponItemFullUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\WeatherControlMessage.cs" />
+    <Compile Include="Messages\N3MessageType.cs" />
+    <Compile Include="Messages\OperatorMessage.cs" />
+    <Compile Include="Messages\PacketType.cs" />
+    <Compile Include="Messages\PetCommandMessage.cs" />
+    <Compile Include="Messages\PingMessage.cs" />
+    <Compile Include="Messages\SystemMessage.cs" />
+    <Compile Include="Messages\N3Messages\SetStatMessage.cs" />
+    <Compile Include="Messages\SystemMessages\CharacterCreatedMessage.cs" />
+    <Compile Include="Messages\SystemMessages\CharacterDeletedMessage.cs" />
+    <Compile Include="Messages\SystemMessages\CharacterListMessage.cs" />
+    <Compile Include="Messages\SystemMessages\ChatServerInfoMessage.cs" />
+    <Compile Include="Messages\SystemMessages\ZoneRedirectionMessage.cs" />
+    <Compile Include="Messages\SystemMessages\CreateCharacterMessage.cs" />
+    <Compile Include="Messages\SystemMessages\DeleteCharacterMessage.cs" />
+    <Compile Include="Messages\SystemMessages\LoginErrorMessage.cs" />
+    <Compile Include="Messages\SystemMessages\LoginError.cs" />
+    <Compile Include="Messages\SystemMessages\NameInUseMessage.cs" />
+    <Compile Include="Messages\SystemMessages\RandomNameRequestMessage.cs" />
+    <Compile Include="Messages\SystemMessages\ServerSaltMessage.cs" />
+    <Compile Include="Messages\SystemMessages\StarterArea.cs" />
+    <Compile Include="Messages\SystemMessages\SuggestNameMessage.cs" />
+    <Compile Include="Messages\SystemMessages\UserCredentialsMessage.cs" />
+    <Compile Include="Messages\SystemMessages\SelectCharacterMessage.cs" />
+    <Compile Include="Messages\SystemMessages\UserLoginMessage.cs" />
+    <Compile Include="Messages\SystemMessages\ZoneLoginMessage.cs" />
+    <Compile Include="Messages\SystemMessages\ZoneInfoMessage.cs" />
+    <Compile Include="Messages\SystemMessageType.cs" />
+    <Compile Include="Messages\TextMessage.cs" />
+    <Compile Include="Messages\TextMessageRange.cs" />
+    <Compile Include="Serialization\ArraySizeType.cs" />
+    <Compile Include="Serialization\DebuggingSerializerResolverBuilder.cs" />
+    <Compile Include="Serialization\DiagnosticInfo.cs" />
+    <Compile Include="Serialization\FlagsCriteria.cs" />
+    <Compile Include="Serialization\IdentifierType.cs" />
+    <Compile Include="Serialization\ISerializer.cs" />
+    <Compile Include="Serialization\MappingAttributes\AoContractAttribute.cs" />
+    <Compile Include="Serialization\MappingAttributes\AoFlagsAttribute.cs" />
+    <Compile Include="Serialization\MappingAttributes\AoKnownTypeAttribute.cs" />
+    <Compile Include="Serialization\MappingAttributes\AoMemberAttribute.cs" />
+    <Compile Include="Serialization\MappingAttributes\AoUsesFlagsAttribute.cs" />
+    <Compile Include="Serialization\MemberOptions.cs" />
+    <Compile Include="Serialization\PacketInspector.cs" />
+    <Compile Include="Serialization\Probe.cs" />
+    <Compile Include="Serialization\PropertyMetaData.cs" />
+    <Compile Include="Serialization\ReflectionHelper.cs" />
+    <Compile Include="Serialization\SerializationContext.cs" />
+    <Compile Include="Serialization\Serializers\ArraySerializer.cs" />
+    <Compile Include="Serialization\Serializers\ArraySizeSerializer.cs" />
+    <Compile Include="Serialization\Serializers\ByteSerializer.cs" />
+    <Compile Include="Serialization\Serializers\Custom\FollowInfoSerializer.cs" />
+    <Compile Include="Serialization\Serializers\Custom\GenericCmdSerializer.cs" />
+    <Compile Include="Serialization\Serializers\Custom\IdentityOnlyN3MessageSerializer.cs" />
+    <Compile Include="Serialization\Serializers\Custom\N3TeleportMessageSerializer.cs" />
+    <Compile Include="Serialization\Serializers\Custom\PlayfieldAnarchyFMessageSerializer.cs" />
+    <Compile Include="Serialization\Serializers\Custom\PlayfieldVendorInfoSerializer.cs" />
+    <Compile Include="Serialization\Serializers\Custom\RecoveredN3MessageSerializers.cs" />
+    <Compile Include="Serialization\Serializers\Custom\ResurrectMessageSerializer.cs" />
+    <Compile Include="Serialization\Serializers\Custom\SimpleCharFullUpdateSerializer.cs" />
+    <Compile Include="Serialization\Serializers\Custom\VendingMachineFullUpdateMessageSerializer.cs" />
+    <Compile Include="Serialization\Serializers\DiagnosticSerializer.cs" />
+    <Compile Include="Serialization\Serializers\IPAddressSerializer.cs" />
+    <Compile Include="Serialization\Serializers\SByteSerializer.cs" />
+    <Compile Include="Serialization\Serializers\UInt16Serializer.cs" />
+    <Compile Include="Serialization\Serializers\HeaderSerializer.cs" />
+    <Compile Include="Serialization\Serializers\StringSerializer.cs" />
+    <Compile Include="Serialization\Serializers\UInt32Serializer.cs" />
+    <Compile Include="Serialization\Serializers\Int64Serializer.cs" />
+    <Compile Include="Serialization\Serializers\Int32Serializer.cs" />
+    <Compile Include="Serialization\Serializers\Int16Serializer.cs" />
+    <Compile Include="Serialization\KnownType.cs" />
+    <Compile Include="Serialization\SerializerResolver.cs" />
+    <Compile Include="Serialization\Serializers\SingleSerializer.cs" />
+    <Compile Include="Serialization\StreamWriter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\MessageSerializer.cs" />
+    <Compile Include="Serialization\StreamReader.cs" />
+    <Compile Include="Serialization\Serializers\TypeSerializer.cs" />
+    <Compile Include="Serialization\TypeInfo.cs" />
+    <Compile Include="Serialization\SerializerResolverBuilder.cs" />
+    <Compile Include="Serialization\TypeSerializerBuilder.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
