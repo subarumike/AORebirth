@@ -92,6 +92,7 @@ $knownCorrectDoorByPlayfield = @{
     1187 = "0xC00204A3"
     2064 = "0xC0010810"
     2073 = "0xC0010819"
+    4704 = "0xC0001260"
 }
 
 $definiteTeleportProblems = @($teleports | Where-Object {
@@ -237,6 +238,7 @@ $markdown.Add("| --- | --- | --- | --- |")
 $markdown.Add("| Neutral Supermarket Advanced / Superior-style interior `1187` | `C00004A3` | `C00204A3` | Old target was in/near main room; correct current-client exterior door is at `205,5,120` |")
 $markdown.Add("| Neutral Basic Implant Shop `2064` | `C0000810` | `C0010810` | Old target was the inner-room doorway; real exterior exit is `C0010810` at `191,5,164` |")
 $markdown.Add("| Neutral Advanced Implant Shop `2073` | `C0000819` | `C0010819` | Same paired-door pattern as `2064`; Borealis entrance playtested successfully after remap |")
+$markdown.Add("| Tower Shop `4704` | `C0001260` | `C0001260` | Borealis tower shop entrance playtested successfully; nearby paired door is not a repair target |")
 $markdown.Add("")
 
 $markdown.Add("## Ranked Repair Plan")
