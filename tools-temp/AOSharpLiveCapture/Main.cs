@@ -50,13 +50,15 @@ namespace AOSharpLiveCapture
             "ClientContainerAddItem",
             "BankCorpse",
             "Feedback",
-            "Stat"
+            "Stat",
+            "VendingMachineFullUpdate"
         };
 
         private string sessionDirectory;
         private StreamWriter eventsLog;
         private StreamWriter packetsLog;
         private StreamWriter shopUpdatesLog;
+        private StreamWriter vendorFullUpdatesLog;
         private bool enabled;
         private int inboundPacketCount;
         private int outboundPacketCount;
@@ -73,6 +75,8 @@ namespace AOSharpLiveCapture
             this.packetsLog = CreateWriter(Path.Combine(this.sessionDirectory, "packets.hex.log"));
             this.shopUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "shop-updates.csv"));
             this.shopUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,TerminalIdentity,Slot,LowId,HighId,Quality");
+            this.vendorFullUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
+            this.vendorFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,Identity,Unknown7,Template,Mesh,BuyModifier,SellModifier,StatsCount");
             this.enabled = true;
             this.nextFlushUtc = DateTime.UtcNow.AddSeconds(2);
             this.nextSnapshotUtc = DateTime.UtcNow.AddSeconds(1);
@@ -98,6 +102,7 @@ namespace AOSharpLiveCapture
             this.LogEvent("PLUGIN", "Commands: /aocap start | stop | mark <text> | status | flush | snapshot");
             this.LogEvent("PLUGIN", "Smoke commands: /aosmoke start [mobAlias] | stop | status | log");
             this.LogEvent("PLUGIN", "ShopUpdate CSV: " + Path.Combine(this.sessionDirectory, "shop-updates.csv"));
+            this.LogEvent("PLUGIN", "VendingMachineFullUpdate CSV: " + Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
             this.LogSnapshot("initial");
             Chat.WriteLine("AOSharpLiveCapture logging to " + this.sessionDirectory, ChatColor.Gold);
         }
@@ -403,6 +408,12 @@ namespace AOSharpLiveCapture
                 this.ExportShopUpdate(direction, sequence, shopUpdate);
             }
 
+            VendingMachineFullUpdateMessage vendorFullUpdate = message as VendingMachineFullUpdateMessage;
+            if (vendorFullUpdate != null)
+            {
+                this.ExportVendorFullUpdate(direction, sequence, vendorFullUpdate);
+            }
+
             this.LogEvent(
                 direction,
                 string.Format(
@@ -505,7 +516,47 @@ namespace AOSharpLiveCapture
                     "terminal={0} slots={1} csv={2}",
                     message.Identity,
                     slots.Length,
-                    Path.Combine(this.sessionDirectory, "shop-updates.csv")));
+                Path.Combine(this.sessionDirectory, "shop-updates.csv")));
+        }
+
+        private void ExportVendorFullUpdate(string direction, int sequence, VendingMachineFullUpdateMessage message)
+        {
+            GameTuple<Stat, int>[] stats = message.Stats ?? new GameTuple<Stat, int>[0];
+            int template = GetStatValue(stats, (Stat)23);
+            int mesh = GetStatValue(stats, (Stat)12);
+            int buyModifier = GetStatValue(stats, (Stat)426);
+            int sellModifier = GetStatValue(stats, (Stat)427);
+
+            lock (this.syncRoot)
+            {
+                this.vendorFullUpdatesLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv(direction),
+                        sequence.ToString(CultureInfo.InvariantCulture),
+                        Csv(message.Identity.ToString()),
+                        message.Unknown7.ToString(CultureInfo.InvariantCulture),
+                        template.ToString(CultureInfo.InvariantCulture),
+                        mesh.ToString(CultureInfo.InvariantCulture),
+                        buyModifier.ToString(CultureInfo.InvariantCulture),
+                        sellModifier.ToString(CultureInfo.InvariantCulture),
+                        stats.Length.ToString(CultureInfo.InvariantCulture)));
+                this.vendorFullUpdatesLog.Flush();
+            }
+        }
+
+        private static int GetStatValue(GameTuple<Stat, int>[] stats, Stat stat)
+        {
+            foreach (GameTuple<Stat, int> entry in stats)
+            {
+                if (entry.Value1 == stat)
+                {
+                    return entry.Value2;
+                }
+            }
+
+            return 0;
         }
 
         private void LogEvent(string category, string message)
@@ -583,7 +634,7 @@ namespace AOSharpLiveCapture
 
             return string.Format(
                 CultureInfo.InvariantCulture,
-                "identity={0} name={1} player={2} npc={3} pet={4} inPlay={5} alive={6} hp={7}/{8} pct={9:0.0} level={10} pos={11} attacking={12} fightingTarget={13} monsterData={14} catMesh={15} visualFlags={16} state={17} currentState={18} actionCategory={19} deadTimer={20} corpseType={21} corpseInstance={22} corpseAnimKey={23} dieAnim={24}",
+                "identity={0} name={1} player={2} npc={3} pet={4} inPlay={5} alive={6} hp={7}/{8} pct={9:0.0} level={10} computerLiteracy={11} pos={12} attacking={13} fightingTarget={14} monsterData={15} catMesh={16} visualFlags={17} state={18} currentState={19} actionCategory={20} deadTimer={21} corpseType={22} corpseInstance={23} corpseAnimKey={24} dieAnim={25}",
                 Safe(() => character.Identity.ToString()),
                 Safe(() => character.Name),
                 Safe(() => character.IsPlayer.ToString()),
@@ -595,6 +646,7 @@ namespace AOSharpLiveCapture
                 SafeStat(character, Stat.MaxHealth),
                 SafeFloat(() => character.HealthPercent),
                 SafeStat(character, Stat.Level),
+                SafeStat(character, Stat.ComputerLiteracy),
                 Safe(() => character.Position.ToString()),
                 Safe(() => character.IsAttacking.ToString()),
                 Safe(() => character.FightingTarget == null ? "null" : character.FightingTarget.Identity.ToString()),
@@ -733,6 +785,7 @@ namespace AOSharpLiveCapture
                 this.eventsLog.Flush();
                 this.packetsLog.Flush();
                 this.shopUpdatesLog.Flush();
+                this.vendorFullUpdatesLog.Flush();
             }
         }
 
@@ -743,12 +796,15 @@ namespace AOSharpLiveCapture
                 this.eventsLog?.Flush();
                 this.packetsLog?.Flush();
                 this.shopUpdatesLog?.Flush();
+                this.vendorFullUpdatesLog?.Flush();
                 this.eventsLog?.Dispose();
                 this.packetsLog?.Dispose();
                 this.shopUpdatesLog?.Dispose();
+                this.vendorFullUpdatesLog?.Dispose();
                 this.eventsLog = null;
                 this.packetsLog = null;
                 this.shopUpdatesLog = null;
+                this.vendorFullUpdatesLog = null;
             }
         }
 

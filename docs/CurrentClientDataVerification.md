@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-07 03:05:50
+Generated: 2026-06-07 04:28:30
 
 ## Scope
 
@@ -18,9 +18,9 @@ Generated: 2026-06-07 03:05:50
 | Built playfields | 618 |
 | Data file source/runtime/version issues | 0 |
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
-| Vendor DB rows with issues | 10 |
+| Vendor DB rows with issues | 4 |
 | Shop inventory rows with item-cache issues | 1 |
-| Vending statels without complete DB shop coverage | 838 |
+| Vending statels without complete DB shop coverage | 832 |
 
 ## Data Files
 
@@ -60,12 +60,6 @@ This separates template-cache truth from live runtime instance truth. If items.d
 
 | Id | Playfield | Hash | DB template | Template item | Shop hash | Active items | Issues |
 | ---: | ---: | --- | ---: | ---: | --- | ---: | --- |
-| 77725733 | 1186 | ICCAccB | 297424 | 297424 | 1AFH | 0 | shop inventory empty or inactive |
-| 77725734 | 1186 | ICCAccA | 297425 | 297425 | 1AFH | 0 | shop inventory empty or inactive |
-| 77725735 | 1186 | ICCAccS | 297426 | 297426 | 1AFH | 0 | shop inventory empty or inactive |
-| 77725739 | 1186 | ICCWepB | 297430 | 297430 | IGNO | 0 | shop inventory empty or inactive |
-| 77725740 | 1186 | ICCWepA | 297431 | 297431 | IGNO | 0 | shop inventory empty or inactive |
-| 77725741 | 1186 | ICCWepS | 297432 | 297432 | IGNO | 0 | shop inventory empty or inactive |
 | 77725745 | 1186 | ICCPhaS | 297395 | 297395 | PC1H | 0 | shop inventory empty or inactive |
 | 77791233 | 1187 | ContG | 99634 | 99501 | Cont | 62 | vendors.TemplateId differs from vendortemplate.ItemTemplate |
 | 77791237 | 1187 | MedA | 152008 | 99575 | Med | 11 | vendors.TemplateId differs from vendortemplate.ItemTemplate |

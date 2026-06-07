@@ -87,7 +87,10 @@ namespace CellAO.Core.Inventory
 
                 int slotNumber = 0;
                 DBShopInventoryTemplate[] inventoryEntries =
-                    ShopInventoryTemplateDao.Instance.GetWhere(new { Hash = vendorTemplate.ShopInvHash }).ToArray();
+                    ShopInventoryTemplateDao.Instance.GetWhere(new { Hash = vendorTemplate.ShopInvHash })
+                        .Where(x => x.Active != 0)
+                        .OrderBy(x => x.Id)
+                        .ToArray();
                 foreach (DBShopInventoryTemplate inventoryEntry in inventoryEntries)
                 {
                     // Skip entries which are out of vendortemplate's QL range

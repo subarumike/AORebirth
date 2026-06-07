@@ -87,8 +87,12 @@ namespace CellAO.Core.Entities
                 this.Name = vendorTemplate.Name;
 
                 this.BaseInventory.Read();
-                this.Stats[StatIds.sellmodifier].BaseValue = (uint)(vendorTemplate.Sell * 100.0f);
-                this.Stats[StatIds.buymodifier].BaseValue = (uint)(vendorTemplate.Buy * 100.0f);
+                int sellModifier = (int)(vendorTemplate.Sell * 100.0f);
+                int buyModifier = (int)(vendorTemplate.Buy * 100.0f);
+                this.Stats[StatIds.sellmodifier].BaseValue = (uint)sellModifier;
+                this.Stats[StatIds.sellmodifier].Value = sellModifier;
+                this.Stats[StatIds.buymodifier].BaseValue = (uint)buyModifier;
+                this.Stats[StatIds.buymodifier].Value = buyModifier;
             }
         }
 
