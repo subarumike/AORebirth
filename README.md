@@ -47,4 +47,4 @@ Installation instructions follow soon.
 - We would also like to give a warm and special thank you to [Funcom](http://www.funcom.com) for giving us [Anarchy Online](http://www.anarchy-online.com)
 
 
-If you feel your name should be in here, email: darkkitten@gmail.com I will eventualy add you I guess ;)
+If you feel your name should be in here, email: jackdanielswarframer@gmail.com I will add you.
