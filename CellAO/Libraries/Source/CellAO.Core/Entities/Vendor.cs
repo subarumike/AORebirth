@@ -52,6 +52,13 @@ namespace CellAO.Core.Entities
 
     public class Vendor : Dynel, IEventHolder, IItemContainer
     {
+        private static readonly Dictionary<int, int> LiveVendorMeshOverrides =
+            new Dictionary<int, int>
+            {
+                { 155599, 85976 }, // Basic Bookstore, live Rome Blue capture 20260607-005753
+                { 155603, 85976 }  // Omni Basic Devices, live Rome Blue capture 20260607-005753
+            };
+
         public Identity OriginalIdentity = Identity.None;
 
         public Vendor(Identity parent, Identity id, string templateHash)
@@ -97,12 +104,22 @@ namespace CellAO.Core.Entities
 
             this.Stats[0x17].Value = templateId;
             this.Stats[0x1f5].Value = 2;
+            this.ApplyLiveVendorVisualOverrides(templateId);
 
             this.TemplateHash = "";
             this.Name = ItemNamesDao.Instance.Get(this.Template.ID).Name;
 
             this.BaseInventory = new VendorInventory(this);
             this.BaseInventory.Read();
+        }
+
+        private void ApplyLiveVendorVisualOverrides(int templateId)
+        {
+            int meshId;
+            if (LiveVendorMeshOverrides.TryGetValue(templateId, out meshId))
+            {
+                this.Stats[(int)StatIds.mesh].Value = meshId;
+            }
         }
 
         public ItemTemplate Template { get; private set; }

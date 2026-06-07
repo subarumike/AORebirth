@@ -889,7 +889,7 @@ namespace Extractor_Serializer
             {
                 foreach (ItemTemplate template in hsitp)
                 {
-                    GetItemRelations(template);
+                    template.Relations.Add(template.ID);
                     Console.Write("\rFound missing item relations for " + template.ID);
                 }
 

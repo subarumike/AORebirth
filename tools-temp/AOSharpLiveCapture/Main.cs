@@ -13,6 +13,7 @@ using AOSharp.Core.UI;
 
 using SmokeLounge.AOtomation.Messaging.Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+using SmokeLounge.AOtomation.Messaging.GameData;
 
 namespace AOSharpLiveCapture
 {
@@ -21,6 +22,7 @@ namespace AOSharpLiveCapture
         private readonly object syncRoot = new object();
         private readonly HashSet<string> knownCharacters = new HashSet<string>();
         private readonly HashSet<string> knownCorpses = new HashSet<string>();
+        private readonly HashSet<string> exportedShopUpdateFingerprints = new HashSet<string>();
         private readonly HashSet<string> interestingMessageNames = new HashSet<string>
         {
             "SimpleCharFullUpdate",
@@ -39,6 +41,10 @@ namespace AOSharpLiveCapture
             "SpecialAttackInfo",
             "CharSecSpecAttack",
             "InventoryUpdate",
+            "ShopUpdate",
+            "Trade",
+            "SimpleItemFullUpdate",
+            "WeaponItemFullUpdate",
             "ClientMoveItemToInventory",
             "ContainerAddItem",
             "ClientContainerAddItem",
@@ -50,6 +56,7 @@ namespace AOSharpLiveCapture
         private string sessionDirectory;
         private StreamWriter eventsLog;
         private StreamWriter packetsLog;
+        private StreamWriter shopUpdatesLog;
         private bool enabled;
         private int inboundPacketCount;
         private int outboundPacketCount;
@@ -64,6 +71,8 @@ namespace AOSharpLiveCapture
             this.sessionDirectory = CreateSessionDirectory(pluginDir);
             this.eventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "events.log"));
             this.packetsLog = CreateWriter(Path.Combine(this.sessionDirectory, "packets.hex.log"));
+            this.shopUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "shop-updates.csv"));
+            this.shopUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,TerminalIdentity,Slot,LowId,HighId,Quality");
             this.enabled = true;
             this.nextFlushUtc = DateTime.UtcNow.AddSeconds(2);
             this.nextSnapshotUtc = DateTime.UtcNow.AddSeconds(1);
@@ -88,6 +97,7 @@ namespace AOSharpLiveCapture
             this.LogEvent("PLUGIN", "AOSharpLiveCapture loaded. session=" + this.sessionDirectory);
             this.LogEvent("PLUGIN", "Commands: /aocap start | stop | mark <text> | status | flush | snapshot");
             this.LogEvent("PLUGIN", "Smoke commands: /aosmoke start [mobAlias] | stop | status | log");
+            this.LogEvent("PLUGIN", "ShopUpdate CSV: " + Path.Combine(this.sessionDirectory, "shop-updates.csv"));
             this.LogSnapshot("initial");
             Chat.WriteLine("AOSharpLiveCapture logging to " + this.sessionDirectory, ChatColor.Gold);
         }
@@ -386,7 +396,12 @@ namespace AOSharpLiveCapture
         {
             string messageName = message.N3MessageType.ToString();
             bool interesting = this.interestingMessageNames.Contains(messageName);
-            string detail = interesting ? this.DescribeObject(message) : string.Empty;
+            string detail = interesting ? this.DescribeN3Message(message) : string.Empty;
+            ShopUpdateMessage shopUpdate = message as ShopUpdateMessage;
+            if (shopUpdate != null)
+            {
+                this.ExportShopUpdate(direction, sequence, shopUpdate);
+            }
 
             this.LogEvent(
                 direction,
@@ -397,6 +412,100 @@ namespace AOSharpLiveCapture
                     message.N3MessageType,
                     message.Identity,
                     string.IsNullOrEmpty(detail) ? string.Empty : " " + detail));
+        }
+
+        private string DescribeN3Message(N3Message message)
+        {
+            ShopUpdateMessage shopUpdate = message as ShopUpdateMessage;
+            if (shopUpdate != null)
+            {
+                return this.DescribeShopUpdate(shopUpdate);
+            }
+
+            return this.DescribeObject(message);
+        }
+
+        private string DescribeShopUpdate(ShopUpdateMessage message)
+        {
+            VendingMachineSlot[] slots = message.VendingMachineSlots ?? new VendingMachineSlot[0];
+            StringBuilder result = new StringBuilder();
+            result.Append("ShopUpdateMessage { ");
+            result.Append("Unknown=");
+            result.Append(message.Unknown.ToString(CultureInfo.InvariantCulture));
+            result.Append(" VendingMachineSlots=count=");
+            result.Append(slots.Length.ToString(CultureInfo.InvariantCulture));
+            result.Append('[');
+
+            for (int i = 0; i < slots.Length; i++)
+            {
+                VendingMachineSlot slot = slots[i];
+                if (i > 0)
+                {
+                    result.Append(';');
+                }
+
+                result.Append('#');
+                result.Append(i.ToString(CultureInfo.InvariantCulture));
+                result.Append(":low=");
+                result.Append(slot.ItemLowId.ToString(CultureInfo.InvariantCulture));
+                result.Append(",high=");
+                result.Append(slot.ItemHighId.ToString(CultureInfo.InvariantCulture));
+                result.Append(",ql=");
+                result.Append(slot.Quality.ToString(CultureInfo.InvariantCulture));
+            }
+
+            result.Append("] }");
+            return result.ToString();
+        }
+
+        private void ExportShopUpdate(string direction, int sequence, ShopUpdateMessage message)
+        {
+            VendingMachineSlot[] slots = message.VendingMachineSlots ?? new VendingMachineSlot[0];
+            string fingerprint = message.Identity + ":" + string.Join(
+                ";",
+                slots.Select(
+                    slot => slot.ItemLowId.ToString(CultureInfo.InvariantCulture)
+                        + "/"
+                        + slot.ItemHighId.ToString(CultureInfo.InvariantCulture)
+                        + ":"
+                        + slot.Quality.ToString(CultureInfo.InvariantCulture)).ToArray());
+
+            lock (this.syncRoot)
+            {
+                if (!this.exportedShopUpdateFingerprints.Add(fingerprint))
+                {
+                    return;
+                }
+
+                string capturedUtc = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
+                string terminalIdentity = message.Identity.ToString();
+                for (int i = 0; i < slots.Length; i++)
+                {
+                    VendingMachineSlot slot = slots[i];
+                    this.shopUpdatesLog.WriteLine(
+                        string.Join(
+                            ",",
+                            Csv(capturedUtc),
+                            Csv(direction),
+                            sequence.ToString(CultureInfo.InvariantCulture),
+                            Csv(terminalIdentity),
+                            i.ToString(CultureInfo.InvariantCulture),
+                            slot.ItemLowId.ToString(CultureInfo.InvariantCulture),
+                            slot.ItemHighId.ToString(CultureInfo.InvariantCulture),
+                            slot.Quality.ToString(CultureInfo.InvariantCulture)));
+                }
+
+                this.shopUpdatesLog.Flush();
+            }
+
+            this.LogEvent(
+                "SHOP-EXPORT",
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "terminal={0} slots={1} csv={2}",
+                    message.Identity,
+                    slots.Length,
+                    Path.Combine(this.sessionDirectory, "shop-updates.csv")));
         }
 
         private void LogEvent(string category, string message)
@@ -623,6 +732,7 @@ namespace AOSharpLiveCapture
             {
                 this.eventsLog.Flush();
                 this.packetsLog.Flush();
+                this.shopUpdatesLog.Flush();
             }
         }
 
@@ -632,10 +742,13 @@ namespace AOSharpLiveCapture
             {
                 this.eventsLog?.Flush();
                 this.packetsLog?.Flush();
+                this.shopUpdatesLog?.Flush();
                 this.eventsLog?.Dispose();
                 this.packetsLog?.Dispose();
+                this.shopUpdatesLog?.Dispose();
                 this.eventsLog = null;
                 this.packetsLog = null;
+                this.shopUpdatesLog = null;
             }
         }
 
@@ -692,6 +805,16 @@ namespace AOSharpLiveCapture
             }
 
             return value.Replace("\r", "\\r").Replace("\n", "\\n");
+        }
+
+        private static string Csv(string value)
+        {
+            if (value == null)
+            {
+                return string.Empty;
+            }
+
+            return "\"" + value.Replace("\"", "\"\"") + "\"";
         }
 
         private static string ToHex(byte[] bytes)
