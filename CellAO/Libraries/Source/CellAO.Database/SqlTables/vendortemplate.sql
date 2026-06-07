@@ -163,10 +163,10 @@ insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('BkStB', 1, 'Basic Bookstore', 155599, 'BkSt', 1, 50, 0.04, 1.00, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ContG', 1, 'Containers', 99501, 'Cont', 1, 1, 0.04, 1.00, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCTech', 1, 'ICC Tech Supplies', 297290, '0T95', 1, 229, 0.04, 1.05, 161);
-insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCPhaB', 1, 'Basic ICC Pharmacy', 297393, 'PC1H', 5, 100, 0.04, 1.05, 161);
-insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCPhaA', 1, 'Advanced ICC Pharmacy', 297394, 'PC1H', 110, 200, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCPhaB', 1, 'Basic ICC Pharmacy', 297393, 'Med', 5, 100, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCPhaA', 1, 'Advanced ICC Pharmacy', 297394, 'Med', 110, 200, 0.04, 1.05, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCPhaS', 1, 'Superior ICC Pharmacy', 297395, 'PC1H', 210, 250, 0.04, 1.05, 161);
-insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCCnt', 1, 'ICC Containers', 297423, '295B', 1, 1, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCCnt', 1, 'ICC Containers', 297423, 'Cont', 1, 1, 0.04, 1.05, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCAccB', 1, 'Basic ICC Accessories', 297424, '1AFH', 1, 109, 0.04, 1.05, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCAccA', 1, 'Advanced ICC Accessories', 297425, '1AFH', 110, 209, 0.04, 1.05, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCAccS', 1, 'Superior ICC Accessories', 297426, '1AFH', 210, 249, 0.04, 1.05, 161);
