@@ -62,6 +62,36 @@ function Get-RequiredSource {
     return Get-Content -LiteralPath $path -Raw
 }
 
+function Get-HexTemplateBytes {
+    param(
+        [string]$Text
+    )
+
+    $match = [System.Text.RegularExpressions.Regex]::Match(
+        $Text,
+        'HexToBytes\(\s*"([0-9a-f]+)"',
+        [System.Text.RegularExpressions.RegexOptions]::Singleline)
+    Assert-True $match.Success 'CorpseFullUpdate template hex should be present for offset assertions.'
+
+    $hex = $match.Groups[1].Value
+    $bytes = New-Object byte[] ($hex.Length / 2)
+    for ($i = 0; $i -lt $bytes.Length; $i++) {
+        $bytes[$i] = [Convert]::ToByte($hex.Substring($i * 2, 2), 16)
+    }
+
+    return $bytes
+}
+
+function Read-Int32BigEndian {
+    param(
+        [byte[]]$Bytes,
+        [int]$Offset
+    )
+
+    Assert-True ($Offset -ge 0 -and $Offset + 3 -lt $Bytes.Length) "Offset $Offset is outside template bounds."
+    return (($Bytes[$Offset] -shl 24) -bor ($Bytes[$Offset + 1] -shl 16) -bor ($Bytes[$Offset + 2] -shl 8) -bor $Bytes[$Offset + 3])
+}
+
 if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
     $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 }
@@ -79,6 +109,7 @@ $statHandlerSource = Get-RequiredSource $RepoRoot 'CellAO\Server\ZoneEngine\Core
 $chatTextHandlerSource = Get-RequiredSource $RepoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\ChatTextMessageHandler.cs'
 $statsSource = Get-RequiredSource $RepoRoot 'CellAO\Libraries\Source\CellAO.Stats\Stats.cs'
 $statSource = Get-RequiredSource $RepoRoot 'CellAO\Libraries\Source\CellAO.Stats\Stat.cs'
+$corpseFullUpdateTemplate = Get-HexTemplateBytes $corpseFullUpdateSource
 
 Assert-SourceMatch $combatCorpseRulesSource 'ObservedCorpseCreditRule\("Beach Leet",\s*17655,\s*1,\s*1\).*?ObservedCorpseCreditRule\("Reef Salamander",\s*30354,\s*23,\s*29\)' 'Observed corpse credit rules should keep known low credit ranges; these rules cannot produce the old 111-credit symptom.'
 Assert-SourceNoMatch $combatCorpseRulesSource 'ObservedCorpseCreditRule\([^)]*,\s*111\s*(?:,|\))|ObservedCorpseCreditRule\([^)]*,\s*\d+\s*,\s*111\s*(?:,|\))' 'Observed corpse credit rules should not encode 111 as a min or max credit value.'
@@ -87,7 +118,12 @@ Assert-SourceMatch $combatCorpseRulesSource 'RollObservedCredits\s*\(string\s+ta
 Assert-SourceMatch $playfieldSource 'RegisterCorpse\s*\(ICharacter\s+target,\s*Identity\s+corpseIdentity\).*?int\s+credits\s*=\s*RollCorpseCredits\s*\(\s*target\s*\).*?Credits\s*=\s*credits.*?corpses\s*\[\s*corpseIdentity\.Instance\s*\]\s*=\s*state' 'Corpse registration should store exactly the rolled credit value in CorpseState before the corpse is visible.'
 Assert-SourceMatch $playfieldSource 'Corpse registered corpse=\{0\} deadNpc=\{1\} lifetimeSeconds=\{2\} lootClass=\{3\} credits=\{4\}' 'Corpse registration log should include the registered credit value for playtest trace comparison.'
 Assert-SourceMatch $playfieldSource 'SendCorpseFullUpdate\s*\(ICharacter\s+target,\s*Identity\s+corpseIdentity\).*?CorpseFullUpdate\.Build\s*\(.*?this\.CorpseCreditsFor\s*\(\s*corpseIdentity\s*\)\s*\)' 'CorpseFullUpdate should receive the registered corpse credit value from CorpseState, not a template default.'
-Assert-SourceMatch $corpseFullUpdateSource 'private\s+const\s+int\s+CorpseCashValueOffset\s*=\s*211\s*;.*?WriteInt32\s*\(\s*buffer,\s*CorpseCashValueOffset,\s*Math\.Max\s*\(\s*0,\s*corpseCredits\s*\)\s*\)' 'CorpseFullUpdate should write the supplied corpse credit value at the known corpse cash offset.'
+Assert-True ((Read-Int32BigEndian $corpseFullUpdateTemplate 203) -eq 61) 'CorpseFullUpdate template offset 203 should be the Cash stat id 61.'
+Assert-True ((Read-Int32BigEndian $corpseFullUpdateTemplate 207) -eq 0) 'CorpseFullUpdate template offset 207 should be a zero cash value placeholder before runtime patching.'
+Assert-True ((Read-Int32BigEndian $corpseFullUpdateTemplate 207) -ne 111) 'CorpseFullUpdate template offset 207 must not preserve the old hardcoded 111 cash value.'
+Assert-True ((Read-Int32BigEndian $corpseFullUpdateTemplate 211) -ne 61) 'CorpseFullUpdate template offset 211 should not be treated as a Cash stat id.'
+Assert-SourceMatch $corpseFullUpdateSource 'private\s+const\s+int\s+CorpseCashValueOffset\s*=\s*207\s*;.*?WriteInt32\s*\(\s*buffer,\s*CorpseCashValueOffset,\s*Math\.Max\s*\(\s*0,\s*corpseCredits\s*\)\s*\)' 'CorpseFullUpdate should write the supplied corpse credit value at offset 207, the value word after Cash stat id 61.'
+Assert-SourceNoMatch $corpseFullUpdateSource 'CorpseCashValueOffset\s*=\s*211|WriteInt32\s*\(\s*buffer,\s*211\s*,\s*Math\.Max\s*\(\s*0,\s*corpseCredits\s*\)\s*\)' 'CorpseFullUpdate should not treat offset 211 as the corpse cash value.'
 Assert-SourceNoMatch $corpseFullUpdateSource '0000003d0000006f' 'CorpseFullUpdate template must not preserve the old hardcoded Cash=111 value.'
 
 Assert-SourceMatch $genericCmdSource 'case\s+GenericCmdAction\.Use:.*?target\.Type\s*==\s*IdentityType\.Corpse.*?TryUseCorpse\s*\(.*?target\s*\).*?AcknowledgeCorpseUseDelayed' 'GenericCmd Use against a corpse should route through TryUseCorpse and delayed acknowledgement.'
