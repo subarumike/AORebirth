@@ -3746,13 +3746,6 @@ namespace CellAO.Core.Playfields
             if (looter.Controller != null && looter.Controller.Client != null)
             {
                 StatMessageHandler.Default.SendChanged(looter);
-                this.SendCorpseCreditFeedback(
-                    looter,
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "You received {0} {1} from the corpse.",
-                        corpse.Credits,
-                        corpse.Credits == 1 ? "credit" : "credits"));
             }
 
             LogUtil.Debug(

@@ -92,6 +92,27 @@ function Read-Int32BigEndian {
     return (($Bytes[$Offset] -shl 24) -bor ($Bytes[$Offset + 1] -shl 16) -bor ($Bytes[$Offset + 2] -shl 8) -bor $Bytes[$Offset + 3])
 }
 
+function Get-RequiredSourceSegment {
+    param(
+        [string]$Text,
+        [string]$Pattern,
+        [string]$Message
+    )
+
+    $match = [System.Text.RegularExpressions.Regex]::Match($Text, $Pattern, [System.Text.RegularExpressions.RegexOptions]::Singleline)
+    Assert-True $match.Success $Message
+    return $match.Value
+}
+
+function Count-SourceMatches {
+    param(
+        [string]$Text,
+        [string]$Pattern
+    )
+
+    return [System.Text.RegularExpressions.Regex]::Matches($Text, $Pattern, [System.Text.RegularExpressions.RegexOptions]::Singleline).Count
+}
+
 if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
     $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 }
@@ -106,10 +127,13 @@ $genericCmdSource = Get-RequiredSource $RepoRoot 'CellAO\Server\ZoneEngine\Core\
 $clientMoveItemSource = Get-RequiredSource $RepoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs'
 $containerAddItemSource = Get-RequiredSource $RepoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs'
 $statHandlerSource = Get-RequiredSource $RepoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\StatMessageHandler.cs'
-$chatTextHandlerSource = Get-RequiredSource $RepoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\ChatTextMessageHandler.cs'
 $statsSource = Get-RequiredSource $RepoRoot 'CellAO\Libraries\Source\CellAO.Stats\Stats.cs'
 $statSource = Get-RequiredSource $RepoRoot 'CellAO\Libraries\Source\CellAO.Stats\Stat.cs'
 $corpseFullUpdateTemplate = Get-HexTemplateBytes $corpseFullUpdateSource
+$awardCorpseCreditsSource = Get-RequiredSourceSegment `
+    $playfieldSource `
+    'private\s+void\s+AwardCorpseCredits\s*\(ICharacter\s+looter,\s*CorpseState\s+corpse\).*?(?=\r?\n\s*private\s+void\s+SendCorpseLootAccessAction)' `
+    'AwardCorpseCredits method should be present for focused corpse credit assertions.'
 
 Assert-SourceMatch $combatCorpseRulesSource 'ObservedCorpseCreditRule\("Beach Leet",\s*17655,\s*1,\s*1\).*?ObservedCorpseCreditRule\("Reef Salamander",\s*30354,\s*23,\s*29\)' 'Observed corpse credit rules should keep known low credit ranges; these rules cannot produce the old 111-credit symptom.'
 Assert-SourceNoMatch $combatCorpseRulesSource 'ObservedCorpseCreditRule\([^)]*,\s*111\s*(?:,|\))|ObservedCorpseCreditRule\([^)]*,\s*\d+\s*,\s*111\s*(?:,|\))' 'Observed corpse credit rules should not encode 111 as a min or max credit value.'
@@ -145,16 +169,16 @@ Assert-SourceOrdered $playfieldSource @(
     'FindByIdentity<ICharacter>\s*\(\s*award\.LooterIdentity\s*\)',
     'AwardCorpseCredits\s*\(\s*looter,\s*corpse\s*\)'
 ) 'Delayed corpse credit processing should remove the pending award, resolve corpse and looter, then award credits.'
-Assert-SourceMatch $playfieldSource 'AwardCorpseCredits\s*\(ICharacter\s+looter,\s*CorpseState\s+corpse\).*?uint\s+cashBeforeBase\s*=\s*looter\.Stats\s*\[\s*StatIds\.cash\s*\]\.BaseValue;.*?int\s+cashBefore\s*=\s*CashStatRules\.Clamp\s*\(\s*cashBeforeBase\s*\);.*?int\s+cashAfter\s*=\s*CashStatRules\.Clamp\s*\(\s*\(long\)cashBefore\s*\+\s*corpse\.Credits\s*\);.*?looter\.Stats\s*\[\s*StatIds\.cash\s*\]\.Set\s*\(\s*\(uint\)cashAfter\s*\).*?StatMessageHandler\.Default\.SendChanged\s*\(\s*looter\s*\)' 'Corpse credit award should add from authoritative cash BaseValue, mutate cash once, and send the normal changed-stat packet.'
-Assert-SourceMatch $playfieldSource 'AwardCorpseCredits\s*\(ICharacter\s+looter,\s*CorpseState\s+corpse\).*?StatMessageHandler\.Default\.SendChanged\s*\(\s*looter\s*\).*?SendCorpseCreditFeedback\s*\(.*?"You received \{0\} \{1\} from the corpse\.",\s*corpse\.Credits' 'Corpse credit chat text should use the same corpse.Credits value after the cash Stat send.'
+Assert-SourceMatch $awardCorpseCreditsSource 'uint\s+cashBeforeBase\s*=\s*looter\.Stats\s*\[\s*StatIds\.cash\s*\]\.BaseValue;.*?int\s+cashBefore\s*=\s*CashStatRules\.Clamp\s*\(\s*cashBeforeBase\s*\);.*?int\s+cashAfter\s*=\s*CashStatRules\.Clamp\s*\(\s*\(long\)cashBefore\s*\+\s*corpse\.Credits\s*\);.*?looter\.Stats\s*\[\s*StatIds\.cash\s*\]\.Set\s*\(\s*\(uint\)cashAfter\s*\).*?StatMessageHandler\.Default\.SendChanged\s*\(\s*looter\s*\)' 'Corpse credit award should add from authoritative cash BaseValue and send the normal changed-stat packet.'
+Assert-True ((Count-SourceMatches $awardCorpseCreditsSource 'Stats\s*\[\s*StatIds\.cash\s*\]\.Set\s*\(') -eq 1) 'Corpse credit award should mutate cash exactly once.'
+Assert-True ((Count-SourceMatches $awardCorpseCreditsSource 'StatMessageHandler\.Default\.SendChanged\s*\(\s*looter\s*\)') -eq 1) 'Corpse credit award should emit exactly one changed-stat send.'
+Assert-SourceNoMatch $awardCorpseCreditsSource 'SendCorpseCreditFeedback|ChatTextMessageHandler\.Default\.Send|You received \{0\} \{1\} from the corpse|Corpse credit feedback sent' 'Corpse credit award should not send manual ChatText feedback; the client derives corpse credit text from the corrected corpse cash/stat flow.'
 Assert-SourceMatch $playfieldSource 'Corpse credits awarded corpse=\{0\} looter=\{1\} credits=\{2\} cashBeforeBase=\{3\} cashAfter=\{4\} inventoryHandle=\{5\}' 'Corpse credit award log should include credit value, prior cash, final cash, and inventory handle for trace comparison.'
-Assert-SourceMatch $playfieldSource 'SendCorpseCreditFeedback\s*\(ICharacter\s+character,\s*string\s+text\).*?ChatTextMessageHandler\.Default\.Send\s*\(\s*character,\s*text\s*\)' 'Corpse credit feedback should stay on the visible ChatText path.'
 
 Assert-SourceMatch $statsSource 'this\.cash\s*=\s*new\s+Stat\s*\(\s*this,\s*61,\s*0,\s*true,\s*false,\s*false\s*\)' 'Cash stat should send BaseValue through changed-stat packets.'
 Assert-SourceMatch $statSource 'public\s+void\s+Set\s*\(uint\s+value,\s*bool\s+starting\s*=\s*false\).*?if\s*\(\s*value\s*!=\s*this\.BaseValue\s*\).*?this\.Changed\s*=\s*true;.*?this\.BaseValue\s*=\s*max' 'Stat.Set should mark changed and update BaseValue when corpse credits mutate cash.'
 Assert-SourceMatch $statsSource 'GetChangedStats\s*\(Dictionary<int,\s*uint>\s+toPlayer,\s*Dictionary<int,\s*uint>\s+toPlayfield\).*?stat\.SendBaseValue\s*\?\s*stat\.BaseValue\s*:\s*\(uint\)stat\.Value.*?stat\.Changed\s*=\s*false' 'Changed cash stats should serialize BaseValue and clear the changed flag through the normal pipeline.'
 Assert-SourceMatch $statHandlerSource 'if\s*\(\s*statsToClient\.TryGetValue\s*\(\s*\(int\)StatIds\.cash,\s*out\s+clientCash\s*\)\s*\).*?clientCash\s*=\s*CashStatRules\.Normalize\s*\(\s*character\s*\).*?statsToClient\s*\[\s*\(int\)StatIds\.cash\s*\]\s*=\s*clientCash' 'Bulk cash stat sends should normalize to authoritative cash before serializing.'
-Assert-SourceMatch $chatTextHandlerSource 'public\s+void\s+Send\s*\(ICharacter\s+character,\s*string\s+text.*?this\.Send\s*\(\s*character,\s*Filler\s*\(\s*character,\s*text.*?x\.Text\s*=\s*text' 'ChatText handler should send the exact corpse credit text string it is given.'
 
 Assert-SourceOrdered $clientMoveItemSource @(
     'Read\s*\(ClientMoveItemToInventoryMessage\s+message,\s*IZoneClient\s+client\)',
