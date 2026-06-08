@@ -65,8 +65,13 @@ Create a maintainable, evidence-backed local AO server that can support login, c
 - `CellAO/Libraries/Source/CellAO.Database`: database access and entities.
 - `CellAO/Libraries/Source/CellAO.Stats`: stat definitions and stat handling.
 - `CellAO/Libraries/Source/AOtomation`: packet/message models.
-- `CellAO/Documentation`: existing technical docs, packet notes, enum docs, and repair reports.
-- `docs`: AI handoff documentation created for this project.
+- `CellAO/Documentation`: generated enum/stat documentation and original generated reference files.
+- `docs/ai`: active AI workflow and task documentation.
+- `docs/project`: active project overview, architecture, decisions, features, roadmap, and status.
+- `docs/backlog`: current bugs and TODO lists.
+- `docs/reports`: current audit reports.
+- `docs/reference`: packet, gameplay, enemy, loot, and client-DLL reference reports and data.
+- `docs/archive`: historical AI session notes and dated handoffs.
 - `tools-temp`: active capture, smoke test, replay, DB backup, and experimental tooling.
 - `Tools`: historical utility projects and launcher tooling.
 
@@ -79,4 +84,3 @@ Unknowns:
 - TODO: Requires human clarification for the intended long-term branch/release policy.
 - TODO: Requires human clarification for production deployment expectations.
 - TODO: Requires human clarification for how much historical CellAO behavior should be preserved versus current-client parity.
-

@@ -2,7 +2,7 @@
 
 Generated: 2026-05-09 15:05:13 -05:00
 
-Input map: C:\Users\Mike\Documents\Cellao-Clean\CellAO\Documentation\AOClientDllFunctionMap\ao_client_dll_combat_corpse_loot_readable_functions.csv
+Input map: C:\Users\Mike\Documents\Cellao-Clean\docs\reference\client-dll-function-map\ao_client_dll_combat_corpse_loot_readable_functions.csv
 
 Outputs:
 - cellao_cross_reference_combat_corpse_loot.csv - all mapped combat/corpse/loot rows with CellAO hit samples.

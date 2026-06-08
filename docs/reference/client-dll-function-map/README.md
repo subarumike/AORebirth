@@ -52,7 +52,7 @@ Important `Gamecode.dll` Ghidra rows:
 PowerShell:
 
 ```powershell
-$map = 'C:\Users\Mike\Documents\Cellao-Clean\CellAO\Documentation\AOClientDllFunctionMap'
+$map = 'C:\Users\Mike\Documents\Cellao-Clean\docs\reference\client-dll-function-map'
 Import-Csv "$map\ghidra\ao_client_dll_ghidra_functions_readable.csv" |
   Where-Object { $_.Name -match 'Corpse|Loot|Attack|Fight|N3Msg' } |
   Select-Object Program,EntryPoint,Name,Namespace,Signature

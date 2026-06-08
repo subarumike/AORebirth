@@ -17,8 +17,12 @@ Generated: 2026-06-02
 - Core entity/inventory/item logic belongs under `CellAO/Libraries/Source/CellAO.Core`.
 - Packet models belong under AOtomation unless a custom ZoneEngine packet builder is intentionally used.
 - Temporary capture/test tooling belongs under `tools-temp`.
-- AI handoff documentation belongs under root `docs`.
-- Existing generated or technical docs remain under `CellAO/Documentation`.
+- Active AI workflow documentation belongs under `docs/ai`.
+- Active project documentation belongs under `docs/project`.
+- Backlog documentation belongs under `docs/backlog`.
+- Authored reports and large evidence references belong under `docs/reference` or `docs/reports`.
+- Historical AI notes and dated handoffs belong under `docs/archive`.
+- Generated enum/stat documentation remains under `CellAO/Documentation`.
 
 ## Class Design Rules
 
@@ -78,4 +82,3 @@ Generated: 2026-06-02
 - Do not revert user or previous-agent changes unless Mike explicitly asks.
 - Keep commits split by system.
 - Do not mix unverified NPC movement with stable equipment/trade/corpse fixes.
-

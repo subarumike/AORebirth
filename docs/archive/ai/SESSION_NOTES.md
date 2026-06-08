@@ -17,19 +17,19 @@ Work performed:
 Files modified:
 
 - `AI_START_HERE.md`
-- `docs/PROJECT_OVERVIEW.md`
-- `docs/ARCHITECTURE.md`
-- `docs/CURRENT_TASK.md`
-- `docs/KNOWN_DECISIONS.md`
-- `docs/ROADMAP.md`
-- `docs/FEATURES.md`
-- `docs/BUGS.md`
-- `docs/TESTING.md`
-- `docs/SESSION_NOTES.md`
-- `docs/CODE_STANDARDS.md`
-- `docs/CHANGELOG_AI.md`
-- `docs/TODO.md`
-- `docs/LESSONS_LEARNED.md`
+- `docs/project/OVERVIEW.md`
+- `docs/project/ARCHITECTURE.md`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/KNOWN_DECISIONS.md`
+- `docs/project/ROADMAP.md`
+- `docs/project/FEATURES.md`
+- `docs/backlog/BUGS.md`
+- `docs/ai/TESTING.md`
+- `docs/archive/ai/SESSION_NOTES.md`
+- `docs/ai/CODE_STANDARDS.md`
+- `docs/ai/CHANGELOG_AI.md`
+- `docs/backlog/TODO.md`
+- `docs/archive/ai/LESSONS_LEARNED.md`
 
 Issues encountered:
 
@@ -44,6 +44,5 @@ Results:
 
 Next steps:
 
-- Continue corpse credit/trade inventory root-cause investigation from `docs/CURRENT_TASK.md`.
+- Continue corpse credit/trade inventory root-cause investigation from `docs/ai/CURRENT_TASK.md`.
 - Update this file before ending future sessions.
-

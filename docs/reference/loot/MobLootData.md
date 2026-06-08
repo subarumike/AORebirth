@@ -66,9 +66,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools-temp\mob-loot-covera
 
 Output files:
 
-- `CellAO\Documentation\MobLootCoverage\MobLootCoverage.csv`
-- `CellAO\Documentation\MobLootCoverage\MobDropTableItems.csv`
-- `CellAO\Documentation\MobLootCoverage\MobLootSummary.csv`
+- `docs\reference\loot\mob-loot-coverage\MobLootCoverage.csv`
+- `docs\reference\loot\mob-loot-coverage\MobDropTableItems.csv`
+- `docs\reference\loot\mob-loot-coverage\MobLootSummary.csv`
 
 The exporter reads item names from `cellao_codex_clean` when MySQL is available. It refuses to read any other database.
 
@@ -80,8 +80,8 @@ python .\tools-temp\live-loot-observations\Export-ObservedMobLootSeed.py
 
 Output files:
 
-- `CellAO\Documentation\MobLootCoverage\ObservedLiveLootSeed.csv`
-- `CellAO\Documentation\MobLootCoverage\ObservedLiveLootSeed.review.sql`
+- `docs\reference\loot\mob-loot-coverage\ObservedLiveLootSeed.csv`
+- `docs\reference\loot\mob-loot-coverage\ObservedLiveLootSeed.review.sql`
 
 The SQL file is not applied automatically. It is only a starting point for
 reviewing observed item ids, sample sizes, estimated rates, and enemy names that

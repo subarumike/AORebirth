@@ -4,10 +4,10 @@ The AO client does not appear to contain exact live spawn tables, but it does co
 
 Generated files:
 
-- `ClientRdbZoneEnemyHints.csv`: playfield-level enemy hints from client district, area, and statel records.
-- `ClientRdbNpcTemplateHints.csv`: NPC/monster template-name hints from client RDB type `1040023`.
-- `ClientHintedEnemyCoverage.csv`: client-hinted enemy families compared against the current supported combat test catalog.
-- `MonsterDataCorpseVisualHints.csv`: CellAO mob templates matched to local model-viewer `MonsterData -> CatMesh` data.
+- `data/ClientRdbZoneEnemyHints.csv`: playfield-level enemy hints from client district, area, and statel records.
+- `data/ClientRdbNpcTemplateHints.csv`: NPC/monster template-name hints from client RDB type `1040023`.
+- `data/ClientHintedEnemyCoverage.csv`: client-hinted enemy families compared against the current supported combat test catalog.
+- `data/MonsterDataCorpseVisualHints.csv`: CellAO mob templates matched to local model-viewer `MonsterData -> CatMesh` data.
 
 Extractor:
 
