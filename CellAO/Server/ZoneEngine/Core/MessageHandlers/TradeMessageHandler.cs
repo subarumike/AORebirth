@@ -87,6 +87,18 @@ namespace ZoneEngine.Core.MessageHandlers
                 message.Target,
                 message.Container);
 
+            LogUtil.Debug(
+                DebugInfoDetail.Shopping,
+                "TRADE_RX char=" + client.Controller.Character.Identity.ToString(true)
+                + " name=" + client.Controller.Character.Name
+                + " action=" + message.Action
+                + " p1=" + message.Param1
+                + " p2=" + message.Param2
+                + " p3=" + message.Param3
+                + " p4=" + message.Param4
+                + " target=" + message.Target.ToString(true)
+                + " container=" + message.Container.ToString(true));
+
             IItemContainer target;
             if ((message.Action != TradeAction.Accept)
                 && (message.Action != TradeAction.Confirm)
@@ -816,6 +828,20 @@ namespace ZoneEngine.Core.MessageHandlers
             int credits = Math.Max(0, message.Param2);
             shoppingBag.SetPlayerTradeCredits(character.Identity, credits);
 
+            LogUtil.Debug(
+                DebugInfoDetail.Shopping,
+                "TRADE_CREDIT_SET char=" + character.Identity.ToString(true)
+                + " name=" + character.Name
+                + " other=" + otherCharacter.Identity.ToString(true)
+                + " action=" + message.Action
+                + " p1=" + message.Param1
+                + " p2=" + message.Param2
+                + " p3=" + message.Param3
+                + " p4=" + message.Param4
+                + " target=" + message.Target.ToString(true)
+                + " container=" + message.Container.ToString(true)
+                + " storedCredits=" + credits);
+
             this.SendPlayerTradeCredits(character, character.Identity, credits);
             this.SendPlayerTradeCredits(otherCharacter, character.Identity, credits);
 
@@ -1024,6 +1050,18 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            LogUtil.Debug(
+                DebugInfoDetail.Shopping,
+                "TRADE_CREDIT_SEND viewer=" + viewer.Identity.ToString(true)
+                + " name=" + viewer.Name
+                + " offerOwner=" + offerOwner.ToString(true)
+                + " action=" + TradeAction.UpdateCredits
+                + " p1=0"
+                + " p2=" + credits
+                + " p3=0"
+                + " p4=0"
+                + " storedCredits=" + credits);
+
             this.Send(viewer, this.PlayerTradeCredits(offerOwner, credits));
         }
 
@@ -1062,7 +1100,26 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             // Live complete sends a pair of action-4 frames that clear both player panes.
+            LogUtil.Debug(
+                DebugInfoDetail.Shopping,
+                "TRADE_COMPLETE_SEND viewer=" + viewer.Identity.ToString(true)
+                + " name=" + viewer.Name
+                + " partner=" + partner.Identity.ToString(true)
+                + " frameIdentity=" + viewer.Identity.ToString(true)
+                + " action=" + TradeAction.Complete
+                + " target=" + partner.Identity.ToString(true)
+                + " container=" + partner.Identity.ToString(true));
             this.Send(viewer, this.PlayerTradeClose(viewer.Identity, TradeAction.Complete, partner.Identity, partner.Identity));
+
+            LogUtil.Debug(
+                DebugInfoDetail.Shopping,
+                "TRADE_COMPLETE_SEND viewer=" + viewer.Identity.ToString(true)
+                + " name=" + viewer.Name
+                + " partner=" + partner.Identity.ToString(true)
+                + " frameIdentity=" + partner.Identity.ToString(true)
+                + " action=" + TradeAction.Complete
+                + " target=" + viewer.Identity.ToString(true)
+                + " container=" + viewer.Identity.ToString(true));
             this.Send(viewer, this.PlayerTradeClose(partner.Identity, TradeAction.Complete, viewer.Identity, viewer.Identity));
         }
 
@@ -1311,6 +1368,16 @@ namespace ZoneEngine.Core.MessageHandlers
                         + " tradeSlot=" + offer.Key
                         + " targetSlot=" + targetSlot
                         + " item=" + offer.Value.LowID + "/" + offer.Value.HighID + ":" + offer.Value.Quality);
+
+                    LogUtil.Debug(
+                        DebugInfoDetail.Shopping,
+                        "TRADE_ITEM_COMMIT from=" + from.Identity.ToString(true)
+                        + " fromName=" + from.Name
+                        + " to=" + to.Identity.ToString(true)
+                        + " toName=" + to.Name
+                        + " sourceSlot=" + offer.Key
+                        + " targetSlot=" + targetSlot
+                        + " item=" + offer.Value.LowID + "/" + offer.Value.HighID + ":" + offer.Value.Quality);
                 }
                 else
                 {
@@ -1388,6 +1455,19 @@ namespace ZoneEngine.Core.MessageHandlers
                 DebugInfoDetail.Shopping,
                 "Player trade credits committed shopper=" + shopper.Identity.ToString(true)
                 + " vendor=" + vendor.Identity.ToString(true)
+                + " shopperCredits=" + shopperCredits
+                + " vendorCredits=" + vendorCredits
+                + " shopperCashBefore=" + shopperCash
+                + " vendorCashBefore=" + vendorCash
+                + " shopperCashAfter=" + shopperFinalCash
+                + " vendorCashAfter=" + vendorFinalCash);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Shopping,
+                "TRADE_CREDIT_COMMIT shopper=" + shopper.Identity.ToString(true)
+                + " shopperName=" + shopper.Name
+                + " vendor=" + vendor.Identity.ToString(true)
+                + " vendorName=" + vendor.Name
                 + " shopperCredits=" + shopperCredits
                 + " vendorCredits=" + vendorCredits
                 + " shopperCashBefore=" + shopperCash
@@ -1558,6 +1638,13 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 offerPage.Remove(offer.Key);
                 owner.BaseInventory[owner.BaseInventory.StandardPage].Add(targetSlot, offer.Value);
+                LogUtil.Debug(
+                    DebugInfoDetail.Shopping,
+                    "TRADE_DECLINE_RETURN owner=" + owner.Identity.ToString(true)
+                    + " name=" + owner.Name
+                    + " sourceSlot=" + offer.Key
+                    + " targetSlot=" + targetSlot
+                    + " item=" + offer.Value.LowID + "/" + offer.Value.HighID + ":" + offer.Value.Quality);
                 this.SendTradeWindowMoveToInventory(owner, IdentityType.KnuBotTradeWindow, offer.Key, targetSlot);
             }
         }

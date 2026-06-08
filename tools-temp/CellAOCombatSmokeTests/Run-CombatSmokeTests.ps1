@@ -196,14 +196,14 @@ $followPositionInfoSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Librar
 $followStopInfoSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\GameData\FollowStopInfo.cs')
 $followInfoSerializerSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\Serialization\Serializers\Custom\FollowInfoSerializer.cs')
 $followTargetHandlerSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Server\ZoneEngine\Core\MessageHandlers\FollowTargetMessageHandler.cs')
-$zoneEnemyHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbZoneEnemyHints.csv'
-$npcTemplateHintsPath = Join-Path $repoRoot 'CellAO\Documentation\ClientRdbNpcTemplateHints.csv'
-$enemyCoveragePath = Join-Path $repoRoot 'CellAO\Documentation\ClientHintedEnemyCoverage.csv'
-$visualHintsPath = Join-Path $repoRoot 'CellAO\Documentation\MonsterDataCorpseVisualHints.csv'
-$livePacketGapsSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Documentation\LivePacketImplementationGaps.md')
+$zoneEnemyHintsPath = Join-Path $repoRoot 'docs\reference\enemies\data\ClientRdbZoneEnemyHints.csv'
+$npcTemplateHintsPath = Join-Path $repoRoot 'docs\reference\enemies\data\ClientRdbNpcTemplateHints.csv'
+$enemyCoveragePath = Join-Path $repoRoot 'docs\reference\enemies\data\ClientHintedEnemyCoverage.csv'
+$visualHintsPath = Join-Path $repoRoot 'docs\reference\enemies\data\MonsterDataCorpseVisualHints.csv'
+$livePacketGapsSource = Get-Content -Raw (Join-Path $repoRoot 'docs\reference\packets\LivePacketImplementationGaps.md')
 $chaseObservationSource = Get-Content -Raw (Join-Path $repoRoot 'tools-temp\live-combat-chase-observations\README.md')
-$enemyNpcMapSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Documentation\EnemyNpcDllAodbMap.md')
-$mobLootDataSource = Get-Content -Raw (Join-Path $repoRoot 'CellAO\Documentation\MobLootData.md')
+$enemyNpcMapSource = Get-Content -Raw (Join-Path $repoRoot 'docs\reference\enemies\EnemyNpcDllAodbMap.md')
+$mobLootDataSource = Get-Content -Raw (Join-Path $repoRoot 'docs\reference\loot\MobLootData.md')
 
 Assert-SourceMatch $fullCharacterSource 'MsgVersion\s*=\s*26\s*;' 'FullCharacter login packet must stay on live-compatible MsgVersion 26.'
 Assert-SourceMatch $clientConnectedSource 'InitializeActionableState\s*\(\s*client\s*\)\s*;' 'ClientConnected must initialize the live-style actionable login state.'
