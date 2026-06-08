@@ -6,7 +6,7 @@ This is the primary handoff file. Update it before ending a work session.
 
 ## Current Objective
 
-Stabilize inventory, corpse loot, credits, and player trade behavior using packet evidence. The immediate symptom under investigation is client-visible credit/item desync after corpse loot and trade flows.
+Stabilize inventory, corpse loot, credits, and player trade behavior using packet evidence. The corpse credit desync investigation is complete; the next highest-value unfinished area is player trade credit/item display behavior.
 
 ## Current Implementation State
 
@@ -18,12 +18,12 @@ Verified or previously playtested as working:
 - Equipment delay synchronization.
 - Equipped items persisting across relog.
 - Death/respawn white-screen repair.
-- Basic corpse creation, loot window, item looting, unique-item checks, and corpse despawn timing.
+- Basic corpse creation, loot window, item looting, unique-item checks, credit loot, and corpse despawn timing.
+- Corpse credit investigation completed: `CorpseFullUpdate` now patches corpse cash at offset `207`, manual corpse credit chat feedback is suppressed, focused assertions are retained, and Cliff Malle playtest showed one correct `3 credits` client message.
 - Correct player trade window selection reached during recent work, but item/credit display behavior still needed follow-up.
 
 Currently unstable or unresolved:
 
-- Corpse credit desync where local client displayed unexpected values such as `111 credits from the corpse` or changing visible credit totals after loot.
 - Trade credits failed or desynced during testing.
 - Stale trade-window item visuals appeared after completed trades in some sequences.
 - NPC movement remains high-risk and should not be patched without source/capture evidence.
@@ -67,33 +67,32 @@ Do not revert these blindly. Some are active user/project work.
 - AOSharp `ContainerAddItem`/inventory message models support the need to compare CellAO packet fields against newer client-side models.
 - Existing docs under `CellAO/Documentation` now contain several high-value packet and mismatch reports.
 - Root AI handoff docs were created to preserve context across sessions.
+- Corpse credit root cause was traced and repaired. The hardcoded `111` came from the old corpse cash template value, `CorpseFullUpdate` was corrected to patch the cash value word at offset `207`, and the server-side manual corpse credit `ChatText` was removed after the client generated the corrected message itself.
+- `tools-temp/CellAOCombatSmokeTests/Run-CorpseCreditTraceAssertions.ps1` now guards the corpse credit flow, including credit roll ranges, `CorpseFullUpdate` cash offset `207`, delayed cash mutation, changed-stat emission, and item loot not mutating cash.
+- Playtest verification passed on `Codex Test Cliff Malle`: the client displayed a single `You received 3 credits from the corpse.` line.
 
 ## Immediate Next Steps
 
-1. Inspect local code paths that can emit corpse-credit chat text or modify cash stats.
-2. Trace corpse loot from client request through:
-   - `GenericCmd Use`
-   - `InventoryUpdate`
-   - `ClientMoveItemToInventory`
-   - `ContainerAddItem`
-   - stat/cash update
-   - chat feedback
-3. Compare emitted local packets with captured official/private packet evidence.
-4. Do not add a workaround that clamps values without identifying the source of the bad value.
-5. Run smoke/source tests after any repair.
-6. Start engines only when Mike asks for playtest.
+1. Trace player trade credit and item display behavior end to end.
+2. Compare trade packet fields against current local logs, AOSharp/AOtomation references, and any available capture evidence.
+3. Verify whether stale trade-window item visuals are caused by trade-window close/reset packets, item return acks, inventory refresh, or stat/cash emission ordering.
+4. Do not patch NPC movement as part of trade/inventory work.
+5. Do not add broad inventory rewrites or cash clamps; patch only the confirmed trade emitter/path.
+6. Run focused smoke/source assertions after any repair.
+7. Start engines only when Mike asks for playtest.
 
 ## Recommended Next Task
 
-Build a narrow trace table for corpse credit flow. For every possible credit mutation or credit chat send, record:
+Build a narrow trace table for player trade credit/item flow. For every possible trade credit mutation, item transfer, item return, trade-window update, stat send, and chat/error message, record:
 
 - file and method,
 - trigger packet or command,
 - input value,
-- stat write,
-- chat text value,
+- cash/stat write,
+- item inventory write,
+- trade-window outbound packet,
+- chat/error text value,
 - outbound packet value,
 - source evidence.
 
 Then patch only the confirmed bad path.
-

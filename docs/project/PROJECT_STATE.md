@@ -10,7 +10,7 @@ CellAO NightPredator is a local C#/.NET Framework-era Anarchy Online server work
 - Weapon and armor equipment visuals are repaired for the current test scope.
 - Equipped items persist across relog in the documented test scope.
 - Death/respawn white-screen behavior is repaired.
-- Corpse use, item loot, credit loot, XP text, and corpse despawn have working documented paths.
+- Corpse use, item loot, credit loot, XP text, and corpse despawn have working documented paths. The completed corpse credit investigation fixed the `CorpseFullUpdate` cash offset, removed duplicate manual corpse credit chat, retained focused assertions, and passed Cliff Malle playtest verification.
 - Player trade item and credit transfer have been repaired in the documented test scope.
 - Vendor shop buy, sell, close, and current-client ICC shop stock coverage have been repaired for the captured Fair Trade areas.
 - Surgery clinic and implant flows have documented repaired behavior.
@@ -19,7 +19,7 @@ CellAO NightPredator is a local C#/.NET Framework-era Anarchy Online server work
 
 - Inventory and container behavior work for several repaired flows but still need broader regression coverage.
 - Combat works for basic weapon/NPC test scenarios, but packet semantics are not complete.
-- Corpse visuals and `CorpseFullUpdate` remain areas for cleanup.
+- Corpse visuals and `CorpseFullUpdate` remain areas for broader cleanup, but the corpse cash value offset is repaired and guarded by focused assertions.
 - Shop/vendor database coverage is improved but still has remaining static vendor coverage gaps.
 - Playfield/interior mapping has repaired fixtures and remaining audit candidates.
 - Enemy spawn testing has supported low-level families, but final spawn tables are not complete.
@@ -36,11 +36,20 @@ CellAO NightPredator is a local C#/.NET Framework-era Anarchy Online server work
 
 # Current Development Focus
 
-The latest completed work focused on captured current-client vendor/shop data for ICC/Fair Trade terminals and documentation reorganization. Future behavior changes should continue to use live capture, private-server capture, AO stripdown source, or local code facts as evidence.
+The latest completed gameplay work finished the corpse credit investigation. Future behavior changes should continue to use live capture, private-server capture, AO stripdown source, or local code facts as evidence.
 
 # Last Completed Milestone
 
-ICC/Fair Trade vendor stock repairs were pushed to `origin/master` in commit `cffc5da` after verification showed:
+Corpse credit repairs were pushed to `origin/master` in commits `343a31d` and `e953c76` after verification showed:
+
+- `CorpseFullUpdate` cash stat id remains at offset `203`.
+- Corpse cash value is patched at offset `207`.
+- The old hardcoded `111` cash value is not preserved.
+- Delayed corpse credit award mutates cash once and sends the normal changed-stat packet.
+- Manual server `ChatText` corpse credit feedback is suppressed so the client displays one corrected message.
+- Cliff Malle playtest displayed one `You received 3 credits from the corpse.` message.
+
+Prior ICC/Fair Trade vendor stock repairs were pushed to `origin/master` in commit `cffc5da` after verification showed:
 
 - vendor DB issues: 0
 - shop inventory item-cache issues: 0
@@ -49,4 +58,4 @@ ICC/Fair Trade vendor stock repairs were pushed to `origin/master` in commit `cf
 
 # Next Milestone
 
-Keep documentation entry points small and current. For gameplay work, choose the next target from `docs/ai/CURRENT_TASK.md` and validate through focused capture, smoke/source assertions, and Mike's playtest when client behavior matters.
+Trace and verify player trade credit/item display behavior from `docs/ai/CURRENT_TASK.md`, keeping NPC movement out of scope unless explicitly selected later. Validate with focused capture, smoke/source assertions, and Mike's playtest when client behavior matters.
