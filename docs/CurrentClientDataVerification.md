@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-07 20:39:46
+Generated: 2026-06-08 01:12:47
 
 ## Scope
 
@@ -18,9 +18,9 @@ Generated: 2026-06-07 20:39:46
 | Built playfields | 618 |
 | Data file source/runtime/version issues | 0 |
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
-| Vendor DB rows with issues | 4 |
-| Shop inventory rows with item-cache issues | 1 |
-| Vending statels without complete DB shop coverage | 832 |
+| Vendor DB rows with issues | 0 |
+| Shop inventory rows with item-cache issues | 0 |
+| Vending statels without complete DB shop coverage | 730 |
 
 ## Data Files
 
@@ -44,9 +44,9 @@ This separates template-cache truth from live runtime instance truth. If items.d
 ## Highest Value Repair Targets
 
 1. Source/runtime data files are aligned.
-2. Fix vendor DB rows with missing template/shop coverage before chasing individual shop terminal behavior.
+2. Vendor DB rows have template/shop coverage.
 3. Review statel vendors with no DB row; these spawn as empty statel vendors and can produce missing shop entry behavior.
-4. Repair shop inventory rows whose item IDs do not exist in the current item cache.
+4. Shop inventory item IDs resolve in current item cache.
 
 ## Report Files
 
@@ -58,12 +58,7 @@ This separates template-cache truth from live runtime instance truth. If items.d
 
 ## Top Vendor DB Issues
 
-| Id | Playfield | Hash | DB template | Template item | Shop hash | Active items | Issues |
-| ---: | ---: | --- | ---: | ---: | --- | ---: | --- |
-| 77725745 | 1186 | ICCPhaS | 297395 | 297395 | PC1H | 0 | shop inventory empty or inactive |
-| 77791233 | 1187 | ContG | 99634 | 99501 | Cont | 62 | vendors.TemplateId differs from vendortemplate.ItemTemplate |
-| 77791237 | 1187 | MedA | 152008 | 99575 | Med | 11 | vendors.TemplateId differs from vendortemplate.ItemTemplate |
-| 77791238 | 1187 | MedS | 152012 | 151975 | Med | 11 | vendors.TemplateId differs from vendortemplate.ItemTemplate |
+No vendor DB issues found.
 
 ## Top Statel Vendor Coverage Issues
 

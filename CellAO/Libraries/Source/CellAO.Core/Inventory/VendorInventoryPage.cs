@@ -51,10 +51,12 @@ namespace CellAO.Core.Inventory
 
     public class VendorInventoryPage : BaseInventoryPage, IItemSlotHandler, IItemHotSwapHandler, IEquipmentPage
     {
+        private const int MaxVendorSlots = 1024;
+
         private readonly Utility.WeakReference<Vendor> ownerReference;
 
         public VendorInventoryPage(Identity ownerInstance)
-            : base((int)IdentityType.Inventory, 250, 0, ownerInstance)
+            : base((int)IdentityType.Inventory, MaxVendorSlots, 0, ownerInstance)
         {
             this.ownerReference = new Utility.WeakReference<Vendor>(Pool.Instance.GetObject<Vendor>(ownerInstance));
         }
@@ -107,7 +109,7 @@ namespace CellAO.Core.Inventory
                         ? inventoryEntry.MaxQl
                         : vendorTemplate.MaxQl;
 
-                    int itemQl = minQl + rnd.Next(maxQl - minQl);
+                    int itemQl = minQl + rnd.Next(maxQl - minQl + 1);
 
                     Item item = new Item(itemQl, inventoryEntry.LowId, inventoryEntry.HighId);
                     this.Add(slotNumber, item);
