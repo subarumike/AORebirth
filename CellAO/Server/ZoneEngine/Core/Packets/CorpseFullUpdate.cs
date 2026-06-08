@@ -29,7 +29,11 @@ namespace ZoneEngine.Core.Packets
         private const int RaceOffset = 175;
         private const int DeadNpcInstanceOffset = 191;
         private const int CorpseCatMeshOffset = 199;
-        private const int CorpseCashValueOffset = 211;
+        // The captured template encodes corpse cash as stat id 61 at offset 203
+        // followed by its 32-bit value at offset 207. The old template value was
+        // hardcoded to 111, so this offset must patch the value word, not the
+        // following word at 211.
+        private const int CorpseCashValueOffset = 207;
         private const int CorpseMonsterDataOffset = 330;
         private const int TailDeadNpcInstanceOffset = 342;
 
