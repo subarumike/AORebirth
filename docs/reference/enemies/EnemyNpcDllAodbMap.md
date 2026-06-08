@@ -77,7 +77,7 @@ Database loot:
 - `mobtemplate` has `DropHashes`, `DropSlots`, `DropRates`.
 - `mobdroptable` has `Hash`, `LowId`, `HighId`, `MinQl`, `MaxQl`, `RangeCheck`.
 - DB-backed corpse loot rolling is wired through the same corpse state used by deterministic test loot. Runtime checks `CombatTestLootCatalog` first for controlled Codex test mobs, then falls back to parsed `mobtemplate`/`mobdroptable` entries for configured population mobs.
-- Current detailed loot status and approved next steps live in `MobLootData.md`.
+- Current detailed loot status and approved next steps live in `docs/reference/loot/MobLootData.md`.
 
 ## Live Death and Corpse Sequence
 
@@ -129,10 +129,10 @@ Useful conclusion:
 ## Client RDB Zone Enemy Hints
 
 Generated evidence files:
-- `Documentation\ClientRdbZoneEnemyHints.csv`
-- `Documentation\ClientRdbNpcTemplateHints.csv`
-- `Documentation\ClientHintedEnemyCoverage.csv`
-- `Documentation\MonsterDataCorpseVisualHints.csv`
+- `docs\reference\enemies\data\ClientRdbZoneEnemyHints.csv`
+- `docs\reference\enemies\data\ClientRdbNpcTemplateHints.csv`
+- `docs\reference\enemies\data\ClientHintedEnemyCoverage.csv`
+- `docs\reference\enemies\data\MonsterDataCorpseVisualHints.csv`
 
 Extractor:
 - `tools-temp\ao-client-rdb-hints\Export-AOClientZoneEnemyHints.ps1`
@@ -333,7 +333,7 @@ Server implication:
 
 5. Move creature visual mapping out of hardcoded one-offs.
    - Short term: extend a small static map for tested MonsterData ids.
-   - Current checked-in coverage file: `Documentation\MonsterDataCorpseVisualHints.csv`.
+   - Current checked-in coverage file: `docs\reference\enemies\data\MonsterDataCorpseVisualHints.csv`.
    - Medium term: generate a runtime-safe data file from AODB for `MonsterData -> CatMesh -> death anim key/resource`.
 
 ## Suggested Morning Test Target

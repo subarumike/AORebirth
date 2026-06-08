@@ -73,8 +73,8 @@ Why immediate:
 
 Evidence:
 - `NPCController.cs` now contains custom motion-segment prediction, throttling, follow stop distance, and combat stop logic.
-- `ProjectWorkingReference.md` records NPC chase as unresolved and requires capture/replay comparison before more chase changes.
-- `StripdownDirectRepairCandidates.md` explicitly says stripdown gives packet contracts, not enough runtime policy to keep changing chase behavior blindly.
+- `CellAO/Documentation/ProjectWorkingReference.md` records NPC chase as unresolved and requires capture/replay comparison before more chase changes.
+- `docs/reference/packets/StripdownDirectRepairCandidates.md` explicitly says stripdown gives packet contracts, not enough runtime policy to keep changing chase behavior blindly.
 
 Next useful work:
 - Build a replay comparison around captured official/private chase data and local outgoing `FollowTarget` / `CharDCMove` / position updates.
@@ -152,7 +152,7 @@ Repair direction:
 
 Current status:
 - Corpse use, item loot, credits, XP text, and despawn have worked in playtests.
-- `StripdownDirectRepairCandidates.md` still calls out corpse/full update and despawn packet distinctions.
+- `docs/reference/packets/StripdownDirectRepairCandidates.md` still calls out corpse/full update and despawn packet distinctions.
 
 Repair direction:
 - Keep runtime `Despawn` path that playtests proved.
@@ -405,4 +405,3 @@ Priority 3:
 - Perks/research.
 - Organizations.
 - PvP/tower systems.
-

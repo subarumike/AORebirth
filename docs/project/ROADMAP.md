@@ -12,7 +12,7 @@ Tasks:
 - Review dirty source files and group them by system.
 - Avoid committing unverified NPC movement changes as stable.
 - Keep source assertions for locked packet behavior.
-- Preserve `CellAO/Documentation/ProjectWorkingReference.md` as active session memory.
+- Preserve active session memory in `docs/ai/CURRENT_TASK.md`; use archived handoffs only as historical reference.
 
 ## Phase 2 - Repair Inventory, Corpse Credits, And Trade
 
@@ -60,4 +60,3 @@ Tasks:
 - Playfield population and pathing using verified navmesh/data sources.
 - More complete packet serializer tests for recovered N3 messages.
 - Long-term refactor of `Playfield.cs` into narrower services.
-

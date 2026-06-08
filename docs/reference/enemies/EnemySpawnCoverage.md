@@ -2,8 +2,8 @@
 
 Generated reports:
 
-- `MonsterDataCorpseVisualHints.csv`: CellAO mob templates matched to AO Model Viewer `MonsterData -> CatMesh` data.
-- `ClientHintedEnemyCoverage.csv`: client-hinted playfield enemy families compared against the current combat test catalog.
+- `data/MonsterDataCorpseVisualHints.csv`: CellAO mob templates matched to AO Model Viewer `MonsterData -> CatMesh` data.
+- `data/ClientHintedEnemyCoverage.csv`: client-hinted playfield enemy families compared against the current combat test catalog.
 
 Regenerate:
 

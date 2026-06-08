@@ -35,11 +35,11 @@
 
 [N3 Message IDs](./N3MessageIDs.md)
 
-[Enemy/NPC DLL and AODB Map](./EnemyNpcDllAodbMap.md)
+[Enemy/NPC DLL and AODB Map](../../docs/reference/enemies/EnemyNpcDllAodbMap.md)
 
-[Client RDB Enemy Spawn Hints](./ClientRdbEnemySpawnHints.md)
+[Client RDB Enemy Spawn Hints](../../docs/reference/enemies/ClientRdbEnemySpawnHints.md)
 
-[Enemy Spawn Coverage](./EnemySpawnCoverage.md)
+[Enemy Spawn Coverage](../../docs/reference/enemies/EnemySpawnCoverage.md)
 
 [Project Working Reference (Codex + Mike)](./ProjectWorkingReference.md)
 
