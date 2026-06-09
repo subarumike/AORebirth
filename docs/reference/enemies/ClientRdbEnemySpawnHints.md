@@ -68,7 +68,7 @@ The GM combat-test spawn path now uses these hints for supported low-level test 
 - `/command spawn status`: shows live combat test mobs in the current playfield.
 - `/command spawn clear`: despawns live combat test mobs and their test corpses in the current playfield without changing DB rows.
 
-The login debug enemy path uses the same playfield hint selector. If no live test mob already exists in the playfield, it spawns the first supported client-hinted test mob for that playfield, falling back to the global beach leet only when the playfield has no supported hints yet.
+Normal login no longer spawns debug enemies. Use `/command spawn hints` to inspect supported mappings and `/command spawn zone` to spawn the current playfield's supported client-hinted population mobs. `CombatTestMobArchetype.DefaultForPlayfield` remains available as a catalog fallback helper and returns the global beach leet only when the playfield has no supported hints.
 
 Currently supported families: leet, reet, snake, rollerrat, flea, lizard, malle, salamander, spider.
 
