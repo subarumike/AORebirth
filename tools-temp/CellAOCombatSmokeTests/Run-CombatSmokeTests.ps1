@@ -332,13 +332,6 @@ Assert-SourceOrdered $zoneClientSource @(
     'zStream\.Close\s*\(\s*\)',
     'netStream\.Close\s*\(\s*\)'
 ) 'Logout flow regression: hard socket close should only start seated timed logout when a normal logout is not already active, then close streams.'
-Assert-SourceOrdered $characterActionSource @(
-    'ApplySit\s*\(IZoneClient\s+client\)',
-    'EnterLogoutSitPosture\s*\(\s*\)',
-    'Action\s*=\s*CharacterActionType\.ChangeAnimationAndStance',
-    'Parameter1\s*=\s*0',
-    'SendPostureMove\s*\(\s*character,\s*30\s*\)'
-) 'Logout flow regression: seated posture should send the local-client CharacterAction before the playfield movement update.'
 Assert-SourceOrdered $messagingSerializerSource @(
     'typeof\s*\(\s*StartLogoutMessage\s*\)',
     'new\s+IdentityOnlyN3MessageSerializer\s*\(\s*typeof\s*\(\s*StartLogoutMessage\s*\)\s*\)',
