@@ -1,5 +1,33 @@
 # AI Changelog
 
+## 2026-06-09 - Verified Player Trade Display And Commit Behavior
+
+Change: Recorded the completed player-to-player trade verification after adding temporary trace logging.
+
+Files affected:
+
+- `CellAO/Server/ZoneEngine/Core/MessageHandlers/TradeMessageHandler.cs`
+- `tools-temp/CellAOCombatSmokeTests/Run-CombatSmokeTests.ps1`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/PROJECT_STATE.md`
+- `docs/ai/CHANGELOG_AI.md`
+
+Reason: Player trade credit and item display needed verification after prior reports of credit desync and stale trade-window visuals.
+
+Result:
+
+- Credit-only trade behaved as expected.
+- Item-only trade behaved as expected.
+- Mixed item-plus-credit trade behaved as expected.
+- Cancel/decline trade behaved as expected.
+- No player trade display or commit defect was reproduced.
+- Temporary `TRADE_*` logging remains available for future trade investigation.
+
+Follow-up work:
+
+- Build broader inventory/container regression coverage for repaired corpse loot, player trade, vendor shop, equipment, and normal inventory move flows.
+- Keep NPC movement out of scope unless explicitly selected later.
+
 ## 2026-06-08 - Completed Corpse Credit Investigation
 
 Change: Fixed the corpse credit client-visible value path and removed duplicate corpse credit chat.
