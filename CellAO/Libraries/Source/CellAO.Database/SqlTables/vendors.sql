@@ -219,6 +219,10 @@ INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`,
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299106304, 4564, 0, 0, 0, 0, 0, 0, 1, '', 152008, 'ToolA');
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299106307, 4564, 0, 0, 0, 0, 0, 0, 1, '', 151981, 'AtkA');
 
+-- 4565 Hardware Dimension - Superior safe statel vendor mappings.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299171840, 4565, 0, 0, 0, 0, 0, 0, 1, '', 152012, 'ToolS');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299171843, 4565, 0, 0, 0, 0, 0, 0, 1, '', 151982, 'AtkS');
+
 -- 4567 Dimensional Shift - Basic safe statel vendor mappings.
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299302912, 4567, 0, 0, 0, 0, 0, 0, 1, '', 155308, 'SNCB');
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299302915, 4567, 0, 0, 0, 0, 0, 0, 1, '', 155299, 'FNCB');
