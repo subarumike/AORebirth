@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -70,13 +71,17 @@ namespace AOSharpLiveCapture
 
         public override void Run(string pluginDir)
         {
+            DateTime captureStartUtc = DateTime.UtcNow;
+            DateTime captureStartLocal = DateTime.Now;
+
             this.sessionDirectory = CreateSessionDirectory(pluginDir);
             this.eventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "events.log"));
             this.packetsLog = CreateWriter(Path.Combine(this.sessionDirectory, "packets.hex.log"));
             this.shopUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "shop-updates.csv"));
             this.shopUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,TerminalIdentity,Slot,LowId,HighId,Quality");
             this.vendorFullUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
-            this.vendorFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,Identity,Unknown7,Template,Mesh,BuyModifier,SellModifier,StatsCount");
+            this.vendorFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,Identity,OwnerType,OwnerInstance,PlayfieldId,PositionX,PositionY,PositionZ,Unknown7,Template,Mesh,BuyModifier,SellModifier,StatsCount");
+            this.WriteCaptureSessionMetadata(captureStartUtc, captureStartLocal);
             this.enabled = true;
             this.nextFlushUtc = DateTime.UtcNow.AddSeconds(2);
             this.nextSnapshotUtc = DateTime.UtcNow.AddSeconds(1);
@@ -103,6 +108,7 @@ namespace AOSharpLiveCapture
             this.LogEvent("PLUGIN", "Smoke commands: /aosmoke start [mobAlias] | stop | status | log");
             this.LogEvent("PLUGIN", "ShopUpdate CSV: " + Path.Combine(this.sessionDirectory, "shop-updates.csv"));
             this.LogEvent("PLUGIN", "VendingMachineFullUpdate CSV: " + Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
+            this.LogEvent("PLUGIN", "Capture session metadata: " + Path.Combine(this.sessionDirectory, "capture-session.json"));
             this.LogSnapshot("initial");
             Chat.WriteLine("AOSharpLiveCapture logging to " + this.sessionDirectory, ChatColor.Gold);
         }
@@ -536,6 +542,12 @@ namespace AOSharpLiveCapture
                         Csv(direction),
                         sequence.ToString(CultureInfo.InvariantCulture),
                         Csv(message.Identity.ToString()),
+                        message.OwnerType.ToString(CultureInfo.InvariantCulture),
+                        message.OwnerInstance.ToString(CultureInfo.InvariantCulture),
+                        message.PlayfieldId.ToString(CultureInfo.InvariantCulture),
+                        OptionalFloat(() => message.Position.Value.X),
+                        OptionalFloat(() => message.Position.Value.Y),
+                        OptionalFloat(() => message.Position.Value.Z),
                         message.Unknown7.ToString(CultureInfo.InvariantCulture),
                         template.ToString(CultureInfo.InvariantCulture),
                         mesh.ToString(CultureInfo.InvariantCulture),
@@ -543,6 +555,54 @@ namespace AOSharpLiveCapture
                         sellModifier.ToString(CultureInfo.InvariantCulture),
                         stats.Length.ToString(CultureInfo.InvariantCulture)));
                 this.vendorFullUpdatesLog.Flush();
+            }
+        }
+
+        private void WriteCaptureSessionMetadata(DateTime captureStartUtc, DateTime captureStartLocal)
+        {
+            try
+            {
+                string path = Path.Combine(this.sessionDirectory, "capture-session.json");
+                Process process = Process.GetCurrentProcess();
+                try
+                {
+                    StringBuilder json = new StringBuilder();
+                    json.AppendLine("{");
+                    json.Append("  \"captureStartUtc\": ");
+                    json.Append(Json(captureStartUtc.ToString("o", CultureInfo.InvariantCulture)));
+                    json.AppendLine(",");
+                    json.Append("  \"captureStartLocal\": ");
+                    json.Append(Json(captureStartLocal.ToString("o", CultureInfo.InvariantCulture)));
+                    json.AppendLine(",");
+                    json.Append("  \"captureFolderPath\": ");
+                    json.Append(Json(this.sessionDirectory));
+                    json.AppendLine(",");
+                    json.AppendLine("  \"aoClientProcess\": {");
+                    json.Append("    \"id\": ");
+                    json.Append(process.Id.ToString(CultureInfo.InvariantCulture));
+                    json.AppendLine(",");
+                    json.Append("    \"processName\": ");
+                    json.Append(Json(Safe(() => process.ProcessName)));
+                    json.AppendLine(",");
+                    json.Append("    \"mainWindowTitle\": ");
+                    json.Append(Json(Safe(() => process.MainWindowTitle)));
+                    json.AppendLine();
+                    json.AppendLine("  },");
+                    json.Append("  \"notes\": ");
+                    json.Append(Json(string.Empty));
+                    json.AppendLine();
+                    json.AppendLine("}");
+
+                    File.WriteAllText(path, json.ToString(), Encoding.UTF8);
+                }
+                finally
+                {
+                    process.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                this.LogEvent("SESSION-METADATA-ERROR", ex.ToString());
             }
         }
 
@@ -853,6 +913,18 @@ namespace AOSharpLiveCapture
             }
         }
 
+        private static string OptionalFloat(Func<float> func)
+        {
+            try
+            {
+                return func().ToString("R", CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
         private static string OneLine(string value)
         {
             if (value == null)
@@ -871,6 +943,58 @@ namespace AOSharpLiveCapture
             }
 
             return "\"" + value.Replace("\"", "\"\"") + "\"";
+        }
+
+        private static string Json(string value)
+        {
+            if (value == null)
+            {
+                return "null";
+            }
+
+            StringBuilder result = new StringBuilder(value.Length + 2);
+            result.Append('"');
+            foreach (char ch in value)
+            {
+                switch (ch)
+                {
+                    case '\\':
+                        result.Append("\\\\");
+                        break;
+
+                    case '"':
+                        result.Append("\\\"");
+                        break;
+
+                    case '\r':
+                        result.Append("\\r");
+                        break;
+
+                    case '\n':
+                        result.Append("\\n");
+                        break;
+
+                    case '\t':
+                        result.Append("\\t");
+                        break;
+
+                    default:
+                        if (ch < ' ')
+                        {
+                            result.Append("\\u");
+                            result.Append(((int)ch).ToString("x4", CultureInfo.InvariantCulture));
+                        }
+                        else
+                        {
+                            result.Append(ch);
+                        }
+
+                        break;
+                }
+            }
+
+            result.Append('"');
+            return result.ToString();
         }
 
         private static string ToHex(byte[] bytes)
