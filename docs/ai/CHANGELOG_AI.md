@@ -1,5 +1,338 @@
 # AI Changelog
 
+## 2026-06-10 - Expanded Neutral Advanced Weapon Shop Vendor Coverage
+
+Change: Recorded the completed `2070 neut_advanced_weapons_shop` vendor coverage expansion.
+
+Files affected:
+
+- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `cellao_codex_clean.vendors`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/PROJECT_STATE.md`
+- `docs/ai/CHANGELOG_AI.md`
+
+Reason: Static vendor coverage remained incomplete after the neutral basic weapon shop pass. The approved safe mapping pass targeted 1 `2070 neut_advanced_weapons_shop` statel vendor with matching `vendortemplate` and active shop inventory evidence.
+
+Result:
+
+- Commit `9c41ed9` added the 1 approved source SQL mapping.
+- Targeted DB import inserted only that row into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import: `C:\Users\Mike\Documents\Cellao-Clean\tools-temp\db-backups\vendors_before_2070_neut_advanced_weapons_shop_20260610_040826.sql`.
+- Mapping added: `135659520 -> ICCAmmo`.
+- Total uncovered statel vendors dropped from `572` to `571`.
+- `2070 neut_advanced_weapons_shop` uncovered count dropped from `5` to `4`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 571`.
+- Rejected candidates `135659521`/`297466`, `135659522`/`297470`, `135659523`/`99572`, and `135659524`/`99573` remain uncovered because no matching `vendortemplate` evidence exists.
+- No runtime vendor behavior changed.
+
+Follow-up work:
+
+- No next target selected in this documentation update.
+- Do not guess unknown terminals.
+- Keep vendor transaction behavior and NPC movement out of scope.
+
+## 2026-06-10 - Expanded Neutral Basic Weapon Shop Vendor Coverage
+
+Change: Recorded the completed `2060 neut_basic_weapon_shop` vendor coverage expansion.
+
+Files affected:
+
+- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `cellao_codex_clean.vendors`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/PROJECT_STATE.md`
+- `docs/ai/CHANGELOG_AI.md`
+
+Reason: Static vendor coverage remained incomplete after the Hardware Dimension Superior pass. The approved safe mapping pass targeted 1 `2060 neut_basic_weapon_shop` statel vendor with matching `vendortemplate` and active shop inventory evidence.
+
+Result:
+
+- Commit `83fc74f` added the 1 approved source SQL mapping.
+- Targeted DB import inserted only that row into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `573` to `572`.
+- `2060 neut_basic_weapon_shop` uncovered count dropped from `5` to `4`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 572`.
+- No runtime vendor behavior changed.
+
+Follow-up work:
+
+- The `2070 neut_advanced_weapons_shop` follow-up pass is complete and recorded above.
+- No next target selected in this documentation update.
+- Do not guess unknown terminals.
+- Keep vendor transaction behavior and NPC movement out of scope.
+
+## 2026-06-10 - Expanded Hardware Dimension Superior Vendor Coverage
+
+Change: Recorded the completed `4565 Hardware Dimension - Superior` vendor coverage expansion.
+
+Files affected:
+
+- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `cellao_codex_clean.vendors`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/PROJECT_STATE.md`
+- `docs/ai/CHANGELOG_AI.md`
+
+Reason: Static vendor coverage remained incomplete after the Hardware Dimension Advanced pass. The approved safe mapping pass targeted 2 `4565 Hardware Dimension - Superior` statel vendors with matching `vendortemplate` and active shop inventory evidence.
+
+Result:
+
+- Commit `1810408` added the 2 approved source SQL mappings.
+- Targeted DB import inserted only those 2 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `575` to `573`.
+- `4565 Hardware Dimension - Superior` uncovered count dropped from `5` to `3`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 573`.
+- No runtime vendor behavior changed.
+
+Follow-up work:
+
+- Audit `2060 neut_basic_weapon _shop` next. Current post-import audit shows `5` uncovered statel vendors there, with `1` likely safe `ICCAmmo` candidate by existing `vendortemplate` and active `shopinventorytemplates` evidence.
+- Do not guess unknown terminals.
+- Keep vendor transaction behavior and NPC movement out of scope.
+
+## 2026-06-10 - Expanded Hardware Dimension Advanced Vendor Coverage
+
+Change: Recorded the completed `4564 Hardware Dimension - Advanced` vendor coverage expansion.
+
+Files affected:
+
+- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `cellao_codex_clean.vendors`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/PROJECT_STATE.md`
+- `docs/ai/CHANGELOG_AI.md`
+
+Reason: Static vendor coverage remained incomplete after the Arete Landing pass. The approved safe mapping pass targeted 2 `4564 Hardware Dimension - Advanced` statel vendors with matching `vendortemplate` and active shop inventory evidence.
+
+Result:
+
+- Commit `aa62dcd` added the 2 approved source SQL mappings.
+- Targeted DB import inserted only those 2 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `577` to `575`.
+- `4564 Hardware Dimension - Advanced` uncovered count dropped from `4` to `2`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 575`.
+- No runtime vendor behavior changed.
+
+Follow-up work:
+
+- Audit `4565 Hardware Dimension - Superior` next. Current post-import audit shows `5` uncovered statel vendors there, with `2` likely safe candidates by existing `vendortemplate` and active `shopinventorytemplates` evidence.
+- Do not guess unknown terminals.
+- Keep vendor transaction behavior and NPC movement out of scope.
+
+## 2026-06-10 - Expanded Arete Landing Vendor Coverage
+
+Change: Recorded the completed `6553 Arete Landing` vendor coverage expansion.
+
+Files affected:
+
+- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `cellao_codex_clean.vendors`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/PROJECT_STATE.md`
+- `docs/ai/CHANGELOG_AI.md`
+
+Reason: Static vendor coverage remained incomplete after the Hardware Dimension Basic pass. The approved safe mapping pass targeted 2 `6553 Arete Landing` statel vendors with matching `vendortemplate` and active shop inventory evidence.
+
+Result:
+
+- Commit `389e8b3` added the 2 approved source SQL mappings.
+- Targeted DB import inserted only those 2 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `579` to `577`.
+- `6553 Arete Landing` uncovered count dropped from `8` to `6`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 577`.
+- No runtime vendor behavior changed.
+
+Follow-up work:
+
+- Audit `4564 Hardware Dimension - Advanced` next. Current post-import audit shows `4` uncovered statel vendors there, with `2` likely safe candidates by existing `vendortemplate` and active `shopinventorytemplates` evidence.
+- Do not guess unknown terminals.
+- Keep vendor transaction behavior and NPC movement out of scope.
+
+## 2026-06-10 - Expanded Hardware Dimension Basic Vendor Coverage
+
+Change: Recorded the completed `4563 Hardware Dimension - Basic` vendor coverage expansion.
+
+Files affected:
+
+- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `cellao_codex_clean.vendors`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/PROJECT_STATE.md`
+- `docs/ai/CHANGELOG_AI.md`
+
+Reason: Static vendor coverage remained incomplete after the Dimensional Shift Superior pass. The approved safe mapping pass targeted 2 `4563 Hardware Dimension - Basic` statel vendors with matching `vendortemplate` and active shop inventory evidence.
+
+Result:
+
+- Commit `0ded4a9` added the 2 approved source SQL mappings.
+- Targeted DB import inserted only those 2 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `581` to `579`.
+- `4563 Hardware Dimension - Basic` uncovered count dropped from `4` to `2`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 579`.
+- No runtime vendor behavior changed.
+
+Follow-up work:
+
+- Audit `6553 Arete Landing` next. Current post-import audit shows `8` uncovered statel vendors there, with `2` likely safe candidates by existing `vendortemplate` and active `shopinventorytemplates` evidence.
+- Do not guess unknown terminals.
+- Keep vendor transaction behavior and NPC movement out of scope.
+
+## 2026-06-10 - Expanded Dimensional Shift Superior Vendor Coverage
+
+Change: Recorded the completed `4569 Dimensional Shift - Superior` vendor coverage expansion.
+
+Files affected:
+
+- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `cellao_codex_clean.vendors`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/PROJECT_STATE.md`
+- `docs/ai/CHANGELOG_AI.md`
+
+Reason: Static vendor coverage remained incomplete after the Dimensional Shift Advanced pass. The approved safe mapping pass targeted 3 `4569 Dimensional Shift - Superior` statel vendors with matching `vendortemplate` and active shop inventory evidence.
+
+Result:
+
+- Commit `abee0ce` added the 3 approved source SQL mappings.
+- Targeted DB import inserted only those 3 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `584` to `581`.
+- `4569 Dimensional Shift - Superior` uncovered count dropped from `5` to `2`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 581`.
+- No runtime vendor behavior changed.
+
+Follow-up work:
+
+- Audit `4563 Hardware Dimension - Basic` next. Current post-import audit shows `4` uncovered statel vendors there, with `2` likely safe candidates by existing `vendortemplate` and active `shopinventorytemplates` evidence.
+- Do not guess unknown terminals.
+- Keep vendor transaction behavior and NPC movement out of scope.
+
+## 2026-06-10 - Expanded Dimensional Shift Advanced Vendor Coverage
+
+Change: Recorded the completed `4568 Dimensional Shift - Advanced` vendor coverage expansion.
+
+Files affected:
+
+- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `cellao_codex_clean.vendors`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/PROJECT_STATE.md`
+- `docs/ai/CHANGELOG_AI.md`
+
+Reason: Static vendor coverage remained incomplete after the Dimensional Shift Basic pass. The approved safe mapping pass targeted 3 `4568 Dimensional Shift - Advanced` statel vendors with matching `vendortemplate` and active shop inventory evidence.
+
+Result:
+
+- Commit `5e5303b` added the 3 approved source SQL mappings.
+- Targeted DB import inserted only those 3 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `587` to `584`.
+- `4568 Dimensional Shift - Advanced` uncovered count dropped from `5` to `2`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 584`.
+- No runtime vendor behavior changed.
+
+Follow-up work:
+
+- Audit `4569 Dimensional Shift - Superior` next. Current post-import audit shows `5` uncovered statel vendors there, with `3` likely safe candidates by existing `vendortemplate` and active `shopinventorytemplates` evidence.
+- Do not guess unknown terminals.
+- Keep vendor transaction behavior and NPC movement out of scope.
+
+## 2026-06-10 - Expanded Dimensional Shift Basic Vendor Coverage
+
+Change: Recorded the completed `4567 Dimensional Shift - Basic` vendor coverage expansion.
+
+Files affected:
+
+- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `cellao_codex_clean.vendors`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/PROJECT_STATE.md`
+- `docs/ai/CHANGELOG_AI.md`
+
+Reason: Static vendor coverage remained incomplete after the 4holes Fashion pass. The approved safe mapping pass targeted 3 `4567 Dimensional Shift - Basic` statel vendors with matching `vendortemplate` and active shop inventory evidence.
+
+Result:
+
+- Commit `7c10b5a` added the 3 approved source SQL mappings.
+- Targeted DB import inserted only those 3 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `590` to `587`.
+- `4567 Dimensional Shift - Basic` uncovered count dropped from `5` to `2`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 587`.
+- No runtime vendor behavior changed.
+
+Follow-up work:
+
+- Audit `4568 Dimensional Shift - Advanced` next. Current post-import audit shows `5` uncovered statel vendors there, with `3` likely safe candidates by existing `vendortemplate` and active `shopinventorytemplates` evidence.
+- Do not guess unknown terminals.
+- Keep vendor transaction behavior and NPC movement out of scope.
+
+## 2026-06-10 - Expanded 4holes Fashion Vendor Coverage
+
+Change: Recorded the completed `2096 4holes Fashion` vendor coverage expansion.
+
+Files affected:
+
+- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `cellao_codex_clean.vendors`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/PROJECT_STATE.md`
+- `docs/ai/CHANGELOG_AI.md`
+
+Reason: Static vendor coverage remained incomplete after the Newland Desert pass. The approved safe mapping pass targeted 3 `2096 4holes Fashion` statel vendors with matching `vendortemplate` and active shop inventory evidence.
+
+Result:
+
+- Commit `0522ffb` added the 3 approved source SQL mappings.
+- Targeted DB import inserted only those 3 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `593` to `590`.
+- `2096 4holes Fashion` uncovered count dropped from `7` to `4`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 590`.
+- No runtime vendor behavior changed.
+
+Follow-up work:
+
+- Audit `4567 Dimensional Shift - Basic` next. Current post-import audit shows `5` uncovered statel vendors there, with `3` likely safe candidates by existing `vendortemplate` and active `shopinventorytemplates` evidence.
+- Do not guess unknown terminals.
+- Keep vendor transaction behavior and NPC movement out of scope.
+
+## 2026-06-10 - Expanded Newland Desert Vendor Coverage
+
+Change: Recorded the completed `565 Newland Desert` vendor coverage expansion.
+
+Files affected:
+
+- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `cellao_codex_clean.vendors`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/PROJECT_STATE.md`
+- `docs/ai/CHANGELOG_AI.md`
+
+Reason: Static vendor coverage remained incomplete after the neutral advanced implant shop pass. The approved safe mapping pass targeted 3 `565 Newland Desert` statel vendors with matching `vendortemplate` and active shop inventory evidence.
+
+Result:
+
+- Commit `2bb7ad5` added the 3 approved source SQL mappings.
+- Targeted DB import inserted only those 3 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `596` to `593`.
+- `565 Newland Desert` uncovered count dropped from `9` to `6`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 593`.
+- No runtime vendor behavior changed.
+
+Follow-up work:
+
+- Audit `2096 4holes Fashion` next. Current post-import audit shows `7` uncovered statel vendors there, with `3` likely safe candidates by existing `vendortemplate` and active `shopinventorytemplates` evidence.
+- Do not guess unknown terminals.
+- Keep vendor transaction behavior and NPC movement out of scope.
+
 ## 2026-06-10 - Expanded Neutral Advanced Implant Shop Vendor Coverage
 
 Change: Recorded the completed `2073 neut_advanced_implants_shop` vendor coverage expansion.

@@ -36,6 +36,17 @@ CellAO NightPredator is a local C#/.NET Framework-era Anarchy Online server work
 - `1181 ord_smarket_clan_advanced` static vendor coverage was expanded with 4 approved mappings. Commit `fbcc1a4` added the source SQL rows, the targeted import inserted only those rows into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 602`. Total uncovered statel vendors dropped from `606` to `602`, and `1181 ord_smarket_clan_advanced` dropped from `30` to `26`. No runtime vendor behavior changed.
 - `2064 neut_basic_implants_shop` static vendor coverage was expanded with 3 approved mappings. Commit `ed869d5` added the source SQL rows, the targeted import inserted only those rows into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 599`. Total uncovered statel vendors dropped from `602` to `599`, and `2064 neut_basic_implants_shop` dropped from `15` to `12`. No runtime vendor behavior changed.
 - `2073 neut_advanced_implants_shop` static vendor coverage was expanded with 3 approved mappings. Commit `a79b5ec` added the source SQL rows, the targeted import inserted only those rows into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 596`. Total uncovered statel vendors dropped from `599` to `596`, and `2073 neut_advanced_implants_shop` dropped from `15` to `12`. No runtime vendor behavior changed.
+- `565 Newland Desert` static vendor coverage was expanded with 3 approved mappings. Commit `2bb7ad5` added the source SQL rows, the targeted import inserted only those rows into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 593`. Total uncovered statel vendors dropped from `596` to `593`, and `565 Newland Desert` dropped from `9` to `6`. No runtime vendor behavior changed.
+- `2096 4holes Fashion` static vendor coverage was expanded with 3 approved mappings. Commit `0522ffb` added the source SQL rows, the targeted import inserted only those rows into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 590`. Total uncovered statel vendors dropped from `593` to `590`, and `2096 4holes Fashion` dropped from `7` to `4`. No runtime vendor behavior changed.
+- `4567 Dimensional Shift - Basic` static vendor coverage was expanded with 3 approved mappings. Commit `7c10b5a` added the source SQL rows, the targeted import inserted only those rows into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 587`. Total uncovered statel vendors dropped from `590` to `587`, and `4567 Dimensional Shift - Basic` dropped from `5` to `2`. No runtime vendor behavior changed.
+- `4568 Dimensional Shift - Advanced` static vendor coverage was expanded with 3 approved mappings. Commit `5e5303b` added the source SQL rows, the targeted import inserted only those rows into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 584`. Total uncovered statel vendors dropped from `587` to `584`, and `4568 Dimensional Shift - Advanced` dropped from `5` to `2`. No runtime vendor behavior changed.
+- `4569 Dimensional Shift - Superior` static vendor coverage was expanded with 3 approved mappings. Commit `abee0ce` added the source SQL rows, the targeted import inserted only those rows into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 581`. Total uncovered statel vendors dropped from `584` to `581`, and `4569 Dimensional Shift - Superior` dropped from `5` to `2`. No runtime vendor behavior changed.
+- `4563 Hardware Dimension - Basic` static vendor coverage was expanded with 2 approved mappings. Commit `0ded4a9` added the source SQL rows, the targeted import inserted only those rows into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 579`. Total uncovered statel vendors dropped from `581` to `579`, and `4563 Hardware Dimension - Basic` dropped from `4` to `2`. No runtime vendor behavior changed.
+- `6553 Arete Landing` static vendor coverage was expanded with 2 approved mappings. Commit `389e8b3` added the source SQL rows, the targeted import inserted only those rows into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 577`. Total uncovered statel vendors dropped from `579` to `577`, and `6553 Arete Landing` dropped from `8` to `6`. No runtime vendor behavior changed.
+- `4564 Hardware Dimension - Advanced` static vendor coverage was expanded with 2 approved mappings. Commit `aa62dcd` added the source SQL rows, the targeted import inserted only those rows into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 575`. Total uncovered statel vendors dropped from `577` to `575`, and `4564 Hardware Dimension - Advanced` dropped from `4` to `2`. No runtime vendor behavior changed.
+- `4565 Hardware Dimension - Superior` static vendor coverage was expanded with 2 approved mappings. Commit `1810408` added the source SQL rows, the targeted import inserted only those rows into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 573`. Total uncovered statel vendors dropped from `575` to `573`, and `4565 Hardware Dimension - Superior` dropped from `5` to `3`. No runtime vendor behavior changed.
+- `2060 neut_basic_weapon_shop` static vendor coverage was expanded with 1 approved mapping. Commit `83fc74f` added the source SQL row, the targeted import inserted only that row into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 572`. Total uncovered statel vendors dropped from `573` to `572`, and `2060 neut_basic_weapon_shop` dropped from `5` to `4`. No runtime vendor behavior changed.
+- `2070 neut_advanced_weapons_shop` static vendor coverage was expanded with 1 approved mapping. Commit `9c41ed9` added the source SQL row, the targeted import inserted only that row into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 571`. Total uncovered statel vendors dropped from `572` to `571`, and `2070 neut_advanced_weapons_shop` dropped from `5` to `4`. Backup: `C:\Users\Mike\Documents\Cellao-Clean\tools-temp\db-backups\vendors_before_2070_neut_advanced_weapons_shop_20260610_040826.sql`. Rejected candidates `135659521`/`297466`, `135659522`/`297470`, `135659523`/`99572`, and `135659524`/`99573` remain uncovered until matching `vendortemplate` evidence is found. No runtime vendor behavior changed.
 - Surgery clinic and implant flows have documented repaired behavior.
 
 # Partially Working Systems
@@ -59,11 +70,122 @@ CellAO NightPredator is a local C#/.NET Framework-era Anarchy Online server work
 
 # Current Development Focus
 
-The latest completed milestone expanded `2073 neut_advanced_implants_shop` static vendor coverage after live persistence was verified for repaired inventory, corpse loot, corpse credits, player trade, and vendor transaction flows. The next high-value target remains static vendor coverage data, because broad shop stock coverage is still documented as incomplete while transaction paths are verified.
+The latest completed milestone expanded `2070 neut_advanced_weapons_shop` static vendor coverage after live persistence was verified for repaired inventory, corpse loot, corpse credits, player trade, and vendor transaction flows. Static vendor coverage data remains the active campaign area, because broad shop stock coverage is still documented as incomplete while transaction paths are verified.
 
 # Last Completed Milestone
 
-`2073 neut_advanced_implants_shop` vendor coverage expansion completed:
+`2070 neut_advanced_weapons_shop` vendor coverage expansion completed:
+
+- Commit `9c41ed9` added the 1 approved source SQL mapping.
+- A targeted import inserted only that row into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import: `C:\Users\Mike\Documents\Cellao-Clean\tools-temp\db-backups\vendors_before_2070_neut_advanced_weapons_shop_20260610_040826.sql`.
+- Total uncovered statel vendors dropped from `572` to `571`.
+- `2070 neut_advanced_weapons_shop` uncovered count dropped from `5` to `4`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 571`.
+- Rejected candidates `135659521`/`297466`, `135659522`/`297470`, `135659523`/`99572`, and `135659524`/`99573` remain uncovered because no matching `vendortemplate` evidence exists.
+- No runtime vendor behavior changed.
+
+Prior `2060 neut_basic_weapon_shop` vendor coverage expansion completed:
+
+- Commit `83fc74f` added the 1 approved source SQL mapping.
+- A targeted import inserted only that row into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `573` to `572`.
+- `2060 neut_basic_weapon_shop` uncovered count dropped from `5` to `4`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 572`.
+- No runtime vendor behavior changed.
+
+Prior `4565 Hardware Dimension - Superior` vendor coverage expansion completed:
+
+- Commit `1810408` added the 2 approved source SQL mappings.
+- A targeted import inserted only those 2 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `575` to `573`.
+- `4565 Hardware Dimension - Superior` uncovered count dropped from `5` to `3`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 573`.
+- No runtime vendor behavior changed.
+
+Prior `4564 Hardware Dimension - Advanced` vendor coverage expansion completed:
+
+- Commit `aa62dcd` added the 2 approved source SQL mappings.
+- A targeted import inserted only those 2 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `577` to `575`.
+- `4564 Hardware Dimension - Advanced` uncovered count dropped from `4` to `2`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 575`.
+- No runtime vendor behavior changed.
+
+Prior `6553 Arete Landing` vendor coverage expansion completed:
+
+- Commit `389e8b3` added the 2 approved source SQL mappings.
+- A targeted import inserted only those 2 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `579` to `577`.
+- `6553 Arete Landing` uncovered count dropped from `8` to `6`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 577`.
+- No runtime vendor behavior changed.
+
+Prior `4563 Hardware Dimension - Basic` vendor coverage expansion completed:
+
+- Commit `0ded4a9` added the 2 approved source SQL mappings.
+- A targeted import inserted only those 2 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `581` to `579`.
+- `4563 Hardware Dimension - Basic` uncovered count dropped from `4` to `2`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 579`.
+- No runtime vendor behavior changed.
+
+Prior `4569 Dimensional Shift - Superior` vendor coverage expansion completed:
+
+- Commit `abee0ce` added the 3 approved source SQL mappings.
+- A targeted import inserted only those 3 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `584` to `581`.
+- `4569 Dimensional Shift - Superior` uncovered count dropped from `5` to `2`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 581`.
+- No runtime vendor behavior changed.
+
+Prior `4568 Dimensional Shift - Advanced` vendor coverage expansion completed:
+
+- Commit `5e5303b` added the 3 approved source SQL mappings.
+- A targeted import inserted only those 3 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `587` to `584`.
+- `4568 Dimensional Shift - Advanced` uncovered count dropped from `5` to `2`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 584`.
+- No runtime vendor behavior changed.
+
+Prior `4567 Dimensional Shift - Basic` vendor coverage expansion completed:
+
+- Commit `7c10b5a` added the 3 approved source SQL mappings.
+- A targeted import inserted only those 3 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `590` to `587`.
+- `4567 Dimensional Shift - Basic` uncovered count dropped from `5` to `2`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 587`.
+- No runtime vendor behavior changed.
+
+Prior `2096 4holes Fashion` vendor coverage expansion completed:
+
+- Commit `0522ffb` added the 3 approved source SQL mappings.
+- A targeted import inserted only those 3 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `593` to `590`.
+- `2096 4holes Fashion` uncovered count dropped from `7` to `4`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 590`.
+- No runtime vendor behavior changed.
+
+Prior `565 Newland Desert` vendor coverage expansion completed:
+
+- Commit `2bb7ad5` added the 3 approved source SQL mappings.
+- A targeted import inserted only those 3 rows into `cellao_codex_clean.vendors`.
+- A `vendors` table backup was created before import.
+- Total uncovered statel vendors dropped from `596` to `593`.
+- `565 Newland Desert` uncovered count dropped from `9` to `6`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 593`.
+- No runtime vendor behavior changed.
+
+Prior `2073 neut_advanced_implants_shop` vendor coverage expansion completed:
 
 - Commit `a79b5ec` added the 3 approved source SQL mappings.
 - A targeted import inserted only those 3 rows into `cellao_codex_clean.vendors`.
@@ -224,4 +346,4 @@ Prior ICC/Fair Trade vendor stock repairs were pushed to `origin/master` in comm
 
 # Next Milestone
 
-Plan and patch the next confirmed static vendor coverage group without changing verified buy/sell/close transaction behavior. The recommended next target is `565 Newland Desert`, which has `9` remaining uncovered statel vendors in the current post-import audit and `3` likely safe candidates by existing `vendortemplate` and active `shopinventorytemplates` evidence. It is now the highest safe candidate target after the `2073 neut_advanced_implants_shop` pass. Keep NPC movement out of scope unless explicitly selected later.
+Static vendor coverage remains the active data-campaign area, but no next target is selected in this documentation update. Continue only after Mike selects or approves the next target from current audit data. Keep NPC movement out of scope unless explicitly selected later.
