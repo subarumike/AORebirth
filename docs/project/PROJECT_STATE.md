@@ -47,6 +47,7 @@ CellAO NightPredator is a local C#/.NET Framework-era Anarchy Online server work
 - `4565 Hardware Dimension - Superior` static vendor coverage was expanded with 2 approved mappings. Commit `1810408` added the source SQL rows, the targeted import inserted only those rows into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 573`. Total uncovered statel vendors dropped from `575` to `573`, and `4565 Hardware Dimension - Superior` dropped from `5` to `3`. No runtime vendor behavior changed.
 - `2060 neut_basic_weapon_shop` static vendor coverage was expanded with 1 approved mapping. Commit `83fc74f` added the source SQL row, the targeted import inserted only that row into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 572`. Total uncovered statel vendors dropped from `573` to `572`, and `2060 neut_basic_weapon_shop` dropped from `5` to `4`. No runtime vendor behavior changed.
 - `2070 neut_advanced_weapons_shop` static vendor coverage was expanded with 1 approved mapping. Commit `9c41ed9` added the source SQL row, the targeted import inserted only that row into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 571`. Total uncovered statel vendors dropped from `572` to `571`, and `2070 neut_advanced_weapons_shop` dropped from `5` to `4`. Backup: `C:\Users\Mike\Documents\Cellao-Clean\tools-temp\db-backups\vendors_before_2070_neut_advanced_weapons_shop_20260610_040826.sql`. Rejected candidates `135659521`/`297466`, `135659522`/`297470`, `135659523`/`99572`, and `135659524`/`99573` remain uncovered until matching `vendortemplate` evidence is found. No runtime vendor behavior changed.
+- `600 Varmint Woods` static vendor coverage was expanded with 1 approved mapping. Commit `e197b9f` added the source SQL row, the targeted import inserted only that row into `cellao_codex_clean.vendors`, query-back confirmed `39321612 | 600 | 93063 | AdvOA`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 570`. Total uncovered statel vendors dropped from `571` to `570`, and `600 Varmint Woods` dropped from `3` to `2`. Backup: `C:\Users\Mike\Documents\Cellao-Clean\tools-temp\db-backups\vendors_before_600_varmint_woods_20260610_052107.sql`. Rejected candidates `39321600`/`99479` and `39321601`/`99482` remain uncovered until matching `vendortemplate.ItemTemplate` evidence is found. No runtime vendor behavior changed.
 - Surgery clinic and implant flows have documented repaired behavior.
 
 # Partially Working Systems
@@ -70,11 +71,23 @@ CellAO NightPredator is a local C#/.NET Framework-era Anarchy Online server work
 
 # Current Development Focus
 
-The latest completed milestone expanded `2070 neut_advanced_weapons_shop` static vendor coverage after live persistence was verified for repaired inventory, corpse loot, corpse credits, player trade, and vendor transaction flows. Static vendor coverage data remains the active campaign area, because broad shop stock coverage is still documented as incomplete while transaction paths are verified.
+The latest completed milestone expanded `600 Varmint Woods` static vendor coverage after live persistence was verified for repaired inventory, corpse loot, corpse credits, player trade, and vendor transaction flows. Static vendor coverage data remains the active campaign area, because broad shop stock coverage is still documented as incomplete while transaction paths are verified.
 
 # Last Completed Milestone
 
-`2070 neut_advanced_weapons_shop` vendor coverage expansion completed:
+`600 Varmint Woods` vendor coverage expansion completed:
+
+- Commit `e197b9f` added the 1 approved source SQL mapping.
+- A targeted import inserted only that row into `cellao_codex_clean.vendors`.
+- Query-back confirmed `39321612 | 600 | 93063 | AdvOA`.
+- A `vendors` table backup was created before import: `C:\Users\Mike\Documents\Cellao-Clean\tools-temp\db-backups\vendors_before_600_varmint_woods_20260610_052107.sql`.
+- Total uncovered statel vendors dropped from `571` to `570`.
+- `600 Varmint Woods` uncovered count dropped from `3` to `2`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 570`.
+- Rejected candidates `39321600`/`99479` and `39321601`/`99482` remain uncovered because no matching `vendortemplate.ItemTemplate` evidence exists.
+- No runtime vendor behavior changed.
+
+Prior `2070 neut_advanced_weapons_shop` vendor coverage expansion completed:
 
 - Commit `9c41ed9` added the 1 approved source SQL mapping.
 - A targeted import inserted only that row into `cellao_codex_clean.vendors`.

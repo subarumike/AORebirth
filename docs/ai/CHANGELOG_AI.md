@@ -1,5 +1,38 @@
 # AI Changelog
 
+## 2026-06-10 - Expanded Varmint Woods Vendor Coverage
+
+Change: Recorded the completed `600 Varmint Woods` vendor coverage expansion.
+
+Files affected:
+
+- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `cellao_codex_clean.vendors`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/project/PROJECT_STATE.md`
+- `docs/ai/CHANGELOG_AI.md`
+
+Reason: Static vendor coverage remained incomplete after the neutral advanced weapon shop pass. The approved safe mapping pass targeted 1 `600 Varmint Woods` statel vendor with matching `vendortemplate` and active shop inventory evidence.
+
+Result:
+
+- Commit `e197b9f` added the 1 approved source SQL mapping.
+- Targeted DB import inserted only that row into `cellao_codex_clean.vendors`.
+- Query-back confirmed `39321612 | 600 | 93063 | AdvOA`.
+- A `vendors` table backup was created before import: `C:\Users\Mike\Documents\Cellao-Clean\tools-temp\db-backups\vendors_before_600_varmint_woods_20260610_052107.sql`.
+- Mapping added: `39321612 -> AdvOA`.
+- Total uncovered statel vendors dropped from `571` to `570`.
+- `600 Varmint Woods` uncovered count dropped from `3` to `2`.
+- `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 570`.
+- Rejected candidates `39321600`/`99479` and `39321601`/`99482` remain uncovered because no matching `vendortemplate.ItemTemplate` evidence exists.
+- No runtime vendor behavior changed.
+
+Follow-up work:
+
+- No next target selected in this documentation update.
+- Do not guess unknown terminals.
+- Keep vendor transaction behavior and NPC movement out of scope.
+
 ## 2026-06-10 - Expanded Neutral Advanced Weapon Shop Vendor Coverage
 
 Change: Recorded the completed `2070 neut_advanced_weapons_shop` vendor coverage expansion.
@@ -28,6 +61,7 @@ Result:
 
 Follow-up work:
 
+- The `600 Varmint Woods` follow-up pass is complete and recorded above.
 - No next target selected in this documentation update.
 - Do not guess unknown terminals.
 - Keep vendor transaction behavior and NPC movement out of scope.
