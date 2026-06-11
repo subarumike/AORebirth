@@ -211,6 +211,17 @@ insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCSpWB', 1, 'Basic ICC Special Weapons', 99572, 'SpWB', 1, 93, 0.04, 0.56, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCSpWA', 1, 'Advanced ICC Special Weapons', 99573, 'SpWA', 101, 200, 0.04, 0.56, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCSpWS', 1, 'Superior ICC Special Weapons', 297470, 'SpWS', 200, 297, 0.04, 0.56, 161);
+-- Live Heavenly Business Basic tradeskill terminals captured 2026-06-10 from current official client.
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('DevB', 1, 'Basic Devices', 155604, 'DevB', 1, 45, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('GToolB', 1, 'General Tools and Bases - Basic', 155284, 'GTBB', 1, 49, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('EMTlB', 1, 'Tools for Electrical and Mechanical Engineering - Basic', 155290, 'EMTB', 10, 49, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('PCTlB', 1, 'Pharmacy and Chemistry Tools and Bases - Basic', 155287, 'PCTB', 7, 49, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('GRecB', 1, 'General Recipes - Basic', 155508, 'GReB', 1, 100, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('GCmpB', 1, 'General Components - Basic', 155499, 'GCmB', 1, 46, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('MECmpB', 1, 'Mechanical and Electrical Engineering Components - Basic', 155493, 'MECB', 3, 49, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('PCCmpB', 1, 'Pharmacy and Chemistry Components - Basic', 155314, 'PCCB', 3, 50, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ACCmpB', 1, 'Armour and Clothing Components - Basic', 155496, 'ACCB', 9, 37, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('NCCmpB', 1, 'Nano Crystal Components - Basic', 155311, 'NCCB', 2, 50, 0.04, 1.05, 161);
 -- Live Neutral Supermarket tradeskill room vendor templates captured 2026-06-08 from current official client.
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCChB', 1, 'Basic ICC Chemical Supplies', 297433, 'ChB', 1, 200, 0.04, 1.05, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCChA', 1, 'Advanced ICC Chemical Supplies', 297434, 'ChA', 1, 209, 0.04, 1.05, 161);
