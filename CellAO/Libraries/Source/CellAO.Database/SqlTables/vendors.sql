@@ -216,8 +216,12 @@ INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`,
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (135856138, 2073, 0, 0, 0, 0, 0, 0, 1, '', 297395, 'ICCPhaS');
 
 -- 2096 4holes Fashion safe statel vendor mappings.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (137363456, 2096, 0, 0, 0, 0, 0, 0, 1, '', 99554, 'MiiHead');
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (137363457, 2096, 0, 0, 0, 0, 0, 0, 1, '', 99552, 'ICCKeeN');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (137363458, 2096, 0, 0, 0, 0, 0, 0, 1, '', 99547, 'MiiSwim');
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (137363459, 2096, 0, 0, 0, 0, 0, 0, 1, '', 99551, 'ICCMetN');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (137363460, 2096, 0, 0, 0, 0, 0, 0, 1, '', 99545, 'MiiLeg');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (137363461, 2096, 0, 0, 0, 0, 0, 0, 1, '', 99548, 'MiiChst');
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (137363462, 2096, 0, 0, 0, 0, 0, 0, 1, '', 99553, 'ICCFixN');
 
 -- 1136 Mir shop clan Miiir fashion safe statel vendor mappings.
