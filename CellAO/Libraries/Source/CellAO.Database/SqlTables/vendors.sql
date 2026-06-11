@@ -295,6 +295,17 @@ INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`,
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299565063, 4571, 0, 0, 0, 0, 0, 0, 1, '', 155314, 'PCCmpB');
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299565064, 4571, 0, 0, 0, 0, 0, 0, 1, '', 155496, 'ACCmpB');
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299565065, 4571, 0, 0, 0, 0, 0, 0, 1, '', 155311, 'NCCmpB');
+-- 4573 Heavenly Business - Superior safe statel vendor mappings.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299696128, 4573, 0, 0, 0, 0, 0, 0, 1, '', 155610, 'DevS');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299696129, 4573, 0, 0, 0, 0, 0, 0, 1, '', 155286, 'GToolS');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299696130, 4573, 0, 0, 0, 0, 0, 0, 1, '', 155292, 'EMTlS');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299696131, 4573, 0, 0, 0, 0, 0, 0, 1, '', 155289, 'PCTlS');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299696132, 4573, 0, 0, 0, 0, 0, 0, 1, '', 155510, 'GRecS');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299696133, 4573, 0, 0, 0, 0, 0, 0, 1, '', 155501, 'GCmpS');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299696134, 4573, 0, 0, 0, 0, 0, 0, 1, '', 155495, 'MECmpS');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299696135, 4573, 0, 0, 0, 0, 0, 0, 1, '', 155489, 'PCCmpS');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299696136, 4573, 0, 0, 0, 0, 0, 0, 1, '', 223502, 'JACmpS');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299696137, 4573, 0, 0, 0, 0, 0, 0, 1, '', 223505, 'JNCmpS');
 -- 6553 Arete Landing safe statel vendor mappings.
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (429457414, 6553, 0, 0, 0, 0, 0, 0, 1, '', 297459, 'ICCAmmo');
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (429457415, 6553, 0, 0, 0, 0, 0, 0, 1, '', 297459, 'ICCAmmo');
