@@ -207,6 +207,9 @@ insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCWepB', 1, 'Basic ICC Weapons', 297430, 'WpB', 1, 109, 0.04, 0.56, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCWepA', 1, 'Advanced ICC Weapons', 297431, 'WpA', 110, 208, 0.04, 0.56, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCWepS', 1, 'Superior ICC Weapons', 297432, 'WpS', 175, 300, 0.04, 0.56, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCSpWB', 1, 'Basic ICC Special Weapons', 99572, 'SpWB', 1, 93, 0.04, 0.56, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCSpWA', 1, 'Advanced ICC Special Weapons', 99573, 'SpWA', 101, 200, 0.04, 0.56, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCSpWS', 1, 'Superior ICC Special Weapons', 297470, 'SpWS', 200, 297, 0.04, 0.56, 161);
 -- Live Neutral Supermarket tradeskill room vendor templates captured 2026-06-08 from current official client.
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCChB', 1, 'Basic ICC Chemical Supplies', 297433, 'ChB', 1, 200, 0.04, 1.05, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCChA', 1, 'Advanced ICC Chemical Supplies', 297434, 'ChA', 1, 209, 0.04, 1.05, 161);
