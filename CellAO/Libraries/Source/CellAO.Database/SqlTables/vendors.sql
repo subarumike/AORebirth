@@ -204,6 +204,7 @@ INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`,
 
 -- 2060 neut_basic_weapon_shop safe statel vendor mappings.
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (135004160, 2060, 0, 0, 0, 0, 0, 0, 1, '', 297459, 'ICCAmmo');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (135004161, 2060, 0, 0, 0, 0, 0, 0, 1, '', 297466, 'ICCMAtk');
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (135004162, 2060, 0, 0, 0, 0, 0, 0, 1, '', 297470, 'ICCSpWS');
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (135004163, 2060, 0, 0, 0, 0, 0, 0, 1, '', 99572, 'ICCSpWB');
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (135004164, 2060, 0, 0, 0, 0, 0, 0, 1, '', 99573, 'ICCSpWA');
