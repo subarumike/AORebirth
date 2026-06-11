@@ -215,6 +215,14 @@ insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCEngA', 1, 'Advanced ICC Engineering Supplies', 297449, 'EnA', 1, 208, 0.04, 1.05, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCEngS', 1, 'Superior ICC Engineering Supplies', 297450, 'EnS', 1, 300, 0.04, 1.05, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCFash', 1, 'ICC Fashion Supplies', 297457, 'Fash', 1, 1, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('MiiArm', 1, 'Miiir Armwear', 99543, 'MArm', 1, 1, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('MiiFoot', 1, 'Miiir Footwear', 99544, 'MFot', 1, 1, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('MiiLeg', 1, 'Miiir Legwear', 99545, 'MLeg', 1, 1, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('MiiHand', 1, 'Miiir Handwear', 99546, 'MHan', 1, 1, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('MiiSwim', 1, 'Miiir Swimwear', 99547, 'MSwm', 1, 1, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('MiiChst', 1, 'Miiir Chestwear', 99548, 'MChs', 1, 1, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('MiiBack', 1, 'Miiir Backwear', 99550, 'MBak', 1, 1, 0.04, 1.05, 161);
+insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('MiiHead', 1, 'Miiir Headwear', 99554, 'MHea', 1, 1, 0.04, 1.05, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCOfB', 1, 'Basic ICC Office Supplies', 297443, 'OfcB', 1, 94, 0.04, 1.05, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCOfA', 1, 'Advanced ICC Office Supplies', 297444, 'OfcA', 1, 200, 0.04, 1.05, 161);
 insert into `vendortemplate` (`HASH`,`lvl`,`Name`,`itemtemplate`,`ShopInvHash`,`minQL`,`maxQL`,`buy`,`sell`,`skill`) VALUES ('ICCOfS', 1, 'Superior ICC Office Supplies', 297445, 'OfcS', 1, 200, 0.04, 1.05, 161);

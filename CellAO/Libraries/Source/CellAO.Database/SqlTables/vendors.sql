@@ -220,6 +220,16 @@ INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`,
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (137363459, 2096, 0, 0, 0, 0, 0, 0, 1, '', 99551, 'ICCMetN');
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (137363462, 2096, 0, 0, 0, 0, 0, 0, 1, '', 99553, 'ICCFixN');
 
+-- 1136 Mir shop clan Miiir fashion safe statel vendor mappings.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (74448896, 1136, 0, 0, 0, 0, 0, 0, 1, '', 99554, 'MiiHead');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (74448897, 1136, 0, 0, 0, 0, 0, 0, 1, '', 99544, 'MiiFoot');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (74448898, 1136, 0, 0, 0, 0, 0, 0, 1, '', 99546, 'MiiHand');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (74448899, 1136, 0, 0, 0, 0, 0, 0, 1, '', 99545, 'MiiLeg');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (74448900, 1136, 0, 0, 0, 0, 0, 0, 1, '', 99547, 'MiiSwim');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (74448901, 1136, 0, 0, 0, 0, 0, 0, 1, '', 99548, 'MiiChst');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (74448902, 1136, 0, 0, 0, 0, 0, 0, 1, '', 99543, 'MiiArm');
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (74448903, 1136, 0, 0, 0, 0, 0, 0, 1, '', 99550, 'MiiBack');
+
 -- 4563 Hardware Dimension - Basic safe statel vendor mappings.
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299040768, 4563, 0, 0, 0, 0, 0, 0, 1, '', 99601, 'ToolB');
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299040771, 4563, 0, 0, 0, 0, 0, 0, 1, '', 99602, 'AtkB');
