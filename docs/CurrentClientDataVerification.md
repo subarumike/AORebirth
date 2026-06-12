@@ -1,12 +1,12 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-10 00:09:04
+Generated: 2026-06-12 03:24:57
 
 ## Scope
 
 - AO client root: C:\Funcom\Anarchy Online
 - AO client version.id: 18.8.62_EP1
-- CellAO repo: C:\Users\Mike\Documents\Cellao-Clean
+- CellAO repo: C:\Users\Mike\Documents\Cellao-AORebirth
 - Database read: cellao_codex_clean only
 
 ## Summary
@@ -20,7 +20,13 @@ Generated: 2026-06-10 00:09:04
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 596 |
+| Vending statels without complete DB shop coverage | 381 |
+
+## Latest Covered Milestone
+
+- Omni Basic General Shop import promoted from AOSharp capture `20260612-012644`.
+- Validated coverage added: 23 `1183 ord_smarket_omni_basic` vendor rows, 16 vendor templates, and 16 shop inventory groups with 690 inventory rows.
+- Current-client verification result: uncovered statel vendors dropped from `404` to `381`; `DataFileIssues = 0`, `VendorDbIssues = 0`, and `ShopInventoryIssues = 0`.
 
 ## Data Files
 
@@ -50,11 +56,11 @@ This separates template-cache truth from live runtime instance truth. If items.d
 
 ## Report Files
 
-- Data file audit: C:\Users\Mike\Documents\Cellao-Clean\tools-temp\current-client-data-verification\data-file-version-audit.csv
-- Live vendor mesh audit: C:\Users\Mike\Documents\Cellao-Clean\tools-temp\current-client-data-verification\live-vendor-mesh-audit.csv
-- Vendor DB audit: C:\Users\Mike\Documents\Cellao-Clean\tools-temp\current-client-data-verification\vendor-db-audit.csv
-- Shop inventory audit: C:\Users\Mike\Documents\Cellao-Clean\tools-temp\current-client-data-verification\shop-inventory-template-audit.csv
-- Statel vendor coverage: C:\Users\Mike\Documents\Cellao-Clean\tools-temp\current-client-data-verification\statel-vendor-coverage.csv
+- Data file audit: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\data-file-version-audit.csv
+- Live vendor mesh audit: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\live-vendor-mesh-audit.csv
+- Vendor DB audit: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\vendor-db-audit.csv
+- Shop inventory audit: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\shop-inventory-template-audit.csv
+- Statel vendor coverage: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\statel-vendor-coverage.csv
 
 ## Top Vendor DB Issues
 
@@ -68,12 +74,10 @@ No vendor DB issues found.
 | 500 | Parnassos | 32768000 | 0xC00001F4 | 99571 | 215.737,16.4,162.412 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768001 | 0xC00101F4 | 99599 | 214.427,16.4,162.485 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768002 | 0xC00201F4 | 99635 | 211.938,16.4,162.399 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768004 | 0xC00401F4 | 99573 | 213.139,16.4,162.472 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768005 | 0xC00501F4 | 99570 | 211.355,16.4,160.109 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768007 | 0xC00701F4 | 99598 | 214.657,16.4,159.581 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768009 | 0xC00901F4 | 118287 | 217.19,16.4,159.708 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768011 | 0xC00B01F4 | 99600 | 213.404,16.4,159.507 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768012 | 0xC00C01F4 | 99572 | 217.917,16.4,160.724 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768013 | 0xC00D01F4 | 117938 | 217.822,16.4,161.884 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768014 | 0xC00E01F4 | 99503 | 219.649,16.4,160.128 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768015 | 0xC00F01F4 | 99533 | 220.751,16.4,160.499 | no vendors row; runtime spawns empty statel vendor |
@@ -104,3 +108,5 @@ No vendor DB issues found.
 | 500 | Parnassos | 32768047 | 0xC02F01F4 | 99518 | 220.105,16.4,171.236 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768048 | 0xC03001F4 | 99542 | 219.015,16.4,171.115 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768049 | 0xC03101F4 | 99529 | 217.832,16.4,171.123 | no vendors row; runtime spawns empty statel vendor |
+| 500 | Parnassos | 32768051 | 0xC03301F4 | 99530 | 215.748,16.4,171.108 | no vendors row; runtime spawns empty statel vendor |
+| 500 | Parnassos | 32768052 | 0xC03401F4 | 99523 | 214.963,16.4,170.276 | no vendors row; runtime spawns empty statel vendor |

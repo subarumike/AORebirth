@@ -26,6 +26,7 @@ CellAO NightPredator is a local C#/.NET Framework-era Anarchy Online server work
 - Player trade item and credit transfer have been repaired and verified in the documented test scope. Credit-only, item-only, mixed item-plus-credit, and cancel/decline trades behaved as expected, and no player trade display or commit defect was reproduced. Temporary `TRADE_*` logging remains available for future trade investigation.
 - Broad combat smoke `-SkipBuild`, focused corpse credit assertions, and inventory/container regression assertions pass after stale harness assertions were cleaned up. The cleanup changed harness expectations only, not gameplay behavior.
 - Vendor shop buy, sell, close, and current-client ICC shop stock coverage have been repaired for the captured Fair Trade areas.
+- Omni Basic General Shop live-capture import completed from AOSharp capture `20260612-012644`. The validated staged SQL added 23 `1183 ord_smarket_omni_basic` vendor rows, 16 vendor templates, and 16 shop inventory groups with 690 inventory rows. Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 381`; total uncovered statel vendors dropped from `404` to `381`, and `1183 ord_smarket_omni_basic` dropped from `39` to `16`. No runtime vendor behavior changed.
 - `1183 ord_smarket_omni_basic` static vendor coverage was expanded with 20 approved mappings. The targeted import backed up `vendors`, inserted only those rows into `cellao_codex_clean.vendors`, and verified `DataFileIssues = 0`, `VendorDbIssues = 0`, and `ShopInventoryIssues = 0`. Total uncovered statel vendors dropped from `730` to `710`, and `1183 ord_smarket_omni_basic` dropped from `77` to `57`. No runtime vendor behavior changed.
 - `1184 ord_smarket_omni_advanced` static vendor coverage was expanded with 21 approved mappings. The targeted import backed up `vendors`, inserted only those rows into `cellao_codex_clean.vendors`, and verified `DataFileIssues = 0`, `VendorDbIssues = 0`, and `ShopInventoryIssues = 0`. Total uncovered statel vendors dropped from `710` to `689`, and `1184 ord_smarket_omni_advanced` dropped from `68` to `47`. No runtime vendor behavior changed.
 - `1185 ord_smarket_omni_sup` static vendor coverage was expanded with 21 approved mappings. The targeted import backed up `vendors`, inserted only those rows into `cellao_codex_clean.vendors`, and verified `DataFileIssues = 0`, `VendorDbIssues = 0`, and `ShopInventoryIssues = 0`. Total uncovered statel vendors dropped from `689` to `668`, and `1185 ord_smarket_omni_sup` dropped from `68` to `47`. No runtime vendor behavior changed.
@@ -71,11 +72,23 @@ CellAO NightPredator is a local C#/.NET Framework-era Anarchy Online server work
 
 # Current Development Focus
 
-The latest completed milestone expanded `600 Varmint Woods` static vendor coverage after live persistence was verified for repaired inventory, corpse loot, corpse credits, player trade, and vendor transaction flows. Static vendor coverage data remains the active campaign area, because broad shop stock coverage is still documented as incomplete while transaction paths are verified.
+The latest completed milestone promoted the validated Omni Basic General Shop live-capture import after dry-run import and current-client verification proved the coverage reduction from `404` to `381`. Static vendor coverage data remains the active campaign area, because broad shop stock coverage is still documented as incomplete while transaction paths are verified.
 
 # Last Completed Milestone
 
-`600 Varmint Woods` vendor coverage expansion completed:
+Omni Basic General Shop import completed:
+
+- Source capture: AOSharp capture `20260612-012644`.
+- Source SQL promotion added the validated staged inserts to `shopinventorytemplates.sql`, `vendortemplate.sql`, and `vendors.sql`.
+- Coverage added: 23 `1183 ord_smarket_omni_basic` vendor rows, 16 vendor templates, and 16 shop inventory groups with 690 inventory rows.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\omni_basic_before_staged_import_20260612-032350.sql`.
+- Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 381`.
+- Total uncovered statel vendors dropped from `404` to `381`.
+- `1183 ord_smarket_omni_basic` uncovered count dropped from `39` to `16`.
+- Spot checks passed for `OTBasicArmor`, `OTBasicWeapons`, and `BasicImplants`.
+- No runtime vendor behavior changed.
+
+Prior `600 Varmint Woods` vendor coverage expansion completed:
 
 - Commit `e197b9f` added the 1 approved source SQL mapping.
 - A targeted import inserted only that row into `cellao_codex_clean.vendors`.
