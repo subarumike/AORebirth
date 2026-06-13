@@ -6,7 +6,7 @@ This is the primary handoff file. Update it before ending a work session.
 
 ## Current Objective
 
-Stabilize CellAO behavior using packet evidence, local playtests, and focused source assertions. Inventory, corpse loot, corpse credits, player trade, and vendor buy/sell/close live persistence verification are complete for the documented repaired flows. The next highest-value unfinished area is static vendor coverage: broad shop stock data still has documented gaps, while the transaction behavior itself is now verified. Latest live-capture vendor milestone: Omni Advanced General Shop import from AOSharp capture `20260613-002828`, reducing actionable uncovered statel vendors from `276` to `253`.
+Stabilize CellAO behavior using packet evidence, local playtests, and focused source assertions. Inventory, corpse loot, corpse credits, player trade, and vendor buy/sell/close live persistence verification are complete for the documented repaired flows. The next highest-value unfinished area is static vendor coverage: broad shop stock data still has documented gaps, while the transaction behavior itself is now verified. Latest vendor milestone: overnight exact-template inferred vendor import, reducing actionable uncovered statel vendors from `202` to `171` without adding new vendor templates or shop inventory groups.
 
 ## Current Implementation State
 
@@ -34,6 +34,7 @@ Verified or previously playtested as working:
 - Vendor Sell Live Verification result: PASS. Sold item left inventory correctly, cash increased by the exact sale price, no duplicate item appeared, and after relog the sold item remained absent and increased cash value persisted.
 - Vendor Close/Cancel Live Verification result: PASS. Pending vendor transaction state closed without accepting, cash stayed unchanged, items remained with their original owner/location, no duplicate item appeared, and the same item/cash state persisted after relog.
 - Live Persistence Verification complete: inventory move, equip item, unequip item, corpse item loot, corpse credit loot, player trade item, player trade credits, player trade cancel/decline, vendor buy, vendor sell, and vendor close/cancel all matched expected client-visible behavior and survived relog.
+- Overnight exact-template inferred vendor import completed. The validated staged SQL added 31 vendor rows only, reusing existing `vendortemplate` hashes and existing `shopinventorytemplates` hashes; no new vendor templates or shop inventory groups were added. Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 171`, and `StatelVendorExclusions = 30`; actionable uncovered statel vendors dropped from `202` to `171`. Remaining exact-template candidates with valid shop hashes are seven Parnassos `spec_smarket` specialty rows already marked `MappingConfidence: Medium`, so they were not included in the high-confidence overnight batch. Current coverage chain is `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171`. No runtime vendor behavior changed.
 - Omni Advanced General Shop live-capture import completed from AOSharp capture `20260613-002828`. The validated staged SQL added 23 `1184 ord_smarket_omni_advanced` vendor rows, 16 vendor templates, and 15 new shop inventory groups with 760 inventory rows while reusing existing shop hash `LJI7`. Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 253`, and `StatelVendorExclusions = 30`; actionable uncovered statel vendors dropped from `276` to `253`. No runtime vendor behavior changed.
 - `1183 ord_smarket_omni_basic` vendor coverage expansion completed. The 20 approved static vendor mappings were committed, imported into `cellao_codex_clean.vendors`, and verified with `DataFileIssues = 0`, `VendorDbIssues = 0`, and `ShopInventoryIssues = 0`. Total uncovered statel vendors dropped from `730` to `710`; `1183 ord_smarket_omni_basic` dropped from `77` to `57`. A `vendors` table backup was created before import, and no runtime vendor behavior changed.
 - `1184 ord_smarket_omni_advanced` vendor coverage expansion completed. The 21 approved static vendor mappings were committed, imported into `cellao_codex_clean.vendors`, and verified with `DataFileIssues = 0`, `VendorDbIssues = 0`, and `ShopInventoryIssues = 0`. Total uncovered statel vendors dropped from `710` to `689`; `1184 ord_smarket_omni_advanced` dropped from `68` to `47`. A `vendors` table backup was created before import, and no runtime vendor behavior changed.
@@ -60,7 +61,7 @@ Verified or previously playtested as working:
 
 Currently unstable or unresolved:
 
-- Broad static vendor coverage remains incomplete. Transaction behavior for vendor buy, sell, and close/cancel is verified; remaining work is data coverage for shop stock and statel-to-template mappings, not transaction semantics. Current post-import audit shows `253` actionable uncovered statel vendors.
+- Broad static vendor coverage remains incomplete. Transaction behavior for vendor buy, sell, and close/cancel is verified; remaining work is data coverage for shop stock and statel-to-template mappings, not transaction semantics. Current post-import audit shows `171` actionable uncovered statel vendors.
 - NPC movement remains high-risk and should not be patched without source/capture evidence.
 
 ## Files Actively Being Modified Or Recently Dirty
@@ -151,7 +152,8 @@ Do not revert these blindly. Some are active user/project work.
 5. Do not patch NPC movement as part of vendor coverage work.
 6. Run focused source/data assertions after any vendor coverage repair.
 7. Start engines only when Mike asks for playtest.
+8. Do not import the remaining seven exact-template `spec_smarket` Parnassos specialty rows without explicit approval to accept their existing `MappingConfidence: Medium` source status.
 
 ## Recommended Next Task
 
-No next target is selected in this documentation update. Continue static vendor coverage only after Mike selects or approves the next target from current audit data. Patch only confirmed mappings; do not guess unknown terminals or change inventory, corpse credit, player trade, or vendor buy/sell/close behavior.
+No next target is selected in this documentation update. The overnight high-confidence inferred pass is exhausted; remaining targets require live capture/access, existing medium-confidence inference approval, or separate evidence review. Continue static vendor coverage only after Mike selects or approves the next target from current audit data. Patch only confirmed mappings; do not guess unknown terminals or change inventory, corpse credit, player trade, or vendor buy/sell/close behavior.
