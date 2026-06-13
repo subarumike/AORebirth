@@ -1,6 +1,6 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 218.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 202.
 
 ## Practical Location Summary
 
@@ -9,7 +9,6 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 500 | Parnassos | GM-only / not live-accessible | 85 | Legacy faction core departments (21); Other unresolved vendor terminal (21); Heavenly weapon construction/components/recipes (19); Containers/computers/furniture/specialty/cars (10) |
 | 4704 | Tower Shop (dungeon) | Likely special/dungeon; verify before travel | 17 | ICC/tower shop special vendors (16); Containers/computers/furniture/specialty/cars (1) |
 | 6007 | BS Signup (dng) | Likely special/dungeon; verify before travel | 17 | OFAB vendors (17) |
-| 1181 | ord_smarket_clan_advanced | Likely live-accessible | 16 | Heavenly weapon construction/components/recipes (6); Legacy faction core departments (5); Clan/Omni device variants (1); Containers/computers/furniture/specialty/cars (1) |
 | 2064 | neut_basic_implants_shop | Unknown accessibility | 12 | Implants/clusters (12) |
 | 2073 | neut_advanced_implants_shop | Unknown accessibility | 12 | Implants/clusters (12) |
 | 4354 | Uncle Bazzits Workshop (Dng) | Likely special/dungeon; verify before travel | 5 | Other unresolved vendor terminal (4); Faction clothes/fashion (1) |
@@ -49,7 +48,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 500 | Parnassos |  |  |  |  |  |
 | 4704 | Tower Shop (dungeon) | Borealis 0xC0180320 @ 729.813,61.686,651.696 | Old Athen 0xC02B021C @ 479.913,9.174,282.706 <br> Rome Blue 0xC00A02DF @ 675.09,22.357,356.184 | 0xC0001260 @ 193.988,9.006,153.992 | 0xC0001260 @ 193.988,9.006,153.992 -> 0xC0011260 @ 178,9.005,157.986 | Medium: same-template sibling door within 30m No patch. Keep as reference evidence for this interior family. |
 | 6007 | BS Signup (dng) |  |  |  |  |  |
-| 1181 | ord_smarket_clan_advanced | Old Athen 0xC01F021C @ 336.799,11.617,435.626 | Avalon 0xC01101F9 @ 2146.273,44.315,3772.396 <br> Mort 0xC0070230 @ 1866.855,47.695,1102.495 <br> Old Athen 0xC020021C @ 406.799,11.618,534.626 <br> Old Athen 0xC01C021C @ 435.948,11.616,561.396 <br> Tir 0xC0050280 @ 387.147,7.999,483.152 <br> Wailing Wastes 0xC0020227 @ 1329.242,25.743,1715.809 <br> West Athens 0xC0180221 @ 359.734,1.604,412.692 | 0xC000049D @ 187.001,5,152.01 | 0xC000049D @ 187.001,5,152.01 -> 0xC002049D @ 197.99,5.001,173 | Medium: same-template sibling door within 30m Review as a supermarket-family candidate; distance is larger than the verified close-door pattern. |
 | 2064 | neut_basic_implants_shop | Borealis 0xC0030320 @ 586.803,68.556,698.497 | Newland City 0xC0060236 @ 256.119,34.813,325.373 | 0xC0010810 @ 191.004,5.01,163.985 | 0xC0010810 @ 191.004,5.01,163.985 -> 0xC0000810 @ 191.003,5.01,154.015 | High-review: same-template paired door within 12m; matches known implant-shop failure pattern No patch. Keep as reference evidence for this interior family. |
 | 2073 | neut_advanced_implants_shop | Borealis 0xC0070320 @ 679.443,69.332,618.09 | Broken Shores 0xC0520299 @ 691.691,11.992,1381.1 <br> Pleasant Meadows 0xC0140276 @ 2298.741,3.395,1824.482 | 0xC0010819 @ 205.004,5.01,205.985 | 0xC0010819 @ 205.004,5.01,205.985 -> 0xC0000819 @ 205.003,5.01,196.015 | High-review: same-template paired door within 12m; matches known implant-shop failure pattern No patch. Keep as reference evidence for this interior family. |
 | 565 | Newland Desert |  |  |  |  |  |
@@ -222,32 +220,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 5 | 393674766 | 266579 | Ofab General Vendor | 216.501,6.021,223.962 | OFAB vendors |
 | 5 | 393674767 | 266577 | Ofab Melee Weapons | 216.501,6.02,221.975 | OFAB vendors |
 | 5 | 393674768 | 266576 | Ofab Ranged Weapons | 216.46,6.02,219.975 | OFAB vendors |
-
-### 1181 - ord_smarket_clan_advanced (16)
-
-- Primary source door: Old Athen 0xC01F021C @ 336.799,11.617,435.626
-- Other source doors: Avalon 0xC01101F9 @ 2146.273,44.315,3772.396 | Mort 0xC0070230 @ 1866.855,47.695,1102.495 | Old Athen 0xC020021C @ 406.799,11.618,534.626 | Old Athen 0xC01C021C @ 435.948,11.616,561.396 | Tir 0xC0050280 @ 387.147,7.999,483.152 | Wailing Wastes 0xC0020227 @ 1329.242,25.743,1715.809 | West Athens 0xC0180221 @ 359.734,1.604,412.692
-- Destination door evidence: 0xC000049D @ 187.001,5,152.01
-- Paired-door candidate: 0xC000049D @ 187.001,5,152.01 -> 0xC002049D @ 197.99,5.001,173 (Medium; same-template sibling door within 30m)
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 1 | 77398040 | 155282 | Advanced Ranged Weapon Construction Kits | 167,11.001,201 | Heavenly weapon construction/components/recipes |
-| 1 | 77398042 | 155234 | Advanced Melee Weapon Construction Kits | 167,11.001,206 | Heavenly weapon construction/components/recipes |
-| 1 | 77398049 | 155297 | Melee Weapon Components - Advanced | 177,5.001,201 | Heavenly weapon construction/components/recipes |
-| 1 | 77398050 | 155491 | Ranged Weapon Components - Advanced | 177,5,195 | Heavenly weapon construction/components/recipes |
-| 1 | 77398056 | 155503 | Melee Weapon Recipes - Advanced | 207,11.001,214 | Heavenly weapon construction/components/recipes |
-| 1 | 77398058 | 155506 | Ranged Weapon Recipes - Advanced | 207,11.001,221 | Heavenly weapon construction/components/recipes |
-| 2 | 77398044 | 155223 | Advanced Implants | 167,11.001,227 | Implants/clusters |
-| 3 | 77398030 | 99533 | Clan Advanced Attacks | 177,5,171 | Legacy faction core departments |
-| 3 | 77398031 | 99517 | Clan Advanced Augmentations | 177,5,175 | Legacy faction core departments |
-| 3 | 77398032 | 99509 | Clan Advanced Medical Supplies | 183,5,177 | Legacy faction core departments |
-| 3 | 77398033 | 99528 | Clan Advanced Tools | 185,5,170.6 | Legacy faction core departments |
-| 3 | 77398034 | 99506 | Clan Advanced Weapons | 197,5,176 | Legacy faction core departments |
-| 4 | 77398036 | 99540 | Clan Containers | 197,5,167 | Containers/computers/furniture/specialty/cars |
-| 6 | 77398035 | 99526 | Clan Clothes | 187.017,5,169 | Faction clothes/fashion |
-| 6 | 77398037 | 117749 | Clan Maps | 192.743,5,162.102 | Maps |
-| 6 | 77398039 | 155605 | Clan Advanced Devices | 189,5.001,170.6 | Clan/Omni device variants |
 
 ### 2064 - neut_basic_implants_shop (12)
 
