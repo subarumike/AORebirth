@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-13 05:14:51
+Generated: 2026-06-13 17:15:08
 
 ## Scope
 
@@ -20,14 +20,15 @@ Generated: 2026-06-13 05:14:51
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 171 |
+| Vending statels without complete DB shop coverage | 147 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Overnight exact-template inferred vendor import promoted from existing captured/inferred template evidence.
-- Validated coverage added: 31 vendor rows only, reusing existing `vendortemplate` hashes and existing `shopinventorytemplates` hashes. No new vendor templates or shop inventory groups were added.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 202 to 171. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171.
+- Neutral ICC implant/cluster import promoted from AOSharp capture 20260613-170220.
+- Validated coverage added: 24 vendor rows across 2064 neut_basic_implants_shop and 2073 neut_advanced_implants_shop, 12 vendor templates, and 12 new shop inventory groups with 1876 inventory rows.
+- The 2064 rows are captured mappings; the 2073 rows are high-confidence exact-template reuse from the captured 2064 template evidence, matching the existing ICC pharmacy reuse pattern across these interiors.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 171 to 147. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147.
 
 ## Coverage Exclusions
 

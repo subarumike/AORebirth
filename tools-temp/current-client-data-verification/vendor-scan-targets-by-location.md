@@ -1,6 +1,6 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 171.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 147.
 
 ## Practical Location Summary
 
@@ -9,8 +9,6 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 500 | Parnassos | GM-only / not live-accessible | 60 | Other unresolved vendor terminal (21); Heavenly weapon construction/components/recipes (19); Containers/computers/furniture/specialty/cars (8); Implants/clusters (4) |
 | 4704 | Tower Shop (dungeon) | Likely special/dungeon; verify before travel | 17 | ICC/tower shop special vendors (16); Containers/computers/furniture/specialty/cars (1) |
 | 6007 | BS Signup (dng) | Likely special/dungeon; verify before travel | 17 | OFAB vendors (17) |
-| 2064 | neut_basic_implants_shop | Unknown accessibility | 12 | Implants/clusters (12) |
-| 2073 | neut_advanced_implants_shop | Unknown accessibility | 12 | Implants/clusters (12) |
 | 4354 | Uncle Bazzits Workshop (Dng) | Likely special/dungeon; verify before travel | 5 | Other unresolved vendor terminal (4); Faction clothes/fashion (1) |
 | 565 | Newland Desert | Likely live-accessible | 5 | Other unresolved vendor terminal (2); Classic armor terminals (1); Implants/clusters (1); Startup equipment (1) |
 | 6553 | Arete Landing | Likely live-accessible | 5 | Implants/clusters (4); Other unresolved vendor terminal (1) |
@@ -46,8 +44,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 500 | Parnassos |  |  |  |  |  |
 | 4704 | Tower Shop (dungeon) | Borealis 0xC0180320 @ 729.813,61.686,651.696 | Old Athen 0xC02B021C @ 479.913,9.174,282.706 <br> Rome Blue 0xC00A02DF @ 675.09,22.357,356.184 | 0xC0001260 @ 193.988,9.006,153.992 | 0xC0001260 @ 193.988,9.006,153.992 -> 0xC0011260 @ 178,9.005,157.986 | Medium: same-template sibling door within 30m No patch. Keep as reference evidence for this interior family. |
 | 6007 | BS Signup (dng) |  |  |  |  |  |
-| 2064 | neut_basic_implants_shop | Borealis 0xC0030320 @ 586.803,68.556,698.497 | Newland City 0xC0060236 @ 256.119,34.813,325.373 | 0xC0010810 @ 191.004,5.01,163.985 | 0xC0010810 @ 191.004,5.01,163.985 -> 0xC0000810 @ 191.003,5.01,154.015 | High-review: same-template paired door within 12m; matches known implant-shop failure pattern No patch. Keep as reference evidence for this interior family. |
-| 2073 | neut_advanced_implants_shop | Borealis 0xC0070320 @ 679.443,69.332,618.09 | Broken Shores 0xC0520299 @ 691.691,11.992,1381.1 <br> Pleasant Meadows 0xC0140276 @ 2298.741,3.395,1824.482 | 0xC0010819 @ 205.004,5.01,205.985 | 0xC0010819 @ 205.004,5.01,205.985 -> 0xC0000819 @ 205.003,5.01,196.015 | High-review: same-template paired door within 12m; matches known implant-shop failure pattern No patch. Keep as reference evidence for this interior family. |
 | 565 | Newland Desert |  |  |  |  |  |
 | 4354 | Uncle Bazzits Workshop (Dng) | Newland Desert 0xC0000235 @ 1546.475,31.502,2717.811 |  | 0xC0001102 @ 183.002,6.02,155.985 |  |  |
 | 6553 | Arete Landing |  |  |  |  |  |
@@ -191,50 +187,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 5 | 393674766 | 266579 | Ofab General Vendor | 216.501,6.021,223.962 | OFAB vendors |
 | 5 | 393674767 | 266577 | Ofab Melee Weapons | 216.501,6.02,221.975 | OFAB vendors |
 | 5 | 393674768 | 266576 | Ofab Ranged Weapons | 216.46,6.02,219.975 | OFAB vendors |
-
-### 2064 - neut_basic_implants_shop (12)
-
-- Primary source door: Borealis 0xC0030320 @ 586.803,68.556,698.497
-- Other source doors: Newland City 0xC0060236 @ 256.119,34.813,325.373
-- Destination door evidence: 0xC0010810 @ 191.004,5.01,163.985
-- Paired-door candidate: 0xC0010810 @ 191.004,5.01,163.985 -> 0xC0000810 @ 191.003,5.01,154.015 (High-review; same-template paired door within 12m; matches known implant-shop failure pattern)
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 2 | 135266305 | 297396 | Basic ICC Implants | 186.965,5.01,155.058 | Implants/clusters |
-| 2 | 135266306 | 297399 | Basic ICC Faded Clusters | 186.965,5.01,159 | Implants/clusters |
-| 2 | 135266307 | 297402 | Basic ICC Bright Clusters | 186.965,5.01,161 | Implants/clusters |
-| 2 | 135266308 | 297405 | Basic ICC Shiny Clusters | 186.965,5.01,163 | Implants/clusters |
-| 2 | 135266310 | 297397 | Advanced ICC Implants | 187,5.003,147 | Implants/clusters |
-| 2 | 135266311 | 297400 | Advanced ICC Faded Clusters | 187,5.003,149 | Implants/clusters |
-| 2 | 135266312 | 297403 | Advanced ICC Bright Clusters | 187,5.003,151.021 | Implants/clusters |
-| 2 | 135266313 | 297406 | Advanced ICC Shiny Clusters | 187,5.003,153 | Implants/clusters |
-| 2 | 135266315 | 297398 | Refined ICC Implants | 195,5.003,151 | Implants/clusters |
-| 2 | 135266316 | 297401 | Refined ICC Faded Clusters | 195,5.003,149 | Implants/clusters |
-| 2 | 135266317 | 297404 | Refined ICC Bright Clusters | 195,5.003,147 | Implants/clusters |
-| 2 | 135266318 | 297407 | Refined ICC Shiny Clusters | 195,5.003,145 | Implants/clusters |
-
-### 2073 - neut_advanced_implants_shop (12)
-
-- Primary source door: Borealis 0xC0070320 @ 679.443,69.332,618.09
-- Other source doors: Broken Shores 0xC0520299 @ 691.691,11.992,1381.1 | Pleasant Meadows 0xC0140276 @ 2298.741,3.395,1824.482
-- Destination door evidence: 0xC0010819 @ 205.004,5.01,205.985
-- Paired-door candidate: 0xC0010819 @ 205.004,5.01,205.985 -> 0xC0000819 @ 205.003,5.01,196.015 (High-review; same-template paired door within 12m; matches known implant-shop failure pattern)
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 2 | 135856129 | 297396 | Basic ICC Implants | 200.965,5.01,199 | Implants/clusters |
-| 2 | 135856130 | 297399 | Basic ICC Faded Clusters | 200.965,5.01,201 | Implants/clusters |
-| 2 | 135856131 | 297402 | Basic ICC Bright Clusters | 200.965,5.01,203 | Implants/clusters |
-| 2 | 135856132 | 297405 | Basic ICC Shiny Clusters | 200.965,5.01,205 | Implants/clusters |
-| 2 | 135856134 | 297397 | Advanced ICC Implants | 201,5.003,189 | Implants/clusters |
-| 2 | 135856135 | 297400 | Advanced ICC Faded Clusters | 201,5.003,191 | Implants/clusters |
-| 2 | 135856136 | 297403 | Advanced ICC Bright Clusters | 201,5.003,193.021 | Implants/clusters |
-| 2 | 135856137 | 297406 | Advanced ICC Shiny Clusters | 201,5.003,195 | Implants/clusters |
-| 2 | 135856139 | 297398 | Refined ICC Implants | 209,5.003,193 | Implants/clusters |
-| 2 | 135856140 | 297401 | Refined ICC Faded Clusters | 209,5.003,191 | Implants/clusters |
-| 2 | 135856141 | 297404 | Refined ICC Bright Clusters | 209,5.003,189 | Implants/clusters |
-| 2 | 135856142 | 297407 | Refined ICC Shiny Clusters | 209,5.003,187 | Implants/clusters |
 
 ### 4354 - Uncle Bazzits Workshop (Dng) (5)
 
