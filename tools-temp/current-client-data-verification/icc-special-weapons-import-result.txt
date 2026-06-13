@@ -1,0 +1,9 @@
+﻿ConfirmedDb=cellao_codex_clean
+BackupPath=C:\Users\Mike\Documents\Cellao-Clean\tools-temp\db-backups\icc_special_weapons_before_2060_20260610_220308.sql
+BeforeTotal=550
+Before2060=4
+Preflight=vendortemplate	0 | vendors_ids	0 | forbidden_playfields	0
+InsertedVendortemplate=3
+InsertedShopinventorytemplates=113
+InsertedVendors=3
+Post=vendortemplate	ICCSpWA	99573	SpWA | vendortemplate	ICCSpWB	99572	SpWB | vendortemplate	ICCSpWS	297470	SpWS | shopinventorytemplates	SpWA	30 | shopinventorytemplates	SpWB	31 | shopinventorytemplates	SpWS	52 | vendors	135004162	2060	297470	ICCSpWS | vendors	135004163	2060	99572	ICCSpWB | vendors	135004164	2060	99573	ICCSpWA | forbidden_playfields	0

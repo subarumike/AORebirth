@@ -3,16 +3,41 @@ param(
     [switch]$NoDecode,
     [ValidateSet("All", "Loot", "Quest", "PacketsOnly")]
     [string]$Mode = "",
-    [string]$RepoRoot = "C:\Users\Mike\Documents\Cellao-Clean"
+    [string]$RepoRoot = "",
+    [switch]$DryRun,
+    [switch]$AllowWrite,
+    [switch]$AllowStopProcess
 )
 
 $ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
+
+function Resolve-RepoRoot {
+    param([string]$Path)
+
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..\..")).Path
+    }
+
+    return (Resolve-Path -LiteralPath $Path).Path
+}
+
+$RepoRoot = Resolve-RepoRoot $RepoRoot
 
 $collectorRoot = Join-Path $RepoRoot "tools-temp\live-data-collector"
 $activePath = Join-Path $collectorRoot "active_capture.json"
 
 if ([string]::IsNullOrWhiteSpace($CaptureDir)) {
     if (-not (Test-Path -LiteralPath $activePath)) {
+        Write-Host "Resolved stop-capture paths:"
+        Write-Host "  RepoRoot=$RepoRoot"
+        Write-Host "  CollectorRoot=$collectorRoot"
+        Write-Host "  ActivePath=$activePath"
+        Write-Host "  IntendedAction=stop active capture and update metadata"
+        Write-Host "No active capture file found. Pass -CaptureDir if you want to stop or decode a specific folder."
+        if ($DryRun -or -not ($AllowStopProcess -and $AllowWrite)) {
+            return
+        }
         throw "No active capture file found. Pass -CaptureDir if you want to decode a specific folder."
     }
     $active = Get-Content -Raw -LiteralPath $activePath | ConvertFrom-Json
@@ -24,6 +49,26 @@ if ([string]::IsNullOrWhiteSpace($CaptureDir)) {
 $metaPath = Join-Path $CaptureDir "capture_meta.json"
 $meta = if (Test-Path -LiteralPath $metaPath) { Get-Content -Raw -LiteralPath $metaPath | ConvertFrom-Json } else { $null }
 $targetPid = if ($meta -and $meta.pid) { [int]$meta.pid } elseif ($active -and $active.pid) { [int]$active.pid } else { 0 }
+$decodeMode = if ([string]::IsNullOrWhiteSpace($Mode)) {
+    if ($meta -and $meta.mode) { [string]$meta.mode } else { "All" }
+} else {
+    $Mode
+}
+
+Write-Host "Resolved stop-capture paths:"
+Write-Host "  RepoRoot=$RepoRoot"
+Write-Host "  CollectorRoot=$collectorRoot"
+Write-Host "  ActivePath=$activePath"
+Write-Host "  CaptureDir=$CaptureDir"
+Write-Host "  MetaPath=$metaPath"
+Write-Host "  TargetPid=$targetPid"
+Write-Host "  DecodeAfterStop=$(-not $NoDecode)"
+Write-Host "  DecodeMode=$decodeMode"
+
+if ($DryRun -or -not ($AllowStopProcess -and $AllowWrite)) {
+    Write-Host "No process stopped and no files written. Pass -AllowStopProcess -AllowWrite to stop and update capture metadata."
+    return
+}
 
 if ($targetPid -gt 0) {
     $proc = Get-Process -Id $targetPid -ErrorAction SilentlyContinue
@@ -47,12 +92,7 @@ if (Test-Path -LiteralPath $activePath) {
 }
 
 if (-not $NoDecode) {
-    $decodeMode = if ([string]::IsNullOrWhiteSpace($Mode)) {
-        if ($meta -and $meta.mode) { [string]$meta.mode } else { "All" }
-    } else {
-        $Mode
-    }
-    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $collectorRoot "Decode-LiveDataCapture.ps1") -CaptureDir $CaptureDir -Mode $decodeMode
+    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $collectorRoot "Decode-LiveDataCapture.ps1") -CaptureDir $CaptureDir -Mode $decodeMode -RepoRoot $RepoRoot -AllowWrite
     if ($LASTEXITCODE -ne 0) { throw "Decode failed" }
 }
 

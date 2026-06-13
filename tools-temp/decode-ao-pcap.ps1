@@ -2,10 +2,28 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$PcapPath,
 
-    [string]$OutDir = ""
+    [string]$OutDir = "",
+    [string]$RepoRoot = "",
+    [string]$TsharkPath = "C:\Program Files\Wireshark\tshark.exe",
+    [string]$MessageDll = "",
+    [switch]$DryRun,
+    [switch]$AllowWrite
 )
 
 $ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
+
+function Resolve-RepoRoot {
+    param([string]$Path)
+
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
+    }
+
+    return (Resolve-Path -LiteralPath $Path).Path
+}
+
+$RepoRoot = Resolve-RepoRoot $RepoRoot
 
 if (-not (Test-Path -LiteralPath $PcapPath)) {
     throw "Pcap not found: $PcapPath"
@@ -15,24 +33,38 @@ if ([string]::IsNullOrWhiteSpace($OutDir)) {
     $OutDir = Join-Path (Split-Path -Parent $PcapPath) "decoded"
 }
 
-New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
-
-$tshark = "C:\Program Files\Wireshark\tshark.exe"
-$messageDll = "C:\Users\Mike\Documents\Cellao-Clean\CellAO\Built\Debug\SmokeLounge.AOtomation.Messaging.dll"
-
-if (-not (Test-Path -LiteralPath $tshark)) {
-    throw "tshark not found: $tshark"
-}
-
-if (-not (Test-Path -LiteralPath $messageDll)) {
-    throw "AOtomation messaging DLL not found: $messageDll"
+if ([string]::IsNullOrWhiteSpace($MessageDll)) {
+    $MessageDll = Join-Path $RepoRoot "CellAO\Built\Debug\SmokeLounge.AOtomation.Messaging.dll"
 }
 
 $payloadTsv = Join-Path $OutDir "tcp-payloads.tsv"
 $clientDecoded = Join-Path $OutDir "client-n3-decoded.txt"
 $chatText = Join-Path $OutDir "chat-strings.txt"
 
-& $tshark -r $PcapPath -T fields `
+Write-Host "Resolved PCAP decode paths:"
+Write-Host "  RepoRoot=$RepoRoot"
+Write-Host "  PcapPath=$PcapPath"
+Write-Host "  OutDir=$OutDir"
+Write-Host "  TsharkPath=$TsharkPath"
+Write-Host "  MessageDll=$MessageDll"
+Write-Host "  IntendedOutputs=$payloadTsv, $clientDecoded, $chatText"
+
+if ($DryRun -or -not $AllowWrite) {
+    Write-Host "No decode outputs written. Pass -AllowWrite to create decoded files."
+    return
+}
+
+New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
+
+if (-not (Test-Path -LiteralPath $TsharkPath)) {
+    throw "tshark not found: $TsharkPath"
+}
+
+if (-not (Test-Path -LiteralPath $MessageDll)) {
+    throw "AOtomation messaging DLL not found: $MessageDll"
+}
+
+& $TsharkPath -r $PcapPath -T fields `
     -e frame.number `
     -e frame.time_relative `
     -e ip.src `
@@ -45,7 +77,7 @@ $chatText = Join-Path $OutDir "chat-strings.txt"
     -e tcp.payload |
     Set-Content -LiteralPath $payloadTsv -Encoding ascii
 
-$asm = [Reflection.Assembly]::LoadFrom($messageDll)
+$asm = [Reflection.Assembly]::LoadFrom($MessageDll)
 $serializerType = $asm.GetType("SmokeLounge.AOtomation.Messaging.Serialization.MessageSerializer")
 $serializer = [Activator]::CreateInstance($serializerType)
 
