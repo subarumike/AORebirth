@@ -106,6 +106,118 @@ function Format-Coord {
     return "{0:0.###},{1:0.###},{2:0.###}" -f [double]$X, [double]$Y, [double]$Z
 }
 
+function Get-ObjectPropertyValue {
+    param(
+        $Object,
+        [string]$PropertyName
+    )
+
+    if ($null -eq $Object -or [string]::IsNullOrWhiteSpace($PropertyName)) {
+        return ""
+    }
+
+    $property = $Object.PSObject.Properties[$PropertyName]
+    if ($null -eq $property -or $null -eq $property.Value) {
+        return ""
+    }
+
+    return [string]$property.Value
+}
+
+function Join-DistinctValues {
+    param([object[]]$Values)
+
+    $seen = [ordered]@{}
+    foreach ($value in $Values) {
+        if ($null -eq $value) {
+            continue
+        }
+
+        $text = [string]$value
+        if ([string]::IsNullOrWhiteSpace($text)) {
+            continue
+        }
+
+        if (-not $seen.Contains($text)) {
+            $seen[$text] = $true
+        }
+    }
+
+    return (@($seen.Keys) -join " | ")
+}
+
+function Format-MarkdownCell {
+    param($Value)
+
+    if ($null -eq $Value) {
+        return ""
+    }
+
+    return ([string]$Value).Replace("|", "<br>").Replace("`r", " ").Replace("`n", " ")
+}
+
+function Format-SourceDoorSummary {
+    param($DoorRow)
+
+    if ($null -eq $DoorRow) {
+        return ""
+    }
+
+    $sourceName = Get-ObjectPropertyValue $DoorRow "SourcePlayfieldName"
+    $sourceDoor = Get-ObjectPropertyValue $DoorRow "SourceInstanceHex"
+    $sourceCoords = Get-ObjectPropertyValue $DoorRow "SourceCoords"
+    if ([string]::IsNullOrWhiteSpace($sourceName) -and [string]::IsNullOrWhiteSpace($sourceDoor) -and [string]::IsNullOrWhiteSpace($sourceCoords)) {
+        return ""
+    }
+
+    $doorName = ("$sourceName $sourceDoor").Trim()
+    if ([string]::IsNullOrWhiteSpace($sourceCoords)) {
+        return $doorName
+    }
+
+    if ([string]::IsNullOrWhiteSpace($doorName)) {
+        return $sourceCoords
+    }
+
+    return "$doorName @ $sourceCoords"
+}
+
+function Get-SourceDoorKey {
+    param($DoorRow)
+
+    if ($null -eq $DoorRow) {
+        return ""
+    }
+
+    return ((Get-ObjectPropertyValue $DoorRow "SourcePlayfieldName"),
+        (Get-ObjectPropertyValue $DoorRow "SourceInstanceHex"),
+        (Get-ObjectPropertyValue $DoorRow "SourceCoords")) -join "|"
+}
+
+function Format-DestinationDoorSummary {
+    param($DoorRow)
+
+    if ($null -eq $DoorRow) {
+        return ""
+    }
+
+    $destinationDoor = Get-ObjectPropertyValue $DoorRow "DestinationInstanceHex"
+    $destinationCoords = Get-ObjectPropertyValue $DoorRow "DestinationCoords"
+    if ([string]::IsNullOrWhiteSpace($destinationDoor) -and [string]::IsNullOrWhiteSpace($destinationCoords)) {
+        return ""
+    }
+
+    if ([string]::IsNullOrWhiteSpace($destinationCoords)) {
+        return $destinationDoor
+    }
+
+    if ([string]::IsNullOrWhiteSpace($destinationDoor)) {
+        return $destinationCoords
+    }
+
+    return "$destinationDoor @ $destinationCoords"
+}
+
 function Get-StatValue {
     param($Template, [int]$StatId)
 
@@ -440,6 +552,46 @@ $excludedStatelVendors = @($statelVendorRows | Where-Object { $_.CoverageExclude
 $problemStatelVendors = @($statelVendorRows | Where-Object { -not $_.CoverageExcluded -and -not [string]::IsNullOrWhiteSpace($_.Issues) })
 $problemVendorMesh = @($vendorMeshAudit | Where-Object { $_.Status -ne "Item cache matches live" })
 
+$teleportAuditCsv = Join-Path $RepoRoot "tools-temp\playfield-teleport-audit.csv"
+$remapCandidatesCsv = Join-Path $RepoRoot "tools-temp\playfield-remap-ranked-candidates.csv"
+$namedLocationsCsv = Join-Path $OutDir "vendor-scan-route-named-locations.csv"
+
+$teleportAuditRows = @()
+if (Test-Path -LiteralPath $teleportAuditCsv) {
+    $teleportAuditRows = @(Import-Csv -LiteralPath $teleportAuditCsv)
+}
+
+$remapCandidateRows = @()
+if (Test-Path -LiteralPath $remapCandidatesCsv) {
+    $remapCandidateRows = @(Import-Csv -LiteralPath $remapCandidatesCsv)
+}
+
+$namedLocationRows = @()
+if (Test-Path -LiteralPath $namedLocationsCsv) {
+    $namedLocationRows = @(Import-Csv -LiteralPath $namedLocationsCsv)
+}
+
+$remapByDestinationPlayfield = @{}
+foreach ($candidate in $remapCandidateRows) {
+    if ([string]::IsNullOrWhiteSpace($candidate.DestinationPlayfield)) {
+        continue
+    }
+
+    $remapByDestinationPlayfield[[int]$candidate.DestinationPlayfield] = $candidate
+}
+
+$namedLocationByInternalPlayfield = @{}
+foreach ($namedLocation in $namedLocationRows) {
+    if ([string]::IsNullOrWhiteSpace($namedLocation.InternalPlayfield)) {
+        continue
+    }
+
+    $internalPlayfield = [int]$namedLocation.InternalPlayfield
+    if (-not $namedLocationByInternalPlayfield.ContainsKey($internalPlayfield)) {
+        $namedLocationByInternalPlayfield[$internalPlayfield] = $namedLocation
+    }
+}
+
 $vendorScanTargetsCsv = Join-Path $OutDir "vendor-scan-targets.csv"
 $existingVendorScanTargetsByKey = @{}
 if (Test-Path -LiteralPath $vendorScanTargetsCsv) {
@@ -449,7 +601,7 @@ if (Test-Path -LiteralPath $vendorScanTargetsCsv) {
         $existingVendorScanTargetsByKey[$targetKey] = $targetRow
     }
 }
-$currentVendorScanTargets = foreach ($row in $problemStatelVendors | Sort-Object Playfield, ComputedVendorId) {
+$baseVendorScanTargets = foreach ($row in $problemStatelVendors | Sort-Object Playfield, ComputedVendorId) {
     $targetKey = "$($row.Playfield):$($row.ComputedVendorId):$($row.StatelInstanceHex)"
     $existingTarget = if ($existingVendorScanTargetsByKey.ContainsKey($targetKey)) { $existingVendorScanTargetsByKey[$targetKey] } else { $null }
 
@@ -465,6 +617,103 @@ $currentVendorScanTargets = foreach ($row in $problemStatelVendors | Sort-Object
         Family = if ($null -ne $existingTarget) { $existingTarget.Family } else { "Unclassified" }
         CaptureInstruction = if ($null -ne $existingTarget) { $existingTarget.CaptureInstruction } else { "Review current statel vendor coverage before capture." }
         AccessStatus = if ($null -ne $existingTarget) { $existingTarget.AccessStatus } else { "Unclassified" }
+    }
+}
+
+$vendorScanDoorLocationsCsv = Join-Path $OutDir "vendor-scan-door-locations.csv"
+$doorEvidenceByPlayfield = @{}
+$doorLocationRows = foreach ($group in @($baseVendorScanTargets | Group-Object Playfield | Sort-Object {[int]$_.Name})) {
+    $playfield = [int]$group.Name
+    $firstTarget = $group.Group | Select-Object -First 1
+    $inboundDoors = @($teleportAuditRows |
+        Where-Object { -not [string]::IsNullOrWhiteSpace($_.DestinationPlayfield) -and [int]$_.DestinationPlayfield -eq $playfield } |
+        Sort-Object SourcePlayfieldName, SourceCoords, SourceInstanceHex)
+    $namedLocation = if ($namedLocationByInternalPlayfield.ContainsKey($playfield)) { $namedLocationByInternalPlayfield[$playfield] } else { $null }
+    $routeDoorCoords = Get-ObjectPropertyValue $namedLocation "DoorCoordinates"
+    $routeNamedLocation = Get-ObjectPropertyValue $namedLocation "NamedLocation"
+    $primaryDoor = $null
+    if (-not [string]::IsNullOrWhiteSpace($routeDoorCoords)) {
+        $matchingDoors = @($inboundDoors | Where-Object { (Get-ObjectPropertyValue $_ "SourceCoords") -eq $routeDoorCoords } | Select-Object -First 1)
+        if ($matchingDoors.Count -gt 0) {
+            $primaryDoor = $matchingDoors[0]
+        }
+    }
+    if ($null -eq $primaryDoor -and -not [string]::IsNullOrWhiteSpace($routeNamedLocation)) {
+        $matchingDoors = @($inboundDoors | Where-Object { (Get-ObjectPropertyValue $_ "SourcePlayfieldName") -eq $routeNamedLocation } | Select-Object -First 1)
+        if ($matchingDoors.Count -gt 0) {
+            $primaryDoor = $matchingDoors[0]
+        }
+    }
+    if ($null -eq $primaryDoor -and $inboundDoors.Count -gt 0) {
+        $primaryDoor = $inboundDoors[0]
+    }
+
+    $primaryDoorKey = Get-SourceDoorKey $primaryDoor
+    $otherDoors = @($inboundDoors | Where-Object {
+        $doorKey = Get-SourceDoorKey $_
+        $doorKey -ne $primaryDoorKey
+    })
+    $remapCandidate = if ($remapByDestinationPlayfield.ContainsKey($playfield)) { $remapByDestinationPlayfield[$playfield] } else { $null }
+    $sourceDoorSummary = Join-DistinctValues @($inboundDoors | ForEach-Object { Format-SourceDoorSummary $_ })
+    $otherDoorSummary = Join-DistinctValues @($otherDoors | ForEach-Object { Format-SourceDoorSummary $_ })
+    $destinationDoorSummary = Join-DistinctValues @($inboundDoors | ForEach-Object { Format-DestinationDoorSummary $_ })
+    $warnings = Join-DistinctValues @($inboundDoors | ForEach-Object { Get-ObjectPropertyValue $_ "Warnings" })
+
+    $doorRow = [pscustomobject]@{
+        Playfield = $playfield
+        PlayfieldName = $firstTarget.PlayfieldName
+        AccessStatus = $firstTarget.AccessStatus
+        UncoveredTerminals = $group.Count
+        RouteNamedLocation = $routeNamedLocation
+        RouteShopName = Get-ObjectPropertyValue $namedLocation "ShopName"
+        RouteDoorCoords = $routeDoorCoords
+        SourceDoorCount = $inboundDoors.Count
+        PrimarySourceDoorSummary = Format-SourceDoorSummary $primaryDoor
+        PrimarySourcePlayfield = Get-ObjectPropertyValue $primaryDoor "SourcePlayfieldName"
+        PrimarySourceDoor = Get-ObjectPropertyValue $primaryDoor "SourceInstanceHex"
+        PrimarySourceCoords = Get-ObjectPropertyValue $primaryDoor "SourceCoords"
+        OtherSourceDoors = $otherDoorSummary
+        AllSourceDoors = $sourceDoorSummary
+        DestinationDoor = $destinationDoorSummary
+        DestinationDoorCoords = Join-DistinctValues @($inboundDoors | ForEach-Object { Get-ObjectPropertyValue $_ "DestinationCoords" })
+        TeleportWarnings = $warnings
+        PairedDoorCurrent = Get-ObjectPropertyValue $remapCandidate "CurrentDoor"
+        PairedDoorCurrentCoords = Get-ObjectPropertyValue $remapCandidate "CurrentCoords"
+        PairedDoorCandidate = Get-ObjectPropertyValue $remapCandidate "CandidateDoor"
+        PairedDoorCandidateCoords = Get-ObjectPropertyValue $remapCandidate "CandidateCoords"
+        PairedDoorDistance = Get-ObjectPropertyValue $remapCandidate "Distance"
+        PairedDoorConfidence = Get-ObjectPropertyValue $remapCandidate "Confidence"
+        PairedDoorReason = Get-ObjectPropertyValue $remapCandidate "Reason"
+        PairedDoorNextAction = Get-ObjectPropertyValue $remapCandidate "NextAction"
+    }
+    $doorEvidenceByPlayfield[$playfield] = $doorRow
+    $doorRow
+}
+$doorLocationRows | Export-Csv -LiteralPath $vendorScanDoorLocationsCsv -NoTypeInformation
+
+$currentVendorScanTargets = foreach ($target in $baseVendorScanTargets) {
+    $doorEvidence = if ($doorEvidenceByPlayfield.ContainsKey([int]$target.Playfield)) { $doorEvidenceByPlayfield[[int]$target.Playfield] } else { $null }
+
+    [pscustomobject]@{
+        Priority = $target.Priority
+        Playfield = $target.Playfield
+        PlayfieldName = $target.PlayfieldName
+        Coordinates = $target.Coordinates
+        VendorId = $target.VendorId
+        StatelInstanceHex = $target.StatelInstanceHex
+        TemplateId = $target.TemplateId
+        TemplateName = $target.TemplateName
+        Family = $target.Family
+        CaptureInstruction = $target.CaptureInstruction
+        AccessStatus = $target.AccessStatus
+        PrimarySourcePlayfield = Get-ObjectPropertyValue $doorEvidence "PrimarySourcePlayfield"
+        PrimarySourceDoor = Get-ObjectPropertyValue $doorEvidence "PrimarySourceDoor"
+        PrimarySourceCoords = Get-ObjectPropertyValue $doorEvidence "PrimarySourceCoords"
+        DestinationDoor = Get-ObjectPropertyValue $doorEvidence "DestinationDoor"
+        DestinationDoorCoords = Get-ObjectPropertyValue $doorEvidence "DestinationDoorCoords"
+        PairedDoorCandidate = Get-ObjectPropertyValue $doorEvidence "PairedDoorCandidate"
+        PairedDoorCandidateCoords = Get-ObjectPropertyValue $doorEvidence "PairedDoorCandidateCoords"
+        DoorEvidenceNote = Get-ObjectPropertyValue $doorEvidence "PairedDoorNextAction"
     }
 }
 $currentVendorScanTargets | Export-Csv -LiteralPath $vendorScanTargetsCsv -NoTypeInformation
@@ -486,12 +735,50 @@ foreach ($group in $targetGroups) {
     $targetMarkdown.Add("| $($firstTarget.Playfield) | $($firstTarget.PlayfieldName) | $($firstTarget.AccessStatus) | $($group.Count) | $familySummary |")
 }
 $targetMarkdown.Add("")
+$targetMarkdown.Add("## Door Evidence By Target Playfield")
+$targetMarkdown.Add("")
+$targetMarkdown.Add("Generated from `playfield-teleport-audit.csv` and `playfield-remap-ranked-candidates.csv`. Source doors are live navigation evidence; destination and paired-door fields are zoning/remap evidence when internal zoning lands on the wrong side of a door pair.")
+$targetMarkdown.Add("")
+$targetMarkdown.Add("| Playfield | Location | Primary source door | Other source doors | Destination door(s) | Paired-door candidate | Note |")
+$targetMarkdown.Add("| ---: | --- | --- | --- | --- | --- | --- |")
+foreach ($doorRow in $doorLocationRows | Sort-Object -Property @{ Expression = "UncoveredTerminals"; Descending = $true }, @{ Expression = "Playfield"; Descending = $false }) {
+    $primarySource = $doorRow.PrimarySourceDoorSummary
+    $pairedDoor = if ([string]::IsNullOrWhiteSpace($doorRow.PairedDoorCandidate)) { "" } else { "$($doorRow.PairedDoorCurrent) @ $($doorRow.PairedDoorCurrentCoords) -> $($doorRow.PairedDoorCandidate) @ $($doorRow.PairedDoorCandidateCoords)" }
+    $noteParts = @()
+    if (-not [string]::IsNullOrWhiteSpace($doorRow.PairedDoorConfidence)) {
+        $noteParts += "$($doorRow.PairedDoorConfidence): $($doorRow.PairedDoorReason)"
+    }
+    if (-not [string]::IsNullOrWhiteSpace($doorRow.PairedDoorNextAction)) {
+        $noteParts += $doorRow.PairedDoorNextAction
+    }
+    if (-not [string]::IsNullOrWhiteSpace($doorRow.TeleportWarnings)) {
+        $noteParts += "Warnings: $($doorRow.TeleportWarnings)"
+    }
+    $targetMarkdown.Add("| $($doorRow.Playfield) | $(Format-MarkdownCell $doorRow.PlayfieldName) | $(Format-MarkdownCell $primarySource) | $(Format-MarkdownCell $doorRow.OtherSourceDoors) | $(Format-MarkdownCell $doorRow.DestinationDoor) | $(Format-MarkdownCell $pairedDoor) | $(Format-MarkdownCell ($noteParts -join " ")) |")
+}
+$targetMarkdown.Add("")
 $targetMarkdown.Add("## Targets By Location")
 foreach ($group in $targetGroups) {
     $firstTarget = $group.Group | Select-Object -First 1
+    $doorEvidence = if ($doorEvidenceByPlayfield.ContainsKey([int]$firstTarget.Playfield)) { $doorEvidenceByPlayfield[[int]$firstTarget.Playfield] } else { $null }
     $targetMarkdown.Add("")
     $targetMarkdown.Add("### $($firstTarget.Playfield) - $($firstTarget.PlayfieldName) ($($group.Count))")
     $targetMarkdown.Add("")
+    if ($null -ne $doorEvidence) {
+        if (-not [string]::IsNullOrWhiteSpace($doorEvidence.PrimarySourceDoorSummary)) {
+            $targetMarkdown.Add("- Primary source door: $($doorEvidence.PrimarySourceDoorSummary)")
+        }
+        if (-not [string]::IsNullOrWhiteSpace($doorEvidence.OtherSourceDoors)) {
+            $targetMarkdown.Add("- Other source doors: $($doorEvidence.OtherSourceDoors)")
+        }
+        if (-not [string]::IsNullOrWhiteSpace($doorEvidence.DestinationDoor)) {
+            $targetMarkdown.Add("- Destination door evidence: $($doorEvidence.DestinationDoor)")
+        }
+        if (-not [string]::IsNullOrWhiteSpace($doorEvidence.PairedDoorCandidate)) {
+            $targetMarkdown.Add("- Paired-door candidate: $($doorEvidence.PairedDoorCurrent) @ $($doorEvidence.PairedDoorCurrentCoords) -> $($doorEvidence.PairedDoorCandidate) @ $($doorEvidence.PairedDoorCandidateCoords) ($($doorEvidence.PairedDoorConfidence); $($doorEvidence.PairedDoorReason))")
+        }
+        $targetMarkdown.Add("")
+    }
     $targetMarkdown.Add("| Priority | Vendor ID | Template | Name | Coords | Family |")
     $targetMarkdown.Add("| ---: | ---: | ---: | --- | --- | --- |")
     foreach ($target in $group.Group | Sort-Object Priority, VendorId) {
@@ -528,9 +815,9 @@ $markdown.Add("| Vending statels excluded from coverage | $($excludedStatelVendo
 $markdown.Add("")
 $markdown.Add("## Latest Vendor Import Milestone")
 $markdown.Add("")
-$markdown.Add("- Omni Basic General Shop import promoted from AOSharp capture `20260612-012644`.")
-$markdown.Add("- Validated coverage added: 23 `1183 ord_smarket_omni_basic` vendor rows, 16 vendor templates, and 16 shop inventory groups with 690 inventory rows.")
-$markdown.Add(("- Current-client verification after import showed uncovered statel vendors dropped from `404` to `381`; the non-shop exclusion rule now reduces the actionable uncovered count to `{0}`." -f $problemStatelVendors.Count))
+$markdown.Add("- Clan Basic General Shop import promoted from AOSharp capture `20260612-225855`.")
+$markdown.Add("- Validated coverage added: 29 `1180 ord_smarket_clan_basic` vendor rows, 29 vendor templates, and 25 new shop inventory groups with 1575 inventory rows; existing shop inventory hashes `G4XZ`, `HYDQ`, `LJI7`, and `R5R7` were reused.")
+$markdown.Add(("- Current-client verification after import showed actionable uncovered statel vendors dropped from `324` to `{0}`. Current live-capture coverage chain: `404 -> 381 -> 351 -> 324 -> {0}`." -f $problemStatelVendors.Count))
 $markdown.Add("")
 $markdown.Add("## Coverage Exclusions")
 $markdown.Add("")
@@ -590,6 +877,7 @@ $markdown.Add("- Live vendor mesh audit: $vendorMeshCsv")
 $markdown.Add("- Vendor DB audit: $vendorDbCsv")
 $markdown.Add("- Shop inventory audit: $shopCsv")
 $markdown.Add("- Statel vendor coverage: $statelVendorCsv")
+$markdown.Add("- Vendor scan door locations: $vendorScanDoorLocationsCsv")
 $markdown.Add("")
 $markdown.Add("## Top Vendor DB Issues")
 $markdown.Add("")
@@ -624,6 +912,7 @@ $markdown | Set-Content -LiteralPath $ReportPath -Encoding UTF8
     VendorDbCsv = $vendorDbCsv
     ShopInventoryCsv = $shopCsv
     StatelVendorCsv = $statelVendorCsv
+    VendorScanDoorLocationsCsv = $vendorScanDoorLocationsCsv
     DataFileIssues = $problemDataFiles.Count
     VendorDbIssues = $problemVendorDb.Count
     ShopInventoryIssues = $problemShopItems.Count
