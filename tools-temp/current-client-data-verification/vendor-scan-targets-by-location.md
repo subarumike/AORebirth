@@ -1,12 +1,12 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 202.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 171.
 
 ## Practical Location Summary
 
 | Playfield | Location | Access | Uncovered terminals | Main families |
 | ---: | --- | --- | ---: | --- |
-| 500 | Parnassos | GM-only / not live-accessible | 85 | Legacy faction core departments (21); Other unresolved vendor terminal (21); Heavenly weapon construction/components/recipes (19); Containers/computers/furniture/specialty/cars (10) |
+| 500 | Parnassos | GM-only / not live-accessible | 60 | Other unresolved vendor terminal (21); Heavenly weapon construction/components/recipes (19); Containers/computers/furniture/specialty/cars (8); Implants/clusters (4) |
 | 4704 | Tower Shop (dungeon) | Likely special/dungeon; verify before travel | 17 | ICC/tower shop special vendors (16); Containers/computers/furniture/specialty/cars (1) |
 | 6007 | BS Signup (dng) | Likely special/dungeon; verify before travel | 17 | OFAB vendors (17) |
 | 2064 | neut_basic_implants_shop | Unknown accessibility | 12 | Implants/clusters (12) |
@@ -15,24 +15,22 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 565 | Newland Desert | Likely live-accessible | 5 | Other unresolved vendor terminal (2); Classic armor terminals (1); Implants/clusters (1); Startup equipment (1) |
 | 6553 | Arete Landing | Likely live-accessible | 5 | Implants/clusters (4); Other unresolved vendor terminal (1) |
 | 540 | Old Athen | Likely live-accessible | 4 | Startup equipment (4) |
-| 665 | Broken Shores | Likely live-accessible | 4 | Legacy faction core departments (4) |
 | 710 | Omni-1 Trade | Likely live-accessible | 4 | Startup equipment (4) |
 | 4565 | Hardware Dimenion - Superior | Unknown accessibility | 3 | Other unresolved vendor terminal (2); Classic armor terminals (1) |
 | 1426 | Clan Registration dng | Likely special/dungeon; verify before travel | 2 | Other unresolved vendor terminal (2) |
-| 1887 | Treepine Hut | Likely live-accessible | 2 | Faction clothes/fashion (1); Legacy faction core departments (1) |
 | 4364 | Unicorn Outpost | Unknown accessibility | 2 | Other unresolved vendor terminal (2) |
 | 4567 | Dimensional Shift - Basic | Unknown accessibility | 2 | Implants/clusters (1); Other unresolved vendor terminal (1) |
 | 4568 | Dimensional Shift - Advanced | Unknown accessibility | 2 | Implants/clusters (1); Other unresolved vendor terminal (1) |
 | 4569 | Dimensional Shift - Superior | Unknown accessibility | 2 | Implants/clusters (1); Other unresolved vendor terminal (1) |
-| 600 | Varmint Woods | Likely live-accessible | 2 | Legacy faction core departments (2) |
+| 665 | Broken Shores | Likely live-accessible | 2 | Legacy faction core departments (2) |
 | 791 | Holes in the Wall | Likely live-accessible | 2 | Containers/computers/furniture/specialty/cars (1); Other unresolved vendor terminal (1) |
 | 954 | Neutral Training | Likely live-accessible | 2 | Startup equipment (2) |
 | 1427 | Omni registration dng | Likely special/dungeon; verify before travel | 1 | Other unresolved vendor terminal (1) |
 | 1428 | Neutral organisation dng | Unknown accessibility | 1 | Other unresolved vendor terminal (1) |
+| 1887 | Treepine Hut | Likely live-accessible | 1 | Faction clothes/fashion (1) |
 | 4563 | Hardware Dimension - Basic | Unknown accessibility | 1 | Classic armor terminals (1) |
 | 4564 | Hardware Dimension - Advanced | Unknown accessibility | 1 | Classic armor terminals (1) |
 | 6131 | ICC Holodeck Alien Training | Unknown accessibility | 1 | Other unresolved vendor terminal (1) |
-| 655 | Andromeda | Likely live-accessible | 1 | Containers/computers/furniture/specialty/cars (1) |
 | 695 | Lush Fields | Likely live-accessible | 1 | Startup equipment (1) |
 | 7011 | Freelancers Inc. HQ - Rome | Unknown accessibility | 1 | Other unresolved vendor terminal (1) |
 | 7012 | Freelancers Inc. HQ - Old Athen | Likely live-accessible | 1 | Other unresolved vendor terminal (1) |
@@ -54,24 +52,22 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 4354 | Uncle Bazzits Workshop (Dng) | Newland Desert 0xC0000235 @ 1546.475,31.502,2717.811 |  | 0xC0001102 @ 183.002,6.02,155.985 |  |  |
 | 6553 | Arete Landing |  |  |  |  |  |
 | 540 | Old Athen |  |  |  |  |  |
-| 665 | Broken Shores |  |  |  |  |  |
 | 710 | Omni-1 Trade |  |  |  |  |  |
 | 4565 | Hardware Dimenion - Superior | Jobe Plaza 0xC00211B5 @ 193.3,482.791,179.373 |  | 0xC00011D5 @ 41.991,6.004,47.989 |  |  |
-| 600 | Varmint Woods |  |  |  |  |  |
+| 665 | Broken Shores |  |  |  |  |  |
 | 791 | Holes in the Wall |  |  |  |  |  |
 | 954 | Neutral Training | Borealis Backyard 1 0xE7100C08 @ 122.603,39.965,77.115 | Borealis Backyard 10 0xE7100C11 @ 122.603,39.965,77.115 <br> Borealis Backyard 2 0xE7100C09 @ 122.603,39.965,77.115 <br> Borealis Backyard 3 0xE7100C0A @ 122.603,39.965,77.115 <br> Borealis Backyard 4 0xE7100C0B @ 122.603,39.965,77.115 <br> Borealis Backyard 5 0xE7100C0C @ 122.603,39.965,77.115 <br> Borealis Backyard 6 0xE7100C0D @ 122.603,39.965,77.115 <br> Borealis Backyard 7 0xE7100C0E @ 122.603,39.965,77.115 <br> Borealis Backyard 8 0xE7100C0F @ 122.603,39.965,77.115 <br> Borealis Backyard 9 0xE7100C10 @ 122.603,39.965,77.115 <br> Neutral Backyard 0xE71003BB @ 122.603,39.965,77.115 <br> Newland Backyard 1 0xE7100BF4 @ 122.603,39.965,77.115 <br> Newland Backyard 10 0xE7100BFD @ 122.603,39.965,77.115 <br> Newland Backyard 11 0xE7100BFE @ 122.603,39.965,77.115 <br> Newland Backyard 12 0xE7100BFF @ 122.603,39.965,77.115 <br> Newland Backyard 2 0xE7100BF5 @ 122.603,39.965,77.115 <br> Newland Backyard 3 0xE7100BF6 @ 122.603,39.965,77.115 <br> Newland Backyard 4 0xE7100BF7 @ 122.603,39.965,77.115 <br> Newland Backyard 5 0xE7100BF8 @ 122.603,39.965,77.115 <br> Newland Backyard 6 0xE7100BF9 @ 122.603,39.965,77.115 <br> Newland Backyard 7 0xE7100BFA @ 122.603,39.965,77.115 <br> Newland Backyard 8 0xE7100BFB @ 122.603,39.965,77.115 <br> Newland Backyard 9 0xE7100BFC @ 122.603,39.965,77.115 | 0xC00003BA @ 239.886,5.965,69.931 |  |  |
 | 1426 | Clan Registration dng |  |  |  |  |  |
-| 1887 | Treepine Hut | Pleasant Meadows 0xC00E0276 @ 2273.288,4.247,1825.317 |  | 0xC002075F @ 197.005,5,266.009 |  |  |
 | 4364 | Unicorn Outpost |  |  |  |  |  |
 | 4567 | Dimensional Shift - Basic | Jobe Harbor 0xC00211B3 @ 239.129,292.717,407.479 |  | 0xC00011D7 @ 55.988,6.006,47.991 |  |  |
 | 4568 | Dimensional Shift - Advanced | Jobe Market 0xC00511B4 @ 383.93,362.891,362.405 |  | 0xC00011D8 @ 55.988,6.005,47.991 |  |  |
 | 4569 | Dimensional Shift - Superior | Jobe Plaza 0xC00311B5 @ 198.696,482.791,165.968 |  | 0xC00011D9 @ 55.988,6.005,47.991 |  |  |
-| 655 | Andromeda |  |  |  |  |  |
 | 695 | Lush Fields |  |  |  |  |  |
 | 950 | Omni Training | Omni-1 Entertainment Backyard 1 0xE7100BB8 @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 10? 0xE7100BC1 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 11? 0xE7100BC2 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 12? 0xE7100BC3 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 13? 0xE7100BC4 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 14? 0xE7100BC5 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 15? 0xE7100BC6 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 16? 0xE7100BC7 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 17? 0xE7100BC8 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 18? 0xE7100BC9 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 19? 0xE7100BCA @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 2 0xE7100BB9 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 20? 0xE7100BCB @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 3 0xE7100BBA @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 4 0xE7100BBB @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 5 0xE7100BBC @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 6 0xE7100BBD @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 7 0xE7100BBE @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 8 0xE7100BBF @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 9 0xE7100BC0 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 1 0xE7100BCC @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 10 0xE7100BD5 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 11 0xE7100BD6 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 12 0xE7100BD7 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 13 0xE7100BD8 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 14 0xE7100BD9 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 15 0xE7100BDA @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 16 0xE7100BDB @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 17 0xE7100BDC @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 18 0xE7100BDD @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 19 0xE7100BDE @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 2 0xE7100BCD @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 20 0xE7100BDF @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 3 0xE7100BCE @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 4 0xE7100BCF @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 5 0xE7100BD0 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 6 0xE7100BD1 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 7 0xE7100BD2 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 8 0xE7100BD3 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 9 0xE7100BD4 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 1 0xE7100BE0 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 10 0xE7100BE9 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 2 0xE7100BE1 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 3 0xE7100BE2 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 4 0xE7100BE3 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 5 0xE7100BE4 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 6 0xE7100BE5 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 7 0xE7100BE6 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 8 0xE7100BE7 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 9 0xE7100BE8 @ 112.143,116.87,101.395 <br> Rome Green Backyard 1 0xE7100BEA @ 112.143,116.87,101.395 <br> Rome Green Backyard 10 0xE7100BF3 @ 112.143,116.87,101.395 <br> Rome Green Backyard 2 0xE7100BEB @ 112.143,116.87,101.395 <br> Rome Green Backyard 3 0xE7100BEC @ 112.143,116.87,101.395 <br> Rome Green Backyard 4 0xE7100BED @ 112.143,116.87,101.395 <br> Rome Green Backyard 5 0xE7100BEE @ 112.143,116.87,101.395 <br> Rome Green Backyard 6 0xE7100BEF @ 112.143,116.87,101.395 <br> Rome Green Backyard 7 0xE7100BF0 @ 112.143,116.87,101.395 <br> Rome Green Backyard 8 0xE7100BF1 @ 112.143,116.87,101.395 <br> Rome Green Backyard 9 0xE7100BF2 @ 112.143,116.87,101.395 | 0xC00003B6 @ 52.597,15.87,55.136 |  |  |
 | 952 | Clan Training | Clan Backyard 0xE71003B9 @ 77.749,25.859,59.156 | Old Athen Backyard 1 0xE7100C30 @ 77.749,25.859,59.156 <br> Old Athen Backyard 10 0xE7100C39 @ 77.749,25.859,59.156 <br> Old Athen Backyard 11 0xE7100C3A @ 77.749,25.859,59.156 <br> Old Athen Backyard 12 0xE7100C3B @ 77.749,25.859,59.156 <br> Old Athen Backyard 13 0xE7100C3C @ 77.749,25.859,59.156 <br> Old Athen Backyard 14 0xE7100C3D @ 77.749,25.859,59.156 <br> Old Athen Backyard 15 0xE7100C3E @ 77.749,25.859,59.156 <br> Old Athen Backyard 16 0xE7100C3F @ 77.749,25.859,59.156 <br> Old Athen Backyard 17 0xE7100C40 @ 77.749,25.859,59.156 <br> Old Athen Backyard 18 0xE7100C41 @ 77.749,25.859,59.156 <br> Old Athen Backyard 19 0xE7100C42 @ 77.749,25.859,59.156 <br> Old Athen Backyard 2 0xE7100C31 @ 77.749,25.859,59.156 <br> Old Athen Backyard 20 0xE7100C43 @ 77.749,25.859,59.156 <br> Old Athen Backyard 3 0xE7100C32 @ 77.749,25.859,59.156 <br> Old Athen Backyard 4 0xE7100C33 @ 77.749,25.859,59.156 <br> Old Athen Backyard 5 0xE7100C34 @ 77.749,25.859,59.156 <br> Old Athen Backyard 6 0xE7100C35 @ 77.749,25.859,59.156 <br> Old Athen Backyard 7 0xE7100C36 @ 77.749,25.859,59.156 <br> Old Athen Backyard 8 0xE7100C37 @ 77.749,25.859,59.156 <br> Old Athen Backyard 9 0xE7100C38 @ 77.749,25.859,59.156 <br> Tir Backyard 1 0xE7100C1C @ 77.749,25.859,59.156 <br> Tir Backyard 10 0xE7100C25 @ 77.749,25.859,59.156 <br> Tir Backyard 11 0xE7100C26 @ 77.749,25.859,59.156 <br> Tir Backyard 12 0xE7100C27 @ 77.749,25.859,59.156 <br> Tir Backyard 13 0xE7100C28 @ 77.749,25.859,59.156 <br> Tir Backyard 14 0xE7100C29 @ 77.749,25.859,59.156 <br> Tir Backyard 15 0xE7100C2A @ 77.749,25.859,59.156 <br> Tir Backyard 16 0xE7100C2B @ 77.749,25.859,59.156 <br> Tir Backyard 17 0xE7100C2C @ 77.749,25.859,59.156 <br> Tir Backyard 18 0xE7100C2D @ 77.749,25.859,59.156 <br> Tir Backyard 2 0xE7100C1D @ 77.749,25.859,59.156 <br> Tir Backyard 3 0xE7100C1E @ 77.749,25.859,59.156 <br> Tir Backyard 4 0xE7100C1F @ 77.749,25.859,59.156 <br> Tir Backyard 5 0xE7100C20 @ 77.749,25.859,59.156 <br> Tir Backyard 6 0xE7100C21 @ 77.749,25.859,59.156 <br> Tir Backyard 7 0xE7100C22 @ 77.749,25.859,59.156 <br> Tir Backyard 8 0xE7100C23 @ 77.749,25.859,59.156 <br> Tir Backyard 9 0xE7100C24 @ 77.749,25.859,59.156 <br> West Athen Backyard 1 0xE7100C44 @ 77.749,25.859,59.156 <br> West Athen Backyard 10 0xE7100C4D @ 77.749,25.859,59.156 <br> West Athen Backyard 2 0xE7100C45 @ 77.749,25.859,59.156 <br> West Athen Backyard 3 0xE7100C46 @ 77.749,25.859,59.156 <br> West Athen Backyard 4 0xE7100C47 @ 77.749,25.859,59.156 <br> West Athen Backyard 5 0xE7100C48 @ 77.749,25.859,59.156 <br> West Athen Backyard 6 0xE7100C49 @ 77.749,25.859,59.156 <br> West Athen Backyard 7 0xE7100C4A @ 77.749,25.859,59.156 <br> West Athen Backyard 8 0xE7100C4B @ 77.749,25.859,59.156 <br> West Athen Backyard 9 0xE7100C4C @ 77.749,25.859,59.156 | 0xC00103B8 @ 40.238,14.859,70.092 |  |  |
 | 1427 | Omni registration dng |  |  |  |  |  |
 | 1428 | Neutral organisation dng |  |  |  |  |  |
+| 1887 | Treepine Hut | Pleasant Meadows 0xC00E0276 @ 2273.288,4.247,1825.317 |  | 0xC002075F @ 197.005,5,266.009 |  |  |
 | 4563 | Hardware Dimension - Basic | Jobe Harbor 0xC00411B3 @ 191.074,282.616,331.007 |  | 0xC00011D3 @ 41.991,6.004,47.989 |  |  |
 | 4564 | Hardware Dimension - Advanced | Jobe Market 0xC00311B4 @ 447.659,362.737,381.7 |  | 0xC00011D4 @ 41.991,6.004,47.989 |  |  |
 | 6131 | ICC Holodeck Alien Training | Arete Landing 0xC0031999 |  | 0xC00117F3 @ 186.9,6.017,114 |  | Warnings: missing source statel |
@@ -80,7 +76,7 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 
 ## Targets By Location
 
-### 500 - Parnassos (85)
+### 500 - Parnassos (60)
 
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
@@ -109,33 +105,14 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 2 | 32768134 | 155223 | Advanced Implants | 493.2,37.001,320.3 | Implants/clusters |
 | 2 | 32768135 | 155224 | Superior Implants | 494.8,37.001,320.32 | Implants/clusters |
 | 3 | 32768014 | 99503 | Clan Advanced Armor | 219.649,16.4,160.128 | Legacy faction core departments |
-| 3 | 32768015 | 99533 | Clan Advanced Attacks | 220.751,16.4,160.499 | Legacy faction core departments |
-| 3 | 32768016 | 99517 | Clan Advanced Augmentations | 221.824,16.4,160.883 | Legacy faction core departments |
-| 3 | 32768018 | 99509 | Clan Advanced Medical Supplies | 224.031,16.4,161.614 | Legacy faction core departments |
-| 3 | 32768020 | 99528 | Clan Advanced Tools | 226.065,16.4,161.447 | Legacy faction core departments |
 | 3 | 32768021 | 99522 | Clan Advanced Trade Skills | 226.448,16.4,160.231 | Legacy faction core departments |
-| 3 | 32768022 | 99506 | Clan Advanced Weapons | 225.719,16.4,159.308 | Legacy faction core departments |
-| 3 | 32768045 | 99504 | Clan Superior Armor | 222.449,16.4,171.153 | Legacy faction core departments |
-| 3 | 32768046 | 99534 | Clan Superior Attacks | 221.286,16.4,171.177 | Legacy faction core departments |
-| 3 | 32768047 | 99518 | Clan Superior Augmentations | 220.105,16.4,171.236 | Legacy faction core departments |
-| 3 | 32768049 | 99529 | Clan Superior Medical Supplies | 217.832,16.4,171.123 | Legacy faction core departments |
-| 3 | 32768051 | 99530 | Clan Superior Tools | 215.748,16.4,171.108 | Legacy faction core departments |
 | 3 | 32768052 | 99523 | Clan Superior Trade Skills | 214.963,16.4,170.276 | Legacy faction core departments |
-| 3 | 32768053 | 99507 | Clan Superior Weapons | 215.002,16.4,169.185 | Legacy faction core departments |
-| 3 | 32768057 | 99477 | OT Superior Armor | 235.875,16.4,178.429 | Legacy faction core departments |
-| 3 | 32768058 | 99497 | OT Superior Attacks | 236.058,16.4,179.236 | Legacy faction core departments |
-| 3 | 32768059 | 99486 | OT Superior Augmentations | 235.241,16.4,175.217 | Legacy faction core departments |
-| 3 | 32768061 | 99483 | OT Superior Medical Supplies | 236.855,16.4,181.04 | Legacy faction core departments |
-| 3 | 32768063 | 99493 | OT Superior Tools | 235.449,16.4,176.047 | Legacy faction core departments |
 | 3 | 32768064 | 99489 | OT Superior Trade Skills | 236.378,16.4,180.767 | Legacy faction core departments |
-| 3 | 32768065 | 99480 | OT Superior Weapons | 236.236,16.4,180.016 | Legacy faction core departments |
-| 4 | 32768002 | 99635 | Advanced Cars | 211.938,16.4,162.399 | Containers/computers/furniture/specialty/cars |
 | 4 | 32768017 | 99541 | Clan Advanced Cars | 222.913,16.4,161.281 | Containers/computers/furniture/specialty/cars |
 | 4 | 32768024 | 99537 | Clan Toys and Curiosities | 223.332,16.4,158.564 | Containers/computers/furniture/specialty/cars |
 | 4 | 32768026 | 99539 | Clan Computers | 221.331,16.4,157.809 | Containers/computers/furniture/specialty/cars |
 | 4 | 32768027 | 99540 | Clan Containers | 220.278,16.4,157.358 | Containers/computers/furniture/specialty/cars |
 | 4 | 32768030 | 120511 | Clan Furniture | 232.893,16.399,165.46 | Containers/computers/furniture/specialty/cars |
-| 4 | 32768044 | 99538 | Clan Specialist Commerce | 223.588,16.4,171.086 | Containers/computers/furniture/specialty/cars |
 | 4 | 32768048 | 99542 | Clan Superior Cars | 219.015,16.4,171.115 | Containers/computers/furniture/specialty/cars |
 | 4 | 32768056 | 99499 | OT Specialist Commerce | 235.707,16.4,177.596 | Containers/computers/furniture/specialty/cars |
 | 4 | 32768060 | 99536 | OT Superior Cars | 238.744,16.4,181.014 | Containers/computers/furniture/specialty/cars |
@@ -143,12 +120,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 6 | 32768005 | 99570 | Basic Armor | 211.355,16.4,160.109 | Classic armor terminals |
 | 6 | 32768025 | 99526 | Clan Clothes | 222.312,16.4,158.193 | Faction clothes/fashion |
 | 6 | 32768031 | 117749 | Clan Maps | 231.973,16.4,166.237 | Maps |
-| 6 | 32768072 | 155602 | Clan Basic Devices | 547.938,37.001,320.321 | Clan/Omni device variants |
-| 6 | 32768073 | 155605 | Clan Advanced Devices | 546.3,37.001,320.333 | Clan/Omni device variants |
-| 6 | 32768074 | 155608 | Clan Superior Devices | 544.645,37.001,320.312 | Clan/Omni device variants |
-| 6 | 32768078 | 155603 | Omni Basic Devices | 530.567,37.001,320.3 | Clan/Omni device variants |
-| 6 | 32768079 | 155606 | Omni Advanced Devices | 529,37.001,320.3 | Clan/Omni device variants |
-| 6 | 32768080 | 155609 | Omni Superior Devices | 527.4,37.001,320.344 | Clan/Omni device variants |
 | 7 | 32768001 | 99599 | Advanced Augmentations | 214.427,16.4,162.485 | Other unresolved vendor terminal |
 | 7 | 32768007 | 99598 | Basic Augmentations | 214.657,16.4,159.581 | Other unresolved vendor terminal |
 | 7 | 32768011 | 99600 | Basic Trade Skills | 213.404,16.4,159.507 | Other unresolved vendor terminal |
@@ -310,16 +281,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 6 | 35389444 | 99569 | Clan Basic Startup Equipment | 406,15,378 | Startup equipment |
 | 6 | 35389446 | 99569 | Clan Basic Startup Equipment | 418,8,458 | Startup equipment |
 
-### 665 - Broken Shores (4)
-
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 3 | 43581440 | 99528 | Clan Advanced Tools | 730.652,22.01,1543.597 | Legacy faction core departments |
-| 3 | 43581441 | 99522 | Clan Advanced Trade Skills | 729.875,22.01,1541.501 | Legacy faction core departments |
-| 3 | 43581442 | 99488 | OT Advanced Trade Skills | 2313.068,7.2,2240.402 | Legacy faction core departments |
-| 3 | 43581443 | 99527 | Clan Basic Tools | 928.852,49.4,3713.883 | Legacy faction core departments |
-
 ### 710 - Omni-1 Trade (4)
 
 
@@ -348,16 +309,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | ---: | ---: | ---: | --- | --- | --- |
 | 7 | 93454336 | 25885 | Budget Ammunition Shop | 166.991,5.01,235.899 | Other unresolved vendor terminal |
 | 7 | 93454337 | 81799 | Organization registration shop | 171.952,5.01,238.745 | Other unresolved vendor terminal |
-
-### 1887 - Treepine Hut (2)
-
-- Primary source door: Pleasant Meadows 0xC00E0276 @ 2273.288,4.247,1825.317
-- Destination door evidence: 0xC002075F @ 197.005,5,266.009
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 3 | 123666432 | 99386 | OT Advanced Armor | 209.691,5,286.698 | Legacy faction core departments |
-| 6 | 123666433 | 99490 | OT Clothes | 199.189,5,286.698 | Faction clothes/fashion |
 
 ### 4364 - Unicorn Outpost (2)
 
@@ -397,13 +348,13 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 2 | 299433986 | 155224 | Superior Implants | 46.9,2.1,29.2 | Implants/clusters |
 | 7 | 299433985 | 220330 | Costly Regenerative Supplies --- 100-175 | 28.1,2.1,40.1 | Other unresolved vendor terminal |
 
-### 600 - Varmint Woods (2)
+### 665 - Broken Shores (2)
 
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
-| 3 | 39321600 | 99479 | OT Advanced Weapons | 3856.8,20.7,1934.4 | Legacy faction core departments |
-| 3 | 39321601 | 99482 | OT Advanced Medical Supplies | 3858,20.727,1934.4 | Legacy faction core departments |
+| 3 | 43581441 | 99522 | Clan Advanced Trade Skills | 729.875,22.01,1541.501 | Legacy faction core departments |
+| 3 | 43581442 | 99488 | OT Advanced Trade Skills | 2313.068,7.2,2240.402 | Legacy faction core departments |
 
 ### 791 - Holes in the Wall (2)
 
@@ -438,6 +389,15 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | ---: | ---: | ---: | --- | --- | --- |
 | 7 | 93585408 | 81799 | Organization registration shop | 201.952,5,162.745 | Other unresolved vendor terminal |
 
+### 1887 - Treepine Hut (1)
+
+- Primary source door: Pleasant Meadows 0xC00E0276 @ 2273.288,4.247,1825.317
+- Destination door evidence: 0xC002075F @ 197.005,5,266.009
+
+| Priority | Vendor ID | Template | Name | Coords | Family |
+| ---: | ---: | ---: | --- | --- | --- |
+| 6 | 123666433 | 99490 | OT Clothes | 199.189,5,286.698 | Faction clothes/fashion |
+
 ### 4563 - Hardware Dimension - Basic (1)
 
 - Primary source door: Jobe Harbor 0xC00411B3 @ 191.074,282.616,331.007
@@ -464,13 +424,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 7 | 401801216 | 287476 | ICC Starter Equipment | 195.672,6.017,130.331 | Other unresolved vendor terminal |
-
-### 655 - Andromeda (1)
-
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 4 | 42926080 | 151987 | Specialist Commerce | 3253.364,36.959,793.912 | Containers/computers/furniture/specialty/cars |
 
 ### 695 - Lush Fields (1)
 
