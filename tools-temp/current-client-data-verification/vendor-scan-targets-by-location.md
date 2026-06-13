@@ -1,6 +1,6 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 147.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 142.
 
 ## Practical Location Summary
 
@@ -11,7 +11,6 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 6007 | BS Signup (dng) | Likely special/dungeon; verify before travel | 17 | OFAB vendors (17) |
 | 4354 | Uncle Bazzits Workshop (Dng) | Likely special/dungeon; verify before travel | 5 | Other unresolved vendor terminal (4); Faction clothes/fashion (1) |
 | 565 | Newland Desert | Likely live-accessible | 5 | Other unresolved vendor terminal (2); Classic armor terminals (1); Implants/clusters (1); Startup equipment (1) |
-| 6553 | Arete Landing | Likely live-accessible | 5 | Implants/clusters (4); Other unresolved vendor terminal (1) |
 | 540 | Old Athen | Likely live-accessible | 4 | Startup equipment (4) |
 | 710 | Omni-1 Trade | Likely live-accessible | 4 | Startup equipment (4) |
 | 4565 | Hardware Dimenion - Superior | Unknown accessibility | 3 | Other unresolved vendor terminal (2); Classic armor terminals (1) |
@@ -46,7 +45,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 6007 | BS Signup (dng) |  |  |  |  |  |
 | 565 | Newland Desert |  |  |  |  |  |
 | 4354 | Uncle Bazzits Workshop (Dng) | Newland Desert 0xC0000235 @ 1546.475,31.502,2717.811 |  | 0xC0001102 @ 183.002,6.02,155.985 |  |  |
-| 6553 | Arete Landing |  |  |  |  |  |
 | 540 | Old Athen |  |  |  |  |  |
 | 710 | Omni-1 Trade |  |  |  |  |  |
 | 4565 | Hardware Dimenion - Superior | Jobe Plaza 0xC00211B5 @ 193.3,482.791,179.373 |  | 0xC00011D5 @ 41.991,6.004,47.989 |  |  |
@@ -211,17 +209,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 6 | 37027844 | 99643 | Basic Startup Equipment | 1518.001,31.2,2730.07 | Startup equipment |
 | 7 | 37027847 | 121035 | Food | 2187.295,21.3,1551.807 | Other unresolved vendor terminal |
 | 7 | 37027848 | 121037 | Drinks | 2185.245,21.3,1552.811 | Other unresolved vendor terminal |
-
-### 6553 - Arete Landing (5)
-
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 2 | 429457409 | 297323 | ICC Shiny Clusters | 3431.5,9.3,790.5 | Implants/clusters |
-| 2 | 429457410 | 297322 | ICC Bright Clusters | 3429.5,9.3,790.5 | Implants/clusters |
-| 2 | 429457411 | 297321 | ICC Faded Clusters | 3427.5,9.3,790.5 | Implants/clusters |
-| 2 | 429457412 | 297320 | ICC Basic Implants | 3425.5,9.3,790.5 | Implants/clusters |
-| 7 | 429457408 | 297325 | ICC Pharmacy | 3421,9.3,797.5 | Other unresolved vendor terminal |
 
 ### 540 - Old Athen (4)
 

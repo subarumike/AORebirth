@@ -1020,3 +1020,29 @@ INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHas
 -- Terminal: Refined ICC Shiny Clusters
 -- NormalizedName: NeutralRefinedICCShinyClusters; TemplateId: 297407; ShopHash: N5PM (new); Inventory rows: 109; Capture identity: (VendingMachine:12D3D4FD); VT window: 0
 INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('NILZLFQ', 1, 'NeutralRefinedICCShinyClusters', 297407, 'N5PM', 300, 300);
+
+-- ============================================================
+-- Arete ICC implant/cluster import
+-- Source: AOSharp capture 20260613-172753
+-- Coverage: 147 -> 142 (5 reduction)
+-- New inventory groups: 5
+-- ============================================================
+-- Terminal: ICC Basic Implants
+-- NormalizedName: AreteICCBasicImplants; TemplateId: 297320; ShopHash: B5K4 (new); Inventory rows: 39; Capture identity: (VendingMachine:12D1BF1D); VT window: 0
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('AIYZS6H', 1, 'AreteICCBasicImplants', 297320, 'B5K4', 1, 10);
+
+-- Terminal: ICC Faded Clusters
+-- NormalizedName: AreteICCFadedClusters; TemplateId: 297321; ShopHash: QDLJ (new); Inventory rows: 166; Capture identity: (VendingMachine:12D1BF1C); VT window: 0
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('AIBFIDW', 1, 'AreteICCFadedClusters', 297321, 'QDLJ', 5, 50);
+
+-- Terminal: ICC Bright Clusters
+-- NormalizedName: AreteICCBrightClusters; TemplateId: 297322; ShopHash: RLKT (new); Inventory rows: 166; Capture identity: (VendingMachine:12D1BF1B); VT window: 0
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('AIGFHES', 1, 'AreteICCBrightClusters', 297322, 'RLKT', 5, 50);
+
+-- Terminal: ICC Shiny Clusters
+-- NormalizedName: AreteICCShinyClusters; TemplateId: 297323; ShopHash: EFER (new); Inventory rows: 166; Capture identity: (VendingMachine:12D1BF1A); VT window: 0
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('AIZDXJ7', 1, 'AreteICCShinyClusters', 297323, 'EFER', 5, 50);
+
+-- Terminal: ICC Pharmacy
+-- NormalizedName: AreteICCPharmacy; TemplateId: 297325; ShopHash: KPMO (new); Inventory rows: 36; Capture identity: (VendingMachine:12D1BF19); VT window: 0
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('AIYTWIL', 1, 'AreteICCPharmacy', 297325, 'KPMO', 5, 30);
