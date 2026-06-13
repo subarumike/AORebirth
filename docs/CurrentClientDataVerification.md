@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-13 01:50:01
+Generated: 2026-06-13 03:33:24
 
 ## Scope
 
@@ -20,14 +20,14 @@ Generated: 2026-06-13 01:50:01
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 234 |
+| Vending statels without complete DB shop coverage | 218 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Neutral Basic General/Specialty Shop import promoted from AOSharp captures 20260613-012810 and 20260613-014033.
-- Validated coverage added: 6 1193 spec_smarket_neut_basic vendor rows, 6 vendor templates, and 6 new shop inventory groups with 64 inventory rows; Specialist Commerce required Trader access.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 240 to 234. Current live-capture coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234.
+- spec_smarket specialty import promoted from inferred mappings based on Neutral Basic/Specialty captures 20260613-012810 and 20260613-014033.
+- Validated coverage added: 16 vendor rows across 1189 spec_smarket_clan_advanced, 1190 spec_smarket_clan_sup, 1191 spec_smarket_omni_advanced, and 1192 spec_smarket_omni_sup; 12 vendor templates; 0 new shop inventory groups. Existing shop hashes I3E4, 7ATH, 7X7Q, PX4X, FBQ3, and FLEW were reused.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 234 to 218. Current live-capture coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218.
 
 ## Coverage Exclusions
 

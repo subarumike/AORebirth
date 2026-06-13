@@ -1,6 +1,6 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 234.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 218.
 
 ## Practical Location Summary
 
@@ -15,10 +15,6 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 4354 | Uncle Bazzits Workshop (Dng) | Likely special/dungeon; verify before travel | 5 | Other unresolved vendor terminal (4); Faction clothes/fashion (1) |
 | 565 | Newland Desert | Likely live-accessible | 5 | Other unresolved vendor terminal (2); Classic armor terminals (1); Implants/clusters (1); Startup equipment (1) |
 | 6553 | Arete Landing | Likely live-accessible | 5 | Implants/clusters (4); Other unresolved vendor terminal (1) |
-| 1189 | spec_smarket_clan_advanced | Likely live-accessible | 4 | Containers/computers/furniture/specialty/cars (4) |
-| 1190 | spec_smarket_clan_sup | Likely live-accessible | 4 | Containers/computers/furniture/specialty/cars (4) |
-| 1191 | spec_smarket_omni_advanced | Likely live-accessible | 4 | Containers/computers/furniture/specialty/cars (4) |
-| 1192 | spec_smarket_omni_sup | Likely live-accessible | 4 | Containers/computers/furniture/specialty/cars (4) |
 | 540 | Old Athen | Likely live-accessible | 4 | Startup equipment (4) |
 | 665 | Broken Shores | Likely live-accessible | 4 | Legacy faction core departments (4) |
 | 710 | Omni-1 Trade | Likely live-accessible | 4 | Startup equipment (4) |
@@ -62,10 +58,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 540 | Old Athen |  |  |  |  |  |
 | 665 | Broken Shores |  |  |  |  |  |
 | 710 | Omni-1 Trade |  |  |  |  |  |
-| 1189 | spec_smarket_clan_advanced | Old Athen 0xC022021C @ 415.201,11.617,519.374 | Old Athen 0xC021021C @ 361.123,11.617,473.594 <br> Tir 0xC00B0280 @ 482.467,8,558.932 | 0xC00004A5 @ 181.001,5,118.01 |  |  |
-| 1190 | spec_smarket_clan_sup | Old Athen 0xC025021C @ 369.799,11.617,497.626 | Tir 0xC0040280 @ 391.774,8.194,544.137 | 0xC00004A6 @ 179.001,5,120.01 |  |  |
-| 1191 | spec_smarket_omni_advanced | Omni-1 Trade 0xC02202C6 @ 572.123,8.617,222.594 | Lush Fields 0xC01502B7 @ 1528.026,45.217,538.591 <br> Omni1 Entertainment 0xC03902C1 @ 855.236,18.681,446.738 <br> Omni-1 Trade 0xC02002C6 @ 334.594,8.617,205.877 <br> Rome Blue 0xC00402DF @ 545.814,18.357,286.939 <br> Rome Green 0xC00402E4 @ 413.114,18.357,287.638 | 0xC00004A7 @ 171.001,5,128.01 |  |  |
-| 1192 | spec_smarket_omni_sup | Omni-1 Trade 0xC02602C6 @ 234.877,8.617,492.406 | Omni1 Entertainment 0xC03802C1 @ 843.923,18.679,435.424 <br> Rome Blue 0xC00302DF @ 545.918,18.357,340.867 <br> Rome Green 0xC00302E4 @ 413.018,18.357,341.567 | 0xC00004A8 @ 169.001,5,134.01 |  |  |
 | 4565 | Hardware Dimenion - Superior | Jobe Plaza 0xC00211B5 @ 193.3,482.791,179.373 |  | 0xC00011D5 @ 41.991,6.004,47.989 |  |  |
 | 600 | Varmint Woods |  |  |  |  |  |
 | 791 | Holes in the Wall |  |  |  |  |  |
@@ -335,58 +327,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 2 | 429457411 | 297321 | ICC Faded Clusters | 3427.5,9.3,790.5 | Implants/clusters |
 | 2 | 429457412 | 297320 | ICC Basic Implants | 3425.5,9.3,790.5 | Implants/clusters |
 | 7 | 429457408 | 297325 | ICC Pharmacy | 3421,9.3,797.5 | Other unresolved vendor terminal |
-
-### 1189 - spec_smarket_clan_advanced (4)
-
-- Primary source door: Old Athen 0xC022021C @ 415.201,11.617,519.374
-- Other source doors: Old Athen 0xC021021C @ 361.123,11.617,473.594 | Tir 0xC00B0280 @ 482.467,8,558.932
-- Destination door evidence: 0xC00004A5 @ 181.001,5,118.01
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 4 | 77922304 | 99537 | Clan Toys and Curiosities | 176.5,5,133.104 | Containers/computers/furniture/specialty/cars |
-| 4 | 77922305 | 99541 | Clan Advanced Cars | 182.532,5,133 | Containers/computers/furniture/specialty/cars |
-| 4 | 77922306 | 99539 | Clan Computers | 179.5,5,133 | Containers/computers/furniture/specialty/cars |
-| 4 | 77922307 | 120511 | Clan Furniture | 185.5,5,133 | Containers/computers/furniture/specialty/cars |
-
-### 1190 - spec_smarket_clan_sup (4)
-
-- Primary source door: Old Athen 0xC025021C @ 369.799,11.617,497.626
-- Other source doors: Tir 0xC0040280 @ 391.774,8.194,544.137
-- Destination door evidence: 0xC00004A6 @ 179.001,5,120.01
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 4 | 77987840 | 99538 | Clan Specialist Commerce | 176,5,133 | Containers/computers/furniture/specialty/cars |
-| 4 | 77987841 | 99542 | Clan Superior Cars | 173,5,127 | Containers/computers/furniture/specialty/cars |
-| 4 | 77987842 | 99539 | Clan Computers | 185,5,127 | Containers/computers/furniture/specialty/cars |
-| 4 | 77987843 | 120511 | Clan Furniture | 182,5,133 | Containers/computers/furniture/specialty/cars |
-
-### 1191 - spec_smarket_omni_advanced (4)
-
-- Primary source door: Omni-1 Trade 0xC02202C6 @ 572.123,8.617,222.594
-- Other source doors: Lush Fields 0xC01502B7 @ 1528.026,45.217,538.591 | Omni1 Entertainment 0xC03902C1 @ 855.236,18.681,446.738 | Omni-1 Trade 0xC02002C6 @ 334.594,8.617,205.877 | Rome Blue 0xC00402DF @ 545.814,18.357,286.939 | Rome Green 0xC00402E4 @ 413.114,18.357,287.638
-- Destination door evidence: 0xC00004A7 @ 171.001,5,128.01
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 4 | 78053376 | 99535 | OT Advanced Cars | 168,5,143 | Containers/computers/furniture/specialty/cars |
-| 4 | 78053377 | 99500 | OT Computers | 174,5,143 | Containers/computers/furniture/specialty/cars |
-| 4 | 78053378 | 99498 | OT Toys and Curiosities | 171,5,143 | Containers/computers/furniture/specialty/cars |
-| 4 | 78053379 | 120510 | OT Furniture | 171,5,139.7 | Containers/computers/furniture/specialty/cars |
-
-### 1192 - spec_smarket_omni_sup (4)
-
-- Primary source door: Omni-1 Trade 0xC02602C6 @ 234.877,8.617,492.406
-- Other source doors: Omni1 Entertainment 0xC03802C1 @ 843.923,18.679,435.424 | Rome Blue 0xC00302DF @ 545.918,18.357,340.867 | Rome Green 0xC00302E4 @ 413.018,18.357,341.567
-- Destination door evidence: 0xC00004A8 @ 169.001,5,134.01
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 4 | 78118912 | 99536 | OT Superior Cars | 166.3,5,146.7 | Containers/computers/furniture/specialty/cars |
-| 4 | 78118913 | 99499 | OT Specialist Commerce | 163,5,141 | Containers/computers/furniture/specialty/cars |
-| 4 | 78118914 | 99500 | OT Computers | 175,5,141 | Containers/computers/furniture/specialty/cars |
-| 4 | 78118915 | 120510 | OT Furniture | 171.7,5,146.7 | Containers/computers/furniture/specialty/cars |
 
 ### 540 - Old Athen (4)
 
