@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-12 22:06:14
+Generated: 2026-06-12 23:11:21
 
 ## Scope
 
@@ -20,15 +20,14 @@ Generated: 2026-06-12 22:06:14
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 324 |
+| Vending statels without complete DB shop coverage | 295 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Omni Superior General Shop import promoted from AOSharp capture 20260612-044234.
-- Validated coverage added: 27 1185 ord_smarket_omni_sup vendor rows, 20 vendor templates, and 19 new shop inventory groups with 1 reused shop inventory hash (`LJI7`).
-- Current-client verification after import shows uncovered statel vendors at 324.
-- Current live-capture coverage chain: 404 -> 381 from Omni Basic, 381 -> 351 from the 155225 non-shop exclusion rule, and 351 -> 324 from Omni Superior.
+- Clan Basic General Shop import promoted from AOSharp capture 20260612-225855.
+- Validated coverage added: 29 1180 ord_smarket_clan_basic vendor rows, 29 vendor templates, and 25 new shop inventory groups with 1575 inventory rows; existing shop inventory hashes G4XZ, HYDQ, LJI7, and R5R7 were reused.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 324 to 295. Current live-capture coverage chain: 404 -> 381 -> 351 -> 324 -> 295.
 
 ## Coverage Exclusions
 
