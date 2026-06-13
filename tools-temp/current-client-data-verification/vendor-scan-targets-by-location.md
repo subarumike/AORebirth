@@ -1,6 +1,6 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 253.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 240.
 
 ## Practical Location Summary
 
@@ -10,7 +10,6 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 4704 | Tower Shop (dungeon) | Likely special/dungeon; verify before travel | 17 | ICC/tower shop special vendors (16); Containers/computers/furniture/specialty/cars (1) |
 | 6007 | BS Signup (dng) | Likely special/dungeon; verify before travel | 17 | OFAB vendors (17) |
 | 1181 | ord_smarket_clan_advanced | Likely live-accessible | 16 | Heavenly weapon construction/components/recipes (6); Legacy faction core departments (5); Clan/Omni device variants (1); Containers/computers/furniture/specialty/cars (1) |
-| 1183 | ord_smarket_omni_basic | Likely live-accessible | 13 | Implants/clusters (13) |
 | 2064 | neut_basic_implants_shop | Unknown accessibility | 12 | Implants/clusters (12) |
 | 2073 | neut_advanced_implants_shop | Unknown accessibility | 12 | Implants/clusters (12) |
 | 1193 | spec_smarket_neut_basic | Likely live-accessible | 6 | Containers/computers/furniture/specialty/cars (6) |
@@ -56,7 +55,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 4704 | Tower Shop (dungeon) | Borealis 0xC0180320 @ 729.813,61.686,651.696 | Old Athen 0xC02B021C @ 479.913,9.174,282.706 <br> Rome Blue 0xC00A02DF @ 675.09,22.357,356.184 | 0xC0001260 @ 193.988,9.006,153.992 | 0xC0001260 @ 193.988,9.006,153.992 -> 0xC0011260 @ 178,9.005,157.986 | Medium: same-template sibling door within 30m No patch. Keep as reference evidence for this interior family. |
 | 6007 | BS Signup (dng) |  |  |  |  |  |
 | 1181 | ord_smarket_clan_advanced | Old Athen 0xC01F021C @ 336.799,11.617,435.626 | Avalon 0xC01101F9 @ 2146.273,44.315,3772.396 <br> Mort 0xC0070230 @ 1866.855,47.695,1102.495 <br> Old Athen 0xC020021C @ 406.799,11.618,534.626 <br> Old Athen 0xC01C021C @ 435.948,11.616,561.396 <br> Tir 0xC0050280 @ 387.147,7.999,483.152 <br> Wailing Wastes 0xC0020227 @ 1329.242,25.743,1715.809 <br> West Athens 0xC0180221 @ 359.734,1.604,412.692 | 0xC000049D @ 187.001,5,152.01 | 0xC000049D @ 187.001,5,152.01 -> 0xC002049D @ 197.99,5.001,173 | Medium: same-template sibling door within 30m Review as a supermarket-family candidate; distance is larger than the verified close-door pattern. |
-| 1183 | ord_smarket_omni_basic | Omni-1 Trade 0xC02F02C6 @ 296.877,14.602,426.406 | Avalon 0xC02C01F9 @ 1857.912,26.448,1185.877 <br> Avalon 0xC04301F9 @ 764.898,31.449,1621.898 <br> Clondyke 0xC01A029E @ 1953.685,7.441,3727.682 <br> Lush Fields 0xC01202B7 @ 3275.877,23.617,845.406 <br> Omni Forest 0xC01502CC @ 309.873,10.948,2092.987 <br> Omni1 Entertainment 0xC03B02C1 @ 428.589,19.135,485.982 <br> Omni1 Entertainment 0xC03F02C1 @ 673.028,22.762,519.48 <br> Omni1 Entertainment 0xC01102C1 @ 765.085,19.135,516.507 <br> Omni-1 Trade 0xC02802C6 @ 296.877,14.602,337.406 <br> Omni-1 Trade 0xC02E02C6 @ 366.406,14.602,495.123 <br> Omni-1 Trade 0xC02902C6 @ 381.594,14.602,268.877 <br> Omni-1 Trade 0xC02A02C6 @ 427.594,14.602,268.877 <br> Omni-1 Trade 0xC02D02C6 @ 442.406,14.602,495.123 <br> Omni-1 Trade 0xC02B02C6 @ 510.123,14.602,337.594 <br> Omni-1 Trade 0xC02C02C6 @ 511.123,14.602,426.594 <br> Rome Blue 0xC00102DF @ 653.08,22.257,418.301 <br> Rome Green 0xC00002E4 @ 306.051,22.257,417.804 | 0xC000049F @ 187.001,5,116.01 | 0xC000049F @ 187.001,5,116.01 -> 0xC004049F @ 189.997,5.01,119.015 | High-review: same-template paired door within 12m; matches known implant-shop failure pattern Confirm one matching supermarket/Fair Trade entrance-exit pair, then patch the family. |
 | 2064 | neut_basic_implants_shop | Borealis 0xC0030320 @ 586.803,68.556,698.497 | Newland City 0xC0060236 @ 256.119,34.813,325.373 | 0xC0010810 @ 191.004,5.01,163.985 | 0xC0010810 @ 191.004,5.01,163.985 -> 0xC0000810 @ 191.003,5.01,154.015 | High-review: same-template paired door within 12m; matches known implant-shop failure pattern No patch. Keep as reference evidence for this interior family. |
 | 2073 | neut_advanced_implants_shop | Borealis 0xC0070320 @ 679.443,69.332,618.09 | Broken Shores 0xC0520299 @ 691.691,11.992,1381.1 <br> Pleasant Meadows 0xC0140276 @ 2298.741,3.395,1824.482 | 0xC0010819 @ 205.004,5.01,205.985 | 0xC0010819 @ 205.004,5.01,205.985 -> 0xC0000819 @ 205.003,5.01,196.015 | High-review: same-template paired door within 12m; matches known implant-shop failure pattern No patch. Keep as reference evidence for this interior family. |
 | 1193 | spec_smarket_neut_basic | Newland City 0xC0040236 @ 289.804,32.585,313.208 | Lush Fields 0xC01A02B7 @ 1511.893,46.822,524.146 <br> Pleasant Meadows 0xC0100276 @ 1190.175,8.591,2353.387 | 0xC00004A9 @ 201.001,5,112.01 |  |  |
@@ -260,29 +258,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 6 | 77398035 | 99526 | Clan Clothes | 187.017,5,169 | Faction clothes/fashion |
 | 6 | 77398037 | 117749 | Clan Maps | 192.743,5,162.102 | Maps |
 | 6 | 77398039 | 155605 | Clan Advanced Devices | 189,5.001,170.6 | Clan/Omni device variants |
-
-### 1183 - ord_smarket_omni_basic (13)
-
-- Primary source door: Omni-1 Trade 0xC02F02C6 @ 296.877,14.602,426.406
-- Other source doors: Avalon 0xC02C01F9 @ 1857.912,26.448,1185.877 | Avalon 0xC04301F9 @ 764.898,31.449,1621.898 | Clondyke 0xC01A029E @ 1953.685,7.441,3727.682 | Lush Fields 0xC01202B7 @ 3275.877,23.617,845.406 | Omni Forest 0xC01502CC @ 309.873,10.948,2092.987 | Omni1 Entertainment 0xC03B02C1 @ 428.589,19.135,485.982 | Omni1 Entertainment 0xC03F02C1 @ 673.028,22.762,519.48 | Omni1 Entertainment 0xC01102C1 @ 765.085,19.135,516.507 | Omni-1 Trade 0xC02802C6 @ 296.877,14.602,337.406 | Omni-1 Trade 0xC02E02C6 @ 366.406,14.602,495.123 | Omni-1 Trade 0xC02902C6 @ 381.594,14.602,268.877 | Omni-1 Trade 0xC02A02C6 @ 427.594,14.602,268.877 | Omni-1 Trade 0xC02D02C6 @ 442.406,14.602,495.123 | Omni-1 Trade 0xC02B02C6 @ 510.123,14.602,337.594 | Omni-1 Trade 0xC02C02C6 @ 511.123,14.602,426.594 | Rome Blue 0xC00102DF @ 653.08,22.257,418.301 | Rome Green 0xC00002E4 @ 306.051,22.257,417.804
-- Destination door evidence: 0xC000049F @ 187.001,5,116.01
-- Paired-door candidate: 0xC000049F @ 187.001,5,116.01 -> 0xC004049F @ 189.997,5.01,119.015 (High-review; same-template paired door within 12m; matches known implant-shop failure pattern)
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 2 | 77529149 | 162158 | Basic Omni-Tek Adventurer Specific Implants | 212.6,5.01,133.6 | Implants/clusters |
-| 2 | 77529151 | 162161 | Basic Omni-Tek Agent Specific Implants | 214,5.01,129 | Implants/clusters |
-| 2 | 77529153 | 162164 | Basic Omni-Tek Bureaucrat Specific Implants | 214,5.01,125 | Implants/clusters |
-| 2 | 77529155 | 162167 | Basic Omni-Tek Doctor Specific Implants | 214,5.01,121 | Implants/clusters |
-| 2 | 77529156 | 162170 | Basic Omni-Tek Enforcer Specific Implants | 214,5.01,118 | Implants/clusters |
-| 2 | 77529157 | 162173 | Basic Omni-Tek Engineer Specific Implants | 214,5.011,114 | Implants/clusters |
-| 2 | 77529158 | 162176 | Basic Omni-Tek Fixer Specific Implants | 214,5.01,110 | Implants/clusters |
-| 2 | 77529159 | 162179 | Basic Omni-Tek Martial Artist Specific Implants | 209,5.01,104 | Implants/clusters |
-| 2 | 77529160 | 162182 | Basic Omni-Tek Meta-Physicist Specific Implants | 204,5.01,110 | Implants/clusters |
-| 2 | 77529161 | 162185 | Basic Omni-Tek Nanotechnician Specific Implants | 212.6,5.01,106.4 | Implants/clusters |
-| 2 | 77529162 | 162188 | Basic Omni-Tek Soldier Specific Implants | 204,5.01,126 | Implants/clusters |
-| 2 | 77529163 | 162191 | Basic Omni-Tek Trader Specific Implants | 209,5.01,136 | Implants/clusters |
-| 2 | 77529164 | 252270 | Basic Omni-Tek Keeper Specific Implants | 203.917,5.01,130.122 | Implants/clusters |
 
 ### 2064 - neut_basic_implants_shop (12)
 

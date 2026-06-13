@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-13 00:46:59
+Generated: 2026-06-13 01:13:05
 
 ## Scope
 
@@ -20,14 +20,14 @@ Generated: 2026-06-13 00:46:59
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 253 |
+| Vending statels without complete DB shop coverage | 240 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Omni Advanced General Shop import promoted from AOSharp capture 20260613-002828.
-- Validated coverage added: 23 1184 ord_smarket_omni_advanced vendor rows, 16 vendor templates, and 15 new shop inventory groups with 760 inventory rows; existing shop inventory hash LJI7 was reused.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 276 to 253. Current live-capture coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253.
+- Omni Basic Implant Terminals import promoted from AOSharp capture 20260613-005616.
+- Validated coverage added: 13 1183 ord_smarket_omni_basic vendor rows and 13 vendor templates; no new shop inventory groups were needed because existing implant shop hashes 5BUX, 5M5F, 6MQN, 6YPW, 7LZ3, A32J, JWHR, KV75, KVVT, O3KI, RNWW, RO4Q, and SBQ6 were reused.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 253 to 240. Current live-capture coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240.
 
 ## Coverage Exclusions
 
