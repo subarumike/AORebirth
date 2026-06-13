@@ -1,0 +1,5 @@
+﻿"TerminalIdentity","TemplateId","TemplateName","Playfield","PlayfieldName","ComputedVendorId","PositionX","PositionY","PositionZ","CoverageMatchDistance","HasVendorRow","ExistingVendorHash","ActiveShopItems","CapturedItemRows","UniqueItemPairs","QlMin","QlMax","ResolvedItemRows"
+"(VendingMachine:12E3837D)","99601","Basic Tools","4563","Hardware Dimension - Basic","299040768","31.0500031","2.10000014","41.5","0.0000","True","ToolB","22","19","19","1","50","19"
+"(VendingMachine:12E3837E)","99570","Basic Armor","4563","Hardware Dimension - Basic","299040769","33.65","2.10000014","41.5","0.0000","False","","0","29","25","1","50","29"
+"(VendingMachine:12E3837F)","99572","Basic ICC Special Weapons","4563","Hardware Dimension - Basic","299040770","36.3500061","2.10000014","41.5","0.0000","True","ICCSpWB","31","31","31","1","91","31"
+"(VendingMachine:12E38380)","99602","Basic Attacks","4563","Hardware Dimension - Basic","299040771","38.9499931","2.10000014","41.5","0.0000","True","AtkB","8","10","8","10","100","10"

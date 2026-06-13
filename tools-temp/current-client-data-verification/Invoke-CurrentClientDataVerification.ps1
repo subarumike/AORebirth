@@ -1,16 +1,29 @@
 param(
-    [string]$RepoRoot = "C:\Users\Mike\Documents\Cellao-Clean",
+    [string]$RepoRoot = "",
     [string]$AoClientRoot = "C:\Funcom\Anarchy Online",
-    [string]$Database = "cellao_codex_clean",
+    [string]$TargetDatabase = "cellao_codex_clean",
+    [string]$Database = "",
     [string]$MysqlExe = "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe",
     [string]$MysqlUser = "cellaodbuser",
     [string]$MysqlPassword = "1Guiness4828!",
-    [string]$ReportPath = "C:\Users\Mike\Documents\Cellao-Clean\docs\CurrentClientDataVerification.md",
-    [string]$OutDir = "C:\Users\Mike\Documents\Cellao-Clean\tools-temp\current-client-data-verification"
+    [string]$ReportPath = "",
+    [string]$OutDir = "",
+    [switch]$DryRun,
+    [switch]$AllowWrite
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+function Resolve-RepoRoot {
+    param([string]$Path)
+
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..\..")).Path
+    }
+
+    return (Resolve-Path -LiteralPath $Path).Path
+}
 
 function Add-AssemblyIfNeeded {
     param([string]$Path)
@@ -124,12 +137,60 @@ function Get-LiveVendorMeshOverrides {
     return $result
 }
 
-New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
-New-Item -ItemType Directory -Path (Split-Path -Parent $ReportPath) -Force | Out-Null
+$coverageExcludedStatelTemplates = @{
+    155225 = "NonShopStatelTemplate"
+}
+
+function Test-CoverageExcludedStatelTemplate {
+    param($TemplateId)
+
+    if ($null -eq $TemplateId -or [string]::IsNullOrWhiteSpace([string]$TemplateId)) {
+        return $false
+    }
+
+    try {
+        return $coverageExcludedStatelTemplates.ContainsKey([int]$TemplateId)
+    } catch {
+        return $false
+    }
+}
+
+if (-not [string]::IsNullOrWhiteSpace($Database)) {
+    $TargetDatabase = $Database
+}
+$Database = $TargetDatabase
+
+$RepoRoot = Resolve-RepoRoot $RepoRoot
+if ([string]::IsNullOrWhiteSpace($ReportPath)) {
+    $ReportPath = Join-Path $RepoRoot "docs\CurrentClientDataVerification.md"
+}
+if ([string]::IsNullOrWhiteSpace($OutDir)) {
+    $OutDir = Join-Path $RepoRoot "tools-temp\current-client-data-verification"
+}
 
 $built = Join-Path $RepoRoot "CellAO\Built\Debug"
 $sourceData = Join-Path $RepoRoot "CellAO\Datafiles"
 $aoVersionPath = Join-Path $AoClientRoot "version.id"
+
+Write-Host "Resolved current-client verification paths:"
+Write-Host "  RepoRoot=$RepoRoot"
+Write-Host "  Built=$built"
+Write-Host "  SourceData=$sourceData"
+Write-Host "  AoClientRoot=$AoClientRoot"
+Write-Host "  AoVersionPath=$aoVersionPath"
+Write-Host "  TargetDatabase=$Database"
+Write-Host "  ReportPath=$ReportPath"
+Write-Host "  OutDir=$OutDir"
+Write-Host "  IntendedAction=query current database and write verification reports"
+
+if ($DryRun -or -not $AllowWrite) {
+    Write-Host "No database query performed and no report files written. Pass -AllowWrite to run verification output generation."
+    return
+}
+
+New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
+New-Item -ItemType Directory -Path (Split-Path -Parent $ReportPath) -Force | Out-Null
+
 $aoVersion = if (Test-Path -LiteralPath $aoVersionPath) { (Get-Content -LiteralPath $aoVersionPath -Raw).Trim() } else { "" }
 
 $previousCurrentDirectory = [Environment]::CurrentDirectory
@@ -349,6 +410,9 @@ foreach ($pfEntry in [ZoneEngine.Core.Playfields.PlayfieldLoader]::PFData.GetEnu
             $issues.Add("matched vendor has no active shop inventory")
         }
 
+        $coverageExcluded = Test-CoverageExcludedStatelTemplate $sd.TemplateId
+        $exclusionReason = if ($coverageExcluded) { $coverageExcludedStatelTemplates[[int]$sd.TemplateId] } else { "" }
+
         $statelVendorRows.Add([pscustomobject]@{
             Playfield = $pfId
             PlayfieldName = $pf.Name
@@ -360,6 +424,8 @@ foreach ($pfEntry in [ZoneEngine.Core.Playfields.PlayfieldLoader]::PFData.GetEnu
             VendorHash = if ($matched) { $dbVendor.Hash } else { "" }
             VendorTemplateItem = if ($matched) { $dbVendor.VendorTemplateItem } else { -1 }
             ActiveShopItems = if ($matched) { $dbVendor.ActiveShopItems } else { 0 }
+            CoverageExcluded = $coverageExcluded
+            ExclusionReason = $exclusionReason
             Issues = ($issues -join "; ")
         })
     }
@@ -370,8 +436,69 @@ $statelVendorRows | Sort-Object Playfield, ComputedVendorId | Export-Csv -Litera
 $problemDataFiles = @($dataFiles | Where-Object { -not $_.Matches -or $_.BuiltVersion -ne $aoVersion })
 $problemVendorDb = @($vendorDbAudit | Where-Object { -not [string]::IsNullOrWhiteSpace($_.Issues) })
 $problemShopItems = @($shopAudit | Where-Object { -not [string]::IsNullOrWhiteSpace($_.Issues) })
-$problemStatelVendors = @($statelVendorRows | Where-Object { -not [string]::IsNullOrWhiteSpace($_.Issues) })
+$excludedStatelVendors = @($statelVendorRows | Where-Object { $_.CoverageExcluded })
+$problemStatelVendors = @($statelVendorRows | Where-Object { -not $_.CoverageExcluded -and -not [string]::IsNullOrWhiteSpace($_.Issues) })
 $problemVendorMesh = @($vendorMeshAudit | Where-Object { $_.Status -ne "Item cache matches live" })
+
+$vendorScanTargetsCsv = Join-Path $OutDir "vendor-scan-targets.csv"
+$existingVendorScanTargetsByKey = @{}
+if (Test-Path -LiteralPath $vendorScanTargetsCsv) {
+    $vendorScanTargetRows = @(Import-Csv -LiteralPath $vendorScanTargetsCsv)
+    foreach ($targetRow in $vendorScanTargetRows) {
+        $targetKey = "$($targetRow.Playfield):$($targetRow.VendorId):$($targetRow.StatelInstanceHex)"
+        $existingVendorScanTargetsByKey[$targetKey] = $targetRow
+    }
+}
+$currentVendorScanTargets = foreach ($row in $problemStatelVendors | Sort-Object Playfield, ComputedVendorId) {
+    $targetKey = "$($row.Playfield):$($row.ComputedVendorId):$($row.StatelInstanceHex)"
+    $existingTarget = if ($existingVendorScanTargetsByKey.ContainsKey($targetKey)) { $existingVendorScanTargetsByKey[$targetKey] } else { $null }
+
+    [pscustomobject]@{
+        Priority = if ($null -ne $existingTarget) { $existingTarget.Priority } else { 5 }
+        Playfield = $row.Playfield
+        PlayfieldName = $row.PlayfieldName
+        Coordinates = $row.Coords
+        VendorId = $row.ComputedVendorId
+        StatelInstanceHex = $row.StatelInstanceHex
+        TemplateId = $row.StatelTemplateId
+        TemplateName = if ($null -ne $existingTarget) { $existingTarget.TemplateName } else { "" }
+        Family = if ($null -ne $existingTarget) { $existingTarget.Family } else { "Unclassified" }
+        CaptureInstruction = if ($null -ne $existingTarget) { $existingTarget.CaptureInstruction } else { "Review current statel vendor coverage before capture." }
+        AccessStatus = if ($null -ne $existingTarget) { $existingTarget.AccessStatus } else { "Unclassified" }
+    }
+}
+$currentVendorScanTargets | Export-Csv -LiteralPath $vendorScanTargetsCsv -NoTypeInformation
+
+$vendorScanTargetsByLocationMd = Join-Path $OutDir "vendor-scan-targets-by-location.md"
+$targetMarkdown = New-Object System.Collections.Generic.List[string]
+$targetMarkdown.Add("# Remaining Vendor Scan Targets")
+$targetMarkdown.Add("")
+$targetMarkdown.Add("Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: $($currentVendorScanTargets.Count).")
+$targetMarkdown.Add("")
+$targetMarkdown.Add("## Practical Location Summary")
+$targetMarkdown.Add("")
+$targetMarkdown.Add("| Playfield | Location | Access | Uncovered terminals | Main families |")
+$targetMarkdown.Add("| ---: | --- | --- | ---: | --- |")
+$targetGroups = @($currentVendorScanTargets | Group-Object Playfield | Sort-Object -Property @{ Expression = "Count"; Descending = $true }, @{ Expression = "Name"; Descending = $false })
+foreach ($group in $targetGroups) {
+    $firstTarget = $group.Group | Select-Object -First 1
+    $familySummary = (($group.Group | Group-Object Family | Sort-Object -Property @{ Expression = "Count"; Descending = $true }, @{ Expression = "Name"; Descending = $false } | Select-Object -First 4 | ForEach-Object { "$($_.Name) ($($_.Count))" }) -join "; ")
+    $targetMarkdown.Add("| $($firstTarget.Playfield) | $($firstTarget.PlayfieldName) | $($firstTarget.AccessStatus) | $($group.Count) | $familySummary |")
+}
+$targetMarkdown.Add("")
+$targetMarkdown.Add("## Targets By Location")
+foreach ($group in $targetGroups) {
+    $firstTarget = $group.Group | Select-Object -First 1
+    $targetMarkdown.Add("")
+    $targetMarkdown.Add("### $($firstTarget.Playfield) - $($firstTarget.PlayfieldName) ($($group.Count))")
+    $targetMarkdown.Add("")
+    $targetMarkdown.Add("| Priority | Vendor ID | Template | Name | Coords | Family |")
+    $targetMarkdown.Add("| ---: | ---: | ---: | --- | --- | --- |")
+    foreach ($target in $group.Group | Sort-Object Priority, VendorId) {
+        $targetMarkdown.Add("| $($target.Priority) | $($target.VendorId) | $($target.TemplateId) | $($target.TemplateName) | $($target.Coordinates) | $($target.Family) |")
+    }
+}
+$targetMarkdown | Set-Content -LiteralPath $vendorScanTargetsByLocationMd -Encoding UTF8
 
 $markdown = New-Object System.Collections.Generic.List[string]
 $markdown.Add("# Current Client Data Verification")
@@ -397,6 +524,21 @@ $markdown.Add("| Live vendor mesh evidence rows not satisfied by item cache | $(
 $markdown.Add("| Vendor DB rows with issues | $($problemVendorDb.Count) |")
 $markdown.Add("| Shop inventory rows with item-cache issues | $($problemShopItems.Count) |")
 $markdown.Add("| Vending statels without complete DB shop coverage | $($problemStatelVendors.Count) |")
+$markdown.Add("| Vending statels excluded from coverage | $($excludedStatelVendors.Count) |")
+$markdown.Add("")
+$markdown.Add("## Latest Vendor Import Milestone")
+$markdown.Add("")
+$markdown.Add("- Omni Basic General Shop import promoted from AOSharp capture `20260612-012644`.")
+$markdown.Add("- Validated coverage added: 23 `1183 ord_smarket_omni_basic` vendor rows, 16 vendor templates, and 16 shop inventory groups with 690 inventory rows.")
+$markdown.Add(("- Current-client verification after import showed uncovered statel vendors dropped from `404` to `381`; the non-shop exclusion rule now reduces the actionable uncovered count to `{0}`." -f $problemStatelVendors.Count))
+$markdown.Add("")
+$markdown.Add("## Coverage Exclusions")
+$markdown.Add("")
+$markdown.Add("| Template | Name | Reason | Excluded statels | Evidence |")
+$markdown.Add("| ---: | --- | --- | ---: | --- |")
+$markdown.Add("| 155225 | Refreshing Drink | NonShopStatelTemplate | $($excludedStatelVendors.Count) | AOSharp captures 20260612-012644 and 20260612-044234 emitted VendorFullUpdate evidence but no ShopUpdate inventory rows; live operator confirmed the Superior instances were not reachable/openable. |")
+$markdown.Add("")
+$markdown.Add("Excluded statels remain in the raw statel vendor coverage CSV with CoverageExcluded and ExclusionReason fields, but they are excluded from coverage metrics, missing-vendor reports, capture targeting, and import planning.")
 $markdown.Add("")
 $markdown.Add("## Data Files")
 $markdown.Add("")
@@ -486,4 +628,5 @@ $markdown | Set-Content -LiteralPath $ReportPath -Encoding UTF8
     VendorDbIssues = $problemVendorDb.Count
     ShopInventoryIssues = $problemShopItems.Count
     StatelVendorIssues = $problemStatelVendors.Count
+    StatelVendorExclusions = $excludedStatelVendors.Count
 }

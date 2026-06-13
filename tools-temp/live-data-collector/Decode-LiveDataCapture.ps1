@@ -4,11 +4,26 @@ param(
     [ValidateSet("All", "Loot", "Quest", "PacketsOnly")]
     [string]$Mode = "All",
     [string]$Python = "python",
-    [string]$RepoRoot = "C:\Users\Mike\Documents\Cellao-Clean",
-    [string]$AoLoggerRoot = "C:\Users\Mike\Documents\AO Live Logger"
+    [string]$RepoRoot = "",
+    [string]$AoLoggerRoot = "C:\Users\Mike\Documents\AO Live Logger",
+    [switch]$DryRun,
+    [switch]$AllowWrite
 )
 
 $ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
+
+function Resolve-RepoRoot {
+    param([string]$Path)
+
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..\..")).Path
+    }
+
+    return (Resolve-Path -LiteralPath $Path).Path
+}
+
+$RepoRoot = Resolve-RepoRoot $RepoRoot
 
 $collectorRoot = Join-Path $RepoRoot "tools-temp\live-data-collector"
 $lootExporter = Join-Path $RepoRoot "tools-temp\live-loot-observations\Export-LiveLootObservations.py"
@@ -23,6 +38,21 @@ if (-not (Test-Path -LiteralPath $CaptureDir)) {
     throw "CaptureDir does not exist: $CaptureDir"
 }
 
+Write-Host "Resolved live data decode paths:"
+Write-Host "  RepoRoot=$RepoRoot"
+Write-Host "  CollectorRoot=$collectorRoot"
+Write-Host "  CaptureDir=$CaptureDir"
+Write-Host "  Mode=$Mode"
+Write-Host "  PacketDecoder=$packetDecoder"
+Write-Host "  S2CDecoder=$s2cDecoder"
+Write-Host "  CoverageExporter=$coverageExporter"
+Write-Host "  IntendedAction=decode capture and write derived reports"
+
+if ($DryRun -or -not $AllowWrite) {
+    Write-Host "No decode/export scripts run and no files written. Pass -AllowWrite to decode capture outputs."
+    return
+}
+
 & $Python $packetDecoder $CaptureDir
 if ($LASTEXITCODE -ne 0) { throw "Packet decode failed" }
 
@@ -30,7 +60,7 @@ if ($Mode -ne "PacketsOnly") {
     & $Python $c2sDecoder $CaptureDir
     if ($LASTEXITCODE -ne 0) { throw "C2S decode failed" }
 
-    & $Python $s2cDecoder $CaptureDir
+    & $Python $s2cDecoder $CaptureDir --repo-root $RepoRoot --allow-write
     if ($LASTEXITCODE -ne 0) { throw "S2C decode failed" }
 }
 
@@ -45,7 +75,7 @@ if ($Mode -in @("All", "Quest")) {
 }
 
 if ($Mode -ne "PacketsOnly") {
-    & $Python $coverageExporter $CaptureDir --repo-root $RepoRoot
+    & $Python $coverageExporter $CaptureDir --repo-root $RepoRoot --allow-write
     if ($LASTEXITCODE -ne 0) { throw "Packet coverage export failed" }
 
     & $Python $timelineExporter $CaptureDir

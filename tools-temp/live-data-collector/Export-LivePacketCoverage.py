@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_REPO_ROOT = Path(r"C:\Users\Mike\Documents\Cellao-Clean")
+DEFAULT_REPO_ROOT = Path(__file__).resolve().parents[2]
 
 HANDLER_ALIASES = {
     "CastNanoSpell": "CastNano",
@@ -287,9 +287,23 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("capture_dir", type=Path)
     parser.add_argument("--repo-root", type=Path, default=DEFAULT_REPO_ROOT)
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--allow-write", action="store_true")
     args = parser.parse_args()
 
-    rows = build_rows(args.capture_dir, args.repo_root)
+    repo_root = args.repo_root.resolve()
+    planned_outputs = [
+        args.capture_dir / "live_packet_coverage.csv",
+        args.capture_dir / "live_packet_coverage.md",
+    ]
+    print(f"repo_root={repo_root}")
+    print(f"capture_dir={args.capture_dir}")
+    print("planned_outputs=" + ", ".join(str(path) for path in planned_outputs))
+    if args.dry_run or not args.allow_write:
+        print("No packet coverage files written. Pass --allow-write to write coverage outputs.")
+        return 0
+
+    rows = build_rows(args.capture_dir, repo_root)
     write_csv(args.capture_dir / "live_packet_coverage.csv", rows)
     write_markdown(args.capture_dir / "live_packet_coverage.md", rows, args.capture_dir)
     missing = sum(1 for row in rows if row["status"] == "missing")

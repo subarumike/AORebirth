@@ -15,19 +15,22 @@ from pathlib import Path
 from typing import Any
 
 
-REPO_ROOT = Path(r"C:\Users\Mike\Documents\Cellao-Clean")
-N3_TYPE_FILE = (
-    REPO_ROOT
-    / "CellAO"
-    / "Libraries"
-    / "Source"
-    / "AOtomation"
-    / "AOtomation.Messaging"
-    / "src"
-    / "SmokeLounge.AOtomation.Messaging"
-    / "Messages"
-    / "N3MessageType.cs"
-)
+DEFAULT_REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def n3_type_file(repo_root: Path) -> Path:
+    return (
+        repo_root
+        / "CellAO"
+        / "Libraries"
+        / "Source"
+        / "AOtomation"
+        / "AOtomation.Messaging"
+        / "src"
+        / "SmokeLounge.AOtomation.Messaging"
+        / "Messages"
+        / "N3MessageType.cs"
+    )
 
 IDENTITY_NAMES = {
     0: "None",
@@ -75,8 +78,8 @@ def identity(type_value: int, instance: int) -> str:
     return f"{IDENTITY_NAMES.get(type_value, str(type_value))}:{instance:08X}" if type_value else f"None:{instance}"
 
 
-def load_n3_names() -> dict[int, str]:
-    text = N3_TYPE_FILE.read_text(encoding="utf-8-sig", errors="replace")
+def load_n3_names(repo_root: Path) -> dict[int, str]:
+    text = n3_type_file(repo_root).read_text(encoding="utf-8-sig", errors="replace")
     names: dict[int, str] = {}
     for match in re.finditer(r"^\s*(\w+)\s*=\s*0x([0-9a-fA-F]+)", text, re.MULTILINE):
         names[int(match.group(2), 16)] = match.group(1)
@@ -361,11 +364,28 @@ def write_outputs(capture_dir: Path, rows: list[dict[str, Any]], stream_summarie
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("capture_dir", type=Path)
+    parser.add_argument("--repo-root", type=Path, default=DEFAULT_REPO_ROOT)
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--allow-write", action="store_true")
     args = parser.parse_args()
 
     capture_dir = args.capture_dir
+    repo_root = args.repo_root.resolve()
+    planned_outputs = [
+        capture_dir / "s2c_frames.jsonl",
+        capture_dir / "s2c_frames.csv",
+        capture_dir / "s2c_quest_decode_summary.md",
+    ]
+    print(f"repo_root={repo_root}")
+    print(f"capture_dir={capture_dir}")
+    print(f"n3_type_file={n3_type_file(repo_root)}")
+    print("planned_outputs=" + ", ".join(str(path) for path in planned_outputs))
+    if args.dry_run or not args.allow_write:
+        print("No S2C decode files written. Pass --allow-write to write decoded outputs.")
+        return 0
+
     packets = load_packets(capture_dir / "packets.jsonl")
-    n3_names = load_n3_names()
+    n3_names = load_n3_names(repo_root)
 
     rows: list[dict[str, Any]] = []
     stream_summaries: list[dict[str, Any]] = []

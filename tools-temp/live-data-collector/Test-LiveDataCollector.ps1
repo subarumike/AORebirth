@@ -1,12 +1,33 @@
 param(
-    [string]$RepoRoot = "C:\Users\Mike\Documents\Cellao-Clean",
+    [string]$RepoRoot = "",
     [string]$Python = "python",
-    [string]$KnownCaptureDir = "C:\Users\Mike\Documents\Cellao-Clean\tools-temp\live-pcaps\private-server-quest-batch\2026-05-10_23-44-53",
-    [string]$OfficialC2SOnlyCaptureDir = "C:\Users\Mike\Documents\Cellao-Clean\tools-temp\live-pcaps\live-official-weapon-equip\2026-05-24_22-09-21",
-    [switch]$SkipKnownCapture
+    [string]$KnownCaptureDir = "",
+    [string]$OfficialC2SOnlyCaptureDir = "",
+    [switch]$SkipKnownCapture,
+    [switch]$DryRun,
+    [switch]$AllowWrite
 )
 
 $ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
+
+function Resolve-RepoRoot {
+    param([string]$Path)
+
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..\..")).Path
+    }
+
+    return (Resolve-Path -LiteralPath $Path).Path
+}
+
+$RepoRoot = Resolve-RepoRoot $RepoRoot
+if ([string]::IsNullOrWhiteSpace($KnownCaptureDir)) {
+    $KnownCaptureDir = Join-Path $RepoRoot "tools-temp\live-pcaps\private-server-quest-batch\2026-05-10_23-44-53"
+}
+if ([string]::IsNullOrWhiteSpace($OfficialC2SOnlyCaptureDir)) {
+    $OfficialC2SOnlyCaptureDir = Join-Path $RepoRoot "tools-temp\live-pcaps\live-official-weapon-equip\2026-05-24_22-09-21"
+}
 
 function Assert-True {
     param(
@@ -40,6 +61,20 @@ $powerShellScripts = @(
     (Join-Path $collectorRoot "Test-LiveDataCollector.ps1")
 )
 
+Write-Host "Resolved live data collector test paths:"
+Write-Host "  RepoRoot=$RepoRoot"
+Write-Host "  KnownCaptureDir=$KnownCaptureDir"
+Write-Host "  OfficialC2SOnlyCaptureDir=$OfficialC2SOnlyCaptureDir"
+Write-Host "  IntendedAction=compile scripts and optionally replay known captures"
+
+if ($DryRun -or -not $AllowWrite) {
+    foreach ($script in $pythonScripts + $powerShellScripts) {
+        Assert-File $script
+    }
+    Write-Host "No py_compile, decode replay, or report writes performed. Pass -AllowWrite to run the mutating smoke test."
+    return
+}
+
 foreach ($script in $pythonScripts) {
     Assert-File $script
     & $Python -m py_compile $script
@@ -53,7 +88,7 @@ foreach ($script in $powerShellScripts) {
 
 if (-not $SkipKnownCapture) {
     if (Test-Path -LiteralPath $KnownCaptureDir) {
-        & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $collectorRoot "Decode-LiveDataCapture.ps1") -CaptureDir $KnownCaptureDir -Mode All
+        & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $collectorRoot "Decode-LiveDataCapture.ps1") -CaptureDir $KnownCaptureDir -Mode All -RepoRoot $RepoRoot -AllowWrite
         Assert-True ($LASTEXITCODE -eq 0) "Known capture decode failed"
 
         $questRows = @((Import-Csv -LiteralPath (Join-Path $KnownCaptureDir "quest_update_observations.csv")))
@@ -87,7 +122,7 @@ if (-not $SkipKnownCapture) {
     }
 
     if (Test-Path -LiteralPath $OfficialC2SOnlyCaptureDir) {
-        & $Python (Join-Path $collectorRoot "Export-LivePacketCoverage.py") $OfficialC2SOnlyCaptureDir --repo-root $RepoRoot
+        & $Python (Join-Path $collectorRoot "Export-LivePacketCoverage.py") $OfficialC2SOnlyCaptureDir --repo-root $RepoRoot --allow-write
         Assert-True ($LASTEXITCODE -eq 0) "Official C2S-only coverage export failed"
         $officialCoverageRows = @((Import-Csv -LiteralPath (Join-Path $OfficialC2SOnlyCaptureDir "live_packet_coverage.csv")))
         Assert-True ($null -ne ($officialCoverageRows | Where-Object { $_.capture_source -eq "official_live" -and $_.coverage_authority -eq "c2s_only_request_flow" } | Select-Object -First 1)) "Expected official weapon capture to be labeled as C2S-only request-flow evidence"
