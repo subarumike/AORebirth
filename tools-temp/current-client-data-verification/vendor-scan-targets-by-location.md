@@ -1,13 +1,12 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 324.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 295.
 
 ## Practical Location Summary
 
 | Playfield | Location | Access | Uncovered terminals | Main families |
 | ---: | --- | --- | ---: | --- |
 | 500 | Parnassos | GM-only / not live-accessible | 85 | Legacy faction core departments (21); Other unresolved vendor terminal (21); Heavenly weapon construction/components/recipes (19); Containers/computers/furniture/specialty/cars (10) |
-| 1180 | ord_smarket_clan_basic | Likely live-accessible | 29 | Implants/clusters (14); Heavenly weapon construction/components/recipes (6); Legacy faction core departments (6); Clan/Omni device variants (1) |
 | 1184 | ord_smarket_omni_advanced | Likely live-accessible | 23 | Heavenly weapon construction/components/recipes (12); Legacy faction core departments (6); Implants/clusters (2); Clan/Omni device variants (1) |
 | 1182 | ord_smarket_clan_sup | Likely live-accessible | 19 | Heavenly weapon construction/components/recipes (6); Legacy faction core departments (6); Other unresolved vendor terminal (2); Clan/Omni device variants (1) |
 | 4704 | Tower Shop (dungeon) | Likely special/dungeon; verify before travel | 17 | ICC/tower shop special vendors (16); Containers/computers/furniture/specialty/cars (1) |
@@ -140,40 +139,6 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 7 | 32768081 | 155595 | S h o p - o f - F o r t u n e | 421.521,32.8,360.723 | Other unresolved vendor terminal |
 | 7 | 32768084 | 155498 | Armour and Clothing Components - Superior | 468.2,37.001,343.7 | Other unresolved vendor terminal |
 | 7 | 32768087 | 155313 | Nano Crystal Components - Superior | 473.8,37.001,343.7 | Other unresolved vendor terminal |
-
-### 1180 - ord_smarket_clan_basic (29)
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 1 | 77332517 | 155233 | Basic Melee Weapon Construction Kits | 154,11.012,153 | Heavenly weapon construction/components/recipes |
-| 1 | 77332518 | 155236 | Basic Ranged Weapon Construction Kits | 159,11,153 | Heavenly weapon construction/components/recipes |
-| 1 | 77332525 | 155296 | Melee Weapon Components - Basic | 159,5,163 | Heavenly weapon construction/components/recipes |
-| 1 | 77332526 | 155490 | Ranged Weapon Components - Basic | 166,5.001,163 | Heavenly weapon construction/components/recipes |
-| 1 | 77332532 | 155502 | Melee Weapon Recipes - Basic | 146,11,193 | Heavenly weapon construction/components/recipes |
-| 1 | 77332534 | 155505 | Ranged Weapon Recipes - Basic | 139.016,11,192.999 | Heavenly weapon construction/components/recipes |
-| 2 | 77332503 | 162157 | Basic Clan Adventurer Specific Implants | 233,5.01,187 | Implants/clusters |
-| 2 | 77332504 | 162160 | Basic Clan Agent Specific Implants | 237,5.01,187 | Implants/clusters |
-| 2 | 77332505 | 162163 | Basic Clan Bureaucrat Specific Implants | 241,5.01,187 | Implants/clusters |
-| 2 | 77332506 | 162166 | Basic Clan Doctor Specific Implants | 241,5.01,183 | Implants/clusters |
-| 2 | 77332507 | 162169 | Basic Clan Enforcer Specific Implants | 241,5.01,175 | Implants/clusters |
-| 2 | 77332508 | 162172 | Basic Clan Engineer Specific Implants | 241,5.01,171 | Implants/clusters |
-| 2 | 77332509 | 162175 | Basic Clan Fixer Specific Implants | 237,5.01,171 | Implants/clusters |
-| 2 | 77332510 | 162178 | Basic Clan Martial Artist Specific Implants | 229,5.01,171 | Implants/clusters |
-| 2 | 77332511 | 162181 | Basic Clan Meta-Physicist Specific Implants | 225,5.01,171 | Implants/clusters |
-| 2 | 77332512 | 162184 | Basic Clan Nanotechnician Specific Implants | 233,5.01,171 | Implants/clusters |
-| 2 | 77332513 | 162187 | Basic Clan Soldier Specific Implants | 225,5.01,187 | Implants/clusters |
-| 2 | 77332514 | 162190 | Basic Clan Trader Specific Implants | 229,5.01,187 | Implants/clusters |
-| 2 | 77332515 | 252271 | Basic Clan Keeper Specific Implants | 221.114,5.01,171.109 | Implants/clusters |
-| 2 | 77332516 | 155222 | Basic Implants | 133,11,153 | Implants/clusters |
-| 3 | 77332493 | 99502 | Clan Basic Armor | 207,5.01,183 | Legacy faction core departments |
-| 3 | 77332494 | 99532 | Clan Basic Attacks | 194.996,4.609,162.997 | Legacy faction core departments |
-| 3 | 77332495 | 99513 | Clan Basic Augmentations | 194.066,4.6,181.138 | Legacy faction core departments |
-| 3 | 77332496 | 99508 | Clan Basic Medical Supplies | 191.887,4.601,163.939 | Legacy faction core departments |
-| 3 | 77332497 | 99527 | Clan Basic Tools | 207.154,4.6,162.871 | Legacy faction core departments |
-| 3 | 77332498 | 99505 | Clan Basic Weapons | 209.829,4.6,163.716 | Legacy faction core departments |
-| 6 | 77332499 | 99526 | Clan Clothes | 191.441,4.6,180.06 | Faction clothes/fashion |
-| 6 | 77332500 | 117749 | Clan Maps | 190.872,4.6,177.595 | Maps |
-| 6 | 77332501 | 155602 | Clan Basic Devices | 190.886,4.6,166.795 | Clan/Omni device variants |
 
 ### 1184 - ord_smarket_omni_advanced (23)
 
