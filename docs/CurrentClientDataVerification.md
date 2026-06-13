@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-13 17:15:08
+Generated: 2026-06-13 17:57:53
 
 ## Scope
 
@@ -20,15 +20,15 @@ Generated: 2026-06-13 17:15:08
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 147 |
+| Vending statels without complete DB shop coverage | 142 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Neutral ICC implant/cluster import promoted from AOSharp capture 20260613-170220.
-- Validated coverage added: 24 vendor rows across 2064 neut_basic_implants_shop and 2073 neut_advanced_implants_shop, 12 vendor templates, and 12 new shop inventory groups with 1876 inventory rows.
-- The 2064 rows are captured mappings; the 2073 rows are high-confidence exact-template reuse from the captured 2064 template evidence, matching the existing ICC pharmacy reuse pattern across these interiors.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 171 to 147. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147.
+- Arete ICC implant/cluster import promoted from AOSharp capture 20260613-172753.
+- Validated coverage added: 5 vendor rows in 6553 Arete Landing, 5 vendor templates, and 5 new shop inventory groups with 573 inventory rows.
+- The imported rows cover ICC Basic Implants, ICC Faded Clusters, ICC Bright Clusters, ICC Shiny Clusters, and ICC Pharmacy; incidental nearby capture evidence was intentionally excluded.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 147 to 142. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142.
 
 ## Coverage Exclusions
 
