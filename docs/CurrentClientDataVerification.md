@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-12 03:24:57
+Generated: 2026-06-12 22:06:14
 
 ## Scope
 
@@ -20,13 +20,23 @@ Generated: 2026-06-12 03:24:57
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 381 |
+| Vending statels without complete DB shop coverage | 324 |
+| Vending statels excluded from coverage | 30 |
 
-## Latest Covered Milestone
+## Latest Vendor Import Milestone
 
-- Omni Basic General Shop import promoted from AOSharp capture `20260612-012644`.
-- Validated coverage added: 23 `1183 ord_smarket_omni_basic` vendor rows, 16 vendor templates, and 16 shop inventory groups with 690 inventory rows.
-- Current-client verification result: uncovered statel vendors dropped from `404` to `381`; `DataFileIssues = 0`, `VendorDbIssues = 0`, and `ShopInventoryIssues = 0`.
+- Omni Superior General Shop import promoted from AOSharp capture 20260612-044234.
+- Validated coverage added: 27 1185 ord_smarket_omni_sup vendor rows, 20 vendor templates, and 19 new shop inventory groups with 1 reused shop inventory hash (`LJI7`).
+- Current-client verification after import shows uncovered statel vendors at 324.
+- Current live-capture coverage chain: 404 -> 381 from Omni Basic, 381 -> 351 from the 155225 non-shop exclusion rule, and 351 -> 324 from Omni Superior.
+
+## Coverage Exclusions
+
+| Template | Name | Reason | Excluded statels | Evidence |
+| ---: | --- | --- | ---: | --- |
+| 155225 | Refreshing Drink | NonShopStatelTemplate | 30 | AOSharp captures 20260612-012644 and 20260612-044234 emitted VendorFullUpdate evidence but no ShopUpdate inventory rows; live operator confirmed the Superior instances were not reachable/openable. |
+
+Excluded statels remain in the raw statel vendor coverage CSV with CoverageExcluded and ExclusionReason fields, but they are excluded from coverage metrics, missing-vendor reports, capture targeting, and import planning.
 
 ## Data Files
 
@@ -70,7 +80,6 @@ No vendor DB issues found.
 
 | Playfield | Name | Vendor id | Statel | Template | Coords | Issues |
 | ---: | --- | ---: | --- | ---: | --- | --- |
-| 346 | ACD Omnilab (dng) | 22675456 | 0xC000015A | 155225 | 73,10.01,385 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768000 | 0xC00001F4 | 99571 | 215.737,16.4,162.412 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768001 | 0xC00101F4 | 99599 | 214.427,16.4,162.485 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768002 | 0xC00201F4 | 99635 | 211.938,16.4,162.399 | no vendors row; runtime spawns empty statel vendor |
@@ -110,3 +119,4 @@ No vendor DB issues found.
 | 500 | Parnassos | 32768049 | 0xC03101F4 | 99529 | 217.832,16.4,171.123 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768051 | 0xC03301F4 | 99530 | 215.748,16.4,171.108 | no vendors row; runtime spawns empty statel vendor |
 | 500 | Parnassos | 32768052 | 0xC03401F4 | 99523 | 214.963,16.4,170.276 | no vendors row; runtime spawns empty statel vendor |
+| 500 | Parnassos | 32768053 | 0xC03501F4 | 99507 | 215.002,16.4,169.185 | no vendors row; runtime spawns empty statel vendor |
