@@ -1,6 +1,6 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 240.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 234.
 
 ## Practical Location Summary
 
@@ -12,7 +12,6 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 1181 | ord_smarket_clan_advanced | Likely live-accessible | 16 | Heavenly weapon construction/components/recipes (6); Legacy faction core departments (5); Clan/Omni device variants (1); Containers/computers/furniture/specialty/cars (1) |
 | 2064 | neut_basic_implants_shop | Unknown accessibility | 12 | Implants/clusters (12) |
 | 2073 | neut_advanced_implants_shop | Unknown accessibility | 12 | Implants/clusters (12) |
-| 1193 | spec_smarket_neut_basic | Likely live-accessible | 6 | Containers/computers/furniture/specialty/cars (6) |
 | 4354 | Uncle Bazzits Workshop (Dng) | Likely special/dungeon; verify before travel | 5 | Other unresolved vendor terminal (4); Faction clothes/fashion (1) |
 | 565 | Newland Desert | Likely live-accessible | 5 | Other unresolved vendor terminal (2); Classic armor terminals (1); Implants/clusters (1); Startup equipment (1) |
 | 6553 | Arete Landing | Likely live-accessible | 5 | Implants/clusters (4); Other unresolved vendor terminal (1) |
@@ -57,7 +56,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 1181 | ord_smarket_clan_advanced | Old Athen 0xC01F021C @ 336.799,11.617,435.626 | Avalon 0xC01101F9 @ 2146.273,44.315,3772.396 <br> Mort 0xC0070230 @ 1866.855,47.695,1102.495 <br> Old Athen 0xC020021C @ 406.799,11.618,534.626 <br> Old Athen 0xC01C021C @ 435.948,11.616,561.396 <br> Tir 0xC0050280 @ 387.147,7.999,483.152 <br> Wailing Wastes 0xC0020227 @ 1329.242,25.743,1715.809 <br> West Athens 0xC0180221 @ 359.734,1.604,412.692 | 0xC000049D @ 187.001,5,152.01 | 0xC000049D @ 187.001,5,152.01 -> 0xC002049D @ 197.99,5.001,173 | Medium: same-template sibling door within 30m Review as a supermarket-family candidate; distance is larger than the verified close-door pattern. |
 | 2064 | neut_basic_implants_shop | Borealis 0xC0030320 @ 586.803,68.556,698.497 | Newland City 0xC0060236 @ 256.119,34.813,325.373 | 0xC0010810 @ 191.004,5.01,163.985 | 0xC0010810 @ 191.004,5.01,163.985 -> 0xC0000810 @ 191.003,5.01,154.015 | High-review: same-template paired door within 12m; matches known implant-shop failure pattern No patch. Keep as reference evidence for this interior family. |
 | 2073 | neut_advanced_implants_shop | Borealis 0xC0070320 @ 679.443,69.332,618.09 | Broken Shores 0xC0520299 @ 691.691,11.992,1381.1 <br> Pleasant Meadows 0xC0140276 @ 2298.741,3.395,1824.482 | 0xC0010819 @ 205.004,5.01,205.985 | 0xC0010819 @ 205.004,5.01,205.985 -> 0xC0000819 @ 205.003,5.01,196.015 | High-review: same-template paired door within 12m; matches known implant-shop failure pattern No patch. Keep as reference evidence for this interior family. |
-| 1193 | spec_smarket_neut_basic | Newland City 0xC0040236 @ 289.804,32.585,313.208 | Lush Fields 0xC01A02B7 @ 1511.893,46.822,524.146 <br> Pleasant Meadows 0xC0100276 @ 1190.175,8.591,2353.387 | 0xC00004A9 @ 201.001,5,112.01 |  |  |
 | 565 | Newland Desert |  |  |  |  |  |
 | 4354 | Uncle Bazzits Workshop (Dng) | Newland Desert 0xC0000235 @ 1546.475,31.502,2717.811 |  | 0xC0001102 @ 183.002,6.02,155.985 |  |  |
 | 6553 | Arete Landing |  |  |  |  |  |
@@ -302,21 +300,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 2 | 135856140 | 297401 | Refined ICC Faded Clusters | 209,5.003,191 | Implants/clusters |
 | 2 | 135856141 | 297404 | Refined ICC Bright Clusters | 209,5.003,189 | Implants/clusters |
 | 2 | 135856142 | 297407 | Refined ICC Shiny Clusters | 209,5.003,187 | Implants/clusters |
-
-### 1193 - spec_smarket_neut_basic (6)
-
-- Primary source door: Newland City 0xC0040236 @ 289.804,32.585,313.208
-- Other source doors: Lush Fields 0xC01A02B7 @ 1511.893,46.822,524.146 | Pleasant Meadows 0xC0100276 @ 1190.175,8.591,2353.387
-- Destination door evidence: 0xC00004A9 @ 201.001,5,112.01
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 4 | 78184448 | 99603 | Computers | 199,5,129 | Containers/computers/furniture/specialty/cars |
-| 4 | 78184449 | 99635 | Advanced Cars | 193,5.001,123 | Containers/computers/furniture/specialty/cars |
-| 4 | 78184450 | 120512 | Furniture | 203,5,129 | Containers/computers/furniture/specialty/cars |
-| 4 | 78184451 | 151983 | Toys and Curiosities | 209,5,123 | Containers/computers/furniture/specialty/cars |
-| 4 | 78184452 | 151987 | Specialist Commerce | 209,5,127 | Containers/computers/furniture/specialty/cars |
-| 4 | 78184453 | 151988 | Superior Cars | 193,5,127 | Containers/computers/furniture/specialty/cars |
 
 ### 4354 - Uncle Bazzits Workshop (Dng) (5)
 
