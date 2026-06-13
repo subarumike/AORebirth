@@ -1,6 +1,6 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 295.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 276.
 
 ## Practical Location Summary
 
@@ -8,7 +8,6 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | ---: | --- | --- | ---: | --- |
 | 500 | Parnassos | GM-only / not live-accessible | 85 | Legacy faction core departments (21); Other unresolved vendor terminal (21); Heavenly weapon construction/components/recipes (19); Containers/computers/furniture/specialty/cars (10) |
 | 1184 | ord_smarket_omni_advanced | Likely live-accessible | 23 | Heavenly weapon construction/components/recipes (12); Legacy faction core departments (6); Implants/clusters (2); Clan/Omni device variants (1) |
-| 1182 | ord_smarket_clan_sup | Likely live-accessible | 19 | Heavenly weapon construction/components/recipes (6); Legacy faction core departments (6); Other unresolved vendor terminal (2); Clan/Omni device variants (1) |
 | 4704 | Tower Shop (dungeon) | Likely special/dungeon; verify before travel | 17 | ICC/tower shop special vendors (16); Containers/computers/furniture/specialty/cars (1) |
 | 6007 | BS Signup (dng) | Likely special/dungeon; verify before travel | 17 | OFAB vendors (17) |
 | 1181 | ord_smarket_clan_advanced | Likely live-accessible | 16 | Heavenly weapon construction/components/recipes (6); Legacy faction core departments (5); Clan/Omni device variants (1); Containers/computers/furniture/specialty/cars (1) |
@@ -48,9 +47,57 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 950 | Omni Training | Likely live-accessible | 1 | Startup equipment (1) |
 | 952 | Clan Training | Likely live-accessible | 1 | Startup equipment (1) |
 
+## Door Evidence By Target Playfield
+
+Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidates.csv. Source doors are live navigation evidence; destination and paired-door fields are zoning/remap evidence when internal zoning lands on the wrong side of a door pair.
+
+| Playfield | Location | Primary source door | Other source doors | Destination door(s) | Paired-door candidate | Note |
+| ---: | --- | --- | --- | --- | --- | --- |
+| 500 | Parnassos |  |  |  |  |  |
+| 1184 | ord_smarket_omni_advanced | Omni-1 Trade 0xC02102C6 @ 359.594,8.617,205.877 | Avalon 0xC03A01F9 @ 1782.473,26.252,1249.89 <br> Lush Fields 0xC01302B7 @ 1493.594,11.017,2518.877 <br> Lush Fields 0xC01402B7 @ 1551.764,45.395,492.815 <br> Omni1 Entertainment 0xC04002C1 @ 698.91,18.679,518.703 <br> Omni1 Entertainment 0xC01202C1 @ 784.241,22.762,536.942 <br> Omni-1 Trade 0xC02702C6 @ 234.877,8.617,429.406 <br> Omni-1 Trade 0xC02302C6 @ 572.123,8.617,431.594 <br> Omni-1 Trade 0xC02502C6 @ 572.123,8.617,559.594 <br> Rome Blue 0xC00002DF @ 652.78,22.257,210.701 <br> Rome Green 0xC00102E4 @ 306.051,22.257,210.204 <br> The Longest Road 0xC000031B @ 2124.487,16.961,768.946 | 0xC00004A0 @ 213.001,5,96.01 | 0xC00004A0 @ 213.001,5,96.01 -> 0xC00204A0 @ 201.99,5.001,119 | Medium: same-template sibling door within 30m Review as a supermarket-family candidate; distance is larger than the verified close-door pattern. |
+| 4704 | Tower Shop (dungeon) | Borealis 0xC0180320 @ 729.813,61.686,651.696 | Old Athen 0xC02B021C @ 479.913,9.174,282.706 <br> Rome Blue 0xC00A02DF @ 675.09,22.357,356.184 | 0xC0001260 @ 193.988,9.006,153.992 | 0xC0001260 @ 193.988,9.006,153.992 -> 0xC0011260 @ 178,9.005,157.986 | Medium: same-template sibling door within 30m No patch. Keep as reference evidence for this interior family. |
+| 6007 | BS Signup (dng) |  |  |  |  |  |
+| 1181 | ord_smarket_clan_advanced | Old Athen 0xC01F021C @ 336.799,11.617,435.626 | Avalon 0xC01101F9 @ 2146.273,44.315,3772.396 <br> Mort 0xC0070230 @ 1866.855,47.695,1102.495 <br> Old Athen 0xC020021C @ 406.799,11.618,534.626 <br> Old Athen 0xC01C021C @ 435.948,11.616,561.396 <br> Tir 0xC0050280 @ 387.147,7.999,483.152 <br> Wailing Wastes 0xC0020227 @ 1329.242,25.743,1715.809 <br> West Athens 0xC0180221 @ 359.734,1.604,412.692 | 0xC000049D @ 187.001,5,152.01 | 0xC000049D @ 187.001,5,152.01 -> 0xC002049D @ 197.99,5.001,173 | Medium: same-template sibling door within 30m Review as a supermarket-family candidate; distance is larger than the verified close-door pattern. |
+| 1183 | ord_smarket_omni_basic | Omni-1 Trade 0xC02F02C6 @ 296.877,14.602,426.406 | Avalon 0xC02C01F9 @ 1857.912,26.448,1185.877 <br> Avalon 0xC04301F9 @ 764.898,31.449,1621.898 <br> Clondyke 0xC01A029E @ 1953.685,7.441,3727.682 <br> Lush Fields 0xC01202B7 @ 3275.877,23.617,845.406 <br> Omni Forest 0xC01502CC @ 309.873,10.948,2092.987 <br> Omni1 Entertainment 0xC03B02C1 @ 428.589,19.135,485.982 <br> Omni1 Entertainment 0xC03F02C1 @ 673.028,22.762,519.48 <br> Omni1 Entertainment 0xC01102C1 @ 765.085,19.135,516.507 <br> Omni-1 Trade 0xC02802C6 @ 296.877,14.602,337.406 <br> Omni-1 Trade 0xC02E02C6 @ 366.406,14.602,495.123 <br> Omni-1 Trade 0xC02902C6 @ 381.594,14.602,268.877 <br> Omni-1 Trade 0xC02A02C6 @ 427.594,14.602,268.877 <br> Omni-1 Trade 0xC02D02C6 @ 442.406,14.602,495.123 <br> Omni-1 Trade 0xC02B02C6 @ 510.123,14.602,337.594 <br> Omni-1 Trade 0xC02C02C6 @ 511.123,14.602,426.594 <br> Rome Blue 0xC00102DF @ 653.08,22.257,418.301 <br> Rome Green 0xC00002E4 @ 306.051,22.257,417.804 | 0xC000049F @ 187.001,5,116.01 | 0xC000049F @ 187.001,5,116.01 -> 0xC004049F @ 189.997,5.01,119.015 | High-review: same-template paired door within 12m; matches known implant-shop failure pattern Confirm one matching supermarket/Fair Trade entrance-exit pair, then patch the family. |
+| 2064 | neut_basic_implants_shop | Borealis 0xC0030320 @ 586.803,68.556,698.497 | Newland City 0xC0060236 @ 256.119,34.813,325.373 | 0xC0010810 @ 191.004,5.01,163.985 | 0xC0010810 @ 191.004,5.01,163.985 -> 0xC0000810 @ 191.003,5.01,154.015 | High-review: same-template paired door within 12m; matches known implant-shop failure pattern No patch. Keep as reference evidence for this interior family. |
+| 2073 | neut_advanced_implants_shop | Borealis 0xC0070320 @ 679.443,69.332,618.09 | Broken Shores 0xC0520299 @ 691.691,11.992,1381.1 <br> Pleasant Meadows 0xC0140276 @ 2298.741,3.395,1824.482 | 0xC0010819 @ 205.004,5.01,205.985 | 0xC0010819 @ 205.004,5.01,205.985 -> 0xC0000819 @ 205.003,5.01,196.015 | High-review: same-template paired door within 12m; matches known implant-shop failure pattern No patch. Keep as reference evidence for this interior family. |
+| 1193 | spec_smarket_neut_basic | Newland City 0xC0040236 @ 289.804,32.585,313.208 | Lush Fields 0xC01A02B7 @ 1511.893,46.822,524.146 <br> Pleasant Meadows 0xC0100276 @ 1190.175,8.591,2353.387 | 0xC00004A9 @ 201.001,5,112.01 |  |  |
+| 565 | Newland Desert |  |  |  |  |  |
+| 4354 | Uncle Bazzits Workshop (Dng) | Newland Desert 0xC0000235 @ 1546.475,31.502,2717.811 |  | 0xC0001102 @ 183.002,6.02,155.985 |  |  |
+| 6553 | Arete Landing |  |  |  |  |  |
+| 540 | Old Athen |  |  |  |  |  |
+| 665 | Broken Shores |  |  |  |  |  |
+| 710 | Omni-1 Trade |  |  |  |  |  |
+| 1189 | spec_smarket_clan_advanced | Old Athen 0xC022021C @ 415.201,11.617,519.374 | Old Athen 0xC021021C @ 361.123,11.617,473.594 <br> Tir 0xC00B0280 @ 482.467,8,558.932 | 0xC00004A5 @ 181.001,5,118.01 |  |  |
+| 1190 | spec_smarket_clan_sup | Old Athen 0xC025021C @ 369.799,11.617,497.626 | Tir 0xC0040280 @ 391.774,8.194,544.137 | 0xC00004A6 @ 179.001,5,120.01 |  |  |
+| 1191 | spec_smarket_omni_advanced | Omni-1 Trade 0xC02202C6 @ 572.123,8.617,222.594 | Lush Fields 0xC01502B7 @ 1528.026,45.217,538.591 <br> Omni1 Entertainment 0xC03902C1 @ 855.236,18.681,446.738 <br> Omni-1 Trade 0xC02002C6 @ 334.594,8.617,205.877 <br> Rome Blue 0xC00402DF @ 545.814,18.357,286.939 <br> Rome Green 0xC00402E4 @ 413.114,18.357,287.638 | 0xC00004A7 @ 171.001,5,128.01 |  |  |
+| 1192 | spec_smarket_omni_sup | Omni-1 Trade 0xC02602C6 @ 234.877,8.617,492.406 | Omni1 Entertainment 0xC03802C1 @ 843.923,18.679,435.424 <br> Rome Blue 0xC00302DF @ 545.918,18.357,340.867 <br> Rome Green 0xC00302E4 @ 413.018,18.357,341.567 | 0xC00004A8 @ 169.001,5,134.01 |  |  |
+| 4565 | Hardware Dimenion - Superior | Jobe Plaza 0xC00211B5 @ 193.3,482.791,179.373 |  | 0xC00011D5 @ 41.991,6.004,47.989 |  |  |
+| 600 | Varmint Woods |  |  |  |  |  |
+| 791 | Holes in the Wall |  |  |  |  |  |
+| 954 | Neutral Training | Borealis Backyard 1 0xE7100C08 @ 122.603,39.965,77.115 | Borealis Backyard 10 0xE7100C11 @ 122.603,39.965,77.115 <br> Borealis Backyard 2 0xE7100C09 @ 122.603,39.965,77.115 <br> Borealis Backyard 3 0xE7100C0A @ 122.603,39.965,77.115 <br> Borealis Backyard 4 0xE7100C0B @ 122.603,39.965,77.115 <br> Borealis Backyard 5 0xE7100C0C @ 122.603,39.965,77.115 <br> Borealis Backyard 6 0xE7100C0D @ 122.603,39.965,77.115 <br> Borealis Backyard 7 0xE7100C0E @ 122.603,39.965,77.115 <br> Borealis Backyard 8 0xE7100C0F @ 122.603,39.965,77.115 <br> Borealis Backyard 9 0xE7100C10 @ 122.603,39.965,77.115 <br> Neutral Backyard 0xE71003BB @ 122.603,39.965,77.115 <br> Newland Backyard 1 0xE7100BF4 @ 122.603,39.965,77.115 <br> Newland Backyard 10 0xE7100BFD @ 122.603,39.965,77.115 <br> Newland Backyard 11 0xE7100BFE @ 122.603,39.965,77.115 <br> Newland Backyard 12 0xE7100BFF @ 122.603,39.965,77.115 <br> Newland Backyard 2 0xE7100BF5 @ 122.603,39.965,77.115 <br> Newland Backyard 3 0xE7100BF6 @ 122.603,39.965,77.115 <br> Newland Backyard 4 0xE7100BF7 @ 122.603,39.965,77.115 <br> Newland Backyard 5 0xE7100BF8 @ 122.603,39.965,77.115 <br> Newland Backyard 6 0xE7100BF9 @ 122.603,39.965,77.115 <br> Newland Backyard 7 0xE7100BFA @ 122.603,39.965,77.115 <br> Newland Backyard 8 0xE7100BFB @ 122.603,39.965,77.115 <br> Newland Backyard 9 0xE7100BFC @ 122.603,39.965,77.115 | 0xC00003BA @ 239.886,5.965,69.931 |  |  |
+| 1426 | Clan Registration dng |  |  |  |  |  |
+| 1887 | Treepine Hut | Pleasant Meadows 0xC00E0276 @ 2273.288,4.247,1825.317 |  | 0xC002075F @ 197.005,5,266.009 |  |  |
+| 4364 | Unicorn Outpost |  |  |  |  |  |
+| 4567 | Dimensional Shift - Basic | Jobe Harbor 0xC00211B3 @ 239.129,292.717,407.479 |  | 0xC00011D7 @ 55.988,6.006,47.991 |  |  |
+| 4568 | Dimensional Shift - Advanced | Jobe Market 0xC00511B4 @ 383.93,362.891,362.405 |  | 0xC00011D8 @ 55.988,6.005,47.991 |  |  |
+| 4569 | Dimensional Shift - Superior | Jobe Plaza 0xC00311B5 @ 198.696,482.791,165.968 |  | 0xC00011D9 @ 55.988,6.005,47.991 |  |  |
+| 655 | Andromeda |  |  |  |  |  |
+| 695 | Lush Fields |  |  |  |  |  |
+| 950 | Omni Training | Omni-1 Entertainment Backyard 1 0xE7100BB8 @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 10? 0xE7100BC1 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 11? 0xE7100BC2 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 12? 0xE7100BC3 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 13? 0xE7100BC4 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 14? 0xE7100BC5 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 15? 0xE7100BC6 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 16? 0xE7100BC7 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 17? 0xE7100BC8 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 18? 0xE7100BC9 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 19? 0xE7100BCA @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 2 0xE7100BB9 @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 20? 0xE7100BCB @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 3 0xE7100BBA @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 4 0xE7100BBB @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 5 0xE7100BBC @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 6 0xE7100BBD @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 7 0xE7100BBE @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 8 0xE7100BBF @ 112.143,116.87,101.395 <br> Omni-1 Entertainment Backyard 9 0xE7100BC0 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 1 0xE7100BCC @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 10 0xE7100BD5 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 11 0xE7100BD6 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 12 0xE7100BD7 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 13 0xE7100BD8 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 14 0xE7100BD9 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 15 0xE7100BDA @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 16 0xE7100BDB @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 17 0xE7100BDC @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 18 0xE7100BDD @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 19 0xE7100BDE @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 2 0xE7100BCD @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 20 0xE7100BDF @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 3 0xE7100BCE @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 4 0xE7100BCF @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 5 0xE7100BD0 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 6 0xE7100BD1 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 7 0xE7100BD2 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 8 0xE7100BD3 @ 112.143,116.87,101.395 <br> Omni-1 Trade Backyard 9 0xE7100BD4 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 1 0xE7100BE0 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 10 0xE7100BE9 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 2 0xE7100BE1 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 3 0xE7100BE2 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 4 0xE7100BE3 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 5 0xE7100BE4 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 6 0xE7100BE5 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 7 0xE7100BE6 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 8 0xE7100BE7 @ 112.143,116.87,101.395 <br> Rome Blue Backyard 9 0xE7100BE8 @ 112.143,116.87,101.395 <br> Rome Green Backyard 1 0xE7100BEA @ 112.143,116.87,101.395 <br> Rome Green Backyard 10 0xE7100BF3 @ 112.143,116.87,101.395 <br> Rome Green Backyard 2 0xE7100BEB @ 112.143,116.87,101.395 <br> Rome Green Backyard 3 0xE7100BEC @ 112.143,116.87,101.395 <br> Rome Green Backyard 4 0xE7100BED @ 112.143,116.87,101.395 <br> Rome Green Backyard 5 0xE7100BEE @ 112.143,116.87,101.395 <br> Rome Green Backyard 6 0xE7100BEF @ 112.143,116.87,101.395 <br> Rome Green Backyard 7 0xE7100BF0 @ 112.143,116.87,101.395 <br> Rome Green Backyard 8 0xE7100BF1 @ 112.143,116.87,101.395 <br> Rome Green Backyard 9 0xE7100BF2 @ 112.143,116.87,101.395 | 0xC00003B6 @ 52.597,15.87,55.136 |  |  |
+| 952 | Clan Training | Clan Backyard 0xE71003B9 @ 77.749,25.859,59.156 | Old Athen Backyard 1 0xE7100C30 @ 77.749,25.859,59.156 <br> Old Athen Backyard 10 0xE7100C39 @ 77.749,25.859,59.156 <br> Old Athen Backyard 11 0xE7100C3A @ 77.749,25.859,59.156 <br> Old Athen Backyard 12 0xE7100C3B @ 77.749,25.859,59.156 <br> Old Athen Backyard 13 0xE7100C3C @ 77.749,25.859,59.156 <br> Old Athen Backyard 14 0xE7100C3D @ 77.749,25.859,59.156 <br> Old Athen Backyard 15 0xE7100C3E @ 77.749,25.859,59.156 <br> Old Athen Backyard 16 0xE7100C3F @ 77.749,25.859,59.156 <br> Old Athen Backyard 17 0xE7100C40 @ 77.749,25.859,59.156 <br> Old Athen Backyard 18 0xE7100C41 @ 77.749,25.859,59.156 <br> Old Athen Backyard 19 0xE7100C42 @ 77.749,25.859,59.156 <br> Old Athen Backyard 2 0xE7100C31 @ 77.749,25.859,59.156 <br> Old Athen Backyard 20 0xE7100C43 @ 77.749,25.859,59.156 <br> Old Athen Backyard 3 0xE7100C32 @ 77.749,25.859,59.156 <br> Old Athen Backyard 4 0xE7100C33 @ 77.749,25.859,59.156 <br> Old Athen Backyard 5 0xE7100C34 @ 77.749,25.859,59.156 <br> Old Athen Backyard 6 0xE7100C35 @ 77.749,25.859,59.156 <br> Old Athen Backyard 7 0xE7100C36 @ 77.749,25.859,59.156 <br> Old Athen Backyard 8 0xE7100C37 @ 77.749,25.859,59.156 <br> Old Athen Backyard 9 0xE7100C38 @ 77.749,25.859,59.156 <br> Tir Backyard 1 0xE7100C1C @ 77.749,25.859,59.156 <br> Tir Backyard 10 0xE7100C25 @ 77.749,25.859,59.156 <br> Tir Backyard 11 0xE7100C26 @ 77.749,25.859,59.156 <br> Tir Backyard 12 0xE7100C27 @ 77.749,25.859,59.156 <br> Tir Backyard 13 0xE7100C28 @ 77.749,25.859,59.156 <br> Tir Backyard 14 0xE7100C29 @ 77.749,25.859,59.156 <br> Tir Backyard 15 0xE7100C2A @ 77.749,25.859,59.156 <br> Tir Backyard 16 0xE7100C2B @ 77.749,25.859,59.156 <br> Tir Backyard 17 0xE7100C2C @ 77.749,25.859,59.156 <br> Tir Backyard 18 0xE7100C2D @ 77.749,25.859,59.156 <br> Tir Backyard 2 0xE7100C1D @ 77.749,25.859,59.156 <br> Tir Backyard 3 0xE7100C1E @ 77.749,25.859,59.156 <br> Tir Backyard 4 0xE7100C1F @ 77.749,25.859,59.156 <br> Tir Backyard 5 0xE7100C20 @ 77.749,25.859,59.156 <br> Tir Backyard 6 0xE7100C21 @ 77.749,25.859,59.156 <br> Tir Backyard 7 0xE7100C22 @ 77.749,25.859,59.156 <br> Tir Backyard 8 0xE7100C23 @ 77.749,25.859,59.156 <br> Tir Backyard 9 0xE7100C24 @ 77.749,25.859,59.156 <br> West Athen Backyard 1 0xE7100C44 @ 77.749,25.859,59.156 <br> West Athen Backyard 10 0xE7100C4D @ 77.749,25.859,59.156 <br> West Athen Backyard 2 0xE7100C45 @ 77.749,25.859,59.156 <br> West Athen Backyard 3 0xE7100C46 @ 77.749,25.859,59.156 <br> West Athen Backyard 4 0xE7100C47 @ 77.749,25.859,59.156 <br> West Athen Backyard 5 0xE7100C48 @ 77.749,25.859,59.156 <br> West Athen Backyard 6 0xE7100C49 @ 77.749,25.859,59.156 <br> West Athen Backyard 7 0xE7100C4A @ 77.749,25.859,59.156 <br> West Athen Backyard 8 0xE7100C4B @ 77.749,25.859,59.156 <br> West Athen Backyard 9 0xE7100C4C @ 77.749,25.859,59.156 | 0xC00103B8 @ 40.238,14.859,70.092 |  |  |
+| 1427 | Omni registration dng |  |  |  |  |  |
+| 1428 | Neutral organisation dng |  |  |  |  |  |
+| 4563 | Hardware Dimension - Basic | Jobe Harbor 0xC00411B3 @ 191.074,282.616,331.007 |  | 0xC00011D3 @ 41.991,6.004,47.989 |  |  |
+| 4564 | Hardware Dimension - Advanced | Jobe Market 0xC00311B4 @ 447.659,362.737,381.7 |  | 0xC00011D4 @ 41.991,6.004,47.989 |  |  |
+| 6131 | ICC Holodeck Alien Training | Arete Landing 0xC0031999 |  | 0xC00117F3 @ 186.9,6.017,114 |  | Warnings: missing source statel |
+| 7011 | Freelancers Inc. HQ - Rome |  |  |  |  |  |
+| 7012 | Freelancers Inc. HQ - Old Athen |  |  |  |  |  |
+
 ## Targets By Location
 
 ### 500 - Parnassos (85)
+
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -142,6 +189,11 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 1184 - ord_smarket_omni_advanced (23)
 
+- Primary source door: Omni-1 Trade 0xC02102C6 @ 359.594,8.617,205.877
+- Other source doors: Avalon 0xC03A01F9 @ 1782.473,26.252,1249.89 | Lush Fields 0xC01302B7 @ 1493.594,11.017,2518.877 | Lush Fields 0xC01402B7 @ 1551.764,45.395,492.815 | Omni1 Entertainment 0xC04002C1 @ 698.91,18.679,518.703 | Omni1 Entertainment 0xC01202C1 @ 784.241,22.762,536.942 | Omni-1 Trade 0xC02702C6 @ 234.877,8.617,429.406 | Omni-1 Trade 0xC02302C6 @ 572.123,8.617,431.594 | Omni-1 Trade 0xC02502C6 @ 572.123,8.617,559.594 | Rome Blue 0xC00002DF @ 652.78,22.257,210.701 | Rome Green 0xC00102E4 @ 306.051,22.257,210.204 | The Longest Road 0xC000031B @ 2124.487,16.961,768.946
+- Destination door evidence: 0xC00004A0 @ 213.001,5,96.01
+- Paired-door candidate: 0xC00004A0 @ 213.001,5,96.01 -> 0xC00204A0 @ 201.99,5.001,119 (Medium; same-template sibling door within 30m)
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 1 | 77594638 | 155503 | Melee Weapon Recipes - Advanced | 155,5,107 | Heavenly weapon construction/components/recipes |
@@ -168,31 +220,12 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 6 | 77594690 | 117649 | OT Maps | 219.032,5,106.9 | Maps |
 | 6 | 77594692 | 155606 | Omni Advanced Devices | 214,5.001,115 | Clan/Omni device variants |
 
-### 1182 - ord_smarket_clan_sup (19)
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 1 | 77463565 | 155283 | Superior Ranged Weapon Construction Kits | 167,13.101,199 | Heavenly weapon construction/components/recipes |
-| 1 | 77463566 | 155235 | Superior Melee Weapon Construction Kits | 167,13.101,204 | Heavenly weapon construction/components/recipes |
-| 1 | 77463571 | 155492 | Ranged Weapon Components - Superior | 177,7.101,193 | Heavenly weapon construction/components/recipes |
-| 1 | 77463579 | 155298 | Melee Weapon Components - Superior | 177,7.101,199 | Heavenly weapon construction/components/recipes |
-| 1 | 77463581 | 155507 | Ranged Weapon Recipes - Superior | 207,13.101,219 | Heavenly weapon construction/components/recipes |
-| 1 | 77463582 | 155504 | Melee Weapon Recipes - Superior | 207,13.101,212 | Heavenly weapon construction/components/recipes |
-| 2 | 77463570 | 155224 | Superior Implants | 167,13.101,225 | Implants/clusters |
-| 3 | 77463585 | 99534 | Clan Superior Attacks | 177,6.1,168 | Legacy faction core departments |
-| 3 | 77463586 | 99518 | Clan Superior Augmentations | 177,6.1,162 | Legacy faction core departments |
-| 3 | 77463587 | 99529 | Clan Superior Medical Supplies | 197,8.101,172 | Legacy faction core departments |
-| 3 | 77463588 | 99530 | Clan Superior Tools | 177,6.1,156 | Legacy faction core departments |
-| 3 | 77463589 | 99507 | Clan Superior Weapons | 182,6.101,175 | Legacy faction core departments |
-| 3 | 77463592 | 99504 | Clan Superior Armor | 177,6.1,174 | Legacy faction core departments |
-| 4 | 77463591 | 99540 | Clan Containers | 193,6.1,155 | Containers/computers/furniture/specialty/cars |
-| 6 | 77463590 | 99526 | Clan Clothes | 197,6.1,158 | Faction clothes/fashion |
-| 6 | 77463593 | 117749 | Clan Maps | 179,6.1,171 | Maps |
-| 6 | 77463594 | 155608 | Clan Superior Devices | 179,6.101,159 | Clan/Omni device variants |
-| 7 | 77463574 | 155498 | Armour and Clothing Components - Superior | 177,7.101,215 | Other unresolved vendor terminal |
-| 7 | 77463577 | 155313 | Nano Crystal Components - Superior | 197,7.101,199 | Other unresolved vendor terminal |
-
 ### 4704 - Tower Shop (dungeon) (17)
+
+- Primary source door: Borealis 0xC0180320 @ 729.813,61.686,651.696
+- Other source doors: Old Athen 0xC02B021C @ 479.913,9.174,282.706 | Rome Blue 0xC00A02DF @ 675.09,22.357,356.184
+- Destination door evidence: 0xC0001260 @ 193.988,9.006,153.992
+- Paired-door candidate: 0xC0001260 @ 193.988,9.006,153.992 -> 0xC0011260 @ 178,9.005,157.986 (Medium; same-template sibling door within 30m)
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -216,6 +249,7 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 6007 - BS Signup (dng) (17)
 
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 5 | 393674752 | 266562 | Ofab Adventurer Vendor | 220.01,6.02,232.985 | OFAB vendors |
@@ -238,6 +272,11 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 1181 - ord_smarket_clan_advanced (16)
 
+- Primary source door: Old Athen 0xC01F021C @ 336.799,11.617,435.626
+- Other source doors: Avalon 0xC01101F9 @ 2146.273,44.315,3772.396 | Mort 0xC0070230 @ 1866.855,47.695,1102.495 | Old Athen 0xC020021C @ 406.799,11.618,534.626 | Old Athen 0xC01C021C @ 435.948,11.616,561.396 | Tir 0xC0050280 @ 387.147,7.999,483.152 | Wailing Wastes 0xC0020227 @ 1329.242,25.743,1715.809 | West Athens 0xC0180221 @ 359.734,1.604,412.692
+- Destination door evidence: 0xC000049D @ 187.001,5,152.01
+- Paired-door candidate: 0xC000049D @ 187.001,5,152.01 -> 0xC002049D @ 197.99,5.001,173 (Medium; same-template sibling door within 30m)
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 1 | 77398040 | 155282 | Advanced Ranged Weapon Construction Kits | 167,11.001,201 | Heavenly weapon construction/components/recipes |
@@ -259,6 +298,11 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 1183 - ord_smarket_omni_basic (13)
 
+- Primary source door: Omni-1 Trade 0xC02F02C6 @ 296.877,14.602,426.406
+- Other source doors: Avalon 0xC02C01F9 @ 1857.912,26.448,1185.877 | Avalon 0xC04301F9 @ 764.898,31.449,1621.898 | Clondyke 0xC01A029E @ 1953.685,7.441,3727.682 | Lush Fields 0xC01202B7 @ 3275.877,23.617,845.406 | Omni Forest 0xC01502CC @ 309.873,10.948,2092.987 | Omni1 Entertainment 0xC03B02C1 @ 428.589,19.135,485.982 | Omni1 Entertainment 0xC03F02C1 @ 673.028,22.762,519.48 | Omni1 Entertainment 0xC01102C1 @ 765.085,19.135,516.507 | Omni-1 Trade 0xC02802C6 @ 296.877,14.602,337.406 | Omni-1 Trade 0xC02E02C6 @ 366.406,14.602,495.123 | Omni-1 Trade 0xC02902C6 @ 381.594,14.602,268.877 | Omni-1 Trade 0xC02A02C6 @ 427.594,14.602,268.877 | Omni-1 Trade 0xC02D02C6 @ 442.406,14.602,495.123 | Omni-1 Trade 0xC02B02C6 @ 510.123,14.602,337.594 | Omni-1 Trade 0xC02C02C6 @ 511.123,14.602,426.594 | Rome Blue 0xC00102DF @ 653.08,22.257,418.301 | Rome Green 0xC00002E4 @ 306.051,22.257,417.804
+- Destination door evidence: 0xC000049F @ 187.001,5,116.01
+- Paired-door candidate: 0xC000049F @ 187.001,5,116.01 -> 0xC004049F @ 189.997,5.01,119.015 (High-review; same-template paired door within 12m; matches known implant-shop failure pattern)
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 2 | 77529149 | 162158 | Basic Omni-Tek Adventurer Specific Implants | 212.6,5.01,133.6 | Implants/clusters |
@@ -277,6 +321,11 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 2064 - neut_basic_implants_shop (12)
 
+- Primary source door: Borealis 0xC0030320 @ 586.803,68.556,698.497
+- Other source doors: Newland City 0xC0060236 @ 256.119,34.813,325.373
+- Destination door evidence: 0xC0010810 @ 191.004,5.01,163.985
+- Paired-door candidate: 0xC0010810 @ 191.004,5.01,163.985 -> 0xC0000810 @ 191.003,5.01,154.015 (High-review; same-template paired door within 12m; matches known implant-shop failure pattern)
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 2 | 135266305 | 297396 | Basic ICC Implants | 186.965,5.01,155.058 | Implants/clusters |
@@ -293,6 +342,11 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 2 | 135266318 | 297407 | Refined ICC Shiny Clusters | 195,5.003,145 | Implants/clusters |
 
 ### 2073 - neut_advanced_implants_shop (12)
+
+- Primary source door: Borealis 0xC0070320 @ 679.443,69.332,618.09
+- Other source doors: Broken Shores 0xC0520299 @ 691.691,11.992,1381.1 | Pleasant Meadows 0xC0140276 @ 2298.741,3.395,1824.482
+- Destination door evidence: 0xC0010819 @ 205.004,5.01,205.985
+- Paired-door candidate: 0xC0010819 @ 205.004,5.01,205.985 -> 0xC0000819 @ 205.003,5.01,196.015 (High-review; same-template paired door within 12m; matches known implant-shop failure pattern)
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -311,6 +365,10 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 1193 - spec_smarket_neut_basic (6)
 
+- Primary source door: Newland City 0xC0040236 @ 289.804,32.585,313.208
+- Other source doors: Lush Fields 0xC01A02B7 @ 1511.893,46.822,524.146 | Pleasant Meadows 0xC0100276 @ 1190.175,8.591,2353.387
+- Destination door evidence: 0xC00004A9 @ 201.001,5,112.01
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 4 | 78184448 | 99603 | Computers | 199,5,129 | Containers/computers/furniture/specialty/cars |
@@ -322,6 +380,9 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 4354 - Uncle Bazzits Workshop (Dng) (5)
 
+- Primary source door: Newland Desert 0xC0000235 @ 1546.475,31.502,2717.811
+- Destination door evidence: 0xC0001102 @ 183.002,6.02,155.985
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 6 | 285343744 | 247744 | Maria's Fashion | 189.677,6.02,146.744 | Faction clothes/fashion |
@@ -331,6 +392,7 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 7 | 285343748 | 255997 | Uncle Bazzit's Furnishings | 176.295,6.02,145.301 | Other unresolved vendor terminal |
 
 ### 565 - Newland Desert (5)
+
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -342,6 +404,7 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 6553 - Arete Landing (5)
 
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 2 | 429457409 | 297323 | ICC Shiny Clusters | 3431.5,9.3,790.5 | Implants/clusters |
@@ -352,6 +415,10 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 1189 - spec_smarket_clan_advanced (4)
 
+- Primary source door: Old Athen 0xC022021C @ 415.201,11.617,519.374
+- Other source doors: Old Athen 0xC021021C @ 361.123,11.617,473.594 | Tir 0xC00B0280 @ 482.467,8,558.932
+- Destination door evidence: 0xC00004A5 @ 181.001,5,118.01
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 4 | 77922304 | 99537 | Clan Toys and Curiosities | 176.5,5,133.104 | Containers/computers/furniture/specialty/cars |
@@ -360,6 +427,10 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 4 | 77922307 | 120511 | Clan Furniture | 185.5,5,133 | Containers/computers/furniture/specialty/cars |
 
 ### 1190 - spec_smarket_clan_sup (4)
+
+- Primary source door: Old Athen 0xC025021C @ 369.799,11.617,497.626
+- Other source doors: Tir 0xC0040280 @ 391.774,8.194,544.137
+- Destination door evidence: 0xC00004A6 @ 179.001,5,120.01
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -370,6 +441,10 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 1191 - spec_smarket_omni_advanced (4)
 
+- Primary source door: Omni-1 Trade 0xC02202C6 @ 572.123,8.617,222.594
+- Other source doors: Lush Fields 0xC01502B7 @ 1528.026,45.217,538.591 | Omni1 Entertainment 0xC03902C1 @ 855.236,18.681,446.738 | Omni-1 Trade 0xC02002C6 @ 334.594,8.617,205.877 | Rome Blue 0xC00402DF @ 545.814,18.357,286.939 | Rome Green 0xC00402E4 @ 413.114,18.357,287.638
+- Destination door evidence: 0xC00004A7 @ 171.001,5,128.01
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 4 | 78053376 | 99535 | OT Advanced Cars | 168,5,143 | Containers/computers/furniture/specialty/cars |
@@ -378,6 +453,10 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 4 | 78053379 | 120510 | OT Furniture | 171,5,139.7 | Containers/computers/furniture/specialty/cars |
 
 ### 1192 - spec_smarket_omni_sup (4)
+
+- Primary source door: Omni-1 Trade 0xC02602C6 @ 234.877,8.617,492.406
+- Other source doors: Omni1 Entertainment 0xC03802C1 @ 843.923,18.679,435.424 | Rome Blue 0xC00302DF @ 545.918,18.357,340.867 | Rome Green 0xC00302E4 @ 413.018,18.357,341.567
+- Destination door evidence: 0xC00004A8 @ 169.001,5,134.01
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -388,6 +467,7 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 540 - Old Athen (4)
 
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 6 | 35389440 | 99569 | Clan Basic Startup Equipment | 442,8.001,330 | Startup equipment |
@@ -396,6 +476,7 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 6 | 35389446 | 99569 | Clan Basic Startup Equipment | 418,8,458 | Startup equipment |
 
 ### 665 - Broken Shores (4)
+
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -406,6 +487,7 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 710 - Omni-1 Trade (4)
 
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 6 | 46530560 | 99555 | OT Basic Startup Equipment | 246,8,413 | Startup equipment |
@@ -415,6 +497,9 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 4565 - Hardware Dimenion - Superior (3)
 
+- Primary source door: Jobe Plaza 0xC00211B5 @ 193.3,482.791,179.373
+- Destination door evidence: 0xC00011D5 @ 41.991,6.004,47.989
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 6 | 299171841 | 151973 | Superior Armor | 33.65,2.1,41.5 | Classic armor terminals |
@@ -423,12 +508,16 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 1426 - Clan Registration dng (2)
 
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 7 | 93454336 | 25885 | Budget Ammunition Shop | 166.991,5.01,235.899 | Other unresolved vendor terminal |
 | 7 | 93454337 | 81799 | Organization registration shop | 171.952,5.01,238.745 | Other unresolved vendor terminal |
 
 ### 1887 - Treepine Hut (2)
+
+- Primary source door: Pleasant Meadows 0xC00E0276 @ 2273.288,4.247,1825.317
+- Destination door evidence: 0xC002075F @ 197.005,5,266.009
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -437,12 +526,16 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 4364 - Unicorn Outpost (2)
 
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 7 | 285999104 | 256457 | Unicorn Supply Depot | 146.464,100.907,156.153 | Other unresolved vendor terminal |
 | 7 | 285999105 | 287037 | Unicorn Medical Supply Depot | 143.328,100.886,152.997 | Other unresolved vendor terminal |
 
 ### 4567 - Dimensional Shift - Basic (2)
+
+- Primary source door: Jobe Harbor 0xC00211B3 @ 239.129,292.717,407.479
+- Destination door evidence: 0xC00011D7 @ 55.988,6.006,47.991
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -451,12 +544,18 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 4568 - Dimensional Shift - Advanced (2)
 
+- Primary source door: Jobe Market 0xC00511B4 @ 383.93,362.891,362.405
+- Destination door evidence: 0xC00011D8 @ 55.988,6.005,47.991
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 2 | 299368450 | 155223 | Advanced Implants | 46.9,2.1,29.2 | Implants/clusters |
 | 7 | 299368449 | 220329 | Costly Regenerative Supplies --- 1-90 | 28.1,2.1,40.1 | Other unresolved vendor terminal |
 
 ### 4569 - Dimensional Shift - Superior (2)
+
+- Primary source door: Jobe Plaza 0xC00311B5 @ 198.696,482.791,165.968
+- Destination door evidence: 0xC00011D9 @ 55.988,6.005,47.991
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -465,12 +564,14 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 600 - Varmint Woods (2)
 
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 3 | 39321600 | 99479 | OT Advanced Weapons | 3856.8,20.7,1934.4 | Legacy faction core departments |
 | 3 | 39321601 | 99482 | OT Advanced Medical Supplies | 3858,20.727,1934.4 | Legacy faction core departments |
 
 ### 791 - Holes in the Wall (2)
+
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -479,6 +580,10 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 954 - Neutral Training (2)
 
+- Primary source door: Borealis Backyard 1 0xE7100C08 @ 122.603,39.965,77.115
+- Other source doors: Borealis Backyard 10 0xE7100C11 @ 122.603,39.965,77.115 | Borealis Backyard 2 0xE7100C09 @ 122.603,39.965,77.115 | Borealis Backyard 3 0xE7100C0A @ 122.603,39.965,77.115 | Borealis Backyard 4 0xE7100C0B @ 122.603,39.965,77.115 | Borealis Backyard 5 0xE7100C0C @ 122.603,39.965,77.115 | Borealis Backyard 6 0xE7100C0D @ 122.603,39.965,77.115 | Borealis Backyard 7 0xE7100C0E @ 122.603,39.965,77.115 | Borealis Backyard 8 0xE7100C0F @ 122.603,39.965,77.115 | Borealis Backyard 9 0xE7100C10 @ 122.603,39.965,77.115 | Neutral Backyard 0xE71003BB @ 122.603,39.965,77.115 | Newland Backyard 1 0xE7100BF4 @ 122.603,39.965,77.115 | Newland Backyard 10 0xE7100BFD @ 122.603,39.965,77.115 | Newland Backyard 11 0xE7100BFE @ 122.603,39.965,77.115 | Newland Backyard 12 0xE7100BFF @ 122.603,39.965,77.115 | Newland Backyard 2 0xE7100BF5 @ 122.603,39.965,77.115 | Newland Backyard 3 0xE7100BF6 @ 122.603,39.965,77.115 | Newland Backyard 4 0xE7100BF7 @ 122.603,39.965,77.115 | Newland Backyard 5 0xE7100BF8 @ 122.603,39.965,77.115 | Newland Backyard 6 0xE7100BF9 @ 122.603,39.965,77.115 | Newland Backyard 7 0xE7100BFA @ 122.603,39.965,77.115 | Newland Backyard 8 0xE7100BFB @ 122.603,39.965,77.115 | Newland Backyard 9 0xE7100BFC @ 122.603,39.965,77.115
+- Destination door evidence: 0xC00003BA @ 239.886,5.965,69.931
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 6 | 62521344 | 99643 | Basic Startup Equipment | 227.013,6,83.073 | Startup equipment |
@@ -486,11 +591,13 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 1427 - Omni registration dng (1)
 
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 7 | 93519872 | 81799 | Organization registration shop | 201.952,5,172.745 | Other unresolved vendor terminal |
 
 ### 1428 - Neutral organisation dng (1)
+
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -498,11 +605,17 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 4563 - Hardware Dimension - Basic (1)
 
+- Primary source door: Jobe Harbor 0xC00411B3 @ 191.074,282.616,331.007
+- Destination door evidence: 0xC00011D3 @ 41.991,6.004,47.989
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 6 | 299040769 | 99570 | Basic Armor | 33.65,2.1,41.5 | Classic armor terminals |
 
 ### 4564 - Hardware Dimension - Advanced (1)
+
+- Primary source door: Jobe Market 0xC00311B4 @ 447.659,362.737,381.7
+- Destination door evidence: 0xC00011D4 @ 41.991,6.004,47.989
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -510,11 +623,15 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 6131 - ICC Holodeck Alien Training (1)
 
+- Primary source door: Arete Landing 0xC0031999
+- Destination door evidence: 0xC00117F3 @ 186.9,6.017,114
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 7 | 401801216 | 287476 | ICC Starter Equipment | 195.672,6.017,130.331 | Other unresolved vendor terminal |
 
 ### 655 - Andromeda (1)
+
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -522,11 +639,13 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 695 - Lush Fields (1)
 
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 6 | 45547520 | 99643 | Basic Startup Equipment | 3277,7,2938 | Startup equipment |
 
 ### 7011 - Freelancers Inc. HQ - Rome (1)
+
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
@@ -534,17 +653,26 @@ Generated from current vendor coverage after excluding non-shop statel templates
 
 ### 7012 - Freelancers Inc. HQ - Old Athen (1)
 
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 7 | 459538432 | 284692 | Agency Shop | 92.2,2.01,102 | Other unresolved vendor terminal |
 
 ### 950 - Omni Training (1)
 
+- Primary source door: Omni-1 Entertainment Backyard 1 0xE7100BB8 @ 112.143,116.87,101.395
+- Other source doors: Omni-1 Entertainment Backyard 10? 0xE7100BC1 @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 11? 0xE7100BC2 @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 12? 0xE7100BC3 @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 13? 0xE7100BC4 @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 14? 0xE7100BC5 @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 15? 0xE7100BC6 @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 16? 0xE7100BC7 @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 17? 0xE7100BC8 @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 18? 0xE7100BC9 @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 19? 0xE7100BCA @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 2 0xE7100BB9 @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 20? 0xE7100BCB @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 3 0xE7100BBA @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 4 0xE7100BBB @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 5 0xE7100BBC @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 6 0xE7100BBD @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 7 0xE7100BBE @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 8 0xE7100BBF @ 112.143,116.87,101.395 | Omni-1 Entertainment Backyard 9 0xE7100BC0 @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 1 0xE7100BCC @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 10 0xE7100BD5 @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 11 0xE7100BD6 @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 12 0xE7100BD7 @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 13 0xE7100BD8 @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 14 0xE7100BD9 @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 15 0xE7100BDA @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 16 0xE7100BDB @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 17 0xE7100BDC @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 18 0xE7100BDD @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 19 0xE7100BDE @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 2 0xE7100BCD @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 20 0xE7100BDF @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 3 0xE7100BCE @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 4 0xE7100BCF @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 5 0xE7100BD0 @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 6 0xE7100BD1 @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 7 0xE7100BD2 @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 8 0xE7100BD3 @ 112.143,116.87,101.395 | Omni-1 Trade Backyard 9 0xE7100BD4 @ 112.143,116.87,101.395 | Rome Blue Backyard 1 0xE7100BE0 @ 112.143,116.87,101.395 | Rome Blue Backyard 10 0xE7100BE9 @ 112.143,116.87,101.395 | Rome Blue Backyard 2 0xE7100BE1 @ 112.143,116.87,101.395 | Rome Blue Backyard 3 0xE7100BE2 @ 112.143,116.87,101.395 | Rome Blue Backyard 4 0xE7100BE3 @ 112.143,116.87,101.395 | Rome Blue Backyard 5 0xE7100BE4 @ 112.143,116.87,101.395 | Rome Blue Backyard 6 0xE7100BE5 @ 112.143,116.87,101.395 | Rome Blue Backyard 7 0xE7100BE6 @ 112.143,116.87,101.395 | Rome Blue Backyard 8 0xE7100BE7 @ 112.143,116.87,101.395 | Rome Blue Backyard 9 0xE7100BE8 @ 112.143,116.87,101.395 | Rome Green Backyard 1 0xE7100BEA @ 112.143,116.87,101.395 | Rome Green Backyard 10 0xE7100BF3 @ 112.143,116.87,101.395 | Rome Green Backyard 2 0xE7100BEB @ 112.143,116.87,101.395 | Rome Green Backyard 3 0xE7100BEC @ 112.143,116.87,101.395 | Rome Green Backyard 4 0xE7100BED @ 112.143,116.87,101.395 | Rome Green Backyard 5 0xE7100BEE @ 112.143,116.87,101.395 | Rome Green Backyard 6 0xE7100BEF @ 112.143,116.87,101.395 | Rome Green Backyard 7 0xE7100BF0 @ 112.143,116.87,101.395 | Rome Green Backyard 8 0xE7100BF1 @ 112.143,116.87,101.395 | Rome Green Backyard 9 0xE7100BF2 @ 112.143,116.87,101.395
+- Destination door evidence: 0xC00003B6 @ 52.597,15.87,55.136
+
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 6 | 62259200 | 100035 | Startup Shop! | 60,14,50 | Startup equipment |
 
 ### 952 - Clan Training (1)
+
+- Primary source door: Clan Backyard 0xE71003B9 @ 77.749,25.859,59.156
+- Other source doors: Old Athen Backyard 1 0xE7100C30 @ 77.749,25.859,59.156 | Old Athen Backyard 10 0xE7100C39 @ 77.749,25.859,59.156 | Old Athen Backyard 11 0xE7100C3A @ 77.749,25.859,59.156 | Old Athen Backyard 12 0xE7100C3B @ 77.749,25.859,59.156 | Old Athen Backyard 13 0xE7100C3C @ 77.749,25.859,59.156 | Old Athen Backyard 14 0xE7100C3D @ 77.749,25.859,59.156 | Old Athen Backyard 15 0xE7100C3E @ 77.749,25.859,59.156 | Old Athen Backyard 16 0xE7100C3F @ 77.749,25.859,59.156 | Old Athen Backyard 17 0xE7100C40 @ 77.749,25.859,59.156 | Old Athen Backyard 18 0xE7100C41 @ 77.749,25.859,59.156 | Old Athen Backyard 19 0xE7100C42 @ 77.749,25.859,59.156 | Old Athen Backyard 2 0xE7100C31 @ 77.749,25.859,59.156 | Old Athen Backyard 20 0xE7100C43 @ 77.749,25.859,59.156 | Old Athen Backyard 3 0xE7100C32 @ 77.749,25.859,59.156 | Old Athen Backyard 4 0xE7100C33 @ 77.749,25.859,59.156 | Old Athen Backyard 5 0xE7100C34 @ 77.749,25.859,59.156 | Old Athen Backyard 6 0xE7100C35 @ 77.749,25.859,59.156 | Old Athen Backyard 7 0xE7100C36 @ 77.749,25.859,59.156 | Old Athen Backyard 8 0xE7100C37 @ 77.749,25.859,59.156 | Old Athen Backyard 9 0xE7100C38 @ 77.749,25.859,59.156 | Tir Backyard 1 0xE7100C1C @ 77.749,25.859,59.156 | Tir Backyard 10 0xE7100C25 @ 77.749,25.859,59.156 | Tir Backyard 11 0xE7100C26 @ 77.749,25.859,59.156 | Tir Backyard 12 0xE7100C27 @ 77.749,25.859,59.156 | Tir Backyard 13 0xE7100C28 @ 77.749,25.859,59.156 | Tir Backyard 14 0xE7100C29 @ 77.749,25.859,59.156 | Tir Backyard 15 0xE7100C2A @ 77.749,25.859,59.156 | Tir Backyard 16 0xE7100C2B @ 77.749,25.859,59.156 | Tir Backyard 17 0xE7100C2C @ 77.749,25.859,59.156 | Tir Backyard 18 0xE7100C2D @ 77.749,25.859,59.156 | Tir Backyard 2 0xE7100C1D @ 77.749,25.859,59.156 | Tir Backyard 3 0xE7100C1E @ 77.749,25.859,59.156 | Tir Backyard 4 0xE7100C1F @ 77.749,25.859,59.156 | Tir Backyard 5 0xE7100C20 @ 77.749,25.859,59.156 | Tir Backyard 6 0xE7100C21 @ 77.749,25.859,59.156 | Tir Backyard 7 0xE7100C22 @ 77.749,25.859,59.156 | Tir Backyard 8 0xE7100C23 @ 77.749,25.859,59.156 | Tir Backyard 9 0xE7100C24 @ 77.749,25.859,59.156 | West Athen Backyard 1 0xE7100C44 @ 77.749,25.859,59.156 | West Athen Backyard 10 0xE7100C4D @ 77.749,25.859,59.156 | West Athen Backyard 2 0xE7100C45 @ 77.749,25.859,59.156 | West Athen Backyard 3 0xE7100C46 @ 77.749,25.859,59.156 | West Athen Backyard 4 0xE7100C47 @ 77.749,25.859,59.156 | West Athen Backyard 5 0xE7100C48 @ 77.749,25.859,59.156 | West Athen Backyard 6 0xE7100C49 @ 77.749,25.859,59.156 | West Athen Backyard 7 0xE7100C4A @ 77.749,25.859,59.156 | West Athen Backyard 8 0xE7100C4B @ 77.749,25.859,59.156 | West Athen Backyard 9 0xE7100C4C @ 77.749,25.859,59.156
+- Destination door evidence: 0xC00103B8 @ 40.238,14.859,70.092
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |

@@ -6,7 +6,7 @@ This is the primary handoff file. Update it before ending a work session.
 
 ## Current Objective
 
-Stabilize CellAO behavior using packet evidence, local playtests, and focused source assertions. Inventory, corpse loot, corpse credits, player trade, and vendor buy/sell/close live persistence verification are complete for the documented repaired flows. The next highest-value unfinished area is static vendor coverage: broad shop stock data still has documented gaps, while the transaction behavior itself is now verified. Latest live-capture vendor milestone: Clan Basic General Shop import from AOSharp capture `20260612-225855`, reducing actionable uncovered statel vendors from `324` to `295`.
+Stabilize CellAO behavior using packet evidence, local playtests, and focused source assertions. Inventory, corpse loot, corpse credits, player trade, and vendor buy/sell/close live persistence verification are complete for the documented repaired flows. The next highest-value unfinished area is static vendor coverage: broad shop stock data still has documented gaps, while the transaction behavior itself is now verified. Latest live-capture vendor milestone: Clan Superior General Shop import from AOSharp capture `20260612-232439`, reducing actionable uncovered statel vendors from `295` to `276`.
 
 ## Current Implementation State
 
@@ -59,7 +59,7 @@ Verified or previously playtested as working:
 
 Currently unstable or unresolved:
 
-- Broad static vendor coverage remains incomplete. Transaction behavior for vendor buy, sell, and close/cancel is verified; remaining work is data coverage for shop stock and statel-to-template mappings, not transaction semantics. Current post-import audit shows `295` actionable uncovered statel vendors.
+- Broad static vendor coverage remains incomplete. Transaction behavior for vendor buy, sell, and close/cancel is verified; remaining work is data coverage for shop stock and statel-to-template mappings, not transaction semantics. Current post-import audit shows `276` actionable uncovered statel vendors.
 - NPC movement remains high-risk and should not be patched without source/capture evidence.
 
 ## Files Actively Being Modified Or Recently Dirty

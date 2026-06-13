@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-12 23:11:21
+Generated: 2026-06-13 00:11:12
 
 ## Scope
 
@@ -20,14 +20,14 @@ Generated: 2026-06-12 23:11:21
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 295 |
+| Vending statels without complete DB shop coverage | 276 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Clan Basic General Shop import promoted from AOSharp capture 20260612-225855.
-- Validated coverage added: 29 1180 ord_smarket_clan_basic vendor rows, 29 vendor templates, and 25 new shop inventory groups with 1575 inventory rows; existing shop inventory hashes G4XZ, HYDQ, LJI7, and R5R7 were reused.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 324 to 295. Current live-capture coverage chain: 404 -> 381 -> 351 -> 324 -> 295.
+- Clan Superior General Shop import promoted from AOSharp capture 20260612-232439.
+- Validated coverage added: 19 1182 ord_smarket_clan_sup vendor rows, 19 vendor templates, and 14 new shop inventory groups with 594 inventory rows; existing shop inventory hashes LJI7, CHHQ, OHOO, JYPE, and Cont were reused.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 295 to 276. Current live-capture coverage chain: 404 → 381 → 351 → 324 → 295 → 276.
 
 ## Coverage Exclusions
 
@@ -70,6 +70,7 @@ This separates template-cache truth from live runtime instance truth. If items.d
 - Vendor DB audit: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\vendor-db-audit.csv
 - Shop inventory audit: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\shop-inventory-template-audit.csv
 - Statel vendor coverage: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\statel-vendor-coverage.csv
+- Vendor scan door locations: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\vendor-scan-door-locations.csv
 
 ## Top Vendor DB Issues
 
