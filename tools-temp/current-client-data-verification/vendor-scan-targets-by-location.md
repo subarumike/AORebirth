@@ -1,13 +1,12 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 276.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 253.
 
 ## Practical Location Summary
 
 | Playfield | Location | Access | Uncovered terminals | Main families |
 | ---: | --- | --- | ---: | --- |
 | 500 | Parnassos | GM-only / not live-accessible | 85 | Legacy faction core departments (21); Other unresolved vendor terminal (21); Heavenly weapon construction/components/recipes (19); Containers/computers/furniture/specialty/cars (10) |
-| 1184 | ord_smarket_omni_advanced | Likely live-accessible | 23 | Heavenly weapon construction/components/recipes (12); Legacy faction core departments (6); Implants/clusters (2); Clan/Omni device variants (1) |
 | 4704 | Tower Shop (dungeon) | Likely special/dungeon; verify before travel | 17 | ICC/tower shop special vendors (16); Containers/computers/furniture/specialty/cars (1) |
 | 6007 | BS Signup (dng) | Likely special/dungeon; verify before travel | 17 | OFAB vendors (17) |
 | 1181 | ord_smarket_clan_advanced | Likely live-accessible | 16 | Heavenly weapon construction/components/recipes (6); Legacy faction core departments (5); Clan/Omni device variants (1); Containers/computers/furniture/specialty/cars (1) |
@@ -54,7 +53,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | Playfield | Location | Primary source door | Other source doors | Destination door(s) | Paired-door candidate | Note |
 | ---: | --- | --- | --- | --- | --- | --- |
 | 500 | Parnassos |  |  |  |  |  |
-| 1184 | ord_smarket_omni_advanced | Omni-1 Trade 0xC02102C6 @ 359.594,8.617,205.877 | Avalon 0xC03A01F9 @ 1782.473,26.252,1249.89 <br> Lush Fields 0xC01302B7 @ 1493.594,11.017,2518.877 <br> Lush Fields 0xC01402B7 @ 1551.764,45.395,492.815 <br> Omni1 Entertainment 0xC04002C1 @ 698.91,18.679,518.703 <br> Omni1 Entertainment 0xC01202C1 @ 784.241,22.762,536.942 <br> Omni-1 Trade 0xC02702C6 @ 234.877,8.617,429.406 <br> Omni-1 Trade 0xC02302C6 @ 572.123,8.617,431.594 <br> Omni-1 Trade 0xC02502C6 @ 572.123,8.617,559.594 <br> Rome Blue 0xC00002DF @ 652.78,22.257,210.701 <br> Rome Green 0xC00102E4 @ 306.051,22.257,210.204 <br> The Longest Road 0xC000031B @ 2124.487,16.961,768.946 | 0xC00004A0 @ 213.001,5,96.01 | 0xC00004A0 @ 213.001,5,96.01 -> 0xC00204A0 @ 201.99,5.001,119 | Medium: same-template sibling door within 30m Review as a supermarket-family candidate; distance is larger than the verified close-door pattern. |
 | 4704 | Tower Shop (dungeon) | Borealis 0xC0180320 @ 729.813,61.686,651.696 | Old Athen 0xC02B021C @ 479.913,9.174,282.706 <br> Rome Blue 0xC00A02DF @ 675.09,22.357,356.184 | 0xC0001260 @ 193.988,9.006,153.992 | 0xC0001260 @ 193.988,9.006,153.992 -> 0xC0011260 @ 178,9.005,157.986 | Medium: same-template sibling door within 30m No patch. Keep as reference evidence for this interior family. |
 | 6007 | BS Signup (dng) |  |  |  |  |  |
 | 1181 | ord_smarket_clan_advanced | Old Athen 0xC01F021C @ 336.799,11.617,435.626 | Avalon 0xC01101F9 @ 2146.273,44.315,3772.396 <br> Mort 0xC0070230 @ 1866.855,47.695,1102.495 <br> Old Athen 0xC020021C @ 406.799,11.618,534.626 <br> Old Athen 0xC01C021C @ 435.948,11.616,561.396 <br> Tir 0xC0050280 @ 387.147,7.999,483.152 <br> Wailing Wastes 0xC0020227 @ 1329.242,25.743,1715.809 <br> West Athens 0xC0180221 @ 359.734,1.604,412.692 | 0xC000049D @ 187.001,5,152.01 | 0xC000049D @ 187.001,5,152.01 -> 0xC002049D @ 197.99,5.001,173 | Medium: same-template sibling door within 30m Review as a supermarket-family candidate; distance is larger than the verified close-door pattern. |
@@ -186,39 +184,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 7 | 32768081 | 155595 | S h o p - o f - F o r t u n e | 421.521,32.8,360.723 | Other unresolved vendor terminal |
 | 7 | 32768084 | 155498 | Armour and Clothing Components - Superior | 468.2,37.001,343.7 | Other unresolved vendor terminal |
 | 7 | 32768087 | 155313 | Nano Crystal Components - Superior | 473.8,37.001,343.7 | Other unresolved vendor terminal |
-
-### 1184 - ord_smarket_omni_advanced (23)
-
-- Primary source door: Omni-1 Trade 0xC02102C6 @ 359.594,8.617,205.877
-- Other source doors: Avalon 0xC03A01F9 @ 1782.473,26.252,1249.89 | Lush Fields 0xC01302B7 @ 1493.594,11.017,2518.877 | Lush Fields 0xC01402B7 @ 1551.764,45.395,492.815 | Omni1 Entertainment 0xC04002C1 @ 698.91,18.679,518.703 | Omni1 Entertainment 0xC01202C1 @ 784.241,22.762,536.942 | Omni-1 Trade 0xC02702C6 @ 234.877,8.617,429.406 | Omni-1 Trade 0xC02302C6 @ 572.123,8.617,431.594 | Omni-1 Trade 0xC02502C6 @ 572.123,8.617,559.594 | Rome Blue 0xC00002DF @ 652.78,22.257,210.701 | Rome Green 0xC00102E4 @ 306.051,22.257,210.204 | The Longest Road 0xC000031B @ 2124.487,16.961,768.946
-- Destination door evidence: 0xC00004A0 @ 213.001,5,96.01
-- Paired-door candidate: 0xC00004A0 @ 213.001,5,96.01 -> 0xC00204A0 @ 201.99,5.001,119 (Medium; same-template sibling door within 30m)
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 1 | 77594638 | 155503 | Melee Weapon Recipes - Advanced | 155,5,107 | Heavenly weapon construction/components/recipes |
-| 1 | 77594639 | 155506 | Ranged Weapon Recipes - Advanced | 153,5,107 | Heavenly weapon construction/components/recipes |
-| 1 | 77594641 | 155503 | Melee Weapon Recipes - Advanced | 153.5,17,133.1 | Heavenly weapon construction/components/recipes |
-| 1 | 77594642 | 155506 | Ranged Weapon Recipes - Advanced | 155.5,17,133.1 | Heavenly weapon construction/components/recipes |
-| 1 | 77594646 | 155297 | Melee Weapon Components - Advanced | 180.8,13,133.1 | Heavenly weapon construction/components/recipes |
-| 1 | 77594647 | 155491 | Ranged Weapon Components - Advanced | 178.8,13,133.1 | Heavenly weapon construction/components/recipes |
-| 1 | 77594656 | 155297 | Melee Weapon Components - Advanced | 177,5,131 | Heavenly weapon construction/components/recipes |
-| 1 | 77594657 | 155491 | Ranged Weapon Components - Advanced | 175,5,131 | Heavenly weapon construction/components/recipes |
-| 1 | 77594664 | 155234 | Advanced Melee Weapon Construction Kits | 146.9,13,108.1 | Heavenly weapon construction/components/recipes |
-| 1 | 77594665 | 155282 | Advanced Ranged Weapon Construction Kits | 146.9,13,110.1 | Heavenly weapon construction/components/recipes |
-| 1 | 77594670 | 155234 | Advanced Melee Weapon Construction Kits | 189,5.001,107 | Heavenly weapon construction/components/recipes |
-| 1 | 77594671 | 155282 | Advanced Ranged Weapon Construction Kits | 187,5.001,107 | Heavenly weapon construction/components/recipes |
-| 2 | 77594663 | 155223 | Advanced Implants | 146.9,13,106.1 | Implants/clusters |
-| 2 | 77594669 | 155223 | Advanced Implants | 191,5.001,107 | Implants/clusters |
-| 3 | 77594682 | 99386 | OT Advanced Armor | 203.2,5,111 | Legacy faction core departments |
-| 3 | 77594683 | 99496 | OT Advanced Attacks | 203.2,5,115 | Legacy faction core departments |
-| 3 | 77594684 | 99485 | OT Advanced Augmentations | 211.99,5,115 | Legacy faction core departments |
-| 3 | 77594685 | 99482 | OT Advanced Medical Supplies | 209.072,5,120.803 | Legacy faction core departments |
-| 3 | 77594686 | 99492 | OT Advanced Tools | 222.8,5,115 | Legacy faction core departments |
-| 3 | 77594687 | 99479 | OT Advanced Weapons | 222.8,5,119 | Legacy faction core departments |
-| 6 | 77594688 | 99490 | OT Clothes | 213,5,113.99 | Faction clothes/fashion |
-| 6 | 77594690 | 117649 | OT Maps | 219.032,5,106.9 | Maps |
-| 6 | 77594692 | 155606 | Omni Advanced Devices | 214,5.001,115 | Clan/Omni device variants |
 
 ### 4704 - Tower Shop (dungeon) (17)
 
