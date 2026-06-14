@@ -1822,3 +1822,18 @@ INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`,
 -- MappingConfidence: High
 -- Justification: target has complete captured template and inventory evidence; vendortemplate links to a newly staged exact inventory group.
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674768, 6007, 216.46, 6.02, 219.975, 0, 0, 0, 1, '', 266576, 'OF4GOBN');
+
+-- ============================================================
+-- Omni Training Startup Shop import
+-- Source: AOSharp capture 20260613-231115
+-- Coverage: 106 -> 105 (1 reduction)
+-- New inventory groups: 1
+-- Note: VendorFull captured on playfield-entry/dynel-spawn; ShopUpdate captured by opening Startup Shop!
+-- ============================================================
+
+-- VendorId: 62259200; Playfield: 950 Omni Training; TemplateId: 100035 Startup Shop!; Statel: 0xC00003B6; Capture identity: (VendingMachine:12E530CC); Capture: 20260613-231115
+-- MappingType: Captured
+-- MappingSource: VendorFull captured after Omni Training playfield entry; ShopUpdate captured by opening Startup Shop!. Capture: 20260613-231115
+-- MappingConfidence: High
+-- Justification: target metadata maps template 100035 to statel 0xC00003B6 at X 60 Y 14 Z 50; capture has matching template, position, and seven-row inventory.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (62259200, 950, 60, 14, 50, 0, 0, 0, 1, '', 100035, 'OTY56RU');

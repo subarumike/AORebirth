@@ -1202,3 +1202,15 @@ INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHas
 -- Terminal: Ofab Ranged Weapons
 -- NormalizedName: BSSignupOfabRangedWeapons; TemplateId: 266576; ShopHash: XID7 (new); Inventory rows: 78; Capture identity: (VendingMachine:C0101777); VT window: 0
 INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OF4GOBN', 1, 'BSSignupOfabRangedWeapons', 266576, 'XID7', 25, 300);
+
+-- ============================================================
+-- Omni Training Startup Shop import
+-- Source: AOSharp capture 20260613-231115
+-- Coverage: 106 -> 105 (1 reduction)
+-- New inventory groups: 1
+-- Note: VendorFull captured on playfield-entry/dynel-spawn; ShopUpdate captured by opening Startup Shop!
+-- ============================================================
+
+-- Terminal: Startup Shop!
+-- NormalizedName: OmniTrainingStartupShop; TemplateId: 100035; ShopHash: AMJX (new); Inventory rows: 7; Capture identity: (VendingMachine:12E530CC); VT window: 0
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OTY56RU', 1, 'OmniTrainingStartupShop', 100035, 'AMJX', 1, 1);
