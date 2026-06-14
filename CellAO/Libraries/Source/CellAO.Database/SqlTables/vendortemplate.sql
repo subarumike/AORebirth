@@ -1214,3 +1214,15 @@ INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHas
 -- Terminal: Startup Shop!
 -- NormalizedName: OmniTrainingStartupShop; TemplateId: 100035; ShopHash: AMJX (new); Inventory rows: 7; Capture identity: (VendingMachine:12E530CC); VT window: 0
 INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OTY56RU', 1, 'OmniTrainingStartupShop', 100035, 'AMJX', 1, 1);
+
+-- ============================================================
+-- Treepine Hut OT Clothes import
+-- Source: AOSharp capture 20260613-233535
+-- Coverage: 105 -> 104 (1 reduction)
+-- New inventory groups: 1
+-- Note: Imported only the remaining uncovered Treepine statel; incidental already-covered captures were not imported.
+-- ============================================================
+
+-- Terminal: OT Clothes
+-- NormalizedName: TreepineOTClothes; TemplateId: 99490; ShopHash: YXAF (new); Inventory rows: 16; Capture identity: (VendingMachine:12E522FB); VT window: 0
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('TPNFK3D', 1, 'TreepineOTClothes', 99490, 'YXAF', 1, 1);

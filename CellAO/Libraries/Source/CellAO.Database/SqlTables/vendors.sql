@@ -1837,3 +1837,18 @@ INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`,
 -- MappingConfidence: High
 -- Justification: target metadata maps template 100035 to statel 0xC00003B6 at X 60 Y 14 Z 50; capture has matching template, position, and seven-row inventory.
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (62259200, 950, 60, 14, 50, 0, 0, 0, 1, '', 100035, 'OTY56RU');
+
+-- ============================================================
+-- Treepine Hut OT Clothes import
+-- Source: AOSharp capture 20260613-233535
+-- Coverage: 105 -> 104 (1 reduction)
+-- New inventory groups: 1
+-- Note: Imported only the remaining uncovered Treepine statel; incidental already-covered captures were not imported.
+-- ============================================================
+
+-- VendorId: 123666433; Playfield: 1887 Treepine Hut; TemplateId: 99490 OT Clothes; Statel: 0xC001075F; Capture identity: (VendingMachine:12E522FB); Capture: 20260613-233535
+-- MappingType: Captured
+-- MappingSource: Captured direct VendorFull + ShopUpdate from Treepine Hut AOSharp capture. Capture: 20260613-233535
+-- MappingConfidence: High
+-- Justification: target has complete captured template and inventory evidence at X 199.189 Y 5.000 Z 286.698; vendortemplate links to a newly staged exact inventory group.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (123666433, 1887, 199.189, 5, 286.698, 0, 0, 0, 1, '', 99490, 'TPNFK3D');

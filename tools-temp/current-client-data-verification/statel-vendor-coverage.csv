@@ -714,7 +714,7 @@
 "1427","Omni registration dng","93519872","0xC0000593","81799","201.952,5,172.745","False","","-1","0","False","","no vendors row; runtime spawns empty statel vendor"
 "1428","Neutral organisation dng","93585408","0xC0000594","81799","201.952,5,162.745","False","","-1","0","False","","no vendors row; runtime spawns empty statel vendor"
 "1887","Treepine Hut","123666432","0xC000075F","99386","209.691,5,286.698","True","OAL6IVC","99386","29","False","",""
-"1887","Treepine Hut","123666433","0xC001075F","99490","199.189,5,286.698","False","","-1","0","False","","no vendors row; runtime spawns empty statel vendor"
+"1887","Treepine Hut","123666433","0xC001075F","99490","199.189,5,286.698","True","TPNFK3D","99490","16","False","",""
 "2060","neut_basic_weapon _shop","135004160","0xC000080C","297459","173,5.01,167","True","ICCAmmo","297459","13","False","",""
 "2060","neut_basic_weapon _shop","135004161","0xC001080C","297466","164.966,5.01,167","True","ICCMAtk","297466","84","False","",""
 "2060","neut_basic_weapon _shop","135004162","0xC002080C","297470","167,5.01,157","True","ICCSpWS","297470","52","False","",""
