@@ -253,18 +253,40 @@ $coverageExcludedStatelTemplates = @{
     155225 = "NonShopStatelTemplate"
 }
 
-function Test-CoverageExcludedStatelTemplate {
-    param($TemplateId)
+$coverageExcludedPlayfields = @{
+    500 = "InaccessibleGmOnlyPlayfield"
+}
+
+function Get-CoverageExclusionReason {
+    param($PlayfieldId, $TemplateId)
+
+    $reasons = New-Object System.Collections.Generic.List[string]
 
     if ($null -eq $TemplateId -or [string]::IsNullOrWhiteSpace([string]$TemplateId)) {
-        return $false
+        # Continue to playfield-level exclusions below.
+    } else {
+        try {
+            $templateKey = [int]$TemplateId
+            if ($coverageExcludedStatelTemplates.ContainsKey($templateKey)) {
+                $reasons.Add($coverageExcludedStatelTemplates[$templateKey])
+            }
+        } catch {
+            # Ignore malformed template ids; raw audit rows still retain the original value.
+        }
     }
 
-    try {
-        return $coverageExcludedStatelTemplates.ContainsKey([int]$TemplateId)
-    } catch {
-        return $false
+    if ($null -ne $PlayfieldId -and -not [string]::IsNullOrWhiteSpace([string]$PlayfieldId)) {
+        try {
+            $playfieldKey = [int]$PlayfieldId
+            if ($coverageExcludedPlayfields.ContainsKey($playfieldKey)) {
+                $reasons.Add($coverageExcludedPlayfields[$playfieldKey])
+            }
+        } catch {
+            # Ignore malformed playfield ids; raw audit rows still retain the original value.
+        }
     }
+
+    return ($reasons -join "; ")
 }
 
 if (-not [string]::IsNullOrWhiteSpace($Database)) {
@@ -522,8 +544,8 @@ foreach ($pfEntry in [ZoneEngine.Core.Playfields.PlayfieldLoader]::PFData.GetEnu
             $issues.Add("matched vendor has no active shop inventory")
         }
 
-        $coverageExcluded = Test-CoverageExcludedStatelTemplate $sd.TemplateId
-        $exclusionReason = if ($coverageExcluded) { $coverageExcludedStatelTemplates[[int]$sd.TemplateId] } else { "" }
+        $exclusionReason = Get-CoverageExclusionReason $pfId $sd.TemplateId
+        $coverageExcluded = -not [string]::IsNullOrWhiteSpace($exclusionReason)
 
         $statelVendorRows.Add([pscustomobject]@{
             Playfield = $pfId
@@ -722,7 +744,7 @@ $vendorScanTargetsByLocationMd = Join-Path $OutDir "vendor-scan-targets-by-locat
 $targetMarkdown = New-Object System.Collections.Generic.List[string]
 $targetMarkdown.Add("# Remaining Vendor Scan Targets")
 $targetMarkdown.Add("")
-$targetMarkdown.Add("Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: $($currentVendorScanTargets.Count).")
+$targetMarkdown.Add("Generated from current vendor coverage after excluding non-shop statel templates and inaccessible playfields. Actionable uncovered statel vendors: $($currentVendorScanTargets.Count).")
 $targetMarkdown.Add("")
 $targetMarkdown.Add("## Practical Location Summary")
 $targetMarkdown.Add("")
@@ -815,16 +837,19 @@ $markdown.Add("| Vending statels excluded from coverage | $($excludedStatelVendo
 $markdown.Add("")
 $markdown.Add("## Latest Vendor Import Milestone")
 $markdown.Add("")
-$markdown.Add("- Arete ICC implant/cluster import promoted from AOSharp capture `20260613-172753`.")
-$markdown.Add("- Validated coverage added: 5 vendor rows in `6553 Arete Landing`, 5 vendor templates, and 5 new shop inventory groups with 573 inventory rows.")
-$markdown.Add("- The imported rows cover ICC Basic Implants, ICC Faded Clusters, ICC Bright Clusters, ICC Shiny Clusters, and ICC Pharmacy; incidental nearby capture evidence was intentionally excluded.")
-$markdown.Add(("- Current-client verification after import showed actionable uncovered statel vendors dropped from `147` to `{0}`. Current coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> {0}`." -f $problemStatelVendors.Count))
+$markdown.Add("- Jobe Superior dimensions import promoted from AOSharp capture `20260614-002319`.")
+$markdown.Add("- Validated coverage added: 4 vendor rows across `4565 Hardware Dimension - Superior` and `4569 Dimensional Shift - Superior`, 4 vendor templates, and 4 new shop inventory groups with 116 inventory rows.")
+$markdown.Add("- The imported rows cover Superior Armor, Superior Equipment for Nano Specialists, Costly Regenerative Supplies --- 100-175, and Superior Implants; incidental Heavenly Business capture evidence was intentionally excluded because those statels were already covered.")
+$markdown.Add(("- Current-client verification after import showed actionable uncovered statel vendors dropped from `93` to `89`; after excluding inaccessible Parnassos playfield `500`, the actionable capture backlog is `{0}`. Current coverage/actionability chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96 -> 93 -> 89 -> {0}`." -f $problemStatelVendors.Count))
 $markdown.Add("")
 $markdown.Add("## Coverage Exclusions")
 $markdown.Add("")
-$markdown.Add("| Template | Name | Reason | Excluded statels | Evidence |")
-$markdown.Add("| ---: | --- | --- | ---: | --- |")
-$markdown.Add("| 155225 | Refreshing Drink | NonShopStatelTemplate | $($excludedStatelVendors.Count) | AOSharp captures 20260612-012644 and 20260612-044234 emitted VendorFullUpdate evidence but no ShopUpdate inventory rows; live operator confirmed the Superior instances were not reachable/openable. |")
+$markdown.Add("| Scope | Id | Name | Reason | Excluded statels | Evidence |")
+$markdown.Add("| --- | ---: | --- | --- | ---: | --- |")
+$nonShopExcludedCount = @($excludedStatelVendors | Where-Object { $_.ExclusionReason -match "NonShopStatelTemplate" }).Count
+$parnassosExcludedCount = @($excludedStatelVendors | Where-Object { $_.ExclusionReason -match "InaccessibleGmOnlyPlayfield" -and [int]$_.Playfield -eq 500 }).Count
+$markdown.Add("| Template | 155225 | Refreshing Drink | NonShopStatelTemplate | $nonShopExcludedCount | AOSharp captures 20260612-012644 and 20260612-044234 emitted VendorFullUpdate evidence but no ShopUpdate inventory rows; live operator confirmed the Superior instances were not reachable/openable. |")
+$markdown.Add("| Playfield | 500 | Parnassos | InaccessibleGmOnlyPlayfield | $parnassosExcludedCount | Operator verification confirmed there is no practical live-client access path for capture; these GM-only statels are kept in raw audit output only. |")
 $markdown.Add("")
 $markdown.Add("Excluded statels remain in the raw statel vendor coverage CSV with CoverageExcluded and ExclusionReason fields, but they are excluded from coverage metrics, missing-vendor reports, capture targeting, and import planning.")
 $markdown.Add("")
