@@ -2,6 +2,8 @@
 
 AO Rebirth NightPredator is a local C#/.NET Framework-era Anarchy Online server workspace. Current work is focused on making the server compatible with Mike's current AO client and local `cellao_codex_clean` MySQL database through evidence-backed packet, gameplay, and data repairs.
 
+Repository licensing now uses a dual-license structure: inherited CellAO portions remain under the CellAO BSD-style license terms, while AO Rebirth additions are proprietary. Root `LICENSE` and `NOTICE` files document the split and attribution.
+
 # Working Systems
 
 - Login, chat, and zone engines build and run locally.
