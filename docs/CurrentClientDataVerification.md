@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-13 23:53:37
+Generated: 2026-06-14 00:11:01
 
 ## Scope
 
@@ -20,15 +20,15 @@ Generated: 2026-06-13 23:53:37
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 99 |
+| Vending statels without complete DB shop coverage | 96 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Uncle Bazzit's Workshop import promoted from AOSharp capture 20260613-184615.
-- Validated coverage added: 5 vendor rows in 4354 Uncle Bazzits Workshop (Dng), 5 vendor templates, and 4 new shop inventory groups with 129 new inventory rows.
-- Maria's Fashion reused existing exact shop hash Fash; Miscellany, Floorplans, Landscaping, and Furnishings received new exact inventory groups.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 104 to 99. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99.
+- Jobe Basic dimensions import promoted from AOSharp capture 20260614-000058.
+- Validated coverage added: 3 vendor rows across 4563 Hardware Dimension - Basic and 4567 Dimensional Shift - Basic, 3 vendor templates, and 3 new shop inventory groups with 98 inventory rows.
+- The imported rows cover Jobe Hardware Basic Armor, Jobe Dimensional Basic Regenerative Supplies, and Jobe Dimensional Basic Implants. Same-template Advanced dimensional targets were not imported without direct capture or explicit inference approval.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 99 to 96. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96.
 
 ## Coverage Exclusions
 
