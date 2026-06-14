@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-13 22:27:25
+Generated: 2026-06-13 22:47:09
 
 ## Scope
 
@@ -20,15 +20,15 @@ Generated: 2026-06-13 22:27:25
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 124 |
+| Vending statels without complete DB shop coverage | 106 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Holes in the Wall live capture import promoted from AOSharp capture 20260613-221619.
-- Validated coverage added: 3 vendor rows across 791 Holes in the Wall and 4565 Hardware Dimenion - Superior, 2 vendor templates, and 1 new shop inventory group with 87 inventory rows while reusing existing shop hash Cont.
-- The imported rows cover Holes in the Wall Containers, Holes in the Wall Superior Weapons, and one high-confidence exact-template inferred Hardware Dimension - Superior Superior Weapons statel. The incidental inventory-only identity (VendingMachine:12E4CE58) had no target correlation and was not imported.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 127 to 124. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124.
+- Tower Shop + BS Signup live capture import promoted from AOSharp capture 20260613-223554.
+- Validated coverage added: 18 vendor rows across 4704 Tower Shop (dungeon) and 6007 BS Signup (dng), 18 vendor templates, and 18 new shop inventory groups with 2047 inventory rows.
+- The imported rows cover 14 Tower Shop terminals plus 4 BS Signup OFAB terminals. Clan City Buildings, Neutral City Buildings, and Leets-R-Us were VendorFull-only / not openable and were not imported; remaining BS Signup profession-locked terminals require matching professions.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 124 to 106. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106.
 
 ## Coverage Exclusions
 
