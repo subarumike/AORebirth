@@ -1,6 +1,6 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 93.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 89.
 
 ## Practical Location Summary
 
@@ -11,8 +11,6 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 4704 | Tower Shop (dungeon) | Likely special/dungeon; verify before travel | 3 | ICC/tower shop special vendors (3) |
 | 1426 | Clan Registration dng | Likely special/dungeon; verify before travel | 2 | Other unresolved vendor terminal (2) |
 | 4364 | Unicorn Outpost | Unknown accessibility | 2 | Other unresolved vendor terminal (2) |
-| 4565 | Hardware Dimenion - Superior | Unknown accessibility | 2 | Classic armor terminals (1); Other unresolved vendor terminal (1) |
-| 4569 | Dimensional Shift - Superior | Unknown accessibility | 2 | Implants/clusters (1); Other unresolved vendor terminal (1) |
 | 954 | Neutral Training | Likely live-accessible | 2 | Startup equipment (2) |
 | 1427 | Omni registration dng | Likely special/dungeon; verify before travel | 1 | Other unresolved vendor terminal (1) |
 | 1428 | Neutral organisation dng | Unknown accessibility | 1 | Other unresolved vendor terminal (1) |
@@ -34,8 +32,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 954 | Neutral Training | Borealis Backyard 1 0xE7100C08 @ 122.603,39.965,77.115 | Borealis Backyard 10 0xE7100C11 @ 122.603,39.965,77.115 <br> Borealis Backyard 2 0xE7100C09 @ 122.603,39.965,77.115 <br> Borealis Backyard 3 0xE7100C0A @ 122.603,39.965,77.115 <br> Borealis Backyard 4 0xE7100C0B @ 122.603,39.965,77.115 <br> Borealis Backyard 5 0xE7100C0C @ 122.603,39.965,77.115 <br> Borealis Backyard 6 0xE7100C0D @ 122.603,39.965,77.115 <br> Borealis Backyard 7 0xE7100C0E @ 122.603,39.965,77.115 <br> Borealis Backyard 8 0xE7100C0F @ 122.603,39.965,77.115 <br> Borealis Backyard 9 0xE7100C10 @ 122.603,39.965,77.115 <br> Neutral Backyard 0xE71003BB @ 122.603,39.965,77.115 <br> Newland Backyard 1 0xE7100BF4 @ 122.603,39.965,77.115 <br> Newland Backyard 10 0xE7100BFD @ 122.603,39.965,77.115 <br> Newland Backyard 11 0xE7100BFE @ 122.603,39.965,77.115 <br> Newland Backyard 12 0xE7100BFF @ 122.603,39.965,77.115 <br> Newland Backyard 2 0xE7100BF5 @ 122.603,39.965,77.115 <br> Newland Backyard 3 0xE7100BF6 @ 122.603,39.965,77.115 <br> Newland Backyard 4 0xE7100BF7 @ 122.603,39.965,77.115 <br> Newland Backyard 5 0xE7100BF8 @ 122.603,39.965,77.115 <br> Newland Backyard 6 0xE7100BF9 @ 122.603,39.965,77.115 <br> Newland Backyard 7 0xE7100BFA @ 122.603,39.965,77.115 <br> Newland Backyard 8 0xE7100BFB @ 122.603,39.965,77.115 <br> Newland Backyard 9 0xE7100BFC @ 122.603,39.965,77.115 | 0xC00003BA @ 239.886,5.965,69.931 |  |  |
 | 1426 | Clan Registration dng |  |  |  |  |  |
 | 4364 | Unicorn Outpost |  |  |  |  |  |
-| 4565 | Hardware Dimenion - Superior | Jobe Plaza 0xC00211B5 @ 193.3,482.791,179.373 |  | 0xC00011D5 @ 41.991,6.004,47.989 |  |  |
-| 4569 | Dimensional Shift - Superior | Jobe Plaza 0xC00311B5 @ 198.696,482.791,165.968 |  | 0xC00011D9 @ 55.988,6.005,47.991 |  |  |
 | 665 | Broken Shores |  |  |  |  |  |
 | 952 | Clan Training | Clan Backyard 0xE71003B9 @ 77.749,25.859,59.156 | Old Athen Backyard 1 0xE7100C30 @ 77.749,25.859,59.156 <br> Old Athen Backyard 10 0xE7100C39 @ 77.749,25.859,59.156 <br> Old Athen Backyard 11 0xE7100C3A @ 77.749,25.859,59.156 <br> Old Athen Backyard 12 0xE7100C3B @ 77.749,25.859,59.156 <br> Old Athen Backyard 13 0xE7100C3C @ 77.749,25.859,59.156 <br> Old Athen Backyard 14 0xE7100C3D @ 77.749,25.859,59.156 <br> Old Athen Backyard 15 0xE7100C3E @ 77.749,25.859,59.156 <br> Old Athen Backyard 16 0xE7100C3F @ 77.749,25.859,59.156 <br> Old Athen Backyard 17 0xE7100C40 @ 77.749,25.859,59.156 <br> Old Athen Backyard 18 0xE7100C41 @ 77.749,25.859,59.156 <br> Old Athen Backyard 19 0xE7100C42 @ 77.749,25.859,59.156 <br> Old Athen Backyard 2 0xE7100C31 @ 77.749,25.859,59.156 <br> Old Athen Backyard 20 0xE7100C43 @ 77.749,25.859,59.156 <br> Old Athen Backyard 3 0xE7100C32 @ 77.749,25.859,59.156 <br> Old Athen Backyard 4 0xE7100C33 @ 77.749,25.859,59.156 <br> Old Athen Backyard 5 0xE7100C34 @ 77.749,25.859,59.156 <br> Old Athen Backyard 6 0xE7100C35 @ 77.749,25.859,59.156 <br> Old Athen Backyard 7 0xE7100C36 @ 77.749,25.859,59.156 <br> Old Athen Backyard 8 0xE7100C37 @ 77.749,25.859,59.156 <br> Old Athen Backyard 9 0xE7100C38 @ 77.749,25.859,59.156 <br> Tir Backyard 1 0xE7100C1C @ 77.749,25.859,59.156 <br> Tir Backyard 10 0xE7100C25 @ 77.749,25.859,59.156 <br> Tir Backyard 11 0xE7100C26 @ 77.749,25.859,59.156 <br> Tir Backyard 12 0xE7100C27 @ 77.749,25.859,59.156 <br> Tir Backyard 13 0xE7100C28 @ 77.749,25.859,59.156 <br> Tir Backyard 14 0xE7100C29 @ 77.749,25.859,59.156 <br> Tir Backyard 15 0xE7100C2A @ 77.749,25.859,59.156 <br> Tir Backyard 16 0xE7100C2B @ 77.749,25.859,59.156 <br> Tir Backyard 17 0xE7100C2C @ 77.749,25.859,59.156 <br> Tir Backyard 18 0xE7100C2D @ 77.749,25.859,59.156 <br> Tir Backyard 2 0xE7100C1D @ 77.749,25.859,59.156 <br> Tir Backyard 3 0xE7100C1E @ 77.749,25.859,59.156 <br> Tir Backyard 4 0xE7100C1F @ 77.749,25.859,59.156 <br> Tir Backyard 5 0xE7100C20 @ 77.749,25.859,59.156 <br> Tir Backyard 6 0xE7100C21 @ 77.749,25.859,59.156 <br> Tir Backyard 7 0xE7100C22 @ 77.749,25.859,59.156 <br> Tir Backyard 8 0xE7100C23 @ 77.749,25.859,59.156 <br> Tir Backyard 9 0xE7100C24 @ 77.749,25.859,59.156 <br> West Athen Backyard 1 0xE7100C44 @ 77.749,25.859,59.156 <br> West Athen Backyard 10 0xE7100C4D @ 77.749,25.859,59.156 <br> West Athen Backyard 2 0xE7100C45 @ 77.749,25.859,59.156 <br> West Athen Backyard 3 0xE7100C46 @ 77.749,25.859,59.156 <br> West Athen Backyard 4 0xE7100C47 @ 77.749,25.859,59.156 <br> West Athen Backyard 5 0xE7100C48 @ 77.749,25.859,59.156 <br> West Athen Backyard 6 0xE7100C49 @ 77.749,25.859,59.156 <br> West Athen Backyard 7 0xE7100C4A @ 77.749,25.859,59.156 <br> West Athen Backyard 8 0xE7100C4B @ 77.749,25.859,59.156 <br> West Athen Backyard 9 0xE7100C4C @ 77.749,25.859,59.156 | 0xC00103B8 @ 40.238,14.859,70.092 |  |  |
 | 1427 | Omni registration dng |  |  |  |  |  |
@@ -159,26 +155,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | ---: | ---: | ---: | --- | --- | --- |
 | 7 | 285999104 | 256457 | Unicorn Supply Depot | 146.464,100.907,156.153 | Other unresolved vendor terminal |
 | 7 | 285999105 | 287037 | Unicorn Medical Supply Depot | 143.328,100.886,152.997 | Other unresolved vendor terminal |
-
-### 4565 - Hardware Dimenion - Superior (2)
-
-- Primary source door: Jobe Plaza 0xC00211B5 @ 193.3,482.791,179.373
-- Destination door evidence: 0xC00011D5 @ 41.991,6.004,47.989
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 6 | 299171841 | 151973 | Superior Armor | 33.65,2.1,41.5 | Classic armor terminals |
-| 7 | 299171844 | 224079 | Superior Equipment for Nano Specialists | 33,2.1,29.4 | Other unresolved vendor terminal |
-
-### 4569 - Dimensional Shift - Superior (2)
-
-- Primary source door: Jobe Plaza 0xC00311B5 @ 198.696,482.791,165.968
-- Destination door evidence: 0xC00011D9 @ 55.988,6.005,47.991
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 2 | 299433986 | 155224 | Superior Implants | 46.9,2.1,29.2 | Implants/clusters |
-| 7 | 299433985 | 220330 | Costly Regenerative Supplies --- 100-175 | 28.1,2.1,40.1 | Other unresolved vendor terminal |
 
 ### 954 - Neutral Training (2)
 

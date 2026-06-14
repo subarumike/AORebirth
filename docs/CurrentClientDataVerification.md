@@ -1,6 +1,6 @@
-﻿# Current Client Data Verification
+# Current Client Data Verification
 
-Generated: 2026-06-14 00:38:06
+Generated: 2026-06-14 00:59:27
 
 ## Scope
 
@@ -20,16 +20,16 @@ Generated: 2026-06-14 00:38:06
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 93 |
+| Vending statels without complete DB shop coverage | 89 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Jobe Advanced dimensions import promoted from AOSharp capture 20260614-002319.
-- Validated coverage added: 3 vendor rows across 4564 Hardware Dimension - Advanced and 4568 Dimensional Shift - Advanced, 3 vendor templates, and 2 new shop inventory groups with 68 new inventory rows.
-- The imported rows cover Jobe Hardware Advanced Armor, Jobe Dimensional Advanced Regenerative Supplies, and Jobe Dimensional Advanced Implants. Regenerative supplies reused existing exact shop hash HMIZ.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 96 to 93. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96 -> 93.
-
+- Jobe Superior dimensions import promoted from AOSharp capture 20260614-002319.
+- Validated coverage added: 4 vendor rows across 4565 Hardware Dimension - Superior and 4569 Dimensional Shift - Superior, 4 vendor templates, and 4 new shop inventory groups with 116 inventory rows.
+- Imported targets: Superior Armor, Superior Equipment for Nano Specialists, Costly Regenerative Supplies --- 100-175, and Superior Implants.
+- Incidental Heavenly Business capture evidence from the same session was not imported because those statels were already covered.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 93 to 89. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96 -> 93 -> 89.
 ## Coverage Exclusions
 
 | Template | Name | Reason | Excluded statels | Evidence |
