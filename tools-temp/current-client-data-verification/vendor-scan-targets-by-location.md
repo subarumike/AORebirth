@@ -1,6 +1,6 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 142.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 133.
 
 ## Practical Location Summary
 
@@ -10,9 +10,7 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 4704 | Tower Shop (dungeon) | Likely special/dungeon; verify before travel | 17 | ICC/tower shop special vendors (16); Containers/computers/furniture/specialty/cars (1) |
 | 6007 | BS Signup (dng) | Likely special/dungeon; verify before travel | 17 | OFAB vendors (17) |
 | 4354 | Uncle Bazzits Workshop (Dng) | Likely special/dungeon; verify before travel | 5 | Other unresolved vendor terminal (4); Faction clothes/fashion (1) |
-| 565 | Newland Desert | Likely live-accessible | 5 | Other unresolved vendor terminal (2); Classic armor terminals (1); Implants/clusters (1); Startup equipment (1) |
 | 540 | Old Athen | Likely live-accessible | 4 | Startup equipment (4) |
-| 710 | Omni-1 Trade | Likely live-accessible | 4 | Startup equipment (4) |
 | 4565 | Hardware Dimenion - Superior | Unknown accessibility | 3 | Other unresolved vendor terminal (2); Classic armor terminals (1) |
 | 1426 | Clan Registration dng | Likely special/dungeon; verify before travel | 2 | Other unresolved vendor terminal (2) |
 | 4364 | Unicorn Outpost | Unknown accessibility | 2 | Other unresolved vendor terminal (2) |
@@ -43,10 +41,8 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 500 | Parnassos |  |  |  |  |  |
 | 4704 | Tower Shop (dungeon) | Borealis 0xC0180320 @ 729.813,61.686,651.696 | Old Athen 0xC02B021C @ 479.913,9.174,282.706 <br> Rome Blue 0xC00A02DF @ 675.09,22.357,356.184 | 0xC0001260 @ 193.988,9.006,153.992 | 0xC0001260 @ 193.988,9.006,153.992 -> 0xC0011260 @ 178,9.005,157.986 | Medium: same-template sibling door within 30m No patch. Keep as reference evidence for this interior family. |
 | 6007 | BS Signup (dng) |  |  |  |  |  |
-| 565 | Newland Desert |  |  |  |  |  |
 | 4354 | Uncle Bazzits Workshop (Dng) | Newland Desert 0xC0000235 @ 1546.475,31.502,2717.811 |  | 0xC0001102 @ 183.002,6.02,155.985 |  |  |
 | 540 | Old Athen |  |  |  |  |  |
-| 710 | Omni-1 Trade |  |  |  |  |  |
 | 4565 | Hardware Dimenion - Superior | Jobe Plaza 0xC00211B5 @ 193.3,482.791,179.373 |  | 0xC00011D5 @ 41.991,6.004,47.989 |  |  |
 | 665 | Broken Shores |  |  |  |  |  |
 | 791 | Holes in the Wall |  |  |  |  |  |
@@ -199,17 +195,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 7 | 285343747 | 255998 | Uncle Bazzit's Landscaping | 177.233,6.02,143.604 | Other unresolved vendor terminal |
 | 7 | 285343748 | 255997 | Uncle Bazzit's Furnishings | 176.295,6.02,145.301 | Other unresolved vendor terminal |
 
-### 565 - Newland Desert (5)
-
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 2 | 37027845 | 118287 | Basic Nano Clusters | 1510.011,31.2,2730.056 | Implants/clusters |
-| 6 | 37027841 | 99570 | Basic Armor | 1549.943,31.2,2730.035 | Classic armor terminals |
-| 6 | 37027844 | 99643 | Basic Startup Equipment | 1518.001,31.2,2730.07 | Startup equipment |
-| 7 | 37027847 | 121035 | Food | 2187.295,21.3,1551.807 | Other unresolved vendor terminal |
-| 7 | 37027848 | 121037 | Drinks | 2185.245,21.3,1552.811 | Other unresolved vendor terminal |
-
 ### 540 - Old Athen (4)
 
 
@@ -219,16 +204,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 6 | 35389442 | 99569 | Clan Basic Startup Equipment | 462,15,414 | Startup equipment |
 | 6 | 35389444 | 99569 | Clan Basic Startup Equipment | 406,15,378 | Startup equipment |
 | 6 | 35389446 | 99569 | Clan Basic Startup Equipment | 418,8,458 | Startup equipment |
-
-### 710 - Omni-1 Trade (4)
-
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 6 | 46530560 | 99555 | OT Basic Startup Equipment | 246,8,413 | Startup equipment |
-| 6 | 46530561 | 99555 | OT Basic Startup Equipment | 246,8,350 | Startup equipment |
-| 6 | 46530562 | 99555 | OT Basic Startup Equipment | 562,8,351 | Startup equipment |
-| 6 | 46530563 | 99555 | OT Basic Startup Equipment | 562,8,413 | Startup equipment |
 
 ### 4565 - Hardware Dimenion - Superior (3)
 

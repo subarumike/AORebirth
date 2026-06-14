@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-13 17:57:53
+Generated: 2026-06-13 20:42:38
 
 ## Scope
 
@@ -20,15 +20,15 @@ Generated: 2026-06-13 17:57:53
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 142 |
+| Vending statels without complete DB shop coverage | 133 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Arete ICC implant/cluster import promoted from AOSharp capture 20260613-172753.
-- Validated coverage added: 5 vendor rows in 6553 Arete Landing, 5 vendor templates, and 5 new shop inventory groups with 573 inventory rows.
-- The imported rows cover ICC Basic Implants, ICC Faded Clusters, ICC Bright Clusters, ICC Shiny Clusters, and ICC Pharmacy; incidental nearby capture evidence was intentionally excluded.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 147 to 142. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142.
+- Newland + Omni startup import promoted from AOSharp capture 20260613-185338.
+- Validated coverage added: 9 vendor rows across 565 Newland Desert and 710 Omni-1 Trade, 6 vendor templates, and 6 new shop inventory groups with 232 inventory rows.
+- The imported rows cover Newland Basic Armor, Newland Basic Startup Equipment, Newland Basic Nano Clusters, Food, Drinks, and four OT Basic Startup Equipment statels; the four Omni startup vendors share one deduplicated inventory group.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 142 to 133. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133.
 
 ## Coverage Exclusions
 
