@@ -1,15 +1,15 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 124.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 106.
 
 ## Practical Location Summary
 
 | Playfield | Location | Access | Uncovered terminals | Main families |
 | ---: | --- | --- | ---: | --- |
 | 500 | Parnassos | GM-only / not live-accessible | 60 | Other unresolved vendor terminal (21); Heavenly weapon construction/components/recipes (19); Containers/computers/furniture/specialty/cars (8); Implants/clusters (4) |
-| 4704 | Tower Shop (dungeon) | Likely special/dungeon; verify before travel | 17 | ICC/tower shop special vendors (16); Containers/computers/furniture/specialty/cars (1) |
-| 6007 | BS Signup (dng) | Likely special/dungeon; verify before travel | 17 | OFAB vendors (17) |
+| 6007 | BS Signup (dng) | Likely special/dungeon; verify before travel | 13 | OFAB vendors (13) |
 | 4354 | Uncle Bazzits Workshop (Dng) | Likely special/dungeon; verify before travel | 5 | Other unresolved vendor terminal (4); Faction clothes/fashion (1) |
+| 4704 | Tower Shop (dungeon) | Likely special/dungeon; verify before travel | 3 | ICC/tower shop special vendors (3) |
 | 1426 | Clan Registration dng | Likely special/dungeon; verify before travel | 2 | Other unresolved vendor terminal (2) |
 | 4364 | Unicorn Outpost | Unknown accessibility | 2 | Other unresolved vendor terminal (2) |
 | 4565 | Hardware Dimenion - Superior | Unknown accessibility | 2 | Classic armor terminals (1); Other unresolved vendor terminal (1) |
@@ -36,9 +36,9 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | Playfield | Location | Primary source door | Other source doors | Destination door(s) | Paired-door candidate | Note |
 | ---: | --- | --- | --- | --- | --- | --- |
 | 500 | Parnassos |  |  |  |  |  |
-| 4704 | Tower Shop (dungeon) | Borealis 0xC0180320 @ 729.813,61.686,651.696 | Old Athen 0xC02B021C @ 479.913,9.174,282.706 <br> Rome Blue 0xC00A02DF @ 675.09,22.357,356.184 | 0xC0001260 @ 193.988,9.006,153.992 | 0xC0001260 @ 193.988,9.006,153.992 -> 0xC0011260 @ 178,9.005,157.986 | Medium: same-template sibling door within 30m No patch. Keep as reference evidence for this interior family. |
 | 6007 | BS Signup (dng) |  |  |  |  |  |
 | 4354 | Uncle Bazzits Workshop (Dng) | Newland Desert 0xC0000235 @ 1546.475,31.502,2717.811 |  | 0xC0001102 @ 183.002,6.02,155.985 |  |  |
+| 4704 | Tower Shop (dungeon) | Borealis 0xC0180320 @ 729.813,61.686,651.696 | Old Athen 0xC02B021C @ 479.913,9.174,282.706 <br> Rome Blue 0xC00A02DF @ 675.09,22.357,356.184 | 0xC0001260 @ 193.988,9.006,153.992 | 0xC0001260 @ 193.988,9.006,153.992 -> 0xC0011260 @ 178,9.005,157.986 | Medium: same-template sibling door within 30m No patch. Keep as reference evidence for this interior family. |
 | 954 | Neutral Training | Borealis Backyard 1 0xE7100C08 @ 122.603,39.965,77.115 | Borealis Backyard 10 0xE7100C11 @ 122.603,39.965,77.115 <br> Borealis Backyard 2 0xE7100C09 @ 122.603,39.965,77.115 <br> Borealis Backyard 3 0xE7100C0A @ 122.603,39.965,77.115 <br> Borealis Backyard 4 0xE7100C0B @ 122.603,39.965,77.115 <br> Borealis Backyard 5 0xE7100C0C @ 122.603,39.965,77.115 <br> Borealis Backyard 6 0xE7100C0D @ 122.603,39.965,77.115 <br> Borealis Backyard 7 0xE7100C0E @ 122.603,39.965,77.115 <br> Borealis Backyard 8 0xE7100C0F @ 122.603,39.965,77.115 <br> Borealis Backyard 9 0xE7100C10 @ 122.603,39.965,77.115 <br> Neutral Backyard 0xE71003BB @ 122.603,39.965,77.115 <br> Newland Backyard 1 0xE7100BF4 @ 122.603,39.965,77.115 <br> Newland Backyard 10 0xE7100BFD @ 122.603,39.965,77.115 <br> Newland Backyard 11 0xE7100BFE @ 122.603,39.965,77.115 <br> Newland Backyard 12 0xE7100BFF @ 122.603,39.965,77.115 <br> Newland Backyard 2 0xE7100BF5 @ 122.603,39.965,77.115 <br> Newland Backyard 3 0xE7100BF6 @ 122.603,39.965,77.115 <br> Newland Backyard 4 0xE7100BF7 @ 122.603,39.965,77.115 <br> Newland Backyard 5 0xE7100BF8 @ 122.603,39.965,77.115 <br> Newland Backyard 6 0xE7100BF9 @ 122.603,39.965,77.115 <br> Newland Backyard 7 0xE7100BFA @ 122.603,39.965,77.115 <br> Newland Backyard 8 0xE7100BFB @ 122.603,39.965,77.115 <br> Newland Backyard 9 0xE7100BFC @ 122.603,39.965,77.115 | 0xC00003BA @ 239.886,5.965,69.931 |  |  |
 | 1426 | Clan Registration dng |  |  |  |  |  |
 | 4364 | Unicorn Outpost |  |  |  |  |  |
@@ -126,34 +126,7 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 7 | 32768084 | 155498 | Armour and Clothing Components - Superior | 468.2,37.001,343.7 | Other unresolved vendor terminal |
 | 7 | 32768087 | 155313 | Nano Crystal Components - Superior | 473.8,37.001,343.7 | Other unresolved vendor terminal |
 
-### 4704 - Tower Shop (dungeon) (17)
-
-- Primary source door: Borealis 0xC0180320 @ 729.813,61.686,651.696
-- Other source doors: Old Athen 0xC02B021C @ 479.913,9.174,282.706 | Rome Blue 0xC00A02DF @ 675.09,22.357,356.184
-- Destination door evidence: 0xC0001260 @ 193.988,9.006,153.992
-- Paired-door candidate: 0xC0001260 @ 193.988,9.006,153.992 -> 0xC0011260 @ 178,9.005,157.986 (Medium; same-template sibling door within 30m)
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 4 | 308281370 | 297058 | Furniture | 193,5.01,178 | Containers/computers/furniture/specialty/cars |
-| 5 | 308281344 | 297060 | Hovercrafts | 189,5.01,141 | ICC/tower shop special vendors |
-| 5 | 308281345 | 297059 | Aircrafts | 187.042,5.01,141 | ICC/tower shop special vendors |
-| 5 | 308281346 | 297056 | Watercrafts | 185,5.01,140.971 | ICC/tower shop special vendors |
-| 5 | 308281347 | 297061 | Basic Towers | 162.953,5.011,136 | ICC/tower shop special vendors |
-| 5 | 308281348 | 297064 | Advanced Towers | 163,5.01,137.98 | ICC/tower shop special vendors |
-| 5 | 308281349 | 249724 | Leets-R-Us | 171,5.01,166.966 | ICC/tower shop special vendors |
-| 5 | 308281350 | 258794 | Veteran Rewards Vendor | 166.952,5.01,167 | ICC/tower shop special vendors |
-| 5 | 308281366 | 295890 | Clan City Buildings | 189,5.01,167 | ICC/tower shop special vendors |
-| 5 | 308281367 | 295891 | Omni City Buildings | 187,5.01,167 | ICC/tower shop special vendors |
-| 5 | 308281368 | 295892 | Neutral City Buildings | 185,5.01,167 | ICC/tower shop special vendors |
-| 5 | 308281369 | 295893 | Social City Buildings | 183,5.01,167 | ICC/tower shop special vendors |
-| 5 | 308281371 | 297057 | Decor | 193,5.01,176 | ICC/tower shop special vendors |
-| 5 | 308281372 | 297063 | Superior Towers | 163,5.01,140 | ICC/tower shop special vendors |
-| 5 | 308281373 | 297062 | Basic Contracts | 168,5.01,148.997 | ICC/tower shop special vendors |
-| 5 | 308281374 | 297065 | Advanced Contracts | 170.026,5.01,149 | ICC/tower shop special vendors |
-| 5 | 308281375 | 297066 | Superior Contracts | 172,5.01,149.037 | ICC/tower shop special vendors |
-
-### 6007 - BS Signup (dng) (17)
+### 6007 - BS Signup (dng) (13)
 
 
 | Priority | Vendor ID | Template | Name | Coords | Family |
@@ -167,14 +140,10 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 5 | 393674758 | 266567 | Ofab Fixer Vendor | 232.01,6.02,232.985 | OFAB vendors |
 | 5 | 393674759 | 266568 | Ofab Keeper Vendor | 234.01,6.02,232.985 | OFAB vendors |
 | 5 | 393674760 | 266570 | Ofab Martial Artist Vendor | 236.01,6.02,232.985 | OFAB vendors |
-| 5 | 393674761 | 266571 | Ofab Meta-Physicist Vendor | 238.01,6.02,232.985 | OFAB vendors |
 | 5 | 393674762 | 266572 | Ofab Nano-Technician Vendor | 240.01,6.02,232.985 | OFAB vendors |
 | 5 | 393674763 | 266574 | Ofab Shade Vendor | 241.988,6.02,233.019 | OFAB vendors |
 | 5 | 393674764 | 266573 | Ofab Soldier Vendor | 244.01,6.02,233.014 | OFAB vendors |
 | 5 | 393674765 | 266575 | Ofab Trader Vendor | 246.01,6.02,232.985 | OFAB vendors |
-| 5 | 393674766 | 266579 | Ofab General Vendor | 216.501,6.021,223.962 | OFAB vendors |
-| 5 | 393674767 | 266577 | Ofab Melee Weapons | 216.501,6.02,221.975 | OFAB vendors |
-| 5 | 393674768 | 266576 | Ofab Ranged Weapons | 216.46,6.02,219.975 | OFAB vendors |
 
 ### 4354 - Uncle Bazzits Workshop (Dng) (5)
 
@@ -188,6 +157,19 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 7 | 285343746 | 254816 | Uncle Bazzit's Floorplans | 188.385,6.021,143.679 | Other unresolved vendor terminal |
 | 7 | 285343747 | 255998 | Uncle Bazzit's Landscaping | 177.233,6.02,143.604 | Other unresolved vendor terminal |
 | 7 | 285343748 | 255997 | Uncle Bazzit's Furnishings | 176.295,6.02,145.301 | Other unresolved vendor terminal |
+
+### 4704 - Tower Shop (dungeon) (3)
+
+- Primary source door: Borealis 0xC0180320 @ 729.813,61.686,651.696
+- Other source doors: Old Athen 0xC02B021C @ 479.913,9.174,282.706 | Rome Blue 0xC00A02DF @ 675.09,22.357,356.184
+- Destination door evidence: 0xC0001260 @ 193.988,9.006,153.992
+- Paired-door candidate: 0xC0001260 @ 193.988,9.006,153.992 -> 0xC0011260 @ 178,9.005,157.986 (Medium; same-template sibling door within 30m)
+
+| Priority | Vendor ID | Template | Name | Coords | Family |
+| ---: | ---: | ---: | --- | --- | --- |
+| 5 | 308281349 | 249724 | Leets-R-Us | 171,5.01,166.966 | ICC/tower shop special vendors |
+| 5 | 308281366 | 295890 | Clan City Buildings | 189,5.01,167 | ICC/tower shop special vendors |
+| 5 | 308281368 | 295892 | Neutral City Buildings | 185,5.01,167 | ICC/tower shop special vendors |
 
 ### 1426 - Clan Registration dng (2)
 
