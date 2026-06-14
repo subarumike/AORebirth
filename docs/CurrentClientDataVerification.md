@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-13 21:29:10
+Generated: 2026-06-13 22:12:39
 
 ## Scope
 
@@ -20,15 +20,15 @@ Generated: 2026-06-13 21:29:10
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 129 |
+| Vending statels without complete DB shop coverage | 127 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Clan Basic Startup Equipment import promoted from AOSharp capture 20260613-211234.
-- Validated coverage added: 4 vendor rows in 540 Old Athen, 1 vendor template, and 1 new shop inventory group with 9 inventory rows.
-- The imported rows cover four Old Athen Clan Basic Startup Equipment statels sharing one deduplicated inventory group. Statel 0xC000021C had captured inventory but no direct VendorFull; it was correlated by template 99569 and exact inventory match with the three VendorFull-confirmed startup terminals.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 133 to 129. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129.
+- Broken Shores + Lush Fields live capture import promoted from AOSharp capture 20260613-215211.
+- Validated coverage added: 2 vendor rows, 2 vendor templates, and 2 new shop inventory groups with 190 inventory rows.
+- The imported rows cover Broken Shores OT Advanced Trade Skills and Lush Fields Basic Startup Equipment. The Lush Fields startup inventory is not an exact reuse of Newland startup because the treatment kit row is QL 8 instead of QL 4.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 129 to 127. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127.
 
 ## Coverage Exclusions
 
