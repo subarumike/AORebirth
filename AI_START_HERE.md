@@ -1,6 +1,6 @@
 # AI Start Here
 
-This repository is Mike's local CellAO NightPredator server workspace for Anarchy Online server repair work.
+This repository is Mike's local AO Rebirth NightPredator server workspace for Anarchy Online server repair work.
 
 Read these files first, in order:
 

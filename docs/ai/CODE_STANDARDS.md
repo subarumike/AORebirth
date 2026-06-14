@@ -4,7 +4,7 @@ Generated: 2026-06-02
 
 ## Naming Conventions
 
-- Preserve existing CellAO naming where possible.
+- Preserve existing AO Rebirth naming where possible.
 - Use clear packet field names, but document when historical names are misleading.
 - Do not rename broad public APIs during focused gameplay repairs unless necessary.
 - When packet fields are unknown, use stable names such as `Unknown1` only with comments or docs explaining source evidence.
@@ -12,9 +12,9 @@ Generated: 2026-06-02
 ## Folder Structure Rules
 
 - Server runtime code belongs under the matching engine directory.
-- Zone gameplay handlers belong under `CellAO/Server/ZoneEngine/Core/MessageHandlers`.
-- Custom packet builders belong under `CellAO/Server/ZoneEngine/Core/Packets`.
-- Core entity/inventory/item logic belongs under `CellAO/Libraries/Source/CellAO.Core`.
+- Zone gameplay handlers belong under `AORebirth/Server/ZoneEngine/Core/MessageHandlers`.
+- Custom packet builders belong under `AORebirth/Server/ZoneEngine/Core/Packets`.
+- Core entity/inventory/item logic belongs under `AORebirth/Libraries/Source/AORebirth.Core`.
 - Packet models belong under AOtomation unless a custom ZoneEngine packet builder is intentionally used.
 - Temporary capture/test tooling belongs under `tools-temp`.
 - Active AI workflow documentation belongs under `docs/ai`.
@@ -22,12 +22,12 @@ Generated: 2026-06-02
 - Backlog documentation belongs under `docs/backlog`.
 - Authored reports and large evidence references belong under `docs/reference` or `docs/reports`.
 - Historical AI notes and dated handoffs belong under `docs/archive`.
-- Generated enum/stat documentation remains under `CellAO/Documentation`.
+- Generated enum/stat documentation remains under `AORebirth/Documentation`.
 
 ## Class Design Rules
 
 - Keep changes scoped to the system being repaired.
-- Prefer existing CellAO patterns over new abstractions.
+- Prefer existing AO Rebirth patterns over new abstractions.
 - Add abstractions only when they reduce real complexity or protect a verified contract.
 - Avoid adding broad gameplay heuristics in packet-sensitive paths.
 - For high-risk systems, separate evidence/model/test work from runtime behavior changes.

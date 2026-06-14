@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2013, CellAO Team
 // 
@@ -30,7 +30,7 @@ namespace Extractor_Serializer.Structs
 
     using System.IO;
 
-    using CellAO.Core.Statels;
+    using AORebirth.Core.Statels;
 
     #endregion
 

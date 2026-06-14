@@ -6,7 +6,7 @@ Change: Recorded the completed `600 Varmint Woods` vendor coverage expansion.
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -39,7 +39,7 @@ Change: Recorded the completed `2070 neut_advanced_weapons_shop` vendor coverage
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -72,7 +72,7 @@ Change: Recorded the completed `2060 neut_basic_weapon_shop` vendor coverage exp
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -103,7 +103,7 @@ Change: Recorded the completed `4565 Hardware Dimension - Superior` vendor cover
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -133,7 +133,7 @@ Change: Recorded the completed `4564 Hardware Dimension - Advanced` vendor cover
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -163,7 +163,7 @@ Change: Recorded the completed `6553 Arete Landing` vendor coverage expansion.
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -193,7 +193,7 @@ Change: Recorded the completed `4563 Hardware Dimension - Basic` vendor coverage
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -223,7 +223,7 @@ Change: Recorded the completed `4569 Dimensional Shift - Superior` vendor covera
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -253,7 +253,7 @@ Change: Recorded the completed `4568 Dimensional Shift - Advanced` vendor covera
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -283,7 +283,7 @@ Change: Recorded the completed `4567 Dimensional Shift - Basic` vendor coverage 
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -313,7 +313,7 @@ Change: Recorded the completed `2096 4holes Fashion` vendor coverage expansion.
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -343,7 +343,7 @@ Change: Recorded the completed `565 Newland Desert` vendor coverage expansion.
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -373,7 +373,7 @@ Change: Recorded the completed `2073 neut_advanced_implants_shop` vendor coverag
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -403,7 +403,7 @@ Change: Recorded the completed `2064 neut_basic_implants_shop` vendor coverage e
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -433,7 +433,7 @@ Change: Recorded the completed `1181 ord_smarket_clan_advanced` vendor coverage 
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -463,7 +463,7 @@ Change: Recorded the completed `1180 ord_smarket_clan_basic` vendor coverage exp
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -493,7 +493,7 @@ Change: Recorded the completed `655 Andromeda` vendor coverage expansion.
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -524,7 +524,7 @@ Change: Recorded the completed `1182 ord_smarket_clan_sup` vendor coverage expan
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -555,7 +555,7 @@ Change: Recorded the completed `500 Parnassos` vendor coverage expansion.
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -585,7 +585,7 @@ Change: Recorded the completed `1185 ord_smarket_omni_sup` vendor coverage expan
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -615,7 +615,7 @@ Change: Recorded the completed `1184 ord_smarket_omni_advanced` vendor coverage 
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -645,7 +645,7 @@ Change: Recorded the completed `1183 ord_smarket_omni_basic` vendor coverage exp
 
 Files affected:
 
-- `CellAO/Libraries/Source/CellAO.Database/SqlTables/vendors.sql`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`
 - `cellao_codex_clean.vendors`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
@@ -705,9 +705,9 @@ Change: Recorded that the broad and focused source assertion harnesses now pass 
 
 Files affected:
 
-- `tools-temp/CellAOCombatSmokeTests/Run-CombatSmokeTests.ps1`
-- `tools-temp/CellAOCombatSmokeTests/Run-CorpseCreditTraceAssertions.ps1`
-- `tools-temp/CellAOCombatSmokeTests/Run-InventoryContainerRegressionAssertions.ps1`
+- `tools-temp/AORebirthCombatSmokeTests/Run-CombatSmokeTests.ps1`
+- `tools-temp/AORebirthCombatSmokeTests/Run-CorpseCreditTraceAssertions.ps1`
+- `tools-temp/AORebirthCombatSmokeTests/Run-InventoryContainerRegressionAssertions.ps1`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
 - `docs/ai/CHANGELOG_AI.md`
@@ -733,8 +733,8 @@ Change: Recorded the completed player-to-player trade verification after adding 
 
 Files affected:
 
-- `CellAO/Server/ZoneEngine/Core/MessageHandlers/TradeMessageHandler.cs`
-- `tools-temp/CellAOCombatSmokeTests/Run-CombatSmokeTests.ps1`
+- `AORebirth/Server/ZoneEngine/Core/MessageHandlers/TradeMessageHandler.cs`
+- `tools-temp/AORebirthCombatSmokeTests/Run-CombatSmokeTests.ps1`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
 - `docs/ai/CHANGELOG_AI.md`
@@ -761,9 +761,9 @@ Change: Fixed the corpse credit client-visible value path and removed duplicate 
 
 Files affected:
 
-- `CellAO/Server/ZoneEngine/Core/Packets/CorpseFullUpdate.cs`
-- `CellAO/Server/ZoneEngine/Core/Playfields/Playfield.cs`
-- `tools-temp/CellAOCombatSmokeTests/Run-CorpseCreditTraceAssertions.ps1`
+- `AORebirth/Server/ZoneEngine/Core/Packets/CorpseFullUpdate.cs`
+- `AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs`
+- `tools-temp/AORebirthCombatSmokeTests/Run-CorpseCreditTraceAssertions.ps1`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
 - `docs/ai/CHANGELOG_AI.md`

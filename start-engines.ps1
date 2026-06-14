@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
-$engineDir = Join-Path $root "CellAO\Built\Debug"
+$engineDir = Join-Path $root "AORebirth\Built\Debug"
 
 if (-not (Test-Path $engineDir)) {
     throw "Engine build folder not found: $engineDir"
@@ -48,4 +48,4 @@ foreach ($engine in $engines) {
     Start-Sleep -Milliseconds 500
 }
 
-Write-Host "CellAO engine startup complete."
+Write-Host "AO Rebirth engine startup complete."

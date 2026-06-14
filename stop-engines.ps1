@@ -21,4 +21,4 @@ foreach ($name in $engineNames) {
     }
 }
 
-Write-Host "CellAO engine shutdown complete."
+Write-Host "AO Rebirth engine shutdown complete."

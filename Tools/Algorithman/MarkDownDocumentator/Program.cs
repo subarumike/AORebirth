@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2013, CellAO Team
 // 
@@ -33,11 +33,11 @@ namespace MarkDownDocumentator
     using System.IO;
     using System.Linq;
 
-    using CellAO.Core.Items;
-    using CellAO.Core.Statels;
-    using CellAO.Database.Dao;
-    using CellAO.Enums;
-    using CellAO.Stats;
+    using AORebirth.Core.Items;
+    using AORebirth.Core.Statels;
+    using AORebirth.Database.Dao;
+    using AORebirth.Enums;
+    using AORebirth.Stats;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
@@ -168,7 +168,7 @@ namespace MarkDownDocumentator
         {
             TextWriter tw = new StreamWriter(fileName);
 
-            WriteHeader1(tw, "CellAO Stats List");
+            WriteHeader1(tw, "AO Rebirth Stats List");
             WriteHorizonalLine(tw);
 
             Stats stats = new Stats(new Identity() { Instance = 1, Type = IdentityType.CanbeAffected });
@@ -224,7 +224,7 @@ namespace MarkDownDocumentator
             TextWriter tw =
                 new StreamWriter(Path.Combine("..", Path.Combine("..", Path.Combine("Documentation", "Index.md"))));
 
-            WriteHeader1(tw, "CellAO Stats and Enums");
+            WriteHeader1(tw, "AO Rebirth Stats and Enums");
             WriteHorizonalLine(tw);
             WriteLink(tw, "Stats list", "Stats.md");
 

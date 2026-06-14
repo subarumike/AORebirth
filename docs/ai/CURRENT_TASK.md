@@ -6,7 +6,7 @@ This is the primary handoff file. Update it before ending a work session.
 
 ## Current Objective
 
-Stabilize CellAO behavior using packet evidence, local playtests, and focused source assertions. Inventory, corpse loot, corpse credits, player trade, and vendor buy/sell/close live persistence verification are complete for the documented repaired flows. The next highest-value unfinished area is static vendor coverage: broad shop stock data still has documented gaps, while the transaction behavior itself is now verified. Latest vendor milestone: Freelancers Inc. HQ - Rome Agency Shop import from AOSharp capture `20260614-022639`, reducing actionable uncovered statel vendors from `27` to `26`.
+Stabilize AO Rebirth behavior using packet evidence, local playtests, and focused source assertions. Inventory, corpse loot, corpse credits, player trade, and vendor buy/sell/close live persistence verification are complete for the documented repaired flows. Static vendor coverage is complete for all practical live-accessible vendors. The remaining `26` uncovered statel vendors require setup-specific access and are deferred; do not continue vendor capture/import work unless Mike intentionally reopens that deferred backlog.
 
 ## Current Implementation State
 
@@ -50,6 +50,7 @@ Verified or previously playtested as working:
 - Parnassos coverage exclusion completed. Playfield `500 Parnassos` is GM-only / not practically live-accessible, so the verification generator now marks all playfield `500` vending statels with `CoverageExcluded = True` and `ExclusionReason = InaccessibleGmOnlyPlayfield`. Raw `statel-vendor-coverage.csv` keeps the audit rows, but Parnassos is excluded from metrics, missing-vendor reports, `vendor-scan-targets.csv`, capture targeting, and import planning. Verification now shows `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 29`, and `StatelVendorExclusions = 169`; actionable capture backlog dropped from `89` to `29`. No SQL, vendor mappings, imports, or runtime vendor behavior changed.
 - Neutral Training Startup Equipment import completed from AOSharp capture `20260614-002319`. The validated staged SQL added 2 `954 Neutral Training` vendor rows, 1 vendor template, and 1 new shop inventory group with 9 inventory rows. Both Basic Startup Equipment statels have direct VendorFull and ShopUpdate evidence and share exact inventory hash `WHBW`. Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 27`, and `StatelVendorExclusions = 169`; actionable uncovered statel vendors dropped from `29` to `27`. Current coverage/actionability chain is `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96 -> 93 -> 89 -> 29 -> 27`. No runtime vendor behavior changed.
 - Freelancers Inc. HQ - Rome Agency Shop import completed from AOSharp capture `20260614-022639`. The validated staged SQL added 1 `7011 Freelancers Inc. HQ - Rome` vendor row, 1 vendor template, and 1 new shop inventory group with 26 inventory rows. The imported row covers Agency Shop template `285348` at X 93.972 Y 2.01 Z 73.734 with direct VendorFull and ShopUpdate evidence. Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 26`, and `StatelVendorExclusions = 169`; actionable uncovered statel vendors dropped from `27` to `26`. Current coverage/actionability chain is `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96 -> 93 -> 89 -> 29 -> 27 -> 26`. No runtime vendor behavior changed.
+- Vendor coverage campaign freeze completed. Status: COMPLETE (LIVE COVERAGE). Remaining `26` uncovered statel vendors are deferred because they require setup-specific access: BS Signup profession-locked terminals, sided/org-dependent Tower Shop terminals, Clan-only shops, ICC Holodeck / Arete divergence, Unicorn Outpost, and special registration interiors. No SQL, capture, import, mapping change, or runtime vendor behavior change was made for the freeze.
 - Jobe Advanced dimensions live capture import completed from AOSharp capture `20260614-002319`. The validated staged SQL added 3 vendor rows across `4564 Hardware Dimension - Advanced` and `4568 Dimensional Shift - Advanced`, 3 vendor templates, and 2 new shop inventory groups with 68 new inventory rows while reusing exact shop hash `HMIZ` for regenerative supplies. Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 93`, and `StatelVendorExclusions = 30`; actionable uncovered statel vendors dropped from `96` to `93`. Current coverage chain is `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96 -> 93`. No runtime vendor behavior changed.
 - Omni Advanced General Shop live-capture import completed from AOSharp capture `20260613-002828`. The validated staged SQL added 23 `1184 ord_smarket_omni_advanced` vendor rows, 16 vendor templates, and 15 new shop inventory groups with 760 inventory rows while reusing existing shop hash `LJI7`. Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 253`, and `StatelVendorExclusions = 30`; actionable uncovered statel vendors dropped from `276` to `253`. No runtime vendor behavior changed.
 - `1183 ord_smarket_omni_basic` vendor coverage expansion completed. The 20 approved static vendor mappings were committed, imported into `cellao_codex_clean.vendors`, and verified with `DataFileIssues = 0`, `VendorDbIssues = 0`, and `ShopInventoryIssues = 0`. Total uncovered statel vendors dropped from `730` to `710`; `1183 ord_smarket_omni_basic` dropped from `77` to `57`. A `vendors` table backup was created before import, and no runtime vendor behavior changed.
@@ -77,30 +78,30 @@ Verified or previously playtested as working:
 
 Currently unstable or unresolved:
 
-- Broad static vendor coverage remains incomplete. Transaction behavior for vendor buy, sell, and close/cancel is verified; remaining work is data coverage for shop stock and statel-to-template mappings, not transaction semantics. Current post-import audit shows `26` actionable uncovered statel vendors.
+- Static vendor coverage is complete for practical live-accessible vendors. Transaction behavior for vendor buy, sell, and close/cancel is verified. The remaining `26` uncovered statel vendors are deferred access/setup backlog, not active capture work.
 - NPC movement remains high-risk and should not be patched without source/capture evidence.
 
 ## Files Actively Being Modified Or Recently Dirty
 
 Check `git status --short --branch` before editing. At the time these docs were created, the dirty tree included:
 
-- `CellAO/Documentation/Index.md`
-- `CellAO/Documentation/ProjectWorkingReference.md`
-- `CellAO/Libraries/Source/AOtomation/AOtomation.Messaging`
-- `CellAO/Libraries/Source/CellAO.Core/Entities/TemporaryBag.cs`
-- `CellAO/Libraries/Source/CellAO.Stats/Stats.cs`
-- `CellAO/Server/ZoneEngine/Core/CombatCorpseRules.cs`
-- `CellAO/Server/ZoneEngine/Core/Controllers/PlayerController.cs`
-- `CellAO/Server/ZoneEngine/Core/Functions/GameFunctions/modify.cs`
-- `CellAO/Server/ZoneEngine/Core/Functions/GameFunctions/modifypercentage.cs`
-- `CellAO/Server/ZoneEngine/Core/MessageHandlers/CharacterActionMessageHandler.cs`
-- `CellAO/Server/ZoneEngine/Core/MessageHandlers/ChatCmdMessageHandler.cs`
-- `CellAO/Server/ZoneEngine/Core/MessageHandlers/ClientMoveItemToInventoryMessageHandler.cs`
-- `CellAO/Server/ZoneEngine/Core/MessageHandlers/ContainerAddItemMessageHandler.cs`
-- `CellAO/Server/ZoneEngine/Core/MessageHandlers/StatMessageHandler.cs`
-- `CellAO/Server/ZoneEngine/Core/MessageHandlers/TradeMessageHandler.cs`
-- `CellAO/Server/ZoneEngine/Core/Playfields/Playfield.cs`
-- `tools-temp/CellAOCombatSmokeTests/Run-CombatSmokeTests.ps1`
+- `AORebirth/Documentation/Index.md`
+- `AORebirth/Documentation/ProjectWorkingReference.md`
+- `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging`
+- `AORebirth/Libraries/Source/AORebirth.Core/Entities/TemporaryBag.cs`
+- `AORebirth/Libraries/Source/AORebirth.Stats/Stats.cs`
+- `AORebirth/Server/ZoneEngine/Core/CombatCorpseRules.cs`
+- `AORebirth/Server/ZoneEngine/Core/Controllers/PlayerController.cs`
+- `AORebirth/Server/ZoneEngine/Core/Functions/GameFunctions/modify.cs`
+- `AORebirth/Server/ZoneEngine/Core/Functions/GameFunctions/modifypercentage.cs`
+- `AORebirth/Server/ZoneEngine/Core/MessageHandlers/CharacterActionMessageHandler.cs`
+- `AORebirth/Server/ZoneEngine/Core/MessageHandlers/ChatCmdMessageHandler.cs`
+- `AORebirth/Server/ZoneEngine/Core/MessageHandlers/ClientMoveItemToInventoryMessageHandler.cs`
+- `AORebirth/Server/ZoneEngine/Core/MessageHandlers/ContainerAddItemMessageHandler.cs`
+- `AORebirth/Server/ZoneEngine/Core/MessageHandlers/StatMessageHandler.cs`
+- `AORebirth/Server/ZoneEngine/Core/MessageHandlers/TradeMessageHandler.cs`
+- `AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs`
+- `tools-temp/AORebirthCombatSmokeTests/Run-CombatSmokeTests.ps1`
 - `tools-temp/db-backups/`
 - New root `docs` handoff files.
 
@@ -108,7 +109,7 @@ Do not revert these blindly. Some are active user/project work.
 
 ## Known Blockers
 
-- Packet semantics for some inventory/trade/corpse fields are still being separated from old CellAO naming.
+- Packet semantics for some inventory/trade/corpse fields are still being separated from old AO Rebirth naming.
 - The client may display values from packet placement fields if the wrong response path is used.
 - Trade and corpse loot flows overlap through inventory/container messages, so a fix in one path can regress the other.
 - Local playtest timing matters; Mike performs in-client validation.
@@ -116,11 +117,11 @@ Do not revert these blindly. Some are active user/project work.
 ## Recent Progress
 
 - External Never Knows Best repos were inspected. AOSharp and AODB are useful reference/tooling sources.
-- AOSharp `ContainerAddItem`/inventory message models support the need to compare CellAO packet fields against newer client-side models.
-- Existing docs under `CellAO/Documentation` now contain several high-value packet and mismatch reports.
+- AOSharp `ContainerAddItem`/inventory message models support the need to compare AO Rebirth packet fields against newer client-side models.
+- Existing docs under `AORebirth/Documentation` now contain several high-value packet and mismatch reports.
 - Root AI handoff docs were created to preserve context across sessions.
 - Corpse credit root cause was traced and repaired. The hardcoded `111` came from the old corpse cash template value, `CorpseFullUpdate` was corrected to patch the cash value word at offset `207`, and the server-side manual corpse credit `ChatText` was removed after the client generated the corrected message itself.
-- `tools-temp/CellAOCombatSmokeTests/Run-CorpseCreditTraceAssertions.ps1` now guards the corpse credit flow, including credit roll ranges, `CorpseFullUpdate` cash offset `207`, delayed cash mutation, changed-stat emission, and item loot not mutating cash.
+- `tools-temp/AORebirthCombatSmokeTests/Run-CorpseCreditTraceAssertions.ps1` now guards the corpse credit flow, including credit roll ranges, `CorpseFullUpdate` cash offset `207`, delayed cash mutation, changed-stat emission, and item loot not mutating cash.
 - Playtest verification passed on `Codex Test Cliff Malle`: the client displayed a single `You received 3 credits from the corpse.` line.
 - Player-to-player trade verification passed after temporary `TRADE_*` logging was added. Credit-only, item-only, mixed item-plus-credit, and cancel/decline trades all behaved as expected; no display or commit defect was reproduced.
 - Stale broad smoke assertions were cleaned up after source-backed repairs changed expected shapes. `Run-CombatSmokeTests.ps1 -SkipBuild`, `Run-CorpseCreditTraceAssertions.ps1`, and `Run-InventoryContainerRegressionAssertions.ps1` now pass.
@@ -161,15 +162,15 @@ Do not revert these blindly. Some are active user/project work.
 
 ## Immediate Next Steps
 
-1. Use the current audit data to choose the next static vendor mapping pass only after Mike selects or approves a target.
-2. Compare current-client data verification output, statel template IDs, `vendortemplate` rows, and active shop inventory counts before proposing rows.
+1. Move to the next AO Rebirth system after Mike selects it.
+2. Do not continue vendor capture/import work unless Mike explicitly reopens the deferred access backlog with the required character, profession, side, or special-location setup.
 3. Keep inventory, corpse credits, player trade, and vendor transaction semantics out of scope unless a new verified regression appears.
 4. Keep the temporary `TRADE_*` logging available until another trade issue appears or Mike approves removing it.
 5. Do not patch NPC movement as part of vendor coverage work.
-6. Run focused source/data assertions after any vendor coverage repair.
+6. Run focused source/data assertions after any future data repair.
 7. Start engines only when Mike asks for playtest.
 8. Do not plan capture or imports for `500 Parnassos`; it is excluded as `InaccessibleGmOnlyPlayfield` and remains raw-audit-only.
 
 ## Recommended Next Task
 
-No next target is selected in this documentation update. Parnassos is not active work. Continue static vendor coverage only after Mike selects or approves the next target from the current non-Parnassos audit data. Patch only confirmed mappings; do not guess unknown terminals or change inventory, corpse credit, player trade, or vendor buy/sell/close behavior.
+Vendor coverage campaign is frozen as COMPLETE (LIVE COVERAGE). Move to the next AO Rebirth system after Mike selects it. Do not guess unknown terminals or change inventory, corpse credit, player trade, or vendor buy/sell/close behavior.

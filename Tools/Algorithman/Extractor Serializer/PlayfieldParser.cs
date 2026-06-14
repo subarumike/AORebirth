@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2013, CellAO Team
 // 
@@ -32,10 +32,10 @@ namespace Extractor_Serializer
     using System.Collections.Generic;
     using System.IO;
 
-    using CellAO.Core.Items;
-    using CellAO.Core.Playfields;
-    using CellAO.Core.Statels;
-    using CellAO.Core.Vector;
+    using AORebirth.Core.Items;
+    using AORebirth.Core.Playfields;
+    using AORebirth.Core.Statels;
+    using AORebirth.Core.Vector;
 
     using Extractor_Serializer.Structs;
 
