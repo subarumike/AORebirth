@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-13 23:40:25
+Generated: 2026-06-13 23:53:37
 
 ## Scope
 
@@ -20,15 +20,15 @@ Generated: 2026-06-13 23:40:25
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 104 |
+| Vending statels without complete DB shop coverage | 99 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Treepine Hut OT Clothes import promoted from AOSharp capture 20260613-233535.
-- Validated coverage added: 1 vendor row in 1887 Treepine Hut, 1 vendor template, and 1 new shop inventory group with 16 inventory rows.
-- The imported row covers OT Clothes template 99490. Incidental already-covered Treepine captures were intentionally not imported.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 105 to 104. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104.
+- Uncle Bazzit's Workshop import promoted from AOSharp capture 20260613-184615.
+- Validated coverage added: 5 vendor rows in 4354 Uncle Bazzits Workshop (Dng), 5 vendor templates, and 4 new shop inventory groups with 129 new inventory rows.
+- Maria's Fashion reused existing exact shop hash Fash; Miscellany, Floorplans, Landscaping, and Furnishings received new exact inventory groups.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 104 to 99. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99.
 
 ## Coverage Exclusions
 
