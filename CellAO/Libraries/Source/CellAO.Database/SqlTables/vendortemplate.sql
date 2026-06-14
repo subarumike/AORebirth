@@ -343,7 +343,7 @@ INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHas
 
 -- Omni Superior General Shop import
 -- Source: AOSharp capture 20260612-044234
--- Coverage: 351 → 324 (27 reduction)
+-- Coverage: 351 ??? 324 (27 reduction)
 -- Excludes: 155225 (non-shop statel template)
 
 -- Terminal: OT Superior Armor
@@ -551,7 +551,7 @@ INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHas
 
 -- Clan Superior General Shop import
 -- Source: AOSharp capture 20260612-232439
--- Coverage: 295 → 276 (19 reduction)
+-- Coverage: 295 ??? 276 (19 reduction)
 -- Excludes: 155225 (non-shop statel template)
 -- Reuses existing shop inventory hashes: LJI7, CHHQ, OHOO, JYPE, Cont
 
@@ -1088,3 +1088,18 @@ INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHas
 -- Terminal: Clan Basic Startup Equipment
 -- NormalizedName: ClanBasicStartupEquipment; TemplateId: 99569; ShopHash: VZMO (new); Inventory rows: 9
 INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('CBFMV5N', 1, 'ClanBasicStartupEquipment', 99569, 'VZMO', 1, 1);
+
+-- ============================================================
+-- Broken Shores + Lush Fields live capture import
+-- Source: AOSharp capture 20260613-215211
+-- Coverage: 129 -> 127 (2 reduction)
+-- New inventory groups: 2
+-- ============================================================
+
+-- Terminal: OT Advanced Trade Skills
+-- NormalizedName: BrokenShoresOTAdvancedTradeSkills; TemplateId: 99488; ShopHash: PBPK (new); Inventory rows: 181; Capture identity: (VendingMachine:C0020299); VT window: 0
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('BSNZBQZ', 1, 'BrokenShoresOTAdvancedTradeSkills', 99488, 'PBPK', 1, 89);
+
+-- Terminal: Basic Startup Equipment
+-- NormalizedName: LushFieldsBasicStartupEquipment; TemplateId: 99643; ShopHash: RCIW (new); Inventory rows: 9; Capture identity: (VendingMachine:C00002B7); VT window: 0
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('LFUZCHW', 1, 'LushFieldsBasicStartupEquipment', 99643, 'RCIW', 1, 8);
