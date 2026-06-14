@@ -1,6 +1,6 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 99.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 96.
 
 ## Practical Location Summary
 
@@ -12,13 +12,11 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 1426 | Clan Registration dng | Likely special/dungeon; verify before travel | 2 | Other unresolved vendor terminal (2) |
 | 4364 | Unicorn Outpost | Unknown accessibility | 2 | Other unresolved vendor terminal (2) |
 | 4565 | Hardware Dimenion - Superior | Unknown accessibility | 2 | Classic armor terminals (1); Other unresolved vendor terminal (1) |
-| 4567 | Dimensional Shift - Basic | Unknown accessibility | 2 | Implants/clusters (1); Other unresolved vendor terminal (1) |
 | 4568 | Dimensional Shift - Advanced | Unknown accessibility | 2 | Implants/clusters (1); Other unresolved vendor terminal (1) |
 | 4569 | Dimensional Shift - Superior | Unknown accessibility | 2 | Implants/clusters (1); Other unresolved vendor terminal (1) |
 | 954 | Neutral Training | Likely live-accessible | 2 | Startup equipment (2) |
 | 1427 | Omni registration dng | Likely special/dungeon; verify before travel | 1 | Other unresolved vendor terminal (1) |
 | 1428 | Neutral organisation dng | Unknown accessibility | 1 | Other unresolved vendor terminal (1) |
-| 4563 | Hardware Dimension - Basic | Unknown accessibility | 1 | Classic armor terminals (1) |
 | 4564 | Hardware Dimension - Advanced | Unknown accessibility | 1 | Classic armor terminals (1) |
 | 6131 | ICC Holodeck Alien Training | Unknown accessibility | 1 | Other unresolved vendor terminal (1) |
 | 665 | Broken Shores | Likely live-accessible | 1 | Legacy faction core departments (1) |
@@ -39,14 +37,12 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 1426 | Clan Registration dng |  |  |  |  |  |
 | 4364 | Unicorn Outpost |  |  |  |  |  |
 | 4565 | Hardware Dimenion - Superior | Jobe Plaza 0xC00211B5 @ 193.3,482.791,179.373 |  | 0xC00011D5 @ 41.991,6.004,47.989 |  |  |
-| 4567 | Dimensional Shift - Basic | Jobe Harbor 0xC00211B3 @ 239.129,292.717,407.479 |  | 0xC00011D7 @ 55.988,6.006,47.991 |  |  |
 | 4568 | Dimensional Shift - Advanced | Jobe Market 0xC00511B4 @ 383.93,362.891,362.405 |  | 0xC00011D8 @ 55.988,6.005,47.991 |  |  |
 | 4569 | Dimensional Shift - Superior | Jobe Plaza 0xC00311B5 @ 198.696,482.791,165.968 |  | 0xC00011D9 @ 55.988,6.005,47.991 |  |  |
 | 665 | Broken Shores |  |  |  |  |  |
 | 952 | Clan Training | Clan Backyard 0xE71003B9 @ 77.749,25.859,59.156 | Old Athen Backyard 1 0xE7100C30 @ 77.749,25.859,59.156 <br> Old Athen Backyard 10 0xE7100C39 @ 77.749,25.859,59.156 <br> Old Athen Backyard 11 0xE7100C3A @ 77.749,25.859,59.156 <br> Old Athen Backyard 12 0xE7100C3B @ 77.749,25.859,59.156 <br> Old Athen Backyard 13 0xE7100C3C @ 77.749,25.859,59.156 <br> Old Athen Backyard 14 0xE7100C3D @ 77.749,25.859,59.156 <br> Old Athen Backyard 15 0xE7100C3E @ 77.749,25.859,59.156 <br> Old Athen Backyard 16 0xE7100C3F @ 77.749,25.859,59.156 <br> Old Athen Backyard 17 0xE7100C40 @ 77.749,25.859,59.156 <br> Old Athen Backyard 18 0xE7100C41 @ 77.749,25.859,59.156 <br> Old Athen Backyard 19 0xE7100C42 @ 77.749,25.859,59.156 <br> Old Athen Backyard 2 0xE7100C31 @ 77.749,25.859,59.156 <br> Old Athen Backyard 20 0xE7100C43 @ 77.749,25.859,59.156 <br> Old Athen Backyard 3 0xE7100C32 @ 77.749,25.859,59.156 <br> Old Athen Backyard 4 0xE7100C33 @ 77.749,25.859,59.156 <br> Old Athen Backyard 5 0xE7100C34 @ 77.749,25.859,59.156 <br> Old Athen Backyard 6 0xE7100C35 @ 77.749,25.859,59.156 <br> Old Athen Backyard 7 0xE7100C36 @ 77.749,25.859,59.156 <br> Old Athen Backyard 8 0xE7100C37 @ 77.749,25.859,59.156 <br> Old Athen Backyard 9 0xE7100C38 @ 77.749,25.859,59.156 <br> Tir Backyard 1 0xE7100C1C @ 77.749,25.859,59.156 <br> Tir Backyard 10 0xE7100C25 @ 77.749,25.859,59.156 <br> Tir Backyard 11 0xE7100C26 @ 77.749,25.859,59.156 <br> Tir Backyard 12 0xE7100C27 @ 77.749,25.859,59.156 <br> Tir Backyard 13 0xE7100C28 @ 77.749,25.859,59.156 <br> Tir Backyard 14 0xE7100C29 @ 77.749,25.859,59.156 <br> Tir Backyard 15 0xE7100C2A @ 77.749,25.859,59.156 <br> Tir Backyard 16 0xE7100C2B @ 77.749,25.859,59.156 <br> Tir Backyard 17 0xE7100C2C @ 77.749,25.859,59.156 <br> Tir Backyard 18 0xE7100C2D @ 77.749,25.859,59.156 <br> Tir Backyard 2 0xE7100C1D @ 77.749,25.859,59.156 <br> Tir Backyard 3 0xE7100C1E @ 77.749,25.859,59.156 <br> Tir Backyard 4 0xE7100C1F @ 77.749,25.859,59.156 <br> Tir Backyard 5 0xE7100C20 @ 77.749,25.859,59.156 <br> Tir Backyard 6 0xE7100C21 @ 77.749,25.859,59.156 <br> Tir Backyard 7 0xE7100C22 @ 77.749,25.859,59.156 <br> Tir Backyard 8 0xE7100C23 @ 77.749,25.859,59.156 <br> Tir Backyard 9 0xE7100C24 @ 77.749,25.859,59.156 <br> West Athen Backyard 1 0xE7100C44 @ 77.749,25.859,59.156 <br> West Athen Backyard 10 0xE7100C4D @ 77.749,25.859,59.156 <br> West Athen Backyard 2 0xE7100C45 @ 77.749,25.859,59.156 <br> West Athen Backyard 3 0xE7100C46 @ 77.749,25.859,59.156 <br> West Athen Backyard 4 0xE7100C47 @ 77.749,25.859,59.156 <br> West Athen Backyard 5 0xE7100C48 @ 77.749,25.859,59.156 <br> West Athen Backyard 6 0xE7100C49 @ 77.749,25.859,59.156 <br> West Athen Backyard 7 0xE7100C4A @ 77.749,25.859,59.156 <br> West Athen Backyard 8 0xE7100C4B @ 77.749,25.859,59.156 <br> West Athen Backyard 9 0xE7100C4C @ 77.749,25.859,59.156 | 0xC00103B8 @ 40.238,14.859,70.092 |  |  |
 | 1427 | Omni registration dng |  |  |  |  |  |
 | 1428 | Neutral organisation dng |  |  |  |  |  |
-| 4563 | Hardware Dimension - Basic | Jobe Harbor 0xC00411B3 @ 191.074,282.616,331.007 |  | 0xC00011D3 @ 41.991,6.004,47.989 |  |  |
 | 4564 | Hardware Dimension - Advanced | Jobe Market 0xC00311B4 @ 447.659,362.737,381.7 |  | 0xC00011D4 @ 41.991,6.004,47.989 |  |  |
 | 6131 | ICC Holodeck Alien Training | Arete Landing 0xC0031999 |  | 0xC00117F3 @ 186.9,6.017,114 |  | Warnings: missing source statel |
 | 7011 | Freelancers Inc. HQ - Rome |  |  |  |  |  |
@@ -178,16 +174,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 6 | 299171841 | 151973 | Superior Armor | 33.65,2.1,41.5 | Classic armor terminals |
 | 7 | 299171844 | 224079 | Superior Equipment for Nano Specialists | 33,2.1,29.4 | Other unresolved vendor terminal |
 
-### 4567 - Dimensional Shift - Basic (2)
-
-- Primary source door: Jobe Harbor 0xC00211B3 @ 239.129,292.717,407.479
-- Destination door evidence: 0xC00011D7 @ 55.988,6.006,47.991
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 2 | 299302914 | 155222 | Basic Implants | 46.9,2.1,29.2 | Implants/clusters |
-| 7 | 299302913 | 220329 | Costly Regenerative Supplies --- 1-90 | 28.1,2.1,40.1 | Other unresolved vendor terminal |
-
 ### 4568 - Dimensional Shift - Advanced (2)
 
 - Primary source door: Jobe Market 0xC00511B4 @ 383.93,362.891,362.405
@@ -232,15 +218,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 7 | 93585408 | 81799 | Organization registration shop | 201.952,5,162.745 | Other unresolved vendor terminal |
-
-### 4563 - Hardware Dimension - Basic (1)
-
-- Primary source door: Jobe Harbor 0xC00411B3 @ 191.074,282.616,331.007
-- Destination door evidence: 0xC00011D3 @ 41.991,6.004,47.989
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 6 | 299040769 | 99570 | Basic Armor | 33.65,2.1,41.5 | Classic armor terminals |
 
 ### 4564 - Hardware Dimension - Advanced (1)
 
