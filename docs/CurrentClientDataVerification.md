@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-13 22:47:09
+Generated: 2026-06-13 23:22:31
 
 ## Scope
 
@@ -20,15 +20,15 @@ Generated: 2026-06-13 22:47:09
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 106 |
+| Vending statels without complete DB shop coverage | 105 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Tower Shop + BS Signup live capture import promoted from AOSharp capture 20260613-223554.
-- Validated coverage added: 18 vendor rows across 4704 Tower Shop (dungeon) and 6007 BS Signup (dng), 18 vendor templates, and 18 new shop inventory groups with 2047 inventory rows.
-- The imported rows cover 14 Tower Shop terminals plus 4 BS Signup OFAB terminals. Clan City Buildings, Neutral City Buildings, and Leets-R-Us were VendorFull-only / not openable and were not imported; remaining BS Signup profession-locked terminals require matching professions.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 124 to 106. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106.
+- Omni Training Startup Shop import promoted from AOSharp capture 20260613-231115.
+- Validated coverage added: 1 vendor row in 950 Omni Training, 1 vendor template, and 1 new shop inventory group with 7 inventory rows.
+- The imported row covers Startup Shop! template 100035. VendorFull evidence was captured on playfield entry/dynel spawn, and ShopUpdate evidence was captured by opening the terminal.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 106 to 105. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105.
 
 ## Coverage Exclusions
 

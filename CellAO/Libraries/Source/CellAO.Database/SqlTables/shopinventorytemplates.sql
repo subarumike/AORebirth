@@ -19716,3 +19716,22 @@ INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL
 INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('XID7', 265108, 265109, 250, 250, 1, 'Live Tower BS Signup 20260613-223554 BSSignupOfabRangedWeapons template 266576', 1);
 INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('XID7', 265108, 265109, 275, 275, 1, 'Live Tower BS Signup 20260613-223554 BSSignupOfabRangedWeapons template 266576', 1);
 INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('XID7', 265110, 265110, 300, 300, 1, 'Live Tower BS Signup 20260613-223554 BSSignupOfabRangedWeapons template 266576', 1);
+
+-- ============================================================
+-- Omni Training Startup Shop import
+-- Source: AOSharp capture 20260613-231115
+-- Coverage: 106 -> 105 (1 reduction)
+-- New inventory groups: 1
+-- Note: VendorFull captured on playfield-entry/dynel-spawn; ShopUpdate captured by opening Startup Shop!
+-- ============================================================
+
+-- ShopHash: AMJX
+-- Terminal: Startup Shop!
+-- NormalizedName: OmniTrainingStartupShop; TemplateId: 100035; Capture identity: (VendingMachine:12E530CC); Inventory rows: 7; Shop window: 0
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('AMJX', 31837, 31837, 1, 1, 1, 'Live Omni Training 20260613-231115 OmniTrainingStartupShop template 100035', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('AMJX', 291082, 291082, 1, 1, 1, 'Live Omni Training 20260613-231115 OmniTrainingStartupShop template 100035', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('AMJX', 291043, 291043, 1, 1, 1, 'Live Omni Training 20260613-231115 OmniTrainingStartupShop template 100035', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('AMJX', 95577, 95577, 1, 1, 1, 'Live Omni Training 20260613-231115 OmniTrainingStartupShop template 100035', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('AMJX', 28564, 28564, 1, 1, 1, 'Live Omni Training 20260613-231115 OmniTrainingStartupShop template 100035', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('AMJX', 161699, 161699, 1, 1, 1, 'Live Omni Training 20260613-231115 OmniTrainingStartupShop template 100035', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('AMJX', 99228, 99228, 1, 1, 1, 'Live Omni Training 20260613-231115 OmniTrainingStartupShop template 100035', 1);

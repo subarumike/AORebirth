@@ -184,7 +184,7 @@
 "710","Omni-1 Trade","46530563","0xC00302C6","99555","562,8,413","True","OTRDLME","99555","10","False","",""
 "791","Holes in the Wall","51838976","0xC0000317","99634","351.576,0.208,778.344","True","HW7LIJB","99634","62","False","",""
 "791","Holes in the Wall","51838977","0xC0010317","151974","344.669,0.504,780.376","True","HWPZYSE","151974","87","False","",""
-"950","Omni Training","62259200","0xC00003B6","100035","60,14,50","False","","-1","0","False","","no vendors row; runtime spawns empty statel vendor"
+"950","Omni Training","62259200","0xC00003B6","100035","60,14,50","True","OTY56RU","100035","7","False","",""
 "952","Clan Training","62390272","0xC00003B8","100034","48,14,62","False","","-1","0","False","","no vendors row; runtime spawns empty statel vendor"
 "954","Neutral Training","62521344","0xC00003BA","99643","227.013,6,83.073","False","","-1","0","False","","no vendors row; runtime spawns empty statel vendor"
 "954","Neutral Training","62521345","0xC00103BA","99643","150.322,3.472,47.923","False","","-1","0","False","","no vendors row; runtime spawns empty statel vendor"
