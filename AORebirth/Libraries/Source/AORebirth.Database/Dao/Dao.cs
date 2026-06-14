@@ -162,6 +162,7 @@ namespace AORebirth.Database.Dao
             {
                 conn = conn ?? Connector.GetConnection();
                 IDbTransaction trans = transaction;
+                bool ownsTransaction = transaction == null;
                 try
                 {
                     trans = trans ?? conn.BeginTransaction();
@@ -182,14 +183,30 @@ namespace AORebirth.Database.Dao
                         throw new DataBaseException(
                             string.Format("Failed to create new record on table '{0}'", this.TableName));
                     }
+
+                    if (ownsTransaction)
+                    {
+                        trans.Commit();
+                    }
                 }
-                finally
+                catch
                 {
-                    if (transaction == null)
+                    if (ownsTransaction)
                     {
                         if (trans != null)
                         {
-                            trans.Commit();
+                            trans.Rollback();
+                        }
+                    }
+
+                    throw;
+                }
+                finally
+                {
+                    if (ownsTransaction)
+                    {
+                        if (trans != null)
+                        {
                             trans.Dispose();
                         }
                     }
@@ -230,21 +247,38 @@ namespace AORebirth.Database.Dao
             {
                 conn = conn ?? Connector.GetConnection();
                 IDbTransaction trans = transaction;
+                bool ownsTransaction = transaction == null;
                 try
                 {
                     trans = trans ?? conn.BeginTransaction();
                     rowsAffected = conn.Execute(
                         SqlMapperUtil.CreateDeleteSQL(this.TableName),
                         new { id = entityId },
-                        transaction);
+                        trans);
+
+                    if (ownsTransaction)
+                    {
+                        trans.Commit();
+                    }
                 }
-                finally
+                catch
                 {
-                    if (transaction == null)
+                    if (ownsTransaction)
                     {
                         if (trans != null)
                         {
-                            trans.Commit();
+                            trans.Rollback();
+                        }
+                    }
+
+                    throw;
+                }
+                finally
+                {
+                    if (ownsTransaction)
+                    {
+                        if (trans != null)
+                        {
                             trans.Dispose();
                         }
                     }
@@ -285,21 +319,38 @@ namespace AORebirth.Database.Dao
             {
                 conn = conn ?? Connector.GetConnection();
                 IDbTransaction trans = transaction;
+                bool ownsTransaction = transaction == null;
                 try
                 {
                     trans = trans ?? conn.BeginTransaction();
                     rowsAffected = conn.Execute(
                         SqlMapperUtil.CreateDeleteSQL(this.TableName, whereParameters),
                         whereParameters,
-                        transaction);
+                        trans);
+
+                    if (ownsTransaction)
+                    {
+                        trans.Commit();
+                    }
                 }
-                finally
+                catch
                 {
-                    if (transaction == null)
+                    if (ownsTransaction)
                     {
                         if (trans != null)
                         {
-                            trans.Commit();
+                            trans.Rollback();
+                        }
+                    }
+
+                    throw;
+                }
+                finally
+                {
+                    if (ownsTransaction)
+                    {
+                        if (trans != null)
+                        {
                             trans.Dispose();
                         }
                     }
@@ -406,21 +457,38 @@ namespace AORebirth.Database.Dao
             {
                 conn = conn ?? Connector.GetConnection();
                 IDbTransaction trans = transaction;
+                bool ownsTransaction = transaction == null;
                 try
                 {
                     trans = trans ?? conn.BeginTransaction();
                     rowsAffected = conn.Execute(
                         SqlMapperUtil.CreateUpdateSQL(this.TableName, parameters ?? entity),
                         parameters ?? entity,
-                        transaction);
+                        trans);
+
+                    if (ownsTransaction)
+                    {
+                        trans.Commit();
+                    }
                 }
-                finally
+                catch
                 {
-                    if (transaction == null)
+                    if (ownsTransaction)
                     {
                         if (trans != null)
                         {
-                            trans.Commit();
+                            trans.Rollback();
+                        }
+                    }
+
+                    throw;
+                }
+                finally
+                {
+                    if (ownsTransaction)
+                    {
+                        if (trans != null)
+                        {
                             trans.Dispose();
                         }
                     }
@@ -465,6 +533,7 @@ namespace AORebirth.Database.Dao
             {
                 conn = conn ?? Connector.GetConnection();
                 IDbTransaction trans = transaction;
+                bool ownsTransaction = transaction == null;
                 try
                 {
                     trans = trans ?? conn.BeginTransaction();
@@ -472,14 +541,30 @@ namespace AORebirth.Database.Dao
                     {
                         rowsAffected += Save(entity, null, conn, trans); // Pass parameters instead of null here? 
                     }
+
+                    if (ownsTransaction)
+                    {
+                        trans.Commit();
+                    }
                 }
-                finally
+                catch
                 {
-                    if (transaction == null)
+                    if (ownsTransaction)
                     {
                         if (trans != null)
                         {
-                            trans.Commit();
+                            trans.Rollback();
+                        }
+                    }
+
+                    throw;
+                }
+                finally
+                {
+                    if (ownsTransaction)
+                    {
+                        if (trans != null)
+                        {
                             trans.Dispose();
                         }
                     }
@@ -571,7 +656,7 @@ namespace AORebirth.Database.Dao
                 IDbTransaction trans = transaction;
                 try
                 {
-                    result = conn.Query<long>(SqlMapperUtil.CreateCountSQL(this.TableName, parameter), trans).Single();
+                    result = conn.Query<long>(SqlMapperUtil.CreateCountSQL(this.TableName, parameter), parameter, trans).Single();
                 }
                 finally
                 {

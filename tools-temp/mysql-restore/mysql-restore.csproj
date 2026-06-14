@@ -3,6 +3,6 @@
     <TargetFramework>net48</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.0.33" />
+    <PackageReference Include="MySqlConnector" Version="2.6.0" />
   </ItemGroup>
 </Project>

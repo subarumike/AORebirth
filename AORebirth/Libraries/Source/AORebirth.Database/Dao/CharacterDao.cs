@@ -84,15 +84,20 @@ namespace AORebirth.Database.Dao
         public new void Delete(int id, IDbConnection connection = null, IDbTransaction transaction = null)
         {
             // NEW AND FUUUUUCK YOU VS
-            using (IDbConnection conn = connection ?? Connector.GetConnection())
+            IDbConnection conn = connection;
+            try
             {
-                using (IDbTransaction trans = transaction ?? conn.BeginTransaction())
+                conn = conn ?? Connector.GetConnection();
+                IDbTransaction trans = transaction;
+                bool ownsTransaction = transaction == null;
+                try
                 {
+                    trans = trans ?? conn.BeginTransaction();
                     // TODO : move these two to their own DAOs
 
                     // remove this character from organisations
 
-                    DBOrganization org = OrganizationDao.Instance.GetAll(new { LeaderId = id }).FirstOrDefault();
+                    DBOrganization org = OrganizationDao.Instance.GetWhere(new { LeaderId = id }, conn, trans).FirstOrDefault();
                     if (org != null)
                     {
                         // What to do if the leader deletes himself?
@@ -100,21 +105,53 @@ namespace AORebirth.Database.Dao
                         OrganizationDao.Instance.Delete(org.Id, conn, trans);
 
                         // Remove the org's Stat from the other characters in the org too
-                        StatDao.Instance.Delete(new { StatValue = org.Id, StatId = (int)StatIds.clan });
+                        StatDao.Instance.Delete(new { StatValue = org.Id, StatId = (int)StatIds.clan }, conn, trans);
                     }
 
                     // empty this characters inventory (items and instanced items)
-                    ItemDao.Instance.Delete(new { ContainerInstance = id });
-                    InstancedItemDao.Instance.Delete(new { ContainerInstance = id });
+                    ItemDao.Instance.Delete(new { ContainerInstance = id }, conn, trans);
+                    InstancedItemDao.Instance.Delete(new { ContainerInstance = id }, conn, trans);
 
                     // deletes this character
                     base.Delete(id, conn, trans);
 
                     // delete characters stats
-                    StatDao.Instance.Delete(new { type = 50000, Id = id });
-                    if (transaction == null)
+                    StatDao.Instance.Delete(new { type = 50000, Id = id }, conn, trans);
+                    if (ownsTransaction)
                     {
                         trans.Commit();
+                    }
+                }
+                catch
+                {
+                    if (ownsTransaction)
+                    {
+                        if (trans != null)
+                        {
+                            trans.Rollback();
+                        }
+                    }
+
+                    throw;
+                }
+                finally
+                {
+                    if (ownsTransaction)
+                    {
+                        if (trans != null)
+                        {
+                            trans.Dispose();
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (connection == null)
+                {
+                    if (conn != null)
+                    {
+                        conn.Dispose();
                     }
                 }
             }
@@ -276,7 +313,9 @@ namespace AORebirth.Database.Dao
             int rowsAffected = Instance.Save(
                 new DBCharacter(),
                 // completely empty one is enough here, parameters have higher priority
-                new { Playfield = pfNum, Id = charId });
+                new { Playfield = pfNum, Id = charId },
+                connection,
+                transaction);
 
             // should ensure that rowsAffected == 1 otherwise ???
         }

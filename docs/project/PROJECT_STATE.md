@@ -10,6 +10,9 @@ Final runtime third-party attribution is documented in the root `NOTICE`: CellAO
 
 - Login, chat, and zone engines build and run locally.
 - Dependency cleanup for proprietary-readiness is in progress/completed for the requested GPL/unlicensed targets: `MySql.Data` was replaced by `MySqlConnector`, WCell-derived `Cell.Core`/`Cell.Util` compiled sources were replaced with clean implementations, and AOSharp remains isolated to `tools-temp`/capture provenance rather than the main solution build.
+- Post-MySqlConnector login select is repaired: the generic DAO helper now passes the active transaction to Dapper, allowing character select `SetOnline` to complete and LoginEngine to redirect the client to Zone.
+- DAO transaction handling is hardened after the MySqlConnector migration: locally owned DAO transactions commit only after successful work, roll back on failure, and nested DAO write/read helpers in transaction scopes receive the active connection/transaction.
+- Post-sweep live validation passed for login, zone entry, shop open, vendor buying, and timed logout, with no current-window MySqlConnector/Dapper/transaction errors in engine logs.
 - Current-client `FullCharacter` version 26 and live-style login state are locked project decisions.
 - Sit/stand behavior is repaired.
 - Weapon and armor equipment visuals are repaired for the current test scope.
