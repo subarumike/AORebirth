@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-13 22:12:39
+Generated: 2026-06-13 22:27:25
 
 ## Scope
 
@@ -20,15 +20,15 @@ Generated: 2026-06-13 22:12:39
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 127 |
+| Vending statels without complete DB shop coverage | 124 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Broken Shores + Lush Fields live capture import promoted from AOSharp capture 20260613-215211.
-- Validated coverage added: 2 vendor rows, 2 vendor templates, and 2 new shop inventory groups with 190 inventory rows.
-- The imported rows cover Broken Shores OT Advanced Trade Skills and Lush Fields Basic Startup Equipment. The Lush Fields startup inventory is not an exact reuse of Newland startup because the treatment kit row is QL 8 instead of QL 4.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 129 to 127. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127.
+- Holes in the Wall live capture import promoted from AOSharp capture 20260613-221619.
+- Validated coverage added: 3 vendor rows across 791 Holes in the Wall and 4565 Hardware Dimenion - Superior, 2 vendor templates, and 1 new shop inventory group with 87 inventory rows while reusing existing shop hash Cont.
+- The imported rows cover Holes in the Wall Containers, Holes in the Wall Superior Weapons, and one high-confidence exact-template inferred Hardware Dimension - Superior Superior Weapons statel. The incidental inventory-only identity (VendingMachine:12E4CE58) had no target correlation and was not imported.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 127 to 124. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124.
 
 ## Coverage Exclusions
 

@@ -1103,3 +1103,20 @@ INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHas
 -- Terminal: Basic Startup Equipment
 -- NormalizedName: LushFieldsBasicStartupEquipment; TemplateId: 99643; ShopHash: RCIW (new); Inventory rows: 9; Capture identity: (VendingMachine:C00002B7); VT window: 0
 INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('LFUZCHW', 1, 'LushFieldsBasicStartupEquipment', 99643, 'RCIW', 1, 8);
+
+-- ============================================================
+-- Holes in the Wall live capture import
+-- Source: AOSharp capture 20260613-221619
+-- Coverage: 127 -> 124 (3 reduction)
+-- New inventory groups: 1; Reuse: Cont
+-- Inference: Hardware Dimension - Superior exact-template reuse for 151974
+-- New vendor templates: 2
+-- ============================================================
+
+-- Terminal: Containers
+-- NormalizedName: HolesInWallContainers; TemplateId: 99634; ShopHash: Cont (reused); Inventory rows: 62; Capture identity: (VendingMachine:C0000317); VT window: 0
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('HW7LIJB', 1, 'HolesInWallContainers', 99634, 'Cont', 1, 1);
+
+-- Terminal: Superior Weapons
+-- NormalizedName: HolesInWallSuperiorWeapons; TemplateId: 151974; ShopHash: FZT5 (new); Inventory rows: 87; Capture identity: (VendingMachine:C0010317); VT window: 0
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('HWPZYSE', 1, 'HolesInWallSuperiorWeapons', 151974, 'FZT5', 1, 125);
