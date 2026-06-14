@@ -1,6 +1,6 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 104.
+Generated from current vendor coverage after excluding non-shop statel templates. Actionable uncovered statel vendors: 99.
 
 ## Practical Location Summary
 
@@ -8,7 +8,6 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | ---: | --- | --- | ---: | --- |
 | 500 | Parnassos | GM-only / not live-accessible | 60 | Other unresolved vendor terminal (21); Heavenly weapon construction/components/recipes (19); Containers/computers/furniture/specialty/cars (8); Implants/clusters (4) |
 | 6007 | BS Signup (dng) | Likely special/dungeon; verify before travel | 13 | OFAB vendors (13) |
-| 4354 | Uncle Bazzits Workshop (Dng) | Likely special/dungeon; verify before travel | 5 | Other unresolved vendor terminal (4); Faction clothes/fashion (1) |
 | 4704 | Tower Shop (dungeon) | Likely special/dungeon; verify before travel | 3 | ICC/tower shop special vendors (3) |
 | 1426 | Clan Registration dng | Likely special/dungeon; verify before travel | 2 | Other unresolved vendor terminal (2) |
 | 4364 | Unicorn Outpost | Unknown accessibility | 2 | Other unresolved vendor terminal (2) |
@@ -35,7 +34,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | ---: | --- | --- | --- | --- | --- | --- |
 | 500 | Parnassos |  |  |  |  |  |
 | 6007 | BS Signup (dng) |  |  |  |  |  |
-| 4354 | Uncle Bazzits Workshop (Dng) | Newland Desert 0xC0000235 @ 1546.475,31.502,2717.811 |  | 0xC0001102 @ 183.002,6.02,155.985 |  |  |
 | 4704 | Tower Shop (dungeon) | Borealis 0xC0180320 @ 729.813,61.686,651.696 | Old Athen 0xC02B021C @ 479.913,9.174,282.706 <br> Rome Blue 0xC00A02DF @ 675.09,22.357,356.184 | 0xC0001260 @ 193.988,9.006,153.992 | 0xC0001260 @ 193.988,9.006,153.992 -> 0xC0011260 @ 178,9.005,157.986 | Medium: same-template sibling door within 30m No patch. Keep as reference evidence for this interior family. |
 | 954 | Neutral Training | Borealis Backyard 1 0xE7100C08 @ 122.603,39.965,77.115 | Borealis Backyard 10 0xE7100C11 @ 122.603,39.965,77.115 <br> Borealis Backyard 2 0xE7100C09 @ 122.603,39.965,77.115 <br> Borealis Backyard 3 0xE7100C0A @ 122.603,39.965,77.115 <br> Borealis Backyard 4 0xE7100C0B @ 122.603,39.965,77.115 <br> Borealis Backyard 5 0xE7100C0C @ 122.603,39.965,77.115 <br> Borealis Backyard 6 0xE7100C0D @ 122.603,39.965,77.115 <br> Borealis Backyard 7 0xE7100C0E @ 122.603,39.965,77.115 <br> Borealis Backyard 8 0xE7100C0F @ 122.603,39.965,77.115 <br> Borealis Backyard 9 0xE7100C10 @ 122.603,39.965,77.115 <br> Neutral Backyard 0xE71003BB @ 122.603,39.965,77.115 <br> Newland Backyard 1 0xE7100BF4 @ 122.603,39.965,77.115 <br> Newland Backyard 10 0xE7100BFD @ 122.603,39.965,77.115 <br> Newland Backyard 11 0xE7100BFE @ 122.603,39.965,77.115 <br> Newland Backyard 12 0xE7100BFF @ 122.603,39.965,77.115 <br> Newland Backyard 2 0xE7100BF5 @ 122.603,39.965,77.115 <br> Newland Backyard 3 0xE7100BF6 @ 122.603,39.965,77.115 <br> Newland Backyard 4 0xE7100BF7 @ 122.603,39.965,77.115 <br> Newland Backyard 5 0xE7100BF8 @ 122.603,39.965,77.115 <br> Newland Backyard 6 0xE7100BF9 @ 122.603,39.965,77.115 <br> Newland Backyard 7 0xE7100BFA @ 122.603,39.965,77.115 <br> Newland Backyard 8 0xE7100BFB @ 122.603,39.965,77.115 <br> Newland Backyard 9 0xE7100BFC @ 122.603,39.965,77.115 | 0xC00003BA @ 239.886,5.965,69.931 |  |  |
 | 1426 | Clan Registration dng |  |  |  |  |  |
@@ -140,19 +138,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 5 | 393674763 | 266574 | Ofab Shade Vendor | 241.988,6.02,233.019 | OFAB vendors |
 | 5 | 393674764 | 266573 | Ofab Soldier Vendor | 244.01,6.02,233.014 | OFAB vendors |
 | 5 | 393674765 | 266575 | Ofab Trader Vendor | 246.01,6.02,232.985 | OFAB vendors |
-
-### 4354 - Uncle Bazzits Workshop (Dng) (5)
-
-- Primary source door: Newland Desert 0xC0000235 @ 1546.475,31.502,2717.811
-- Destination door evidence: 0xC0001102 @ 183.002,6.02,155.985
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 6 | 285343744 | 247744 | Maria's Fashion | 189.677,6.02,146.744 | Faction clothes/fashion |
-| 7 | 285343745 | 247743 | Uncle Bazzit's Miscellany | 190.031,6.02,144.965 | Other unresolved vendor terminal |
-| 7 | 285343746 | 254816 | Uncle Bazzit's Floorplans | 188.385,6.021,143.679 | Other unresolved vendor terminal |
-| 7 | 285343747 | 255998 | Uncle Bazzit's Landscaping | 177.233,6.02,143.604 | Other unresolved vendor terminal |
-| 7 | 285343748 | 255997 | Uncle Bazzit's Furnishings | 176.295,6.02,145.301 | Other unresolved vendor terminal |
 
 ### 4704 - Tower Shop (dungeon) (3)
 
