@@ -1077,3 +1077,14 @@ INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHas
 -- Terminal: OT Basic Startup Equipment
 -- NormalizedName: OTBasicStartupEquipment; TemplateId: 99555; ShopHash: NTV2 (new); Inventory rows: 10; Capture identity: (VendingMachine:C00002C6), (VendingMachine:C00102C6), (VendingMachine:C00202C6), (VendingMachine:C00302C6); VT window: 0
 INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OTRDLME', 1, 'OTBasicStartupEquipment', 99555, 'NTV2', 1, 1);
+
+-- ============================================================
+-- Clan Basic Startup Equipment import
+-- Source: AOSharp capture 20260613-211234
+-- Coverage: 133 -> 129 (4 reduction)
+-- Dedup: 4 Old Athen vendors share 1 inventory
+-- ============================================================
+
+-- Terminal: Clan Basic Startup Equipment
+-- NormalizedName: ClanBasicStartupEquipment; TemplateId: 99569; ShopHash: VZMO (new); Inventory rows: 9
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('CBFMV5N', 1, 'ClanBasicStartupEquipment', 99569, 'VZMO', 1, 1);
