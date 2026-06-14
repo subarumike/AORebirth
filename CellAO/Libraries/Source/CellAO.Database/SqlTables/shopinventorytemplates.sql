@@ -19735,3 +19735,31 @@ INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL
 INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('AMJX', 28564, 28564, 1, 1, 1, 'Live Omni Training 20260613-231115 OmniTrainingStartupShop template 100035', 1);
 INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('AMJX', 161699, 161699, 1, 1, 1, 'Live Omni Training 20260613-231115 OmniTrainingStartupShop template 100035', 1);
 INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('AMJX', 99228, 99228, 1, 1, 1, 'Live Omni Training 20260613-231115 OmniTrainingStartupShop template 100035', 1);
+
+-- ============================================================
+-- Treepine Hut OT Clothes import
+-- Source: AOSharp capture 20260613-233535
+-- Coverage: 105 -> 104 (1 reduction)
+-- New inventory groups: 1
+-- Note: Imported only the remaining uncovered Treepine statel; incidental already-covered captures were not imported.
+-- ============================================================
+
+-- ShopHash: YXAF
+-- Terminal: OT Clothes
+-- NormalizedName: TreepineOTClothes; TemplateId: 99490; Capture identity: (VendingMachine:12E522FB); Inventory rows: 16; Shop window: 0
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27377, 27377, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27367, 27367, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27368, 27368, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27370, 27370, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27363, 27363, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27362, 27362, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27376, 27376, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27366, 27366, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27373, 27373, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27371, 27371, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27387, 27387, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27383, 27383, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27384, 27384, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27385, 27385, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 27386, 27386, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('YXAF', 31515, 31515, 1, 1, 1, 'Live Treepine Hut 20260613-233535 TreepineOTClothes template 99490', 1);
