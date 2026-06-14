@@ -48,3 +48,12 @@ Installation instructions follow soon.
 
 
 If you feel your name should be in here, email: jackdanielswarframer@gmail.com I will add you.
+
+## License
+
+This project is based on CellAO. Portions inherited from CellAO remain under
+the CellAO BSD-style license terms.
+
+AO Rebirth additions, modifications, documentation, tools, data, configuration,
+assets, and other AO Rebirth-owned material are proprietary. See [LICENSE](LICENSE)
+and [NOTICE](NOTICE) for the full license split and attribution details.

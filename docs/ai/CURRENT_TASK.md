@@ -6,7 +6,13 @@ This is the primary handoff file. Update it before ending a work session.
 
 ## Current Objective
 
-Stabilize AO Rebirth behavior using packet evidence, local playtests, and focused source assertions. Inventory, corpse loot, corpse credits, player trade, and vendor buy/sell/close live persistence verification are complete for the documented repaired flows. Static vendor coverage is complete for all practical live-accessible vendors. The remaining `26` uncovered statel vendors require setup-specific access and are deferred; do not continue vendor capture/import work unless Mike intentionally reopens that deferred backlog.
+Apply final dual-license repository structure without changing code behavior:
+
+- Preserve CellAO BSD-style licensing for inherited CellAO portions.
+- Mark AO Rebirth additions as proprietary.
+- Add root `LICENSE` and `NOTICE`.
+- Append a concise `README.md` license section.
+- Do not edit code, SQL, schema, config, `tools-temp`, `docs/reference`, or historical capture data.
 
 ## Current Implementation State
 

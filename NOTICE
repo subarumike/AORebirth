@@ -1,0 +1,19 @@
+AO Rebirth Notice
+=================
+
+AO Rebirth is a derivative work based in part on the CellAO project.
+
+Portions inherited from CellAO remain attributed to the CellAO Team and remain
+under the CellAO BSD-style license terms reproduced in the root LICENSE file.
+
+AO Rebirth additions, modifications, documentation, tools, data, configuration,
+assets, and other AO Rebirth-owned material are proprietary. Copyright (c)
+2026 AO Rebirth. All rights reserved. No redistribution or reuse is permitted
+without prior written permission from AO Rebirth.
+
+This repository therefore contains mixed-code licensing: open CellAO portions
+and closed AO Rebirth proprietary portions. See LICENSE for the controlling
+license text and warranty disclaimer.
+
+AO Rebirth is not affiliated with, endorsed by, sponsored by, or approved by
+Funcom.
