@@ -1,19 +1,365 @@
 AO Rebirth Notice
 =================
 
-AO Rebirth is a derivative work based in part on the CellAO project.
+This NOTICE accompanies AO Rebirth and supplements the root LICENSE file. It
+documents attribution and distribution notices for the CellAO-derived code,
+AO Rebirth proprietary layer, bundled runtime source components, and NuGet
+libraries detected in the AO Rebirth runtime project closure.
 
-Portions inherited from CellAO remain attributed to the CellAO Team and remain
-under the CellAO BSD-style license terms reproduced in the root LICENSE file.
+This NOTICE does not grant rights to AO Rebirth proprietary material beyond
+the rights stated in the root LICENSE file.
 
-AO Rebirth additions, modifications, documentation, tools, data, configuration,
-assets, and other AO Rebirth-owned material are proprietary. Copyright (c)
-2026 AO Rebirth. All rights reserved. No redistribution or reuse is permitted
-without prior written permission from AO Rebirth.
 
-This repository therefore contains mixed-code licensing: open CellAO portions
-and closed AO Rebirth proprietary portions. See LICENSE for the controlling
-license text and warranty disclaimer.
+Licensing Structure
+-------------------
 
-AO Rebirth is not affiliated with, endorsed by, sponsored by, or approved by
-Funcom.
+Open / inherited components:
+
+- Portions inherited from the CellAO project remain attributed to the CellAO
+  Team and remain under the CellAO BSD-style license terms reproduced in the
+  root LICENSE file.
+- Third-party runtime libraries and bundled third-party source components remain
+  under their own licenses as listed below. They are not relicensed as AO
+  Rebirth proprietary code.
+
+AO Rebirth proprietary layer:
+
+- AO Rebirth additions, modifications, documentation, tools, data,
+  configuration, assets, and other AO Rebirth-owned material are proprietary.
+- Copyright (c) 2026 AO Rebirth. All rights reserved.
+- No redistribution or reuse of AO Rebirth proprietary material is permitted
+  without prior written permission from AO Rebirth.
+
+Mixed-code clarification:
+
+- This repository contains both open CellAO portions and closed AO Rebirth
+  proprietary portions.
+- The root LICENSE controls the CellAO BSD-style terms, AO Rebirth proprietary
+  terms, warranty disclaimer, and non-affiliation notice.
+
+Non-affiliation:
+
+- AO Rebirth is not affiliated with, endorsed by, sponsored by, or approved by
+  Funcom.
+
+
+Distribution Exclusions
+-----------------------
+
+The following components and paths are not part of the AO Rebirth runtime
+distribution covered by this NOTICE:
+
+- tools-temp/*
+- AOSharp integrations and capture tooling
+- EasyHook integrations used by capture tooling
+- test projects and test-only packages
+- historical capture data and provenance-only capture artifacts
+
+If any excluded component is later distributed, it requires a separate license
+review before inclusion.
+
+
+CellAO Attribution
+------------------
+
+Name: CellAO
+Location: AORebirth runtime source tree; inherited CellAO-derived code
+License: CellAO BSD-style license
+Source URL: Historical CellAO project attribution preserved in repository files
+Required attribution text:
+
+  Copyright (c) 2005-2014, CellAO Team
+  All rights reserved.
+
+The CellAO BSD-style license terms are reproduced unchanged in the root LICENSE
+file. CellAO-derived portions remain open under those terms.
+
+
+Bundled Runtime Source Components
+---------------------------------
+
+Name: SmokeLounge.AOtomation.Messaging
+Location: AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging
+License: WTFPL Version 2
+Source URL: https://github.com/SmokeLounge/AOtomation.Messaging
+Required attribution text:
+
+  SmokeLounge.AOtomation.Messaging
+  Copyright (c) SmokeLounge 2013
+  Licensed under the Do What The Fuck You Want To Public License, Version 2.
+  The bundled COPYING file carries the WTFPL Version 2 text by Sam Hocevar.
+
+Name: MsgPack.Cli / MsgPack.Mono
+Location: AORebirth/Libraries/Source/msgpack-cli
+License: Apache License 2.0
+Source URL: https://github.com/msgpack/msgpack-cli
+Required attribution text:
+
+  MsgPack.Cli
+  Copyright 2010-2013 FUJIWARA, Yusuke, all rights reserved.
+  Licensed under the Apache License, Version 2.0.
+
+
+Runtime NuGet Dependencies
+--------------------------
+
+Name: Dapper 1.13
+Location: AORebirth/packages/Dapper.1.13
+License: Apache License 2.0
+Source URL: https://github.com/DapperLib/Dapper
+Required attribution text:
+
+  Dapper
+  Copyright Sam Saffron, Marc Gravell, and contributors.
+  Licensed under the Apache License, Version 2.0.
+
+Name: DotNetZip 1.9.2
+Location: AORebirth/packages/dotnetzip.1.9.2
+License: Microsoft Public License (Ms-PL), with bundled third-party notices
+Source URL: https://github.com/haf/DotNetZip.Semverd
+Required attribution text:
+
+  DotNetZip
+  Copyright (c) 2006-2011 Dino Chiesa.
+  Copyright (c) 2006, 2007, 2008, 2009 Dino Chiesa and Microsoft Corporation.
+  Licensed under the Microsoft Public License (Ms-PL).
+  Bundled notices include jzlib (Copyright (c) 2000-2003 ymnk, JCraft, Inc.,
+  BSD-style terms), zlib (Copyright (C) 1995-2004 Jean-loup Gailly and Mark
+  Adler, zlib license), Apache Commons Compress (Apache License 2.0), and
+  DeflateManaged/.NET Foundation material (MIT license).
+
+Name: Google.Protobuf 3.21.9
+Location: AORebirth/packages/Google.Protobuf.3.21.9
+License: BSD 3-Clause
+Source URL: https://github.com/protocolbuffers/protobuf
+Required attribution text:
+
+  Protocol Buffers / Google.Protobuf
+  Copyright 2008 Google Inc. All rights reserved.
+  Licensed under the BSD 3-Clause license.
+
+Name: K4os.Compression.LZ4 1.3.5
+Location: AORebirth/packages/K4os.Compression.LZ4.1.3.5
+License: MIT
+Source URL: https://github.com/MiloszKrajewski/K4os.Compression.LZ4
+Required attribution text:
+
+  K4os.Compression.LZ4
+  Copyright (c) 2017 Milosz Krajewski.
+  Licensed under the MIT license.
+
+Name: K4os.Compression.LZ4.Streams 1.3.5
+Location: AORebirth/packages/K4os.Compression.LZ4.Streams.1.3.5
+License: MIT
+Source URL: https://github.com/MiloszKrajewski/K4os.Compression.LZ4
+Required attribution text:
+
+  K4os.Compression.LZ4.Streams
+  Copyright (c) 2017 Milosz Krajewski.
+  Licensed under the MIT license.
+
+Name: K4os.Hash.xxHash 1.0.8
+Location: AORebirth/packages/K4os.Hash.xxHash.1.0.8
+License: MIT
+Source URL: https://github.com/MiloszKrajewski/K4os.Hash.xxHash
+Required attribution text:
+
+  K4os.Hash.xxHash
+  Copyright (c) 2017 Milosz Krajewski.
+  Licensed under the MIT license.
+
+Name: MathNet.Numerics 2.6.2
+Location: AORebirth/packages/mathnet.numerics.2.6.2
+License: MIT/X11, with bundled ALGLIB BSD-style and Boost Software License
+notices
+Source URL: https://github.com/mathnet/mathnet-numerics
+Required attribution text:
+
+  Math.NET Numerics
+  Copyright (c) 2002-2013 Math.NET.
+  Licensed under the MIT/X11 license.
+  Bundled notices include ALGLIB material by Sergey Bochkanov under BSD-style
+  terms and material under the Boost Software License, Version 1.0.
+
+Name: MemBus 2.0.2
+Location: AORebirth/packages/membus.2.0.2
+License: Apache License 2.0
+Source URL: https://github.com/flq/MemBus
+Required attribution text:
+
+  MemBus
+  Copyright 2010 Frank-Leonardo Quednau (realfiction.net).
+  Licensed under the Apache License, Version 2.0.
+
+Name: Microsoft.Bcl.AsyncInterfaces 8.0.0
+Location: AORebirth/packages/Microsoft.Bcl.AsyncInterfaces.8.0.0
+License: MIT
+Source URL: https://github.com/dotnet/runtime
+Required attribution text:
+
+  Microsoft.Bcl.AsyncInterfaces
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the MIT license.
+
+Name: Microsoft.Extensions.DependencyInjection.Abstractions 8.0.2
+Location: AORebirth/packages/Microsoft.Extensions.DependencyInjection.Abstractions.8.0.2
+License: MIT
+Source URL: https://github.com/dotnet/runtime
+Required attribution text:
+
+  Microsoft.Extensions.DependencyInjection.Abstractions
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the MIT license.
+
+Name: Microsoft.Extensions.Logging.Abstractions 8.0.2
+Location: AORebirth/packages/Microsoft.Extensions.Logging.Abstractions.8.0.2
+License: MIT
+Source URL: https://github.com/dotnet/runtime
+Required attribution text:
+
+  Microsoft.Extensions.Logging.Abstractions
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the MIT license.
+
+Name: MySqlConnector 2.6.0
+Location: AORebirth/packages/MySqlConnector.2.6.0
+License: MIT
+Source URL: https://github.com/mysql-net/MySqlConnector
+Required attribution text:
+
+  MySqlConnector
+  Copyright (c) 2016-2026 Bradley Grainger.
+  Licensed under the MIT license.
+
+Name: NBug 1.2.2
+Location: AORebirth/packages/nbug.1.2.2
+License: MIT
+Source URL: https://github.com/soygul/NBug
+Required attribution text:
+
+  NBug
+  Copyright (c) 2011 Teoman Soygul and contributors.
+  Licensed under the MIT license.
+
+Name: NLog 2.1.0
+Location: AORebirth/packages/nlog.2.1.0
+License: BSD 3-Clause
+Source URL: https://github.com/NLog/NLog
+Required attribution text:
+
+  NLog
+  Copyright (c) 2004-2024 Jaroslaw Kowalski, Kim Christensen,
+  Julian Verdurmen. All rights reserved.
+  Licensed under the BSD 3-Clause license.
+
+Name: NLog.Config 2.1.0
+Location: AORebirth/packages/nlog.config.2.1.0
+License: BSD 3-Clause
+Source URL: https://github.com/NLog/NLog
+Required attribution text:
+
+  NLog.Config
+  Copyright (c) 2004-2024 Jaroslaw Kowalski, Kim Christensen,
+  Julian Verdurmen. All rights reserved.
+  Licensed under the BSD 3-Clause license.
+
+Name: Npgsql 2.0.14.3
+Location: AORebirth/packages/npgsql.2.0.14.3
+License: BSD-style / PostgreSQL-style
+Source URL: https://github.com/npgsql/npgsql
+Required attribution text:
+
+  Npgsql
+  Copyright 2002-2013 Npgsql Development Team.
+  Licensed under BSD-style / PostgreSQL-style terms.
+
+Name: System.Buffers 4.5.1
+Location: AORebirth/packages/System.Buffers.4.5.1
+License: MIT
+Source URL: https://github.com/dotnet/runtime
+Required attribution text:
+
+  System.Buffers
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the MIT license.
+
+Name: System.Diagnostics.DiagnosticSource 8.0.1
+Location: AORebirth/packages/System.Diagnostics.DiagnosticSource.8.0.1
+License: MIT
+Source URL: https://github.com/dotnet/runtime
+Required attribution text:
+
+  System.Diagnostics.DiagnosticSource
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the MIT license.
+
+Name: System.IO.Pipelines 5.0.2
+Location: AORebirth/packages/System.IO.Pipelines.5.0.2
+License: MIT
+Source URL: https://github.com/dotnet/runtime
+Required attribution text:
+
+  System.IO.Pipelines
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the MIT license.
+
+Name: System.Memory 4.5.5
+Location: AORebirth/packages/System.Memory.4.5.5
+License: MIT
+Source URL: https://github.com/dotnet/runtime
+Required attribution text:
+
+  System.Memory
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the MIT license.
+
+Name: System.Numerics.Vectors 4.5.0
+Location: AORebirth/packages/System.Numerics.Vectors.4.5.0
+License: MIT
+Source URL: https://github.com/dotnet/runtime
+Required attribution text:
+
+  System.Numerics.Vectors
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the MIT license.
+
+Name: System.Runtime.CompilerServices.Unsafe 6.1.2
+Location: AORebirth/packages/System.Runtime.CompilerServices.Unsafe.6.1.2
+License: MIT
+Source URL: https://github.com/dotnet/maintenance-packages
+Required attribution text:
+
+  System.Runtime.CompilerServices.Unsafe
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the MIT license.
+
+Name: System.Threading.Tasks.Extensions 4.6.3
+Location: AORebirth/packages/System.Threading.Tasks.Extensions.4.6.3
+License: MIT
+Source URL: https://github.com/dotnet/maintenance-packages
+Required attribution text:
+
+  System.Threading.Tasks.Extensions
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the MIT license.
+
+
+Runtime Licensing Validation
+----------------------------
+
+Runtime validation performed on 2026-06-14:
+
+- Runtime dependencies were scanned from the ChatEngine, LoginEngine,
+  ZoneEngine, and WebEngine project closure and their referenced library
+  projects.
+- Runtime PackageReference and packages.config entries were scanned against
+  AORebirth/packages.
+- No GPL, AGPL, or LGPL component was identified in the runtime closure.
+- No unlicensed runtime component was identified in the runtime closure.
+- AOSharp and EasyHook were not identified in the runtime project closure and
+  remain excluded with tools-temp/capture tooling.
+- Test-only packages and historical capture data are excluded from runtime
+  distribution.
+- LICENSE and NOTICE together document the CellAO BSD-style inherited code,
+  AO Rebirth proprietary layer, third-party runtime attributions, warranty
+  disclaimer, and Funcom non-affiliation notice.

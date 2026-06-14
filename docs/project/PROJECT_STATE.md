@@ -4,9 +4,12 @@ AO Rebirth NightPredator is a local C#/.NET Framework-era Anarchy Online server 
 
 Repository licensing now uses a dual-license structure: inherited CellAO portions remain under the CellAO BSD-style license terms, while AO Rebirth additions are proprietary. Root `LICENSE` and `NOTICE` files document the split and attribution.
 
+Final runtime third-party attribution is documented in the root `NOTICE`: CellAO, bundled runtime source components, and all detected runtime NuGet dependencies are attributed; `tools-temp`, AOSharp, EasyHook, test packages, and historical captures remain excluded from runtime distribution.
+
 # Working Systems
 
 - Login, chat, and zone engines build and run locally.
+- Dependency cleanup for proprietary-readiness is in progress/completed for the requested GPL/unlicensed targets: `MySql.Data` was replaced by `MySqlConnector`, WCell-derived `Cell.Core`/`Cell.Util` compiled sources were replaced with clean implementations, and AOSharp remains isolated to `tools-temp`/capture provenance rather than the main solution build.
 - Current-client `FullCharacter` version 26 and live-style login state are locked project decisions.
 - Sit/stand behavior is repaired.
 - Weapon and armor equipment visuals are repaired for the current test scope.
