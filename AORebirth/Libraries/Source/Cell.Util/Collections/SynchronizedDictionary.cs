@@ -1,152 +1,95 @@
-﻿/*************************************************************************
- *
- *   file		: SynchronizedDictionary.cs
- *   copyright		: (C) The WCell Team
- *   email		: info@wcell.org
- *   last changed	: $LastChangedDate: 2008-08-17 02:08:03 +0200 (sø, 17 aug 2008) $
- 
- *   revision		: $Rev: 598 $
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 2 of the License, or
- *   (at your option) any later version.
- *
- *************************************************************************/
-
 using System.Collections.Generic;
 using System.Threading;
 
 namespace Cell.Util.Collections
 {
+    public class SynchronizedDictionary<TKey, TValue> : Dictionary<TKey, TValue>
+    {
+        private readonly object syncLock = new object();
 
-	public class SynchronizedDictionary<TKey, TValue> : Dictionary<TKey, TValue>
-	{
-		private readonly object _syncLock = new object();
+        public SynchronizedDictionary()
+        {
+        }
 
-		public SynchronizedDictionary() { }
-		public SynchronizedDictionary(IEqualityComparer<TKey> comparer) : base(comparer) { }
-		public SynchronizedDictionary(int capacity) : base(capacity) { }
-		public SynchronizedDictionary(IDictionary<TKey, TValue> dictionary) : base(dictionary) { }
+        public SynchronizedDictionary(IEqualityComparer<TKey> comparer)
+            : base(comparer)
+        {
+        }
 
-		public object SyncLock
-		{
-			get { return _syncLock; }
-		}
+        public SynchronizedDictionary(int capacity)
+            : base(capacity)
+        {
+        }
 
-		public virtual new TValue this[TKey key]
-		{
-			get
-			{
-				Monitor.Enter(_syncLock);
+        public SynchronizedDictionary(IDictionary<TKey, TValue> dictionary)
+            : base(dictionary)
+        {
+        }
 
-				try
-				{
-					if (!base.ContainsKey(key))
-					{
-						throw new KeyNotFoundException();
-					}
+        public object SyncLock
+        {
+            get { return this.syncLock; }
+        }
 
-					return base[key];
-				}
-				finally
-				{
-					Monitor.Exit(_syncLock);
-				}
-			}
-			set
-			{
-				Monitor.Enter(_syncLock);
+        public virtual new TValue this[TKey key]
+        {
+            get
+            {
+                lock (this.syncLock)
+                {
+                    return base[key];
+                }
+            }
 
-				try
-				{
-					if (base.ContainsKey(key))
-					{
-						base[key] = value;
-					}
-					else
-					{
-						base.Add(key, value);
-					}
-				}
-				finally
-				{
-					Monitor.Exit(_syncLock);
-				}
-			}
-		}
+            set
+            {
+                lock (this.syncLock)
+                {
+                    base[key] = value;
+                }
+            }
+        }
 
-		public virtual new void Add(TKey key, TValue value)
-		{
-			Monitor.Enter(_syncLock);
+        public virtual new void Add(TKey key, TValue value)
+        {
+            lock (this.syncLock)
+            {
+                base.Add(key, value);
+            }
+        }
 
-			try
-			{
-				base.Add(key, value);
-			}
-			finally
-			{
-				Monitor.Exit(_syncLock);
-			}
-		}
+        public virtual new void Clear()
+        {
+            lock (this.syncLock)
+            {
+                base.Clear();
+            }
+        }
 
-		public virtual new void Clear()
-		{
-			Monitor.Enter(_syncLock);
+        public new bool ContainsKey(TKey key)
+        {
+            lock (this.syncLock)
+            {
+                return base.ContainsKey(key);
+            }
+        }
 
-			try
-			{
-				base.Clear();
-			}
-			finally
-			{
-				Monitor.Exit(_syncLock);
-			}
-		}
+        public virtual new bool Remove(TKey key)
+        {
+            lock (this.syncLock)
+            {
+                return base.Remove(key);
+            }
+        }
 
-		public new bool ContainsKey(TKey key)
-		{
-			Monitor.Enter(_syncLock);
+        public void Lock()
+        {
+            Monitor.Enter(this.syncLock);
+        }
 
-			try
-			{
-				return base.ContainsKey(key);
-			}
-			finally
-			{
-				Monitor.Exit(_syncLock);
-			}
-		}
-
-		public virtual new bool Remove(TKey key)
-		{
-			Monitor.Enter(_syncLock);
-
-			try
-			{
-				if (!base.ContainsKey(key))
-				{
-					return false;
-				}
-
-				base.Remove(key);
-			}
-			finally
-			{
-				Monitor.Exit(_syncLock);
-			}
-
-			return true;
-		}
-
-		public void Lock()
-		{
-			Monitor.Enter(_syncLock);
-		}
-
-		public void Unlock()
-		{
-			Monitor.Exit(_syncLock);
-		}
-	}
+        public void Unlock()
+        {
+            Monitor.Exit(this.syncLock);
+        }
+    }
 }

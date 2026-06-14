@@ -1,163 +1,98 @@
-﻿/*************************************************************************
- *
- *   file		: SynchronizedList.cs
- *   copyright		: (C) The WCell Team
- *   email		: info@wcell.org
- *   last changed	: $LastChangedDate: 2009-04-05 02:29:47 +0200 (sø, 05 apr 2009) $
- 
- *   revision		: $Rev: 864 $
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 2 of the License, or
- *   (at your option) any later version.
- *
- *************************************************************************/
-
-using System;
 using System.Collections.Generic;
 using System.Threading;
 
 namespace Cell.Util.Collections
 {
-	/// <summary>
-	/// Not actually synchronized.
-	/// It's especially missing a synchronized enumerator.
-	/// </summary>
-	public class SynchronizedList<T> : List<T>
-	{
-		private readonly object _syncLock = new object();
+    public class SynchronizedList<T> : List<T>
+    {
+        private readonly object syncLock = new object();
 
-		public SynchronizedList() : base() { }
-		public SynchronizedList(int capacity) : base(capacity) { }
-		public SynchronizedList(IEnumerable<T> collection) : base(collection) { }
+        public SynchronizedList()
+        {
+        }
 
-		public new T this[int index]
-		{
-			get
-			{
-				if (index > Count)
-					throw new ArgumentOutOfRangeException("index");
+        public SynchronizedList(int capacity)
+            : base(capacity)
+        {
+        }
 
-				T result;
+        public SynchronizedList(IEnumerable<T> collection)
+            : base(collection)
+        {
+        }
 
-				Monitor.Enter(_syncLock);
+        public new T this[int index]
+        {
+            get
+            {
+                lock (this.syncLock)
+                {
+                    return base[index];
+                }
+            }
 
-				try
-				{
-					result = base[index];
-				}
-				finally
-				{
-					Monitor.Exit(_syncLock);
-				}
+            set
+            {
+                lock (this.syncLock)
+                {
+                    base[index] = value;
+                }
+            }
+        }
 
-				return result;
-			}
-			set
-			{
-				if (index > Count)
-					throw new ArgumentOutOfRangeException("index");
+        public new void Add(T value)
+        {
+            lock (this.syncLock)
+            {
+                base.Add(value);
+            }
+        }
 
-				Monitor.Enter(_syncLock);
+        public new bool Remove(T value)
+        {
+            lock (this.syncLock)
+            {
+                return base.Remove(value);
+            }
+        }
 
-				try
-				{
-					base[index] = value;
-				}
-				finally
-				{
-					Monitor.Exit(_syncLock);
-				}
-			}
-		}
+        public new void RemoveAt(int index)
+        {
+            lock (this.syncLock)
+            {
+                base.RemoveAt(index);
+            }
+        }
 
-		public new void Add(T value)
-		{
-			Monitor.Enter(_syncLock);
+        protected void RemoveUnlocked(int index)
+        {
+            base.RemoveAt(index);
+        }
 
-			try
-			{
-				base.Add(value);
-			}
-			finally
-			{
-				Monitor.Exit(_syncLock);
-			}
-		}
+        public new void Clear()
+        {
+            lock (this.syncLock)
+            {
+                base.Clear();
+            }
+        }
 
-		public new bool Remove(T value)
-		{
-			Monitor.Enter(_syncLock);
+        public new bool Contains(T item)
+        {
+            lock (this.syncLock)
+            {
+                return base.Contains(item);
+            }
+        }
 
-			try
-			{
-				return base.Remove(value);
-			}
-			finally
-			{
-				Monitor.Exit(_syncLock);
-			}
-		}
+        public void EnterLock()
+        {
+            Monitor.Enter(this.syncLock);
+        }
 
-		public new void RemoveAt(int index)
-		{
-			if (index > Count)
-				throw new ArgumentOutOfRangeException("index");
-
-			Monitor.Enter(_syncLock);
-
-			try
-			{
-				base.RemoveAt(index);
-			}
-			finally
-			{
-				Monitor.Exit(_syncLock);
-			}
-		}
-
-		protected void RemoveUnlocked(int index)
-		{
-			base.RemoveAt(index);
-		}
-
-		public new void Clear()
-		{
-			Monitor.Enter(_syncLock);
-
-			try
-			{
-				base.Clear();
-			}
-			finally
-			{
-				Monitor.Exit(_syncLock);
-			}
-		}
-
-		public new bool Contains(T item)
-		{
-			Monitor.Enter(_syncLock);
-
-			try
-			{
-				return base.Contains(item);
-			}
-			finally
-			{
-				Monitor.Exit(_syncLock);
-			}
-		}
-
-		public void EnterLock()
-		{
-			Monitor.Enter(_syncLock);
-		}
-
-		public void ExitLock()
-		{
-			Monitor.Exit(_syncLock);
-		}
-	}
+        public void ExitLock()
+        {
+            Monitor.Exit(this.syncLock);
+        }
+    }
 }

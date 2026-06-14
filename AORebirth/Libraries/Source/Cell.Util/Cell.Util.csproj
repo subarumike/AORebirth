@@ -46,7 +46,6 @@
     <Compile Include="Collections\LockfreeQueue.cs" />
     <Compile Include="Collections\LockfreeStack.cs" />
     <Compile Include="Collections\PriorityQueue.cs" />
-    <Compile Include="Collections\SingleLinkNode.cs" />
     <Compile Include="Collections\SynchronizedDictionary.cs" />
     <Compile Include="Collections\SynchronizedList.cs" />
     <Compile Include="Collections\SynchronizedQueue.cs" />

@@ -333,8 +333,7 @@ namespace locales {
         /// <summary>
         ///   Looks up a localized string similar to ========================================================
         ///AORebirth copyright {0} by the AO Rebirth Dev team
-        ///We are using BSD Licensing for our Core files
-        ///Cell Framework is copyright under GPL
+        ///Licensing and third-party notices are documented in the repository
         ///Anarchy Online is copyright by Funcom
         ///Thank you for choosing AO Rebirth
         ///========================================================.

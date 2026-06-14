@@ -143,7 +143,7 @@ flowchart TB
     AORebirthCore --> AORebirthStats["AORebirth.Stats"]
     AORebirthCore --> AORebirthEnums["AORebirth.Enums"]
     AORebirthDatabase --> Dapper
-    AORebirthDatabase --> MySqlData["MySql.Data"]
+    AORebirthDatabase --> MySqlConnector["MySqlConnector"]
 ```
 
 ## Architectural Concerns
@@ -153,4 +153,3 @@ flowchart TB
 - Some current-client packet contracts differ from old AO Rebirth assumptions.
 - Movement and NPC behavior need capture/replay validation before more runtime edits.
 - Tests are mostly smoke/source assertions; they are useful but not full simulation coverage.
-

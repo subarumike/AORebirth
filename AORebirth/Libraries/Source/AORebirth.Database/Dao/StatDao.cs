@@ -68,6 +68,7 @@ namespace AORebirth.Database.Dao
             {
                 conn = conn ?? Connector.GetConnection();
                 IDbTransaction trans = transaction;
+                bool ownsTransaction = transaction == null;
                 try
                 {
                     trans = trans ?? conn.BeginTransaction();
@@ -78,14 +79,30 @@ namespace AORebirth.Database.Dao
                     {
                         this.Add(stat, conn, trans);
                     }
+
+                    if (ownsTransaction)
+                    {
+                        trans.Commit();
+                    }
                 }
-                finally
+                catch
                 {
-                    if (transaction == null)
+                    if (ownsTransaction)
                     {
                         if (trans != null)
                         {
-                            trans.Commit();
+                            trans.Rollback();
+                        }
+                    }
+
+                    throw;
+                }
+                finally
+                {
+                    if (ownsTransaction)
+                    {
+                        if (trans != null)
+                        {
                             trans.Dispose();
                         }
                     }

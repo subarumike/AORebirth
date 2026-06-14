@@ -1,107 +1,93 @@
-﻿/*************************************************************************
- *
- *   file		: BaseImmutableDictionary.cs
- *   copyright		: (C) 2008 Wilco Bauwer
- *   last changed	: $LastChangedDate: 2009-12-20 21:43:00 +0100 (sø, 20 dec 2009) $
- 
- *   revision		: $Rev: 1148 $
- *
- *   Written by/rights held by Wilco Bauwer (wilcob.com)
- *   Modified by WCell
- *   
- *************************************************************************/
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace Cell.Util.Collections
 {
-	public sealed class BaseImmutableDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>, IEnumerable
-	{
-		private Dictionary<TKey, TValue> _dictionary;
+    public sealed class BaseImmutableDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
+    {
+        private readonly Dictionary<TKey, TValue> dictionary;
 
-		public TValue this[TKey key]
-		{
-			get { return _dictionary[key]; }
-		}
+        public BaseImmutableDictionary()
+        {
+            this.dictionary = new Dictionary<TKey, TValue>();
+        }
 
-		public BaseImmutableDictionary()
-		{
-			_dictionary = new Dictionary<TKey, TValue>();
-		}
+        public BaseImmutableDictionary(int capacity)
+        {
+            this.dictionary = new Dictionary<TKey, TValue>(capacity);
+        }
 
-		public BaseImmutableDictionary(int capacity)
-		{
-			_dictionary = new Dictionary<TKey, TValue>(capacity);
-		}
+        private BaseImmutableDictionary(Dictionary<TKey, TValue> dictionary)
+        {
+            this.dictionary = dictionary;
+        }
 
-		public int Count
-		{
-			get { return _dictionary.Count; }
-		}
+        public TValue this[TKey key]
+        {
+            get { return this.dictionary[key]; }
+        }
 
-		public BaseImmutableDictionary<TKey, TValue> Add(TKey key, TValue value)
-		{
-			return CopyAndMutate(dictionary => dictionary.Add(key, value));
-		}
+        public int Count
+        {
+            get { return this.dictionary.Count; }
+        }
 
-		public BaseImmutableDictionary<TKey, TValue> Remove(TKey key)
-		{
-			return CopyAndMutate(dictionary => dictionary.Remove(key));
-		}
+        public ICollection<TKey> Keys
+        {
+            get { return this.dictionary.Keys; }
+        }
 
-		public BaseImmutableDictionary<TKey, TValue> Clear()
-		{
-			return CopyAndMutate(dictionary => dictionary.Clear());
-		}
+        public ICollection<TValue> Values
+        {
+            get { return this.dictionary.Values; }
+        }
 
-		public bool ContainsKey(TKey key)
-		{
-			return _dictionary.ContainsKey(key);
-		}
+        public BaseImmutableDictionary<TKey, TValue> Add(TKey key, TValue value)
+        {
+            return this.CopyAndMutate(copy => copy.Add(key, value));
+        }
 
-		private BaseImmutableDictionary<TKey, TValue> CopyAndMutate(Action<Dictionary<TKey, TValue>> mutator)
-		{
-			BaseImmutableDictionary<TKey, TValue> dictionary = new BaseImmutableDictionary<TKey, TValue>();
+        public BaseImmutableDictionary<TKey, TValue> Remove(TKey key)
+        {
+            return this.CopyAndMutate(copy => copy.Remove(key));
+        }
 
-			foreach (KeyValuePair<TKey, TValue> pair in _dictionary)
-			{
-				dictionary._dictionary.Add(pair.Key, pair.Value);
-			}
-			mutator(dictionary._dictionary);
+        public BaseImmutableDictionary<TKey, TValue> Clear()
+        {
+            return new BaseImmutableDictionary<TKey, TValue>();
+        }
 
-			return dictionary;
-		}
+        public BaseImmutableDictionary<TKey, TValue> SetValue(TKey key, TValue value)
+        {
+            return this.CopyAndMutate(copy => copy[key] = value);
+        }
 
-		public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
-		{
-			return _dictionary.GetEnumerator();
-		}
+        public bool ContainsKey(TKey key)
+        {
+            return this.dictionary.ContainsKey(key);
+        }
 
-		public BaseImmutableDictionary<TKey, TValue> SetValue(TKey key, TValue value)
-		{
-			return CopyAndMutate(dictionary => dictionary[key] = value);
-		}
+        public bool TryGetValue(TKey key, out TValue value)
+        {
+            return this.dictionary.TryGetValue(key, out value);
+        }
 
-		public Dictionary<TKey, TValue>.KeyCollection Keys
-		{
-			get { return _dictionary.Keys; }
-		}
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        {
+            return this.dictionary.GetEnumerator();
+        }
 
-		public Dictionary<TKey, TValue>.ValueCollection Values
-		{
-			get { return _dictionary.Values; }
-		}
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
 
-		public bool TryGetValue(TKey key, out TValue value)
-		{
-			return _dictionary.TryGetValue(key, out value);
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-	}
+        private BaseImmutableDictionary<TKey, TValue> CopyAndMutate(Action<Dictionary<TKey, TValue>> mutator)
+        {
+            var copy = new Dictionary<TKey, TValue>(this.dictionary);
+            mutator(copy);
+            return new BaseImmutableDictionary<TKey, TValue>(copy);
+        }
+    }
 }

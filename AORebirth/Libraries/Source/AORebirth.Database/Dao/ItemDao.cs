@@ -125,20 +125,60 @@ namespace AORebirth.Database.Dao
         {
             if (items.Count > 0)
             {
-                using (IDbConnection conn = connection ?? Connector.GetConnection())
+                IDbConnection conn = connection;
+                try
                 {
-                    using (IDbTransaction trans = transaction ?? conn.BeginTransaction())
+                    conn = conn ?? Connector.GetConnection();
+                    IDbTransaction trans = transaction;
+                    bool ownsTransaction = transaction == null;
+                    try
                     {
+                        trans = trans ?? conn.BeginTransaction();
                         Instance.Delete(
                             new { items[0].containertype, items[0].containerinstance },
-                            connection,
-                            transaction);
+                            conn,
+                            trans);
                         foreach (DBItem item in items)
                         {
-                            Instance.Add(item, connection, transaction);
+                            Instance.Add(item, conn, trans);
                         }
 
-                        trans.Commit();
+                        if (ownsTransaction)
+                        {
+                            trans.Commit();
+                        }
+                    }
+                    catch
+                    {
+                        if (ownsTransaction)
+                        {
+                            if (trans != null)
+                            {
+                                trans.Rollback();
+                            }
+                        }
+
+                        throw;
+                    }
+                    finally
+                    {
+                        if (ownsTransaction)
+                        {
+                            if (trans != null)
+                            {
+                                trans.Dispose();
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    if (connection == null)
+                    {
+                        if (conn != null)
+                        {
+                            conn.Dispose();
+                        }
                     }
                 }
             }
