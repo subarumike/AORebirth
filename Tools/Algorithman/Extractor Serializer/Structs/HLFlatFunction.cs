@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2013, CellAO Team
 // 
@@ -34,11 +34,11 @@ namespace Extractor_Serializer.Structs
     using System.Net;
     using System.Text;
 
-    using CellAO.Core.Functions;
-    using CellAO.Core.Requirements;
+    using AORebirth.Core.Functions;
+    using AORebirth.Core.Requirements;
 
     using MsgPack;
-    using CellAO.Enums;
+    using AORebirth.Enums;
 
     #endregion
 

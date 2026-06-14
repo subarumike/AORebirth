@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2013, CellAO Team
 // 
@@ -84,9 +84,9 @@ namespace Extractor_Serializer
     using System.Text;
     using System.Text.RegularExpressions;
 
-    using CellAO.Core.Items;
-    using CellAO.Core.Nanos;
-    using CellAO.Core.Playfields;
+    using AORebirth.Core.Items;
+    using AORebirth.Core.Nanos;
+    using AORebirth.Core.Playfields;
 
     using Utility;
 
@@ -304,7 +304,7 @@ namespace Extractor_Serializer
         {
             bool result = true;
 
-            // Presume we are in CellAO/Built/Debug or Release
+            // Presume we are in AORebirth/Built/Debug or Release
             string pathToDatafiles = Path.Combine("..", "..", "Datafiles");
             if (File.Exists(Path.Combine(pathToDatafiles, "items.dat")))
             {
@@ -334,7 +334,7 @@ namespace Extractor_Serializer
 
             File.Copy("itemrelations.txt", Path.Combine(pathToDatafiles, "itemrelations.txt"));
 
-            pathToDatafiles = Path.Combine("..", "..", "Libraries", "Source", "CellAO.Database", "SqlTables");
+            pathToDatafiles = Path.Combine("..", "..", "Libraries", "Source", "AORebirth.Database", "SqlTables");
             if (File.Exists(Path.Combine(pathToDatafiles, "itemnames.sql")))
             {
                 File.Delete(Path.Combine(pathToDatafiles, "itemnames.sql"));
@@ -564,7 +564,7 @@ namespace Extractor_Serializer
         /// </param>
         private static void Main(string[] args)
         {
-            OnScreenBanner.PrintCellAOBanner(ConsoleColor.White);
+            OnScreenBanner.PrintAORebirthBanner(ConsoleColor.White);
 
             Console.WriteLine();
 
@@ -657,7 +657,7 @@ namespace Extractor_Serializer
             Console.WriteLine();
             Console.WriteLine("Further Instructions:");
             Console.WriteLine(
-                "- Copy items.dat, nanos.dat and playfields.dat into your CellAO/Datafiles folder and overwrite.");
+                "- Copy items.dat, nanos.dat and playfields.dat into your AORebirth/Datafiles folder and overwrite.");
             Console.WriteLine("- Apply itemnames.sql to your database");
             Console.WriteLine();
             Console.WriteLine("   OR   ");
@@ -667,7 +667,7 @@ namespace Extractor_Serializer
             while (true)
             {
                 Console.WriteLine("Please choose:");
-                Console.WriteLine("1: Copy the files to CellAO/Datafiles and CellAO/.../CellAO.Database/SqlTables.");
+                Console.WriteLine("1: Copy the files to AORebirth/Datafiles and AORebirth/.../AORebirth.Database/SqlTables.");
                 Console.WriteLine("2: Exit and copy yourself");
                 Console.WriteLine("[1,2]:");
                 string line = Console.ReadLine();

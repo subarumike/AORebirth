@@ -4,7 +4,7 @@ Generated: 2026-06-02
 
 ## System Architecture
 
-CellAO is split into console engines plus shared libraries:
+AO Rebirth is split into console engines plus shared libraries:
 
 ```mermaid
 flowchart LR
@@ -15,7 +15,7 @@ flowchart LR
     Login --> DB
     Chat --> DB
     Zone --> DB
-    Zone --> Core["CellAO.Core"]
+    Zone --> Core["AORebirth.Core"]
     Zone --> Msg["AOtomation Messaging"]
     Login --> Core
     Chat --> Core
@@ -72,16 +72,16 @@ sequenceDiagram
 
 Important files and directories:
 
-- `CellAO/Libraries/Source/CellAO.Core/Entities/Dynel.cs`: base dynamic entity.
-- `CellAO/Libraries/Source/CellAO.Core/Entities/Character.cs`: character model.
-- `CellAO/Libraries/Source/CellAO.Core/Inventory`: inventory pages and item movement models.
-- `CellAO/Server/ZoneEngine/Core/Controllers/PlayerController.cs`: player runtime controller.
-- `CellAO/Server/ZoneEngine/Core/Controllers/NPCController.cs`: NPC runtime controller and movement/combat behavior.
-- `CellAO/Server/ZoneEngine/Core/Playfields/Playfield.cs`: playfield entity registry, combat, death, corpse, loot, despawn, and broad gameplay flow.
-- `CellAO/Server/ZoneEngine/Core/MessageHandlers`: N3 message handlers for zone gameplay.
-- `CellAO/Server/ZoneEngine/Core/Packets`: custom packet builders.
-- `CellAO/Server/ZoneEngine/ChatCommands`: GM/debug command surface.
-- `CellAO/Libraries/Source/AOtomation/AOtomation.Messaging`: message models and serializer contracts.
+- `AORebirth/Libraries/Source/AORebirth.Core/Entities/Dynel.cs`: base dynamic entity.
+- `AORebirth/Libraries/Source/AORebirth.Core/Entities/Character.cs`: character model.
+- `AORebirth/Libraries/Source/AORebirth.Core/Inventory`: inventory pages and item movement models.
+- `AORebirth/Server/ZoneEngine/Core/Controllers/PlayerController.cs`: player runtime controller.
+- `AORebirth/Server/ZoneEngine/Core/Controllers/NPCController.cs`: NPC runtime controller and movement/combat behavior.
+- `AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs`: playfield entity registry, combat, death, corpse, loot, despawn, and broad gameplay flow.
+- `AORebirth/Server/ZoneEngine/Core/MessageHandlers`: N3 message handlers for zone gameplay.
+- `AORebirth/Server/ZoneEngine/Core/Packets`: custom packet builders.
+- `AORebirth/Server/ZoneEngine/ChatCommands`: GM/debug command surface.
+- `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging`: message models and serializer contracts.
 
 ## Networking Architecture
 
@@ -106,7 +106,7 @@ Packet repairs must distinguish:
 
 ## Database Architecture
 
-The local configuration is MySQL and must use only `cellao_codex_clean`. The project includes DAO/entity code under `CellAO/Libraries/Source/CellAO.Database`. Do not infer schema safety from code alone; data mutation requires explicit project-owner approval when destructive or broad.
+The local configuration is MySQL and must use only `cellao_codex_clean`. The project includes DAO/entity code under `AORebirth/Libraries/Source/AORebirth.Database`. Do not infer schema safety from code alone; data mutation requires explicit project-owner approval when destructive or broad.
 
 ## Asset Pipeline
 
@@ -123,7 +123,7 @@ The project itself has console engines and no modern app UI. AO client UI behavi
 Primary build:
 
 ```powershell
-& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' 'CellAO\CellAO.sln' /t:Build /p:Configuration=Debug /m
+& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' 'AORebirth\AORebirth.sln' /t:Build /p:Configuration=Debug /m
 ```
 
 The solution includes server engines, shared libraries, AOtomation, msgpack-cli, and utility projects. Some tools under `tools-temp` are separate projects and are not necessarily part of the main solution.
@@ -134,23 +134,23 @@ High-level dependency direction:
 
 ```mermaid
 flowchart TB
-    ZoneEngine --> CellAOCore["CellAO.Core"]
-    ZoneEngine --> CellAODatabase["CellAO.Database"]
+    ZoneEngine --> AORebirthCore["AORebirth.Core"]
+    ZoneEngine --> AORebirthDatabase["AORebirth.Database"]
     ZoneEngine --> AOtomation["AOtomation.Messaging"]
-    LoginEngine --> CellAODatabase
-    ChatEngine --> CellAODatabase
-    WebEngine --> CellAODatabase
-    CellAOCore --> CellAOStats["CellAO.Stats"]
-    CellAOCore --> CellAOEnums["CellAO.Enums"]
-    CellAODatabase --> Dapper
-    CellAODatabase --> MySqlData["MySql.Data"]
+    LoginEngine --> AORebirthDatabase
+    ChatEngine --> AORebirthDatabase
+    WebEngine --> AORebirthDatabase
+    AORebirthCore --> AORebirthStats["AORebirth.Stats"]
+    AORebirthCore --> AORebirthEnums["AORebirth.Enums"]
+    AORebirthDatabase --> Dapper
+    AORebirthDatabase --> MySqlData["MySql.Data"]
 ```
 
 ## Architectural Concerns
 
 - `Playfield.cs` is a large god object and owns many unrelated systems.
 - Packet behavior is split across AOtomation models, handlers, and custom packet builders.
-- Some current-client packet contracts differ from old CellAO assumptions.
+- Some current-client packet contracts differ from old AO Rebirth assumptions.
 - Movement and NPC behavior need capture/replay validation before more runtime edits.
 - Tests are mostly smoke/source assertions; they are useful but not full simulation coverage.
 

@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{60385925-84F5-4893-A5E0-C8C1D1190790}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ZoneEngine</RootNamespace>
+    <AssemblyName>ZoneEngine</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <NoWin32Manifest>False</NoWin32Manifest>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>Full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>..\..\Built\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\Built\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>zone.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <BaseAddress>4194304</BaseAddress>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Dapper, Version=1.12.1.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Dapper.1.13\lib\net40\Dapper.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip, Version=1.9.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\DotNetZip.1.9.2\lib\net20\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="MemBus, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\MemBus.2.0.2\lib\Net40-Client\MemBus.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="NBug, Version=1.2.0.0, Culture=neutral, PublicKeyToken=a4292a325f69b123, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\NBug.1.2.2\lib\net40-client\NBug.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog">
+      <HintPath>..\..\packages\NLog.2.1.0\lib\net40\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\SolutionAssemblyInfo.cs">
+      <Link>Properties\SolutionAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="ChatCommands\ChatCommandGet.cs" />
+    <Compile Include="ChatCommands\ChatCommandGiveCredits.cs" />
+    <Compile Include="ChatCommands\ChatCommandGiveItem.cs" />
+    <Compile Include="ChatCommands\ChatCommandSet.cs" />
+    <Compile Include="ChatCommands\DebugItem.cs" />
+    <Compile Include="ChatCommands\FindWeaponVisual.cs" />
+    <Compile Include="ChatCommands\InstaGrid.cs" />
+    <Compile Include="ChatCommands\MakeShop.cs" />
+    <Compile Include="ChatCommands\Npc.cs" />
+    <Compile Include="ChatCommands\SaveProxy.cs" />
+    <Compile Include="ChatCommands\Spawn.cs" />
+    <Compile Include="ChatCommands\TeleportDynel.cs" />
+    <Compile Include="ChatCommands\Teleport.cs" />
+    <Compile Include="ChatCommands\ChatCommandListStatels.cs" />
+    <Compile Include="ChatCommands\PlayfieldList.cs" />
+    <Compile Include="ChatCommands\ShowStatel.cs" />
+    <Compile Include="ChatCommands\tpout.cs" />
+    <Compile Include="ChatCommands\tptoproxy.cs" />
+    <Compile Include="ChatCommands\WalkingTest.cs" />
+    <Compile Include="ChatCommands\Weather.cs" />
+    <Compile Include="ChatCommands\Posture.cs" />
+    <Compile Include="Core\Controllers\NPCController.cs" />
+    <Compile Include="Core\Controllers\PlayerController.cs" />
+    <Compile Include="Core\CombatCorpseRules.cs" />
+    <Compile Include="Core\CombatDamageRules.cs" />
+    <Compile Include="Core\CombatTestMobArchetype.cs" />
+    <Compile Include="Core\EnemyBehaviorContract.cs" />
+    <Compile Include="Core\NpcAiProfile.cs" />
+    <Compile Include="Core\Functions\FunctionCollection.cs" />
+    <Compile Include="Core\Functions\FunctionPrototype.cs" />
+    <Compile Include="Core\Functions\GameFunctions\applytexture.cs" />
+    <Compile Include="Core\Functions\GameFunctions\backmesh.cs" />
+    <Compile Include="Core\Functions\GameFunctions\changebodymesh.cs" />
+    <Compile Include="Core\Functions\GameFunctions\changeactionrestriction.cs" />
+    <Compile Include="Core\Functions\GameFunctions\lockskill.cs" />
+    <Compile Include="Core\Functions\GameFunctions\shophash.cs" />
+    <Compile Include="Core\Functions\GameFunctions\exitproxyplayfield.cs" />
+    <Compile Include="Core\Functions\GameFunctions\headmesh.cs" />
+    <Compile Include="Core\Functions\GameFunctions\hit.cs" />
+    <Compile Include="Core\Functions\GameFunctions\lineteleport.cs" />
+    <Compile Include="Core\Functions\GameFunctions\mesh.cs" />
+    <Compile Include="Core\Functions\GameFunctions\modify.cs" />
+    <Compile Include="Core\Functions\GameFunctions\modifypercentage.cs" />
+    <Compile Include="Core\Functions\GameFunctions\openbank.cs" />
+    <Compile Include="Core\Functions\GameFunctions\teleportproxy.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Core\Functions\GameFunctions\set.cs" />
+    <Compile Include="Core\Functions\GameFunctions\systemtext.cs" />
+    <Compile Include="Core\Functions\GameFunctions\teleport.cs" />
+    <Compile Include="Core\Functions\GameFunctions\teleportproxy2.cs" />
+    <Compile Include="Core\Functions\GameFunctions\uploadnano.cs" />
+    <Compile Include="Core\IntermalMessageEvents\PlayfieldMessageReceivedEvent.cs" />
+    <Compile Include="Core\InternalMessages\IMExecuteFunction.cs" />
+    <Compile Include="Core\InternalMessages\IMSendAOtomatinMessageToPlayfieldOthers.cs" />
+    <Compile Include="Core\InternalMessages\IMSendAOtomationMessageBodiesToClient.cs" />
+    <Compile Include="Core\InternalMessages\IMSendAOtomationMessageBodyToClient.cs" />
+    <Compile Include="Core\InternalMessages\IMSendAOtomationMessageToClient.cs" />
+    <Compile Include="Core\InternalMessages\IMSendAOtomationMessageToPlayfield.cs" />
+    <Compile Include="Core\InternalMessages\IMSendPlayerSCFUs.cs" />
+    <Compile Include="Core\InternalMessages\InternalMessage.cs" />
+    <Compile Include="Core\InternalMessages\InternalMessageBody.cs" />
+    <Compile Include="Core\KnuBot\BaseKnuBot.cs" />
+    <Compile Include="Core\KnuBot\KnuBotDialogTree.cs" />
+    <Compile Include="Core\MessageHandlers\AddTemplateMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\AppearanceUpdateMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\AttackMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\BankMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\CastNanoMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\CharacterActionMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\CharacterInfoPacketMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\CharDCMoveMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\CharInPlayMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\ChatCmdMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\ChatServerInfoMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\ChatTextMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\ContainerAddItemMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\DespawnMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\DropDynelMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\FeedbackMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\FollowTargetMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\FullCharacterMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\GenericCmdMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\InventoryUpdatedMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\InventoryUpdateMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\KnuBotAnswerListMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\KnuBotAnswerMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\KnuBotAppendTextMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\KnuBotCloseChatWindowMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\KnuBotFinishTradeMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\KnuBotOpenChatWindowMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\KnuBotRejectedItemsMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\KnuBotStartTradeMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\KnuBotTradeMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\LookAtMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\PlayfieldAnarchyFMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\ResearchRequestMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\ResearchUpdateMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\ShopUpdateMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\SimpleItemFullUpdateMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\SkillMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\SocialActionCmdMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\StatMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\StopFightMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\TeleportMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\TemplateActionMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\TradeMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\VendingMachineFullUpdateMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\VicinityChatMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\WeatherControlMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\ZoneLoginMessageHandler.cs" />
+    <Compile Include="Core\PacketHandlers\ClientConnected.cs" />
+    <Compile Include="Core\PacketHandlers\OrgClient.cs" />
+    <Compile Include="Core\PacketHandlers\TradeSkillReceiver.cs" />
+    <Compile Include="Core\Packets\Bulk.cs" />
+    <Compile Include="Core\Packets\CorpseFullUpdate.cs" />
+    <Compile Include="Core\Packets\Equip.cs" />
+    <Compile Include="Core\Packets\SimpleCharFullUpdate.cs" />
+    <Compile Include="Core\Packets\Stat.cs" />
+    <Compile Include="Core\Packets\TradeSkillPacket.cs" />
+    <Compile Include="Core\Packets\UnEquip.cs" />
+    <Compile Include="Core\Packets\WeaponItemFullUpdate.cs" />
+    <Compile Include="Core\Playfields\Playfield.cs" />
+    <Compile Include="Core\Playfields\Playfields.cs" />
+    <Compile Include="Core\Playfields\WallCollision.cs" />
+    <Compile Include="Core\Playfields\WallCollisionResult.cs" />
+    <Compile Include="Core\TradeSkill.cs" />
+    <Compile Include="Core\TradeSkillEntry.cs" />
+    <Compile Include="Core\TradeSkillSkill.cs" />
+    <Compile Include="Core\ZoneClient.cs" />
+    <Compile Include="Core\ZoneServer.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ChatCommands\AOChatCommand.cs" />
+    <None Include="Scripts\KnuBotFlappy.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\InfoBot.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Compile Include="Scripts\KnuBotItemGiver.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Script\IAOScript.cs" />
+    <Compile Include="Script\ScriptCompiler.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\SmokeLounge.AOtomation.Messaging.csproj">
+      <Project>{3ceac898-bfca-45ea-bf34-c4bbb85d2da4}</Project>
+      <Name>SmokeLounge.AOtomation.Messaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\Cell.Core\Cell.Core.csproj">
+      <Project>{71ab07ad-4d94-4693-8560-47862e5b6e61}</Project>
+      <Name>Cell.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\AORebirth.Communication\AORebirth.Communication.csproj">
+      <Project>{55f93bc4-61c6-42f3-a8cb-788221059917}</Project>
+      <Name>AORebirth.Communication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\AORebirth.Core\AORebirth.Core.csproj">
+      <Project>{8aef23b2-9e44-40a1-a74e-cf7348b45b62}</Project>
+      <Name>AORebirth.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\AORebirth.Database\AORebirth.Database.csproj">
+      <Project>{63d6c409-58eb-4033-87e0-e0dda6594075}</Project>
+      <Name>AORebirth.Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\AORebirth.Enums\AORebirth.Enums.csproj">
+      <Project>{0c09af43-3456-4fd6-9041-d9a6d7c3f36c}</Project>
+      <Name>AORebirth.Enums</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\AORebirth.Interfaces\AORebirth.Interfaces.csproj">
+      <Project>{d53f0612-fefe-4eaf-80aa-480f25c8dd76}</Project>
+      <Name>AORebirth.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\AORebirth.ObjectManager\AORebirth.ObjectManager.csproj">
+      <Project>{65a705b0-f8bf-4d68-a8fd-c630a87dc120}</Project>
+      <Name>AORebirth.ObjectManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\AORebirth.Stats\AORebirth.Stats.csproj">
+      <Project>{3e414ed6-3cad-4c99-a35d-1802255de3cb}</Project>
+      <Name>AORebirth.Stats</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\Exceptions\AORebirth.Exceptions.csproj">
+      <Project>{ddd3b520-1f43-4eef-a2a9-fc621424090a}</Project>
+      <Name>AORebirth.Exceptions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\msgpack-cli\src\MsgPack.Mono\MsgPack.Mono.csproj">
+      <Project>{6e8c2296-21e9-4113-89c4-76376516aa14}</Project>
+      <Name>MsgPack.Mono</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\PlayfieldLoader\PlayfieldLoader.csproj">
+      <Project>{E187E908-8CD8-4EC5-B46B-09F81BE9D4C4}</Project>
+      <Name>PlayfieldLoader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\Translations\Translations.csproj">
+      <Project>{4bbd60c6-aed0-4347-b4ca-a262d3474826}</Project>
+      <Name>Translations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\Utility\Utility.csproj">
+      <Project>{cb56f285-02ae-4816-9e8a-ec69991400e5}</Project>
+      <Name>Utility</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\Config\Config.xml">
+      <Link>Config.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dummy.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\100.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\101.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\102.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\103.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\105.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\107.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\109.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\110.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\111.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\120.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\124.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\125.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\127.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\128.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\152.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\320.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\500.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\501.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\505.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Districts\800.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Perks.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Playfields.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\Stats.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zone.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Config\NBug.ZoneEngine.config">
+      <Link>NBug.ZoneEngine.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\Datafiles\items.dat">
+      <Link>items.dat</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\Datafiles\nanos.dat">
+      <Link>nanos.dat</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\Datafiles\playfields.dat">
+      <Link>playfields.dat</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ClassDiagrams\Playfield.cd" />
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Component\" />
+    <Folder Include="Core\InternalMessageHandler\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

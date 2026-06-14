@@ -1,6 +1,6 @@
 # Current Status
 
-CellAO NightPredator is a local C#/.NET Framework-era Anarchy Online server workspace. Current work is focused on making the server compatible with Mike's current AO client and local `cellao_codex_clean` MySQL database through evidence-backed packet, gameplay, and data repairs.
+AO Rebirth NightPredator is a local C#/.NET Framework-era Anarchy Online server workspace. Current work is focused on making the server compatible with Mike's current AO client and local `cellao_codex_clean` MySQL database through evidence-backed packet, gameplay, and data repairs.
 
 # Working Systems
 
@@ -31,6 +31,7 @@ CellAO NightPredator is a local C#/.NET Framework-era Anarchy Online server work
 - Inaccessible playfield `500 Parnassos` is excluded from active vendor coverage metrics, missing-vendor reports, capture targeting, and import planning while remaining visible in raw statel coverage output. Operator verification confirmed there is no practical live-client access path for capture. Current verification shows `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 29`, and `StatelVendorExclusions = 169`; the actionable capture backlog dropped from `89` to `29`. No SQL, vendor mappings, imports, or runtime vendor behavior changed.
 - Neutral Training Startup Equipment import completed from AOSharp capture `20260614-002319`. The validated staged SQL added 2 `954 Neutral Training` vendor rows, 1 vendor template, and 1 new shop inventory group with 9 inventory rows. Both Basic Startup Equipment statels have direct VendorFull and ShopUpdate evidence and share exact inventory hash `WHBW`. Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 27`, and `StatelVendorExclusions = 169`; actionable uncovered statel vendors dropped from `29` to `27`. Current coverage/actionability chain is `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96 -> 93 -> 89 -> 29 -> 27`. No runtime vendor behavior changed.
 - Freelancers Inc. HQ - Rome Agency Shop import completed from AOSharp capture `20260614-022639`. The validated staged SQL added 1 `7011 Freelancers Inc. HQ - Rome` vendor row, 1 vendor template, and 1 new shop inventory group with 26 inventory rows. The imported row covers Agency Shop template `285348` at X 93.972 Y 2.01 Z 73.734 with direct VendorFull and ShopUpdate evidence. Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 26`, and `StatelVendorExclusions = 169`; actionable uncovered statel vendors dropped from `27` to `26`. Current coverage/actionability chain is `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96 -> 93 -> 89 -> 29 -> 27 -> 26`. No runtime vendor behavior changed.
+- Vendor coverage campaign freeze completed. Status: COMPLETE (LIVE COVERAGE). The campaign is complete for all practical live-accessible vendors. The remaining `26` uncovered statel vendors are deferred because they require setup-specific access: BS Signup profession-locked terminals, sided/org-dependent Tower Shop terminals, Clan-only shops, ICC Holodeck / Arete divergence, Unicorn Outpost, and special registration interiors. No SQL, capture, import, mapping change, or runtime vendor behavior change was made for the freeze.
 - Omni Superior General Shop live-capture import completed from AOSharp capture `20260612-044234`. The validated v2 staged SQL added 27 `1185 ord_smarket_omni_sup` vendor rows, 20 vendor templates, and 19 new shop inventory groups while reusing existing map shop hash `LJI7`. Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 324`, and `StatelVendorExclusions = 30`; actionable uncovered statel vendors dropped from `351` to `324`. Current live-capture coverage chain is `404 -> 381 -> 351 -> 324`. No runtime vendor behavior changed.
 - Clan Basic General Shop live-capture import completed from AOSharp capture `20260612-225855`. The validated staged SQL added 29 `1180 ord_smarket_clan_basic` vendor rows, 29 vendor templates, and 25 new shop inventory groups with 1575 inventory rows while reusing existing shop hashes `G4XZ`, `HYDQ`, `LJI7`, and `R5R7`. Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 295`, and `StatelVendorExclusions = 30`; actionable uncovered statel vendors dropped from `324` to `295`. Current live-capture coverage chain is `404 -> 381 -> 351 -> 324 -> 295`. No runtime vendor behavior changed.
 - Clan Superior General Shop live-capture import completed from AOSharp capture `20260612-232439`. The validated staged SQL added 19 `1182 ord_smarket_clan_sup` vendor rows, 19 vendor templates, and 14 new shop inventory groups with 594 inventory rows while reusing existing shop hashes `LJI7`, `CHHQ`, `OHOO`, `JYPE`, and `Cont`. Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 276`, and `StatelVendorExclusions = 30`; actionable uncovered statel vendors dropped from `295` to `276`. Current live-capture coverage chain is `404 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 381 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 351 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 324 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 295 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 276`. No runtime vendor behavior changed.
@@ -82,7 +83,7 @@ CellAO NightPredator is a local C#/.NET Framework-era Anarchy Online server work
 - Inventory, corpse item loot, corpse credit loot, player trade item/credit/cancel, and vendor buy/sell/close persistence flows have passing source assertion coverage where available and completed live-client relog verification for the documented repaired paths.
 - Combat works for basic weapon/NPC test scenarios, but packet semantics are not complete.
 - Corpse visuals and `CorpseFullUpdate` remain areas for broader cleanup, but the corpse cash value offset is repaired and guarded by focused assertions.
-- Shop/vendor database coverage is improved but still has remaining static vendor coverage gaps.
+- Shop/vendor database coverage is complete for practical live-accessible vendors. The remaining 26 statel coverage gaps are deferred access/setup backlog, not active capture work.
 - Playfield/interior mapping has repaired fixtures and remaining audit candidates.
 - Enemy spawn testing has supported low-level families, but final spawn tables are not complete.
 - DB-backed mob loot is modeled and partially wired, with limited reviewed data.
@@ -693,6 +694,50 @@ Prior ICC/Fair Trade vendor stock repairs were pushed to `origin/master` in comm
 - tradeskill room captured rows: 3,101
 - tradeskill vendor rows: 38
 
+# Vendor Coverage Deferred Backlog
+
+Status: COMPLETE (LIVE COVERAGE).
+
+Vendor coverage campaign complete for all practical live-accessible vendors. Remaining vendors require setup-specific access and are deferred.
+
+Final state:
+
+- Current uncovered count: 26.
+- Covered: all practical live-accessible vendors reached during the campaign.
+- Deferred: access-restricted, setup-specific, profession-locked, sided, special-location, or current-client divergence vendors.
+- No SQL was generated for this freeze.
+- No capture was run for this freeze.
+- Existing mappings were not modified.
+
+| Category | Playfield | Name | VendorId | TemplateId | Reason blocked | Required setup |
+| --- | ---: | --- | ---: | ---: | --- | --- |
+| Clan-only vendors | 665 | Broken Shores | 43581441 | 99522 | Clan-side shop access friction; not practical from current Omni-focused sweep. | Leveled/access-capable Clan character. |
+| Clan-only vendors | 952 | Clan Training | 62390272 | 100034 | Clan starter/training access requires a Clan character in the correct area. | Clan character with access to Clan Training. |
+| Clan-only vendors | 1426 | Clan Registration dng | 93454336 | 25885 | Clan registration interior; outside current Omni/non-swap scope. | Clan character and registration interior access. |
+| Clan-only vendors | 1426 | Clan Registration dng | 93454337 | 81799 | Clan registration interior; outside current Omni/non-swap scope. | Clan character and registration interior access. |
+| Clan-only vendors | 7012 | Freelancers Inc. HQ - Old Athen | 459538432 | 284692 | Old Athen/Clan-side Freelancers access requires separate Clan setup. | Clan character able to reach Old Athen Freelancers HQ. |
+| BS Signup profession-locked | 6007 | BS Signup (dng) | 393674752 | 266562 | OFAB terminal is profession-locked. | Adventurer character with BS Signup access. |
+| BS Signup profession-locked | 6007 | BS Signup (dng) | 393674753 | 266563 | OFAB terminal is profession-locked. | Agent character with BS Signup access. |
+| BS Signup profession-locked | 6007 | BS Signup (dng) | 393674754 | 266569 | OFAB terminal is profession-locked. | Bureaucrat character with BS Signup access. |
+| BS Signup profession-locked | 6007 | BS Signup (dng) | 393674755 | 266564 | OFAB terminal is profession-locked. | Doctor character with BS Signup access. |
+| BS Signup profession-locked | 6007 | BS Signup (dng) | 393674756 | 266565 | OFAB terminal is profession-locked. | Enforcer character with BS Signup access. |
+| BS Signup profession-locked | 6007 | BS Signup (dng) | 393674757 | 266566 | OFAB terminal is profession-locked. | Engineer character with BS Signup access. |
+| BS Signup profession-locked | 6007 | BS Signup (dng) | 393674758 | 266567 | OFAB terminal is profession-locked. | Fixer character with BS Signup access. |
+| BS Signup profession-locked | 6007 | BS Signup (dng) | 393674759 | 266568 | OFAB terminal is profession-locked. | Keeper character with BS Signup access. |
+| BS Signup profession-locked | 6007 | BS Signup (dng) | 393674760 | 266570 | OFAB terminal is profession-locked. | Martial Artist character with BS Signup access. |
+| BS Signup profession-locked | 6007 | BS Signup (dng) | 393674762 | 266572 | OFAB terminal is profession-locked. | Nano-Technician character with BS Signup access. |
+| BS Signup profession-locked | 6007 | BS Signup (dng) | 393674763 | 266574 | OFAB terminal is profession-locked. | Shade character with BS Signup access. |
+| BS Signup profession-locked | 6007 | BS Signup (dng) | 393674764 | 266573 | OFAB terminal is profession-locked. | Soldier character with BS Signup access. |
+| BS Signup profession-locked | 6007 | BS Signup (dng) | 393674765 | 266575 | OFAB terminal is profession-locked. | Trader character with BS Signup access. |
+| Tower Shop sided/org-dependent | 4704 | Tower Shop (dungeon) | 308281349 | 249724 | Terminal did not open during live attempts. | Unknown; revisit only with explicit tower-shop access investigation. |
+| Tower Shop sided/org-dependent | 4704 | Tower Shop (dungeon) | 308281366 | 295890 | Sided city-building terminal; not openable from current character side. | Clan-side or appropriate city-building access setup. |
+| Tower Shop sided/org-dependent | 4704 | Tower Shop (dungeon) | 308281368 | 295892 | Sided city-building terminal; not openable from current character side. | Neutral-side or appropriate city-building access setup. |
+| ICC Holodeck / Arete divergence | 6131 | ICC Holodeck Alien Training | 401801216 | 287476 | Current-client Arete/Holodeck access diverges from legacy AO Rebirth playfield assumptions. | Separate current-client source-data investigation, not normal vendor capture. |
+| Unicorn / registration / special terminals | 1427 | Omni registration dng | 93519872 | 81799 | Special registration interior; not part of practical shop sweep. | Registration-interior access investigation. |
+| Unicorn / registration / special terminals | 1428 | Neutral organisation dng | 93585408 | 81799 | Special registration interior; access unknown. | Neutral organisation registration access investigation. |
+| Unicorn / registration / special terminals | 4364 | Unicorn Outpost | 285999104 | 256457 | Special outpost terminal; access/route not confirmed during campaign. | Unicorn Outpost access and terminal capture plan. |
+| Unicorn / registration / special terminals | 4364 | Unicorn Outpost | 285999105 | 287037 | Special outpost terminal; access/route not confirmed during campaign. | Unicorn Outpost access and terminal capture plan. |
+
 # Next Milestone
 
-Static vendor coverage remains the active data-campaign area, but no next target is selected in this documentation update. Continue only after Mike selects or approves the next target from current audit data. Keep NPC movement out of scope unless explicitly selected later.
+Move to the next AO Rebirth system. Do not continue vendor capture/import work unless Mike intentionally reopens the deferred access backlog with the required character, profession, side, or special-location setup. Keep NPC movement out of scope unless explicitly selected later.

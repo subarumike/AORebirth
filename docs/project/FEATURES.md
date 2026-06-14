@@ -116,6 +116,6 @@ Implementation notes:
 
 - `tools-temp/live-pcaps` stores captures.
 - `tools-temp/AOSharpLiveCapture` and `tools-temp/AOSharpLiveInjector` support live capture work.
-- `tools-temp/CellAOCombatSmokeTests/Run-CombatSmokeTests.ps1` contains important source assertions.
+- `tools-temp/AORebirthCombatSmokeTests/Run-CombatSmokeTests.ps1` contains important source assertions.
 - `tools-temp/enemy-movement-replay` contains enemy movement replay infrastructure.
 

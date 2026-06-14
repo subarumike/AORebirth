@@ -46,7 +46,7 @@ Dependencies: Phases 1-3.
 Tasks:
 
 - Mine one or more captured combat chase windows into replay fixtures.
-- Add local packet tap/trace for CellAO S2C movement packets.
+- Add local packet tap/trace for AO Rebirth S2C movement packets.
 - Compare local movement packet sequence against official/private evidence.
 - Build a minimal server-authoritative enemy behavior contract.
 - Only then wire runtime `NPCController` changes.

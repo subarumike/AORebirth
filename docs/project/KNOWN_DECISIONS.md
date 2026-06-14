@@ -24,11 +24,11 @@ Consequences: Debugging may require more careful targeted queries, but it avoids
 
 ## Current-Client Parity Beats Legacy Assumptions
 
-Decision: The current installed AO client is newer than the original CellAO target, so current-client captures and AO stripdown docs can override old CellAO structure assumptions.
+Decision: The current installed AO client is newer than the original AO Rebirth target, so current-client captures and AO stripdown docs can override old AO Rebirth structure assumptions.
 
 Reason: Sit/stand, death/respawn, and packet shape issues were tied to client-version mismatches.
 
-Alternatives considered: Preserve old packet models because CellAO originally used them.
+Alternatives considered: Preserve old packet models because AO Rebirth originally used them.
 
 Consequences: Some legacy structures must be replaced or gated by evidence.
 

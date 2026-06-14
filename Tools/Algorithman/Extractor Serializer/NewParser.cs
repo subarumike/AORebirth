@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2013, CellAO Team
 // 
@@ -33,13 +33,13 @@ namespace Extractor_Serializer
     using System.IO;
     using System.Text;
 
-    using CellAO.Core.Actions;
-    using CellAO.Core.Events;
-    using CellAO.Core.Functions;
-    using CellAO.Core.Items;
-    using CellAO.Core.Nanos;
-    using CellAO.Core.Requirements;
-    using CellAO.Enums;
+    using AORebirth.Core.Actions;
+    using AORebirth.Core.Events;
+    using AORebirth.Core.Functions;
+    using AORebirth.Core.Items;
+    using AORebirth.Core.Nanos;
+    using AORebirth.Core.Requirements;
+    using AORebirth.Enums;
 
     using MsgPack;
 

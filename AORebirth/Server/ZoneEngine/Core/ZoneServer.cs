@@ -1,0 +1,436 @@
+#region License
+
+// Copyright (c) 2005-2014, CellAO Team
+// 
+// 
+// All rights reserved.
+// 
+// 
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// 
+// 
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+// 
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// 
+
+#endregion
+
+namespace ZoneEngine.Core
+{
+    #region Usings ...
+
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Reflection;
+    using System.Threading;
+
+    using Cell.Core;
+
+    using AORebirth.Communication.Messages;
+    using AORebirth.Core.Components;
+    using AORebirth.Core.Entities;
+    using AORebirth.Core.Playfields;
+    using AORebirth.ObjectManager;
+
+    using MemBus;
+    using MemBus.Configurators;
+    using MemBus.Support;
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
+
+    using ZoneEngine.ChatCommands;
+    using ZoneEngine.Script;
+
+    using IBus = MemBus.IBus;
+
+    #endregion
+
+    /// <summary>
+    /// </summary>
+    public class ZoneServer : ServerBase
+    {
+        #region Fields
+
+        /// <summary>
+        /// </summary>
+        public HashSet<ZoneClient> Clients = new HashSet<ZoneClient>();
+
+        /// <summary>
+        /// </summary>
+        public int Id;
+
+        /// <summary>
+        /// </summary>
+        private readonly List<IPlayfield> playfields = new List<IPlayfield>();
+
+        private readonly DisposeContainer memBusDisposeContainer = new DisposeContainer();
+
+        private readonly IBus zoneBus;
+
+        private readonly MessageSerializer messageSerializer = new MessageSerializer();
+
+        #endregion
+
+        #region Constructors and Destructors
+
+        private readonly List<Type> subscribedMessageHandlers = new List<Type>();
+
+        /// <summary>
+        /// </summary>
+        public ZoneServer()
+        {
+            // TODO: Get the Server id from chatengine or config file
+            this.Id = 0x356;
+            this.ClientDisconnected += this.ZoneServerClientDisconnected;
+
+            // New Bus initialization
+            this.zoneBus = BusSetup.StartWith<AsyncConfiguration>().Construct();
+
+            this.subscribedMessageHandlers.Clear();
+
+            IEnumerable<Type> types =
+                Assembly.GetExecutingAssembly()
+                    .GetTypes()
+                    .Where(
+                        x =>
+                            x.GetCustomAttributes(typeof(MessageHandlerAttribute), false)
+                                .Any(
+                                    y => ((MessageHandlerAttribute)y).Direction != MessageHandlerDirection.OutboundOnly));
+
+            MethodInfo subscriptMethodInfo = typeof(ZoneServer).GetMethod(
+                "SubscribeMessage",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+            foreach (Type type in
+                types)
+            {
+                Type[] temp = type.BaseType.GetGenericArguments();
+                MethodInfo generic = subscriptMethodInfo.MakeGenericMethod(new Type[] { temp[1], temp[0] });
+                generic.Invoke(this, null);
+            }
+            this.CheckSubscribedMessageHandlers();
+        }
+
+        private void SubscribeMessage<T, TU>() where T : AbstractMessageHandler<TU> where TU : MessageBody, new()
+        {
+            T def =
+                (T)
+                    typeof(T).GetProperty(
+                        "Default",
+                        BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.Public).GetValue(null, null);
+            this.memBusDisposeContainer.Add(this.zoneBus.Subscribe<MessageWrapper<TU>>(def.Receive));
+            this.subscribedMessageHandlers.Add(typeof(TU));
+        }
+
+        private void CheckSubscribedMessageHandlers()
+        {
+            bool warned = false;
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            foreach (Type type in
+                assembly.GetTypes()
+                    .Where(x => x.IsClass && (x.GetCustomAttributes(typeof(MessageHandlerAttribute), true).Any())))
+            {
+                if (type.BaseType != null)
+                {
+                    Type genericArgument = type.BaseType.GetGenericArguments()[0];
+                    MessageHandlerAttribute handlerAttribute =
+                        (MessageHandlerAttribute)
+                            type.GetCustomAttributes(typeof(MessageHandlerAttribute), true).FirstOrDefault();
+
+                    if (handlerAttribute.Direction == MessageHandlerDirection.None)
+                    {
+                        Console.WriteLine(
+                            "Warning: '" + type.Name
+                            + "' has no Direction defined (MessageHandlerAttribute missing in declaration?)");
+                    }
+                    else
+                    {
+                        if (handlerAttribute.Direction != MessageHandlerDirection.OutboundOnly)
+                        {
+                            if (!this.subscribedMessageHandlers.Contains(genericArgument))
+                            {
+                                // Found a Messagehandler which is not subscribed
+                                if (!warned)
+                                {
+                                    Console.WriteLine("Warning! Following Messagehandlers have not been subscribed!");
+                                    warned = true;
+                                }
+                                Console.WriteLine("Missing: " + type.Name);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
+        public void DisconnectAllClients()
+        {
+            foreach (Playfield pf in this.playfields)
+            {
+                pf.DisconnectAllClients();
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="global">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public Dictionary<Identity, string> ListAvailablePlayfields(bool global = true)
+        {
+            Dictionary<Identity, string> temp = new Dictionary<Identity, string>();
+            Dictionary<int, string> names = Playfields.Playfields.PlayfieldNames();
+
+            if (!global)
+            {
+                foreach (Playfield pf in this.playfields)
+                {
+                    temp.Add(pf.Identity, names[pf.Identity.Instance]);
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<int, string> pf in names)
+                {
+                    temp.Add(new Identity() { Type = IdentityType.Playfield, Instance = pf.Key }, pf.Value);
+                }
+            }
+
+            return temp;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="id">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public IPlayfield PlayfieldById(Identity id)
+        {
+            // TODO: This needs to be changed to check for whole Identity
+            foreach (IPlayfield pf in this.playfields)
+            {
+                if (pf.Identity == id)
+                {
+                    return pf;
+                }
+            }
+
+            this.CreatePlayfield(id);
+            return this.PlayfieldById(id);
+        }
+
+        #endregion
+
+        #region Methods
+
+        private readonly Dictionary<IPAddress, DateTime> connectDelayList = new Dictionary<IPAddress, DateTime>();
+
+        /// <summary>
+        /// </summary>
+        /// <param name="messageobject">
+        /// </param>
+        internal void ProcessISComMessage(DynamicMessage messageobject)
+        {
+            // Switch to handlers
+            var chatCommand = messageobject.DataObject as ChatCommand;
+            if (chatCommand != null)
+            {
+                this.HandleChatCommand(chatCommand);
+            }
+
+            var requestPlayfieldList = messageobject.DataObject as RequestPlayfieldList;
+            if (requestPlayfieldList != null)
+            {
+                this.HandleRequestPlayfieldList(requestPlayfieldList);
+            }
+        }
+
+        private void HandleRequestPlayfieldList(RequestPlayfieldList requestPlayfieldList)
+        {
+            // Fill in the data
+            requestPlayfieldList.ZoneEngineAddress = this.TcpEndPoint.Address.ToString();
+            lock (this.playfields)
+            {
+                requestPlayfieldList.PlayfieldIds.Clear();
+                foreach (Playfield pf in this.playfields)
+                {
+                    requestPlayfieldList.PlayfieldIds.Add(pf.Identity);
+                }
+            }
+
+            // Now send it back to ChatEngine
+            Program.ISComClient.Send(requestPlayfieldList);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        protected override IClient CreateClient(IPAddress address)
+        {
+            bool delay = false;
+            if (address != null)
+            {
+                lock (this.connectDelayList)
+                {
+                    delay = this.connectDelayList.Any(x => x.Key.Equals(address) && (x.Value < DateTime.UtcNow));
+                }
+            }
+            if (delay)
+            {
+                Thread.Sleep(1000);
+            }
+            return new ZoneClient(this, this.messageSerializer, this.zoneBus);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="playfieldIdentity">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        protected IPlayfield CreatePlayfield(Identity playfieldIdentity)
+        {
+            var temp = new Playfield(this, playfieldIdentity);
+            this.playfields.Add(temp);
+            return temp;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="num_bytes">
+        /// </param>
+        /// <param name="buf">
+        /// </param>
+        /// <param name="ip">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        protected override void OnReceiveUDP(int num_bytes, byte[] buf, IPEndPoint ip)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="clientIP">
+        /// </param>
+        /// <param name="num_bytes">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        protected override void OnSendTo(IPEndPoint clientIP, int num_bytes)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="chatCommand">
+        /// </param>
+        private void HandleChatCommand(ChatCommand chatCommand)
+        {
+            ICharacter character =
+                Pool.Instance.GetObject<Character>(
+                    new Identity { Type = IdentityType.CanbeAffected, Instance = chatCommand.CharacterId });
+            if (character != null)
+            {
+                string fullArgs = chatCommand.ChatCommandString.TrimEnd(char.MinValue).TrimStart('.').TrimStart('/');
+
+                string temp = string.Empty;
+                do
+                {
+                    temp = fullArgs;
+                    fullArgs = fullArgs.Replace("  ", " ");
+                }
+                while (temp != fullArgs);
+
+                string[] cmdArgs = fullArgs.Trim().Split(' ');
+
+                string commandName = cmdArgs[0].ToLower();
+                if ((commandName == "sit") || (commandName == "stand"))
+                {
+                    new Posture().ExecuteCommand(
+                        character,
+                        character.SelectedTarget,
+                        cmdArgs);
+                    return;
+                }
+
+                ScriptCompiler.Instance.CallChatCommand(
+                    commandName,
+                    character.Controller.Client,
+                    character.SelectedTarget,
+                    cmdArgs);
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
+        /// <param name="forced">
+        /// </param>
+        private void ZoneServerClientDisconnected(IClient client, bool forced)
+        {
+            ZoneClient cli = (ZoneClient)client;
+            IPAddress address = cli.ClientAddress;
+            if (address != null)
+            {
+                lock (this.connectDelayList)
+                {
+                    if (this.connectDelayList.Any(x => x.Key.Equals(address)))
+                    {
+                        KeyValuePair<IPAddress, DateTime> kv = this.connectDelayList.First(x => x.Key.Equals(address));
+                        this.connectDelayList[kv.Key] = DateTime.UtcNow + TimeSpan.FromSeconds(2);
+                    }
+                    else
+                    {
+                        this.connectDelayList.Add(address, DateTime.UtcNow + TimeSpan.FromSeconds(2));
+                    }
+                }
+            }
+            if (cli != null)
+            {
+                cli.Dispose();
+            }
+        }
+
+        public override void Stop()
+        {
+            foreach (Playfield pf in this.playfields)
+            {
+                pf.Dispose();
+            }
+            base.Stop();
+        }
+
+        #endregion
+    }
+}
