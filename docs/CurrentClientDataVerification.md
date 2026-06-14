@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-14 00:11:01
+Generated: 2026-06-14 00:38:06
 
 ## Scope
 
@@ -20,15 +20,15 @@ Generated: 2026-06-14 00:11:01
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 96 |
+| Vending statels without complete DB shop coverage | 93 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Jobe Basic dimensions import promoted from AOSharp capture 20260614-000058.
-- Validated coverage added: 3 vendor rows across 4563 Hardware Dimension - Basic and 4567 Dimensional Shift - Basic, 3 vendor templates, and 3 new shop inventory groups with 98 inventory rows.
-- The imported rows cover Jobe Hardware Basic Armor, Jobe Dimensional Basic Regenerative Supplies, and Jobe Dimensional Basic Implants. Same-template Advanced dimensional targets were not imported without direct capture or explicit inference approval.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 99 to 96. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96.
+- Jobe Advanced dimensions import promoted from AOSharp capture 20260614-002319.
+- Validated coverage added: 3 vendor rows across 4564 Hardware Dimension - Advanced and 4568 Dimensional Shift - Advanced, 3 vendor templates, and 2 new shop inventory groups with 68 new inventory rows.
+- The imported rows cover Jobe Hardware Advanced Armor, Jobe Dimensional Advanced Regenerative Supplies, and Jobe Dimensional Advanced Implants. Regenerative supplies reused existing exact shop hash HMIZ.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 96 to 93. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96 -> 93.
 
 ## Coverage Exclusions
 
