@@ -878,5 +878,5 @@
 "6553","Arete Landing","429457414","0xC0061999","297459","3527.521,5.11,863.923","True","ICCAmmo","297459","13","False","",""
 "6553","Arete Landing","429457415","0xC0071999","297459","3438.5,9.01,830.998","True","ICCAmmo","297459","13","False","",""
 "6553","Arete Landing","429457416","0xC0081999","297466","3436.5,9.01,831","True","ICCMAtk","297466","84","False","",""
-"7011","Freelancers Inc. HQ - Rome","459472896","0xC0001B63","285348","93.972,2.01,73.734","False","","-1","0","False","","no vendors row; runtime spawns empty statel vendor"
+"7011","Freelancers Inc. HQ - Rome","459472896","0xC0001B63","285348","93.972,2.01,73.734","True","FRGYZBG","285348","26","False","",""
 "7012","Freelancers Inc. HQ - Old Athen","459538432","0xC0001B64","284692","92.2,2.01,102","False","","-1","0","False","","no vendors row; runtime spawns empty statel vendor"

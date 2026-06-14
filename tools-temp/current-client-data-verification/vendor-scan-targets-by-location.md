@@ -1,6 +1,6 @@
 ﻿# Remaining Vendor Scan Targets
 
-Generated from current vendor coverage after excluding non-shop statel templates and inaccessible playfields. Actionable uncovered statel vendors: 27.
+Generated from current vendor coverage after excluding non-shop statel templates and inaccessible playfields. Actionable uncovered statel vendors: 26.
 
 ## Practical Location Summary
 
@@ -14,7 +14,6 @@ Generated from current vendor coverage after excluding non-shop statel templates
 | 1428 | Neutral organisation dng | Unknown accessibility | 1 | Other unresolved vendor terminal (1) |
 | 6131 | ICC Holodeck Alien Training | Unknown accessibility | 1 | Other unresolved vendor terminal (1) |
 | 665 | Broken Shores | Likely live-accessible | 1 | Legacy faction core departments (1) |
-| 7011 | Freelancers Inc. HQ - Rome | Unknown accessibility | 1 | Other unresolved vendor terminal (1) |
 | 7012 | Freelancers Inc. HQ - Old Athen | Likely live-accessible | 1 | Other unresolved vendor terminal (1) |
 | 952 | Clan Training | Likely live-accessible | 1 | Startup equipment (1) |
 
@@ -33,7 +32,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | 1427 | Omni registration dng |  |  |  |  |  |
 | 1428 | Neutral organisation dng |  |  |  |  |  |
 | 6131 | ICC Holodeck Alien Training | Arete Landing 0xC0031999 |  | 0xC00117F3 @ 186.9,6.017,114 |  | Warnings: missing source statel |
-| 7011 | Freelancers Inc. HQ - Rome |  |  |  |  |  |
 | 7012 | Freelancers Inc. HQ - Old Athen |  |  |  |  |  |
 
 ## Targets By Location
@@ -115,13 +113,6 @@ Generated from playfield-teleport-audit.csv and playfield-remap-ranked-candidate
 | Priority | Vendor ID | Template | Name | Coords | Family |
 | ---: | ---: | ---: | --- | --- | --- |
 | 3 | 43581441 | 99522 | Clan Advanced Trade Skills | 729.875,22.01,1541.501 | Legacy faction core departments |
-
-### 7011 - Freelancers Inc. HQ - Rome (1)
-
-
-| Priority | Vendor ID | Template | Name | Coords | Family |
-| ---: | ---: | ---: | --- | --- | --- |
-| 7 | 459472896 | 285348 | Agency Shop | 93.972,2.01,73.734 | Other unresolved vendor terminal |
 
 ### 7012 - Freelancers Inc. HQ - Old Athen (1)
 
