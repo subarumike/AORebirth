@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-14 01:51:12
+Generated: 2026-06-14 02:34:33
 
 ## Scope
 
@@ -20,15 +20,15 @@ Generated: 2026-06-14 01:51:12
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 27 |
+| Vending statels without complete DB shop coverage | 26 |
 | Vending statels excluded from coverage | 169 |
 
 ## Latest Vendor Import Milestone
 
-- Neutral Training Startup Equipment import promoted from AOSharp capture 20260614-002319.
-- Validated coverage added: 2 vendor rows in 954 Neutral Training, 1 vendor template, and 1 new shop inventory group with 9 inventory rows.
-- The imported rows cover both Basic Startup Equipment statels; both have direct VendorFull and ShopUpdate evidence and share exact inventory hash WHBW.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 29 to 27. Current coverage/actionability chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96 -> 93 -> 89 -> 29 -> 27.
+- Freelancers Inc. HQ - Rome Agency Shop import promoted from AOSharp capture 20260614-022639.
+- Validated coverage added: 1 `7011 Freelancers Inc. HQ - Rome` vendor row, 1 vendor template, and 1 new shop inventory group with 26 inventory rows.
+- The imported row covers Agency Shop template `285348` at X 93.972 Y 2.01 Z 73.734 with direct VendorFull and ShopUpdate evidence; no incidental vendors were imported.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 27 to 26. Current coverage/actionability chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96 -> 93 -> 89 -> 29 -> 27 -> 26.
 
 ## Coverage Exclusions
 
@@ -107,5 +107,4 @@ No vendor DB issues found.
 | 6007 | BS Signup (dng) | 393674764 | 0xC00C1777 | 266573 | 244.01,6.02,233.014 | no vendors row; runtime spawns empty statel vendor |
 | 6007 | BS Signup (dng) | 393674765 | 0xC00D1777 | 266575 | 246.01,6.02,232.985 | no vendors row; runtime spawns empty statel vendor |
 | 6131 | ICC Holodeck Alien Training | 401801216 | 0xC00017F3 | 287476 | 195.672,6.017,130.331 | no vendors row; runtime spawns empty statel vendor |
-| 7011 | Freelancers Inc. HQ - Rome | 459472896 | 0xC0001B63 | 285348 | 93.972,2.01,73.734 | no vendors row; runtime spawns empty statel vendor |
 | 7012 | Freelancers Inc. HQ - Old Athen | 459538432 | 0xC0001B64 | 284692 | 92.2,2.01,102 | no vendors row; runtime spawns empty statel vendor |
