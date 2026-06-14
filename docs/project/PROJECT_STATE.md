@@ -160,7 +160,7 @@ Prior Treepine Hut OT Clothes live capture import completed:
 - Coverage added: 1 `1887 Treepine Hut` vendor row, 1 vendor template, and 1 new shop inventory group with 16 inventory rows.
 - Imported target: OT Clothes template `99490`, vendor id `123666433`, statel `0xC001075F`, coordinates X `199.189` Z `286.698`.
 - Evidence note: VendorFull and ShopUpdate were both captured directly. Incidental already-covered Treepine captures were intentionally not imported.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\treepine_ot_clothes_before_import_20260613-233955.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\treepine_ot_clothes_before_import_20260613-233955.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 104`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `105` to `104`.
 - Current coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104`.
@@ -173,7 +173,7 @@ Prior Omni Training Startup Shop live capture import completed:
 - Coverage added: 1 `950 Omni Training` vendor row, 1 vendor template, and 1 new shop inventory group with 7 inventory rows.
 - Imported target: Startup Shop! template `100035`, vendor id `62259200`, statel `0xC00003B6`, coordinates X `60` Z `50`.
 - Evidence note: VendorFull rows are emitted on playfield entry/dynel spawn for this target; ShopUpdate rows are emitted when the terminal is opened.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\omni_training_startup_before_import_20260613-232146.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\omni_training_startup_before_import_20260613-232146.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 105`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `106` to `105`.
 - Current coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105`.
@@ -186,7 +186,7 @@ Prior Tower Shop + BS Signup live capture import completed:
 - Coverage added: 18 vendor rows across `4704 Tower Shop (dungeon)` and `6007 BS Signup (dng)`, 18 vendor templates, and 18 new shop inventory groups with 2047 inventory rows.
 - Imported targets: 14 Tower Shop terminals plus 4 BS Signup OFAB terminals.
 - Excluded from this import: Clan City Buildings, Neutral City Buildings, and Leets-R-Us were VendorFull-only / not openable; remaining BS Signup profession-locked terminals require matching professions.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\tower_bs_signup_before_import_20260613-224634.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\tower_bs_signup_before_import_20260613-224634.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 106`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `124` to `106`.
 - Current coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106`.
@@ -199,7 +199,7 @@ Prior Holes in the Wall live capture import completed:
 - Coverage added: 3 vendor rows across `791 Holes in the Wall` and `4565 Hardware Dimenion - Superior`, 2 vendor templates, and 1 new shop inventory group with 87 inventory rows.
 - Imported targets: Holes in the Wall Containers, Holes in the Wall Superior Weapons, and one high-confidence exact-template inferred Hardware Dimension - Superior Superior Weapons statel.
 - Reuse note: Holes in the Wall Containers exactly reused existing shop hash `Cont`; Holes in the Wall Superior Weapons created new shop hash `FZT5`.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\holes_in_wall_before_import_20260613-222653.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\holes_in_wall_before_import_20260613-222653.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 124`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `127` to `124`.
 - Current coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124`.
@@ -212,7 +212,7 @@ Prior Broken Shores + Lush Fields live capture import completed:
 - Coverage added: 2 vendor rows across `665 Broken Shores` and `695 Lush Fields`, 2 vendor templates, and 2 new shop inventory groups with 190 inventory rows.
 - Imported targets: Broken Shores OT Advanced Trade Skills and Lush Fields Basic Startup Equipment.
 - Reuse note: Lush Fields Basic Startup Equipment did not reuse Newland Basic Startup Equipment because the captured treatment kit row is QL 8 instead of QL 4.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\broken_shores_lush_fields_before_import_20260613-221147.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\broken_shores_lush_fields_before_import_20260613-221147.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 127`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `129` to `127`.
 - Current coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127`.
@@ -226,7 +226,7 @@ Prior Clan Basic Startup Equipment import completed:
 - Imported targets: four Old Athen Clan Basic Startup Equipment statels for template `99569`.
 - Deduplication: all four startup terminals share one deduplicated shop inventory group, `VZMO`.
 - Correlation note: `0xC000021C` had captured inventory but no direct VendorFull; it was accepted as Captured by template `99569` and exact inventory match with the three VendorFull-confirmed startup terminals.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\clan_basic_startup_before_import_20260613-212759.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\clan_basic_startup_before_import_20260613-212759.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 129`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `133` to `129`.
 - Current coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129`.
@@ -239,7 +239,7 @@ Prior Newland + Omni startup import completed:
 - Coverage added: 9 vendor rows across `565 Newland Desert` and `710 Omni-1 Trade`, 6 vendor templates, and 6 new shop inventory groups with 232 inventory rows.
 - Imported targets: Newland Basic Armor, Newland Basic Startup Equipment, Newland Basic Nano Clusters, Food, Drinks, and four OT Basic Startup Equipment statels.
 - Deduplication: the four OT Basic Startup Equipment vendors share one deduplicated shop inventory group.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\newland_startup_before_import_20260613-204052.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\newland_startup_before_import_20260613-204052.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 133`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `142` to `133`.
 - Current coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133`.
@@ -252,7 +252,7 @@ Prior Arete ICC implant/cluster import completed:
 - Coverage added: 5 `6553 Arete Landing` vendor rows, 5 vendor templates, and 5 new shop inventory groups with 573 inventory rows.
 - Imported core targets: ICC Basic Implants, ICC Faded Clusters, ICC Bright Clusters, ICC Shiny Clusters, and ICC Pharmacy.
 - Incidental nearby capture evidence was intentionally excluded from this import.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\arete_icc_before_import_20260613-174753.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\arete_icc_before_import_20260613-174753.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 142`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `147` to `142`.
 - Current coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142`.
@@ -264,7 +264,7 @@ Prior Neutral ICC implant/cluster import completed:
 - Source SQL promotion added the validated staged inserts to `shopinventorytemplates.sql`, `vendortemplate.sql`, and `vendors.sql`.
 - Coverage added: 24 vendor rows across `2064 neut_basic_implants_shop` and `2073 neut_advanced_implants_shop`, 12 vendor templates, and 12 new shop inventory groups with 1876 inventory rows.
 - Mapping basis: `2064` rows were captured directly; `2073` rows used high-confidence exact-template reuse from the captured `2064` template evidence, matching the existing ICC pharmacy reuse pattern across these interiors.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\neutral_icc_implants_before_import_20260613-171134.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\neutral_icc_implants_before_import_20260613-171134.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 147`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `171` to `147`.
 - Current coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147`.
@@ -276,7 +276,7 @@ Prior overnight exact-template inferred vendor import completed:
 - Source SQL promotion added the validated staged vendor inserts to `vendors.sql` only.
 - Coverage added: 31 vendor rows across Parnassos, Varmint Woods, Andromeda, Broken Shores, and Treepine Hut.
 - Reused existing vendortemplate hashes: `NBBBPWA`, `CAWFVZL`, `CAXKPAK`, `CAKVRD3`, `CA4ANR3`, `CAIYRLU`, `SPPJAN4`, `CSFKCVG`, `CSSD5SY`, `CSXKWKP`, `CSZKPVY`, `CSAUZMP`, `CS5JCOM`, `OSLC3UI`, `OSRA2ZZ`, `OSGQXEO`, `OSCP3HJ`, `OSXOL6H`, `OSQC5XR`, `CBGXGWQ`, `CASMUGY`, `CS3Q3IF`, `OBIUAFT`, `OAX2G2O`, `OST6OJS`, `OAE5BNV`, `OAW76SU`, `NBCQ762`, `CBIGA24`, and `OAL6IVC`.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\overnight_exact_template_before_import_20260613-051359.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\overnight_exact_template_before_import_20260613-051359.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 171`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `202` to `171`.
 - Current coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171`.
@@ -289,7 +289,7 @@ Prior Clan Advanced General Shop import completed:
 - Source SQL promotion added the validated staged inserts to `shopinventorytemplates.sql`, `vendortemplate.sql`, and `vendors.sql`.
 - Coverage added: 16 `1181 ord_smarket_clan_advanced` vendor rows, 16 vendor templates, and 11 new shop inventory groups with 505 inventory rows.
 - Reused shop hashes: `Cont`, `IVM2`, `IYD4`, `JTYS`, and `LJI7`.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\cellao_codex_clean_clan_advanced_20260613-035810.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\cellao_codex_clean_clan_advanced_20260613-035810.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 202`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `218` to `202`.
 - Current live-capture coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202`.
@@ -303,7 +303,7 @@ Prior spec_smarket specialty import (inferred) completed:
 - Source SQL promotion added the validated inferred staged inserts to `vendortemplate.sql` and `vendors.sql`; `shopinventorytemplates.sql` was unchanged because all inventories reused existing shop hashes.
 - Coverage added: 16 vendor rows across `1189 spec_smarket_clan_advanced`, `1190 spec_smarket_clan_sup`, `1191 spec_smarket_omni_advanced`, and `1192 spec_smarket_omni_sup`, plus 12 vendor templates.
 - Reused shop hashes: `I3E4`, `7ATH`, `7X7Q`, `PX4X`, `FBQ3`, and `FLEW`.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\spec_smarket_before_import_20260613-033215.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\spec_smarket_before_import_20260613-033215.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 218`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `234` to `218`.
 - Current live-capture coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218`.
@@ -317,7 +317,7 @@ Prior Neutral Basic General/Specialty Shop import completed:
 - Source SQL promotion added the validated staged inserts to `shopinventorytemplates.sql`, `vendortemplate.sql`, and `vendors.sql`.
 - Coverage added: 6 `1193 spec_smarket_neut_basic` vendor rows, 6 vendor templates, and 6 new shop inventory groups with 64 inventory rows.
 - Specialist Commerce required Trader access and was captured in the second AOSharp session.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\neutral_basic_before_import_20260613-014923.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\neutral_basic_before_import_20260613-014923.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 234`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `240` to `234`.
 - Current live-capture coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234`.
@@ -330,7 +330,7 @@ Prior Omni Basic Implant Terminals import completed:
 - Source capture: AOSharp capture `20260613-005616`.
 - Source SQL promotion added the validated staged inserts to `vendortemplate.sql` and `vendors.sql`; `shopinventorytemplates.sql` was unchanged because all implant inventories reused existing shop hashes.
 - Coverage added: 13 `1183 ord_smarket_omni_basic` implant vendor rows and 13 vendor templates, with existing implant shop hashes `5BUX`, `5M5F`, `6MQN`, `6YPW`, `7LZ3`, `A32J`, `JWHR`, `KV75`, `KVVT`, `O3KI`, `RNWW`, `RO4Q`, and `SBQ6` reused.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\omni_basic_implants_before_import_20260613-011140.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\omni_basic_implants_before_import_20260613-011140.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 240`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `253` to `240`.
 - Current live-capture coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240`.
@@ -343,7 +343,7 @@ Prior Omni Advanced General Shop import completed:
 - Source capture: AOSharp capture `20260613-002828`.
 - Source SQL promotion added the validated staged inserts to `shopinventorytemplates.sql`, `vendortemplate.sql`, and `vendors.sql`.
 - Coverage added: 23 `1184 ord_smarket_omni_advanced` vendor rows, 16 vendor templates, and 15 new shop inventory groups with 760 inventory rows, while reusing existing shop hash `LJI7`.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\omni_advanced_before_import_20260613-004623.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\omni_advanced_before_import_20260613-004623.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 253`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `276` to `253`.
 - Current live-capture coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253`.
@@ -356,7 +356,7 @@ Prior Clan Superior General Shop import completed:
 - Source capture: AOSharp capture `20260612-232439`.
 - Source SQL promotion added the validated staged inserts to `shopinventorytemplates.sql`, `vendortemplate.sql`, and `vendors.sql`.
 - Coverage added: 19 `1182 ord_smarket_clan_sup` vendor rows, 19 vendor templates, and 14 new shop inventory groups with 594 inventory rows, while reusing existing shop hashes `LJI7`, `CHHQ`, `OHOO`, `JYPE`, and `Cont`.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\clan_superior_before_import_20260613-000803.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\clan_superior_before_import_20260613-000803.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 276`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `295` to `276`.
 - Current live-capture coverage chain: `404 -> 381 -> 351 -> 324 -> 295 -> 276`.
@@ -369,7 +369,7 @@ Prior Clan Basic General Shop import completed:
 - Source capture: AOSharp capture `20260612-225855`.
 - Source SQL promotion added the validated staged inserts to `shopinventorytemplates.sql`, `vendortemplate.sql`, and `vendors.sql`.
 - Coverage added: 29 `1180 ord_smarket_clan_basic` vendor rows, 29 vendor templates, and 25 new shop inventory groups with 1575 inventory rows, while reusing existing shop hashes `G4XZ`, `HYDQ`, `LJI7`, and `R5R7`.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\clan_basic_before_import_20260612-231024.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\clan_basic_before_import_20260612-231024.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 295`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `324` to `295`.
 - Current live-capture coverage chain: `404 -> 381 -> 351 -> 324 -> 295`.
@@ -382,7 +382,7 @@ Prior Omni Superior General Shop import completed:
 - Source capture: AOSharp capture `20260612-044234`.
 - Source SQL promotion added the validated v2 staged inserts to `shopinventorytemplates.sql`, `vendortemplate.sql`, and `vendors.sql`.
 - Coverage added: 27 `1185 ord_smarket_omni_sup` vendor rows, 20 vendor templates, and 19 new shop inventory groups, with existing map shop hash `LJI7` reused.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\omni_superior_v2_before_import_20260612-220448.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\omni_superior_v2_before_import_20260612-220448.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, `StatelVendorIssues = 324`, and `StatelVendorExclusions = 30`.
 - Total actionable uncovered statel vendors dropped from `351` to `324`.
 - Current live-capture coverage chain: `404 -> 381 -> 351 -> 324`.
@@ -405,7 +405,7 @@ Prior Omni Basic General Shop import completed:
 - Source capture: AOSharp capture `20260612-012644`.
 - Source SQL promotion added the validated staged inserts to `shopinventorytemplates.sql`, `vendortemplate.sql`, and `vendors.sql`.
 - Coverage added: 23 `1183 ord_smarket_omni_basic` vendor rows, 16 vendor templates, and 16 shop inventory groups with 690 inventory rows.
-- A test DB backup was created before import: `C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\db-backups\omni_basic_before_staged_import_20260612-032350.sql`.
+- A test DB backup was created before import: `C:\Users\Mike\Documents\AORebirth\tools-temp\db-backups\omni_basic_before_staged_import_20260612-032350.sql`.
 - Verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 381`.
 - Total uncovered statel vendors dropped from `404` to `381`.
 - `1183 ord_smarket_omni_basic` uncovered count dropped from `39` to `16`.

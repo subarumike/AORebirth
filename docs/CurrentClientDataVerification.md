@@ -6,7 +6,7 @@ Generated: 2026-06-14 02:34:33
 
 - AO client root: C:\Funcom\Anarchy Online
 - AO client version.id: 18.8.62_EP1
-- AO Rebirth repo: C:\Users\Mike\Documents\Cellao-AORebirth
+- AO Rebirth repo: C:\Users\Mike\Documents\AORebirth
 - Database read: cellao_codex_clean only
 
 ## Summary
@@ -82,12 +82,12 @@ This separates template-cache truth from live runtime instance truth. If items.d
 
 ## Report Files
 
-- Data file audit: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\data-file-version-audit.csv
-- Live vendor mesh audit: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\live-vendor-mesh-audit.csv
-- Vendor DB audit: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\vendor-db-audit.csv
-- Shop inventory audit: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\shop-inventory-template-audit.csv
-- Statel vendor coverage: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\statel-vendor-coverage.csv
-- Vendor scan door locations: C:\Users\Mike\Documents\Cellao-AORebirth\tools-temp\current-client-data-verification\vendor-scan-door-locations.csv
+- Data file audit: C:\Users\Mike\Documents\AORebirth\tools-temp\current-client-data-verification\data-file-version-audit.csv
+- Live vendor mesh audit: C:\Users\Mike\Documents\AORebirth\tools-temp\current-client-data-verification\live-vendor-mesh-audit.csv
+- Vendor DB audit: C:\Users\Mike\Documents\AORebirth\tools-temp\current-client-data-verification\vendor-db-audit.csv
+- Shop inventory audit: C:\Users\Mike\Documents\AORebirth\tools-temp\current-client-data-verification\shop-inventory-template-audit.csv
+- Statel vendor coverage: C:\Users\Mike\Documents\AORebirth\tools-temp\current-client-data-verification\statel-vendor-coverage.csv
+- Vendor scan door locations: C:\Users\Mike\Documents\AORebirth\tools-temp\current-client-data-verification\vendor-scan-door-locations.csv
 
 ## Top Vendor DB Issues
 
