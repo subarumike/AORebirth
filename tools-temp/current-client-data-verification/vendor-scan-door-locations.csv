@@ -1,6 +1,5 @@
 "Playfield","PlayfieldName","AccessStatus","UncoveredTerminals","RouteNamedLocation","RouteShopName","RouteDoorCoords","SourceDoorCount","PrimarySourceDoorSummary","PrimarySourcePlayfield","PrimarySourceDoor","PrimarySourceCoords","OtherSourceDoors","AllSourceDoors","DestinationDoor","DestinationDoorCoords","TeleportWarnings","PairedDoorCurrent","PairedDoorCurrentCoords","PairedDoorCandidate","PairedDoorCandidateCoords","PairedDoorDistance","PairedDoorConfidence","PairedDoorReason","PairedDoorNextAction"
 "500","Parnassos","GM-only / not live-accessible","60","","","","0","","","","","","","","","","","","","","","","",""
-"540","Old Athen","Likely live-accessible","4","Old Athen","Old Athen","","0","","","","","","","","","","","","","","","","",""
 "665","Broken Shores","Likely live-accessible","2","Broken Shores","Broken Shores","","0","","","","","","","","","","","","","","","","",""
 "695","Lush Fields","Likely live-accessible","1","Lush Fields","Lush Fields","","0","","","","","","","","","","","","","","","","",""
 "791","Holes in the Wall","Likely live-accessible","2","Holes in the Wall","Holes in the Wall","","0","","","","","","","","","","","","","","","","",""

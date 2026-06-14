@@ -1,6 +1,6 @@
 ﻿# Current Client Data Verification
 
-Generated: 2026-06-13 20:42:38
+Generated: 2026-06-13 21:29:10
 
 ## Scope
 
@@ -20,15 +20,15 @@ Generated: 2026-06-13 20:42:38
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 133 |
+| Vending statels without complete DB shop coverage | 129 |
 | Vending statels excluded from coverage | 30 |
 
 ## Latest Vendor Import Milestone
 
-- Newland + Omni startup import promoted from AOSharp capture 20260613-185338.
-- Validated coverage added: 9 vendor rows across 565 Newland Desert and 710 Omni-1 Trade, 6 vendor templates, and 6 new shop inventory groups with 232 inventory rows.
-- The imported rows cover Newland Basic Armor, Newland Basic Startup Equipment, Newland Basic Nano Clusters, Food, Drinks, and four OT Basic Startup Equipment statels; the four Omni startup vendors share one deduplicated inventory group.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 142 to 133. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133.
+- Clan Basic Startup Equipment import promoted from AOSharp capture 20260613-211234.
+- Validated coverage added: 4 vendor rows in 540 Old Athen, 1 vendor template, and 1 new shop inventory group with 9 inventory rows.
+- The imported rows cover four Old Athen Clan Basic Startup Equipment statels sharing one deduplicated inventory group. Statel 0xC000021C had captured inventory but no direct VendorFull; it was correlated by template 99569 and exact inventory match with the three VendorFull-confirmed startup terminals.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 133 to 129. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129.
 
 ## Coverage Exclusions
 
