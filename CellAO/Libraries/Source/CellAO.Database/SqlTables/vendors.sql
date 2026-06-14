@@ -1998,3 +1998,26 @@ INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`,
 -- MappingConfidence: High
 -- Justification: target has complete captured template and inventory evidence at X 46.9 Y 2.1 Z 29.2; vendortemplate links to new exact inventory group FZZ2.
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (299433986, 4569, 46.9, 2.1, 29.2, 0, 0, 0, 1, '', 155224, 'JSX36TD');
+
+-- ============================================================
+-- Neutral Training Startup Equipment import
+-- Source: AOSharp capture 20260614-002319
+-- Coverage: 29 -> 27 (2 reduction)
+-- Dedup: 2 Neutral Training vendors share 1 inventory
+-- ============================================================
+
+-- Vendor rows: 2; MappingType: Captured for every row.
+
+-- VendorId: 62521344; Playfield: 954 Neutral Training; TemplateId: 99643 Basic Startup Equipment; Statel: 0xC00003BA; Capture identity: (VendingMachine:12E4B870); Capture: 20260614-002319
+-- MappingType: Captured
+-- MappingSource: Captured direct VendorFull + ShopUpdate from Neutral Training AOSharp capture. Capture: 20260614-002319
+-- MappingConfidence: High
+-- Justification: target has complete captured template and inventory evidence at X 227.013 Y 6 Z 83.073; vendortemplate links to new exact inventory group WHBW.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (62521344, 954, 227.013, 6, 83.073, 0, 0, 0, 1, '', 99643, 'NT37J3W');
+
+-- VendorId: 62521345; Playfield: 954 Neutral Training; TemplateId: 99643 Basic Startup Equipment; Statel: 0xC00103BA; Capture identity: (VendingMachine:12E4B871); Capture: 20260614-002319
+-- MappingType: Captured
+-- MappingSource: Captured direct VendorFull + ShopUpdate from Neutral Training AOSharp capture. Capture: 20260614-002319
+-- MappingConfidence: High
+-- Justification: target has complete captured template and inventory evidence at X 150.322 Y 3.472 Z 47.923; vendortemplate links to new exact inventory group WHBW.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (62521345, 954, 150.322, 3.472, 47.923, 0, 0, 0, 1, '', 99643, 'NT37J3W');

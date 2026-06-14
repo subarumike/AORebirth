@@ -1,6 +1,6 @@
-# Current Client Data Verification
+﻿# Current Client Data Verification
 
-Generated: 2026-06-14 00:59:27
+Generated: 2026-06-14 01:51:12
 
 ## Scope
 
@@ -20,21 +20,22 @@ Generated: 2026-06-14 00:59:27
 | Live vendor mesh evidence rows not satisfied by item cache | 2 |
 | Vendor DB rows with issues | 0 |
 | Shop inventory rows with item-cache issues | 0 |
-| Vending statels without complete DB shop coverage | 89 |
-| Vending statels excluded from coverage | 30 |
+| Vending statels without complete DB shop coverage | 27 |
+| Vending statels excluded from coverage | 169 |
 
 ## Latest Vendor Import Milestone
 
-- Jobe Superior dimensions import promoted from AOSharp capture 20260614-002319.
-- Validated coverage added: 4 vendor rows across 4565 Hardware Dimension - Superior and 4569 Dimensional Shift - Superior, 4 vendor templates, and 4 new shop inventory groups with 116 inventory rows.
-- Imported targets: Superior Armor, Superior Equipment for Nano Specialists, Costly Regenerative Supplies --- 100-175, and Superior Implants.
-- Incidental Heavenly Business capture evidence from the same session was not imported because those statels were already covered.
-- Current-client verification after import showed actionable uncovered statel vendors dropped from 93 to 89. Current coverage chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96 -> 93 -> 89.
+- Neutral Training Startup Equipment import promoted from AOSharp capture 20260614-002319.
+- Validated coverage added: 2 vendor rows in 954 Neutral Training, 1 vendor template, and 1 new shop inventory group with 9 inventory rows.
+- The imported rows cover both Basic Startup Equipment statels; both have direct VendorFull and ShopUpdate evidence and share exact inventory hash WHBW.
+- Current-client verification after import showed actionable uncovered statel vendors dropped from 29 to 27. Current coverage/actionability chain: 404 -> 381 -> 351 -> 324 -> 295 -> 276 -> 253 -> 240 -> 234 -> 218 -> 202 -> 171 -> 147 -> 142 -> 133 -> 129 -> 127 -> 124 -> 106 -> 105 -> 104 -> 99 -> 96 -> 93 -> 89 -> 29 -> 27.
+
 ## Coverage Exclusions
 
-| Template | Name | Reason | Excluded statels | Evidence |
-| ---: | --- | --- | ---: | --- |
-| 155225 | Refreshing Drink | NonShopStatelTemplate | 30 | AOSharp captures 20260612-012644 and 20260612-044234 emitted VendorFullUpdate evidence but no ShopUpdate inventory rows; live operator confirmed the Superior instances were not reachable/openable. |
+| Scope | Id | Name | Reason | Excluded statels | Evidence |
+| --- | ---: | --- | --- | ---: | --- |
+| Template | 155225 | Refreshing Drink | NonShopStatelTemplate | 30 | AOSharp captures 20260612-012644 and 20260612-044234 emitted VendorFullUpdate evidence but no ShopUpdate inventory rows; live operator confirmed the Superior instances were not reachable/openable. |
+| Playfield | 500 | Parnassos | InaccessibleGmOnlyPlayfield | 140 | Operator verification confirmed there is no practical live-client access path for capture; these GM-only statels are kept in raw audit output only. |
 
 Excluded statels remain in the raw statel vendor coverage CSV with CoverageExcluded and ExclusionReason fields, but they are excluded from coverage metrics, missing-vendor reports, capture targeting, and import planning.
 
@@ -81,43 +82,30 @@ No vendor DB issues found.
 
 | Playfield | Name | Vendor id | Statel | Template | Coords | Issues |
 | ---: | --- | ---: | --- | ---: | --- | --- |
-| 500 | Parnassos | 32768000 | 0xC00001F4 | 99571 | 215.737,16.4,162.412 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768001 | 0xC00101F4 | 99599 | 214.427,16.4,162.485 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768005 | 0xC00501F4 | 99570 | 211.355,16.4,160.109 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768007 | 0xC00701F4 | 99598 | 214.657,16.4,159.581 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768009 | 0xC00901F4 | 118287 | 217.19,16.4,159.708 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768011 | 0xC00B01F4 | 99600 | 213.404,16.4,159.507 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768013 | 0xC00D01F4 | 117938 | 217.822,16.4,161.884 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768014 | 0xC00E01F4 | 99503 | 219.649,16.4,160.128 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768017 | 0xC01101F4 | 99541 | 222.913,16.4,161.281 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768021 | 0xC01501F4 | 99522 | 226.448,16.4,160.231 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768023 | 0xC01701F4 | 117673 | 224.476,16.4,158.955 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768024 | 0xC01801F4 | 99537 | 223.332,16.4,158.564 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768025 | 0xC01901F4 | 99526 | 222.312,16.4,158.193 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768026 | 0xC01A01F4 | 99539 | 221.331,16.4,157.809 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768027 | 0xC01B01F4 | 99540 | 220.278,16.4,157.358 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768028 | 0xC01C01F4 | 121033 | 219.673,16.4,157.879 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768029 | 0xC01D01F4 | 121031 | 219.333,16.4,159.129 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768030 | 0xC01E01F4 | 120511 | 232.893,16.399,165.46 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768031 | 0xC01F01F4 | 117749 | 231.973,16.4,166.237 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768038 | 0xC02601F4 | 99561 | 218.148,16.4,172.2 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768039 | 0xC02701F4 | 99563 | 223.306,16.4,175.132 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768040 | 0xC02801F4 | 99564 | 223.583,16.4,172.203 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768041 | 0xC02901F4 | 99562 | 222.371,16.4,172.19 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768042 | 0xC02A01F4 | 99565 | 221.267,16.4,172.117 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768043 | 0xC02B01F4 | 99566 | 220.09,16.4,172.17 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768048 | 0xC03001F4 | 99542 | 219.015,16.4,171.115 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768052 | 0xC03401F4 | 99523 | 214.963,16.4,170.276 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768054 | 0xC03601F4 | 117674 | 223.993,16.4,169.768 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768055 | 0xC03701F4 | 99531 | 223.792,16.4,168.819 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768056 | 0xC03801F4 | 99499 | 235.707,16.4,177.596 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768060 | 0xC03C01F4 | 99536 | 238.744,16.4,181.014 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768064 | 0xC04001F4 | 99489 | 236.378,16.4,180.767 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768066 | 0xC04201F4 | 117648 | 237.855,16.4,181.098 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768067 | 0xC04301F4 | 120977 | 113.4,32,422.44 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768068 | 0xC04401F4 | 120973 | 113.4,32,420.4 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768081 | 0xC05101F4 | 155595 | 421.521,32.8,360.723 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768084 | 0xC05401F4 | 155498 | 468.2,37.001,343.7 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768087 | 0xC05701F4 | 155313 | 473.8,37.001,343.7 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768103 | 0xC06701F4 | 155296 | 508.824,37.001,343.7 | no vendors row; runtime spawns empty statel vendor |
-| 500 | Parnassos | 32768104 | 0xC06801F4 | 155297 | 510.4,37.001,343.735 | no vendors row; runtime spawns empty statel vendor |
+| 665 | Broken Shores | 43581441 | 0xC0010299 | 99522 | 729.875,22.01,1541.501 | no vendors row; runtime spawns empty statel vendor |
+| 952 | Clan Training | 62390272 | 0xC00003B8 | 100034 | 48,14,62 | no vendors row; runtime spawns empty statel vendor |
+| 1426 | Clan Registration dng | 93454336 | 0xC0000592 | 25885 | 166.991,5.01,235.899 | no vendors row; runtime spawns empty statel vendor |
+| 1426 | Clan Registration dng | 93454337 | 0xC0010592 | 81799 | 171.952,5.01,238.745 | no vendors row; runtime spawns empty statel vendor |
+| 1427 | Omni registration dng | 93519872 | 0xC0000593 | 81799 | 201.952,5,172.745 | no vendors row; runtime spawns empty statel vendor |
+| 1428 | Neutral organisation dng | 93585408 | 0xC0000594 | 81799 | 201.952,5,162.745 | no vendors row; runtime spawns empty statel vendor |
+| 4364 | Unicorn Outpost | 285999104 | 0xC000110C | 256457 | 146.464,100.907,156.153 | no vendors row; runtime spawns empty statel vendor |
+| 4364 | Unicorn Outpost | 285999105 | 0xC001110C | 287037 | 143.328,100.886,152.997 | no vendors row; runtime spawns empty statel vendor |
+| 4704 | Tower Shop (dungeon) | 308281349 | 0xC0051260 | 249724 | 171,5.01,166.966 | no vendors row; runtime spawns empty statel vendor |
+| 4704 | Tower Shop (dungeon) | 308281366 | 0xC0161260 | 295890 | 189,5.01,167 | no vendors row; runtime spawns empty statel vendor |
+| 4704 | Tower Shop (dungeon) | 308281368 | 0xC0181260 | 295892 | 185,5.01,167 | no vendors row; runtime spawns empty statel vendor |
+| 6007 | BS Signup (dng) | 393674752 | 0xC0001777 | 266562 | 220.01,6.02,232.985 | no vendors row; runtime spawns empty statel vendor |
+| 6007 | BS Signup (dng) | 393674753 | 0xC0011777 | 266563 | 222,6.02,232.985 | no vendors row; runtime spawns empty statel vendor |
+| 6007 | BS Signup (dng) | 393674754 | 0xC0021777 | 266569 | 224.027,6.02,232.985 | no vendors row; runtime spawns empty statel vendor |
+| 6007 | BS Signup (dng) | 393674755 | 0xC0031777 | 266564 | 226.01,6.02,232.982 | no vendors row; runtime spawns empty statel vendor |
+| 6007 | BS Signup (dng) | 393674756 | 0xC0041777 | 266565 | 228.01,6.02,232.985 | no vendors row; runtime spawns empty statel vendor |
+| 6007 | BS Signup (dng) | 393674757 | 0xC0051777 | 266566 | 230.01,6.02,232.985 | no vendors row; runtime spawns empty statel vendor |
+| 6007 | BS Signup (dng) | 393674758 | 0xC0061777 | 266567 | 232.01,6.02,232.985 | no vendors row; runtime spawns empty statel vendor |
+| 6007 | BS Signup (dng) | 393674759 | 0xC0071777 | 266568 | 234.01,6.02,232.985 | no vendors row; runtime spawns empty statel vendor |
+| 6007 | BS Signup (dng) | 393674760 | 0xC0081777 | 266570 | 236.01,6.02,232.985 | no vendors row; runtime spawns empty statel vendor |
+| 6007 | BS Signup (dng) | 393674762 | 0xC00A1777 | 266572 | 240.01,6.02,232.985 | no vendors row; runtime spawns empty statel vendor |
+| 6007 | BS Signup (dng) | 393674763 | 0xC00B1777 | 266574 | 241.988,6.02,233.019 | no vendors row; runtime spawns empty statel vendor |
+| 6007 | BS Signup (dng) | 393674764 | 0xC00C1777 | 266573 | 244.01,6.02,233.014 | no vendors row; runtime spawns empty statel vendor |
+| 6007 | BS Signup (dng) | 393674765 | 0xC00D1777 | 266575 | 246.01,6.02,232.985 | no vendors row; runtime spawns empty statel vendor |
+| 6131 | ICC Holodeck Alien Training | 401801216 | 0xC00017F3 | 287476 | 195.672,6.017,130.331 | no vendors row; runtime spawns empty statel vendor |
+| 7011 | Freelancers Inc. HQ - Rome | 459472896 | 0xC0001B63 | 285348 | 93.972,2.01,73.734 | no vendors row; runtime spawns empty statel vendor |
+| 7012 | Freelancers Inc. HQ - Old Athen | 459538432 | 0xC0001B64 | 284692 | 92.2,2.01,102 | no vendors row; runtime spawns empty statel vendor |

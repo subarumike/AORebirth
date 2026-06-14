@@ -1330,3 +1330,14 @@ INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHas
 -- Terminal: Superior Implants
 -- NormalizedName: JobeDimensionalSuperiorImplants; TemplateId: 155224; ShopHash: FZZ2 (new); Inventory rows: 37; Capture identity: (VendingMachine:12E5237B); VT window: 0
 INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('JSX36TD', 1, 'JobeDimensionalSuperiorImplants', 155224, 'FZZ2', 70, 125);
+
+-- ============================================================
+-- Neutral Training Startup Equipment import
+-- Source: AOSharp capture 20260614-002319
+-- Coverage: 29 -> 27 (2 reduction)
+-- Dedup: 2 Neutral Training vendors share 1 inventory
+-- ============================================================
+
+-- Terminal: Basic Startup Equipment
+-- NormalizedName: NeutralTrainingBasicStartupEquipment; TemplateId: 99643; ShopHash: WHBW (new); Inventory rows: 9; Capture identities: (VendingMachine:12E4B870), (VendingMachine:12E4B871); VT window: 0
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('NT37J3W', 1, 'NeutralTrainingBasicStartupEquipment', 99643, 'WHBW', 1, 6);

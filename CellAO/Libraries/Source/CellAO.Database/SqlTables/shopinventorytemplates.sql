@@ -20271,4 +20271,24 @@ INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL
 INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('FZZ2', 101197, 101198, 112, 112, 1, 'Live Jobe Superior dimensions 20260614-002319 JobeDimensionalSuperiorImplants template 155224', 1);
 INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('FZZ2', 101213, 101214, 81, 81, 1, 'Live Jobe Superior dimensions 20260614-002319 JobeDimensionalSuperiorImplants template 155224', 1);
 INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('FZZ2', 101213, 101214, 123, 123, 1, 'Live Jobe Superior dimensions 20260614-002319 JobeDimensionalSuperiorImplants template 155224', 1);
+
+-- ============================================================
+-- Neutral Training Startup Equipment import
+-- Source: AOSharp capture 20260614-002319
+-- Coverage: 29 -> 27 (2 reduction)
+-- Dedup: 2 Neutral Training vendors share 1 inventory
+-- ============================================================
+
+-- ShopHash: WHBW
+-- Terminal: Basic Startup Equipment
+-- NormalizedName: NeutralTrainingBasicStartupEquipment; TemplateId: 99643; Capture identities: (VendingMachine:12E4B870), (VendingMachine:12E4B871); Inventory rows: 9; Shop window: 0
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('WHBW', 31837, 31837, 1, 1, 1, 'Live Neutral Training 20260614-002319 NeutralTrainingBasicStartupEquipment template 99643', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('WHBW', 291082, 291082, 1, 1, 1, 'Live Neutral Training 20260614-002319 NeutralTrainingBasicStartupEquipment template 99643', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('WHBW', 291043, 291043, 1, 1, 1, 'Live Neutral Training 20260614-002319 NeutralTrainingBasicStartupEquipment template 99643', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('WHBW', 95577, 95577, 1, 1, 1, 'Live Neutral Training 20260614-002319 NeutralTrainingBasicStartupEquipment template 99643', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('WHBW', 81757, 81756, 6, 6, 1, 'Live Neutral Training 20260614-002319 NeutralTrainingBasicStartupEquipment template 99643', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('WHBW', 81753, 99727, 2, 2, 1, 'Live Neutral Training 20260614-002319 NeutralTrainingBasicStartupEquipment template 99643', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('WHBW', 28564, 28564, 1, 1, 1, 'Live Neutral Training 20260614-002319 NeutralTrainingBasicStartupEquipment template 99643', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('WHBW', 161699, 161699, 1, 1, 1, 'Live Neutral Training 20260614-002319 NeutralTrainingBasicStartupEquipment template 99643', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('WHBW', 99228, 99228, 1, 1, 1, 'Live Neutral Training 20260614-002319 NeutralTrainingBasicStartupEquipment template 99643', 1);
 INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('FZZ2', 101213, 101214, 124, 124, 1, 'Live Jobe Superior dimensions 20260614-002319 JobeDimensionalSuperiorImplants template 155224', 1);
