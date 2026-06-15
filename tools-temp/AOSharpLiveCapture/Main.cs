@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 
 using AOSharp.Common.GameData;
 using AOSharp.Core;
@@ -24,10 +25,16 @@ namespace AOSharpLiveCapture
         private readonly HashSet<string> knownCharacters = new HashSet<string>();
         private readonly HashSet<string> knownCorpses = new HashSet<string>();
         private readonly HashSet<string> exportedShopUpdateFingerprints = new HashSet<string>();
+        private readonly HashSet<string> vendorInteractionIdentities = new HashSet<string>();
+        private readonly HashSet<string> shopUpdateIdentities = new HashSet<string>();
+        private readonly HashSet<string> vendorFullUpdateIdentities = new HashSet<string>();
+        private readonly Dictionary<string, EnemyEntityState> enemyStates = new Dictionary<string, EnemyEntityState>();
+        private readonly Dictionary<string, List<EnemyStateEvent>> enemyStateTimeline = new Dictionary<string, List<EnemyStateEvent>>();
         private readonly HashSet<string> interestingMessageNames = new HashSet<string>
         {
             "SimpleCharFullUpdate",
             "CharInPlay",
+            "ChatText",
             "CharacterAction",
             "GenericCmd",
             "TemplateAction",
@@ -51,7 +58,26 @@ namespace AOSharpLiveCapture
             "ClientContainerAddItem",
             "BankCorpse",
             "Feedback",
+            "FormatFeedback",
             "Stat",
+            "SetPos",
+            "CharDCMove",
+            "InventoryUpdated",
+            "Quest",
+            "QuestFullUpdate",
+            "QuestAlternative",
+            "CreateQuest",
+            "NewLevel",
+            "KnubotNPCDescription",
+            "KnubotOpenChatWindow",
+            "KnubotAppendText",
+            "KnubotAnswerList",
+            "KnubotAnswer",
+            "KnubotCloseChatWindow",
+            "KnubotStartTrade",
+            "KnubotTrade",
+            "KnubotFinishTrade",
+            "KnubotRejectedItems",
             "VendingMachineFullUpdate"
         };
 
@@ -60,19 +86,47 @@ namespace AOSharpLiveCapture
         private StreamWriter packetsLog;
         private StreamWriter shopUpdatesLog;
         private StreamWriter vendorFullUpdatesLog;
+        private StreamWriter systemMessagesLog;
+        private StreamWriter chatDialogueLog;
+        private StreamWriter npcInteractionsLog;
+        private StreamWriter inventoryUpdatesLog;
+        private StreamWriter enemyStateLog;
         private bool enabled;
+        private bool captureFinalized;
         private int inboundPacketCount;
         private int outboundPacketCount;
         private int decodedInboundCount;
         private int decodedOutboundCount;
+        private int shopUpdateMessageCount;
+        private int shopUpdateRowCount;
+        private int vendorFullUpdateMessageCount;
+        private int systemMessageCount;
+        private int chatDialogueMessageCount;
+        private int npcInteractionCount;
+        private int inventoryUpdateMessageCount;
+        private int inventoryUpdateRowCount;
+        private int vendorInteractionAttemptCount;
+        private int enemyStateRowCount;
+        private int enemyCombatEventCount;
+        private int enemyDamageEventCount;
+        private int enemyDeathEventCount;
+        private int enemySpawnEventCount;
+        private int enemyDespawnEventCount;
+        private int enemyHealthUpdateCount;
+        private int enemyPositionUpdateCount;
         private DateTime nextFlushUtc;
         private DateTime nextSnapshotUtc;
+        private DateTime captureStartUtc;
+        private DateTime captureStartLocal;
+        private DateTime lastPacketUtc;
+        private string lastPlayfieldId = string.Empty;
         private CombatLootSmoke combatLootSmoke;
 
         public override void Run(string pluginDir)
         {
-            DateTime captureStartUtc = DateTime.UtcNow;
-            DateTime captureStartLocal = DateTime.Now;
+            this.captureStartUtc = DateTime.UtcNow;
+            this.captureStartLocal = DateTime.Now;
+            this.lastPacketUtc = this.captureStartUtc;
 
             this.sessionDirectory = CreateSessionDirectory(pluginDir);
             this.eventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "events.log"));
@@ -81,7 +135,16 @@ namespace AOSharpLiveCapture
             this.shopUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,TerminalIdentity,Slot,LowId,HighId,Quality");
             this.vendorFullUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
             this.vendorFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,Identity,OwnerType,OwnerInstance,PlayfieldId,PositionX,PositionY,PositionZ,Unknown7,Template,Mesh,BuyModifier,SellModifier,StatsCount");
-            this.WriteCaptureSessionMetadata(captureStartUtc, captureStartLocal);
+            this.systemMessagesLog = CreateWriter(Path.Combine(this.sessionDirectory, "system-messages.log"));
+            this.chatDialogueLog = CreateWriter(Path.Combine(this.sessionDirectory, "chat-dialogue.log"));
+            this.npcInteractionsLog = CreateWriter(Path.Combine(this.sessionDirectory, "npc-interactions.log"));
+            this.inventoryUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "inventory-updates.csv"));
+            this.inventoryUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,InventoryIdentity,Handle,Slot,Placement,Flags,Count,ItemIdentity,LowId,HighId,Quality,Unknown");
+            this.enemyStateLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-state.csv"));
+            this.enemyStateLog.WriteLine("timestamp,entityId,level,currentHealth,maxHealth,x,y,z,eventType");
+            this.WriteEnemyStateJson();
+            this.WriteCaptureSessionMetadata(this.captureStartUtc, this.captureStartLocal);
+            this.WriteCaptureInfo(null, CaptureValidation.Running());
             this.enabled = true;
             this.nextFlushUtc = DateTime.UtcNow.AddSeconds(2);
             this.nextSnapshotUtc = DateTime.UtcNow.AddSeconds(1);
@@ -108,6 +171,13 @@ namespace AOSharpLiveCapture
             this.LogEvent("PLUGIN", "Smoke commands: /aosmoke start [mobAlias] | stop | status | log");
             this.LogEvent("PLUGIN", "ShopUpdate CSV: " + Path.Combine(this.sessionDirectory, "shop-updates.csv"));
             this.LogEvent("PLUGIN", "VendingMachineFullUpdate CSV: " + Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
+            this.LogEvent("PLUGIN", "System messages log: " + Path.Combine(this.sessionDirectory, "system-messages.log"));
+            this.LogEvent("PLUGIN", "Chat/dialogue log: " + Path.Combine(this.sessionDirectory, "chat-dialogue.log"));
+            this.LogEvent("PLUGIN", "NPC interactions log: " + Path.Combine(this.sessionDirectory, "npc-interactions.log"));
+            this.LogEvent("PLUGIN", "Inventory update CSV: " + Path.Combine(this.sessionDirectory, "inventory-updates.csv"));
+            this.LogEvent("PLUGIN", "Enemy state CSV: " + Path.Combine(this.sessionDirectory, "enemy-state.csv"));
+            this.LogEvent("PLUGIN", "Enemy state JSON: " + Path.Combine(this.sessionDirectory, "enemy-state.json"));
+            this.LogEvent("PLUGIN", "Capture info: " + Path.Combine(this.sessionDirectory, "capture_info.json"));
             this.LogEvent("PLUGIN", "Capture session metadata: " + Path.Combine(this.sessionDirectory, "capture-session.json"));
             this.LogSnapshot("initial");
             Chat.WriteLine("AOSharpLiveCapture logging to " + this.sessionDirectory, ChatColor.Gold);
@@ -130,7 +200,7 @@ namespace AOSharpLiveCapture
             this.combatLootSmoke?.Teardown();
 
             this.LogEvent("PLUGIN", "AOSharpLiveCapture teardown.");
-            this.FlushAndClose();
+            this.FinalizeCapture();
         }
 
         private void OnCommand(string command, string[] args, ChatWindow chatWindow)
@@ -196,6 +266,7 @@ namespace AOSharpLiveCapture
             }
 
             this.inboundPacketCount++;
+            this.lastPacketUtc = DateTime.UtcNow;
             this.LogPacket("IN", this.inboundPacketCount, packet);
         }
 
@@ -207,6 +278,7 @@ namespace AOSharpLiveCapture
             }
 
             this.outboundPacketCount++;
+            this.lastPacketUtc = DateTime.UtcNow;
             this.LogPacket("OUT", this.outboundPacketCount, packet);
         }
 
@@ -220,6 +292,7 @@ namespace AOSharpLiveCapture
             }
 
             this.decodedInboundCount++;
+            this.lastPacketUtc = DateTime.UtcNow;
             this.LogN3Message("IN-N3", this.decodedInboundCount, message);
         }
 
@@ -233,6 +306,7 @@ namespace AOSharpLiveCapture
             }
 
             this.decodedOutboundCount++;
+            this.lastPacketUtc = DateTime.UtcNow;
             this.LogN3Message("OUT-N3", this.decodedOutboundCount, message);
         }
 
@@ -244,6 +318,7 @@ namespace AOSharpLiveCapture
             }
 
             this.LogEvent("CHAT", this.DescribeObject(message));
+            this.LogChatDialogue("CHAT", 0, message.PacketType.ToString(), "chat-protocol", this.DescribeObject(message));
         }
 
         private void OnDynelSpawned(object sender, Dynel dynel)
@@ -254,6 +329,7 @@ namespace AOSharpLiveCapture
             }
 
             this.LogEvent("DYNEL-SPAWNED", this.DescribeDynel(dynel));
+            this.TrackEnemyFromDynel(dynel, "spawn");
         }
 
         private void OnCharInPlay(object sender, SimpleChar character)
@@ -264,11 +340,13 @@ namespace AOSharpLiveCapture
             }
 
             this.LogEvent("CHAR-IN-PLAY", this.DescribeCharacter(character));
+            this.TrackEnemyFromCharacter(character, "spawn");
         }
 
         private void OnPlayfieldInit(object sender, uint playfieldId)
         {
-            this.LogEvent("PLAYFIELD-INIT", playfieldId.ToString(CultureInfo.InvariantCulture));
+            this.lastPlayfieldId = playfieldId.ToString(CultureInfo.InvariantCulture);
+            this.LogEvent("PLAYFIELD-INIT", this.lastPlayfieldId);
             this.knownCharacters.Clear();
             this.knownCorpses.Clear();
             this.LogSnapshot("playfield-init");
@@ -325,12 +403,14 @@ namespace AOSharpLiveCapture
                     if (this.knownCharacters.Add(key))
                     {
                         this.LogEvent("CHAR-SEEN", this.DescribeCharacter(character));
+                        this.TrackEnemyFromCharacter(character, "spawn");
                     }
                 }
 
                 foreach (string removed in this.knownCharacters.Except(currentCharacters).ToArray())
                 {
                     this.LogEvent("CHAR-GONE", removed);
+                    this.TrackEnemyGone(removed);
                     this.knownCharacters.Remove(removed);
                 }
 
@@ -408,6 +488,8 @@ namespace AOSharpLiveCapture
             string messageName = message.N3MessageType.ToString();
             bool interesting = this.interestingMessageNames.Contains(messageName);
             string detail = interesting ? this.DescribeN3Message(message) : string.Empty;
+            this.ExportSpecializedMessage(direction, sequence, message);
+            this.TrackEnemyStateFromMessage(direction, sequence, message);
             ShopUpdateMessage shopUpdate = message as ShopUpdateMessage;
             if (shopUpdate != null)
             {
@@ -418,6 +500,12 @@ namespace AOSharpLiveCapture
             if (vendorFullUpdate != null)
             {
                 this.ExportVendorFullUpdate(direction, sequence, vendorFullUpdate);
+            }
+
+            InventoryUpdateMessage inventoryUpdate = message as InventoryUpdateMessage;
+            if (inventoryUpdate != null)
+            {
+                this.ExportInventoryUpdate(direction, sequence, inventoryUpdate);
             }
 
             this.LogEvent(
@@ -440,6 +528,164 @@ namespace AOSharpLiveCapture
             }
 
             return this.DescribeObject(message);
+        }
+
+        private void ExportSpecializedMessage(string direction, int sequence, N3Message message)
+        {
+            string messageName = message.N3MessageType.ToString();
+
+            if (IsSystemMessage(messageName))
+            {
+                this.LogSystemMessage(direction, sequence, messageName, this.ExtractMessageText(message), this.DescribeObject(message));
+            }
+
+            if (IsDialogueMessage(messageName))
+            {
+                this.LogChatDialogue(direction, sequence, messageName, this.ExtractMessageText(message), this.DescribeObject(message));
+            }
+
+            GenericCmdMessage genericCmd = message as GenericCmdMessage;
+            if (genericCmd != null)
+            {
+                this.TrackVendorInteraction(genericCmd);
+                this.LogNpcInteraction(direction, sequence, messageName, this.ExtractMessageText(message), this.DescribeObject(message));
+                return;
+            }
+
+            if (IsNpcInteractionMessage(messageName))
+            {
+                this.LogNpcInteraction(direction, sequence, messageName, this.ExtractMessageText(message), this.DescribeObject(message));
+            }
+        }
+
+        private void TrackVendorInteraction(GenericCmdMessage message)
+        {
+            if (message.Action != GenericCmdAction.Use || message.Target.Type != IdentityType.VendingMachine)
+            {
+                return;
+            }
+
+            lock (this.syncRoot)
+            {
+                this.vendorInteractionAttemptCount++;
+                this.vendorInteractionIdentities.Add(message.Target.ToString());
+            }
+        }
+
+        private string ExtractMessageText(N3Message message)
+        {
+            ChatTextMessage chatText = message as ChatTextMessage;
+            if (chatText != null)
+            {
+                return chatText.Text ?? string.Empty;
+            }
+
+            FormatFeedbackMessage formatFeedback = message as FormatFeedbackMessage;
+            if (formatFeedback != null)
+            {
+                return formatFeedback.Message ?? string.Empty;
+            }
+
+            KnuBotAppendTextMessage appendText = message as KnuBotAppendTextMessage;
+            if (appendText != null)
+            {
+                return appendText.Text ?? string.Empty;
+            }
+
+            KnuBotStartTradeMessage startTrade = message as KnuBotStartTradeMessage;
+            if (startTrade != null)
+            {
+                return startTrade.Message ?? string.Empty;
+            }
+
+            KnuBotAnswerListMessage answerList = message as KnuBotAnswerListMessage;
+            if (answerList != null)
+            {
+                KnuBotDialogOption[] options = answerList.DialogOptions ?? new KnuBotDialogOption[0];
+                return string.Join(" | ", options.Select(option => option == null ? string.Empty : option.Text ?? string.Empty).ToArray());
+            }
+
+            return string.Empty;
+        }
+
+        private void LogSystemMessage(string direction, int sequence, string messageName, string text, string detail)
+        {
+            lock (this.syncRoot)
+            {
+                this.systemMessageCount++;
+                this.systemMessagesLog.WriteLine(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0:o} [{1}] #{2} type={3} text={4} detail={5}",
+                        DateTime.UtcNow,
+                        direction,
+                        sequence,
+                        messageName,
+                        OneLine(text),
+                        OneLine(detail)));
+            }
+        }
+
+        private void LogChatDialogue(string direction, int sequence, string messageName, string text, string detail)
+        {
+            lock (this.syncRoot)
+            {
+                this.chatDialogueMessageCount++;
+                this.chatDialogueLog.WriteLine(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0:o} [{1}] #{2} type={3} text={4} detail={5}",
+                        DateTime.UtcNow,
+                        direction,
+                        sequence,
+                        messageName,
+                        OneLine(text),
+                        OneLine(detail)));
+            }
+        }
+
+        private void LogNpcInteraction(string direction, int sequence, string messageName, string text, string detail)
+        {
+            lock (this.syncRoot)
+            {
+                this.npcInteractionCount++;
+                this.npcInteractionsLog.WriteLine(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0:o} [{1}] #{2} type={3} text={4} detail={5}",
+                        DateTime.UtcNow,
+                        direction,
+                        sequence,
+                        messageName,
+                        OneLine(text),
+                        OneLine(detail)));
+            }
+        }
+
+        private static bool IsSystemMessage(string messageName)
+        {
+            return messageName == "Feedback"
+                || messageName == "FormatFeedback"
+                || messageName == "Quest"
+                || messageName == "QuestFullUpdate"
+                || messageName == "QuestAlternative"
+                || messageName == "CreateQuest"
+                || messageName == "NewLevel"
+                || messageName == "ResearchUpdate"
+                || messageName == "Stat";
+        }
+
+        private static bool IsDialogueMessage(string messageName)
+        {
+            return messageName == "ChatText"
+                || messageName.StartsWith("Knubot", StringComparison.Ordinal);
+        }
+
+        private static bool IsNpcInteractionMessage(string messageName)
+        {
+            return messageName == "CharacterAction"
+                || messageName == "InfromPlayer"
+                || messageName.StartsWith("Knubot", StringComparison.Ordinal);
         }
 
         private string DescribeShopUpdate(ShopUpdateMessage message)
@@ -489,6 +735,8 @@ namespace AOSharpLiveCapture
 
             lock (this.syncRoot)
             {
+                this.shopUpdateMessageCount++;
+                this.shopUpdateIdentities.Add(message.Identity.ToString());
                 if (!this.exportedShopUpdateFingerprints.Add(fingerprint))
                 {
                     return;
@@ -499,6 +747,7 @@ namespace AOSharpLiveCapture
                 for (int i = 0; i < slots.Length; i++)
                 {
                     VendingMachineSlot slot = slots[i];
+                    this.shopUpdateRowCount++;
                     this.shopUpdatesLog.WriteLine(
                         string.Join(
                             ",",
@@ -535,6 +784,8 @@ namespace AOSharpLiveCapture
 
             lock (this.syncRoot)
             {
+                this.vendorFullUpdateMessageCount++;
+                this.vendorFullUpdateIdentities.Add(message.Identity.ToString());
                 this.vendorFullUpdatesLog.WriteLine(
                     string.Join(
                         ",",
@@ -555,6 +806,580 @@ namespace AOSharpLiveCapture
                         sellModifier.ToString(CultureInfo.InvariantCulture),
                         stats.Length.ToString(CultureInfo.InvariantCulture)));
                 this.vendorFullUpdatesLog.Flush();
+            }
+        }
+
+        private void ExportInventoryUpdate(string direction, int sequence, InventoryUpdateMessage message)
+        {
+            InventorySlot[] items = message.Items ?? new InventorySlot[0];
+
+            lock (this.syncRoot)
+            {
+                this.inventoryUpdateMessageCount++;
+                string capturedUtc = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
+                string inventoryIdentity = message.InventoryIdentity.ToString();
+                for (int i = 0; i < items.Length; i++)
+                {
+                    InventorySlot item = items[i];
+                    this.inventoryUpdateRowCount++;
+                    this.inventoryUpdatesLog.WriteLine(
+                        string.Join(
+                            ",",
+                            Csv(capturedUtc),
+                            Csv(direction),
+                            sequence.ToString(CultureInfo.InvariantCulture),
+                            Csv(inventoryIdentity),
+                            message.Handle.ToString(CultureInfo.InvariantCulture),
+                            i.ToString(CultureInfo.InvariantCulture),
+                            item.Placement.ToString(CultureInfo.InvariantCulture),
+                            item.Flags.ToString(CultureInfo.InvariantCulture),
+                            item.Count.ToString(CultureInfo.InvariantCulture),
+                            Csv(item.Identity.ToString()),
+                            item.ItemLowId.ToString(CultureInfo.InvariantCulture),
+                            item.ItemHighId.ToString(CultureInfo.InvariantCulture),
+                            item.Quality.ToString(CultureInfo.InvariantCulture),
+                            item.Unknown.ToString(CultureInfo.InvariantCulture)));
+                }
+
+                this.inventoryUpdatesLog.Flush();
+            }
+        }
+
+        private void TrackEnemyStateFromMessage(string direction, int sequence, N3Message message)
+        {
+            SimpleCharFullUpdateMessage simpleCharFullUpdate = message as SimpleCharFullUpdateMessage;
+            if (simpleCharFullUpdate != null)
+            {
+                this.TrackEnemyFromSimpleCharFullUpdate(direction, sequence, simpleCharFullUpdate);
+                return;
+            }
+
+            StatMessage stat = message as StatMessage;
+            if (stat != null)
+            {
+                this.TrackEnemyFromStatMessage(direction, sequence, stat);
+                return;
+            }
+
+            HealthDamageMessage healthDamage = message as HealthDamageMessage;
+            if (healthDamage != null)
+            {
+                this.TrackEnemyFromHealthDamage(direction, sequence, healthDamage);
+                return;
+            }
+
+            AttackInfoMessage attackInfo = message as AttackInfoMessage;
+            if (attackInfo != null)
+            {
+                bool didDamage = attackInfo.Amount > 0;
+                this.TrackEnemyCombatTarget(direction, sequence, attackInfo.Target, didDamage ? "damage" : "update", didDamage);
+                return;
+            }
+
+            SpecialAttackInfoMessage specialAttackInfo = message as SpecialAttackInfoMessage;
+            if (specialAttackInfo != null)
+            {
+                bool didDamage = specialAttackInfo.Amount > 0;
+                this.TrackEnemyCombatTarget(direction, sequence, specialAttackInfo.Target, didDamage ? "damage" : "update", didDamage);
+                return;
+            }
+
+            AttackMessage attack = message as AttackMessage;
+            if (attack != null)
+            {
+                this.TrackEnemyCombatTarget(direction, sequence, attack.Target, "update", false);
+                return;
+            }
+
+            MissedAttackInfoMessage missedAttackInfo = message as MissedAttackInfoMessage;
+            if (missedAttackInfo != null)
+            {
+                this.TrackEnemyCombatTarget(direction, sequence, missedAttackInfo.Defender, "update", false);
+                return;
+            }
+
+            CharDCMoveMessage charMove = message as CharDCMoveMessage;
+            if (charMove != null)
+            {
+                this.TrackEnemyPosition(direction, sequence, charMove.Identity, charMove.Position, "update");
+                return;
+            }
+
+            SetPosMessage setPos = message as SetPosMessage;
+            if (setPos != null)
+            {
+                this.TrackEnemyPosition(direction, sequence, setPos.Identity, setPos.Position, "update");
+                return;
+            }
+
+            DespawnMessage despawn = message as DespawnMessage;
+            if (despawn != null)
+            {
+                this.TrackEnemyDespawn(direction, sequence, despawn.Identity);
+                return;
+            }
+
+            SimpleItemFullUpdateMessage simpleItemFullUpdate = message as SimpleItemFullUpdateMessage;
+            if (simpleItemFullUpdate != null)
+            {
+                this.TrackEnemyFromSimpleItemFullUpdate(direction, sequence, simpleItemFullUpdate);
+            }
+        }
+
+        private void TrackEnemyFromSimpleCharFullUpdate(string direction, int sequence, SimpleCharFullUpdateMessage message)
+        {
+            if (!this.IsEnemySimpleCharUpdate(message))
+            {
+                return;
+            }
+
+            DateTime timestamp = DateTime.UtcNow;
+            lock (this.syncRoot)
+            {
+                bool created;
+                EnemyEntityState state = this.GetOrCreateEnemyState(message.Identity, timestamp, out created);
+                state.Level = message.Level;
+
+                if (message.Health > 0)
+                {
+                    state.MaxHealth = message.Health;
+                    state.CurrentHealth = message.HealthDamage > 0 && message.Health >= message.HealthDamage
+                        ? message.Health - message.HealthDamage
+                        : message.Health;
+                    this.enemyHealthUpdateCount++;
+                }
+
+                if (this.UpdateEnemyPosition(state, message.Position))
+                {
+                    this.enemyPositionUpdateCount++;
+                }
+
+                this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : "update");
+                this.RecordEnemyDeathIfNeeded(state, timestamp);
+            }
+        }
+
+        private void TrackEnemyFromStatMessage(string direction, int sequence, StatMessage message)
+        {
+            if (!this.IsTrackableEnemyIdentity(message.Identity))
+            {
+                return;
+            }
+
+            GameTuple<Stat, uint>[] stats = message.Stats ?? new GameTuple<Stat, uint>[0];
+            if (!ContainsEnemyStateStats(stats))
+            {
+                return;
+            }
+
+            DateTime timestamp = DateTime.UtcNow;
+            lock (this.syncRoot)
+            {
+                bool created;
+                EnemyEntityState state = this.GetOrCreateEnemyState(message.Identity, timestamp, out created);
+                bool changed = false;
+                foreach (GameTuple<Stat, uint> stat in stats)
+                {
+                    changed |= this.ApplyEnemyStat(state, stat.Value1, ToInt32Clamp(stat.Value2));
+                }
+
+                if (changed)
+                {
+                    this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : "update");
+                    this.RecordEnemyDeathIfNeeded(state, timestamp);
+                }
+            }
+        }
+
+        private void TrackEnemyFromSimpleItemFullUpdate(string direction, int sequence, SimpleItemFullUpdateMessage message)
+        {
+            if (!this.IsTrackableEnemyIdentity(message.Identity))
+            {
+                return;
+            }
+
+            GameTuple<Stat, int>[] stats = message.Stats ?? new GameTuple<Stat, int>[0];
+            if (!ContainsEnemyStateStats(stats) && !message.Position.HasValue)
+            {
+                return;
+            }
+
+            DateTime timestamp = DateTime.UtcNow;
+            lock (this.syncRoot)
+            {
+                bool created;
+                EnemyEntityState state = this.GetOrCreateEnemyState(message.Identity, timestamp, out created);
+                bool changed = false;
+                foreach (GameTuple<Stat, int> stat in stats)
+                {
+                    changed |= this.ApplyEnemyStat(state, stat.Value1, stat.Value2);
+                }
+
+                if (message.Position.HasValue && this.UpdateEnemyPosition(state, message.Position.Value))
+                {
+                    changed = true;
+                    this.enemyPositionUpdateCount++;
+                }
+
+                if (changed)
+                {
+                    this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : "update");
+                    this.RecordEnemyDeathIfNeeded(state, timestamp);
+                }
+            }
+        }
+
+        private void TrackEnemyFromHealthDamage(string direction, int sequence, HealthDamageMessage message)
+        {
+            if (!this.IsTrackableEnemyIdentity(message.Target))
+            {
+                return;
+            }
+
+            DateTime timestamp = DateTime.UtcNow;
+            lock (this.syncRoot)
+            {
+                bool created;
+                EnemyEntityState state = this.GetOrCreateEnemyState(message.Target, timestamp, out created);
+                this.enemyCombatEventCount++;
+                this.enemyDamageEventCount++;
+                state.CurrentHealth = message.TargetHp;
+                this.enemyHealthUpdateCount++;
+                if (created)
+                {
+                    this.RecordEnemyStateEvent(state, timestamp, "spawn");
+                }
+
+                this.RecordEnemyStateEvent(state, timestamp, "damage");
+                this.RecordEnemyDeathIfNeeded(state, timestamp);
+            }
+        }
+
+        private void TrackEnemyCombatTarget(string direction, int sequence, Identity target, string eventType, bool isDamage)
+        {
+            if (!this.IsTrackableEnemyIdentity(target))
+            {
+                return;
+            }
+
+            DateTime timestamp = DateTime.UtcNow;
+            lock (this.syncRoot)
+            {
+                bool created;
+                EnemyEntityState state = this.GetOrCreateEnemyState(target, timestamp, out created);
+                this.enemyCombatEventCount++;
+                if (isDamage)
+                {
+                    this.enemyDamageEventCount++;
+                }
+
+                if (created)
+                {
+                    this.RecordEnemyStateEvent(state, timestamp, "spawn");
+                }
+
+                this.RecordEnemyStateEvent(state, timestamp, eventType);
+            }
+        }
+
+        private void TrackEnemyPosition(string direction, int sequence, Identity identity, Vector3 position, string eventType)
+        {
+            if (!this.IsTrackableEnemyIdentity(identity))
+            {
+                return;
+            }
+
+            DateTime timestamp = DateTime.UtcNow;
+            lock (this.syncRoot)
+            {
+                bool created;
+                EnemyEntityState state = this.GetOrCreateEnemyState(identity, timestamp, out created);
+                if (this.UpdateEnemyPosition(state, position))
+                {
+                    this.enemyPositionUpdateCount++;
+                    this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : eventType);
+                }
+            }
+        }
+
+        private void TrackEnemyDespawn(string direction, int sequence, Identity identity)
+        {
+            if (!this.IsTrackableEnemyIdentity(identity))
+            {
+                return;
+            }
+
+            DateTime timestamp = DateTime.UtcNow;
+            lock (this.syncRoot)
+            {
+                bool created;
+                EnemyEntityState state = this.GetOrCreateEnemyState(identity, timestamp, out created);
+                if (created)
+                {
+                    this.RecordEnemyStateEvent(state, timestamp, "spawn");
+                }
+
+                this.RecordEnemyStateEvent(state, timestamp, "despawn");
+            }
+        }
+
+        private void TrackEnemyFromDynel(Dynel dynel, string requestedEventType)
+        {
+            if (dynel == null || dynel.Identity.Type != IdentityType.SimpleChar)
+            {
+                return;
+            }
+
+            try
+            {
+                this.TrackEnemyFromCharacter(dynel.Cast<SimpleChar>(), requestedEventType);
+            }
+            catch
+            {
+                // Dynel snapshots are best-effort; decoded packets remain the capture source of truth.
+            }
+        }
+
+        private void TrackEnemyFromCharacter(SimpleChar character, string requestedEventType)
+        {
+            if (!this.IsEnemyCharacter(character))
+            {
+                return;
+            }
+
+            DateTime timestamp = DateTime.UtcNow;
+            lock (this.syncRoot)
+            {
+                bool created;
+                EnemyEntityState state = this.GetOrCreateEnemyState(character.Identity, timestamp, out created);
+                state.Level = TryGetCharacterStat(character, Stat.Level);
+                state.CurrentHealth = TryGetCharacterStat(character, Stat.Health);
+                state.MaxHealth = TryGetCharacterStat(character, Stat.MaxHealth);
+                this.enemyHealthUpdateCount++;
+                if (this.UpdateEnemyPosition(state, character.Position))
+                {
+                    this.enemyPositionUpdateCount++;
+                }
+
+                this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : requestedEventType == "spawn" ? "update" : requestedEventType);
+                this.RecordEnemyDeathIfNeeded(state, timestamp);
+            }
+        }
+
+        private void TrackEnemyGone(string entityId)
+        {
+            DateTime timestamp = DateTime.UtcNow;
+            lock (this.syncRoot)
+            {
+                EnemyEntityState state;
+                if (!this.enemyStates.TryGetValue(entityId, out state))
+                {
+                    return;
+                }
+
+                this.RecordEnemyStateEvent(state, timestamp, "despawn");
+            }
+        }
+
+        private EnemyEntityState GetOrCreateEnemyState(Identity identity, DateTime timestamp, out bool created)
+        {
+            string entityId = identity.ToString();
+            EnemyEntityState state;
+            if (this.enemyStates.TryGetValue(entityId, out state))
+            {
+                created = false;
+                return state;
+            }
+
+            state = new EnemyEntityState
+            {
+                EntityId = entityId,
+                FirstSeenUtc = timestamp,
+                LastUpdateUtc = timestamp
+            };
+            this.enemyStates.Add(entityId, state);
+            this.enemyStateTimeline.Add(entityId, new List<EnemyStateEvent>());
+            created = true;
+            return state;
+        }
+
+        private bool ApplyEnemyStat(EnemyEntityState state, Stat stat, int value)
+        {
+            switch (stat)
+            {
+                case Stat.Health:
+                    state.CurrentHealth = value;
+                    this.enemyHealthUpdateCount++;
+                    return true;
+
+                case Stat.MaxHealth:
+                    state.MaxHealth = value;
+                    this.enemyHealthUpdateCount++;
+                    return true;
+
+                case Stat.Level:
+                    state.Level = value;
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        private bool UpdateEnemyPosition(EnemyEntityState state, Vector3 position)
+        {
+            bool changed = state.X != position.X || state.Y != position.Y || state.Z != position.Z;
+            state.X = position.X;
+            state.Y = position.Y;
+            state.Z = position.Z;
+            return changed;
+        }
+
+        private void RecordEnemyDeathIfNeeded(EnemyEntityState state, DateTime timestamp)
+        {
+            if (!state.CurrentHealth.HasValue || state.CurrentHealth.Value > 0 || state.DeathLogged)
+            {
+                return;
+            }
+
+            state.DeathLogged = true;
+            this.RecordEnemyStateEvent(state, timestamp, "death");
+        }
+
+        private void RecordEnemyStateEvent(EnemyEntityState state, DateTime timestamp, string eventType)
+        {
+            state.LastUpdateUtc = timestamp;
+            EnemyStateEvent stateEvent = new EnemyStateEvent
+            {
+                TimestampUtc = timestamp,
+                EntityId = state.EntityId,
+                Level = state.Level,
+                CurrentHealth = state.CurrentHealth,
+                MaxHealth = state.MaxHealth,
+                X = state.X,
+                Y = state.Y,
+                Z = state.Z,
+                EventType = eventType
+            };
+
+            List<EnemyStateEvent> timeline;
+            if (!this.enemyStateTimeline.TryGetValue(state.EntityId, out timeline))
+            {
+                timeline = new List<EnemyStateEvent>();
+                this.enemyStateTimeline.Add(state.EntityId, timeline);
+            }
+
+            timeline.Add(stateEvent);
+            this.enemyStateRowCount++;
+            if (eventType == "spawn")
+            {
+                this.enemySpawnEventCount++;
+            }
+            else if (eventType == "death")
+            {
+                this.enemyDeathEventCount++;
+            }
+            else if (eventType == "despawn")
+            {
+                this.enemyDespawnEventCount++;
+            }
+
+            this.enemyStateLog.WriteLine(
+                string.Join(
+                    ",",
+                    Csv(timestamp.ToString("o", CultureInfo.InvariantCulture)),
+                    Csv(state.EntityId),
+                    NullableInt(state.Level),
+                    NullableInt(state.CurrentHealth),
+                    NullableInt(state.MaxHealth),
+                    NullableFloat(state.X),
+                    NullableFloat(state.Y),
+                    NullableFloat(state.Z),
+                    Csv(eventType)));
+        }
+
+        private bool IsEnemySimpleCharUpdate(SimpleCharFullUpdateMessage message)
+        {
+            if (!this.IsTrackableEnemyIdentity(message.Identity))
+            {
+                return false;
+            }
+
+            if (message.CharacterInfo is SimpleCharInfo.NPCInfo)
+            {
+                return true;
+            }
+
+            return this.enemyStates.ContainsKey(message.Identity.ToString());
+        }
+
+        private bool IsTrackableEnemyIdentity(Identity identity)
+        {
+            return identity.Type == IdentityType.SimpleChar && !this.IsLocalPlayerIdentity(identity);
+        }
+
+        private bool IsLocalPlayerIdentity(Identity identity)
+        {
+            try
+            {
+                return DynelManager.LocalPlayer != null && identity.Equals(DynelManager.LocalPlayer.Identity);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool IsEnemyCharacter(SimpleChar character)
+        {
+            if (character == null || this.IsLocalPlayerIdentity(character.Identity))
+            {
+                return false;
+            }
+
+            return SafeBool(() => character.IsNpc) || SafeBool(() => character.IsPet);
+        }
+
+        private static bool ContainsEnemyStateStats(GameTuple<Stat, uint>[] stats)
+        {
+            foreach (GameTuple<Stat, uint> stat in stats)
+            {
+                if (IsEnemyStateStat(stat.Value1))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool ContainsEnemyStateStats(GameTuple<Stat, int>[] stats)
+        {
+            foreach (GameTuple<Stat, int> stat in stats)
+            {
+                if (IsEnemyStateStat(stat.Value1))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsEnemyStateStat(Stat stat)
+        {
+            return stat == Stat.Health || stat == Stat.MaxHealth || stat == Stat.Level;
+        }
+
+        private static int? TryGetCharacterStat(SimpleChar character, Stat stat)
+        {
+            try
+            {
+                return character.GetStat(stat);
+            }
+            catch
+            {
+                return null;
             }
         }
 
@@ -604,6 +1429,443 @@ namespace AOSharpLiveCapture
             {
                 this.LogEvent("SESSION-METADATA-ERROR", ex.ToString());
             }
+        }
+
+        private void FinalizeCapture()
+        {
+            if (this.captureFinalized)
+            {
+                return;
+            }
+
+            this.captureFinalized = true;
+            this.enabled = false;
+
+            this.LogEvent("PLUGIN", "Final capture flush delay starting: 5 seconds.");
+            this.Flush();
+            Thread.Sleep(TimeSpan.FromSeconds(5));
+            this.Flush();
+            this.WriteEnemyStateJson();
+
+            CaptureValidation validation = this.ValidateCapture();
+            this.WriteCaptureHealth(validation);
+            this.WriteCaptureInfo(DateTime.UtcNow, validation);
+            this.LogEvent(
+                "CAPTURE-VALIDATION",
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "status={0} processingAllowed={1} issues={2}",
+                    validation.Status,
+                    validation.ProcessingAllowed,
+                    validation.Issues.Count));
+
+            this.FlushAndClose();
+        }
+
+        private CaptureValidation ValidateCapture()
+        {
+            List<string> issues = new List<string>();
+            List<string> notes = new List<string>();
+
+            if (this.GetSessionFileLength("events.log") <= 0)
+            {
+                issues.Add("events.log is empty or missing.");
+            }
+
+            if (this.GetSessionFileLength("packets.hex.log") <= 0)
+            {
+                notes.Add("packets.hex.log is empty; no raw packets were observed in this session.");
+            }
+
+            if (this.vendorInteractionAttemptCount > 0 && this.shopUpdateRowCount == 0)
+            {
+                issues.Add("Vendor/shop interactions were observed, but shop-updates.csv has no stock rows.");
+            }
+
+            if (this.vendorInteractionAttemptCount > 0 && this.vendorFullUpdateMessageCount == 0)
+            {
+                issues.Add("Vendor/shop interactions were observed, but vendor-full-updates.csv has no vendor full-update entries.");
+            }
+
+            if (this.shopUpdateMessageCount > 0 && this.shopUpdateRowCount == 0)
+            {
+                issues.Add("ShopUpdate messages were observed, but all exported shop updates were empty.");
+            }
+
+            if (this.vendorInteractionAttemptCount == 0)
+            {
+                notes.Add("No GenericCmd Use against VendingMachine identities was observed; shop-specific row checks are informational only.");
+            }
+
+            if (this.chatDialogueMessageCount == 0)
+            {
+                notes.Add("No chat/dialogue messages were observed.");
+            }
+
+            if (this.systemMessageCount == 0)
+            {
+                notes.Add("No system/feedback/quest messages were observed.");
+            }
+
+            if (this.enemyCombatEventCount > 0 && this.enemyStateRowCount == 0)
+            {
+                issues.Add("Combat packets were observed, but enemy-state.csv has no rows.");
+            }
+
+            if (this.enemyCombatEventCount == 0)
+            {
+                notes.Add("No enemy combat packets were observed.");
+            }
+
+            string status = issues.Count == 0 ? "complete" : "incomplete";
+            return new CaptureValidation(status, issues.Count == 0, issues, notes);
+        }
+
+        private void WriteEnemyStateJson()
+        {
+            try
+            {
+                string path = Path.Combine(this.sessionDirectory, "enemy-state.json");
+                StringBuilder json = new StringBuilder();
+                lock (this.syncRoot)
+                {
+                    json.AppendLine("{");
+                    json.Append("  \"generatedUtc\": ");
+                    json.Append(Json(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)));
+                    json.AppendLine(",");
+                    json.AppendLine("  \"entities\": {");
+
+                    string[] entityIds = this.enemyStateTimeline.Keys.OrderBy(value => value).ToArray();
+                    for (int i = 0; i < entityIds.Length; i++)
+                    {
+                        string entityId = entityIds[i];
+                        json.Append("    ");
+                        json.Append(Json(entityId));
+                        json.AppendLine(": [");
+
+                        List<EnemyStateEvent> timeline = this.enemyStateTimeline[entityId];
+                        for (int j = 0; j < timeline.Count; j++)
+                        {
+                            this.AppendEnemyStateEventJson(json, timeline[j], "      ");
+                            if (j < timeline.Count - 1)
+                            {
+                                json.Append(",");
+                            }
+
+                            json.AppendLine();
+                        }
+
+                        json.Append("    ]");
+                        if (i < entityIds.Length - 1)
+                        {
+                            json.Append(",");
+                        }
+
+                        json.AppendLine();
+                    }
+
+                    json.AppendLine("  }");
+                    json.AppendLine("}");
+                }
+
+                File.WriteAllText(path, json.ToString(), Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                this.LogEvent("ENEMY-STATE-JSON-ERROR", ex.ToString());
+            }
+        }
+
+        private void AppendEnemyStateEventJson(StringBuilder json, EnemyStateEvent stateEvent, string indent)
+        {
+            json.Append(indent);
+            json.Append("{ ");
+            json.Append("\"timestamp\": ");
+            json.Append(Json(stateEvent.TimestampUtc.ToString("o", CultureInfo.InvariantCulture)));
+            json.Append(", \"entityId\": ");
+            json.Append(Json(stateEvent.EntityId));
+            json.Append(", \"level\": ");
+            AppendJsonNullableInt(json, stateEvent.Level);
+            json.Append(", \"currentHealth\": ");
+            AppendJsonNullableInt(json, stateEvent.CurrentHealth);
+            json.Append(", \"maxHealth\": ");
+            AppendJsonNullableInt(json, stateEvent.MaxHealth);
+            json.Append(", \"x\": ");
+            AppendJsonNullableFloat(json, stateEvent.X);
+            json.Append(", \"y\": ");
+            AppendJsonNullableFloat(json, stateEvent.Y);
+            json.Append(", \"z\": ");
+            AppendJsonNullableFloat(json, stateEvent.Z);
+            json.Append(", \"eventType\": ");
+            json.Append(Json(stateEvent.EventType));
+            json.Append(" }");
+        }
+
+        private void WriteCaptureHealth(CaptureValidation validation)
+        {
+            try
+            {
+                string path = Path.Combine(this.sessionDirectory, "capture-health.json");
+                StringBuilder json = new StringBuilder();
+                json.AppendLine("{");
+                json.Append("  \"timestampUtc\": ");
+                json.Append(Json(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)));
+                json.AppendLine(",");
+                this.AppendValidationJson(json, validation, "  ");
+                json.AppendLine();
+                json.AppendLine("}");
+                File.WriteAllText(path, json.ToString(), Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                this.LogEvent("CAPTURE-HEALTH-ERROR", ex.ToString());
+            }
+        }
+
+        private void WriteCaptureInfo(DateTime? captureEndUtc, CaptureValidation validation)
+        {
+            try
+            {
+                DateTime timestampUtc = DateTime.UtcNow;
+                DateTime durationEndUtc = captureEndUtc ?? timestampUtc;
+                string path = Path.Combine(this.sessionDirectory, "capture_info.json");
+                StringBuilder json = new StringBuilder();
+                json.AppendLine("{");
+                json.Append("  \"timestampUtc\": ");
+                json.Append(Json(timestampUtc.ToString("o", CultureInfo.InvariantCulture)));
+                json.AppendLine(",");
+                json.Append("  \"captureStartUtc\": ");
+                json.Append(Json(this.captureStartUtc.ToString("o", CultureInfo.InvariantCulture)));
+                json.AppendLine(",");
+                json.Append("  \"captureEndUtc\": ");
+                json.Append(captureEndUtc.HasValue ? Json(captureEndUtc.Value.ToString("o", CultureInfo.InvariantCulture)) : "null");
+                json.AppendLine(",");
+                json.Append("  \"sessionDurationSeconds\": ");
+                json.Append(Math.Max(0, (durationEndUtc - this.captureStartUtc).TotalSeconds).ToString("0.###", CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("  \"captureFolderPath\": ");
+                json.Append(Json(this.sessionDirectory));
+                json.AppendLine(",");
+                json.Append("  \"characterName\": ");
+                json.Append(Json(this.GetLocalCharacterName()));
+                json.AppendLine(",");
+                json.Append("  \"playfieldId\": ");
+                json.Append(Json(this.GetDetectedPlayfieldId()));
+                json.AppendLine(",");
+                json.AppendLine("  \"packetCounts\": {");
+                json.Append("    \"inboundRaw\": ");
+                json.Append(this.inboundPacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"outboundRaw\": ");
+                json.Append(this.outboundPacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"decodedInboundN3\": ");
+                json.Append(this.decodedInboundCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"decodedOutboundN3\": ");
+                json.Append(this.decodedOutboundCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine();
+                json.AppendLine("  },");
+                json.AppendLine("  \"captureCounts\": {");
+                json.Append("    \"vendorInteractionAttempts\": ");
+                json.Append(this.vendorInteractionAttemptCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"vendorFullUpdateMessages\": ");
+                json.Append(this.vendorFullUpdateMessageCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"shopUpdateMessages\": ");
+                json.Append(this.shopUpdateMessageCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"shopUpdateRows\": ");
+                json.Append(this.shopUpdateRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"systemMessages\": ");
+                json.Append(this.systemMessageCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"chatDialogueMessages\": ");
+                json.Append(this.chatDialogueMessageCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"npcInteractions\": ");
+                json.Append(this.npcInteractionCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"inventoryUpdateMessages\": ");
+                json.Append(this.inventoryUpdateMessageCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"inventoryUpdateRows\": ");
+                json.Append(this.inventoryUpdateRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemyTrackedEntities\": ");
+                json.Append(this.enemyStates.Count.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemyStateRows\": ");
+                json.Append(this.enemyStateRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemyCombatEvents\": ");
+                json.Append(this.enemyCombatEventCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemyDamageEvents\": ");
+                json.Append(this.enemyDamageEventCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemyDeathEvents\": ");
+                json.Append(this.enemyDeathEventCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemySpawnEvents\": ");
+                json.Append(this.enemySpawnEventCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemyDespawnEvents\": ");
+                json.Append(this.enemyDespawnEventCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemyHealthUpdates\": ");
+                json.Append(this.enemyHealthUpdateCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemyPositionUpdates\": ");
+                json.Append(this.enemyPositionUpdateCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine();
+                json.AppendLine("  },");
+                json.Append("  \"lastPacketUtc\": ");
+                json.Append(this.lastPacketUtc == default(DateTime) ? "null" : Json(this.lastPacketUtc.ToString("o", CultureInfo.InvariantCulture)));
+                json.AppendLine(",");
+                json.Append("  \"vendorInteractionIdentities\": ");
+                AppendJsonStringArray(json, this.vendorInteractionIdentities.OrderBy(value => value).ToArray());
+                json.AppendLine(",");
+                json.Append("  \"shopUpdateIdentities\": ");
+                AppendJsonStringArray(json, this.shopUpdateIdentities.OrderBy(value => value).ToArray());
+                json.AppendLine(",");
+                json.Append("  \"vendorFullUpdateIdentities\": ");
+                AppendJsonStringArray(json, this.vendorFullUpdateIdentities.OrderBy(value => value).ToArray());
+                json.AppendLine(",");
+                this.AppendValidationJson(json, validation, "  ");
+                json.AppendLine();
+                json.AppendLine("}");
+
+                File.WriteAllText(path, json.ToString(), Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                this.LogEvent("CAPTURE-INFO-ERROR", ex.ToString());
+            }
+        }
+
+        private void AppendValidationJson(StringBuilder json, CaptureValidation validation, string indent)
+        {
+            json.Append(indent);
+            json.AppendLine("\"validation\": {");
+            json.Append(indent);
+            json.Append("  \"status\": ");
+            json.Append(Json(validation.Status));
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"processingAllowed\": ");
+            json.Append(validation.ProcessingAllowed ? "true" : "false");
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"issues\": ");
+            AppendJsonStringArray(json, validation.Issues);
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"notes\": ");
+            AppendJsonStringArray(json, validation.Notes);
+            json.AppendLine();
+            json.Append(indent);
+            json.Append("}");
+        }
+
+        private long GetSessionFileLength(string fileName)
+        {
+            string path = Path.Combine(this.sessionDirectory, fileName);
+            if (!File.Exists(path))
+            {
+                return 0;
+            }
+
+            return new FileInfo(path).Length;
+        }
+
+        private string GetLocalCharacterName()
+        {
+            return Safe(() => DynelManager.LocalPlayer == null ? string.Empty : DynelManager.LocalPlayer.Name);
+        }
+
+        private string GetDetectedPlayfieldId()
+        {
+            if (!string.IsNullOrWhiteSpace(this.lastPlayfieldId))
+            {
+                return this.lastPlayfieldId;
+            }
+
+            return Safe(() => Playfield.Identity.ToString());
+        }
+
+        private sealed class CaptureValidation
+        {
+            public CaptureValidation(string status, bool processingAllowed, List<string> issues, List<string> notes)
+            {
+                this.Status = status;
+                this.ProcessingAllowed = processingAllowed;
+                this.Issues = issues;
+                this.Notes = notes;
+            }
+
+            public string Status { get; private set; }
+
+            public bool ProcessingAllowed { get; private set; }
+
+            public List<string> Issues { get; private set; }
+
+            public List<string> Notes { get; private set; }
+
+            public static CaptureValidation Running()
+            {
+                return new CaptureValidation(
+                    "running",
+                    false,
+                    new List<string>(),
+                    new List<string> { "Capture is active; final validation runs during plugin teardown." });
+            }
+        }
+
+        private sealed class EnemyEntityState
+        {
+            public string EntityId { get; set; }
+
+            public int? Level { get; set; }
+
+            public int? CurrentHealth { get; set; }
+
+            public int? MaxHealth { get; set; }
+
+            public float? X { get; set; }
+
+            public float? Y { get; set; }
+
+            public float? Z { get; set; }
+
+            public DateTime FirstSeenUtc { get; set; }
+
+            public DateTime LastUpdateUtc { get; set; }
+
+            public bool DeathLogged { get; set; }
+        }
+
+        private sealed class EnemyStateEvent
+        {
+            public DateTime TimestampUtc { get; set; }
+
+            public string EntityId { get; set; }
+
+            public int? Level { get; set; }
+
+            public int? CurrentHealth { get; set; }
+
+            public int? MaxHealth { get; set; }
+
+            public float? X { get; set; }
+
+            public float? Y { get; set; }
+
+            public float? Z { get; set; }
+
+            public string EventType { get; set; }
         }
 
         private static int GetStatValue(GameTuple<Stat, int>[] stats, Stat stat)
@@ -846,6 +2108,11 @@ namespace AOSharpLiveCapture
                 this.packetsLog.Flush();
                 this.shopUpdatesLog.Flush();
                 this.vendorFullUpdatesLog.Flush();
+                this.systemMessagesLog.Flush();
+                this.chatDialogueLog.Flush();
+                this.npcInteractionsLog.Flush();
+                this.inventoryUpdatesLog.Flush();
+                this.enemyStateLog.Flush();
             }
         }
 
@@ -857,14 +2124,29 @@ namespace AOSharpLiveCapture
                 this.packetsLog?.Flush();
                 this.shopUpdatesLog?.Flush();
                 this.vendorFullUpdatesLog?.Flush();
+                this.systemMessagesLog?.Flush();
+                this.chatDialogueLog?.Flush();
+                this.npcInteractionsLog?.Flush();
+                this.inventoryUpdatesLog?.Flush();
+                this.enemyStateLog?.Flush();
                 this.eventsLog?.Dispose();
                 this.packetsLog?.Dispose();
                 this.shopUpdatesLog?.Dispose();
                 this.vendorFullUpdatesLog?.Dispose();
+                this.systemMessagesLog?.Dispose();
+                this.chatDialogueLog?.Dispose();
+                this.npcInteractionsLog?.Dispose();
+                this.inventoryUpdatesLog?.Dispose();
+                this.enemyStateLog?.Dispose();
                 this.eventsLog = null;
                 this.packetsLog = null;
                 this.shopUpdatesLog = null;
                 this.vendorFullUpdatesLog = null;
+                this.systemMessagesLog = null;
+                this.chatDialogueLog = null;
+                this.npcInteractionsLog = null;
+                this.inventoryUpdatesLog = null;
+                this.enemyStateLog = null;
             }
         }
 
@@ -899,6 +2181,18 @@ namespace AOSharpLiveCapture
         private static string SafeStat(SimpleChar character, Stat stat)
         {
             return Safe(() => character.GetStat(stat).ToString(CultureInfo.InvariantCulture));
+        }
+
+        private static bool SafeBool(Func<bool> func)
+        {
+            try
+            {
+                return func();
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private static float SafeFloat(Func<float> func)
@@ -943,6 +2237,16 @@ namespace AOSharpLiveCapture
             }
 
             return "\"" + value.Replace("\"", "\"\"") + "\"";
+        }
+
+        private static string NullableInt(int? value)
+        {
+            return value.HasValue ? value.Value.ToString(CultureInfo.InvariantCulture) : string.Empty;
+        }
+
+        private static string NullableFloat(float? value)
+        {
+            return value.HasValue ? value.Value.ToString("R", CultureInfo.InvariantCulture) : string.Empty;
         }
 
         private static string Json(string value)
@@ -995,6 +2299,54 @@ namespace AOSharpLiveCapture
 
             result.Append('"');
             return result.ToString();
+        }
+
+        private static void AppendJsonStringArray(StringBuilder json, IEnumerable<string> values)
+        {
+            json.Append("[");
+
+            bool first = true;
+            foreach (string value in values ?? new string[0])
+            {
+                if (!first)
+                {
+                    json.Append(", ");
+                }
+
+                json.Append(Json(value));
+                first = false;
+            }
+
+            json.Append("]");
+        }
+
+        private static void AppendJsonNullableInt(StringBuilder json, int? value)
+        {
+            if (value.HasValue)
+            {
+                json.Append(value.Value.ToString(CultureInfo.InvariantCulture));
+            }
+            else
+            {
+                json.Append("null");
+            }
+        }
+
+        private static void AppendJsonNullableFloat(StringBuilder json, float? value)
+        {
+            if (value.HasValue)
+            {
+                json.Append(value.Value.ToString("R", CultureInfo.InvariantCulture));
+            }
+            else
+            {
+                json.Append("null");
+            }
+        }
+
+        private static int ToInt32Clamp(uint value)
+        {
+            return value > int.MaxValue ? int.MaxValue : (int)value;
         }
 
         private static string ToHex(byte[] bytes)
