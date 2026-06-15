@@ -1,44 +1,47 @@
 # Current Task
 
-Generated: 2026-06-14
+Generated: 2026-06-15
 
 ## Current Objective
 
-Enforce DAO transaction safety after the MySqlConnector migration.
+Extend AOSharp Live Capture with passive enemy-state logging for NPC/dynel health, level, location, and lifecycle evidence.
 
 Scope:
 
-- Do not change packet behavior, SQL text, database schema, checked-in SQL, config connection strings, capture data, or tools.
-- Only fix transaction ownership, propagation, and commit/rollback handling for DAO/database calls.
-- Preserve existing runtime behavior outside transaction consistency.
+- Extend capture logging only.
+- Do not automate gameplay.
+- Do not alter AO client behavior.
+- Do not change packet definitions.
+- Do not interpret captured data beyond recording fields exposed by existing AOSharp/AOtomation message classes.
 
 ## Current Findings
 
-- Dapper usage is concentrated in `AORebirth.Database`.
-- Runtime `BeginTransaction` usage is limited to DAO methods.
-- `ItemDao.Save(List<DBItem>)` opens or receives a transaction but delegates delete/add operations with the original nullable transaction instead of the active transaction.
-- `CharacterDao.Delete` opens or receives a transaction but performs organization/stat/item cleanup through DAO calls that do not receive that transaction.
-- Generic DAO write helpers pass the active transaction to Dapper after the login-select fix, but still commit locally owned transactions from `finally`, which can commit partial unit-of-work changes after exceptions.
+- Existing AOSharp capture hooks raw packet receive/send and decoded N3 receive/send.
+- Existing decoded packet classes expose enough fields for passive enemy state capture:
+  - `SimpleCharFullUpdateMessage`: identity, level, health, health damage, position, NPC/player info.
+  - `StatMessage`: identity plus `Health`, `MaxHealth`, and `Level` stat updates.
+  - `HealthDamageMessage`: target identity, target HP, and amount.
+  - `AttackMessage`, `AttackInfoMessage`, `SpecialAttackInfoMessage`, and `MissedAttackInfoMessage`: combat target/defender evidence.
+  - `CharDCMoveMessage` and `SetPosMessage`: identity and position.
+  - `DespawnMessage`: identity lifecycle evidence.
+- `SimpleItemFullUpdateMessage` has stats and optional position, but is item-oriented; it is only consumed for enemy state when its identity is a trackable simple-character identity.
 
 ## Current Implementation State
 
-- `AORebirth.Database.Dao.Dao<T,TU>` now treats locally created transactions as owned unit-of-work transactions: commit after success, rollback on exception, dispose only when locally owned.
-- `StatDao.BulkReplace` now uses the active transaction for the delete and all replacement inserts, with rollback on local transaction failure.
-- `ItemDao.Save(List<DBItem>)` now passes the active connection/transaction to the container delete and every item insert.
-- `CharacterDao.Delete` now keeps organization cleanup, stat cleanup, inventory cleanup, character delete, and stat delete under the active transaction.
-- `CharacterDao.SetPlayfield` now propagates its optional connection/transaction into the underlying save call.
+- Added an in-memory enemy state dictionary keyed by entity identity.
+- Added per-entity state fields: level, current health, max health, position, first-seen time, last-update time, and death-logged state.
+- Added streaming `enemy-state.csv` with columns: `timestamp,entityId,level,currentHealth,maxHealth,x,y,z,eventType`.
+- Added `enemy-state.json` grouped by `entityId`, containing the full recorded timeline.
+- Added passive lifecycle capture from dynel spawn, CharInPlay/character-seen, damage/combat packets, health/stat updates, position packets, death detection when current health reaches zero, and despawn/character-gone events.
+- Added enemy-state counters to `capture_info.json`.
+- Added validation that flags a capture as incomplete if combat packets are observed but no enemy-state rows are written.
 
 ## Validation
 
-- Transaction/Dapper scans completed for `BeginTransaction`, `IDbTransaction`, `Query`, `Execute`, `QueryAsync`, and `ExecuteAsync`.
-- Debug build succeeded with `0` errors.
-- ChatEngine, LoginEngine, and ZoneEngine were restarted from `AORebirth\Built\Debug`.
-- Runtime listeners came up on `6996`, `7012`, `7500`, and `7501`.
-- Live client login succeeded through LoginEngine and ZoneEngine for character `18` / `Mikedoc`.
-- Fresh Login/Zone/Chat log scan after live login found no MySqlConnector, Dapper, transaction, or DB exception lines in the current run window.
-- Live vendor/shop interaction succeeded: shop windows opened and Mike confirmed buying works. Zone logs showed `GenericCmd action=Use` against `VendingMachine` targets plus trade item actions, with no current-window DB/transaction errors.
-- Timed logout succeeded: Zone log showed `CharacterAction action=Logout(120)` at `18:45:01` and disconnect at `18:45:31`, with no current-window DB/transaction errors.
+- `git status --short --branch` showed only the existing uncommitted logger/doc changes before this extension.
+- `tools-temp/AOSharpLiveCapture/AOSharpLiveCapture.csproj` Debug build succeeded with `0` warnings and `0` errors after the enemy-state changes.
+- `git diff --check` passed; Git reported only normal Windows LF-to-CRLF working-copy warnings.
 
 ## Next Step
 
-Transaction sweep complete. Continue normal runtime work.
+Run a live combat capture from a freshly injected or freshly zoned AO client and verify `enemy-state.csv`, `enemy-state.json`, and `capture_info.json` enemy counters contain expected NPC rows.
