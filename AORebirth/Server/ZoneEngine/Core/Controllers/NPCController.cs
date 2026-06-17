@@ -447,7 +447,7 @@ namespace ZoneEngine.Core.Controllers
 
         public bool Trade(Identity target)
         {
-            if (AreteRexDialogueRouter.TryStartDialogue(this.Character, target))
+            if (ContentDrivenNpcDialogueRouter.TryStartDialogue(this.Character, target))
             {
                 return true;
             }

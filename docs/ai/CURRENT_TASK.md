@@ -4,25 +4,25 @@ Generated: 2026-06-16
 
 ## Current Objective
 
-Make NPCs face the player when a dialogue interaction opens.
+Standardize NPC dialogue architecture so legacy scripted KnuBot NPCs and new JSON content-pack-driven NPCs share a clear routing model.
 
 Scope:
 
-- Add a narrow dialogue-facing helper on `NPCController`.
-- Apply it to legacy KnuBot dialogue starts.
-- Apply it to the gated Rex Larsson Arete dialogue route before the chat window opens.
-- Use existing recovered `SetWantedDirection` packet support only for dialogue-facing; do not alter normal NPC chase movement.
-- No schema changes, quest behavior, rewards, inventory, XP/credits, mission state execution, quest packets, packet semantics guesses, validation infrastructure, or report/export tooling.
+- Preserve legacy scripted KnuBot behavior and spawn-driven `KnuBotScriptName` attachment.
+- Add the narrow shared content-driven NPC dialogue router needed to avoid a Rex-only one-off architecture.
+- Keep Rex Larsson as the only registered content-driven NPC.
+- Keep `AO_REBIRTH_ENABLE_ARETE_REX_DIALOGUE_ROUTING` disabled by default.
+- Preserve Rex behavior, including KnuBot packet UI reuse and Rex-only Arete playfield registration.
+- Do not add validation infrastructure, report/export tooling, broad automatic routing, other Arete NPCs, quest behavior, rewards, inventory, XP/credits, DB writes, mission bits, action `59`, or Quest Delete interpretation.
 
 ## Active Questions
 
-- Manual smoke result: PASS. The local client visibly shows the NPC turning toward the player when dialogue opens.
+- None. Use a small in-code registration table unless existing content loader code makes a manifest index simpler.
 
 ## Validation Plan
 
-- Build focused ZoneEngine.
-- Restart engines with `AO_REBIRTH_ENABLE_ARETE_REX_DIALOGUE_ROUTING=1`.
-- Run Rex aggregate validation/dry-run.
-- Run Arete validation harness.
-- Run `git diff --check`.
-- Manual in-client smoke result: PASS.
+- Focused ZoneEngine build: passed.
+- Rex dry-run: passed.
+- Arete validation harness: passed 131 cases.
+- `git diff --check`: passed with normal LF-to-CRLF warnings.
+- Document manual Rex smoke instructions: done in `docs/generated/npc_dialogue_content_architecture_result.md`.

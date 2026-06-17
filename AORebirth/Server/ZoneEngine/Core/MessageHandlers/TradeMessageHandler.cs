@@ -114,7 +114,7 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 case TradeAction.Open:
                 {
-                    if (AreteRexDialogueRouter.TryStartDialogueForTarget(
+                    if (ContentDrivenNpcDialogueRouter.TryStartDialogueForTarget(
                         client.Controller.Character,
                         message.Target))
                     {
