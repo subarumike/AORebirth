@@ -124,6 +124,7 @@
     <Compile Include="Core\Arete\Dialogue\DialogueContentPackLoader.cs" />
     <Compile Include="Core\Arete\Dialogue\DialogueContentPackValidator.cs" />
     <Compile Include="Core\Arete\Dialogue\DialogueContentRegistry.cs" />
+    <Compile Include="Core\Arete\Dialogue\ContentDrivenNpcDialogueRouter.cs" />
     <Compile Include="Core\Arete\Dialogue\AreteRexDialogueRouter.cs" />
     <Compile Include="Core\Arete\Dialogue\DialogueActionReferenceValidator.cs" />
     <Compile Include="Core\Arete\Dialogue\DialogueMissionActionAdapter.cs" />

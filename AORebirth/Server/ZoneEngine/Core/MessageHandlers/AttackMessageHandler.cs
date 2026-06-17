@@ -79,7 +79,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            if (AreteRexDialogueRouter.ShouldSuppressCombat(target) || IsImmuneTarget(target))
+            if (ContentDrivenNpcDialogueRouter.ShouldSuppressCombat(target) || IsImmuneTarget(target))
             {
                 character.SetFightingTarget(Identity.None);
                 this.ResetCombatTick(character);

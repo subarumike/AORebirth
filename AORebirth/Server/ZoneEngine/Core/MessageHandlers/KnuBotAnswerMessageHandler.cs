@@ -62,7 +62,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 messageWrapper.MessageBody.Answer,
                 messageWrapper.MessageBody.Unknown1);
 
-            if (AreteRexDialogueRouter.TryHandleAnswer(
+            if (ContentDrivenNpcDialogueRouter.TryHandleAnswer(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody.Target,
                 messageWrapper.MessageBody.Answer))
