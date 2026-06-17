@@ -76,6 +76,7 @@ namespace AORebirth.Core.Playfields
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
+    using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Script;
 
     using Config = Utility.Config.ConfigReadWrite;
@@ -2093,6 +2094,7 @@ namespace AORebirth.Core.Playfields
             this.MarkNpcDead(target);
             this.StopFightingDeadTarget(target.Identity);
             this.SendNpcDeathAnimation(target);
+            RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);
             this.AwardCombatXp(attacker, target);
             if (corpseIdentity != Identity.None)
             {
