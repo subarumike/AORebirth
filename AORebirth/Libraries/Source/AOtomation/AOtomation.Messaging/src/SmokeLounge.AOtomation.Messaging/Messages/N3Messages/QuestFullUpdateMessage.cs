@@ -19,8 +19,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         }
 
 
-        [AoMember(1, SerializeSize = ArraySizeType.X3F1)]
-        public QuestInfo[] QuestInfos { get; set; }
+        [AoMember(0, SerializeSize = ArraySizeType.X3F1)]
+        public Quest[] Quests { get; set; }
 
     }
 }

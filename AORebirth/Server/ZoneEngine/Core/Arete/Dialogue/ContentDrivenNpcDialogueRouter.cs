@@ -17,6 +17,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Arete.Quests;
 
     #endregion
 
@@ -230,6 +231,17 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             LogRecordedActions(source, result, registration);
+            Action emitQuestPreviewAfterPrompt = delegate
+            {
+                LogQuestPreviewResult(
+                    RexQuestPreviewEmitter.TryEmitB18CPreview(
+                        source,
+                        registration.NpcIdentity,
+                        previousNodeId,
+                        answerIndex,
+                        IsRegistrationEnabled(registration)),
+                    registration);
+            };
 
             if (result.Session == null || !result.Session.IsActive)
             {
@@ -254,7 +266,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 + " from=" + previousNodeId
                 + " to=" + result.Session.CurrentNodeId
                 + " answer=" + answerIndex);
-            SendDialogueNode(source, result, registration);
+            SendDialogueNode(source, result, registration, emitQuestPreviewAfterPrompt);
             return true;
         }
 
@@ -440,7 +452,8 @@ namespace ZoneEngine.Core.Arete.Dialogue
         private static void SendDialogueNode(
             ICharacter source,
             DialogueSessionResult result,
-            ContentDrivenNpcDialogueRegistration registration)
+            ContentDrivenNpcDialogueRegistration registration,
+            Action afterPromptBeforeOptions = null)
         {
             if (result.CurrentNode != null && !string.IsNullOrWhiteSpace(result.CurrentNode.PromptText))
             {
@@ -448,6 +461,12 @@ namespace ZoneEngine.Core.Arete.Dialogue
                     source,
                     registration.NpcIdentity,
                     result.CurrentNode.PromptText);
+                PaceKnuBotPackets();
+            }
+
+            if (afterPromptBeforeOptions != null)
+            {
+                afterPromptBeforeOptions();
                 PaceKnuBotPackets();
             }
 
@@ -505,6 +524,18 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 registration,
                 "recorded " + actionCount
                 + " no-op action(s) for character=" + source.Identity.ToString(true));
+        }
+
+        private static void LogQuestPreviewResult(
+            RexQuestPreviewEmissionResult result,
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            if (result == null || !result.IsApplicable || string.IsNullOrWhiteSpace(result.Message))
+            {
+                return;
+            }
+
+            LogDialogue(registration, result.Message);
         }
 
         private static void PaceKnuBotPackets()
