@@ -77,6 +77,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization
                                        { typeof(GenericCmdMessage), new GenericCmdSerializer() },
                                        { typeof(N3TeleportMessage), new N3TeleportMessageSerializer() },
                                        { typeof(PlayfieldAnarchyFMessage), new PlayfieldAnarchyFMessageSerializer() },
+                                       { typeof(QuestFullUpdateMessage), new QuestFullUpdateMessageSerializer() },
                                        { typeof(ResurrectMessage), new ResurrectMessageSerializer() },
                                        { typeof(ToClientQuitMessage), new KeyOnlyN3MessageSerializer(typeof(ToClientQuitMessage)) },
                                        { typeof(DropDynelMessage), new DropDynelMessageSerializer() },

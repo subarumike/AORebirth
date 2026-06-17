@@ -153,6 +153,7 @@
     <Compile Include="GameData\FullCharacterSub.cs" />
     <Compile Include="GameData\FullCharacterSub2.cs" />
     <Compile Include="GameData\GameTuple.cs" />
+    <Compile Include="GameData\CharacterInfo.cs" />
     <Compile Include="GameData\InfoPacket.cs" />
     <Compile Include="GameData\InventoryEntry.cs" />
     <Compile Include="GameData\InventorySlot.cs" />
@@ -166,10 +167,13 @@
     <Compile Include="GameData\ActiveNano.cs" />
     <Compile Include="GameData\MonsterInfoPacket.cs" />
     <Compile Include="GameData\NanoEffect.cs" />
+    <Compile Include="GameData\MissionItemReward.cs" />
     <Compile Include="GameData\PlayfieldVendorInfo.cs" />
     <Compile Include="GameData\Profession.cs" />
     <Compile Include="GameData\Quaternion.cs" />
     <Compile Include="GameData\KnuBotRejectedItem.cs" />
+    <Compile Include="GameData\Quest.cs" />
+    <Compile Include="GameData\QuestActionInfo.cs" />
     <Compile Include="GameData\QuestActionList.cs" />
     <Compile Include="GameData\QuestCharInfo.cs" />
     <Compile Include="GameData\QuestFaction.cs" />
@@ -356,6 +360,7 @@
     <Compile Include="Serialization\Serializers\Custom\N3TeleportMessageSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\PlayfieldAnarchyFMessageSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\PlayfieldVendorInfoSerializer.cs" />
+    <Compile Include="Serialization\Serializers\Custom\QuestFullUpdateMessageSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\RecoveredN3MessageSerializers.cs" />
     <Compile Include="Serialization\Serializers\Custom\ResurrectMessageSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\SimpleCharFullUpdateSerializer.cs" />
