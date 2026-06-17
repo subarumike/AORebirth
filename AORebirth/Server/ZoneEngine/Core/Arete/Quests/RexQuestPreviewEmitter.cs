@@ -71,7 +71,9 @@ namespace ZoneEngine.Core.Arete.Quests
                     "B18C quest preview failed: source character is not in Arete Landing 6553.");
             }
 
-            return SafeQuestFullUpdateSender.TrySendB18CPreview(source);
+            RexQuestPreviewEmissionResult result = SafeQuestFullUpdateSender.TrySendB18CPreview(source);
+            RexB18CObjectiveProgressTracker.TryActivateFromPreview(source, result);
+            return result;
         }
 
         private static bool IsB18CPreviewOption(string previousNodeId, int answerIndex)
