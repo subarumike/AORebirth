@@ -1,0 +1,28 @@
+{
+  "Identity": {
+    "Id": "dialogue-directory-pack-a",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "Npcs": [
+    {
+      "Id": "synthetic-directory-npc-a",
+      "NpcIdentity": "SimpleChar:synthetic-directory-a",
+      "Name": "Synthetic Directory NPC A",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-close",
+              "Index": 0,
+              "Text": "Synthetic close",
+              "NextNodeId": "close"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

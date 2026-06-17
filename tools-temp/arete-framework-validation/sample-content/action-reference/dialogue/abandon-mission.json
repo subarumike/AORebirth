@@ -1,0 +1,38 @@
+{
+  "Identity": {
+    "Id": "file-action-reference-dialogue-abandon",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-action-reference-npc-abandon",
+      "NpcIdentity": "SimpleChar:file-action-reference-abandon",
+      "Name": "Synthetic Action Reference NPC Abandon",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-action",
+              "Index": 0,
+              "Text": "Synthetic action option",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "action-abandon",
+                  "Type": "AbandonMission",
+                  "QuestId": "file-action-reference-mission"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

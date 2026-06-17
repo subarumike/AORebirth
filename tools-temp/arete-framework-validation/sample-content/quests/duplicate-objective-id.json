@@ -1,0 +1,30 @@
+{
+  "Identity": {
+    "Id": "quest-file-duplicate-objective",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "Quests": [
+    {
+      "QuestId": "mission-synthetic-duplicate-objective",
+      "InitialStepId": "step-a",
+      "Steps": [
+        {
+          "StepId": "step-a",
+          "Name": "Synthetic Step A",
+          "Objectives": [
+            {
+              "ObjectiveId": "objective-a",
+              "Type": "synthetic"
+            },
+            {
+              "ObjectiveId": "objective-a",
+              "Type": "synthetic"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "Links": []
+}

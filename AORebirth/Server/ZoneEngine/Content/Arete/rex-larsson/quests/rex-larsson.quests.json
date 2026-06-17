@@ -1,0 +1,523 @@
+{
+  "Identity": {
+    "Id": "arete-rex-larsson-quests-20260614-194454",
+    "Version": "captured-draft-20260615-objective-events",
+    "Source": "tools-temp/arete-analysis/quest_chains.json"
+  },
+  "SourceCaptures": [
+    "20260614-194454",
+    "tools-temp/arete-analysis/quest_chains.json",
+    "tools-temp/arete-analysis/scripts/decode_rex_questfullupdate.ps1"
+  ],
+  "Quests": [
+    {
+      "QuestId": "Mission:5514B18C",
+      "Title": "Terminate 5 Malfunctioning Cleaning Robots",
+      "TitleConfidence": "decoded-from-QuestFullUpdate-LongInfo-heading; ShortInfo captured as 'Terminate 5 Malfunctioning C...'",
+      "SourceNpcIdentity": "SimpleChar:782DE568",
+      "InitialStepId": "raw_evidence",
+      "Steps": [
+        {
+          "StepId": "raw_evidence",
+          "Name": "Terminate 5 Malfunctioning Cleaning Robots",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_5514B18C_objective_questfullupdate",
+              "Type": "CapturedKillCountObjective",
+              "Description": "Kill 5 Malfunctining Cleaning Robots.",
+              "TargetIdentity": null,
+              "RequiredCount": 5,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": [
+            {
+              "Id": "mission_5514B18C_quest_full_update",
+              "Type": null,
+              "QuestId": "Mission:5514B18C",
+              "StepId": "raw_evidence",
+              "TargetIdentity": "Mission:5514B18C",
+              "Parameters": {
+                "rawMissionIdentity": "(Mission:5514B18C)",
+                "timestamp": "2026-06-15T00:47:10.2347316Z",
+                "folder": "20260614-194454",
+                "sourceLog": "packets.hex.log",
+                "eventType": "QuestFullUpdate",
+                "eventKind": "quest-full-update",
+                "packetNumber": "2757",
+                "packetLogLine": "2835",
+                "eventsLogReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:3099",
+                "systemMessagesReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/system-messages.log:1001",
+                "decoderReference": "tools-temp/arete-analysis/scripts/decode_rex_questfullupdate.ps1",
+                "decodedQuestId": "(Mission:5514B18C)",
+                "decodedShortInfo": "Terminate 5 Malfunctioning C...",
+                "decodedLongInfoHeading": "Terminate 5 Malfunctioning Cleaning Robots",
+                "decodedMissionObjective": "Kill 5 Malfunctining Cleaning Robots.",
+                "decodedPlainText": "Terminate 5 Malfunctioning Cleaning Robots\n\nIdentity Crisis:\nIn order to leave Arete Landing and become a citizen of Rubi-Ka, you need an identity. Your mission is to create a fake ID Card to you can leave this place..\n\nRex Larsson considers himself too lazy to clean up his cleaning business. Since you need his help, he wanted a favor in return. You have to terminate 5 of his Malfunctioning Cleaning Robots then open the package with brand new cleaning robots and set them to work.\n\nMission Objective:\nKill 5 Malfunctining Cleaning Robots.",
+                "linkedIdentityUnknownId1": "(SimpleChar:782DE568)",
+                "linkedIdentityInterpretation": "QuestFullUpdate UnknownId1 equals Rex Larsson identity; exact DTO field semantics remain unresolved",
+                "unknown1": "15",
+                "unknown2": "0",
+                "unknown3": "0",
+                "unknown4": "2",
+                "unknown5": "6",
+                "unknown6": "0",
+                "unknown7": "0",
+                "unknown8": "0",
+                "unknown9": "1009",
+                "unknown10": "1009",
+                "missionItemDataCount": "0",
+                "unknownId2": "(SimpleChar:78CB984B)",
+                "missionIconId": "11330",
+                "questActionCount": "1",
+                "questActionVersion": "20",
+                "questActionAction": "(None:0000)",
+                "questActionPlayfieldId": "(Playfield2:1999)",
+                "questActionPosition": "(3614, 0, 779)",
+                "unknown28": "1"
+              }
+            },
+            {
+              "Id": "mission_5514B18C_character_action_59",
+              "Type": null,
+              "QuestId": "Mission:5514B18C",
+              "StepId": "raw_evidence",
+              "TargetIdentity": "Mission:5514B18C",
+              "Parameters": {
+                "rawMissionIdentity": "(Mission:5514B18C)",
+                "timestamp": "2026-06-15T00:48:42.2131275Z",
+                "folder": "20260614-194454",
+                "sourceLog": "npc-interactions.log",
+                "eventType": "CharacterAction",
+                "eventKind": "mission-character-action",
+                "capturedAction": "59",
+                "parameter1": "56003",
+                "parameter1Meaning": "IdentityType.Mission (0xDAC3) from tool-side AOSharp identity enum",
+                "parameter2": "1427419532",
+                "parameter2Meaning": "mission identity instance for Mission:5514B18C",
+                "meaning": "uncertain-not-decoded",
+                "packetReviewStatus": "unresolved-no-local-or-aosharp-character-action-enum-name-for-decimal-59-hex-0x3B",
+                "safeInterpretation": "CharacterAction numeric 59 targeting Mission:5514B18C was observed; no mission-state transition meaning is inferred",
+                "rawPacketReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:5920",
+                "pairedQuestDeleteReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:5923",
+                "pairedQuestFullUpdateReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:5925"
+              }
+            },
+            {
+              "Id": "mission_5514B18C_quest_delete",
+              "Type": null,
+              "QuestId": "Mission:5514B18C",
+              "StepId": "raw_evidence",
+              "TargetIdentity": "Mission:5514B18C",
+              "Parameters": {
+                "rawMissionIdentity": "(Mission:5514B18C)",
+                "timestamp": "2026-06-15T00:48:42.2131275Z",
+                "folder": "20260614-194454",
+                "sourceLog": "system-messages.log",
+                "eventType": "Quest",
+                "eventKind": "quest-delete-or-completion-evidence",
+                "capturedAction": "Delete",
+                "meaning": "mission-delete-packet-observed-gameplay-meaning-unresolved",
+                "packetReviewStatus": "QuestAction.Delete value 0x01 is present in tool-side AOSharp QuestAction enum",
+                "toolSideReference": "tools-temp/external/aosharp/AOSharp.Core/Mission.cs sends QuestMessage Action=QuestAction.Delete from Mission.Delete",
+                "safeInterpretation": "Quest delete/removal packet for Mission:5514B18C was observed; completion, abandon, replacement, or mission-window cleanup is not distinguished",
+                "rawPacketReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:5923",
+                "pairedCharacterActionReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:5920",
+                "pairedQuestFullUpdateReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:5925"
+              }
+            },
+            {
+              "Id": "mission_5514B18C_objective_event_semantics",
+              "Type": null,
+              "QuestId": "Mission:5514B18C",
+              "StepId": "raw_evidence",
+              "TargetIdentity": null,
+              "Parameters": {
+                "objectiveId": "mission_5514B18C_objective_questfullupdate",
+                "eventKind": "objective-trigger-evidence",
+                "triggerType": "KillCount",
+                "triggerConfidence": "partial-evidence-backed",
+                "targetName": "Malfunctioning Cleaning Robot",
+                "targetNameEvidence": "QuestFullUpdate objective text names Malfunctioning Cleaning Robots; capture includes SimpleCharFullUpdate, CHAR-SEEN, and DYNEL-SPAWNED records with Name=\"Malfunctioning Cleaning Robot\".",
+                "targetIdentityScope": "multiple SimpleChar identities observed; no single target identity is assigned",
+                "requiredCount": "5",
+                "requiredCountEvidence": "decoded QuestFullUpdate objective text says Kill 5 Malfunctining Cleaning Robots.",
+                "deathSignal": "CharacterAction Action=Death",
+                "deathSignalSourceReference": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/N3Messages/CharacterActionType.cs",
+                "deathHandlerReference": "AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs SendNpcDeathAnimation",
+                "observedDeathIdentitiesAfterMissionOffer": "(SimpleChar:78D3ACC6),(SimpleChar:78D3ACAE),(SimpleChar:78D3ACC5),(SimpleChar:78D3ACC9),(SimpleChar:78D3ACB7),(SimpleChar:78D3ACD3),(SimpleChar:78D3ACD6),(SimpleChar:78D3ACCE),(SimpleChar:78D3ACD7)",
+                "observedDeathReferences": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:3248,3305,3414,3566,3814,5375,5554,5759,5890",
+                "questFeedbackReferences": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/system-messages.log:1123,1237,1419,1539,1679",
+                "questFeedbackInterpretation": "FormatFeedback messages contain Malfunctioning Cleaning Robot, but encoded payload semantics are unresolved; they are not mapped to exact objective increments",
+                "completionPacketGroup": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:5919-5926",
+                "completionPacketInterpretation": "mission-targeted action 59, Quest Delete, and next QuestFullUpdate were observed after robot deaths; gameplay completion semantics remain unresolved",
+                "enemyStateCsvNote": "enemy-state.csv captured damage/despawn rows for robot identities, but capture_info.json reports enemyDeathEvents=0"
+              }
+            }
+          ]
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": [
+        "action59Meaning",
+        "action59SourceName",
+        "questDeleteGameplayMeaning",
+        "questFullUpdateUnknownNumericFields",
+        "questActionSemantics",
+        "missionSequenceGameplaySemantics",
+        "dialogueMissionBinding",
+        "objectiveCountProgressMapping",
+        "formatFeedbackPayloadSemantics",
+        "objectiveCompletionTriggerSemantics",
+        "rewards"
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B18D",
+      "Title": "Open the Cargo Box",
+      "TitleConfidence": "decoded-from-QuestFullUpdate-ShortInfo-and-LongInfo-heading",
+      "SourceNpcIdentity": "SimpleChar:782DE568",
+      "InitialStepId": "raw_evidence",
+      "Steps": [
+        {
+          "StepId": "raw_evidence",
+          "Name": "Open the Cargo Box",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_5514B18D_objective_questfullupdate",
+              "Type": "CapturedUseInteractObjective",
+              "Description": "Use (Right Click) the Cargo Box to open it.",
+              "TargetIdentity": null,
+              "RequiredCount": 0,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": [
+            {
+              "Id": "mission_5514B18D_quest_full_update",
+              "Type": null,
+              "QuestId": "Mission:5514B18D",
+              "StepId": "raw_evidence",
+              "TargetIdentity": "Mission:5514B18D",
+              "Parameters": {
+                "rawMissionIdentity": "(Mission:5514B18D)",
+                "timestamp": "2026-06-15T00:48:42.2131275Z",
+                "folder": "20260614-194454",
+                "sourceLog": "packets.hex.log",
+                "eventType": "QuestFullUpdate",
+                "eventKind": "quest-full-update",
+                "packetNumber": "5045",
+                "packetLogLine": "5389",
+                "eventsLogReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:5925",
+                "systemMessagesReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/system-messages.log:1827",
+                "decoderReference": "tools-temp/arete-analysis/scripts/decode_rex_questfullupdate.ps1",
+                "decodedQuestId": "(Mission:5514B18D)",
+                "decodedShortInfo": "Open the Cargo Box",
+                "decodedLongInfoHeading": "Open the Cargo Box",
+                "decodedMissionObjective": "Use (Right Click) the Cargo Box to open it.",
+                "decodedPlainText": "Open the Cargo Box\n\nRex Larsson considers himself too lazy to clean up his cleaning business. Since you need his help, he wanted a favor in return. You have to terminate 5 of his Malfunctioning Cleaning Robots then open the Cargo Box with brand new cleaning robots and set them to work.\n\nMission Objective:\nUse (Right Click) the Cargo Box to open it.",
+                "linkedIdentityUnknownId1": "(SimpleChar:782DE568)",
+                "linkedIdentityInterpretation": "QuestFullUpdate UnknownId1 equals Rex Larsson identity; exact DTO field semantics remain unresolved",
+                "unknown1": "15",
+                "unknown2": "0",
+                "unknown3": "0",
+                "unknown4": "2",
+                "unknown5": "6",
+                "unknown6": "0",
+                "unknown7": "0",
+                "unknown8": "0",
+                "unknown9": "1009",
+                "unknown10": "1009",
+                "missionItemDataCount": "0",
+                "unknownId2": "(SimpleChar:78CB984B)",
+                "missionIconId": "244818",
+                "questActionCount": "1",
+                "questActionVersion": "24",
+                "questActionAction": "(None:0000)",
+                "questActionPlayfieldId": "(Playfield2:1999)",
+                "questActionPosition": "(3621, 0, 782)",
+                "unknown28": "1",
+                "sequenceEvidence": "Quest Delete for Mission:5514B18C at packets.hex.log:5387 is followed by this QuestFullUpdate for Mission:5514B18D at packets.hex.log:5389"
+              }
+            },
+            {
+              "Id": "mission_5514B18D_character_action_59",
+              "Type": null,
+              "QuestId": "Mission:5514B18D",
+              "StepId": "raw_evidence",
+              "TargetIdentity": "Mission:5514B18D",
+              "Parameters": {
+                "rawMissionIdentity": "(Mission:5514B18D)",
+                "timestamp": "2026-06-15T00:48:56.4762819Z",
+                "folder": "20260614-194454",
+                "sourceLog": "npc-interactions.log",
+                "eventType": "CharacterAction",
+                "eventKind": "mission-character-action",
+                "capturedAction": "59",
+                "parameter1": "56003",
+                "parameter1Meaning": "IdentityType.Mission (0xDAC3) from tool-side AOSharp identity enum",
+                "parameter2": "1427419533",
+                "parameter2Meaning": "mission identity instance for Mission:5514B18D",
+                "meaning": "uncertain-not-decoded",
+                "packetReviewStatus": "unresolved-no-local-or-aosharp-character-action-enum-name-for-decimal-59-hex-0x3B",
+                "safeInterpretation": "CharacterAction numeric 59 targeting Mission:5514B18D was observed; no mission-state transition meaning is inferred",
+                "rawPacketReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6338",
+                "pairedQuestDeleteReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6341",
+                "pairedQuestFullUpdateReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6343"
+              }
+            },
+            {
+              "Id": "mission_5514B18D_quest_delete",
+              "Type": null,
+              "QuestId": "Mission:5514B18D",
+              "StepId": "raw_evidence",
+              "TargetIdentity": "Mission:5514B18D",
+              "Parameters": {
+                "rawMissionIdentity": "(Mission:5514B18D)",
+                "timestamp": "2026-06-15T00:48:56.4762819Z",
+                "folder": "20260614-194454",
+                "sourceLog": "system-messages.log",
+                "eventType": "Quest",
+                "eventKind": "quest-delete-or-completion-evidence",
+                "capturedAction": "Delete",
+                "meaning": "mission-delete-packet-observed-gameplay-meaning-unresolved",
+                "packetReviewStatus": "QuestAction.Delete value 0x01 is present in tool-side AOSharp QuestAction enum",
+                "toolSideReference": "tools-temp/external/aosharp/AOSharp.Core/Mission.cs sends QuestMessage Action=QuestAction.Delete from Mission.Delete",
+                "safeInterpretation": "Quest delete/removal packet for Mission:5514B18D was observed; completion, abandon, replacement, or mission-window cleanup is not distinguished",
+                "rawPacketReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6341",
+                "pairedCharacterActionReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6338",
+                "pairedQuestFullUpdateReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6343"
+              }
+            },
+            {
+              "Id": "mission_5514B18D_objective_event_semantics",
+              "Type": null,
+              "QuestId": "Mission:5514B18D",
+              "StepId": "raw_evidence",
+              "TargetIdentity": null,
+              "Parameters": {
+                "objectiveId": "mission_5514B18D_objective_questfullupdate",
+                "eventKind": "objective-trigger-evidence",
+                "triggerType": "UseInteract",
+                "triggerConfidence": "partial-evidence-backed",
+                "targetName": "Cargo Box",
+                "targetNameEvidence": "decoded QuestFullUpdate objective text only; capture did not decode a Cargo Box name for the terminal target",
+                "targetIdentityCandidate": "(Terminal:56D9B4AF)",
+                "targetIdentityConfidence": "candidate-temporal-adjacency-only",
+                "useSignal": "GenericCmd Action=Use",
+                "useSignalSourceReference": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/N3Messages/GenericCmdAction.cs",
+                "useHandlerReference": "AORebirth/Server/ZoneEngine/Core/MessageHandlers/GenericCmdMessageHandler.cs",
+                "usePacketReferences": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6327,6333; tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/packets.hex.log:5755,5759",
+                "playerPositionBeforeUse": "(3621.016, 51.745, 783.9352)",
+                "questActionPosition": "(3621, 0, 782)",
+                "completionPacketGroup": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6337-6344",
+                "completionPacketInterpretation": "mission-targeted action 59, Quest Delete, and next QuestFullUpdate were observed after the Use packet; gameplay completion semantics remain unresolved",
+                "inventoryEvidence": "No inventory-updates.csv rows were observed between 2026-06-15T00:48:40Z and 2026-06-15T00:49:05Z",
+                "unresolved": "Cargo Box identity/name binding is not proven from the capture"
+              }
+            }
+          ]
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": [
+        "action59Meaning",
+        "action59SourceName",
+        "questDeleteGameplayMeaning",
+        "questFullUpdateUnknownNumericFields",
+        "questActionSemantics",
+        "missionSequenceGameplaySemantics",
+        "dialogueMissionBinding",
+        "cargoBoxIdentityBinding",
+        "cargoBoxCompletionTriggerSemantics",
+        "cargoBoxInventoryEffect",
+        "rewards"
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B18E",
+      "Title": "Return to Rex Larsson",
+      "TitleConfidence": "decoded-from-QuestFullUpdate-ShortInfo-and-LongInfo-heading",
+      "SourceNpcIdentity": "SimpleChar:782DE568",
+      "InitialStepId": "raw_evidence",
+      "Steps": [
+        {
+          "StepId": "raw_evidence",
+          "Name": "Return to Rex Larsson",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_5514B18E_objective_questfullupdate",
+              "Type": "CapturedTalkToNpcObjective",
+              "Description": "Talk to Rex Larsson.",
+              "TargetIdentity": "SimpleChar:782DE568",
+              "RequiredCount": 0,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": [
+            {
+              "Id": "mission_5514B18E_quest_full_update",
+              "Type": null,
+              "QuestId": "Mission:5514B18E",
+              "StepId": "raw_evidence",
+              "TargetIdentity": "Mission:5514B18E",
+              "Parameters": {
+                "rawMissionIdentity": "(Mission:5514B18E)",
+                "timestamp": "2026-06-15T00:48:56.4762819Z",
+                "folder": "20260614-194454",
+                "sourceLog": "packets.hex.log",
+                "eventType": "QuestFullUpdate",
+                "eventKind": "quest-full-update",
+                "packetNumber": "5339",
+                "packetLogLine": "5767",
+                "eventsLogReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6343",
+                "systemMessagesReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/system-messages.log:1917",
+                "decoderReference": "tools-temp/arete-analysis/scripts/decode_rex_questfullupdate.ps1",
+                "decodedQuestId": "(Mission:5514B18E)",
+                "decodedShortInfo": "Return to Rex Larsson",
+                "decodedLongInfoHeading": "Return to Rex Larsson",
+                "decodedMissionObjective": "Talk to Rex Larsson.",
+                "decodedPlainText": "Return to Rex Larsson\n\nReturn to Rex Larsson to inform him of the great cleaning success.\n\nMission Objective:\nTalk to Rex Larsson.",
+                "linkedIdentityUnknownId1": "(SimpleChar:782DE568)",
+                "linkedIdentityInterpretation": "QuestFullUpdate UnknownId1 equals Rex Larsson identity; exact DTO field semantics remain unresolved",
+                "unknown1": "15",
+                "unknown2": "0",
+                "unknown3": "0",
+                "unknown4": "2",
+                "unknown5": "6",
+                "unknown6": "1040",
+                "unknown7": "0",
+                "unknown8": "1281",
+                "unknown9": "1009",
+                "unknown10": "1009",
+                "missionItemDataCount": "0",
+                "unknownId2": "(SimpleChar:78CB984B)",
+                "missionIconId": "244818",
+                "questActionCount": "1",
+                "questActionVersion": "23",
+                "questActionAction": "(None:0000)",
+                "questActionPlayfieldId": "(Playfield2:1999)",
+                "questActionPosition": "(3621, 0, 790)",
+                "unknown28": "1",
+                "sequenceEvidence": "Quest Delete for Mission:5514B18D at packets.hex.log:5765 is followed by this QuestFullUpdate for Mission:5514B18E at packets.hex.log:5767",
+                "nextObservedQuestFullUpdate": "Mission:5514B18F appears at packets.hex.log:5949 after Mission:5514B18E delete; not added as Rex target content in this pack"
+              }
+            },
+            {
+              "Id": "mission_5514B18E_character_action_59",
+              "Type": null,
+              "QuestId": "Mission:5514B18E",
+              "StepId": "raw_evidence",
+              "TargetIdentity": "Mission:5514B18E",
+              "Parameters": {
+                "rawMissionIdentity": "(Mission:5514B18E)",
+                "timestamp": "2026-06-15T00:49:01.8992326Z",
+                "folder": "20260614-194454",
+                "sourceLog": "npc-interactions.log",
+                "eventType": "CharacterAction",
+                "eventKind": "mission-character-action",
+                "capturedAction": "59",
+                "parameter1": "56003",
+                "parameter1Meaning": "IdentityType.Mission (0xDAC3) from tool-side AOSharp identity enum",
+                "parameter2": "1427419534",
+                "parameter2Meaning": "mission identity instance for Mission:5514B18E",
+                "meaning": "uncertain-not-decoded",
+                "packetReviewStatus": "unresolved-no-local-or-aosharp-character-action-enum-name-for-decimal-59-hex-0x3B",
+                "safeInterpretation": "CharacterAction numeric 59 targeting Mission:5514B18E was observed; no mission-state transition meaning is inferred",
+                "rawPacketReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6531",
+                "pairedQuestDeleteReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6534",
+                "pairedQuestFullUpdateReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6536"
+              }
+            },
+            {
+              "Id": "mission_5514B18E_quest_delete",
+              "Type": null,
+              "QuestId": "Mission:5514B18E",
+              "StepId": "raw_evidence",
+              "TargetIdentity": "Mission:5514B18E",
+              "Parameters": {
+                "rawMissionIdentity": "(Mission:5514B18E)",
+                "timestamp": "2026-06-15T00:49:01.8992326Z",
+                "folder": "20260614-194454",
+                "sourceLog": "system-messages.log",
+                "eventType": "Quest",
+                "eventKind": "quest-delete-or-completion-evidence",
+                "capturedAction": "Delete",
+                "meaning": "mission-delete-packet-observed-gameplay-meaning-unresolved",
+                "packetReviewStatus": "QuestAction.Delete value 0x01 is present in tool-side AOSharp QuestAction enum",
+                "toolSideReference": "tools-temp/external/aosharp/AOSharp.Core/Mission.cs sends QuestMessage Action=QuestAction.Delete from Mission.Delete",
+                "safeInterpretation": "Quest delete/removal packet for Mission:5514B18E was observed; completion, abandon, replacement, or mission-window cleanup is not distinguished",
+                "rawPacketReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6534",
+                "pairedCharacterActionReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6531",
+                "pairedQuestFullUpdateReference": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6536"
+              }
+            },
+            {
+              "Id": "mission_5514B18E_objective_event_semantics",
+              "Type": null,
+              "QuestId": "Mission:5514B18E",
+              "StepId": "raw_evidence",
+              "TargetIdentity": "SimpleChar:782DE568",
+              "Parameters": {
+                "objectiveId": "mission_5514B18E_objective_questfullupdate",
+                "eventKind": "objective-trigger-evidence",
+                "triggerType": "NpcDialogueOpen",
+                "triggerConfidence": "evidence-backed-talk-signal-completion-semantics-unresolved",
+                "targetName": "Rex Larsson",
+                "targetIdentity": "SimpleChar:782DE568",
+                "targetNameEvidence": "tools-temp/arete-analysis/npc_list.json:522 and tools-temp/arete-analysis/npc_list.json:525",
+                "talkSignal": "KnuBotOpenChatWindow",
+                "talkSignalSourceReference": "AORebirth/Server/ZoneEngine/Core/MessageHandlers/KnuBotOpenChatWindowMessageHandler.cs",
+                "talkPacketReferences": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6520,6522; tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/npc-interactions.log:431,433",
+                "questPacketGroup": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log:6530-6537",
+                "dialogueNodeId": "rex_194454_006",
+                "dialogueNodeEvidence": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/npc-interactions.log:439; tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/chat-dialogue.log:63; tools-temp/arete-analysis/dialogue_trees.json:7173",
+                "dialogueOptionText": "I've done what you asked. Can you tell me who your contact is?",
+                "completionPacketInterpretation": "mission-targeted action 59 and Quest Delete were observed after Rex chat open; gameplay completion semantics remain unresolved"
+              }
+            }
+          ]
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": [
+        "action59Meaning",
+        "action59SourceName",
+        "questDeleteGameplayMeaning",
+        "questFullUpdateUnknownNumericFields",
+        "questActionSemantics",
+        "missionSequenceGameplaySemantics",
+        "dialogueMissionBinding",
+        "talkObjectiveCompletionSemantics",
+        "returnDialogueConditionRouting",
+        "rewards"
+      ]
+    }
+  ],
+  "Links": [
+    {
+      "Id": "rex_5514B18C_delete_then_5514B18D_full_update",
+      "FromQuestId": "Mission:5514B18C",
+      "FromStepId": "raw_evidence",
+      "ToQuestId": "Mission:5514B18D",
+      "ToStepId": "raw_evidence",
+      "Relationship": "packet-sequence-delete-followed-by-next-questfullupdate",
+      "Evidence": "Quest Delete for Mission:5514B18C at packets.hex.log:5387 is followed by QuestFullUpdate for Mission:5514B18D at packets.hex.log:5389. Gameplay transition semantics remain unresolved."
+    },
+    {
+      "Id": "rex_5514B18D_delete_then_5514B18E_full_update",
+      "FromQuestId": "Mission:5514B18D",
+      "FromStepId": "raw_evidence",
+      "ToQuestId": "Mission:5514B18E",
+      "ToStepId": "raw_evidence",
+      "Relationship": "packet-sequence-delete-followed-by-next-questfullupdate",
+      "Evidence": "Quest Delete for Mission:5514B18D at packets.hex.log:5765 is followed by QuestFullUpdate for Mission:5514B18E at packets.hex.log:5767. Gameplay transition semantics remain unresolved."
+    }
+  ]
+}

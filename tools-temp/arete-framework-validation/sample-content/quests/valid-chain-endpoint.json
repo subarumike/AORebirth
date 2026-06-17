@@ -1,0 +1,41 @@
+{
+  "Identity": {
+    "Id": "quest-file-valid-chain",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "Quests": [
+    {
+      "QuestId": "mission-synthetic-a",
+      "InitialStepId": "step-a",
+      "Steps": [
+        {
+          "StepId": "step-a",
+          "Name": "Synthetic Step A",
+          "Objectives": []
+        }
+      ]
+    },
+    {
+      "QuestId": "mission-synthetic-b",
+      "InitialStepId": "step-b",
+      "Steps": [
+        {
+          "StepId": "step-b",
+          "Name": "Synthetic Step B",
+          "Objectives": []
+        }
+      ]
+    }
+  ],
+  "Links": [
+    {
+      "Id": "synthetic-link-valid",
+      "FromQuestId": "mission-synthetic-a",
+      "FromStepId": "step-a",
+      "ToQuestId": "mission-synthetic-b",
+      "ToStepId": "step-b",
+      "Relationship": "synthetic"
+    }
+  ]
+}

@@ -1,0 +1,5138 @@
+{
+  "metadata": {
+    "generatedUtc": "2026-06-15T04:42:10.711Z",
+    "sourceIndex": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\arete-analysis\\capture_segment_index.json",
+    "captureRoot": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures",
+    "eligibleSegmentCount": 15,
+    "eligibleSegments": [
+      {
+        "folder": "20260614-194454",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-195107",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-195725",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-200311",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-200850",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-202500",
+        "classification": "usable-partial"
+      },
+      {
+        "folder": "20260614-203038",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-203631",
+        "classification": "usable-partial"
+      },
+      {
+        "folder": "20260614-205724",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-211754",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-212914",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-213857",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-214357",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-214819",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-221915",
+        "classification": "clean"
+      }
+    ],
+    "excludedSegments": [
+      {
+        "folder": "20260614-212335",
+        "classification": "incomplete"
+      },
+      {
+        "folder": "20260614-215831",
+        "classification": "incomplete"
+      }
+    ],
+    "allowedLogs": [
+      "enemy-state.csv",
+      "enemy-state.json",
+      "inventory-updates.csv",
+      "vendor-full-updates.csv",
+      "shop-updates.csv",
+      "system-messages.log"
+    ],
+    "sourceFileStats": [
+      {
+        "folder": "20260614-194454",
+        "classification": "clean",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-195107",
+        "classification": "clean",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-195725",
+        "classification": "clean",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-200311",
+        "classification": "clean",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-200850",
+        "classification": "clean",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-202500",
+        "classification": "usable-partial",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-203038",
+        "classification": "clean",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-203631",
+        "classification": "usable-partial",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-205724",
+        "classification": "clean",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-211754",
+        "classification": "clean",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-212914",
+        "classification": "clean",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-213857",
+        "classification": "clean",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-214357",
+        "classification": "clean",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-214819",
+        "classification": "clean",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      },
+      {
+        "folder": "20260614-221915",
+        "classification": "clean",
+        "enemy-state.csv": true,
+        "enemy-state.json": true,
+        "inventory-updates.csv": true,
+        "vendor-full-updates.csv": true,
+        "shop-updates.csv": true,
+        "system-messages.log": true
+      }
+    ],
+    "rules": [
+      "No SQL generated.",
+      "No game data or runtime server code modified.",
+      "Only the logs named by the request were read for extraction.",
+      "Names are null when the allowed logs do not expose display names.",
+      "Quest/reward associations are only same-folder temporal associations and are marked uncertain unless same-timestamp."
+    ]
+  },
+  "counts": {
+    "vendorObservationCount": 24,
+    "completeVendorAndShopCount": 9,
+    "vendorFullOnlyCount": 15,
+    "shopOnlyCount": 0,
+    "dedupedVendorFullRows": 191,
+    "dedupedShopRows": 343,
+    "totalUniqueStockRows": 320
+  },
+  "limitations": [
+    "Vendor display names are not present in the allowed vendor/shop CSV logs.",
+    "Stock completeness is evidence completeness within this capture set, not proof of canonical final shop inventory."
+  ],
+  "vendors": [
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF19)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        297325
+      ],
+      "template": 297325,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [
+        {
+          "x": 3421,
+          "y": 9.300202,
+          "z": 797.5,
+          "folder": "20260614-202500",
+          "capturedUtc": "2026-06-15T01:25:05.1958943Z"
+        },
+        {
+          "x": 3421,
+          "y": 9.300202,
+          "z": 797.5,
+          "folder": "20260614-203631",
+          "capturedUtc": "2026-06-15T01:37:47.5200382Z"
+        },
+        {
+          "x": 3421,
+          "y": 9.300202,
+          "z": 797.5,
+          "folder": "20260614-205724",
+          "capturedUtc": "2026-06-15T01:57:53.3727033Z"
+        },
+        {
+          "x": 3421,
+          "y": 9.300202,
+          "z": 797.5,
+          "folder": "20260614-211754",
+          "capturedUtc": "2026-06-15T02:20:48.2636817Z"
+        },
+        {
+          "x": 3421,
+          "y": 9.300202,
+          "z": 797.5,
+          "folder": "20260614-212914",
+          "capturedUtc": "2026-06-15T02:35:17.5169304Z"
+        },
+        {
+          "x": 3421,
+          "y": 9.300202,
+          "z": 797.5,
+          "folder": "20260614-214357",
+          "capturedUtc": "2026-06-15T02:45:38.5610382Z"
+        },
+        {
+          "x": 3421,
+          "y": 9.300202,
+          "z": 797.5,
+          "folder": "20260614-214819",
+          "capturedUtc": "2026-06-15T02:52:13.0232227Z"
+        },
+        {
+          "x": 3421,
+          "y": 9.300202,
+          "z": 797.5,
+          "folder": "20260614-221915",
+          "capturedUtc": "2026-06-15T03:25:37.2721899Z"
+        }
+      ],
+      "ownerEvidence": [
+        "0:0"
+      ],
+      "vendorFullRowCount": 8,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-202500",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819",
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T01:25:05.1958943Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF1A)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        297323
+      ],
+      "template": 297323,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [
+        {
+          "x": 3431.5,
+          "y": 9.3,
+          "z": 790.5,
+          "folder": "20260614-202500",
+          "capturedUtc": "2026-06-15T01:25:05.1958943Z"
+        },
+        {
+          "x": 3431.5,
+          "y": 9.3,
+          "z": 790.5,
+          "folder": "20260614-203631",
+          "capturedUtc": "2026-06-15T01:37:47.5200382Z"
+        },
+        {
+          "x": 3431.5,
+          "y": 9.3,
+          "z": 790.5,
+          "folder": "20260614-205724",
+          "capturedUtc": "2026-06-15T01:57:53.3727033Z"
+        },
+        {
+          "x": 3431.5,
+          "y": 9.3,
+          "z": 790.5,
+          "folder": "20260614-211754",
+          "capturedUtc": "2026-06-15T02:20:48.2636817Z"
+        },
+        {
+          "x": 3431.5,
+          "y": 9.3,
+          "z": 790.5,
+          "folder": "20260614-212914",
+          "capturedUtc": "2026-06-15T02:35:17.5169304Z"
+        },
+        {
+          "x": 3431.5,
+          "y": 9.3,
+          "z": 790.5,
+          "folder": "20260614-214357",
+          "capturedUtc": "2026-06-15T02:45:38.5610382Z"
+        },
+        {
+          "x": 3431.5,
+          "y": 9.3,
+          "z": 790.5,
+          "folder": "20260614-214819",
+          "capturedUtc": "2026-06-15T02:52:13.0232227Z"
+        },
+        {
+          "x": 3431.5,
+          "y": 9.3,
+          "z": 790.5,
+          "folder": "20260614-221915",
+          "capturedUtc": "2026-06-15T03:25:37.2731899Z"
+        }
+      ],
+      "ownerEvidence": [
+        "0:0"
+      ],
+      "vendorFullRowCount": 8,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-202500",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819",
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T01:25:05.1958943Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF1B)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        297322
+      ],
+      "template": 297322,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [
+        {
+          "x": 3429.5,
+          "y": 9.29983,
+          "z": 790.5,
+          "folder": "20260614-202500",
+          "capturedUtc": "2026-06-15T01:25:05.1958943Z"
+        },
+        {
+          "x": 3429.5,
+          "y": 9.29983,
+          "z": 790.5,
+          "folder": "20260614-203631",
+          "capturedUtc": "2026-06-15T01:37:47.5200382Z"
+        },
+        {
+          "x": 3429.5,
+          "y": 9.29983,
+          "z": 790.5,
+          "folder": "20260614-205724",
+          "capturedUtc": "2026-06-15T01:57:53.3727033Z"
+        },
+        {
+          "x": 3429.5,
+          "y": 9.29983,
+          "z": 790.5,
+          "folder": "20260614-211754",
+          "capturedUtc": "2026-06-15T02:20:48.2646815Z"
+        },
+        {
+          "x": 3429.5,
+          "y": 9.29983,
+          "z": 790.5,
+          "folder": "20260614-212914",
+          "capturedUtc": "2026-06-15T02:35:17.5169304Z"
+        },
+        {
+          "x": 3429.5,
+          "y": 9.29983,
+          "z": 790.5,
+          "folder": "20260614-214357",
+          "capturedUtc": "2026-06-15T02:45:38.5610382Z"
+        },
+        {
+          "x": 3429.5,
+          "y": 9.29983,
+          "z": 790.5,
+          "folder": "20260614-214819",
+          "capturedUtc": "2026-06-15T02:52:13.0232227Z"
+        },
+        {
+          "x": 3429.5,
+          "y": 9.29983,
+          "z": 790.5,
+          "folder": "20260614-221915",
+          "capturedUtc": "2026-06-15T03:25:37.2731899Z"
+        }
+      ],
+      "ownerEvidence": [
+        "0:0"
+      ],
+      "vendorFullRowCount": 8,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-202500",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819",
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T01:25:05.1958943Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF1C)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        297321
+      ],
+      "template": 297321,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [
+        {
+          "x": 3427.5,
+          "y": 9.300183,
+          "z": 790.5,
+          "folder": "20260614-202500",
+          "capturedUtc": "2026-06-15T01:25:05.1958943Z"
+        },
+        {
+          "x": 3427.5,
+          "y": 9.300183,
+          "z": 790.5,
+          "folder": "20260614-203631",
+          "capturedUtc": "2026-06-15T01:37:47.5200382Z"
+        },
+        {
+          "x": 3427.5,
+          "y": 9.300183,
+          "z": 790.5,
+          "folder": "20260614-205724",
+          "capturedUtc": "2026-06-15T01:57:53.3727033Z"
+        },
+        {
+          "x": 3427.5,
+          "y": 9.300183,
+          "z": 790.5,
+          "folder": "20260614-211754",
+          "capturedUtc": "2026-06-15T02:20:48.2646815Z"
+        },
+        {
+          "x": 3427.5,
+          "y": 9.300183,
+          "z": 790.5,
+          "folder": "20260614-212914",
+          "capturedUtc": "2026-06-15T02:35:17.5169304Z"
+        },
+        {
+          "x": 3427.5,
+          "y": 9.300183,
+          "z": 790.5,
+          "folder": "20260614-214357",
+          "capturedUtc": "2026-06-15T02:45:38.5610382Z"
+        },
+        {
+          "x": 3427.5,
+          "y": 9.300183,
+          "z": 790.5,
+          "folder": "20260614-214819",
+          "capturedUtc": "2026-06-15T02:52:13.0232227Z"
+        },
+        {
+          "x": 3427.5,
+          "y": 9.300183,
+          "z": 790.5,
+          "folder": "20260614-221915",
+          "capturedUtc": "2026-06-15T03:25:37.2731899Z"
+        }
+      ],
+      "ownerEvidence": [
+        "0:0"
+      ],
+      "vendorFullRowCount": 8,
+      "rawShopRowCount": 166,
+      "stockRowCount": 166,
+      "evidenceCompleteness": "complete-vendor-full-and-shop-stock-observed",
+      "folders": [
+        "20260614-202500",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819",
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T01:25:05.1958943Z",
+      "stockItems": [
+        {
+          "slot": 0,
+          "lowId": 101406,
+          "highId": 101334,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 1,
+          "lowId": 101406,
+          "highId": 101334,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 2,
+          "lowId": 101339,
+          "highId": 101340,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 3,
+          "lowId": 101339,
+          "highId": 101340,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 4,
+          "lowId": 101363,
+          "highId": 101364,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 5,
+          "lowId": 101363,
+          "highId": 101364,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 6,
+          "lowId": 101351,
+          "highId": 101352,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 7,
+          "lowId": 101351,
+          "highId": 101352,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 8,
+          "lowId": 101579,
+          "highId": 101580,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 9,
+          "lowId": 101579,
+          "highId": 101580,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 10,
+          "lowId": 101777,
+          "highId": 101778,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 11,
+          "lowId": 101777,
+          "highId": 101778,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 12,
+          "lowId": 101657,
+          "highId": 101658,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 13,
+          "lowId": 101657,
+          "highId": 101658,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 14,
+          "lowId": 101471,
+          "highId": 101472,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 15,
+          "lowId": 101471,
+          "highId": 101472,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 16,
+          "lowId": 101543,
+          "highId": 101544,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 17,
+          "lowId": 101543,
+          "highId": 101544,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 18,
+          "lowId": 101663,
+          "highId": 101664,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 19,
+          "lowId": 101663,
+          "highId": 101664,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 20,
+          "lowId": 101441,
+          "highId": 101442,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 21,
+          "lowId": 101441,
+          "highId": 101442,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 22,
+          "lowId": 101501,
+          "highId": 101502,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 23,
+          "lowId": 101501,
+          "highId": 101502,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 24,
+          "lowId": 101609,
+          "highId": 101610,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 25,
+          "lowId": 101609,
+          "highId": 101610,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 26,
+          "lowId": 101735,
+          "highId": 101736,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 27,
+          "lowId": 101735,
+          "highId": 101736,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 28,
+          "lowId": 101753,
+          "highId": 101754,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 29,
+          "lowId": 101753,
+          "highId": 101754,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 30,
+          "lowId": 101327,
+          "highId": 101328,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 31,
+          "lowId": 101327,
+          "highId": 101328,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 32,
+          "lowId": 101723,
+          "highId": 101724,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 33,
+          "lowId": 101723,
+          "highId": 101724,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 34,
+          "lowId": 101376,
+          "highId": 101377,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 35,
+          "lowId": 101376,
+          "highId": 101377,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 36,
+          "lowId": 101711,
+          "highId": 101712,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 37,
+          "lowId": 101711,
+          "highId": 101712,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 38,
+          "lowId": 101729,
+          "highId": 101730,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 39,
+          "lowId": 101729,
+          "highId": 101730,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 40,
+          "lowId": 101621,
+          "highId": 101622,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 41,
+          "lowId": 101621,
+          "highId": 101622,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 42,
+          "lowId": 101759,
+          "highId": 101760,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 43,
+          "lowId": 101759,
+          "highId": 101760,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 44,
+          "lowId": 101675,
+          "highId": 101676,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 45,
+          "lowId": 101675,
+          "highId": 101676,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 46,
+          "lowId": 101669,
+          "highId": 101670,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 47,
+          "lowId": 101669,
+          "highId": 101670,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 48,
+          "lowId": 101531,
+          "highId": 101532,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 49,
+          "lowId": 101531,
+          "highId": 101532,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 50,
+          "lowId": 101321,
+          "highId": 101322,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 51,
+          "lowId": 101321,
+          "highId": 101322,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 52,
+          "lowId": 101681,
+          "highId": 101682,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 53,
+          "lowId": 101681,
+          "highId": 101682,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 54,
+          "lowId": 101639,
+          "highId": 101640,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 55,
+          "lowId": 101639,
+          "highId": 101640,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 56,
+          "lowId": 101388,
+          "highId": 101389,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 57,
+          "lowId": 101388,
+          "highId": 101389,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 58,
+          "lowId": 101513,
+          "highId": 101514,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 59,
+          "lowId": 101513,
+          "highId": 101514,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 60,
+          "lowId": 101651,
+          "highId": 101652,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 61,
+          "lowId": 101651,
+          "highId": 101652,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 62,
+          "lowId": 101747,
+          "highId": 101748,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 63,
+          "lowId": 101747,
+          "highId": 101748,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 64,
+          "lowId": 101429,
+          "highId": 101430,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 65,
+          "lowId": 101429,
+          "highId": 101430,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 66,
+          "lowId": 101435,
+          "highId": 101436,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 67,
+          "lowId": 101435,
+          "highId": 101436,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 68,
+          "lowId": 101309,
+          "highId": 101310,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 69,
+          "lowId": 101309,
+          "highId": 101310,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 70,
+          "lowId": 101789,
+          "highId": 101790,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 71,
+          "lowId": 101789,
+          "highId": 101790,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 72,
+          "lowId": 101459,
+          "highId": 101460,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 73,
+          "lowId": 101459,
+          "highId": 101460,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 74,
+          "lowId": 101394,
+          "highId": 101395,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 75,
+          "lowId": 101394,
+          "highId": 101395,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 76,
+          "lowId": 101537,
+          "highId": 101538,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 77,
+          "lowId": 101537,
+          "highId": 101538,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 78,
+          "lowId": 101408,
+          "highId": 101409,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 79,
+          "lowId": 101408,
+          "highId": 101409,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 80,
+          "lowId": 101807,
+          "highId": 101808,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 81,
+          "lowId": 101807,
+          "highId": 101808,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 82,
+          "lowId": 101813,
+          "highId": 101814,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 83,
+          "lowId": 101813,
+          "highId": 101814,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 84,
+          "lowId": 101525,
+          "highId": 101526,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 85,
+          "lowId": 101525,
+          "highId": 101526,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 86,
+          "lowId": 101345,
+          "highId": 101346,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 87,
+          "lowId": 101345,
+          "highId": 101346,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 88,
+          "lowId": 101483,
+          "highId": 101484,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 89,
+          "lowId": 101483,
+          "highId": 101484,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 90,
+          "lowId": 101315,
+          "highId": 101316,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 91,
+          "lowId": 101315,
+          "highId": 101316,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 92,
+          "lowId": 101400,
+          "highId": 101401,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 93,
+          "lowId": 101400,
+          "highId": 101401,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 94,
+          "lowId": 101561,
+          "highId": 101562,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 95,
+          "lowId": 101561,
+          "highId": 101562,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 96,
+          "lowId": 101420,
+          "highId": 101421,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 97,
+          "lowId": 101420,
+          "highId": 101421,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 98,
+          "lowId": 101705,
+          "highId": 101706,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 99,
+          "lowId": 101705,
+          "highId": 101706,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 100,
+          "lowId": 101382,
+          "highId": 101383,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 101,
+          "lowId": 101382,
+          "highId": 101383,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 102,
+          "lowId": 101645,
+          "highId": 101646,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 103,
+          "lowId": 101645,
+          "highId": 101646,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 104,
+          "lowId": 101627,
+          "highId": 101628,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 105,
+          "lowId": 101627,
+          "highId": 101628,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 106,
+          "lowId": 101573,
+          "highId": 101574,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 107,
+          "lowId": 101573,
+          "highId": 101574,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 108,
+          "lowId": 101699,
+          "highId": 101700,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 109,
+          "lowId": 101699,
+          "highId": 101700,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 110,
+          "lowId": 101495,
+          "highId": 101496,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 111,
+          "lowId": 101495,
+          "highId": 101496,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 112,
+          "lowId": 101357,
+          "highId": 101358,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 113,
+          "lowId": 101357,
+          "highId": 101358,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 114,
+          "lowId": 101447,
+          "highId": 101448,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 115,
+          "lowId": 101447,
+          "highId": 101448,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 116,
+          "lowId": 101801,
+          "highId": 101802,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 117,
+          "lowId": 101801,
+          "highId": 101802,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 118,
+          "lowId": 101549,
+          "highId": 101550,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 119,
+          "lowId": 101549,
+          "highId": 101550,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 120,
+          "lowId": 101717,
+          "highId": 101718,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 121,
+          "lowId": 101717,
+          "highId": 101718,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 122,
+          "lowId": 101687,
+          "highId": 101688,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 123,
+          "lowId": 101687,
+          "highId": 101688,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 124,
+          "lowId": 101333,
+          "highId": 101371,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 125,
+          "lowId": 101333,
+          "highId": 101371,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 126,
+          "lowId": 101555,
+          "highId": 101556,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 127,
+          "lowId": 101555,
+          "highId": 101556,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 128,
+          "lowId": 101489,
+          "highId": 101490,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 129,
+          "lowId": 101489,
+          "highId": 101490,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 130,
+          "lowId": 101453,
+          "highId": 101454,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 131,
+          "lowId": 101453,
+          "highId": 101454,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 132,
+          "lowId": 101615,
+          "highId": 101616,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 133,
+          "lowId": 101615,
+          "highId": 101616,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 134,
+          "lowId": 130003,
+          "highId": 130004,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 135,
+          "lowId": 130003,
+          "highId": 130004,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 136,
+          "lowId": 101795,
+          "highId": 101796,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 137,
+          "lowId": 101795,
+          "highId": 101796,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 138,
+          "lowId": 101507,
+          "highId": 101508,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 139,
+          "lowId": 101507,
+          "highId": 101508,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 140,
+          "lowId": 101369,
+          "highId": 101370,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 141,
+          "lowId": 101369,
+          "highId": 101370,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 142,
+          "lowId": 101465,
+          "highId": 101466,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 143,
+          "lowId": 101465,
+          "highId": 101466,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 144,
+          "lowId": 101633,
+          "highId": 101634,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 145,
+          "lowId": 101633,
+          "highId": 101634,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 146,
+          "lowId": 101783,
+          "highId": 101784,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 147,
+          "lowId": 101783,
+          "highId": 101784,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 148,
+          "lowId": 101771,
+          "highId": 101772,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 149,
+          "lowId": 101771,
+          "highId": 101772,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 150,
+          "lowId": 101414,
+          "highId": 101415,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 151,
+          "lowId": 101414,
+          "highId": 101415,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 152,
+          "lowId": 101567,
+          "highId": 101568,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 153,
+          "lowId": 101567,
+          "highId": 101568,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 154,
+          "lowId": 101519,
+          "highId": 101520,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 155,
+          "lowId": 101519,
+          "highId": 101520,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 156,
+          "lowId": 101603,
+          "highId": 101604,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 157,
+          "lowId": 101603,
+          "highId": 101604,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 158,
+          "lowId": 101591,
+          "highId": 101592,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 159,
+          "lowId": 101591,
+          "highId": 101592,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 160,
+          "lowId": 101741,
+          "highId": 101742,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 161,
+          "lowId": 101741,
+          "highId": 101742,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 162,
+          "lowId": 101477,
+          "highId": 101478,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 163,
+          "lowId": 101477,
+          "highId": 101478,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 164,
+          "lowId": 101693,
+          "highId": 101694,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 165,
+          "lowId": 101693,
+          "highId": 101694,
+          "quality": 50,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:58.5515422Z",
+          "observationCount": 1
+        }
+      ]
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF1D)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        297320
+      ],
+      "template": 297320,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [
+        {
+          "x": 3425.5,
+          "y": 9.300117,
+          "z": 790.5,
+          "folder": "20260614-202500",
+          "capturedUtc": "2026-06-15T01:25:05.1958943Z"
+        },
+        {
+          "x": 3425.5,
+          "y": 9.300117,
+          "z": 790.5,
+          "folder": "20260614-203631",
+          "capturedUtc": "2026-06-15T01:37:47.5200382Z"
+        },
+        {
+          "x": 3425.5,
+          "y": 9.300117,
+          "z": 790.5,
+          "folder": "20260614-205724",
+          "capturedUtc": "2026-06-15T01:57:53.3727033Z"
+        },
+        {
+          "x": 3425.5,
+          "y": 9.300117,
+          "z": 790.5,
+          "folder": "20260614-211754",
+          "capturedUtc": "2026-06-15T02:20:48.2646815Z"
+        },
+        {
+          "x": 3425.5,
+          "y": 9.300117,
+          "z": 790.5,
+          "folder": "20260614-212914",
+          "capturedUtc": "2026-06-15T02:35:17.5169304Z"
+        },
+        {
+          "x": 3425.5,
+          "y": 9.300117,
+          "z": 790.5,
+          "folder": "20260614-214357",
+          "capturedUtc": "2026-06-15T02:45:38.5610382Z"
+        },
+        {
+          "x": 3425.5,
+          "y": 9.300117,
+          "z": 790.5,
+          "folder": "20260614-214819",
+          "capturedUtc": "2026-06-15T02:52:13.0232227Z"
+        },
+        {
+          "x": 3425.5,
+          "y": 9.300117,
+          "z": 790.5,
+          "folder": "20260614-221915",
+          "capturedUtc": "2026-06-15T03:25:37.2741899Z"
+        }
+      ],
+      "ownerEvidence": [
+        "0:0"
+      ],
+      "vendorFullRowCount": 8,
+      "rawShopRowCount": 39,
+      "stockRowCount": 39,
+      "evidenceCompleteness": "complete-vendor-full-and-shop-stock-observed",
+      "folders": [
+        "20260614-202500",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819",
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T01:25:05.1958943Z",
+      "stockItems": [
+        {
+          "slot": 0,
+          "lowId": 101165,
+          "highId": 101165,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 1,
+          "lowId": 101165,
+          "highId": 101166,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 2,
+          "lowId": 101165,
+          "highId": 101166,
+          "quality": 10,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 3,
+          "lowId": 101133,
+          "highId": 101133,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 4,
+          "lowId": 101133,
+          "highId": 101134,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 5,
+          "lowId": 101133,
+          "highId": 101134,
+          "quality": 10,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 6,
+          "lowId": 101101,
+          "highId": 101101,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 7,
+          "lowId": 101101,
+          "highId": 101102,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 8,
+          "lowId": 101101,
+          "highId": 101102,
+          "quality": 10,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 9,
+          "lowId": 101293,
+          "highId": 101293,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 10,
+          "lowId": 101293,
+          "highId": 101294,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 11,
+          "lowId": 101293,
+          "highId": 101294,
+          "quality": 10,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 12,
+          "lowId": 101117,
+          "highId": 101117,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 13,
+          "lowId": 101117,
+          "highId": 101118,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 14,
+          "lowId": 101117,
+          "highId": 101118,
+          "quality": 10,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 15,
+          "lowId": 101181,
+          "highId": 101181,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 16,
+          "lowId": 101181,
+          "highId": 101182,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 17,
+          "lowId": 101181,
+          "highId": 101182,
+          "quality": 10,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 18,
+          "lowId": 101277,
+          "highId": 101277,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 19,
+          "lowId": 101277,
+          "highId": 101278,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 20,
+          "lowId": 101277,
+          "highId": 101278,
+          "quality": 10,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 21,
+          "lowId": 101229,
+          "highId": 101229,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 22,
+          "lowId": 101229,
+          "highId": 101230,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 23,
+          "lowId": 101229,
+          "highId": 101230,
+          "quality": 10,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 24,
+          "lowId": 101261,
+          "highId": 101261,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 25,
+          "lowId": 101261,
+          "highId": 101262,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 26,
+          "lowId": 101261,
+          "highId": 101262,
+          "quality": 10,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 27,
+          "lowId": 101149,
+          "highId": 101149,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 28,
+          "lowId": 101149,
+          "highId": 101150,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 29,
+          "lowId": 101149,
+          "highId": 101150,
+          "quality": 10,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 30,
+          "lowId": 101245,
+          "highId": 101245,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 31,
+          "lowId": 101245,
+          "highId": 101246,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 32,
+          "lowId": 101245,
+          "highId": 101246,
+          "quality": 10,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 33,
+          "lowId": 101197,
+          "highId": 101197,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 34,
+          "lowId": 101197,
+          "highId": 101198,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 35,
+          "lowId": 101197,
+          "highId": 101198,
+          "quality": 10,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 36,
+          "lowId": 101213,
+          "highId": 101213,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 37,
+          "lowId": 101213,
+          "highId": 101214,
+          "quality": 5,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 38,
+          "lowId": 101213,
+          "highId": 101214,
+          "quality": 10,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:29:28.7639633Z",
+          "observationCount": 1
+        }
+      ]
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF1E)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        297459
+      ],
+      "template": 297459,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [
+        {
+          "x": 3527.521,
+          "y": 5.109988,
+          "z": 863.9226,
+          "folder": "20260614-195725",
+          "capturedUtc": "2026-06-15T00:59:00.8229950Z"
+        },
+        {
+          "x": 3527.521,
+          "y": 5.109988,
+          "z": 863.9226,
+          "folder": "20260614-200311",
+          "capturedUtc": "2026-06-15T01:05:10.0529378Z"
+        },
+        {
+          "x": 3527.521,
+          "y": 5.109988,
+          "z": 863.9226,
+          "folder": "20260614-211754",
+          "capturedUtc": "2026-06-15T02:19:36.6177717Z"
+        },
+        {
+          "x": 3527.521,
+          "y": 5.109988,
+          "z": 863.9226,
+          "folder": "20260614-214819",
+          "capturedUtc": "2026-06-15T02:50:46.5796388Z"
+        }
+      ],
+      "ownerEvidence": [
+        "0:0"
+      ],
+      "vendorFullRowCount": 4,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-195725",
+        "20260614-200311",
+        "20260614-211754",
+        "20260614-214819"
+      ],
+      "firstSeen": "2026-06-15T00:59:00.8229950Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF1F)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        297459
+      ],
+      "template": 297459,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [
+        {
+          "x": 3438.5,
+          "y": 9.010476,
+          "z": 830.9984,
+          "folder": "20260614-202500",
+          "capturedUtc": "2026-06-15T01:25:05.1978933Z"
+        },
+        {
+          "x": 3438.5,
+          "y": 9.010476,
+          "z": 830.9984,
+          "folder": "20260614-203038",
+          "capturedUtc": "2026-06-15T01:32:31.7075813Z"
+        },
+        {
+          "x": 3438.5,
+          "y": 9.010476,
+          "z": 830.9984,
+          "folder": "20260614-203631",
+          "capturedUtc": "2026-06-15T01:37:34.7346054Z"
+        },
+        {
+          "x": 3438.5,
+          "y": 9.010476,
+          "z": 830.9984,
+          "folder": "20260614-205724",
+          "capturedUtc": "2026-06-15T02:01:41.0101830Z"
+        },
+        {
+          "x": 3438.5,
+          "y": 9.010476,
+          "z": 830.9984,
+          "folder": "20260614-211754",
+          "capturedUtc": "2026-06-15T02:20:48.2646815Z"
+        },
+        {
+          "x": 3438.5,
+          "y": 9.010476,
+          "z": 830.9984,
+          "folder": "20260614-212914",
+          "capturedUtc": "2026-06-15T02:35:26.3025565Z"
+        },
+        {
+          "x": 3438.5,
+          "y": 9.010476,
+          "z": 830.9984,
+          "folder": "20260614-214357",
+          "capturedUtc": "2026-06-15T02:45:38.5600381Z"
+        },
+        {
+          "x": 3438.5,
+          "y": 9.010476,
+          "z": 830.9984,
+          "folder": "20260614-214819",
+          "capturedUtc": "2026-06-15T02:52:13.0242224Z"
+        },
+        {
+          "x": 3438.5,
+          "y": 9.010476,
+          "z": 830.9984,
+          "folder": "20260614-221915",
+          "capturedUtc": "2026-06-15T03:25:51.1267472Z"
+        }
+      ],
+      "ownerEvidence": [
+        "0:0"
+      ],
+      "vendorFullRowCount": 9,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-202500",
+        "20260614-203038",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819",
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T01:25:05.1978933Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF20)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        297466
+      ],
+      "template": 297466,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [
+        {
+          "x": 3436.5,
+          "y": 9.01,
+          "z": 831,
+          "folder": "20260614-202500",
+          "capturedUtc": "2026-06-15T01:25:05.1978933Z"
+        },
+        {
+          "x": 3436.5,
+          "y": 9.01,
+          "z": 831,
+          "folder": "20260614-203038",
+          "capturedUtc": "2026-06-15T01:32:31.7085803Z"
+        },
+        {
+          "x": 3436.5,
+          "y": 9.01,
+          "z": 831,
+          "folder": "20260614-203631",
+          "capturedUtc": "2026-06-15T01:37:34.7346054Z"
+        },
+        {
+          "x": 3436.5,
+          "y": 9.01,
+          "z": 831,
+          "folder": "20260614-205724",
+          "capturedUtc": "2026-06-15T02:01:41.0101830Z"
+        },
+        {
+          "x": 3436.5,
+          "y": 9.01,
+          "z": 831,
+          "folder": "20260614-211754",
+          "capturedUtc": "2026-06-15T02:20:48.2646815Z"
+        },
+        {
+          "x": 3436.5,
+          "y": 9.01,
+          "z": 831,
+          "folder": "20260614-212914",
+          "capturedUtc": "2026-06-15T02:35:26.3025565Z"
+        },
+        {
+          "x": 3436.5,
+          "y": 9.01,
+          "z": 831,
+          "folder": "20260614-214357",
+          "capturedUtc": "2026-06-15T02:45:38.5600381Z"
+        },
+        {
+          "x": 3436.5,
+          "y": 9.01,
+          "z": 831,
+          "folder": "20260614-214819",
+          "capturedUtc": "2026-06-15T02:52:13.0242224Z"
+        },
+        {
+          "x": 3436.5,
+          "y": 9.01,
+          "z": 831,
+          "folder": "20260614-221915",
+          "capturedUtc": "2026-06-15T03:25:51.1267472Z"
+        }
+      ],
+      "ownerEvidence": [
+        "0:0"
+      ],
+      "vendorFullRowCount": 9,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-202500",
+        "20260614-203038",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819",
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T01:25:05.1978933Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF21)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        300946
+      ],
+      "template": 300946,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [
+        {
+          "x": 3442.93945,
+          "y": 12.2764158,
+          "z": 822.5013,
+          "folder": "20260614-195725",
+          "capturedUtc": "2026-06-15T01:02:00.7106278Z"
+        },
+        {
+          "x": 3442.93945,
+          "y": 12.2764158,
+          "z": 822.5013,
+          "folder": "20260614-200311",
+          "capturedUtc": "2026-06-15T01:05:25.8702479Z"
+        },
+        {
+          "x": 3442.93945,
+          "y": 12.2764158,
+          "z": 822.5013,
+          "folder": "20260614-200850",
+          "capturedUtc": "2026-06-15T01:20:53.9603947Z"
+        },
+        {
+          "x": 3442.93945,
+          "y": 12.2764158,
+          "z": 822.5013,
+          "folder": "20260614-202500",
+          "capturedUtc": "2026-06-15T01:25:44.5134573Z"
+        },
+        {
+          "x": 3442.93945,
+          "y": 12.2764158,
+          "z": 822.5013,
+          "folder": "20260614-203038",
+          "capturedUtc": "2026-06-15T01:32:31.7235814Z"
+        },
+        {
+          "x": 3442.93945,
+          "y": 12.2764158,
+          "z": 822.5013,
+          "folder": "20260614-203631",
+          "capturedUtc": "2026-06-15T01:37:34.7366040Z"
+        },
+        {
+          "x": 3442.93945,
+          "y": 12.2764158,
+          "z": 822.5013,
+          "folder": "20260614-205724",
+          "capturedUtc": "2026-06-15T02:01:30.2322349Z"
+        },
+        {
+          "x": 3442.93945,
+          "y": 12.2764158,
+          "z": 822.5013,
+          "folder": "20260614-211754",
+          "capturedUtc": "2026-06-15T02:20:36.6049062Z"
+        },
+        {
+          "x": 3442.93945,
+          "y": 12.2764158,
+          "z": 822.5013,
+          "folder": "20260614-212914",
+          "capturedUtc": "2026-06-15T02:35:27.6054995Z"
+        },
+        {
+          "x": 3442.93945,
+          "y": 12.2764158,
+          "z": 822.5013,
+          "folder": "20260614-214357",
+          "capturedUtc": "2026-06-15T02:44:48.2632539Z"
+        },
+        {
+          "x": 3442.93945,
+          "y": 12.2764158,
+          "z": 822.5013,
+          "folder": "20260614-214819",
+          "capturedUtc": "2026-06-15T02:51:59.9393114Z"
+        },
+        {
+          "x": 3442.93945,
+          "y": 12.2764158,
+          "z": 822.5013,
+          "folder": "20260614-221915",
+          "capturedUtc": "2026-06-15T03:25:51.2089657Z"
+        }
+      ],
+      "ownerEvidence": [
+        "0:0"
+      ],
+      "vendorFullRowCount": 12,
+      "rawShopRowCount": 4,
+      "stockRowCount": 4,
+      "evidenceCompleteness": "complete-vendor-full-and-shop-stock-observed",
+      "folders": [
+        "20260614-195725",
+        "20260614-200311",
+        "20260614-200850",
+        "20260614-202500",
+        "20260614-203038",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819",
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T01:02:00.7106278Z",
+      "stockItems": [
+        {
+          "slot": 0,
+          "lowId": 87810,
+          "highId": 87810,
+          "quality": 1,
+          "folders": [
+            "20260614-202500"
+          ],
+          "firstSeen": "2026-06-15T01:26:23.5299165Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 1,
+          "lowId": 28564,
+          "highId": 28564,
+          "quality": 1,
+          "folders": [
+            "20260614-202500"
+          ],
+          "firstSeen": "2026-06-15T01:26:23.5299165Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 2,
+          "lowId": 29738,
+          "highId": 29738,
+          "quality": 1,
+          "folders": [
+            "20260614-202500"
+          ],
+          "firstSeen": "2026-06-15T01:26:23.5299165Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 3,
+          "lowId": 295999,
+          "highId": 295999,
+          "quality": 1,
+          "folders": [
+            "20260614-202500"
+          ],
+          "firstSeen": "2026-06-15T01:26:23.5299165Z",
+          "observationCount": 1
+        }
+      ]
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF22)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        297281
+      ],
+      "template": 297281,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [
+        {
+          "x": 3527.351,
+          "y": 5.189701,
+          "z": 858.1203,
+          "folder": "20260614-195725",
+          "capturedUtc": "2026-06-15T00:59:00.8229950Z"
+        },
+        {
+          "x": 3527.351,
+          "y": 5.189701,
+          "z": 858.1203,
+          "folder": "20260614-200311",
+          "capturedUtc": "2026-06-15T01:05:10.0529378Z"
+        },
+        {
+          "x": 3527.351,
+          "y": 5.189701,
+          "z": 858.1203,
+          "folder": "20260614-211754",
+          "capturedUtc": "2026-06-15T02:19:36.6177717Z"
+        },
+        {
+          "x": 3527.351,
+          "y": 5.189701,
+          "z": 858.1203,
+          "folder": "20260614-214819",
+          "capturedUtc": "2026-06-15T02:50:46.5796388Z"
+        }
+      ],
+      "ownerEvidence": [
+        "0:0"
+      ],
+      "vendorFullRowCount": 4,
+      "rawShopRowCount": 10,
+      "stockRowCount": 10,
+      "evidenceCompleteness": "complete-vendor-full-and-shop-stock-observed",
+      "folders": [
+        "20260614-195725",
+        "20260614-200311",
+        "20260614-200850",
+        "20260614-211754",
+        "20260614-214819"
+      ],
+      "firstSeen": "2026-06-15T00:59:00.8229950Z",
+      "stockItems": [
+        {
+          "slot": 0,
+          "lowId": 156020,
+          "highId": 156021,
+          "quality": 5,
+          "folders": [
+            "20260614-200850"
+          ],
+          "firstSeen": "2026-06-15T01:21:23.0669506Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 1,
+          "lowId": 247123,
+          "highId": 247123,
+          "quality": 100,
+          "folders": [
+            "20260614-200850"
+          ],
+          "firstSeen": "2026-06-15T01:21:23.0669506Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 2,
+          "lowId": 164557,
+          "highId": 164558,
+          "quality": 15,
+          "folders": [
+            "20260614-200850"
+          ],
+          "firstSeen": "2026-06-15T01:21:23.0669506Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 3,
+          "lowId": 156024,
+          "highId": 156025,
+          "quality": 5,
+          "folders": [
+            "20260614-200850"
+          ],
+          "firstSeen": "2026-06-15T01:21:23.0669506Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 4,
+          "lowId": 161699,
+          "highId": 161699,
+          "quality": 1,
+          "folders": [
+            "20260614-200850"
+          ],
+          "firstSeen": "2026-06-15T01:21:23.0669506Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 5,
+          "lowId": 150922,
+          "highId": 150922,
+          "quality": 10,
+          "folders": [
+            "20260614-200850"
+          ],
+          "firstSeen": "2026-06-15T01:21:23.0669506Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 6,
+          "lowId": 156016,
+          "highId": 156017,
+          "quality": 5,
+          "folders": [
+            "20260614-200850"
+          ],
+          "firstSeen": "2026-06-15T01:21:23.0669506Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 7,
+          "lowId": 156016,
+          "highId": 156017,
+          "quality": 10,
+          "folders": [
+            "20260614-200850"
+          ],
+          "firstSeen": "2026-06-15T01:21:23.0669506Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 8,
+          "lowId": 156016,
+          "highId": 156017,
+          "quality": 15,
+          "folders": [
+            "20260614-200850"
+          ],
+          "firstSeen": "2026-06-15T01:21:23.0669506Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 9,
+          "lowId": 247110,
+          "highId": 247110,
+          "quality": 100,
+          "folders": [
+            "20260614-200850"
+          ],
+          "firstSeen": "2026-06-15T01:21:23.0669506Z",
+          "observationCount": 1
+        }
+      ]
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF23)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        295748
+      ],
+      "template": 295748,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2016273774"
+      ],
+      "vendorFullRowCount": 10,
+      "rawShopRowCount": 46,
+      "stockRowCount": 23,
+      "evidenceCompleteness": "complete-vendor-full-and-shop-stock-observed",
+      "folders": [
+        "20260614-195725",
+        "20260614-200311",
+        "20260614-200850",
+        "20260614-202500",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819"
+      ],
+      "firstSeen": "2026-06-15T01:02:00.7116278Z",
+      "stockItems": [
+        {
+          "slot": 0,
+          "lowId": 162294,
+          "highId": 162294,
+          "quality": 10,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 1,
+          "lowId": 162293,
+          "highId": 162293,
+          "quality": 10,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 2,
+          "lowId": 162290,
+          "highId": 162290,
+          "quality": 10,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 3,
+          "lowId": 162289,
+          "highId": 162289,
+          "quality": 10,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 4,
+          "lowId": 162292,
+          "highId": 162292,
+          "quality": 10,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 5,
+          "lowId": 162291,
+          "highId": 162291,
+          "quality": 10,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 6,
+          "lowId": 248273,
+          "highId": 248273,
+          "quality": 1,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 7,
+          "lowId": 248269,
+          "highId": 248269,
+          "quality": 1,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 8,
+          "lowId": 248277,
+          "highId": 248277,
+          "quality": 1,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 9,
+          "lowId": 248271,
+          "highId": 248271,
+          "quality": 1,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 10,
+          "lowId": 248275,
+          "highId": 248275,
+          "quality": 1,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 11,
+          "lowId": 234050,
+          "highId": 234051,
+          "quality": 10,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 12,
+          "lowId": 234050,
+          "highId": 234051,
+          "quality": 11,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 13,
+          "lowId": 234061,
+          "highId": 234062,
+          "quality": 3,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 14,
+          "lowId": 234061,
+          "highId": 234062,
+          "quality": 4,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 15,
+          "lowId": 234065,
+          "highId": 234065,
+          "quality": 1,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 16,
+          "lowId": 234065,
+          "highId": 234066,
+          "quality": 9,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 17,
+          "lowId": 234057,
+          "highId": 234057,
+          "quality": 1,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 18,
+          "lowId": 234057,
+          "highId": 234058,
+          "quality": 14,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 19,
+          "lowId": 234059,
+          "highId": 234060,
+          "quality": 4,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 20,
+          "lowId": 234059,
+          "highId": 234060,
+          "quality": 12,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 21,
+          "lowId": 234063,
+          "highId": 234064,
+          "quality": 6,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        },
+        {
+          "slot": 22,
+          "lowId": 234063,
+          "highId": 234064,
+          "quality": 11,
+          "folders": [
+            "20260614-203631",
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:38:56.5268428Z",
+          "observationCount": 2
+        }
+      ]
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF24)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        297371
+      ],
+      "template": 297371,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2016273776"
+      ],
+      "vendorFullRowCount": 7,
+      "rawShopRowCount": 38,
+      "stockRowCount": 38,
+      "evidenceCompleteness": "complete-vendor-full-and-shop-stock-observed",
+      "folders": [
+        "20260614-202500",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214819",
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T01:26:19.1206321Z",
+      "stockItems": [
+        {
+          "slot": 0,
+          "lowId": 130621,
+          "highId": 130621,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 1,
+          "lowId": 130622,
+          "highId": 130622,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 2,
+          "lowId": 130620,
+          "highId": 130620,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 3,
+          "lowId": 130618,
+          "highId": 130618,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 4,
+          "lowId": 282068,
+          "highId": 282068,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 5,
+          "lowId": 130593,
+          "highId": 130593,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 6,
+          "lowId": 130588,
+          "highId": 130588,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 7,
+          "lowId": 130605,
+          "highId": 130605,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 8,
+          "lowId": 130610,
+          "highId": 130610,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 9,
+          "lowId": 130612,
+          "highId": 130612,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 10,
+          "lowId": 130611,
+          "highId": 130611,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 11,
+          "lowId": 282067,
+          "highId": 282067,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 12,
+          "lowId": 282066,
+          "highId": 282066,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 13,
+          "lowId": 282065,
+          "highId": 282065,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 14,
+          "lowId": 130599,
+          "highId": 130599,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 15,
+          "lowId": 130617,
+          "highId": 130617,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 16,
+          "lowId": 130606,
+          "highId": 130606,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 17,
+          "lowId": 130619,
+          "highId": 130619,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 18,
+          "lowId": 130602,
+          "highId": 130602,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 19,
+          "lowId": 282070,
+          "highId": 282070,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 20,
+          "lowId": 130604,
+          "highId": 130604,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 21,
+          "lowId": 130595,
+          "highId": 130595,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 22,
+          "lowId": 130591,
+          "highId": 130591,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 23,
+          "lowId": 130587,
+          "highId": 130587,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 24,
+          "lowId": 130592,
+          "highId": 130592,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 25,
+          "lowId": 130590,
+          "highId": 130590,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 26,
+          "lowId": 130596,
+          "highId": 130596,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 27,
+          "lowId": 130608,
+          "highId": 130608,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 28,
+          "lowId": 130598,
+          "highId": 130598,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 29,
+          "lowId": 130597,
+          "highId": 130597,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 30,
+          "lowId": 130609,
+          "highId": 130609,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 31,
+          "lowId": 297370,
+          "highId": 297370,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 32,
+          "lowId": 130600,
+          "highId": 130600,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 33,
+          "lowId": 130594,
+          "highId": 130594,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 34,
+          "lowId": 130589,
+          "highId": 130589,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 35,
+          "lowId": 282075,
+          "highId": 282075,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 36,
+          "lowId": 130607,
+          "highId": 130607,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 37,
+          "lowId": 282069,
+          "highId": 282069,
+          "quality": 1,
+          "folders": [
+            "20260614-212914"
+          ],
+          "firstSeen": "2026-06-15T02:31:01.6176984Z",
+          "observationCount": 1
+        }
+      ]
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF25)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        295764
+      ],
+      "template": 295764,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2016273786"
+      ],
+      "vendorFullRowCount": 9,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-202500",
+        "20260614-203038",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819",
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T01:25:05.1978933Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF26)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        248368
+      ],
+      "template": 248368,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2016273793"
+      ],
+      "vendorFullRowCount": 12,
+      "rawShopRowCount": 16,
+      "stockRowCount": 16,
+      "evidenceCompleteness": "complete-vendor-full-and-shop-stock-observed",
+      "folders": [
+        "20260614-195725",
+        "20260614-200311",
+        "20260614-200850",
+        "20260614-202500",
+        "20260614-203038",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819",
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T01:02:00.7106278Z",
+      "stockItems": [
+        {
+          "slot": 0,
+          "lowId": 248306,
+          "highId": 248306,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 1,
+          "lowId": 150922,
+          "highId": 150922,
+          "quality": 10,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 2,
+          "lowId": 121569,
+          "highId": 121569,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 3,
+          "lowId": 248340,
+          "highId": 248340,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 4,
+          "lowId": 248338,
+          "highId": 248338,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 5,
+          "lowId": 121567,
+          "highId": 121567,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 6,
+          "lowId": 121568,
+          "highId": 121568,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 7,
+          "lowId": 121570,
+          "highId": 121570,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 8,
+          "lowId": 121571,
+          "highId": 121571,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 9,
+          "lowId": 121564,
+          "highId": 121564,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 10,
+          "lowId": 218403,
+          "highId": 218403,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 11,
+          "lowId": 248339,
+          "highId": 248339,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 12,
+          "lowId": 218395,
+          "highId": 218395,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 13,
+          "lowId": 218406,
+          "highId": 218406,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 14,
+          "lowId": 121565,
+          "highId": 121565,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 15,
+          "lowId": 218404,
+          "highId": 218404,
+          "quality": 1,
+          "folders": [
+            "20260614-205724"
+          ],
+          "firstSeen": "2026-06-15T01:58:37.6518494Z",
+          "observationCount": 1
+        }
+      ]
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF27)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        121036
+      ],
+      "template": 121036,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2016273794"
+      ],
+      "vendorFullRowCount": 12,
+      "rawShopRowCount": 10,
+      "stockRowCount": 10,
+      "evidenceCompleteness": "complete-vendor-full-and-shop-stock-observed",
+      "folders": [
+        "20260614-195725",
+        "20260614-200311",
+        "20260614-200850",
+        "20260614-202500",
+        "20260614-203038",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819",
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T01:00:23.4751713Z",
+      "stockItems": [
+        {
+          "slot": 0,
+          "lowId": 130621,
+          "highId": 130621,
+          "quality": 1,
+          "folders": [
+            "20260614-214819"
+          ],
+          "firstSeen": "2026-06-15T02:55:48.5526851Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 1,
+          "lowId": 130593,
+          "highId": 130593,
+          "quality": 1,
+          "folders": [
+            "20260614-214819"
+          ],
+          "firstSeen": "2026-06-15T02:55:48.5526851Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 2,
+          "lowId": 130623,
+          "highId": 130623,
+          "quality": 1,
+          "folders": [
+            "20260614-214819"
+          ],
+          "firstSeen": "2026-06-15T02:55:48.5526851Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 3,
+          "lowId": 130624,
+          "highId": 130624,
+          "quality": 1,
+          "folders": [
+            "20260614-214819"
+          ],
+          "firstSeen": "2026-06-15T02:55:48.5526851Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 4,
+          "lowId": 130581,
+          "highId": 130581,
+          "quality": 1,
+          "folders": [
+            "20260614-214819"
+          ],
+          "firstSeen": "2026-06-15T02:55:48.5526851Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 5,
+          "lowId": 130612,
+          "highId": 130612,
+          "quality": 1,
+          "folders": [
+            "20260614-214819"
+          ],
+          "firstSeen": "2026-06-15T02:55:48.5526851Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 6,
+          "lowId": 130625,
+          "highId": 130625,
+          "quality": 1,
+          "folders": [
+            "20260614-214819"
+          ],
+          "firstSeen": "2026-06-15T02:55:48.5526851Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 7,
+          "lowId": 130606,
+          "highId": 130606,
+          "quality": 1,
+          "folders": [
+            "20260614-214819"
+          ],
+          "firstSeen": "2026-06-15T02:55:48.5526851Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 8,
+          "lowId": 130602,
+          "highId": 130602,
+          "quality": 1,
+          "folders": [
+            "20260614-214819"
+          ],
+          "firstSeen": "2026-06-15T02:55:48.5526851Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 9,
+          "lowId": 130603,
+          "highId": 130603,
+          "quality": 1,
+          "folders": [
+            "20260614-214819"
+          ],
+          "firstSeen": "2026-06-15T02:55:48.5526851Z",
+          "observationCount": 1
+        }
+      ]
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF28)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        248370
+      ],
+      "template": 248370,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2016273795"
+      ],
+      "vendorFullRowCount": 3,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-203038",
+        "20260614-203631",
+        "20260614-205724"
+      ],
+      "firstSeen": "2026-06-15T01:31:56.8455378Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF29)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        248369
+      ],
+      "template": 248369,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2016273796"
+      ],
+      "vendorFullRowCount": 7,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-202500",
+        "20260614-203038",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214819"
+      ],
+      "firstSeen": "2026-06-15T01:26:19.1216319Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF2A)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        120512
+      ],
+      "template": 120512,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2016273797"
+      ],
+      "vendorFullRowCount": 4,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-202500",
+        "20260614-203038",
+        "20260614-203631",
+        "20260614-205724"
+      ],
+      "firstSeen": "2026-06-15T01:25:16.0899659Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF2B)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        248371
+      ],
+      "template": 248371,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2016273798"
+      ],
+      "vendorFullRowCount": 9,
+      "rawShopRowCount": 14,
+      "stockRowCount": 14,
+      "evidenceCompleteness": "complete-vendor-full-and-shop-stock-observed",
+      "folders": [
+        "20260614-202500",
+        "20260614-203038",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819",
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T01:25:05.1988935Z",
+      "stockItems": [
+        {
+          "slot": 0,
+          "lowId": 248255,
+          "highId": 248255,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 1,
+          "lowId": 248256,
+          "highId": 248256,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 2,
+          "lowId": 248257,
+          "highId": 248257,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 3,
+          "lowId": 248258,
+          "highId": 248258,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 4,
+          "lowId": 248259,
+          "highId": 248259,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 5,
+          "lowId": 248260,
+          "highId": 248260,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 6,
+          "lowId": 248261,
+          "highId": 248261,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 7,
+          "lowId": 300892,
+          "highId": 300892,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 8,
+          "lowId": 248262,
+          "highId": 248262,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 9,
+          "lowId": 248263,
+          "highId": 248263,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 10,
+          "lowId": 248264,
+          "highId": 248264,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 11,
+          "lowId": 300893,
+          "highId": 300893,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 12,
+          "lowId": 248265,
+          "highId": 248265,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        },
+        {
+          "slot": 13,
+          "lowId": 248266,
+          "highId": 248266,
+          "quality": 1,
+          "folders": [
+            "20260614-203631"
+          ],
+          "firstSeen": "2026-06-15T01:38:01.6615266Z",
+          "observationCount": 1
+        }
+      ]
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF2D)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        275373
+      ],
+      "template": 275373,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2016273800"
+      ],
+      "vendorFullRowCount": 10,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-195725",
+        "20260614-200311",
+        "20260614-200850",
+        "20260614-202500",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819"
+      ],
+      "firstSeen": "2026-06-15T01:02:00.7126281Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF2E)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        99637
+      ],
+      "template": 99637,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2016273801"
+      ],
+      "vendorFullRowCount": 10,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-195725",
+        "20260614-200311",
+        "20260614-200850",
+        "20260614-202500",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819"
+      ],
+      "firstSeen": "2026-06-15T01:02:00.7126281Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF2F)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        209286
+      ],
+      "template": 209286,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2016273802"
+      ],
+      "vendorFullRowCount": 10,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-195725",
+        "20260614-200311",
+        "20260614-200850",
+        "20260614-202500",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819"
+      ],
+      "firstSeen": "2026-06-15T01:02:00.7126281Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D1BF30)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        121033
+      ],
+      "template": 121033,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2016273961"
+      ],
+      "vendorFullRowCount": 3,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-203038",
+        "20260614-203631",
+        "20260614-205724"
+      ],
+      "firstSeen": "2026-06-15T01:32:15.8992603Z",
+      "stockItems": []
+    },
+    {
+      "vendorIdentity": "(VendingMachine:12D2932F)",
+      "name": null,
+      "nameConfidence": "unavailable-in-allowed-logs",
+      "templates": [
+        121035
+      ],
+      "template": 121035,
+      "playfieldIds": [
+        478032
+      ],
+      "positions": [],
+      "ownerEvidence": [
+        "50000:2017309817"
+      ],
+      "vendorFullRowCount": 7,
+      "rawShopRowCount": 0,
+      "stockRowCount": 0,
+      "evidenceCompleteness": "partial-vendor-full-only-no-shop-stock-observed",
+      "folders": [
+        "20260614-202500",
+        "20260614-203631",
+        "20260614-205724",
+        "20260614-211754",
+        "20260614-212914",
+        "20260614-214357",
+        "20260614-214819"
+      ],
+      "firstSeen": "2026-06-15T01:25:06.4472274Z",
+      "stockItems": []
+    }
+  ]
+}

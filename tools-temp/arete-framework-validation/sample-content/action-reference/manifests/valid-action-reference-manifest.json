@@ -1,0 +1,8 @@
+{
+  "DialoguePacks": [
+    "../dialogue/offer-mission.json"
+  ],
+  "QuestPacks": [
+    "../quests/mission.json"
+  ]
+}

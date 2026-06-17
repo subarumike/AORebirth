@@ -39,6 +39,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Controllers;
 
     #endregion
@@ -54,6 +55,21 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public override void Receive(MessageWrapper<KnuBotAnswerMessage> messageWrapper)
         {
+            messageWrapper.Client.Server.Info(
+                messageWrapper.Client,
+                "KnuBotAnswer target={0} answer={1} unknown={2}",
+                messageWrapper.MessageBody.Target,
+                messageWrapper.MessageBody.Answer,
+                messageWrapper.MessageBody.Unknown1);
+
+            if (AreteRexDialogueRouter.TryHandleAnswer(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody.Target,
+                messageWrapper.MessageBody.Answer))
+            {
+                return;
+            }
+
             // TODO: Fill in code!
             // Find character object by identity
             // call character AI controller 

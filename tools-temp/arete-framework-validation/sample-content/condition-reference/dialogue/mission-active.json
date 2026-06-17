@@ -1,0 +1,38 @@
+{
+  "Identity": {
+    "Id": "condition-reference-dialogue-mission-active",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-condition-npc-mission-active",
+      "NpcIdentity": "SimpleChar:condition-mission-active",
+      "Name": "Synthetic Condition NPC Mission Active",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-condition",
+              "Index": 0,
+              "Text": "Synthetic condition option",
+              "NextNodeId": "close",
+              "Conditions": [
+                {
+                  "Id": "condition-mission-active",
+                  "Type": "MissionActive",
+                  "QuestId": "condition-reference-mission"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

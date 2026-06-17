@@ -1,0 +1,38 @@
+{
+  "Identity": {
+    "Id": "condition-reference-dialogue-unknown-mission",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-condition-npc-unknown-mission",
+      "NpcIdentity": "SimpleChar:condition-unknown-mission",
+      "Name": "Synthetic Condition NPC Unknown Mission",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-condition",
+              "Index": 0,
+              "Text": "Synthetic condition option",
+              "NextNodeId": "close",
+              "Conditions": [
+                {
+                  "Id": "condition-unknown-mission",
+                  "Type": "MissionCompleted",
+                  "QuestId": "condition-reference-unknown"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

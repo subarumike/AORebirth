@@ -51,6 +51,7 @@ namespace ZoneEngine.Core.Controllers
 
     using Utility;
 
+    using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Functions;
     using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.KnuBot;
@@ -203,15 +204,23 @@ namespace ZoneEngine.Core.Controllers
 
         private void FaceToward(Vector3 start, Vector3 destination)
         {
+            Vector3 normalizedDirection;
+            this.TryFaceToward(start, destination, out normalizedDirection);
+        }
+
+        private bool TryFaceToward(Vector3 start, Vector3 destination, out Vector3 normalizedDirection)
+        {
+            normalizedDirection = new Vector3();
             if (start.Distance2D(destination) < 0.001)
             {
-                return;
+                return false;
             }
 
             Vector3 direction = destination - start;
             direction.y = 0;
-            Vector3 normalizedDirection = direction.Normalize();
+            normalizedDirection = direction.Normalize();
             this.Character.Heading = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(normalizedDirection);
+            return true;
         }
 
         private Vector3 BuildVisibleFollowDestination(Vector3 start, Vector3 targetPosition)
@@ -438,14 +447,45 @@ namespace ZoneEngine.Core.Controllers
 
         public bool Trade(Identity target)
         {
+            if (AreteRexDialogueRouter.TryStartDialogue(this.Character, target))
+            {
+                return true;
+            }
+
             // Do we have a attached KnuBot?
             if ((this.KnuBot != null) && (this.KnuBot.Character.Target == null))
             {
-                return
-                    this.KnuBot.StartDialog(
-                        Pool.Instance.GetObject<ICharacter>(this.Character.Playfield.Identity, target));
+                ICharacter source = Pool.Instance.GetObject<ICharacter>(this.Character.Playfield.Identity, target);
+                this.FaceDialoguePartner(source);
+                return this.KnuBot.StartDialog(source);
             }
             return false;
+        }
+
+        public bool FaceDialoguePartner(ICharacter source)
+        {
+            if (source == null || this.Character == null || this.Character.Playfield == null)
+            {
+                return false;
+            }
+
+            if (source.Playfield == null || !source.Playfield.Identity.Equals(this.Character.Playfield.Identity))
+            {
+                return false;
+            }
+
+            Vector3 normalizedDirection;
+            if (!this.TryFaceToward(this.Character.RawCoordinates, source.RawCoordinates, out normalizedDirection))
+            {
+                return false;
+            }
+
+            SendWantedDirection(normalizedDirection);
+            LogUtil.Debug(
+                DebugInfoDetail.KnuBot,
+                "NPC dialogue facing npc=" + this.Character.Identity.ToString(true)
+                + " source=" + source.Identity.ToString(true));
+            return true;
         }
 
         public bool UseItem(Identity itemPosition)

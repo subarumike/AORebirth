@@ -1,0 +1,41 @@
+{
+  "Identity": {
+    "Id": "condition-reference-objective-quest-pack",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Quests": [
+    {
+      "QuestId": "condition-reference-mission",
+      "Title": "Synthetic Objective Condition Mission",
+      "TitleConfidence": "synthetic",
+      "InitialStepId": "step-a",
+      "Steps": [
+        {
+          "StepId": "step-a",
+          "Name": "Synthetic Step A",
+          "Objectives": [
+            {
+              "ObjectiveId": "objective-a",
+              "Type": "synthetic",
+              "Description": "Synthetic objective",
+              "RequiredCount": 1,
+              "Conditions": [
+                {
+                  "Id": "objective-condition",
+                  "Type": "MissionCompleted",
+                  "QuestId": "condition-reference-mission",
+                  "StepId": "step-a"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "Links": []
+}

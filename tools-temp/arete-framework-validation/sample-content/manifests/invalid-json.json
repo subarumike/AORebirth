@@ -1,0 +1,7 @@
+{
+  "DialoguePacks": [
+    "../dialogue/valid-pack-a.json"
+  ],
+  "QuestPacks": [
+    "../quests/valid-pack-a.json"
+  ]

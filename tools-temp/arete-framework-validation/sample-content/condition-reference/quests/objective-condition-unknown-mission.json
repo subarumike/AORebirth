@@ -1,0 +1,41 @@
+{
+  "Identity": {
+    "Id": "condition-reference-objective-unknown-quest-pack",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Quests": [
+    {
+      "QuestId": "condition-reference-mission",
+      "Title": "Synthetic Objective Unknown Condition Mission",
+      "TitleConfidence": "synthetic",
+      "InitialStepId": "step-a",
+      "Steps": [
+        {
+          "StepId": "step-a",
+          "Name": "Synthetic Step A",
+          "Objectives": [
+            {
+              "ObjectiveId": "objective-a",
+              "Type": "synthetic",
+              "Description": "Synthetic objective",
+              "RequiredCount": 1,
+              "Conditions": [
+                {
+                  "Id": "objective-condition-unknown",
+                  "Type": "MissionCompleted",
+                  "QuestId": "condition-reference-unknown",
+                  "StepId": "step-a"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "Links": []
+}

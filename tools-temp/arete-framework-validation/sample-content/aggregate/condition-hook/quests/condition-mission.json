@@ -1,0 +1,44 @@
+{
+  "Identity": {
+    "Id": "aggregate-condition-quest-pack",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Quests": [
+    {
+      "QuestId": "aggregate-condition-mission",
+      "Title": "Synthetic Aggregate Condition Mission",
+      "TitleConfidence": "synthetic",
+      "InitialStepId": "step-a",
+      "Conditions": [
+        {
+          "Id": "quest-condition-future",
+          "Type": "AlwaysTrue",
+          "QuestId": "aggregate-condition-mission",
+          "StepId": "step-a",
+          "Value": "synthetic"
+        }
+      ],
+      "Steps": [
+        {
+          "StepId": "step-a",
+          "Name": "Synthetic Step A",
+          "Conditions": [
+            {
+              "Id": "step-condition-future",
+              "Type": "MissionActive",
+              "QuestId": "aggregate-condition-mission",
+              "StepId": "step-a",
+              "Value": "synthetic"
+            }
+          ],
+          "Objectives": []
+        }
+      ]
+    }
+  ],
+  "Links": []
+}

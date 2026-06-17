@@ -40,6 +40,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.KnuBot;
 
@@ -57,6 +58,21 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public override void Receive(MessageWrapper<KnuBotCloseChatWindowMessage> messageWrapper)
         {
+            messageWrapper.Client.Server.Info(
+                messageWrapper.Client,
+                "KnuBotClose target={0} marker={1} seconds={2} unknown3={3}",
+                messageWrapper.MessageBody.Target,
+                messageWrapper.MessageBody.Unknown1,
+                messageWrapper.MessageBody.Seconds,
+                messageWrapper.MessageBody.Unknown3);
+
+            if (AreteRexDialogueRouter.TryHandleClose(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody.Target))
+            {
+                return;
+            }
+
             ICharacter npc =
                 Pool.Instance.GetObject<ICharacter>(
                     messageWrapper.Client.Controller.Character.Playfield.Identity,

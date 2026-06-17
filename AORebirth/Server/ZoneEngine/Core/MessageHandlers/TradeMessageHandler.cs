@@ -50,6 +50,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using Utility;
 
+    using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Controllers;
 
     #endregion
@@ -113,6 +114,13 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 case TradeAction.Open:
                 {
+                    if (AreteRexDialogueRouter.TryStartDialogueForTarget(
+                        client.Controller.Character,
+                        message.Target))
+                    {
+                        break;
+                    }
+
                     if (this.TryStartPlayerTrade(client.Controller.Character, message.Target))
                     {
                         break;

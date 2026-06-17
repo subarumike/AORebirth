@@ -1,0 +1,19 @@
+{
+  "Identity": {
+    "Id": "quest-file-missing-step-id",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "Quests": [
+    {
+      "QuestId": "mission-synthetic-missing-step",
+      "Steps": [
+        {
+          "Name": "Synthetic Missing Step Id",
+          "Objectives": []
+        }
+      ]
+    }
+  ],
+  "Links": []
+}

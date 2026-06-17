@@ -1767,6 +1767,9 @@
   <Playfield id="6551" expansion="0" disabled="false" x="100000" xscale="1.00000" z="100000" zscale="1.00000">
     <Name>Uturn Forest</Name>
   </Playfield>
+  <Playfield id="6553" expansion="0" disabled="false" x="100000" xscale="1.00000" z="100000" zscale="1.00000">
+    <Name>Arete Landing</Name>
+  </Playfield>
   <Playfield id="7010" expansion="0" disabled="false" x="100000" xscale="1.00000" z="100000" zscale="1.00000">
     <Name>DOJA Research</Name>
   </Playfield>

@@ -1,0 +1,45 @@
+{
+  "Identity": {
+    "Id": "condition-reference-dialogue-action-and-condition-failure",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-condition-npc-action-and-condition",
+      "NpcIdentity": "SimpleChar:condition-action-and-condition",
+      "Name": "Synthetic Condition NPC Action And Condition",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-condition",
+              "Index": 0,
+              "Text": "Synthetic condition option",
+              "NextNodeId": "close",
+              "Conditions": [
+                {
+                  "Id": "condition-unknown-type",
+                  "Type": "UnsupportedSyntheticCondition",
+                  "QuestId": "condition-reference-mission"
+                }
+              ],
+              "Actions": [
+                {
+                  "Id": "action-unknown-mission",
+                  "Type": "OfferMission",
+                  "QuestId": "condition-reference-unknown"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
