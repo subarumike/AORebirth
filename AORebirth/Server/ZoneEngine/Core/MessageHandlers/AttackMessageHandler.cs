@@ -45,6 +45,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using Utility;
 
+    using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Controllers;
 
     #endregion
@@ -55,6 +56,8 @@ namespace ZoneEngine.Core.MessageHandlers
     [MessageHandler(MessageHandlerDirection.All)]
     public class AttackMessageHandler : BaseMessageHandler<AttackMessage, AttackMessageHandler>
     {
+        private const int SimpleCharFullUpdateIsImmuneFlag = 0x00800000;
+
         protected override void Read(AttackMessage message, IZoneClient client)
         {
             ICharacter character = client.Controller.Character;
@@ -76,6 +79,15 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            if (AreteRexDialogueRouter.ShouldSuppressCombat(target) || IsImmuneTarget(target))
+            {
+                character.SetFightingTarget(Identity.None);
+                this.ResetCombatTick(character);
+                this.SendAttackState(character, Identity.None, 0);
+                client.Server.Info(client, "Attack ignored for non-attackable target.");
+                return;
+            }
+
             character.SetTarget(message.Target);
             character.SetFightingTarget(message.Target);
             this.ResetCombatTick(character);
@@ -90,6 +102,13 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 playfield.ResetCombatTick(character.Identity);
             }
+        }
+
+        private static bool IsImmuneTarget(ICharacter target)
+        {
+            return target != null
+                   && (target.Stats[StatIds.flags].Value & SimpleCharFullUpdateIsImmuneFlag)
+                   == SimpleCharFullUpdateIsImmuneFlag;
         }
 
         private void EngageNpcTarget(ICharacter character, ICharacter target)

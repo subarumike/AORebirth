@@ -1,0 +1,38 @@
+{
+  "Identity": {
+    "Id": "file-action-reference-dialogue-complete",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-action-reference-npc-complete",
+      "NpcIdentity": "SimpleChar:file-action-reference-complete",
+      "Name": "Synthetic Action Reference NPC Complete",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-action",
+              "Index": 0,
+              "Text": "Synthetic action option",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "action-complete",
+                  "Type": "CompleteMission",
+                  "QuestId": "file-action-reference-mission"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "Identity": {
+    "Id": "aggregate-condition-dialogue-pack",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-aggregate-condition-npc",
+      "NpcIdentity": "SimpleChar:aggregate-condition",
+      "Name": "Synthetic Aggregate Condition NPC",
+      "RootNodeId": "node-a",
+      "Conditions": [
+        {
+          "Id": "dialogue-condition-future",
+          "Type": "AlwaysTrue",
+          "QuestId": "aggregate-condition-mission",
+          "Value": "synthetic"
+        }
+      ],
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-action",
+              "Index": 0,
+              "Text": "Synthetic aggregate condition option",
+              "NextNodeId": "close",
+              "Conditions": [
+                {
+                  "Id": "option-condition-future",
+                  "Type": "MissionCompleted",
+                  "QuestId": "aggregate-condition-mission",
+                  "Value": "synthetic"
+                }
+              ],
+              "Actions": [
+                {
+                  "Id": "action-offer",
+                  "Type": "OfferMission",
+                  "QuestId": "aggregate-condition-mission"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

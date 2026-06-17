@@ -1,0 +1,38 @@
+{
+  "Identity": {
+    "Id": "file-action-reference-dialogue-fail",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-action-reference-npc-fail",
+      "NpcIdentity": "SimpleChar:file-action-reference-fail",
+      "Name": "Synthetic Action Reference NPC Fail",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-action",
+              "Index": 0,
+              "Text": "Synthetic action option",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "action-fail",
+                  "Type": "FailMission",
+                  "QuestId": "file-action-reference-mission"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

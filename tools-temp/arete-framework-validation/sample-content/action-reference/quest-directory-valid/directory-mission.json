@@ -1,0 +1,26 @@
+{
+  "Identity": {
+    "Id": "directory-action-reference-quest-pack",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Quests": [
+    {
+      "QuestId": "directory-action-reference-mission",
+      "Title": "Synthetic Directory Action Reference Mission",
+      "TitleConfidence": "synthetic",
+      "InitialStepId": "step-a",
+      "Steps": [
+        {
+          "StepId": "step-a",
+          "Name": "Synthetic Step A",
+          "Objectives": []
+        }
+      ]
+    }
+  ],
+  "Links": []
+}

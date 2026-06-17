@@ -1,0 +1,26 @@
+{
+  "Identity": {
+    "Id": "aggregate-directory-quest-pack",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Quests": [
+    {
+      "QuestId": "aggregate-directory-mission",
+      "Title": "Synthetic Aggregate Directory Mission",
+      "TitleConfidence": "synthetic",
+      "InitialStepId": "step-a",
+      "Steps": [
+        {
+          "StepId": "step-a",
+          "Name": "Synthetic Step A",
+          "Objectives": []
+        }
+      ]
+    }
+  ],
+  "Links": []
+}

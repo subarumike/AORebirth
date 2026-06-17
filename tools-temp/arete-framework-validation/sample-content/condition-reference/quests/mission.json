@@ -1,0 +1,26 @@
+{
+  "Identity": {
+    "Id": "condition-reference-quest-pack",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Quests": [
+    {
+      "QuestId": "condition-reference-mission",
+      "Title": "Synthetic Condition Reference Mission",
+      "TitleConfidence": "synthetic",
+      "InitialStepId": "step-a",
+      "Steps": [
+        {
+          "StepId": "step-a",
+          "Name": "Synthetic Step A",
+          "Objectives": []
+        }
+      ]
+    }
+  ],
+  "Links": []
+}

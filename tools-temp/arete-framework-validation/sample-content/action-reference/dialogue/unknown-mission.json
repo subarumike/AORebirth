@@ -1,0 +1,38 @@
+{
+  "Identity": {
+    "Id": "file-action-reference-dialogue-unknown-mission",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-action-reference-npc-unknown-mission",
+      "NpcIdentity": "SimpleChar:file-action-reference-unknown-mission",
+      "Name": "Synthetic Action Reference NPC Unknown Mission",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-action",
+              "Index": 0,
+              "Text": "Synthetic action option",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "action-unknown-mission",
+                  "Type": "OfferMission",
+                  "QuestId": "file-action-reference-unknown"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

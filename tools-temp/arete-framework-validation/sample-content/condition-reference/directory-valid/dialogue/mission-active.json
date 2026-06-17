@@ -1,0 +1,38 @@
+{
+  "Identity": {
+    "Id": "condition-reference-directory-dialogue-pack",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-condition-directory-npc",
+      "NpcIdentity": "SimpleChar:condition-directory",
+      "Name": "Synthetic Condition Directory NPC",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-condition",
+              "Index": 0,
+              "Text": "Synthetic condition option",
+              "NextNodeId": "close",
+              "Conditions": [
+                {
+                  "Id": "condition-directory-active",
+                  "Type": "MissionActive",
+                  "QuestId": "condition-reference-directory-mission"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

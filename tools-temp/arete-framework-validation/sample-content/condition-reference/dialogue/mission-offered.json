@@ -1,0 +1,38 @@
+{
+  "Identity": {
+    "Id": "condition-reference-dialogue-mission-offered",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-condition-npc-mission-offered",
+      "NpcIdentity": "SimpleChar:condition-mission-offered",
+      "Name": "Synthetic Condition NPC Mission Offered",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-condition",
+              "Index": 0,
+              "Text": "Synthetic condition option",
+              "NextNodeId": "close",
+              "Conditions": [
+                {
+                  "Id": "condition-mission-offered",
+                  "Type": "MissionOffered",
+                  "QuestId": "condition-reference-mission"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

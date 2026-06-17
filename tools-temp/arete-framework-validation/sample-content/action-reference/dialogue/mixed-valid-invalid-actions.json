@@ -1,0 +1,52 @@
+{
+  "Identity": {
+    "Id": "file-action-reference-dialogue-mixed",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-action-reference-npc-mixed",
+      "NpcIdentity": "SimpleChar:file-action-reference-mixed",
+      "Name": "Synthetic Action Reference NPC Mixed",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-action",
+              "Index": 0,
+              "Text": "Synthetic action option",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "action-valid-offer",
+                  "Type": "OfferMission",
+                  "QuestId": "file-action-reference-mission"
+                },
+                {
+                  "Id": "action-missing-mission",
+                  "Type": "CompleteMission"
+                },
+                {
+                  "Id": "action-unknown-mission",
+                  "Type": "AcceptMission",
+                  "QuestId": "file-action-reference-unknown"
+                },
+                {
+                  "Id": "action-unsupported-type",
+                  "Type": "UnsupportedSyntheticAction",
+                  "QuestId": "file-action-reference-mission"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

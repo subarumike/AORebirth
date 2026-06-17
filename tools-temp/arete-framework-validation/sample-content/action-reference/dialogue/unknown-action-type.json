@@ -1,0 +1,38 @@
+{
+  "Identity": {
+    "Id": "file-action-reference-dialogue-unknown-action",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-action-reference-npc-unknown-action",
+      "NpcIdentity": "SimpleChar:file-action-reference-unknown-action",
+      "Name": "Synthetic Action Reference NPC Unknown Action",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-action",
+              "Index": 0,
+              "Text": "Synthetic action option",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "action-unknown-action",
+                  "Type": "UnsupportedSyntheticAction",
+                  "QuestId": "file-action-reference-mission"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

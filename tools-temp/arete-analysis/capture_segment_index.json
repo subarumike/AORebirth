@@ -1,0 +1,433 @@
+﻿{
+    "generatedUtc":  "2026-06-15T04:09:07.8868850Z",
+    "captureRoot":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures",
+    "rangeStart":  "20260614-194454",
+    "rangeEnd":  "20260614-221915",
+    "segmentCount":  17,
+    "classificationCounts":  {
+                                 "clean":  13,
+                                 "usablePartial":  2,
+                                 "incomplete":  2
+                             },
+    "totals":  {
+                   "chatDialogueLogLines":  1982,
+                   "npcInteractionsLogLines":  9140,
+                   "systemMessagesLogLines":  46745,
+                   "enemyStateCsvRows":  74780,
+                   "inventoryUpdatesCsvRows":  114,
+                   "vendorFullUpdatesCsvRows":  1044,
+                   "shopUpdatesCsvRows":  880
+               },
+    "recommendedNextBatchOrder":  [
+                                      {
+                                          "order":  1,
+                                          "classification":  "clean",
+                                          "folders":  [
+                                                          "20260614-194454",
+                                                          "20260614-195107",
+                                                          "20260614-195725",
+                                                          "20260614-200311",
+                                                          "20260614-200850",
+                                                          "20260614-203038",
+                                                          "20260614-205724",
+                                                          "20260614-211754",
+                                                          "20260614-212914",
+                                                          "20260614-213857",
+                                                          "20260614-214357",
+                                                          "20260614-214819",
+                                                          "20260614-221915"
+                                                      ],
+                                          "reason":  "Use first for quest/dialogue/NPC/enemy/inventory indexing because final health validation passed."
+                                      },
+                                      {
+                                          "order":  2,
+                                          "classification":  "usable-partial",
+                                          "folders":  [
+                                                          "20260614-202500",
+                                                          "20260614-203631"
+                                                      ],
+                                          "reason":  "Use after clean segments; raw rows exist but final health metadata is missing due crash/logout handoff."
+                                      },
+                                      {
+                                          "order":  3,
+                                          "classification":  "incomplete",
+                                          "folders":  [
+                                                          "20260614-212335",
+                                                          "20260614-215831"
+                                                      ],
+                                          "reason":  "Use last and only for non-vendor evidence unless the listed health issue is resolved by adjacent segments."
+                                      }
+                                  ],
+    "segments":  [
+                     {
+                         "folder":  "20260614-194454",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-194454",
+                         "counts":  {
+                                        "chatDialogueLogLines":  78,
+                                        "npcInteractionsLogLines":  530,
+                                        "systemMessagesLogLines":  2610,
+                                        "enemyStateCsvRows":  2766,
+                                        "inventoryUpdatesCsvRows":  8,
+                                        "vendorFullUpdatesCsvRows":  0,
+                                        "shopUpdatesCsvRows":  0
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "complete",
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "clean"
+                     },
+                     {
+                         "folder":  "20260614-195107",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-195107",
+                         "counts":  {
+                                        "chatDialogueLogLines":  124,
+                                        "npcInteractionsLogLines":  484,
+                                        "systemMessagesLogLines":  4752,
+                                        "enemyStateCsvRows":  5516,
+                                        "inventoryUpdatesCsvRows":  0,
+                                        "vendorFullUpdatesCsvRows":  0,
+                                        "shopUpdatesCsvRows":  0
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "complete",
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "clean"
+                     },
+                     {
+                         "folder":  "20260614-195725",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-195725",
+                         "counts":  {
+                                        "chatDialogueLogLines":  112,
+                                        "npcInteractionsLogLines":  454,
+                                        "systemMessagesLogLines":  3858,
+                                        "enemyStateCsvRows":  5696,
+                                        "inventoryUpdatesCsvRows":  12,
+                                        "vendorFullUpdatesCsvRows":  32,
+                                        "shopUpdatesCsvRows":  0
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "complete",
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "clean"
+                     },
+                     {
+                         "folder":  "20260614-200311",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-200311",
+                         "counts":  {
+                                        "chatDialogueLogLines":  36,
+                                        "npcInteractionsLogLines":  298,
+                                        "systemMessagesLogLines":  1314,
+                                        "enemyStateCsvRows":  2667,
+                                        "inventoryUpdatesCsvRows":  0,
+                                        "vendorFullUpdatesCsvRows":  18,
+                                        "shopUpdatesCsvRows":  0
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "complete",
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "clean"
+                     },
+                     {
+                         "folder":  "20260614-200850",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-200850",
+                         "counts":  {
+                                        "chatDialogueLogLines":  78,
+                                        "npcInteractionsLogLines":  796,
+                                        "systemMessagesLogLines":  2732,
+                                        "enemyStateCsvRows":  5541,
+                                        "inventoryUpdatesCsvRows":  0,
+                                        "vendorFullUpdatesCsvRows":  26,
+                                        "shopUpdatesCsvRows":  10
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "complete",
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "clean"
+                     },
+                     {
+                         "folder":  "20260614-202500",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-202500",
+                         "counts":  {
+                                        "chatDialogueLogLines":  26,
+                                        "npcInteractionsLogLines":  130,
+                                        "systemMessagesLogLines":  268,
+                                        "enemyStateCsvRows":  1672,
+                                        "inventoryUpdatesCsvRows":  0,
+                                        "vendorFullUpdatesCsvRows":  80,
+                                        "shopUpdatesCsvRows":  4
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  false
+                                   },
+                         "healthStatus":  null,
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "usable-partial"
+                     },
+                     {
+                         "folder":  "20260614-203038",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-203038",
+                         "counts":  {
+                                        "chatDialogueLogLines":  78,
+                                        "npcInteractionsLogLines":  190,
+                                        "systemMessagesLogLines":  624,
+                                        "enemyStateCsvRows":  1437,
+                                        "inventoryUpdatesCsvRows":  0,
+                                        "vendorFullUpdatesCsvRows":  22,
+                                        "shopUpdatesCsvRows":  0
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "complete",
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "clean"
+                     },
+                     {
+                         "folder":  "20260614-203631",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-203631",
+                         "counts":  {
+                                        "chatDialogueLogLines":  182,
+                                        "npcInteractionsLogLines":  1438,
+                                        "systemMessagesLogLines":  5198,
+                                        "enemyStateCsvRows":  9024,
+                                        "inventoryUpdatesCsvRows":  28,
+                                        "vendorFullUpdatesCsvRows":  228,
+                                        "shopUpdatesCsvRows":  37
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  false
+                                   },
+                         "healthStatus":  null,
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "usable-partial"
+                     },
+                     {
+                         "folder":  "20260614-205724",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-205724",
+                         "counts":  {
+                                        "chatDialogueLogLines":  242,
+                                        "npcInteractionsLogLines":  1498,
+                                        "systemMessagesLogLines":  6926,
+                                        "enemyStateCsvRows":  9634,
+                                        "inventoryUpdatesCsvRows":  40,
+                                        "vendorFullUpdatesCsvRows":  182,
+                                        "shopUpdatesCsvRows":  39
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "complete",
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "clean"
+                     },
+                     {
+                         "folder":  "20260614-211754",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-211754",
+                         "counts":  {
+                                        "chatDialogueLogLines":  140,
+                                        "npcInteractionsLogLines":  368,
+                                        "systemMessagesLogLines":  1297,
+                                        "enemyStateCsvRows":  3321,
+                                        "inventoryUpdatesCsvRows":  4,
+                                        "vendorFullUpdatesCsvRows":  62,
+                                        "shopUpdatesCsvRows":  0
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "complete",
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "clean"
+                     },
+                     {
+                         "folder":  "20260614-212335",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-212335",
+                         "counts":  {
+                                        "chatDialogueLogLines":  122,
+                                        "npcInteractionsLogLines":  208,
+                                        "systemMessagesLogLines":  966,
+                                        "enemyStateCsvRows":  1030,
+                                        "inventoryUpdatesCsvRows":  0,
+                                        "vendorFullUpdatesCsvRows":  0,
+                                        "shopUpdatesCsvRows":  537
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "incomplete",
+                         "healthIssues":  "Vendor/shop interactions were observed, but vendor-full-updates.csv has no vendor full-update entries.",
+                         "classification":  "incomplete"
+                     },
+                     {
+                         "folder":  "20260614-212914",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-212914",
+                         "counts":  {
+                                        "chatDialogueLogLines":  116,
+                                        "npcInteractionsLogLines":  310,
+                                        "systemMessagesLogLines":  1630,
+                                        "enemyStateCsvRows":  4182,
+                                        "inventoryUpdatesCsvRows":  0,
+                                        "vendorFullUpdatesCsvRows":  88,
+                                        "shopUpdatesCsvRows":  243
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "complete",
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "clean"
+                     },
+                     {
+                         "folder":  "20260614-213857",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-213857",
+                         "counts":  {
+                                        "chatDialogueLogLines":  50,
+                                        "npcInteractionsLogLines":  150,
+                                        "systemMessagesLogLines":  790,
+                                        "enemyStateCsvRows":  776,
+                                        "inventoryUpdatesCsvRows":  0,
+                                        "vendorFullUpdatesCsvRows":  0,
+                                        "shopUpdatesCsvRows":  0
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "complete",
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "clean"
+                     },
+                     {
+                         "folder":  "20260614-214357",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-214357",
+                         "counts":  {
+                                        "chatDialogueLogLines":  98,
+                                        "npcInteractionsLogLines":  268,
+                                        "systemMessagesLogLines":  1050,
+                                        "enemyStateCsvRows":  1326,
+                                        "inventoryUpdatesCsvRows":  0,
+                                        "vendorFullUpdatesCsvRows":  48,
+                                        "shopUpdatesCsvRows":  0
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "complete",
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "clean"
+                     },
+                     {
+                         "folder":  "20260614-214819",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-214819",
+                         "counts":  {
+                                        "chatDialogueLogLines":  138,
+                                        "npcInteractionsLogLines":  704,
+                                        "systemMessagesLogLines":  5774,
+                                        "enemyStateCsvRows":  10837,
+                                        "inventoryUpdatesCsvRows":  0,
+                                        "vendorFullUpdatesCsvRows":  122,
+                                        "shopUpdatesCsvRows":  10
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "complete",
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "clean"
+                     },
+                     {
+                         "folder":  "20260614-215831",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-215831",
+                         "counts":  {
+                                        "chatDialogueLogLines":  180,
+                                        "npcInteractionsLogLines":  928,
+                                        "systemMessagesLogLines":  5284,
+                                        "enemyStateCsvRows":  6858,
+                                        "inventoryUpdatesCsvRows":  6,
+                                        "vendorFullUpdatesCsvRows":  84,
+                                        "shopUpdatesCsvRows":  0
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "incomplete",
+                         "healthIssues":  "Vendor/shop interactions were observed, but shop-updates.csv has no stock rows.",
+                         "classification":  "incomplete"
+                     },
+                     {
+                         "folder":  "20260614-221915",
+                         "path":  "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260614-221915",
+                         "counts":  {
+                                        "chatDialogueLogLines":  182,
+                                        "npcInteractionsLogLines":  386,
+                                        "systemMessagesLogLines":  1672,
+                                        "enemyStateCsvRows":  2497,
+                                        "inventoryUpdatesCsvRows":  16,
+                                        "vendorFullUpdatesCsvRows":  52,
+                                        "shopUpdatesCsvRows":  0
+                                    },
+                         "files":  {
+                                       "captureInfoJson":  true,
+                                       "captureHealthJson":  true
+                                   },
+                         "healthStatus":  "complete",
+                         "healthIssues":  {
+
+                                          },
+                         "classification":  "clean"
+                     }
+                 ]
+}

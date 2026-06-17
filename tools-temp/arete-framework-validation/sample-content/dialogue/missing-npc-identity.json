@@ -1,0 +1,27 @@
+{
+  "Identity": {
+    "Id": "dialogue-file-missing-npc",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "Npcs": [
+    {
+      "Id": "synthetic-npc-missing-identity",
+      "Name": "Synthetic Missing Identity NPC",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-close",
+              "Index": 0,
+              "Text": "Synthetic close",
+              "NextNodeId": "close"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

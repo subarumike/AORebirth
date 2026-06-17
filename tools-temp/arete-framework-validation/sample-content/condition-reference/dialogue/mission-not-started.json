@@ -1,0 +1,38 @@
+{
+  "Identity": {
+    "Id": "condition-reference-dialogue-mission-not-started",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-condition-npc-mission-not-started",
+      "NpcIdentity": "SimpleChar:condition-mission-not-started",
+      "Name": "Synthetic Condition NPC Mission Not Started",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-condition",
+              "Index": 0,
+              "Text": "Synthetic condition option",
+              "NextNodeId": "close",
+              "Conditions": [
+                {
+                  "Id": "condition-mission-not-started",
+                  "Type": "MissionNotStarted",
+                  "QuestId": "condition-reference-mission"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

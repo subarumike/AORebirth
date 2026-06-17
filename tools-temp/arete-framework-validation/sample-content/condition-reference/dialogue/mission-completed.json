@@ -1,0 +1,38 @@
+{
+  "Identity": {
+    "Id": "condition-reference-dialogue-mission-completed",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-condition-npc-mission-completed",
+      "NpcIdentity": "SimpleChar:condition-mission-completed",
+      "Name": "Synthetic Condition NPC Mission Completed",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-condition",
+              "Index": 0,
+              "Text": "Synthetic condition option",
+              "NextNodeId": "close",
+              "Conditions": [
+                {
+                  "Id": "condition-mission-completed",
+                  "Type": "MissionCompleted",
+                  "QuestId": "condition-reference-mission"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

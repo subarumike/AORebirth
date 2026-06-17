@@ -1,0 +1,268 @@
+{
+  "Identity": {
+    "Id": "arete-rex-larsson-dialogue-20260614-194454",
+    "Version": "captured-draft-20260615",
+    "Source": "tools-temp/arete-analysis/dialogue_trees.json + tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/packets.hex.log"
+  },
+  "SourceCaptures": [
+    "20260614-194454",
+    "tools-temp/arete-analysis/npc_list.json",
+    "tools-temp/arete-analysis/dialogue_trees.json",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/packets.hex.log"
+  ],
+  "Npcs": [
+    {
+      "Id": "rex-larsson",
+      "NpcIdentity": "SimpleChar:782DE568",
+      "Name": "Rex Larsson",
+      "RootNodeId": "rex_194454_001",
+      "Aliases": [
+        "(SimpleChar:782DE568)"
+      ],
+      "Nodes": [
+        {
+          "Id": "rex_194454_001",
+          "PromptText": "Hi, I'm Rex. \\nNice moves, I'm impressed. It is not easy hiding in a cargo ship. Say, how did you do it?",
+          "PromptTextConfidence": "captured-knubot-append-text packets.hex.log lines 2505-2506 packets #2435-#2436",
+          "Options": [
+            {
+              "Id": "rex_194454_001_option_0",
+              "Index": 0,
+              "Text": "I don't really feel like telling you any of my secrets. If you'll excuse me, I need to go now.",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:46:55.9780554Z, selected answer index 0 at 2026-06-15T00:47:00.8648673Z; captured text is visible answer-list text, not verified NPC prompt text.",
+              "NextNodeId": "rex_194454_002",
+              "Actions": []
+            },
+            {
+              "Id": "rex_194454_001_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:46:55.9780554Z; branch was visible but not selected in this capture.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "rex_194454_001_option_1_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close action for captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rex_194454_002",
+          "PromptText": "You have it all figured out, don't you? I bet you forgot that you need an ID card to enter ICC. I don't even need glasses to notice that you don't have anything of value...\\n\\nRex lowers his voice.\\n\\nYou know, I arrived here the same way as you just did. I might know a guy that can help you out... I got a fake ID myself.",
+          "PromptTextConfidence": "captured-knubot-append-text packets.hex.log lines 2607-2612 packets #2535-#2540",
+          "Options": [
+            {
+              "Id": "rex_194454_002_option_0",
+              "Index": 0,
+              "Text": "Who said I don't have any ID?",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:47:01.9349845Z, selected answer index 0 at 2026-06-15T00:47:04.7744986Z; captured text is visible answer-list text, not verified NPC prompt text.",
+              "NextNodeId": "rex_194454_003",
+              "Actions": []
+            },
+            {
+              "Id": "rex_194454_002_option_1",
+              "Index": 1,
+              "Text": "Tell me who to talk to.",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:47:01.9349845Z; branch was visible but not selected in this capture.",
+              "NextNodeId": "rex_194454_002",
+              "Actions": []
+            },
+            {
+              "Id": "rex_194454_002_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:47:01.9349845Z; branch was visible but not selected in this capture.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "rex_194454_002_option_2_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close action for captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rex_194454_003",
+          "PromptText": "Alright there, boss, say what you want. Just know that if you don't have any form of identification, your options are limited. You can either take a quick stroll \\n\\nOr.. you could get my help getting an ID, if you start helping me out here instead of denying facts...",
+          "PromptTextConfidence": "captured-knubot-append-text packets.hex.log lines 2699-2700 packets #2625-#2626",
+          "Options": [
+            {
+              "Id": "rex_194454_003_option_0",
+              "Index": 0,
+              "Text": "Get to the point, Rex.",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:47:05.8448062Z, selected answer index 0 at 2026-06-15T00:47:06.6539321Z; captured text is visible answer-list text, not verified NPC prompt text.",
+              "NextNodeId": "rex_194454_004",
+              "Actions": []
+            },
+            {
+              "Id": "rex_194454_003_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:47:05.8448062Z; branch was visible but not selected in this capture.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "rex_194454_003_option_1_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close action for captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rex_194454_004",
+          "PromptText": "Ya see these Cleaning Robots? They are old, stupid and broken now. I need you to terminate them and open the cargo box with the new ones so they can start cleaning up this place... It looks messy here, don't you agree?",
+          "PromptTextConfidence": "captured-knubot-append-text packets.hex.log lines 2739-2740 packets #2663-#2664",
+          "Options": [
+            {
+              "Id": "rex_194454_004_option_0",
+              "Index": 0,
+              "Text": "I'll do it if you promise to tell me who your contact is.",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:47:07.6040523Z, selected answer index 0 at 2026-06-15T00:47:09.1035673Z; captured text is visible answer-list text, not verified NPC prompt text.",
+              "NextNodeId": "rex_194454_005",
+              "Actions": []
+            },
+            {
+              "Id": "rex_194454_004_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:47:07.6040523Z; branch was visible but not selected in this capture.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "rex_194454_004_option_1_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close action for captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rex_194454_005",
+          "PromptText": "Excellent choice, I will tell you what you need to know when you have completed the task.",
+          "PromptTextConfidence": "captured-knubot-append-text packets.hex.log lines 2833-2834 packets #2755-#2756",
+          "Options": [
+            {
+              "Id": "rex_194454_005_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:47:10.2447301Z; no answer event before captured close at 2026-06-15T00:47:14.1537625Z.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "rex_194454_005_option_0_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close action for captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rex_194454_006",
+          "PromptText": "How did it go?",
+          "PromptTextConfidence": "captured-knubot-append-text packets.hex.log lines 5981-5982 packets #5529-#5530",
+          "Options": [
+            {
+              "Id": "rex_194454_006_option_0",
+              "Index": 0,
+              "Text": "I've done what you asked. Can you tell me who your contact is?",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:49:02.9588113Z, selected answer index 0 at 2026-06-15T00:49:03.8283253Z; captured text is visible answer-list text, not verified NPC prompt text. This node followed a later open event at 2026-06-15T00:49:01.7982325Z and Mission:5514B18E packet events at 2026-06-15T00:49:01.8992326Z, but packet semantics remain unresolved, so the node is not condition-routed.",
+              "NextNodeId": "rex_194454_007",
+              "Actions": []
+            },
+            {
+              "Id": "rex_194454_006_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:49:02.9588113Z; branch was visible but not selected in this capture.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "rex_194454_006_option_1_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close action for captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rex_194454_007",
+          "PromptText": "I've had my fun watching you do my job. You didn't actually believe that I got a fake ID from someone here, did you? The only person I know around here is Marcus Stone, you could try asking him.",
+          "PromptTextConfidence": "captured-knubot-append-text packets.hex.log lines 6031-6032 packets #5577-#5578",
+          "Options": [
+            {
+              "Id": "rex_194454_007_option_0",
+              "Index": 0,
+              "Text": "I can see why you don't have too many friends.",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:49:04.8888429Z, selected answer index 0 at 2026-06-15T00:49:05.5879767Z; captured text is visible answer-list text, not verified NPC prompt text.",
+              "NextNodeId": "rex_194454_008",
+              "Actions": []
+            },
+            {
+              "Id": "rex_194454_007_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:49:04.8888429Z; branch was visible but not selected in this capture.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "rex_194454_007_option_1_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close action for captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rex_194454_008",
+          "PromptText": "Off you go, I need to relax now. It has been a long day at work.",
+          "PromptTextConfidence": "captured-knubot-append-text packets.hex.log lines 6071-6072 packets #5615-#5616; final post-Goodbye close lines also captured at lines 6151-6154 packets #5693-#5696 but are not wired as a separate close node in this pass",
+          "Options": [
+            {
+              "Id": "rex_194454_008_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:49:06.5684993Z, selected answer index 0 at 2026-06-15T00:49:10.3181950Z, captured close at 2026-06-15T00:49:10.8288533Z.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "rex_194454_008_option_0_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close action for captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": []
+    }
+  ]
+}

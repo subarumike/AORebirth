@@ -1,0 +1,37 @@
+{
+  "Identity": {
+    "Id": "file-action-reference-dialogue-end",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-action-reference-npc-end",
+      "NpcIdentity": "SimpleChar:file-action-reference-end",
+      "Name": "Synthetic Action Reference NPC End",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-action",
+              "Index": 0,
+              "Text": "Synthetic action option",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "action-end",
+                  "Type": "EndDialogue"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

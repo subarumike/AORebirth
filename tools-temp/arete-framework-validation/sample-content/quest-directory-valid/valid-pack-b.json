@@ -1,0 +1,23 @@
+{
+  "Identity": {
+    "Id": "quest-directory-pack-b",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "Quests": [
+    {
+      "QuestId": "mission-directory-b",
+      "Title": "Synthetic Directory Mission B",
+      "TitleConfidence": "synthetic",
+      "InitialStepId": "step-b",
+      "Steps": [
+        {
+          "StepId": "step-b",
+          "Name": "Synthetic Step B",
+          "Objectives": []
+        }
+      ]
+    }
+  ],
+  "Links": []
+}

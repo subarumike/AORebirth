@@ -1,0 +1,38 @@
+{
+  "Identity": {
+    "Id": "directory-action-reference-dialogue-pack",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-directory-action-reference-npc",
+      "NpcIdentity": "SimpleChar:directory-action-reference",
+      "Name": "Synthetic Directory Action Reference NPC",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-action",
+              "Index": 0,
+              "Text": "Synthetic action option",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "action-directory-offer",
+                  "Type": "OfferMission",
+                  "QuestId": "directory-action-reference-mission"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

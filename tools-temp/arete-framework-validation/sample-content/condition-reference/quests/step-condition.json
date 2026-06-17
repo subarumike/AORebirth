@@ -1,0 +1,34 @@
+{
+  "Identity": {
+    "Id": "condition-reference-step-quest-pack",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Quests": [
+    {
+      "QuestId": "condition-reference-mission",
+      "Title": "Synthetic Step Condition Mission",
+      "TitleConfidence": "synthetic",
+      "InitialStepId": "step-a",
+      "Steps": [
+        {
+          "StepId": "step-a",
+          "Name": "Synthetic Step A",
+          "Conditions": [
+            {
+              "Id": "step-condition",
+              "Type": "MissionActive",
+              "QuestId": "condition-reference-mission",
+              "StepId": "step-a"
+            }
+          ],
+          "Objectives": []
+        }
+      ]
+    }
+  ],
+  "Links": []
+}

@@ -1,0 +1,37 @@
+{
+  "Identity": {
+    "Id": "condition-reference-dialogue-always-false",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-condition-npc-always-false",
+      "NpcIdentity": "SimpleChar:condition-always-false",
+      "Name": "Synthetic Condition NPC Always False",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-condition",
+              "Index": 0,
+              "Text": "Synthetic condition option",
+              "NextNodeId": "close",
+              "Conditions": [
+                {
+                  "Id": "condition-always-false",
+                  "Type": "AlwaysFalse"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

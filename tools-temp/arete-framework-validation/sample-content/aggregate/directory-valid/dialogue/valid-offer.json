@@ -1,0 +1,38 @@
+{
+  "Identity": {
+    "Id": "aggregate-directory-dialogue-pack",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Npcs": [
+    {
+      "Id": "synthetic-aggregate-directory-npc",
+      "NpcIdentity": "SimpleChar:aggregate-directory",
+      "Name": "Synthetic Aggregate Directory NPC",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-action",
+              "Index": 0,
+              "Text": "Synthetic aggregate option",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "action-offer",
+                  "Type": "OfferMission",
+                  "QuestId": "aggregate-directory-mission"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

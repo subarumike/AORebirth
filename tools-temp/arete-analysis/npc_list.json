@@ -1,0 +1,780 @@
+{
+  "metadata": {
+    "generatedUtc": "2026-06-15T04:21:47.943Z",
+    "sourceIndex": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\arete-analysis\\capture_segment_index.json",
+    "captureRoot": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures",
+    "eligibleSegmentCount": 15,
+    "eligibleSegments": [
+      {
+        "folder": "20260614-194454",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-195107",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-195725",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-200311",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-200850",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-202500",
+        "classification": "usable-partial"
+      },
+      {
+        "folder": "20260614-203038",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-203631",
+        "classification": "usable-partial"
+      },
+      {
+        "folder": "20260614-205724",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-211754",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-212914",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-213857",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-214357",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-214819",
+        "classification": "clean"
+      },
+      {
+        "folder": "20260614-221915",
+        "classification": "clean"
+      }
+    ],
+    "allowedLogs": [
+      "chat-dialogue.log",
+      "npc-interactions.log",
+      "system-messages.log",
+      "events.log"
+    ],
+    "excludedSegments": [
+      {
+        "folder": "20260614-212335",
+        "classification": "incomplete"
+      },
+      {
+        "folder": "20260614-215831",
+        "classification": "incomplete"
+      }
+    ],
+    "rules": [
+      "Enemy, vendor, shop, inventory, packet hex, SQL, and runtime server data were not processed.",
+      "KnuBotAnswerList text is treated as captured dialogue branch/options evidence, not proof of NPC spoken text.",
+      "Quest titles/objectives are emitted only when visible in allowed logs; no packets.hex.log decoding was used.",
+      "NPC identity/name mapping uses SimpleCharFullUpdate records from events.log only as a lookup, then outputs only dialogue/quest-relevant NPCs."
+    ]
+  },
+  "counts": {
+    "npcCount": 26,
+    "knubotEventCount": 422,
+    "npcMessageCount": 46,
+    "noiseNpcMessageCount": 348
+  },
+  "npcs": [
+    {
+      "name": "Alex Gibbs",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE566)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-195725",
+        "20260614-200850"
+      ],
+      "firstSeen": "2026-06-15T01:02:02.3987770Z",
+      "lastSeen": "2026-06-15T01:22:19.4295682Z",
+      "observedLevels": [
+        "20"
+      ],
+      "samplePositions": [
+        "3520.787, 5.110001, 856.6881",
+        "3520.787, 5.110001, 856.6881",
+        "3520.787, 5.110001, 856.6881"
+      ],
+      "eventCount": 46
+    },
+    {
+      "name": "Antonio Stacklund",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE581)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-205724"
+      ],
+      "firstSeen": "2026-06-15T01:58:11.1994048Z",
+      "lastSeen": "2026-06-15T01:58:44.1180972Z",
+      "observedLevels": [
+        "20"
+      ],
+      "samplePositions": [
+        "3443.087, 9.145, 832.6508",
+        "3443.087, 9.145, 832.6508",
+        "3443.087, 9.145, 832.6508"
+      ],
+      "eventCount": 17
+    },
+    {
+      "name": "Barry the Food Vendor",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE582)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-214819"
+      ],
+      "firstSeen": "2026-06-15T02:55:38.0089003Z",
+      "lastSeen": "2026-06-15T02:55:55.6470849Z",
+      "observedLevels": [
+        "10"
+      ],
+      "samplePositions": [
+        "3516.731, 6.805, 826.9835",
+        "3516.731, 6.805, 826.9835",
+        "3516.731, 6.805, 826.9835"
+      ],
+      "eventCount": 13
+    },
+    {
+      "name": "Boris the Peacekeeper",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE699)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T03:24:45.2914984Z",
+      "lastSeen": "2026-06-15T03:24:57.3121370Z",
+      "observedLevels": [
+        "25"
+      ],
+      "samplePositions": [
+        "3613.707, 3.91, 683.9014",
+        "3613.707, 3.91, 683.9014",
+        "3613.707, 3.91, 683.9014"
+      ],
+      "eventCount": 24
+    },
+    {
+      "name": "Desmond Calitri",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE57C)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-214819"
+      ],
+      "firstSeen": "2026-06-15T02:55:07.2206552Z",
+      "lastSeen": "2026-06-15T02:57:08.5711848Z",
+      "observedLevels": [
+        "20"
+      ],
+      "samplePositions": [
+        "3605.203, 8.075, 826.8825",
+        "3605.203, 8.075, 826.8825",
+        "3605.203, 8.075, 826.8825"
+      ],
+      "eventCount": 36
+    },
+    {
+      "name": "Flint Novak",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE569)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-195725"
+      ],
+      "firstSeen": "2026-06-15T00:59:19.0642478Z",
+      "lastSeen": "2026-06-15T00:59:34.7178454Z",
+      "observedLevels": [
+        "20"
+      ],
+      "samplePositions": [
+        "3597.903, 5.110001, 862.7041",
+        "3597.903, 5.110001, 862.7041",
+        "3597.903, 5.110001, 862.7041"
+      ],
+      "eventCount": 19
+    },
+    {
+      "name": "ICC Immigration Officer Bill",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE56B)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-200311",
+        "20260614-214819"
+      ],
+      "firstSeen": "2026-06-15T01:05:28.6267256Z",
+      "lastSeen": "2026-06-15T02:51:14.0188784Z",
+      "observedLevels": [
+        "25"
+      ],
+      "samplePositions": [
+        "3510.501, 5.110001, 826.7322",
+        "3510.501, 5.110001, 826.7322",
+        "3510.501, 5.110001, 826.7322"
+      ],
+      "eventCount": 32
+    },
+    {
+      "name": "Lolly the Reet",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:78D3A950)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-212914"
+      ],
+      "firstSeen": "2026-06-15T02:32:56.3260906Z",
+      "lastSeen": "2026-06-15T02:34:50.1067647Z",
+      "observedLevels": [
+        "10"
+      ],
+      "samplePositions": [
+        "3320.019, 0.1854242, 645.7635",
+        "3320.019, 0.1854242, 645.7635",
+        "3334.875, 1.561288, 612.6404"
+      ],
+      "eventCount": 18
+    },
+    {
+      "name": "Lolly the Reet",
+      "aliases": [],
+      "identities": [],
+      "evidenceTypes": [
+        "npc-message-speaker"
+      ],
+      "confidence": [
+        "speaker-name-matched-multiple-identities"
+      ],
+      "folders": [
+        "20260614-212914"
+      ],
+      "firstSeen": "2026-06-15T02:32:39.1843619Z",
+      "lastSeen": "2026-06-15T02:33:03.9866030Z",
+      "observedLevels": [],
+      "samplePositions": [],
+      "eventCount": 3
+    },
+    {
+      "name": "Lorelei the Bartender",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE570)"
+      ],
+      "evidenceTypes": [
+        "knubot-target",
+        "npc-message-speaker"
+      ],
+      "confidence": [
+        "identity-and-name",
+        "speaker-name-matched-one-identity"
+      ],
+      "folders": [
+        "20260614-212914"
+      ],
+      "firstSeen": "2026-06-15T02:30:41.7431877Z",
+      "lastSeen": "2026-06-15T02:36:01.3115618Z",
+      "observedLevels": [
+        "10"
+      ],
+      "samplePositions": [
+        "3369.141, 17.315, 794.4229",
+        "3369.141, 17.315, 794.4229",
+        "3369.141, 17.315, 794.4229"
+      ],
+      "eventCount": 41
+    },
+    {
+      "name": "Marco Spida",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE586)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-203631"
+      ],
+      "firstSeen": "2026-06-15T01:37:49.2089239Z",
+      "lastSeen": "2026-06-15T01:38:20.0232419Z",
+      "observedLevels": [
+        "10"
+      ],
+      "samplePositions": [
+        "3407.677, 9.01, 831.2606",
+        "3407.677, 9.01, 831.2606",
+        "3407.677, 9.01, 831.2606"
+      ],
+      "eventCount": 20
+    },
+    {
+      "name": "Marcus Stone",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE567)"
+      ],
+      "evidenceTypes": [
+        "knubot-target",
+        "npc-message-speaker"
+      ],
+      "confidence": [
+        "identity-and-name",
+        "speaker-name-matched-one-identity"
+      ],
+      "folders": [
+        "20260614-195107"
+      ],
+      "firstSeen": "2026-06-15T00:51:44.5303613Z",
+      "lastSeen": "2026-06-15T00:53:47.0909682Z",
+      "observedLevels": [
+        "15"
+      ],
+      "samplePositions": [
+        "3630.962, 40.985, 823.1738",
+        "3630.962, 40.985, 823.1738",
+        "3630.962, 40.985, 823.1738"
+      ],
+      "eventCount": 60
+    },
+    {
+      "name": "Mario Carles",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:78D3AA6E)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T03:22:14.0448520Z",
+      "lastSeen": "2026-06-15T03:22:26.5310630Z",
+      "observedLevels": [
+        "10"
+      ],
+      "samplePositions": [
+        "3637.903, 7.910576, 720.0207",
+        "3637.903, 7.910576, 720.0207",
+        "3463.741, 3.374545, 760.052"
+      ],
+      "eventCount": 9
+    },
+    {
+      "name": "Mario Carles",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:78D45A3E)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T03:25:41.3264927Z",
+      "lastSeen": "2026-06-15T03:26:04.4382244Z",
+      "observedLevels": [
+        "10"
+      ],
+      "samplePositions": [
+        "3533.453, 3.01, 733.338",
+        "3533.453, 3.01, 733.338",
+        "3533.453, 3.01, 733.338"
+      ],
+      "eventCount": 19
+    },
+    {
+      "name": "Mario Carles",
+      "aliases": [],
+      "identities": [],
+      "evidenceTypes": [
+        "npc-message-speaker"
+      ],
+      "confidence": [
+        "speaker-name-matched-multiple-identities"
+      ],
+      "folders": [
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T03:22:14.2845698Z",
+      "lastSeen": "2026-06-15T03:26:39.8780364Z",
+      "observedLevels": [],
+      "samplePositions": [],
+      "eventCount": 29
+    },
+    {
+      "name": "Patrick Sun",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE580)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-214357"
+      ],
+      "firstSeen": "2026-06-15T02:45:00.8365045Z",
+      "lastSeen": "2026-06-15T02:46:11.7295049Z",
+      "observedLevels": [
+        "20"
+      ],
+      "samplePositions": [
+        "3462.5, 9.01, 812.4938",
+        "3462.5, 9.01, 812.4938",
+        "3462.5, 9.01, 812.4938"
+      ],
+      "eventCount": 46
+    },
+    {
+      "name": "Rex Larsson",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE568)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-194454"
+      ],
+      "firstSeen": "2026-06-15T00:46:54.8661621Z",
+      "lastSeen": "2026-06-15T00:49:10.8288533Z",
+      "observedLevels": [
+        "15"
+      ],
+      "samplePositions": [
+        "3624.599, 51.745, 787.7465",
+        "3624.599, 51.745, 787.7465",
+        "3624.599, 51.745, 787.7465"
+      ],
+      "eventCount": 29
+    },
+    {
+      "name": "Robotic Guard Dog",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE5EE)"
+      ],
+      "evidenceTypes": [
+        "npc-message-speaker"
+      ],
+      "confidence": [
+        "speaker-name-matched-one-identity"
+      ],
+      "folders": [
+        "20260614-203038"
+      ],
+      "firstSeen": "2026-06-15T01:32:25.7987157Z",
+      "lastSeen": "2026-06-15T01:32:25.7987157Z",
+      "observedLevels": [
+        "13"
+      ],
+      "samplePositions": [
+        "3405.595, 9.01, 885.6395",
+        "3405.595, 9.01, 885.6395",
+        "3405.595, 9.01, 885.6395"
+      ],
+      "eventCount": 1
+    },
+    {
+      "name": "Sarah Greene",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE56E)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-203631",
+        "20260614-205724"
+      ],
+      "firstSeen": "2026-06-15T01:38:43.5183716Z",
+      "lastSeen": "2026-06-15T02:12:42.1052748Z",
+      "observedLevels": [
+        "20"
+      ],
+      "samplePositions": [
+        "3471.268, 9.01, 840.8781",
+        "3471.268, 9.01, 840.8781",
+        "3471.268, 9.01, 840.8781"
+      ],
+      "eventCount": 39
+    },
+    {
+      "name": "Shady Guy",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE57E)"
+      ],
+      "evidenceTypes": [
+        "npc-message-speaker"
+      ],
+      "confidence": [
+        "speaker-name-matched-one-identity"
+      ],
+      "folders": [
+        "20260614-221915"
+      ],
+      "firstSeen": "2026-06-15T03:23:10.8781004Z",
+      "lastSeen": "2026-06-15T03:23:25.8785426Z",
+      "observedLevels": [
+        "20"
+      ],
+      "samplePositions": [
+        "3540.865, 6.085, 748.3144",
+        "3540.865, 6.085, 748.3144",
+        "3540.865, 6.085, 748.3144"
+      ],
+      "eventCount": 3
+    },
+    {
+      "name": "Stanley Goodman",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE56A)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-202500",
+        "20260614-203038"
+      ],
+      "firstSeen": "2026-06-15T01:25:28.7943133Z",
+      "lastSeen": "2026-06-15T01:33:36.3402484Z",
+      "observedLevels": [
+        "20"
+      ],
+      "samplePositions": [
+        "3463.169, 9.01, 880.1864",
+        "3463.169, 9.01, 880.1864",
+        "3463.169, 9.01, 880.1864"
+      ],
+      "eventCount": 52
+    },
+    {
+      "name": "Surveillance Droid",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE58F)"
+      ],
+      "evidenceTypes": [
+        "npc-message-speaker"
+      ],
+      "confidence": [
+        "speaker-name-matched-one-identity"
+      ],
+      "folders": [
+        "20260614-200311"
+      ],
+      "firstSeen": "2026-06-15T01:04:46.2611104Z",
+      "lastSeen": "2026-06-15T01:04:46.2611104Z",
+      "observedLevels": [
+        "6"
+      ],
+      "samplePositions": [
+        "3565.887, 5.110001, 821.869",
+        "3565.887, 5.110001, 821.869",
+        "3565.887, 5.110001, 821.869"
+      ],
+      "eventCount": 1
+    },
+    {
+      "name": "unknown KnuBot target",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE56F)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-only-name-unresolved"
+      ],
+      "folders": [
+        "20260614-211754"
+      ],
+      "firstSeen": "2026-06-15T02:20:07.7856069Z",
+      "lastSeen": "2026-06-15T02:20:24.8169632Z",
+      "observedLevels": [],
+      "samplePositions": [],
+      "eventCount": 20
+    },
+    {
+      "name": "Vaughn Hammond",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE578)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-213857"
+      ],
+      "firstSeen": "2026-06-15T02:39:10.1345213Z",
+      "lastSeen": "2026-06-15T02:39:44.5447977Z",
+      "observedLevels": [
+        "25"
+      ],
+      "samplePositions": [
+        "3369.495, 18.11043, 828.3444",
+        "3369.495, 18.11043, 828.3444",
+        "3369.495, 18.11043, 828.3444"
+      ],
+      "eventCount": 29
+    },
+    {
+      "name": "Vernon Godfray",
+      "aliases": [],
+      "identities": [
+        "(SimpleChar:782DE56D)"
+      ],
+      "evidenceTypes": [
+        "knubot-target"
+      ],
+      "confidence": [
+        "identity-and-name"
+      ],
+      "folders": [
+        "20260614-211754"
+      ],
+      "firstSeen": "2026-06-15T02:18:15.5286153Z",
+      "lastSeen": "2026-06-15T02:21:36.4545427Z",
+      "observedLevels": [
+        "15"
+      ],
+      "samplePositions": [
+        "3433.956, 12.285, 825.9001",
+        "3433.956, 12.285, 825.9001",
+        "3433.956, 12.285, 825.9001"
+      ],
+      "eventCount": 69
+    },
+    {
+      "name": "Wounded Dockworker",
+      "aliases": [],
+      "identities": [],
+      "evidenceTypes": [
+        "npc-message-speaker"
+      ],
+      "confidence": [
+        "speaker-name-matched-multiple-identities"
+      ],
+      "folders": [
+        "20260614-195107"
+      ],
+      "firstSeen": "2026-06-15T00:52:39.5053067Z",
+      "lastSeen": "2026-06-15T00:52:39.5053067Z",
+      "observedLevels": [],
+      "samplePositions": [],
+      "eventCount": 1
+    }
+  ]
+}

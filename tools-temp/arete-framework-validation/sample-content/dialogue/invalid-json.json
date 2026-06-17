@@ -1,0 +1,9 @@
+{
+  "Identity": {
+    "Id": "dialogue-file-invalid-json"
+  },
+  "Npcs": [
+    {
+      "Id": "synthetic-broken"
+    }
+  ]

@@ -1,0 +1,28 @@
+{
+  "Identity": {
+    "Id": "quest-file-missing-chain-endpoint",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "Quests": [
+    {
+      "QuestId": "mission-synthetic-a",
+      "InitialStepId": "step-a",
+      "Steps": [
+        {
+          "StepId": "step-a",
+          "Name": "Synthetic Step A",
+          "Objectives": []
+        }
+      ]
+    }
+  ],
+  "Links": [
+    {
+      "Id": "synthetic-link-missing-endpoint",
+      "FromQuestId": "mission-synthetic-a",
+      "FromStepId": "step-a",
+      "Relationship": "synthetic"
+    }
+  ]
+}

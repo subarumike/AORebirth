@@ -1,0 +1,26 @@
+{
+  "Identity": {
+    "Id": "quest-file-pack-a",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "SourceCaptures": [
+    "synthetic"
+  ],
+  "Quests": [
+    {
+      "QuestId": "mission-synthetic-a",
+      "Title": "Synthetic Mission A",
+      "TitleConfidence": "synthetic",
+      "InitialStepId": "step-a",
+      "Steps": [
+        {
+          "StepId": "step-a",
+          "Name": "Synthetic Step A",
+          "Objectives": []
+        }
+      ]
+    }
+  ],
+  "Links": []
+}

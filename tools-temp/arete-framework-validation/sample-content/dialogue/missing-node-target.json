@@ -1,0 +1,27 @@
+{
+  "Identity": {
+    "Id": "dialogue-file-missing-node-target",
+    "Version": "synthetic",
+    "Source": "synthetic-validation"
+  },
+  "Npcs": [
+    {
+      "Id": "synthetic-npc-missing-target",
+      "NpcIdentity": "SimpleChar:synthetic-missing-target",
+      "Name": "Synthetic Missing Target NPC",
+      "RootNodeId": "node-a",
+      "Nodes": [
+        {
+          "Id": "node-a",
+          "Options": [
+            {
+              "Id": "option-missing-target",
+              "Index": 0,
+              "Text": "Synthetic missing target option"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
