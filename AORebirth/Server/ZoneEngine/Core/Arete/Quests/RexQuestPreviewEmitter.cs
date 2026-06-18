@@ -3,10 +3,14 @@ namespace ZoneEngine.Core.Arete.Quests
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
+    using System.Globalization;
 
     using AORebirth.Core.Entities;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+
+    using Utility;
 
     #endregion
 
@@ -59,6 +63,15 @@ namespace ZoneEngine.Core.Arete.Quests
                 return RexQuestPreviewEmissionResult.Failed("B18C quest preview failed: source character missing.");
             }
 
+            RexMissionChainState chainState = RexMissionChainStateStore.GetState(source);
+            if (chainState != RexMissionChainState.NoRexMission)
+            {
+                return RexQuestPreviewEmissionResult.Skipped(
+                    "B18C quest preview skipped because Rex chain state is "
+                    + chainState
+                    + ". duplicateOfferBlocked=true noPersistence=true noRewards=true noCompletion=true");
+            }
+
             if (!IsRexLarsson(npcIdentity))
             {
                 return RexQuestPreviewEmissionResult.Failed(
@@ -106,6 +119,101 @@ namespace ZoneEngine.Core.Arete.Quests
                    || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)
                    || string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase)
                    || string.Equals(value, "on", StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    public enum RexMissionChainState
+    {
+        NoRexMission = 0,
+        B18CPreviewed = 1,
+        B18CObjectiveComplete = 2,
+        B18DPreviewed = 3,
+        B18DObjectiveComplete = 4,
+        B18EPreviewed = 5,
+        B18ECompleted = 6,
+        B18FPreviewed = 7
+    }
+
+    public static class RexMissionChainStateStore
+    {
+        private static readonly Dictionary<string, RexMissionChainState> StateByCharacter =
+            new Dictionary<string, RexMissionChainState>(StringComparer.OrdinalIgnoreCase);
+
+        private static readonly object SyncRoot = new object();
+
+        public static RexMissionChainState GetState(ICharacter character)
+        {
+            if (character == null)
+            {
+                return RexMissionChainState.NoRexMission;
+            }
+
+            return GetState(character.Identity);
+        }
+
+        public static RexMissionChainState GetState(Identity identity)
+        {
+            if (identity.Type != IdentityType.CanbeAffected || identity.Instance == 0)
+            {
+                return RexMissionChainState.NoRexMission;
+            }
+
+            RexMissionChainState state;
+            lock (SyncRoot)
+            {
+                if (StateByCharacter.TryGetValue(MakeCharacterKey(identity), out state))
+                {
+                    return state;
+                }
+            }
+
+            return RexMissionChainState.NoRexMission;
+        }
+
+        public static void AdvanceAtLeast(
+            ICharacter character,
+            RexMissionChainState targetState,
+            string reason)
+        {
+            if (character == null
+                || character.Identity.Type != IdentityType.CanbeAffected
+                || character.Identity.Instance == 0)
+            {
+                return;
+            }
+
+            RexMissionChainState currentState;
+            RexMissionChainState nextState;
+            string characterText = character.Identity.ToString(true);
+            lock (SyncRoot)
+            {
+                string key = MakeCharacterKey(character.Identity);
+                if (!StateByCharacter.TryGetValue(key, out currentState))
+                {
+                    currentState = RexMissionChainState.NoRexMission;
+                }
+
+                nextState = currentState < targetState ? targetState : currentState;
+                StateByCharacter[key] = nextState;
+            }
+
+            if (nextState != currentState)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "ARETE_REX_CHAIN_STATE character=" + characterText
+                    + " from=" + currentState
+                    + " to=" + nextState
+                    + " reason=\"" + (reason ?? string.Empty) + "\""
+                    + " inMemoryOnly=true noPersistence=true noRewards=true noInventory=true noXpCredits=true");
+            }
+        }
+
+        private static string MakeCharacterKey(Identity identity)
+        {
+            return ((int)identity.Type).ToString(CultureInfo.InvariantCulture)
+                   + ":"
+                   + identity.Instance.ToString("X8", CultureInfo.InvariantCulture);
         }
     }
 

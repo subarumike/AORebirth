@@ -142,6 +142,7 @@
     <Compile Include="Core\Arete\Quests\ObjectivePlaybackService.cs" />
     <Compile Include="Core\Arete\Quests\RexB18CObjectiveProgressTracker.cs" />
     <Compile Include="Core\Arete\Quests\RexB18DBoxProgressTracker.cs" />
+    <Compile Include="Core\Arete\Quests\RexB18ECompletionHandler.cs" />
     <Compile Include="Core\Arete\Quests\RexQuestPreviewEmitter.cs" />
     <Compile Include="Core\Arete\Quests\SafeQuestFullUpdateSender.cs" />
     <Compile Include="Core\CombatCorpseRules.cs" />

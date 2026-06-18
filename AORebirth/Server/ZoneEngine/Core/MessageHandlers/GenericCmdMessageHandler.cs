@@ -97,17 +97,11 @@ namespace ZoneEngine.Core.MessageHandlers
                 case GenericCmdAction.Drop:
                     break;
                 case GenericCmdAction.Use:
-                    bool shouldSendB18DHandoff;
                     if (RexB18DBoxProgressTracker.TryObserveBoxUse(
                         client.Controller.Character,
-                        target,
-                        out shouldSendB18DHandoff))
+                        target))
                     {
                         this.Acknowledge(client.Controller.Character, message);
-                        if (shouldSendB18DHandoff)
-                        {
-                            SafeQuestFullUpdateSender.TrySendB18DCompletionHandoff(client.Controller.Character);
-                        }
                     }
                     else if (target.Type == IdentityType.Inventory)
                     {
