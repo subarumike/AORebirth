@@ -1,49 +1,69 @@
 # Current Task
 
-Generated: 2026-06-17
+Generated: 2026-06-18
 
 ## Current Objective
 
-Add the first gated live objective-progress path for Rex Larsson mission B18C.
+Repair the Rex B18D Cargo Box static dynel row using packet identity evidence only.
 
 Scope:
 
-- Preserve existing gated Rex content-driven dialogue behavior.
-- Preserve the safe DTO-based B18C `QuestFullUpdate` sender.
-- Keep `AO_REBIRTH_ENABLE_ARETE_REX_DIALOGUE_ROUTING`, `AO_REBIRTH_ENABLE_ARETE_REX_QUEST_PREVIEW`, and the new `AO_REBIRTH_ENABLE_ARETE_REX_B18C_PROGRESS` disabled by default.
-- Track only `Mission:5514B18C` objective progress in memory.
-- Count only live kills of `Malfunctioning Cleaning Robot` for the player who received the gated B18C preview.
-- Do not emit quest progress packets unless packet fields are evidence-backed.
-- Do not implement completion, rewards, inventory, XP/credits, DB writes, quest deletion, Cargo Box behavior, B18D/B18E behavior, broad Arete quest routing, or action `59` interpretation.
+- Target identity: `Terminal:56D9B4AF`.
+- Do not use rendered text as the lookup source.
+- Do not use nearby static clutter as a substitute identity.
+- Do not use rejected local smoke attempts:
+  - `Terminal:57369E8E` `Junk` anchor.
+  - Template `285300`.
+  - Explicit `Mesh=18794`.
+- Keep B18D behavior narrow:
+  - exact-target `GenericCmd Action=Use` only;
+  - captured B18D-to-B18E packet-window handoff only;
+  - no rewards, inventory, XP/credits, persistence, schema change, or broad static dynel execution.
+
+## Packet Evidence
+
+- Capture `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454` proves B18D use target `Terminal:56D9B4AF`:
+  - `events.log:6327`
+  - `events.log:6333`
+  - `events.log:7798`
+- Capture `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724` proves exact `SimpleItemFullUpdate` for `Terminal:56D9B4AF`:
+  - `events.log:5493-5494`
+- Capture `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819` repeats the exact full-update:
+  - `events.log:14605-14606`
+  - `events.log:15738-15739`
+  - `events.log:19521-19522`
+- Capture `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831` repeats the exact full-update:
+  - `events.log:10939-10940`
+  - `events.log:11431-11432`
+  - `packets.hex.log:9058-9059`
+  - `packets.hex.log:9328-9329`
+
+Exact captured row data:
+
+- Position: `(3621.576, 51.745, 780.4768)`
+- Rotation: `(0, -0.7101817, 0, 0.7040185)`
+- Stats:
+  - `Flags=139265`
+  - `StaticInstance=297277`
+  - `ACGItemLevel=1`
+  - `ACGItemTemplateID=297277`
+  - `ACGItemTemplateID2=297277`
+  - `MultipleCount=1`
+  - `AnimPlay=0`
+  - `AnimPos=0`
 
 ## Current Status
 
-- Rex dialogue works.
-- The safe B18C `QuestFullUpdate` sender works in live smoke.
-- `Mission:5514B18C` appears in the client mission window.
-- B18C in-memory live progress tracking is implemented behind `AO_REBIRTH_ENABLE_ARETE_REX_B18C_PROGRESS`.
-- Focused ZoneEngine build passed.
-- Rex inactive content dry-run passed.
-- Arete validation harness passed 131 cases.
-- `git diff --check` passed with line-ending warnings only.
-- Default engines were restarted with all three Rex gates cleared.
-
-## Active Questions
-
-- Capture `20260614-194454` contains named `Malfunctioning Cleaning Robot` spawn/full-update/death/corpse evidence, including level, HP, `monsterData=297023`, and coordinates.
-- Read-only local DB verification found no runtime `Malfunctioning Cleaning Robot` spawns in playfield `6553`; live `5/5` smoke is blocked until the captured robot observations are promoted into evidence-backed runtime spawn data or an explicitly approved isolated test path.
-- Does the client mission window need a later evidence-backed progress refresh packet, or is server-side in-memory progress sufficient for this phase?
+- `tools-temp/sql-staging/arete_cargo_box_staticdynel.sql` has been corrected to the exact captured `Terminal:56D9B4AF` full-update position, rotation, and stats.
+- Corrected SQL has been applied locally to `cellao_codex_clean`.
+- DB verification shows one row for `Type=51005`, `Instance=1457108143`, `Playfield=6553` at `(3621.576, 51.745, 780.4768)` with rotation `(0, -0.7101817, 0, 0.7040185)`.
+- DB stat decode matches the captured eight stat entries: `Flags=139265`, `StaticInstance=297277`, `ACGItemLevel=1`, `ACGItemTemplateID=297277`, `ACGItemTemplateID2=297277`, `MultipleCount=1`, `AnimPlay=0`, `AnimPos=0`.
+- ZoneEngine has been restarted with the four Rex gates enabled so playfield `6553` can reload the corrected row.
+- Capture folders remain read-only for this repair; `git status --short -- tools-temp/AOSharpLiveCapture` returned no modified capture files.
+- Client smoke still needs to inspect the corrected object and exact-target B18D use behavior.
 
 ## Validation Plan
 
-- Run focused ZoneEngine build.
-- Run Rex inactive content dry-run.
-- Run Arete validation harness if Arete framework/content is touched.
+- Inspect corrected `Terminal:56D9B4AF` in the client after relog/rezoning to Arete Landing.
+- Confirm whether exact-target use advances from B18D to B18E.
 - Run `git diff --check`.
-- When evidence-backed robot spawns exist, start engines with all three Rex gates enabled and run a manual in-client smoke:
-  - `/tp 3624.599 787.7465 51.745 6553`
-  - talk to Rex
-  - start B18C so it appears in the mission window
-  - kill `Malfunctioning Cleaning Robot` if available
-  - observe ZoneEngine logs for progress
-- Restore all three gates off after smoke.

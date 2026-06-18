@@ -19,6 +19,10 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int B18CInstance = unchecked((int)0x5514B18C);
 
+        private const int B18DInstance = unchecked((int)0x5514B18D);
+
+        private const int B18EInstance = unchecked((int)0x5514B18E);
+
         private const int RexLarssonInstance = unchecked((int)0x782DE568);
 
         private const int B18CUnknownActionIdType = 0x00001999;
@@ -28,6 +32,22 @@ namespace ZoneEngine.Core.Arete.Quests
         private const int B18CUnknownActionId7Type = 0x0000D2FC;
 
         private const int B18CUnknownActionId7Instance = 0x1C50D8CE;
+
+        private const int B18DUnknownActionId2Type = 0x000111D3;
+
+        private const int B18DUnknownActionId2Instance = 0x00019A8F;
+
+        private const int B18DUnknownActionId7Type = 0x0000D2F1;
+
+        private const int B18DUnknownActionId7Instance = 0x4D167F39;
+
+        private const int B18EUnknownActionId2Type = 0x000111D3;
+
+        private const int B18EUnknownActionId2Instance = 0x52454C53;
+
+        private const int B18EUnknownActionId7Type = 0x0000D2F1;
+
+        private const int B18EUnknownActionId7Instance = 0x4D167F3A;
 
         private const string B18CShortInfo = "Terminate 5 Malfunctioning C...";
 
@@ -41,6 +61,24 @@ namespace ZoneEngine.Core.Arete.Quests
             + "open the package with brand new cleaning robots and set them to work.<BR><BR>"
             + "<font color=\"#FF0000\">Mission Objective:<BR>"
             + "Kill 5 Malfunctining Cleaning Robots.</font>";
+
+        private const string B18DShortInfo = "Open the Cargo Box";
+
+        private const string B18DLongInfo =
+            "Open the Cargo Box<BR><BR>"
+            + "Rex Larsson considers himself too lazy to clean up his cleaning business. Since you need his help, "
+            + "he wanted a favor in return. You have to terminate 5 of his Malfunctioning Cleaning Robots then "
+            + "open the Cargo Box with brand new cleaning robots and set them to work.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Use (Right Click) the Cargo Box to open it.</font>";
+
+        private const string B18EShortInfo = "Return to Rex Larsson";
+
+        private const string B18ELongInfo =
+            "Return to Rex Larsson<BR><BR>"
+            + "Return to Rex Larsson to inform him of the great cleaning success.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Talk to Rex Larsson.</font>";
 
         public static RexQuestPreviewEmissionResult TrySendB18CPreview(ICharacter source)
         {
@@ -85,6 +123,108 @@ namespace ZoneEngine.Core.Arete.Quests
                     "Arete Rex B18C QuestFullUpdate DTO preview failed: " + e.Message);
                 return RexQuestPreviewEmissionResult.Failed(
                     "B18C QuestFullUpdate preview failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        public static bool TrySendB18CCompletionHandoff(ICharacter source)
+        {
+            if (source == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Rex B18C completion handoff skipped: source character missing.");
+                return false;
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Rex B18C completion handoff skipped: source client missing.");
+                return false;
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Rex B18C completion handoff skipped: source identity is invalid.");
+                return false;
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateB18CAction59Message(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB18CQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB18DPreviewMessage(source.Identity));
+
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "Arete Rex B18C completion handoff sent character="
+                    + source.Identity.ToString(true)
+                    + " action59=Mission:5514B18C questDelete=Mission:5514B18C "
+                    + "nextQuestFullUpdate=Mission:5514B18D capture=20260614-194454/events.log:5919-5926 "
+                    + "packetHandoffOnly=true noRewards=true noInventory=true noXpCredits=true "
+                    + "noDbWrites=true noPersistence=true noCargoBox=true");
+                return true;
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Rex B18C completion handoff failed: " + e.Message);
+                return false;
+            }
+        }
+
+        public static bool TrySendB18DCompletionHandoff(ICharacter source)
+        {
+            if (source == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Rex B18D completion handoff skipped: source character missing.");
+                return false;
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Rex B18D completion handoff skipped: source client missing.");
+                return false;
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Rex B18D completion handoff skipped: source identity is invalid.");
+                return false;
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateB18DAction59Message(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB18DQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB18EPreviewMessage(source.Identity));
+
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "Arete Rex B18D completion handoff sent character="
+                    + source.Identity.ToString(true)
+                    + " action59=Mission:5514B18D questDelete=Mission:5514B18D "
+                    + "nextQuestFullUpdate=Mission:5514B18E capture=20260614-194454/events.log:6327-6344 "
+                    + "packetHandoffOnly=true noRewards=true noInventory=true noXpCredits=true "
+                    + "noDbWrites=true noPersistence=true noQuestSemantics=true");
+                return true;
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Rex B18D completion handoff failed: " + e.Message);
+                return false;
             }
         }
 
@@ -185,6 +325,264 @@ namespace ZoneEngine.Core.Arete.Quests
                                    Unknown28 = 1
                                }
                            }
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateB18DPreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, B18DInstance);
+            Identity rexIdentity = new Identity { Type = IdentityType.CanbeAffected, Instance = RexLarssonInstance };
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = B18DShortInfo,
+                                   LongInfo = B18DLongInfo,
+                                   UnknownId1 = rexIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = 1145587534,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 244818,
+                                   Unknown20 = 0,
+                                   Unknown21 = 0,
+                                   QuestActions =
+                                       new[]
+                                       {
+                                           new QuestActionInfo
+                                           {
+                                               Version = 24,
+                                               Action = Identity.None,
+                                               UnknownId1 = Identity.None,
+                                               UnknownId2 = IdentityFromRaw(
+                                                   B18DUnknownActionId2Type,
+                                                   B18DUnknownActionId2Instance),
+                                               UnknownId3 = Identity.None,
+                                               UnknownId4 = Identity.None,
+                                               Unknown1 = 0,
+                                               Unknown2 = 0,
+                                               Unknown3 = 0,
+                                               Unknown4 = 0,
+                                               UnknownId5 = Identity.None,
+                                               Unknown5 = 0,
+                                               Unknown6 = 0,
+                                               Unknown7 = 0,
+                                               Unknown8 = 0,
+                                               UnknownId6 = Identity.None,
+                                               UnknownHash1 = string.Empty,
+                                               Unknown9 = 0,
+                                               UnknownId7 = IdentityFromRaw(
+                                                   B18DUnknownActionId7Type,
+                                                   B18DUnknownActionId7Instance),
+                                               PlayfieldId = new Identity
+                                                             {
+                                                                 Type = IdentityType.Playfield2,
+                                                                 Instance = 6553
+                                                             },
+                                               Unknown10 = 100000,
+                                               Unknown11 = 100000,
+                                               Position = new Vector3(3621, 0, 782)
+                                           }
+                                       },
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360441 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105103,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 7,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateB18EPreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, B18EInstance);
+            Identity rexIdentity = new Identity { Type = IdentityType.CanbeAffected, Instance = RexLarssonInstance };
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = B18EShortInfo,
+                                   LongInfo = B18ELongInfo,
+                                   UnknownId1 = rexIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 1040,
+                                   Unknown7 = 0,
+                                   Unknown8 = 1281,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = 861490233,
+                                   Unknown12 = 0,
+                                   Unknown13 = 1,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 894781018,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 244818,
+                                   Unknown20 = 0,
+                                   Unknown21 = 0,
+                                   QuestActions =
+                                       new[]
+                                       {
+                                           new QuestActionInfo
+                                           {
+                                               Version = 23,
+                                               Action = Identity.None,
+                                               UnknownId1 = Identity.None,
+                                               UnknownId2 = IdentityFromRaw(
+                                                   B18EUnknownActionId2Type,
+                                                   B18EUnknownActionId2Instance),
+                                               UnknownId3 = Identity.None,
+                                               UnknownId4 = Identity.None,
+                                               Unknown1 = 0,
+                                               Unknown2 = 0,
+                                               Unknown3 = 0,
+                                               Unknown4 = 0,
+                                               UnknownId5 = Identity.None,
+                                               Unknown5 = 0,
+                                               Unknown6 = 0,
+                                               Unknown7 = 0,
+                                               Unknown8 = 0,
+                                               UnknownId6 = Identity.None,
+                                               UnknownHash1 = string.Empty,
+                                               Unknown9 = 0,
+                                               UnknownId7 = IdentityFromRaw(
+                                                   B18EUnknownActionId7Type,
+                                                   B18EUnknownActionId7Instance),
+                                               PlayfieldId = new Identity
+                                                             {
+                                                                 Type = IdentityType.Playfield2,
+                                                                 Instance = 6553
+                                                             },
+                                               Unknown10 = 100000,
+                                               Unknown11 = 100000,
+                                               Position = new Vector3(3621, 0, 790)
+                                           }
+                                       },
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360442 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105104,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 7,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static CharacterActionMessage CreateB18CAction59Message(Identity characterIdentity)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, B18CInstance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = B18CInstance,
+                       Unknown2 = 0
+                   };
+        }
+
+        internal static CharacterActionMessage CreateB18DAction59Message(Identity characterIdentity)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, B18DInstance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = B18DInstance,
+                       Unknown2 = 0
+                   };
+        }
+
+        internal static QuestMessage CreateB18CQuestDeleteMessage(Identity characterIdentity)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Unknown1 = 0,
+                       Mission = IdentityFromRaw(MissionIdentityType, B18CInstance),
+                       Unknown2 = 0,
+                       Unknown3 = 0
+                   };
+        }
+
+        internal static QuestMessage CreateB18DQuestDeleteMessage(Identity characterIdentity)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Unknown1 = 0,
+                       Mission = IdentityFromRaw(MissionIdentityType, B18DInstance),
+                       Unknown2 = 0,
+                       Unknown3 = 0
                    };
         }
 

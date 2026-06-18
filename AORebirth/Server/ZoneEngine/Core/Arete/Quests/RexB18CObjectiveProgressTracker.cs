@@ -9,6 +9,7 @@ namespace ZoneEngine.Core.Arete.Quests
     using AORebirth.Core.Entities;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using Utility;
 
@@ -154,6 +155,8 @@ namespace ZoneEngine.Core.Arete.Quests
             bool targetMatches = string.Equals(targetName, TargetName, StringComparison.OrdinalIgnoreCase);
             string characterKey = MakeCharacterKey(attacker.Identity);
             RexB18CProgressState state;
+            ObjectiveProgressRecord matchedProgress;
+            bool shouldSendCompletionHandoff = false;
 
             lock (SyncRoot)
             {
@@ -196,9 +199,23 @@ namespace ZoneEngine.Core.Arete.Quests
                     state.Progress.IgnoredEvidenceCount++;
                 }
 
+                if (state.Progress.Completed && !state.CompletionHandoffSent)
+                {
+                    state.CompletionHandoffSent = true;
+                    shouldSendCompletionHandoff = true;
+                }
+
                 LogProgress(attacker, target, state.Progress);
-                return RexB18CProgressUpdateResult.MatchedProgress(state.Progress);
+                matchedProgress = CopyProgress(state.Progress);
             }
+
+            RexB18CProgressFeedbackSender.TrySend(attacker, matchedProgress);
+            if (shouldSendCompletionHandoff)
+            {
+                SafeQuestFullUpdateSender.TrySendB18CCompletionHandoff(attacker);
+            }
+
+            return RexB18CProgressUpdateResult.MatchedProgress(matchedProgress);
         }
 
         public static ObjectiveProgressRecord GetProgressForCharacter(ICharacter source)
@@ -228,7 +245,7 @@ namespace ZoneEngine.Core.Arete.Quests
             if (progress.Completed)
             {
                 Log(
-                    "progress mission={0} character={1} target={2} targetName=\"{3}\" progress={4}/{5} complete=true inMemoryOnly=true noMissionCompletion=true noQuestDelete=true noRewards=true noDbWrites=true",
+                    "progress mission={0} character={1} target={2} targetName=\"{3}\" progress={4}/{5} complete=true inMemoryOnly=true capturedCompletionHandoffPending=true noRewards=true noDbWrites=true noPersistence=true",
                     MissionId,
                     IdentityText(attacker),
                     IdentityText(target),
@@ -343,6 +360,95 @@ namespace ZoneEngine.Core.Arete.Quests
             public ObjectiveProgressRecord Progress { get; set; }
 
             public DateTime ActivatedAtUtc { get; set; }
+
+            public bool CompletionHandoffSent { get; set; }
+        }
+
+        private static class RexB18CProgressFeedbackSender
+        {
+            private const int FeedbackCategoryId = 110;
+
+            private const int FeedbackMessageId = 249817907;
+
+            public static bool TrySend(ICharacter character, ObjectiveProgressRecord progress)
+            {
+                if (character == null || character.Controller == null || character.Controller.Client == null)
+                {
+                    Log(
+                        "feedback skipped mission={0} reason=missing-client progress={1}/{2} noQuestDelete=true noCompletion=true",
+                        MissionId,
+                        ProgressCount(progress),
+                        RequiredCount);
+                    return false;
+                }
+
+                if (progress == null)
+                {
+                    Log(
+                        "feedback skipped mission={0} reason=missing-progress noQuestDelete=true noCompletion=true",
+                        MissionId);
+                    return false;
+                }
+
+                string formatFeedback = GetCapturedRemainingCountFeedback(progress.CurrentCount);
+                if (!string.IsNullOrEmpty(formatFeedback))
+                {
+                    character.Controller.Client.SendCompressed(
+                        new FormatFeedbackMessage
+                        {
+                            Identity = character.Identity,
+                            Unknown = 1,
+                            Unknown1 = 0,
+                            FormattedMessage = formatFeedback,
+                            Unknown2 = 0
+                        });
+                }
+
+                character.Controller.Client.SendCompressed(
+                    new FeedbackMessage
+                    {
+                        Identity = character.Identity,
+                        Unknown = 1,
+                        Unknown1 = 0,
+                        CategoryId = FeedbackCategoryId,
+                        MessageId = FeedbackMessageId
+                    });
+
+                Log(
+                    "feedback sent mission={0} character={1} progress={2}/{3} formatFeedback={4} feedbackCategory={5} feedbackMessage={6} sender=server capturedSource=20260614-194454/system-messages.log completionHandoffCandidate={7} noRewards=true noDbWrites=true",
+                    MissionId,
+                    IdentityText(character),
+                    progress.CurrentCount,
+                    progress.RequiredCount,
+                    !string.IsNullOrEmpty(formatFeedback),
+                    FeedbackCategoryId,
+                    FeedbackMessageId,
+                    progress.Completed);
+
+                return true;
+            }
+
+            private static string GetCapturedRemainingCountFeedback(int currentCount)
+            {
+                switch (currentCount)
+                {
+                    case 1:
+                        return "~&!!!\":$nZiAi!!!!%s\u001e" + TargetName;
+                    case 2:
+                        return "~&!!!\":$nZiAi!!!!$s\u001e" + TargetName;
+                    case 3:
+                        return "~&!!!\":$nZiAi!!!!#s\u001e" + TargetName;
+                    case 4:
+                        return "~&!!!\":$nZiAi!!!!\"s\u001e" + TargetName;
+                    default:
+                        return null;
+                }
+            }
+
+            private static int ProgressCount(ObjectiveProgressRecord progress)
+            {
+                return progress == null ? 0 : progress.CurrentCount;
+            }
         }
     }
 

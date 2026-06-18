@@ -51,6 +51,8 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Arete.Quests;
+
     #endregion
 
     /// <summary>
@@ -95,7 +97,19 @@ namespace ZoneEngine.Core.MessageHandlers
                 case GenericCmdAction.Drop:
                     break;
                 case GenericCmdAction.Use:
-                    if (target.Type == IdentityType.Inventory)
+                    bool shouldSendB18DHandoff;
+                    if (RexB18DBoxProgressTracker.TryObserveBoxUse(
+                        client.Controller.Character,
+                        target,
+                        out shouldSendB18DHandoff))
+                    {
+                        this.Acknowledge(client.Controller.Character, message);
+                        if (shouldSendB18DHandoff)
+                        {
+                            SafeQuestFullUpdateSender.TrySendB18DCompletionHandoff(client.Controller.Character);
+                        }
+                    }
+                    else if (target.Type == IdentityType.Inventory)
                     {
                         client.Controller.UseItem(target);
 
