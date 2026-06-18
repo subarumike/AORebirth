@@ -273,7 +273,9 @@
     <Compile Include="Messages\N3Messages\PlayfieldAnarchyFMessage.cs" />
     <Compile Include="Messages\N3Messages\PlaySoundMessage.cs" />
     <Compile Include="Messages\N3Messages\QuestAlternativeMessage.cs" />
+    <Compile Include="Messages\N3Messages\QuestAction.cs" />
     <Compile Include="Messages\N3Messages\QuestFullUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\QuestMessage.cs" />
     <Compile Include="Messages\N3Messages\RemovePetMessage.cs" />
     <Compile Include="Messages\N3Messages\ResearchRequestMessage.cs" />
     <Compile Include="Messages\N3Messages\ResearchUpdateMessage.cs" />
