@@ -10,6 +10,7 @@ namespace ZoneEngine.Core.Arete.Quests
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using Utility;
 
@@ -28,6 +29,12 @@ namespace ZoneEngine.Core.Arete.Quests
         private const int RexLarssonInstance = unchecked((int)0x782DE568);
 
         private const int XpReward = 290;
+
+        private const int CreditReward = 1040;
+
+        private const int RewardMessageDisplayXp = 1281;
+
+        private const string RewardFeedbackText = "Received reward: 1281 XP, 1040 credits.";
 
         private static readonly Dictionary<string, RexB18ECompletionState> StateByCharacter =
             new Dictionary<string, RexB18ECompletionState>(StringComparer.OrdinalIgnoreCase);
@@ -65,7 +72,7 @@ namespace ZoneEngine.Core.Arete.Quests
                     + " questPreviewGate=" + questPreviewGateEnabled
                     + " b18dPreviewGate=" + b18dPreviewGateEnabled
                     + " b18eCompletionGate=" + completionGateEnabled
-                    + " attempted=false noAction59=true noCredits=true noItems=true noInventory=true "
+                    + " attempted=false noAction59=true noCreditGrant=true noItems=true noInventory=true "
                     + "noDbMissionPersistence=true noMarcusStoneImplementation=true");
             }
 
@@ -102,12 +109,35 @@ namespace ZoneEngine.Core.Arete.Quests
                     return RexB18ECompletionResult.Failed(
                         "B18E completion failed before XP/B18F because Quest Delete was not emitted. "
                         + "message=\"" + deleteResult.Message + "\" noAction59=true noXpGranted=true "
-                        + "noCredits=true noItems=true noInventory=true noDbMissionPersistence=true");
+                        + "noCreditsGranted=true noRewardFeedback=true noItems=true noInventory=true "
+                        + "noDbMissionPersistence=true");
                 }
 
                 lock (SyncRoot)
                 {
                     completionState.B18EDeleteSent = true;
+                }
+            }
+
+            RewardFeedbackResult rewardFeedbackResult = null;
+            if (!completionState.RewardFeedbackSent)
+            {
+                rewardFeedbackResult = SendCapturedRewardFeedback(source);
+                lock (SyncRoot)
+                {
+                    completionState.RewardFeedbackSent = rewardFeedbackResult.Sent;
+                }
+            }
+
+            CreditGrantResult creditResult = null;
+            if (!completionState.CreditsGranted)
+            {
+                creditResult = GrantCapturedCredits(source);
+                lock (SyncRoot)
+                {
+                    completionState.CreditsGranted = true;
+                    completionState.CashBefore = creditResult.CashBefore;
+                    completionState.CashAfter = creditResult.CashAfter;
                 }
             }
 
@@ -136,8 +166,9 @@ namespace ZoneEngine.Core.Arete.Quests
 
                     return RexB18ECompletionResult.Failed(
                         "B18E completion partially applied but B18F QuestFullUpdate was not emitted. "
-                        + "b18eDeleteSent=true xpGranted=true message=\"" + b18fResult.Message + "\" "
-                        + "noAction59=true noCredits=true noItems=true noInventory=true "
+                        + "b18eDeleteSent=true rewardFeedbackSent=" + completionState.RewardFeedbackSent
+                        + " creditsGranted=true xpGranted=true message=\"" + b18fResult.Message + "\" "
+                        + "noAction59=true noItems=true noInventory=true "
                         + "noDbMissionPersistence=true noMarcusStoneImplementation=true");
                 }
 
@@ -159,6 +190,16 @@ namespace ZoneEngine.Core.Arete.Quests
                 + completionState.XpBefore
                 + " xpAfter="
                 + completionState.XpAfter
+                + " creditsGranted=true creditDelta=1040 cashBefore="
+                + completionState.CashBefore
+                + " cashAfter="
+                + completionState.CashAfter
+                + " rewardFeedbackSent="
+                + completionState.RewardFeedbackSent
+                + " rewardFeedbackMessage=\""
+                + RewardFeedbackText
+                + "\" rewardMessageDisplayXp="
+                + RewardMessageDisplayXp
                 + " b18fQuestFullUpdateSent="
                 + completionState.B18FQuestFullUpdateSent
                 + " b18fMission=Mission:5514B18F nextNpc=SimpleChar:782DE567 "
@@ -166,10 +207,79 @@ namespace ZoneEngine.Core.Arete.Quests
                 + (deleteResult == null ? "already-sent" : deleteResult.Message)
                 + "\" xpMessage=\""
                 + (xpResult == null ? "already-granted" : xpResult.Message)
+                + "\" creditMessage=\""
+                + (creditResult == null ? "already-granted" : creditResult.Message)
+                + "\" rewardFeedbackStatus=\""
+                + (rewardFeedbackResult == null ? "already-sent" : rewardFeedbackResult.Message)
                 + "\" b18fMessage=\""
                 + (b18fResult == null ? "already-sent" : b18fResult.Message)
-                + "\" noAction59=true noCredits=true noItems=true noInventory=true "
+                + "\" noAction59=true noApplied1281Xp=true noItems=true noInventory=true "
                 + "noDbMissionPersistence=true noMarcusStoneImplementation=true");
+        }
+
+        private static RewardFeedbackResult SendCapturedRewardFeedback(ICharacter source)
+        {
+            if (source == null || source.Controller == null || source.Controller.Client == null)
+            {
+                return new RewardFeedbackResult
+                       {
+                           Sent = false,
+                           Message = "Reward feedback skipped because source client is missing."
+                       };
+            }
+
+            source.Controller.Client.SendCompressed(
+                new FormatFeedbackMessage
+                {
+                    Identity = source.Identity,
+                    Unknown = 1,
+                    Unknown1 = 0,
+                    FormattedMessage = RewardFeedbackText,
+                    Unknown2 = 0
+                });
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                "ARETE_REX_B18E_COMPLETION reward feedback sent character="
+                + source.Identity.ToString(true)
+                + " message=\""
+                + RewardFeedbackText
+                + "\" displayXp=1281 actualXpDelta=290 creditReward=1040 "
+                + "source=20260618-083035/events.log:1076,system-messages.log:281 "
+                + "safeFormatFeedback=true noAction59=true noItems=true noInventory=true");
+
+            return new RewardFeedbackResult
+                   {
+                       Sent = true,
+                       Message = "Reward feedback sent using existing FormatFeedbackMessage path."
+                   };
+        }
+
+        private static CreditGrantResult GrantCapturedCredits(ICharacter source)
+        {
+            uint cashBeforeBase = source.Stats[StatIds.cash].BaseValue;
+            int cashBefore = CashStatRules.Clamp(cashBeforeBase);
+            int cashAfter = CashStatRules.Clamp((long)cashBefore + CreditReward);
+
+            source.Stats[StatIds.cash].Set((uint)cashAfter);
+            StatMessageHandler.Default.SendChanged(source);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                "ARETE_REX_B18E_COMPLETION credit grant applied character="
+                + source.Identity.ToString(true)
+                + " cashBefore=" + cashBefore.ToString(CultureInfo.InvariantCulture)
+                + " cashBeforeBase=" + cashBeforeBase.ToString(CultureInfo.InvariantCulture)
+                + " cashAfter=" + cashAfter.ToString(CultureInfo.InvariantCulture)
+                + " creditDelta=1040 source=20260618-083035/events.log:1077,system-messages.log:282 "
+                + "noAction59=true noItems=true noInventory=true noDbMissionPersistence=true");
+
+            return new CreditGrantResult
+                   {
+                       CashBefore = cashBefore,
+                       CashAfter = cashAfter,
+                       Message = "Credits +1040 applied using existing cash stat update path."
+                   };
         }
 
         private static XpGrantResult GrantCapturedXp(ICharacter source)
@@ -190,8 +300,9 @@ namespace ZoneEngine.Core.Arete.Quests
                 + source.Identity.ToString(true)
                 + " xpBefore=" + xpBefore.ToString(CultureInfo.InvariantCulture)
                 + " xpAfter=" + xpAfter.ToString(CultureInfo.InvariantCulture)
-                + " xpDelta=290 source=20260614-194454/events.log:5915-5916,6528-6529 "
-                + "noCredits=true noItems=true noInventory=true noDbMissionPersistence=true");
+                + " xpDelta=290 displayXp=1281 displayXpNotApplied=true "
+                + "source=20260618-083035/events.log:923,1078 "
+                + "noItems=true noInventory=true noDbMissionPersistence=true");
 
             return new XpGrantResult
                    {
@@ -268,6 +379,10 @@ namespace ZoneEngine.Core.Arete.Quests
         {
             public bool B18EDeleteSent { get; set; }
 
+            public bool RewardFeedbackSent { get; set; }
+
+            public bool CreditsGranted { get; set; }
+
             public bool XpGranted { get; set; }
 
             public bool B18FQuestFullUpdateSent { get; set; }
@@ -275,6 +390,26 @@ namespace ZoneEngine.Core.Arete.Quests
             public uint XpBefore { get; set; }
 
             public uint XpAfter { get; set; }
+
+            public int CashBefore { get; set; }
+
+            public int CashAfter { get; set; }
+        }
+
+        private sealed class RewardFeedbackResult
+        {
+            public bool Sent { get; set; }
+
+            public string Message { get; set; }
+        }
+
+        private sealed class CreditGrantResult
+        {
+            public int CashBefore { get; set; }
+
+            public int CashAfter { get; set; }
+
+            public string Message { get; set; }
         }
 
         private sealed class XpGrantResult
