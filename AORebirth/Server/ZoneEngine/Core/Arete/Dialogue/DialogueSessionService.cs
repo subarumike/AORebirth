@@ -33,6 +33,11 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
         public DialogueSessionResult StartSession(string npcIdentity)
         {
+            return this.StartSessionAtNode(npcIdentity, null);
+        }
+
+        public DialogueSessionResult StartSessionAtNode(string npcIdentity, string requestedStartNodeId)
+        {
             var validation = new AreteValidationResult();
             DialogueNpcEntry npc = this.ResolveNpc(npcIdentity, validation);
             if (!validation.IsValid)
@@ -46,10 +51,13 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return this.CreateResult(null, npc, null, Enumerable.Empty<AreteRecordedAction>(), validation);
             }
 
-            DialogueNode startNode = FindNode(npc, npc.RootNodeId);
+            string startNodeId = string.IsNullOrWhiteSpace(requestedStartNodeId)
+                                     ? npc.RootNodeId
+                                     : requestedStartNodeId;
+            DialogueNode startNode = FindNode(npc, startNodeId);
             if (startNode == null)
             {
-                validation.AddError(npc.NpcIdentity, "start dialogue node '" + npc.RootNodeId + "' was not found");
+                validation.AddError(npc.NpcIdentity, "start dialogue node '" + startNodeId + "' was not found");
                 return this.CreateResult(null, npc, null, Enumerable.Empty<AreteRecordedAction>(), validation);
             }
 

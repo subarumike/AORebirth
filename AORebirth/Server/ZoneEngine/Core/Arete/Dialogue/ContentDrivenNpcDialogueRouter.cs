@@ -32,6 +32,8 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
         private const string RexLarssonNpcIdentity = "SimpleChar:782DE568";
 
+        private const string RexB18EReturnNodeId = "rex_194454_006";
+
         private const string RexManifestRelativePath =
             @"Server\ZoneEngine\Content\Arete\rex-larsson\manifest.json";
 
@@ -324,10 +326,29 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return false;
             }
 
-            DialogueSessionResult result = service.StartSession(registration.NpcIdentityText);
+            string requestedStartNodeId = ResolveRequestedStartNodeId(source, registration);
+            DialogueSessionResult result = string.IsNullOrWhiteSpace(requestedStartNodeId)
+                                               ? service.StartSession(registration.NpcIdentityText)
+                                               : service.StartSessionAtNode(
+                                                   registration.NpcIdentityText,
+                                                   requestedStartNodeId);
             if (!result.IsValid || result.Session == null)
             {
                 LogValidation(registration, "dialogue start failed", result.Validation);
+                if (!string.IsNullOrWhiteSpace(requestedStartNodeId))
+                {
+                    KnuBotOpenChatWindowMessageHandler.Default.Send(source, registration.NpcIdentity);
+                    PaceKnuBotPackets();
+                    KnuBotCloseChatWindowMessageHandler.Default.Send(source, registration.NpcIdentity);
+                    LogDialogue(
+                        registration,
+                        "return-state start node unavailable; closed safely character="
+                        + source.Identity.ToString(true)
+                        + " requestedNode=" + requestedStartNodeId
+                        + " chainState=" + RexMissionChainStateStore.GetState(source));
+                    return true;
+                }
+
                 return false;
             }
 
@@ -340,14 +361,48 @@ namespace ZoneEngine.Core.Arete.Dialogue
             FaceNpcTowardSource(npc, source);
             KnuBotOpenChatWindowMessageHandler.Default.Send(source, registration.NpcIdentity);
             PaceKnuBotPackets();
+
+            if (string.Equals(requestedStartNodeId, RexB18EReturnNodeId, StringComparison.OrdinalIgnoreCase))
+            {
+                LogB18ECompletionResult(
+                    RexB18ECompletionHandler.TryCompleteOnReturn(
+                        source,
+                        registration.NpcIdentity,
+                        IsRegistrationEnabled(registration)),
+                    registration);
+                PaceKnuBotPackets();
+            }
+
             SendDialogueNode(source, result, registration);
 
             LogDialogue(
                 registration,
                 "started character=" + source.Identity.ToString(true)
-                + " node=" + result.Session.CurrentNodeId);
+                + " node=" + result.Session.CurrentNodeId
+                + " requestedStartNode=" + (string.IsNullOrWhiteSpace(requestedStartNodeId)
+                                                ? "<default>"
+                                                : requestedStartNodeId)
+                + " chainState=" + RexMissionChainStateStore.GetState(source));
 
             return true;
+        }
+
+        private static string ResolveRequestedStartNodeId(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            if (registration != RexLarssonRegistration)
+            {
+                return null;
+            }
+
+            RexMissionChainState chainState = RexMissionChainStateStore.GetState(source);
+            if (chainState >= RexMissionChainState.B18EPreviewed)
+            {
+                return RexB18EReturnNodeId;
+            }
+
+            return null;
         }
 
         private static void FaceNpcTowardSource(ICharacter npc, ICharacter source)
@@ -528,6 +583,18 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
         private static void LogQuestPreviewResult(
             RexQuestPreviewEmissionResult result,
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            if (result == null || !result.IsApplicable || string.IsNullOrWhiteSpace(result.Message))
+            {
+                return;
+            }
+
+            LogDialogue(registration, result.Message);
+        }
+
+        private static void LogB18ECompletionResult(
+            RexB18ECompletionResult result,
             ContentDrivenNpcDialogueRegistration registration)
         {
             if (result == null || !result.IsApplicable || string.IsNullOrWhiteSpace(result.Message))

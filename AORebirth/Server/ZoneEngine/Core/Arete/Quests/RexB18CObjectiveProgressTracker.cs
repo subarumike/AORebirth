@@ -123,6 +123,10 @@ namespace ZoneEngine.Core.Arete.Quests
                 MissionId,
                 source.Identity.ToString(true),
                 RequiredCount);
+            RexMissionChainStateStore.AdvanceAtLeast(
+                source,
+                RexMissionChainState.B18CPreviewed,
+                "B18C preview activated");
 
             return true;
         }
@@ -210,9 +214,21 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             RexB18CProgressFeedbackSender.TrySend(attacker, matchedProgress);
+            if (matchedProgress != null && matchedProgress.Completed)
+            {
+                RexMissionChainStateStore.AdvanceAtLeast(
+                    attacker,
+                    RexMissionChainState.B18CObjectiveComplete,
+                    "B18C kill count reached required progress");
+            }
+
             if (shouldSendCompletionHandoff)
             {
-                SafeQuestFullUpdateSender.TrySendB18CCompletionHandoff(attacker);
+                bool handoffSent = SafeQuestFullUpdateSender.TrySendB18CCompletionHandoff(attacker);
+                if (handoffSent)
+                {
+                    RexB18DBoxProgressTracker.TryActivateFromPreview(attacker);
+                }
             }
 
             return RexB18CProgressUpdateResult.MatchedProgress(matchedProgress);
