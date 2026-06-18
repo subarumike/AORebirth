@@ -4,7 +4,7 @@ Generated: 2026-06-18
 
 ## Current Objective
 
-Implement and validate the gated Rex B18E completion and B18F handoff path.
+Implement and validate the gated Rex B18E completion reward and B18F handoff path.
 
 Scope:
 
@@ -15,7 +15,8 @@ Scope:
 - Next NPC evidence: Marcus Stone, `SimpleChar:782DE567`.
 - B18E delete evidence: `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/packets.hex.log:5947`, packet `#5495`.
 - B18F QuestFullUpdate evidence: `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/packets.hex.log:5949`, packet `#5497`.
-- XP reward evidence: same-player XP changes from `870` to `1160`, proving `+290 XP`.
+- XP reward evidence: fresh capture `20260618-083035` changes from `725` to `1015`, proving actual `+290 XP`.
+- Credit reward evidence: fresh capture `20260618-083035` sends `Cash=1040` and displays `Received reward: 1281 XP, 1040 credits.`
 
 ## Current Status
 
@@ -23,14 +24,15 @@ Scope:
 - The handler also requires the existing Rex dialogue, quest preview, and B18D preview gates.
 - Completion triggers only when a player in Arete has reached in-memory `B18EPreviewed` state and opens Rex's captured return dialogue branch.
 - The implementation sends a DTO-built `QuestMessage Action=Delete` for only `Mission:5514B18E`.
+- The implementation sends captured reward feedback text through the existing safe `FormatFeedbackMessage` path.
 - The implementation grants exactly `+290 XP` through the existing stat update path.
+- The implementation grants exactly `+1040` credits through the existing cash stat update path.
 - The implementation sends a DTO-built `QuestFullUpdate` for only `Mission:5514B18F`, title/objective `Talk to Marcus Stone`.
-- Per-character in-memory completion state prevents duplicate B18E delete, duplicate XP, or duplicate B18F send on retry.
+- Per-character in-memory completion state prevents duplicate B18E delete, duplicate reward feedback, duplicate credits, duplicate XP, or duplicate B18F send on retry.
 
 ## Explicitly Disabled / Not Implemented
 
 - No action `59`.
-- No credits.
 - No item rewards.
 - No inventory mutation.
 - No DB mission persistence.
@@ -47,7 +49,9 @@ Scope:
 - B18F QuestFullUpdate DTO body matches captured packet `#5497` byte-for-byte from the N3 body onward.
 - Manual in-client smoke is still needed to confirm:
   - B18E is removed from the mission window.
-  - XP increases by 290.
+  - XP increases by 290, not 1281.
+  - Credits increase by 1040.
+  - Reward message appears.
   - B18F appears as `Talk to Marcus Stone`.
   - Client remains stable.
 
@@ -60,5 +64,7 @@ Start engines with all Rex gates enabled, then in client:
 3. Return to Rex when B18E is active.
 4. Confirm B18E is removed.
 5. Confirm XP increases by 290.
-6. Confirm B18F appears as `Talk to Marcus Stone`.
-7. Confirm no credits, items, inventory mutation, action `59`, DB mission persistence, or Marcus Stone dialogue occurs.
+6. Confirm credits increase by 1040.
+7. Confirm reward message appears.
+8. Confirm B18F appears as `Talk to Marcus Stone`.
+9. Confirm no item reward, inventory mutation, action `59`, DB mission persistence, or Marcus Stone dialogue occurs.
