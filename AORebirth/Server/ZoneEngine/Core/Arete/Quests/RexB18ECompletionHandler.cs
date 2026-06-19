@@ -14,6 +14,7 @@ namespace ZoneEngine.Core.Arete.Quests
 
     using Utility;
 
+    using ZoneEngine.Core.Arete;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
 
@@ -45,7 +46,7 @@ namespace ZoneEngine.Core.Arete.Quests
         {
             get
             {
-                return IsTruthy(Environment.GetEnvironmentVariable(EnableEnvironmentVariableName));
+                return AreteEnvironmentGate.IsDefaultEnabled(EnableEnvironmentVariableName);
             }
         }
 
@@ -360,19 +361,6 @@ namespace ZoneEngine.Core.Arete.Quests
             return ((int)identity.Type).ToString(CultureInfo.InvariantCulture)
                    + ":"
                    + identity.Instance.ToString("X8", CultureInfo.InvariantCulture);
-        }
-
-        private static bool IsTruthy(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return false;
-            }
-
-            return string.Equals(value, "1", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "on", StringComparison.OrdinalIgnoreCase);
         }
 
         private sealed class RexB18ECompletionState

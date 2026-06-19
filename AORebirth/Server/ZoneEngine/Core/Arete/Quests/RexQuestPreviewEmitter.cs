@@ -12,6 +12,8 @@ namespace ZoneEngine.Core.Arete.Quests
 
     using Utility;
 
+    using ZoneEngine.Core.Arete;
+
     #endregion
 
     public static class RexQuestPreviewEmitter
@@ -31,7 +33,7 @@ namespace ZoneEngine.Core.Arete.Quests
         {
             get
             {
-                return IsTruthy(Environment.GetEnvironmentVariable(EnableEnvironmentVariableName));
+                return AreteEnvironmentGate.IsDefaultEnabled(EnableEnvironmentVariableName);
             }
         }
 
@@ -108,18 +110,6 @@ namespace ZoneEngine.Core.Arete.Quests
                    && source.Playfield.Identity.Instance == AreteLandingPlayfieldId;
         }
 
-        private static bool IsTruthy(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return false;
-            }
-
-            return string.Equals(value, "1", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "on", StringComparison.OrdinalIgnoreCase);
-        }
     }
 
     public enum RexMissionChainState

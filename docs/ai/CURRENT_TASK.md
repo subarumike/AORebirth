@@ -1,70 +1,38 @@
 # Current Task
 
-Generated: 2026-06-18
+Generated: 2026-06-19
 
 ## Current Objective
 
-Implement and validate the gated Rex B18E completion reward and B18F handoff path.
+Default-enable remaining Rex local/dev quest gates.
 
-Scope:
+## Current Scope
 
-- Return NPC: Rex Larsson, `SimpleChar:782DE568`.
-- Playfield: Arete Landing `6553`.
-- Completion mission: `Mission:5514B18E`.
-- Next mission: `Mission:5514B18F`.
-- Next NPC evidence: Marcus Stone, `SimpleChar:782DE567`.
-- B18E delete evidence: `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/packets.hex.log:5947`, packet `#5495`.
-- B18F QuestFullUpdate evidence: `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/packets.hex.log:5949`, packet `#5497`.
-- XP reward evidence: fresh capture `20260618-083035` changes from `725` to `1015`, proving actual `+290 XP`.
-- Credit reward evidence: fresh capture `20260618-083035` sends `Cash=1040` and displays `Received reward: 1281 XP, 1040 credits.`
+Apply the already-fixed content-driven dialogue gate semantics to the remaining Rex quest gates:
+
+- Missing or empty environment variable defaults enabled.
+- Explicit falsey values disable: `0`, `false`, `no`, `off`.
+- Explicit truthy values enable: `1`, `true`, `yes`, `on`.
+- Other non-empty values remain disabled.
+
+Target gates:
+
+- `AO_REBIRTH_ENABLE_ARETE_REX_QUEST_PREVIEW`
+- `AO_REBIRTH_ENABLE_ARETE_REX_B18C_PROGRESS`
+- `AO_REBIRTH_ENABLE_ARETE_REX_B18D_PREVIEW`
+- `AO_REBIRTH_ENABLE_ARETE_REX_B18E_COMPLETION`
 
 ## Current Status
 
-- B18E completion is gated by `AO_REBIRTH_ENABLE_ARETE_REX_B18E_COMPLETION`, disabled by default.
-- The handler also requires the existing Rex dialogue, quest preview, and B18D preview gates.
-- Completion triggers only when a player in Arete has reached in-memory `B18EPreviewed` state and opens Rex's captured return dialogue branch.
-- The implementation sends a DTO-built `QuestMessage Action=Delete` for only `Mission:5514B18E`.
-- The implementation sends captured reward feedback text through the existing safe `FormatFeedbackMessage` path.
-- The implementation grants exactly `+290 XP` through the existing stat update path.
-- The implementation grants exactly `+1040` credits through the existing cash stat update path.
-- The implementation sends a DTO-built `QuestFullUpdate` for only `Mission:5514B18F`, title/objective `Talk to Marcus Stone`.
-- Per-character in-memory completion state prevents duplicate B18E delete, duplicate reward feedback, duplicate credits, duplicate XP, or duplicate B18F send on retry.
+- Active investigation found the Rex content-driven dialogue gate already default-enabled in `ContentDrivenNpcDialogueRouter`.
+- The four remaining Rex quest gates still used private truthy-only checks that default disabled when unset.
+- Marcus has no separate per-mission environment gate; it reuses the content-driven dialogue routing gate.
+- Do not change quest logic, packet serialization, rewards, database schema, or SQL/data.
 
-## Explicitly Disabled / Not Implemented
+## Result Document
 
-- No action `59`.
-- No item rewards.
-- No inventory mutation.
-- No DB mission persistence.
-- No Marcus Stone dialogue or B18F implementation.
-- No raw packet replay.
-- No SQL or schema changes.
-- No broad quest framework changes.
+Write `docs/generated/rex_default_enabled_gate_fix_result.md`.
 
-## Validation Status
+## Next Step
 
-- Focused ZoneEngine build passed.
-- Rex inactive content dry-run passed.
-- B18E Quest Delete DTO body matches captured packet `#5495` byte-for-byte from the N3 body onward.
-- B18F QuestFullUpdate DTO body matches captured packet `#5497` byte-for-byte from the N3 body onward.
-- Manual in-client smoke is still needed to confirm:
-  - B18E is removed from the mission window.
-  - XP increases by 290, not 1281.
-  - Credits increase by 1040.
-  - Reward message appears.
-  - B18F appears as `Talk to Marcus Stone`.
-  - Client remains stable.
-
-## Next Validation Step
-
-Start engines with all Rex gates enabled, then in client:
-
-1. Complete B18C.
-2. Complete B18D by using exact Cargo Box target `Terminal:56D9B4AF`.
-3. Return to Rex when B18E is active.
-4. Confirm B18E is removed.
-5. Confirm XP increases by 290.
-6. Confirm credits increase by 1040.
-7. Confirm reward message appears.
-8. Confirm B18F appears as `Talk to Marcus Stone`.
-9. Confirm no item reward, inventory mutation, action `59`, DB mission persistence, or Marcus Stone dialogue occurs.
+Implement shared gate helper, replace inconsistent checks, build, dry-run, run `git diff --check`, restart ZoneEngine with Rex gate environment variables unset, and confirm logs no longer block B18C preview because of disabled gates.
