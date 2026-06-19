@@ -1,0 +1,399 @@
+{
+  "generatedLocal": "2026-06-18",
+  "scope": "Quest chain map beginning at Mission:5514B18F using captured Marcus Stone evidence only.",
+  "startingMission": "Mission:5514B18F",
+  "targetNpc": {
+    "name": "Marcus Stone",
+    "identity": "SimpleChar:782DE567",
+    "confidence": "confirmed"
+  },
+  "mainChain": [
+    {
+      "order": 1,
+      "mission": "Mission:5514B18F",
+      "title": "Talk to Marcus Stone",
+      "objective": "Talk to Marcus Stone.",
+      "offeredByEvidence": {
+        "sourceNpc": "Rex Larsson",
+        "sourceNpcIdentity": "SimpleChar:782DE568",
+        "captureFolder": "20260614-194454",
+        "source": "packets.hex.log:5949",
+        "packet": "#5497",
+        "confidence": "confirmed QuestFullUpdate"
+      },
+      "completionEvidence": {
+        "trigger": "Talk to Marcus Stone",
+        "targetNpcIdentity": "SimpleChar:782DE567",
+        "dialogueEvidence": [
+          "20260614-195107/npc-interactions.log:39-42",
+          "20260614-195107/chat-dialogue.log:7-16"
+        ],
+        "deleteEvidence": "20260614-195107/events.log:1645-1646",
+        "action59Evidence": "20260614-195107/events.log:1641-1644",
+        "action59Meaning": "unresolved",
+        "confidence": "confirmed packet sequence; action 59 unresolved"
+      },
+      "nextMission": "Mission:5514B194"
+    },
+    {
+      "order": 2,
+      "mission": "Mission:5514B194",
+      "title": "Extinguish the Gas Fire",
+      "objective": "(Left Click) the Compact Fire Suppressant Container in your inventory to lift it up, then Left Click the Gas Fire to apply the fire suppressant.",
+      "offeredByEvidence": {
+        "captureFolder": "20260614-195107",
+        "source": "packets.hex.log:1407",
+        "packet": "#1323",
+        "additionalPackets": [
+          "TemplateAction item 296780 to OverflowWindow at events.log:1627-1628"
+        ],
+        "confidence": "confirmed QuestFullUpdate and captured handout packet"
+      },
+      "objectiveEvidence": {
+        "sourceItem": "Inventory:004A",
+        "capturedUseTarget": "Terminal:57369E98",
+        "targetDisplayName": "Gas Fire",
+        "usePacket": "20260614-195107/events.log:1961-1962",
+        "ackPacket": "20260614-195107/events.log:1987-1988",
+        "feedback": "You extinguish the Gas Fire.",
+        "feedbackSource": "20260614-195107/events.log:2005-2006",
+        "confidence": "confirmed interaction for this captured completion"
+      },
+      "completionEvidence": {
+        "deleteEvidence": "20260614-195107/events.log:2025-2026",
+        "action59Evidence": "20260614-195107/events.log:2021-2024",
+        "action59Meaning": "unresolved",
+        "confidence": "confirmed packet sequence; action 59 unresolved"
+      },
+      "nextMission": "Mission:5514B196"
+    },
+    {
+      "order": 3,
+      "mission": "Mission:5514B196",
+      "title": "Return to Marcus",
+      "objective": "Talk to Marcus Stone and hand him the Compact Fire Suppressant Container.",
+      "offeredByEvidence": {
+        "captureFolder": "20260614-195107",
+        "source": "packets.hex.log:1773",
+        "packet": "#1677",
+        "confidence": "confirmed QuestFullUpdate"
+      },
+      "objectiveEvidence": {
+        "trigger": "Return to Marcus and trade container",
+        "targetNpcIdentity": "SimpleChar:782DE567",
+        "tradeContainer": "Inventory:004A",
+        "dialogueSources": [
+          "chat-dialogue.log:23-30",
+          "npc-interactions.log:83-98"
+        ],
+        "tradeSources": [
+          "events.log:2507-2508",
+          "events.log:2541-2542",
+          "events.log:2549-2550"
+        ],
+        "confidence": "confirmed trade interaction"
+      },
+      "completionEvidence": {
+        "statEvidence": [
+          "system-messages.log:627-628 Cash=2145",
+          "system-messages.log:637-638 LastSaveXP=1450",
+          "system-messages.log:641-642 XP=1450"
+        ],
+        "templateActionEvidence": "events.log:2569-2570 TemplateAction item 296569 to OverflowWindow",
+        "deleteEvidence": "events.log:2581-2582",
+        "action59Evidence": "events.log:2577-2580",
+        "action59Meaning": "unresolved",
+        "rewardDeltaConfidence": "unresolved",
+        "confidence": "captured final stats and packet sequence"
+      },
+      "nextMission": "Mission:5514B197"
+    },
+    {
+      "order": 4,
+      "mission": "Mission:5514B197",
+      "title": "Talk to Flint Novak",
+      "objective": "Talk to Flint Novak.",
+      "offeredByEvidence": {
+        "captureFolder": "20260614-195107",
+        "source": "packets.hex.log:2311",
+        "packet": "#2193",
+        "confidence": "confirmed QuestFullUpdate"
+      },
+      "nextNpc": {
+        "name": "Flint Novak",
+        "identity": "SimpleChar:782DE569",
+        "identityEvidence": "20260614-195725/events.log:141",
+        "confidence": "confirmed"
+      },
+      "completionEvidence": {
+        "captureFolder": "20260614-195725",
+        "deleteEvidence": "events.log:5263-5264",
+        "nextQuestFullUpdateEvidence": "events.log:5265-5266",
+        "note": "Flint chain is outside this Marcus extraction and should be decoded in a separate slice.",
+        "confidence": "captured next-chain context only"
+      },
+      "nextMission": "unresolved in this Marcus extraction"
+    }
+  ],
+  "optionalMarcusBranch": [
+    {
+      "order": "A",
+      "mission": "Mission:5514B199",
+      "title": "Use the Stim on a Wounded Dockworker",
+      "objective": "Target a Wounded Dockworker and use the Health Regeneration Stim (Right-Click).",
+      "branchTriggerEvidence": {
+        "dialogueOption": "Are those wounded workers your guys?",
+        "optionSource": "20260614-195107/chat-dialogue.log:47-52",
+        "acceptSource": "20260614-195107/chat-dialogue.log:53-56",
+        "templateActionEvidence": "events.log:3051-3052 TemplateAction item 297044 to OverflowWindow",
+        "questFullUpdateEvidence": "packets.hex.log:2765 packet #2641",
+        "confidence": "confirmed optional branch offer"
+      },
+      "objectiveEvidence": {
+        "targetFamily": "Wounded Dockworker",
+        "targetIdentitiesObserved": [
+          "SimpleChar:782DE573",
+          "SimpleChar:782DE574",
+          "SimpleChar:782DE575",
+          "SimpleChar:782DE576",
+          "SimpleChar:782DE577"
+        ],
+        "item": "Health Regeneration Stim",
+        "itemIdentity": "TemplateAction item 297044",
+        "completionPacketEvidence": [
+          "events.log:3752-3753 TemplateAction item 297044 appears in Inventory:004B",
+          "events.log:3766-3767 Quest Delete Mission:5514B199"
+        ],
+        "confidence": "confirmed objective family and packet sequence; exact use packet requires separate focused extraction"
+      },
+      "nextMission": "Mission:5514B19A"
+    },
+    {
+      "order": "B",
+      "mission": "Mission:5514B19A",
+      "title": "Return to Marcus Stone",
+      "objective": "Return to Marcus Stone and hand him the Health Regeneration Stim.",
+      "offeredByEvidence": {
+        "captureFolder": "20260614-195107",
+        "source": "packets.hex.log:3451",
+        "packet": "#3297",
+        "confidence": "confirmed QuestFullUpdate"
+      },
+      "objectiveEvidence": {
+        "trigger": "Return to Marcus and trade stim",
+        "targetNpcIdentity": "SimpleChar:782DE567",
+        "tradeContainer": "Inventory:004B",
+        "dialogueSources": [
+          "chat-dialogue.log:95-102",
+          "npc-interactions.log:247-262"
+        ],
+        "tradeSources": [
+          "events.log:6793-6794",
+          "events.log:6821-6822",
+          "events.log:6843-6844"
+        ],
+        "confidence": "confirmed trade interaction"
+      },
+      "completionEvidence": {
+        "statEvidence": [
+          "system-messages.log:1949-1950 Cash=3185",
+          "system-messages.log:1951-1952 XP=2230"
+        ],
+        "templateActionEvidence": [
+          "events.log:6851-6852 TemplateAction item 291082 Unknown1=50 to OverflowWindow",
+          "events.log:6859-6860 TemplateAction item 291043 Unknown1=25 to OverflowWindow"
+        ],
+        "deleteEvidence": "events.log:6871-6872",
+        "action59Evidence": "events.log:6867-6870",
+        "action59Meaning": "unresolved",
+        "rewardDeltaConfidence": "unresolved",
+        "confidence": "captured final stats and packet sequence"
+      },
+      "nextMission": "none observed immediately in 20260614-195107 after B19A delete"
+    }
+  ],
+  "evidenceTables": [
+    {
+      "mission": "Mission:5514B18F",
+      "fields": [
+        {
+          "field": "mission id",
+          "value": "5514B18F",
+          "identity": "Mission:5514B18F",
+          "captureFolder": "20260614-194454",
+          "source": "packets.hex.log:5949",
+          "confidence": "confirmed"
+        },
+        {
+          "field": "title",
+          "value": "Talk to Marcus Stone",
+          "identity": "Mission:5514B18F",
+          "captureFolder": "20260614-194454",
+          "source": "QuestFullUpdate packet #5497",
+          "confidence": "confirmed"
+        },
+        {
+          "field": "objective",
+          "value": "Talk to Marcus Stone.",
+          "identity": "Mission:5514B18F",
+          "captureFolder": "20260614-194454",
+          "source": "QuestFullUpdate packet #5497",
+          "confidence": "confirmed"
+        }
+      ]
+    },
+    {
+      "mission": "Mission:5514B194",
+      "fields": [
+        {
+          "field": "mission id",
+          "value": "5514B194",
+          "identity": "Mission:5514B194",
+          "captureFolder": "20260614-195107",
+          "source": "packets.hex.log:1407",
+          "confidence": "confirmed"
+        },
+        {
+          "field": "title",
+          "value": "Extinguish the Gas Fire",
+          "identity": "Mission:5514B194",
+          "captureFolder": "20260614-195107",
+          "source": "QuestFullUpdate packet #1323",
+          "confidence": "confirmed"
+        },
+        {
+          "field": "use target",
+          "value": "Terminal:57369E98 for the captured completion",
+          "identity": "Terminal:57369E98",
+          "captureFolder": "20260614-195107",
+          "source": "events.log:1961-1988",
+          "confidence": "confirmed interaction target; static definition not extracted here"
+        }
+      ]
+    },
+    {
+      "mission": "Mission:5514B196",
+      "fields": [
+        {
+          "field": "mission id",
+          "value": "5514B196",
+          "identity": "Mission:5514B196",
+          "captureFolder": "20260614-195107",
+          "source": "packets.hex.log:1773",
+          "confidence": "confirmed"
+        },
+        {
+          "field": "title",
+          "value": "Return to Marcus",
+          "identity": "Mission:5514B196",
+          "captureFolder": "20260614-195107",
+          "source": "QuestFullUpdate packet #1677",
+          "confidence": "confirmed"
+        },
+        {
+          "field": "trade target",
+          "value": "SimpleChar:782DE567",
+          "identity": "SimpleChar:782DE567",
+          "captureFolder": "20260614-195107",
+          "source": "events.log:2507-2550",
+          "confidence": "confirmed"
+        }
+      ]
+    },
+    {
+      "mission": "Mission:5514B197",
+      "fields": [
+        {
+          "field": "mission id",
+          "value": "5514B197",
+          "identity": "Mission:5514B197",
+          "captureFolder": "20260614-195107",
+          "source": "packets.hex.log:2311",
+          "confidence": "confirmed"
+        },
+        {
+          "field": "title",
+          "value": "Talk to Flint Novak",
+          "identity": "Mission:5514B197",
+          "captureFolder": "20260614-195107",
+          "source": "QuestFullUpdate packet #2193",
+          "confidence": "confirmed"
+        },
+        {
+          "field": "next npc",
+          "value": "Flint Novak, SimpleChar:782DE569",
+          "identity": "SimpleChar:782DE569",
+          "captureFolder": "20260614-195725",
+          "source": "events.log:141",
+          "confidence": "confirmed"
+        }
+      ]
+    },
+    {
+      "mission": "Mission:5514B199",
+      "fields": [
+        {
+          "field": "mission id",
+          "value": "5514B199",
+          "identity": "Mission:5514B199",
+          "captureFolder": "20260614-195107",
+          "source": "packets.hex.log:2765",
+          "confidence": "confirmed"
+        },
+        {
+          "field": "title",
+          "value": "Use the Stim on a Wounded Dockworker",
+          "identity": "Mission:5514B199",
+          "captureFolder": "20260614-195107",
+          "source": "QuestFullUpdate packet #2641",
+          "confidence": "confirmed"
+        },
+        {
+          "field": "target family",
+          "value": "Wounded Dockworker",
+          "identity": "multiple SimpleChar identities",
+          "captureFolder": "20260614-195107",
+          "source": "events.log:92,101,867-914",
+          "confidence": "confirmed target family; exact used instance unresolved"
+        }
+      ]
+    },
+    {
+      "mission": "Mission:5514B19A",
+      "fields": [
+        {
+          "field": "mission id",
+          "value": "5514B19A",
+          "identity": "Mission:5514B19A",
+          "captureFolder": "20260614-195107",
+          "source": "packets.hex.log:3451",
+          "confidence": "confirmed"
+        },
+        {
+          "field": "title",
+          "value": "Return to Marcus Stone",
+          "identity": "Mission:5514B19A",
+          "captureFolder": "20260614-195107",
+          "source": "QuestFullUpdate packet #3297",
+          "confidence": "confirmed"
+        },
+        {
+          "field": "trade target",
+          "value": "SimpleChar:782DE567",
+          "identity": "SimpleChar:782DE567",
+          "captureFolder": "20260614-195107",
+          "source": "events.log:6793-6844",
+          "confidence": "confirmed"
+        }
+      ]
+    }
+  ],
+  "remainingUnknowns": [
+    "Action 59 semantics remain unresolved.",
+    "Reward deltas for Marcus B196 and B19A require separate focused before/after stat extraction.",
+    "Item names for 296569, 291082, and 291043 are unresolved.",
+    "Exact Wounded Dockworker use packet is not mapped in this artifact.",
+    "Flint Novak chain after B197 is outside this Marcus extraction."
+  ],
+  "recommendedNextImplementationSlice": "Marcus B18F gated dialogue handoff plus B194 preview only."
+}

@@ -1,0 +1,453 @@
+{
+  "generatedLocal": "2026-06-18",
+  "scope": "Capture-evidence extraction for Marcus Stone beginning at Mission:5514B18F. No implementation, SQL, runtime data, content pack, reward, dialogue, or quest logic changes.",
+  "identityFirstTarget": {
+    "npcName": "Marcus Stone",
+    "identity": "SimpleChar:782DE567",
+    "confidence": "confirmed"
+  },
+  "filesInspected": [
+    "AI_START_HERE.md",
+    "AGENTS.md",
+    "docs/ai/AI_START.md",
+    "docs/ai/CURRENT_TASK.md",
+    "docs/project/PROJECT_STATE.md",
+    "docs/project/KNOWN_DECISIONS.md",
+    "docs/project/ARCHITECTURE.md",
+    "docs/ai/WORKFLOW.md",
+    "docs/generated/rex_b18e_completion_reward_handoff_analysis.md",
+    "docs/generated/rex_b18e_completion_b18f_handoff_result.md",
+    "tools-temp/arete-analysis/npc_list.json",
+    "tools-temp/arete-analysis/dialogue_trees.json",
+    "tools-temp/arete-analysis/quest_chains.json",
+    "tools-temp/arete-analysis/scripts/decode_rex_questfullupdate.ps1",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/events.log",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-194454/packets.hex.log",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/events.log",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/packets.hex.log",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/system-messages.log",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/npc-interactions.log",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/chat-dialogue.log",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/inventory-updates.csv",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/enemy-state.csv",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/enemy-state.json",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/vendor-full-updates.csv",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/shop-updates.csv",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725/events.log",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725/npc-interactions.log",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725/chat-dialogue.log"
+  ],
+  "captureSearchSummary": {
+    "searchedRoot": "tools-temp/AOSharpLiveCapture/bin/Debug/captures",
+    "searchedPatterns": [
+      "SimpleChar:782DE567",
+      "Marcus Stone",
+      "Mission:5514B18F",
+      "Mission:5514B194",
+      "Mission:5514B196",
+      "Mission:5514B197",
+      "Mission:5514B199",
+      "Mission:5514B19A"
+    ],
+    "searchedLogTypes": [
+      "events.log",
+      "packets.hex.log",
+      "system-messages.log",
+      "npc-interactions.log",
+      "chat-dialogue.log",
+      "inventory-updates.csv",
+      "enemy-state.csv",
+      "enemy-state.json",
+      "vendor-full-updates.csv",
+      "shop-updates.csv"
+    ],
+    "matchedFolders": [
+      "20260531-023030",
+      "20260531-155930",
+      "20260531-160142",
+      "20260614-024525",
+      "20260614-193426",
+      "20260614-194454",
+      "20260614-195107",
+      "20260614-195725",
+      "20260614-200311",
+      "20260614-200850",
+      "20260614-203631",
+      "20260614-205724",
+      "20260614-214819",
+      "20260618-075746",
+      "20260618-081630",
+      "20260618-083035"
+    ],
+    "primaryEvidenceFolders": [
+      "20260614-194454",
+      "20260614-195107"
+    ],
+    "laterContextFolder": "20260614-195725",
+    "notes": [
+      "The official Marcus Stone identity remains SimpleChar:782DE567.",
+      "The 20260618 local server captures contain locally generated identities and were not used to redefine Marcus Stone.",
+      "The B18F handoff is in the Rex segment 20260614-194454. Marcus dialogue and the following mission slice are in 20260614-195107."
+    ]
+  },
+  "identityEvidence": [
+    {
+      "field": "name",
+      "value": "Marcus Stone",
+      "identity": "SimpleChar:782DE567",
+      "captureFolder": "20260614-195107",
+      "source": "events.log:100",
+      "confidence": "confirmed"
+    },
+    {
+      "field": "position",
+      "value": "3630.962, 40.985, 823.1738",
+      "identity": "SimpleChar:782DE567",
+      "captureFolder": "20260614-195107",
+      "source": "events.log:100",
+      "confidence": "confirmed observed position"
+    },
+    {
+      "field": "playfield",
+      "value": "PlayfieldId=478032 in SimpleCharFullUpdate; Arete runtime target is playfield 6553 from current server mapping",
+      "identity": "SimpleChar:782DE567",
+      "captureFolder": "20260614-195725",
+      "source": "events.log:4712-4713",
+      "confidence": "captured field, playfield-id semantics require current-client mapping care"
+    },
+    {
+      "field": "level",
+      "value": "15",
+      "identity": "SimpleChar:782DE567",
+      "captureFolder": "20260614-195107",
+      "source": "events.log:100",
+      "confidence": "confirmed"
+    },
+    {
+      "field": "hp",
+      "value": "117800/117800",
+      "identity": "SimpleChar:782DE567",
+      "captureFolder": "20260614-195107",
+      "source": "events.log:100",
+      "confidence": "confirmed"
+    },
+    {
+      "field": "monsterData",
+      "value": "258744",
+      "identity": "SimpleChar:782DE567",
+      "captureFolder": "20260614-195107",
+      "source": "events.log:100",
+      "confidence": "confirmed"
+    },
+    {
+      "field": "full-update visual fields",
+      "value": "HeadMesh=40667, MonsterScale=105, VisualFlags=31, heading=(0,-0.2588223,0,-0.965926)",
+      "identity": "SimpleChar:782DE567",
+      "captureFolder": "20260614-195725",
+      "source": "events.log:4712-4713",
+      "confidence": "confirmed full-update evidence"
+    }
+  ],
+  "dialogueEvidence": [
+    {
+      "event": "player opens Marcus chat",
+      "target": "SimpleChar:782DE567",
+      "captureFolder": "20260614-195107",
+      "source": "npc-interactions.log:39-42",
+      "confidence": "confirmed"
+    },
+    {
+      "event": "initial answer list",
+      "options": [
+        "Actually, Rex said you could help me... I seem to have misplaced my Identity Card.",
+        "Who are you?",
+        "Where am I?",
+        "Goodbye"
+      ],
+      "captureFolder": "20260614-195107",
+      "source": "chat-dialogue.log:7-8",
+      "confidence": "confirmed visible options"
+    },
+    {
+      "event": "follow-up answer list after selecting option 0",
+      "options": [
+        "So, let me guess... You need some help with the fire?",
+        "Goodbye"
+      ],
+      "captureFolder": "20260614-195107",
+      "source": "chat-dialogue.log:11-12",
+      "confidence": "confirmed visible options"
+    },
+    {
+      "event": "B196 return answer list",
+      "options": [
+        "Thanks.",
+        "Goodbye"
+      ],
+      "captureFolder": "20260614-195107",
+      "source": "chat-dialogue.log:23-24",
+      "confidence": "confirmed visible options"
+    },
+    {
+      "event": "trade handoff prompt",
+      "text": "Drag and drop the item(s) you want to give to Marcus Stone into one of the slots available and press \"accept\"",
+      "captureFolder": "20260614-195107",
+      "source": "chat-dialogue.log:27-28",
+      "confidence": "confirmed"
+    },
+    {
+      "event": "optional wounded-worker branch answer list",
+      "options": [
+        "Who are you?",
+        "Where am I?",
+        "Are those wounded workers your guys?",
+        "Goodbye"
+      ],
+      "captureFolder": "20260614-195107",
+      "source": "chat-dialogue.log:47-48",
+      "confidence": "confirmed visible options"
+    },
+    {
+      "event": "optional wounded-worker acceptance answer list",
+      "options": [
+        "I'll do it, just tell me how.",
+        "Goodbye"
+      ],
+      "captureFolder": "20260614-195107",
+      "source": "chat-dialogue.log:51-52",
+      "confidence": "confirmed visible options"
+    },
+    {
+      "event": "ambient Marcus NPC message",
+      "text": "Marcus Stone: What're you looking at? Help me out here!",
+      "captureFolder": "20260614-195107",
+      "source": "chat-dialogue.log:63-90 and dialogue_trees.json:4495-4626",
+      "confidence": "confirmed repeated NPC message"
+    },
+    {
+      "event": "B19A return answer list",
+      "options": [
+        "I healed one of your workers with the Health Regeneration Stim.",
+        "Who are you?",
+        "Where am I?",
+        "Goodbye"
+      ],
+      "captureFolder": "20260614-195107",
+      "source": "chat-dialogue.log:95-96",
+      "confidence": "confirmed visible options"
+    },
+    {
+      "event": "post-B19A answer list",
+      "options": [
+        "You are welcome.",
+        "Goodbye"
+      ],
+      "captureFolder": "20260614-195107",
+      "source": "chat-dialogue.log:107-108",
+      "confidence": "confirmed visible options"
+    }
+  ],
+  "missionEvidence": [
+    {
+      "mission": "Mission:5514B18F",
+      "title": "Talk to Marcus Stone",
+      "objective": "Talk to Marcus Stone.",
+      "captureFolder": "20260614-194454",
+      "packet": "#5497",
+      "source": "packets.hex.log:5949",
+      "decoder": "decode_rex_questfullupdate.ps1",
+      "confidence": "confirmed from QuestFullUpdate",
+      "plainText": "Rex Larsson told you to spreak with Marcus Stone, an overseer for arriving cargo in the area, might be able to aid in getting your license issue settled."
+    },
+    {
+      "mission": "Mission:5514B194",
+      "title": "Extinguish the Gas Fire",
+      "objective": "(Left Click) the Compact Fire Suppressant Container in your inventory to lift it up, then Left Click the Gas Fire to apply the fire suppressant.",
+      "captureFolder": "20260614-195107",
+      "packet": "#1323",
+      "source": "packets.hex.log:1407",
+      "decoder": "decode_rex_questfullupdate.ps1",
+      "confidence": "confirmed from QuestFullUpdate",
+      "plainText": "Marcus Stone mentioned that he may be able to assist you with your lack of identity on Rubi-Ka, but at a price. A recent accident on one of his landing pads has left cargo damaged and people injured. Bodies can heal while cargo cannot. Extinguish one of the Gas Fires that has errupted on the landing pad."
+    },
+    {
+      "mission": "Mission:5514B196",
+      "title": "Return to Marcus",
+      "objective": "Talk to Marcus Stone and hand him the Compact Fire Suppressant Container.",
+      "captureFolder": "20260614-195107",
+      "packet": "#1677",
+      "source": "packets.hex.log:1773",
+      "decoder": "decode_rex_questfullupdate.ps1",
+      "confidence": "confirmed from QuestFullUpdate",
+      "plainText": "After extinguishing one of the Gas Fires on Marcus' landing platform, he may be more willing to help you with your lack of identity."
+    },
+    {
+      "mission": "Mission:5514B197",
+      "title": "Talk to Flint Novak",
+      "objective": "Talk to Flint Novak.",
+      "captureFolder": "20260614-195107",
+      "packet": "#2193",
+      "source": "packets.hex.log:2311",
+      "decoder": "decode_rex_questfullupdate.ps1",
+      "confidence": "confirmed from QuestFullUpdate",
+      "plainText": "Marcus Stone told you to speak with Flint Novak, who oversees the local junkyard. He should be able to help with aquiring the parts for an ID card."
+    },
+    {
+      "mission": "Mission:5514B199",
+      "title": "Use the Stim on a Wounded Dockworker",
+      "objective": "Target a Wounded Dockworker and use the Health Regeneration Stim (Right-Click).",
+      "captureFolder": "20260614-195107",
+      "packet": "#2641",
+      "source": "packets.hex.log:2765",
+      "decoder": "decode_rex_questfullupdate.ps1",
+      "confidence": "confirmed from QuestFullUpdate; optional branch",
+      "plainText": "Marcus Stone's workers got damaged by the fire, he asked you to help him save their lives."
+    },
+    {
+      "mission": "Mission:5514B19A",
+      "title": "Return to Marcus Stone",
+      "objective": "Return to Marcus Stone and hand him the Health Regeneration Stim.",
+      "captureFolder": "20260614-195107",
+      "packet": "#3297",
+      "source": "packets.hex.log:3451",
+      "decoder": "decode_rex_questfullupdate.ps1",
+      "confidence": "confirmed from QuestFullUpdate; optional branch",
+      "plainText": "Marcus Stone's workers got damaged by the fire, he asked you to help him save their lives."
+    }
+  ],
+  "interactionAndRewardEvidence": [
+    {
+      "event": "B18F removed and B194 offered",
+      "evidence": [
+        "QuestMessage Delete Mission:5514B18F at events.log:1645-1646",
+        "QuestFullUpdate Mission:5514B194 at packets.hex.log:1407",
+        "TemplateAction item 296780 to OverflowWindow at events.log:1627-1628"
+      ],
+      "confidence": "confirmed packet sequence; item name comes from quest text, item template name unresolved from item DB in this extraction"
+    },
+    {
+      "event": "Gas Fire item use",
+      "evidence": [
+        "GenericCmd Action=UseItemOnItem Source=(Inventory:004A) Target=(Terminal:57369E98) at events.log:1961-1962",
+        "server acknowledgement at events.log:1987-1988",
+        "FormatFeedback text 'You extinguish the Gas Fire.' at events.log:2005-2006"
+      ],
+      "confidence": "confirmed interaction for this captured completion"
+    },
+    {
+      "event": "B194 removed and B196 offered",
+      "evidence": [
+        "QuestMessage Delete Mission:5514B194 at events.log:2025-2026",
+        "QuestFullUpdate Mission:5514B196 at packets.hex.log:1773"
+      ],
+      "confidence": "confirmed packet sequence"
+    },
+    {
+      "event": "B196 trade to Marcus",
+      "evidence": [
+        "KnuBotTrade Container=(Inventory:004A) at events.log:2507-2508",
+        "KnuBotFinishTrade at events.log:2541-2542",
+        "KnuBotRejectedItems count=0 at events.log:2549-2550"
+      ],
+      "confidence": "confirmed trade interaction"
+    },
+    {
+      "event": "B196 completion-side stats and handoff",
+      "evidence": [
+        "Cash=2145 at system-messages.log:627-628",
+        "LastSaveXP=1450 at system-messages.log:637-638",
+        "XP=1450 at system-messages.log:641-642",
+        "TemplateAction item 296569 to OverflowWindow at events.log:2569-2570",
+        "QuestMessage Delete Mission:5514B196 at events.log:2581-2582",
+        "QuestFullUpdate Mission:5514B197 at packets.hex.log:2311"
+      ],
+      "confidence": "captured final stat values and packets; reward deltas and item name unresolved"
+    },
+    {
+      "event": "B199 optional branch offer",
+      "evidence": [
+        "dialogue option 'Are those wounded workers your guys?' at chat-dialogue.log:47-48",
+        "player selects answer 2 at chat-dialogue.log:49-50",
+        "dialogue option 'I'll do it, just tell me how.' at chat-dialogue.log:51-52",
+        "TemplateAction item 297044 to OverflowWindow at events.log:3051-3052",
+        "QuestFullUpdate Mission:5514B199 at packets.hex.log:2765"
+      ],
+      "confidence": "confirmed optional branch sequence"
+    },
+    {
+      "event": "B199 objective interaction result",
+      "evidence": [
+        "QuestFullUpdate objective names Health Regeneration Stim and Wounded Dockworker",
+        "TemplateAction item 297044 appears in Inventory:004B at events.log:3752-3753",
+        "QuestMessage Delete Mission:5514B199 at events.log:3766-3767",
+        "QuestFullUpdate Mission:5514B19A at packets.hex.log:3451"
+      ],
+      "confidence": "confirmed packet sequence; exact use packet should be extracted in a separate focused wounded-worker task before implementation"
+    },
+    {
+      "event": "B19A return trade and reward-side packets",
+      "evidence": [
+        "KnuBotTrade Container=(Inventory:004B) at events.log:6793-6794",
+        "KnuBotFinishTrade at events.log:6821-6822",
+        "KnuBotRejectedItems count=0 at events.log:6843-6844",
+        "Cash=3185 at system-messages.log:1949-1950",
+        "XP=2230 at system-messages.log:1951-1952",
+        "TemplateAction item 291082 quantity-like Unknown1=50 to OverflowWindow at events.log:6851-6852",
+        "TemplateAction item 291043 quantity-like Unknown1=25 to OverflowWindow at events.log:6859-6860",
+        "QuestMessage Delete Mission:5514B19A at events.log:6871-6872"
+      ],
+      "confidence": "captured final stat values and packets; reward deltas and item names unresolved"
+    }
+  ],
+  "relatedNpcs": [
+    {
+      "name": "Rex Larsson",
+      "identity": "SimpleChar:782DE568",
+      "relationshipEvidence": "Rex handoff QuestFullUpdate Mission:5514B18F",
+      "source": "20260614-194454/packets.hex.log:5949",
+      "confidence": "confirmed source handoff; QuestFullUpdate linked identity field semantics remain cautious"
+    },
+    {
+      "name": "Flint Novak",
+      "identity": "SimpleChar:782DE569",
+      "relationshipEvidence": "Mission:5514B197 title/objective and PlainText point to Flint Novak",
+      "source": "20260614-195107/packets.hex.log:2311; 20260614-195725/events.log:141",
+      "confidence": "confirmed next NPC handoff"
+    },
+    {
+      "name": "Wounded Dockworker",
+      "identity": "multiple observed, including SimpleChar:782DE573, SimpleChar:782DE574, SimpleChar:782DE575, SimpleChar:782DE576, SimpleChar:782DE577",
+      "relationshipEvidence": "Mission:5514B199 objective and nearby SimpleCharFullUpdate / char-seen evidence",
+      "source": "20260614-195107/events.log:92,101,867-914; packets.hex.log:2765",
+      "confidence": "confirmed target family; exact objective target instance used should be extracted separately before implementation"
+    },
+    {
+      "name": "Gas Fire",
+      "identity": "multiple Terminal identities, captured use target Terminal:57369E98",
+      "relationshipEvidence": "Mission:5514B194 objective and GenericCmd UseItemOnItem target",
+      "source": "20260614-195107/events.log:371-372,529-530,657-658,899-900,923-924,941-942,947-948,1961-1988",
+      "confidence": "confirmed interaction target for captured completion; static data fields require separate exact-identity full-update extraction"
+    }
+  ],
+  "remainingUnknowns": [
+    "CharacterAction Action=59 appears immediately before mission deletes, but its gameplay semantics remain unresolved.",
+    "QuestMessage Action=Delete is confirmed as mission-window removal for specific missions, but broader gameplay semantics remain constrained to captured cleanup evidence.",
+    "Marcus B196 and B19A reward deltas are not fully proven by this extraction; only final Cash/XP stat values near completion were captured here.",
+    "TemplateAction item identities 296569, 291082, and 291043 were captured, but item names were not resolved in this extraction.",
+    "Inventory CSV for 20260614-195107 contains only a header, so item evidence comes from TemplateAction packets rather than inventory-updates.csv.",
+    "The exact Wounded Dockworker use packet should be extracted separately before implementing B199.",
+    "Quest action playfield and coordinate fields in decoded QuestFullUpdate bodies are captured but their runtime map semantics remain cautious."
+  ],
+  "recommendedNextImplementationSlice": {
+    "slice": "Marcus B18F gated dialogue handoff and B194 preview only",
+    "reason": "B18F delete, Marcus dialogue option path, TemplateAction 296780, and B194 QuestFullUpdate are the first complete evidence-backed handoff group after Rex.",
+    "doNotIncludeYet": [
+      "B196 reward behavior",
+      "B197 Flint implementation",
+      "B199 optional wounded-worker branch",
+      "B19A rewards",
+      "action 59 interpretation",
+      "DB mission persistence"
+    ]
+  }
+}
