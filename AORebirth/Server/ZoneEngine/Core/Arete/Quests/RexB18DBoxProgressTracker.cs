@@ -12,6 +12,7 @@ namespace ZoneEngine.Core.Arete.Quests
 
     using Utility;
 
+    using ZoneEngine.Core.Arete;
     using ZoneEngine.Core.Controllers;
 
     #endregion
@@ -42,7 +43,7 @@ namespace ZoneEngine.Core.Arete.Quests
         {
             get
             {
-                return IsTruthy(Environment.GetEnvironmentVariable(EnableEnvironmentVariableName));
+                return AreteEnvironmentGate.IsDefaultEnabled(EnableEnvironmentVariableName);
             }
         }
 
@@ -303,19 +304,6 @@ namespace ZoneEngine.Core.Arete.Quests
                 DebugInfoDetail.Engine,
                 "ARETE_REX_B18D_PREVIEW "
                 + string.Format(CultureInfo.InvariantCulture, format, args));
-        }
-
-        private static bool IsTruthy(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return false;
-            }
-
-            return string.Equals(value, "1", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "on", StringComparison.OrdinalIgnoreCase);
         }
 
         private sealed class RexB18DPreviewState

@@ -15,9 +15,10 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
     using Utility;
 
+    using ZoneEngine.Core.Arete;
+    using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
-    using ZoneEngine.Core.Arete.Quests;
 
     #endregion
 
@@ -30,12 +31,19 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
         private const int RexLarssonInstance = unchecked((int)0x782DE568);
 
+        private const int MarcusStoneInstance = unchecked((int)0x782DE567);
+
         private const string RexLarssonNpcIdentity = "SimpleChar:782DE568";
+
+        private const string MarcusStoneNpcIdentity = "SimpleChar:782DE567";
 
         private const string RexB18EReturnNodeId = "rex_194454_006";
 
         private const string RexManifestRelativePath =
             @"Server\ZoneEngine\Content\Arete\rex-larsson\manifest.json";
+
+        private const string MarcusManifestRelativePath =
+            @"Server\ZoneEngine\Content\Arete\marcus-stone\manifest.json";
 
         private const int KnuBotPacketPacingMilliseconds = 20;
 
@@ -56,9 +64,27 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 LogPrefix = "ARETE_REX_DIALOGUE"
             };
 
+        private static readonly ContentDrivenNpcDialogueRegistration MarcusStoneRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Marcus Stone",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = MarcusStoneInstance
+                    },
+                NpcIdentityText = MarcusStoneNpcIdentity,
+                PlayfieldId = AreteLandingPlayfieldId,
+                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                ManifestRelativePath = MarcusManifestRelativePath,
+                LogPrefix = "ARETE_MARCUS_DIALOGUE"
+            };
+
         private static readonly ContentDrivenNpcDialogueRegistration[] Registrations =
         {
-            RexLarssonRegistration
+            RexLarssonRegistration,
+            MarcusStoneRegistration
         };
 
         private static readonly Dictionary<string, DialogueSessionRecord> SessionsByCharacter =
@@ -236,12 +262,11 @@ namespace ZoneEngine.Core.Arete.Dialogue
             Action emitQuestPreviewAfterPrompt = delegate
             {
                 LogQuestPreviewResult(
-                    RexQuestPreviewEmitter.TryEmitB18CPreview(
+                    TryHandleDialogueSideEffect(
                         source,
-                        registration.NpcIdentity,
+                        registration,
                         previousNodeId,
-                        answerIndex,
-                        IsRegistrationEnabled(registration)),
+                        answerIndex),
                     registration);
             };
 
@@ -320,6 +345,11 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ICharacter npc,
             ContentDrivenNpcDialogueRegistration registration)
         {
+            if (registration == MarcusStoneRegistration)
+            {
+                MarcusStoneQuestChainHandler.TryActivateFromRexB18F(source);
+            }
+
             DialogueSessionService service;
             if (!TryGetSessionService(registration, out service))
             {
@@ -345,7 +375,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
                         "return-state start node unavailable; closed safely character="
                         + source.Identity.ToString(true)
                         + " requestedNode=" + requestedStartNodeId
-                        + " chainState=" + RexMissionChainStateStore.GetState(source));
+                        + " chainState=" + DescribeChainState(source, registration));
                     return true;
                 }
 
@@ -382,15 +412,49 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 + " requestedStartNode=" + (string.IsNullOrWhiteSpace(requestedStartNodeId)
                                                 ? "<default>"
                                                 : requestedStartNodeId)
-                + " chainState=" + RexMissionChainStateStore.GetState(source));
+                + " chainState=" + DescribeChainState(source, registration));
 
             return true;
+        }
+
+        private static RexQuestPreviewEmissionResult TryHandleDialogueSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (registration == RexLarssonRegistration)
+            {
+                return RexQuestPreviewEmitter.TryEmitB18CPreview(
+                    source,
+                    registration.NpcIdentity,
+                    previousNodeId,
+                    answerIndex,
+                    IsRegistrationEnabled(registration));
+            }
+
+            if (registration == MarcusStoneRegistration)
+            {
+                return MarcusStoneQuestChainHandler.TryHandleDialogueAnswer(
+                    source,
+                    registration.NpcIdentity,
+                    previousNodeId,
+                    answerIndex,
+                    IsRegistrationEnabled(registration));
+            }
+
+            return RexQuestPreviewEmissionResult.NotApplicable();
         }
 
         private static string ResolveRequestedStartNodeId(
             ICharacter source,
             ContentDrivenNpcDialogueRegistration registration)
         {
+            if (registration == MarcusStoneRegistration)
+            {
+                return MarcusStoneQuestChainHandler.ResolveRequestedStartNodeId(source);
+            }
+
             if (registration != RexLarssonRegistration)
             {
                 return null;
@@ -403,6 +467,23 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             return null;
+        }
+
+        private static string DescribeChainState(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            if (registration == MarcusStoneRegistration)
+            {
+                return MarcusStoneQuestChainHandler.GetState(source).ToString();
+            }
+
+            if (registration == RexLarssonRegistration)
+            {
+                return RexMissionChainStateStore.GetState(source).ToString();
+            }
+
+            return "<none>";
         }
 
         private static void FaceNpcTowardSource(ICharacter npc, ICharacter source)
@@ -740,20 +821,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
         private static bool IsRegistrationEnabled(ContentDrivenNpcDialogueRegistration registration)
         {
             return registration != null
-                   && IsTruthy(Environment.GetEnvironmentVariable(registration.GateEnvironmentVariableName));
-        }
-
-        private static bool IsTruthy(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return false;
-            }
-
-            return string.Equals(value, "1", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "on", StringComparison.OrdinalIgnoreCase);
+                   && AreteEnvironmentGate.IsDefaultEnabled(registration.GateEnvironmentVariableName);
         }
 
         private sealed class ContentDrivenNpcDialogueRegistration

@@ -113,6 +113,7 @@
     <Compile Include="Core\Arete\AreteContentLoadResult.cs" />
     <Compile Include="Core\Arete\AreteContentManifest.cs" />
     <Compile Include="Core\Arete\AreteContentManifestLoader.cs" />
+    <Compile Include="Core\Arete\AreteEnvironmentGate.cs" />
     <Compile Include="Core\Arete\AreteAggregateContentValidator.cs" />
     <Compile Include="Core\Arete\AreteAggregateValidationReport.cs" />
     <Compile Include="Core\Arete\AreteConditionReferenceValidator.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="Core\Arete\Quests\RexB18DBoxProgressTracker.cs" />
     <Compile Include="Core\Arete\Quests\RexB18ECompletionHandler.cs" />
     <Compile Include="Core\Arete\Quests\RexQuestPreviewEmitter.cs" />
+    <Compile Include="Core\Arete\Quests\MarcusStoneQuestChainHandler.cs" />
     <Compile Include="Core\Arete\Quests\SafeQuestFullUpdateSender.cs" />
     <Compile Include="Core\CombatCorpseRules.cs" />
     <Compile Include="Core\CombatDamageRules.cs" />

@@ -13,6 +13,7 @@ namespace ZoneEngine.Core.Arete.Quests
 
     using Utility;
 
+    using ZoneEngine.Core.Arete;
     using ZoneEngine.Core.Controllers;
 
     #endregion
@@ -49,7 +50,7 @@ namespace ZoneEngine.Core.Arete.Quests
         {
             get
             {
-                return IsTruthy(Environment.GetEnvironmentVariable(EnableEnvironmentVariableName));
+                return AreteEnvironmentGate.IsDefaultEnabled(EnableEnvironmentVariableName);
             }
         }
 
@@ -57,8 +58,8 @@ namespace ZoneEngine.Core.Arete.Quests
         {
             get
             {
-                return IsTruthy(Environment.GetEnvironmentVariable(DialogueGateEnvironmentVariableName))
-                       && IsTruthy(Environment.GetEnvironmentVariable(QuestPreviewGateEnvironmentVariableName))
+                return AreteEnvironmentGate.IsDefaultEnabled(DialogueGateEnvironmentVariableName)
+                       && AreteEnvironmentGate.IsDefaultEnabled(QuestPreviewGateEnvironmentVariableName)
                        && IsProgressEnabled;
             }
         }
@@ -77,8 +78,8 @@ namespace ZoneEngine.Core.Arete.Quests
                 Log(
                     "activation skipped mission={0} allGates=false dialogueGate={1} questPreviewGate={2} progressGate={3} noPersistence=true noCompletion=true noQuestDelete=true",
                     MissionId,
-                    IsTruthy(Environment.GetEnvironmentVariable(DialogueGateEnvironmentVariableName)),
-                    IsTruthy(Environment.GetEnvironmentVariable(QuestPreviewGateEnvironmentVariableName)),
+                    AreteEnvironmentGate.IsDefaultEnabled(DialogueGateEnvironmentVariableName),
+                    AreteEnvironmentGate.IsDefaultEnabled(QuestPreviewGateEnvironmentVariableName),
                     IsProgressEnabled);
                 return false;
             }
@@ -352,19 +353,6 @@ namespace ZoneEngine.Core.Arete.Quests
                 DebugInfoDetail.Engine,
                 "ARETE_REX_B18C_PROGRESS "
                 + string.Format(CultureInfo.InvariantCulture, format, args));
-        }
-
-        private static bool IsTruthy(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return false;
-            }
-
-            return string.Equals(value, "1", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(value, "on", StringComparison.OrdinalIgnoreCase);
         }
 
         private sealed class RexB18CProgressState
