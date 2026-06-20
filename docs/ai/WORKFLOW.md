@@ -22,7 +22,7 @@ After code changes that affect server binaries:
 Stop engines:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\Cellao-Clean\stop-engines.ps1'
+powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\stop-engines.ps1'
 ```
 
 Build:
@@ -34,12 +34,12 @@ Build:
 Start engines:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\Cellao-Clean\start-engines.ps1'
+powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\start-engines.ps1'
 ```
 
 ## Database
 
-- Use only `cellao_codex_clean`.
+- Use only `cellao_codex_clean`; this is the active legacy database name retained for local compatibility.
 - Do not change schemas without explicit approval.
 - Do not wipe or mass-edit data without explicit approval.
 - Treat checked-in SQL and runtime DB changes as separate surfaces.

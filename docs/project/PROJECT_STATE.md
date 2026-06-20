@@ -1,11 +1,11 @@
 # Project State
 
-Primary Codex memory file for AO Rebirth NightPredator. This top section is the current source of truth. Historical sections below are retained for evidence and provenance; older Rex/B18D/B18E/gate notes in those sections may be superseded by the current state here.
+Primary Codex memory file for AO Rebirth. This top section is the current source of truth. Historical sections below are retained for evidence and provenance; older Rex/B18D/B18E/gate notes in those sections may be superseded by the current state here.
 
 ## Current Baseline
 
 - HEAD baseline: `0946690`.
-- Repository purpose: local C#/.NET Framework-era Anarchy Online server workspace for Mike's current AO client and local `cellao_codex_clean` MySQL database.
+- Repository purpose: local C#/.NET Framework-era Anarchy Online server workspace for Mike's current AO client and local `cellao_codex_clean` MySQL database; this is a legacy database name retained for local compatibility.
 - Current stable approach: evidence-backed packet/gameplay/data repair, current-client parity over legacy assumptions, and identity-first capture-derived reconstruction.
 - Documentation split: `docs/ai/CURRENT_TASK.md` remains the active task handoff; this file is the stable project memory; `docs/generated/` contains historical result reports only.
 - Active cleanup note: `docs/ai/CURRENT_TASK.md` has been updated and now states: "No active implementation task selected. Await user instruction." Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
@@ -42,8 +42,9 @@ Primary Codex memory file for AO Rebirth NightPredator. This top section is the 
 - B18E: returning to Rex from B18E state starts the captured return branch, deletes B18E with DTO-built `QuestMessage Action=Delete`, grants actual `+290 XP`, grants `+1040` credits, sends reward feedback, and emits B18F `QuestFullUpdate`.
 - B18F: handoff is implemented as `Mission:5514B18F` / `Talk to Marcus Stone`. Marcus Stone identity evidence is `SimpleChar:782DE567`.
 - Reward feedback text is `Received reward: 1281 XP, 1040 credits.` The `1281 XP` value is display metadata only and must not be applied as actual XP.
-- No item reward, inventory mutation, raw replay, DB mission persistence, Marcus quest chain, Marcus dialogue chain, B18F completion, or action `59` interpretation is implemented.
-- Stale Marcus runtime hooks from the rolled-back dirty vertical slice have been removed: `ZoneEngine.csproj` no longer includes missing `MarcusStoneQuestChainHandler.cs`, `ContentDrivenNpcDialogueRouter.cs` no longer actively registers the missing `Content/Arete/marcus-stone/manifest.json`, and runtime router code no longer references `MarcusStoneQuestChainHandler`. Rex B18E still emits B18F / `Talk to Marcus Stone`, Marcus remains unimplemented/future work, gate behavior is unchanged, focused ZoneEngine build passed, and `git diff --check` passed.
+- Marcus Stone static B18F dialogue visibility is implemented as content-driven static dialogue only for `SimpleChar:782DE567` in playfield `6553`, using captured `20260614-195107` B18F prompt/options. It does not delete B18F, emit follow-up missions, hand out items, start trade, grant rewards, persist mission state, interpret action `59`, or implement the Marcus quest chain.
+- No item reward, inventory mutation, raw replay, DB mission persistence, Marcus quest chain, B18F completion, or action `59` interpretation is implemented.
+- Historical stale Marcus runtime hook cleanup remains preserved: `ZoneEngine.csproj` no longer includes missing `MarcusStoneQuestChainHandler.cs`, and runtime router code no longer references `MarcusStoneQuestChainHandler`. Current Marcus static dialogue is registered through content-driven dialogue and loads the checked-in `Content/Arete/marcus-stone/manifest.json`; Marcus quest chain remains future work, gate behavior is unchanged, focused ZoneEngine build passed, and `git diff --check` passed for the cleanup.
 
 ## Current Arete / Rex Source Documents
 
@@ -71,11 +72,11 @@ Primary Codex memory file for AO Rebirth NightPredator. This top section is the 
 
 # Historical State Log
 
-Historical notes below are preserved for provenance. Any older Rex/B18D/B18E statements about disabled-by-default gates, missing B18D cleanup, missing B18E completion, missing credits, or missing B18F handoff are superseded by the current memory section above.
+Historical notes below are preserved for provenance. Any older Rex/B18D/B18E statements about disabled-by-default gates, missing B18D cleanup, missing B18E completion, missing credits, or missing B18F handoff are superseded by the current memory section above. Historical `cellao_codex_clean` database references and old `Cellao-Clean` backup paths in this log are retained as exact historical provenance, not current repo naming guidance.
 
 ## Historical Current Status Snapshot
 
-AO Rebirth NightPredator is a local C#/.NET Framework-era Anarchy Online server workspace. Current work is focused on making the server compatible with Mike's current AO client and local `cellao_codex_clean` MySQL database through evidence-backed packet, gameplay, and data repairs.
+AO Rebirth is a local C#/.NET Framework-era Anarchy Online server workspace. Current work is focused on making the server compatible with Mike's current AO client and local `cellao_codex_clean` MySQL database; this is a legacy database name retained for local compatibility while evidence-backed packet, gameplay, and data repairs continue.
 
 Capture-derived content reconstruction now has mandatory identity-first rules in `docs/project/KNOWN_DECISIONS.md` and `docs/ai/WORKFLOW.md`: captured AO identity is the primary key, complete relevant capture sets must be searched before declaring evidence missing, identity-linked full-update/stat evidence outranks names/screenshots/proximity, evidence tables are required before SQL or game-data edits, and uncertain fields must fail closed instead of being guessed.
 

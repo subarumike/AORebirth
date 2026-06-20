@@ -1,6 +1,6 @@
 # AI Start Here
 
-This repository is Mike's local AO Rebirth NightPredator server workspace for Anarchy Online server repair work.
+This repository is Mike's local AO Rebirth server workspace for Anarchy Online server repair work.
 
 Repo-wide agent rules live in [AGENTS.md](AGENTS.md) and are normally loaded before this file.
 

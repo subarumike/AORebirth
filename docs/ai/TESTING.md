@@ -18,28 +18,30 @@ Get-Process ChatEngine,LoginEngine,ZoneEngine,WebEngine,MSBuild -ErrorAction Sil
 
 ## Automated Smoke Tests
 
+The `CellAOCombatSmokeTests` directory name is a legacy tool folder name retained in-place; it is not current repository branding or a reason to rename AO Rebirth.
+
 Primary smoke/source assertion script:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\Cellao-Clean\tools-temp\CellAOCombatSmokeTests\Run-CombatSmokeTests.ps1'
+powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\tools-temp\CellAOCombatSmokeTests\Run-CombatSmokeTests.ps1'
 ```
 
 Skip build when the solution was already built:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\Cellao-Clean\tools-temp\CellAOCombatSmokeTests\Run-CombatSmokeTests.ps1' -SkipBuild
+powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\tools-temp\CellAOCombatSmokeTests\Run-CombatSmokeTests.ps1' -SkipBuild
 ```
 
 Enemy movement replay:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\Cellao-Clean\tools-temp\enemy-movement-replay\Test-EnemyMovementReplay.ps1'
+powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\tools-temp\enemy-movement-replay\Test-EnemyMovementReplay.ps1'
 ```
 
 Live data collector self-check:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\Cellao-Clean\tools-temp\live-data-collector\Test-LiveDataCollector.ps1'
+powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\tools-temp\live-data-collector\Test-LiveDataCollector.ps1'
 ```
 
 ## Manual Testing
@@ -101,4 +103,3 @@ For packet/gameplay repairs:
 - Smoke/source assertion is added or updated when practical.
 - Mike completes a focused playtest when client behavior matters.
 - Final report states what was verified and what remains unknown.
-
