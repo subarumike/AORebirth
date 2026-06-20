@@ -8,7 +8,10 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Repository purpose: local C#/.NET Framework-era Anarchy Online server workspace for Mike's current AO client and local `cellao_codex_clean` MySQL database; this is a legacy database name retained for local compatibility.
 - Current stable approach: evidence-backed packet/gameplay/data repair, current-client parity over legacy assumptions, and identity-first capture-derived reconstruction.
 - Documentation split: `docs/ai/CURRENT_TASK.md` remains the active task handoff; this file is the stable project memory; `docs/generated/` contains historical result reports only.
-- Active cleanup note: `docs/ai/CURRENT_TASK.md` has been updated and now states: "No active implementation task selected. Await user instruction." Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
+- Active cleanup note: `docs/ai/CURRENT_TASK.md` has been updated to pause Marcus quest work. Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
+- Last live-smoked committed quest baseline: `ecbca7d` (`Implement Marcus B18F to B194 transition`).
+- Current uncommitted quest work: Marcus Phase 4B item `296780` handout exists in `MarcusB18FCompletionHandler.cs`, has focused ZoneEngine build/search validation, has not had live smoke, and is intentionally paused/uncommitted.
+- Quest system work is on the back burner. The next work item should be selected from non-quest gameplay bugs unless Mike explicitly resumes quest work.
 
 ## Current Hard Rules
 
@@ -44,7 +47,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Reward feedback text is `Received reward: 1281 XP, 1040 credits.` The `1281 XP` value is display metadata only and must not be applied as actual XP.
 - Marcus Stone static B18F dialogue visibility is implemented for `SimpleChar:782DE567` in playfield `6553`, using captured `20260614-195107` B18F prompt/options.
 - Marcus B18F -> B194 transition is implemented only for node `marcus_195107_b18f_002`, answer index `0`, option text `So, let me guess... You need some help with the fire?`. It requires Rex chain state `B18FPreviewed` or later, uses a process-local duplicate guard, sends DTO-built B18F `QuestMessage Action=Delete`, and sends DTO-built B194 `QuestFullUpdate`.
-- Item `296780` handout is deferred. No item reward, inventory mutation, raw replay, DB mission persistence, full Marcus quest chain, gas-fire use, trade, rewards, or follow-up mission is implemented.
+- Uncommitted Phase 4B item `296780` handout work exists inside the Marcus B18F -> B194 transition. It grants item `296780/296780` at QL `1` through `BaseInventory`, persists inventory immediately, sends safe DTO-built `TemplateAction`/`ContainerAddItem` notifications, and blocks the mission transition if template lookup, inventory add, or inventory persistence fails. It has focused build/search validation but has not had live smoke and is not committed. No raw replay, DB mission persistence, full Marcus quest chain, gas-fire use, trade, rewards, or follow-up mission is implemented.
 - Historical stale Marcus runtime hook cleanup remains preserved: `ZoneEngine.csproj` no longer includes missing `MarcusStoneQuestChainHandler.cs`, and runtime router code no longer references `MarcusStoneQuestChainHandler`. Current Marcus static dialogue is registered through content-driven dialogue and loads the checked-in `Content/Arete/marcus-stone/manifest.json`; Marcus quest chain remains future work, gate behavior is unchanged, focused ZoneEngine build passed, and `git diff --check` passed for the cleanup.
 
 ## Current Arete / Rex Source Documents
@@ -68,7 +71,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - `Quest Delete` gameplay cause remains unresolved; current use is packet-level mission-window cleanup only.
 - `CharacterAction` action `59` remains unresolved.
 - Rex/Mission state is not persisted to DB and will not survive process restart as mission state.
-- Marcus Stone quest chain beyond the B194 mission-window preview is not implemented.
+- Marcus Stone quest chain beyond the committed B194 mission-window preview is not implemented. Uncommitted item `296780` handout work is validated but unsmoked and paused.
 - NPC chase/movement remains high risk and should not be changed without replay/capture evidence.
 - `PlayfieldAnarchyF` remains a current-client structure mismatch.
 - Full gameplay systems for missions, quests, perks, research, pets, PvP/towers, teams, and organizations remain incomplete outside the documented repaired slices.
