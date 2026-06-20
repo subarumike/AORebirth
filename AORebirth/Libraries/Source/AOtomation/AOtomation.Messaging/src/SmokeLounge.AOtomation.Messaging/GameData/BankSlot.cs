@@ -21,7 +21,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         #region AoMember Properties
 
         [AoMember(0)]
-        public int ItemFlags { get; set; }
+        public int Placement { get; set; }
 
         [AoMember(1)]
         public short Flags { get; set; }

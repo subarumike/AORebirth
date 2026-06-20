@@ -216,12 +216,20 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
 
         public object Deserialize(StreamReader streamReader, SerializationContext serializationContext, PropertyMetaData propertyMetaData = null)
         {
-            return new ClientContainerAddItemMessage
-                       {
-                           N3MessageType = (N3MessageType)streamReader.ReadInt32(),
-                           Identity1 = streamReader.ReadIdentity(),
-                           Identity2 = streamReader.ReadIdentity()
-                       };
+            long bodyStart = streamReader.Position;
+            int bodyLength = (int)(streamReader.Length - bodyStart);
+
+            var message = new ClientContainerAddItemMessage
+                          {
+                              N3MessageType = (N3MessageType)streamReader.ReadInt32(),
+                              Identity = streamReader.ReadIdentity(),
+                              Unknown = streamReader.ReadByte(),
+                              Target = streamReader.ReadIdentity(),
+                              Source = streamReader.ReadIdentity()
+                          };
+
+            streamReader.Position = bodyStart + bodyLength;
+            return message;
         }
 
         public Expression DeserializerExpression(ParameterExpression streamReaderExpression, ParameterExpression serializationContextExpression, Expression assignmentTargetExpression, PropertyMetaData propertyMetaData)
@@ -235,8 +243,10 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
         {
             var message = (ClientContainerAddItemMessage)value;
             streamWriter.WriteInt32((int)message.N3MessageType);
-            streamWriter.WriteIdentity(message.Identity1);
-            streamWriter.WriteIdentity(message.Identity2);
+            streamWriter.WriteIdentity(message.Identity);
+            streamWriter.WriteByte(message.Unknown);
+            streamWriter.WriteIdentity(message.Target);
+            streamWriter.WriteIdentity(message.Source);
         }
 
         public Expression SerializerExpression(ParameterExpression streamWriterExpression, ParameterExpression serializationContextExpression, Expression valueExpression, PropertyMetaData propertyMetaData)

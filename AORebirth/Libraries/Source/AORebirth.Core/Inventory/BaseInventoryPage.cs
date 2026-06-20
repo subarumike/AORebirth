@@ -331,7 +331,7 @@ namespace AORebirth.Core.Inventory
                 slot.ItemLowId = kv.Value.LowID;
                 slot.ItemHighId = kv.Value.HighID;
                 slot.Quality = kv.Value.Quality;
-                slot.ItemFlags = 0;
+                slot.Placement = kv.Key;
                 slots.Add(slot);
             }
 

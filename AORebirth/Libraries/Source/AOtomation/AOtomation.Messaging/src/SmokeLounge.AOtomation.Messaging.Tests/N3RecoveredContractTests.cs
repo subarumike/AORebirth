@@ -76,8 +76,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     },
                 17);
             AssertSerializedSize(
-                new ClientContainerAddItemMessage { Identity1 = identity, Identity2 = item },
-                20);
+                new ClientContainerAddItemMessage
+                    {
+                        Identity = identity,
+                        Unknown = 0,
+                        Target = new Identity { Type = IdentityType.IncomingTradeWindow, Instance = identity.Instance },
+                        Source = new Identity { Type = IdentityType.Inventory, Instance = 0x40 }
+                    },
+                29);
             AssertSerializedSize(new ClientGetItemMessage { Identity1 = item }, 12);
 
             AssertSerializedSize(new StartLogoutMessage { Identity = identity }, 12);
@@ -197,6 +203,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CollectionAssert.AreEqual(
                 HexToBytes("5469373F0000C35000000012010000006B007C00000000006F"),
                 Serialize(moveItem));
+        }
+
+        [TestMethod]
+        public void ClientContainerAddItemBankDepositMatchesCapturedBody()
+        {
+            byte[] body = HexToBytes("1F4D5F7E0000C3503CAC6F14000000DEAD3CAC6F140000006800000040");
+
+            var decoded = (ClientContainerAddItemMessage)Deserialize<ClientContainerAddItemMessage>(body);
+
+            Assert.AreEqual(N3MessageType.ClientContainerAddItem, decoded.N3MessageType);
+            Assert.AreEqual(IdentityType.CanbeAffected, decoded.Identity.Type);
+            Assert.AreEqual(0x3CAC6F14, decoded.Identity.Instance);
+            Assert.AreEqual(0, decoded.Unknown);
+            Assert.AreEqual(IdentityType.IncomingTradeWindow, decoded.Target.Type);
+            Assert.AreEqual(0x3CAC6F14, decoded.Target.Instance);
+            Assert.AreEqual(IdentityType.Inventory, decoded.Source.Type);
+            Assert.AreEqual(0x40, decoded.Source.Instance);
+            CollectionAssert.AreEqual(body, Serialize(decoded));
         }
 
         [TestMethod]

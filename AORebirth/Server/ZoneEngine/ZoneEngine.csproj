@@ -200,6 +200,7 @@
     <Compile Include="Core\MessageHandlers\ChatCmdMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ChatServerInfoMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ChatTextMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\ClientContainerAddItemMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ContainerAddItemMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\DespawnMessageHandler.cs" />

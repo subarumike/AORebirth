@@ -4,6 +4,13 @@
 
 - `docs/project/PROJECT_STATE.md` is now the primary Codex memory file.
 - AI startup/read order now reads `docs/project/PROJECT_STATE.md` before this file.
+- Bank repair closure is complete as of 2026-06-20.
+- Manual private-server smoke confirmed bank deposit, withdraw, slot persistence, close/reopen, zone change, relog, and persistence.
+- Root cause: inventory-to-bank drag uses `ClientContainerAddItem` (`0x1F4D5F7E`) with base character identity, one-byte `Unknown`, target `0xDEAD:<char>`, and source `Inventory:<slot>`; AO Rebirth previously decoded the message as two immediate identities and ignored/misread the actual deposit path.
+- Serializer repair: `ClientContainerAddItemMessageSerializer` now reads `N3MessageType`, base `Identity`, `Unknown`, `Target`, and `Source`.
+- Bank persistence repair: `BankSlot.Placement` and `BaseInventoryPage.ToInventoryArray()` now emit real bank slot keys, and successful deposits persist through `BaseInventory.Write()`.
+- Validation performed: `N3RecoveredContractTests` passed `11/11`; `AORebirth.Core` Debug focused build passed; `ZoneEngine` Debug focused build passed; `git diff --check` passed with only LF-to-CRLF warnings; Chat/Login/Zone were restarted after rebuild.
+- Files changed for bank repair: `ClientContainerAddItemMessage.cs`, `RecoveredN3MessageSerializers.cs`, `BankSlot.cs`, `N3RecoveredContractTests.cs`, `BaseInventoryPage.cs`, `ClientContainerAddItemMessageHandler.cs`, and `ZoneEngine.csproj`.
 - Rex works through B18F on the current stable baseline.
 - Marcus quest chain is not implemented.
 - The Marcus dirty vertical slice was rolled back.
@@ -20,7 +27,7 @@
 
 ## Active task
 
-Marcus quest work paused. Await user selection of a non-quest gameplay bug.
+Bank repair closure complete. Await user selection of the next non-quest gameplay bug.
 
 ## Explicit non-goals
 
@@ -41,4 +48,5 @@ Marcus quest work paused. Await user selection of a non-quest gameplay bug.
 - Review `docs/project/PROJECT_STATE.md` before selecting any new implementation task.
 - Select the next development target explicitly before code changes.
 - Prefer non-quest gameplay bugs for the next work item.
+- Recommended next investigation: audit backpack/container item movement next, because it shares container identity and slot-placement behavior with the repaired bank path while staying adjacent to the current evidence.
 - Before switching work, decide whether to commit the validated-but-unsmoked item handout or revert it.
