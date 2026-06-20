@@ -1,4 +1,78 @@
-# Current Status
+# Project State
+
+Primary Codex memory file for AO Rebirth NightPredator. This top section is the current source of truth. Historical sections below are retained for evidence and provenance; older Rex/B18D/B18E/gate notes in those sections may be superseded by the current state here.
+
+## Current Baseline
+
+- HEAD baseline: `0946690`.
+- Repository purpose: local C#/.NET Framework-era Anarchy Online server workspace for Mike's current AO client and local `cellao_codex_clean` MySQL database.
+- Current stable approach: evidence-backed packet/gameplay/data repair, current-client parity over legacy assumptions, and identity-first capture-derived reconstruction.
+- Documentation split: `docs/ai/CURRENT_TASK.md` remains the active task handoff; this file is the stable project memory; `docs/generated/` contains historical result reports only.
+- Active cleanup note: `docs/ai/CURRENT_TASK.md` has been updated and now states: "No active implementation task selected. Await user instruction." Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
+
+## Current Hard Rules
+
+- Do not use raw packet replay for Rex/Arete mission packets. Use decoded DTO/body serializer paths only.
+- Do not guess packet behavior; unresolved packet semantics must stay unresolved until evidence-backed.
+- Capture-derived content must be identity-first. Display names, proximity, screenshots, or plausible templates cannot define runtime data.
+- Cargo Box identity is exactly `Terminal:56D9B4AF`; do not substitute nearby terminals, rendered labels, templates, meshes, or inferred anchors.
+- `CharacterAction` action `59` remains unresolved. Do not treat it as offer, accept, complete, fail, abandon, reward, or persistence semantics.
+- Rex chain state is process-local/in-memory only. There is no DB mission persistence.
+- Do not change database schemas or perform destructive database operations without explicit approval.
+- Marcus Stone content must not be treated as implemented. The Marcus dirty vertical slice was rolled back.
+
+## Current Arete Environment Gate Semantics
+
+- Missing or empty Arete/Rex environment variables default enabled for local/dev.
+- Explicit falsey values disable: `0`, `false`, `no`, `off`.
+- Explicit truthy values enable: `1`, `true`, `yes`, `on`.
+- Other non-empty values remain disabled.
+- Current Rex gates using this model: `AO_REBIRTH_ENABLE_ARETE_REX_DIALOGUE_ROUTING`, `AO_REBIRTH_ENABLE_ARETE_REX_QUEST_PREVIEW`, `AO_REBIRTH_ENABLE_ARETE_REX_B18C_PROGRESS`, `AO_REBIRTH_ENABLE_ARETE_REX_B18D_PREVIEW`, and `AO_REBIRTH_ENABLE_ARETE_REX_B18E_COMPLETION`.
+
+## Current AO Arete / Rex State
+
+- `6553 Arete Landing` is enabled and is the active Rex test playfield.
+- Rex Larsson identity is `SimpleChar:782DE568`.
+- Rex checked-in content lives under `AORebirth/Server/ZoneEngine/Content/Arete/rex-larsson`.
+- Rex works through B18F on the current baseline.
+- B18C, B18D, B18E, and B18F handoff paths are implemented through safe DTO/body packet construction.
+- B18C: Rex dialogue can offer `Mission:5514B18C`; B18C counts five `Malfunctioning Cleaning Robot` kills; captured per-kill feedback is emitted; final handoff sends captured mission-window sequence to B18D.
+- B18C runtime targets are five evidence-backed `Malfunctioning Cleaning Robot` rows in playfield `6553`; the local spawn repair uses heartbeat-safe actor-baseline stats and preserves captured HP/level/monster data.
+- B18D: exact Cargo Box use target is `Terminal:56D9B4AF`; use records B18D progress, cleans up B18D with DTO-built `QuestMessage Action=Delete`, and emits B18E `QuestFullUpdate`.
+- B18E: returning to Rex from B18E state starts the captured return branch, deletes B18E with DTO-built `QuestMessage Action=Delete`, grants actual `+290 XP`, grants `+1040` credits, sends reward feedback, and emits B18F `QuestFullUpdate`.
+- B18F: handoff is implemented as `Mission:5514B18F` / `Talk to Marcus Stone`. Marcus Stone identity evidence is `SimpleChar:782DE567`.
+- Reward feedback text is `Received reward: 1281 XP, 1040 credits.` The `1281 XP` value is display metadata only and must not be applied as actual XP.
+- No item reward, inventory mutation, raw replay, DB mission persistence, Marcus quest chain, Marcus dialogue chain, B18F completion, or action `59` interpretation is implemented.
+
+## Current Arete / Rex Source Documents
+
+- Current Rex content pack: `AORebirth/Server/ZoneEngine/Content/Arete/rex-larsson/manifest.json`.
+- Key Rex/Arete result history: `docs/generated/rex_b18c_robot_progress_smoke_result.md`, `docs/generated/rex_b18d_to_b18e_safe_handoff_result.md`, `docs/generated/rex_mission_window_cleanup_return_state_result.md`, `docs/generated/rex_b18e_completion_b18f_handoff_result.md`, `docs/generated/rex_b18e_credit_reward_message_result.md`, and `docs/generated/arete_malfunctioning_cleaning_robot_spawn_result.md`.
+- Older generated reports may describe earlier disabled-by-default gates, missing B18D cleanup, missing B18E completion, missing credits, or missing B18F handoff. Treat those as historical phase notes superseded by this top section unless a newer file says otherwise.
+
+## Current Working Systems Summary
+
+- Login, chat, and zone engines build/run locally in documented prior validations.
+- MySqlConnector migration and DAO transaction handling are repaired for login select/zone redirect.
+- Current-client `FullCharacter` version 26 and live-style login state are locked decisions.
+- Sit/stand, equipment visuals, inventory move, equip/unequip, corpse item/credit loot, player trade item/credit/cancel, vendor buy/sell/close, and death/respawn have passing documented validation for their repaired scopes.
+- Vendor coverage is complete for practical live-accessible vendors; remaining 26 statel vendors are deferred setup/access backlog.
+
+## Current Open Risks
+
+- `Quest Delete` gameplay cause remains unresolved; current use is packet-level mission-window cleanup only.
+- `CharacterAction` action `59` remains unresolved.
+- Rex/Mission state is not persisted to DB and will not survive process restart as mission state.
+- Marcus Stone quest chain is not implemented after the B18F handoff.
+- NPC chase/movement remains high risk and should not be changed without replay/capture evidence.
+- `PlayfieldAnarchyF` remains a current-client structure mismatch.
+- Full gameplay systems for missions, quests, perks, research, pets, PvP/towers, teams, and organizations remain incomplete outside the documented repaired slices.
+
+# Historical State Log
+
+Historical notes below are preserved for provenance. Any older Rex/B18D/B18E statements about disabled-by-default gates, missing B18D cleanup, missing B18E completion, missing credits, or missing B18F handoff are superseded by the current memory section above.
+
+## Historical Current Status Snapshot
 
 AO Rebirth NightPredator is a local C#/.NET Framework-era Anarchy Online server workspace. Current work is focused on making the server compatible with Mike's current AO client and local `cellao_codex_clean` MySQL database through evidence-backed packet, gameplay, and data repairs.
 
