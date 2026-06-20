@@ -56,6 +56,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 - Login, chat, and zone engines build/run locally in documented prior validations.
 - Engine launcher cleanup is implemented and validated: `start-engines.ps1` defaults to detached hidden Chat/Login/Zone headless startup, records stdout/stderr logs and PID metadata under `logs/engines`, waits for ports `6996`, `7012`, `7500`, and `7501`, and `stop-engines.ps1` stops engines through shutdown metadata before fallback. `status-engines.ps1` reports process and port state. `-WithWeb` starts and stops WebEngine on port `8181`. `-Visible` starts the debug-mode path and validated process/port startup in Codex, but this host reported `MainWindowHandle=0`, so desktop window visibility should be manually observed if window chrome matters.
+- Runtime startup branding and shared server version baseline cleanup is implemented and validated: hidden Chat/Login/Zone logs show revision/banner branding as `AO Rebirth`, startup text uses `AO Rebirth Dev Team`, displayed version is `1.0.0.0`, and the Funcom/Anarchy Online notice remains unchanged.
 - MySqlConnector migration and DAO transaction handling are repaired for login select/zone redirect.
 - Current-client `FullCharacter` version 26 and live-style login state are locked decisions.
 - Sit/stand, equipment visuals, inventory move, equip/unequip, corpse item/credit loot, player trade item/credit/cancel, vendor buy/sell/close, and death/respawn have passing documented validation for their repaired scopes.
