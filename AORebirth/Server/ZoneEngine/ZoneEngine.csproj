@@ -139,6 +139,7 @@
     <Compile Include="Core\Arete\Quests\MissionStateModels.cs" />
     <Compile Include="Core\Arete\Quests\MissionStateService.cs" />
     <Compile Include="Core\Arete\Quests\MissionStateStore.cs" />
+    <Compile Include="Core\Arete\Quests\MarcusB18FCompletionHandler.cs" />
     <Compile Include="Core\Arete\Quests\ObjectivePlaybackModels.cs" />
     <Compile Include="Core\Arete\Quests\ObjectivePlaybackService.cs" />
     <Compile Include="Core\Arete\Quests\RexB18CObjectiveProgressTracker.cs" />

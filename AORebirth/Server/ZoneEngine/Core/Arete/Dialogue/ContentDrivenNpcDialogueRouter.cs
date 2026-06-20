@@ -243,6 +243,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             string previousNodeId = session.CurrentNodeId;
+            string selectedOptionText = ResolveSelectedOptionText(service, session, answerIndex);
             LogDialogue(
                 registration,
                 "answer received character=" + source.Identity.ToString(true)
@@ -259,7 +260,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             LogRecordedActions(source, result, registration);
-            Action emitQuestPreviewAfterPrompt = delegate
+            Action emitDialogueSideEffectsAfterPrompt = delegate
             {
                 LogQuestPreviewResult(
                     TryHandleDialogueSideEffect(
@@ -267,6 +268,14 @@ namespace ZoneEngine.Core.Arete.Dialogue
                         registration,
                         previousNodeId,
                         answerIndex),
+                    registration);
+                LogMarcusB18FCompletionResult(
+                    TryHandleMarcusB18FCompletion(
+                        source,
+                        registration,
+                        previousNodeId,
+                        answerIndex,
+                        selectedOptionText),
                     registration);
             };
 
@@ -293,7 +302,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 + " from=" + previousNodeId
                 + " to=" + result.Session.CurrentNodeId
                 + " answer=" + answerIndex);
-            SendDialogueNode(source, result, registration, emitQuestPreviewAfterPrompt);
+            SendDialogueNode(source, result, registration, emitDialogueSideEffectsAfterPrompt);
             return true;
         }
 
@@ -431,6 +440,27 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return RexQuestPreviewEmissionResult.NotApplicable();
         }
 
+        private static MarcusB18FCompletionResult TryHandleMarcusB18FCompletion(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            string optionText)
+        {
+            if (registration == MarcusStoneRegistration)
+            {
+                return MarcusB18FCompletionHandler.TryCompleteFromDialogue(
+                    source,
+                    registration.NpcIdentity,
+                    previousNodeId,
+                    answerIndex,
+                    optionText,
+                    IsRegistrationEnabled(registration));
+            }
+
+            return MarcusB18FCompletionResult.NotApplicable();
+        }
+
         private static string ResolveRequestedStartNodeId(
             ICharacter source,
             ContentDrivenNpcDialogueRegistration registration)
@@ -459,6 +489,21 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             return "<none>";
+        }
+
+        private static string ResolveSelectedOptionText(
+            DialogueSessionService service,
+            DialogueSession session,
+            int answerIndex)
+        {
+            if (service == null || session == null)
+            {
+                return null;
+            }
+
+            DialogueOption selectedOption = service.ListAvailableOptions(session)
+                .FirstOrDefault(option => option != null && option.Index == answerIndex);
+            return selectedOption == null ? null : selectedOption.Text;
         }
 
         private static void FaceNpcTowardSource(ICharacter npc, ICharacter source)
@@ -651,6 +696,18 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
         private static void LogB18ECompletionResult(
             RexB18ECompletionResult result,
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            if (result == null || !result.IsApplicable || string.IsNullOrWhiteSpace(result.Message))
+            {
+                return;
+            }
+
+            LogDialogue(registration, result.Message);
+        }
+
+        private static void LogMarcusB18FCompletionResult(
+            MarcusB18FCompletionResult result,
             ContentDrivenNpcDialogueRegistration registration)
         {
             if (result == null || !result.IsApplicable || string.IsNullOrWhiteSpace(result.Message))

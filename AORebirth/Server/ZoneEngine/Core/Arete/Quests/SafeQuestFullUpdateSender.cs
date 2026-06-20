@@ -25,6 +25,8 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int B18FInstance = unchecked((int)0x5514B18F);
 
+        private const int B194Instance = unchecked((int)0x5514B194);
+
         private const int RexLarssonInstance = unchecked((int)0x782DE568);
 
         private const int B18CUnknownActionIdType = 0x00001999;
@@ -58,6 +60,14 @@ namespace ZoneEngine.Core.Arete.Quests
         private const int B18FUnknownActionId7Type = 0x0000D2F1;
 
         private const int B18FUnknownActionId7Instance = 0x4D167F3B;
+
+        private const int B194UnknownActionId2Type = 0x000111D3;
+
+        private const int B194UnknownActionId2Instance = 0x000199EB;
+
+        private const int B194UnknownActionId7Type = 0x0000D2F1;
+
+        private const int B194UnknownActionId7Instance = 0x4D167F40;
 
         private const string B18CShortInfo = "Terminate 5 Malfunctioning C...";
 
@@ -101,6 +111,18 @@ namespace ZoneEngine.Core.Arete.Quests
             + "might be able to aid in getting your license issue settled.<BR><BR>"
             + "<font color=\"#FF0000\">Mission Objective:<BR>"
             + "Talk to Marcus Stone.</font>";
+
+        private const string B194ShortInfo = "Extinguish the Gas Fire";
+
+        private const string B194LongInfo =
+            "Extinguish the Gas Fire<BR><BR>"
+            + "Marcus Stone mentioned that he may be able to assist you with your lack of identity on Rubi-Ka, "
+            + "but at a price. A recent accident on one of his landing pads has left cargo damaged and people "
+            + "injured. Bodies can heal while cargo cannot. Extinguish one of the Gas Fires that has errupted "
+            + "on the landing pad.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "(Left Click) the <a href='itemref://296780/296780/1'>Compact Fire Suppressant Container</a> "
+            + "in your inventory to lift it up, then Left Click the Gas Fire to apply the fire suppressant.</font>";
 
         public static RexQuestPreviewEmissionResult TrySendB18CPreview(ICharacter source)
         {
@@ -383,6 +405,99 @@ namespace ZoneEngine.Core.Arete.Quests
                     "Arete Rex B18F QuestFullUpdate DTO handoff failed: " + e.Message);
                 return RexQuestPreviewEmissionResult.Failed(
                     "B18F QuestFullUpdate failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        public static RexQuestPreviewEmissionResult TrySendB18FQuestDelete(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B18F Quest Delete skipped: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B18F Quest Delete skipped: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B18F Quest Delete skipped: source identity is invalid.");
+            }
+
+            try
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "Arete Marcus B18F Quest Delete DTO cleanup sending character="
+                    + source.Identity.ToString(true)
+                    + " mission=Mission:5514B18F source=20260614-195107/events.log:1645-1646 "
+                    + "rawReplay=false b18fWindowCleanupOnly=true noCompletionSemantics=true noPersistence=true "
+                    + "noRewards=true noInventory=true noXpCredits=true");
+
+                source.Controller.Client.SendCompressed(CreateB18FQuestDeleteMessage(source.Identity));
+
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B18F Quest Delete sent using DTO serializer. mission=Mission:5514B18F "
+                    + "source=20260614-195107/events.log:1645-1646 rawReplay=false "
+                    + "b18fWindowCleanupOnly=true noCompletionSemantics=true noPersistence=true noRewards=true "
+                    + "noInventory=true noXpCredits=true");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B18F Quest Delete DTO cleanup failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B18F Quest Delete failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        public static RexQuestPreviewEmissionResult TrySendB194Preview(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B194 QuestFullUpdate preview failed: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B194 QuestFullUpdate preview failed: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B194 QuestFullUpdate preview failed: source identity is invalid.");
+            }
+
+            try
+            {
+                QuestFullUpdateMessage message = CreateB194PreviewMessage(source.Identity);
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "Arete Marcus B194 QuestFullUpdate DTO preview sending character="
+                    + source.Identity.ToString(true)
+                    + " mission=Mission:5514B194 source=20260614-195107/packets.hex.log:1407 "
+                    + "trigger=marcus_195107_b18f_002:0 rawReplay=false noPersistence=true noRewards=true "
+                    + "noInventory=true item296780Deferred=true noFollowUpMission=true noTrade=true");
+
+                source.Controller.Client.SendCompressed(message);
+
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B194 QuestFullUpdate preview sent using DTO serializer. mission=Mission:5514B194 "
+                    + "source=20260614-195107/packets.hex.log:1407 title=\"Extinguish the Gas Fire\" "
+                    + "rawReplay=false noPersistence=true noRewards=true noInventory=true "
+                    + "item296780Deferred=true noFollowUpMission=true noTrade=true");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B194 QuestFullUpdate DTO preview failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B194 QuestFullUpdate preview failed during DTO serialization/send: " + e.Message);
             }
         }
 
@@ -786,6 +901,106 @@ namespace ZoneEngine.Core.Arete.Quests
                    };
         }
 
+        internal static QuestFullUpdateMessage CreateB194PreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, B194Instance);
+            Identity rexIdentity = new Identity { Type = IdentityType.CanbeAffected, Instance = RexLarssonInstance };
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = B194ShortInfo,
+                                   LongInfo = B194LongInfo,
+                                   UnknownId1 = rexIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = 1229076054,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 244818,
+                                   Unknown20 = 0,
+                                   Unknown21 = 0,
+                                   QuestActions =
+                                       new[]
+                                       {
+                                           new QuestActionInfo
+                                           {
+                                               Version = 24,
+                                               Action = Identity.None,
+                                               UnknownId1 = Identity.None,
+                                               UnknownId2 = IdentityFromRaw(
+                                                   B194UnknownActionId2Type,
+                                                   B194UnknownActionId2Instance),
+                                               UnknownId3 = Identity.None,
+                                               UnknownId4 = Identity.None,
+                                               Unknown1 = 0,
+                                               Unknown2 = 0,
+                                               Unknown3 = 0,
+                                               Unknown4 = 0,
+                                               UnknownId5 = Identity.None,
+                                               Unknown5 = 0,
+                                               Unknown6 = 0,
+                                               Unknown7 = 0,
+                                               Unknown8 = 0,
+                                               UnknownId6 = Identity.None,
+                                               UnknownHash1 = string.Empty,
+                                               Unknown9 = 0,
+                                               UnknownId7 = IdentityFromRaw(
+                                                   B194UnknownActionId7Type,
+                                                   B194UnknownActionId7Instance),
+                                               PlayfieldId = new Identity
+                                                             {
+                                                                 Type = IdentityType.Playfield2,
+                                                                 Instance = 6553
+                                                             },
+                                               Unknown10 = 100000,
+                                               Unknown11 = 100000,
+                                               Position = new Vector3(3604, 0, 833)
+                                           }
+                                       },
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360448 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 104939,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 7,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
         internal static CharacterActionMessage CreateB18CAction59Message(Identity characterIdentity)
         {
             return new CharacterActionMessage
@@ -838,6 +1053,20 @@ namespace ZoneEngine.Core.Arete.Quests
                        Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
                        Unknown1 = 0,
                        Mission = IdentityFromRaw(MissionIdentityType, B18EInstance),
+                       Unknown2 = 0,
+                       Unknown3 = 0
+                   };
+        }
+
+        internal static QuestMessage CreateB18FQuestDeleteMessage(Identity characterIdentity)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Unknown1 = 0,
+                       Mission = IdentityFromRaw(MissionIdentityType, B18FInstance),
                        Unknown2 = 0,
                        Unknown3 = 0
                    };
