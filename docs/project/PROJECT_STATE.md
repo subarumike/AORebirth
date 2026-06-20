@@ -43,6 +43,7 @@ Primary Codex memory file for AO Rebirth NightPredator. This top section is the 
 - B18F: handoff is implemented as `Mission:5514B18F` / `Talk to Marcus Stone`. Marcus Stone identity evidence is `SimpleChar:782DE567`.
 - Reward feedback text is `Received reward: 1281 XP, 1040 credits.` The `1281 XP` value is display metadata only and must not be applied as actual XP.
 - No item reward, inventory mutation, raw replay, DB mission persistence, Marcus quest chain, Marcus dialogue chain, B18F completion, or action `59` interpretation is implemented.
+- Stale Marcus runtime hooks from the rolled-back dirty vertical slice have been removed: `ZoneEngine.csproj` no longer includes missing `MarcusStoneQuestChainHandler.cs`, `ContentDrivenNpcDialogueRouter.cs` no longer actively registers the missing `Content/Arete/marcus-stone/manifest.json`, and runtime router code no longer references `MarcusStoneQuestChainHandler`. Rex B18E still emits B18F / `Talk to Marcus Stone`, Marcus remains unimplemented/future work, gate behavior is unchanged, focused ZoneEngine build passed, and `git diff --check` passed.
 
 ## Current Arete / Rex Source Documents
 
