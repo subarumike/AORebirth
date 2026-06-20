@@ -72,7 +72,22 @@ namespace AORebirth.Core.Inventory
         /// <param name="ownerInstance">
         /// </param>
         public BaseInventoryPage(int pagenum, int maxslots, int firstslotnumber, Identity ownerInstance)
-            : base(ownerInstance, new Identity() { Type = (IdentityType)ownerInstance.Instance, Instance = pagenum })
+            : this(
+                pagenum,
+                maxslots,
+                firstslotnumber,
+                ownerInstance,
+                new Identity() { Type = (IdentityType)ownerInstance.Instance, Instance = pagenum })
+        {
+        }
+
+        protected BaseInventoryPage(
+            int pagenum,
+            int maxslots,
+            int firstslotnumber,
+            Identity ownerInstance,
+            Identity pageIdentity)
+            : base(ownerInstance, pageIdentity)
         {
             this.MaxSlots = maxslots;
             this.FirstSlotNumber = firstslotnumber;

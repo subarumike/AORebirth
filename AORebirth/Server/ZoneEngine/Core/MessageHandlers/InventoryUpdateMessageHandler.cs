@@ -34,6 +34,7 @@ namespace ZoneEngine.Core.MessageHandlers
     #region Usings ...
 
     using System.Collections.Generic;
+    using System.Threading;
 
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
@@ -49,9 +50,48 @@ namespace ZoneEngine.Core.MessageHandlers
     public class InventoryUpdateMessageHandler :
         BaseMessageHandler<InventoryUpdateMessage, InventoryUpdateMessageHandler>
     {
+        private const int BackpackInventoryFirstHandle = 0x70;
+
+        private static int nextBackpackInventoryHandle = BackpackInventoryFirstHandle - 1;
+
         public void Send(ICharacter character, IInventoryPage page)
         {
             this.Send(character, this.FillData(character, page));
+        }
+
+        public void SendContainerOpen(ICharacter character, IInventoryPage page)
+        {
+            this.SendContainerOpen(character, page, ReserveBackpackInventoryHandle());
+        }
+
+        public void SendContainerOpen(ICharacter character, IInventoryPage page, int handle)
+        {
+            this.Send(character, this.FillContainerData(character, page, handle, 1));
+        }
+
+        public void SendContainerIntroduce(ICharacter character, IInventoryPage page)
+        {
+            this.SendContainerIntroduce(character, page, ReserveBackpackInventoryHandle());
+        }
+
+        public void SendContainerIntroduce(ICharacter character, IInventoryPage page, int handle)
+        {
+            this.Send(character, this.FillContainerData(character, page, handle, 0));
+        }
+
+        public void SendFreshContainerOpen(ICharacter character, IInventoryPage page)
+        {
+            this.SendFreshContainerOpen(character, page, ReserveBackpackInventoryHandle());
+        }
+
+        public void SendFreshContainerOpen(ICharacter character, IInventoryPage page, int handle)
+        {
+            this.Send(character, this.FillContainerData(character, page, handle, 1));
+        }
+
+        public int ReserveBackpackInventoryHandle()
+        {
+            return Interlocked.Increment(ref nextBackpackInventoryHandle);
         }
 
         public MessageDataFiller FillData(ICharacter character, IInventoryPage page)
@@ -84,6 +124,58 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.Identity = character.Identity;
                 x.Unknown = 1;
             };
+        }
+
+        public MessageDataFiller FillContainerOpenData(ICharacter character, IInventoryPage page)
+        {
+            return this.FillContainerOpenData(character, page, BackpackInventoryFirstHandle);
+        }
+
+        public MessageDataFiller FillContainerOpenData(ICharacter character, IInventoryPage page, int handle)
+        {
+            return this.FillContainerData(character, page, handle, 1);
+        }
+
+        private MessageDataFiller FillContainerData(
+            ICharacter character,
+            IInventoryPage page,
+            int handle,
+            int unknown2)
+        {
+            return x =>
+            {
+                x.BagIdentity = page.Identity;
+                x.NumberOfSlots = page.MaxSlots;
+                x.SlotnumberInMainInventory = handle;
+                List<InventoryEntry> temp = new List<InventoryEntry>();
+
+                foreach (KeyValuePair<int, IItem> kv in page.List())
+                {
+                    temp.Add(
+                        new InventoryEntry()
+                        {
+                            Slotnumber = kv.Key,
+                            Identity = kv.Value.Identity,
+                            Quality = kv.Value.Quality,
+                            HighId = kv.Value.HighID,
+                            LowId = kv.Value.LowID,
+                            UnknownFlags = 0x21,
+                            Unknown1 = (short)this.GetItemCount(kv.Value),
+                            Unknown2 = 0
+                        });
+                }
+
+                x.Entries = temp.ToArray();
+                x.Unknown2 = unknown2;
+                x.Unknown1 = 3;
+                x.Identity = character.Identity;
+                x.Unknown = 1;
+            };
+        }
+
+        private int GetItemCount(IItem item)
+        {
+            return item.MultipleCount > 0 ? item.MultipleCount : 1;
         }
     }
 }

@@ -110,6 +110,15 @@ namespace ZoneEngine.Core.MessageHandlers
                         // Acknowledge action
                         this.Acknowledge(client.Controller.Character, message);
                     }
+                    else if (target.Type == IdentityType.Container)
+                    {
+                        IInventoryPage backpackPage;
+                        if (client.Controller.Character.BaseInventory.TryGetBackpackPage(target, out backpackPage))
+                        {
+                            BackpackContainerActionMessageHandler.Default.SendClose(client.Controller.Character, target);
+                            this.Acknowledge(client.Controller.Character, message);
+                        }
+                    }
                     else if (target.Type == IdentityType.Corpse)
                     {
                         bool used = client.Controller.Character.Playfield.TryUseCorpse(

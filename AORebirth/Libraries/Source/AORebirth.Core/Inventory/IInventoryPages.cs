@@ -40,6 +40,8 @@ namespace AORebirth.Core.Inventory
     using AORebirth.Core.Items;
     using AORebirth.Enums;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     #endregion
 
     /// <summary>
@@ -111,6 +113,24 @@ namespace AORebirth.Core.Inventory
         /// <returns>
         /// </returns>
         Item GetItemInContainer(int container, int placement);
+
+        /// <summary>
+        /// </summary>
+        /// <param name="containerIdentity">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        IInventoryPage GetOrCreateBackpackPage(Identity containerIdentity);
+
+        /// <summary>
+        /// </summary>
+        /// <param name="containerIdentity">
+        /// </param>
+        /// <param name="page">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        bool TryGetBackpackPage(Identity containerIdentity, out IInventoryPage page);
 
         /// <summary>
         /// </summary>

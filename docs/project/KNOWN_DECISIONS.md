@@ -12,6 +12,26 @@ Alternatives considered: Patch from visual symptoms or intuitive AI behavior.
 
 Consequences: Repairs may take longer up front, but they are easier to defend and less likely to break unrelated systems.
 
+## Live Client Behavior Bugs Start With Capture
+
+Decision: For AORebirth bugs involving current AO client behavior, packet flow, UI actions, item movement, inventory, bank, backpacks, shops, trade, missions, NPC interactions, pets, combat actions, or other client/server behavior, Codex must prioritize live capture/log evidence before designing the repair.
+
+Required behavior:
+
+- Treat the live AO client as the authoritative protocol source.
+- Treat legacy server code as a partially-correct reference, not proof.
+- Do not rely on static audit alone when packet behavior is involved.
+- Start with live capture or existing capture review whenever feasible.
+- User should only perform in-game actions; Codex must inspect logs/captures itself.
+- If capture is not possible, explicitly say so and explain the fallback evidence.
+- Repairs must be based on confirmed live packet/message behavior when available.
+
+Reason: Current-client behavior repeatedly differs from legacy AO Rebirth assumptions, especially in inventory, bank, trade, shop, mission, NPC, and UI-driven packet flows.
+
+Alternatives considered: Start from static source audit, legacy server behavior, or inferred packet semantics before checking live evidence.
+
+Consequences: Client-behavior bug work starts with existing capture review or a live capture plan whenever feasible, and fallback evidence must be explicit when capture cannot be obtained.
+
 ## Capture-Derived Content Uses Identity-First Evidence
 
 Decision: NPC, mob, statel, static dynel, vendor, quest, item, and playfield reconstruction must use the captured AO identity as the primary key. Display names, item names, screenshots, nearby objects, spatial proximity, visual similarity, assumed meshes, or assumed relationships may guide a search, but they must never define or replace runtime data.

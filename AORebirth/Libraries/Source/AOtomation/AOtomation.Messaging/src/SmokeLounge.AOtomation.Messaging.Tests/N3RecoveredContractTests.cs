@@ -44,6 +44,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0x754F1115, (int)N3MessageType.SpecialAttackInfo);
             Assert.AreEqual(0x260F3671, (int)N3MessageType.FollowTarget);
             Assert.AreEqual(0x60201D0E, (int)N3MessageType.SetWantedDirection);
+
+            Assert.AreEqual(0x0000C749, (int)IdentityType.Container);
         }
 
         [TestMethod]
@@ -221,6 +223,99 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(IdentityType.Inventory, decoded.Source.Type);
             Assert.AreEqual(0x40, decoded.Source.Instance);
             CollectionAssert.AreEqual(body, Serialize(decoded));
+        }
+
+        [TestMethod]
+        public void BackpackOpenChestItemFullUpdateMatchesCapturedBody()
+        {
+            var message = new ChestItemFullUpdateMessage
+                          {
+                              Identity = new Identity { Type = IdentityType.Container, Instance = 0x0A22540A },
+                              Unknown = 0,
+                              Unknown1 = 0x0b,
+                              Owner = new Identity { Type = IdentityType.CanbeAffected, Instance = 0x3CAC6F14 },
+                              PlayfieldId = 0x02DF,
+                              StateMachine = new Identity { Type = (IdentityType)0x000F424F, Instance = 0 },
+                              Unknown5 = 0x0144,
+                              Stats = new[]
+                                      {
+                                          new GameTuple<CharacterStat, uint>
+                                          {
+                                              Value1 = CharacterStat.Flags,
+                                              Value2 = 1
+                                          },
+                                          new GameTuple<CharacterStat, uint>
+                                          {
+                                              Value1 = CharacterStat.StaticInstance,
+                                              Value2 = 287428
+                                          },
+                                          new GameTuple<CharacterStat, uint>
+                                          {
+                                              Value1 = CharacterStat.ACGItemLevel,
+                                              Value2 = 1
+                                          },
+                                          new GameTuple<CharacterStat, uint>
+                                          {
+                                              Value1 = CharacterStat.ACGItemTemplateID,
+                                              Value2 = 287428
+                                          },
+                                          new GameTuple<CharacterStat, uint>
+                                          {
+                                              Value1 = CharacterStat.ACGItemTemplateID2,
+                                              Value2 = 287428
+                                          },
+                                          new GameTuple<CharacterStat, uint>
+                                          {
+                                              Value1 = CharacterStat.MultipleCount,
+                                              Value2 = 1
+                                          }
+                                      },
+                              Unknown6 = 0,
+                              Unknown7 = 2,
+                              Unknown8 = 50,
+                              UnknownArray = new int[0],
+                              Unknown9 = 3
+                          };
+            byte[] body = HexToBytes(
+                "465A5D730000C7490A22540A000000000B0000C3503CAC6F14000002DF000F424F00000000014400001B97000000000000000100000017000462C4000002BD00000001000002BE000462C4000002BF000462C40000019C00000001000000000000000200000032000003F100000003");
+
+            CollectionAssert.AreEqual(body, Serialize(message));
+
+            var decoded = (ChestItemFullUpdateMessage)Deserialize<ChestItemFullUpdateMessage>(body);
+            Assert.AreEqual(IdentityType.Container, decoded.Identity.Type);
+            Assert.AreEqual(0x0A22540A, decoded.Identity.Instance);
+            Assert.AreEqual(0x44, decoded.Unknown5 & 0xff);
+            Assert.AreEqual(6, decoded.Stats.Length);
+            Assert.AreEqual(3, decoded.Unknown9);
+        }
+
+        [TestMethod]
+        public void BackpackContainerOpenAndCloseActionsMatchCapturedBodies()
+        {
+            Identity container = new Identity { Type = IdentityType.Container, Instance = 0x0B9A7139 };
+            Identity character = new Identity { Type = IdentityType.CanbeAffected, Instance = 0x3CAC6F14 };
+
+            var open = new ActionMessage
+                       {
+                           Identity = container,
+                           Unknown = 0,
+                           ActionCode = 1,
+                           ActionIdentity = 0x64,
+                           Target = character
+                       };
+            byte[] openBody = HexToBytes("2049527C0000C7490B9A71390000000001000000640000C3503CAC6F14");
+            CollectionAssert.AreEqual(openBody, Serialize(open));
+
+            var close = new ActionMessage
+                        {
+                            Identity = container,
+                            Unknown = 1,
+                            ActionCode = 1,
+                            ActionIdentity = 0x66,
+                            Target = character
+                        };
+            byte[] closeBody = HexToBytes("2049527C0000C7490B9A71390100000001000000660000C3503CAC6F14");
+            CollectionAssert.AreEqual(closeBody, Serialize(close));
         }
 
         [TestMethod]

@@ -42,72 +42,42 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
     [AoContract((int)N3MessageType.ChestItemFullUpdate)]
     public class ChestItemFullUpdateMessage : N3Message
     {
-        public Identity Owner { get; set; }
-
-        private int identityType;
-
-        private int instance;
-
         public ChestItemFullUpdateMessage()
         {
             this.N3MessageType = N3MessageType.ChestItemFullUpdate;
         }
 
         [AoMember(1)]
-        public int MsgVersion { get; set; }
-
-        [AoMember(2)]
-        [AoFlags("flag")]
-        public int Identitytype
-        {
-            get
-            {
-                return this.identityType;
-            }
-            set
-            {
-                this.identityType = value;
-                this.Owner = new Identity() { Type = (IdentityType)value, Instance = this.instance };
-            }
-        }
-
-        [AoMember(3)]
-        public int Instance
-        {
-            get
-            {
-                return this.instance;
-            }
-            set
-            {
-                this.instance = value;
-                this.Owner = new Identity() { Type = (IdentityType)this.identityType, Instance = value };
-            }
-        }
-
-        [AoMember(4)]
-        [AoUsesFlags("flag", typeof(Vector3), FlagsCriteria.HasNone, new[] { int.MaxValue })]
-        public Vector3 Coordinates { get; set; }
-
-        [AoMember(5)]
-        [AoUsesFlags("flag", typeof(Quaternion), FlagsCriteria.HasNone, new[] { int.MaxValue })]
-        public Quaternion Heading { get; set; }
-
-        [AoMember(6)]
         public int Unknown1 { get; set; }
 
-        [AoMember(7)]
-        public Identity Unknown2 { get; set; }
+        [AoMember(2)]
+        public Identity Owner { get; set; }
 
-        [AoMember(8)]
-        public byte Unknown3 { get; set; }
-        [AoMember(9)]
-        public byte Unknown4 { get; set; }
+        [AoMember(3)]
+        public int PlayfieldId { get; set; }
 
-        [AoMember(10, SerializeSize = ArraySizeType.X3F1)]
+        [AoMember(4)]
+        public Identity StateMachine { get; set; }
+
+        [AoMember(5)]
+        public short Unknown5 { get; set; }
+
+        [AoMember(6, SerializeSize = ArraySizeType.X3F1)]
         public GameTuple<CharacterStat, uint>[] Stats { get; set; }
 
-        [AoMember(12, SerializeSize = ArraySizeType.Int32)]
-        public string Name { get; set; }
+        [AoMember(7)]
+        public int Unknown6 { get; set; }
+
+        [AoMember(8)]
+        public int Unknown7 { get; set; }
+
+        [AoMember(9)]
+        public int Unknown8 { get; set; }
+
+        [AoMember(10, SerializeSize = ArraySizeType.X3F1)]
+        public int[] UnknownArray { get; set; }
+
+        [AoMember(11)]
+        public int Unknown9 { get; set; }
     }
 }

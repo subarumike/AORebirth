@@ -29,36 +29,47 @@
 
 #endregion
 
-namespace AORebirth.Core.Inventory
+namespace ZoneEngine.Core.MessageHandlers
 {
     #region Usings ...
 
+    using AORebirth.Core.Components;
+    using AORebirth.Core.Entities;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     #endregion
 
-    /// <summary>
-    /// </summary>
-    public class BackPackInventoryPage : BaseInventoryPage
+    [MessageHandler(MessageHandlerDirection.OutboundOnly)]
+    public class BackpackContainerActionMessageHandler :
+        BaseMessageHandler<ActionMessage, BackpackContainerActionMessageHandler>
     {
-        #region Constructors and Destructors
+        private const int OpenActionIdentity = 0x64;
 
-        /// <summary>
-        /// </summary>
-        /// <param name="ownerInstance">
-        /// </param>
-        /// <param name="pooledIn">
-        /// </param>
-        public BackPackInventoryPage(Identity ownerInstance)
-            : base((int)IdentityType.Backpack, 21, 0, ownerInstance)
+        private const int CloseActionIdentity = 0x66;
+
+        public void SendOpen(ICharacter character, Identity containerIdentity)
         {
+            this.Send(character, containerIdentity, 0, OpenActionIdentity);
         }
 
-        public BackPackInventoryPage(Identity ownerInstance, Identity containerIdentity)
-            : base((int)IdentityType.Backpack, 21, 0, ownerInstance, containerIdentity)
+        public void SendClose(ICharacter character, Identity containerIdentity)
         {
+            this.Send(character, containerIdentity, 1, CloseActionIdentity);
         }
 
-        #endregion
+        private void Send(ICharacter character, Identity containerIdentity, byte unknown, int actionIdentity)
+        {
+            character.Send(
+                new ActionMessage
+                {
+                    Identity = containerIdentity,
+                    Unknown = unknown,
+                    ActionCode = 1,
+                    ActionIdentity = actionIdentity,
+                    Target = character.Identity
+                });
+        }
     }
 }
