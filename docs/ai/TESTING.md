@@ -13,7 +13,7 @@ Use this command from repo root:
 If engines are running and lock binaries, stop them first:
 
 ```powershell
-Get-Process ChatEngine,LoginEngine,ZoneEngine,WebEngine,MSBuild -ErrorAction SilentlyContinue | Stop-Process -Force
+powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\stop-engines.ps1'
 ```
 
 ## Automated Smoke Tests
@@ -50,6 +50,7 @@ Mike performs live client playtests. Codex should:
 
 - build the server,
 - start/stop engines when asked,
+- use `status-engines.ps1` to confirm process and port state,
 - provide exact commands to run in game,
 - watch logs/captures if needed,
 - avoid asking Mike to tab rapidly or perform unclear sequences.

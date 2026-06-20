@@ -35,8 +35,10 @@ namespace LoginEngine
 
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Net;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using AO.Core.Encryption;
@@ -81,6 +83,10 @@ namespace LoginEngine
         /// <summary>
         /// </summary>
         private static bool exited = false;
+
+        private static StreamWriter headlessErrorWriter;
+
+        private static StreamWriter headlessOutputWriter;
 
         /// <summary>
         /// </summary>
@@ -334,6 +340,121 @@ namespace LoginEngine
         /// </summary>
         /// <param name="args">
         /// </param>
+        private static string GetArgumentValue(string[] args, string argument)
+        {
+            for (int index = 0; index < args.Length - 1; index++)
+            {
+                if (string.Equals(args[index], argument, StringComparison.OrdinalIgnoreCase))
+                {
+                    return args[index + 1];
+                }
+            }
+
+            return null;
+        }
+
+        private static bool HasArgument(string[] args, string argument)
+        {
+            foreach (string arg in args)
+            {
+                if (string.Equals(arg, argument, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static void ConfigureHeadlessConsoleLogging(string[] args)
+        {
+            string stdoutLog = GetArgumentValue(args, "/stdout-log");
+            if (!string.IsNullOrWhiteSpace(stdoutLog))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(stdoutLog));
+                headlessOutputWriter = new StreamWriter(
+                    new FileStream(stdoutLog, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
+                headlessOutputWriter.AutoFlush = true;
+                Console.SetOut(headlessOutputWriter);
+            }
+
+            string stderrLog = GetArgumentValue(args, "/stderr-log");
+            if (!string.IsNullOrWhiteSpace(stderrLog))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(stderrLog));
+                headlessErrorWriter = new StreamWriter(
+                    new FileStream(stderrLog, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
+                headlessErrorWriter.AutoFlush = true;
+                Console.SetError(headlessErrorWriter);
+            }
+        }
+
+        private static void FlushHeadlessConsoleLogging()
+        {
+            if (headlessOutputWriter != null)
+            {
+                headlessOutputWriter.Flush();
+            }
+
+            if (headlessErrorWriter != null)
+            {
+                headlessErrorWriter.Flush();
+            }
+        }
+
+        private static void StartShutdownFileWatcher(string[] args)
+        {
+            string shutdownFile = GetArgumentValue(args, "/shutdown-file");
+            if (string.IsNullOrWhiteSpace(shutdownFile))
+            {
+                return;
+            }
+
+            Thread shutdownThread = new Thread(
+                () =>
+                    {
+                        while (!exited)
+                        {
+                            if (File.Exists(shutdownFile))
+                            {
+                                Console.WriteLine("Shutdown file requested.");
+                                ShutDownServer(null);
+                                FlushHeadlessConsoleLogging();
+                                Environment.Exit(0);
+                            }
+
+                            Thread.Sleep(1000);
+                        }
+                    });
+
+            shutdownThread.IsBackground = true;
+            shutdownThread.Start();
+        }
+
+        private static void RunHeadless(string[] args)
+        {
+            Console.WriteLine("Starting LoginEngine in headless mode.");
+            StartTheServer();
+
+            string shutdownFile = GetArgumentValue(args, "/shutdown-file");
+            while (!exited)
+            {
+                if (!string.IsNullOrWhiteSpace(shutdownFile) && File.Exists(shutdownFile))
+                {
+                    Console.WriteLine("Headless shutdown requested.");
+                    ShutDownServer(null);
+                    FlushHeadlessConsoleLogging();
+                    Environment.Exit(0);
+                }
+
+                Thread.Sleep(1000);
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="args">
+        /// </param>
         private static void CommandLoop(string[] args)
         {
             bool processedargs = false;
@@ -343,13 +464,10 @@ namespace LoginEngine
             {
                 if (!processedargs)
                 {
-                    if (args.Length == 1)
+                    if (HasArgument(args, "/autostart"))
                     {
-                        if (args[0].ToLower() == "/autostart")
-                        {
-                            Console.WriteLine(locales.ServerConsoleAutostart);
-                            StartTheServer();
-                        }
+                        Console.WriteLine(locales.ServerConsoleAutostart);
+                        StartTheServer();
                     }
 
                     processedargs = true;
@@ -559,6 +677,12 @@ namespace LoginEngine
         /// </param>
         private static void Main(string[] args)
         {
+            bool headless = HasArgument(args, "/headless");
+            if (headless)
+            {
+                ConfigureHeadlessConsoleLogging(args);
+            }
+
             ct = new ConsoleText();
 
             OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Red);
@@ -574,6 +698,15 @@ namespace LoginEngine
             }
             else
             {
+                if (headless)
+                {
+                    RunHeadless(args);
+                    LogManager.Configuration = null;
+                    FlushHeadlessConsoleLogging();
+                    return;
+                }
+
+                StartShutdownFileWatcher(args);
 #if DEBUG
                 StartTheServer();
 #endif
