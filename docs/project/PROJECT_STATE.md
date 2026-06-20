@@ -63,8 +63,21 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Runtime startup branding and shared server version baseline cleanup is implemented and validated: hidden Chat/Login/Zone logs show revision/banner branding as `AO Rebirth`, startup text uses `AO Rebirth Dev Team`, displayed version is `1.0.0.0`, and the Funcom/Anarchy Online notice remains unchanged.
 - MySqlConnector migration and DAO transaction handling are repaired for login select/zone redirect.
 - Current-client `FullCharacter` version 26 and live-style login state are locked decisions.
-- Sit/stand, equipment visuals, inventory move, equip/unequip, corpse item/credit loot, player trade item/credit/cancel, vendor buy/sell/close, and death/respawn have passing documented validation for their repaired scopes.
+- Sit/stand, equipment visuals, inventory move, equip/unequip, bank deposit/withdraw/persistence, corpse item/credit loot, player trade item/credit/cancel, vendor buy/sell/close, and death/respawn have passing documented validation for their repaired scopes.
 - Vendor coverage is complete for practical live-accessible vendors; remaining 26 statel vendors are deferred setup/access backlog.
+
+## Current Bank Repair State
+
+- Bank repair closure completed on 2026-06-20 and was manually live-smoked by Mike on the private AO Rebirth server.
+- Confirmed behavior: deposit works, withdraw works, bank slot positions persist, close/reopen bank passes, zone change passes, relog passes, and persistence passes.
+- Root cause: inventory-to-bank drag uses current-client `ClientContainerAddItem` (`0x1F4D5F7E`), not the legacy inbound `ContainerAddItem` handler path. AO Rebirth also decoded `ClientContainerAddItem` with the wrong body shape, so the base character identity and one-byte `Unknown` field misaligned the target/source identities. Bank reopen persistence visibility was also affected because bank slot serialization emitted zero instead of each real bank slot placement.
+- Packet discovery result: live AOSharp capture showed `ClientContainerAddItem` body `1F4D5F7E 0000C350:<char> 00 0000DEAD:<char> 00000068:<inventory slot>`. The live server answered with `ContainerAddItem` (`0x47537A24`) as `Source=Inventory:<source slot>`, `Target=Bank/0xDEAD:<char>`, and `Slot=<bank slot>`.
+- Serializer repair: `ClientContainerAddItemMessageSerializer` now reads `N3MessageType`, base character `Identity`, one-byte `Unknown`, target `Identity`, then source `Identity`, and consumes the full body for compatibility with observed private-client trailing bytes.
+- Bank movement repair: `ClientContainerAddItemMessageHandler` handles only `Source.Type == Inventory` and `Target.Type == 0xDEAD` deposits, moves the item from the inventory page to the first free bank slot, sends the live-shaped `ContainerAddItem` acknowledgement, and persists through `character.BaseInventory.Write()`.
+- Bank persistence repair: `BankSlot` field 0 is modeled as `Placement`, and `BaseInventoryPage.ToInventoryArray()` emits each actual slot key so bank item positions survive reopen, zone change, and relog.
+- Temporary diagnostics removed: temporary bank diagnostic source logging and raw body capture storage were removed after closure.
+- Validation performed: `SmokeLounge.AOtomation.Messaging.Tests` focused `N3RecoveredContractTests` passed `11/11`; `AORebirth.Core` Debug focused build passed; `ZoneEngine` Debug focused build passed; `git diff --check` passed with only existing LF-to-CRLF warnings; Chat/Login/Zone were restarted after rebuild and listened on ports `6996`, `7012`, `7500`, and `7501`.
+- Files changed for the bank repair: `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/N3Messages/ClientContainerAddItemMessage.cs`, `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Serialization/Serializers/Custom/RecoveredN3MessageSerializers.cs`, `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/BankSlot.cs`, `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/N3RecoveredContractTests.cs`, `AORebirth/Libraries/Source/AORebirth.Core/Inventory/BaseInventoryPage.cs`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/ClientContainerAddItemMessageHandler.cs`, and `AORebirth/Server/ZoneEngine/ZoneEngine.csproj`.
 
 ## Current Open Risks
 

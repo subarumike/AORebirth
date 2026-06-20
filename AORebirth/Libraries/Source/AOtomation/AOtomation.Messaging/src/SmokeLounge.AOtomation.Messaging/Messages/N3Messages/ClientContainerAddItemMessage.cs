@@ -11,8 +11,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
             this.N3MessageType = N3MessageType.ClientContainerAddItem;
         }
 
-        public Identity Identity1 { get; set; }
+        public Identity Target { get; set; }
 
-        public Identity Identity2 { get; set; }
+        public Identity Source { get; set; }
     }
 }
