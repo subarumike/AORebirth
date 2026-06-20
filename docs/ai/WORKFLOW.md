@@ -17,7 +17,8 @@ After code changes that affect server binaries:
 1. Stop engines.
 2. Build.
 3. Start Chat, Login, and Zone.
-4. Do not start WebEngine unless explicitly needed.
+4. Check engine status and expected ports.
+5. Do not start WebEngine unless explicitly needed.
 
 Stop engines:
 
@@ -35,6 +36,26 @@ Start engines:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\start-engines.ps1'
+```
+
+Default startup launches Chat, Login, and Zone hidden in the background, writes launcher stdout/stderr logs and PID metadata under `C:\Users\Mike\Documents\AORebirth\logs\engines\`, and waits for ports `6996`, `7012`, `7500`, and `7501`.
+
+Visible debug startup:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\start-engines.ps1' -Visible
+```
+
+Optional WebEngine startup:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\start-engines.ps1' -WithWeb
+```
+
+Status:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\status-engines.ps1'
 ```
 
 ## Database
