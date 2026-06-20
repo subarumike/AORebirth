@@ -19,7 +19,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - `CharacterAction` action `59` remains unresolved. Do not treat it as offer, accept, complete, fail, abandon, reward, or persistence semantics.
 - Rex chain state is process-local/in-memory only. There is no DB mission persistence.
 - Do not change database schemas or perform destructive database operations without explicit approval.
-- Marcus Stone content must not be treated as implemented. The Marcus dirty vertical slice was rolled back.
+- Marcus Stone full quest chain must not be treated as fully implemented. The Marcus dirty vertical slice was rolled back.
 
 ## Current Arete Environment Gate Semantics
 
@@ -42,8 +42,9 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - B18E: returning to Rex from B18E state starts the captured return branch, deletes B18E with DTO-built `QuestMessage Action=Delete`, grants actual `+290 XP`, grants `+1040` credits, sends reward feedback, and emits B18F `QuestFullUpdate`.
 - B18F: handoff is implemented as `Mission:5514B18F` / `Talk to Marcus Stone`. Marcus Stone identity evidence is `SimpleChar:782DE567`.
 - Reward feedback text is `Received reward: 1281 XP, 1040 credits.` The `1281 XP` value is display metadata only and must not be applied as actual XP.
-- Marcus Stone static B18F dialogue visibility is implemented as content-driven static dialogue only for `SimpleChar:782DE567` in playfield `6553`, using captured `20260614-195107` B18F prompt/options. It does not delete B18F, emit follow-up missions, hand out items, start trade, grant rewards, persist mission state, interpret action `59`, or implement the Marcus quest chain.
-- No item reward, inventory mutation, raw replay, DB mission persistence, Marcus quest chain, B18F completion, or action `59` interpretation is implemented.
+- Marcus Stone static B18F dialogue visibility is implemented for `SimpleChar:782DE567` in playfield `6553`, using captured `20260614-195107` B18F prompt/options.
+- Marcus B18F -> B194 transition is implemented only for node `marcus_195107_b18f_002`, answer index `0`, option text `So, let me guess... You need some help with the fire?`. It requires Rex chain state `B18FPreviewed` or later, uses a process-local duplicate guard, sends DTO-built B18F `QuestMessage Action=Delete`, and sends DTO-built B194 `QuestFullUpdate`.
+- Item `296780` handout is deferred. No item reward, inventory mutation, raw replay, DB mission persistence, full Marcus quest chain, gas-fire use, trade, rewards, or follow-up mission is implemented.
 - Historical stale Marcus runtime hook cleanup remains preserved: `ZoneEngine.csproj` no longer includes missing `MarcusStoneQuestChainHandler.cs`, and runtime router code no longer references `MarcusStoneQuestChainHandler`. Current Marcus static dialogue is registered through content-driven dialogue and loads the checked-in `Content/Arete/marcus-stone/manifest.json`; Marcus quest chain remains future work, gate behavior is unchanged, focused ZoneEngine build passed, and `git diff --check` passed for the cleanup.
 
 ## Current Arete / Rex Source Documents
@@ -67,7 +68,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - `Quest Delete` gameplay cause remains unresolved; current use is packet-level mission-window cleanup only.
 - `CharacterAction` action `59` remains unresolved.
 - Rex/Mission state is not persisted to DB and will not survive process restart as mission state.
-- Marcus Stone quest chain is not implemented after the B18F handoff.
+- Marcus Stone quest chain beyond the B194 mission-window preview is not implemented.
 - NPC chase/movement remains high risk and should not be changed without replay/capture evidence.
 - `PlayfieldAnarchyF` remains a current-client structure mismatch.
 - Full gameplay systems for missions, quests, perks, research, pets, PvP/towers, teams, and organizations remain incomplete outside the documented repaired slices.
