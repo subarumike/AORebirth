@@ -1,0 +1,129 @@
+{
+  "Identity": {
+    "Id": "arete-marcus-stone-dialogue-20260614-195107",
+    "Version": "captured-static-b18f-20260619",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/chat-dialogue.log + packets.hex.log"
+  },
+  "SourceCaptures": [
+    "20260614-195107",
+    "tools-temp/arete-analysis/dialogue_trees.json",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/chat-dialogue.log",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/packets.hex.log"
+  ],
+  "Npcs": [
+    {
+      "Id": "marcus-stone",
+      "NpcIdentity": "SimpleChar:782DE567",
+      "Name": "Marcus Stone",
+      "RootNodeId": "marcus_195107_b18f_001",
+      "Aliases": [
+        "(SimpleChar:782DE567)"
+      ],
+      "Nodes": [
+        {
+          "Id": "marcus_195107_b18f_001",
+          "PromptText": "As you might have noticed, I'm a little busy at the moment.",
+          "PromptTextConfidence": "captured-knubot-append-text 20260614-195107/packets.hex.log lines 1241-1242 packets #1161-#1162",
+          "Options": [
+            {
+              "Id": "marcus_195107_b18f_001_option_0",
+              "Index": 0,
+              "Text": "Actually, Rex said you could help me... I seem to have misplaced my Identity Card.",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:51:45.7868886Z, 20260614-195107/chat-dialogue.log lines 7-8; selected answer index 0 at 2026-06-15T00:51:46.7671023Z.",
+              "NextNodeId": "marcus_195107_b18f_002",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_195107_b18f_001_option_1",
+              "Index": 1,
+              "Text": "Who are you?",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:51:45.7868886Z, 20260614-195107/chat-dialogue.log lines 7-8; response branch was visible but not captured in this B18F path.",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_195107_b18f_001_option_2",
+              "Index": 2,
+              "Text": "Where am I?",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:51:45.7868886Z, 20260614-195107/chat-dialogue.log lines 7-8; response branch was visible but not captured in this B18F path.",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_195107_b18f_001_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:51:45.7868886Z, 20260614-195107/chat-dialogue.log lines 7-8.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "marcus_195107_b18f_001_option_3_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close action for captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_195107_b18f_002",
+          "PromptText": "Well now. Sounds like you got a problem. I'm not going to say I <i>can't</i> help you but, well, as you'll find out soon enough, everyone on Rubi-Ka needs <i>something</i>...",
+          "PromptTextConfidence": "captured-knubot-append-text 20260614-195107/packets.hex.log lines 1311-1312 packets #1229-#1230",
+          "Options": [
+            {
+              "Id": "marcus_195107_b18f_002_option_0",
+              "Index": 0,
+              "Text": "So, let me guess... You need some help with the fire?",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:51:47.9429581Z, 20260614-195107/chat-dialogue.log lines 11-12; selected answer index 0 at 2026-06-15T00:51:49.0685084Z.",
+              "NextNodeId": "marcus_195107_b18f_003",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_195107_b18f_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:51:47.9429581Z, 20260614-195107/chat-dialogue.log lines 11-12.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "marcus_195107_b18f_002_option_1_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close action for captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_195107_b18f_003",
+          "PromptText": "A little smirk crosses his lips as he nods his approval.\\n\\nYeah, now you're catching on. As you have already noticed, a few, small fires have erupted up on this landing platform. The appropriate authorities are on their way to deal with the wounded and property damage, but if you wouldn't mind helping me with a few of these fires, it would be appreciated. You do that, I'll see if I can't help you out with your little... identity issue.",
+          "PromptTextConfidence": "captured-knubot-append-text 20260614-195107/packets.hex.log lines 1391-1394 packets #1307-#1310; subsequent mission transition packets from the same capture timestamp are intentionally not implemented in this static dialogue phase",
+          "Options": [
+            {
+              "Id": "marcus_195107_b18f_003_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-06-15T00:51:50.0820171Z, 20260614-195107/chat-dialogue.log lines 15-16.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "marcus_195107_b18f_003_option_0_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close action for captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": []
+    }
+  ]
+}

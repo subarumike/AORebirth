@@ -31,12 +31,19 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
         private const int RexLarssonInstance = unchecked((int)0x782DE568);
 
+        private const int MarcusStoneInstance = unchecked((int)0x782DE567);
+
         private const string RexLarssonNpcIdentity = "SimpleChar:782DE568";
+
+        private const string MarcusStoneNpcIdentity = "SimpleChar:782DE567";
 
         private const string RexB18EReturnNodeId = "rex_194454_006";
 
         private const string RexManifestRelativePath =
             @"Server\ZoneEngine\Content\Arete\rex-larsson\manifest.json";
+
+        private const string MarcusManifestRelativePath =
+            @"Server\ZoneEngine\Content\Arete\marcus-stone\manifest.json";
 
         private const int KnuBotPacketPacingMilliseconds = 20;
 
@@ -57,9 +64,27 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 LogPrefix = "ARETE_REX_DIALOGUE"
             };
 
+        private static readonly ContentDrivenNpcDialogueRegistration MarcusStoneRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Marcus Stone",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = MarcusStoneInstance
+                    },
+                NpcIdentityText = MarcusStoneNpcIdentity,
+                PlayfieldId = AreteLandingPlayfieldId,
+                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                ManifestRelativePath = MarcusManifestRelativePath,
+                LogPrefix = "ARETE_MARCUS_DIALOGUE"
+            };
+
         private static readonly ContentDrivenNpcDialogueRegistration[] Registrations =
         {
-            RexLarssonRegistration
+            RexLarssonRegistration,
+            MarcusStoneRegistration
         };
 
         private static readonly Dictionary<string, DialogueSessionRecord> SessionsByCharacter =
