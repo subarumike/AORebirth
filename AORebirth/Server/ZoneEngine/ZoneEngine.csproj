@@ -192,9 +192,11 @@
     <Compile Include="Core\MessageHandlers\AppearanceUpdateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\AttackMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\BankMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\BackpackContainerActionMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\CastNanoMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\CharacterActionMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\CharacterInfoPacketMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\ChestItemFullUpdateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\CharDCMoveMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\CharInPlayMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ChatCmdMessageHandler.cs" />

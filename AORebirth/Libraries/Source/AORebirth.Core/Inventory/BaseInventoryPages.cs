@@ -50,6 +50,8 @@ namespace AORebirth.Core.Inventory
     /// </summary>
     public abstract class BaseInventoryPages : IInventoryPages
     {
+        private readonly IDictionary<ulong, IInventoryPage> backpackPages;
+
         private bool disposed = false;
 
         #region Constructors and Destructors
@@ -64,6 +66,7 @@ namespace AORebirth.Core.Inventory
             : this()
         {
             this.StandardPage = standardpage;
+            this.Owner = owner;
         }
 
         /// <summary>
@@ -71,6 +74,7 @@ namespace AORebirth.Core.Inventory
         private BaseInventoryPages()
         {
             this.Pages = new Dictionary<int, IInventoryPage>();
+            this.backpackPages = new Dictionary<ulong, IInventoryPage>();
         }
 
         #endregion
@@ -215,6 +219,55 @@ namespace AORebirth.Core.Inventory
 
         /// <summary>
         /// </summary>
+        /// <param name="containerIdentity">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public IInventoryPage GetOrCreateBackpackPage(Identity containerIdentity)
+        {
+            if ((containerIdentity == null) || (containerIdentity.Type != IdentityType.Container))
+            {
+                throw new ArgumentException("Backpack page identity must be a Container identity.", "containerIdentity");
+            }
+
+            IInventoryPage page;
+            if (this.TryGetBackpackPage(containerIdentity, out page))
+            {
+                return page;
+            }
+
+            if (this.Owner == null)
+            {
+                throw new InvalidOperationException("Inventory page owner is required for backpack pages.");
+            }
+
+            page = new BackPackInventoryPage(this.Owner.Identity, containerIdentity);
+            page.Read();
+            this.backpackPages.Add(containerIdentity.Long(), page);
+            return page;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="containerIdentity">
+        /// </param>
+        /// <param name="page">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public bool TryGetBackpackPage(Identity containerIdentity, out IInventoryPage page)
+        {
+            page = null;
+            if (containerIdentity == null)
+            {
+                return false;
+            }
+
+            return this.backpackPages.TryGetValue(containerIdentity.Long(), out page);
+        }
+
+        /// <summary>
+        /// </summary>
         /// <param name="slotNum">
         /// </param>
         /// <returns>
@@ -354,6 +407,12 @@ namespace AORebirth.Core.Inventory
                         ((PooledObject)kv.Value).Dispose();
                     }
                     this.Pages.Clear();
+
+                    foreach (KeyValuePair<ulong, IInventoryPage> kv in this.backpackPages)
+                    {
+                        ((PooledObject)kv.Value).Dispose();
+                    }
+                    this.backpackPages.Clear();
                 }
             }
             this.disposed = true;

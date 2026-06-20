@@ -17,6 +17,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 - Do not use raw packet replay for Rex/Arete mission packets. Use decoded DTO/body serializer paths only.
 - Do not guess packet behavior; unresolved packet semantics must stay unresolved until evidence-backed.
+- For current AO client behavior bugs, treat the live AO client as authoritative, start with live capture or existing capture review whenever feasible, and base repairs on confirmed live packet/message behavior when available.
 - Capture-derived content must be identity-first. Display names, proximity, screenshots, or plausible templates cannot define runtime data.
 - Cargo Box identity is exactly `Terminal:56D9B4AF`; do not substitute nearby terminals, rendered labels, templates, meshes, or inferred anchors.
 - `CharacterAction` action `59` remains unresolved. Do not treat it as offer, accept, complete, fail, abandon, reward, or persistence semantics.

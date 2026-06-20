@@ -72,6 +72,18 @@ powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AOR
 - Mike performs live client playtests.
 - Do not ask Mike to run commands inside the game when Codex can run external tooling.
 
+## Live Client Behavior Bugs
+
+For AORebirth bugs involving current AO client behavior, packet flow, UI actions, item movement, inventory, bank, backpacks, shops, trade, missions, NPC interactions, pets, combat actions, or other client/server behavior:
+
+- Treat the live AO client as the authoritative protocol source.
+- Treat legacy server code as a partially-correct reference, not proof.
+- Do not rely on static audit alone when packet behavior is involved.
+- Start with live capture or existing capture review whenever feasible.
+- User should only perform in-game actions; Codex must inspect logs/captures itself.
+- If capture is not possible, explicitly say so and explain the fallback evidence.
+- Repairs must be based on confirmed live packet/message behavior when available.
+
 ## Capture-Derived Content
 
 These rules apply to NPC, mob, statel, static dynel, vendor, quest, item, and playfield reconstruction.

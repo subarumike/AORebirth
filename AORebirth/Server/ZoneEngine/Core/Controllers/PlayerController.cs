@@ -523,6 +523,11 @@ namespace ZoneEngine.Core.Controllers
                 throw new NullReferenceException("No item found at " + itemPosition);
             }
 
+            if (this.TryOpenBackpackContainer(itemPosition, item))
+            {
+                return true;
+            }
+
             if (this.IsUseBlockedBySkillLock(item))
             {
                 return false;
@@ -555,6 +560,138 @@ namespace ZoneEngine.Core.Controllers
 
             item.PerformAction(this.Character, EventType.OnUse, itemPosition.Instance);
             return true;
+        }
+
+        private bool TryOpenBackpackContainer(Identity itemPosition, Item item)
+        {
+            if (itemPosition.Type != IdentityType.Inventory)
+            {
+                return false;
+            }
+
+            Identity containerIdentity;
+            if (!this.TryResolveBackpackContainerIdentity(itemPosition, item, out containerIdentity))
+            {
+                return false;
+            }
+
+            if (!this.IsItemUsable(item))
+            {
+                return false;
+            }
+
+            IInventoryPage backpackPage;
+            bool pageAlreadyKnown = this.Character.BaseInventory.TryGetBackpackPage(containerIdentity, out backpackPage);
+            if (pageAlreadyKnown)
+            {
+                BackpackContainerActionMessageHandler.Default.SendOpen(this.Character, containerIdentity);
+            }
+            else
+            {
+                backpackPage = this.Character.BaseInventory.GetOrCreateBackpackPage(containerIdentity);
+
+                if (backpackPage.List().Any())
+                {
+                    int openHandle = InventoryUpdateMessageHandler.Default.ReserveBackpackInventoryHandle();
+                    ChestItemFullUpdateMessageHandler.Default.Send(this.Character, item, itemPosition, backpackPage.Identity);
+                    InventoryUpdateMessageHandler.Default.SendContainerOpen(this.Character, backpackPage, openHandle);
+                }
+                else
+                {
+                    int introduceHandle = InventoryUpdateMessageHandler.Default.ReserveBackpackInventoryHandle();
+                    int openHandle = InventoryUpdateMessageHandler.Default.ReserveBackpackInventoryHandle();
+                    InventoryUpdateMessageHandler.Default.SendContainerIntroduce(this.Character, backpackPage, introduceHandle);
+                    ChestItemFullUpdateMessageHandler.Default.Send(this.Character, item, itemPosition, backpackPage.Identity);
+                    InventoryUpdateMessageHandler.Default.SendFreshContainerOpen(this.Character, backpackPage, openHandle);
+                }
+            }
+
+            return true;
+        }
+
+        private bool TryResolveBackpackContainerIdentity(Identity itemPosition, Item item, out Identity containerIdentity)
+        {
+            containerIdentity = Identity.None;
+
+            if ((item.Identity != null) && (item.Identity.Type == IdentityType.Container))
+            {
+                containerIdentity = item.Identity;
+                return true;
+            }
+
+            if (!this.IsLegacyBackpackTemplate(item))
+            {
+                return false;
+            }
+
+            containerIdentity = this.CreateLegacyBackpackContainerIdentity(itemPosition, item);
+            return true;
+        }
+
+        private bool IsLegacyBackpackTemplate(Item item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+
+            const int BackpackCanFlags =
+                (int)(CanFlags.Carry | CanFlags.Wear | CanFlags.Use);
+
+            if (item.GetAttribute((int)StatIds.can) != BackpackCanFlags)
+            {
+                return false;
+            }
+
+            if (item.GetAttribute((int)StatIds.itemclass) != 2)
+            {
+                return false;
+            }
+
+            if (item.GetAttribute((int)StatIds.placement) != 8)
+            {
+                return false;
+            }
+
+            return item.Events.Any(
+                x => x.EventType == EventType.OnWear
+                     && x.Functions.Any(y => y.FunctionType == (int)FunctionType.BackMesh));
+        }
+
+        private Identity CreateLegacyBackpackContainerIdentity(Identity itemPosition, Item item)
+        {
+            unchecked
+            {
+                uint hash = 2166136261;
+                hash = this.MixBackpackContainerIdentity(hash, (uint)this.Character.Identity.Instance);
+                hash = this.MixBackpackContainerIdentity(hash, (uint)itemPosition.Type);
+                hash = this.MixBackpackContainerIdentity(hash, (uint)itemPosition.Instance);
+                hash = this.MixBackpackContainerIdentity(hash, (uint)item.LowID);
+                hash = this.MixBackpackContainerIdentity(hash, (uint)item.HighID);
+                hash = this.MixBackpackContainerIdentity(hash, (uint)item.Quality);
+
+                int instance = (int)(hash & 0x7fffffff);
+                if (instance == 0)
+                {
+                    instance = 1;
+                }
+
+                return new Identity { Type = IdentityType.Container, Instance = instance };
+            }
+        }
+
+        private uint MixBackpackContainerIdentity(uint hash, uint value)
+        {
+            unchecked
+            {
+                hash ^= value;
+                return hash * 16777619;
+            }
+        }
+
+        private bool IsItemUsable(Item item)
+        {
+            return (item.GetAttribute((int)StatIds.can) & (int)CanFlags.Use) == (int)CanFlags.Use;
         }
 
         private bool IsUseBlockedBySkillLock(Item item)
