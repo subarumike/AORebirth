@@ -1,38 +1,33 @@
 # Current Task
 
-Generated: 2026-06-19
+## Current status
 
-## Current Objective
+- `docs/project/PROJECT_STATE.md` is now the primary Codex memory file.
+- AI startup/read order now reads `docs/project/PROJECT_STATE.md` before this file.
+- Rex works through B18F on the current stable baseline.
+- Marcus quest chain is not implemented.
+- The Marcus dirty vertical slice was rolled back.
+- Worktree has intentional docs changes only, plus a pre-existing `.gitignore` modification.
+- Next development task is not selected yet.
 
-Default-enable remaining Rex local/dev quest gates.
+## Stable baseline
 
-## Current Scope
+- Current stable baseline commit: `0946690`.
 
-Apply the already-fixed content-driven dialogue gate semantics to the remaining Rex quest gates:
+## Active task
 
-- Missing or empty environment variable defaults enabled.
-- Explicit falsey values disable: `0`, `false`, `no`, `off`.
-- Explicit truthy values enable: `1`, `true`, `yes`, `on`.
-- Other non-empty values remain disabled.
+No active implementation task selected. Await user instruction.
 
-Target gates:
+## Explicit non-goals
 
-- `AO_REBIRTH_ENABLE_ARETE_REX_QUEST_PREVIEW`
-- `AO_REBIRTH_ENABLE_ARETE_REX_B18C_PROGRESS`
-- `AO_REBIRTH_ENABLE_ARETE_REX_B18D_PREVIEW`
-- `AO_REBIRTH_ENABLE_ARETE_REX_B18E_COMPLETION`
+- Do not rebuild Marcus chain yet.
+- Do not modify Rex unless user asks.
+- Do not alter gate behavior.
+- Do not stage or commit without user instruction.
 
-## Current Status
+## Next safe options
 
-- Active investigation found the Rex content-driven dialogue gate already default-enabled in `ContentDrivenNpcDialogueRouter`.
-- The four remaining Rex quest gates still used private truthy-only checks that default disabled when unset.
-- Marcus has no separate per-mission environment gate; it reuses the content-driven dialogue routing gate.
-- Do not change quest logic, packet serialization, rewards, database schema, or SQL/data.
-
-## Result Document
-
-Write `docs/generated/rex_default_enabled_gate_fix_result.md`.
-
-## Next Step
-
-Implement shared gate helper, replace inconsistent checks, build, dry-run, run `git diff --check`, restart ZoneEngine with Rex gate environment variables unset, and confirm logs no longer block B18C preview because of disabled gates.
+- Review `docs/project/PROJECT_STATE.md` before selecting any new implementation task.
+- Select the next development target explicitly before code changes.
+- Audit Marcus evidence before any Marcus work.
+- If continuing Rex, inspect current Rex state and generated result history before touching code.
