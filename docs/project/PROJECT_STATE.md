@@ -10,7 +10,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Documentation split: `docs/ai/CURRENT_TASK.md` remains the active task handoff; this file is the stable project memory; `docs/generated/` contains historical result reports only.
 - Active cleanup note: `docs/ai/CURRENT_TASK.md` is focused on seated-login persistence. Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
 - Last live-smoked committed quest baseline: `ecbca7d` (`Implement Marcus B18F to B194 transition`).
-- Current task result: seated-login persistence preserves a loaded `currentmovementmode=Sit` through login initialization before the first character update packets are sent; standing login still uses the existing Run baseline.
+- Current task result: seated-login persistence preserves a loaded `currentmovementmode=Sit` through login initialization before the first character update packets are sent; standing login still uses the existing Run baseline. Mike live-smoked the private server login repro and confirmed the seated login is fixed.
 - Current uncommitted quest work: Marcus Phase 4B item `296780` handout exists in `MarcusB18FCompletionHandler.cs`, has focused ZoneEngine build/search validation, has not had live smoke, and is intentionally paused/uncommitted.
 - Quest system work is on the back burner. The next work item should be selected from non-quest gameplay bugs unless Mike explicitly resumes quest work.
 
