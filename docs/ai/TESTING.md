@@ -12,6 +12,8 @@ cmd /d /c tools\build_aorebirth_debug.cmd
 
 Never use raw AORebirth `MSBuild /m`, MSBuild node reuse, PowerShell, or `.ps1` wrappers for Codex build validation. If engines are running and lock binaries, stop them through an approved `cmd.exe` or Git Bash workflow only.
 
+The build wrapper disables legacy build-time `RestorePackages` with `/p:RestorePackages=false`, checks required package folders before MSBuild, and runs explicit NuGet restore only before the build when required packages are missing.
+
 ## Automated Smoke Tests
 
 Run test scripts only through approved `cmd.exe` or Git Bash workflows. PowerShell and `.ps1` validation wrappers are deprecated for Codex use. If a command fails with permission or access denied, stop and report the exact command, working directory, target path, and full error before retrying with any elevated Codex permission.
