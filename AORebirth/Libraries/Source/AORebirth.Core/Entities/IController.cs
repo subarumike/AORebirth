@@ -224,6 +224,14 @@ namespace AORebirth.Core.Entities
 
         /// <summary>
         /// </summary>
+        /// <param name="itemPosition">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        bool TryUseBackpackContainer(Identity itemPosition);
+
+        /// <summary>
+        /// </summary>
         /// <param name="container">
         /// </param>
         /// <param name="slotNumber">

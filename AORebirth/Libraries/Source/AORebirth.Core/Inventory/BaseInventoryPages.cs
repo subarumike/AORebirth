@@ -50,7 +50,11 @@ namespace AORebirth.Core.Inventory
     /// </summary>
     public abstract class BaseInventoryPages : IInventoryPages
     {
+        private readonly IDictionary<int, ulong> backpackHandlePages;
+
         private readonly IDictionary<ulong, IInventoryPage> backpackPages;
+
+        private readonly ISet<ulong> openBackpackPages;
 
         private bool disposed = false;
 
@@ -74,7 +78,9 @@ namespace AORebirth.Core.Inventory
         private BaseInventoryPages()
         {
             this.Pages = new Dictionary<int, IInventoryPage>();
+            this.backpackHandlePages = new Dictionary<int, ulong>();
             this.backpackPages = new Dictionary<ulong, IInventoryPage>();
+            this.openBackpackPages = new HashSet<ulong>();
         }
 
         #endregion
@@ -266,6 +272,73 @@ namespace AORebirth.Core.Inventory
             return this.backpackPages.TryGetValue(containerIdentity.Long(), out page);
         }
 
+        public bool IsBackpackOpen(Identity containerIdentity)
+        {
+            if ((containerIdentity == null) || (containerIdentity.Type != IdentityType.Container))
+            {
+                return false;
+            }
+
+            return this.openBackpackPages.Contains(containerIdentity.Long());
+        }
+
+        public void MarkBackpackOpen(Identity containerIdentity)
+        {
+            if ((containerIdentity == null) || (containerIdentity.Type != IdentityType.Container))
+            {
+                return;
+            }
+
+            this.openBackpackPages.Add(containerIdentity.Long());
+        }
+
+        public void MarkBackpackClosed(Identity containerIdentity)
+        {
+            if ((containerIdentity == null) || (containerIdentity.Type != IdentityType.Container))
+            {
+                return;
+            }
+
+            this.openBackpackPages.Remove(containerIdentity.Long());
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="handle">
+        /// </param>
+        /// <param name="containerIdentity">
+        /// </param>
+        public void RegisterBackpackHandle(int handle, Identity containerIdentity)
+        {
+            if ((containerIdentity == null) || (containerIdentity.Type != IdentityType.Container))
+            {
+                throw new ArgumentException("Backpack handle must map to a Container identity.", "containerIdentity");
+            }
+
+            this.backpackHandlePages[handle] = containerIdentity.Long();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="handle">
+        /// </param>
+        /// <param name="page">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public bool TryGetBackpackPageByHandle(int handle, out IInventoryPage page)
+        {
+            page = null;
+
+            ulong containerKey;
+            if (!this.backpackHandlePages.TryGetValue(handle, out containerKey))
+            {
+                return false;
+            }
+
+            return this.backpackPages.TryGetValue(containerKey, out page);
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="slotNum">
@@ -385,6 +458,11 @@ namespace AORebirth.Core.Inventory
                 inventoryPage.Write();
             }
 
+            foreach (IInventoryPage inventoryPage in this.backpackPages.Values)
+            {
+                inventoryPage.Write();
+            }
+
             return true;
         }
 
@@ -413,6 +491,7 @@ namespace AORebirth.Core.Inventory
                         ((PooledObject)kv.Value).Dispose();
                     }
                     this.backpackPages.Clear();
+                    this.backpackHandlePages.Clear();
                 }
             }
             this.disposed = true;

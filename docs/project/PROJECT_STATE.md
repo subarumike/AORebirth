@@ -4,7 +4,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Baseline
 
-- HEAD baseline: `0946690`.
+- HEAD baseline: `e85440de`.
 - Repository purpose: local C#/.NET Framework-era Anarchy Online server workspace for Mike's current AO client and local `cellao_codex_clean` MySQL database; this is a legacy database name retained for local compatibility.
 - Current stable approach: evidence-backed packet/gameplay/data repair, current-client parity over legacy assumptions, and identity-first capture-derived reconstruction.
 - Documentation split: `docs/ai/CURRENT_TASK.md` remains the active task handoff; this file is the stable project memory; `docs/generated/` contains historical result reports only.
@@ -64,7 +64,8 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Runtime startup branding and shared server version baseline cleanup is implemented and validated: hidden Chat/Login/Zone logs show revision/banner branding as `AO Rebirth`, startup text uses `AO Rebirth Dev Team`, displayed version is `1.0.0.0`, and the Funcom/Anarchy Online notice remains unchanged.
 - MySqlConnector migration and DAO transaction handling are repaired for login select/zone redirect.
 - Current-client `FullCharacter` version 26 and live-style login state are locked decisions.
-- Sit/stand, equipment visuals, inventory move, equip/unequip, bank deposit/withdraw/persistence, corpse item/credit loot, player trade item/credit/cancel, vendor buy/sell/close, and death/respawn have passing documented validation for their repaired scopes.
+- Sit/stand, equipment visuals, inventory move, equip/unequip, bank deposit/withdraw/persistence, backpack open/close/reopen, corpse item/credit loot, player trade item/credit/cancel, vendor buy/sell/close, and death/respawn have passing documented validation for their repaired scopes.
+- Uncommitted backpack follow-up work now covers captured inventory-to-backpack movement, captured backpack-to-inventory movement, worn-slot backpack open/close, and post-zone backpack visibility. It is live-smoked and pending commit.
 - Vendor coverage is complete for practical live-accessible vendors; remaining 26 statel vendors are deferred setup/access backlog.
 
 ## Current Bank Repair State
@@ -80,12 +81,37 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Validation performed: `SmokeLounge.AOtomation.Messaging.Tests` focused `N3RecoveredContractTests` passed `11/11`; `AORebirth.Core` Debug focused build passed; `ZoneEngine` Debug focused build passed; `git diff --check` passed with only existing LF-to-CRLF warnings; Chat/Login/Zone were restarted after rebuild and listened on ports `6996`, `7012`, `7500`, and `7501`.
 - Files changed for the bank repair: `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/N3Messages/ClientContainerAddItemMessage.cs`, `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Serialization/Serializers/Custom/RecoveredN3MessageSerializers.cs`, `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/BankSlot.cs`, `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/N3RecoveredContractTests.cs`, `AORebirth/Libraries/Source/AORebirth.Core/Inventory/BaseInventoryPage.cs`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/ClientContainerAddItemMessageHandler.cs`, and `AORebirth/Server/ZoneEngine/ZoneEngine.csproj`.
 
+## Current Backpack Open Repair State
+
+- Backpack open closure completed on 2026-06-20 and was manually live-smoked by Mike on the private AO Rebirth server.
+- Confirmed behavior: right-click opens a backpack, left-clicking the window X closes it, and right-clicking the same backpack reopens it visually.
+- Packet discovery result: current live client open is `GenericCmd Use` against `Inventory:<placement>`, which resolves through main inventory to `Container:<id>`. Existing/non-empty open sends `ChestFullUpdate` for `Container:<id>`, then `InventoryUpdate` for the same container, then the `GenericCmd` success ack with `Temp1=1` and the original inventory target.
+- Fresh empty backpack handling: because AO Rebirth vendor buy does not yet emit the live purchase-time container introduction, first open introduces the empty container with `InventoryUpdate Unknown3=0`, sends `ChestFullUpdate`, then sends the open `InventoryUpdate Unknown3=1` before the `GenericCmd` ack.
+- Close/reopen handling: close via `GenericCmd Use` on `Container:<id>` sends the live-shaped `Action` packet with `Unknown=1`, `ActionCode=1`, and `ActionIdentity=0x66`; reopen of an already-known page sends `Action` with `Unknown=0`, `ActionCode=1`, and `ActionIdentity=0x64`, followed by the normal `GenericCmd` ack.
+- Backpack pages are keyed by the item/container identity `Container:<id>`, not by template id and not by inventory slot. Legacy uninstanced backpack templates get a deterministic local `Container` identity.
+- Item movement into or out of backpacks is not implemented by the backpack-open repair and remains a separate future task.
+- Temporary diagnostics removed: no temporary backpack logging or capture probe remains in the checked source.
+- Validation performed: focused `AORebirth.Core` MSBuild passed; focused `ZoneEngine` MSBuild passed; `N3RecoveredContractTests` passed `13/13`; `git diff --check` passed with only LF-to-CRLF warnings; private live smoke passed.
+- Files changed for the backpack-open repair: `AORebirth/Libraries/Source/AORebirth.Core/Inventory/BackPackInventory.cs`, `AORebirth/Libraries/Source/AORebirth.Core/Inventory/BaseInventoryPage.cs`, `AORebirth/Libraries/Source/AORebirth.Core/Inventory/BaseInventoryPages.cs`, `AORebirth/Libraries/Source/AORebirth.Core/Inventory/IInventoryPages.cs`, `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/N3RecoveredContractTests.cs`, `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/IdentityType.cs`, `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/N3Messages/ChestItemFullUpdateMessage.cs`, `AORebirth/Server/ZoneEngine/Core/Controllers/PlayerController.cs`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/BackpackContainerActionMessageHandler.cs`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/ChestItemFullUpdateMessageHandler.cs`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/GenericCmdMessageHandler.cs`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/InventoryUpdateMessageHandler.cs`, and `AORebirth/Server/ZoneEngine/ZoneEngine.csproj`.
+
+## Current Backpack Item Movement Follow-Up State
+
+- Backpack movement follow-up is uncommitted, validated, and live-smoked.
+- Live evidence: inventory-to-backpack drag uses `ClientContainerAddItem` with `Target=Container:<id>` and `Source=Inventory:<slot>`; the server answers with `ContainerAddItem` using the original source, target `Container:<id>`, and a server-chosen backpack slot.
+- Live evidence: backpack-to-inventory drag uses `ClientMoveItemToInventory` with `SourceContainer=Backpack:<handle/slot>` and a target inventory slot; the server answers with `ContainerAddItem` from that backpack handle/slot to the character identity.
+- Live evidence: right-clicking a worn backpack in `ArmorPage:<slot>` or `SocialPage:<slot>` sends `GenericCmd Use` for that worn slot. Closing sends `GenericCmd Use` for `Container:<id>`.
+- Live evidence after zoning: first reopen of worn and inventory backpacks sends `ChestFullUpdate`, `InventoryUpdate` with the persisted item count, and a `GenericCmd` success ack. Mike confirmed bags persist, items inside bags persist, and bags can be opened from both worn slots and inventory after the latest test.
+- Implementation shape: backpack pages remain keyed by `Container:<id>`; `InventoryUpdate` handles are registered back to the container identity so `Backpack:<handle/slot>` packets can resolve to the correct page; page writes replace only the affected page rows inside a transaction.
+- Current validation: focused `AORebirth.Core` build passed; focused `ZoneEngine` build passed; focused `N3RecoveredContractTests` passed `14/14`; `git diff --check` passed with only LF-to-CRLF warnings.
+- Current smoke result: private live smoke passed after another round of testing. Bags persist, items inside bags persist, and bags open from worn slots and inventory.
+
 ## Current Open Risks
 
 - `Quest Delete` gameplay cause remains unresolved; current use is packet-level mission-window cleanup only.
 - `CharacterAction` action `59` remains unresolved.
 - Rex/Mission state is not persisted to DB and will not survive process restart as mission state.
 - Marcus Stone quest chain beyond the committed B194 mission-window preview is not implemented. Uncommitted item `296780` handout work is validated but unsmoked and paused.
+- Backpack item movement into and out of backpack pages has an uncommitted live-capture-backed repair pending commit; keep it out of unrelated work until committed.
 - NPC chase/movement remains high risk and should not be changed without replay/capture evidence.
 - `PlayfieldAnarchyF` remains a current-client structure mismatch.
 - Full gameplay systems for missions, quests, perks, research, pets, PvP/towers, teams, and organizations remain incomplete outside the documented repaired slices.

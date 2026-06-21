@@ -493,6 +493,11 @@ namespace ZoneEngine.Core.Controllers
             throw new NotImplementedException();
         }
 
+        public bool TryUseBackpackContainer(Identity itemPosition)
+        {
+            return false;
+        }
+
         public bool DeleteItem(int container, int slotNumber)
         {
             throw new NotImplementedException();

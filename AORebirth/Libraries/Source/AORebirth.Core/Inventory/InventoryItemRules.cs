@@ -1,9 +1,14 @@
 namespace AORebirth.Core.Inventory
 {
     using System.Collections.Generic;
+    using System.Linq;
 
+    using AORebirth.Core.Events;
+    using AORebirth.Core.Functions;
     using AORebirth.Core.Items;
     using AORebirth.Enums;
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
 
     public static class InventoryItemRules
     {
@@ -68,6 +73,105 @@ namespace AORebirth.Core.Inventory
             }
 
             return false;
+        }
+
+        public static bool TryEnsureBackpackContainerIdentity(
+            IItem item,
+            Identity ownerIdentity,
+            Identity itemPosition,
+            out Identity containerIdentity)
+        {
+            containerIdentity = Identity.None;
+
+            if (item == null)
+            {
+                return false;
+            }
+
+            if ((item.Identity != null) && (item.Identity.Type == IdentityType.Container))
+            {
+                containerIdentity = item.Identity;
+                return true;
+            }
+
+            if (!IsLegacyBackpackTemplate(item))
+            {
+                return false;
+            }
+
+            containerIdentity = CreateLegacyBackpackContainerIdentity(ownerIdentity, itemPosition, item);
+
+            Item concreteItem = item as Item;
+            if (concreteItem != null)
+            {
+                concreteItem.Identity = containerIdentity;
+            }
+
+            return true;
+        }
+
+        public static bool IsLegacyBackpackTemplate(IItem item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+
+            const int BackpackCanFlags =
+                (int)(CanFlags.Carry | CanFlags.Wear | CanFlags.Use);
+
+            if (item.GetAttribute((int)StatIds.can) != BackpackCanFlags)
+            {
+                return false;
+            }
+
+            if (item.GetAttribute((int)StatIds.itemclass) != 2)
+            {
+                return false;
+            }
+
+            if (item.GetAttribute((int)StatIds.placement) != 8)
+            {
+                return false;
+            }
+
+            return item.Events.Any(
+                x => x.EventType == EventType.OnWear
+                     && x.Functions.Any(y => y.FunctionType == (int)FunctionType.BackMesh));
+        }
+
+        private static Identity CreateLegacyBackpackContainerIdentity(
+            Identity ownerIdentity,
+            Identity itemPosition,
+            IItem item)
+        {
+            unchecked
+            {
+                uint hash = 2166136261;
+                hash = MixBackpackContainerIdentity(hash, (uint)ownerIdentity.Instance);
+                hash = MixBackpackContainerIdentity(hash, (uint)itemPosition.Type);
+                hash = MixBackpackContainerIdentity(hash, (uint)itemPosition.Instance);
+                hash = MixBackpackContainerIdentity(hash, (uint)item.LowID);
+                hash = MixBackpackContainerIdentity(hash, (uint)item.HighID);
+                hash = MixBackpackContainerIdentity(hash, (uint)item.Quality);
+
+                int instance = (int)(hash & 0x7fffffff);
+                if (instance == 0)
+                {
+                    instance = 1;
+                }
+
+                return new Identity { Type = IdentityType.Container, Instance = instance };
+            }
+        }
+
+        private static uint MixBackpackContainerIdentity(uint hash, uint value)
+        {
+            unchecked
+            {
+                hash ^= value;
+                return hash * 16777619;
+            }
         }
     }
 }

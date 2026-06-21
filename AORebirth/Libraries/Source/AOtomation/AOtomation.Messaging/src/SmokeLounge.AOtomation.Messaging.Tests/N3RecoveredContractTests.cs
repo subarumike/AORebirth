@@ -226,6 +226,65 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void BackpackItemMovementPacketsMatchCapturedBodies()
+        {
+            Identity character = new Identity { Type = IdentityType.CanbeAffected, Instance = unchecked((int)0x78CB984B) };
+            Identity container = new Identity { Type = IdentityType.Container, Instance = 0x0B7D1F67 };
+            Identity inventorySlot = new Identity { Type = IdentityType.Inventory, Instance = 0x5B };
+            Identity backpackSlot = new Identity { Type = IdentityType.Backpack, Instance = 0x00770000 };
+
+            byte[] moveIntoBackpackBody = HexToBytes("1F4D5F7E0000C35078CB984B000000C7490B7D1F67000000680000005B");
+            var moveIntoBackpack = (ClientContainerAddItemMessage)Deserialize<ClientContainerAddItemMessage>(
+                moveIntoBackpackBody);
+
+            Assert.AreEqual(N3MessageType.ClientContainerAddItem, moveIntoBackpack.N3MessageType);
+            Assert.AreEqual(character.Type, moveIntoBackpack.Identity.Type);
+            Assert.AreEqual(character.Instance, moveIntoBackpack.Identity.Instance);
+            Assert.AreEqual(0, moveIntoBackpack.Unknown);
+            Assert.AreEqual(container.Type, moveIntoBackpack.Target.Type);
+            Assert.AreEqual(container.Instance, moveIntoBackpack.Target.Instance);
+            Assert.AreEqual(inventorySlot.Type, moveIntoBackpack.Source.Type);
+            Assert.AreEqual(inventorySlot.Instance, moveIntoBackpack.Source.Instance);
+            CollectionAssert.AreEqual(moveIntoBackpackBody, Serialize(moveIntoBackpack));
+
+            var moveIntoBackpackAck = new ContainerAddItemMessage
+                                      {
+                                          Identity = character,
+                                          Unknown = 0,
+                                          SourceContainer = inventorySlot,
+                                          Target = container,
+                                          TargetPlacement = 0
+                                      };
+            CollectionAssert.AreEqual(
+                HexToBytes("47537A240000C35078CB984B00000000680000005B0000C7490B7D1F6700000000"),
+                Serialize(moveIntoBackpackAck));
+
+            byte[] moveOutBody = HexToBytes("5469373F0000C35078CB984B000000006B007700000000006F");
+            var moveOut = (ClientMoveItemToInventoryMessage)Deserialize<ClientMoveItemToInventoryMessage>(moveOutBody);
+
+            Assert.AreEqual(N3MessageType.ClientMoveItemToInventory, moveOut.N3MessageType);
+            Assert.AreEqual(character.Type, moveOut.Identity.Type);
+            Assert.AreEqual(character.Instance, moveOut.Identity.Instance);
+            Assert.AreEqual(0, moveOut.Unknown);
+            Assert.AreEqual(backpackSlot.Type, moveOut.SourceContainer.Type);
+            Assert.AreEqual(backpackSlot.Instance, moveOut.SourceContainer.Instance);
+            Assert.AreEqual(0x6F, moveOut.TargetPlacement);
+            CollectionAssert.AreEqual(moveOutBody, Serialize(moveOut));
+
+            var moveOutAck = new ContainerAddItemMessage
+                             {
+                                 Identity = character,
+                                 Unknown = 0,
+                                 SourceContainer = backpackSlot,
+                                 Target = character,
+                                 TargetPlacement = 0x6F
+                             };
+            CollectionAssert.AreEqual(
+                HexToBytes("47537A240000C35078CB984B000000006B007700000000C35078CB984B0000006F"),
+                Serialize(moveOutAck));
+        }
+
+        [TestMethod]
         public void BackpackOpenChestItemFullUpdateMatchesCapturedBody()
         {
             var message = new ChestItemFullUpdateMessage

@@ -134,6 +134,44 @@ namespace AORebirth.Core.Inventory
 
         /// <summary>
         /// </summary>
+        /// <param name="containerIdentity">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        bool IsBackpackOpen(Identity containerIdentity);
+
+        /// <summary>
+        /// </summary>
+        /// <param name="containerIdentity">
+        /// </param>
+        void MarkBackpackOpen(Identity containerIdentity);
+
+        /// <summary>
+        /// </summary>
+        /// <param name="containerIdentity">
+        /// </param>
+        void MarkBackpackClosed(Identity containerIdentity);
+
+        /// <summary>
+        /// </summary>
+        /// <param name="handle">
+        /// </param>
+        /// <param name="containerIdentity">
+        /// </param>
+        void RegisterBackpackHandle(int handle, Identity containerIdentity);
+
+        /// <summary>
+        /// </summary>
+        /// <param name="handle">
+        /// </param>
+        /// <param name="page">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        bool TryGetBackpackPageByHandle(int handle, out IInventoryPage page);
+
+        /// <summary>
+        /// </summary>
         /// <param name="slotNum">
         /// </param>
         /// <returns>
