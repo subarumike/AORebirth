@@ -35,10 +35,12 @@ namespace AORebirth.Core.Inventory
 
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Data.Linq;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.Items;
+    using AORebirth.Database;
     using AORebirth.Database.Dao;
     using AORebirth.Enums;
     using AORebirth.ObjectManager;
@@ -273,6 +275,7 @@ namespace AORebirth.Core.Inventory
                 // 0x02 for any bag
                 // 0x81 for unique totw rings
                 newItem.Flags |= 0x1;
+                this.Content[item.containerplacement] = newItem;
             }
 
             return true;
@@ -411,8 +414,42 @@ namespace AORebirth.Core.Inventory
                 }
             }
 
-            ItemDao.Instance.Save(DBuninstanced, null, null);
-            InstancedItemDao.Instance.Save(DBinstanced, null, null);
+            using (IDbConnection connection = Connector.GetConnection())
+            {
+                IDbTransaction transaction = connection.BeginTransaction();
+                try
+                {
+                    ItemDao.Instance.Delete(
+                        new { containertype = (int)this.Identity.Type, containerinstance = this.Identity.Instance },
+                        connection,
+                        transaction);
+                    foreach (DBItem item in DBuninstanced)
+                    {
+                        ItemDao.Instance.Add(item, connection, transaction);
+                    }
+
+                    InstancedItemDao.Instance.Delete(
+                        new { containertype = (int)this.Identity.Type, containerinstance = this.Identity.Instance },
+                        connection,
+                        transaction);
+                    foreach (DBInstancedItem item in DBinstanced)
+                    {
+                        InstancedItemDao.Instance.Add(item, connection, transaction, false);
+                    }
+
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+                finally
+                {
+                    transaction.Dispose();
+                }
+            }
+
             return true;
         }
 
