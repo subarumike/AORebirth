@@ -2,23 +2,23 @@
 
 ## Active Task
 
-Add a root-level `restart-engines.cmd` wrapper for post-build AORebirth engine restarts.
+Fix login/re-entry seated-state persistence so characters who log out seated return seated.
 
 ## Current Scope
 
-- Keep this workflow-only.
-- Use cmd.exe-compatible scripts only.
-- Do not redesign the engine startup system.
-- Use the existing approved `stop-engines.cmd` and `start-engines.cmd` wrappers.
-- Do not add slow polling loops, diagnostics, or unrelated checks.
-- Do not touch gameplay code.
+- Keep the fix scoped to persistence/load/spawn state handling.
+- Do not reopen the already-fixed X-close seated logout timer unless the login issue shares the same state path.
+- Preserve normal standing logout/login behavior.
+- Preserve existing logout seated timer behavior.
+- Do not touch unrelated gameplay code.
 - Do not change database schemas or perform destructive database operations.
 
-## Implementation
+## Investigation Targets
 
-- Add `restart-engines.cmd` at the repository root.
-- The wrapper should stop engines, start engines, report simple success/failure, and return through the wrapped commands' exit codes.
-- Update workflow docs so future agents use `cmd /d /c restart-engines.cmd` after rebuilds.
+- Character state serialization/save path during logout.
+- Character load/deserialization path during login.
+- Spawn/init code that may reset stance/action/movement state to standing.
+- Packet/state broadcast sent to nearby clients and to the logging-in client after spawn.
 
 ## Validation Plan
 
