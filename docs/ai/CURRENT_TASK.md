@@ -2,28 +2,34 @@
 
 ## Active Task
 
-Fix login/re-entry seated-state persistence so characters who log out seated return seated.
+Investigate and begin implementing the missing terminal-use system for Statel-backed terminal interactions.
 
 ## Current Scope
 
-- Keep the fix scoped to persistence/load/spawn state handling.
-- Do not reopen the already-fixed X-close seated logout timer unless the login issue shares the same state path.
-- Preserve normal standing logout/login behavior.
-- Preserve existing logout seated timer behavior.
-- Do not touch unrelated gameplay code.
+- Work only in AORebirth.
+- Keep changes scoped to terminal/statel use handling and capture-backed implementation.
+- Use live capture evidence before implementing terminal behavior.
+- Do not fabricate terminal event semantics.
+- Do not touch AO client stripdown, AO rebuild, or unrelated projects.
+- Do not add unrelated cleanup or rebranding work.
 - Do not change database schemas or perform destructive database operations.
 
 ## Investigation Targets
 
-- Character state serialization/save path during logout.
-- Character load/deserialization path during login.
-- Spawn/init code that may reset stance/action/movement state to standing.
-- Packet/state broadcast sent to nearby clients and to the logging-in client after spawn.
+- Generic command handler for Action Use (3).
+- Statel lookup and event dispatch.
+- Terminal-specific Statel event model.
+- Existing capture tools/docs for live client behavior.
+- Packets/events emitted when affected terminal `Terminal 0000C73D:C00204A2` is used.
+- Whether the 2 Statel events represent selection, requirements, dialog, teleport, shop, mission, or another terminal subsystem.
 
 ## Validation Plan
 
+- Use the repo-approved AOSharp live capture workflow when available.
+- Document the captured packet/event sequence, or the blocker if capture cannot be collected.
 - Run `cmd /d /c tools\build_aorebirth_debug.cmd`.
-- Run `cmd /d /c restart-engines.cmd`.
-- Run `git diff --check`.
-- Review final `git status --short --branch`.
-- Commit only intended source/doc changes.
+- After successful rebuild, run `cmd /d /c restart-engines.cmd`.
+- Validate the affected terminal against the captured scenario.
+- Run `cmd /d /c git diff --check`.
+- Review final `cmd /d /c git status --short --branch`.
+- Commit and push only the scoped fix and required task/docs updates.
