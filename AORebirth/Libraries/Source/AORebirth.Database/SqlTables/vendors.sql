@@ -1823,6 +1823,89 @@ INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`,
 -- Justification: target has complete captured template and inventory evidence; vendortemplate links to a newly staged exact inventory group.
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674768, 6007, 216.46, 6.02, 219.975, 0, 0, 0, 1, '', 266576, 'OF4GOBN');
 
+-- BS Signup OFAB profession armor terminal repair
+-- Source: live MP terminal capture 20260620-230138 plus current OFAB profession list files in docs/Ofab.
+-- Capture limitation: remaining profession armor terminals are profession-locked for the live capture character.
+-- MappingType: CaptureLimited
+
+-- VendorId: 393674752; Playfield: 6007 BS Signup (dng); TemplateId: 266562 Ofab Adventurer Vendor; Statel: 0xC0001777; Capture identity unavailable: profession-locked for current live character
+-- MappingSource: GenericCmd/ShopUpdate/Trade shape confirmed by live MP terminal (VendingMachine:C0091777); terminal statel/template/position from current vendor coverage; stock rows from current OFAB list and itemnames using captured MP row shape.
+-- MappingConfidence: Medium
+-- Justification: fixes runtime empty statel vendor for the matching profession terminal without altering shop packet handling.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674752, 6007, 220.01, 6.02, 232.985, 0, 0, 0, 1, '', 266562, 'OFADV');
+
+-- VendorId: 393674753; Playfield: 6007 BS Signup (dng); TemplateId: 266563 Ofab Agent Vendor; Statel: 0xC0011777; Capture identity unavailable: profession-locked for current live character
+-- MappingSource: GenericCmd/ShopUpdate/Trade shape confirmed by live MP terminal (VendingMachine:C0091777); terminal statel/template/position from current vendor coverage; stock rows from current OFAB list and itemnames using captured MP row shape.
+-- MappingConfidence: Medium
+-- Justification: fixes runtime empty statel vendor for the matching profession terminal without altering shop packet handling.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674753, 6007, 222, 6.02, 232.985, 0, 0, 0, 1, '', 266563, 'OFAGT');
+
+-- VendorId: 393674754; Playfield: 6007 BS Signup (dng); TemplateId: 266569 Ofab Bureaucrat Vendor; Statel: 0xC0021777; Capture identity unavailable: profession-locked for current live character
+-- MappingSource: GenericCmd/ShopUpdate/Trade shape confirmed by live MP terminal (VendingMachine:C0091777); terminal statel/template/position from current vendor coverage; stock rows from current OFAB list and itemnames using captured MP row shape.
+-- MappingConfidence: Medium
+-- Justification: fixes runtime empty statel vendor for the matching profession terminal without altering shop packet handling.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674754, 6007, 224.027, 6.02, 232.985, 0, 0, 0, 1, '', 266569, 'OFCRT');
+
+-- VendorId: 393674755; Playfield: 6007 BS Signup (dng); TemplateId: 266564 Ofab Doctor Vendor; Statel: 0xC0031777; Capture identity unavailable: profession-locked for current live character
+-- MappingSource: GenericCmd/ShopUpdate/Trade shape confirmed by live MP terminal (VendingMachine:C0091777); terminal statel/template/position from current vendor coverage; stock rows from current OFAB list and itemnames using captured MP row shape.
+-- MappingConfidence: Medium
+-- Justification: fixes runtime empty statel vendor for the matching profession terminal without altering shop packet handling.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674755, 6007, 226.01, 6.02, 232.982, 0, 0, 0, 1, '', 266564, 'OFDOC');
+
+-- VendorId: 393674756; Playfield: 6007 BS Signup (dng); TemplateId: 266565 Ofab Enforcer Vendor; Statel: 0xC0041777; Capture identity unavailable: profession-locked for current live character
+-- MappingSource: GenericCmd/ShopUpdate/Trade shape confirmed by live MP terminal (VendingMachine:C0091777); terminal statel/template/position from current vendor coverage; stock rows from current OFAB list and itemnames using captured MP row shape.
+-- MappingConfidence: Medium
+-- Justification: fixes runtime empty statel vendor for the matching profession terminal without altering shop packet handling.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674756, 6007, 228.01, 6.02, 232.985, 0, 0, 0, 1, '', 266565, 'OFENF');
+
+-- VendorId: 393674757; Playfield: 6007 BS Signup (dng); TemplateId: 266566 Ofab Engineer Vendor; Statel: 0xC0051777; Capture identity unavailable: profession-locked for current live character
+-- MappingSource: GenericCmd/ShopUpdate/Trade shape confirmed by live MP terminal (VendingMachine:C0091777); terminal statel/template/position from current vendor coverage; stock rows from current OFAB list and itemnames using captured MP row shape.
+-- MappingConfidence: Medium
+-- Justification: fixes runtime empty statel vendor for the matching profession terminal without altering shop packet handling.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674757, 6007, 230.01, 6.02, 232.985, 0, 0, 0, 1, '', 266566, 'OFENG');
+
+-- VendorId: 393674758; Playfield: 6007 BS Signup (dng); TemplateId: 266567 Ofab Fixer Vendor; Statel: 0xC0061777; Capture identity unavailable: profession-locked for current live character
+-- MappingSource: GenericCmd/ShopUpdate/Trade shape confirmed by live MP terminal (VendingMachine:C0091777); terminal statel/template/position from current vendor coverage; stock rows from current OFAB list and itemnames using captured MP row shape.
+-- MappingConfidence: Medium
+-- Justification: fixes runtime empty statel vendor for the matching profession terminal without altering shop packet handling.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674758, 6007, 232.01, 6.02, 232.985, 0, 0, 0, 1, '', 266567, 'OFFIX');
+
+-- VendorId: 393674759; Playfield: 6007 BS Signup (dng); TemplateId: 266568 Ofab Keeper Vendor; Statel: 0xC0071777; Capture identity unavailable: profession-locked for current live character
+-- MappingSource: GenericCmd/ShopUpdate/Trade shape confirmed by live MP terminal (VendingMachine:C0091777); terminal statel/template/position from current vendor coverage; stock rows from current OFAB list and itemnames using captured MP row shape.
+-- MappingConfidence: Medium
+-- Justification: fixes runtime empty statel vendor for the matching profession terminal without altering shop packet handling.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674759, 6007, 234.01, 6.02, 232.985, 0, 0, 0, 1, '', 266568, 'OFKEE');
+
+-- VendorId: 393674760; Playfield: 6007 BS Signup (dng); TemplateId: 266570 Ofab Martial Artist Vendor; Statel: 0xC0081777; Capture identity unavailable: profession-locked for current live character
+-- MappingSource: GenericCmd/ShopUpdate/Trade shape confirmed by live MP terminal (VendingMachine:C0091777); terminal statel/template/position from current vendor coverage; stock rows from current OFAB list and itemnames using captured MP row shape.
+-- MappingConfidence: Medium
+-- Justification: fixes runtime empty statel vendor for the matching profession terminal without altering shop packet handling.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674760, 6007, 236.01, 6.02, 232.985, 0, 0, 0, 1, '', 266570, 'OFMA');
+
+-- VendorId: 393674762; Playfield: 6007 BS Signup (dng); TemplateId: 266572 Ofab Nano-Technician Vendor; Statel: 0xC00A1777; Capture identity unavailable: profession-locked for current live character
+-- MappingSource: GenericCmd/ShopUpdate/Trade shape confirmed by live MP terminal (VendingMachine:C0091777); terminal statel/template/position from current vendor coverage; stock rows from current OFAB list and itemnames using captured MP row shape.
+-- MappingConfidence: Medium
+-- Justification: fixes runtime empty statel vendor for the matching profession terminal without altering shop packet handling.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674762, 6007, 240.01, 6.02, 232.985, 0, 0, 0, 1, '', 266572, 'OFNT');
+
+-- VendorId: 393674763; Playfield: 6007 BS Signup (dng); TemplateId: 266574 Ofab Shade Vendor; Statel: 0xC00B1777; Capture identity unavailable: profession-locked for current live character
+-- MappingSource: GenericCmd/ShopUpdate/Trade shape confirmed by live MP terminal (VendingMachine:C0091777); terminal statel/template/position from current vendor coverage; stock rows from current OFAB list and itemnames using captured MP row shape.
+-- MappingConfidence: Medium
+-- Justification: fixes runtime empty statel vendor for the matching profession terminal without altering shop packet handling.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674763, 6007, 241.988, 6.02, 233.019, 0, 0, 0, 1, '', 266574, 'OFSHD');
+
+-- VendorId: 393674764; Playfield: 6007 BS Signup (dng); TemplateId: 266573 Ofab Soldier Vendor; Statel: 0xC00C1777; Capture identity unavailable: profession-locked for current live character
+-- MappingSource: GenericCmd/ShopUpdate/Trade shape confirmed by live MP terminal (VendingMachine:C0091777); terminal statel/template/position from current vendor coverage; stock rows from current OFAB list and itemnames using captured MP row shape.
+-- MappingConfidence: Medium
+-- Justification: fixes runtime empty statel vendor for the matching profession terminal without altering shop packet handling.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674764, 6007, 244.01, 6.02, 233.014, 0, 0, 0, 1, '', 266573, 'OFSOL');
+
+-- VendorId: 393674765; Playfield: 6007 BS Signup (dng); TemplateId: 266575 Ofab Trader Vendor; Statel: 0xC00D1777; Capture identity unavailable: profession-locked for current live character
+-- MappingSource: GenericCmd/ShopUpdate/Trade shape confirmed by live MP terminal (VendingMachine:C0091777); terminal statel/template/position from current vendor coverage; stock rows from current OFAB list and itemnames using captured MP row shape.
+-- MappingConfidence: Medium
+-- Justification: fixes runtime empty statel vendor for the matching profession terminal without altering shop packet handling.
+INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (393674765, 6007, 246.01, 6.02, 232.985, 0, 0, 0, 1, '', 266575, 'OFTRD');
+
 -- ============================================================
 -- Omni Training Startup Shop import
 -- Source: AOSharp capture 20260613-231115
