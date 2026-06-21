@@ -2,11 +2,10 @@
 setlocal EnableExtensions EnableDelayedExpansion
 
 set MSBUILD=C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe
-set NUGET=AORebirth\.nuget\NuGet.exe
-set RESTORE_LOG=build_nuget_restore.log
-set RESTORE_CMD=%TEMP%\aorebirth_nuget_restore_%RANDOM%.cmd
-set RESTORE_DONE=%TEMP%\aorebirth_nuget_restore_done_%RANDOM%.tmp
-set RESTORE_STATUS=%TEMP%\aorebirth_nuget_restore_status_%RANDOM%.tmp
+set RESTORE_LOG=build_package_restore.log
+set RESTORE_CMD=%TEMP%\aorebirth_package_restore_%RANDOM%.cmd
+set RESTORE_DONE=%TEMP%\aorebirth_package_restore_done_%RANDOM%.tmp
+set RESTORE_STATUS=%TEMP%\aorebirth_package_restore_status_%RANDOM%.tmp
 set RESTORE_TIMEOUT_SECONDS=120
 set RESTORE_POLL_SECONDS=5
 set /A RESTORE_PING_COUNT=%RESTORE_POLL_SECONDS%+1
@@ -23,19 +22,13 @@ if not exist "%MSBUILD%" (
     exit /b 1
 )
 
-if not exist "%NUGET%" (
-    echo [AORebirth Build] NuGet.exe not found: %NUGET%
-    popd
-    exit /b 1
-)
-
 echo [AORebirth Build] Cleaning stale build processes...
 taskkill /F /T /IM MSBuild.exe >nul 2>&1
 taskkill /F /T /IM dotnet.exe >nul 2>&1
 taskkill /F /T /IM VBCSCompiler.exe >nul 2>&1
 taskkill /F /T /IM NuGet.exe >nul 2>&1
 
-call :RestorePackages
+call :RestoreDependencies
 if errorlevel 1 (
     set RESTORE_EXIT=!ERRORLEVEL!
     popd
@@ -43,7 +36,7 @@ if errorlevel 1 (
 )
 
 echo [AORebirth Build] Building AORebirth.Core...
-"%MSBUILD%" "AORebirth\Libraries\Source\AORebirth.Core\AORebirth.Core.csproj" /t:Build /p:Configuration=Debug /p:RestorePackages=false /m:1 /nr:false /v:minimal
+"%MSBUILD%" "AORebirth\Libraries\Source\AORebirth.Core\AORebirth.Core.csproj" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 set CORE_EXIT=%ERRORLEVEL%
 if not "%CORE_EXIT%"=="0" (
     echo [AORebirth Build] AORebirth.Core failed with exit code %CORE_EXIT%.
@@ -58,7 +51,7 @@ taskkill /F /T /IM VBCSCompiler.exe >nul 2>&1
 taskkill /F /T /IM NuGet.exe >nul 2>&1
 
 echo [AORebirth Build] Building ZoneEngine...
-"%MSBUILD%" "AORebirth\Server\ZoneEngine\ZoneEngine.csproj" /t:Build /p:Configuration=Debug /p:RestorePackages=false /m:1 /nr:false /v:minimal
+"%MSBUILD%" "AORebirth\Server\ZoneEngine\ZoneEngine.csproj" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 set ZONE_EXIT=%ERRORLEVEL%
 if not "%ZONE_EXIT%"=="0" (
     echo [AORebirth Build] ZoneEngine failed with exit code %ZONE_EXIT%.
@@ -76,7 +69,7 @@ echo [AORebirth Build] Build succeeded.
 popd
 exit /b 0
 
-:RestorePackages
+:RestoreDependencies
 call :VerifyPackagesRestored
 if not errorlevel 1 exit /b 0
 
@@ -85,11 +78,11 @@ if exist "%RESTORE_STATUS%" del /q "%RESTORE_STATUS%" >nul 2>&1
 if exist "%RESTORE_CMD%" del /q "%RESTORE_CMD%" >nul 2>&1
 if exist "%RESTORE_LOG%" del /q "%RESTORE_LOG%" >nul 2>&1
 
-echo [AORebirth Build] Restoring NuGet packages explicitly...
+echo [AORebirth Build] Restoring packages explicitly with MSBuild Restore...
 echo [AORebirth Build] Restore log: %CD%\%RESTORE_LOG%
 (
     echo @echo off
-    echo "%CD%\%NUGET%" restore "%CD%\AORebirth\AORebirth.sln" -NonInteractive -Verbosity normal -ConfigFile "%CD%\AORebirth\.nuget\NuGet.Config" -DisableParallelProcessing ^> "%CD%\%RESTORE_LOG%" 2^>^&1
+    echo "%MSBUILD%" "%CD%\AORebirth\AORebirth.sln" /t:Restore /p:RestorePackagesConfig=true /m:1 /nr:false /v:minimal ^> "%CD%\%RESTORE_LOG%" 2^>^&1
     echo echo %%ERRORLEVEL%% ^> "%RESTORE_STATUS%"
     echo type nul ^> "%RESTORE_DONE%"
 ) > "%RESTORE_CMD%"
@@ -99,14 +92,17 @@ set /A RESTORE_ELAPSED=0
 :RestoreWait
 if exist "%RESTORE_DONE%" goto RestoreFinished
 if %RESTORE_ELAPSED% GEQ %RESTORE_TIMEOUT_SECONDS% goto RestoreTimedOut
-echo [AORebirth Build] NuGet restore still running; elapsed %RESTORE_ELAPSED%s.
+echo [AORebirth Build] MSBuild restore still running; elapsed %RESTORE_ELAPSED%s.
 ping -n %RESTORE_PING_COUNT% 127.0.0.1 >nul
 set /A RESTORE_ELAPSED+=%RESTORE_POLL_SECONDS%
 goto RestoreWait
 
 :RestoreTimedOut
-echo [AORebirth Build] NuGet restore timed out after %RESTORE_TIMEOUT_SECONDS%s.
-echo [AORebirth Build] Killing NuGet.exe and failing build validation.
+echo [AORebirth Build] MSBuild restore timed out after %RESTORE_TIMEOUT_SECONDS%s.
+echo [AORebirth Build] Killing build processes and failing build validation.
+taskkill /F /T /IM MSBuild.exe >nul 2>&1
+taskkill /F /T /IM dotnet.exe >nul 2>&1
+taskkill /F /T /IM VBCSCompiler.exe >nul 2>&1
 taskkill /F /T /IM NuGet.exe >nul 2>&1
 exit /b 1
 
@@ -117,12 +113,12 @@ if exist "%RESTORE_CMD%" del /q "%RESTORE_CMD%" >nul 2>&1
 if exist "%RESTORE_DONE%" del /q "%RESTORE_DONE%" >nul 2>&1
 if exist "%RESTORE_STATUS%" del /q "%RESTORE_STATUS%" >nul 2>&1
 if not "%RESTORE_EXIT%"=="0" (
-    echo [AORebirth Build] NuGet restore failed with exit code %RESTORE_EXIT%.
+    echo [AORebirth Build] MSBuild restore failed with exit code %RESTORE_EXIT%.
     if exist "%RESTORE_LOG%" type "%RESTORE_LOG%"
     exit /b %RESTORE_EXIT%
 )
 
-echo [AORebirth Build] NuGet restore completed.
+echo [AORebirth Build] MSBuild restore completed.
 if exist "%RESTORE_LOG%" type "%RESTORE_LOG%"
 exit /b 0
 
@@ -140,11 +136,11 @@ call :CheckPackageConfig "AORebirth\Server\ZoneEngine\packages.config"
 
 if "%MISSING_PACKAGES%"=="0" (
     echo [AORebirth Build] All required package folders already exist in AORebirth\packages.
-    echo [AORebirth Build] Skipping NuGet.exe restore; build-time RestorePackages remains disabled.
+    echo [AORebirth Build] Skipping explicit restore; required packages are already present.
     exit /b 0
 )
 
-echo [AORebirth Build] Missing package folders detected; running NuGet.exe restore.
+echo [AORebirth Build] Missing package folders detected; running explicit MSBuild restore.
 exit /b 1
 
 :CheckPackageConfig

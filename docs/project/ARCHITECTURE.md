@@ -126,7 +126,7 @@ Primary build:
 cmd /d /c tools\build_aorebirth_debug.cmd
 ```
 
-The standard validation wrapper verifies required package folders before MSBuild, disables legacy build-time `RestorePackages`, then builds `AORebirth.Core` first and `ZoneEngine` second with single-node MSBuild (`/m:1`) and node reuse disabled (`/nr:false`). PowerShell and `.ps1` wrappers are deprecated for Codex build, launch, validation, and live capture workflows. The solution includes server engines, shared libraries, AOtomation, msgpack-cli, and utility projects. Some tools under `tools-temp` are separate projects and are not necessarily part of the main solution.
+The standard validation wrapper verifies required package folders before MSBuild, runs explicit MSBuild solution restore only when package folders are missing, then builds `AORebirth.Core` first and `ZoneEngine` second with single-node MSBuild (`/m:1`) and node reuse disabled (`/nr:false`). Legacy build-time NuGet restore through `.nuget\NuGet.targets` has been removed from project files. PowerShell and `.ps1` wrappers are deprecated for Codex build, launch, validation, and live capture workflows. The solution includes server engines, shared libraries, AOtomation, msgpack-cli, and utility projects. Some tools under `tools-temp` are separate projects and are not necessarily part of the main solution.
 
 ## Dependency Graph
 
