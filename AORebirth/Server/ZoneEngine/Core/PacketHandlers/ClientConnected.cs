@@ -143,6 +143,7 @@ client.Controller.Character.Playfield.Identity,
             client.SendCompressed(gameTimeMessage);
 
             InitializeActionableState(client);
+            SendActionableState(client);
             CharacterActionMessageHandler.Default.SendSkillAvailable(
                 client.Controller.Character,
                 (int)StatIds.treatment);
@@ -227,6 +228,7 @@ client.Controller.Character.Playfield.Identity,
 
             AppearanceUpdateMessageHandler.Default.Send(client.Controller.Character);
             CompleteDeathRespawnCharInPlay(client);
+            SendAliveDeadTimerBaseline(client);
 
             // done, so we call a hook.
             // Call all OnConnect script Methods
@@ -258,8 +260,8 @@ client.Controller.Character.Playfield.Identity,
 
         private static void InitializeActionableState(ZoneClient client)
         {
-            // Match the live client's login baseline so the client enables its built-in normal action table.
-            SetStat(client, StatIds.state, 0);
+            // Match the captured live alive/actionable baseline.
+            SetStat(client, StatIds.state, 1000001);
             SetStat(client, StatIds.currentmovementmode, (int)MoveModes.Run);
             SetStat(client, StatIds.prevmovementmode, (int)MoveModes.Run);
             SetStat(client, StatIds.currentstate, 0);
@@ -267,12 +269,64 @@ client.Controller.Character.Playfield.Identity,
             SetStat(client, StatIds.socialstatus, 4);
             SetStat(client, StatIds.specialcondition, 3);
             SetStat(client, StatIds.actioncategory, 0);
+
+            if (client.PreserveLogoutSitOnConnect)
+            {
+                client.Controller.Character.EnterLogoutSitPosture();
+                client.PreserveLogoutSitOnConnect = false;
+            }
         }
 
         private static void SetStat(ZoneClient client, StatIds stat, int value)
         {
             client.Controller.Character.Stats[stat].Value = value;
             client.Controller.Character.Stats[stat].BaseValue = (uint)value;
+        }
+
+        private static void SendAliveDeadTimerBaseline(ZoneClient client)
+        {
+            ICharacter character = client.Controller.Character;
+            if (character.Stats[StatIds.health].Value <= 0)
+            {
+                return;
+            }
+
+            SetStat(client, StatIds.deadtimer, 75);
+            client.SendCompressed(
+                new StatMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 1,
+                    Stats =
+                        new[]
+                        {
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = CharacterStat.DeadTimer,
+                                Value2 = (uint)character.Stats[StatIds.deadtimer].Value
+                            }
+                        }
+                });
+        }
+
+        private static void SendActionableState(ZoneClient client)
+        {
+            ICharacter character = client.Controller.Character;
+            client.SendCompressed(
+                new StatMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 1,
+                    Stats =
+                        new[]
+                        {
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = CharacterStat.State,
+                                Value2 = (uint)character.Stats[StatIds.state].Value
+                            }
+                        }
+                });
         }
 
         #endregion
