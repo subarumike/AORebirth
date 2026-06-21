@@ -8,9 +8,9 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Repository purpose: local C#/.NET Framework-era Anarchy Online server workspace for Mike's current AO client and local `cellao_codex_clean` MySQL database; this is a legacy database name retained for local compatibility.
 - Current stable approach: evidence-backed packet/gameplay/data repair, current-client parity over legacy assumptions, and identity-first capture-derived reconstruction.
 - Documentation split: `docs/ai/CURRENT_TASK.md` remains the active task handoff; this file is the stable project memory; `docs/generated/` contains historical result reports only.
-- Active cleanup note: `docs/ai/CURRENT_TASK.md` is focused on seated-login persistence. Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
+- Active cleanup note: `docs/ai/CURRENT_TASK.md` is focused on surgery-clinic terminal/statel use. Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
 - Last live-smoked committed quest baseline: `ecbca7d` (`Implement Marcus B18F to B194 transition`).
-- Current task result: seated-login persistence preserves a loaded `currentmovementmode=Sit` through login initialization before the first character update packets are sent; standing login still uses the existing Run baseline. Mike live-smoked the private server login repro and confirmed the seated login is fixed.
+- Current task result: surgery-clinic terminal use now has a capture-backed route for the affected `Terminal:C00204A2` family. It debits 300 credits, sends captured feedback/nano/action packets, acknowledges `GenericCmd Use`, and avoids the old generic Statel-only stop. Build and engine restart validation passed; final private live click smoke remains pending.
 - Current uncommitted quest work: Marcus Phase 4B item `296780` handout exists in `MarcusB18FCompletionHandler.cs`, has focused ZoneEngine build/search validation, has not had live smoke, and is intentionally paused/uncommitted.
 - Quest system work is on the back burner. The next work item should be selected from non-quest gameplay bugs unless Mike explicitly resumes quest work.
 
@@ -69,6 +69,14 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Sit/stand, equipment visuals, inventory move, equip/unequip, bank deposit/withdraw/persistence, backpack open/close/reopen/movement/worn-slot persistence, corpse item/credit loot, player trade item/credit/cancel, vendor buy/sell/close, and death/respawn have passing documented validation for their repaired scopes.
 - Backpack container open, item movement, worn-slot open, zoning visibility, persistence, and bag-in-bag rejection are implemented in the current working baseline.
 - Vendor coverage is complete for practical live-accessible vendors. The current dirty OFAB repair covers the 13 BS Signup profession-locked armor terminals using live MP terminal evidence plus capture-limited fallback data and adds a live-shaped profession denial path with captured client feedback text; after validation/import/audit, the deferred statel backlog should drop from 26 to 13.
+
+## Current Surgery Clinic Terminal State
+
+- Surgery-clinic terminal repair is scoped to captured `GenericCmd Action=Use` behavior for `Stationary Automated Surgery Clinic` terminals, including affected private identity `Terminal:C00204A2`.
+- Evidence split: private AO Rebirth capture `20260620-213807` proves `Terminal:C00204A2` and `Terminal:C00004A2` spawn as `Stationary Automated Surgery Clinic`; official live capture `20260621-062224` proves the use response family for a surgery-clinic terminal target.
+- Implemented response: debit 300 credits, send captured `FormatFeedbackMessage`, send `CastNanoSpell` and `SetNanoDuration` for `NanoProgram:26732` with duration `90000`, send `SpecialUsed` for stat `124` with `5` seconds, acknowledge the original `GenericCmd`, then send delayed `SpecialAvailable` for stat `124`.
+- Not implemented: generic Statel event interpretation, shop/dialog/teleport/mission behavior, unobserved insufficient-credit behavior, database schema changes, and raw packet replay.
+- Validation so far: approved debug build passed after cleanly stopping locked engines; `restart-engines.cmd` restarted Chat/Login/Zone. Final private live smoke of `Terminal:C00204A2` is still pending until a post-restart client click is captured.
 
 ## Current Bank Repair State
 
