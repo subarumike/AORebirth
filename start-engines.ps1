@@ -81,15 +81,6 @@ function Wait-EnginePort {
     return $false
 }
 
-function ConvertTo-CommandLineArgument {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Value
-    )
-
-    '"' + ($Value -replace '"', '\"') + '"'
-}
-
 function Start-HiddenEngineProcess {
     param(
         [Parameter(Mandatory = $true)]
@@ -102,24 +93,18 @@ function Start-HiddenEngineProcess {
         [string]$WorkingDirectory
     )
 
-    $commandLine = (ConvertTo-CommandLineArgument -Value $ExePath)
-    if ($Arguments.Count -gt 0) {
-        $commandLine += " "
-        $commandLine += (($Arguments | ForEach-Object { ConvertTo-CommandLineArgument -Value $_ }) -join " ")
-    }
-
-    $startup = ([wmiclass]"Win32_ProcessStartup").CreateInstance()
-    $startup.ShowWindow = 0
-
-    $result = ([wmiclass]"Win32_Process").Create($commandLine, $WorkingDirectory, $startup)
-    if ($result.ReturnValue -ne 0) {
-        throw "Win32_Process.Create failed for $ExePath with return value $($result.ReturnValue)."
-    }
+    $process = Start-Process `
+        -FilePath $ExePath `
+        -ArgumentList $Arguments `
+        -WorkingDirectory $WorkingDirectory `
+        -WindowStyle Hidden `
+        -PassThru `
+        -ErrorAction Stop
 
     Start-Sleep -Milliseconds 250
-    $process = Get-Process -Id $result.ProcessId -ErrorAction SilentlyContinue
-    if (-not $process) {
-        throw "Started $ExePath as pid=$($result.ProcessId), but the process is no longer running."
+    $process.Refresh()
+    if ($process.HasExited) {
+        throw "Started $ExePath as pid=$($process.Id), but the process exited immediately."
     }
 
     return $process
