@@ -228,6 +228,22 @@ namespace ZoneEngine.Core.MessageHandlers
                 return true;
             }
 
+            if (InventoryItemRules.IsBackpackContainerItem(item))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Rejected ClientContainerAddItem backpack move because source item is a container char={0} source={1} target={2} item={3}/{4} ql={5} itemIdentity={6}",
+                        character.Identity,
+                        message.Source,
+                        message.Target,
+                        item.LowID,
+                        item.HighID,
+                        item.Quality,
+                        item.Identity));
+                return true;
+            }
+
             int backpackSlot = backpackPage.FindFreeSlot();
             if (backpackSlot < 0)
             {
