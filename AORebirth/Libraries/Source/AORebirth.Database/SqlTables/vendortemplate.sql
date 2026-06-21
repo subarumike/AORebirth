@@ -1203,6 +1203,63 @@ INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHas
 -- NormalizedName: BSSignupOfabRangedWeapons; TemplateId: 266576; ShopHash: XID7 (new); Inventory rows: 78; Capture identity: (VendingMachine:C0101777); VT window: 0
 INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OF4GOBN', 1, 'BSSignupOfabRangedWeapons', 266576, 'XID7', 25, 300);
 
+-- BS Signup OFAB profession armor terminal repair
+-- Source: live MP terminal capture 20260620-230138 plus current OFAB profession list files in docs/Ofab.
+-- Capture limitation: remaining profession armor terminals are profession-locked for the live capture character.
+-- New vendor templates: 13
+
+-- Terminal: Ofab Adventurer Vendor
+-- NormalizedName: BSSignupOfabAdventurerVendor; TemplateId: 266562; ShopHash: OA01; Inventory rows: 88; Source file: OfabAdv.html; MappingType: CaptureLimited
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OFADV', 1, 'BSSignupOfabAdventurerVendor', 266562, 'OA01', 1, 300);
+
+-- Terminal: Ofab Agent Vendor
+-- NormalizedName: BSSignupOfabAgentVendor; TemplateId: 266563; ShopHash: OA02; Inventory rows: 88; Source file: OfabAgent.html; MappingType: CaptureLimited
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OFAGT', 1, 'BSSignupOfabAgentVendor', 266563, 'OA02', 1, 300);
+
+-- Terminal: Ofab Bureaucrat Vendor
+-- NormalizedName: BSSignupOfabBureaucratVendor; TemplateId: 266569; ShopHash: OA03; Inventory rows: 88; Source file: OfabCrat.html; MappingType: CaptureLimited
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OFCRT', 1, 'BSSignupOfabBureaucratVendor', 266569, 'OA03', 1, 300);
+
+-- Terminal: Ofab Doctor Vendor
+-- NormalizedName: BSSignupOfabDoctorVendor; TemplateId: 266564; ShopHash: OA04; Inventory rows: 88; Source file: OfabDoc.html; MappingType: CaptureLimited
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OFDOC', 1, 'BSSignupOfabDoctorVendor', 266564, 'OA04', 1, 300);
+
+-- Terminal: Ofab Enforcer Vendor
+-- NormalizedName: BSSignupOfabEnforcerVendor; TemplateId: 266565; ShopHash: OA05; Inventory rows: 88; Source file: OfabEnf.html; MappingType: CaptureLimited
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OFENF', 1, 'BSSignupOfabEnforcerVendor', 266565, 'OA05', 1, 300);
+
+-- Terminal: Ofab Engineer Vendor
+-- NormalizedName: BSSignupOfabEngineerVendor; TemplateId: 266566; ShopHash: OA06; Inventory rows: 88; Source file: OfabEng.html; MappingType: CaptureLimited
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OFENG', 1, 'BSSignupOfabEngineerVendor', 266566, 'OA06', 1, 300);
+
+-- Terminal: Ofab Fixer Vendor
+-- NormalizedName: BSSignupOfabFixerVendor; TemplateId: 266567; ShopHash: OA07; Inventory rows: 88; Source file: OfabFix.html; MappingType: CaptureLimited
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OFFIX', 1, 'BSSignupOfabFixerVendor', 266567, 'OA07', 1, 300);
+
+-- Terminal: Ofab Keeper Vendor
+-- NormalizedName: BSSignupOfabKeeperVendor; TemplateId: 266568; ShopHash: OA08; Inventory rows: 88; Source file: OfabKeep.html; MappingType: CaptureLimited
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OFKEE', 1, 'BSSignupOfabKeeperVendor', 266568, 'OA08', 1, 300);
+
+-- Terminal: Ofab Martial Artist Vendor
+-- NormalizedName: BSSignupOfabMartialArtistVendor; TemplateId: 266570; ShopHash: OA09; Inventory rows: 88; Source file: OfabMA.html; MappingType: CaptureLimited
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OFMA', 1, 'BSSignupOfabMartialArtistVendor', 266570, 'OA09', 1, 300);
+
+-- Terminal: Ofab Nano-Technician Vendor
+-- NormalizedName: BSSignupOfabNanoTechnicianVendor; TemplateId: 266572; ShopHash: OA10; Inventory rows: 88; Source file: OfabNT.html; MappingType: CaptureLimited
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OFNT', 1, 'BSSignupOfabNanoTechnicianVendor', 266572, 'OA10', 1, 300);
+
+-- Terminal: Ofab Shade Vendor
+-- NormalizedName: BSSignupOfabShadeVendor; TemplateId: 266574; ShopHash: OA11; Inventory rows: 88; Source file: OfabShade.html; MappingType: CaptureLimited
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OFSHD', 1, 'BSSignupOfabShadeVendor', 266574, 'OA11', 1, 300);
+
+-- Terminal: Ofab Soldier Vendor
+-- NormalizedName: BSSignupOfabSoldierVendor; TemplateId: 266573; ShopHash: OA12; Inventory rows: 88; Source file: OfabSol.html; MappingType: CaptureLimited
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OFSOL', 1, 'BSSignupOfabSoldierVendor', 266573, 'OA12', 1, 300);
+
+-- Terminal: Ofab Trader Vendor
+-- NormalizedName: BSSignupOfabTraderVendor; TemplateId: 266575; ShopHash: OA13; Inventory rows: 88; Source file: OfabTrader.html; MappingType: CaptureLimited
+INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('OFTRD', 1, 'BSSignupOfabTraderVendor', 266575, 'OA13', 1, 300);
+
 -- ============================================================
 -- Omni Training Startup Shop import
 -- Source: AOSharp capture 20260613-231115
