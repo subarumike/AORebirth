@@ -79,6 +79,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int SurgeryClinicNanoDuration = 90000;
 
+        private const int SurgeryClinicImplantAccessSeconds = 300;
+
         private const int SurgeryClinicSpecialStatId = 124;
 
         private const int SurgeryClinicSpecialLockSeconds = 5;
@@ -388,13 +390,14 @@ namespace ZoneEngine.Core.MessageHandlers
                 character.Identity,
                 SurgeryClinicNanoId,
                 SurgeryClinicNanoDuration);
+            this.GrantSurgeryClinicImplantAccess(character);
             this.SendSurgeryClinicSpecialUsed(character);
             this.Acknowledge(character, message);
             this.SendSurgeryClinicSpecialAvailableDelayed(character);
 
             client.Server.Info(
                 client,
-                "Surgery clinic terminal use handled char={0} target={1} statelTemplate={2} cashBefore={3} cashAfter={4} nano={5} duration={6} evidence={7}",
+                "Surgery clinic terminal use handled char={0} target={1} statelTemplate={2} cashBefore={3} cashAfter={4} nano={5} duration={6} implantAccessSeconds={7} evidence={8}",
                 character.Identity,
                 target,
                 statelData == null ? 0 : statelData.TemplateId,
@@ -402,6 +405,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 cashAfter,
                 SurgeryClinicNanoId.ToString("X", CultureInfo.InvariantCulture),
                 SurgeryClinicNanoDuration,
+                SurgeryClinicImplantAccessSeconds,
                 "captures/20260620-213807/events.log:51-52;captures/20260621-062224/events.log:52-71");
 
             return true;
@@ -438,6 +442,17 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             return statelData != null && CapturedSurgeryClinicTemplateIds.Contains(statelData.TemplateId);
+        }
+
+        private void GrantSurgeryClinicImplantAccess(ICharacter character)
+        {
+            Character concreteCharacter = character as Character;
+            if (concreteCharacter == null)
+            {
+                return;
+            }
+
+            concreteCharacter.GrantImplantAccess(SurgeryClinicImplantAccessSeconds);
         }
 
         private void SendSurgeryClinicFeedback(ICharacter character)
