@@ -10,6 +10,14 @@ git status --short --branch
 
 Identify dirty files before editing. Do not revert user or previous-agent work unless Mike explicitly asks.
 
+## Command Permissions
+
+- Run shell, Git, build, test, validation, and capture commands normally first.
+- Do not set `sandbox_permissions` or use `require_escalated` unless the normal command has already failed with a real OS permission error.
+- Before retrying with escalation, stop and report the exact command, working directory, target path, and full error text.
+- Do not use admin elevation or machine-wide policy changes for routine repo work.
+- PowerShell CurrentUser policy is expected to allow local scripts; do not add `-ExecutionPolicy Bypass` to normal commands.
+
 ## Build And Engines
 
 After code changes that affect server binaries:
@@ -23,7 +31,7 @@ After code changes that affect server binaries:
 Stop engines:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\stop-engines.ps1'
+powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\stop-engines.ps1'
 ```
 
 Build:
@@ -35,7 +43,7 @@ Build:
 Start engines:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\start-engines.ps1'
+powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\start-engines.ps1'
 ```
 
 Default startup launches Chat, Login, and Zone hidden in the background, writes launcher stdout/stderr logs and PID metadata under `C:\Users\Mike\Documents\AORebirth\logs\engines\`, and waits for ports `6996`, `7012`, `7500`, and `7501`.
@@ -43,19 +51,19 @@ Default startup launches Chat, Login, and Zone hidden in the background, writes 
 Visible debug startup:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\start-engines.ps1' -Visible
+powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\start-engines.ps1' -Visible
 ```
 
 Optional WebEngine startup:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\start-engines.ps1' -WithWeb
+powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\start-engines.ps1' -WithWeb
 ```
 
 Status:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\AORebirth\status-engines.ps1'
+powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\status-engines.ps1'
 ```
 
 ## Database

@@ -1,2 +1,2 @@
 @echo off
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0stop-engines.ps1"
+powershell -NoProfile -File "%~dp0stop-engines.ps1"

@@ -21,7 +21,7 @@ The sample CSV uses:
 Run it from repo root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools-temp\enemy-movement-replay\Test-EnemyMovementReplay.ps1
+powershell -NoProfile -File tools-temp\enemy-movement-replay\Test-EnemyMovementReplay.ps1
 ```
 
 The useful next step is to mine one real combat window into this CSV format, then wire runtime movement decisions to this contract shape instead of patching chase code during live playtest.

@@ -12,7 +12,7 @@ Generated files:
 Extractor:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools-temp\ao-client-rdb-hints\Export-AOClientZoneEnemyHints.ps1
+powershell -NoProfile -File tools-temp\ao-client-rdb-hints\Export-AOClientZoneEnemyHints.ps1
 ```
 
 Default client input:

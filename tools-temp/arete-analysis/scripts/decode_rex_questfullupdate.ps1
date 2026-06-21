@@ -21,7 +21,7 @@ if ([Environment]::Is64BitProcess) {
             $command += " -RepoRoot '$escapedRepoRoot'"
         }
 
-        & $wowPowerShell -NoProfile -ExecutionPolicy Bypass -Command $command
+        & $wowPowerShell -NoProfile -Command $command
         exit $LASTEXITCODE
     }
 

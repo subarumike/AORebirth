@@ -88,7 +88,7 @@ foreach ($script in $powerShellScripts) {
 
 if (-not $SkipKnownCapture) {
     if (Test-Path -LiteralPath $KnownCaptureDir) {
-        & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $collectorRoot "Decode-LiveDataCapture.ps1") -CaptureDir $KnownCaptureDir -Mode All -RepoRoot $RepoRoot -AllowWrite
+        & powershell -NoProfile -File (Join-Path $collectorRoot "Decode-LiveDataCapture.ps1") -CaptureDir $KnownCaptureDir -Mode All -RepoRoot $RepoRoot -AllowWrite
         Assert-True ($LASTEXITCODE -eq 0) "Known capture decode failed"
 
         $questRows = @((Import-Csv -LiteralPath (Join-Path $KnownCaptureDir "quest_update_observations.csv")))

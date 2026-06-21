@@ -58,7 +58,7 @@ if ($RestartEngines) {
     if (-not $NoBuild) {
         & $msbuild $solution /t:Build /p:Configuration=Debug /m | Write-Host
     }
-    powershell -NoProfile -ExecutionPolicy Bypass -File $engineStart | Write-Host
+    powershell -NoProfile -File $engineStart | Write-Host
 }
 
 $client = Get-Process AnarchyOnline -ErrorAction SilentlyContinue |
@@ -127,4 +127,4 @@ if (-not $NoBuild) {
     )
 }
 
-& powershell -NoProfile -ExecutionPolicy Bypass -File $runner @smokeArgs
+& powershell -NoProfile -File $runner @smokeArgs

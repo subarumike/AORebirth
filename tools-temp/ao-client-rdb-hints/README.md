@@ -7,7 +7,7 @@ It is intentionally evidence-only. The client data is good for answering questio
 ## Run
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools-temp\ao-client-rdb-hints\Export-AOClientZoneEnemyHints.ps1
+powershell -NoProfile -File .\tools-temp\ao-client-rdb-hints\Export-AOClientZoneEnemyHints.ps1
 ```
 
 Default inputs:

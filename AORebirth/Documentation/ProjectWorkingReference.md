@@ -129,7 +129,7 @@ Get-Process ChatEngine,LoginEngine,ZoneEngine,WebEngine,MSBuild -ErrorAction Sil
 ### Start engines
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\Cellao-Clean\start-engines.ps1'
+powershell -NoProfile -File 'C:\Users\Mike\Documents\Cellao-Clean\start-engines.ps1'
 ```
 
 ## 7) Test Accounts and Session Notes
@@ -149,4 +149,3 @@ powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\Mike\Documents\Cel
 3. Re-test player trade credits once corpse credit behavior is stable.
 4. Continue NPC chase work only with fresh live/private capture windows and replay assertions.
 5. Keep commits split by system (movement vs trade vs corpse vs docs) to avoid mixed regressions.
-

@@ -61,7 +61,7 @@ Runtime behavior:
 Generate the current loot coverage CSVs with:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools-temp\mob-loot-coverage\Export-MobLootCoverage.ps1
+powershell -NoProfile -File .\tools-temp\mob-loot-coverage\Export-MobLootCoverage.ps1
 ```
 
 Output files:

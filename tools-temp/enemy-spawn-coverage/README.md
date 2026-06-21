@@ -9,7 +9,7 @@ Builds checked-in coverage reports from three local sources:
 Run:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools-temp\enemy-spawn-coverage\Export-EnemySpawnCoverage.ps1
+powershell -NoProfile -File tools-temp\enemy-spawn-coverage\Export-EnemySpawnCoverage.ps1
 ```
 
 Outputs:
