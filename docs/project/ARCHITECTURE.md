@@ -122,11 +122,11 @@ The project itself has console engines and no modern app UI. AO client UI behavi
 
 Primary build:
 
-```powershell
-& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' 'AORebirth\AORebirth.sln' /t:Build /p:Configuration=Debug /m
+```cmd
+cmd /d /c tools\build_aorebirth_debug.cmd
 ```
 
-The solution includes server engines, shared libraries, AOtomation, msgpack-cli, and utility projects. Some tools under `tools-temp` are separate projects and are not necessarily part of the main solution.
+The standard validation wrapper builds `AORebirth.Core` first and `ZoneEngine` second with single-node MSBuild (`/m:1`) and node reuse disabled (`/nr:false`). PowerShell and `.ps1` wrappers are deprecated for Codex build, launch, validation, and live capture workflows. The solution includes server engines, shared libraries, AOtomation, msgpack-cli, and utility projects. Some tools under `tools-temp` are separate projects and are not necessarily part of the main solution.
 
 ## Dependency Graph
 

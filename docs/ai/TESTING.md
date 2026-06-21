@@ -6,53 +6,27 @@ Generated: 2026-06-02
 
 Use this command from repo root:
 
-```powershell
-& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' 'AORebirth\AORebirth.sln' /t:Build /p:Configuration=Debug /m
+```cmd
+cmd /d /c tools\build_aorebirth_debug.cmd
 ```
 
-If engines are running and lock binaries, stop them first:
-
-```powershell
-powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\stop-engines.ps1'
-```
+Never use raw AORebirth `MSBuild /m`, MSBuild node reuse, PowerShell, or `.ps1` wrappers for Codex build validation. If engines are running and lock binaries, stop them through an approved `cmd.exe` or Git Bash workflow only.
 
 ## Automated Smoke Tests
 
-Run test scripts normally. If a command fails with permission or access denied, stop and report the exact command, working directory, target path, and full error before retrying with any elevated Codex permission.
+Run test scripts only through approved `cmd.exe` or Git Bash workflows. PowerShell and `.ps1` validation wrappers are deprecated for Codex use. If a command fails with permission or access denied, stop and report the exact command, working directory, target path, and full error before retrying with any elevated Codex permission.
 
 The `CellAOCombatSmokeTests` directory name is a legacy tool folder name retained in-place; it is not current repository branding or a reason to rename AO Rebirth.
 
-Primary smoke/source assertion script:
-
-```powershell
-powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\tools-temp\CellAOCombatSmokeTests\Run-CombatSmokeTests.ps1'
-```
-
-Skip build when the solution was already built:
-
-```powershell
-powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\tools-temp\CellAOCombatSmokeTests\Run-CombatSmokeTests.ps1' -SkipBuild
-```
-
-Enemy movement replay:
-
-```powershell
-powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\tools-temp\enemy-movement-replay\Test-EnemyMovementReplay.ps1'
-```
-
-Live data collector self-check:
-
-```powershell
-powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\tools-temp\live-data-collector\Test-LiveDataCollector.ps1'
-```
+Existing PowerShell smoke, replay, and live-data scripts must not be run by Codex until they have `cmd.exe` or Git Bash wrappers.
 
 ## Manual Testing
 
 Mike performs live client playtests. Codex should:
 
 - build the server,
-- start/stop engines when asked,
-- use `status-engines.ps1` to confirm process and port state,
+- start/stop engines only through approved `cmd.exe` or Git Bash workflows when asked,
+- avoid `.ps1` engine status wrappers until replaced,
 - provide exact commands to run in game,
 - watch logs/captures if needed,
 - avoid asking Mike to tab rapidly or perform unclear sequences.
