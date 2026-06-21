@@ -4,7 +4,7 @@
 
 Run:
 
-```powershell
+```cmd
 git status --short --branch
 ```
 
@@ -13,10 +13,11 @@ Identify dirty files before editing. Do not revert user or previous-agent work u
 ## Command Permissions
 
 - Run shell, Git, build, test, validation, and capture commands normally first.
+- PowerShell is disallowed for AORebirth build, launch, validation, and live capture workflows.
+- `.ps1` wrappers are deprecated for Codex AORebirth workflows. Use `cmd.exe` or Git Bash.
 - Do not set `sandbox_permissions` or use `require_escalated` unless the normal command has already failed with a real OS permission error.
 - Before retrying with escalation, stop and report the exact command, working directory, target path, and full error text.
 - Do not use admin elevation or machine-wide policy changes for routine repo work.
-- PowerShell CurrentUser policy is expected to allow local scripts; do not add `-ExecutionPolicy Bypass` to normal commands.
 
 ## Build And Engines
 
@@ -28,43 +29,23 @@ After code changes that affect server binaries:
 4. Check engine status and expected ports.
 5. Do not start WebEngine unless explicitly needed.
 
-Stop engines:
-
-```powershell
-powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\stop-engines.ps1'
-```
+Stop engines through an approved `cmd.exe` or Git Bash workflow only. Do not run `stop-engines.ps1` from Codex.
 
 Build:
 
-```powershell
-& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' 'AORebirth\AORebirth.sln' /t:Build /p:Configuration=Debug /m
+```cmd
+cmd /d /c tools\build_aorebirth_debug.cmd
 ```
 
-Start engines:
+Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper kills stale `MSBuild.exe`, `dotnet.exe`, and `VBCSCompiler.exe` processes, builds `AORebirth.Core` first, then builds `ZoneEngine`, using:
 
-```powershell
-powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\start-engines.ps1'
+```cmd
+MSBuild.exe <project> /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 ```
 
-Default startup launches Chat, Login, and Zone hidden in the background, writes launcher stdout/stderr logs and PID metadata under `C:\Users\Mike\Documents\AORebirth\logs\engines\`, and waits for ports `6996`, `7012`, `7500`, and `7501`.
+If a Codex shell command times out during build validation, do not treat timeout exit code `124` as a build failure until checking for orphaned build child processes and stopping them.
 
-Visible debug startup:
-
-```powershell
-powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\start-engines.ps1' -Visible
-```
-
-Optional WebEngine startup:
-
-```powershell
-powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\start-engines.ps1' -WithWeb
-```
-
-Status:
-
-```powershell
-powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\status-engines.ps1'
-```
+Start engines, stop engines, and check engine status through approved `cmd.exe` or Git Bash workflows only. Existing `.ps1` engine launch/status wrappers are deprecated for Codex use until replaced.
 
 ## Database
 
@@ -79,6 +60,7 @@ powershell -NoProfile -File 'C:\Users\Mike\Documents\AORebirth\status-engines.ps
 - Codex runs tools, builds, servers, and captures.
 - Mike performs live client playtests.
 - Do not ask Mike to run commands inside the game when Codex can run external tooling.
+- Do not run PowerShell or `.ps1` live capture wrappers from Codex; use `cmd.exe` or Git Bash workflows.
 
 ## Live Client Behavior Bugs
 

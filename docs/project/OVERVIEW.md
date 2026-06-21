@@ -45,7 +45,7 @@ Create a maintainable, evidence-backed local AO server that can support login, c
 - Visual Studio solution: `AORebirth/AORebirth.sln`.
 - MySQL database configured for local use.
 - Dapper, NLog, NBug, MemBus, DotNetZip, MathNet.Numerics, MySqlConnector, Npgsql, and bundled AOtomation/msgpack dependencies.
-- PowerShell scripts for build, smoke tests, engine start/stop, capture analysis, and tooling.
+- Legacy PowerShell scripts still exist, but Codex AORebirth build, launch, validation, and live capture workflows must use `cmd.exe` or Git Bash wrappers.
 
 ## Third-Party And External Reference Sources
 
