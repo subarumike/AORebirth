@@ -23,10 +23,10 @@ Identify dirty files before editing. Do not revert user or previous-agent work u
 
 After code changes that affect server binaries:
 
-1. Stop engines.
+1. Stop engines if running processes are locking build outputs.
 2. Build.
-3. Start Chat, Login, and Zone.
-4. Check engine status and expected ports.
+3. Restart Chat, Login, and Zone with the root restart wrapper.
+4. Check engine status and expected ports only through the existing quick wrapper output.
 5. Do not start WebEngine unless explicitly needed.
 
 Stop engines through an approved `cmd.exe` or Git Bash workflow only. Do not run `stop-engines.ps1` from Codex.
@@ -54,6 +54,14 @@ Do not reintroduce project-level `RestorePackages` targets or `.nuget\NuGet.targ
 If a Codex shell command times out during build validation, do not treat timeout exit code `124` as a build failure until checking for orphaned build child processes and stopping them.
 
 Start engines, stop engines, and check engine status through approved `cmd.exe` or Git Bash workflows only. Existing `.ps1` engine launch/status wrappers are deprecated for Codex use until replaced.
+
+After a successful rebuild, restart engines with:
+
+```cmd
+cmd /d /c restart-engines.cmd
+```
+
+`restart-engines.cmd` is the repo-owned Codex restart entrypoint. It calls the existing approved `stop-engines.cmd` and `start-engines.cmd` wrappers and does not add extra polling, diagnostics, or manual lifecycle commands.
 
 ## Database
 

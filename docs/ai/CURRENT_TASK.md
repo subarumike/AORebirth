@@ -2,28 +2,28 @@
 
 ## Active Task
 
-Make Book of Knowledge behave as a backpack-style container and keep it out of other containers.
+Add a root-level `restart-engines.cmd` wrapper for post-build AORebirth engine restarts.
 
 ## Current Scope
 
-- Use live AOSharp capture evidence for the right-click and drag behavior.
-- Keep the change in the existing inventory/container classification and move validation path.
-- Do not rewrite inventory, bank, or backpack systems.
+- Keep this workflow-only.
+- Use cmd.exe-compatible scripts only.
+- Do not redesign the engine startup system.
+- Use the existing approved `stop-engines.cmd` and `start-engines.cmd` wrappers.
+- Do not add slow polling loops, diagnostics, or unrelated checks.
+- Do not touch gameplay code.
 - Do not change database schemas or perform destructive database operations.
-- Preserve normal non-container item moves into backpacks.
-- Preserve backpack-to-inventory moves.
-- Preserve existing bank/backpack behavior.
-- Add focused logging/validation consistent with existing patterns.
 
-## Live Evidence
+## Implementation
 
-- Capture `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260621-052003` shows right-click on Book of Knowledge sends `GenericCmd Use` for `Inventory:0049`.
-- The server resolved that slot to `ItemLowId=99302 ItemHighId=99302` and sent `TemplateAction` plus a success ACK instead of a backpack container open.
-- Dragging the same item into a real backpack was accepted because the shared container classifier did not recognize `99302/99302` as a container.
+- Add `restart-engines.cmd` at the repository root.
+- The wrapper should stop engines, start engines, report simple success/failure, and return through the wrapped commands' exit codes.
+- Update workflow docs so future agents use `cmd /d /c restart-engines.cmd` after rebuilds.
 
 ## Validation Plan
 
 - Run `cmd /d /c tools\build_aorebirth_debug.cmd`.
+- Run `cmd /d /c restart-engines.cmd`.
 - Run `git diff --check`.
 - Review final `git status --short --branch`.
 - Commit only intended source/doc changes.
