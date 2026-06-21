@@ -2,36 +2,28 @@
 
 ## Active Task
 
-Capture and implement the surgery clinic implant-install flow after terminal activation.
+Fix bank items appearing in the Wear window Weapon tab after deposit and zone/relog.
 
 ## Current Scope
 
-- Work only in AORebirth.
-- Keep changes scoped to surgery-clinic state, implant install validation, inventory/equipment mutation, and required packets.
-- Use live capture evidence before implementing post-terminal implant behavior.
-- Do not rework the already-implemented surgery-clinic terminal-use route unless capture proves it blocks implant install.
-- Do not guess implant behavior.
-- Do not touch AO client stripdown, AO rebuild, or unrelated projects.
-- Do not add unrelated cleanup or rebranding work.
-- Do not change database schemas or perform destructive database operations.
+- Keep changes scoped to bank inventory state, wear/equipment serialization, and packet routing.
+- Use live capture evidence before changing packet behavior.
+- Do not rework unrelated inventory systems.
 
-## Investigation Targets
+## Current Evidence
 
-- What client packet/action is sent when installing an implant after surgery clinic use.
-- Whether surgery clinic activation creates a timed character state, nano/effect flag, skill-lock, treatment modifier window, or server-side permission window.
-- Implant install validation for source inventory slot, target wear slot, treatment requirement, ability/stat requirements, and any profession/breed/side checks.
-- Inventory-to-equipment mutation path for implants.
-- Outbound packets required after a successful implant install, including inventory, equipment, stats, feedback, and any action availability updates.
-- Failure behavior when the clinic is not active or requirements are not met.
+- Capture `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260621-073837` shows an inventory-to-bank `ClientContainerAddItem`, a server `ContainerAddItem` acknowledgement, then zone initialization.
+- During the zone sequence, the server sends `WeaponItemFullUpdate` packets for bank-owned item instances before `FullCharacter`.
+- The same bank-owned item instances are present in the `FullCharacter` inventory slot payload.
 
 ## Validation Plan
 
-- Use the repo-approved AOSharp live capture workflow when available.
-- Capture surgery-clinic use followed by a successful implant install, and failure behavior without clinic if practical.
-- Document the captured packet/event sequence under `docs/generated/`, or the blocker if capture cannot be collected.
+- Run `cmd /d /c git diff --check`.
 - Run `cmd /d /c tools\build_aorebirth_debug.cmd`.
 - After successful rebuild, run `cmd /d /c restart-engines.cmd`.
-- Validate surgery-clinic activation, implant install, source inventory update, equipment/wear update, and persistence if applicable.
-- Run `cmd /d /c git diff --check`.
-- Review final `cmd /d /c git status --short --branch`.
-- Commit and push only the scoped fix and required task/docs updates.
+- Live smoke: deposit bank item, zone or relog, confirm Wear Weapon tab does not show bank items, withdraw still works, and equipped items remain visible.
+
+## Validation Result
+
+- Build and restart passed.
+- Mike's live smoke passed: bank deposit, zone/relog Wear Weapon tab check, and bank withdraw.

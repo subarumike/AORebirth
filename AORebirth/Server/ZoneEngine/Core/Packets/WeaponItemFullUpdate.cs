@@ -80,6 +80,11 @@ namespace ZoneEngine.Core.Packets
 
             foreach (IInventoryPage page in character.BaseInventory.Pages.Values)
             {
+                if (page is BankInventoryPage)
+                {
+                    continue;
+                }
+
                 for (int slot = page.FirstSlotNumber; slot < page.FirstSlotNumber + page.MaxSlots; slot++)
                 {
                     IItem item = page[slot];
@@ -102,6 +107,11 @@ namespace ZoneEngine.Core.Packets
 
             foreach (IInventoryPage page in character.BaseInventory.Pages.Values)
             {
+                if (page is BankInventoryPage)
+                {
+                    continue;
+                }
+
                 for (int slot = page.FirstSlotNumber; slot < page.FirstSlotNumber + page.MaxSlots; slot++)
                 {
                     if (object.ReferenceEquals(page[slot], item))

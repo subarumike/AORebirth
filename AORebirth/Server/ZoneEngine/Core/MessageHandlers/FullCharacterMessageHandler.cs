@@ -92,6 +92,11 @@ namespace ZoneEngine.Core.MessageHandlers
                 List<InventorySlot> inventory = new List<InventorySlot>();
                 foreach (IInventoryPage ivp in character.BaseInventory.Pages.Values)
                 {
+                    if (ivp is BankInventoryPage)
+                    {
+                        continue;
+                    }
+
                     foreach (KeyValuePair<int, IItem> kv in ivp.List())
                     {
                         var temp = new InventorySlot
