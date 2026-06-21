@@ -260,21 +260,28 @@ client.Controller.Character.Playfield.Identity,
 
         private static void InitializeActionableState(ZoneClient client)
         {
+            bool restoreSeatedPosture = client.PreserveLogoutSitOnConnect
+                                        || client.Controller.Character.MoveMode == MoveModes.Sit;
+
             // Match the captured live alive/actionable baseline.
             SetStat(client, StatIds.state, 1000001);
-            SetStat(client, StatIds.currentmovementmode, (int)MoveModes.Run);
-            SetStat(client, StatIds.prevmovementmode, (int)MoveModes.Run);
+
+            if (restoreSeatedPosture)
+            {
+                client.Controller.Character.EnterLogoutSitPosture();
+                client.PreserveLogoutSitOnConnect = false;
+            }
+            else
+            {
+                SetStat(client, StatIds.currentmovementmode, (int)MoveModes.Run);
+                SetStat(client, StatIds.prevmovementmode, (int)MoveModes.Run);
+            }
+
             SetStat(client, StatIds.currentstate, 0);
             SetStat(client, StatIds.waitstate, 0);
             SetStat(client, StatIds.socialstatus, 4);
             SetStat(client, StatIds.specialcondition, 3);
             SetStat(client, StatIds.actioncategory, 0);
-
-            if (client.PreserveLogoutSitOnConnect)
-            {
-                client.Controller.Character.EnterLogoutSitPosture();
-                client.PreserveLogoutSitOnConnect = false;
-            }
         }
 
         private static void SetStat(ZoneClient client, StatIds stat, int value)

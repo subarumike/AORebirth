@@ -4,13 +4,13 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Baseline
 
-- HEAD baseline at start of bag-in-bag guard work: `eb95f379`.
+- HEAD baseline at start of seated-login persistence work: `1db78bc2`.
 - Repository purpose: local C#/.NET Framework-era Anarchy Online server workspace for Mike's current AO client and local `cellao_codex_clean` MySQL database; this is a legacy database name retained for local compatibility.
 - Current stable approach: evidence-backed packet/gameplay/data repair, current-client parity over legacy assumptions, and identity-first capture-derived reconstruction.
 - Documentation split: `docs/ai/CURRENT_TASK.md` remains the active task handoff; this file is the stable project memory; `docs/generated/` contains historical result reports only.
-- Active cleanup note: `docs/ai/CURRENT_TASK.md` is focused on the bag-in-bag guard. Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
+- Active cleanup note: `docs/ai/CURRENT_TASK.md` is focused on seated-login persistence. Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
 - Last live-smoked committed quest baseline: `ecbca7d` (`Implement Marcus B18F to B194 transition`).
-- Current task result: bag-in-bag guard blocks container/backpack items from being placed into another container through the existing `ClientContainerAddItem` inventory-to-container path; no SQL, schema, bank, or broad backpack behavior changes are part of this task.
+- Current task result: seated-login persistence preserves a loaded `currentmovementmode=Sit` through login initialization before the first character update packets are sent; standing login still uses the existing Run baseline.
 - Current uncommitted quest work: Marcus Phase 4B item `296780` handout exists in `MarcusB18FCompletionHandler.cs`, has focused ZoneEngine build/search validation, has not had live smoke, and is intentionally paused/uncommitted.
 - Quest system work is on the back burner. The next work item should be selected from non-quest gameplay bugs unless Mike explicitly resumes quest work.
 
