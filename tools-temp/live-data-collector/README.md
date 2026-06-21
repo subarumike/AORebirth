@@ -5,19 +5,19 @@ These scripts automate the passive AO data collection workflow.
 Start a capture:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools-temp\live-data-collector\Start-LiveDataCapture.ps1 -Mode All
+powershell -NoProfile -File .\tools-temp\live-data-collector\Start-LiveDataCapture.ps1 -Mode All
 ```
 
 Check whether a capture is running:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools-temp\live-data-collector\Get-LiveDataCaptureStatus.ps1
+powershell -NoProfile -File .\tools-temp\live-data-collector\Get-LiveDataCaptureStatus.ps1
 ```
 
 Stop, decode, and export:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools-temp\live-data-collector\Stop-LiveDataCapture.ps1
+powershell -NoProfile -File .\tools-temp\live-data-collector\Stop-LiveDataCapture.ps1
 ```
 
 The stop script automatically writes:
@@ -54,5 +54,5 @@ Quick truth table:
 Smoke test the offline pipeline:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools-temp\live-data-collector\Test-LiveDataCollector.ps1
+powershell -NoProfile -File .\tools-temp\live-data-collector\Test-LiveDataCollector.ps1
 ```

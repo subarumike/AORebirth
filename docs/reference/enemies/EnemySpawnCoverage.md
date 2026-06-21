@@ -8,7 +8,7 @@ Generated reports:
 Regenerate:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools-temp\enemy-spawn-coverage\Export-EnemySpawnCoverage.ps1
+powershell -NoProfile -File tools-temp\enemy-spawn-coverage\Export-EnemySpawnCoverage.ps1
 ```
 
 Current supported combat-test families:

@@ -92,7 +92,7 @@ if (Test-Path -LiteralPath $activePath) {
 }
 
 if (-not $NoDecode) {
-    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $collectorRoot "Decode-LiveDataCapture.ps1") -CaptureDir $CaptureDir -Mode $decodeMode -RepoRoot $RepoRoot -AllowWrite
+    & powershell -NoProfile -File (Join-Path $collectorRoot "Decode-LiveDataCapture.ps1") -CaptureDir $CaptureDir -Mode $decodeMode -RepoRoot $RepoRoot -AllowWrite
     if ($LASTEXITCODE -ne 0) { throw "Decode failed" }
 }
 

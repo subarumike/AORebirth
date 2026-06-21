@@ -129,7 +129,7 @@ Official live capture `tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260531
 Run the offline collector self-check with:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools-temp\live-data-collector\Test-LiveDataCollector.ps1
+powershell -NoProfile -File .\tools-temp\live-data-collector\Test-LiveDataCollector.ps1
 ```
 
 Current expected known-capture assertions:
