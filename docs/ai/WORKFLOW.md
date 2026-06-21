@@ -37,11 +37,13 @@ Build:
 cmd /d /c tools\build_aorebirth_debug.cmd
 ```
 
-Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper kills stale `MSBuild.exe`, `dotnet.exe`, and `VBCSCompiler.exe` processes, builds `AORebirth.Core` first, then builds `ZoneEngine`, using:
+Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper kills stale `MSBuild.exe`, `dotnet.exe`, `VBCSCompiler.exe`, and `NuGet.exe` processes, verifies required packages under `AORebirth\packages`, disables legacy `.nuget\NuGet.targets` build-time restore, builds `AORebirth.Core` first, then builds `ZoneEngine`, using:
 
 ```cmd
-MSBuild.exe <project> /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
+MSBuild.exe <project> /t:Build /p:Configuration=Debug /p:RestorePackages=false /m:1 /nr:false /v:minimal
 ```
+
+If required package folders are missing, the wrapper runs an explicit `NuGet.exe restore` step before MSBuild with visible progress and timeout handling. Do not let project-level `RestorePackages` run inside MSBuild.
 
 If a Codex shell command times out during build validation, do not treat timeout exit code `124` as a build failure until checking for orphaned build child processes and stopping them.
 

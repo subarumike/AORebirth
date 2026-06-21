@@ -14,6 +14,7 @@ Fix the recurring AORebirth MSBuild hang/timeout validation workflow.
 - Preserve the real failing MSBuild exit code.
 - Print visible progress before every major build step.
 - Use `cmd.exe` or Git Bash only; do not use PowerShell or `.ps1` wrappers.
+- Disable legacy build-time NuGet restore from `.nuget\NuGet.targets`; restore explicitly before MSBuild only when required packages are missing.
 
 ## Validation Plan
 
