@@ -4,13 +4,13 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Baseline
 
-- HEAD baseline: `d243fbb1`.
+- HEAD baseline at start of bag-in-bag guard work: `eb95f379`.
 - Repository purpose: local C#/.NET Framework-era Anarchy Online server workspace for Mike's current AO client and local `cellao_codex_clean` MySQL database; this is a legacy database name retained for local compatibility.
 - Current stable approach: evidence-backed packet/gameplay/data repair, current-client parity over legacy assumptions, and identity-first capture-derived reconstruction.
 - Documentation split: `docs/ai/CURRENT_TASK.md` remains the active task handoff; this file is the stable project memory; `docs/generated/` contains historical result reports only.
-- Active cleanup note: `docs/ai/CURRENT_TASK.md` is focused on the current OFAB terminal repair. Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
+- Active cleanup note: `docs/ai/CURRENT_TASK.md` is focused on the bag-in-bag guard. Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
 - Last live-smoked committed quest baseline: `ecbca7d` (`Implement Marcus B18F to B194 transition`).
-- Current dirty work: BS Signup OFAB profession armor terminal repair adds capture-limited vendor/template/shop rows for the 13 profession-locked armor terminals that were missing vendor coverage, gates the 14 OFAB profession armor terminal hashes by character profession, and sends the captured denial feedback text.
+- Current task result: bag-in-bag guard blocks container/backpack items from being placed into another container through the existing `ClientContainerAddItem` inventory-to-container path; no SQL, schema, bank, or broad backpack behavior changes are part of this task.
 - Current uncommitted quest work: Marcus Phase 4B item `296780` handout exists in `MarcusB18FCompletionHandler.cs`, has focused ZoneEngine build/search validation, has not had live smoke, and is intentionally paused/uncommitted.
 - Quest system work is on the back burner. The next work item should be selected from non-quest gameplay bugs unless Mike explicitly resumes quest work.
 
@@ -67,7 +67,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - MySqlConnector migration and DAO transaction handling are repaired for login select/zone redirect.
 - Current-client `FullCharacter` version 26 and live-style login state are locked decisions.
 - Sit/stand, equipment visuals, inventory move, equip/unequip, bank deposit/withdraw/persistence, backpack open/close/reopen/movement/worn-slot persistence, corpse item/credit loot, player trade item/credit/cancel, vendor buy/sell/close, and death/respawn have passing documented validation for their repaired scopes.
-- Backpack container open, item movement, worn-slot open, zoning visibility, and persistence are committed in `d243fbb1`.
+- Backpack container open, item movement, worn-slot open, zoning visibility, persistence, and bag-in-bag rejection are implemented in the current working baseline.
 - Vendor coverage is complete for practical live-accessible vendors. The current dirty OFAB repair covers the 13 BS Signup profession-locked armor terminals using live MP terminal evidence plus capture-limited fallback data and adds a live-shaped profession denial path with captured client feedback text; after validation/import/audit, the deferred statel backlog should drop from 26 to 13.
 
 ## Current Bank Repair State
@@ -106,6 +106,14 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Implementation shape: backpack pages remain keyed by `Container:<id>`; `InventoryUpdate` handles are registered back to the container identity so `Backpack:<handle/slot>` packets can resolve to the correct page; page writes replace only the affected page rows inside a transaction.
 - Final validation before commit: focused `AORebirth.Core` build passed; focused `ZoneEngine` build passed; focused `N3RecoveredContractTests` passed `14/14`; `git diff --check` passed with only LF-to-CRLF warnings.
 - Final smoke result: private live smoke passed after another round of testing. Bags persist, items inside bags persist, and bags open from worn slots and inventory.
+
+## Current Backpack Nesting Guard State
+
+- Bag-in-bag rejection is implemented server-side in `ClientContainerAddItemMessageHandler.TryMoveInventoryItemToBackpack`, before any destination slot allocation or inventory mutation.
+- A source item is treated as a container item when it already has `IdentityType.Container` or matches the existing legacy backpack template classifier in `InventoryItemRules`.
+- Normal non-container item-to-backpack moves still use the existing add/remove/ack/persist path. Backpack-to-inventory moves still use the existing `ClientMoveItemToInventory` backpack-handle path.
+- Validation performed: `cmd /d /c tools\build_aorebirth_debug.cmd` passed after stopping DLL-locking Chat/Login/Zone processes; `cmd /d /c start-engines.cmd` confirmed Chat/Login/Zone were running, and ports `6996`, `7012`, `7500`, and `7501` were listening; `git diff --check` passed with only existing LF-to-CRLF warnings.
+- Files changed for the bag-in-bag guard: `AORebirth/Libraries/Source/AORebirth.Core/Inventory/InventoryItemRules.cs`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/ClientContainerAddItemMessageHandler.cs`, `docs/ai/CURRENT_TASK.md`, and `docs/project/PROJECT_STATE.md`.
 
 ## Current OFAB Profession Terminal Repair State
 

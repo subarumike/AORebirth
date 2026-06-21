@@ -55,6 +55,21 @@ namespace AORebirth.Core.Inventory
             return IsUniqueFlags(item.GetAttribute(0));
         }
 
+        public static bool IsBackpackContainerItem(IItem item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+
+            if ((item.Identity != null) && (item.Identity.Type == IdentityType.Container))
+            {
+                return true;
+            }
+
+            return IsLegacyBackpackTemplate(item);
+        }
+
         public static bool HasSameUniqueItem(IItem candidate, IEnumerable<IItem> existingItems)
         {
             if (!IsUnique(candidate) || existingItems == null)

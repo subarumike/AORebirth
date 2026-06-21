@@ -2,24 +2,20 @@
 
 ## Active Task
 
-Modernize the AORebirth legacy NuGet restore workflow.
+Prevent bags/backpacks/container items from being placed inside other bags/backpacks/containers.
 
 ## Current Scope
 
-- Do not change gameplay or server behavior for this task.
-- Remove legacy project-level build-time NuGet restore wiring.
-- Keep existing `packages.config` package versions unchanged.
-- Use single-node MSBuild with node reuse disabled.
-- Kill stale `MSBuild`, `dotnet`, `VBCSCompiler`, and `NuGet` processes before each build.
-- Build `AORebirth.Core` first, then `ZoneEngine`.
-- Preserve the real failing MSBuild exit code.
-- Print visible progress before every major build step.
-- Use `cmd.exe` only for this modernization; do not use PowerShell, Git Bash, or `.ps1` wrappers.
-- Restore packages explicitly before MSBuild only when required package folders are missing.
-- Do not run implicit project-level restore targets during build.
+- Keep the change in the existing inventory/container move validation path.
+- Do not rewrite inventory, bank, or backpack systems.
+- Do not change database schemas or perform destructive database operations.
+- Preserve normal non-container item moves into backpacks.
+- Preserve backpack-to-inventory moves.
+- Add focused logging/validation consistent with existing patterns.
 
 ## Validation Plan
 
 - Run `cmd /d /c tools\build_aorebirth_debug.cmd`.
 - Run `git diff --check`.
-- Commit only build workflow/tooling/doc changes for this task.
+- Review final `git status --short --branch`.
+- Commit only intended source/doc changes for this task.
