@@ -5,6 +5,7 @@
 - Never rely on old chat history.
 - Run `git status --short --branch` before editing.
 - After creating a commit, push it to the configured remote; do not leave commits local-only unless Mike explicitly asks for a local-only commit.
+- After committing and pushing, include a small Discord-ready summary Mike can post.
 - Do not guess packet behavior.
 - Do not change database schemas without explicit approval.
 - Do not perform destructive database operations.
