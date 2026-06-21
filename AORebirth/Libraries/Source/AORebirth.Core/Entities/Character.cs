@@ -873,8 +873,6 @@ namespace AORebirth.Core.Entities
         {
             this.StopMovement();
             this.UpdateMoveType(30);
-            this.Stats[StatIds.state].Value = 0;
-            this.Stats[StatIds.state].BaseValue = 0;
             this.Stats[StatIds.currentstate].Value = 0;
             this.Stats[StatIds.currentstate].BaseValue = 0;
         }

@@ -195,8 +195,10 @@ namespace ZoneEngine.Core.MessageHandlers
                 case CharacterActionType.Logout:
 
                     // If action == Logout
-                    this.ApplySit(client);
+                    this.ApplyLogoutSit(client);
+                    this.SendOwnerLogoutSitAction(client);
                     this.SendStartLogout(client.Controller.Character);
+                    this.SendLogoutMovementModeStat(client);
                     client.Controller.Character.StartLogoutTimer();
 
                     break;
@@ -715,6 +717,40 @@ namespace ZoneEngine.Core.MessageHandlers
             SimpleCharFullUpdate.SendToPlayfield(client.Controller.Client);
         }
 
+        private void ApplyLogoutSit(IZoneClient client)
+        {
+            ICharacter character = client.Controller.Character;
+            character.EnterLogoutSitPosture();
+            client.Controller.State = CharacterState.Idle;
+
+            CharDCMoveMessage postureUpdate = this.CreatePostureMove(character, 30);
+            SimpleCharFullUpdateMessage fullUpdate = SimpleCharFullUpdate.ConstructMessage((Character)character);
+
+            client.SendCompressed(postureUpdate);
+            client.SendCompressed(fullUpdate);
+
+            character.Playfield.AnnounceOthers(postureUpdate, character.Identity);
+            character.Playfield.AnnounceOthers(fullUpdate, character.Identity);
+        }
+
+        private void SendOwnerLogoutSitAction(IZoneClient client)
+        {
+            ICharacter character = client.Controller.Character;
+
+            client.SendCompressed(
+                new CharacterActionMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 0x00,
+                    Action = CharacterActionType.ChangeAnimationAndStance,
+                    Unknown1 = 0,
+                    Target = Identity.None,
+                    Parameter1 = 0,
+                    Parameter2 = 0,
+                    Unknown2 = 0
+                });
+        }
+
         private void ApplyStand(IZoneClient client)
         {
             ICharacter character = client.Controller.Character;
@@ -760,34 +796,60 @@ namespace ZoneEngine.Core.MessageHandlers
                     });
         }
 
+        private void SendLogoutMovementModeStat(IZoneClient client)
+        {
+            ICharacter character = client.Controller.Character;
+
+            client.SendCompressed(
+                new StatMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 1,
+                    Stats =
+                        new[]
+                        {
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = (CharacterStat)StatIds.currentmovementmode,
+                                Value2 = (uint)character.Stats[StatIds.currentmovementmode].Value
+                            }
+                        }
+                });
+        }
+
         private void SendPostureMove(ICharacter character, byte moveType)
         {
-            var postureUpdate = new CharDCMoveMessage
-                                {
-                                    Identity = character.Identity,
-                                    Unknown = 0x00,
-                                    MoveType = moveType,
-                                    Heading =
-                                        new Quaternion
-                                        {
-                                            X = character.Heading.xf,
-                                            Y = character.Heading.yf,
-                                            Z = character.Heading.zf,
-                                            W = character.Heading.wf
-                                        },
-                                    Coordinates =
-                                        new Vector3
-                                        {
-                                            X = character.RawCoordinates.X,
-                                            Y = character.RawCoordinates.Y,
-                                            Z = character.RawCoordinates.Z
-                                        },
-                                    Unknown1 = 0,
-                                    Unknown2 = 0,
-                                    Unknown3 = 0
-                                };
+            CharDCMoveMessage postureUpdate = this.CreatePostureMove(character, moveType);
 
             character.Playfield.Publish(new IMSendAOtomationMessageToPlayfield { Body = postureUpdate });
+        }
+
+        private CharDCMoveMessage CreatePostureMove(ICharacter character, byte moveType)
+        {
+            return new CharDCMoveMessage
+                   {
+                       Identity = character.Identity,
+                       Unknown = 0x00,
+                       MoveType = moveType,
+                       Heading =
+                           new Quaternion
+                           {
+                               X = character.Heading.xf,
+                               Y = character.Heading.yf,
+                               Z = character.Heading.zf,
+                               W = character.Heading.wf
+                           },
+                       Coordinates =
+                           new Vector3
+                           {
+                               X = character.RawCoordinates.X,
+                               Y = character.RawCoordinates.Y,
+                               Z = character.RawCoordinates.Z
+                           },
+                       Unknown1 = 0,
+                       Unknown2 = 0,
+                       Unknown3 = 0
+                   };
         }
 
         /// <summary>

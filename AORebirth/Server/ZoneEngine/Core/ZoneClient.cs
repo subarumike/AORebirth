@@ -73,6 +73,8 @@ namespace ZoneEngine.Core
         /// </summary>
         public IPlayfield Playfield;
 
+        public bool PreserveLogoutSitOnConnect { get; set; }
+
         /// <summary>
         /// </summary>
         private readonly ZoneServer server;
@@ -245,6 +247,10 @@ namespace ZoneEngine.Core
                 this.Controller.Character.Reconnect(this);
                 LogUtil.Debug(DebugInfoDetail.Engine, "Reconnected to Character " + charId);
             }
+
+            this.PreserveLogoutSitOnConnect =
+                this.Controller.Character.InLogoutTimerPeriod()
+                && (this.Controller.Character.MoveMode == MoveModes.Sit);
 
             // Stop pending logouts
             this.Controller.Character.StopLogoutTimer();

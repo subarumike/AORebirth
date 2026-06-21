@@ -60,6 +60,8 @@ namespace AOSharpLiveCapture
             "Feedback",
             "FormatFeedback",
             "Stat",
+            "StartLogout",
+            "StopLogout",
             "SetPos",
             "CharDCMove",
             "InventoryUpdated",
