@@ -4,12 +4,13 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Baseline
 
-- HEAD baseline: `e85440de`.
+- HEAD baseline: `d243fbb1`.
 - Repository purpose: local C#/.NET Framework-era Anarchy Online server workspace for Mike's current AO client and local `cellao_codex_clean` MySQL database; this is a legacy database name retained for local compatibility.
 - Current stable approach: evidence-backed packet/gameplay/data repair, current-client parity over legacy assumptions, and identity-first capture-derived reconstruction.
 - Documentation split: `docs/ai/CURRENT_TASK.md` remains the active task handoff; this file is the stable project memory; `docs/generated/` contains historical result reports only.
-- Active cleanup note: `docs/ai/CURRENT_TASK.md` has been updated to pause Marcus quest work. Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
+- Active cleanup note: `docs/ai/CURRENT_TASK.md` is focused on the current OFAB terminal repair. Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
 - Last live-smoked committed quest baseline: `ecbca7d` (`Implement Marcus B18F to B194 transition`).
+- Current dirty work: BS Signup OFAB profession armor terminal repair adds capture-limited vendor/template/shop rows for the 13 profession-locked armor terminals that were missing vendor coverage, gates the 14 OFAB profession armor terminal hashes by character profession, and sends the captured denial feedback text.
 - Current uncommitted quest work: Marcus Phase 4B item `296780` handout exists in `MarcusB18FCompletionHandler.cs`, has focused ZoneEngine build/search validation, has not had live smoke, and is intentionally paused/uncommitted.
 - Quest system work is on the back burner. The next work item should be selected from non-quest gameplay bugs unless Mike explicitly resumes quest work.
 
@@ -64,9 +65,9 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Runtime startup branding and shared server version baseline cleanup is implemented and validated: hidden Chat/Login/Zone logs show revision/banner branding as `AO Rebirth`, startup text uses `AO Rebirth Dev Team`, displayed version is `1.0.0.0`, and the Funcom/Anarchy Online notice remains unchanged.
 - MySqlConnector migration and DAO transaction handling are repaired for login select/zone redirect.
 - Current-client `FullCharacter` version 26 and live-style login state are locked decisions.
-- Sit/stand, equipment visuals, inventory move, equip/unequip, bank deposit/withdraw/persistence, backpack open/close/reopen, corpse item/credit loot, player trade item/credit/cancel, vendor buy/sell/close, and death/respawn have passing documented validation for their repaired scopes.
-- Uncommitted backpack follow-up work now covers captured inventory-to-backpack movement, captured backpack-to-inventory movement, worn-slot backpack open/close, and post-zone backpack visibility. It is live-smoked and pending commit.
-- Vendor coverage is complete for practical live-accessible vendors; remaining 26 statel vendors are deferred setup/access backlog.
+- Sit/stand, equipment visuals, inventory move, equip/unequip, bank deposit/withdraw/persistence, backpack open/close/reopen/movement/worn-slot persistence, corpse item/credit loot, player trade item/credit/cancel, vendor buy/sell/close, and death/respawn have passing documented validation for their repaired scopes.
+- Backpack container open, item movement, worn-slot open, zoning visibility, and persistence are committed in `d243fbb1`.
+- Vendor coverage is complete for practical live-accessible vendors. The current dirty OFAB repair covers the 13 BS Signup profession-locked armor terminals using live MP terminal evidence plus capture-limited fallback data and adds a live-shaped profession denial path with captured client feedback text; after validation/import/audit, the deferred statel backlog should drop from 26 to 13.
 
 ## Current Bank Repair State
 
@@ -94,16 +95,27 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Validation performed: focused `AORebirth.Core` MSBuild passed; focused `ZoneEngine` MSBuild passed; `N3RecoveredContractTests` passed `13/13`; `git diff --check` passed with only LF-to-CRLF warnings; private live smoke passed.
 - Files changed for the backpack-open repair: `AORebirth/Libraries/Source/AORebirth.Core/Inventory/BackPackInventory.cs`, `AORebirth/Libraries/Source/AORebirth.Core/Inventory/BaseInventoryPage.cs`, `AORebirth/Libraries/Source/AORebirth.Core/Inventory/BaseInventoryPages.cs`, `AORebirth/Libraries/Source/AORebirth.Core/Inventory/IInventoryPages.cs`, `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/N3RecoveredContractTests.cs`, `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/IdentityType.cs`, `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/N3Messages/ChestItemFullUpdateMessage.cs`, `AORebirth/Server/ZoneEngine/Core/Controllers/PlayerController.cs`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/BackpackContainerActionMessageHandler.cs`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/ChestItemFullUpdateMessageHandler.cs`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/GenericCmdMessageHandler.cs`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/InventoryUpdateMessageHandler.cs`, and `AORebirth/Server/ZoneEngine/ZoneEngine.csproj`.
 
-## Current Backpack Item Movement Follow-Up State
+## Current Backpack Container Repair State
 
-- Backpack movement follow-up is uncommitted, validated, and live-smoked.
+- Backpack container repair is committed in `d243fbb1` (`Fix backpack container open, movement, and persistence`).
 - Live evidence: inventory-to-backpack drag uses `ClientContainerAddItem` with `Target=Container:<id>` and `Source=Inventory:<slot>`; the server answers with `ContainerAddItem` using the original source, target `Container:<id>`, and a server-chosen backpack slot.
 - Live evidence: backpack-to-inventory drag uses `ClientMoveItemToInventory` with `SourceContainer=Backpack:<handle/slot>` and a target inventory slot; the server answers with `ContainerAddItem` from that backpack handle/slot to the character identity.
 - Live evidence: right-clicking a worn backpack in `ArmorPage:<slot>` or `SocialPage:<slot>` sends `GenericCmd Use` for that worn slot. Closing sends `GenericCmd Use` for `Container:<id>`.
 - Live evidence after zoning: first reopen of worn and inventory backpacks sends `ChestFullUpdate`, `InventoryUpdate` with the persisted item count, and a `GenericCmd` success ack. Mike confirmed bags persist, items inside bags persist, and bags can be opened from both worn slots and inventory after the latest test.
 - Implementation shape: backpack pages remain keyed by `Container:<id>`; `InventoryUpdate` handles are registered back to the container identity so `Backpack:<handle/slot>` packets can resolve to the correct page; page writes replace only the affected page rows inside a transaction.
-- Current validation: focused `AORebirth.Core` build passed; focused `ZoneEngine` build passed; focused `N3RecoveredContractTests` passed `14/14`; `git diff --check` passed with only LF-to-CRLF warnings.
-- Current smoke result: private live smoke passed after another round of testing. Bags persist, items inside bags persist, and bags open from worn slots and inventory.
+- Final validation before commit: focused `AORebirth.Core` build passed; focused `ZoneEngine` build passed; focused `N3RecoveredContractTests` passed `14/14`; `git diff --check` passed with only LF-to-CRLF warnings.
+- Final smoke result: private live smoke passed after another round of testing. Bags persist, items inside bags persist, and bags open from worn slots and inventory.
+
+## Current OFAB Profession Terminal Repair State
+
+- Current dirty work adds static vendor coverage for 13 missing `6007 BS Signup (dng)` OFAB profession armor terminals: Adventurer, Agent, Bureaucrat, Doctor, Enforcer, Engineer, Fixer, Keeper, Martial Artist, Nano-Technician, Shade, Soldier, and Trader.
+- Live evidence from capture `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260620-230138` confirms the accessible Meta-Physicist OFAB terminal request/response shape: outbound `GenericCmd Use` to `VendingMachine:C0091777`, inbound `ShopUpdate` with 88 slots, inbound `Trade Open`, and inbound `GenericCmd` success ack.
+- Live evidence from capture `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260620-234156` confirms denied profession terminal attempts receive `GenericCmd Use` failure ack with `Temp1=2` and do not receive `ShopUpdate` or `Trade Open`.
+- Live client feedback observed for denied profession terminal attempts is `This effect can only be utilitized by <Profession>.` followed by `Your GM capabilities is required to be at least 1!`.
+- Capture limitation: the other profession armor terminals are profession-locked for the current live character, so full live `ShopUpdate` capture for those terminals is not feasible from this character.
+- Repair source model: the non-Meta-Physicist profession terminal rows are marked `CaptureLimited`; stock shape mirrors the captured MP profession terminal and item IDs come from current `docs/Ofab` profession lists plus current item-name data for profession shoulder/ring accessories.
+- Implementation shape: `GenericCmd Use` checks the target `Vendor.TemplateHash` before `shophash` can send `ShopUpdate`; mismatched professions receive the captured client feedback text and the live-shaped `GenericCmd` failure ack (`Temp1=2`), while matching professions and non-profession OFAB terminals stay on the existing shop-open path.
+- Dirty files for the OFAB repair are `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendors.sql`, `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/vendortemplate.sql`, `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/shopinventorytemplates.sql`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/GenericCmdMessageHandler.cs`, `docs/ai/CURRENT_TASK.md`, and `docs/project/PROJECT_STATE.md`.
 
 ## Current Open Risks
 
@@ -111,7 +123,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - `CharacterAction` action `59` remains unresolved.
 - Rex/Mission state is not persisted to DB and will not survive process restart as mission state.
 - Marcus Stone quest chain beyond the committed B194 mission-window preview is not implemented. Uncommitted item `296780` handout work is validated but unsmoked and paused.
-- Backpack item movement into and out of backpack pages has an uncommitted live-capture-backed repair pending commit; keep it out of unrelated work until committed.
+- OFAB profession armor terminal SQL and profession lock are dirty and pending private smoke.
 - NPC chase/movement remains high risk and should not be changed without replay/capture evidence.
 - `PlayfieldAnarchyF` remains a current-client structure mismatch.
 - Full gameplay systems for missions, quests, perks, research, pets, PvP/towers, teams, and organizations remain incomplete outside the documented repaired slices.

@@ -35,6 +35,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     // TODO: Make this to EntityEnvent or something like this
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
 
@@ -61,6 +62,46 @@ namespace ZoneEngine.Core.MessageHandlers
     public class GenericCmdMessageHandler : BaseMessageHandler<GenericCmdMessage, GenericCmdMessageHandler>
     {
         private static readonly TimeSpan CorpseUseAcknowledgeDelay = TimeSpan.FromMilliseconds(550);
+
+        private static readonly IDictionary<string, Profession> OfabProfessionVendorRequirements =
+            new Dictionary<string, Profession>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "OFADV", Profession.Adventurer },
+                { "OFAGT", Profession.Agent },
+                { "OFCRT", Profession.Bureaucrat },
+                { "OFDOC", Profession.Doctor },
+                { "OFENF", Profession.Enforcer },
+                { "OFENG", Profession.Engineer },
+                { "OFFIX", Profession.Fixer },
+                { "OFKEE", Profession.Keeper },
+                { "OFMA", Profession.MartialArtist },
+                { "OFNT", Profession.Nanotechnician },
+                { "OFPMQ3T", Profession.Metaphysicist },
+                { "OFSHD", Profession.Shade },
+                { "OFSOL", Profession.Soldier },
+                { "OFTRD", Profession.Trader }
+            };
+
+        private static readonly IDictionary<Profession, string> ProfessionFeedbackNames =
+            new Dictionary<Profession, string>
+            {
+                { Profession.Adventurer, "Adventurer" },
+                { Profession.Agent, "Agent" },
+                { Profession.Bureaucrat, "Bureaucrat" },
+                { Profession.Doctor, "Doctor" },
+                { Profession.Enforcer, "Enforcer" },
+                { Profession.Engineer, "Engineer" },
+                { Profession.Fixer, "Fixer" },
+                { Profession.Keeper, "Keeper" },
+                { Profession.MartialArtist, "Martial Artist" },
+                { Profession.Metaphysicist, "Meta-Physicist" },
+                { Profession.Nanotechnician, "Nano-Technician" },
+                { Profession.Shade, "Shade" },
+                { Profession.Soldier, "Soldier" },
+                { Profession.Trader, "Trader" }
+            };
+
+        private const string OfabGmRequirementFeedback = "Your GM capabilities is required to be at least 1!";
 
         #region Inbound
 
@@ -182,6 +223,13 @@ namespace ZoneEngine.Core.MessageHandlers
                                         ev = temp.Events.FirstOrDefault(x => x.EventType == EventType.OnTrade);
                                         if (ev != null)
                                         {
+                                            var vendor = entity as Vendor;
+                                            if (vendor != null
+                                                && this.TryDenyOfabProfessionVendor(client, message, vendor))
+                                            {
+                                                break;
+                                            }
+
                                             ev.Perform(client.Controller.Character, entity);
 
                                             TemporaryBag tempBag = new TemporaryBag(
@@ -292,6 +340,14 @@ namespace ZoneEngine.Core.MessageHandlers
             this.Send(character, this.Reply(character, message), announceToPlayfield);
         }
 
+        public void AcknowledgeDenied(
+            ICharacter character,
+            GenericCmdMessage message,
+            bool announceToPlayfield = false)
+        {
+            this.Send(character, this.Reply(character, message, Identity.None, message.Temp4, 2), announceToPlayfield);
+        }
+
         public void AcknowledgeWithTarget(
             ICharacter character,
             GenericCmdMessage message,
@@ -353,6 +409,16 @@ namespace ZoneEngine.Core.MessageHandlers
             Identity targetOverride,
             int temp4)
         {
+            return this.Reply(character, message, targetOverride, temp4, 1);
+        }
+
+        private MessageDataFiller Reply(
+            ICharacter character,
+            GenericCmdMessage message,
+            Identity targetOverride,
+            int temp4,
+            int temp1)
+        {
             return x =>
             {
                 Identity[] targets = message.Target.ToList().ToArray();
@@ -364,7 +430,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.Identity = message.Identity;
                 x.N3MessageType = message.N3MessageType;
                 x.Target = targets;
-                x.Temp1 = 1;
+                x.Temp1 = temp1;
                 x.Count = message.Count;
                 x.Action = message.Action;
                 x.Temp4 = temp4;
@@ -374,5 +440,49 @@ namespace ZoneEngine.Core.MessageHandlers
         }
 
         #endregion
+
+        private bool TryDenyOfabProfessionVendor(IZoneClient client, GenericCmdMessage message, Vendor vendor)
+        {
+            Profession requiredProfession;
+            if (string.IsNullOrEmpty(vendor.TemplateHash)
+                || !OfabProfessionVendorRequirements.TryGetValue(vendor.TemplateHash, out requiredProfession))
+            {
+                return false;
+            }
+
+            ICharacter character = client.Controller.Character;
+            Profession characterProfession = (Profession)character.Stats[StatIds.profession].Value;
+            if (characterProfession == requiredProfession)
+            {
+                return false;
+            }
+
+            client.Server.Info(
+                client,
+                "OFAB profession vendor denied character={0} profession={1} required={2} vendor={3} hash={4}",
+                character.Identity,
+                characterProfession,
+                requiredProfession,
+                vendor.Identity,
+                vendor.TemplateHash);
+
+            this.SendOfabProfessionDeniedFeedback(character, requiredProfession);
+            this.AcknowledgeDenied(character, message);
+            return true;
+        }
+
+        private void SendOfabProfessionDeniedFeedback(ICharacter character, Profession requiredProfession)
+        {
+            string professionName;
+            if (!ProfessionFeedbackNames.TryGetValue(requiredProfession, out professionName))
+            {
+                professionName = requiredProfession.ToString();
+            }
+
+            ChatTextMessageHandler.Default.Send(
+                character,
+                "This effect can only be utilitized by " + professionName + ".");
+            ChatTextMessageHandler.Default.Send(character, OfabGmRequirementFeedback);
+        }
     }
 }
