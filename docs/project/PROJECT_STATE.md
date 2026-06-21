@@ -10,7 +10,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Documentation split: `docs/ai/CURRENT_TASK.md` remains the active task handoff; this file is the stable project memory; `docs/generated/` contains historical result reports only.
 - Active cleanup note: `docs/ai/CURRENT_TASK.md` is focused on surgery-clinic implant-install behavior after terminal activation. Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
 - Last live-smoked committed quest baseline: `ecbca7d` (`Implement Marcus B18F to B194 transition`).
-- Current task result: surgery-clinic terminal use remains capture-backed, and post-terminal implant install now grants the existing 300-second implant-access state so the captured `ClientMoveItemToInventory` implant equip path can run. Live capture `20260621-063942` proved the install sequence.
+- Current task result: surgery-clinic terminal use remains capture-backed, and post-terminal implant install now grants the existing 300-second implant-access state so the captured `ClientMoveItemToInventory` implant equip path can run. Live capture `20260621-063942` proved the install sequence, and private AO Rebirth smoke confirmed implant install/removal, zone-time NCU cleanup, and normal effect expiry.
 - Current uncommitted quest work: Marcus Phase 4B item `296780` handout exists in `MarcusB18FCompletionHandler.cs`, has focused ZoneEngine build/search validation, has not had live smoke, and is intentionally paused/uncommitted.
 - Quest system work is on the back burner. The next work item should be selected from non-quest gameplay bugs unless Mike explicitly resumes quest work.
 
@@ -77,7 +77,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Implemented response: debit 300 credits, send captured `FormatFeedbackMessage`, send `CastNanoSpell` and `SetNanoDuration` for `NanoProgram:26732` with duration `90000`, grant 300 seconds of existing server-side implant access, send `SpecialUsed` for stat `124` with `5` seconds, acknowledge the original `GenericCmd`, then send delayed `SpecialAvailable` for stat `124`.
 - Captured implant install path: unequip sends `ClientMoveItemToInventory Source=ImplantPage:<slot> Slot=0x6F` and receives `TemplateAction Unknown2=7` plus `ContainerAddItem`; equip sends `ClientMoveItemToInventory Source=Inventory:<slot> Slot=<implant slot>` and receives `ContainerAddItem` plus `TemplateAction Unknown2=6`.
 - Not implemented: generic Statel event interpretation, shop/dialog/teleport/mission behavior, unobserved insufficient-credit behavior, database schema changes, and raw packet replay.
-- Validation so far: approved debug build passed after cleanly stopping locked engines; `restart-engines.cmd` restarted Chat/Login/Zone in the prior terminal-use repair. Current implant-access build/restart validation is tracked in `docs/generated/surgery_clinic_implant_install_capture_result.md`.
+- Validation so far: approved debug build passed after cleanly stopping locked engines; `restart-engines.cmd` restarted Chat/Login/Zone; private AO Rebirth smoke passed for implant install/removal, clinic nano NCU cleanup on zone, and clinic effect expiry. Current implant-access build/restart validation is tracked in `docs/generated/surgery_clinic_implant_install_capture_result.md`.
 
 ## Current Bank Repair State
 

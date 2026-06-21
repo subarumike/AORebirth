@@ -63,4 +63,4 @@ Failure behavior without a clinic was not captured in this session. The existing
 - `cmd /d /c tools\build_aorebirth_debug.cmd` then passed.
 - `cmd /d /c restart-engines.cmd` restarted Chat/Login/Zone and confirmed ports `6996`, `7012`, `7500`, and `7501`.
 - `cmd /d /c git diff --check` passed with only existing LF-to-CRLF warnings.
-- Private AO Rebirth post-restart live smoke is pending until a client uses `Terminal:C00204A2` and installs a valid implant on the restarted server.
+- Private AO Rebirth post-restart live smoke passed: implant install and removal now work after surgery-clinic activation, the clinic nano exits NCU properly on zone, and the clinic effect expires as expected.
