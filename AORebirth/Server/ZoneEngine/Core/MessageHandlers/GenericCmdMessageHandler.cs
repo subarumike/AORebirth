@@ -47,6 +47,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using AORebirth.Core.Items;
     using AORebirth.Core.Network;
     using AORebirth.Core.Statels;
+    using AORebirth.Core.Vector;
     using AORebirth.Enums;
     using AORebirth.Interfaces;
     using AORebirth.ObjectManager;
@@ -86,6 +87,12 @@ namespace ZoneEngine.Core.MessageHandlers
         private const int SurgeryClinicSpecialLockSeconds = 5;
 
         private const int SurgeryClinicCreditCost = 300;
+
+        private const int CapturedBorealisPlayfieldId = 800;
+
+        private const int CapturedGridPlayfieldId = 152;
+
+        private const int CapturedBorealisGridTerminalInstance = unchecked((int)0xC0040320);
 
         private const string SurgeryClinicFeedback =
             "~&!!!\":!!!)<sHYou have 5 minutes (or until you leave the playfield) to swap implants.";
@@ -216,6 +223,10 @@ namespace ZoneEngine.Core.MessageHandlers
                              && this.TryRouteDeadNpcCorpseUse(client, target, out routedCorpseIdentity))
                     {
                         this.AcknowledgeCorpseUseDelayed(client.Controller.Character, message, routedCorpseIdentity);
+                    }
+                    else if (this.TryHandleCapturedGridTerminalUse(client, target))
+                    {
+                        break;
                     }
                     else if (this.TryHandleSurgeryClinicTerminalUse(client, message, target))
                     {
@@ -354,6 +365,47 @@ namespace ZoneEngine.Core.MessageHandlers
             return routed;
         }
 
+        private bool TryHandleCapturedGridTerminalUse(
+            IZoneClient client,
+            Identity target)
+        {
+            ICharacter character = client.Controller.Character;
+            StatelData statelData = this.GetStatelData(character, target);
+
+            if (!this.IsCapturedBorealisGridTerminal(character, target, statelData))
+            {
+                return false;
+            }
+
+            Dynel dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            character.StopMovement();
+            Coordinate destination = character.Coordinates();
+            character.Playfield.Teleport(
+                dynel,
+                destination,
+                character.Heading,
+                new Identity { Type = IdentityType.Playfield, Instance = CapturedGridPlayfieldId });
+
+            client.Server.Info(
+                client,
+                "Captured grid terminal use handled char={0} target={1} sourcePf={2} destPf={3} dest=({4:F3},{5:F3},{6:F3}) evidence={7}",
+                character.Identity,
+                target,
+                CapturedBorealisPlayfieldId,
+                CapturedGridPlayfieldId,
+                destination.x,
+                destination.y,
+                destination.z,
+                "captures/20260611-005202/packets.hex.log:8483-8492;captures/20260613-170220/packets.hex.log:3133-3146");
+
+            return true;
+        }
+
         private bool TryHandleSurgeryClinicTerminalUse(
             IZoneClient client,
             GenericCmdMessage message,
@@ -426,6 +478,33 @@ namespace ZoneEngine.Core.MessageHandlers
 
             return playfieldData.Statels.FirstOrDefault(
                 x => x.Identity.Type == target.Type && x.Identity.Instance == target.Instance);
+        }
+
+        private bool IsCapturedBorealisGridTerminal(
+            ICharacter character,
+            Identity target,
+            StatelData statelData)
+        {
+            if (character == null || character.Playfield == null)
+            {
+                return false;
+            }
+
+            if (target.Type != IdentityType.Terminal
+                || target.Instance != CapturedBorealisGridTerminalInstance)
+            {
+                return false;
+            }
+
+            if (character.Playfield.Identity.Instance != CapturedBorealisPlayfieldId)
+            {
+                return false;
+            }
+
+            return statelData != null
+                   && statelData.PlayfieldId == CapturedBorealisPlayfieldId
+                   && statelData.Identity.Type == target.Type
+                   && statelData.Identity.Instance == target.Instance;
         }
 
         private bool IsCapturedSurgeryClinicTerminal(Identity target, StatelData statelData)
