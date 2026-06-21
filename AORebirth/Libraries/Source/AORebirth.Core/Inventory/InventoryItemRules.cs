@@ -12,6 +12,8 @@ namespace AORebirth.Core.Inventory
 
     public static class InventoryItemRules
     {
+        private const int BookOfKnowledgeTemplateId = 99302;
+
         public static bool IsSameTemplate(IItem left, IItem right)
         {
             return left != null
@@ -67,7 +69,7 @@ namespace AORebirth.Core.Inventory
                 return true;
             }
 
-            return IsLegacyBackpackTemplate(item);
+            return IsBackpackContainerTemplate(item);
         }
 
         public static bool HasSameUniqueItem(IItem candidate, IEnumerable<IItem> existingItems)
@@ -109,7 +111,7 @@ namespace AORebirth.Core.Inventory
                 return true;
             }
 
-            if (!IsLegacyBackpackTemplate(item))
+            if (!IsBackpackContainerTemplate(item))
             {
                 return false;
             }
@@ -153,6 +155,21 @@ namespace AORebirth.Core.Inventory
             return item.Events.Any(
                 x => x.EventType == EventType.OnWear
                      && x.Functions.Any(y => y.FunctionType == (int)FunctionType.BackMesh));
+        }
+
+        private static bool IsBackpackContainerTemplate(IItem item)
+        {
+            return IsLegacyBackpackTemplate(item)
+                   || IsBookOfKnowledgeContainerTemplate(item);
+        }
+
+        private static bool IsBookOfKnowledgeContainerTemplate(IItem item)
+        {
+            return IsSameTemplateIdPair(
+                item.LowID,
+                item.HighID,
+                BookOfKnowledgeTemplateId,
+                BookOfKnowledgeTemplateId);
         }
 
         private static Identity CreateLegacyBackpackContainerIdentity(

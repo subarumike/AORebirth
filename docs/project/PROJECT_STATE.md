@@ -111,9 +111,11 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 - Bag-in-bag rejection is implemented server-side in `ClientContainerAddItemMessageHandler.TryMoveInventoryItemToBackpack`, before any destination slot allocation or inventory mutation.
 - A source item is treated as a container item when it already has `IdentityType.Container` or matches the existing legacy backpack template classifier in `InventoryItemRules`.
+- Book of Knowledge (`99302/99302`) is also classified as a backpack-style container, so right-click opens it through the existing backpack container path and the shared bag-in-bag guard rejects attempts to move it into another backpack/container.
 - Normal non-container item-to-backpack moves still use the existing add/remove/ack/persist path. Backpack-to-inventory moves still use the existing `ClientMoveItemToInventory` backpack-handle path.
-- Validation performed: `cmd /d /c tools\build_aorebirth_debug.cmd` passed after stopping DLL-locking Chat/Login/Zone processes; `cmd /d /c start-engines.cmd` confirmed Chat/Login/Zone were running, and ports `6996`, `7012`, `7500`, and `7501` were listening; `git diff --check` passed with only existing LF-to-CRLF warnings.
-- Files changed for the bag-in-bag guard: `AORebirth/Libraries/Source/AORebirth.Core/Inventory/InventoryItemRules.cs`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/ClientContainerAddItemMessageHandler.cs`, `docs/ai/CURRENT_TASK.md`, and `docs/project/PROJECT_STATE.md`.
+- Latest Book of Knowledge validation: live AOSharp capture `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260621-052003` showed the pre-fix right-click/drag issue; after the classifier repair, Mike live-smoked that Book of Knowledge opens and cannot be moved into another bag.
+- Build/start validation performed for the Book repair: `cmd /d /c tools\build_aorebirth_debug.cmd` passed after stopping DLL-locking Chat/Login/Zone processes; `cmd /d /c start-engines.cmd` completed in 9.2 seconds and confirmed ports `6996`, `7012`, `7500`, and `7501` were listening.
+- Files changed for the bag-in-bag guard and Book repair: `AORebirth/Libraries/Source/AORebirth.Core/Inventory/InventoryItemRules.cs`, `AORebirth/Server/ZoneEngine/Core/MessageHandlers/ClientContainerAddItemMessageHandler.cs`, `docs/ai/CURRENT_TASK.md`, and `docs/project/PROJECT_STATE.md`.
 
 ## Current OFAB Profession Terminal Repair State
 
