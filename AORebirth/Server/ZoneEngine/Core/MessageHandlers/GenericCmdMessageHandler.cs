@@ -94,6 +94,20 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int CapturedBorealisGridTerminalInstance = unchecked((int)0xC0040320);
 
+        private const float CapturedGridLandingX = 234.3062f;
+
+        private const float CapturedGridLandingY = 3.7750f;
+
+        private const float CapturedGridLandingZ = 212.8138f;
+
+        private const float CapturedGridLandingHeadingX = 0.0f;
+
+        private const float CapturedGridLandingHeadingY = 1.0f;
+
+        private const float CapturedGridLandingHeadingZ = 0.0f;
+
+        private const float CapturedGridLandingHeadingW = -4.371139E-08f;
+
         private const string SurgeryClinicFeedback =
             "~&!!!\":!!!)<sHYou have 5 minutes (or until you leave the playfield) to swap implants.";
 
@@ -384,11 +398,19 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             character.StopMovement();
-            Coordinate destination = character.Coordinates();
+            var destination = new Coordinate(
+                CapturedGridLandingX,
+                CapturedGridLandingY,
+                CapturedGridLandingZ);
+            var heading = new AORebirth.Core.Vector.Quaternion(
+                CapturedGridLandingHeadingX,
+                CapturedGridLandingHeadingY,
+                CapturedGridLandingHeadingZ,
+                CapturedGridLandingHeadingW);
             character.Playfield.Teleport(
                 dynel,
                 destination,
-                character.Heading,
+                heading,
                 new Identity { Type = IdentityType.Playfield, Instance = CapturedGridPlayfieldId });
 
             client.Server.Info(
@@ -401,7 +423,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 destination.x,
                 destination.y,
                 destination.z,
-                "captures/20260611-005202/packets.hex.log:8483-8492;captures/20260613-170220/packets.hex.log:3133-3146");
+                "captures/20260621-091447/events.log:645-646;captures/20260621-091447/packets.hex.log:223-224");
 
             return true;
         }
