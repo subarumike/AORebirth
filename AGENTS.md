@@ -10,6 +10,8 @@
 - Do not change database schemas without explicit approval.
 - Do not perform destructive database operations.
 - Use documented workflow commands first for known workflows; do not rediscover known build, engine, capture, or validation commands.
+- Do not improvise shell syntax. Use repository-approved command forms and wrappers; malformed quoting, escaping, regex, or path syntax is an agent error to correct with one simpler safe command form, not a project blocker.
+- For Windows/cmd searches, prefer shell-safe `rg` forms with repeated `-e` patterns over complex quoted regex strings, especially when paths contain spaces.
 - Protect the context window: avoid command spam, large logs, repeated searches, and noisy transcripts.
 - Never launch the AO game/client unless Mike explicitly instructs it in the current task.
 - For AOSharp live capture startup, use only the approved `cmd.exe` wrapper documented in `docs/ai/WORKFLOW.md`.
