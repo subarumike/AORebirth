@@ -11,6 +11,7 @@
 - Do not perform destructive database operations.
 - Use documented workflow commands first for known workflows; do not rediscover known build, engine, capture, or validation commands.
 - Do not improvise shell syntax. Use repository-approved command forms and wrappers; malformed quoting, escaping, regex, or path syntax is an agent error to correct with one simpler safe command form, not a project blocker.
+- Do not run command probes, line-count probes, empty-pattern commands, placeholder commands, or shell-syntax experiments unless the task explicitly requires them. Required workflow-doc reads must use known-good targeted read commands, and malformed probe commands are workflow violations even if they change no repo state.
 - For Windows/cmd searches, prefer shell-safe `rg` forms with repeated `-e` patterns over complex quoted regex strings, especially when paths contain spaces.
 - Protect the context window: avoid command spam, large logs, repeated searches, and noisy transcripts.
 - Never launch the AO game/client unless Mike explicitly instructs it in the current task.
