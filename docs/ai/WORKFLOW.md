@@ -22,6 +22,12 @@ Identify dirty files before editing. Do not revert user or previous-agent work u
 ## Command Syntax Safety
 
 - Do not improvise shell syntax. Use repository-approved command forms, documented wrappers, and simple shell-safe commands.
+- Prevention comes first: do not run command probes, line-count probes, empty-pattern commands, placeholder commands, or shell-syntax experiments unless the task explicitly requires them. Reporting a malformed command after the fact is not sufficient.
+- Do not run line-count probes just to prove a file exists or estimate file size.
+- Do not run `find`, `findstr`, `rg`, `grep`, `dir`, or similar commands with empty patterns, placeholder arguments, or syntax experiments.
+- Required workflow-doc reads must use known-good targeted read commands only.
+- If a file needs to be inspected, read the relevant section directly using a known-good command form.
+- A malformed probe command is still an agent workflow violation even if it caused no repo change.
 - Malformed command syntax is an agent error, not a project blocker. If a command fails because of quoting, shell syntax, escaped characters, regex syntax, or path quoting, immediately rerun the task once with a simpler command form.
 - Search commands must be shell-safe. For ripgrep on Windows/cmd workflows, prefer repeated `-e` patterns instead of complex quoted regex strings.
 - Good:
@@ -39,7 +45,7 @@ rg -n "(PatternOne|PatternTwo)" "path with nested quoting"
 
 - Do not combine fragile quoting with paths containing spaces. Use simpler searches, narrower paths, or multiple safe commands instead.
 - Keep output compact. Do not dump full files, full logs, broad recursive output, or noisy command output into chat or the context window. Use targeted searches, line-numbered snippets, and concise summaries.
-- If a malformed command happened, final reporting must include the failed command category, the corrected safe command form used, and confirmation that the malformed command did not change repo state. Do not paste a giant output dump.
+- If a malformed command happened, final reporting must include the failed command category, the corrected safe command form used, and confirmation that the malformed command did not change repo state. This reporting is required after prevention failed, but it does not excuse the workflow violation. Do not paste a giant output dump.
 
 ## Command Budget And Context Protection
 
