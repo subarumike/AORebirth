@@ -62,6 +62,10 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int CapturedPrivateCityOrganizationInstance = 1370122;
 
+        private const int CapturedMontroyalPrivateCityInstance = 1196045;
+
+        private const int CapturedMontroyalPrivateCityBuildingInstance = 0x0000138A;
+
         #region Outbound
 
         /// <summary>
@@ -108,10 +112,10 @@ namespace ZoneEngine.Core.MessageHandlers
                     x.PlayfieldId1 = new Identity
                                      {
                                          Type = CapturedPrivateCityPlayfieldProxyType,
-                                         Instance = CapturedPrivateCityBuildingInstance
+                                         Instance = ResolvePrivateCityBuildingInstance(character.Playfield.Identity.Instance)
                                      };
                     x.Unknown4 = ResolvePrivateCityOrganizationInstance(character);
-                    x.GeneratorPayload = CreateCapturedPrivateCityGeneratorPayload();
+                    x.GeneratorPayload = CreateCapturedPrivateCityGeneratorPayload(character.Playfield.Identity.Instance);
                 }
 
                 IEnumerable<Vendor> vendors = Pool.Instance.GetAll<Vendor>(
@@ -149,6 +153,20 @@ namespace ZoneEngine.Core.MessageHandlers
             return organizationInstance > 0 ? organizationInstance : CapturedPrivateCityOrganizationInstance;
         }
 
+        private static int ResolvePrivateCityBuildingInstance(int playfieldInstance)
+        {
+            return playfieldInstance == CapturedMontroyalPrivateCityInstance
+                       ? CapturedMontroyalPrivateCityBuildingInstance
+                       : CapturedPrivateCityBuildingInstance;
+        }
+
+        private static byte[] CreateCapturedPrivateCityGeneratorPayload(int playfieldId)
+        {
+            return playfieldId == CapturedMontroyalPrivateCityInstance
+                       ? CreateCapturedMontroyalPrivateCityGeneratorPayload()
+                       : CreateCapturedPrivateCityGeneratorPayload();
+        }
+
         private static byte[] CreateCapturedPrivateCityGeneratorPayload()
         {
             return new byte[]
@@ -163,6 +181,24 @@ namespace ZoneEngine.Core.MessageHandlers
                        0x57, 0x4D, 0xF8, 0xBB, 0x00, 0x00, 0xC7, 0x48,
                        0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02,
                        0x00, 0x00, 0x00, 0x01, 0x10, 0x8E, 0xBC, 0x21,
+                       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+                   };
+        }
+
+        private static byte[] CreateCapturedMontroyalPrivateCityGeneratorPayload()
+        {
+            return new byte[]
+                   {
+                       0x00, 0x00, 0xC7, 0x7D, 0x00, 0x00, 0x00, 0x01,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+                       0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0xC4, 0x18,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x9C, 0x60, 0x10,
+                       0x00, 0x00, 0xC7, 0x3D, 0x00, 0x00, 0x00, 0x01,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+                       0x57, 0x4B, 0x84, 0xAB, 0x00, 0x00, 0xC7, 0x48,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02,
+                       0x00, 0x00, 0x00, 0x01, 0x10, 0x8E, 0xCA, 0x90,
                        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
                    };
         }

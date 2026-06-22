@@ -164,6 +164,42 @@ namespace AORebirth.Core.Playfields
 
         private const int UnknownPlayfieldSizeFallback = 100000;
 
+        private const int CapturedMontroyalEntrySourcePlayfieldId = 655;
+
+        private const int CapturedMontroyalPrivateCityInstance = 1196045;
+
+        private const float CapturedMontroyalEntrySourceX = 3140.412f;
+
+        private const float CapturedMontroyalEntrySourceY = 51.54391f;
+
+        private const float CapturedMontroyalEntrySourceZ = 799.8611f;
+
+        private const float CapturedMontroyalEntryRadius = 2.5f;
+
+        private const float CapturedMontroyalEntryVerticalTolerance = 6.0f;
+
+        private const float CapturedMontroyalEntryDestinationX = 530.0042f;
+
+        private const float CapturedMontroyalEntryDestinationY = 163.2545f;
+
+        private const float CapturedMontroyalEntryDestinationZ = 580.9957f;
+
+        private const float UserConfirmedMontroyalExitSourceX = 530.4664f;
+
+        private const float UserConfirmedMontroyalExitSourceY = 160.6381f;
+
+        private const float UserConfirmedMontroyalExitSourceZ = 590.7054f;
+
+        private const float UserConfirmedMontroyalExitRadius = 3.0f;
+
+        private const float UserConfirmedMontroyalExitVerticalTolerance = 12.0f;
+
+        private const float UserConfirmedMontroyalExitDestinationX = 3138.2f;
+
+        private const float UserConfirmedMontroyalExitDestinationY = 51.4f;
+
+        private const float UserConfirmedMontroyalExitDestinationZ = 812.8f;
+
         private static readonly TimeSpan DeadNpcDespawnDelay = TimeSpan.FromSeconds(10);
 
         private static readonly TimeSpan CorpseSpawnDelay = TimeSpan.FromMilliseconds(600);
@@ -253,10 +289,32 @@ namespace AORebirth.Core.Playfields
             this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<IMExecuteFunction>(this.ExecuteFunction));
             this.heartBeat = new Timer(this.HeartBeatTimer, null, 10, 0);
 
-            this.statels = PlayfieldLoader.PFData[this.Identity.Instance].Statels;
+            this.statels = ResolvePlayfieldStatels(playfieldIdentity);
             this.LoadMobSpawns(playfieldIdentity);
             this.LoadVendors(playfieldIdentity);
             this.LoadStaticDynels(playfieldIdentity);
+        }
+
+        private static List<StatelData> ResolvePlayfieldStatels(Identity playfieldIdentity)
+        {
+            PlayfieldData playfieldData;
+            if (PlayfieldLoader.PFData.TryGetValue(playfieldIdentity.Instance, out playfieldData))
+            {
+                return playfieldData.Statels;
+            }
+
+            if (IsPrivateCityPlayfieldCandidate(playfieldIdentity))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Zoning,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Dynamic private city instance created without PFData statels instance={0} evidence=live_capture_20260622-101935",
+                        playfieldIdentity));
+                return new List<StatelData>();
+            }
+
+            return PlayfieldLoader.PFData[playfieldIdentity.Instance].Statels;
         }
 
         private void LoadStaticDynels(Identity playfieldIdentity)
@@ -300,10 +358,15 @@ namespace AORebirth.Core.Playfields
 
         private void LoadVendors(Identity playfieldIdentity)
         {
+            PlayfieldData playfieldData;
+            if (!PlayfieldLoader.PFData.TryGetValue(playfieldIdentity.Instance, out playfieldData))
+            {
+                return;
+            }
+
             VendorHandler.SpawnVendorsForPlayfield(
                 this,
-                PlayfieldLoader.PFData[playfieldIdentity.Instance].Statels.Where(
-                    x => x.Identity.Type == IdentityType.VendingMachine).ToArray());
+                playfieldData.Statels.Where(x => x.Identity.Type == IdentityType.VendingMachine).ToArray());
         }
 
         private void LoadMobSpawns(Identity playfieldIdentity)
@@ -654,13 +717,14 @@ namespace AORebirth.Core.Playfields
 
         public static bool IsPrivateCityPlayfieldCandidate(Identity playfieldIdentity)
         {
-            if (playfieldIdentity.Type != IdentityType.Playfield2)
+            if (playfieldIdentity.Type != IdentityType.Playfield
+                && playfieldIdentity.Type != IdentityType.Playfield2)
             {
                 return false;
             }
 
             int instance = playfieldIdentity.Instance;
-            // Live captures observed dynamic private city playfields 0x104868, 0x116000, 0x120005, and 0x121001.
+            // Live captures observed dynamic private city playfields 0x104868, 0x116000, 0x120005, 0x121001, and 0x12400D.
             if (instance < PrivateCityPlayfieldMinInstance || instance > PrivateCityPlayfieldMaxInstance)
             {
                 return false;
@@ -677,11 +741,18 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            this.SendPlayfieldTowersAndCities(client, 1, CreateCapturedPrivateCityAllCitiesPayload());
+            if (this.Identity.Instance == CapturedMontroyalPrivateCityInstance)
+            {
+                this.SendEmptyPlayfieldTowersAndCities(client);
+            }
+            else
+            {
+                this.SendPlayfieldTowersAndCities(client, 1, CreateCapturedPrivateCityAllCitiesPayload());
+            }
 
             client.Server.Info(
                 client,
-                "Private city ready block sent character={0} playfield={1} evidence=live_capture_20260622-092054 live_capture_20260622-093540",
+                "Private city ready block sent character={0} playfield={1} evidence=live_capture_20260622-092054 live_capture_20260622-093540 live_capture_20260622-101935",
                 character.Identity,
                 this.Identity);
         }
@@ -1105,6 +1176,16 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (this.TryHandleCapturedMontroyalPrivateCityEntry(dynel))
+            {
+                return;
+            }
+
+            if (this.TryHandleUserConfirmedMontroyalPrivateCityExit(dynel))
+            {
+                return;
+            }
+
             int dynelId = dynel.Identity.Instance;
             bool initialized = this.statelCollisionInitializedCharacters.Contains(dynelId);
             HashSet<string> activeEnterContacts;
@@ -1209,6 +1290,129 @@ namespace AORebirth.Core.Playfields
             this.statelCollisionInitializedCharacters.Add(dynelId);
         }
 
+        private bool TryHandleCapturedMontroyalPrivateCityEntry(ICharacter character)
+        {
+            if (character == null
+                || this.Identity.Instance != CapturedMontroyalEntrySourcePlayfieldId
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            double deltaX = sourceX - CapturedMontroyalEntrySourceX;
+            double deltaZ = sourceZ - CapturedMontroyalEntrySourceZ;
+            double horizontalDistanceSquared = deltaX * deltaX + deltaZ * deltaZ;
+            double verticalDistance = Math.Abs(sourceY - CapturedMontroyalEntrySourceY);
+            if (horizontalDistanceSquared > CapturedMontroyalEntryRadius * CapturedMontroyalEntryRadius
+                || verticalDistance > CapturedMontroyalEntryVerticalTolerance)
+            {
+                return false;
+            }
+
+            var destination = new Coordinate(
+                CapturedMontroyalEntryDestinationX,
+                CapturedMontroyalEntryDestinationY,
+                CapturedMontroyalEntryDestinationZ);
+            var heading = new AORebirth.Core.Vector.Quaternion(0.0f, 1.0f, 0.0f, -4.371139E-08f);
+
+            character.StopMovement();
+            this.SendCapturedPrivateCityEntrySocialStatus(character);
+            this.Teleport(
+                dynel,
+                destination,
+                heading,
+                new Identity { Type = IdentityType.Playfield, Instance = CapturedMontroyalPrivateCityInstance });
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Montroyal private city entry teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) evidence=live_capture_20260622-101935",
+                    character.Identity.ToString(true),
+                    this.Identity.Instance,
+                    sourceX,
+                    sourceY,
+                    sourceZ,
+                    CapturedMontroyalPrivateCityInstance,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
+        }
+
+        private bool TryHandleUserConfirmedMontroyalPrivateCityExit(ICharacter character)
+        {
+            if (character == null
+                || this.Identity.Instance != CapturedMontroyalPrivateCityInstance
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            double deltaX = sourceX - UserConfirmedMontroyalExitSourceX;
+            double deltaZ = sourceZ - UserConfirmedMontroyalExitSourceZ;
+            double horizontalDistanceSquared = deltaX * deltaX + deltaZ * deltaZ;
+            double verticalDistance = Math.Abs(sourceY - UserConfirmedMontroyalExitSourceY);
+            if (horizontalDistanceSquared > UserConfirmedMontroyalExitRadius * UserConfirmedMontroyalExitRadius
+                || verticalDistance > UserConfirmedMontroyalExitVerticalTolerance)
+            {
+                return false;
+            }
+
+            var destination = new Coordinate(
+                UserConfirmedMontroyalExitDestinationX,
+                UserConfirmedMontroyalExitDestinationY,
+                UserConfirmedMontroyalExitDestinationZ);
+            var heading = new AORebirth.Core.Vector.Quaternion(0.0f, 0.9991581f, 0.0f, 0.04102511f);
+
+            character.StopMovement();
+            this.Teleport(
+                dynel,
+                destination,
+                heading,
+                new Identity { Type = IdentityType.Playfield, Instance = CapturedMontroyalEntrySourcePlayfieldId });
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Montroyal private city exit teleport character={0} sourceInstance={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) evidence=live_capture_20260622-101935 user_extended_location_20260622_180812",
+                    character.Identity.ToString(true),
+                    this.Identity.Instance,
+                    sourceX,
+                    sourceY,
+                    sourceZ,
+                    CapturedMontroyalEntrySourcePlayfieldId,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
+        }
+
         private static string BuildStatelContactKey(StatelData sd)
         {
             return string.Format(
@@ -1238,6 +1442,11 @@ namespace AORebirth.Core.Playfields
         private void CheckWallCollision(ICharacter dynel)
         {
             if (IsPostZoneCollisionGraceActive(dynel))
+            {
+                return;
+            }
+
+            if (!PlayfieldLoader.PFData.ContainsKey(dynel.Playfield.Identity.Instance))
             {
                 return;
             }
@@ -2784,6 +2993,33 @@ namespace AORebirth.Core.Playfields
                 string.Format(
                     CultureInfo.InvariantCulture,
                     "Player death social status target={0} socialStatus=0 unknown=1",
+                    target.Identity));
+        }
+
+        private void SendCapturedPrivateCityEntrySocialStatus(ICharacter target)
+        {
+            target.Send(
+                new StatMessage
+                {
+                    Identity = target.Identity,
+                    Unknown = 1,
+                    Stats =
+                        new[]
+                        {
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = CharacterStat.SocialStatus,
+                                Value2 = 4
+                            }
+                        }
+                },
+                false);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Private city entry social status target={0} socialStatus=4 unknown=1 evidence=live_capture_20260622-101935",
                     target.Identity));
         }
 
