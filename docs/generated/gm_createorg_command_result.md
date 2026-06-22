@@ -1,4 +1,4 @@
-# GM Create Organization Command Result
+# Create Organization Command Result
 
 ## Purpose
 
@@ -6,13 +6,14 @@ Local AORebirth testing needs a way to create an organization without reproducin
 
 ## Result
 
-- Added GM chat command `/command createorg <organization name>`.
+- Added local-testing chat command `/command createorg <organization name>`.
 - Added aliases `/command makeorg <organization name>` and `/command orgcreate <organization name>`.
 - The command creates the organization through `OrganizationDao.CreateOrganization`.
 - `OrganizationDao.CreateOrganization` now initializes required non-null organization text fields before insert.
 - The caller is assigned to the new organization with `clanlevel = 0`.
 - The command rejects callers already in an organization.
 - The command reports and logs insert exceptions instead of failing silently.
+- The command does not require `gmlevel`; this is the local bypass for the live six-character team requirement.
 
 ## Explicit Non-Goals
 
@@ -30,4 +31,8 @@ Local AORebirth testing needs a way to create an organization without reproducin
 - Follow-up `git diff --check`: PASS.
 - Follow-up `tools\build_aorebirth_debug.cmd`: PASS after stopping running engine locks.
 - Follow-up `restart-engines.cmd`: PASS.
+- Follow-up authorization check: `createorg` originally required `gmlevel >= 1`; lowered requirement to `0` for the local-testing bypass.
+- Follow-up authorization fix `git diff --check`: PASS.
+- Follow-up authorization fix `tools\build_aorebirth_debug.cmd`: PASS after stopping running engines.
+- Follow-up authorization fix `restart-engines.cmd`: PASS.
 - User gameplay testing required for `/command createorg <organization name>`.

@@ -2,11 +2,11 @@
 
 ## Active Task
 
-GM organization creation bypass for local testing without a six-character team.
+Organization creation bypass for local testing without a six-character team.
 
 ## Scope
 
-- Add a GM-only chat command that creates an organization through `OrganizationDao.CreateOrganization`.
+- Add a local-testing chat command that creates an organization through `OrganizationDao.CreateOrganization`.
 - Repair `OrganizationDao.CreateOrganization` enough for required organization table fields.
 - Assign the caller to the new organization as rank `0`.
 - Do not enable the full legacy `OrgClient.Read` handler or bypass through packet behavior.
@@ -24,6 +24,7 @@ GM organization creation bypass for local testing without a six-character team.
 - Accepted aliases may include `makeorg` and `orgcreate`.
 - The command should reject callers already in an organization to avoid orphaning existing org membership.
 - The command should report organization insert exceptions to the client and ZoneEngine log.
+- The command must not require `gmlevel`; this is specifically for local testing where a six-character org team is unavailable.
 
 ## Validation Plan
 
@@ -44,4 +45,8 @@ GM organization creation bypass for local testing without a six-character team.
 - Follow-up `stop-engines.cmd`: PASS, used only to clear the build locks.
 - Follow-up second `tools\build_aorebirth_debug.cmd`: PASS.
 - Follow-up `restart-engines.cmd`: PASS.
+- Follow-up authorization check: `createorg` originally required `gmlevel >= 1`; lowered requirement to `0` for the local-testing bypass.
+- Follow-up authorization fix `git diff --check`: PASS.
+- Follow-up authorization fix `tools\build_aorebirth_debug.cmd`: PASS after stopping running engines.
+- Follow-up authorization fix `restart-engines.cmd`: PASS.
 - User gameplay testing required for `/command createorg <organization name>`.
