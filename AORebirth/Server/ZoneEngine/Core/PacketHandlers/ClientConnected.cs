@@ -103,6 +103,7 @@ namespace ZoneEngine.Core.PacketHandlers
             // these packets somewhere else and make packet 
             // builders instead of sending (half) hardcoded
             // packets.
+            GridZoneInDiagnostics.BeginGridZoneIn(client);
 
             /* send chat server info to client */
             ChatServerInfoMessageHandler.Default.Send(client.Controller.Character);

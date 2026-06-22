@@ -169,6 +169,7 @@ namespace ZoneEngine.Core
             {
                 return;
             }
+            GridZoneInDiagnostics.LogOutboundMessage(this, messageBody);
             this.SendCompressed(messageBody, this.server.Id);
         }
 
