@@ -615,6 +615,33 @@ namespace ZoneEngine.Core.MessageHandlers
                 route.HeadingY,
                 route.HeadingZ,
                 route.HeadingW);
+
+            Function rawTeleportFunction;
+            int rawDestinationPlayfieldId;
+            int rawDestinationInstance;
+            if (!this.TryGetGridTeleportProxy2Destination(
+                statelData,
+                out rawTeleportFunction,
+                out rawDestinationPlayfieldId,
+                out rawDestinationInstance))
+            {
+                rawDestinationInstance = 0;
+            }
+
+            StatelData destinationTerminal;
+            this.TryGetGridDestinationTerminal(
+                CapturedGridPlayfieldId,
+                route.DestinationExitTerminalInstance,
+                out destinationTerminal);
+            ZoneEngine.Core.GridZoneInDiagnostics.RecordGridEntry(
+                character,
+                statelData,
+                destinationTerminal,
+                destination,
+                "CapturedGridTerminalRoute",
+                route.Evidence,
+                rawDestinationInstance);
+
             character.Playfield.Teleport(
                 dynel,
                 destination,
@@ -722,6 +749,14 @@ namespace ZoneEngine.Core.MessageHandlers
             character.StopMovement();
             character.Stats[StatIds.externaldoorinstance].BaseValue = 0;
             character.Stats[StatIds.externalplayfieldinstance].BaseValue = 0;
+            ZoneEngine.Core.GridZoneInDiagnostics.RecordGridEntry(
+                character,
+                statelData,
+                destinationTerminal,
+                new Coordinate(destination),
+                "GridTeleportProxy2TerminalRoute",
+                "playfields.dat Enter The Grid template 95350 TeleportProxy2 -> PF152; destination template 95351",
+                destinationInstance);
             character.Playfield.Teleport(
                 dynel,
                 new Coordinate(destination),
