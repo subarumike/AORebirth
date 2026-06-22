@@ -117,7 +117,7 @@ namespace ZoneEngine.ChatCommands
 
         public override int GMLevelNeeded()
         {
-            return 1;
+            return 0;
         }
 
         public override List<string> ListCommands()
