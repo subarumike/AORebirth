@@ -165,6 +165,8 @@ namespace ZoneEngine.Core.MessageHandlers
                     }
                 }
 
+                int cityPlayfieldId = GetOrganizationCityPlayfieldId(orgId);
+
                 if (tPlayer.Stats[StatIds.npcfamily].Value != 0)
                 {
                     type = InfoPacketType.Monster;
@@ -208,7 +210,7 @@ namespace ZoneEngine.Core.MessageHandlers
                                  Unknown2 = 0x0000,
                                  OrganizationRank = orgRank,
                                  TowerFields = null,
-                                 CityPlayfieldId = 0x00000000,
+                                 CityPlayfieldId = cityPlayfieldId,
                                  Towers = null,
                                  InvadersKilled = tPlayer.Stats[StatIds.invaderskilled].Value,
                                  KilledByInvaders = tPlayer.Stats[StatIds.killedbyinvaders].Value,
@@ -229,6 +231,24 @@ namespace ZoneEngine.Core.MessageHandlers
                 
                 x.Identity = tPlayer.Identity;
             };
+        }
+
+        private static int GetOrganizationCityPlayfieldId(int? orgId)
+        {
+            if (!orgId.HasValue || orgId.Value <= 0)
+            {
+                return 0;
+            }
+
+            try
+            {
+                var organization = OrganizationDao.Instance.Get(orgId.Value);
+                return organization == null ? 0 : organization.CityId;
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
         }
 
         #endregion
