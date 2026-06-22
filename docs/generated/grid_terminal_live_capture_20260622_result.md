@@ -27,6 +27,24 @@ Previously captured mapping retained:
 | --- | --- | --- | --- | --- | --- | --- |
 | `655` | `Terminal:C002028F` | `20260621-091447/events.log:255-256,321-322` | `20260621-091447/events.log:645-646` | `(234.3062, 3.7750, 212.8138)` | `(0, 1, 0, -4.371139E-08)` | `Terminal:C04E0098` |
 
+User-submitted follow-up mapping:
+
+| Source PF | Source terminal | Source evidence | Grid landing evidence | Grid landing | Heading | Nearest grid exit |
+| --- | --- | --- | --- | --- | --- | --- |
+| `556` | `Terminal:C002022C` | user extended location before use, 2026-06-22 11:28:44 UTC | user extended location after grid entry, 2026-06-22 11:29:47 UTC | `(202.1, 3.8, 249.8)` | nearest exit statel `(0, 0, 0, 1)` | `Terminal:C0510098` |
+| `565` | `Terminal:C0050235` | user extended location before use, 2026-06-22 11:31:13 UTC | user extended location after grid entry, 2026-06-22 11:36:28 UTC | `(169.5, 37.4, 165.2)` | nearest exit statel `(0, 0, 0, 1)` | `Terminal:C00C0098` |
+| `635` | `Terminal:C003027B` | user extended location before use, 2026-06-22 11:33:25 UTC | user extended location after grid entry, 2026-06-22 11:37:15 UTC | `(188.7, 37.4, 211.1)` | nearest exit statel `(0, 0, 0, 1)` | `Terminal:C0050098` |
+| `646` | `Terminal:C0040286` | user extended location before use, 2026-06-22 11:38:02 UTC | user extended location after grid entry, 2026-06-22 11:38:34 UTC | `(155.4, 3.8, 185.5)` | nearest exit statel `(0, 0, 0, 1)` | `Terminal:C00B0098` |
+| `656` | `Terminal:C0020290` | user extended location before use, 2026-06-22 11:39:15 UTC | user extended location after grid entry, 2026-06-22 11:40:01 UTC | `(219.2, 3.8, 246.4)` | nearest exit statel `(0, 0, 0, 1)` | `Terminal:C0520098` |
+| `665` | `Terminal:C0000299` | user extended location before use, 2026-06-22 11:41:46 UTC | user supplied matching grid-side exit spot, 2026-06-22 11:40:46 UTC | `(239.6, 37.4, 221.6)` | nearest exit statel `(0, 0, 0, 1)` | `Terminal:C00A0098` |
+| `685` | `Terminal:C00502AD` | user extended location before use, 2026-06-22 11:42:26 UTC | user extended location after grid entry, 2026-06-22 11:43:13 UTC | `(215.9, 37.4, 225.7)` | nearest exit statel `(0, 0, 0, 1)` | `Terminal:C0080098` |
+| `695` | `Terminal:C00702B7` | user extended location before use, 2026-06-22 11:44:20 UTC | user supplied matching grid-side exit spot, 2026-06-22 11:43:45 UTC | `(185.1, 37.4, 227.4)` | nearest exit statel `(0, 0, 0, 1)` | `Terminal:C0040098` |
+| `705` | `Terminal:C00302C1` | user extended location before use, 2026-06-22 11:45:45 UTC | user supplied matching grid-side exit spot, 2026-06-22 11:45:23 UTC | `(180.2, 37.4, 248.0)` | nearest exit statel `(0, 0, 0, 1)` | `Terminal:C0020098` |
+| `760` | `Terminal:C00502F8` | user extended location before use, 2026-06-22 11:46:38 UTC | user extended location after grid entry, 2026-06-22 11:47:19 UTC | `(196.6, 37.4, 208.1)` | nearest exit statel `(0, 0, 0, 1)` | `Terminal:C0060098` |
+| `800` | `Terminal:C0040320` | user extended location at outside terminal, 2026-06-22 11:48:20 UTC | user supplied matching grid-side exit spot, 2026-06-22 11:47:52 UTC | `(234.4, 3.8, 198.9)` | nearest exit statel `(0, 0, 0, 1)` | `Terminal:C04C0098` |
+| `6101` | `Terminal:C00017D5` | user extended location before use, 2026-06-22 11:49:30 UTC | user extended location after grid entry, 2026-06-22 11:50:50 UTC | `(218.3, 3.8, 190.7)` | nearest exit statel `(0, 0, 0, 1)` | `Terminal:C0480098` |
+| `6102` | `Terminal:C00017D6` | user extended location at outside terminal, 2026-06-22 11:51:18 UTC | user supplied matching grid-side exit spot, 2026-06-22 11:50:50 UTC | `(218.3, 3.8, 190.7)` | nearest exit statel `(0, 0, 0, 1)` | `Terminal:C0480098` |
+
 ## Statel inspection
 
 `playfields.dat` reports all inspected source terminals as `TemplateId 95350` with raw `TeleportProxy2` args `[51102,152,0,0]`, which computes destination instance `C0000098`. Live capture proves this raw proxy tuple is not enough to derive the real grid-side landing for every terminal.
@@ -35,4 +53,4 @@ Read-only `teleports` table inspection found no terminal-row override for `C0010
 
 ## Implementation rule
 
-Use captured route entries for the terminals above. For terminals without capture-backed landing evidence, keep the existing statel-based route path; do not assign them one of these captured landings unless later capture proves it.
+Use captured/user-submitted route entries for the terminals above. For terminals without landing evidence, keep the existing statel-based route path; do not assign them one of these captured landings unless later evidence proves it.

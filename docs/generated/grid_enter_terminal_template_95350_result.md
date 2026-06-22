@@ -34,4 +34,4 @@ Capture `20260622-003221` proves additional terminal-specific landings even thou
 
 ## Implementation
 
-The server now handles `TemplateId 95350` terminals whose `OnUse` event has `TeleportProxy2` to playfield `152`. It preserves the statel requirements and failure feedback, resolves destination statels by instance plus `TemplateId 95351`, and applies live-captured route entries for terminals whose exact grid landing has been captured. `Terminal:C0040320` and `Terminal:C002022C` still need capture-backed destination confirmation before they should receive terminal-specific captured landings.
+The server now handles `TemplateId 95350` terminals whose `OnUse` event has `TeleportProxy2` to playfield `152`. It preserves the statel requirements and failure feedback, resolves destination statels by instance plus `TemplateId 95351`, and applies live-captured/user-submitted route entries for terminals whose exact grid landing has been captured. `Terminal:C002022C` and `Terminal:C0040320` now have user-submitted landing evidence documented in `docs/generated/grid_terminal_live_capture_20260622_result.md`.
