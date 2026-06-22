@@ -60,6 +60,37 @@ namespace ZoneEngine.Core.PacketHandlers
         /// </param>
         /// <param name="client">
         /// </param>
+        public static bool TryHandleCapturedCityControllerBankAdd(OrgClientMessage message, ZoneClient client)
+        {
+            if (message == null
+                || client == null
+                || message.Command != OrgClientCommand.BankAdd
+                || message.Target.Type != IdentityType.CityController)
+            {
+                return false;
+            }
+
+            Identity characterIdentity = client.Controller == null || client.Controller.Character == null
+                                             ? Identity.None
+                                             : client.Controller.Character.Identity;
+
+            client.Server.Info(
+                client,
+                "OrgClient BankAdd routed to CityController character={0} target={1} unknown1={2} args={3} evidence=live_capture_20260622-073015 no_state_change=1",
+                characterIdentity,
+                message.Target,
+                message.Unknown1,
+                message.CommandArgs ?? string.Empty);
+
+            return true;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="message">
+        /// </param>
+        /// <param name="client">
+        /// </param>
         public static void Read(OrgClientMessage message, ZoneClient client)
         {
             switch ((byte)message.Command)

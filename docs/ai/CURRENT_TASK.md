@@ -2,47 +2,45 @@
 
 ## Active Task
 
-Investigate private-server Grid crash around Grid entry and PF152 floor-pad movement.
+Implement first-layer private-city and CityController compatibility plumbing from live capture `20260622-073015`.
 
 ## Current Scope
 
-- Do not launch the game.
-- Do not live test.
-- Keep changes scoped to Grid entry routing, Grid zone-in object diagnostics, PF152 Grid floor-pad teleport handling, and static/build validation.
+- Do not continue Grid work.
+- Do not hardcode captured private-city playfield IDs as permanent behavior.
+- Do not split `Playfield.cs`.
 - Do not change database schemas or data.
-- Preserve existing terminal-specific Grid landing routes.
+- Do not implement full city-bank, org-bank persistence, city ownership, guest-key generation, or item semantics.
+- Packet-sensitive behavior must remain backed by the live capture.
 
 ## Current Evidence
 
-- Crash occurs in the Grid on the private server.
-- Client crash signature includes `E06D7363`, `KERNELBASE.dll`, `MSVCR100.dll`, repeated `N3.dll` / `Vehicle.dll`, recurring `Vehicle.dll` frame `0001:0000D906`, and repeated stack value `00000012`.
-- Existing Grid entry code handles captured terminal-specific routes first, then falls back to `TeleportProxy2` destination reconstruction for template `95350` terminals.
-- Existing PF `152` Grid exit statels use template `95351`.
-- `0x12` is not an AORebirth `IdentityType`; when interpreted as an AORebirth stat id, decimal `18` maps to `StatIds.stamina`.
-- Live private-server diagnostic after entering from `PF545 Terminal:C0020221` showed the Grid entry route is correct: destination `PF152 Terminal:C0000098`, landing `(170.077,4.600,243.439)`.
-- The repeated `0x12` value in the post-zone-in diagnostics is the logged-in character instance `CanbeAffected:18`, not a Vehicle object route.
-- No outbound Grid zone-in object was classified as `Vehicle`; emitted object classes were `Playfield2`, `CanbeAffected`, and `WeaponInstance`.
-- The crash/reconnect path occurred after stepping on PF152 floor pad `Terminal:C0160098`, which fired `OnTargetInVicinity`/`LineTeleport` and was handled as a full PF152-to-PF152 zone transfer.
-- User-submitted Coast of Peace `Terminal:C002022C` route evidence: source `(1805.0, 14.1, 622.3)` in PF `556`, grid landing `(202.1, 3.8, 249.8)` in PF `152`, nearest grid exit `Terminal:C0510098`.
-- User-submitted grid route batch from `C:\Users\Mike\.codex\attachments\2434b879-40ce-4adb-86b9-eb0c31a7d760\pasted-text.txt` added or corrected route evidence for `Terminal:C0050235`, `Terminal:C003027B`, `Terminal:C0040286`, `Terminal:C0020290`, `Terminal:C0000299`, `Terminal:C00502AD`, `Terminal:C00702B7`, `Terminal:C00302C1`, `Terminal:C00502F8`, `Terminal:C0040320`, `Terminal:C00017D5`, and `Terminal:C00017D6`.
+- Live capture `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260622-073015` is authoritative for this task.
+- Captured private-city playfield identities included `Playfield2:116000`, `Playfield2:120005`, and `Playfield2:121001`.
+- Captured private-city zone-in received empty `PlayfieldAllTowers` and empty `PlayfieldAllCities`.
+- Captured CityController use sent `GenericCmd Action=Use` to `CityController:9C8818` and received a success ack with `Temp1=1`, the same count, action, temp4, user, and target.
+- Captured city-bank UI emitted `OrgClient BankAdd` command `19` targeting `CityController:9C8818` with command arg text `300000000`.
+- No live server response behavior was captured for the `OrgClient BankAdd` command, so no money or persistence semantics are implemented.
+
+## Implementation Plan
+
+- Reuse the existing empty playfield towers/cities send block for normal private-city zone connect.
+- Add explicit `CityController` use handling in `GenericCmdMessageHandler`.
+- Subscribe an inbound `OrgClientMessage` handler for safe `BankAdd` recognition and logging only.
+- Add a generated result note under `docs/generated/`.
 
 ## Validation Plan
 
 - Run `cmd /d /c git diff --check`.
-- Run `cmd /d /c tools\build_aorebirth_debug.cmd` if engines are stopped, or a focused temp-output ZoneEngine build if `ZoneEngine.exe` is locked by a live server.
-- No Codex game launch or Codex live smoke in this task; Mike live smoke is authoritative.
+- Run `cmd /d /c tools\build_aorebirth_debug.cmd`.
+- Run `cmd /d /c restart-engines.cmd` after rebuild.
+- Prefer Mike live smoke for private-city zone-in, CityController use ack, and `OrgClient BankAdd` safe routing.
 
 ## Validation Result
 
 - `cmd /d /c git diff --check`: PASS.
-- First `cmd /d /c tools\build_aorebirth_debug.cmd`: blocked by running `ZoneEngine` PID `21928` locking `AORebirth\Built\Debug\ZoneEngine.exe`.
+- First `cmd /d /c tools\build_aorebirth_debug.cmd`: blocked only by running `ZoneEngine` PID `4736` locking `AORebirth\Built\Debug\ZoneEngine.exe`.
 - `cmd /d /c stop-engines.cmd`: PASS, used only to clear the build lock.
 - Second `cmd /d /c tools\build_aorebirth_debug.cmd`: PASS.
-- Current Grid floor-pad fix `cmd /d /c git diff --check`: PASS.
-- Current full `cmd /d /c tools\build_aorebirth_debug.cmd`: blocked only by running `ZoneEngine` PID `23692` locking `AORebirth\Built\Debug\ZoneEngine.exe`; engines were not stopped because Mike was logged in.
-- Current temp-output ZoneEngine build with `OutDir=../../Built/CodexValidation/`: PASS.
-- Codex performed no game launch or live smoke.
-- Mike live smoke after the Grid floor-pad fix: PASS, no crash.
-- Grid route batch full build: PASS.
-- Grid route batch restart: PASS.
-- User smoke check for updated grid route table: PASS.
+- `cmd /d /c restart-engines.cmd`: PASS.
+- AOSharp smoke capture `20260622-081427` completed cleanly with no capture issues, but it stayed in `Playfield2:028F`; no private-city, CityController, or `OrgClient BankAdd` smoke evidence was produced.

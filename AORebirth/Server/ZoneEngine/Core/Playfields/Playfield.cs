@@ -158,6 +158,12 @@ namespace AORebirth.Core.Playfields
 
         private const int DeathRespawnActionParameter2 = 295830;
 
+        private const int PrivateCityPlayfieldMinInstance = 0x110000;
+
+        private const int PrivateCityPlayfieldMaxInstance = 0x12FFFF;
+
+        private const int UnknownPlayfieldSizeFallback = 100000;
+
         private static readonly TimeSpan DeadNpcDespawnDelay = TimeSpan.FromSeconds(10);
 
         private static readonly TimeSpan CorpseSpawnDelay = TimeSpan.FromMilliseconds(600);
@@ -644,6 +650,40 @@ namespace AORebirth.Core.Playfields
         public int NumberOfPlayers()
         {
             return Pool.Instance.GetAll<Character>((int)IdentityType.CanbeAffected).Count();
+        }
+
+        public static bool IsPrivateCityPlayfieldCandidate(Identity playfieldIdentity)
+        {
+            if (playfieldIdentity.Type != IdentityType.Playfield2)
+            {
+                return false;
+            }
+
+            int instance = playfieldIdentity.Instance;
+            // Live capture 20260622-073015 observed 0x116000, 0x120005, and 0x121001.
+            if (instance < PrivateCityPlayfieldMinInstance || instance > PrivateCityPlayfieldMaxInstance)
+            {
+                return false;
+            }
+
+            return Playfields.GetPlayfieldX(instance) == UnknownPlayfieldSizeFallback
+                   && Playfields.GetPlayfieldZ(instance) == UnknownPlayfieldSizeFallback;
+        }
+
+        public void SendPrivateCityPlayfieldReadyBlock(ZoneClient client, ICharacter character)
+        {
+            if (client == null || character == null || !IsPrivateCityPlayfieldCandidate(this.Identity))
+            {
+                return;
+            }
+
+            this.SendEmptyPlayfieldTowersAndCities(client);
+
+            client.Server.Info(
+                client,
+                "Private city ready block sent character={0} playfield={1} evidence=live_capture_20260622-073015",
+                character.Identity,
+                this.Identity);
         }
 
         /// <summary>
@@ -2872,6 +2912,23 @@ namespace AORebirth.Core.Playfields
 
         private void SendDeathRespawnPlayfieldReadyBlock(ZoneClient client, ICharacter character)
         {
+            this.SendEmptyPlayfieldTowersAndCities(client);
+
+            client.SendCompressed(
+                new SpecialAttackWeaponMessage
+                {
+                    Identity = character.Identity,
+                    Specials = CreateDefaultPlayerSpecialAttacks(),
+                    Unknown1 = 6,
+                    Unknown2 = 6,
+                    Unknown3 = 6,
+                    Unknown4 = 6,
+                    Unknown5 = 100
+                });
+        }
+
+        private void SendEmptyPlayfieldTowersAndCities(ZoneClient client)
+        {
             var playfieldIdentity = new Identity
                                     {
                                         Type = IdentityType.Playfield2,
@@ -2890,18 +2947,6 @@ namespace AORebirth.Core.Playfields
                 {
                     Identity = playfieldIdentity,
                     Payload = new byte[0]
-                });
-
-            client.SendCompressed(
-                new SpecialAttackWeaponMessage
-                {
-                    Identity = character.Identity,
-                    Specials = CreateDefaultPlayerSpecialAttacks(),
-                    Unknown1 = 6,
-                    Unknown2 = 6,
-                    Unknown3 = 6,
-                    Unknown4 = 6,
-                    Unknown5 = 100
                 });
         }
 

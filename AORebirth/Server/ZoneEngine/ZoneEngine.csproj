@@ -223,6 +223,7 @@
     <Compile Include="Core\MessageHandlers\KnuBotStartTradeMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\KnuBotTradeMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\LookAtMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\OrgClientMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\PlayfieldAnarchyFMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ResearchRequestMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ResearchUpdateMessageHandler.cs" />

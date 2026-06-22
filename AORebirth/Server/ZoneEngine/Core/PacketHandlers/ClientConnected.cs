@@ -177,6 +177,11 @@ client.Controller.Character.Playfield.Identity,
             /* inventory, items and all that */
             Packets.WeaponItemFullUpdate.SendWeaponDefinitions(client.Controller.Character);
             FullCharacterMessageHandler.Default.Send(client.Controller.Character);
+            Playfield currentPlayfield = client.Controller.Character.Playfield as Playfield;
+            if (currentPlayfield != null)
+            {
+                currentPlayfield.SendPrivateCityPlayfieldReadyBlock(client, client.Controller.Character);
+            }
 
             var specials = new[]
                            {
