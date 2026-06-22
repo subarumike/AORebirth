@@ -170,6 +170,7 @@ namespace ZoneEngine.Core
                 return;
             }
             GridZoneInDiagnostics.LogOutboundMessage(this, messageBody);
+            WorldEntrySummary.RecordOutboundMessage(this, messageBody);
             this.SendCompressed(messageBody, this.server.Id);
         }
 
