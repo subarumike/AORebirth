@@ -21,14 +21,14 @@ Identify dirty files before editing. Do not revert user or previous-agent work u
 
 ## Command Syntax Safety
 
-- Do not improvise shell syntax. Use repository-approved command forms, documented wrappers, and simple shell-safe commands.
-- Prevention comes first: do not run command probes, line-count probes, empty-pattern commands, placeholder commands, or shell-syntax experiments unless the task explicitly requires them. Reporting a malformed command after the fact is not sufficient.
+- Do not improvise shell syntax. Use repository-approved command forms, documented wrappers, and simple shell-safe commands. Malformed command syntax must be prevented, not merely corrected after failure.
+- Agents must not run probe commands, line-count probes, empty-pattern commands, placeholder commands, or shell-syntax experiments unless the task explicitly requires them. Required file inspection must use known-good targeted read commands only. A malformed probe command is an agent workflow violation even if it causes no repo change. Reporting the bad command afterward is not enough; prevention is required.
 - Do not run line-count probes just to prove a file exists or estimate file size.
 - Do not run `find`, `findstr`, `rg`, `grep`, `dir`, or similar commands with empty patterns, placeholder arguments, or syntax experiments.
 - Required workflow-doc reads must use known-good targeted read commands only.
 - If a file needs to be inspected, read the relevant section directly using a known-good command form.
 - A malformed probe command is still an agent workflow violation even if it caused no repo change.
-- Malformed command syntax is an agent error, not a project blocker. If a command fails because of quoting, shell syntax, escaped characters, regex syntax, or path quoting, immediately rerun the task once with a simpler command form.
+- Malformed command syntax is an agent execution error, not a project blocker. Malformed search, find, rg, grep, dir, or line-count commands are agent execution errors, not project blockers. If a command fails because of quoting, shell syntax, escaped characters, regex syntax, or path quoting, immediately rerun the task once with a simpler command form.
 - Search commands must be shell-safe. For ripgrep on Windows/cmd workflows, prefer repeated `-e` patterns instead of complex quoted regex strings.
 - Good:
 
