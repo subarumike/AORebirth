@@ -72,6 +72,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         GoverningForm = 27, 
 
-        StopVote = 28
+        StopVote = 28,
+
+        CityAdvantages = 31
     }
 }

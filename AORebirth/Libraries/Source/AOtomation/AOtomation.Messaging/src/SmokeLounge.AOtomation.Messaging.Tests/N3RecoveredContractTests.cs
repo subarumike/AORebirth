@@ -20,6 +20,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             Assert.AreEqual(0x36510078, (int)N3MessageType.ToClientQuit);
             Assert.AreEqual(0x36510078, (int)N3MessageType.Despawn);
+            Assert.AreEqual(0x365E555B, (int)N3MessageType.CityAdvantages);
             Assert.AreEqual(0x47483633, (int)N3MessageType.DropDynel);
             Assert.AreEqual(0x264B514B, (int)N3MessageType.RelocateDynels);
             Assert.AreEqual(0x4C530320, (int)N3MessageType.LocalityUpdate);
@@ -447,6 +448,89 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0x1999, decoded.PlayfieldId1.Instance);
             Assert.AreEqual(128, decoded.GeneratorPayload.Length);
             CollectionAssert.AreEqual(body, Serialize(decoded));
+        }
+
+        [TestMethod]
+        public void PrivateCityAdvantagesResponseMatchesCapturedBody()
+        {
+            var message = new CityAdvantagesMessage
+                          {
+                              Identity = new Identity { Type = IdentityType.CanbeAffected, Instance = 0x3CAC6F14 },
+                              Unknown = 1,
+                              Advantages =
+                                  new[]
+                                  {
+                                      new CityAdvantage { LowId = 254403, HighId = 254403, QualityLevel = 300, Unknown = 0 },
+                                      new CityAdvantage { LowId = 254387, HighId = 254387, QualityLevel = 300, Unknown = 0 },
+                                      new CityAdvantage { LowId = 254406, HighId = 254406, QualityLevel = 300, Unknown = 0 },
+                                      new CityAdvantage { LowId = 254395, HighId = 254395, QualityLevel = 300, Unknown = 0 }
+                                  }
+                          };
+
+            byte[] body = HexToBytes(
+                "365E555B0000C3503CAC6F1401000000040003E1C30003E1C30000012C000000000003E1B30003E1B30000012C000000000003E1C60003E1C60000012C000000000003E1BB0003E1BB0000012C00000000");
+
+            CollectionAssert.AreEqual(body, Serialize(message));
+
+            var decoded = (CityAdvantagesMessage)Deserialize<CityAdvantagesMessage>(body);
+            Assert.AreEqual(4, decoded.Advantages.Length);
+            Assert.AreEqual(254403, decoded.Advantages[0].LowId);
+            CollectionAssert.AreEqual(body, Serialize(decoded));
+        }
+
+        [TestMethod]
+        public void PrivateCityGuestAccessCardPacketsMatchCapturedBodies()
+        {
+            Identity character = new Identity { Type = IdentityType.CanbeAffected, Instance = 0x3CAC6F14 };
+            var item = new SimpleItemFullUpdateMessage
+                       {
+                           Identity = new Identity { Type = (IdentityType)0x0000C770, Instance = 0x006E0001 },
+                           Unknown = 0,
+                           MsgVersion = 0x0B,
+                           Identitytype = (int)character.Type,
+                           Instance = character.Instance,
+                           Playfield = 0x00104868,
+                           Unknown1 = new Identity { Type = (IdentityType)0x000F424F, Instance = 0 },
+                           Unknown2 = 0x71,
+                           Unknown3 = 0x6F,
+                           Stats =
+                               new[]
+                               {
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.Flags, Value2 = 1 },
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.StaticInstance, Value2 = 280642 },
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.ACGItemLevel, Value2 = 1 },
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.ACGItemTemplateID, Value2 = 280642 },
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.ACGItemTemplateID2, Value2 = 280642 },
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.MultipleCount, Value2 = 1 },
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.BuildingType, Value2 = 0x0000C79E },
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.BuildingInstance, Value2 = 0x0000177A },
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.CardOwnerType, Value2 = 0x000186A1 },
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.CardOwnerInstance, Value2 = 0x0001177A },
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.BuildingComplexInst, Value2 = 0xC017028F },
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.AccessKey, Value2 = 0 },
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.ExternalPlayfieldInstance, Value2 = 0x0014E80A },
+                                   new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.TimeExist, Value2 = 90000 }
+                               },
+                           Name = string.Empty
+                       };
+
+            CollectionAssert.AreEqual(
+                HexToBytes(
+                    "3B11256F0000C770006E0001000000000B0000C3503CAC6F1400104868000F424F00000000716F00003B1F00000000000000010000001700044842000002BD00000001000002BE00044842000002BF000448420000019C00000001000000B80000C79E000000B90000177A000000BA000186A1000000BB0001177A000000BCC017028F000000C300000000000000C00014E80A0000000800015F9000000000"),
+                Serialize(item));
+
+            var addToOverflow = new ContainerAddItemMessage
+                                {
+                                    Identity = character,
+                                    Unknown = 0,
+                                    SourceContainer = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
+                                    Target = new Identity { Type = IdentityType.OverflowWindow, Instance = character.Instance },
+                                    TargetPlacement = 0x6F
+                                };
+
+            CollectionAssert.AreEqual(
+                HexToBytes("47537A240000C3503CAC6F14000000006E000000000000006E3CAC6F140000006F"),
+                Serialize(addToOverflow));
         }
 
         [TestMethod]

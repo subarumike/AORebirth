@@ -158,7 +158,7 @@ namespace AORebirth.Core.Playfields
 
         private const int DeathRespawnActionParameter2 = 295830;
 
-        private const int PrivateCityPlayfieldMinInstance = 0x110000;
+        private const int PrivateCityPlayfieldMinInstance = 0x100000;
 
         private const int PrivateCityPlayfieldMaxInstance = 0x12FFFF;
 
@@ -660,7 +660,7 @@ namespace AORebirth.Core.Playfields
             }
 
             int instance = playfieldIdentity.Instance;
-            // Live capture 20260622-073015 observed 0x116000, 0x120005, and 0x121001.
+            // Live captures observed dynamic private city playfields 0x104868, 0x116000, 0x120005, and 0x121001.
             if (instance < PrivateCityPlayfieldMinInstance || instance > PrivateCityPlayfieldMaxInstance)
             {
                 return false;
@@ -677,11 +677,11 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            this.SendEmptyPlayfieldTowersAndCities(client);
+            this.SendPlayfieldTowersAndCities(client, 1, CreateCapturedPrivateCityAllCitiesPayload());
 
             client.Server.Info(
                 client,
-                "Private city ready block sent character={0} playfield={1} evidence=live_capture_20260622-073015",
+                "Private city ready block sent character={0} playfield={1} evidence=live_capture_20260622-092054 live_capture_20260622-093540",
                 character.Identity,
                 this.Identity);
         }
@@ -2929,6 +2929,11 @@ namespace AORebirth.Core.Playfields
 
         private void SendEmptyPlayfieldTowersAndCities(ZoneClient client)
         {
+            this.SendPlayfieldTowersAndCities(client, 0, new byte[0]);
+        }
+
+        private void SendPlayfieldTowersAndCities(ZoneClient client, byte cityUnknown, byte[] cityPayload)
+        {
             var playfieldIdentity = new Identity
                                     {
                                         Type = IdentityType.Playfield2,
@@ -2946,8 +2951,33 @@ namespace AORebirth.Core.Playfields
                 new PlayfieldAllCitiesMessage
                 {
                     Identity = playfieldIdentity,
-                    Payload = new byte[0]
+                    Unknown = cityUnknown,
+                    Payload = cityPayload ?? new byte[0]
                 });
+        }
+
+        private static byte[] CreateCapturedPrivateCityAllCitiesPayload()
+        {
+            return new byte[]
+                   {
+                       0x00, 0x00, 0x00, 0x05, 0x44, 0x5C, 0x00, 0x00,
+                       0x40, 0xA0, 0x00, 0x00, 0x44, 0xB5, 0x80, 0x00,
+                       0x00, 0x00, 0x00, 0xB4, 0x00, 0x00, 0x0F, 0x42,
+                       0x68, 0x00, 0x6A, 0x00, 0x6D, 0x44, 0x62, 0x00,
+                       0x00, 0x40, 0xA0, 0x00, 0x00, 0x44, 0xB0, 0x80,
+                       0x00, 0x00, 0x00, 0x00, 0xB4, 0x00, 0x00, 0x0F,
+                       0x42, 0x68, 0x00, 0x6A, 0x00, 0x6E, 0x44, 0x80,
+                       0x80, 0x00, 0x40, 0xA0, 0x00, 0x00, 0x44, 0xA9,
+                       0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                       0x0F, 0x42, 0x68, 0x00, 0x6A, 0x00, 0x68, 0x44,
+                       0x85, 0x80, 0x00, 0x40, 0xA0, 0x00, 0x00, 0x44,
+                       0xB0, 0x80, 0x00, 0x00, 0x00, 0x00, 0x5A, 0x00,
+                       0x00, 0x0F, 0x42, 0x68, 0x00, 0x6A, 0x00, 0x66,
+                       0x44, 0x87, 0x80, 0x00, 0x40, 0xA0, 0x00, 0x00,
+                       0x44, 0xA9, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
+                       0x00, 0x00, 0x0F, 0x42, 0x68, 0x00, 0x6A, 0x00,
+                       0x75
+                   };
         }
 
         private static SpecialAttack[] CreateDefaultPlayerSpecialAttacks()
