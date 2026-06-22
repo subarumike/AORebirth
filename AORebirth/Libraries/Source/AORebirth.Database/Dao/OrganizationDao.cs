@@ -69,6 +69,10 @@ namespace AORebirth.Database.Dao
                 newOrganization.LeaderId = leaderId;
                 newOrganization.Creation = creationDate;
                 newOrganization.Name = desiredOrgName;
+                newOrganization.Description = string.Empty;
+                newOrganization.Objective = string.Empty;
+                newOrganization.History = string.Empty;
+                newOrganization.Comission = 1;
                 this.Add(newOrganization);
             }
 
