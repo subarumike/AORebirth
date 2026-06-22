@@ -174,6 +174,8 @@ namespace AORebirth.Core.Playfields
 
         private const int RubiKaStartPlayfield = 4582;
 
+        private const int GridPlayfield = 152;
+
         private const int RubiKaStartX = 939;
 
         private const int RubiKaStartY = 20;
@@ -692,6 +694,12 @@ namespace AORebirth.Core.Playfields
             {
                 return;
             }
+
+            if (this.TryCompleteGridTeleportInCurrentPlayfield(dynel, destination, heading, playfield))
+            {
+                return;
+            }
+
             Thread.Sleep(200);
             int dynelId = dynel.Identity.Instance;
             this.statelEnterContacts.Remove(dynelId);
@@ -768,6 +776,62 @@ namespace AORebirth.Core.Playfields
                 client.SendCompressed(redirect);
             }
             // client.Server.DisconnectClient(client);
+        }
+
+        private bool TryCompleteGridTeleportInCurrentPlayfield(
+            Dynel dynel,
+            Coordinate destination,
+            IQuaternion heading,
+            Identity playfield)
+        {
+            if (this.Identity.Instance != GridPlayfield
+                || playfield.Type != this.Identity.Type
+                || playfield.Instance != this.Identity.Instance)
+            {
+                return false;
+            }
+
+            ICharacter character = dynel as ICharacter;
+            if (character == null
+                || character.Controller == null
+                || character.Controller.Client == null)
+            {
+                return false;
+            }
+
+            float fromX = dynel.RawCoordinates.X;
+            float fromY = dynel.RawCoordinates.Y;
+            float fromZ = dynel.RawCoordinates.Z;
+
+            TeleportMessageHandler.Default.SendLocal(
+                character,
+                destination.coordinate,
+                new AORebirth.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf));
+
+            dynel.RawCoordinates = new AORebirth.Core.Vector.Vector3
+                                   {
+                                       x = destination.x,
+                                       y = destination.y,
+                                       z = destination.z
+                                   };
+            dynel.RawHeading = new AORebirth.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
+            this.PrimeStatelCollisionContacts(character);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Grid current-playfield teleport completed character={0} playfield={1} fromCoords={2:F1},{3:F1},{4:F1} toCoords={5:F1},{6:F1},{7:F1}",
+                    dynel.Identity.ToString(true),
+                    this.Identity.Instance,
+                    fromX,
+                    fromY,
+                    fromZ,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
         }
 
         /// <summary>
