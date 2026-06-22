@@ -573,6 +573,17 @@ namespace ZoneEngine.Core.MessageHandlers
                             this.Acknowledge(client.Controller.Character, message);
                         }
                     }
+                    else if (target.Type == IdentityType.CityController)
+                    {
+                        this.Acknowledge(client.Controller.Character, message);
+                        client.Server.Info(
+                            client,
+                            "CityController use acknowledged character={0} target={1} count={2} temp4={3} evidence=live_capture_20260622-073015",
+                            client.Controller.Character.Identity,
+                            target,
+                            message.Count,
+                            message.Temp4);
+                    }
                     else if (target.Type == IdentityType.Corpse)
                     {
                         bool used = client.Controller.Character.Playfield.TryUseCorpse(
