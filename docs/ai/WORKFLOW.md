@@ -19,6 +19,28 @@ Identify dirty files before editing. Do not revert user or previous-agent work u
 - If no wrapper exists for a recurring task, create the smallest practical `cmd.exe` wrapper only when that is within the task scope, then document that wrapper as the approved entrypoint.
 - If the documented command is missing, ambiguous, or outdated, stop and report the documentation gap. Do not improvise a discovery session.
 
+## Command Syntax Safety
+
+- Do not improvise shell syntax. Use repository-approved command forms, documented wrappers, and simple shell-safe commands.
+- Malformed command syntax is an agent error, not a project blocker. If a command fails because of quoting, shell syntax, escaped characters, regex syntax, or path quoting, immediately rerun the task once with a simpler command form.
+- Search commands must be shell-safe. For ripgrep on Windows/cmd workflows, prefer repeated `-e` patterns instead of complex quoted regex strings.
+- Good:
+
+```bat
+cmd /d /c rg -n -e "PatternOne" -e "PatternTwo" AORebirth\Server
+```
+
+- Bad:
+
+```bat
+rg -n 'PatternOne|PatternTwo' "AORebirth/Server"
+rg -n "(PatternOne|PatternTwo)" "path with nested quoting"
+```
+
+- Do not combine fragile quoting with paths containing spaces. Use simpler searches, narrower paths, or multiple safe commands instead.
+- Keep output compact. Do not dump full files, full logs, broad recursive output, or noisy command output into chat or the context window. Use targeted searches, line-numbered snippets, and concise summaries.
+- If a malformed command happened, final reporting must include the failed command category, the corrected safe command form used, and confirmation that the malformed command did not change repo state. Do not paste a giant output dump.
+
 ## Command Budget And Context Protection
 
 - Protect the context window as a project resource.
