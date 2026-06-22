@@ -20,6 +20,8 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Do not guess packet behavior; unresolved packet semantics must stay unresolved until evidence-backed.
 - For current AO client behavior bugs, treat the live AO client as authoritative, start with live capture or existing capture review whenever feasible, and base repairs on confirmed live packet/message behavior when available.
 - Capture-derived content must be identity-first. Display names, proximity, screenshots, or plausible templates cannot define runtime data.
+- Known workflow commands are project contracts. Use documented wrappers before exploration, protect the context window from command spam or large output, and never launch the AO game/client unless Mike explicitly instructs it in the current task.
+- AOSharp live capture startup for Codex is `cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "<AO window title>"`, or `--pid <ao-client-pid>` only when Mike provides the process id. Do not use deprecated PowerShell capture startup or rediscover the workflow before running the wrapper.
 - Cargo Box identity is exactly `Terminal:56D9B4AF`; do not substitute nearby terminals, rendered labels, templates, meshes, or inferred anchors.
 - `CharacterAction` action `59` remains unresolved. Do not treat it as offer, accept, complete, fail, abandon, reward, or persistence semantics.
 - Rex chain state is process-local/in-memory only. There is no DB mission persistence.

@@ -10,6 +10,27 @@ git status --short --branch
 
 Identify dirty files before editing. Do not revert user or previous-agent work unless Mike explicitly asks.
 
+## Known Workflow First
+
+- Before exploratory commands, check the project AI docs for the documented workflow.
+- For known workflows, use the documented command first.
+- If a wrapper exists, use the wrapper.
+- Do not bypass wrappers with hand-rolled command chains unless the wrapper itself is broken and the task is specifically to repair it.
+- If no wrapper exists for a recurring task, create the smallest practical `cmd.exe` wrapper only when that is within the task scope, then document that wrapper as the approved entrypoint.
+- If the documented command is missing, ambiguous, or outdated, stop and report the documentation gap. Do not improvise a discovery session.
+
+## Command Budget And Context Protection
+
+- Protect the context window as a project resource.
+- For known workflow startup, use at most one command to start the tool.
+- Use at most one optional command to verify expected output only if required.
+- Use at most one optional command to inspect a targeted failure log only if the start command fails.
+- Do not rediscover known commands with repo-wide searches, directory sweeps, process sweeps, tasklist sweeps, repeated log reads, or source-code inspection.
+- Prefer exact known paths over discovery commands.
+- Prefer targeted file reads over broad searches.
+- Do not paste large command output, long transcripts, repeated directory listings, tasklist output, full logs, or broad search results into chat.
+- When a command is expected to be noisy, redirect output to a local log file and summarize only the result, exact command, relevant path, or smallest relevant error.
+
 ## Command Permissions
 
 - Run shell, Git, build, test, validation, and capture commands normally first.
@@ -77,6 +98,34 @@ cmd /d /c restart-engines.cmd
 - Mike performs live client playtests.
 - Do not ask Mike to run commands inside the game when Codex can run external tooling.
 - Do not run PowerShell or `.ps1` live capture wrappers from Codex; use `cmd.exe` or Git Bash workflows.
+- Never launch the AO game/client automatically unless Mike explicitly instructs it in the current task.
+- Live game testing is manual by Mike. Codex may build, validate, inspect files, or prepare capture tools only within the documented workflow.
+
+### AOSharp Live Capture Startup
+
+Approved startup command:
+
+```cmd
+cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "<AO window title>"
+```
+
+Alternative when Mike provides the client process id:
+
+```cmd
+cmd /d /c tools-temp\start-aosharp-live-capture.cmd --pid <ao-client-pid>
+```
+
+This wrapper is the only approved Codex startup command for AOSharp live capture. It starts the existing AOSharp injector against an already-running AO client and reports only the exact injector command, success or failure, capture output path, and failure log path. It does not launch the AO game/client.
+
+Before running the wrapper, do not run `rg`, `dir`, `tasklist`, recursive searches, process sweeps, source inspection, build-folder enumeration, or old-log scraping to rediscover how capture startup works. Use the wrapper directly.
+
+Do not inspect AOSharp capture source code, search for command names, enumerate build folders, or read old capture logs unless the wrapper fails or Mike explicitly asks for investigation.
+
+If the wrapper fails, run at most one targeted failure-log inspection command, summarize the smallest relevant failure, identify the likely broken doc, wrapper, missing build output, or runtime prerequisite, then stop unless Mike asked for repair. The approved targeted failure check is:
+
+```cmd
+cmd /d /c findstr /C:"ERROR:" tools-temp\AOSharpLiveInjector\bin\Debug\AOSharpLiveInjector-start.log
+```
 
 ## Live Client Behavior Bugs
 

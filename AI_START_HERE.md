@@ -14,4 +14,6 @@ Expected startup context/read order:
 6. [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md)
 7. [docs/ai/WORKFLOW.md](docs/ai/WORKFLOW.md)
 
+Before exploratory commands for recurring build, engine, capture, or validation work, read the documented workflow and use the approved wrapper/command first. If the documented command is missing, ambiguous, or stale, stop and report the documentation gap instead of rediscovering the workflow.
+
 Keep this file short. Put active task details in `docs/ai/CURRENT_TASK.md`, stable project status in `docs/project/PROJECT_STATE.md`, and historical/reference material under `docs/reference/` or `docs/archive/`.
