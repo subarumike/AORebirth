@@ -1,27 +1,24 @@
-# Grid Terminal C0040320 Capture Result
+# Grid Terminal C0040320 Destination Mapping
 
 ## Scope
 
-This note records the capture-backed behavior for using `Terminal:C0040320` in Borealis.
+Correct the destination evidence for Borealis `Terminal:C0040320`.
 
 ## Evidence
 
-- `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260621-073837/events.log:203` identifies `Terminal:C0040320` as `Enter The Grid` at `(636.4026, 66.81002, 728.8094)`.
-- `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260611-005202/events.log:11361` and `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-170220/events.log:3938` show `GenericCmd Use` targeting `Terminal:C0040320`.
-- `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260611-005202/packets.hex.log:8489` shows the server response as `N3Teleport` to playfield proxy `0xC79E:00000098`, which is playfield `152`, with destination `(634.302, 66.810, 726.667)`.
-- `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-170220/packets.hex.log:3143` shows the same flow to playfield proxy `0xC79E:00000098`, with destination `(636.604, 66.810, 726.744)`.
-- `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260621-091447/packets.hex.log:223` shows the grid handoff `PlayfieldAnarchyF` with `CharacterCoordinates=(234.3062, 3.7750, 212.8138)`.
-- `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260621-091447/events.log:645` shows the first local `SimpleCharFullUpdate` in playfield instance `1077254` at `Position=(234.3062, 3.775, 212.8138)` and `Heading=X: 0 | Y: 1 | Z: 0 | W: -4.371139E-08`.
-- `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260621-091447/events.log:785` shows the first local post-load `CharDCMove FullStop` at the same position and heading.
-- The live captures did not show a separate successful `GenericCmd` acknowledgement packet between terminal use and teleport.
-- The destination carried in `N3Teleport` is source-side terminal context and is not the grid landing transform.
-- No post-transfer `SetPos` correction was captured.
-- `tools-temp/playfield-teleport-audit.csv:967` maps the same raw instance through older statel-door audit data to playfield `2063`; this conflicts with the live terminal-use captures and is not used for this terminal route.
+- Current-client statel data `AORebirth/Built/Debug/playfields.dat` contains `PF 800`, `Terminal:C0040320`, template `95350` (`Enter The Grid`) at `(636.4026, 66.8100, 728.8094)`.
+- Its `OnUse` `TeleportProxy2` maps to `PF 152`, destination index `0`, destination instance `C0000098`.
+- `PF 152` contains `Terminal:C0000098`, template `95351` (`Exit the Grid`) at `(170.0766, 4.6002, 240.9393)`, heading `(0, 0, 0, 1)`.
+- Read-only `teleports` DB inspection found no terminal override for `Terminal:C0040320`; the only `C0040320` DB row uses a non-terminal statel type and points to playfield `2063`, so it does not apply to this grid terminal.
+
+## Corrected Capture Attribution
+
+- `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260621-091447/events.log:255-256` shows the local player used `Terminal:C002028F`, not `Terminal:C0040320`.
+- `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260621-091447/events.log:321-322` shows the server echo for that same `Terminal:C002028F` use.
+- `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260621-091447/events.log:645-646` shows the resulting local grid spawn at `(234.3062, 3.7750, 212.8138)` with heading `(0, 1, 0, -4.371139E-08)`.
+- Nearest `PF 152` exit anchor to that captured landing is `Terminal:C04E0098`, template `95351`, at `(237.5000, 4.2000, 217.4000)`.
+- `Terminal:C0040320` appears later in the same capture as a spawned Borealis statel (`events.log:2925-2926`) and as other players' use events, but that capture does not prove a local `C0040320` landing transform.
 
 ## Result
 
-Use of Borealis `Terminal:C0040320` should route through the existing playfield teleport flow to playfield `152` and land at `(234.3062, 3.7750, 212.8138)` with heading `(0, 1, 0, -4.371139E-08)`. The source-side terminal position must not be reused as the grid spawn position.
-
-## Unknowns
-
-No captured failure branch was found for side, level, expansion, paid access, distance, or other access checks. No new checks are implemented from this capture.
+`Terminal:C0040320` must not use the captured `(234.3062, 3.7750, 212.8138)` landing. For the private server, it should route through its own `TeleportProxy2` destination and spawn adjacent to `Terminal:C0000098` at `(170.0766, 4.6002, 243.4393)` with heading `(0, 0, 0, 1)`, pending live smoke confirmation.
