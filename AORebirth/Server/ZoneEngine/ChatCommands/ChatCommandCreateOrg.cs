@@ -22,6 +22,8 @@ namespace ZoneEngine.ChatCommands
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using Utility;
+
     using ZoneEngine.Core.MessageHandlers;
 
     #endregion
@@ -48,6 +50,13 @@ namespace ZoneEngine.ChatCommands
                 return;
             }
 
+            if (organizationName.Length > 32)
+            {
+                character.Playfield.Publish(
+                    ChatTextMessageHandler.Default.CreateIM(character, "Organization name must be 32 characters or less."));
+                return;
+            }
+
             if (character.Stats[StatIds.clan].BaseValue != 0)
             {
                 character.Playfield.Publish(
@@ -57,10 +66,25 @@ namespace ZoneEngine.ChatCommands
                 return;
             }
 
-            if (!OrganizationDao.Instance.CreateOrganization(
+            bool organizationCreated;
+            try
+            {
+                organizationCreated = OrganizationDao.Instance.CreateOrganization(
                     organizationName,
                     DateTime.UtcNow,
-                    character.Identity.Instance))
+                    character.Identity.Instance);
+            }
+            catch (Exception exception)
+            {
+                LogUtil.ErrorException(exception);
+                character.Playfield.Publish(
+                    ChatTextMessageHandler.Default.CreateIM(
+                        character,
+                        "Organization create failed; see ZoneEngine log."));
+                return;
+            }
+
+            if (!organizationCreated)
             {
                 character.Playfield.Publish(
                     ChatTextMessageHandler.Default.CreateIM(

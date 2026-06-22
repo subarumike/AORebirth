@@ -93,7 +93,7 @@ namespace AORebirth.Database.Dao
         /// <summary>
         /// Organization commission
         /// </summary>
-        public int Commission { get; set; }
+        public int Comission { get; set; }
 
         /// <summary>
         /// Id of the organizations contracts

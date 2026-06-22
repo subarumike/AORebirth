@@ -7,6 +7,7 @@ GM organization creation bypass for local testing without a six-character team.
 ## Scope
 
 - Add a GM-only chat command that creates an organization through `OrganizationDao.CreateOrganization`.
+- Repair `OrganizationDao.CreateOrganization` enough for required organization table fields.
 - Assign the caller to the new organization as rank `0`.
 - Do not enable the full legacy `OrgClient.Read` handler or bypass through packet behavior.
 - Do not modify database schema or run destructive database operations.
@@ -15,12 +16,14 @@ GM organization creation bypass for local testing without a six-character team.
 
 - `OrgClient.Read` has legacy command `1` organization creation logic, but the active inbound `OrgClientMessageHandler` does not route full legacy org behavior.
 - `/set` only changes numeric stats and cannot create the organization row or leader record.
+- `organizations.Description`, `Objective`, and `History` are `NOT NULL`; `OrganizationDao.CreateOrganization` previously left them unset.
 
 ## Implementation Notes
 
 - Prefer `/command createorg <organization name>` so macro/chat command wrapper behavior remains compatible.
 - Accepted aliases may include `makeorg` and `orgcreate`.
 - The command should reject callers already in an organization to avoid orphaning existing org membership.
+- The command should report organization insert exceptions to the client and ZoneEngine log.
 
 ## Validation Plan
 
@@ -35,5 +38,10 @@ GM organization creation bypass for local testing without a six-character team.
 - First `tools\build_aorebirth_debug.cmd`: blocked only by running `ZoneEngine` PID `25584` locking `ZoneEngine.exe`.
 - `stop-engines.cmd`: PASS, used only to clear the build lock.
 - Second `tools\build_aorebirth_debug.cmd`: PASS.
-- `restart-engines.cmd`: PASS.
+- Follow-up investigation found `/command createorg Testing Org` reached ZoneEngine but created no DB row because organization DAO insert did not satisfy live `organizations` schema.
+- Follow-up `git diff --check`: PASS.
+- Follow-up first `tools\build_aorebirth_debug.cmd`: compile passed, final copy blocked only by running engine DLL locks.
+- Follow-up `stop-engines.cmd`: PASS, used only to clear the build locks.
+- Follow-up second `tools\build_aorebirth_debug.cmd`: PASS.
+- Follow-up `restart-engines.cmd`: PASS.
 - User gameplay testing required for `/command createorg <organization name>`.
