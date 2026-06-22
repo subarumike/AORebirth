@@ -19,6 +19,53 @@
 - Keep `docs/ai/CURRENT_TASK.md` focused on active work only.
 - Keep `docs/project/PROJECT_STATE.md` updated when stable project status changes.
 
+## ACTIVE WORKFLOW DISCIPLINE (MANDATORY)
+
+- When an approved workflow, wrapper, launcher, startup command, capture command, build command, validation command, or investigation workflow already exists and has previously succeeded, use it immediately.
+- Do not rediscover workflows.
+- Do not revalidate workflows.
+- Do not search the repository for workflows that are already documented.
+- Do not inspect workflow source code unless the workflow itself is being modified.
+- Assume approved workflows remain valid until they fail.
+
+For capture-backed tasks:
+
+- When a workflow document explicitly identifies the approved command, wrapper, launcher, or script, use that command directly. Do not perform any repository search to verify, locate, confirm, inspect, or rediscover it.
+- Launch the approved AOSharp capture workflow immediately.
+- Reproduce the gameplay action.
+- Stop the capture.
+- Analyze the capture.
+- The first operational command should normally be the approved capture launcher.
+- If the task explicitly says "perform a capture", "start capture", "run capture", or references a known capture workflow, the approved capture launcher should be the first task-related command executed.
+
+Do not spend command budget on these unless the approved workflow has already failed:
+
+- `rg`
+- `grep`
+- `findstr`
+- `dir`
+- `tree`
+- `Get-ChildItem`
+- repository-wide searches
+- workflow discovery
+- workflow archaeology
+- documentation archaeology
+- source-code archaeology
+
+Active task discipline:
+
+- Stay on the active gameplay task.
+- Do not switch to repo cleanup.
+- Do not switch to architecture reviews.
+- Do not switch to modernization work.
+- Do not switch to documentation cleanup.
+- Do not classify unrelated dirty files.
+- Do not propose unrelated future work.
+
+Failure exception:
+
+- If the approved workflow fails, explain the failure, investigate only the failure, and then immediately return to the active task.
+
 ## OUTPUT DISCIPLINE (MANDATORY)
 
 - Work silently whenever possible.
