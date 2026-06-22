@@ -23,6 +23,8 @@ Investigate private-server Grid crash around Grid entry and PF152 floor-pad move
 - The repeated `0x12` value in the post-zone-in diagnostics is the logged-in character instance `CanbeAffected:18`, not a Vehicle object route.
 - No outbound Grid zone-in object was classified as `Vehicle`; emitted object classes were `Playfield2`, `CanbeAffected`, and `WeaponInstance`.
 - The crash/reconnect path occurred after stepping on PF152 floor pad `Terminal:C0160098`, which fired `OnTargetInVicinity`/`LineTeleport` and was handled as a full PF152-to-PF152 zone transfer.
+- User-submitted Coast of Peace `Terminal:C002022C` route evidence: source `(1805.0, 14.1, 622.3)` in PF `556`, grid landing `(202.1, 3.8, 249.8)` in PF `152`, nearest grid exit `Terminal:C0510098`.
+- User-submitted grid route batch from `C:\Users\Mike\.codex\attachments\2434b879-40ce-4adb-86b9-eb0c31a7d760\pasted-text.txt` added or corrected route evidence for `Terminal:C0050235`, `Terminal:C003027B`, `Terminal:C0040286`, `Terminal:C0020290`, `Terminal:C0000299`, `Terminal:C00502AD`, `Terminal:C00702B7`, `Terminal:C00302C1`, `Terminal:C00502F8`, `Terminal:C0040320`, `Terminal:C00017D5`, and `Terminal:C00017D6`.
 
 ## Validation Plan
 
@@ -41,3 +43,6 @@ Investigate private-server Grid crash around Grid entry and PF152 floor-pad move
 - Current temp-output ZoneEngine build with `OutDir=../../Built/CodexValidation/`: PASS.
 - Codex performed no game launch or live smoke.
 - Mike live smoke after the Grid floor-pad fix: PASS, no crash.
+- Grid route batch full build: PASS.
+- Grid route batch restart: PASS.
+- User smoke check for updated grid route table: PASS.

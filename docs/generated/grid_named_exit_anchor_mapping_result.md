@@ -28,4 +28,4 @@ Packed `playfields.dat` confirms these outside entrance terminals:
 | `640` | Tir | `Terminal:C0030280` |
 | `710` | Omni-1 Trade | `Terminal:C00502C6` |
 
-`Terminal:C0040320` in PF `800` and `Terminal:C002022C` in PF `556` remain separate routes; these named anchor notes do not prove their destinations.
+`Terminal:C0040320` in PF `800` and `Terminal:C002022C` in PF `556` are documented separately from user-submitted landing evidence; these named anchor notes are only for named city/hub anchors listed above.
