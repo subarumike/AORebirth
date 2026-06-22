@@ -92,12 +92,31 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 return false;
             }
 
+            ICharacter character = self as ICharacter;
+            if ((character == null) || (character.Playfield == null))
+            {
+                return false;
+            }
+
             uint arg1 = arguments[1].AsUInt32();
             int toPlayfield = arguments[2].AsInt32();
+            if (toPlayfield == 0)
+            {
+                toPlayfield = character.Playfield.Identity.Instance;
+            }
 
             byte destinationIndex = (byte)(arg1 >> 16);
-            PlayfieldData pfd = PlayfieldLoader.PFData[toPlayfield];
-            PlayfieldDestination pfDestination = pfd.Destinations[destinationIndex];
+            PlayfieldData pfd;
+            if (!PlayfieldLoader.PFData.TryGetValue(toPlayfield, out pfd))
+            {
+                return false;
+            }
+
+            PlayfieldDestination pfDestination;
+            if (!pfd.Destinations.TryGetValue(destinationIndex, out pfDestination))
+            {
+                return false;
+            }
 
             float newX = (pfDestination.EndX - pfDestination.StartX) * 0.5f + pfDestination.StartX;
             float newZ = (pfDestination.EndZ - pfDestination.StartZ) * 0.5f + pfDestination.StartZ;
@@ -106,6 +125,11 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 pfDestination.StartZ,
                 pfDestination.EndX,
                 pfDestination.EndZ);
+            if (dist <= 0.0f)
+            {
+                return false;
+            }
+
             float headDistX = (pfDestination.EndX - pfDestination.StartX) / dist;
             float headDistZ = (pfDestination.EndZ - pfDestination.StartZ) / dist;
             newX -= headDistZ * 4;
@@ -113,9 +137,9 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
             Coordinate destCoordinate = new Coordinate(newX, pfDestination.EndY, newZ);
 
-            ((ICharacter)self).Teleport(
+            character.Teleport(
                 destCoordinate,
-                ((ICharacter)self).Heading,
+                character.Heading,
                 new Identity() { Type = IdentityType.Playfield, Instance = toPlayfield });
             return true;
         }
