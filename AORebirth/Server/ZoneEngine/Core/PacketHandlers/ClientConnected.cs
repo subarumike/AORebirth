@@ -108,6 +108,8 @@ namespace ZoneEngine.Core.PacketHandlers
             /* send chat server info to client */
             ChatServerInfoMessageHandler.Default.Send(client.Controller.Character);
 
+            WorldEntrySummary.Begin(client, "zone_login");
+
             /* send playfield info to client */
             PlayfieldAnarchyFMessageHandler.Default.Send(client.Controller.Character);
 
@@ -210,6 +212,7 @@ client.Controller.Character.Playfield.Identity,
             var specialAttackWeaponMessage = new SpecialAttackWeaponMessage { Identity = identity, Specials = specials };
 
             client.SendCompressed(specialAttackWeaponMessage);
+            WorldEntrySummary.Complete(client);
 
             // done
 
