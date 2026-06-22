@@ -38,6 +38,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
     using AORebirth.Core.Entities;
     using AORebirth.Core.Statels;
     using AORebirth.Core.Vector;
+    using AORebirth.Database.Dao;
     using AORebirth.Enums;
     using AORebirth.Interfaces;
 
@@ -111,6 +112,95 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                     new Identity() { Type = IdentityType.Playfield, Instance = externalPlayfieldId });
             }
             return door != null;
+        }
+    }
+
+    internal class instancedplayercity : FunctionPrototype
+    {
+        private const int CapturedPrivateCityPlayfieldId = 1067112;
+
+        private const int CapturedPrivateCityOrganizationInstance = 1370122;
+
+        public override FunctionType FunctionId
+        {
+            get
+            {
+                return FunctionType.InstancedPlayerCity;
+            }
+        }
+
+        public override bool Execute(
+            INamedEntity self,
+            IEntity caller,
+            IInstancedEntity target,
+            MessagePackObject[] arguments)
+        {
+            ICharacter character = self as ICharacter;
+            Dynel dynel = self as Dynel;
+            if (character == null || dynel == null || character.Playfield == null)
+            {
+                return false;
+            }
+
+            int organizationInstance = character.Stats[StatIds.clan].Value;
+            int destinationPlayfieldId = ResolvePrivateCityPlayfieldId(organizationInstance);
+            if (destinationPlayfieldId <= 0)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Zoning,
+                    string.Format(
+                        "InstancedPlayerCity skipped character={0} org={1} reason=no_city",
+                        character.Identity.ToString(true),
+                        organizationInstance));
+                return false;
+            }
+
+            var destination = new Coordinate(211.55756f, 3.77500f, 186.51588f);
+            var heading = new Quaternion(0.0f, -0.9575281f, 0.0f, 0.28834003f);
+
+            character.StopMovement();
+            character.Playfield.Teleport(
+                dynel,
+                destination,
+                heading,
+                new Identity { Type = IdentityType.Playfield, Instance = destinationPlayfieldId });
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    "InstancedPlayerCity teleport character={0} org={1} destPf={2} dest=({3:F3},{4:F3},{5:F3}) evidence=live_capture_20260622-093540",
+                    character.Identity.ToString(true),
+                    organizationInstance,
+                    destinationPlayfieldId,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
+        }
+
+        private static int ResolvePrivateCityPlayfieldId(int organizationInstance)
+        {
+            if (organizationInstance <= 0)
+            {
+                return 0;
+            }
+
+            try
+            {
+                var organization = OrganizationDao.Instance.Get(organizationInstance);
+                if (organization != null && organization.CityId > 0)
+                {
+                    return organization.CityId;
+                }
+            }
+            catch
+            {
+            }
+
+            return organizationInstance == CapturedPrivateCityOrganizationInstance
+                       ? CapturedPrivateCityPlayfieldId
+                       : 0;
         }
     }
 }

@@ -92,6 +92,32 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int CapturedGridPlayfieldId = 152;
 
+        private const int CapturedPrivateCityGuestKeyTerminalInstance = unchecked((int)0x574DF8BB);
+
+        private const int CapturedCityAccessCardTemplateId = 280642;
+
+        private const int CapturedCityAccessCardIdentityType = 0x0000C770;
+
+        private const int CapturedCityAccessCardInstance = 0x006E0001;
+
+        private const int CapturedCityAccessCardOverflowSlot = 0x6F;
+
+        private const int CapturedCityAccessCardStateMachineType = 0x000F424F;
+
+        private const int CapturedCityAccessCardBuildingType = 0x0000C79E;
+
+        private const int CapturedCityAccessCardBuildingInstance = 0x0000177A;
+
+        private const int CapturedCityAccessCardOwnerType = 0x000186A1;
+
+        private const int CapturedCityAccessCardOwnerInstance = 0x0001177A;
+
+        private const uint CapturedCityAccessCardBuildingComplexInstance = 0xC017028F;
+
+        private const int CapturedCityAccessCardTimeExist = 90000;
+
+        private const int CapturedPrivateCityOrganizationInstance = 1370122;
+
         private const int GridEnterTerminalTemplateId = 95350;
 
         private const int GridExitTerminalTemplateId = 95351;
@@ -573,12 +599,16 @@ namespace ZoneEngine.Core.MessageHandlers
                             this.Acknowledge(client.Controller.Character, message);
                         }
                     }
+                    else if (this.TryHandlePrivateCityGuestKeyTerminalUse(client, message, target))
+                    {
+                        break;
+                    }
                     else if (target.Type == IdentityType.CityController)
                     {
                         this.Acknowledge(client.Controller.Character, message);
                         client.Server.Info(
                             client,
-                            "CityController use acknowledged character={0} target={1} count={2} temp4={3} evidence=live_capture_20260622-073015",
+                            "CityController use acknowledged character={0} target={1} count={2} temp4={3} evidence=live_capture_20260622-093102",
                             client.Controller.Character.Identity,
                             target,
                             message.Count,
@@ -749,6 +779,104 @@ namespace ZoneEngine.Core.MessageHandlers
                 routedCorpseIdentity);
 
             return routed;
+        }
+
+        private bool TryHandlePrivateCityGuestKeyTerminalUse(
+            IZoneClient client,
+            GenericCmdMessage message,
+            Identity target)
+        {
+            ICharacter character = client.Controller.Character;
+            if (character == null
+                || character.Playfield == null
+                || target.Type != IdentityType.Terminal
+                || target.Instance != CapturedPrivateCityGuestKeyTerminalInstance
+                || !AORebirth.Core.Playfields.Playfield.IsPrivateCityPlayfieldCandidate(character.Playfield.Identity))
+            {
+                return false;
+            }
+
+            client.SendCompressed(CreateCapturedCityAccessCardItem(character));
+            client.SendCompressed(
+                new ContainerAddItemMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 0,
+                    SourceContainer = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
+                    Target = new Identity { Type = IdentityType.OverflowWindow, Instance = character.Identity.Instance },
+                    TargetPlacement = CapturedCityAccessCardOverflowSlot
+                });
+            this.Acknowledge(character, message);
+
+            client.Server.Info(
+                client,
+                "Private city guest key terminal created captured City Access Card character={0} terminal={1} template={2} overflowSlot={3} evidence=live_capture_20260622-092724 no_persistence=1",
+                character.Identity,
+                target,
+                CapturedCityAccessCardTemplateId,
+                CapturedCityAccessCardOverflowSlot);
+
+            return true;
+        }
+
+        private static SimpleItemFullUpdateMessage CreateCapturedCityAccessCardItem(ICharacter character)
+        {
+            return new SimpleItemFullUpdateMessage
+                   {
+                       Identity =
+                           new Identity
+                           {
+                               Type = (IdentityType)CapturedCityAccessCardIdentityType,
+                               Instance = CapturedCityAccessCardInstance
+                           },
+                       Unknown = 0,
+                       MsgVersion = 0x0B,
+                       Identitytype = (int)character.Identity.Type,
+                       Instance = character.Identity.Instance,
+                       Playfield = character.Playfield.Identity.Instance,
+                       Unknown1 = new Identity { Type = (IdentityType)CapturedCityAccessCardStateMachineType, Instance = 0 },
+                       Unknown2 = 0x71,
+                       Unknown3 = CapturedCityAccessCardOverflowSlot,
+                       Stats = CreateCapturedCityAccessCardStats(ResolvePrivateCityOrganizationInstance(character)),
+                       Name = string.Empty
+                   };
+        }
+
+        private static GameTuple<CharacterStat, uint>[] CreateCapturedCityAccessCardStats(int organizationInstance)
+        {
+            return new[]
+                   {
+                       CityAccessCardStat(CharacterStat.Flags, 1),
+                       CityAccessCardStat(CharacterStat.StaticInstance, CapturedCityAccessCardTemplateId),
+                       CityAccessCardStat(CharacterStat.ACGItemLevel, 1),
+                       CityAccessCardStat(CharacterStat.ACGItemTemplateID, CapturedCityAccessCardTemplateId),
+                       CityAccessCardStat(CharacterStat.ACGItemTemplateID2, CapturedCityAccessCardTemplateId),
+                       CityAccessCardStat(CharacterStat.MultipleCount, 1),
+                       CityAccessCardStat(CharacterStat.BuildingType, CapturedCityAccessCardBuildingType),
+                       CityAccessCardStat(CharacterStat.BuildingInstance, CapturedCityAccessCardBuildingInstance),
+                       CityAccessCardStat(CharacterStat.CardOwnerType, CapturedCityAccessCardOwnerType),
+                       CityAccessCardStat(CharacterStat.CardOwnerInstance, CapturedCityAccessCardOwnerInstance),
+                       CityAccessCardStat(CharacterStat.BuildingComplexInst, CapturedCityAccessCardBuildingComplexInstance),
+                       CityAccessCardStat(CharacterStat.AccessKey, 0),
+                       CityAccessCardStat(CharacterStat.ExternalPlayfieldInstance, organizationInstance),
+                       CityAccessCardStat(CharacterStat.TimeExist, CapturedCityAccessCardTimeExist)
+                   };
+        }
+
+        private static GameTuple<CharacterStat, uint> CityAccessCardStat(CharacterStat stat, int value)
+        {
+            return CityAccessCardStat(stat, unchecked((uint)value));
+        }
+
+        private static GameTuple<CharacterStat, uint> CityAccessCardStat(CharacterStat stat, uint value)
+        {
+            return new GameTuple<CharacterStat, uint> { Value1 = stat, Value2 = value };
+        }
+
+        private static int ResolvePrivateCityOrganizationInstance(ICharacter character)
+        {
+            int organizationInstance = character.Stats[StatIds.clan].Value;
+            return organizationInstance > 0 ? organizationInstance : CapturedPrivateCityOrganizationInstance;
         }
 
         private bool TryHandleCapturedGridTerminalUse(

@@ -38,6 +38,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
     using AORebirth.Core.Vector;
+    using AORebirth.Enums;
     using AORebirth.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -55,6 +56,12 @@ namespace ZoneEngine.Core.MessageHandlers
     public class PlayfieldAnarchyFMessageHandler :
         BaseMessageHandler<PlayfieldAnarchyFMessage, PlayfieldAnarchyFMessageHandler>
     {
+        private const IdentityType CapturedPrivateCityPlayfieldProxyType = (IdentityType)0x0000C79E;
+
+        private const int CapturedPrivateCityBuildingInstance = 0x0000177A;
+
+        private const int CapturedPrivateCityOrganizationInstance = 1370122;
+
         #region Outbound
 
         /// <summary>
@@ -96,6 +103,17 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.PlayfieldX = Playfields.GetPlayfieldX(character.Playfield.Identity.Instance);
                 x.PlayfieldZ = Playfields.GetPlayfieldZ(character.Playfield.Identity.Instance);
 
+                if (AORebirth.Core.Playfields.Playfield.IsPrivateCityPlayfieldCandidate(character.Playfield.Identity))
+                {
+                    x.PlayfieldId1 = new Identity
+                                     {
+                                         Type = CapturedPrivateCityPlayfieldProxyType,
+                                         Instance = CapturedPrivateCityBuildingInstance
+                                     };
+                    x.Unknown4 = ResolvePrivateCityOrganizationInstance(character);
+                    x.GeneratorPayload = CreateCapturedPrivateCityGeneratorPayload();
+                }
+
                 IEnumerable<Vendor> vendors = Pool.Instance.GetAll<Vendor>(
                     character.Playfield.Identity,
                     (int)IdentityType.VendingMachine);
@@ -123,6 +141,30 @@ namespace ZoneEngine.Core.MessageHandlers
                                                   };
             }
             */
+        }
+
+        private static int ResolvePrivateCityOrganizationInstance(ICharacter character)
+        {
+            int organizationInstance = character.Stats[StatIds.clan].Value;
+            return organizationInstance > 0 ? organizationInstance : CapturedPrivateCityOrganizationInstance;
+        }
+
+        private static byte[] CreateCapturedPrivateCityGeneratorPayload()
+        {
+            return new byte[]
+                   {
+                       0x00, 0x00, 0xC7, 0x7D, 0x00, 0x00, 0x00, 0x01,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+                       0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0xC4, 0x18,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x9C, 0xA0, 0x0B,
+                       0x00, 0x00, 0xC7, 0x3D, 0x00, 0x00, 0x00, 0x01,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+                       0x57, 0x4D, 0xF8, 0xBB, 0x00, 0x00, 0xC7, 0x48,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02,
+                       0x00, 0x00, 0x00, 0x01, 0x10, 0x8E, 0xBC, 0x21,
+                       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+                   };
         }
 
         #endregion

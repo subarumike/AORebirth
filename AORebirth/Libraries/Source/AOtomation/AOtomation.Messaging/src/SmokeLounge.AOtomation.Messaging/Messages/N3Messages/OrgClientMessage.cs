@@ -50,7 +50,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
                     (int)OrgClientCommand.Kick, (int)OrgClientCommand.Tax, (int)OrgClientCommand.BankAdd, 
                     (int)OrgClientCommand.BankRemove, (int)OrgClientCommand.BankPaymembers, (int)OrgClientCommand.History, 
                     (int)OrgClientCommand.Objective, (int)OrgClientCommand.Description, (int)OrgClientCommand.Name, 
-                    (int)OrgClientCommand.GoverningForm, (int)OrgClientCommand.StopVote
+                    (int)OrgClientCommand.GoverningForm, (int)OrgClientCommand.StopVote,
+                    (int)OrgClientCommand.CityAdvantages
                 })]
         public string CommandArgs { get; set; }
 

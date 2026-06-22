@@ -252,6 +252,7 @@
     <Compile Include="Messages\N3Message.cs" />
     <Compile Include="Messages\N3Messages\CharacterActionMessage.cs" />
     <Compile Include="Messages\N3Messages\CharacterActionType.cs" />
+    <Compile Include="Messages\N3Messages\CityAdvantagesMessage.cs" />
     <Compile Include="Messages\N3Messages\FullCharacterMessage.cs" />
     <Compile Include="Messages\N3Messages\GameTimeMessage.cs" />
     <Compile Include="Messages\N3Messages\KnuBotAnswerMessage.cs" />

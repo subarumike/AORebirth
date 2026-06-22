@@ -2,63 +2,37 @@
 
 ## Active Task
 
-Organization creation bypass for local testing without a six-character team.
-Follow-up: expose organization city association for local city entry testing.
+Captured private-city compatibility layer for CityController, guest-key terminal, city advantages, and grid exit entry.
 
 ## Scope
 
-- Add a local-testing chat command that creates an organization through `OrganizationDao.CreateOrganization`.
-- Repair `OrganizationDao.CreateOrganization` enough for required organization table fields.
-- Assign the caller to the new organization as rank `0`.
-- Do not enable the full legacy `OrgClient.Read` handler or bypass through packet behavior.
-- Do not modify database schema or run destructive database operations.
-- Send `organizations.CityID` as the character info packet city playfield id when a character is in an org.
+- Use only AOSharp live capture evidence from `20260622-092054`, `20260622-092724`, `20260622-093102`, and `20260622-093540`.
+- Send private-city ready packets on normal city zone-in, including captured `PlayfieldAnarchyF` generator payload and non-empty `PlayfieldAllCities` payload.
+- Handle `GenericCmd Use` for `CityController` and the captured guest-key terminal without falling through to generic statel handling.
+- Create the captured temporary City Access Card visual/update packets only; do not persist inventory, city bank, org storage, or money semantics.
+- Route `OrgClient BankAdd = 19` safely and respond to captured `OrgClient CityAdvantages = 31`.
+- Add the minimal `InstancedPlayerCity` function path needed for the captured grid exit destination, resolving an org `CityId` first and using the captured playfield only for captured org fallback.
 
-## Repo Evidence
+## Evidence
 
-- `OrgClient.Read` has legacy command `1` organization creation logic, but the active inbound `OrgClientMessageHandler` does not route full legacy org behavior.
-- `/set` only changes numeric stats and cannot create the organization row or leader record.
-- `organizations.Description`, `Objective`, and `History` are `NOT NULL`; `OrganizationDao.CreateOrganization` previously left them unset.
-- `CharacterInfoPacketMessageHandler` previously hardcoded `CityPlayfieldId = 0`, so the client still saw no org city association.
-- The tested city entry terminal in playfield `655` maps to destination playfield `1702`.
-
-## Implementation Notes
-
-- Prefer `/command createorg <organization name>` so macro/chat command wrapper behavior remains compatible.
-- Accepted aliases may include `makeorg` and `orgcreate`.
-- The command should reject callers already in an organization to avoid orphaning existing org membership.
-- The command should report organization insert exceptions to the client and ZoneEngine log.
-- The command must not require `gmlevel`; this is specifically for local testing where a six-character org team is unavailable.
+- `20260622-092054`: private city zone-in, PF `1067112`, city dynels, `PlayfieldAnarchyF`, and non-empty `PlayfieldAllCities`.
+- `20260622-092724`: guest-key terminal `Terminal:574DF8BB`, City Access Card template `280642`, overflow slot `111`, and success ack.
+- `20260622-093102`: `CityController:9CA00B` use ack and `OrgClient` command `31` followed by four QL 300 city advantages.
+- `20260622-093540`: grid city exit uses `GridDestinationSelect` / `GridSelected`, then `N3Teleport` to PF `1067112`, org `1370122`, building identity `C79E:177A`.
 
 ## Validation Plan
 
 - `git diff --check`
 - repo-approved build
 - `cmd /d /c restart-engines.cmd`
-- User gameplay testing: run `/command createorg <organization name>` on a GM character not already in an org.
-- User gameplay testing: retry the city entry after `organizations.CityID` is set for the test org.
+- User gameplay testing required: private city zone-in, guest-key terminal, CityController use, city advantages request, and grid exit entry.
 
 ## Validation Result
 
 - `git diff --check`: PASS.
-- First `tools\build_aorebirth_debug.cmd`: blocked only by running `ZoneEngine` PID `25584` locking `ZoneEngine.exe`.
-- `stop-engines.cmd`: PASS, used only to clear the build lock.
+- First `tools\build_aorebirth_debug.cmd`: compile passed; final copy blocked by running engine DLL locks.
+- `stop-engines.cmd`: PASS, used only to clear build locks.
 - Second `tools\build_aorebirth_debug.cmd`: PASS.
-- Follow-up investigation found `/command createorg Testing Org` reached ZoneEngine but created no DB row because organization DAO insert did not satisfy live `organizations` schema.
-- Follow-up `git diff --check`: PASS.
-- Follow-up first `tools\build_aorebirth_debug.cmd`: compile passed, final copy blocked only by running engine DLL locks.
-- Follow-up `stop-engines.cmd`: PASS, used only to clear the build locks.
-- Follow-up second `tools\build_aorebirth_debug.cmd`: PASS.
-- Follow-up `restart-engines.cmd`: PASS.
-- Follow-up authorization check: `createorg` originally required `gmlevel >= 1`; lowered requirement to `0` for the local-testing bypass.
-- Follow-up authorization fix `git diff --check`: PASS.
-- Follow-up authorization fix `tools\build_aorebirth_debug.cmd`: PASS after stopping running engines.
-- Follow-up authorization fix `restart-engines.cmd`: PASS.
-- User gameplay testing required for `/command createorg <organization name>`.
-- Follow-up city association DB patch: `organizations.Id=1` updated from `CityID=0` to `CityID=1702`; rows changed `1`.
-- Follow-up city info packet fix `git diff --check`: PASS.
-- Follow-up city info packet first `tools\build_aorebirth_debug.cmd`: compile passed, final copy blocked only by running `ZoneEngine` PID `2756`.
-- Follow-up city info packet `stop-engines.cmd`: PASS, used only to clear the build lock.
-- Follow-up city info packet second `tools\build_aorebirth_debug.cmd`: PASS.
-- Follow-up city info packet `restart-engines.cmd`: PASS.
-- Follow-up city terminal live smoke: not observed in fresh ZoneEngine log after restart; user gameplay testing still required.
+- `SmokeLounge.AOtomation.Messaging.Tests.csproj` build: PASS.
+- `restart-engines.cmd`: PASS.
+- User gameplay testing still required.
