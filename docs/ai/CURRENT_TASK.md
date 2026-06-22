@@ -2,45 +2,38 @@
 
 ## Active Task
 
-Implement first-layer private-city and CityController compatibility plumbing from live capture `20260622-073015`.
+GM organization creation bypass for local testing without a six-character team.
 
-## Current Scope
+## Scope
 
-- Do not continue Grid work.
-- Do not hardcode captured private-city playfield IDs as permanent behavior.
-- Do not split `Playfield.cs`.
-- Do not change database schemas or data.
-- Do not implement full city-bank, org-bank persistence, city ownership, guest-key generation, or item semantics.
-- Packet-sensitive behavior must remain backed by the live capture.
+- Add a GM-only chat command that creates an organization through `OrganizationDao.CreateOrganization`.
+- Assign the caller to the new organization as rank `0`.
+- Do not enable the full legacy `OrgClient.Read` handler or bypass through packet behavior.
+- Do not modify database schema or run destructive database operations.
 
-## Current Evidence
+## Repo Evidence
 
-- Live capture `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260622-073015` is authoritative for this task.
-- Captured private-city playfield identities included `Playfield2:116000`, `Playfield2:120005`, and `Playfield2:121001`.
-- Captured private-city zone-in received empty `PlayfieldAllTowers` and empty `PlayfieldAllCities`.
-- Captured CityController use sent `GenericCmd Action=Use` to `CityController:9C8818` and received a success ack with `Temp1=1`, the same count, action, temp4, user, and target.
-- Captured city-bank UI emitted `OrgClient BankAdd` command `19` targeting `CityController:9C8818` with command arg text `300000000`.
-- No live server response behavior was captured for the `OrgClient BankAdd` command, so no money or persistence semantics are implemented.
+- `OrgClient.Read` has legacy command `1` organization creation logic, but the active inbound `OrgClientMessageHandler` does not route full legacy org behavior.
+- `/set` only changes numeric stats and cannot create the organization row or leader record.
 
-## Implementation Plan
+## Implementation Notes
 
-- Reuse the existing empty playfield towers/cities send block for normal private-city zone connect.
-- Add explicit `CityController` use handling in `GenericCmdMessageHandler`.
-- Subscribe an inbound `OrgClientMessage` handler for safe `BankAdd` recognition and logging only.
-- Add a generated result note under `docs/generated/`.
+- Prefer `/command createorg <organization name>` so macro/chat command wrapper behavior remains compatible.
+- Accepted aliases may include `makeorg` and `orgcreate`.
+- The command should reject callers already in an organization to avoid orphaning existing org membership.
 
 ## Validation Plan
 
-- Run `cmd /d /c git diff --check`.
-- Run `cmd /d /c tools\build_aorebirth_debug.cmd`.
-- Run `cmd /d /c restart-engines.cmd` after rebuild.
-- Prefer Mike live smoke for private-city zone-in, CityController use ack, and `OrgClient BankAdd` safe routing.
+- `git diff --check`
+- repo-approved build
+- `cmd /d /c restart-engines.cmd`
+- User gameplay testing: run `/command createorg <organization name>` on a GM character not already in an org.
 
 ## Validation Result
 
-- `cmd /d /c git diff --check`: PASS.
-- First `cmd /d /c tools\build_aorebirth_debug.cmd`: blocked only by running `ZoneEngine` PID `4736` locking `AORebirth\Built\Debug\ZoneEngine.exe`.
-- `cmd /d /c stop-engines.cmd`: PASS, used only to clear the build lock.
-- Second `cmd /d /c tools\build_aorebirth_debug.cmd`: PASS.
-- `cmd /d /c restart-engines.cmd`: PASS.
-- AOSharp smoke capture `20260622-081427` completed cleanly with no capture issues, but it stayed in `Playfield2:028F`; no private-city, CityController, or `OrgClient BankAdd` smoke evidence was produced.
+- `git diff --check`: PASS.
+- First `tools\build_aorebirth_debug.cmd`: blocked only by running `ZoneEngine` PID `25584` locking `ZoneEngine.exe`.
+- `stop-engines.cmd`: PASS, used only to clear the build lock.
+- Second `tools\build_aorebirth_debug.cmd`: PASS.
+- `restart-engines.cmd`: PASS.
+- User gameplay testing required for `/command createorg <organization name>`.

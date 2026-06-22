@@ -87,6 +87,7 @@
       <Link>Properties\SolutionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="ChatCommands\ChatCommandGet.cs" />
+    <Compile Include="ChatCommands\ChatCommandCreateOrg.cs" />
     <Compile Include="ChatCommands\ChatCommandGiveCredits.cs" />
     <Compile Include="ChatCommands\ChatCommandGiveItem.cs" />
     <Compile Include="ChatCommands\ChatCommandSet.cs" />
