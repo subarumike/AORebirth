@@ -47,6 +47,28 @@ rg -n "(PatternOne|PatternTwo)" "path with nested quoting"
 - Keep output compact. Do not dump full files, full logs, broad recursive output, or noisy command output into chat or the context window. Use targeted searches, line-numbered snippets, and concise summaries.
 - If a malformed command happened, final reporting must include the failed command category, the corrected safe command form used, and confirmation that the malformed command did not change repo state. This reporting is required after prevention failed, but it does not excuse the workflow violation. Do not paste a giant output dump.
 
+## Small Task Discipline
+
+For small docs-only or workflow-rule edits, use the smallest sufficient action. If the prompt names the exact target files, do not rediscover them; inspect only the named files and the smallest relevant sections.
+
+For small scoped tasks:
+
+- Use at most three pre-edit commands.
+- Use at most two validation commands.
+- Use at most one final status command.
+- Do not search memory files, generated docs, project state, or the broader repo.
+- Do not inspect source code, build scripts, logs, captures, or unrelated docs.
+- Do not build, launch the game, start live capture, start or stop engines, or use PowerShell.
+
+Progress update discipline:
+
+- Use at most one short pre-edit progress line and one compact final response.
+- Do not narrate obvious steps such as staging, validation starting, commit starting, push starting, or final status checking unless something fails or user action is needed.
+
+Stop-after-success rule:
+
+- Once the requested change is made, validation passes, and the commit/push is complete, stop. Do not perform extra audits, cleanup, refactoring, project-state edits, generated-doc updates, exploratory searches, or additional verification not requested by the task.
+
 ## Command Budget And Context Protection
 
 - Protect the context window as a project resource.
