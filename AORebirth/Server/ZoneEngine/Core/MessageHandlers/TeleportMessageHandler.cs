@@ -68,6 +68,11 @@ namespace ZoneEngine.Core.MessageHandlers
             this.Send(character, this.NormalTeleport(character, destination, heading, playfield), false);
         }
 
+        public void SendLocal(ICharacter character, Vector3 destination, Quaternion heading)
+        {
+            this.Send(character, this.LocalTeleport(character, destination, heading), false);
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="character">
@@ -210,6 +215,38 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.GameServerId = 1;
                 x.SgId = 0;
                 x.ChangePlayfield = new Identity { Type = IdentityType.Playfield2, Instance = playfield.Instance };
+                x.Unknown4 = 0;
+                x.Unknown5 = 0;
+                x.Playfield2 = Identity.None;
+                x.Payload = BuildDestinationPayload(destination);
+            };
+        }
+
+        private MessageDataFiller LocalTeleport(ICharacter character, Vector3 destination, Quaternion heading)
+        {
+            return x =>
+            {
+                x.Identity = character.Identity;
+                x.Unknown = 0;
+                x.Destination = new SmokeLounge.AOtomation.Messaging.GameData.Vector3()
+                                {
+                                    X = (float)destination.x,
+                                    Y = (float)destination.y,
+                                    Z = (float)destination.z
+                                };
+                x.Heading = new SmokeLounge.AOtomation.Messaging.GameData.Quaternion()
+                            {
+                                X = (float)heading.x,
+                                Y = (float)heading.y,
+                                Z = (float)heading.z,
+                                W = (float)heading.w
+                            };
+                x.Unknown1 = 0x61;
+                x.Playfield =
+                    new Identity() { Type = LivePlayfieldProxyType, Instance = character.Playfield.Identity.Instance };
+                x.GameServerId = 1;
+                x.SgId = 0;
+                x.ChangePlayfield = Identity.None;
                 x.Unknown4 = 0;
                 x.Unknown5 = 0;
                 x.Playfield2 = Identity.None;
