@@ -9,6 +9,10 @@
 - Do not guess packet behavior.
 - Do not change database schemas without explicit approval.
 - Do not perform destructive database operations.
+- Use documented workflow commands first for known workflows; do not rediscover known build, engine, capture, or validation commands.
+- Protect the context window: avoid command spam, large logs, repeated searches, and noisy transcripts.
+- Never launch the AO game/client unless Mike explicitly instructs it in the current task.
+- For AOSharp live capture startup, use only the approved `cmd.exe` wrapper documented in `docs/ai/WORKFLOW.md`.
 - Report files inspected.
 - Report files changed.
 - Report validation performed.
