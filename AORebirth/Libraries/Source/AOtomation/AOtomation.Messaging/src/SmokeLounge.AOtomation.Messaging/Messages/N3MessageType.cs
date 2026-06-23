@@ -38,6 +38,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages
 
         SetPos = 0x195e496e, 
 
+        CityControllerWindowClose = 0x1b3c614d,
+
         ReflectAttack = 0x1c3a4f77, 
 
         SpecialAttackWeapon = 0x1d3c0f1c, 

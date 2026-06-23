@@ -1842,4 +1842,83 @@ namespace ZoneEngine.Core.MessageHandlers
             ChatTextMessageHandler.Default.Send(character, OfabGmRequirementFeedback);
         }
     }
+
+    [MessageHandler(MessageHandlerDirection.All)]
+    public class CityControllerWindowCloseMessageHandler :
+        BaseMessageHandler<CityControllerWindowCloseMessage, CityControllerWindowCloseMessageHandler>
+    {
+        private const int CapturedCityControllerCloseWindowInstance = 0x0000C000;
+
+        private const int CapturedOwnedPrivateCityOrganizationInstance = 1970177;
+
+        private const int CapturedCityControllerInfoIdentityType = 0x0000C419;
+
+        private const int CapturedCityControllerInfoIdentityInstance = 0x0000C000;
+
+        private const int CapturedCityControllerBuildingType = 0x0000C79E;
+
+        private const int CapturedCityControllerBuildingInstance = 0x0000138A;
+
+        public override void Receive(MessageWrapper<CityControllerWindowCloseMessage> messageWrapper)
+        {
+            ICharacter character = messageWrapper.Client.Controller.Character;
+            CityControllerWindowCloseMessage message = messageWrapper.MessageBody;
+            if (character == null
+                || character.Playfield == null
+                || message.WindowInstance != CapturedCityControllerCloseWindowInstance
+                || !AORebirth.Core.Playfields.Playfield.IsPrivateCityPlayfieldCandidate(character.Playfield.Identity))
+            {
+                return;
+            }
+
+            messageWrapper.Client.SendCompressed(
+                new AOTransportSignalMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 1,
+                    Signal = 7,
+                    Payload = CreateCapturedCityControllerClosePayload(character)
+                });
+
+            messageWrapper.Client.Server.Info(
+                messageWrapper.Client,
+                "CityController window close handled character={0} windowInstance={1} signal=7 evidence=private_city_owned_entry_capture_20260623_021643",
+                character.Identity,
+                message.WindowInstance);
+        }
+
+        private static byte[] CreateCapturedCityControllerClosePayload(ICharacter character)
+        {
+            int organizationId = ResolveCharacterOrganizationInstance(character);
+            var payload = new List<byte>(20);
+
+            AppendInt32(payload, CapturedCityControllerInfoIdentityType);
+            AppendInt32(payload, CapturedCityControllerInfoIdentityInstance);
+            AppendInt32(payload, organizationId);
+            AppendInt32(payload, CapturedCityControllerBuildingType);
+            AppendInt32(payload, CapturedCityControllerBuildingInstance);
+
+            return payload.ToArray();
+        }
+
+        private static int ResolveCharacterOrganizationInstance(ICharacter character)
+        {
+            uint baseOrganizationInstance = character.Stats[StatIds.clan].BaseValue;
+            if (baseOrganizationInstance > 0 && baseOrganizationInstance <= int.MaxValue)
+            {
+                return (int)baseOrganizationInstance;
+            }
+
+            int organizationInstance = character.Stats[StatIds.clan].Value;
+            return organizationInstance > 0 ? organizationInstance : CapturedOwnedPrivateCityOrganizationInstance;
+        }
+
+        private static void AppendInt32(ICollection<byte> bytes, int value)
+        {
+            bytes.Add((byte)((value >> 24) & 0xFF));
+            bytes.Add((byte)((value >> 16) & 0xFF));
+            bytes.Add((byte)((value >> 8) & 0xFF));
+            bytes.Add((byte)(value & 0xFF));
+        }
+    }
 }
