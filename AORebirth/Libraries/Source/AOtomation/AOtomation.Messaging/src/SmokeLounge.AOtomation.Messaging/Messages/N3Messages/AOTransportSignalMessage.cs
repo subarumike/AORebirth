@@ -15,4 +15,16 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         public byte[] Payload { get; set; }
     }
+
+    [AoContract((int)N3MessageType.CityControllerWindowClose)]
+    public class CityControllerWindowCloseMessage : N3Message
+    {
+        public CityControllerWindowCloseMessage()
+        {
+            this.N3MessageType = N3MessageType.CityControllerWindowClose;
+        }
+
+        [AoMember(0)]
+        public int WindowInstance { get; set; }
+    }
 }
