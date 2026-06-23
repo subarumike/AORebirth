@@ -2,7 +2,7 @@
 
 ## Active Task
 
-Fix AOSharp live capture wrapper reliability.
+Fix AOSharp live capture double injection.
 
 ## Scope
 
@@ -14,18 +14,16 @@ Fix AOSharp live capture wrapper reliability.
 
 ## Problem
 
-`tools-temp\start-aosharp-live-capture.cmd` failed from Codex with:
+Commit `6a789e27` fixed false failure detection, but repeated wrapper runs can still inject while an AOSharpLiveCapture session is already active.
 
-`ERROR: Input redirection is not supported, exiting the process immediately.`
-
-The wrapper used `start` to launch `AOSharpLiveInjector.exe`; under the Codex command host that path can inherit unsupported input redirection before the injector writes its startup log.
+Client evidence showed one wrapper run producing duplicate in-game startup lines for the same capture folder. That points at duplicate load/attach/initialization, or repeated wrapper injection into an already-running capture session.
 
 ## Fix
 
-- Replace the wrapper's direct `start` launch with a temporary Windows Script Host launcher.
-- The launcher starts `AOSharpLiveInjector.exe` minimized and detached without inheriting Codex stdin.
-- Treat live capture-folder output as success when the plugin is active, even if the injector log includes the known stdin warning.
-- Require `packets.hex.log` and `events.log` to exist with content in the newest capture folder before using capture-folder output as the success signal.
+- Keep the Windows Script Host launcher path from `6a789e27`.
+- Add an active-capture preflight before launching the injector.
+- If the newest capture folder is still marked `running` and already has non-empty `packets.hex.log` and `events.log`, report success and do not invoke `AOSharpLiveInjector.exe` again.
+- Continue treating the known stdin warning as non-fatal when capture output proves the plugin is active.
 - The approved external command remains unchanged:
 
 ```cmd
@@ -40,21 +38,25 @@ cmd /d /c tools-temp\start-aosharp-live-capture.cmd --pid <ao-client-pid>
 
 ## Validation Plan
 
-- `git diff --check`
 - Run the fixed wrapper once against an already-running AO client.
-- Confirm the wrapper reports success.
-- Confirm a new capture folder path.
+- Confirm exactly one capture folder outcome for the invocation: either one new folder after a fresh start, or the already-active folder with no reinjection.
+- Confirm one in-game `AOSharpLiveCapture logging to ...` line for a fresh start, and no duplicate line when the wrapper detects an already-active capture.
+- Confirm no lingering `AOSharpLiveInjector.exe` process/window.
 - Confirm live packet files are written.
+- `git diff --check`
 
 ## Validation Result
 
-- Existing in-game capture folder confirmed: `tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260623-010420`.
-- `20260623-010420` contains `capture_info.json`, `packets.hex.log` (`78470` bytes), and `events.log` (`123365` bytes).
-- Fixed wrapper returned success against the running AO client using:
+- First validation exposed the stale-success path: the injector logged a plugin load against PID `26428`, but the wrapper reported completed folder `20260623-010726`.
+- Updated wrapper then returned before injector launch:
 
 ```cmd
 cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "Anarchy Online"
 ```
 
-- Latest wrapper-reported capture output: `tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260623-010708`.
-- `20260623-010708` contains `packets.hex.log` (`9185` bytes) and `events.log` (`20539` bytes).
+- Wrapper result: `SUCCESS: AOSharp live capture already active.`
+- Reported capture folder: `tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260623-011533`.
+- `20260623-011533` contains `packets.hex.log` (`13631` bytes) and `events.log` (`26106` bytes).
+- `AOSharpLiveInjector.exe` was not left running.
+- `git diff --check` passed with existing CRLF warnings only.
+- In-game duplicate-line confirmation is limited to wrapper behavior: the final validation returned before invoking the injector, so that run should not create a new startup line.
