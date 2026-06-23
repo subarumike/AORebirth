@@ -250,6 +250,7 @@
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\MessageBody.cs" />
     <Compile Include="Messages\N3Message.cs" />
+    <Compile Include="Messages\N3Messages\AOTransportSignalMessage.cs" />
     <Compile Include="Messages\N3Messages\CharacterActionMessage.cs" />
     <Compile Include="Messages\N3Messages\CharacterActionType.cs" />
     <Compile Include="Messages\N3Messages\CityAdvantagesMessage.cs" />
@@ -357,6 +358,7 @@
     <Compile Include="Serialization\Serializers\ArraySerializer.cs" />
     <Compile Include="Serialization\Serializers\ArraySizeSerializer.cs" />
     <Compile Include="Serialization\Serializers\ByteSerializer.cs" />
+    <Compile Include="Serialization\Serializers\Custom\AOTransportSignalMessageSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\FollowInfoSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\GenericCmdSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\IdentityOnlyN3MessageSerializer.cs" />

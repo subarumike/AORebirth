@@ -92,13 +92,13 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int CapturedGridPlayfieldId = 152;
 
-        private const int CapturedPrivateCityGuestKeyTerminalInstance = unchecked((int)0x574DF8BB);
+        private const int CapturedPrivateCityGuestKeyTerminalInstance = unchecked((int)0x5751538B);
 
         private const int CapturedCityAccessCardTemplateId = 280642;
 
         private const int CapturedCityAccessCardIdentityType = 0x0000C770;
 
-        private const int CapturedCityAccessCardInstance = 0x006E0001;
+        private const int CapturedCityAccessCardInstance = 0x006D780D;
 
         private const int CapturedCityAccessCardOverflowSlot = 0x6F;
 
@@ -118,9 +118,25 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int CapturedPrivateCityOrganizationInstance = 1370122;
 
+        private const int CapturedOwnedPrivateCityOrganizationInstance = 1970177;
+
+        private const int CapturedCityControllerInstance = 0x009C182E;
+
+        private const int CapturedCityControllerInfoIdentityType = 0x0000C419;
+
+        private const int CapturedCityControllerInfoIdentityInstance = 0x0000C000;
+
+        private const int CapturedCityControllerBuildingType = 0x0000C79E;
+
+        private const int CapturedCityControllerBuildingInstance = 0x0000138A;
+
         private const int CapturedCityControllerFeedbackCategoryId = 110;
 
         private const int CapturedCityControllerNoOrganizationMessageId = 8208531;
+
+        private const string CapturedCityControllerNoOrganizationText = "no organization";
+
+        private const string CapturedCityControllerOwnedOrganizationText = "Est. 2024";
 
         private const int GridEnterTerminalTemplateId = 95350;
 
@@ -807,7 +823,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
             client.Server.Info(
                 client,
-                "Private city guest key terminal created captured City Access Card character={0} terminal={1} template={2} overflowSlot={3} evidence=live_capture_20260622-092724 no_persistence=1",
+                "Private city guest key terminal created captured City Access Card character={0} terminal={1} template={2} overflowSlot={3} evidence=private_city_capture_20260623_012720 no_persistence=1",
                 character.Identity,
                 target,
                 CapturedCityAccessCardTemplateId,
@@ -821,7 +837,7 @@ namespace ZoneEngine.Core.MessageHandlers
             GenericCmdMessage message,
             Identity target)
         {
-            if (target.Type != IdentityType.CityController)
+            if (target.Type != IdentityType.CityController || target.Instance != CapturedCityControllerInstance)
             {
                 return false;
             }
@@ -839,12 +855,21 @@ namespace ZoneEngine.Core.MessageHandlers
                 return true;
             }
 
+            if (character.Playfield == null
+                || !AORebirth.Core.Playfields.Playfield.IsPrivateCityPlayfieldCandidate(character.Playfield.Identity))
+            {
+                return false;
+            }
+
+            int organizationId = ResolveCharacterOrganizationInstance(character);
+            bool hasOrganization = organizationId > 0;
+            SendCapturedCityControllerOpenSignals(client, character, organizationId, hasOrganization);
             this.Acknowledge(character, message);
 
-            int organizationId = character.Stats[StatIds.clan].Value;
-            bool sentNoOrganizationFeedback = organizationId <= 0;
+            bool sentNoOrganizationFeedback = !hasOrganization;
             if (sentNoOrganizationFeedback)
             {
+                SendCapturedCityControllerSignal(client, character, 6, new byte[] { 0x00, 0x00, 0x00, 0x03 });
                 FeedbackMessageHandler.Default.Send(
                     character,
                     CapturedCityControllerFeedbackCategoryId,
@@ -853,7 +878,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
             client.Server.Info(
                 client,
-                "CityController use handled character={0} target={1} org={2} count={3} temp4={4} feedbackSent={5} feedbackCategory={6} feedbackMessage={7} aoTransportSignalSent=0 aoTransportSignalReason=no_outbound_model cashStatSent=0 cashStatReason=not_proven_current_response noCityAdvantages=1 noOwnershipChange=1 evidence=live_capture_20260623-015602",
+                "CityController use handled character={0} target={1} org={2} count={3} temp4={4} feedbackSent={5} feedbackCategory={6} feedbackMessage={7} aoTransportSignalSent={8} noCityAdvantages=1 noOwnershipChange=1 evidence=private_city_capture_20260623_012720/private_city_owned_entry_capture_20260623_021643",
                 character.Identity,
                 target,
                 organizationId,
@@ -861,9 +886,98 @@ namespace ZoneEngine.Core.MessageHandlers
                 message.Temp4,
                 sentNoOrganizationFeedback,
                 CapturedCityControllerFeedbackCategoryId,
-                CapturedCityControllerNoOrganizationMessageId);
+                CapturedCityControllerNoOrganizationMessageId,
+                hasOrganization ? 5 : 6);
 
             return true;
+        }
+
+        private static void SendCapturedCityControllerOpenSignals(
+            IZoneClient client,
+            ICharacter character,
+            int organizationId,
+            bool hasOrganization)
+        {
+            SendCapturedCityControllerSignal(
+                client,
+                character,
+                5,
+                CreateCapturedCityControllerInfoPayload(character, organizationId, hasOrganization));
+            SendCapturedCityControllerSignal(client, character, 10, new byte[] { 0x00, 0xE4, 0xE1, 0xC0 });
+            SendCapturedCityControllerSignal(
+                client,
+                character,
+                13,
+                hasOrganization
+                    ? new byte[] { 0x00, 0x27, 0x88, 0x05 }
+                    : new byte[] { 0x95, 0xC5, 0xD6, 0xBD });
+            SendCapturedCityControllerSignal(
+                client,
+                character,
+                14,
+                hasOrganization
+                    ? new byte[] { 0x00, 0x00, 0x00, 0x00, 0x95, 0xC5, 0xCC, 0xD7 }
+                    : new byte[] { 0x00, 0x00, 0x00, 0x00, 0x95, 0xC5, 0xD6, 0xBD });
+            SendCapturedCityControllerSignal(client, character, 15, new byte[] { 0x3F, 0x80, 0x00, 0x00 });
+        }
+
+        private static void SendCapturedCityControllerSignal(
+            IZoneClient client,
+            ICharacter character,
+            int signal,
+            byte[] payload)
+        {
+            client.SendCompressed(
+                new AOTransportSignalMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 1,
+                    Signal = signal,
+                    Payload = payload
+                });
+        }
+
+        private static byte[] CreateCapturedCityControllerInfoPayload(
+            ICharacter character,
+            int organizationId,
+            bool hasOrganization)
+        {
+            string text = hasOrganization
+                ? CapturedCityControllerOwnedOrganizationText
+                : CapturedCityControllerNoOrganizationText;
+            byte[] textBytes = System.Text.Encoding.ASCII.GetBytes(text);
+            var payload = new List<byte>(58 + textBytes.Length);
+
+            AppendInt32(payload, CapturedCityControllerInfoIdentityType);
+            AppendInt32(payload, CapturedCityControllerInfoIdentityInstance);
+            AppendInt32(
+                payload,
+                hasOrganization ? organizationId : CapturedOwnedPrivateCityOrganizationInstance);
+            AppendInt32(payload, CapturedCityControllerBuildingType);
+            AppendInt32(payload, CapturedCityControllerBuildingInstance);
+            AppendInt32(payload, (int)character.Identity.Type);
+            AppendInt32(payload, character.Identity.Instance);
+            AppendInt32(payload, hasOrganization ? 2 : 1);
+            AppendInt32(payload, hasOrganization ? 3 : 2);
+            AppendInt32(payload, hasOrganization ? 1 : -1);
+            AppendInt16(payload, textBytes.Length);
+            payload.AddRange(textBytes);
+
+            return payload.ToArray();
+        }
+
+        private static void AppendInt32(ICollection<byte> bytes, int value)
+        {
+            bytes.Add((byte)((value >> 24) & 0xFF));
+            bytes.Add((byte)((value >> 16) & 0xFF));
+            bytes.Add((byte)((value >> 8) & 0xFF));
+            bytes.Add((byte)(value & 0xFF));
+        }
+
+        private static void AppendInt16(ICollection<byte> bytes, int value)
+        {
+            bytes.Add((byte)((value >> 8) & 0xFF));
+            bytes.Add((byte)(value & 0xFF));
         }
 
         private static SimpleItemFullUpdateMessage CreateCapturedCityAccessCardItem(ICharacter character)
@@ -922,8 +1036,20 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private static int ResolvePrivateCityOrganizationInstance(ICharacter character)
         {
-            int organizationInstance = character.Stats[StatIds.clan].Value;
+            int organizationInstance = ResolveCharacterOrganizationInstance(character);
             return organizationInstance > 0 ? organizationInstance : CapturedPrivateCityOrganizationInstance;
+        }
+
+        private static int ResolveCharacterOrganizationInstance(ICharacter character)
+        {
+            uint baseOrganizationInstance = character.Stats[StatIds.clan].BaseValue;
+            if (baseOrganizationInstance > 0 && baseOrganizationInstance <= int.MaxValue)
+            {
+                return (int)baseOrganizationInstance;
+            }
+
+            int organizationInstance = character.Stats[StatIds.clan].Value;
+            return organizationInstance > 0 ? organizationInstance : 0;
         }
 
         private bool TryHandleCapturedGridTerminalUse(
