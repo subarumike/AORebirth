@@ -94,6 +94,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int CapturedPrivateCityGuestKeyTerminalInstance = unchecked((int)0x5751538B);
 
+        private const int RuntimePrivateCityGuestKeyTerminalInstance = unchecked((int)0x574B84AB);
+
         private const int CapturedCityAccessCardTemplateId = 280642;
 
         private const int CapturedCityAccessCardIdentityType = 0x0000C770;
@@ -121,6 +123,8 @@ namespace ZoneEngine.Core.MessageHandlers
         private const int CapturedOwnedPrivateCityOrganizationInstance = 1970177;
 
         private const int CapturedCityControllerInstance = 0x009C182E;
+
+        private const int RuntimeCityControllerInstance = 0x009C6010;
 
         private const int CapturedCityControllerInfoIdentityType = 0x0000C419;
 
@@ -802,8 +806,7 @@ namespace ZoneEngine.Core.MessageHandlers
             ICharacter character = client.Controller.Character;
             if (character == null
                 || character.Playfield == null
-                || target.Type != IdentityType.Terminal
-                || target.Instance != CapturedPrivateCityGuestKeyTerminalInstance
+                || !IsPrivateCityGuestKeyTerminalTarget(target)
                 || !AORebirth.Core.Playfields.Playfield.IsPrivateCityPlayfieldCandidate(character.Playfield.Identity))
             {
                 return false;
@@ -823,7 +826,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
             client.Server.Info(
                 client,
-                "Private city guest key terminal created captured City Access Card character={0} terminal={1} template={2} overflowSlot={3} evidence=private_city_capture_20260623_012720 no_persistence=1",
+                "Private city guest key terminal created captured City Access Card character={0} terminal={1} template={2} overflowSlot={3} evidence=private_city_capture_20260623_012720 runtime_target=574B84AB no_persistence=1",
                 character.Identity,
                 target,
                 CapturedCityAccessCardTemplateId,
@@ -837,7 +840,7 @@ namespace ZoneEngine.Core.MessageHandlers
             GenericCmdMessage message,
             Identity target)
         {
-            if (target.Type != IdentityType.CityController || target.Instance != CapturedCityControllerInstance)
+            if (!IsPrivateCityControllerTarget(target))
             {
                 return false;
             }
@@ -878,7 +881,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
             client.Server.Info(
                 client,
-                "CityController use handled character={0} target={1} org={2} count={3} temp4={4} feedbackSent={5} feedbackCategory={6} feedbackMessage={7} aoTransportSignalSent={8} noCityAdvantages=1 noOwnershipChange=1 evidence=private_city_capture_20260623_012720/private_city_owned_entry_capture_20260623_021643",
+                "CityController use handled character={0} target={1} org={2} count={3} temp4={4} feedbackSent={5} feedbackCategory={6} feedbackMessage={7} aoTransportSignalSent={8} noCityAdvantages=1 noOwnershipChange=1 evidence=private_city_capture_20260623_012720/private_city_owned_entry_capture_20260623_021643 runtime_target=009C6010",
                 character.Identity,
                 target,
                 organizationId,
@@ -890,6 +893,20 @@ namespace ZoneEngine.Core.MessageHandlers
                 hasOrganization ? 5 : 6);
 
             return true;
+        }
+
+        private static bool IsPrivateCityGuestKeyTerminalTarget(Identity target)
+        {
+            return target.Type == IdentityType.Terminal
+                && (target.Instance == CapturedPrivateCityGuestKeyTerminalInstance
+                    || target.Instance == RuntimePrivateCityGuestKeyTerminalInstance);
+        }
+
+        private static bool IsPrivateCityControllerTarget(Identity target)
+        {
+            return target.Type == IdentityType.CityController
+                && (target.Instance == CapturedCityControllerInstance
+                    || target.Instance == RuntimeCityControllerInstance);
         }
 
         private static void SendCapturedCityControllerOpenSignals(
