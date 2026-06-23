@@ -798,13 +798,16 @@ namespace AORebirth.Core.Playfields
                     });
             }
 
-            this.SendPrivateCityStat(client, character, StatIds.socialstatus, 1);
+            this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
             this.SendPrivateCityStat(client, character, StatIds.clan, 0);
             this.SendPrivateCityStat(client, character, StatIds.clanlevel, 0);
+            this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
+            this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
+            this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
 
             client.Server.Info(
                 client,
-                "Private city owned org init sent character={0} playfield={1} org={2} orgInfoSent={3} evidence=live_capture_20260623-021643",
+                "Private city owned org init sent character={0} playfield={1} org={2} orgInfoSent={3} socialStatus=4 repeats=4 evidence=live_capture_20260623-021643 live_capture_20260623-042326",
                 character.Identity,
                 this.Identity,
                 organizationInstance,
@@ -3354,6 +3357,16 @@ namespace AORebirth.Core.Playfields
 
         private void SendPrivateCityStat(ZoneClient client, ICharacter character, StatIds statId, byte unknown)
         {
+            this.SendPrivateCityStatValue(client, character, statId, ResolveCharacterStatWireValue(character, statId), unknown);
+        }
+
+        private void SendPrivateCityStatValue(
+            ZoneClient client,
+            ICharacter character,
+            StatIds statId,
+            uint value,
+            byte unknown)
+        {
             client.SendCompressed(
                 new StatMessage
                 {
@@ -3365,7 +3378,7 @@ namespace AORebirth.Core.Playfields
                             new GameTuple<CharacterStat, uint>
                             {
                                 Value1 = (CharacterStat)statId,
-                                Value2 = ResolveCharacterStatWireValue(character, statId)
+                                Value2 = value
                             }
                         }
                 });
