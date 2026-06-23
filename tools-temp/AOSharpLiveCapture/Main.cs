@@ -137,6 +137,8 @@ namespace AOSharpLiveCapture
         private string lastPlayfieldId = string.Empty;
         private CombatLootSmoke combatLootSmoke;
         private bool initialized;
+        private bool enemyFightCaptureEnabled;
+        private bool enemyFightCaptureStarted;
 
         public override void Run(string pluginDir)
         {
@@ -204,7 +206,7 @@ namespace AOSharpLiveCapture
             Chat.RegisterCommand("aosmoke", this.OnSmokeCommand);
 
             this.LogEvent("PLUGIN", "AOSharpLiveCapture loaded. session=" + this.sessionDirectory);
-            this.LogEvent("PLUGIN", "Commands: /aocap start | stop | mark <text> | status | flush | snapshot | dynels");
+            this.LogEvent("PLUGIN", "Commands: /aocap start | stop | mark <text> | status | flush | snapshot | dynels [force] | fight start|stop|status");
             this.LogEvent("PLUGIN", "Smoke commands: /aosmoke start [mobAlias] | stop | status | log");
             this.LogEvent("PLUGIN", "ShopUpdate CSV: " + Path.Combine(this.sessionDirectory, "shop-updates.csv"));
             this.LogEvent("PLUGIN", "VendingMachineFullUpdate CSV: " + Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
@@ -316,25 +318,33 @@ namespace AOSharpLiveCapture
                     break;
 
                 case "dynels":
-                    DynelDumpResult result = this.DumpDynelsNoThrow();
+                    bool forceDynelDump = args.Length > 1 && string.Equals(args[1], "force", StringComparison.OrdinalIgnoreCase);
+                    DynelDumpResult result = this.DumpDynelsNoThrow(forceDynelDump);
                     this.TryWriteChat(
                         chatWindow,
                         result.Success
-                            ? string.Format(
-                                CultureInfo.InvariantCulture,
-                                "AO dynel dump appended {0} rows: {1}",
-                                result.Count,
-                                result.CsvPath)
+                            ? result.AlreadyWritten
+                                ? "AO dynel static dump already exists: " + result.CsvPath + " Use /aocap dynels force to replace it."
+                                : string.Format(
+                                    CultureInfo.InvariantCulture,
+                                    "AO dynel static dump wrote {0} rows: {1}",
+                                    result.Count,
+                                    result.CsvPath)
                             : "AO dynel dump failed: " + result.Error,
                         ChatColor.Gold);
+                    break;
+
+                case "fight":
+                    this.OnFightCommand(args, chatWindow);
                     break;
 
                 default:
                     chatWindow.WriteLine(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "AO capture {0}. inRaw={1} outRaw={2} inN3={3} outN3={4} dir={5}",
+                            "AO capture {0}. fight={1}. inRaw={2} outRaw={3} inN3={4} outN3={5} dir={6}",
                             this.enabled ? "running" : "stopped",
+                            this.enemyFightCaptureEnabled ? "on" : "off",
                             this.inboundPacketCount,
                             this.outboundPacketCount,
                             this.decodedInboundCount,
@@ -345,11 +355,39 @@ namespace AOSharpLiveCapture
             }
         }
 
-        private DynelDumpResult DumpDynelsNoThrow()
+        private void OnFightCommand(string[] args, ChatWindow chatWindow)
+        {
+            string action = args.Length > 1 ? args[1].ToLowerInvariant() : "status";
+            switch (action)
+            {
+                case "start":
+                    this.enemyFightCaptureEnabled = true;
+                    this.enemyFightCaptureStarted = true;
+                    this.LogEvent("COMMAND", "enemy fight capture started");
+                    this.TryWriteChat(chatWindow, "AO enemy fight capture started.", ChatColor.Gold);
+                    break;
+
+                case "stop":
+                    this.enemyFightCaptureEnabled = false;
+                    this.LogEvent("COMMAND", "enemy fight capture stopped");
+                    this.Flush();
+                    this.TryWriteChat(chatWindow, "AO enemy fight capture stopped.", ChatColor.Gold);
+                    break;
+
+                default:
+                    this.TryWriteChat(
+                        chatWindow,
+                        "AO enemy fight capture " + (this.enemyFightCaptureEnabled ? "running." : "stopped."),
+                        ChatColor.Gold);
+                    break;
+            }
+        }
+
+        private DynelDumpResult DumpDynelsNoThrow(bool force)
         {
             try
             {
-                return this.DumpDynels();
+                return this.DumpDynels(force);
             }
             catch (Exception ex)
             {
@@ -358,9 +396,18 @@ namespace AOSharpLiveCapture
             }
         }
 
-        private DynelDumpResult DumpDynels()
+        private DynelDumpResult DumpDynels(bool force)
         {
             DateTime capturedUtc = DateTime.UtcNow;
+            string csvPath = Path.Combine(this.sessionDirectory, "dynels.csv");
+            string jsonPath = Path.Combine(this.sessionDirectory, "dynels.json");
+            string summaryPath = Path.Combine(this.sessionDirectory, "dynels-summary.txt");
+
+            if (!force && File.Exists(csvPath) && new FileInfo(csvPath).Length > 0)
+            {
+                return DynelDumpResult.AlreadyExists(csvPath, jsonPath, summaryPath);
+            }
+
             Dynel[] dynels = DynelManager.AllDynels == null ? new Dynel[0] : DynelManager.AllDynels.ToArray();
             LocalPlayer localPlayer = DynelManager.LocalPlayer;
 
@@ -371,10 +418,6 @@ namespace AOSharpLiveCapture
                 .ThenBy(x => x.Name)
                 .ToArray();
 
-            string csvPath = Path.Combine(this.sessionDirectory, "dynels.csv");
-            string jsonPath = Path.Combine(this.sessionDirectory, "dynels.json");
-            string summaryPath = Path.Combine(this.sessionDirectory, "dynels-summary.txt");
-
             this.WriteDynelCsv(csvPath, rows);
             this.WriteDynelJson(jsonPath, capturedUtc, rows);
             this.WriteDynelSummary(summaryPath, capturedUtc, rows);
@@ -383,8 +426,9 @@ namespace AOSharpLiveCapture
                 "DYNEL-DUMP",
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "rows={0} csv={1} json={2} summary={3}",
+                    "rows={0} force={1} csv={2} json={3} summary={4}",
                     rows.Length,
+                    force,
                     csvPath,
                     jsonPath,
                     summaryPath));
@@ -542,13 +586,9 @@ namespace AOSharpLiveCapture
 
         private void WriteDynelCsv(string path, DynelDumpRow[] rows)
         {
-            bool writeHeader = !File.Exists(path) || new FileInfo(path).Length == 0;
-            using (StreamWriter writer = CreateAppendWriter(path))
+            using (StreamWriter writer = CreateWriter(path))
             {
-                if (writeHeader)
-                {
-                    writer.WriteLine("CapturedUtc,LocalCharacterName,LocalCharacterIdentity,PlayfieldIdentity,Index,DynelCategory,CharacterKind,Identity,IdentityType,IdentityTypeValue,Instance,InstanceHex,ClassName,Name,Position,IsNpc,IsPet,IsInPlay,IsAlive,IsAttacking,FightingTarget,Health,MaxHealth,HealthPercent,NpcLevel,MonsterData,CATMesh,DisplayCATMesh,VisualFlags,State,CurrentState,ActionCategory,Scale,CharRadius,NPCBrainState,PetState,PetOwnerId,NPCFamily,NPCVicinityFamily,RunSpeed,MinDamage,MaxDamage,DefaultAttackType,DamageType1,DamageType2,AttackDelay,RechargeDelay,AttackDelayCap,RechargeDelayCap,EquippedWeapons,HealDelta,DeadTimer,CorpseType,CorpseInstance,CorpseAnimKey,DieAnim,Pointer,Error");
-                }
+                writer.WriteLine("CapturedUtc,LocalCharacterName,LocalCharacterIdentity,PlayfieldIdentity,Index,DynelCategory,CharacterKind,Identity,IdentityType,IdentityTypeValue,Instance,InstanceHex,ClassName,Name,Position,IsNpc,IsPet,IsInPlay,IsAlive,IsAttacking,FightingTarget,Health,MaxHealth,HealthPercent,NpcLevel,MonsterData,CATMesh,DisplayCATMesh,VisualFlags,State,CurrentState,ActionCategory,Scale,CharRadius,NPCBrainState,PetState,PetOwnerId,NPCFamily,NPCVicinityFamily,RunSpeed,MinDamage,MaxDamage,DefaultAttackType,DamageType1,DamageType2,AttackDelay,RechargeDelay,AttackDelayCap,RechargeDelayCap,EquippedWeapons,HealDelta,DeadTimer,CorpseType,CorpseInstance,CorpseAnimKey,DieAnim,Pointer,Error");
 
                 foreach (DynelDumpRow row in rows)
                 {
@@ -1009,8 +1049,11 @@ namespace AOSharpLiveCapture
             bool interesting = this.interestingMessageNames.Contains(messageName);
             string detail = interesting ? this.DescribeN3Message(message) : string.Empty;
             this.ExportSpecializedMessage(direction, sequence, message);
-            this.ExportEnemyN3Evidence(direction, sequence, message);
-            this.TrackEnemyStateFromMessage(direction, sequence, message);
+            if (this.enemyFightCaptureEnabled)
+            {
+                this.ExportEnemyN3Evidence(direction, sequence, message);
+                this.TrackEnemyStateFromMessage(direction, sequence, message);
+            }
             ShopUpdateMessage shopUpdate = message as ShopUpdateMessage;
             if (shopUpdate != null)
             {
@@ -1974,6 +2017,11 @@ namespace AOSharpLiveCapture
 
         private void TrackEnemyFromDynel(Dynel dynel, string requestedEventType)
         {
+            if (!this.enemyFightCaptureEnabled)
+            {
+                return;
+            }
+
             if (dynel == null || dynel.Identity.Type != IdentityType.SimpleChar)
             {
                 return;
@@ -2017,6 +2065,11 @@ namespace AOSharpLiveCapture
 
         private void TrackEnemyGone(string entityId)
         {
+            if (!this.enemyFightCaptureEnabled)
+            {
+                return;
+            }
+
             DateTime timestamp = DateTime.UtcNow;
             lock (this.syncRoot)
             {
@@ -2459,12 +2512,18 @@ namespace AOSharpLiveCapture
                 notes.Add("No system/feedback/quest messages were observed.");
             }
 
-            if ((this.enemyCombatEventCount > 0 || this.enemyCombatRowCount > 0) && this.enemyStateRowCount == 0)
+            if (this.enemyFightCaptureStarted
+                && (this.enemyCombatEventCount > 0 || this.enemyCombatRowCount > 0)
+                && this.enemyStateRowCount == 0)
             {
                 issues.Add("Combat packets were observed, but enemy-state.csv has no rows.");
             }
 
-            if (this.enemyCombatEventCount == 0 && this.enemyCombatRowCount == 0)
+            if (!this.enemyFightCaptureStarted)
+            {
+                notes.Add("Enemy fight capture was not started; enemy behavior CSVs are intentionally gated.");
+            }
+            else if (this.enemyCombatEventCount == 0 && this.enemyCombatRowCount == 0)
             {
                 notes.Add("No enemy combat packets were observed.");
             }
@@ -2646,6 +2705,12 @@ namespace AOSharpLiveCapture
                 json.Append("    \"inventoryUpdateRows\": ");
                 json.Append(this.inventoryUpdateRowCount.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine(",");
+                json.Append("    \"enemyFightCaptureStarted\": ");
+                json.Append(this.enemyFightCaptureStarted ? "true" : "false");
+                json.AppendLine(",");
+                json.Append("    \"enemyFightCaptureEnabled\": ");
+                json.Append(this.enemyFightCaptureEnabled ? "true" : "false");
+                json.AppendLine(",");
                 json.Append("    \"enemyTrackedEntities\": ");
                 json.Append(this.enemyStates.Count.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine(",");
@@ -2811,12 +2876,22 @@ namespace AOSharpLiveCapture
 
             public string Error { get; private set; }
 
+            public bool AlreadyWritten { get; private set; }
+
             public static DynelDumpResult Failed(string error)
             {
                 return new DynelDumpResult(0, string.Empty, string.Empty, string.Empty)
                 {
                     Success = false,
                     Error = error ?? string.Empty
+                };
+            }
+
+            public static DynelDumpResult AlreadyExists(string csvPath, string jsonPath, string summaryPath)
+            {
+                return new DynelDumpResult(0, csvPath, jsonPath, summaryPath)
+                {
+                    AlreadyWritten = true
                 };
             }
         }
