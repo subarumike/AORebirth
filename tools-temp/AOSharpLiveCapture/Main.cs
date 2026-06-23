@@ -294,23 +294,17 @@ namespace AOSharpLiveCapture
                     break;
 
                 case "dynels":
-                    try
-                    {
-                        DynelDumpResult result = this.DumpDynels();
-                        chatWindow.WriteLine(
-                            string.Format(
+                    DynelDumpResult result = this.DumpDynelsNoThrow();
+                    this.TryWriteChat(
+                        chatWindow,
+                        result.Success
+                            ? string.Format(
                                 CultureInfo.InvariantCulture,
                                 "AO dynel dump wrote {0} rows: {1}",
                                 result.Count,
-                                result.CsvPath),
-                            ChatColor.Gold);
-                    }
-                    catch (Exception ex)
-                    {
-                        this.LogEvent("DYNEL-DUMP-ERROR", ex.ToString());
-                        chatWindow.WriteLine("AO dynel dump failed: " + ex.Message, ChatColor.Gold);
-                    }
-
+                                result.CsvPath)
+                            : "AO dynel dump failed: " + result.Error,
+                        ChatColor.Gold);
                     break;
 
                 default:
@@ -326,6 +320,19 @@ namespace AOSharpLiveCapture
                             this.sessionDirectory),
                         ChatColor.Gold);
                     break;
+            }
+        }
+
+        private DynelDumpResult DumpDynelsNoThrow()
+        {
+            try
+            {
+                return this.DumpDynels();
+            }
+            catch (Exception ex)
+            {
+                this.TryLogEvent("DYNEL-DUMP-ERROR", ex.ToString());
+                return DynelDumpResult.Failed(ex.Message);
             }
         }
 
@@ -350,7 +357,7 @@ namespace AOSharpLiveCapture
             this.WriteDynelJson(jsonPath, capturedUtc, rows);
             this.WriteDynelSummary(summaryPath, capturedUtc, rows);
 
-            this.LogEvent(
+            this.TryLogEvent(
                 "DYNEL-DUMP",
                 string.Format(
                     CultureInfo.InvariantCulture,
@@ -368,12 +375,9 @@ namespace AOSharpLiveCapture
             var row = new DynelDumpRow
             {
                 CapturedUtc = capturedUtc.ToString("o", CultureInfo.InvariantCulture),
-                LocalCharacterName = Safe(() => localPlayer == null ? string.Empty : localPlayer.Name),
+                LocalCharacterName = this.GetLocalCharacterName(),
                 LocalCharacterIdentity = Safe(() => localPlayer == null ? string.Empty : localPlayer.Identity.ToString()),
-                PlayfieldIdentity = Safe(() => Playfield.Identity.ToString()),
-                LocalX = Safe(() => localPlayer == null ? string.Empty : localPlayer.Position.X.ToString("R", CultureInfo.InvariantCulture)),
-                LocalY = Safe(() => localPlayer == null ? string.Empty : localPlayer.Position.Y.ToString("R", CultureInfo.InvariantCulture)),
-                LocalZ = Safe(() => localPlayer == null ? string.Empty : localPlayer.Position.Z.ToString("R", CultureInfo.InvariantCulture)),
+                PlayfieldIdentity = this.GetDetectedPlayfieldId(),
                 Index = index.ToString(CultureInfo.InvariantCulture)
             };
 
@@ -401,38 +405,8 @@ namespace AOSharpLiveCapture
 
             row.ClassName = Safe(() => dynel.GetType().Name);
             row.Name = Safe(() => dynel.Name);
-            row.X = Safe(() => dynel.Position.X.ToString("R", CultureInfo.InvariantCulture));
-            row.Y = Safe(() => dynel.Position.Y.ToString("R", CultureInfo.InvariantCulture));
-            row.Z = Safe(() => dynel.Position.Z.ToString("R", CultureInfo.InvariantCulture));
-            row.Distance = Safe(
-                () => localPlayer == null
-                    ? string.Empty
-                    : Vector3.Distance(localPlayer.Position, dynel.Position).ToString("R", CultureInfo.InvariantCulture));
-            row.Radius = Safe(() => dynel.Radius.ToString("R", CultureInfo.InvariantCulture));
-            row.Velocity = Safe(() => dynel.Velocity.ToString("R", CultureInfo.InvariantCulture));
-            row.MovementState = Safe(() => dynel.MovementState.ToString());
-            row.Flags = Safe(() => dynel.Flags.ToString());
-            row.IsValid = Safe(() => dynel.IsValid.ToString());
+            row.Position = Safe(() => dynel.Position.ToString());
             row.Pointer = Safe(() => "0x" + dynel.Pointer.ToInt64().ToString("X", CultureInfo.InvariantCulture));
-            row.Description = Safe(() => this.DescribeDynel(dynel));
-
-            if (SafeBool(() => dynel.Identity.Type == IdentityType.SimpleChar))
-            {
-                SimpleChar character = dynel.Cast<SimpleChar>();
-                row.IsSimpleChar = "True";
-                row.IsPlayer = Safe(() => character.IsPlayer.ToString());
-                row.IsNpc = Safe(() => character.IsNpc.ToString());
-                row.IsPet = Safe(() => character.IsPet.ToString());
-                row.IsInPlay = Safe(() => character.IsInPlay.ToString());
-                row.IsAlive = Safe(() => character.IsAlive.ToString());
-                row.Health = SafeStat(character, Stat.Health);
-                row.MaxHealth = SafeStat(character, Stat.MaxHealth);
-                row.HealthPercent = Safe(() => character.HealthPercent.ToString("R", CultureInfo.InvariantCulture));
-                row.Level = SafeStat(character, Stat.Level);
-                row.Side = Safe(() => character.Side.ToString());
-                row.Profession = Safe(() => character.Profession.ToString());
-                row.ComputerLiteracy = SafeStat(character, Stat.ComputerLiteracy);
-            }
 
             return row;
         }
@@ -441,7 +415,7 @@ namespace AOSharpLiveCapture
         {
             using (StreamWriter writer = CreateWriter(path))
             {
-                writer.WriteLine("CapturedUtc,LocalCharacterName,LocalCharacterIdentity,PlayfieldIdentity,LocalX,LocalY,LocalZ,Index,Identity,IdentityType,IdentityTypeValue,Instance,InstanceHex,ClassName,Name,X,Y,Z,Distance,Radius,Velocity,MovementState,Flags,IsValid,Pointer,IsSimpleChar,IsPlayer,IsNpc,IsPet,IsInPlay,IsAlive,Health,MaxHealth,HealthPercent,Level,Side,Profession,ComputerLiteracy,Description,Error");
+                writer.WriteLine("CapturedUtc,LocalCharacterName,LocalCharacterIdentity,PlayfieldIdentity,Index,Identity,IdentityType,IdentityTypeValue,Instance,InstanceHex,ClassName,Name,Position,Pointer,Error");
                 foreach (DynelDumpRow row in rows)
                 {
                     writer.WriteLine(string.Join(
@@ -452,9 +426,6 @@ namespace AOSharpLiveCapture
                             Csv(row.LocalCharacterName),
                             Csv(row.LocalCharacterIdentity),
                             Csv(row.PlayfieldIdentity),
-                            Csv(row.LocalX),
-                            Csv(row.LocalY),
-                            Csv(row.LocalZ),
                             Csv(row.Index),
                             Csv(row.Identity),
                             Csv(row.IdentityType),
@@ -463,30 +434,8 @@ namespace AOSharpLiveCapture
                             Csv(row.InstanceHex),
                             Csv(row.ClassName),
                             Csv(row.Name),
-                            Csv(row.X),
-                            Csv(row.Y),
-                            Csv(row.Z),
-                            Csv(row.Distance),
-                            Csv(row.Radius),
-                            Csv(row.Velocity),
-                            Csv(row.MovementState),
-                            Csv(row.Flags),
-                            Csv(row.IsValid),
+                            Csv(row.Position),
                             Csv(row.Pointer),
-                            Csv(row.IsSimpleChar),
-                            Csv(row.IsPlayer),
-                            Csv(row.IsNpc),
-                            Csv(row.IsPet),
-                            Csv(row.IsInPlay),
-                            Csv(row.IsAlive),
-                            Csv(row.Health),
-                            Csv(row.MaxHealth),
-                            Csv(row.HealthPercent),
-                            Csv(row.Level),
-                            Csv(row.Side),
-                            Csv(row.Profession),
-                            Csv(row.ComputerLiteracy),
-                            Csv(row.Description),
                             Csv(row.Error)
                         }));
                 }
@@ -542,30 +491,8 @@ namespace AOSharpLiveCapture
             AppendJsonField(json, indent + "  ", "instanceHex", row.InstanceHex, true);
             AppendJsonField(json, indent + "  ", "className", row.ClassName, true);
             AppendJsonField(json, indent + "  ", "name", row.Name, true);
-            AppendJsonField(json, indent + "  ", "x", row.X, true);
-            AppendJsonField(json, indent + "  ", "y", row.Y, true);
-            AppendJsonField(json, indent + "  ", "z", row.Z, true);
-            AppendJsonField(json, indent + "  ", "distance", row.Distance, true);
-            AppendJsonField(json, indent + "  ", "radius", row.Radius, true);
-            AppendJsonField(json, indent + "  ", "velocity", row.Velocity, true);
-            AppendJsonField(json, indent + "  ", "movementState", row.MovementState, true);
-            AppendJsonField(json, indent + "  ", "flags", row.Flags, true);
-            AppendJsonField(json, indent + "  ", "isValid", row.IsValid, true);
+            AppendJsonField(json, indent + "  ", "position", row.Position, true);
             AppendJsonField(json, indent + "  ", "pointer", row.Pointer, true);
-            AppendJsonField(json, indent + "  ", "isSimpleChar", row.IsSimpleChar, true);
-            AppendJsonField(json, indent + "  ", "isPlayer", row.IsPlayer, true);
-            AppendJsonField(json, indent + "  ", "isNpc", row.IsNpc, true);
-            AppendJsonField(json, indent + "  ", "isPet", row.IsPet, true);
-            AppendJsonField(json, indent + "  ", "isInPlay", row.IsInPlay, true);
-            AppendJsonField(json, indent + "  ", "isAlive", row.IsAlive, true);
-            AppendJsonField(json, indent + "  ", "health", row.Health, true);
-            AppendJsonField(json, indent + "  ", "maxHealth", row.MaxHealth, true);
-            AppendJsonField(json, indent + "  ", "healthPercent", row.HealthPercent, true);
-            AppendJsonField(json, indent + "  ", "level", row.Level, true);
-            AppendJsonField(json, indent + "  ", "side", row.Side, true);
-            AppendJsonField(json, indent + "  ", "profession", row.Profession, true);
-            AppendJsonField(json, indent + "  ", "computerLiteracy", row.ComputerLiteracy, true);
-            AppendJsonField(json, indent + "  ", "description", row.Description, true);
             AppendJsonField(json, indent + "  ", "error", row.Error, false);
             json.AppendLine();
             json.Append(indent);
@@ -599,6 +526,31 @@ namespace AOSharpLiveCapture
             }
 
             File.WriteAllText(path, summary.ToString(), Encoding.UTF8);
+        }
+
+        private void TryLogEvent(string category, string message)
+        {
+            try
+            {
+                this.LogEvent(category, message);
+            }
+            catch
+            {
+            }
+        }
+
+        private void TryWriteChat(ChatWindow chatWindow, string message, ChatColor color)
+        {
+            try
+            {
+                if (chatWindow != null)
+                {
+                    chatWindow.WriteLine(message, color);
+                }
+            }
+            catch
+            {
+            }
         }
 
         private void OnSmokeCommand(string command, string[] args, ChatWindow chatWindow)
@@ -2180,6 +2132,7 @@ namespace AOSharpLiveCapture
                 this.CsvPath = csvPath;
                 this.JsonPath = jsonPath;
                 this.SummaryPath = summaryPath;
+                this.Success = true;
             }
 
             public int Count { get; private set; }
@@ -2189,6 +2142,19 @@ namespace AOSharpLiveCapture
             public string JsonPath { get; private set; }
 
             public string SummaryPath { get; private set; }
+
+            public bool Success { get; private set; }
+
+            public string Error { get; private set; }
+
+            public static DynelDumpResult Failed(string error)
+            {
+                return new DynelDumpResult(0, string.Empty, string.Empty, string.Empty)
+                {
+                    Success = false,
+                    Error = error ?? string.Empty
+                };
+            }
         }
 
         private sealed class DynelDumpRow
@@ -2204,12 +2170,6 @@ namespace AOSharpLiveCapture
             public string LocalCharacterIdentity { get; set; }
 
             public string PlayfieldIdentity { get; set; }
-
-            public string LocalX { get; set; }
-
-            public string LocalY { get; set; }
-
-            public string LocalZ { get; set; }
 
             public string Index { get; set; }
 
@@ -2227,53 +2187,9 @@ namespace AOSharpLiveCapture
 
             public string Name { get; set; }
 
-            public string X { get; set; }
-
-            public string Y { get; set; }
-
-            public string Z { get; set; }
-
-            public string Distance { get; set; }
-
-            public string Radius { get; set; }
-
-            public string Velocity { get; set; }
-
-            public string MovementState { get; set; }
-
-            public string Flags { get; set; }
-
-            public string IsValid { get; set; }
+            public string Position { get; set; }
 
             public string Pointer { get; set; }
-
-            public string IsSimpleChar { get; set; }
-
-            public string IsPlayer { get; set; }
-
-            public string IsNpc { get; set; }
-
-            public string IsPet { get; set; }
-
-            public string IsInPlay { get; set; }
-
-            public string IsAlive { get; set; }
-
-            public string Health { get; set; }
-
-            public string MaxHealth { get; set; }
-
-            public string HealthPercent { get; set; }
-
-            public string Level { get; set; }
-
-            public string Side { get; set; }
-
-            public string Profession { get; set; }
-
-            public string ComputerLiteracy { get; set; }
-
-            public string Description { get; set; }
 
             public string Error { get; set; }
         }
