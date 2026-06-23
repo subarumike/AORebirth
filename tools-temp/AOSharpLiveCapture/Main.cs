@@ -186,7 +186,7 @@ namespace AOSharpLiveCapture
             Chat.RegisterCommand("aosmoke", this.OnSmokeCommand);
 
             this.LogEvent("PLUGIN", "AOSharpLiveCapture loaded. session=" + this.sessionDirectory);
-            this.LogEvent("PLUGIN", "Commands: /aocap start | stop | mark <text> | status | flush | snapshot");
+            this.LogEvent("PLUGIN", "Commands: /aocap start | stop | mark <text> | status | flush | snapshot | dynels");
             this.LogEvent("PLUGIN", "Smoke commands: /aosmoke start [mobAlias] | stop | status | log");
             this.LogEvent("PLUGIN", "ShopUpdate CSV: " + Path.Combine(this.sessionDirectory, "shop-updates.csv"));
             this.LogEvent("PLUGIN", "VendingMachineFullUpdate CSV: " + Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
@@ -293,6 +293,26 @@ namespace AOSharpLiveCapture
                     chatWindow.WriteLine("AO capture snapshot written.", ChatColor.Gold);
                     break;
 
+                case "dynels":
+                    try
+                    {
+                        DynelDumpResult result = this.DumpDynels();
+                        chatWindow.WriteLine(
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                "AO dynel dump wrote {0} rows: {1}",
+                                result.Count,
+                                result.CsvPath),
+                            ChatColor.Gold);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.LogEvent("DYNEL-DUMP-ERROR", ex.ToString());
+                        chatWindow.WriteLine("AO dynel dump failed: " + ex.Message, ChatColor.Gold);
+                    }
+
+                    break;
+
                 default:
                     chatWindow.WriteLine(
                         string.Format(
@@ -307,6 +327,278 @@ namespace AOSharpLiveCapture
                         ChatColor.Gold);
                     break;
             }
+        }
+
+        private DynelDumpResult DumpDynels()
+        {
+            DateTime capturedUtc = DateTime.UtcNow;
+            Dynel[] dynels = DynelManager.AllDynels == null ? new Dynel[0] : DynelManager.AllDynels.ToArray();
+            LocalPlayer localPlayer = DynelManager.LocalPlayer;
+
+            DynelDumpRow[] rows = dynels.Select(
+                    (dynel, index) => this.CreateDynelDumpRow(capturedUtc, index, dynel, localPlayer))
+                .OrderBy(x => x.SortType)
+                .ThenBy(x => x.SortInstance)
+                .ThenBy(x => x.Name)
+                .ToArray();
+
+            string csvPath = Path.Combine(this.sessionDirectory, "dynels.csv");
+            string jsonPath = Path.Combine(this.sessionDirectory, "dynels.json");
+            string summaryPath = Path.Combine(this.sessionDirectory, "dynels-summary.txt");
+
+            this.WriteDynelCsv(csvPath, rows);
+            this.WriteDynelJson(jsonPath, capturedUtc, rows);
+            this.WriteDynelSummary(summaryPath, capturedUtc, rows);
+
+            this.LogEvent(
+                "DYNEL-DUMP",
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "rows={0} csv={1} json={2} summary={3}",
+                    rows.Length,
+                    csvPath,
+                    jsonPath,
+                    summaryPath));
+
+            return new DynelDumpResult(rows.Length, csvPath, jsonPath, summaryPath);
+        }
+
+        private DynelDumpRow CreateDynelDumpRow(DateTime capturedUtc, int index, Dynel dynel, LocalPlayer localPlayer)
+        {
+            var row = new DynelDumpRow
+            {
+                CapturedUtc = capturedUtc.ToString("o", CultureInfo.InvariantCulture),
+                LocalCharacterName = Safe(() => localPlayer == null ? string.Empty : localPlayer.Name),
+                LocalCharacterIdentity = Safe(() => localPlayer == null ? string.Empty : localPlayer.Identity.ToString()),
+                PlayfieldIdentity = Safe(() => Playfield.Identity.ToString()),
+                LocalX = Safe(() => localPlayer == null ? string.Empty : localPlayer.Position.X.ToString("R", CultureInfo.InvariantCulture)),
+                LocalY = Safe(() => localPlayer == null ? string.Empty : localPlayer.Position.Y.ToString("R", CultureInfo.InvariantCulture)),
+                LocalZ = Safe(() => localPlayer == null ? string.Empty : localPlayer.Position.Z.ToString("R", CultureInfo.InvariantCulture)),
+                Index = index.ToString(CultureInfo.InvariantCulture)
+            };
+
+            if (dynel == null)
+            {
+                row.Error = "null dynel";
+                return row;
+            }
+
+            try
+            {
+                Identity identity = dynel.Identity;
+                row.Identity = Safe(() => identity.ToString());
+                row.IdentityType = Safe(() => identity.Type.ToString());
+                row.IdentityTypeValue = Safe(() => ((int)identity.Type).ToString(CultureInfo.InvariantCulture));
+                row.Instance = Safe(() => identity.Instance.ToString(CultureInfo.InvariantCulture));
+                row.InstanceHex = Safe(() => identity.Instance.ToString("X8", CultureInfo.InvariantCulture));
+                row.SortType = (int)identity.Type;
+                row.SortInstance = identity.Instance;
+            }
+            catch (Exception ex)
+            {
+                row.Error = "identity: " + ex.Message;
+            }
+
+            row.ClassName = Safe(() => dynel.GetType().Name);
+            row.Name = Safe(() => dynel.Name);
+            row.X = Safe(() => dynel.Position.X.ToString("R", CultureInfo.InvariantCulture));
+            row.Y = Safe(() => dynel.Position.Y.ToString("R", CultureInfo.InvariantCulture));
+            row.Z = Safe(() => dynel.Position.Z.ToString("R", CultureInfo.InvariantCulture));
+            row.Distance = Safe(
+                () => localPlayer == null
+                    ? string.Empty
+                    : Vector3.Distance(localPlayer.Position, dynel.Position).ToString("R", CultureInfo.InvariantCulture));
+            row.Radius = Safe(() => dynel.Radius.ToString("R", CultureInfo.InvariantCulture));
+            row.Velocity = Safe(() => dynel.Velocity.ToString("R", CultureInfo.InvariantCulture));
+            row.MovementState = Safe(() => dynel.MovementState.ToString());
+            row.Flags = Safe(() => dynel.Flags.ToString());
+            row.IsValid = Safe(() => dynel.IsValid.ToString());
+            row.Pointer = Safe(() => "0x" + dynel.Pointer.ToInt64().ToString("X", CultureInfo.InvariantCulture));
+            row.Description = Safe(() => this.DescribeDynel(dynel));
+
+            if (SafeBool(() => dynel.Identity.Type == IdentityType.SimpleChar))
+            {
+                SimpleChar character = dynel.Cast<SimpleChar>();
+                row.IsSimpleChar = "True";
+                row.IsPlayer = Safe(() => character.IsPlayer.ToString());
+                row.IsNpc = Safe(() => character.IsNpc.ToString());
+                row.IsPet = Safe(() => character.IsPet.ToString());
+                row.IsInPlay = Safe(() => character.IsInPlay.ToString());
+                row.IsAlive = Safe(() => character.IsAlive.ToString());
+                row.Health = SafeStat(character, Stat.Health);
+                row.MaxHealth = SafeStat(character, Stat.MaxHealth);
+                row.HealthPercent = Safe(() => character.HealthPercent.ToString("R", CultureInfo.InvariantCulture));
+                row.Level = SafeStat(character, Stat.Level);
+                row.Side = Safe(() => character.Side.ToString());
+                row.Profession = Safe(() => character.Profession.ToString());
+                row.ComputerLiteracy = SafeStat(character, Stat.ComputerLiteracy);
+            }
+
+            return row;
+        }
+
+        private void WriteDynelCsv(string path, DynelDumpRow[] rows)
+        {
+            using (StreamWriter writer = CreateWriter(path))
+            {
+                writer.WriteLine("CapturedUtc,LocalCharacterName,LocalCharacterIdentity,PlayfieldIdentity,LocalX,LocalY,LocalZ,Index,Identity,IdentityType,IdentityTypeValue,Instance,InstanceHex,ClassName,Name,X,Y,Z,Distance,Radius,Velocity,MovementState,Flags,IsValid,Pointer,IsSimpleChar,IsPlayer,IsNpc,IsPet,IsInPlay,IsAlive,Health,MaxHealth,HealthPercent,Level,Side,Profession,ComputerLiteracy,Description,Error");
+                foreach (DynelDumpRow row in rows)
+                {
+                    writer.WriteLine(string.Join(
+                        ",",
+                        new[]
+                        {
+                            Csv(row.CapturedUtc),
+                            Csv(row.LocalCharacterName),
+                            Csv(row.LocalCharacterIdentity),
+                            Csv(row.PlayfieldIdentity),
+                            Csv(row.LocalX),
+                            Csv(row.LocalY),
+                            Csv(row.LocalZ),
+                            Csv(row.Index),
+                            Csv(row.Identity),
+                            Csv(row.IdentityType),
+                            Csv(row.IdentityTypeValue),
+                            Csv(row.Instance),
+                            Csv(row.InstanceHex),
+                            Csv(row.ClassName),
+                            Csv(row.Name),
+                            Csv(row.X),
+                            Csv(row.Y),
+                            Csv(row.Z),
+                            Csv(row.Distance),
+                            Csv(row.Radius),
+                            Csv(row.Velocity),
+                            Csv(row.MovementState),
+                            Csv(row.Flags),
+                            Csv(row.IsValid),
+                            Csv(row.Pointer),
+                            Csv(row.IsSimpleChar),
+                            Csv(row.IsPlayer),
+                            Csv(row.IsNpc),
+                            Csv(row.IsPet),
+                            Csv(row.IsInPlay),
+                            Csv(row.IsAlive),
+                            Csv(row.Health),
+                            Csv(row.MaxHealth),
+                            Csv(row.HealthPercent),
+                            Csv(row.Level),
+                            Csv(row.Side),
+                            Csv(row.Profession),
+                            Csv(row.ComputerLiteracy),
+                            Csv(row.Description),
+                            Csv(row.Error)
+                        }));
+                }
+            }
+        }
+
+        private void WriteDynelJson(string path, DateTime capturedUtc, DynelDumpRow[] rows)
+        {
+            var json = new StringBuilder();
+            json.AppendLine("{");
+            json.Append("  \"capturedUtc\": ");
+            json.Append(Json(capturedUtc.ToString("o", CultureInfo.InvariantCulture)));
+            json.AppendLine(",");
+            json.Append("  \"captureFolderPath\": ");
+            json.Append(Json(this.sessionDirectory));
+            json.AppendLine(",");
+            json.Append("  \"playfieldIdentity\": ");
+            json.Append(Json(Safe(() => Playfield.Identity.ToString())));
+            json.AppendLine(",");
+            json.Append("  \"localCharacterName\": ");
+            json.Append(Json(Safe(() => DynelManager.LocalPlayer == null ? string.Empty : DynelManager.LocalPlayer.Name)));
+            json.AppendLine(",");
+            json.Append("  \"dynelCount\": ");
+            json.Append(rows.Length.ToString(CultureInfo.InvariantCulture));
+            json.AppendLine(",");
+            json.AppendLine("  \"dynels\": [");
+
+            for (int i = 0; i < rows.Length; i++)
+            {
+                if (i > 0)
+                {
+                    json.AppendLine(",");
+                }
+
+                this.AppendDynelRowJson(json, rows[i], "    ");
+            }
+
+            json.AppendLine();
+            json.AppendLine("  ]");
+            json.AppendLine("}");
+            File.WriteAllText(path, json.ToString(), Encoding.UTF8);
+        }
+
+        private void AppendDynelRowJson(StringBuilder json, DynelDumpRow row, string indent)
+        {
+            json.Append(indent);
+            json.AppendLine("{");
+            AppendJsonField(json, indent + "  ", "capturedUtc", row.CapturedUtc, true);
+            AppendJsonField(json, indent + "  ", "identity", row.Identity, true);
+            AppendJsonField(json, indent + "  ", "identityType", row.IdentityType, true);
+            AppendJsonField(json, indent + "  ", "identityTypeValue", row.IdentityTypeValue, true);
+            AppendJsonField(json, indent + "  ", "instance", row.Instance, true);
+            AppendJsonField(json, indent + "  ", "instanceHex", row.InstanceHex, true);
+            AppendJsonField(json, indent + "  ", "className", row.ClassName, true);
+            AppendJsonField(json, indent + "  ", "name", row.Name, true);
+            AppendJsonField(json, indent + "  ", "x", row.X, true);
+            AppendJsonField(json, indent + "  ", "y", row.Y, true);
+            AppendJsonField(json, indent + "  ", "z", row.Z, true);
+            AppendJsonField(json, indent + "  ", "distance", row.Distance, true);
+            AppendJsonField(json, indent + "  ", "radius", row.Radius, true);
+            AppendJsonField(json, indent + "  ", "velocity", row.Velocity, true);
+            AppendJsonField(json, indent + "  ", "movementState", row.MovementState, true);
+            AppendJsonField(json, indent + "  ", "flags", row.Flags, true);
+            AppendJsonField(json, indent + "  ", "isValid", row.IsValid, true);
+            AppendJsonField(json, indent + "  ", "pointer", row.Pointer, true);
+            AppendJsonField(json, indent + "  ", "isSimpleChar", row.IsSimpleChar, true);
+            AppendJsonField(json, indent + "  ", "isPlayer", row.IsPlayer, true);
+            AppendJsonField(json, indent + "  ", "isNpc", row.IsNpc, true);
+            AppendJsonField(json, indent + "  ", "isPet", row.IsPet, true);
+            AppendJsonField(json, indent + "  ", "isInPlay", row.IsInPlay, true);
+            AppendJsonField(json, indent + "  ", "isAlive", row.IsAlive, true);
+            AppendJsonField(json, indent + "  ", "health", row.Health, true);
+            AppendJsonField(json, indent + "  ", "maxHealth", row.MaxHealth, true);
+            AppendJsonField(json, indent + "  ", "healthPercent", row.HealthPercent, true);
+            AppendJsonField(json, indent + "  ", "level", row.Level, true);
+            AppendJsonField(json, indent + "  ", "side", row.Side, true);
+            AppendJsonField(json, indent + "  ", "profession", row.Profession, true);
+            AppendJsonField(json, indent + "  ", "computerLiteracy", row.ComputerLiteracy, true);
+            AppendJsonField(json, indent + "  ", "description", row.Description, true);
+            AppendJsonField(json, indent + "  ", "error", row.Error, false);
+            json.AppendLine();
+            json.Append(indent);
+            json.Append("}");
+        }
+
+        private void WriteDynelSummary(string path, DateTime capturedUtc, DynelDumpRow[] rows)
+        {
+            var summary = new StringBuilder();
+            summary.AppendLine("Dynel dump");
+            summary.Append("CapturedUtc: ");
+            summary.AppendLine(capturedUtc.ToString("o", CultureInfo.InvariantCulture));
+            summary.Append("CaptureFolder: ");
+            summary.AppendLine(this.sessionDirectory);
+            summary.Append("Playfield: ");
+            summary.AppendLine(Safe(() => Playfield.Identity.ToString()));
+            summary.Append("LocalCharacter: ");
+            summary.AppendLine(Safe(() => DynelManager.LocalPlayer == null ? string.Empty : DynelManager.LocalPlayer.Identity + " " + DynelManager.LocalPlayer.Name));
+            summary.Append("DynelCount: ");
+            summary.AppendLine(rows.Length.ToString(CultureInfo.InvariantCulture));
+            summary.AppendLine();
+            summary.AppendLine("Counts by identity type:");
+
+            foreach (var group in rows.GroupBy(x => string.IsNullOrWhiteSpace(x.IdentityType) ? "(unknown)" : x.IdentityType)
+                         .OrderBy(x => x.Key))
+            {
+                summary.Append("  ");
+                summary.Append(group.Key);
+                summary.Append(": ");
+                summary.AppendLine(group.Count().ToString(CultureInfo.InvariantCulture));
+            }
+
+            File.WriteAllText(path, summary.ToString(), Encoding.UTF8);
         }
 
         private void OnSmokeCommand(string command, string[] args, ChatWindow chatWindow)
@@ -1880,6 +2172,112 @@ namespace AOSharpLiveCapture
             }
         }
 
+        private sealed class DynelDumpResult
+        {
+            public DynelDumpResult(int count, string csvPath, string jsonPath, string summaryPath)
+            {
+                this.Count = count;
+                this.CsvPath = csvPath;
+                this.JsonPath = jsonPath;
+                this.SummaryPath = summaryPath;
+            }
+
+            public int Count { get; private set; }
+
+            public string CsvPath { get; private set; }
+
+            public string JsonPath { get; private set; }
+
+            public string SummaryPath { get; private set; }
+        }
+
+        private sealed class DynelDumpRow
+        {
+            public int SortType { get; set; }
+
+            public int SortInstance { get; set; }
+
+            public string CapturedUtc { get; set; }
+
+            public string LocalCharacterName { get; set; }
+
+            public string LocalCharacterIdentity { get; set; }
+
+            public string PlayfieldIdentity { get; set; }
+
+            public string LocalX { get; set; }
+
+            public string LocalY { get; set; }
+
+            public string LocalZ { get; set; }
+
+            public string Index { get; set; }
+
+            public string Identity { get; set; }
+
+            public string IdentityType { get; set; }
+
+            public string IdentityTypeValue { get; set; }
+
+            public string Instance { get; set; }
+
+            public string InstanceHex { get; set; }
+
+            public string ClassName { get; set; }
+
+            public string Name { get; set; }
+
+            public string X { get; set; }
+
+            public string Y { get; set; }
+
+            public string Z { get; set; }
+
+            public string Distance { get; set; }
+
+            public string Radius { get; set; }
+
+            public string Velocity { get; set; }
+
+            public string MovementState { get; set; }
+
+            public string Flags { get; set; }
+
+            public string IsValid { get; set; }
+
+            public string Pointer { get; set; }
+
+            public string IsSimpleChar { get; set; }
+
+            public string IsPlayer { get; set; }
+
+            public string IsNpc { get; set; }
+
+            public string IsPet { get; set; }
+
+            public string IsInPlay { get; set; }
+
+            public string IsAlive { get; set; }
+
+            public string Health { get; set; }
+
+            public string MaxHealth { get; set; }
+
+            public string HealthPercent { get; set; }
+
+            public string Level { get; set; }
+
+            public string Side { get; set; }
+
+            public string Profession { get; set; }
+
+            public string ComputerLiteracy { get; set; }
+
+            public string Description { get; set; }
+
+            public string Error { get; set; }
+        }
+
         private sealed class EnemyEntityState
         {
             public string EntityId { get; set; }
@@ -2398,6 +2796,20 @@ namespace AOSharpLiveCapture
             {
                 json.Append("null");
             }
+        }
+
+        private static void AppendJsonField(StringBuilder json, string indent, string name, string value, bool comma)
+        {
+            json.Append(indent);
+            json.Append(Json(name));
+            json.Append(": ");
+            json.Append(Json(value ?? string.Empty));
+            if (comma)
+            {
+                json.Append(",");
+            }
+
+            json.AppendLine();
         }
 
         private static int ToInt32Clamp(uint value)
