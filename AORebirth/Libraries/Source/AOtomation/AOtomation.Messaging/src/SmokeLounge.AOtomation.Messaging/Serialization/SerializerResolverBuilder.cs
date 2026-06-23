@@ -75,6 +75,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization
                                            typeof(VendingMachineFullUpdateMessage), new VendingMachineFullUpdateMessageSerializer()
                                        },
                                        { typeof(GenericCmdMessage), new GenericCmdSerializer() },
+                                       { typeof(AOTransportSignalMessage), new AOTransportSignalMessageSerializer() },
                                        { typeof(N3TeleportMessage), new N3TeleportMessageSerializer() },
                                        { typeof(PlayfieldAnarchyFMessage), new PlayfieldAnarchyFMessageSerializer() },
                                        { typeof(QuestFullUpdateMessage), new QuestFullUpdateMessageSerializer() },
