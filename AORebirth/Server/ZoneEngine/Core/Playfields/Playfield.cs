@@ -1222,7 +1222,7 @@ namespace AORebirth.Core.Playfields
                 }
 
                 bool senderIsPlayer = entity.Controller != null && entity.Controller.Client != null;
-                if (senderIsPlayer || senderEqualsRecipient || sent)
+                if (senderIsPlayer || senderEqualsRecipient)
                 {
                     Identity senderPlayfield = entity.Playfield == null ? Identity.None : entity.Playfield.Identity;
                     LogUtil.Debug(
@@ -1241,6 +1241,18 @@ namespace AORebirth.Core.Playfields
                             sent));
                 }
             }
+        }
+
+        public void AnnouncePlayerVisibility(ICharacter character)
+        {
+            var temp = character as Character;
+            if (temp == null)
+            {
+                return;
+            }
+
+            this.Announce(SimpleCharFullUpdate.ConstructMessage(temp));
+            this.Announce(new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 });
         }
 
         #endregion
