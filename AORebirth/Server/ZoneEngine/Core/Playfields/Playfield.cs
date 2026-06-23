@@ -1200,8 +1200,9 @@ namespace AORebirth.Core.Playfields
         {
             Identity dontSendTo = sendSCFUs.toClient.Controller.Character.Identity;
             Identity playfieldIdentity = sendSCFUs.toClient.Controller.Character.Playfield.Identity;
-            foreach (IEntity entity in
-                Pool.Instance.GetAll<ICharacter>(playfieldIdentity, (int)IdentityType.CanbeAffected))
+            foreach (ICharacter entity in
+                Pool.Instance.GetAll<ICharacter>((int)IdentityType.CanbeAffected)
+                    .Where(xx => xx.InPlayfield(playfieldIdentity)))
             {
                 if (entity.Identity != dontSendTo)
                 {
