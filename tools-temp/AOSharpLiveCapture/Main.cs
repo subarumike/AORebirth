@@ -300,7 +300,7 @@ namespace AOSharpLiveCapture
                         result.Success
                             ? string.Format(
                                 CultureInfo.InvariantCulture,
-                                "AO dynel dump wrote {0} rows: {1}",
+                                "AO dynel dump appended {0} rows: {1}",
                                 result.Count,
                                 result.CsvPath)
                             : "AO dynel dump failed: " + result.Error,
@@ -413,9 +413,14 @@ namespace AOSharpLiveCapture
 
         private void WriteDynelCsv(string path, DynelDumpRow[] rows)
         {
-            using (StreamWriter writer = CreateWriter(path))
+            bool writeHeader = !File.Exists(path) || new FileInfo(path).Length == 0;
+            using (StreamWriter writer = CreateAppendWriter(path))
             {
-                writer.WriteLine("CapturedUtc,LocalCharacterName,LocalCharacterIdentity,PlayfieldIdentity,Index,Identity,IdentityType,IdentityTypeValue,Instance,InstanceHex,ClassName,Name,Position,Pointer,Error");
+                if (writeHeader)
+                {
+                    writer.WriteLine("CapturedUtc,LocalCharacterName,LocalCharacterIdentity,PlayfieldIdentity,Index,Identity,IdentityType,IdentityTypeValue,Instance,InstanceHex,ClassName,Name,Position,Pointer,Error");
+                }
+
                 foreach (DynelDumpRow row in rows)
                 {
                     writer.WriteLine(string.Join(
@@ -2523,6 +2528,14 @@ namespace AOSharpLiveCapture
         private static StreamWriter CreateWriter(string path)
         {
             return new StreamWriter(new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite), Encoding.UTF8)
+            {
+                AutoFlush = false
+            };
+        }
+
+        private static StreamWriter CreateAppendWriter(string path)
+        {
+            return new StreamWriter(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite), Encoding.UTF8)
             {
                 AutoFlush = false
             };
