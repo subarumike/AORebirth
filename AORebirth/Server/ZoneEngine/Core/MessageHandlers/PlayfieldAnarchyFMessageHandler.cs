@@ -151,8 +151,24 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private static int ResolvePrivateCityOrganizationInstance(ICharacter character)
         {
-            int organizationInstance = character.Stats[StatIds.clan].Value;
+            int organizationInstance = ResolveCharacterOrganizationInstance(character);
             return organizationInstance > 0 ? organizationInstance : CapturedPrivateCityOrganizationInstance;
+        }
+
+        private static int ResolveCharacterOrganizationInstance(ICharacter character)
+        {
+            if (character == null)
+            {
+                return 0;
+            }
+
+            uint baseValue = character.Stats[StatIds.clan].BaseValue;
+            if (baseValue > 0 && baseValue <= int.MaxValue)
+            {
+                return (int)baseValue;
+            }
+
+            return character.Stats[StatIds.clan].Value;
         }
 
         private static int ResolvePrivateCityBuildingInstance(int playfieldInstance)
