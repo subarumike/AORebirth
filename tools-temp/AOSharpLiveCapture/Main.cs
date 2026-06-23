@@ -96,6 +96,10 @@ namespace AOSharpLiveCapture
         private StreamWriter npcInteractionsLog;
         private StreamWriter inventoryUpdatesLog;
         private StreamWriter enemyStateLog;
+        private StreamWriter enemyFullUpdatesLog;
+        private StreamWriter enemyCombatLog;
+        private StreamWriter enemyMovementLog;
+        private StreamWriter enemyStatUpdatesLog;
         private bool enabled;
         private bool captureFinalized;
         private int inboundPacketCount;
@@ -119,6 +123,10 @@ namespace AOSharpLiveCapture
         private int enemyDespawnEventCount;
         private int enemyHealthUpdateCount;
         private int enemyPositionUpdateCount;
+        private int enemyFullUpdateRowCount;
+        private int enemyCombatRowCount;
+        private int enemyMovementRowCount;
+        private int enemyStatUpdateRowCount;
         private DateTime nextFlushUtc;
         private DateTime nextSnapshotUtc;
         private DateTime captureStartUtc;
@@ -161,6 +169,14 @@ namespace AOSharpLiveCapture
             this.inventoryUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,InventoryIdentity,Handle,Slot,Placement,Flags,Count,ItemIdentity,LowId,HighId,Quality,Unknown");
             this.enemyStateLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-state.csv"));
             this.enemyStateLog.WriteLine("timestamp,entityId,level,currentHealth,maxHealth,x,y,z,eventType");
+            this.enemyFullUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-full-updates.csv"));
+            this.enemyFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,Identity,Name,PlayfieldId,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,FightingTargetRole,FightingTargetIdentity,Version,Flags,CharacterFlags,AccountFlags,Expansions,CharacterInfoType,NPCFamily,LosHeight,Level,Health,HealthDamage,MonsterData,MonsterScale,VisualFlags,VisibleTitle,Unknown1Length,HeadMesh,RunSpeedBase,ActiveNanoCount,TextureCount,Textures,MeshCount,Meshes,Flags2,Unknown2,Detail");
+            this.enemyCombatLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-combat.csv"));
+            this.enemyCombatLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail");
+            this.enemyMovementLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-movement.csv"));
+            this.enemyMovementLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,MoveType,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,Unknown1,Unknown2,Unknown3,Detail");
+            this.enemyStatUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-stat-updates.csv"));
+            this.enemyStatUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,Stat,StatId,Value,PositionX,PositionY,PositionZ,StatsCount,Detail");
             this.WriteEnemyStateJson();
             this.WriteCaptureSessionMetadata(this.captureStartUtc, this.captureStartLocal);
             this.WriteCaptureInfo(null, CaptureValidation.Running());
@@ -195,6 +211,10 @@ namespace AOSharpLiveCapture
             this.LogEvent("PLUGIN", "NPC interactions log: " + Path.Combine(this.sessionDirectory, "npc-interactions.log"));
             this.LogEvent("PLUGIN", "Inventory update CSV: " + Path.Combine(this.sessionDirectory, "inventory-updates.csv"));
             this.LogEvent("PLUGIN", "Enemy state CSV: " + Path.Combine(this.sessionDirectory, "enemy-state.csv"));
+            this.LogEvent("PLUGIN", "Enemy full update CSV: " + Path.Combine(this.sessionDirectory, "enemy-full-updates.csv"));
+            this.LogEvent("PLUGIN", "Enemy combat CSV: " + Path.Combine(this.sessionDirectory, "enemy-combat.csv"));
+            this.LogEvent("PLUGIN", "Enemy movement CSV: " + Path.Combine(this.sessionDirectory, "enemy-movement.csv"));
+            this.LogEvent("PLUGIN", "Enemy stat update CSV: " + Path.Combine(this.sessionDirectory, "enemy-stat-updates.csv"));
             this.LogEvent("PLUGIN", "Enemy state JSON: " + Path.Combine(this.sessionDirectory, "enemy-state.json"));
             this.LogEvent("PLUGIN", "Capture info: " + Path.Combine(this.sessionDirectory, "capture_info.json"));
             this.LogEvent("PLUGIN", "Capture session metadata: " + Path.Combine(this.sessionDirectory, "capture-session.json"));
@@ -422,6 +442,23 @@ namespace AOSharpLiveCapture
 
                 if (isNpc || isPet)
                 {
+                    row.IsInPlay = Safe(() => character.IsInPlay.ToString());
+                    row.IsAlive = Safe(() => character.IsAlive.ToString());
+                    row.IsAttacking = Safe(() => character.IsAttacking.ToString());
+                    row.FightingTarget = Safe(
+                        () =>
+                        {
+                            if (character.FightingTarget == null)
+                            {
+                                return string.Empty;
+                            }
+
+                            string target = character.FightingTarget.Identity.ToString();
+                            return target == this.GetLocalPlayerIdentityString() ? "local-player" : target;
+                        });
+                    row.Health = SafeStat(character, Stat.Health);
+                    row.MaxHealth = SafeStat(character, Stat.MaxHealth);
+                    row.HealthPercent = SafeFloat(() => character.HealthPercent).ToString("R", CultureInfo.InvariantCulture);
                     row.NpcLevel = SafeStat(character, Stat.Level);
                     row.MonsterData = SafeStat(character, Stat.MonsterData);
                     row.CatMesh = SafeStat(character, Stat.CATMesh);
@@ -435,6 +472,25 @@ namespace AOSharpLiveCapture
                     row.NpcBrainState = SafeStat(character, Stat.NPCBrainState);
                     row.PetState = SafeStat(character, Stat.PetState);
                     row.PetOwnerId = isPet ? Safe(() => character.PetOwnerId.ToString(CultureInfo.InvariantCulture)) : string.Empty;
+                    row.NpcFamily = SafeStat(character, Stat.NPCFamily);
+                    row.NpcVicinityFamily = SafeStat(character, Stat.NPCVicinityFamily);
+                    row.RunSpeed = SafeStat(character, Stat.RunSpeed);
+                    row.MinDamage = SafeStat(character, Stat.MinDamage);
+                    row.MaxDamage = SafeStat(character, Stat.MaxDamage);
+                    row.DefaultAttackType = SafeStat(character, Stat.DefaultAttackType);
+                    row.DamageType1 = SafeStat(character, Stat.DamageType1);
+                    row.DamageType2 = SafeStat(character, Stat.DamageType2);
+                    row.AttackDelay = SafeStat(character, Stat.AttackDelay);
+                    row.RechargeDelay = SafeStat(character, Stat.RechargeDelay);
+                    row.AttackDelayCap = SafeStat(character, Stat.AttackDelayCap);
+                    row.RechargeDelayCap = SafeStat(character, Stat.RechargeDelayCap);
+                    row.EquippedWeapons = SafeStat(character, Stat.EquippedWeapons);
+                    row.HealDelta = SafeStat(character, Stat.HealDelta);
+                    row.DeadTimer = SafeStat(character, Stat.DeadTimer);
+                    row.CorpseType = SafeStat(character, Stat.CorpseType);
+                    row.CorpseInstance = SafeStat(character, Stat.CorpseInstance);
+                    row.CorpseAnimKey = SafeStat(character, Stat.CorpseAnimKey);
+                    row.DieAnim = SafeStat(character, Stat.DieAnim);
                 }
             }
 
@@ -489,7 +545,7 @@ namespace AOSharpLiveCapture
             {
                 if (writeHeader)
                 {
-                    writer.WriteLine("CapturedUtc,LocalCharacterName,LocalCharacterIdentity,PlayfieldIdentity,Index,DynelCategory,CharacterKind,Identity,IdentityType,IdentityTypeValue,Instance,InstanceHex,ClassName,Name,Position,IsNpc,IsPet,NpcLevel,MonsterData,CATMesh,DisplayCATMesh,VisualFlags,State,CurrentState,ActionCategory,Scale,CharRadius,NPCBrainState,PetState,PetOwnerId,Pointer,Error");
+                    writer.WriteLine("CapturedUtc,LocalCharacterName,LocalCharacterIdentity,PlayfieldIdentity,Index,DynelCategory,CharacterKind,Identity,IdentityType,IdentityTypeValue,Instance,InstanceHex,ClassName,Name,Position,IsNpc,IsPet,IsInPlay,IsAlive,IsAttacking,FightingTarget,Health,MaxHealth,HealthPercent,NpcLevel,MonsterData,CATMesh,DisplayCATMesh,VisualFlags,State,CurrentState,ActionCategory,Scale,CharRadius,NPCBrainState,PetState,PetOwnerId,NPCFamily,NPCVicinityFamily,RunSpeed,MinDamage,MaxDamage,DefaultAttackType,DamageType1,DamageType2,AttackDelay,RechargeDelay,AttackDelayCap,RechargeDelayCap,EquippedWeapons,HealDelta,DeadTimer,CorpseType,CorpseInstance,CorpseAnimKey,DieAnim,Pointer,Error");
                 }
 
                 foreach (DynelDumpRow row in rows)
@@ -515,6 +571,13 @@ namespace AOSharpLiveCapture
                             Csv(row.Position),
                             Csv(row.IsNpc),
                             Csv(row.IsPet),
+                            Csv(row.IsInPlay),
+                            Csv(row.IsAlive),
+                            Csv(row.IsAttacking),
+                            Csv(row.FightingTarget),
+                            Csv(row.Health),
+                            Csv(row.MaxHealth),
+                            Csv(row.HealthPercent),
                             Csv(row.NpcLevel),
                             Csv(row.MonsterData),
                             Csv(row.CatMesh),
@@ -528,6 +591,25 @@ namespace AOSharpLiveCapture
                             Csv(row.NpcBrainState),
                             Csv(row.PetState),
                             Csv(row.PetOwnerId),
+                            Csv(row.NpcFamily),
+                            Csv(row.NpcVicinityFamily),
+                            Csv(row.RunSpeed),
+                            Csv(row.MinDamage),
+                            Csv(row.MaxDamage),
+                            Csv(row.DefaultAttackType),
+                            Csv(row.DamageType1),
+                            Csv(row.DamageType2),
+                            Csv(row.AttackDelay),
+                            Csv(row.RechargeDelay),
+                            Csv(row.AttackDelayCap),
+                            Csv(row.RechargeDelayCap),
+                            Csv(row.EquippedWeapons),
+                            Csv(row.HealDelta),
+                            Csv(row.DeadTimer),
+                            Csv(row.CorpseType),
+                            Csv(row.CorpseInstance),
+                            Csv(row.CorpseAnimKey),
+                            Csv(row.DieAnim),
                             Csv(row.Pointer),
                             Csv(row.Error)
                         }));
@@ -589,6 +671,13 @@ namespace AOSharpLiveCapture
             AppendJsonField(json, indent + "  ", "characterKind", row.CharacterKind, true);
             AppendJsonField(json, indent + "  ", "isNpc", row.IsNpc, true);
             AppendJsonField(json, indent + "  ", "isPet", row.IsPet, true);
+            AppendJsonField(json, indent + "  ", "isInPlay", row.IsInPlay, true);
+            AppendJsonField(json, indent + "  ", "isAlive", row.IsAlive, true);
+            AppendJsonField(json, indent + "  ", "isAttacking", row.IsAttacking, true);
+            AppendJsonField(json, indent + "  ", "fightingTarget", row.FightingTarget, true);
+            AppendJsonField(json, indent + "  ", "health", row.Health, true);
+            AppendJsonField(json, indent + "  ", "maxHealth", row.MaxHealth, true);
+            AppendJsonField(json, indent + "  ", "healthPercent", row.HealthPercent, true);
             AppendJsonField(json, indent + "  ", "npcLevel", row.NpcLevel, true);
             AppendJsonField(json, indent + "  ", "monsterData", row.MonsterData, true);
             AppendJsonField(json, indent + "  ", "catMesh", row.CatMesh, true);
@@ -602,6 +691,25 @@ namespace AOSharpLiveCapture
             AppendJsonField(json, indent + "  ", "npcBrainState", row.NpcBrainState, true);
             AppendJsonField(json, indent + "  ", "petState", row.PetState, true);
             AppendJsonField(json, indent + "  ", "petOwnerId", row.PetOwnerId, true);
+            AppendJsonField(json, indent + "  ", "npcFamily", row.NpcFamily, true);
+            AppendJsonField(json, indent + "  ", "npcVicinityFamily", row.NpcVicinityFamily, true);
+            AppendJsonField(json, indent + "  ", "runSpeed", row.RunSpeed, true);
+            AppendJsonField(json, indent + "  ", "minDamage", row.MinDamage, true);
+            AppendJsonField(json, indent + "  ", "maxDamage", row.MaxDamage, true);
+            AppendJsonField(json, indent + "  ", "defaultAttackType", row.DefaultAttackType, true);
+            AppendJsonField(json, indent + "  ", "damageType1", row.DamageType1, true);
+            AppendJsonField(json, indent + "  ", "damageType2", row.DamageType2, true);
+            AppendJsonField(json, indent + "  ", "attackDelay", row.AttackDelay, true);
+            AppendJsonField(json, indent + "  ", "rechargeDelay", row.RechargeDelay, true);
+            AppendJsonField(json, indent + "  ", "attackDelayCap", row.AttackDelayCap, true);
+            AppendJsonField(json, indent + "  ", "rechargeDelayCap", row.RechargeDelayCap, true);
+            AppendJsonField(json, indent + "  ", "equippedWeapons", row.EquippedWeapons, true);
+            AppendJsonField(json, indent + "  ", "healDelta", row.HealDelta, true);
+            AppendJsonField(json, indent + "  ", "deadTimer", row.DeadTimer, true);
+            AppendJsonField(json, indent + "  ", "corpseType", row.CorpseType, true);
+            AppendJsonField(json, indent + "  ", "corpseInstance", row.CorpseInstance, true);
+            AppendJsonField(json, indent + "  ", "corpseAnimKey", row.CorpseAnimKey, true);
+            AppendJsonField(json, indent + "  ", "dieAnim", row.DieAnim, true);
             AppendJsonField(json, indent + "  ", "pointer", row.Pointer, true);
             AppendJsonField(json, indent + "  ", "error", row.Error, false);
             json.AppendLine();
@@ -899,6 +1007,7 @@ namespace AOSharpLiveCapture
             bool interesting = this.interestingMessageNames.Contains(messageName);
             string detail = interesting ? this.DescribeN3Message(message) : string.Empty;
             this.ExportSpecializedMessage(direction, sequence, message);
+            this.ExportEnemyN3Evidence(direction, sequence, message);
             this.TrackEnemyStateFromMessage(direction, sequence, message);
             ShopUpdateMessage shopUpdate = message as ShopUpdateMessage;
             if (shopUpdate != null)
@@ -1252,6 +1361,316 @@ namespace AOSharpLiveCapture
                 }
 
                 this.inventoryUpdatesLog.Flush();
+            }
+        }
+
+        private void ExportEnemyN3Evidence(string direction, int sequence, N3Message message)
+        {
+            SimpleCharFullUpdateMessage simpleCharFullUpdate = message as SimpleCharFullUpdateMessage;
+            if (simpleCharFullUpdate != null)
+            {
+                this.ExportEnemyFullUpdate(direction, sequence, simpleCharFullUpdate);
+                return;
+            }
+
+            StatMessage stat = message as StatMessage;
+            if (stat != null)
+            {
+                this.ExportEnemyStatUpdates(direction, sequence, message, message.Identity, GetMemberValue(stat, "Stats"), GetMemberValue(stat, "Position"));
+                return;
+            }
+
+            SimpleItemFullUpdateMessage simpleItemFullUpdate = message as SimpleItemFullUpdateMessage;
+            if (simpleItemFullUpdate != null)
+            {
+                this.ExportEnemyStatUpdates(
+                    direction,
+                    sequence,
+                    message,
+                    message.Identity,
+                    GetMemberValue(simpleItemFullUpdate, "Stats"),
+                    GetMemberValue(simpleItemFullUpdate, "Position"));
+                return;
+            }
+
+            CharDCMoveMessage charMove = message as CharDCMoveMessage;
+            if (charMove != null)
+            {
+                this.ExportEnemyMovement(
+                    direction,
+                    sequence,
+                    message,
+                    message.Identity,
+                    GetMemberValue(charMove, "MoveType"),
+                    GetMemberValue(charMove, "Position") ?? GetMemberValue(charMove, "Coordinates"),
+                    GetMemberValue(charMove, "Heading"));
+                return;
+            }
+
+            SetPosMessage setPos = message as SetPosMessage;
+            if (setPos != null)
+            {
+                this.ExportEnemyMovement(
+                    direction,
+                    sequence,
+                    message,
+                    message.Identity,
+                    string.Empty,
+                    GetMemberValue(setPos, "Position") ?? GetMemberValue(setPos, "Coordinates"),
+                    null);
+                return;
+            }
+
+            DespawnMessage despawn = message as DespawnMessage;
+            if (despawn != null)
+            {
+                this.ExportEnemyMovement(direction, sequence, message, message.Identity, "despawn", null, null);
+                this.ExportEnemyCombat(direction, sequence, message, null, null, null);
+                return;
+            }
+
+            if (message is AttackMessage
+                || message is AttackInfoMessage
+                || message is SpecialAttackInfoMessage
+                || message is MissedAttackInfoMessage
+                || message is HealthDamageMessage
+                || message is CharacterActionMessage
+                || message is StopFightMessage)
+            {
+                object target = GetMemberValue(message, "Target")
+                    ?? GetMemberValue(message, "Defender")
+                    ?? GetMemberValue(message, "Unknown4");
+                object aux1 = GetMemberValue(message, "Unknown3");
+                object aux2 = GetMemberValue(message, "Unknown4");
+
+                this.ExportEnemyCombat(direction, sequence, message, target, aux1, aux2);
+            }
+        }
+
+        private void ExportEnemyFullUpdate(string direction, int sequence, SimpleCharFullUpdateMessage message)
+        {
+            object characterInfo = GetMemberValue(message, "CharacterInfo");
+            if (!this.IsNpcCharacterInfo(characterInfo))
+            {
+                return;
+            }
+
+            object position = GetMemberValue(message, "Position") ?? GetMemberValue(message, "Coordinates");
+            object heading = GetMemberValue(message, "Heading");
+            object fightingTarget = GetMemberValue(message, "FightingTarget");
+            string fightingTargetRole;
+            string fightingTargetIdentity;
+            this.DescribeIdentityForEnemyOutput(fightingTarget, out fightingTargetRole, out fightingTargetIdentity);
+
+            lock (this.syncRoot)
+            {
+                this.enemyFullUpdateRowCount++;
+                this.enemyFullUpdatesLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv(direction),
+                        sequence.ToString(CultureInfo.InvariantCulture),
+                        Csv(message.Identity.ToString()),
+                        Csv(GetMemberString(message, "Name")),
+                        Csv(GetMemberString(message, "PlayfieldId")),
+                        MemberComponent(position, "X"),
+                        MemberComponent(position, "Y"),
+                        MemberComponent(position, "Z"),
+                        MemberComponent(heading, "X"),
+                        MemberComponent(heading, "Y"),
+                        MemberComponent(heading, "Z"),
+                        MemberComponent(heading, "W"),
+                        Csv(fightingTargetRole),
+                        Csv(fightingTargetIdentity),
+                        Csv(GetMemberString(message, "Version")),
+                        Csv(GetMemberString(message, "Flags")),
+                        Csv(GetMemberString(message, "CharacterFlags")),
+                        Csv(GetMemberString(message, "AccountFlags")),
+                        Csv(GetMemberString(message, "Expansions")),
+                        Csv(characterInfo == null ? string.Empty : characterInfo.GetType().Name),
+                        Csv(GetMemberString(characterInfo, "Family")),
+                        Csv(GetMemberString(characterInfo, "LosHeight")),
+                        Csv(GetMemberString(message, "Level")),
+                        Csv(GetMemberString(message, "Health")),
+                        Csv(GetMemberString(message, "HealthDamage")),
+                        Csv(GetMemberString(message, "MonsterData")),
+                        Csv(GetMemberString(message, "MonsterScale")),
+                        Csv(GetMemberString(message, "VisualFlags")),
+                        Csv(GetMemberString(message, "VisibleTitle")),
+                        Csv(GetByteArrayLengthString(GetMemberValue(message, "Unknown1"))),
+                        Csv(GetMemberString(message, "HeadMesh")),
+                        Csv(GetMemberString(message, "RunSpeedBase")),
+                        Csv(GetCountString(GetMemberValue(message, "ActiveNanos"))),
+                        Csv(GetCountString(GetMemberValue(message, "Textures"))),
+                        Csv(FormatValue(GetMemberValue(message, "Textures"))),
+                        Csv(GetCountString(GetMemberValue(message, "Meshes"))),
+                        Csv(FormatValue(GetMemberValue(message, "Meshes"))),
+                        Csv(GetMemberString(message, "Flags2")),
+                        Csv(GetMemberString(message, "Unknown2")),
+                        Csv(this.DescribeObject(message))));
+                this.enemyFullUpdatesLog.Flush();
+            }
+        }
+
+        private void ExportEnemyCombat(string direction, int sequence, N3Message message, object target, object aux1, object aux2)
+        {
+            string sourceRole;
+            string sourceIdentity;
+            this.DescribeIdentityForEnemyOutput(message.Identity, out sourceRole, out sourceIdentity);
+
+            string targetRole;
+            string targetIdentity;
+            this.DescribeIdentityForEnemyOutput(target, out targetRole, out targetIdentity);
+
+            string auxRole1;
+            string auxIdentity1;
+            this.DescribeIdentityForEnemyOutput(aux1, out auxRole1, out auxIdentity1);
+
+            string auxRole2;
+            string auxIdentity2;
+            this.DescribeIdentityForEnemyOutput(aux2, out auxRole2, out auxIdentity2);
+
+            if (!IsEnemyRole(sourceRole) && !IsEnemyRole(targetRole) && !IsEnemyRole(auxRole1) && !IsEnemyRole(auxRole2))
+            {
+                return;
+            }
+
+            lock (this.syncRoot)
+            {
+                this.enemyCombatRowCount++;
+                this.enemyCombatLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv(direction),
+                        sequence.ToString(CultureInfo.InvariantCulture),
+                        Csv(message.N3MessageType.ToString()),
+                        Csv(sourceRole),
+                        Csv(sourceIdentity),
+                        Csv(targetRole),
+                        Csv(targetIdentity),
+                        Csv(auxRole1),
+                        Csv(auxIdentity1),
+                        Csv(auxRole2),
+                        Csv(auxIdentity2),
+                        Csv(GetMemberString(message, "Action")),
+                        Csv(GetMemberString(message, "Amount")),
+                        Csv(GetMemberString(message, "TargetHp")),
+                        Csv(GetMemberString(message, "Unknown1")),
+                        Csv(GetMemberString(message, "Unknown2")),
+                        Csv(GetMemberString(message, "Unknown3")),
+                        Csv(GetMemberString(message, "Unknown4")),
+                        Csv(GetMemberString(message, "Unknown5")),
+                        Csv(GetMemberString(message, "Unknown6")),
+                        Csv(this.DescribeObject(message))));
+                this.enemyCombatLog.Flush();
+            }
+        }
+
+        private void ExportEnemyMovement(
+            string direction,
+            int sequence,
+            N3Message message,
+            object identity,
+            object moveType,
+            object position,
+            object heading)
+        {
+            string role;
+            string safeIdentity;
+            this.DescribeIdentityForEnemyOutput(identity, out role, out safeIdentity);
+            if (!IsEnemyRole(role))
+            {
+                return;
+            }
+
+            lock (this.syncRoot)
+            {
+                this.enemyMovementRowCount++;
+                this.enemyMovementLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv(direction),
+                        sequence.ToString(CultureInfo.InvariantCulture),
+                        Csv(message.N3MessageType.ToString()),
+                        Csv(role),
+                        Csv(safeIdentity),
+                        Csv(FormatObjectForCsv(moveType)),
+                        MemberComponent(position, "X"),
+                        MemberComponent(position, "Y"),
+                        MemberComponent(position, "Z"),
+                        MemberComponent(heading, "X"),
+                        MemberComponent(heading, "Y"),
+                        MemberComponent(heading, "Z"),
+                        MemberComponent(heading, "W"),
+                        Csv(GetMemberString(message, "Unknown1")),
+                        Csv(GetMemberString(message, "Unknown2")),
+                        Csv(GetMemberString(message, "Unknown3")),
+                        Csv(this.DescribeObject(message))));
+                this.enemyMovementLog.Flush();
+            }
+        }
+
+        private void ExportEnemyStatUpdates(
+            string direction,
+            int sequence,
+            N3Message message,
+            object identity,
+            object statsObject,
+            object position)
+        {
+            string role;
+            string safeIdentity;
+            this.DescribeIdentityForEnemyOutput(identity, out role, out safeIdentity);
+            if (!IsEnemyRole(role))
+            {
+                return;
+            }
+
+            IEnumerable stats = statsObject as IEnumerable;
+            if (stats == null)
+            {
+                return;
+            }
+
+            string capturedUtc = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
+            string statsCount = GetCountString(statsObject);
+            string detail = this.DescribeObject(message);
+
+            lock (this.syncRoot)
+            {
+                foreach (object stat in stats)
+                {
+                    object statName;
+                    object statValue;
+                    if (!TryGetGameTupleValues(stat, out statName, out statValue))
+                    {
+                        continue;
+                    }
+
+                    this.enemyStatUpdateRowCount++;
+                    this.enemyStatUpdatesLog.WriteLine(
+                        string.Join(
+                            ",",
+                            Csv(capturedUtc),
+                            Csv(direction),
+                            sequence.ToString(CultureInfo.InvariantCulture),
+                            Csv(message.N3MessageType.ToString()),
+                            Csv(role),
+                            Csv(safeIdentity),
+                            Csv(FormatObjectForCsv(statName)),
+                            Csv(GetStatNumericValue(statName)),
+                            Csv(FormatObjectForCsv(statValue)),
+                            MemberComponent(position, "X"),
+                            MemberComponent(position, "Y"),
+                            MemberComponent(position, "Z"),
+                            Csv(statsCount),
+                            Csv(detail)));
+                }
+
+                this.enemyStatUpdatesLog.Flush();
             }
         }
 
@@ -1740,6 +2159,84 @@ namespace AOSharpLiveCapture
             }
         }
 
+        private void DescribeIdentityForEnemyOutput(object identityValue, out string role, out string safeIdentity)
+        {
+            role = string.Empty;
+            safeIdentity = string.Empty;
+
+            string identityText = FormatIdentityValue(identityValue);
+            if (string.IsNullOrWhiteSpace(identityText))
+            {
+                return;
+            }
+
+            if (identityText == this.GetLocalPlayerIdentityString())
+            {
+                role = "local-player";
+                return;
+            }
+
+            string identityType = GetIdentityTypeName(identityValue);
+            role = identityType;
+            safeIdentity = identityText;
+
+            if (this.enemyStates.ContainsKey(identityText) || this.IsNpcDynelIdentity(identityValue))
+            {
+                role = "enemy";
+            }
+        }
+
+        private bool IsNpcDynelIdentity(object identityValue)
+        {
+            try
+            {
+                if (!(identityValue is Identity))
+                {
+                    return false;
+                }
+
+                Identity identity = (Identity)identityValue;
+                if (identity.Type != IdentityType.SimpleChar)
+                {
+                    return false;
+                }
+
+                Dynel dynel = DynelManager.GetDynel(identity);
+                if (dynel == null)
+                {
+                    return false;
+                }
+
+                SimpleChar character = dynel.Cast<SimpleChar>();
+                return SafeBool(() => character.IsNpc) || SafeBool(() => character.IsPet);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool IsNpcCharacterInfo(object characterInfo)
+        {
+            if (characterInfo == null)
+            {
+                return false;
+            }
+
+            string typeName = characterInfo.GetType().Name;
+            return typeName.IndexOf("npc", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private static bool IsEnemyRole(string role)
+        {
+            return string.Equals(role, "enemy", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private string GetLocalPlayerIdentityString()
+        {
+            return Safe(() => DynelManager.LocalPlayer == null ? string.Empty : DynelManager.LocalPlayer.Identity.ToString());
+        }
+
         private bool IsEnemyCharacter(SimpleChar character)
         {
             if (character == null || this.IsLocalPlayerIdentity(character.Identity))
@@ -1917,12 +2414,12 @@ namespace AOSharpLiveCapture
                 notes.Add("No system/feedback/quest messages were observed.");
             }
 
-            if (this.enemyCombatEventCount > 0 && this.enemyStateRowCount == 0)
+            if ((this.enemyCombatEventCount > 0 || this.enemyCombatRowCount > 0) && this.enemyStateRowCount == 0)
             {
                 issues.Add("Combat packets were observed, but enemy-state.csv has no rows.");
             }
 
-            if (this.enemyCombatEventCount == 0)
+            if (this.enemyCombatEventCount == 0 && this.enemyCombatRowCount == 0)
             {
                 notes.Add("No enemy combat packets were observed.");
             }
@@ -2109,6 +2606,18 @@ namespace AOSharpLiveCapture
                 json.AppendLine(",");
                 json.Append("    \"enemyStateRows\": ");
                 json.Append(this.enemyStateRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemyFullUpdateRows\": ");
+                json.Append(this.enemyFullUpdateRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemyCombatRows\": ");
+                json.Append(this.enemyCombatRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemyMovementRows\": ");
+                json.Append(this.enemyMovementRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemyStatUpdateRows\": ");
+                json.Append(this.enemyStatUpdateRowCount.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine(",");
                 json.Append("    \"enemyCombatEvents\": ");
                 json.Append(this.enemyCombatEventCount.ToString(CultureInfo.InvariantCulture));
@@ -2307,6 +2816,20 @@ namespace AOSharpLiveCapture
 
             public string IsPet { get; set; }
 
+            public string IsInPlay { get; set; }
+
+            public string IsAlive { get; set; }
+
+            public string IsAttacking { get; set; }
+
+            public string FightingTarget { get; set; }
+
+            public string Health { get; set; }
+
+            public string MaxHealth { get; set; }
+
+            public string HealthPercent { get; set; }
+
             public string NpcLevel { get; set; }
 
             public string MonsterData { get; set; }
@@ -2332,6 +2855,44 @@ namespace AOSharpLiveCapture
             public string PetState { get; set; }
 
             public string PetOwnerId { get; set; }
+
+            public string NpcFamily { get; set; }
+
+            public string NpcVicinityFamily { get; set; }
+
+            public string RunSpeed { get; set; }
+
+            public string MinDamage { get; set; }
+
+            public string MaxDamage { get; set; }
+
+            public string DefaultAttackType { get; set; }
+
+            public string DamageType1 { get; set; }
+
+            public string DamageType2 { get; set; }
+
+            public string AttackDelay { get; set; }
+
+            public string RechargeDelay { get; set; }
+
+            public string AttackDelayCap { get; set; }
+
+            public string RechargeDelayCap { get; set; }
+
+            public string EquippedWeapons { get; set; }
+
+            public string HealDelta { get; set; }
+
+            public string DeadTimer { get; set; }
+
+            public string CorpseType { get; set; }
+
+            public string CorpseInstance { get; set; }
+
+            public string CorpseAnimKey { get; set; }
+
+            public string DieAnim { get; set; }
 
             public string Pointer { get; set; }
 
@@ -2552,6 +3113,113 @@ namespace AOSharpLiveCapture
             return result.Length > 6000 ? result.ToString(0, 6000) + "..." : result.ToString();
         }
 
+        private static object GetMemberValue(object value, string name)
+        {
+            if (value == null || string.IsNullOrWhiteSpace(name))
+            {
+                return null;
+            }
+
+            try
+            {
+                Type type = value.GetType();
+                PropertyInfo property = type.GetProperty(name, BindingFlags.Instance | BindingFlags.Public);
+                if (property != null && property.CanRead && property.GetIndexParameters().Length == 0)
+                {
+                    return property.GetValue(value, null);
+                }
+
+                FieldInfo field = type.GetField(name, BindingFlags.Instance | BindingFlags.Public);
+                if (field != null)
+                {
+                    return field.GetValue(value);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+
+            return null;
+        }
+
+        private static string GetMemberString(object value, string name)
+        {
+            return FormatObjectForCsv(GetMemberValue(value, name));
+        }
+
+        private static string MemberComponent(object value, string name)
+        {
+            return FormatObjectForCsv(GetMemberValue(value, name));
+        }
+
+        private static string GetIdentityTypeName(object identityValue)
+        {
+            object type = GetMemberValue(identityValue, "Type");
+            return FormatObjectForCsv(type);
+        }
+
+        private static string FormatIdentityValue(object identityValue)
+        {
+            if (identityValue == null)
+            {
+                return string.Empty;
+            }
+
+            string text = FormatObjectForCsv(identityValue);
+            return string.Equals(text, "None:0", StringComparison.OrdinalIgnoreCase) ? string.Empty : text;
+        }
+
+        private static string FormatObjectForCsv(object value)
+        {
+            if (value == null)
+            {
+                return string.Empty;
+            }
+
+            IFormattable formattable = value as IFormattable;
+            if (formattable != null)
+            {
+                return formattable.ToString(null, CultureInfo.InvariantCulture);
+            }
+
+            return value.ToString();
+        }
+
+        private static string GetCountString(object value)
+        {
+            if (value == null)
+            {
+                return string.Empty;
+            }
+
+            ICollection collection = value as ICollection;
+            if (collection != null)
+            {
+                return collection.Count.ToString(CultureInfo.InvariantCulture);
+            }
+
+            IEnumerable enumerable = value as IEnumerable;
+            if (enumerable == null || value is string)
+            {
+                return string.Empty;
+            }
+
+            int count = 0;
+            foreach (object ignored in enumerable)
+            {
+                count++;
+            }
+
+            return count.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private static string GetByteArrayLengthString(object value)
+        {
+            byte[] bytes = value as byte[];
+            return bytes == null ? string.Empty : bytes.Length.ToString(CultureInfo.InvariantCulture);
+        }
+
         private static string FormatValue(object value)
         {
             if (value == null)
@@ -2614,6 +3282,62 @@ namespace AOSharpLiveCapture
             return FormatValue(left) + "=" + FormatValue(right);
         }
 
+        private static bool TryGetGameTupleValues(object value, out object left, out object right)
+        {
+            left = null;
+            right = null;
+
+            if (value == null)
+            {
+                return false;
+            }
+
+            Type type = value.GetType();
+            if (!type.IsGenericType || type.GetGenericTypeDefinition().FullName != "SmokeLounge.AOtomation.Messaging.GameData.GameTuple`2")
+            {
+                return false;
+            }
+
+            PropertyInfo value1 = type.GetProperty("Value1", BindingFlags.Instance | BindingFlags.Public);
+            PropertyInfo value2 = type.GetProperty("Value2", BindingFlags.Instance | BindingFlags.Public);
+            if (value1 == null || value2 == null)
+            {
+                return false;
+            }
+
+            left = value1.GetValue(value, null);
+            right = value2.GetValue(value, null);
+            return true;
+        }
+
+        private static string GetStatNumericValue(object value)
+        {
+            if (value == null)
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                if (value is Enum)
+                {
+                    return Convert.ToInt32(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+                }
+
+                IConvertible convertible = value as IConvertible;
+                if (convertible != null)
+                {
+                    return convertible.ToInt32(CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+                }
+            }
+            catch
+            {
+                return string.Empty;
+            }
+
+            return string.Empty;
+        }
+
         private void Flush()
         {
             lock (this.syncRoot)
@@ -2627,6 +3351,10 @@ namespace AOSharpLiveCapture
                 this.npcInteractionsLog.Flush();
                 this.inventoryUpdatesLog.Flush();
                 this.enemyStateLog.Flush();
+                this.enemyFullUpdatesLog.Flush();
+                this.enemyCombatLog.Flush();
+                this.enemyMovementLog.Flush();
+                this.enemyStatUpdatesLog.Flush();
             }
         }
 
@@ -2643,6 +3371,10 @@ namespace AOSharpLiveCapture
                 this.npcInteractionsLog?.Flush();
                 this.inventoryUpdatesLog?.Flush();
                 this.enemyStateLog?.Flush();
+                this.enemyFullUpdatesLog?.Flush();
+                this.enemyCombatLog?.Flush();
+                this.enemyMovementLog?.Flush();
+                this.enemyStatUpdatesLog?.Flush();
                 this.eventsLog?.Dispose();
                 this.packetsLog?.Dispose();
                 this.shopUpdatesLog?.Dispose();
@@ -2652,6 +3384,10 @@ namespace AOSharpLiveCapture
                 this.npcInteractionsLog?.Dispose();
                 this.inventoryUpdatesLog?.Dispose();
                 this.enemyStateLog?.Dispose();
+                this.enemyFullUpdatesLog?.Dispose();
+                this.enemyCombatLog?.Dispose();
+                this.enemyMovementLog?.Dispose();
+                this.enemyStatUpdatesLog?.Dispose();
                 this.eventsLog = null;
                 this.packetsLog = null;
                 this.shopUpdatesLog = null;
@@ -2661,6 +3397,10 @@ namespace AOSharpLiveCapture
                 this.npcInteractionsLog = null;
                 this.inventoryUpdatesLog = null;
                 this.enemyStateLog = null;
+                this.enemyFullUpdatesLog = null;
+                this.enemyCombatLog = null;
+                this.enemyMovementLog = null;
+                this.enemyStatUpdatesLog = null;
             }
         }
 
