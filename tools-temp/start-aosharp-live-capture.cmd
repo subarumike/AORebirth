@@ -68,43 +68,30 @@ for /f "delims=" %%D in ('dir /b /ad /o-d "%CAPTURE_ROOT%" 2^>nul') do (
 
 if defined PREVIOUS_CAPTURE (
     set "ACTIVE_CAPTURE_PATH=%CAPTURE_ROOT%\!PREVIOUS_CAPTURE!"
-    set "ACTIVE_CAPTURE_HAS_PACKET_FILE="
-    set "ACTIVE_CAPTURE_HAS_EVENT_FILE="
-    set "ACTIVE_CAPTURE_IS_RUNNING="
-    set "ACTIVE_CAPTURE_PID="
-    set "ACTIVE_CAPTURE_PROCESS_RUNNING="
-    if exist "!ACTIVE_CAPTURE_PATH!\packets.hex.log" (
-        for %%F in ("!ACTIVE_CAPTURE_PATH!\packets.hex.log") do if %%~zF GTR 0 set "ACTIVE_CAPTURE_HAS_PACKET_FILE=1"
+    set "PRE_PACKET_SIZE="
+    set "PRE_EVENT_SIZE="
+    set "POST_PACKET_SIZE="
+    set "POST_EVENT_SIZE="
+    if exist "!ACTIVE_CAPTURE_PATH!\packets.hex.log" if exist "!ACTIVE_CAPTURE_PATH!\events.log" (
+        for %%F in ("!ACTIVE_CAPTURE_PATH!\packets.hex.log") do set "PRE_PACKET_SIZE=%%~zF"
+        for %%F in ("!ACTIVE_CAPTURE_PATH!\events.log") do set "PRE_EVENT_SIZE=%%~zF"
+        ping -n 3 127.0.0.1 >nul
+        for %%F in ("!ACTIVE_CAPTURE_PATH!\packets.hex.log") do set "POST_PACKET_SIZE=%%~zF"
+        for %%F in ("!ACTIVE_CAPTURE_PATH!\events.log") do set "POST_EVENT_SIZE=%%~zF"
     )
-    if exist "!ACTIVE_CAPTURE_PATH!\events.log" (
-        for %%F in ("!ACTIVE_CAPTURE_PATH!\events.log") do if %%~zF GTR 0 set "ACTIVE_CAPTURE_HAS_EVENT_FILE=1"
-    )
-    if exist "!ACTIVE_CAPTURE_PATH!\capture_info.json" (
-        findstr /C:"running" "!ACTIVE_CAPTURE_PATH!\capture_info.json" >nul 2>nul
-        if not errorlevel 1 set "ACTIVE_CAPTURE_IS_RUNNING=1"
-    )
-    if exist "!ACTIVE_CAPTURE_PATH!\capture-session.json" (
-        for /f "tokens=2 delims=:" %%P in ('findstr /C:"id" "!ACTIVE_CAPTURE_PATH!\capture-session.json" 2^>nul') do if not defined ACTIVE_CAPTURE_PID (
-            set "ACTIVE_CAPTURE_PID=%%P"
-            set "ACTIVE_CAPTURE_PID=!ACTIVE_CAPTURE_PID:,=!"
-            set "ACTIVE_CAPTURE_PID=!ACTIVE_CAPTURE_PID: =!"
+    if defined PRE_PACKET_SIZE if defined PRE_EVENT_SIZE if defined POST_PACKET_SIZE if defined POST_EVENT_SIZE (
+        if !POST_PACKET_SIZE! GTR !PRE_PACKET_SIZE! if !POST_EVENT_SIZE! GEQ !PRE_EVENT_SIZE! (
+            echo SUCCESS: AOSharp live capture already active.
+            echo CaptureOutputPath: "!ACTIVE_CAPTURE_PATH!"
+            echo FailureLog: "%LOG_PATH%"
+            exit /b 0
         )
-    )
-    if defined ACTIVE_CAPTURE_PID (
-        tasklist /FI "PID eq !ACTIVE_CAPTURE_PID!" /FI "IMAGENAME eq AnarchyOnline.exe" 2>nul | findstr /I /C:"AnarchyOnline.exe" >nul 2>nul
-        if not errorlevel 1 set "ACTIVE_CAPTURE_PROCESS_RUNNING=1"
-    )
-    if defined ACTIVE_CAPTURE_HAS_PACKET_FILE if defined ACTIVE_CAPTURE_HAS_EVENT_FILE if defined ACTIVE_CAPTURE_IS_RUNNING (
-        echo SUCCESS: AOSharp live capture already active.
-        echo CaptureOutputPath: "!ACTIVE_CAPTURE_PATH!"
-        echo FailureLog: "%LOG_PATH%"
-        exit /b 0
-    )
-    if defined ACTIVE_CAPTURE_PROCESS_RUNNING (
-        echo SUCCESS: AOSharp live capture already loaded in PID !ACTIVE_CAPTURE_PID!.
-        echo CaptureOutputPath: "!ACTIVE_CAPTURE_PATH!"
-        echo FailureLog: "%LOG_PATH%"
-        exit /b 0
+        if !POST_EVENT_SIZE! GTR !PRE_EVENT_SIZE! if !POST_PACKET_SIZE! GEQ !PRE_PACKET_SIZE! (
+            echo SUCCESS: AOSharp live capture already active.
+            echo CaptureOutputPath: "!ACTIVE_CAPTURE_PATH!"
+            echo FailureLog: "%LOG_PATH%"
+            exit /b 0
+        )
     )
 )
 
@@ -126,7 +113,7 @@ if not "%LAUNCH_EXIT%"=="0" (
     exit /b 1
 )
 
-timeout /t 3 /nobreak >nul
+ping -n 4 127.0.0.1 >nul
 
 for /f "delims=" %%D in ('dir /b /ad /o-d "%CAPTURE_ROOT%" 2^>nul') do (
     if not defined LATEST_CAPTURE set "LATEST_CAPTURE=%%D"
@@ -154,7 +141,7 @@ if not exist "%LOG_PATH%" (
     exit /b 1
 )
 
-findstr /C:"Capture plugin injected. Keeping pipe open." "%LOG_PATH%" >nul
+findstr /C:"Capture plugin injected." "%LOG_PATH%" >nul
 if not errorlevel 1 if defined LATEST_CAPTURE if /I not "%LATEST_CAPTURE%"=="%PREVIOUS_CAPTURE%" (
     echo SUCCESS: AOSharp live capture injected.
     echo CaptureOutputPath: "%CAPTURE_ROOT%\%LATEST_CAPTURE%"
