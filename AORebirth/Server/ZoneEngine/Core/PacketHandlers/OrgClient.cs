@@ -52,7 +52,87 @@ namespace ZoneEngine.Core.PacketHandlers
     /// </summary>
     public static class OrgClient
     {
+        private const int CapturedOrgInfoOrganizationInstance = 1970177;
+
+        private const string CapturedOrgInfoOrganizationName = "Est. 2024";
+
+        private const string CapturedOrgInfoLeaderName = "Celcius2024";
+
         #region Public Methods and Operators
+
+        public static bool TryHandleCapturedOrgInfo(OrgClientMessage message, ZoneClient client)
+        {
+            if (message == null
+                || client == null
+                || message.Command != OrgClientCommand.Info)
+            {
+                return false;
+            }
+
+            Character character = client.Controller == null ? null : client.Controller.Character as Character;
+            if (character == null)
+            {
+                return true;
+            }
+
+            IInstancedEntity target = client.Playfield == null ? null : client.Playfield.FindByIdentity(message.Target);
+            if (target == null
+                && message.Target.Type == character.Identity.Type
+                && message.Target.Instance == character.Identity.Instance)
+            {
+                target = character;
+            }
+
+            if (target == null)
+            {
+                client.Server.Info(
+                    client,
+                    "OrgClient Info ignored target={0} unknown1={1} reason=target_not_found evidence=live_capture_20260623-084448",
+                    message.Target,
+                    message.Unknown1);
+                return true;
+            }
+
+            int organizationInstance = ResolveCharacterStatValue(target, StatIds.clan);
+            if (organizationInstance <= 0)
+            {
+                client.Server.Info(
+                    client,
+                    "OrgClient Info ignored target={0} unknown1={1} reason=no_organization evidence=live_capture_20260623-084448",
+                    message.Target,
+                    message.Unknown1);
+                return true;
+            }
+
+            DBOrganization orgData = ResolveOrganization(organizationInstance);
+            int governingForm = orgData == null ? 0 : orgData.GovernmentForm;
+            int leaderId = orgData == null ? 0 : orgData.LeaderId;
+            string leaderName = ResolveLeaderName(leaderId, target as Character, organizationInstance);
+
+            var infoMessage = new OrgInfoMessage
+                              {
+                                  Identity = target.Identity,
+                                  Unknown = 0x00,
+                                  Unknown1 = 0x00000000,
+                                  Unknown2 = 0x00000000,
+                                  Organization =
+                                      new Identity
+                                      {
+                                          Type = IdentityType.Organization,
+                                          Instance = organizationInstance
+                                  },
+                                  OrganizationName = ResolveOrganizationName(orgData, target as Character, organizationInstance),
+                                  Description = orgData == null ? string.Empty : orgData.Description ?? string.Empty,
+                                  Objective = orgData == null ? string.Empty : orgData.Objective ?? string.Empty,
+                                  GoverningForm = ResolveGoverningFormText(governingForm),
+                                  LeaderName = leaderName,
+                                  Rank = GetRank(governingForm, (uint)ResolveCharacterStatValue(target, StatIds.clanlevel)),
+                                  Unknown3 = new object[0]
+                              };
+
+            client.SendCompressed(infoMessage);
+            return true;
+        }
 
         /// <summary>
         /// </summary>
@@ -164,90 +244,7 @@ namespace ZoneEngine.Core.PacketHandlers
 
                 case 5:
                 {
-                    IInstancedEntity tPlayer = null;
-                    if ((tPlayer = client.Playfield.FindByIdentity(message.Target)) != null)
-                    {
-                        string orgDescription = string.Empty,
-                            orgObjective = string.Empty,
-                            orgHistory = string.Empty,
-                            orgLeaderName = string.Empty;
-                        int orgGoverningForm = 0, orgLeaderID = 0;
-
-                        DBOrganization orgData = OrganizationDao.Instance.Get(
-                            (int)tPlayer.Stats[StatIds.clan].BaseValue);
-
-                        if (orgData != null)
-                        {
-                            orgDescription = orgData.Description;
-                            orgObjective = orgData.Objective;
-                            orgHistory = orgData.History;
-                            orgGoverningForm = orgData.GovernmentForm;
-                            orgLeaderID = orgData.LeaderId;
-                        }
-
-                        orgLeaderName = CharacterDao.Instance.GetCharacterNameById(orgLeaderID);
-
-                        string textGovForm = null;
-                        if (orgGoverningForm == 0)
-                        {
-                            textGovForm = "Department";
-                        }
-                        else if (orgGoverningForm == 1)
-                        {
-                            textGovForm = "Faction";
-                        }
-                        else if (orgGoverningForm == 2)
-                        {
-                            textGovForm = "Republic";
-                        }
-                        else if (orgGoverningForm == 3)
-                        {
-                            textGovForm = "Monarchy";
-                        }
-                        else if (orgGoverningForm == 4)
-                        {
-                            textGovForm = "Anarchism";
-                        }
-                        else if (orgGoverningForm == 5)
-                        {
-                            textGovForm = "Feudalism";
-                        }
-                        else
-                        {
-                            textGovForm = "Department";
-                        }
-
-                        string orgRank = GetRank(orgGoverningForm, tPlayer.Stats[StatIds.clanlevel].BaseValue);
-
-                        var infoMessage = new OrgInfoMessage
-                                          {
-                                              Identity = tPlayer.Identity,
-                                              Unknown = 0x00,
-                                              Unknown1 = 0x00000000,
-                                              Unknown2 = 0x00000000,
-                                              Organization =
-                                                  new Identity
-                                                  {
-                                                      Type = IdentityType.Organization,
-                                                      Instance =
-                                                          (int)
-                                                          tPlayer.Stats[StatIds.clan]
-                                                          .BaseValue
-                                                  }, 
-
-                                              // TODO: Possible NULL here
-                                              OrganizationName =
-                                                  (tPlayer as Character).OrganizationName,
-                                              Description = orgDescription,
-                                              Objective = orgObjective,
-                                              GoverningForm = textGovForm,
-                                              LeaderName = orgLeaderName,
-                                              Rank = orgRank,
-                                              Unknown3 = new object[0]
-                                          };
-
-                        client.SendCompressed(infoMessage);
-                    }
+                    TryHandleCapturedOrgInfo(message, client);
                 }
 
                     break;
@@ -1010,6 +1007,102 @@ namespace ZoneEngine.Core.PacketHandlers
                 default:
                     return 0;
             }
+        }
+
+        private static string ResolveGoverningFormText(int governingForm)
+        {
+            switch (governingForm)
+            {
+                case 0:
+                    return "Department";
+                case 1:
+                    return "Faction";
+                case 2:
+                    return "Republic";
+                case 3:
+                    return "Monarchy";
+                case 4:
+                    return "Anarchism";
+                case 5:
+                    return "Feudalism";
+                default:
+                    return "Department";
+            }
+        }
+
+        private static string ResolveLeaderName(int leaderId, Character targetCharacter, int organizationInstance)
+        {
+            if (leaderId > 0)
+            {
+                try
+                {
+                    string leaderName = CharacterDao.Instance.GetCharacterNameById(leaderId);
+                    if (!string.IsNullOrEmpty(leaderName))
+                    {
+                        return leaderName;
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            if (targetCharacter != null && !string.IsNullOrEmpty(targetCharacter.Name))
+            {
+                return targetCharacter.Name;
+            }
+
+            return organizationInstance == CapturedOrgInfoOrganizationInstance
+                       ? CapturedOrgInfoLeaderName
+                       : string.Empty;
+        }
+
+        private static DBOrganization ResolveOrganization(int organizationInstance)
+        {
+            try
+            {
+                return OrganizationDao.Instance.Get(organizationInstance);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static string ResolveOrganizationName(
+            DBOrganization organization,
+            Character targetCharacter,
+            int organizationInstance)
+        {
+            if (organization != null && !string.IsNullOrEmpty(organization.Name))
+            {
+                return organization.Name;
+            }
+
+            if (targetCharacter != null && !string.IsNullOrEmpty(targetCharacter.OrganizationName))
+            {
+                return targetCharacter.OrganizationName;
+            }
+
+            return organizationInstance == CapturedOrgInfoOrganizationInstance
+                       ? CapturedOrgInfoOrganizationName
+                       : string.Empty;
+        }
+
+        private static int ResolveCharacterStatValue(IInstancedEntity entity, StatIds statId)
+        {
+            if (entity == null)
+            {
+                return 0;
+            }
+
+            uint baseValue = entity.Stats[statId].BaseValue;
+            if (baseValue > 0)
+            {
+                return (int)baseValue;
+            }
+
+            return entity.Stats[statId].Value;
         }
 
         /// <summary>

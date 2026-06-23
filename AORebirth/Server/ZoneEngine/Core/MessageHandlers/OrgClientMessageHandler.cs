@@ -19,6 +19,11 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            if (OrgClient.TryHandleCapturedOrgInfo(message, zoneClient))
+            {
+                return;
+            }
+
             if (OrgClient.TryHandleCapturedCityControllerBankAdd(message, zoneClient))
             {
                 return;
