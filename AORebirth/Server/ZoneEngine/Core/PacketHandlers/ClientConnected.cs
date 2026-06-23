@@ -49,6 +49,7 @@ namespace ZoneEngine.Core.PacketHandlers
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Script;
@@ -236,6 +237,12 @@ client.Controller.Character.Playfield.Identity,
             // client.Character.ProcessTimers(DateTime.Now + TimeSpan.FromMilliseconds(200));
             client.Controller.Character.CalculateSkills();
             ClientMoveItemToInventoryMessageHandler.EnsureWeaponVisualMeshes(client.Controller.Character, false);
+
+            if (currentPlayfield != null)
+            {
+                currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character);
+                currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });
+            }
 
             AppearanceUpdateMessageHandler.Default.Send(client.Controller.Character);
             CompleteDeathRespawnCharInPlay(client);

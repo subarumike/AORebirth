@@ -46,7 +46,6 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using Utility;
-    using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.Packets;
 
     #endregion
@@ -81,22 +80,14 @@ namespace ZoneEngine.Core.MessageHandlers
                     message.Unknown));
             client.Controller.Character.DoNotDoTimers = true;
             Thread.Sleep(1000);
-            // Player is in game now, starting is over, set stats normally now
-            client.Controller.Character.Starting = false;
-
-            SimpleCharFullUpdate.SendToPlayfield(client);
-
             // client got all the needed data and
             // wants to enter the world. After we
             // reply to this, the character will really be in game
             var announce = new CharInPlayMessage { Identity = client.Controller.Character.Identity, Unknown = 0x00 };
             client.Controller.Character.Playfield.Announce(announce);
 
-            Playfield currentPlayfield = client.Controller.Character.Playfield as Playfield;
-            if (currentPlayfield != null)
-            {
-                currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });
-            }
+            // Player is in game now, starting is over, set stats normally now
+            client.Controller.Character.Starting = false;
 
             client.Controller.Character.Stats.ClearChangedFlags();
 
