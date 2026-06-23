@@ -361,15 +361,11 @@ namespace ZoneEngine.Core
                     new Identity { Type = IdentityType.CanbeAffected, Instance = chatCommand.CharacterId });
             if (character != null)
             {
-                string fullArgs = chatCommand.ChatCommandString.TrimEnd(char.MinValue).TrimStart('.').TrimStart('/');
-
-                string temp = string.Empty;
-                do
+                string fullArgs = ChatCommandText.Normalize(chatCommand.ChatCommandString);
+                if (string.IsNullOrWhiteSpace(fullArgs))
                 {
-                    temp = fullArgs;
-                    fullArgs = fullArgs.Replace("  ", " ");
+                    return;
                 }
-                while (temp != fullArgs);
 
                 string[] cmdArgs = fullArgs.Trim().Split(' ');
 
