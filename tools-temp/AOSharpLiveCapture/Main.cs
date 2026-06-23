@@ -22,6 +22,7 @@ namespace AOSharpLiveCapture
     public class Main : AOPluginEntry
     {
         private static readonly object LifecycleSyncRoot = new object();
+        private const int LocalEnemyCombatContextSeconds = 10;
         private static Main activeInstance;
 
         private readonly object syncRoot = new object();
@@ -132,6 +133,7 @@ namespace AOSharpLiveCapture
         private DateTime captureStartUtc;
         private DateTime captureStartLocal;
         private DateTime lastPacketUtc;
+        private DateTime localEnemyCombatContextUntilUtc;
         private string lastPlayfieldId = string.Empty;
         private CombatLootSmoke combatLootSmoke;
         private bool initialized;
@@ -1531,18 +1533,36 @@ namespace AOSharpLiveCapture
             string auxIdentity2;
             this.DescribeIdentityForEnemyOutput(aux2, out auxRole2, out auxIdentity2);
 
-            if (!IsEnemyRole(sourceRole) && !IsEnemyRole(targetRole) && !IsEnemyRole(auxRole1) && !IsEnemyRole(auxRole2))
-            {
-                return;
-            }
+            DateTime capturedUtc = DateTime.UtcNow;
+            bool hasEnemyRole = IsEnemyRole(sourceRole)
+                || IsEnemyRole(targetRole)
+                || IsEnemyRole(auxRole1)
+                || IsEnemyRole(auxRole2);
+            bool hasLocalPlayerRole = IsLocalPlayerRole(sourceRole)
+                || IsLocalPlayerRole(targetRole)
+                || IsLocalPlayerRole(auxRole1)
+                || IsLocalPlayerRole(auxRole2);
 
             lock (this.syncRoot)
             {
+                if (hasEnemyRole && hasLocalPlayerRole)
+                {
+                    this.localEnemyCombatContextUntilUtc = capturedUtc.AddSeconds(LocalEnemyCombatContextSeconds);
+                }
+
+                bool includeLocalTerminalRow = hasLocalPlayerRole
+                    && IsLocalPlayerCombatTerminalMessage(message, sourceRole)
+                    && capturedUtc <= this.localEnemyCombatContextUntilUtc;
+                if (!hasEnemyRole && !includeLocalTerminalRow)
+                {
+                    return;
+                }
+
                 this.enemyCombatRowCount++;
                 this.enemyCombatLog.WriteLine(
                     string.Join(
                         ",",
-                        Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
                         Csv(direction),
                         sequence.ToString(CultureInfo.InvariantCulture),
                         Csv(message.N3MessageType.ToString()),
@@ -2230,6 +2250,31 @@ namespace AOSharpLiveCapture
         private static bool IsEnemyRole(string role)
         {
             return string.Equals(role, "enemy", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsLocalPlayerRole(string role)
+        {
+            return string.Equals(role, "local-player", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsLocalPlayerCombatTerminalMessage(N3Message message, string sourceRole)
+        {
+            if (!IsLocalPlayerRole(sourceRole))
+            {
+                return false;
+            }
+
+            if (message is StopFightMessage)
+            {
+                return true;
+            }
+
+            if (message is CharacterActionMessage)
+            {
+                return string.Equals(GetMemberString(message, "Action"), "Death", StringComparison.OrdinalIgnoreCase);
+            }
+
+            return false;
         }
 
         private string GetLocalPlayerIdentityString()
