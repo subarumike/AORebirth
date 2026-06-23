@@ -172,6 +172,8 @@ namespace AORebirth.Core.Playfields
 
         private const int CapturedOwnedPrivateCityOrganizationInstance = 1970177;
 
+        private const string CapturedOwnedPrivateCityOrganizationName = "Est. 2024";
+
         private const float CapturedMontroyalEntrySourceX = 3140.412f;
 
         private const float CapturedMontroyalEntrySourceY = 51.54391f;
@@ -740,6 +742,11 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            if (IsCapturedMontroyalPrivateCityInstance(instance))
+            {
+                return true;
+            }
+
             return Playfields.GetPlayfieldX(instance) == UnknownPlayfieldSizeFallback
                    && Playfields.GetPlayfieldZ(instance) == UnknownPlayfieldSizeFallback;
         }
@@ -774,7 +781,7 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            int organizationInstance = character.Stats[StatIds.clan].Value;
+            int organizationInstance = ResolveCharacterOrganizationInstance(character);
             if (organizationInstance <= 0)
             {
                 return;
@@ -1398,7 +1405,7 @@ namespace AORebirth.Core.Playfields
                     destination.x,
                     destination.y,
                     destination.z,
-                    character.Stats[StatIds.clan].Value));
+                    ResolveCharacterOrganizationInstance(character)));
 
             return true;
         }
@@ -1472,7 +1479,7 @@ namespace AORebirth.Core.Playfields
 
         private static int ResolveCapturedMontroyalPrivateCityInstance(ICharacter character)
         {
-            int organizationInstance = character == null ? 0 : character.Stats[StatIds.clan].Value;
+            int organizationInstance = ResolveCharacterOrganizationInstance(character);
             int organizationCityId = ResolveOrganizationCityId(organizationInstance);
             if (organizationCityId > 0)
             {
@@ -1525,12 +1532,45 @@ namespace AORebirth.Core.Playfields
             try
             {
                 DBOrganization organization = OrganizationDao.Instance.Get(organizationInstance);
-                return organization == null ? string.Empty : organization.Name;
+                if (organization != null && !string.IsNullOrEmpty(organization.Name))
+                {
+                    return organization.Name;
+                }
             }
             catch
             {
-                return string.Empty;
             }
+
+            return organizationInstance == CapturedOwnedPrivateCityOrganizationInstance
+                       ? CapturedOwnedPrivateCityOrganizationName
+                       : string.Empty;
+        }
+
+        private static int ResolveCharacterOrganizationInstance(ICharacter character)
+        {
+            return ResolveCharacterStatValue(character, StatIds.clan);
+        }
+
+        private static int ResolveCharacterStatValue(ICharacter character, StatIds statId)
+        {
+            if (character == null)
+            {
+                return 0;
+            }
+
+            uint baseValue = character.Stats[statId].BaseValue;
+            if (baseValue > 0 && baseValue <= int.MaxValue)
+            {
+                return (int)baseValue;
+            }
+
+            return character.Stats[statId].Value;
+        }
+
+        private static uint ResolveCharacterStatWireValue(ICharacter character, StatIds statId)
+        {
+            int value = ResolveCharacterStatValue(character, statId);
+            return value < 0 ? 0u : (uint)value;
         }
 
         private static string BuildStatelContactKey(StatelData sd)
@@ -3325,7 +3365,7 @@ namespace AORebirth.Core.Playfields
                             new GameTuple<CharacterStat, uint>
                             {
                                 Value1 = (CharacterStat)statId,
-                                Value2 = (uint)character.Stats[statId].Value
+                                Value2 = ResolveCharacterStatWireValue(character, statId)
                             }
                         }
                 });

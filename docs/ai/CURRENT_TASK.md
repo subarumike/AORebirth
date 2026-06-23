@@ -32,6 +32,8 @@ Owned private-city initialization parity against capture `20260623-021643`.
 - Add captured owned Montroyal `PlayfieldAnarchyF` generator payload identities.
 - Send private-city organization info and `SocialStatus`, `Clan`, and `ClanLevel` stats before `FullCharacter`.
 - Keep towers/cities empty for captured Montroyal private-city instances.
+- Treat captured Montroyal private-city playfield ids as private-city ids directly instead of depending only on missing playfield metadata.
+- Resolve organization ids and org stats from base stat values so captured owned org initialization is not skipped by effective-value calculation.
 
 ## Validation Plan
 
@@ -52,3 +54,10 @@ Owned private-city initialization parity against capture `20260623-021643`.
 - `cmd /d /c restart-engines.cmd`: PASS.
 - `cmd /d /c git diff --check`: PASS.
 - Live smoke: Pending.
+
+## Repair Result
+
+- Fixed failed owned-private-city init path after `ab039e32`.
+- Captured owned/non-owned Montroyal private-city ids now force the private-city packet path.
+- Owned org id/stat packet values now use base stat values.
+- Captured org-name fallback sends `Est. 2024` when the captured org row is unavailable locally.
