@@ -64,6 +64,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int CapturedMontroyalPrivateCityInstance = 1196045;
 
+        private const int CapturedOwnedMontroyalPrivateCityInstance = 1196034;
+
         private const int CapturedMontroyalPrivateCityBuildingInstance = 0x0000138A;
 
         #region Outbound
@@ -155,16 +157,27 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private static int ResolvePrivateCityBuildingInstance(int playfieldInstance)
         {
-            return playfieldInstance == CapturedMontroyalPrivateCityInstance
+            return IsCapturedMontroyalPrivateCityInstance(playfieldInstance)
                        ? CapturedMontroyalPrivateCityBuildingInstance
                        : CapturedPrivateCityBuildingInstance;
         }
 
         private static byte[] CreateCapturedPrivateCityGeneratorPayload(int playfieldId)
         {
+            if (playfieldId == CapturedOwnedMontroyalPrivateCityInstance)
+            {
+                return CreateCapturedOwnedMontroyalPrivateCityGeneratorPayload();
+            }
+
             return playfieldId == CapturedMontroyalPrivateCityInstance
                        ? CreateCapturedMontroyalPrivateCityGeneratorPayload()
                        : CreateCapturedPrivateCityGeneratorPayload();
+        }
+
+        private static bool IsCapturedMontroyalPrivateCityInstance(int playfieldInstance)
+        {
+            return playfieldInstance == CapturedMontroyalPrivateCityInstance
+                   || playfieldInstance == CapturedOwnedMontroyalPrivateCityInstance;
         }
 
         private static byte[] CreateCapturedPrivateCityGeneratorPayload()
@@ -199,6 +212,24 @@ namespace ZoneEngine.Core.MessageHandlers
                        0x57, 0x4B, 0x84, 0xAB, 0x00, 0x00, 0xC7, 0x48,
                        0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02,
                        0x00, 0x00, 0x00, 0x01, 0x10, 0x8E, 0xCA, 0x90,
+                       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+                   };
+        }
+
+        private static byte[] CreateCapturedOwnedMontroyalPrivateCityGeneratorPayload()
+        {
+            return new byte[]
+                   {
+                       0x00, 0x00, 0xC7, 0x7D, 0x00, 0x00, 0x00, 0x01,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+                       0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0xC4, 0x18,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x9C, 0x18, 0x2E,
+                       0x00, 0x00, 0xC7, 0x3D, 0x00, 0x00, 0x00, 0x01,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+                       0x57, 0x51, 0x53, 0x8B, 0x00, 0x00, 0xC7, 0x48,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02,
+                       0x00, 0x00, 0x00, 0x01, 0x10, 0x8D, 0x96, 0xED,
                        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
                    };
         }

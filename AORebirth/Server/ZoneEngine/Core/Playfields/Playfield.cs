@@ -168,6 +168,10 @@ namespace AORebirth.Core.Playfields
 
         private const int CapturedMontroyalPrivateCityInstance = 1196045;
 
+        private const int CapturedOwnedMontroyalPrivateCityInstance = 1196034;
+
+        private const int CapturedOwnedPrivateCityOrganizationInstance = 1970177;
+
         private const float CapturedMontroyalEntrySourceX = 3140.412f;
 
         private const float CapturedMontroyalEntrySourceY = 51.54391f;
@@ -183,6 +187,12 @@ namespace AORebirth.Core.Playfields
         private const float CapturedMontroyalEntryDestinationY = 163.2545f;
 
         private const float CapturedMontroyalEntryDestinationZ = 580.9957f;
+
+        private const float CapturedOwnedMontroyalEntryDestinationX = 528.6631f;
+
+        private const float CapturedOwnedMontroyalEntryDestinationY = 163.2526f;
+
+        private const float CapturedOwnedMontroyalEntryDestinationZ = 580.9919f;
 
         private const float UserConfirmedMontroyalExitSourceX = 530.4664f;
 
@@ -724,7 +734,7 @@ namespace AORebirth.Core.Playfields
             }
 
             int instance = playfieldIdentity.Instance;
-            // Live captures observed dynamic private city playfields 0x104868, 0x116000, 0x120005, 0x121001, and 0x12400D.
+            // Live captures observed dynamic private city playfields 0x104868, 0x116000, 0x120005, 0x121001, 0x124002, and 0x12400D.
             if (instance < PrivateCityPlayfieldMinInstance || instance > PrivateCityPlayfieldMaxInstance)
             {
                 return false;
@@ -741,7 +751,7 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            if (this.Identity.Instance == CapturedMontroyalPrivateCityInstance)
+            if (IsCapturedMontroyalPrivateCityInstance(this.Identity.Instance))
             {
                 this.SendEmptyPlayfieldTowersAndCities(client);
             }
@@ -752,9 +762,46 @@ namespace AORebirth.Core.Playfields
 
             client.Server.Info(
                 client,
-                "Private city ready block sent character={0} playfield={1} evidence=live_capture_20260622-092054 live_capture_20260622-093540 live_capture_20260622-101935",
+                "Private city ready block sent character={0} playfield={1} evidence=live_capture_20260622-092054 live_capture_20260622-093540 live_capture_20260622-101935 live_capture_20260623-021643",
                 character.Identity,
                 this.Identity);
+        }
+
+        public void SendPrivateCityPreFullCharacterReadyBlock(ZoneClient client, ICharacter character)
+        {
+            if (client == null || character == null || !IsPrivateCityPlayfieldCandidate(this.Identity))
+            {
+                return;
+            }
+
+            int organizationInstance = character.Stats[StatIds.clan].Value;
+            if (organizationInstance <= 0)
+            {
+                return;
+            }
+
+            string organizationName = ResolveOrganizationName(organizationInstance);
+            if (!string.IsNullOrEmpty(organizationName))
+            {
+                client.SendCompressed(
+                    new OrgInfoPacketMessage
+                    {
+                        Identity = character.Identity,
+                        Name = organizationName
+                    });
+            }
+
+            this.SendPrivateCityStat(client, character, StatIds.socialstatus, 1);
+            this.SendPrivateCityStat(client, character, StatIds.clan, 0);
+            this.SendPrivateCityStat(client, character, StatIds.clanlevel, 0);
+
+            client.Server.Info(
+                client,
+                "Private city owned org init sent character={0} playfield={1} org={2} orgInfoSent={3} evidence=live_capture_20260623-021643",
+                character.Identity,
+                this.Identity,
+                organizationInstance,
+                !string.IsNullOrEmpty(organizationName));
         }
 
         /// <summary>
@@ -1320,10 +1367,13 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            var destination = new Coordinate(
-                CapturedMontroyalEntryDestinationX,
-                CapturedMontroyalEntryDestinationY,
-                CapturedMontroyalEntryDestinationZ);
+            int destinationPlayfieldId = ResolveCapturedMontroyalPrivateCityInstance(character);
+            if (destinationPlayfieldId <= 0)
+            {
+                return false;
+            }
+
+            Coordinate destination = ResolveCapturedMontroyalEntryDestination(destinationPlayfieldId);
             var heading = new AORebirth.Core.Vector.Quaternion(0.0f, 1.0f, 0.0f, -4.371139E-08f);
 
             character.StopMovement();
@@ -1332,22 +1382,23 @@ namespace AORebirth.Core.Playfields
                 dynel,
                 destination,
                 heading,
-                new Identity { Type = IdentityType.Playfield, Instance = CapturedMontroyalPrivateCityInstance });
+                new Identity { Type = IdentityType.Playfield, Instance = destinationPlayfieldId });
 
             LogUtil.Debug(
                 DebugInfoDetail.Zoning,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Montroyal private city entry teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) evidence=live_capture_20260622-101935",
+                    "Montroyal private city entry teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) org={9} evidence=live_capture_20260622-101935 live_capture_20260623-021643",
                     character.Identity.ToString(true),
                     this.Identity.Instance,
                     sourceX,
                     sourceY,
                     sourceZ,
-                    CapturedMontroyalPrivateCityInstance,
+                    destinationPlayfieldId,
                     destination.x,
                     destination.y,
-                    destination.z));
+                    destination.z,
+                    character.Stats[StatIds.clan].Value));
 
             return true;
         }
@@ -1355,7 +1406,7 @@ namespace AORebirth.Core.Playfields
         private bool TryHandleUserConfirmedMontroyalPrivateCityExit(ICharacter character)
         {
             if (character == null
-                || this.Identity.Instance != CapturedMontroyalPrivateCityInstance
+                || !IsCapturedMontroyalPrivateCityInstance(this.Identity.Instance)
                 || character.Controller == null
                 || character.Controller.Client == null
                 || character.DoNotDoTimers)
@@ -1411,6 +1462,75 @@ namespace AORebirth.Core.Playfields
                     destination.z));
 
             return true;
+        }
+
+        private static bool IsCapturedMontroyalPrivateCityInstance(int playfieldInstance)
+        {
+            return playfieldInstance == CapturedMontroyalPrivateCityInstance
+                   || playfieldInstance == CapturedOwnedMontroyalPrivateCityInstance;
+        }
+
+        private static int ResolveCapturedMontroyalPrivateCityInstance(ICharacter character)
+        {
+            int organizationInstance = character == null ? 0 : character.Stats[StatIds.clan].Value;
+            int organizationCityId = ResolveOrganizationCityId(organizationInstance);
+            if (organizationCityId > 0)
+            {
+                return organizationCityId;
+            }
+
+            return organizationInstance == CapturedOwnedPrivateCityOrganizationInstance
+                       ? CapturedOwnedMontroyalPrivateCityInstance
+                       : CapturedMontroyalPrivateCityInstance;
+        }
+
+        private static Coordinate ResolveCapturedMontroyalEntryDestination(int destinationPlayfieldId)
+        {
+            return destinationPlayfieldId == CapturedOwnedMontroyalPrivateCityInstance
+                       ? new Coordinate(
+                             CapturedOwnedMontroyalEntryDestinationX,
+                             CapturedOwnedMontroyalEntryDestinationY,
+                             CapturedOwnedMontroyalEntryDestinationZ)
+                       : new Coordinate(
+                             CapturedMontroyalEntryDestinationX,
+                             CapturedMontroyalEntryDestinationY,
+                             CapturedMontroyalEntryDestinationZ);
+        }
+
+        private static int ResolveOrganizationCityId(int organizationInstance)
+        {
+            if (organizationInstance <= 0)
+            {
+                return 0;
+            }
+
+            try
+            {
+                DBOrganization organization = OrganizationDao.Instance.Get(organizationInstance);
+                return organization == null ? 0 : organization.CityId;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        private static string ResolveOrganizationName(int organizationInstance)
+        {
+            if (organizationInstance <= 0)
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                DBOrganization organization = OrganizationDao.Instance.Get(organizationInstance);
+                return organization == null ? string.Empty : organization.Name;
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
 
         private static string BuildStatelContactKey(StatelData sd)
@@ -3189,6 +3309,25 @@ namespace AORebirth.Core.Playfields
                     Identity = playfieldIdentity,
                     Unknown = cityUnknown,
                     Payload = cityPayload ?? new byte[0]
+                });
+        }
+
+        private void SendPrivateCityStat(ZoneClient client, ICharacter character, StatIds statId, byte unknown)
+        {
+            client.SendCompressed(
+                new StatMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = unknown,
+                    Stats =
+                        new[]
+                        {
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = (CharacterStat)statId,
+                                Value2 = (uint)character.Stats[statId].Value
+                            }
+                        }
                 });
         }
 
