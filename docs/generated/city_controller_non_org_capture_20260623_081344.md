@@ -99,3 +99,5 @@ AORebirth must not choose the owner/member menu based on the character having an
 - If the character organization does not own the current private-city playfield, send the captured limited non-org menu above.
 - Keep the captured `GenericCmd` success ack after the menu response.
 - Do not send `CityAdvantages`, `OrgClient`, ownership, purchase, or guest-key lifecycle behavior for this path.
+
+When applying this captured response to AORebirth private-city instances, the response must not reuse the live capture's unrelated city/building context. The limited-menu text and signal sequence are captured behavior, but the signal `5` org/city value and building identity must be resolved from the current private-city owner and current private-city playfield so the client receives a menu for the controller it actually clicked.
