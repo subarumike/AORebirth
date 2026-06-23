@@ -124,6 +124,7 @@ namespace ZoneEngine.Core.PacketHandlers
                                   OrganizationName = ResolveOrganizationName(orgData, target as Character, organizationInstance),
                                   Description = orgData == null ? string.Empty : orgData.Description ?? string.Empty,
                                   Objective = orgData == null ? string.Empty : orgData.Objective ?? string.Empty,
+                                  History = orgData == null ? string.Empty : orgData.History ?? string.Empty,
                                   GoverningForm = ResolveGoverningFormText(governingForm),
                                   LeaderName = leaderName,
                                   Rank = GetRank(governingForm, (uint)ResolveCharacterStatValue(target, StatIds.clanlevel)),
