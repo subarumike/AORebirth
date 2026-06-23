@@ -118,6 +118,10 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int CapturedPrivateCityOrganizationInstance = 1370122;
 
+        private const int CapturedCityControllerFeedbackCategoryId = 110;
+
+        private const int CapturedCityControllerNoOrganizationMessageId = 8208531;
+
         private const int GridEnterTerminalTemplateId = 95350;
 
         private const int GridExitTerminalTemplateId = 95351;
@@ -603,16 +607,9 @@ namespace ZoneEngine.Core.MessageHandlers
                     {
                         break;
                     }
-                    else if (target.Type == IdentityType.CityController)
+                    else if (this.TryHandleCapturedCityControllerUse(client, message, target))
                     {
-                        this.Acknowledge(client.Controller.Character, message);
-                        client.Server.Info(
-                            client,
-                            "CityController use acknowledged character={0} target={1} count={2} temp4={3} evidence=live_capture_20260622-093102",
-                            client.Controller.Character.Identity,
-                            target,
-                            message.Count,
-                            message.Temp4);
+                        break;
                     }
                     else if (target.Type == IdentityType.Corpse)
                     {
@@ -815,6 +812,56 @@ namespace ZoneEngine.Core.MessageHandlers
                 target,
                 CapturedCityAccessCardTemplateId,
                 CapturedCityAccessCardOverflowSlot);
+
+            return true;
+        }
+
+        private bool TryHandleCapturedCityControllerUse(
+            IZoneClient client,
+            GenericCmdMessage message,
+            Identity target)
+        {
+            if (target.Type != IdentityType.CityController)
+            {
+                return false;
+            }
+
+            ICharacter character = client.Controller.Character;
+            if (character == null)
+            {
+                client.Server.Info(
+                    client,
+                    "CityController use consumed without character target={0} count={1} temp4={2} evidence=live_capture_20260623-015602",
+                    target,
+                    message.Count,
+                    message.Temp4);
+
+                return true;
+            }
+
+            this.Acknowledge(character, message);
+
+            int organizationId = character.Stats[StatIds.clan].Value;
+            bool sentNoOrganizationFeedback = organizationId <= 0;
+            if (sentNoOrganizationFeedback)
+            {
+                FeedbackMessageHandler.Default.Send(
+                    character,
+                    CapturedCityControllerFeedbackCategoryId,
+                    CapturedCityControllerNoOrganizationMessageId);
+            }
+
+            client.Server.Info(
+                client,
+                "CityController use handled character={0} target={1} org={2} count={3} temp4={4} feedbackSent={5} feedbackCategory={6} feedbackMessage={7} aoTransportSignalSent=0 aoTransportSignalReason=no_outbound_model cashStatSent=0 cashStatReason=not_proven_current_response noCityAdvantages=1 noOwnershipChange=1 evidence=live_capture_20260623-015602",
+                character.Identity,
+                target,
+                organizationId,
+                message.Count,
+                message.Temp4,
+                sentNoOrganizationFeedback,
+                CapturedCityControllerFeedbackCategoryId,
+                CapturedCityControllerNoOrganizationMessageId);
 
             return true;
         }
