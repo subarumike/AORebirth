@@ -1790,6 +1790,13 @@ namespace AOSharpLiveCapture
                 return;
             }
 
+            CharacterActionMessage characterAction = message as CharacterActionMessage;
+            if (characterAction != null)
+            {
+                this.TrackEnemyCharacterAction(direction, sequence, characterAction);
+                return;
+            }
+
             CharDCMoveMessage charMove = message as CharDCMoveMessage;
             if (charMove != null)
             {
@@ -1815,6 +1822,33 @@ namespace AOSharpLiveCapture
             if (simpleItemFullUpdate != null)
             {
                 this.TrackEnemyFromSimpleItemFullUpdate(direction, sequence, simpleItemFullUpdate);
+            }
+        }
+
+        private void TrackEnemyCharacterAction(string direction, int sequence, CharacterActionMessage message)
+        {
+            if (!string.Equals(GetMemberString(message, "Action"), "Death", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            if (!this.IsTrackableEnemyIdentity(message.Identity))
+            {
+                return;
+            }
+
+            DateTime timestamp = DateTime.UtcNow;
+            lock (this.syncRoot)
+            {
+                bool created;
+                EnemyEntityState state = this.GetOrCreateEnemyState(message.Identity, timestamp, out created);
+                this.enemyCombatEventCount++;
+                if (created)
+                {
+                    this.RecordEnemyStateEvent(state, timestamp, "spawn");
+                }
+
+                this.RecordEnemyDeath(state, timestamp);
             }
         }
 
@@ -2140,6 +2174,16 @@ namespace AOSharpLiveCapture
         private void RecordEnemyDeathIfNeeded(EnemyEntityState state, DateTime timestamp)
         {
             if (!state.CurrentHealth.HasValue || state.CurrentHealth.Value > 0 || state.DeathLogged)
+            {
+                return;
+            }
+
+            this.RecordEnemyDeath(state, timestamp);
+        }
+
+        private void RecordEnemyDeath(EnemyEntityState state, DateTime timestamp)
+        {
+            if (state.DeathLogged)
             {
                 return;
             }
