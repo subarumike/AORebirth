@@ -66,6 +66,48 @@ for /f "delims=" %%D in ('dir /b /ad /o-d "%CAPTURE_ROOT%" 2^>nul') do (
     if not defined PREVIOUS_CAPTURE set "PREVIOUS_CAPTURE=%%D"
 )
 
+if defined PREVIOUS_CAPTURE (
+    set "ACTIVE_CAPTURE_PATH=%CAPTURE_ROOT%\!PREVIOUS_CAPTURE!"
+    set "ACTIVE_CAPTURE_HAS_PACKET_FILE="
+    set "ACTIVE_CAPTURE_HAS_EVENT_FILE="
+    set "ACTIVE_CAPTURE_IS_RUNNING="
+    set "ACTIVE_CAPTURE_PID="
+    set "ACTIVE_CAPTURE_PROCESS_RUNNING="
+    if exist "!ACTIVE_CAPTURE_PATH!\packets.hex.log" (
+        for %%F in ("!ACTIVE_CAPTURE_PATH!\packets.hex.log") do if %%~zF GTR 0 set "ACTIVE_CAPTURE_HAS_PACKET_FILE=1"
+    )
+    if exist "!ACTIVE_CAPTURE_PATH!\events.log" (
+        for %%F in ("!ACTIVE_CAPTURE_PATH!\events.log") do if %%~zF GTR 0 set "ACTIVE_CAPTURE_HAS_EVENT_FILE=1"
+    )
+    if exist "!ACTIVE_CAPTURE_PATH!\capture_info.json" (
+        findstr /C:"running" "!ACTIVE_CAPTURE_PATH!\capture_info.json" >nul 2>nul
+        if not errorlevel 1 set "ACTIVE_CAPTURE_IS_RUNNING=1"
+    )
+    if exist "!ACTIVE_CAPTURE_PATH!\capture-session.json" (
+        for /f "tokens=2 delims=:" %%P in ('findstr /C:"id" "!ACTIVE_CAPTURE_PATH!\capture-session.json" 2^>nul') do if not defined ACTIVE_CAPTURE_PID (
+            set "ACTIVE_CAPTURE_PID=%%P"
+            set "ACTIVE_CAPTURE_PID=!ACTIVE_CAPTURE_PID:,=!"
+            set "ACTIVE_CAPTURE_PID=!ACTIVE_CAPTURE_PID: =!"
+        )
+    )
+    if defined ACTIVE_CAPTURE_PID (
+        tasklist /FI "PID eq !ACTIVE_CAPTURE_PID!" /FI "IMAGENAME eq AnarchyOnline.exe" 2>nul | findstr /I /C:"AnarchyOnline.exe" >nul 2>nul
+        if not errorlevel 1 set "ACTIVE_CAPTURE_PROCESS_RUNNING=1"
+    )
+    if defined ACTIVE_CAPTURE_HAS_PACKET_FILE if defined ACTIVE_CAPTURE_HAS_EVENT_FILE if defined ACTIVE_CAPTURE_IS_RUNNING (
+        echo SUCCESS: AOSharp live capture already active.
+        echo CaptureOutputPath: "!ACTIVE_CAPTURE_PATH!"
+        echo FailureLog: "%LOG_PATH%"
+        exit /b 0
+    )
+    if defined ACTIVE_CAPTURE_PROCESS_RUNNING (
+        echo SUCCESS: AOSharp live capture already loaded in PID !ACTIVE_CAPTURE_PID!.
+        echo CaptureOutputPath: "!ACTIVE_CAPTURE_PATH!"
+        echo FailureLog: "%LOG_PATH%"
+        exit /b 0
+    )
+)
+
 if exist "%LOG_PATH%" del /q "%LOG_PATH%" >nul 2>nul
 
 echo Command: "%INJECTOR_EXE%" --plugin "%PLUGIN_DLL%" --log "%LOG_PATH%" %TARGET_SWITCH% "%TARGET_VALUE%"
@@ -98,7 +140,7 @@ if defined LATEST_CAPTURE (
     if exist "!LATEST_CAPTURE_PATH!\events.log" (
         for %%F in ("!LATEST_CAPTURE_PATH!\events.log") do if %%~zF GTR 0 set "CAPTURE_HAS_EVENT_FILE=1"
     )
-    if defined CAPTURE_HAS_PACKET_FILE if defined CAPTURE_HAS_EVENT_FILE (
+    if defined CAPTURE_HAS_PACKET_FILE if defined CAPTURE_HAS_EVENT_FILE if /I not "!LATEST_CAPTURE!"=="!PREVIOUS_CAPTURE!" (
         echo SUCCESS: AOSharp live capture injected.
         echo CaptureOutputPath: "!LATEST_CAPTURE_PATH!"
         echo FailureLog: "%LOG_PATH%"
@@ -121,10 +163,10 @@ if not errorlevel 1 if defined LATEST_CAPTURE if /I not "%LATEST_CAPTURE%"=="%PR
 )
 
 if not errorlevel 1 (
-    echo SUCCESS: AOSharp live capture injected.
+    echo FAILED: injector reported plugin load, but no new capture folder with packet output was created.
     echo CaptureOutputPath: "%CAPTURE_ROOT%"
     echo FailureLog: "%LOG_PATH%"
-    exit /b 0
+    exit /b 1
 )
 
 echo FAILED: AOSharp live capture did not report injection success or write capture packet files.
