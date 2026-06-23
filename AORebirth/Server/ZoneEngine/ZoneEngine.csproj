@@ -150,6 +150,7 @@
     <Compile Include="Core\CombatCorpseRules.cs" />
     <Compile Include="Core\CombatDamageRules.cs" />
     <Compile Include="Core\CombatTestMobArchetype.cs" />
+    <Compile Include="Core\ChatCommandText.cs" />
     <Compile Include="Core\GridZoneInDiagnostics.cs" />
     <Compile Include="Core\WorldEntrySummary.cs" />
     <Compile Include="Core\EnemyBehaviorContract.cs" />
