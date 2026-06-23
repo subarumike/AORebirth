@@ -406,9 +406,80 @@ namespace AOSharpLiveCapture
             row.ClassName = Safe(() => dynel.GetType().Name);
             row.Name = Safe(() => dynel.Name);
             row.Position = Safe(() => dynel.Position.ToString());
+            row.DynelCategory = this.GetDynelCategory(dynel);
             row.Pointer = Safe(() => "0x" + dynel.Pointer.ToInt64().ToString("X", CultureInfo.InvariantCulture));
 
+            if (SafeBool(() => dynel.Identity.Type == IdentityType.SimpleChar))
+            {
+                SimpleChar character = dynel.Cast<SimpleChar>();
+                bool isPet = SafeBool(() => character.IsPet);
+                bool isNpc = SafeBool(() => character.IsNpc);
+                bool isPlayer = SafeBool(() => character.IsPlayer);
+
+                row.CharacterKind = isPet ? "pet" : isNpc ? "npc" : isPlayer ? "player" : "simplechar";
+                row.IsNpc = isNpc.ToString();
+                row.IsPet = isPet.ToString();
+
+                if (isNpc || isPet)
+                {
+                    row.NpcLevel = SafeStat(character, Stat.Level);
+                    row.MonsterData = SafeStat(character, Stat.MonsterData);
+                    row.CatMesh = SafeStat(character, Stat.CATMesh);
+                    row.DisplayCatMesh = SafeStat(character, Stat.DisplayCATMesh);
+                    row.VisualFlags = SafeStat(character, Stat.VisualFlags);
+                    row.State = SafeStat(character, Stat.State);
+                    row.CurrentState = SafeStat(character, Stat.CurrentState);
+                    row.ActionCategory = SafeStat(character, Stat.ActionCategory);
+                    row.Scale = SafeStat(character, Stat.Scale);
+                    row.CharRadius = SafeStat(character, Stat.CharRadius);
+                    row.NpcBrainState = SafeStat(character, Stat.NPCBrainState);
+                    row.PetState = SafeStat(character, Stat.PetState);
+                    row.PetOwnerId = isPet ? Safe(() => character.PetOwnerId.ToString(CultureInfo.InvariantCulture)) : string.Empty;
+                }
+            }
+
             return row;
+        }
+
+        private string GetDynelCategory(Dynel dynel)
+        {
+            if (dynel == null)
+            {
+                return "null";
+            }
+
+            string identityType = Safe(() => dynel.Identity.Type.ToString());
+            if (identityType == "SimpleChar")
+            {
+                return "character";
+            }
+
+            if (identityType == "Door")
+            {
+                return "door";
+            }
+
+            if (identityType == "Terminal")
+            {
+                return "terminal";
+            }
+
+            if (identityType == "CityController")
+            {
+                return "city-controller";
+            }
+
+            if (identityType == "VendingMachine")
+            {
+                return "vendor";
+            }
+
+            if (identityType == "Corpse")
+            {
+                return "corpse";
+            }
+
+            return identityType;
         }
 
         private void WriteDynelCsv(string path, DynelDumpRow[] rows)
@@ -418,7 +489,7 @@ namespace AOSharpLiveCapture
             {
                 if (writeHeader)
                 {
-                    writer.WriteLine("CapturedUtc,LocalCharacterName,LocalCharacterIdentity,PlayfieldIdentity,Index,Identity,IdentityType,IdentityTypeValue,Instance,InstanceHex,ClassName,Name,Position,Pointer,Error");
+                    writer.WriteLine("CapturedUtc,LocalCharacterName,LocalCharacterIdentity,PlayfieldIdentity,Index,DynelCategory,CharacterKind,Identity,IdentityType,IdentityTypeValue,Instance,InstanceHex,ClassName,Name,Position,IsNpc,IsPet,NpcLevel,MonsterData,CATMesh,DisplayCATMesh,VisualFlags,State,CurrentState,ActionCategory,Scale,CharRadius,NPCBrainState,PetState,PetOwnerId,Pointer,Error");
                 }
 
                 foreach (DynelDumpRow row in rows)
@@ -432,6 +503,8 @@ namespace AOSharpLiveCapture
                             Csv(row.LocalCharacterIdentity),
                             Csv(row.PlayfieldIdentity),
                             Csv(row.Index),
+                            Csv(row.DynelCategory),
+                            Csv(row.CharacterKind),
                             Csv(row.Identity),
                             Csv(row.IdentityType),
                             Csv(row.IdentityTypeValue),
@@ -440,6 +513,21 @@ namespace AOSharpLiveCapture
                             Csv(row.ClassName),
                             Csv(row.Name),
                             Csv(row.Position),
+                            Csv(row.IsNpc),
+                            Csv(row.IsPet),
+                            Csv(row.NpcLevel),
+                            Csv(row.MonsterData),
+                            Csv(row.CatMesh),
+                            Csv(row.DisplayCatMesh),
+                            Csv(row.VisualFlags),
+                            Csv(row.State),
+                            Csv(row.CurrentState),
+                            Csv(row.ActionCategory),
+                            Csv(row.Scale),
+                            Csv(row.CharRadius),
+                            Csv(row.NpcBrainState),
+                            Csv(row.PetState),
+                            Csv(row.PetOwnerId),
                             Csv(row.Pointer),
                             Csv(row.Error)
                         }));
@@ -497,6 +585,23 @@ namespace AOSharpLiveCapture
             AppendJsonField(json, indent + "  ", "className", row.ClassName, true);
             AppendJsonField(json, indent + "  ", "name", row.Name, true);
             AppendJsonField(json, indent + "  ", "position", row.Position, true);
+            AppendJsonField(json, indent + "  ", "dynelCategory", row.DynelCategory, true);
+            AppendJsonField(json, indent + "  ", "characterKind", row.CharacterKind, true);
+            AppendJsonField(json, indent + "  ", "isNpc", row.IsNpc, true);
+            AppendJsonField(json, indent + "  ", "isPet", row.IsPet, true);
+            AppendJsonField(json, indent + "  ", "npcLevel", row.NpcLevel, true);
+            AppendJsonField(json, indent + "  ", "monsterData", row.MonsterData, true);
+            AppendJsonField(json, indent + "  ", "catMesh", row.CatMesh, true);
+            AppendJsonField(json, indent + "  ", "displayCatMesh", row.DisplayCatMesh, true);
+            AppendJsonField(json, indent + "  ", "visualFlags", row.VisualFlags, true);
+            AppendJsonField(json, indent + "  ", "state", row.State, true);
+            AppendJsonField(json, indent + "  ", "currentState", row.CurrentState, true);
+            AppendJsonField(json, indent + "  ", "actionCategory", row.ActionCategory, true);
+            AppendJsonField(json, indent + "  ", "scale", row.Scale, true);
+            AppendJsonField(json, indent + "  ", "charRadius", row.CharRadius, true);
+            AppendJsonField(json, indent + "  ", "npcBrainState", row.NpcBrainState, true);
+            AppendJsonField(json, indent + "  ", "petState", row.PetState, true);
+            AppendJsonField(json, indent + "  ", "petOwnerId", row.PetOwnerId, true);
             AppendJsonField(json, indent + "  ", "pointer", row.Pointer, true);
             AppendJsonField(json, indent + "  ", "error", row.Error, false);
             json.AppendLine();
@@ -2178,6 +2283,10 @@ namespace AOSharpLiveCapture
 
             public string Index { get; set; }
 
+            public string DynelCategory { get; set; }
+
+            public string CharacterKind { get; set; }
+
             public string Identity { get; set; }
 
             public string IdentityType { get; set; }
@@ -2193,6 +2302,36 @@ namespace AOSharpLiveCapture
             public string Name { get; set; }
 
             public string Position { get; set; }
+
+            public string IsNpc { get; set; }
+
+            public string IsPet { get; set; }
+
+            public string NpcLevel { get; set; }
+
+            public string MonsterData { get; set; }
+
+            public string CatMesh { get; set; }
+
+            public string DisplayCatMesh { get; set; }
+
+            public string VisualFlags { get; set; }
+
+            public string State { get; set; }
+
+            public string CurrentState { get; set; }
+
+            public string ActionCategory { get; set; }
+
+            public string Scale { get; set; }
+
+            public string CharRadius { get; set; }
+
+            public string NpcBrainState { get; set; }
+
+            public string PetState { get; set; }
+
+            public string PetOwnerId { get; set; }
 
             public string Pointer { get; set; }
 
