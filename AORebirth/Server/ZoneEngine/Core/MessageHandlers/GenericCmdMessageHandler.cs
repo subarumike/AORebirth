@@ -50,6 +50,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using AORebirth.Core.Requirements;
     using AORebirth.Core.Statels;
     using AORebirth.Core.Vector;
+    using AORebirth.Database.Dao;
     using AORebirth.Enums;
     using AORebirth.Interfaces;
     using AORebirth.ObjectManager;
@@ -130,6 +131,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int RuntimeCityControllerInstance = 0x009C6010;
 
+        private const int CapturedNonOrgCityControllerInstance = 0x009CA011;
+
         private const int CapturedCityControllerInfoIdentityType = 0x0000C419;
 
         private const int CapturedCityControllerInfoIdentityInstance = 0x0000C000;
@@ -138,6 +141,10 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int CapturedCityControllerBuildingInstance = 0x0000138A;
 
+        private const int CapturedNonOrgCityControllerBuildingInstance = 0x0000177A;
+
+        private const int CapturedOwnedMontroyalPrivateCityInstance = 1196034;
+
         private const int CapturedCityControllerFeedbackCategoryId = 110;
 
         private const int CapturedCityControllerNoOrganizationMessageId = 8208531;
@@ -145,6 +152,8 @@ namespace ZoneEngine.Core.MessageHandlers
         private const string CapturedCityControllerNoOrganizationText = "no organization";
 
         private const string CapturedCityControllerOwnedOrganizationText = "Est. 2024";
+
+        private const string CapturedCityControllerNonOrgText = "Identifies As Clan";
 
         private static readonly object CityAccessCardExpirationSync = new object();
 
@@ -895,32 +904,29 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             int organizationId = ResolveCharacterOrganizationInstance(character);
-            bool hasOrganization = organizationId > 0;
-            SendCapturedCityControllerOpenSignals(client, character, organizationId, hasOrganization);
-            this.Acknowledge(character, message);
-
-            bool sentNoOrganizationFeedback = !hasOrganization;
-            if (sentNoOrganizationFeedback)
+            int owningOrganizationId = ResolveCurrentPrivateCityOwningOrganizationInstance(character, organizationId);
+            bool isOwningOrganizationMember = organizationId > 0 && organizationId == owningOrganizationId;
+            if (isOwningOrganizationMember)
             {
-                SendCapturedCityControllerSignal(client, character, 6, new byte[] { 0x00, 0x00, 0x00, 0x03 });
-                FeedbackMessageHandler.Default.Send(
-                    character,
-                    CapturedCityControllerFeedbackCategoryId,
-                    CapturedCityControllerNoOrganizationMessageId);
+                SendCapturedCityControllerOpenSignals(client, character, organizationId, true);
             }
+            else
+            {
+                SendCapturedCityControllerNonOrgOpenSignals(client, character);
+            }
+
+            this.Acknowledge(character, message);
 
             client.Server.Info(
                 client,
-                "CityController use handled character={0} target={1} org={2} count={3} temp4={4} feedbackSent={5} feedbackCategory={6} feedbackMessage={7} aoTransportSignalSent={8} noCityAdvantages=1 noOwnershipChange=1 evidence=private_city_capture_20260623_012720/private_city_owned_entry_capture_20260623_021643 runtime_target=009C6010",
+                "CityController use handled character={0} target={1} org={2} owningOrg={3} menu={4} count={5} temp4={6} feedbackSent=False aoTransportSignalSent=5 noCityAdvantages=1 noOwnershipChange=1 evidence=private_city_owned_entry_capture_20260623_021643/city_controller_non_org_capture_20260623_081344 runtime_target=009C6010",
                 character.Identity,
                 target,
                 organizationId,
+                owningOrganizationId,
+                isOwningOrganizationMember ? "owner_member" : "non_org_limited",
                 message.Count,
-                message.Temp4,
-                sentNoOrganizationFeedback,
-                CapturedCityControllerFeedbackCategoryId,
-                CapturedCityControllerNoOrganizationMessageId,
-                hasOrganization ? 5 : 6);
+                message.Temp4);
 
             return true;
         }
@@ -936,7 +942,8 @@ namespace ZoneEngine.Core.MessageHandlers
         {
             return target.Type == IdentityType.CityController
                 && (target.Instance == CapturedCityControllerInstance
-                    || target.Instance == RuntimeCityControllerInstance);
+                    || target.Instance == RuntimeCityControllerInstance
+                    || target.Instance == CapturedNonOrgCityControllerInstance);
         }
 
         private static void SendCapturedCityControllerOpenSignals(
@@ -965,6 +972,25 @@ namespace ZoneEngine.Core.MessageHandlers
                 hasOrganization
                     ? new byte[] { 0x00, 0x00, 0x00, 0x00, 0x95, 0xC5, 0xCC, 0xD7 }
                     : new byte[] { 0x00, 0x00, 0x00, 0x00, 0x95, 0xC5, 0xD6, 0xBD });
+            SendCapturedCityControllerSignal(client, character, 15, new byte[] { 0x3F, 0x80, 0x00, 0x00 });
+        }
+
+        private static void SendCapturedCityControllerNonOrgOpenSignals(
+            IZoneClient client,
+            ICharacter character)
+        {
+            SendCapturedCityControllerSignal(
+                client,
+                character,
+                5,
+                CreateCapturedCityControllerNonOrgInfoPayload(character));
+            SendCapturedCityControllerSignal(client, character, 10, new byte[] { 0x03, 0x93, 0x87, 0x00 });
+            SendCapturedCityControllerSignal(client, character, 13, new byte[] { 0x00, 0x26, 0x32, 0xBF });
+            SendCapturedCityControllerSignal(
+                client,
+                character,
+                14,
+                new byte[] { 0x00, 0x00, 0x00, 0x01, 0x95, 0xC5, 0x79, 0x53 });
             SendCapturedCityControllerSignal(client, character, 15, new byte[] { 0x3F, 0x80, 0x00, 0x00 });
         }
 
@@ -1011,6 +1037,77 @@ namespace ZoneEngine.Core.MessageHandlers
             payload.AddRange(textBytes);
 
             return payload.ToArray();
+        }
+
+        private static byte[] CreateCapturedCityControllerNonOrgInfoPayload(ICharacter character)
+        {
+            byte[] textBytes = System.Text.Encoding.ASCII.GetBytes(CapturedCityControllerNonOrgText);
+            var payload = new List<byte>(58 + textBytes.Length);
+
+            AppendInt32(payload, CapturedCityControllerInfoIdentityType);
+            AppendInt32(payload, CapturedCityControllerInfoIdentityInstance);
+            AppendInt32(payload, CapturedPrivateCityOrganizationInstance);
+            AppendInt32(payload, CapturedCityControllerBuildingType);
+            AppendInt32(payload, CapturedNonOrgCityControllerBuildingInstance);
+            AppendInt32(payload, (int)character.Identity.Type);
+            AppendInt32(payload, character.Identity.Instance);
+            AppendInt32(payload, 2);
+            AppendInt32(payload, 1);
+            AppendInt32(payload, -1);
+            AppendInt16(payload, textBytes.Length);
+            payload.AddRange(textBytes);
+
+            return payload.ToArray();
+        }
+
+        private static int ResolveCurrentPrivateCityOwningOrganizationInstance(ICharacter character, int characterOrganizationId)
+        {
+            if (character == null || character.Playfield == null)
+            {
+                return 0;
+            }
+
+            int currentPlayfieldInstance = character.Playfield.Identity.Instance;
+            if (characterOrganizationId > 0
+                && ResolveOrganizationCityId(characterOrganizationId) == currentPlayfieldInstance)
+            {
+                return characterOrganizationId;
+            }
+
+            try
+            {
+                DBOrganization organization =
+                    OrganizationDao.Instance.GetAll(new { CityId = currentPlayfieldInstance }).FirstOrDefault();
+                if (organization != null)
+                {
+                    return organization.Id;
+                }
+            }
+            catch
+            {
+            }
+
+            return currentPlayfieldInstance == CapturedOwnedMontroyalPrivateCityInstance
+                       ? CapturedOwnedPrivateCityOrganizationInstance
+                       : 0;
+        }
+
+        private static int ResolveOrganizationCityId(int organizationInstance)
+        {
+            if (organizationInstance <= 0)
+            {
+                return 0;
+            }
+
+            try
+            {
+                DBOrganization organization = OrganizationDao.Instance.Get(organizationInstance);
+                return organization == null ? 0 : organization.CityId;
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
         private static void AppendInt32(ICollection<byte> bytes, int value)
