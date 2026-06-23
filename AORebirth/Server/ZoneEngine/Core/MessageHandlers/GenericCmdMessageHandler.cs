@@ -143,6 +143,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int CapturedNonOrgCityControllerBuildingInstance = 0x0000177A;
 
+        private const int CapturedMontroyalPrivateCityInstance = 1196045;
+
         private const int CapturedOwnedMontroyalPrivateCityInstance = 1196034;
 
         private const int CapturedCityControllerFeedbackCategoryId = 110;
@@ -912,7 +914,7 @@ namespace ZoneEngine.Core.MessageHandlers
             }
             else
             {
-                SendCapturedCityControllerNonOrgOpenSignals(client, character);
+                SendCapturedCityControllerNonOrgOpenSignals(client, character, owningOrganizationId);
             }
 
             this.Acknowledge(character, message);
@@ -977,13 +979,14 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private static void SendCapturedCityControllerNonOrgOpenSignals(
             IZoneClient client,
-            ICharacter character)
+            ICharacter character,
+            int owningOrganizationId)
         {
             SendCapturedCityControllerSignal(
                 client,
                 character,
                 5,
-                CreateCapturedCityControllerNonOrgInfoPayload(character));
+                CreateCapturedCityControllerNonOrgInfoPayload(character, owningOrganizationId));
             SendCapturedCityControllerSignal(client, character, 10, new byte[] { 0x03, 0x93, 0x87, 0x00 });
             SendCapturedCityControllerSignal(client, character, 13, new byte[] { 0x00, 0x26, 0x32, 0xBF });
             SendCapturedCityControllerSignal(
@@ -1039,16 +1042,20 @@ namespace ZoneEngine.Core.MessageHandlers
             return payload.ToArray();
         }
 
-        private static byte[] CreateCapturedCityControllerNonOrgInfoPayload(ICharacter character)
+        private static byte[] CreateCapturedCityControllerNonOrgInfoPayload(
+            ICharacter character,
+            int owningOrganizationId)
         {
             byte[] textBytes = System.Text.Encoding.ASCII.GetBytes(CapturedCityControllerNonOrgText);
             var payload = new List<byte>(58 + textBytes.Length);
 
             AppendInt32(payload, CapturedCityControllerInfoIdentityType);
             AppendInt32(payload, CapturedCityControllerInfoIdentityInstance);
-            AppendInt32(payload, CapturedPrivateCityOrganizationInstance);
+            AppendInt32(
+                payload,
+                owningOrganizationId > 0 ? owningOrganizationId : CapturedPrivateCityOrganizationInstance);
             AppendInt32(payload, CapturedCityControllerBuildingType);
-            AppendInt32(payload, CapturedNonOrgCityControllerBuildingInstance);
+            AppendInt32(payload, ResolvePrivateCityControllerBuildingInstance(character));
             AppendInt32(payload, (int)character.Identity.Type);
             AppendInt32(payload, character.Identity.Instance);
             AppendInt32(payload, 2);
@@ -1058,6 +1065,20 @@ namespace ZoneEngine.Core.MessageHandlers
             payload.AddRange(textBytes);
 
             return payload.ToArray();
+        }
+
+        private static int ResolvePrivateCityControllerBuildingInstance(ICharacter character)
+        {
+            if (character == null || character.Playfield == null)
+            {
+                return CapturedNonOrgCityControllerBuildingInstance;
+            }
+
+            int playfieldInstance = character.Playfield.Identity.Instance;
+            return playfieldInstance == CapturedMontroyalPrivateCityInstance
+                   || playfieldInstance == CapturedOwnedMontroyalPrivateCityInstance
+                       ? CapturedCityControllerBuildingInstance
+                       : CapturedNonOrgCityControllerBuildingInstance;
         }
 
         private static int ResolveCurrentPrivateCityOwningOrganizationInstance(ICharacter character, int characterOrganizationId)
