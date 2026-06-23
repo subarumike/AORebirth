@@ -36,6 +36,25 @@ namespace ZoneEngine.Core
             new[] { 540, 545, 565, 585, 600, 655, 716, 730, 800, 4582 },
             NpcAiProfile.Passive);
 
+        public static readonly Entry MalfunctioningCleaningRobot = new Entry(
+            "robot",
+            new[] { "robot", "cleaningrobot", "malfunctioningrobot", "mcr" },
+            TemplateHash,
+            "Malfunctioning Cleaning Robot",
+            1,
+            12,
+            297023,
+            MissingVisualId,
+            200,
+            1019,
+            6,
+            5,
+            new[] { 1044525 },
+            0x1F,
+            5,
+            500,
+            NpcAiProfile.Passive);
+
         public static readonly Entry IslandReet = new Entry(
             "islandreet",
             new[] { "islandreet", "reet" },
@@ -167,6 +186,7 @@ namespace ZoneEngine.Core
         public static readonly Entry[] All =
         {
             BeachLeet,
+            MalfunctioningCleaningRobot,
             IslandReet,
             ShoreSnake,
             StowawayRollerrat,
@@ -178,6 +198,7 @@ namespace ZoneEngine.Core
         };
 
         private const int LiveObservedDeathActionKey = 0x1F7;
+        private const int MissingVisualId = 1234567890;
 
         public static Entry Default
         {
@@ -283,6 +304,11 @@ namespace ZoneEngine.Core
         {
             foreach (Entry entry in All)
             {
+                if (!CombatCorpseVisuals.IsUsableVisualId(entry.CorpseCatMesh))
+                {
+                    continue;
+                }
+
                 yield return new KeyValuePair<int, int>(entry.MonsterData, entry.CorpseCatMesh);
             }
         }
@@ -335,19 +361,19 @@ namespace ZoneEngine.Core
             SetMobStat(mobCharacter, StatIds.catmesh, entry.CorpseCatMesh);
             SetMobStat(mobCharacter, StatIds.displaycatmesh, entry.CorpseCatMesh);
             SetMobStat(mobCharacter, StatIds.monsterscale, entry.MonsterScale);
-            SetMobStat(mobCharacter, StatIds.visualflags, 0x1F);
+            SetMobStat(mobCharacter, StatIds.visualflags, entry.VisualFlags);
             SetMobStat(mobCharacter, StatIds.side, 3);
             SetMobStat(mobCharacter, StatIds.fatness, 1);
             SetMobStat(mobCharacter, StatIds.currentmovementmode, (int)MoveModes.Run);
             SetMobStat(mobCharacter, StatIds.prevmovementmode, (int)MoveModes.Run);
-            SetMobStat(mobCharacter, StatIds.runspeed, EnemyBehaviorContract.NpcRunSpeedForMaxFollowSpeed);
+            SetMobStat(mobCharacter, StatIds.runspeed, entry.RunSpeedBase);
             SetMobStat(mobCharacter, StatIds.breed, entry.Breed);
             SetMobStat(mobCharacter, StatIds.sex, entry.Sex);
             SetMobStat(mobCharacter, StatIds.race, 1);
             SetMobStat(mobCharacter, StatIds.npcfamily, entry.NpcFamily);
-            SetMobStat(mobCharacter, StatIds.itemanim, LiveObservedDeathActionKey);
-            SetMobStat(mobCharacter, StatIds.corpseanimkey, LiveObservedDeathActionKey);
-            SetMobStat(mobCharacter, StatIds.dieanim, LiveObservedDeathActionKey);
+            SetMobStat(mobCharacter, StatIds.itemanim, entry.DeathAnimationKey);
+            SetMobStat(mobCharacter, StatIds.corpseanimkey, entry.DeathAnimationKey);
+            SetMobStat(mobCharacter, StatIds.dieanim, entry.DeathAnimationKey);
             SetMobStat(mobCharacter, StatIds.life, entry.Health);
             SetMobStat(mobCharacter, StatIds.health, entry.Health);
             SetMobStat(mobCharacter, StatIds.healdelta, 0);
@@ -391,6 +417,45 @@ namespace ZoneEngine.Core
                 int sex,
                 int[] clientHintPlayfieldIds,
                 NpcAiProfile aiProfile)
+                : this(
+                    key,
+                    aliases,
+                    templateHash,
+                    displayName,
+                    level,
+                    health,
+                    monsterData,
+                    corpseCatMesh,
+                    monsterScale,
+                    npcFamily,
+                    breed,
+                    sex,
+                    clientHintPlayfieldIds,
+                    0x1F,
+                    EnemyBehaviorContract.NpcRunSpeedForMaxFollowSpeed,
+                    LiveObservedDeathActionKey,
+                    aiProfile)
+            {
+            }
+
+            public Entry(
+                string key,
+                string[] aliases,
+                string templateHash,
+                string displayName,
+                int level,
+                int health,
+                int monsterData,
+                int corpseCatMesh,
+                int monsterScale,
+                int npcFamily,
+                int breed,
+                int sex,
+                int[] clientHintPlayfieldIds,
+                int visualFlags,
+                int runSpeedBase,
+                int deathAnimationKey,
+                NpcAiProfile aiProfile)
             {
                 this.Key = key;
                 this.Aliases = aliases;
@@ -405,6 +470,9 @@ namespace ZoneEngine.Core
                 this.Breed = breed;
                 this.Sex = sex;
                 this.ClientHintPlayfieldIds = clientHintPlayfieldIds ?? new int[0];
+                this.VisualFlags = visualFlags;
+                this.RunSpeedBase = runSpeedBase;
+                this.DeathAnimationKey = deathAnimationKey;
                 this.AiProfile = aiProfile;
             }
 
@@ -447,6 +515,12 @@ namespace ZoneEngine.Core
             public int Sex { get; private set; }
 
             public int[] ClientHintPlayfieldIds { get; private set; }
+
+            public int VisualFlags { get; private set; }
+
+            public int RunSpeedBase { get; private set; }
+
+            public int DeathAnimationKey { get; private set; }
 
             public NpcAiProfile AiProfile { get; private set; }
 
