@@ -21,6 +21,9 @@ namespace AOSharpLiveCapture
 {
     public class Main : AOPluginEntry
     {
+        private static readonly object LifecycleSyncRoot = new object();
+        private static Main activeInstance;
+
         private readonly object syncRoot = new object();
         private readonly HashSet<string> knownCharacters = new HashSet<string>();
         private readonly HashSet<string> knownCorpses = new HashSet<string>();
@@ -123,9 +126,23 @@ namespace AOSharpLiveCapture
         private DateTime lastPacketUtc;
         private string lastPlayfieldId = string.Empty;
         private CombatLootSmoke combatLootSmoke;
+        private bool initialized;
 
         public override void Run(string pluginDir)
         {
+            lock (LifecycleSyncRoot)
+            {
+                if (activeInstance != null)
+                {
+                    return;
+                }
+
+                activeInstance = this;
+                this.initialized = true;
+            }
+
+            try
+            {
             this.captureStartUtc = DateTime.UtcNow;
             this.captureStartLocal = DateTime.Now;
             this.lastPacketUtc = this.captureStartUtc;
@@ -183,10 +200,37 @@ namespace AOSharpLiveCapture
             this.LogEvent("PLUGIN", "Capture session metadata: " + Path.Combine(this.sessionDirectory, "capture-session.json"));
             this.LogSnapshot("initial");
             Chat.WriteLine("AOSharpLiveCapture logging to " + this.sessionDirectory, ChatColor.Gold);
+            }
+            catch
+            {
+                lock (LifecycleSyncRoot)
+                {
+                    if (ReferenceEquals(activeInstance, this))
+                    {
+                        activeInstance = null;
+                    }
+                }
+
+                this.initialized = false;
+                throw;
+            }
         }
 
         public override void Teardown()
         {
+            if (!this.initialized)
+            {
+                return;
+            }
+
+            lock (LifecycleSyncRoot)
+            {
+                if (!ReferenceEquals(activeInstance, this))
+                {
+                    return;
+                }
+            }
+
             Network.PacketReceived -= this.OnPacketReceived;
             Network.PacketSent -= this.OnPacketSent;
             Network.N3MessageReceived -= this.OnN3MessageReceived;
@@ -203,6 +247,16 @@ namespace AOSharpLiveCapture
 
             this.LogEvent("PLUGIN", "AOSharpLiveCapture teardown.");
             this.FinalizeCapture();
+
+            lock (LifecycleSyncRoot)
+            {
+                if (ReferenceEquals(activeInstance, this))
+                {
+                    activeInstance = null;
+                }
+            }
+
+            this.initialized = false;
         }
 
         private void OnCommand(string command, string[] args, ChatWindow chatWindow)

@@ -52,17 +52,8 @@ namespace AOSharpLiveInjector
                 IPCClient pipe = new IPCClient(target.Id.ToString(CultureInfo.InvariantCulture));
                 pipe.Connect();
                 pipe.Send(new LoadAssemblyMessage { Assemblies = new[] { pluginPath } });
-                Log(logPath, "Capture plugin injected. Keeping pipe open.");
-
-                pipe.OnDisconnected += client => Log(logPath, "IPC pipe disconnected; plugin should be unloaded.");
-
-                while (!target.HasExited)
-                {
-                    Thread.Sleep(1000);
-                    target.Refresh();
-                }
-
-                Log(logPath, "Target process exited.");
+                Log(logPath, "Capture plugin injected.");
+                Thread.Sleep(3000);
                 return 0;
             }
             catch (Exception ex)
