@@ -1198,13 +1198,16 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)
         {
-            Identity dontSendTo = sendSCFUs.toClient.Controller.Character.Identity;
-            Identity playfieldIdentity = sendSCFUs.toClient.Controller.Character.Playfield.Identity;
+            ICharacter recipient = sendSCFUs.toClient.Controller.Character;
+            Identity dontSendTo = recipient.Identity;
+            Identity playfieldIdentity = recipient.Playfield.Identity;
             foreach (ICharacter entity in
-                Pool.Instance.GetAll<ICharacter>((int)IdentityType.CanbeAffected)
-                    .Where(xx => xx.InPlayfield(playfieldIdentity)))
+                Pool.Instance.GetAll<ICharacter>((int)IdentityType.CanbeAffected))
             {
-                if (entity.Identity != dontSendTo)
+                bool senderEqualsRecipient = entity.Identity == dontSendTo;
+                bool senderInRecipientPlayfield = entity.InPlayfield(playfieldIdentity);
+                bool sent = false;
+                if (senderInRecipientPlayfield && !senderEqualsRecipient)
                 {
                     var temp = entity as Character;
                     if (temp != null)
@@ -1214,7 +1217,28 @@ namespace AORebirth.Core.Playfields
 
                         var charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 };
                         sendSCFUs.toClient.SendCompressed(charInPlay);
+                        sent = true;
                     }
+                }
+
+                bool senderIsPlayer = entity.Controller != null && entity.Controller.Client != null;
+                if (senderIsPlayer || senderEqualsRecipient || sent)
+                {
+                    Identity senderPlayfield = entity.Playfield == null ? Identity.None : entity.Playfield.Identity;
+                    LogUtil.Debug(
+                        DebugInfoDetail.NetworkMessages,
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "PlayerVisibilitySCFU sender={0}/{1} recipient={2}/{3} senderPf={4} recipientPf={5} self={6} inPlayfield={7} rangeRejected=False sent={8}",
+                            entity.Identity,
+                            entity.Name,
+                            recipient.Identity,
+                            recipient.Name,
+                            senderPlayfield,
+                            playfieldIdentity,
+                            senderEqualsRecipient,
+                            senderInRecipientPlayfield,
+                            sent));
                 }
             }
         }

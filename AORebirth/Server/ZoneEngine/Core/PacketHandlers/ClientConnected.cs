@@ -49,7 +49,6 @@ namespace ZoneEngine.Core.PacketHandlers
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
-    using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Script;
@@ -125,9 +124,6 @@ client.Controller.Character.Playfield.Identity,
 
             // Debug-only combat test mob spawns are disabled on normal login.
             // Use /command spawn / spawnleet for explicit test spawns.
-
-            var sendSCFUs = new IMSendPlayerSCFUs { toClient = client };
-            ((Playfield)client.Playfield).SendSCFUsToClient(sendSCFUs);
 
             /* Live login advertises the character as socially/action-ready. */
             client.Controller.Character.Stats[StatIds.socialstatus].BaseValue = 4;
