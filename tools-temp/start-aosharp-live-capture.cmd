@@ -1,5 +1,5 @@
 @echo off
-setlocal EnableExtensions
+setlocal EnableExtensions EnableDelayedExpansion
 
 set "SCRIPT_DIR=%~dp0"
 for %%I in ("%SCRIPT_DIR%..") do set "REPO_ROOT=%%~fI"
@@ -10,6 +10,7 @@ set "CAPTURE_ROOT=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\captures"
 set "LOG_PATH=%REPO_ROOT%\tools-temp\AOSharpLiveInjector\bin\Debug\AOSharpLiveInjector-start.log"
 set "TARGET_SWITCH="
 set "TARGET_VALUE="
+set "LAUNCHER_VBS=%TEMP%\start-aosharp-live-capture-%RANDOM%%RANDOM%.vbs"
 
 if "%~1"=="" goto usage
 
@@ -69,8 +70,41 @@ if exist "%LOG_PATH%" del /q "%LOG_PATH%" >nul 2>nul
 
 echo Command: "%INJECTOR_EXE%" --plugin "%PLUGIN_DLL%" --log "%LOG_PATH%" %TARGET_SWITCH% "%TARGET_VALUE%"
 
-start "AOSharpLiveInjector" /min "%INJECTOR_EXE%" --plugin "%PLUGIN_DLL%" --log "%LOG_PATH%" %TARGET_SWITCH% "%TARGET_VALUE%"
+> "%LAUNCHER_VBS%" echo Set shell = CreateObject("WScript.Shell"^)
+>> "%LAUNCHER_VBS%" echo command = Chr(34^) ^& WScript.Arguments(0^) ^& Chr(34^) ^& " --plugin " ^& Chr(34^) ^& WScript.Arguments(1^) ^& Chr(34^) ^& " --log " ^& Chr(34^) ^& WScript.Arguments(2^) ^& Chr(34^) ^& " " ^& WScript.Arguments(3^) ^& " " ^& Chr(34^) ^& WScript.Arguments(4^) ^& Chr(34^)
+>> "%LAUNCHER_VBS%" echo WScript.Quit shell.Run(command, 2, False^)
+
+wscript.exe "%LAUNCHER_VBS%" "%INJECTOR_EXE%" "%PLUGIN_DLL%" "%LOG_PATH%" "%TARGET_SWITCH%" "%TARGET_VALUE%" >nul 2>nul
+set "LAUNCH_EXIT=%ERRORLEVEL%"
+del /q "%LAUNCHER_VBS%" >nul 2>nul
+
+if not "%LAUNCH_EXIT%"=="0" (
+    echo FAILED: injector launch helper failed.
+    echo FailureLog: "%LOG_PATH%"
+    exit /b 1
+)
+
 timeout /t 3 /nobreak >nul
+
+for /f "delims=" %%D in ('dir /b /ad /o-d "%CAPTURE_ROOT%" 2^>nul') do (
+    if not defined LATEST_CAPTURE set "LATEST_CAPTURE=%%D"
+)
+
+if defined LATEST_CAPTURE (
+    set "LATEST_CAPTURE_PATH=%CAPTURE_ROOT%\%LATEST_CAPTURE%"
+    if exist "!LATEST_CAPTURE_PATH!\packets.hex.log" (
+        for %%F in ("!LATEST_CAPTURE_PATH!\packets.hex.log") do if %%~zF GTR 0 set "CAPTURE_HAS_PACKET_FILE=1"
+    )
+    if exist "!LATEST_CAPTURE_PATH!\events.log" (
+        for %%F in ("!LATEST_CAPTURE_PATH!\events.log") do if %%~zF GTR 0 set "CAPTURE_HAS_EVENT_FILE=1"
+    )
+    if defined CAPTURE_HAS_PACKET_FILE if defined CAPTURE_HAS_EVENT_FILE (
+        echo SUCCESS: AOSharp live capture injected.
+        echo CaptureOutputPath: "!LATEST_CAPTURE_PATH!"
+        echo FailureLog: "%LOG_PATH%"
+        exit /b 0
+    )
+)
 
 if not exist "%LOG_PATH%" (
     echo FAILED: injector did not create the expected log.
@@ -79,28 +113,24 @@ if not exist "%LOG_PATH%" (
 )
 
 findstr /C:"Capture plugin injected. Keeping pipe open." "%LOG_PATH%" >nul
-if errorlevel 1 (
-    echo FAILED: AOSharp live capture did not report injection success.
-    echo FailureLog: "%LOG_PATH%"
-    findstr /C:"ERROR:" "%LOG_PATH%" 2>nul
-    exit /b 1
-)
-
-for /f "delims=" %%D in ('dir /b /ad /o-d "%CAPTURE_ROOT%" 2^>nul') do (
-    if not defined LATEST_CAPTURE set "LATEST_CAPTURE=%%D"
-)
-
-if defined LATEST_CAPTURE if /I not "%LATEST_CAPTURE%"=="%PREVIOUS_CAPTURE%" (
+if not errorlevel 1 if defined LATEST_CAPTURE if /I not "%LATEST_CAPTURE%"=="%PREVIOUS_CAPTURE%" (
     echo SUCCESS: AOSharp live capture injected.
     echo CaptureOutputPath: "%CAPTURE_ROOT%\%LATEST_CAPTURE%"
     echo FailureLog: "%LOG_PATH%"
     exit /b 0
 )
 
-echo SUCCESS: AOSharp live capture injected.
-echo CaptureOutputPath: "%CAPTURE_ROOT%"
+if not errorlevel 1 (
+    echo SUCCESS: AOSharp live capture injected.
+    echo CaptureOutputPath: "%CAPTURE_ROOT%"
+    echo FailureLog: "%LOG_PATH%"
+    exit /b 0
+)
+
+echo FAILED: AOSharp live capture did not report injection success or write capture packet files.
 echo FailureLog: "%LOG_PATH%"
-exit /b 0
+findstr /C:"ERROR:" "%LOG_PATH%" 2>nul
+exit /b 1
 
 :usage
 echo Usage: cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "Anarchy Online"
