@@ -2,61 +2,65 @@
 
 ## Active Task
 
-Fix AOSharp live capture double injection.
+Implement captured CityController no-organization compatibility response.
 
 ## Scope
 
 - Work only in AORebirth.
-- Modify only `tools-temp\start-aosharp-live-capture.cmd` and required task/result docs.
-- Do not implement private-city gameplay.
-- Do not modify CityController, OrgClient, CityAdvantages, grid, bank, surgery clinic, or other gameplay code.
-- Do not perform repo cleanup or touch unrelated dirty GM/chat/grid-inspection files.
+- Implement only the captured no-organization CityController response from `20260623-015602`.
+- Do not implement owned-city transition.
+- Do not implement CityAdvantages.
+- Do not implement OrgClient 31.
+- Do not implement city purchase or ownership persistence.
+- Do not touch unrelated GM/chat/grid-inspection dirty files.
 
-## Problem
+## Evidence
 
-Commit `6a789e27` fixed false failure detection, but repeated wrapper runs can still inject while an AOSharpLiveCapture session is already active.
+Capture folder:
 
-Client evidence showed one wrapper run producing duplicate in-game startup lines for the same capture folder. That points at duplicate load/attach/initialization, or repeated wrapper injection into an already-running capture session.
+`tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260623-015602`
 
-## Fix
+Report:
 
-- Keep the Windows Script Host launcher path from `6a789e27`.
-- Add an active-capture preflight before launching the injector.
-- If the newest capture folder is still marked `running` and already has non-empty `packets.hex.log` and `events.log`, report success and do not invoke `AOSharpLiveInjector.exe` again.
-- Continue treating the known stdin warning as non-fatal when capture output proves the plugin is active.
-- The approved external command remains unchanged:
+`docs\generated\private_city_purchase_capture_20260623_015602.md`
 
-```cmd
-cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "<AO window title>"
-```
+Captured behavior:
 
-or:
+- Target: `CityController:9C182E`.
+- OUT `GenericCmd Use`: `Temp1=0 Count=4 Action=Use Temp4=1`.
+- IN `AOTransportSignal` packets contain raw ASCII `no organization`.
+- IN `GenericCmd Use` success ack: `Temp1=1 Count=4 Action=Use Temp4=1`.
+- IN `FeedbackMessage`: `CategoryId=110 MessageId=8208531`.
+- Later IN `StatMessage`: `Cash=175232992`.
+- No decoded `OrgClient`.
+- No decoded `CityAdvantages`.
+- No teleport/playfield transition.
+- No inventory movement.
 
-```cmd
-cmd /d /c tools-temp\start-aosharp-live-capture.cmd --pid <ao-client-pid>
-```
+## Implementation
+
+- Add a dedicated CityController use handler.
+- Send the captured-compatible `GenericCmd` success ack.
+- Send `FeedbackMessage CategoryId=110 MessageId=8208531` when the character is not in an organization.
+- Do not synthesize `AOTransportSignal`; no outbound model exists in the current server packet layer.
+- Do not send or mutate the later cash stat because the capture does not prove it is part of the immediate CityController response path.
+- Log unsupported captured packet pieces explicitly.
 
 ## Validation Plan
 
-- Run the fixed wrapper once against an already-running AO client.
-- Confirm exactly one capture folder outcome for the invocation: either one new folder after a fresh start, or the already-active folder with no reinjection.
-- Confirm one in-game `AOSharpLiveCapture logging to ...` line for a fresh start, and no duplicate line when the wrapper detects an already-active capture.
-- Confirm no lingering `AOSharpLiveInjector.exe` process/window.
-- Confirm live packet files are written.
+- `cmd /d /c tools\build_aorebirth_debug.cmd`
+- `cmd /d /c restart-engines.cmd`
 - `git diff --check`
+- Live smoke if available:
+  - Use CityController while not in an organization / not owning a city.
+  - Confirm no crash/stall.
+  - Confirm `GenericCmd` success ack behavior.
+  - Confirm no `CityAdvantages`.
+  - Confirm no ownership transition.
 
 ## Validation Result
 
-- First validation exposed the stale-success path: the injector logged a plugin load against PID `26428`, but the wrapper reported completed folder `20260623-010726`.
-- Updated wrapper then returned before injector launch:
-
-```cmd
-cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "Anarchy Online"
-```
-
-- Wrapper result: `SUCCESS: AOSharp live capture already active.`
-- Reported capture folder: `tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260623-011533`.
-- `20260623-011533` contains `packets.hex.log` (`13631` bytes) and `events.log` (`26106` bytes).
-- `AOSharpLiveInjector.exe` was not left running.
-- `git diff --check` passed with existing CRLF warnings only.
-- In-game duplicate-line confirmation is limited to wrapper behavior: the final validation returned before invoking the injector, so that run should not create a new startup line.
+- `cmd /d /c tools\build_aorebirth_debug.cmd`: PASS after stopping running `ZoneEngine.exe` processes that locked the build output.
+- `cmd /d /c restart-engines.cmd`: PASS.
+- `git diff --check`: PASS.
+- Live smoke: Not run in this pass.
