@@ -90,6 +90,8 @@ namespace ZoneEngine.Core.Controllers
 
         private const double MaxNpcFollowSpeedPerSecond = EnemyBehaviorContract.MaxNpcFollowSpeedPerSecond;
 
+        private const double MinNpcFollowSpeedPerSecond = 0.25;
+
         private const double MaxPlayerChaseProjectionDistance = EnemyBehaviorContract.MaxPlayerChaseProjectionDistance;
 
         private const double MinVisibleFollowUpdateSeconds = 0.35;
@@ -181,6 +183,22 @@ namespace ZoneEngine.Core.Controllers
             this.lastMotionPacketDestination = new Vector3();
         }
 
+        private double CurrentFollowSpeedPerSecond()
+        {
+            uint runSpeedBase = this.Character.Stats[StatIds.runspeed].BaseValue;
+            int runSpeedValue = this.Character.Stats[StatIds.runspeed].Value;
+            double runSpeed = runSpeedBase > 0 ? (double)runSpeedBase : Math.Max(0, runSpeedValue);
+
+            if (runSpeed <= 0.0)
+            {
+                return MaxNpcFollowSpeedPerSecond;
+            }
+
+            double scaledSpeed = MaxNpcFollowSpeedPerSecond
+                                 * (runSpeed / EnemyBehaviorContract.NpcRunSpeedForMaxFollowSpeed);
+            return Math.Max(MinNpcFollowSpeedPerSecond, Math.Min(MaxNpcFollowSpeedPerSecond, scaledSpeed));
+        }
+
         private Vector3 CurrentMotionSegmentPosition(DateTime now)
         {
             if (!this.followMotionSegment.Active)
@@ -192,7 +210,7 @@ namespace ZoneEngine.Core.Controllers
             return MoveToward(
                 this.followMotionSegment.Start,
                 this.followMotionSegment.End,
-                MaxNpcFollowSpeedPerSecond * elapsedSeconds);
+                this.CurrentFollowSpeedPerSecond() * elapsedSeconds);
         }
 
         private Vector3 UpdateMotionSegmentPosition(DateTime now)
