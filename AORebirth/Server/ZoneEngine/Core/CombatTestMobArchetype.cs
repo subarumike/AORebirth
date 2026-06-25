@@ -42,7 +42,7 @@ namespace ZoneEngine.Core
             TemplateHash,
             "Malfunctioning Cleaning Robot",
             1,
-            12,
+            120,
             297023,
             MissingVisualId,
             200,
