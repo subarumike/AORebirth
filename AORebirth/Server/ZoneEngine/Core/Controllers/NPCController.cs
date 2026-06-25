@@ -408,11 +408,12 @@ namespace ZoneEngine.Core.Controllers
                 return false;
             }
 
+            DateTime now = DateTime.UtcNow;
+            Vector3 start = this.UpdateMotionSegmentPosition(now);
             this.ResetFollowPosition();
             this.followIdentity = target;
             this.followStopDistance = Math.Max(0.0, stopDistance);
             Vector3 targetPosition = GetFollowTargetPosition(npc);
-            Vector3 start = this.Character.RawCoordinates;
             this.followCoordinates = targetPosition;
             if (this.followStopDistance > 0.0 && start.Distance2D(targetPosition) <= this.followStopDistance)
             {
@@ -423,7 +424,6 @@ namespace ZoneEngine.Core.Controllers
 
             this.Run();
             this.FaceToward(start, targetPosition);
-            DateTime now = DateTime.UtcNow;
             this.SendMotionSegmentFollow("coordinate-follow", start, targetPosition, now);
 
             return true;
