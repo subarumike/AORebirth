@@ -2279,7 +2279,11 @@ namespace AORebirth.Core.Playfields
                     return;
                 }
 
-                npcController.Follow(target.Identity, robotStopDistance);
+                if (!npcController.IsFollowing(target.Identity))
+                {
+                    npcController.Follow(target.Identity, robotStopDistance);
+                }
+
                 LogNpcBrain("Following", reason, attacker, target, range, robotDistance);
                 return;
             }
