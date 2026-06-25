@@ -220,6 +220,8 @@ namespace AORebirth.Core.Playfields
 
         private const double MaxMeleeFollowHoldDistance = 3.0;
 
+        private const double MinNpcCombatMoveDistance = 0.3;
+
         private const int MissingItemStatValue = 1234567890;
 
         private const double DefaultCombatTickSeconds = 2.0;
@@ -2101,18 +2103,6 @@ namespace AORebirth.Core.Playfields
             }
 
             CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
-            if (attacker.Controller is NPCController
-                && !this.IsInCombatRange(attacker, target, attackSource.Range))
-            {
-                this.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
-                return;
-            }
-
-            if (attacker.Controller is NPCController && !ShouldNpcStopForCombatAttack(attackSource))
-            {
-                this.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);
-            }
-
             DateTime nextTick;
             if (this.nextCombatTicks.TryGetValue(attacker.Identity.Instance, out nextTick)
                 && nextTick > DateTime.UtcNow)
@@ -2128,9 +2118,9 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            if (attacker.Controller is NPCController && ShouldNpcStopForCombatAttack(attackSource))
+            if (attacker.Controller is NPCController && attackSource.Range <= MaxMeleeCombatDistance)
             {
-                this.StopNpcFollowIfInCombatRange(attacker, target, attackSource.Range);
+                this.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);
             }
 
             int currentHealth = target.Stats[StatIds.health].Value;
@@ -2240,6 +2230,55 @@ namespace AORebirth.Core.Playfields
             return GetCombatPosition(attacker).Distance2D(GetCombatPosition(target));
         }
 
+        private static double BuildNpcCombatStopDistance(double range)
+        {
+            return range > MaxMeleeCombatDistance ? range : MaxMeleeFollowHoldDistance;
+        }
+
+        private void MoveNpcTowardCombatTarget(ICharacter attacker, ICharacter target, double range, string reason)
+        {
+            NPCController npcController = attacker.Controller as NPCController;
+            if (npcController == null)
+            {
+                return;
+            }
+
+            npcController.StopFollow();
+
+            AORebirth.Core.Vector.Vector3 attackerPosition = GetCombatPosition(attacker);
+            AORebirth.Core.Vector.Vector3 targetPosition = GetCombatPosition(target);
+            double stopDistance = BuildNpcCombatStopDistance(range);
+            double distance = attackerPosition.Distance2D(targetPosition);
+            double travelDistance = Math.Min(
+                EnemyBehaviorContract.MaxNpcFollowSpeedPerSecond * OutOfRangeRetrySeconds,
+                Math.Max(0.0, distance - stopDistance));
+
+            if (travelDistance < MinNpcCombatMoveDistance)
+            {
+                return;
+            }
+
+            AORebirth.Core.Vector.Vector3 nextPosition =
+                MoveCombatPositionToward(attackerPosition, targetPosition, travelDistance);
+
+            attacker.Coordinates(nextPosition);
+            this.Announce(
+                new SetPosMessage
+                {
+                    Identity = attacker.Identity,
+                    Coordinates =
+                        new Vector3
+                        {
+                            X = nextPosition.xf,
+                            Y = nextPosition.yf,
+                            Z = nextPosition.zf
+                        },
+                    Unknown1 = 0
+                });
+
+            LogNpcBrain("Chasing", reason, attacker, target, range, distance);
+        }
+
         private static void LogNpcBrain(string state, string reason, ICharacter attacker, ICharacter target, double range, double distance)
         {
             LogUtil.Debug(
@@ -2253,29 +2292,6 @@ namespace AORebirth.Core.Playfields
                     target == null ? Identity.None.ToString(true) : target.Identity.ToString(true),
                     distance,
                     range));
-        }
-
-        private void StopNpcFollowIfInCombatRange(ICharacter attacker, ICharacter target, double range)
-        {
-            NPCController npcController = attacker.Controller as NPCController;
-            if (npcController == null || !npcController.IsFollowing())
-            {
-                return;
-            }
-
-            if (!this.IsInCombatRange(attacker, target, range))
-            {
-                return;
-            }
-
-            LogNpcBrain(
-                "InRangeAttacking",
-                "in-range",
-                attacker,
-                target,
-                range,
-                GetCombatDistance(attacker, target));
-            npcController.StopFollowForCombatRange(GetCombatPosition(target));
         }
 
         private void AnnounceCombatDamage(
@@ -2531,16 +2547,6 @@ namespace AORebirth.Core.Playfields
             return Math.Max(0.25, totalCentiseconds / 100.0);
         }
 
-        private static double BuildNpcCombatFollowStopDistance(double range)
-        {
-            return range > MaxMeleeCombatDistance ? range : 0.0;
-        }
-
-        private static bool ShouldNpcStopForCombatAttack(CombatAttackSource attackSource)
-        {
-            return attackSource.Range > MaxMeleeCombatDistance;
-        }
-
         private void UpdateNpcMeleeFollowHold(ICharacter attacker, ICharacter target, double range)
         {
             NPCController npcController = attacker.Controller as NPCController;
@@ -2550,21 +2556,13 @@ namespace AORebirth.Core.Playfields
             }
 
             double distance = GetCombatDistance(attacker, target);
-            bool closeEnoughToHold = distance <= MaxMeleeFollowHoldDistance;
-            npcController.SuppressMotionSegmentUpdates(closeEnoughToHold);
-            if (closeEnoughToHold || npcController.IsFollowing())
+            if (distance <= MaxMeleeFollowHoldDistance)
             {
+                npcController.StopFollow();
                 return;
             }
 
-            LogNpcBrain(
-                "Chasing",
-                "melee-separated",
-                attacker,
-                target,
-                range,
-                distance);
-            npcController.Follow(target.Identity, BuildNpcCombatFollowStopDistance(range));
+            this.MoveNpcTowardCombatTarget(attacker, target, range, "melee-separated");
         }
 
         private void TryMoveNpcIntoCombatRange(ICharacter attacker, ICharacter target, double range)
@@ -2575,20 +2573,7 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            npcController.SuppressMotionSegmentUpdates(false);
-            if (npcController.IsFollowing())
-            {
-                return;
-            }
-
-            LogNpcBrain(
-                "Chasing",
-                "out-of-range",
-                attacker,
-                target,
-                range,
-                GetCombatDistance(attacker, target));
-            npcController.Follow(target.Identity, BuildNpcCombatFollowStopDistance(range));
+            this.MoveNpcTowardCombatTarget(attacker, target, range, "out-of-range");
         }
 
         private void KillNpcTarget(ICharacter attacker, ICharacter target)
