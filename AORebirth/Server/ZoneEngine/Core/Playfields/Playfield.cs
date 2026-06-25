@@ -394,6 +394,7 @@ namespace AORebirth.Core.Playfields
                     stats.ToArray(),
                     new NPCController(),
                     this);
+                ApplyMalfunctioningCleaningRobotTestHealth(cmob);
                 if (mob.KnuBotScriptName != "")
                 {
                     ((NPCController)cmob.Controller).SetKnuBot(
@@ -407,6 +408,20 @@ namespace AORebirth.Core.Playfields
                     }*/
                 }
             }
+        }
+
+        private static void ApplyMalfunctioningCleaningRobotTestHealth(ICharacter character)
+        {
+            if (!IsMalfunctioningCleaningRobot(character))
+            {
+                return;
+            }
+
+            int testHealth = CombatTestMobArchetype.MalfunctioningCleaningRobot.Health;
+            character.Stats[StatIds.life].Value = testHealth;
+            character.Stats[StatIds.life].BaseValue = (uint)testHealth;
+            character.Stats[StatIds.health].Value = testHealth;
+            character.Stats[StatIds.health].BaseValue = (uint)testHealth;
         }
 
         #endregion
