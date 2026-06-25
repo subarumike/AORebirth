@@ -185,7 +185,7 @@ namespace ZoneEngine.Core.Controllers
         {
             if (!this.followMotionSegment.Active)
             {
-                return this.Character.RawCoordinates;
+                return this.Character.Coordinates().coordinate;
             }
 
             double elapsedSeconds = Math.Max(0.0, (now - this.followMotionSegment.StartedUtc).TotalSeconds);
@@ -723,6 +723,11 @@ namespace ZoneEngine.Core.Controllers
         {
             return ((!this.followIdentity.Equals(Identity.None)) || (this.followCoordinates.x != 0.0f)
                     || (this.followCoordinates.y != 0.0f) || (this.followCoordinates.z != 0.0f));
+        }
+
+        public bool IsFollowing(Identity target)
+        {
+            return this.followIdentity.Equals(target);
         }
 
         public void StopFollowForCombatRange(Vector3 targetPosition)
