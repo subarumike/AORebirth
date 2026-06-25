@@ -2243,6 +2243,32 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (IsMalfunctioningCleaningRobot(attacker))
+            {
+                AORebirth.Core.Vector.Vector3 robotPosition = GetCombatPosition(attacker);
+                AORebirth.Core.Vector.Vector3 robotTargetPosition = GetCombatPosition(target);
+                double robotStopDistance = BuildNpcCombatStopDistance(range);
+                double robotDistance = robotPosition.Distance2D(robotTargetPosition);
+
+                if (robotDistance <= robotStopDistance)
+                {
+                    if (npcController.IsFollowing())
+                    {
+                        npcController.StopFollowForCombatRange(robotTargetPosition);
+                    }
+                    else
+                    {
+                        npcController.StopFollow();
+                    }
+
+                    return;
+                }
+
+                npcController.Follow(target.Identity, robotStopDistance);
+                LogNpcBrain("Following", reason, attacker, target, range, robotDistance);
+                return;
+            }
+
             npcController.StopFollow();
 
             AORebirth.Core.Vector.Vector3 attackerPosition = GetCombatPosition(attacker);
@@ -2277,6 +2303,17 @@ namespace AORebirth.Core.Playfields
                 });
 
             LogNpcBrain("Chasing", reason, attacker, target, range, distance);
+        }
+
+        private static bool IsMalfunctioningCleaningRobot(ICharacter character)
+        {
+            return character != null
+                   && string.Equals(
+                       character.Name,
+                       CombatTestMobArchetype.MalfunctioningCleaningRobot.DisplayName,
+                       StringComparison.OrdinalIgnoreCase)
+                   && character.Stats[StatIds.monsterdata].Value
+                   == CombatTestMobArchetype.MalfunctioningCleaningRobot.MonsterData;
         }
 
         private static void LogNpcBrain(string state, string reason, ICharacter attacker, ICharacter target, double range, double distance)
@@ -2558,7 +2595,15 @@ namespace AORebirth.Core.Playfields
             double distance = GetCombatDistance(attacker, target);
             if (distance <= MaxMeleeFollowHoldDistance)
             {
-                npcController.StopFollow();
+                if (IsMalfunctioningCleaningRobot(attacker) && npcController.IsFollowing())
+                {
+                    npcController.StopFollowForCombatRange(GetCombatPosition(target));
+                }
+                else
+                {
+                    npcController.StopFollow();
+                }
+
                 return;
             }
 
