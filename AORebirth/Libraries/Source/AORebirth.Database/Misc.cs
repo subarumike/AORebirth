@@ -52,7 +52,7 @@ namespace AORebirth.Database
     /// </summary>
     public static class Misc
     {
-        private const int MaxSqlBatchLength = 1024 * 1000;
+        private const int MaxSqlBatchLength = 256 * 1024;
 
         private const string InsertIntoKeyword = "insert into";
 
@@ -150,33 +150,8 @@ namespace AORebirth.Database
                                 {
                                     string[] queries = File.ReadAllLines(sqlFile);
                                     int counter = 0;
-                                    sqlQuery = string.Empty;
                                     string lastpercent = "0";
-                                    while (counter < queries.Length)
-                                    {
-                                        if (queries[counter].IndexOf("INSERT INTO") == -1)
-                                        {
-                                            sqlQuery += queries[counter] + "\n";
-                                        }
-                                        else
-                                        {
-                                            counter--;
-                                            break;
-                                        }
-
-                                        counter++;
-                                    }
-                                    try
-                                    {
-                                        conn.Execute(sqlQuery);
-                                    }
-                                    catch (Exception)
-                                    {
-                                        Console.WriteLine(sqlQuery);
-                                        throw;
-                                    }
-
-                                    counter++;
+                                    ExecuteSqlStatementsUntilFirstInsert(conn, queries, ref counter);
                                     while (counter < queries.Length)
                                     {
                                         if (queries[counter].TrimStart().StartsWith(
@@ -259,26 +234,54 @@ namespace AORebirth.Database
                 {
                     FlushSqlBatch(conn, buffer);
                     batchPrefix = insertPrefix;
-                    buffer.Append(batchPrefix);
                 }
 
-                if (buffer.Length + valuesPart.Length + 2 > MaxSqlBatchLength)
+                foreach (string valuesRow in SplitSqlValuesRows(valuesPart))
                 {
-                    FlushSqlBatch(conn, buffer);
-                    batchPrefix = insertPrefix;
-                    buffer.Append(batchPrefix);
-                }
+                    if (buffer.Length == 0)
+                    {
+                        buffer.Append(batchPrefix);
+                    }
 
-                if (buffer.Length > batchPrefix.Length)
-                {
-                    buffer.Append(", ");
-                }
+                    if (buffer.Length > batchPrefix.Length
+                        && buffer.Length + valuesRow.Length + 2 > MaxSqlBatchLength)
+                    {
+                        FlushSqlBatch(conn, buffer);
+                        buffer.Append(batchPrefix);
+                    }
 
-                buffer.Append(valuesPart);
+                    if (buffer.Length > batchPrefix.Length)
+                    {
+                        buffer.Append(", ");
+                    }
+
+                    buffer.Append(valuesRow);
+                }
                 WriteTableProgress(tableName, counter, queries.Length, ref lastPercent);
             }
 
             FlushSqlBatch(conn, buffer);
+        }
+
+        private static void ExecuteSqlStatementsUntilFirstInsert(IDbConnection conn, string[] queries, ref int counter)
+        {
+            while (counter < queries.Length)
+            {
+                int statementStart = counter;
+                string statement = ReadSqlStatement(queries, ref counter);
+                if (statement.Trim().Length == 0)
+                {
+                    continue;
+                }
+
+                if (statement.TrimStart().StartsWith(InsertIntoKeyword, StringComparison.OrdinalIgnoreCase))
+                {
+                    counter = statementStart;
+                    return;
+                }
+
+                conn.Execute(statement);
+            }
         }
 
         private static string ReadSqlStatement(string[] queries, ref int counter)
@@ -338,6 +341,75 @@ namespace AORebirth.Database
 
             insertPrefix = trimmed.Substring(0, valuesIndex).TrimEnd() + " VALUES ";
             return true;
+        }
+
+        private static IEnumerable<string> SplitSqlValuesRows(string valuesPart)
+        {
+            List<string> rows = new List<string>();
+            int rowStart = -1;
+            int depth = 0;
+            bool inString = false;
+            char stringDelimiter = '\0';
+            for (int i = 0; i < valuesPart.Length; i++)
+            {
+                char current = valuesPart[i];
+                if (inString)
+                {
+                    if (current == '\\')
+                    {
+                        i++;
+                        continue;
+                    }
+
+                    if (current == stringDelimiter)
+                    {
+                        if (i + 1 < valuesPart.Length && valuesPart[i + 1] == stringDelimiter)
+                        {
+                            i++;
+                            continue;
+                        }
+
+                        inString = false;
+                    }
+
+                    continue;
+                }
+
+                if (current == '\'' || current == '"')
+                {
+                    inString = true;
+                    stringDelimiter = current;
+                    continue;
+                }
+
+                if (current == '(')
+                {
+                    if (depth == 0)
+                    {
+                        rowStart = i;
+                    }
+
+                    depth++;
+                    continue;
+                }
+
+                if (current == ')' && depth > 0)
+                {
+                    depth--;
+                    if (depth == 0 && rowStart >= 0)
+                    {
+                        rows.Add(valuesPart.Substring(rowStart, i - rowStart + 1).Trim());
+                        rowStart = -1;
+                    }
+                }
+            }
+
+            if (rows.Count == 0 && valuesPart.Trim().Length > 0)
+            {
+                rows.Add(valuesPart.Trim());
+            }
+
+            return rows;
         }
 
         private static void FlushSqlBatch(IDbConnection conn, StringBuilder buffer)
