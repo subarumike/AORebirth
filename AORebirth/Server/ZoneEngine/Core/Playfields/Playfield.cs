@@ -226,6 +226,8 @@ namespace AORebirth.Core.Playfields
 
         private const int CapturedCleaningRobotMonsterData = 297023;
 
+        private const double CapturedCleaningRobotFollowStopDistance = 0.0;
+
         private const int MissingItemStatValue = 1234567890;
 
         private const double DefaultCombatTickSeconds = 2.0;
@@ -2323,23 +2325,8 @@ namespace AORebirth.Core.Playfields
         {
             AORebirth.Core.Vector.Vector3 attackerPosition = GetCombatPosition(attacker);
             AORebirth.Core.Vector.Vector3 targetPosition = GetCombatPosition(target);
-            double stopDistance = BuildNpcCombatStopDistance(range);
+            double stopDistance = CapturedCleaningRobotFollowStopDistance;
             double distance = attackerPosition.Distance2D(targetPosition);
-
-            if (distance <= stopDistance)
-            {
-                if (npcController.IsFollowing())
-                {
-                    npcController.StopFollowForCombatRange(targetPosition);
-                }
-                else
-                {
-                    npcController.StopFollow();
-                }
-
-                LogNpcBrain("FollowHold", reason, attacker, target, range, distance);
-                return;
-            }
 
             if (!npcController.IsFollowing(target.Identity))
             {
