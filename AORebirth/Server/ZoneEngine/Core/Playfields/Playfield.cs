@@ -116,6 +116,7 @@ namespace AORebirth.Core.Playfields
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
         private readonly Dictionary<int, int> lastCombatWeaponSlots = new Dictionary<int, int>();
         private readonly Dictionary<int, int> lastNpcUnarmedAttackInfoSlots = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> lastNpcSpecialAttackWeaponTargets = new Dictionary<int, int>();
 
         private readonly Dictionary<int, DateTime> deadNpcDespawnTicks = new Dictionary<int, DateTime>();
 
@@ -232,6 +233,12 @@ namespace AORebirth.Core.Playfields
         private const int CapturedCleaningRobotRightHandDamage = 10;
 
         private const int CapturedCleaningRobotLeftHandDamage = 8;
+        private const int CapturedCleaningRobotLeftWeaponTemplate = 0x0001E960;
+        private const int CapturedCleaningRobotRightWeaponTemplate = 0x0001E95D;
+        private const int CapturedCleaningRobotLeftWeaponTag = 0x4C495732;
+        private const int CapturedCleaningRobotRightWeaponTag = 0x4C495731;
+        private const int CapturedCleaningRobotSpecialAttackWeaponValue = 8;
+        private const int CapturedCleaningRobotSpecialAttackWeaponLastValue = 0;
 
         private const int UnarmedAttackInfoAmmoCount = -1;
 
@@ -1942,6 +1949,7 @@ namespace AORebirth.Core.Playfields
         public void ResetCombatTick(Identity attacker)
         {
             this.nextCombatTicks.Remove(attacker.Instance);
+            this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Instance);
         }
 
         public void RespawnPlayer(ICharacter character)
@@ -2005,6 +2013,7 @@ namespace AORebirth.Core.Playfields
             this.nextCombatTicks.Remove(character.Identity.Instance);
             this.lastCombatWeaponSlots.Remove(character.Identity.Instance);
             this.lastNpcUnarmedAttackInfoSlots.Remove(character.Identity.Instance);
+            this.lastNpcSpecialAttackWeaponTargets.Remove(character.Identity.Instance);
             this.StopFightingDeadTarget(character.Identity);
             this.SendCombatStopMessage(character);
             character.SendChangedStats();
@@ -2127,6 +2136,7 @@ namespace AORebirth.Core.Playfields
                 this.nextCombatTicks.Remove(attacker.Identity.Instance);
                 this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
                 this.lastNpcUnarmedAttackInfoSlots.Remove(attacker.Identity.Instance);
+                this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
                 return;
             }
 
@@ -2154,6 +2164,7 @@ namespace AORebirth.Core.Playfields
                 this.nextCombatTicks.Remove(attacker.Identity.Instance);
                 this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
                 this.lastNpcUnarmedAttackInfoSlots.Remove(attacker.Identity.Instance);
+                this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
                 return;
             }
 
@@ -2183,6 +2194,7 @@ namespace AORebirth.Core.Playfields
             int newHealth = Math.Max(0, currentHealth - damage);
             bool killingHit = newHealth == 0;
 
+            this.AnnounceNpcSpecialAttackWeaponContextIfNeeded(attacker, target, attackSource);
             target.Stats[StatIds.health].Value = newHealth;
             this.AnnounceCombatDamage(
                 attacker,
@@ -2221,6 +2233,7 @@ namespace AORebirth.Core.Playfields
                     this.nextCombatTicks.Remove(attacker.Identity.Instance);
                     this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
                     this.lastNpcUnarmedAttackInfoSlots.Remove(attacker.Identity.Instance);
+                    this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
                 }
 
                 return;
@@ -2368,6 +2381,48 @@ namespace AORebirth.Core.Playfields
             return character != null
                    && string.Equals(character.Name, CapturedCleaningRobotName, StringComparison.OrdinalIgnoreCase)
                    && character.Stats[StatIds.monsterdata].Value == CapturedCleaningRobotMonsterData;
+        }
+
+        private void AnnounceNpcSpecialAttackWeaponContextIfNeeded(
+            ICharacter attacker,
+            ICharacter target,
+            CombatAttackSource attackSource)
+        {
+            if (!IsCapturedCleaningRobot(attacker) || attackSource.UsesEquippedWeapon)
+            {
+                return;
+            }
+
+            int attackerInstance = attacker.Identity.Instance;
+            int targetInstance = target.Identity.Instance;
+            int previousTargetInstance;
+            if (this.lastNpcSpecialAttackWeaponTargets.TryGetValue(attackerInstance, out previousTargetInstance)
+                && previousTargetInstance == targetInstance)
+            {
+                return;
+            }
+
+            this.lastNpcSpecialAttackWeaponTargets[attackerInstance] = targetInstance;
+            this.Announce(
+                new SpecialAttackWeaponMessage
+                {
+                    Identity = attacker.Identity,
+                    Specials = CreateCapturedCleaningRobotSpecialAttacks(),
+                    Unknown1 = CapturedCleaningRobotSpecialAttackWeaponValue,
+                    Unknown2 = CapturedCleaningRobotSpecialAttackWeaponValue,
+                    Unknown3 = CapturedCleaningRobotSpecialAttackWeaponValue,
+                    Unknown4 = CapturedCleaningRobotSpecialAttackWeaponValue,
+                    Unknown5 = CapturedCleaningRobotSpecialAttackWeaponLastValue
+                });
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "CombatSpecialAttackWeaponSend attacker={0} target={1} monsterData={2}",
+                    attacker.Identity,
+                    target.Identity,
+                    attacker.Stats[StatIds.monsterdata].Value));
         }
 
         private static void LogNpcBrain(string state, string reason, ICharacter attacker, ICharacter target, double range, double distance)
@@ -2832,6 +2887,7 @@ namespace AORebirth.Core.Playfields
             this.nextCombatTicks.Remove(target.Identity.Instance);
             this.lastCombatWeaponSlots.Remove(target.Identity.Instance);
             this.lastNpcUnarmedAttackInfoSlots.Remove(target.Identity.Instance);
+            this.lastNpcSpecialAttackWeaponTargets.Remove(target.Identity.Instance);
             this.StopFightingDeadTarget(target.Identity);
             this.SendCombatStopMessage(target);
             this.SendPlayerDeathAnimation(target);
@@ -3604,12 +3660,34 @@ namespace AORebirth.Core.Playfields
                    };
         }
 
+        private static SpecialAttack[] CreateCapturedCleaningRobotSpecialAttacks()
+        {
+            return new[]
+                   {
+                       new SpecialAttack
+                       {
+                           Unknown1 = CapturedCleaningRobotLeftWeaponTemplate,
+                           Unknown2 = CapturedCleaningRobotLeftWeaponTemplate,
+                           Unknown3 = CapturedCleaningRobotLeftWeaponTag,
+                           Unknown4 = "LIW2"
+                       },
+                       new SpecialAttack
+                       {
+                           Unknown1 = CapturedCleaningRobotRightWeaponTemplate,
+                           Unknown2 = CapturedCleaningRobotRightWeaponTemplate,
+                           Unknown3 = CapturedCleaningRobotRightWeaponTag,
+                           Unknown4 = "LIW1"
+                       }
+                   };
+        }
+
         private void FinalizeNpcDespawn(ICharacter target)
         {
             target.DoNotDoTimers = true;
             this.nextCombatTicks.Remove(target.Identity.Instance);
             this.lastCombatWeaponSlots.Remove(target.Identity.Instance);
             this.lastNpcUnarmedAttackInfoSlots.Remove(target.Identity.Instance);
+            this.lastNpcSpecialAttackWeaponTargets.Remove(target.Identity.Instance);
             this.deadNpcDespawnTicks.Remove(target.Identity.Instance);
             this.npcHomeStates.Remove(target.Identity.Instance);
             this.Despawn(target.Identity);
@@ -3970,6 +4048,7 @@ namespace AORebirth.Core.Playfields
                     this.nextCombatTicks.Remove(character.Identity.Instance);
                     this.lastCombatWeaponSlots.Remove(character.Identity.Instance);
                     this.lastNpcUnarmedAttackInfoSlots.Remove(character.Identity.Instance);
+                    this.lastNpcSpecialAttackWeaponTargets.Remove(character.Identity.Instance);
                     this.SendCombatStopMessage(character);
                 }
             }
