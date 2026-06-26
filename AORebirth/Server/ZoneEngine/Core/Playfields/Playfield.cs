@@ -233,6 +233,7 @@ namespace AORebirth.Core.Playfields
         private const int CapturedCleaningRobotRightHandDamage = 10;
 
         private const int CapturedCleaningRobotLeftHandDamage = 8;
+        private const int CapturedCleaningRobotDeathActionParameter2 = 500;
         private const int CapturedCleaningRobotLeftWeaponTemplate = 0x0001E960;
         private const int CapturedCleaningRobotRightWeaponTemplate = 0x0001E95D;
         private const int CapturedCleaningRobotLeftWeaponTag = 0x4C495732;
@@ -2790,6 +2791,17 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            this.BeginNpcDeath(attacker, target);
+        }
+
+        private void BeginNpcDeath(ICharacter attacker, ICharacter target)
+        {
+            if (!(target.Controller is NPCController)
+                || this.deadNpcDespawnTicks.ContainsKey(target.Identity.Instance))
+            {
+                return;
+            }
+
             Identity corpseIdentity = Identity.None;
             if (this.CanBuildKnownCorpseVisual(target))
             {
@@ -2798,9 +2810,14 @@ namespace AORebirth.Core.Playfields
 
             this.MarkNpcDead(target);
             this.StopFightingDeadTarget(target.Identity);
+            this.StopDyingNpcCombatState(target);
             this.SendNpcDeathAnimation(target);
-            RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);
-            this.AwardCombatXp(attacker, target);
+            if (attacker != null)
+            {
+                RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);
+                this.AwardCombatXp(attacker, target);
+            }
+
             if (corpseIdentity != Identity.None)
             {
                 this.ScheduleCorpseSpawn(target, corpseIdentity);
@@ -2815,6 +2832,27 @@ namespace AORebirth.Core.Playfields
             this.deadNpcDespawnTicks[target.Identity.Instance] = DateTime.UtcNow + DeadNpcDespawnDelay;
 
             LogUtil.Debug(DebugInfoDetail.Network, string.Format("NPC died target={0}", target.Identity));
+        }
+
+        private void StopDyingNpcCombatState(ICharacter target)
+        {
+            target.SetTarget(Identity.None);
+            target.SetFightingTarget(Identity.None);
+            this.nextCombatTicks.Remove(target.Identity.Instance);
+            this.lastCombatWeaponSlots.Remove(target.Identity.Instance);
+            this.lastNpcUnarmedAttackInfoSlots.Remove(target.Identity.Instance);
+            this.lastNpcSpecialAttackWeaponTargets.Remove(target.Identity.Instance);
+
+            NPCController npcController = target.Controller as NPCController;
+            if (npcController != null)
+            {
+                npcController.StopFollow();
+            }
+
+            if (IsCapturedCleaningRobot(target))
+            {
+                this.SendCombatStopMessage(target);
+            }
         }
 
         private void AwardCombatXp(ICharacter attacker, ICharacter target)
@@ -3232,7 +3270,7 @@ namespace AORebirth.Core.Playfields
             DateTime despawnTick;
             if (!this.deadNpcDespawnTicks.TryGetValue(character.Identity.Instance, out despawnTick))
             {
-                this.deadNpcDespawnTicks[character.Identity.Instance] = DateTime.UtcNow + DeadNpcDespawnDelay;
+                this.BeginNpcDeath(null, character);
                 return true;
             }
 
@@ -4031,6 +4069,11 @@ namespace AORebirth.Core.Playfields
 
         private static int DeathAnimationKeyFor(ICharacter target)
         {
+            if (IsCapturedCleaningRobot(target))
+            {
+                return CapturedCleaningRobotDeathActionParameter2;
+            }
+
             return CombatCorpseVisuals.DeathAnimationKeyFor(
                 target.Stats[StatIds.corpseanimkey].Value,
                 target.Stats[StatIds.itemanim].Value,
