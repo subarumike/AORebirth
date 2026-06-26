@@ -222,6 +222,10 @@ namespace AORebirth.Core.Playfields
 
         private const double MinNpcCombatMoveDistance = 0.3;
 
+        private const string CapturedCleaningRobotName = "Malfunctioning Cleaning Robot";
+
+        private const int CapturedCleaningRobotMonsterData = 297023;
+
         private const int MissingItemStatValue = 1234567890;
 
         private const double DefaultCombatTickSeconds = 2.0;
@@ -2268,6 +2272,12 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (IsCapturedCleaningRobot(attacker))
+            {
+                this.MoveCapturedCleaningRobotTowardCombatTarget(attacker, target, range, reason, npcController);
+                return;
+            }
+
             npcController.StopFollow();
 
             AORebirth.Core.Vector.Vector3 attackerPosition = GetCombatPosition(attacker);
@@ -2302,6 +2312,50 @@ namespace AORebirth.Core.Playfields
                 });
 
             LogNpcBrain("Chasing", reason, attacker, target, range, distance);
+        }
+
+        private void MoveCapturedCleaningRobotTowardCombatTarget(
+            ICharacter attacker,
+            ICharacter target,
+            double range,
+            string reason,
+            NPCController npcController)
+        {
+            AORebirth.Core.Vector.Vector3 attackerPosition = GetCombatPosition(attacker);
+            AORebirth.Core.Vector.Vector3 targetPosition = GetCombatPosition(target);
+            double stopDistance = BuildNpcCombatStopDistance(range);
+            double distance = attackerPosition.Distance2D(targetPosition);
+
+            if (distance <= stopDistance)
+            {
+                if (npcController.IsFollowing())
+                {
+                    npcController.StopFollowForCombatRange(targetPosition);
+                }
+                else
+                {
+                    npcController.StopFollow();
+                }
+
+                LogNpcBrain("FollowHold", reason, attacker, target, range, distance);
+                return;
+            }
+
+            if (!npcController.IsFollowing(target.Identity))
+            {
+                npcController.Follow(target.Identity, stopDistance);
+                LogNpcBrain("FollowTargetStart", reason, attacker, target, range, distance);
+                return;
+            }
+
+            LogNpcBrain("FollowTargetContinue", reason, attacker, target, range, distance);
+        }
+
+        private static bool IsCapturedCleaningRobot(ICharacter character)
+        {
+            return character != null
+                   && string.Equals(character.Name, CapturedCleaningRobotName, StringComparison.OrdinalIgnoreCase)
+                   && character.Stats[StatIds.monsterdata].Value == CapturedCleaningRobotMonsterData;
         }
 
         private static void LogNpcBrain(string state, string reason, ICharacter attacker, ICharacter target, double range, double distance)
