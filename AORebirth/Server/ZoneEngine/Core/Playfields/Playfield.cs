@@ -229,6 +229,10 @@ namespace AORebirth.Core.Playfields
 
         private const double CapturedCleaningRobotFollowStopDistance = 0.0;
 
+        private const int CapturedCleaningRobotRightHandDamage = 10;
+
+        private const int CapturedCleaningRobotLeftHandDamage = 8;
+
         private const int UnarmedAttackInfoAmmoCount = -1;
 
         private const int PlayerUnarmedAttackInfoWeaponSlot = 0;
@@ -2180,7 +2184,6 @@ namespace AORebirth.Core.Playfields
             bool killingHit = newHealth == 0;
 
             target.Stats[StatIds.health].Value = newHealth;
-            target.SendChangedStats();
             this.AnnounceCombatDamage(
                 attacker,
                 target,
@@ -2189,6 +2192,7 @@ namespace AORebirth.Core.Playfields
                 attackSource.UsesEquippedWeapon
                     ? CombatDamageSource.WeaponAutoAttack
                     : CombatDamageSource.UnarmedAutoAttack);
+            target.SendChangedStats();
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
@@ -2488,16 +2492,18 @@ namespace AORebirth.Core.Playfields
                         attacker.Stats[StatIds.damagetype].Value,
                         attacker.Stats[StatIds.weapontype].Value,
                         attacker.Stats[StatIds.equippedweapons].Value));
+                int attackInfoWeaponSlot = this.GetUnarmedAttackInfoWeaponSlot(attacker);
+                int attackInfoDamage = this.GetUnarmedAttackDamage(attacker, attackInfoWeaponSlot);
                 return new CombatAttackSource
                        {
-                           MinDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.mindamage].Value, 0),
-                           MaxDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.maxdamage].Value, 0),
+                           MinDamage = attackInfoDamage,
+                           MaxDamage = attackInfoDamage,
                            DamageBonus = NormalizeCombatItemStat(attacker.Stats[StatIds.damagebonus].Value, 0),
                            Range = MaxMeleeCombatDistance,
                            RechargeSeconds = DefaultCombatTickSeconds,
                            UsesEquippedWeapon = false,
                            AttackInfoAmmoCount = UnarmedAttackInfoAmmoCount,
-                           AttackInfoWeaponSlot = this.GetUnarmedAttackInfoWeaponSlot(attacker),
+                           AttackInfoWeaponSlot = attackInfoWeaponSlot,
                            AttackInfoUnk1 = 0,
                            AttackInfoHitType = NormalAttackInfoHitType,
                            AttackInfoWeaponInstance = this.GetUnarmedAttackInfoWeaponInstance(attacker)
@@ -2556,6 +2562,20 @@ namespace AORebirth.Core.Playfields
 
             this.lastNpcUnarmedAttackInfoSlots[attacker.Identity.Instance] = NpcUnarmedRightAttackInfoWeaponSlot;
             return NpcUnarmedRightAttackInfoWeaponSlot;
+        }
+
+        private int GetUnarmedAttackDamage(ICharacter attacker, int attackInfoWeaponSlot)
+        {
+            if (IsCapturedCleaningRobot(attacker))
+            {
+                return attackInfoWeaponSlot == NpcUnarmedLeftAttackInfoWeaponSlot
+                           ? CapturedCleaningRobotLeftHandDamage
+                           : CapturedCleaningRobotRightHandDamage;
+            }
+
+            return Math.Max(
+                NormalizeCombatItemStat(attacker.Stats[StatIds.mindamage].Value, 0),
+                NormalizeCombatItemStat(attacker.Stats[StatIds.maxdamage].Value, 0));
         }
 
         private int GetUnarmedAttackInfoWeaponInstance(ICharacter attacker)
