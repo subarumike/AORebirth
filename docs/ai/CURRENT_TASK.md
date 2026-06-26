@@ -2,62 +2,67 @@
 
 ## Active Task
 
-Owned private-city initialization parity against capture `20260623-021643`.
+Captured Cleaning Robot Combat Parity.
 
-## Scope
+The active scope is enemy combat behavior for the captured `Malfunctioning Cleaning Robot`. Old private-city, org-command, city-controller, guest-key, and player-visibility work is not active implementation scope for this task.
 
-- Compare AORebirth owned-city entry sequence against `docs/generated/private_city_owned_entry_capture_20260623_021643.md`.
-- Implement only capture-backed owned-entry initialization plumbing.
-- Do not implement `CityAdvantages`.
-- Do not implement `OrgClient`.
-- Do not implement ownership management or city purchase state.
+## Current Target
 
-## Capture-Proven Behavior
+- Enemy: `Malfunctioning Cleaning Robot`
+- MonsterData: `297023`
+- HP: `12`
+- RunSpeed: `5/6`
+- Primary evidence folder: `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260625-192827`
 
-- Public/source playfield: `655`.
-- Owned private city playfield: `1196034`.
-- Organization stat: `Clan=1970177`.
-- Organization rank/stat: `ClanLevel=1`.
-- `OrgInfoPacket` was sent on owned private-city init.
-- Owned private-city `PlayfieldAnarchyF` advertised:
-  - `CityController:9C182E`
-  - `Terminal:5751538B`
-  - `Door:108D96ED`
-- Private-city ready block included `PlayfieldAllTowers` and `PlayfieldAllCities`.
+## Proven Live Combat Sequence
 
-## Implementation
+- `Attack`
+- `AttackInfo`
+- `FollowTarget`
+- occasional `SetPos`
+- `StopFight`
+- `CharacterAction Death`
+- `CorpseFullUpdate`
+- delayed despawn
 
-- Resolve Montroyal private-city entry destination from the character organization city id when available.
-- Preserve captured fallback behavior for prior Montroyal private-city capture evidence.
-- Add captured owned Montroyal `PlayfieldAnarchyF` generator payload identities.
-- Send private-city organization info and `SocialStatus`, `Clan`, and `ClanLevel` stats before `FullCharacter`.
-- Keep towers/cities empty for captured Montroyal private-city instances.
-- Treat captured Montroyal private-city playfield ids as private-city ids directly instead of depending only on missing playfield metadata.
-- Resolve organization ids and org stats from base stat values so captured owned org initialization is not skipped by effective-value calculation.
+## Completed Enemy Work
+
+- Cleaning robot combat chase uses continuous `FollowTarget` behavior.
+- Cleaning robot damage text path sends captured `SpecialAttackWeapon` `LIW2`/`LIW1` context before robot `AttackInfo`.
+
+Recent enemy commits:
+
+- `d9a9b9d2` - cleaning robot continuous `FollowTarget` chase.
+- `c8f517b8` - cleaning robot `SpecialAttackWeapon` damage context before `AttackInfo`.
+
+## Next Enemy Work
+
+- Mike live-tests robot incoming damage text and reports whether the AO client still shows `nanobots` or `unknown damage`.
+- Patch death, corpse, and despawn parity:
+  - `StopFight`
+  - `CharacterAction Death Parameter2=500`
+  - `CorpseFullUpdate`
+  - delayed despawn
+
+## Regression Risks Only
+
+These systems are not active implementation scope for this task. Preserve them while changing enemy combat behavior:
+
+- Private-city zoning, guest-key generator, city-controller open/close, and private-city org initialization.
+- `/org info` behavior.
+- Same-playfield player visibility and movement rendering.
 
 ## Validation Plan
 
+For docs-only task updates:
+
+- `cmd /d /c git diff --check`
+
+For future code changes affecting server binaries:
+
+- `cmd /d /c stop-engines.cmd`
 - `cmd /d /c tools\build_aorebirth_debug.cmd`
 - `cmd /d /c restart-engines.cmd`
 - `cmd /d /c git diff --check`
-- Live smoke if available:
-  - enter owned private city from Montroyal/ICC area
-  - confirm private PF resolves to owned city
-  - confirm guest-key terminal, CityController, and shuttle door identities are correct
-  - confirm zone init does not stall
-  - confirm no `CityAdvantages` or `OrgClient` implementation was added
 
-## Validation Result
-
-- `cmd /d /c stop-engines.cmd`: PASS.
-- `cmd /d /c tools\build_aorebirth_debug.cmd`: PASS.
-- `cmd /d /c restart-engines.cmd`: PASS.
-- `cmd /d /c git diff --check`: PASS.
-- Live smoke: Pending.
-
-## Repair Result
-
-- Fixed failed owned-private-city init path after `ab039e32`.
-- Captured owned/non-owned Montroyal private-city ids now force the private-city packet path.
-- Owned org id/stat packet values now use base stat values.
-- Captured org-name fallback sends `Est. 2024` when the captured org row is unavailable locally.
+Mike performs live AO client playtesting. Do not claim live validation unless Mike reports it.
