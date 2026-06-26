@@ -32,6 +32,7 @@ namespace AOSharpLiveCapture
         private readonly HashSet<string> vendorInteractionIdentities = new HashSet<string>();
         private readonly HashSet<string> shopUpdateIdentities = new HashSet<string>();
         private readonly HashSet<string> vendorFullUpdateIdentities = new HashSet<string>();
+        private readonly HashSet<string> focusedEnemyIdentities = new HashSet<string>();
         private readonly Dictionary<string, EnemyEntityState> enemyStates = new Dictionary<string, EnemyEntityState>();
         private readonly Dictionary<string, List<EnemyStateEvent>> enemyStateTimeline = new Dictionary<string, List<EnemyStateEvent>>();
         private readonly HashSet<string> interestingMessageNames = new HashSet<string>
@@ -101,6 +102,7 @@ namespace AOSharpLiveCapture
         private StreamWriter enemyCombatLog;
         private StreamWriter enemyMovementLog;
         private StreamWriter enemyStatUpdatesLog;
+        private StreamWriter enemyFightEventsLog;
         private bool enabled;
         private bool captureFinalized;
         private int inboundPacketCount;
@@ -138,6 +140,7 @@ namespace AOSharpLiveCapture
         private CombatLootSmoke combatLootSmoke;
         private bool initialized;
         private bool enemyFightCaptureEnabled;
+        private bool enemyFightAutoCaptureEnabled = true;
         private bool enemyFightCaptureStarted;
 
         public override void Run(string pluginDir)
@@ -181,7 +184,9 @@ namespace AOSharpLiveCapture
             this.enemyMovementLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,MoveType,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,Unknown1,Unknown2,Unknown3,Detail");
             this.enemyStatUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-stat-updates.csv"));
             this.enemyStatUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,Stat,StatId,Value,PositionX,PositionY,PositionZ,StatsCount,Detail");
+            this.enemyFightEventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-fight-events.log"));
             this.WriteEnemyStateJson();
+            this.WriteEnemyDossierJson();
             this.WriteCaptureSessionMetadata(this.captureStartUtc, this.captureStartLocal);
             this.WriteCaptureInfo(null, CaptureValidation.Running());
             this.enabled = true;
@@ -206,7 +211,7 @@ namespace AOSharpLiveCapture
             Chat.RegisterCommand("aosmoke", this.OnSmokeCommand);
 
             this.LogEvent("PLUGIN", "AOSharpLiveCapture loaded. session=" + this.sessionDirectory);
-            this.LogEvent("PLUGIN", "Commands: /aocap start | stop | mark <text> | status | flush | snapshot | dynels [force] | fight start|stop|status");
+            this.LogEvent("PLUGIN", "Commands: /aocap start | stop | mark <text> | status | flush | snapshot | dynels [force] | fight start|stop|auto on|auto off|status");
             this.LogEvent("PLUGIN", "Smoke commands: /aosmoke start [mobAlias] | stop | status | log");
             this.LogEvent("PLUGIN", "ShopUpdate CSV: " + Path.Combine(this.sessionDirectory, "shop-updates.csv"));
             this.LogEvent("PLUGIN", "VendingMachineFullUpdate CSV: " + Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
@@ -219,6 +224,8 @@ namespace AOSharpLiveCapture
             this.LogEvent("PLUGIN", "Enemy combat CSV: " + Path.Combine(this.sessionDirectory, "enemy-combat.csv"));
             this.LogEvent("PLUGIN", "Enemy movement CSV: " + Path.Combine(this.sessionDirectory, "enemy-movement.csv"));
             this.LogEvent("PLUGIN", "Enemy stat update CSV: " + Path.Combine(this.sessionDirectory, "enemy-stat-updates.csv"));
+            this.LogEvent("PLUGIN", "Enemy fight events log: " + Path.Combine(this.sessionDirectory, "enemy-fight-events.log"));
+            this.LogEvent("PLUGIN", "Enemy dossier JSON: " + Path.Combine(this.sessionDirectory, "enemy-dossier.json"));
             this.LogEvent("PLUGIN", "Enemy state JSON: " + Path.Combine(this.sessionDirectory, "enemy-state.json"));
             this.LogEvent("PLUGIN", "Capture info: " + Path.Combine(this.sessionDirectory, "capture_info.json"));
             this.LogEvent("PLUGIN", "Capture session metadata: " + Path.Combine(this.sessionDirectory, "capture-session.json"));
@@ -342,9 +349,11 @@ namespace AOSharpLiveCapture
                     chatWindow.WriteLine(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "AO capture {0}. fight={1}. inRaw={2} outRaw={3} inN3={4} outN3={5} dir={6}",
+                            "AO capture {0}. fightManual={1} fightAuto={2} focusedEnemies={3} inRaw={4} outRaw={5} inN3={6} outN3={7} dir={8}",
                             this.enabled ? "running" : "stopped",
                             this.enemyFightCaptureEnabled ? "on" : "off",
+                            this.enemyFightAutoCaptureEnabled ? "on" : "off",
+                            this.focusedEnemyIdentities.Count,
                             this.inboundPacketCount,
                             this.outboundPacketCount,
                             this.decodedInboundCount,
@@ -374,10 +383,34 @@ namespace AOSharpLiveCapture
                     this.TryWriteChat(chatWindow, "AO enemy fight capture stopped.", ChatColor.Gold);
                     break;
 
+                case "auto":
+                    string autoMode = args.Length > 2 ? args[2].ToLowerInvariant() : "status";
+                    if (autoMode == "on" || autoMode == "start")
+                    {
+                        this.enemyFightAutoCaptureEnabled = true;
+                        this.LogEvent("COMMAND", "enemy fight auto capture enabled");
+                    }
+                    else if (autoMode == "off" || autoMode == "stop")
+                    {
+                        this.enemyFightAutoCaptureEnabled = false;
+                        this.LogEvent("COMMAND", "enemy fight auto capture disabled");
+                    }
+
+                    this.TryWriteChat(
+                        chatWindow,
+                        "AO enemy fight auto capture " + (this.enemyFightAutoCaptureEnabled ? "running." : "stopped."),
+                        ChatColor.Gold);
+                    break;
+
                 default:
                     this.TryWriteChat(
                         chatWindow,
-                        "AO enemy fight capture " + (this.enemyFightCaptureEnabled ? "running." : "stopped."),
+                        "AO enemy fight capture manual="
+                        + (this.enemyFightCaptureEnabled ? "running" : "stopped")
+                        + " auto="
+                        + (this.enemyFightAutoCaptureEnabled ? "running" : "stopped")
+                        + " focusedEnemies="
+                        + this.focusedEnemyIdentities.Count.ToString(CultureInfo.InvariantCulture),
                         ChatColor.Gold);
                     break;
             }
@@ -1049,8 +1082,9 @@ namespace AOSharpLiveCapture
             bool interesting = this.interestingMessageNames.Contains(messageName);
             string detail = interesting ? this.DescribeN3Message(message) : string.Empty;
             this.ExportSpecializedMessage(direction, sequence, message);
-            if (this.enemyFightCaptureEnabled)
+            if (this.ShouldCaptureEnemyFightEvidence(direction, sequence, message))
             {
+                this.LogEnemyFightEvent(direction, sequence, message);
                 this.ExportEnemyN3Evidence(direction, sequence, message);
                 this.TrackEnemyStateFromMessage(direction, sequence, message);
             }
@@ -1492,6 +1526,131 @@ namespace AOSharpLiveCapture
             }
         }
 
+        private bool ShouldCaptureEnemyFightEvidence(string direction, int sequence, N3Message message)
+        {
+            if (message == null)
+            {
+                return false;
+            }
+
+            if (this.enemyFightCaptureEnabled)
+            {
+                this.enemyFightCaptureStarted = true;
+                return true;
+            }
+
+            if (!this.enemyFightAutoCaptureEnabled)
+            {
+                return false;
+            }
+
+            bool registered = this.TryRegisterFocusedEnemyFromMessage(direction, sequence, message);
+            return registered || this.MessageTouchesFocusedEnemy(message);
+        }
+
+        private bool TryRegisterFocusedEnemyFromMessage(string direction, int sequence, N3Message message)
+        {
+            bool registered = false;
+            Identity source = message.Identity;
+            object targetObject = GetMemberValue(message, "Target")
+                ?? GetMemberValue(message, "Defender")
+                ?? GetMemberValue(message, "Unknown4");
+            Identity target;
+            if (TryGetIdentity(targetObject, out target))
+            {
+                if (this.IsLocalPlayerIdentity(source))
+                {
+                    registered |= this.RegisterFocusedEnemyIdentity(target, "local-player-target", direction, sequence);
+                }
+
+                if (this.IsLocalPlayerIdentity(target))
+                {
+                    registered |= this.RegisterFocusedEnemyIdentity(source, "local-player-targeted", direction, sequence);
+                }
+            }
+
+            Identity fightingTarget;
+            if (TryGetIdentity(GetMemberValue(message, "FightingTarget"), out fightingTarget)
+                && this.IsLocalPlayerIdentity(fightingTarget))
+            {
+                registered |= this.RegisterFocusedEnemyIdentity(source, "fighting-local-player", direction, sequence);
+            }
+
+            return registered;
+        }
+
+        private bool RegisterFocusedEnemyIdentity(Identity identity, string reason, string direction, int sequence)
+        {
+            if (!this.IsSimpleNonLocalCharacterIdentity(identity))
+            {
+                return false;
+            }
+
+            string identityText = identity.ToString();
+            bool added;
+            lock (this.syncRoot)
+            {
+                added = this.focusedEnemyIdentities.Add(identityText);
+                this.enemyFightCaptureStarted = true;
+                this.localEnemyCombatContextUntilUtc = DateTime.UtcNow.AddSeconds(LocalEnemyCombatContextSeconds);
+                if (added)
+                {
+                    bool created;
+                    EnemyEntityState state = this.GetOrCreateEnemyState(identity, DateTime.UtcNow, out created);
+                    this.RecordEnemyStateEvent(state, DateTime.UtcNow, "focus");
+                }
+            }
+
+            if (added)
+            {
+                this.LogEvent(
+                    "ENEMY-FIGHT-AUTO",
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "focused identity={0} reason={1} direction={2} sequence={3}",
+                        identityText,
+                        reason,
+                        direction,
+                        sequence));
+
+                Dynel dynel = DynelManager.GetDynel(identity);
+                if (dynel != null)
+                {
+                    this.TrackEnemyFromDynel(dynel, "focus");
+                }
+            }
+
+            return true;
+        }
+
+        private bool MessageTouchesFocusedEnemy(N3Message message)
+        {
+            return this.IsFocusedEnemyIdentity(message.Identity)
+                || this.IsFocusedEnemyIdentityObject(GetMemberValue(message, "Target"))
+                || this.IsFocusedEnemyIdentityObject(GetMemberValue(message, "Defender"))
+                || this.IsFocusedEnemyIdentityObject(GetMemberValue(message, "Unknown3"))
+                || this.IsFocusedEnemyIdentityObject(GetMemberValue(message, "Unknown4"))
+                || this.IsFocusedEnemyIdentityObject(GetMemberValue(message, "FightingTarget"));
+        }
+
+        private void LogEnemyFightEvent(string direction, int sequence, N3Message message)
+        {
+            lock (this.syncRoot)
+            {
+                this.enemyFightEventsLog.WriteLine(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0:o} {1} #{2} type={3} identity={4} {5}",
+                        DateTime.UtcNow,
+                        direction,
+                        sequence,
+                        message.N3MessageType,
+                        message.Identity,
+                        OneLine(this.DescribeObject(message))));
+                this.enemyFightEventsLog.Flush();
+            }
+        }
+
         private void ExportEnemyFullUpdate(string direction, int sequence, SimpleCharFullUpdateMessage message)
         {
             object characterInfo = GetMemberValue(message, "CharacterInfo");
@@ -1864,6 +2023,7 @@ namespace AOSharpLiveCapture
             {
                 bool created;
                 EnemyEntityState state = this.GetOrCreateEnemyState(message.Identity, timestamp, out created);
+                this.UpdateEnemyStaticStateFromSimpleCharFullUpdate(state, message);
                 state.Level = message.Level;
 
                 if (message.Health > 0)
@@ -1883,6 +2043,38 @@ namespace AOSharpLiveCapture
                 this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : "update");
                 this.RecordEnemyDeathIfNeeded(state, timestamp);
             }
+        }
+
+        private void UpdateEnemyStaticStateFromSimpleCharFullUpdate(EnemyEntityState state, SimpleCharFullUpdateMessage message)
+        {
+            state.Name = PreferEnemyStateString(state.Name, GetMemberString(message, "Name"));
+            state.MonsterData = PreferEnemyStateString(state.MonsterData, GetMemberString(message, "MonsterData"));
+            state.MonsterScale = PreferEnemyStateString(state.MonsterScale, GetMemberString(message, "MonsterScale"));
+            state.VisualFlags = PreferEnemyStateString(state.VisualFlags, GetMemberString(message, "VisualFlags"));
+            state.HeadMesh = PreferEnemyStateString(state.HeadMesh, GetMemberString(message, "HeadMesh"));
+            state.RunSpeed = PreferEnemyStateString(state.RunSpeed, GetMemberString(message, "RunSpeedBase"));
+            object characterInfo = GetMemberValue(message, "CharacterInfo");
+            state.NpcFamily = PreferEnemyStateString(state.NpcFamily, GetMemberString(characterInfo, "Family"));
+            state.LosHeight = PreferEnemyStateString(state.LosHeight, GetMemberString(characterInfo, "LosHeight"));
+        }
+
+        private void UpdateEnemyStaticStateFromCharacter(EnemyEntityState state, SimpleChar character)
+        {
+            state.Name = PreferEnemyStateString(state.Name, Safe(() => character.Name));
+            state.MonsterData = PreferEnemyStateString(state.MonsterData, SafeStat(character, Stat.MonsterData));
+            state.CatMesh = PreferEnemyStateString(state.CatMesh, SafeStat(character, Stat.CATMesh));
+            state.VisualFlags = PreferEnemyStateString(state.VisualFlags, SafeStat(character, Stat.VisualFlags));
+            state.RunSpeed = PreferEnemyStateString(state.RunSpeed, SafeStat(character, Stat.RunSpeed));
+            state.MinDamage = PreferEnemyStateString(state.MinDamage, SafeStat(character, Stat.MinDamage));
+            state.MaxDamage = PreferEnemyStateString(state.MaxDamage, SafeStat(character, Stat.MaxDamage));
+            state.DefaultAttackType = PreferEnemyStateString(state.DefaultAttackType, SafeStat(character, Stat.DefaultAttackType));
+            state.AttackDelay = PreferEnemyStateString(state.AttackDelay, SafeStat(character, Stat.AttackDelay));
+            state.RechargeDelay = PreferEnemyStateString(state.RechargeDelay, SafeStat(character, Stat.RechargeDelay));
+        }
+
+        private static string PreferEnemyStateString(string current, string value)
+        {
+            return string.IsNullOrEmpty(value) ? current : value;
         }
 
         private void TrackEnemyFromStatMessage(string direction, int sequence, StatMessage message)
@@ -2051,12 +2243,12 @@ namespace AOSharpLiveCapture
 
         private void TrackEnemyFromDynel(Dynel dynel, string requestedEventType)
         {
-            if (!this.enemyFightCaptureEnabled)
+            if (dynel == null || dynel.Identity.Type != IdentityType.SimpleChar)
             {
                 return;
             }
 
-            if (dynel == null || dynel.Identity.Type != IdentityType.SimpleChar)
+            if (!this.enemyFightCaptureEnabled && !this.IsFocusedEnemyIdentity(dynel.Identity))
             {
                 return;
             }
@@ -2078,11 +2270,17 @@ namespace AOSharpLiveCapture
                 return;
             }
 
+            if (!this.enemyFightCaptureEnabled && !this.IsFocusedEnemyIdentity(character.Identity))
+            {
+                return;
+            }
+
             DateTime timestamp = DateTime.UtcNow;
             lock (this.syncRoot)
             {
                 bool created;
                 EnemyEntityState state = this.GetOrCreateEnemyState(character.Identity, timestamp, out created);
+                this.UpdateEnemyStaticStateFromCharacter(state, character);
                 state.Level = TryGetCharacterStat(character, Stat.Level);
                 state.CurrentHealth = TryGetCharacterStat(character, Stat.Health);
                 state.MaxHealth = TryGetCharacterStat(character, Stat.MaxHealth);
@@ -2099,7 +2297,7 @@ namespace AOSharpLiveCapture
 
         private void TrackEnemyGone(string entityId)
         {
-            if (!this.enemyFightCaptureEnabled)
+            if (!this.enemyFightCaptureEnabled && !this.IsFocusedEnemyIdentityText(entityId))
             {
                 return;
             }
@@ -2261,7 +2459,61 @@ namespace AOSharpLiveCapture
 
         private bool IsTrackableEnemyIdentity(Identity identity)
         {
+            if (!this.IsSimpleNonLocalCharacterIdentity(identity))
+            {
+                return false;
+            }
+
+            return this.enemyFightCaptureEnabled || this.IsFocusedEnemyIdentity(identity);
+        }
+
+        private bool IsSimpleNonLocalCharacterIdentity(Identity identity)
+        {
             return identity.Type == IdentityType.SimpleChar && !this.IsLocalPlayerIdentity(identity);
+        }
+
+        private bool IsFocusedEnemyIdentity(Identity identity)
+        {
+            if (!this.IsSimpleNonLocalCharacterIdentity(identity))
+            {
+                return false;
+            }
+
+            lock (this.syncRoot)
+            {
+                return this.focusedEnemyIdentities.Contains(identity.ToString());
+            }
+        }
+
+        private bool IsFocusedEnemyIdentityObject(object identityValue)
+        {
+            Identity identity;
+            return TryGetIdentity(identityValue, out identity) && this.IsFocusedEnemyIdentity(identity);
+        }
+
+        private bool IsFocusedEnemyIdentityText(string identityText)
+        {
+            if (string.IsNullOrEmpty(identityText))
+            {
+                return false;
+            }
+
+            lock (this.syncRoot)
+            {
+                return this.focusedEnemyIdentities.Contains(identityText);
+            }
+        }
+
+        private static bool TryGetIdentity(object identityValue, out Identity identity)
+        {
+            if (identityValue is Identity)
+            {
+                identity = (Identity)identityValue;
+                return true;
+            }
+
+            identity = default(Identity);
+            return false;
         }
 
         private bool IsLocalPlayerIdentity(Identity identity)
@@ -2495,6 +2747,7 @@ namespace AOSharpLiveCapture
             Thread.Sleep(TimeSpan.FromSeconds(5));
             this.Flush();
             this.WriteEnemyStateJson();
+            this.WriteEnemyDossierJson();
 
             CaptureValidation validation = this.ValidateCapture();
             this.WriteCaptureHealth(validation);
@@ -2563,9 +2816,9 @@ namespace AOSharpLiveCapture
                 issues.Add("Combat packets were observed, but enemy-state.csv has no rows.");
             }
 
-            if (!this.enemyFightCaptureStarted)
+            if (this.focusedEnemyIdentities.Count == 0 && !this.enemyFightCaptureEnabled)
             {
-                notes.Add("Enemy fight capture was not started; enemy behavior CSVs are intentionally gated.");
+                notes.Add("No local-player enemy fight was auto-detected; enemy behavior files are empty unless combat happened.");
             }
             else if (this.enemyCombatEventCount == 0 && this.enemyCombatRowCount == 0)
             {
@@ -2629,6 +2882,119 @@ namespace AOSharpLiveCapture
             {
                 this.LogEvent("ENEMY-STATE-JSON-ERROR", ex.ToString());
             }
+        }
+
+        private void WriteEnemyDossierJson()
+        {
+            try
+            {
+                string path = Path.Combine(this.sessionDirectory, "enemy-dossier.json");
+                StringBuilder json = new StringBuilder();
+                lock (this.syncRoot)
+                {
+                    json.AppendLine("{");
+                    json.Append("  \"generatedUtc\": ");
+                    json.Append(Json(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)));
+                    json.AppendLine(",");
+                    json.Append("  \"captureFolder\": ");
+                    json.Append(Json(this.sessionDirectory));
+                    json.AppendLine(",");
+                    json.Append("  \"autoCaptureEnabled\": ");
+                    json.Append(this.enemyFightAutoCaptureEnabled ? "true" : "false");
+                    json.AppendLine(",");
+                    json.Append("  \"manualCaptureEnabled\": ");
+                    json.Append(this.enemyFightCaptureEnabled ? "true" : "false");
+                    json.AppendLine(",");
+                    json.Append("  \"focusedEnemyIdentities\": ");
+                    AppendJsonStringArray(json, this.focusedEnemyIdentities.OrderBy(value => value).ToArray());
+                    json.AppendLine(",");
+                    json.AppendLine("  \"enemies\": [");
+
+                    EnemyEntityState[] states = this.enemyStates.Values.OrderBy(value => value.EntityId).ToArray();
+                    for (int i = 0; i < states.Length; i++)
+                    {
+                        this.AppendEnemyDossierJson(json, states[i], "    ");
+                        if (i < states.Length - 1)
+                        {
+                            json.Append(",");
+                        }
+
+                        json.AppendLine();
+                    }
+
+                    json.AppendLine("  ]");
+                    json.AppendLine("}");
+                }
+
+                File.WriteAllText(path, json.ToString(), Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                this.LogEvent("ENEMY-DOSSIER-JSON-ERROR", ex.ToString());
+            }
+        }
+
+        private void AppendEnemyDossierJson(StringBuilder json, EnemyEntityState state, string indent)
+        {
+            List<EnemyStateEvent> timeline;
+            this.enemyStateTimeline.TryGetValue(state.EntityId, out timeline);
+            int eventCount = timeline == null ? 0 : timeline.Count;
+
+            json.Append(indent);
+            json.AppendLine("{");
+            AppendJsonField(json, indent + "  ", "identity", state.EntityId, true);
+            AppendJsonField(json, indent + "  ", "name", state.Name, true);
+            AppendJsonField(json, indent + "  ", "monsterData", state.MonsterData, true);
+            AppendJsonField(json, indent + "  ", "monsterScale", state.MonsterScale, true);
+            AppendJsonField(json, indent + "  ", "catMesh", state.CatMesh, true);
+            AppendJsonField(json, indent + "  ", "visualFlags", state.VisualFlags, true);
+            AppendJsonField(json, indent + "  ", "headMesh", state.HeadMesh, true);
+            AppendJsonField(json, indent + "  ", "runSpeed", state.RunSpeed, true);
+            AppendJsonField(json, indent + "  ", "npcFamily", state.NpcFamily, true);
+            AppendJsonField(json, indent + "  ", "losHeight", state.LosHeight, true);
+            AppendJsonField(json, indent + "  ", "minDamage", state.MinDamage, true);
+            AppendJsonField(json, indent + "  ", "maxDamage", state.MaxDamage, true);
+            AppendJsonField(json, indent + "  ", "defaultAttackType", state.DefaultAttackType, true);
+            AppendJsonField(json, indent + "  ", "attackDelay", state.AttackDelay, true);
+            AppendJsonField(json, indent + "  ", "rechargeDelay", state.RechargeDelay, true);
+            json.Append(indent);
+            json.Append("  \"level\": ");
+            AppendJsonNullableInt(json, state.Level);
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"currentHealth\": ");
+            AppendJsonNullableInt(json, state.CurrentHealth);
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"maxHealth\": ");
+            AppendJsonNullableInt(json, state.MaxHealth);
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"position\": { \"x\": ");
+            AppendJsonNullableFloat(json, state.X);
+            json.Append(", \"y\": ");
+            AppendJsonNullableFloat(json, state.Y);
+            json.Append(", \"z\": ");
+            AppendJsonNullableFloat(json, state.Z);
+            json.AppendLine(" },");
+            json.Append(indent);
+            json.Append("  \"firstSeenUtc\": ");
+            json.Append(Json(state.FirstSeenUtc.ToString("o", CultureInfo.InvariantCulture)));
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"lastUpdateUtc\": ");
+            json.Append(Json(state.LastUpdateUtc.ToString("o", CultureInfo.InvariantCulture)));
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"deathObserved\": ");
+            json.Append(state.DeathLogged ? "true" : "false");
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"eventCount\": ");
+            json.Append(eventCount.ToString(CultureInfo.InvariantCulture));
+            json.AppendLine();
+            json.Append(indent);
+            json.Append("}");
         }
 
         private void AppendEnemyStateEventJson(StringBuilder json, EnemyStateEvent stateEvent, string indent)
@@ -2755,6 +3121,9 @@ namespace AOSharpLiveCapture
                 json.Append("    \"enemyFightCaptureEnabled\": ");
                 json.Append(this.enemyFightCaptureEnabled ? "true" : "false");
                 json.AppendLine(",");
+                json.Append("    \"enemyFightAutoCaptureEnabled\": ");
+                json.Append(this.enemyFightAutoCaptureEnabled ? "true" : "false");
+                json.AppendLine(",");
                 json.Append("    \"enemyTrackedEntities\": ");
                 json.Append(this.enemyStates.Count.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine(",");
@@ -2806,6 +3175,9 @@ namespace AOSharpLiveCapture
                 json.AppendLine(",");
                 json.Append("  \"vendorFullUpdateIdentities\": ");
                 AppendJsonStringArray(json, this.vendorFullUpdateIdentities.OrderBy(value => value).ToArray());
+                json.AppendLine(",");
+                json.Append("  \"focusedEnemyIdentities\": ");
+                AppendJsonStringArray(json, this.focusedEnemyIdentities.OrderBy(value => value).ToArray());
                 json.AppendLine(",");
                 this.AppendValidationJson(json, validation, "  ");
                 json.AppendLine();
@@ -3066,6 +3438,34 @@ namespace AOSharpLiveCapture
         private sealed class EnemyEntityState
         {
             public string EntityId { get; set; }
+
+            public string Name { get; set; }
+
+            public string MonsterData { get; set; }
+
+            public string MonsterScale { get; set; }
+
+            public string CatMesh { get; set; }
+
+            public string VisualFlags { get; set; }
+
+            public string HeadMesh { get; set; }
+
+            public string RunSpeed { get; set; }
+
+            public string NpcFamily { get; set; }
+
+            public string LosHeight { get; set; }
+
+            public string MinDamage { get; set; }
+
+            public string MaxDamage { get; set; }
+
+            public string DefaultAttackType { get; set; }
+
+            public string AttackDelay { get; set; }
+
+            public string RechargeDelay { get; set; }
 
             public int? Level { get; set; }
 
@@ -3519,6 +3919,7 @@ namespace AOSharpLiveCapture
                 this.enemyCombatLog.Flush();
                 this.enemyMovementLog.Flush();
                 this.enemyStatUpdatesLog.Flush();
+                this.enemyFightEventsLog.Flush();
             }
         }
 
@@ -3539,6 +3940,7 @@ namespace AOSharpLiveCapture
                 this.enemyCombatLog?.Flush();
                 this.enemyMovementLog?.Flush();
                 this.enemyStatUpdatesLog?.Flush();
+                this.enemyFightEventsLog?.Flush();
                 this.eventsLog?.Dispose();
                 this.packetsLog?.Dispose();
                 this.shopUpdatesLog?.Dispose();
@@ -3552,6 +3954,7 @@ namespace AOSharpLiveCapture
                 this.enemyCombatLog?.Dispose();
                 this.enemyMovementLog?.Dispose();
                 this.enemyStatUpdatesLog?.Dispose();
+                this.enemyFightEventsLog?.Dispose();
                 this.eventsLog = null;
                 this.packetsLog = null;
                 this.shopUpdatesLog = null;
@@ -3565,6 +3968,7 @@ namespace AOSharpLiveCapture
                 this.enemyCombatLog = null;
                 this.enemyMovementLog = null;
                 this.enemyStatUpdatesLog = null;
+                this.enemyFightEventsLog = null;
             }
         }
 
