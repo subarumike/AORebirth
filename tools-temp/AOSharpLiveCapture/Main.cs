@@ -33,6 +33,8 @@ namespace AOSharpLiveCapture
         private readonly HashSet<string> shopUpdateIdentities = new HashSet<string>();
         private readonly HashSet<string> vendorFullUpdateIdentities = new HashSet<string>();
         private readonly HashSet<string> focusedEnemyIdentities = new HashSet<string>();
+        private readonly Dictionary<string, RecentEnemyFullUpdateEvidence> recentEnemyFullUpdates =
+            new Dictionary<string, RecentEnemyFullUpdateEvidence>();
         private readonly Dictionary<string, EnemyEntityState> enemyStates = new Dictionary<string, EnemyEntityState>();
         private readonly Dictionary<string, List<EnemyStateEvent>> enemyStateTimeline = new Dictionary<string, List<EnemyStateEvent>>();
         private readonly HashSet<string> interestingMessageNames = new HashSet<string>
@@ -45,6 +47,7 @@ namespace AOSharpLiveCapture
             "TemplateAction",
             "CorpseFullUpdate",
             "Despawn",
+            "FollowTarget",
             "StopFight",
             "FightModeUpdate",
             "Attack",
@@ -305,6 +308,11 @@ namespace AOSharpLiveCapture
                     this.LogEvent("COMMAND", "capture stopped");
                     this.enabled = false;
                     this.Flush();
+                    this.WriteEnemyStateJson();
+                    this.WriteEnemyDossierJson();
+                    CaptureValidation stopValidation = this.ValidateCapture();
+                    this.WriteCaptureHealth(stopValidation);
+                    this.WriteCaptureInfo(DateTime.UtcNow, stopValidation);
                     chatWindow.WriteLine("AO capture stopped.", ChatColor.Gold);
                     break;
 
@@ -1082,6 +1090,7 @@ namespace AOSharpLiveCapture
             bool interesting = this.interestingMessageNames.Contains(messageName);
             string detail = interesting ? this.DescribeN3Message(message) : string.Empty;
             this.ExportSpecializedMessage(direction, sequence, message);
+            this.CacheEnemyFullUpdate(direction, sequence, message);
             if (this.ShouldCaptureEnemyFightEvidence(direction, sequence, message))
             {
                 this.LogEnemyFightEvent(direction, sequence, message);
@@ -1500,6 +1509,12 @@ namespace AOSharpLiveCapture
                 return;
             }
 
+            if (string.Equals(message.N3MessageType.ToString(), "FollowTarget", StringComparison.OrdinalIgnoreCase))
+            {
+                this.ExportEnemyMovement(direction, sequence, message, message.Identity, "follow-target", null, null);
+                return;
+            }
+
             DespawnMessage despawn = message as DespawnMessage;
             if (despawn != null)
             {
@@ -1523,6 +1538,26 @@ namespace AOSharpLiveCapture
                 object aux2 = GetMemberValue(message, "Unknown4");
 
                 this.ExportEnemyCombat(direction, sequence, message, target, aux1, aux2);
+            }
+        }
+
+        private void CacheEnemyFullUpdate(string direction, int sequence, N3Message message)
+        {
+            SimpleCharFullUpdateMessage simpleCharFullUpdate = message as SimpleCharFullUpdateMessage;
+            if (simpleCharFullUpdate == null || !this.IsNpcCharacterInfo(GetMemberValue(simpleCharFullUpdate, "CharacterInfo")))
+            {
+                return;
+            }
+
+            lock (this.syncRoot)
+            {
+                this.recentEnemyFullUpdates[simpleCharFullUpdate.Identity.ToString()] =
+                    new RecentEnemyFullUpdateEvidence
+                    {
+                        Direction = direction,
+                        Sequence = sequence,
+                        Message = simpleCharFullUpdate
+                    };
             }
         }
 
@@ -1618,9 +1653,26 @@ namespace AOSharpLiveCapture
                 {
                     this.TrackEnemyFromDynel(dynel, "focus");
                 }
+
+                this.ReplayFocusedEnemyFullUpdate(identity);
             }
 
             return true;
+        }
+
+        private void ReplayFocusedEnemyFullUpdate(Identity identity)
+        {
+            RecentEnemyFullUpdateEvidence evidence;
+            lock (this.syncRoot)
+            {
+                if (!this.recentEnemyFullUpdates.TryGetValue(identity.ToString(), out evidence))
+                {
+                    return;
+                }
+            }
+
+            this.ExportEnemyFullUpdate(evidence.Direction, evidence.Sequence, evidence.Message);
+            this.TrackEnemyFromSimpleCharFullUpdate(evidence.Direction, evidence.Sequence, evidence.Message);
         }
 
         private bool MessageTouchesFocusedEnemy(N3Message message)
@@ -3505,6 +3557,15 @@ namespace AOSharpLiveCapture
             public float? Z { get; set; }
 
             public string EventType { get; set; }
+        }
+
+        private sealed class RecentEnemyFullUpdateEvidence
+        {
+            public string Direction { get; set; }
+
+            public int Sequence { get; set; }
+
+            public SimpleCharFullUpdateMessage Message { get; set; }
         }
 
         private static int GetStatValue(GameTuple<Stat, int>[] stats, Stat stat)
