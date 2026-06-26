@@ -52,6 +52,12 @@ namespace AORebirth.Database
     /// </summary>
     public static class Misc
     {
+        private const int MaxSqlBatchLength = 1024 * 1000;
+
+        private const string InsertIntoKeyword = "insert into";
+
+        private const string ValuesKeyword = "values";
+
         #region Public Methods and Operators
 
         /// <summary>
@@ -171,10 +177,11 @@ namespace AORebirth.Database
                                     }
 
                                     counter++;
-                                    string buf1 = string.Empty;
                                     while (counter < queries.Length)
                                     {
-                                        if (queries[counter].ToLower().Substring(0, 11) == "insert into")
+                                        if (queries[counter].TrimStart().StartsWith(
+                                            InsertIntoKeyword,
+                                            StringComparison.OrdinalIgnoreCase))
                                         {
                                             break;
                                         }
@@ -184,77 +191,7 @@ namespace AORebirth.Database
 
                                     if (counter < queries.Length)
                                     {
-                                        buf1 = queries[counter].Substring(
-                                            0,
-                                            queries[counter].ToLower().IndexOf("values"));
-                                        buf1 = buf1 + "VALUES ";
-                                        StringBuilder Buffer = new StringBuilder(0, 1 * 1024 * 1024);
-                                        while (counter < queries.Length)
-                                        {
-                                            if (Buffer.Length == 0)
-                                            {
-                                                Buffer.Append(buf1);
-                                            }
-
-                                            string part = string.Empty;
-                                            while (counter < queries.Length)
-                                            {
-                                                if (queries[counter].Trim() != string.Empty)
-                                                {
-                                                    part =
-                                                        queries[counter].Substring(
-                                                            queries[counter].ToLower().IndexOf("values"));
-                                                    part = part.Substring(part.IndexOf("(")); // from '(' to end
-                                                    part = part.Substring(0, part.Length - 1); // Remove ';'
-                                                    if (Buffer.Length + 1 + part.Length > 1024 * 1000)
-                                                    {
-                                                        Buffer.Remove(Buffer.Length - 2, 2);
-                                                        Buffer.Append(";");
-                                                        try
-                                                        {
-                                                            conn.Execute(Buffer.ToString());
-                                                        }
-                                                        catch (Exception)
-                                                        {
-                                                            Console.WriteLine(Buffer.ToString().Substring(0, 300));
-                                                            throw;
-                                                        }
-
-                                                        Buffer.Clear();
-                                                        Buffer.Append(buf1);
-                                                        string lp2 =
-                                                            Convert.ToInt32(
-                                                                Math.Floor((double)counter / queries.Length * 100))
-                                                                .ToString();
-                                                        if (lp2 != lastpercent)
-                                                        {
-                                                            Console.Write(
-                                                                "\rTable " + fName.PadRight(67) + "[" + lp2.PadLeft(3)
-                                                                + "%]");
-                                                            lastpercent = lp2;
-                                                        }
-                                                    }
-
-                                                    Buffer.Append(part + ", ");
-                                                }
-
-                                                counter++;
-                                            }
-
-                                            Buffer.Remove(Buffer.Length - 2, 2);
-                                            Buffer.Append(";");
-                                            conn.Execute(Buffer.ToString());
-                                            Buffer.Clear();
-                                            string lp =
-                                                Convert.ToInt32(Math.Floor((double)counter / queries.Length * 100))
-                                                    .ToString();
-                                            if (lp != lastpercent)
-                                            {
-                                                Console.Write(
-                                                    "\rTable " + fName.PadRight(67) + "[" + lp.PadLeft(3) + "%]");
-                                                lastpercent = lp;
-                                            }
-                                        }
+                                        ExecuteLargeSqlInserts(conn, queries, counter, fName, lastpercent);
                                     }
                                     else
                                     {
@@ -287,6 +224,153 @@ namespace AORebirth.Database
             }
 
             return true;
+        }
+
+        private static void ExecuteLargeSqlInserts(
+            IDbConnection conn,
+            string[] queries,
+            int startIndex,
+            string tableName,
+            string lastPercent)
+        {
+            StringBuilder buffer = new StringBuilder(MaxSqlBatchLength);
+            string batchPrefix = string.Empty;
+            int counter = startIndex;
+            while (counter < queries.Length)
+            {
+                string statement = ReadSqlStatement(queries, ref counter);
+                if (statement.Trim().Length == 0)
+                {
+                    continue;
+                }
+
+                string insertPrefix;
+                string valuesPart;
+                if (!TrySplitInsertStatement(statement, out insertPrefix, out valuesPart))
+                {
+                    FlushSqlBatch(conn, buffer);
+                    batchPrefix = string.Empty;
+                    conn.Execute(statement);
+                    WriteTableProgress(tableName, counter, queries.Length, ref lastPercent);
+                    continue;
+                }
+
+                if (batchPrefix != insertPrefix)
+                {
+                    FlushSqlBatch(conn, buffer);
+                    batchPrefix = insertPrefix;
+                    buffer.Append(batchPrefix);
+                }
+
+                if (buffer.Length + valuesPart.Length + 2 > MaxSqlBatchLength)
+                {
+                    FlushSqlBatch(conn, buffer);
+                    batchPrefix = insertPrefix;
+                    buffer.Append(batchPrefix);
+                }
+
+                if (buffer.Length > batchPrefix.Length)
+                {
+                    buffer.Append(", ");
+                }
+
+                buffer.Append(valuesPart);
+                WriteTableProgress(tableName, counter, queries.Length, ref lastPercent);
+            }
+
+            FlushSqlBatch(conn, buffer);
+        }
+
+        private static string ReadSqlStatement(string[] queries, ref int counter)
+        {
+            StringBuilder statement = new StringBuilder();
+            while (counter < queries.Length)
+            {
+                string line = queries[counter];
+                counter++;
+                if (line.Trim().Length == 0)
+                {
+                    continue;
+                }
+
+                if (statement.Length > 0)
+                {
+                    statement.Append('\n');
+                }
+
+                statement.Append(line);
+                if (line.TrimEnd().EndsWith(";", StringComparison.Ordinal))
+                {
+                    break;
+                }
+            }
+
+            return statement.ToString();
+        }
+
+        private static bool TrySplitInsertStatement(string statement, out string insertPrefix, out string valuesPart)
+        {
+            insertPrefix = string.Empty;
+            valuesPart = string.Empty;
+
+            string trimmed = statement.Trim();
+            if (!trimmed.StartsWith(InsertIntoKeyword, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            int valuesIndex = trimmed.IndexOf(ValuesKeyword, StringComparison.OrdinalIgnoreCase);
+            if (valuesIndex < 0)
+            {
+                return false;
+            }
+
+            valuesPart = trimmed.Substring(valuesIndex + ValuesKeyword.Length).Trim();
+            if (valuesPart.EndsWith(";", StringComparison.Ordinal))
+            {
+                valuesPart = valuesPart.Substring(0, valuesPart.Length - 1).Trim();
+            }
+
+            if (!valuesPart.StartsWith("(", StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            insertPrefix = trimmed.Substring(0, valuesIndex).TrimEnd() + " VALUES ";
+            return true;
+        }
+
+        private static void FlushSqlBatch(IDbConnection conn, StringBuilder buffer)
+        {
+            if (buffer.Length == 0)
+            {
+                return;
+            }
+
+            buffer.Append(";");
+            try
+            {
+                conn.Execute(buffer.ToString());
+            }
+            catch (Exception)
+            {
+                Console.WriteLine(buffer.ToString().Substring(0, Math.Min(300, buffer.Length)));
+                throw;
+            }
+
+            buffer.Clear();
+        }
+
+        private static void WriteTableProgress(string tableName, int counter, int total, ref string lastPercent)
+        {
+            string percent = Convert.ToInt32(Math.Floor((double)counter / total * 100)).ToString();
+            if (percent == lastPercent)
+            {
+                return;
+            }
+
+            Console.Write("\rTable " + tableName.PadRight(67) + "[" + percent.PadLeft(3) + "%]");
+            lastPercent = percent;
         }
 
         /// <summary>
