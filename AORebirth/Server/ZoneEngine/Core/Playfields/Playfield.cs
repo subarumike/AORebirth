@@ -2414,12 +2414,19 @@ namespace AORebirth.Core.Playfields
                     Unknown4 = CapturedCleaningRobotSpecialAttackWeaponValue,
                     Unknown5 = CapturedCleaningRobotSpecialAttackWeaponLastValue
                 });
+            this.Announce(
+                new AttackMessage
+                {
+                    Identity = attacker.Identity,
+                    Target = target.Identity,
+                    Action = 0
+                });
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "CombatSpecialAttackWeaponSend attacker={0} target={1} monsterData={2}",
+                    "CombatNpcAttackStartContextSend attacker={0} target={1} monsterData={2}",
                     attacker.Identity,
                     target.Identity,
                     attacker.Stats[StatIds.monsterdata].Value));
