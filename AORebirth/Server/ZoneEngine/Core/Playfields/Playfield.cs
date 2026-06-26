@@ -115,6 +115,7 @@ namespace AORebirth.Core.Playfields
 
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
         private readonly Dictionary<int, int> lastCombatWeaponSlots = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> lastNpcUnarmedAttackInfoSlots = new Dictionary<int, int>();
 
         private readonly Dictionary<int, DateTime> deadNpcDespawnTicks = new Dictionary<int, DateTime>();
 
@@ -227,6 +228,22 @@ namespace AORebirth.Core.Playfields
         private const int CapturedCleaningRobotMonsterData = 297023;
 
         private const double CapturedCleaningRobotFollowStopDistance = 0.0;
+
+        private const int UnarmedAttackInfoAmmoCount = -1;
+
+        private const int PlayerUnarmedAttackInfoWeaponSlot = 0;
+
+        private const int PlayerUnarmedAttackInfoWeaponInstance = 100;
+
+        private const int NpcUnarmedRightAttackInfoWeaponSlot = 0;
+
+        private const int NpcUnarmedLeftAttackInfoWeaponSlot = 1;
+
+        private const int NpcUnarmedRightAttackInfoWeaponInstance = 1279874865;
+
+        private const int NpcUnarmedLeftAttackInfoWeaponInstance = 1279874866;
+
+        private const int NormalAttackInfoHitType = 3;
 
         private const int MissingItemStatValue = 1234567890;
 
@@ -1983,6 +2000,7 @@ namespace AORebirth.Core.Playfields
             character.SetFightingTarget(Identity.None);
             this.nextCombatTicks.Remove(character.Identity.Instance);
             this.lastCombatWeaponSlots.Remove(character.Identity.Instance);
+            this.lastNpcUnarmedAttackInfoSlots.Remove(character.Identity.Instance);
             this.StopFightingDeadTarget(character.Identity);
             this.SendCombatStopMessage(character);
             character.SendChangedStats();
@@ -2104,6 +2122,7 @@ namespace AORebirth.Core.Playfields
             {
                 this.nextCombatTicks.Remove(attacker.Identity.Instance);
                 this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
+                this.lastNpcUnarmedAttackInfoSlots.Remove(attacker.Identity.Instance);
                 return;
             }
 
@@ -2130,6 +2149,7 @@ namespace AORebirth.Core.Playfields
                 attacker.SetFightingTarget(Identity.None);
                 this.nextCombatTicks.Remove(attacker.Identity.Instance);
                 this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
+                this.lastNpcUnarmedAttackInfoSlots.Remove(attacker.Identity.Instance);
                 return;
             }
 
@@ -2196,6 +2216,7 @@ namespace AORebirth.Core.Playfields
                     attacker.SetFightingTarget(Identity.None);
                     this.nextCombatTicks.Remove(attacker.Identity.Instance);
                     this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
+                    this.lastNpcUnarmedAttackInfoSlots.Remove(attacker.Identity.Instance);
                 }
 
                 return;
@@ -2370,7 +2391,7 @@ namespace AORebirth.Core.Playfields
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
-                    "CombatAttackInfoSend source={0} attacker={1} target={2} dmg={3} u2={4} u3={5} u4={6} u5={7} u6=0 weaponBased={8} atkDefault={9} atkDamageType={10} atkWeaponType={11} atkEquippedWeapons={12}",
+                    "CombatAttackInfoSend source={0} attacker={1} target={2} dmg={3} u2={4} u3={5} u4={6} u5={7} u6={8} weaponBased={9} atkDefault={10} atkDamageType={11} atkWeaponType={12} atkEquippedWeapons={13}",
                     source,
                     attacker.Identity,
                     target.Identity,
@@ -2379,6 +2400,7 @@ namespace AORebirth.Core.Playfields
                     attackSource.AttackInfoWeaponSlot,
                     attackSource.AttackInfoUnk1,
                     attackSource.AttackInfoHitType,
+                    attackSource.AttackInfoWeaponInstance,
                     attackSource.UsesEquippedWeapon ? 1 : 0,
                     attacker.Stats[StatIds.defaultattacktype].Value,
                     attacker.Stats[StatIds.damagetype].Value,
@@ -2395,7 +2417,7 @@ namespace AORebirth.Core.Playfields
                     Unknown3 = attackSource.AttackInfoWeaponSlot,
                     Unknown4 = attackSource.AttackInfoUnk1,
                     Unknown5 = attackSource.AttackInfoHitType,
-                    Unknown6 = 0
+                    Unknown6 = attackSource.AttackInfoWeaponInstance
                 });
 
             this.AnnounceHealthDamageIfNeeded(attacker, target, damage, source);
@@ -2466,7 +2488,6 @@ namespace AORebirth.Core.Playfields
                         attacker.Stats[StatIds.damagetype].Value,
                         attacker.Stats[StatIds.weapontype].Value,
                         attacker.Stats[StatIds.equippedweapons].Value));
-                bool isNpcAttacker = attacker.Controller is NPCController;
                 return new CombatAttackSource
                        {
                            MinDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.mindamage].Value, 0),
@@ -2475,10 +2496,11 @@ namespace AORebirth.Core.Playfields
                            Range = MaxMeleeCombatDistance,
                            RechargeSeconds = DefaultCombatTickSeconds,
                            UsesEquippedWeapon = false,
-                           AttackInfoAmmoCount = 0,
-                           AttackInfoWeaponSlot = 0,
+                           AttackInfoAmmoCount = UnarmedAttackInfoAmmoCount,
+                           AttackInfoWeaponSlot = this.GetUnarmedAttackInfoWeaponSlot(attacker),
                            AttackInfoUnk1 = 0,
-                           AttackInfoHitType = isNpcAttacker ? 3 : 0
+                           AttackInfoHitType = NormalAttackInfoHitType,
+                           AttackInfoWeaponInstance = this.GetUnarmedAttackInfoWeaponInstance(attacker)
                         };
             }
 
@@ -2512,8 +2534,45 @@ namespace AORebirth.Core.Playfields
                        AttackInfoAmmoCount = 40,
                        AttackInfoWeaponSlot = equippedWeapon.Slot,
                        AttackInfoUnk1 = 4,
-                       AttackInfoHitType = 3
+                       AttackInfoHitType = NormalAttackInfoHitType,
+                       AttackInfoWeaponInstance = 0
                     };
+        }
+
+        private int GetUnarmedAttackInfoWeaponSlot(ICharacter attacker)
+        {
+            if (!(attacker.Controller is NPCController))
+            {
+                return PlayerUnarmedAttackInfoWeaponSlot;
+            }
+
+            int lastSlot;
+            if (this.lastNpcUnarmedAttackInfoSlots.TryGetValue(attacker.Identity.Instance, out lastSlot)
+                && lastSlot == NpcUnarmedRightAttackInfoWeaponSlot)
+            {
+                this.lastNpcUnarmedAttackInfoSlots[attacker.Identity.Instance] = NpcUnarmedLeftAttackInfoWeaponSlot;
+                return NpcUnarmedLeftAttackInfoWeaponSlot;
+            }
+
+            this.lastNpcUnarmedAttackInfoSlots[attacker.Identity.Instance] = NpcUnarmedRightAttackInfoWeaponSlot;
+            return NpcUnarmedRightAttackInfoWeaponSlot;
+        }
+
+        private int GetUnarmedAttackInfoWeaponInstance(ICharacter attacker)
+        {
+            if (!(attacker.Controller is NPCController))
+            {
+                return PlayerUnarmedAttackInfoWeaponInstance;
+            }
+
+            int slot;
+            if (!this.lastNpcUnarmedAttackInfoSlots.TryGetValue(attacker.Identity.Instance, out slot)
+                || slot == NpcUnarmedRightAttackInfoWeaponSlot)
+            {
+                return NpcUnarmedRightAttackInfoWeaponInstance;
+            }
+
+            return NpcUnarmedLeftAttackInfoWeaponInstance;
         }
 
         private EquippedCombatWeapon GetEquippedCombatWeapon(ICharacter attacker)
@@ -2752,6 +2811,7 @@ namespace AORebirth.Core.Playfields
             target.SetFightingTarget(Identity.None);
             this.nextCombatTicks.Remove(target.Identity.Instance);
             this.lastCombatWeaponSlots.Remove(target.Identity.Instance);
+            this.lastNpcUnarmedAttackInfoSlots.Remove(target.Identity.Instance);
             this.StopFightingDeadTarget(target.Identity);
             this.SendCombatStopMessage(target);
             this.SendPlayerDeathAnimation(target);
@@ -3529,6 +3589,7 @@ namespace AORebirth.Core.Playfields
             target.DoNotDoTimers = true;
             this.nextCombatTicks.Remove(target.Identity.Instance);
             this.lastCombatWeaponSlots.Remove(target.Identity.Instance);
+            this.lastNpcUnarmedAttackInfoSlots.Remove(target.Identity.Instance);
             this.deadNpcDespawnTicks.Remove(target.Identity.Instance);
             this.npcHomeStates.Remove(target.Identity.Instance);
             this.Despawn(target.Identity);
@@ -3888,6 +3949,7 @@ namespace AORebirth.Core.Playfields
                     character.SetFightingTarget(Identity.None);
                     this.nextCombatTicks.Remove(character.Identity.Instance);
                     this.lastCombatWeaponSlots.Remove(character.Identity.Instance);
+                    this.lastNpcUnarmedAttackInfoSlots.Remove(character.Identity.Instance);
                     this.SendCombatStopMessage(character);
                 }
             }
@@ -4600,6 +4662,8 @@ namespace AORebirth.Core.Playfields
             public int AttackInfoUnk1 { get; set; }
 
             public int AttackInfoHitType { get; set; }
+
+            public int AttackInfoWeaponInstance { get; set; }
         }
 
         private enum CombatDamageSource
