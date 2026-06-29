@@ -271,13 +271,13 @@ namespace AORebirth.Core.Playfields
 
         private static readonly CapturedMobSpawn[] CapturedAreteCleaningRobotSpawns =
         {
-            new CapturedMobSpawn(0x790B89CF, 3599.479f, 51.745f, 780.4631f, 12, 1, 6),
-            new CapturedMobSpawn(0x790B89E4, 3621.168f, 51.745f, 796.8157f, 12, 1, 6),
-            new CapturedMobSpawn(0x790B89E6, 3601.302f, 52.135f, 788.4078f, 12, 1, 6),
-            new CapturedMobSpawn(0x790B89EC, 3602.963f, 52.135f, 788.1797f, 12, 1, 6),
-            new CapturedMobSpawn(0x790B89F1, 3608.467f, 52.265f, 784.1666f, 12, 1, 6),
-            new CapturedMobSpawn(0x790B89F2, 3601.385f, 51.745f, 799.7108f, 12, 1, 6),
-            new CapturedMobSpawn(0x790B89F7, 3613.574f, 51.745f, 794.3343f, 12, 1, 6)
+            new CapturedMobSpawn(0x7921D500, 3600.051f, 51.925f, 784.2881f, 12, 1, 5, 3598.772f, 52.5f, 786.8053f),
+            new CapturedMobSpawn(0x7921D4F7, 3619.366f, 51.745f, 786.3605f, 12, 1, 5, 3620.901f, 52.5f, 784.2832f),
+            new CapturedMobSpawn(0x7921D4F6, 3598.846f, 51.745f, 787.9852f, 12, 1, 5, 3594.300f, 52.5f, 799.990f),
+            new CapturedMobSpawn(0x7921D506, 3598.281f, 51.745f, 793.5734f, 12, 1, 5, 3594.300f, 52.5f, 800.000f),
+            new CapturedMobSpawn(0x7921D508, 3617.396f, 51.745f, 784.3879f, 12, 1, 5, 3602.184f, 52.5f, 787.763f),
+            new CapturedMobSpawn(0x7921D50B, 3608.910f, 51.745f, 795.7574f, 12, 1, 5, 3598.852f, 52.5f, 787.261f),
+            new CapturedMobSpawn(0x7921D511, 3604.946f, 51.745f, 774.3661f, 12, 1, 5, 3602.210f, 52.5f, 787.786f)
         };
 
         private const int UnarmedAttackInfoAmmoCount = -1;
@@ -551,6 +551,7 @@ namespace AORebirth.Core.Playfields
             SetCapturedMobStat(mobCharacter, StatIds.level, spawn.Level);
             SetCapturedMobStat(mobCharacter, StatIds.runspeed, spawn.RunSpeed);
             mobCharacter.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
+            AssignCapturedPatrolWaypoints(mobCharacter, spawn);
             mobCharacter.DoNotDoTimers = false;
 
             LogUtil.Debug(
@@ -566,6 +567,17 @@ namespace AORebirth.Core.Playfields
                     spawn.Health,
                     spawn.Level,
                     spawn.RunSpeed));
+        }
+
+        private static void AssignCapturedPatrolWaypoints(ICharacter mobCharacter, CapturedMobSpawn spawn)
+        {
+            mobCharacter.Waypoints.Clear();
+            mobCharacter.AddWaypoint(
+                new AORebirth.Core.Vector.Vector3(spawn.X, spawn.Y, spawn.Z),
+                false);
+            mobCharacter.AddWaypoint(
+                new AORebirth.Core.Vector.Vector3(spawn.PatrolX, spawn.PatrolY, spawn.PatrolZ),
+                false);
         }
 
         private static void SetCapturedMobStat(ICharacter mobCharacter, StatIds stat, int value)
@@ -4126,7 +4138,10 @@ namespace AORebirth.Core.Playfields
                 float z,
                 int health,
                 int level,
-                int runSpeed)
+                int runSpeed,
+                float patrolX,
+                float patrolY,
+                float patrolZ)
             {
                 this.SourceInstance = sourceInstance;
                 this.X = x;
@@ -4135,6 +4150,9 @@ namespace AORebirth.Core.Playfields
                 this.Health = health;
                 this.Level = level;
                 this.RunSpeed = runSpeed;
+                this.PatrolX = patrolX;
+                this.PatrolY = patrolY;
+                this.PatrolZ = patrolZ;
             }
 
             public int SourceInstance { get; private set; }
@@ -4150,6 +4168,12 @@ namespace AORebirth.Core.Playfields
             public int Level { get; private set; }
 
             public int RunSpeed { get; private set; }
+
+            public float PatrolX { get; private set; }
+
+            public float PatrolY { get; private set; }
+
+            public float PatrolZ { get; private set; }
         }
 
         private Identity AllocateCorpseIdentity()
