@@ -245,6 +245,8 @@ namespace AORebirth.Core.Playfields
         private const int CapturedCleaningRobotSpecialAttackWeaponValue = 8;
         private const int CapturedCleaningRobotSpecialAttackWeaponLastValue = 0;
 
+        private const int CapturedAretePlayfieldInstance = 0xFF02D;
+
         private static readonly int[][] CapturedCleaningRobotLootOutcomes =
         {
             new[] { 42620 },
@@ -265,6 +267,17 @@ namespace AORebirth.Core.Playfields
             new[] { 70565 },
             new[] { 155684 },
             new int[0]
+        };
+
+        private static readonly CapturedMobSpawn[] CapturedAreteCleaningRobotSpawns =
+        {
+            new CapturedMobSpawn(0x790B89CF, 3599.479f, 51.745f, 780.4631f, 12, 1, 6),
+            new CapturedMobSpawn(0x790B89E4, 3621.168f, 51.745f, 796.8157f, 12, 1, 6),
+            new CapturedMobSpawn(0x790B89E6, 3601.302f, 52.135f, 788.4078f, 12, 1, 6),
+            new CapturedMobSpawn(0x790B89EC, 3602.963f, 52.135f, 788.1797f, 12, 1, 6),
+            new CapturedMobSpawn(0x790B89F1, 3608.467f, 52.265f, 784.1666f, 12, 1, 6),
+            new CapturedMobSpawn(0x790B89F2, 3601.385f, 51.745f, 799.7108f, 12, 1, 6),
+            new CapturedMobSpawn(0x790B89F7, 3613.574f, 51.745f, 794.3343f, 12, 1, 6)
         };
 
         private const int UnarmedAttackInfoAmmoCount = -1;
@@ -366,6 +379,7 @@ namespace AORebirth.Core.Playfields
 
             this.statels = ResolvePlayfieldStatels(playfieldIdentity);
             this.LoadMobSpawns(playfieldIdentity);
+            this.LoadCapturedAreteMobSpawns(playfieldIdentity);
             this.LoadVendors(playfieldIdentity);
             this.LoadStaticDynels(playfieldIdentity);
         }
@@ -493,6 +507,71 @@ namespace AORebirth.Core.Playfields
                 default:
                     return false;
             }
+        }
+
+        private void LoadCapturedAreteMobSpawns(Identity playfieldIdentity)
+        {
+            if (playfieldIdentity.Instance != CapturedAretePlayfieldInstance)
+            {
+                return;
+            }
+
+            foreach (CapturedMobSpawn spawn in CapturedAreteCleaningRobotSpawns)
+            {
+                this.SpawnCapturedAreteCleaningRobot(playfieldIdentity, spawn);
+            }
+        }
+
+        private void SpawnCapturedAreteCleaningRobot(Identity playfieldIdentity, CapturedMobSpawn spawn)
+        {
+            var npcController = new NPCController();
+            Character mobCharacter = NonPlayerCharacterHandler.SpawnMobFromTemplate(
+                CombatTestMobArchetype.TemplateHash,
+                playfieldIdentity,
+                new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z },
+                new AORebirth.Core.Vector.Quaternion(0, 0, 0, 1),
+                npcController,
+                spawn.Level);
+
+            if (mobCharacter == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Captured Arete robot spawn failed source=20260625-185456 sourceIdentity=SimpleChar:{0:X8}",
+                        spawn.SourceInstance));
+                return;
+            }
+
+            mobCharacter.Name = CapturedCleaningRobotName;
+            mobCharacter.Playfield = this;
+            CombatTestMobArchetype.Prepare(mobCharacter, CombatTestMobArchetype.MalfunctioningCleaningRobot);
+            SetCapturedMobStat(mobCharacter, StatIds.life, spawn.Health);
+            SetCapturedMobStat(mobCharacter, StatIds.health, spawn.Health);
+            SetCapturedMobStat(mobCharacter, StatIds.level, spawn.Level);
+            SetCapturedMobStat(mobCharacter, StatIds.runspeed, spawn.RunSpeed);
+            mobCharacter.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
+            mobCharacter.DoNotDoTimers = false;
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Captured Arete robot spawned source=20260625-185456 sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} pos=({2},{3},{4}) health={5} level={6} runSpeed={7}",
+                    spawn.SourceInstance,
+                    mobCharacter.Identity,
+                    spawn.X,
+                    spawn.Y,
+                    spawn.Z,
+                    spawn.Health,
+                    spawn.Level,
+                    spawn.RunSpeed));
+        }
+
+        private static void SetCapturedMobStat(ICharacter mobCharacter, StatIds stat, int value)
+        {
+            mobCharacter.Stats[stat].Value = value;
+            mobCharacter.Stats[stat].BaseValue = (uint)value;
         }
 
         #endregion
@@ -4036,6 +4115,41 @@ namespace AORebirth.Core.Playfields
             public int CorpseInstance { get; set; }
 
             public DateTime DueAtUtc { get; set; }
+        }
+
+        private class CapturedMobSpawn
+        {
+            public CapturedMobSpawn(
+                int sourceInstance,
+                float x,
+                float y,
+                float z,
+                int health,
+                int level,
+                int runSpeed)
+            {
+                this.SourceInstance = sourceInstance;
+                this.X = x;
+                this.Y = y;
+                this.Z = z;
+                this.Health = health;
+                this.Level = level;
+                this.RunSpeed = runSpeed;
+            }
+
+            public int SourceInstance { get; private set; }
+
+            public float X { get; private set; }
+
+            public float Y { get; private set; }
+
+            public float Z { get; private set; }
+
+            public int Health { get; private set; }
+
+            public int Level { get; private set; }
+
+            public int RunSpeed { get; private set; }
         }
 
         private Identity AllocateCorpseIdentity()
