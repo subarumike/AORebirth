@@ -230,7 +230,7 @@ namespace AORebirth.Core.Playfields
 
         private const int CapturedCleaningRobotCorpseCatMesh = 297018;
 
-        private const int CapturedCleaningRobotCorpseCredits = 0;
+        private const int CapturedCleaningRobotCorpseCredits = 5;
 
         private const double CapturedCleaningRobotFollowStopDistance = 0.0;
 
