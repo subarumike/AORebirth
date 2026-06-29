@@ -198,7 +198,7 @@ namespace AORebirth.Core.NPCHandler
                     cmob.Waypoints.Add(mobwp);
                 }
                 npccontroller.Character = cmob;
-                if (cmob.Waypoints.Count > 2)
+                if (cmob.Waypoints.Count > 1)
                 {
                     cmob.Controller.State = CharacterState.Patrolling;
                 }

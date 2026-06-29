@@ -784,7 +784,7 @@ namespace ZoneEngine.Core.Controllers
         private Waypoint FindNextWaypoint()
         {
             Waypoint result = null;
-            if (this.Character.Waypoints.Count <= 2)
+            if (this.Character.Waypoints.Count < 2)
             {
                 return null;
             }
