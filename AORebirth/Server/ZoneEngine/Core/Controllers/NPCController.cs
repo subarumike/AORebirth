@@ -98,6 +98,8 @@ namespace ZoneEngine.Core.Controllers
 
         private const double CoordinateFollowArrivalDistance = 0.3;
 
+        private const double WalkFollowSpeedPerSecond = 1.5;
+
         public NpcAiProfile AiProfile { get; set; } = NpcAiProfile.Passive;
 
         private struct NpcMotionSegment
@@ -194,7 +196,17 @@ namespace ZoneEngine.Core.Controllers
             return MoveToward(
                 this.followMotionSegment.Start,
                 this.followMotionSegment.End,
-                MaxNpcFollowSpeedPerSecond * elapsedSeconds);
+                this.CurrentFollowSpeedPerSecond() * elapsedSeconds);
+        }
+
+        private double CurrentFollowSpeedPerSecond()
+        {
+            if (this.followIdentity.Equals(Identity.None) && this.Character.MoveMode == MoveModes.Walk)
+            {
+                return WalkFollowSpeedPerSecond;
+            }
+
+            return MaxNpcFollowSpeedPerSecond;
         }
 
         private Vector3 UpdateMotionSegmentPosition(DateTime now)
@@ -278,7 +290,11 @@ namespace ZoneEngine.Core.Controllers
         private void SendMotionSegmentFollow(string phase, Vector3 start, Vector3 targetPosition, DateTime now)
         {
             Vector3 destination = this.BuildVisibleFollowDestination(start, targetPosition);
-            this.Run();
+            if (!this.followIdentity.Equals(Identity.None))
+            {
+                this.Run();
+            }
+
             this.Character.Coordinates(start);
             this.FaceToward(start, destination);
             this.LogChase(phase, start, destination);
