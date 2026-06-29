@@ -578,6 +578,7 @@ namespace AORebirth.Core.Playfields
             mobCharacter.AddWaypoint(
                 new AORebirth.Core.Vector.Vector3(spawn.PatrolX, spawn.PatrolY, spawn.PatrolZ),
                 false);
+            mobCharacter.Controller.State = CharacterState.Patrolling;
         }
 
         private static void SetCapturedMobStat(ICharacter mobCharacter, StatIds stat, int value)
