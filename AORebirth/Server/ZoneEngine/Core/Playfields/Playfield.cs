@@ -230,6 +230,8 @@ namespace AORebirth.Core.Playfields
 
         private const int CapturedCleaningRobotCorpseCatMesh = 297018;
 
+        private const int CapturedCleaningRobotCorpseCredits = 5;
+
         private const double CapturedCleaningRobotFollowStopDistance = 0.0;
 
         private const int CapturedCleaningRobotRightHandDamage = 10;
@@ -4123,6 +4125,11 @@ namespace AORebirth.Core.Playfields
         {
             var lootItems = new List<CorpseLootItem>();
 
+            if (IsCapturedCleaningRobot(target))
+            {
+                return lootItems;
+            }
+
             int monsterData = target.Stats[StatIds.monsterdata].Value;
             int npcFamily = target.Stats[StatIds.npcfamily].Value;
             int level = target.Stats[StatIds.level].Value;
@@ -4196,6 +4203,11 @@ namespace AORebirth.Core.Playfields
             if (target == null)
             {
                 return 0;
+            }
+
+            if (IsCapturedCleaningRobot(target))
+            {
+                return CapturedCleaningRobotCorpseCredits;
             }
 
             int monsterData = target.Stats[StatIds.monsterdata].Value;
