@@ -96,6 +96,8 @@ namespace ZoneEngine.Core.Controllers
 
         private const double MinVisibleFollowTargetDelta = 1.0;
 
+        private const double CoordinateFollowArrivalDistance = 0.3;
+
         public NpcAiProfile AiProfile { get; set; } = NpcAiProfile.Passive;
 
         private struct NpcMotionSegment
@@ -285,6 +287,20 @@ namespace ZoneEngine.Core.Controllers
             this.lastMotionPacketUtc = now;
             this.lastMotionPacketDestination = destination;
             this.hasMotionPacket = true;
+        }
+
+        private bool TryCompleteCoordinateFollow(Vector3 current, Vector3 targetPosition)
+        {
+            if (!this.followIdentity.Equals(Identity.None)
+                || current.Distance2D(targetPosition) > CoordinateFollowArrivalDistance)
+            {
+                return false;
+            }
+
+            this.Character.Coordinates(targetPosition);
+            this.StopMovement();
+            this.StopFollow();
+            return true;
         }
 
         public void SuppressMotionSegmentUpdates(bool suppress)
@@ -670,6 +686,11 @@ namespace ZoneEngine.Core.Controllers
             DateTime now = DateTime.UtcNow;
             Vector3 current = this.UpdateMotionSegmentPosition(now);
             this.followCoordinates = targetPosition;
+
+            if (this.TryCompleteCoordinateFollow(current, targetPosition))
+            {
+                return;
+            }
 
             if (this.followStopDistance > 0.0 && current.Distance2D(targetPosition) <= this.followStopDistance)
             {
