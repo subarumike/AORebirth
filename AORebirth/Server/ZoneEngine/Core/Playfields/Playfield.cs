@@ -228,8 +228,6 @@ namespace AORebirth.Core.Playfields
 
         private const int CapturedCleaningRobotMonsterData = 297023;
 
-        private const int CapturedCleaningRobotCorpseCatMesh = CapturedCleaningRobotMonsterData;
-
         private const double CapturedCleaningRobotFollowStopDistance = 0.0;
 
         private const int CapturedCleaningRobotRightHandDamage = 10;
@@ -4057,18 +4055,12 @@ namespace AORebirth.Core.Playfields
 
         private bool CanBuildKnownCorpseVisual(ICharacter target)
         {
-            return IsCapturedCleaningRobot(target)
-                   || CombatCorpseVisuals.IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
+            return CombatCorpseVisuals.IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
                    || MonsterDataToCorpseCatMesh.ContainsKey(target.Stats[StatIds.monsterdata].Value);
         }
 
         private static int CorpseCatMeshFor(ICharacter target)
         {
-            if (IsCapturedCleaningRobot(target))
-            {
-                return CapturedCleaningRobotCorpseCatMesh;
-            }
-
             return CombatCorpseVisuals.CorpseCatMeshFor(
                 target.Stats[StatIds.catmesh].Value,
                 target.Stats[StatIds.monsterdata].Value,
