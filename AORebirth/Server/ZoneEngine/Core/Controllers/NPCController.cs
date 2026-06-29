@@ -750,7 +750,6 @@ namespace ZoneEngine.Core.Controllers
                 this.Character.Heading = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(temp).Normalize();
                 LogUtil.Debug(DebugInfoDetail.Movement, "Direction: " + this.Character.Heading.ToString());
                 this.SendMotionSegmentFollow("patrol-start", start, next.Position, now);
-                this.StartMovement();
                 LogUtil.Debug(DebugInfoDetail.Movement, "Walking to: " + this.followCoordinates);
             }
         }
