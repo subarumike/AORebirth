@@ -313,8 +313,8 @@ namespace ZoneEngine.Core.Controllers
                 return false;
             }
 
-            this.Character.Coordinates(targetPosition);
             this.StopMovement();
+            this.Character.Coordinates(targetPosition);
             this.StopFollow();
             return true;
         }
@@ -743,14 +743,13 @@ namespace ZoneEngine.Core.Controllers
                     this.Walk();
                 }
                 this.followCoordinates = next.Position;
-                Vector3 temp = this.Character.Coordinates().coordinate - next.Position;
+                DateTime now = DateTime.UtcNow;
+                Vector3 start = this.Character.Coordinates().coordinate;
+                Vector3 temp = start - next.Position;
                 temp.y = 0;
                 this.Character.Heading = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(temp).Normalize();
                 LogUtil.Debug(DebugInfoDetail.Movement, "Direction: " + this.Character.Heading.ToString());
-                FollowTargetMessageHandler.Default.Send(
-                    this.Character,
-                    this.Character.Coordinates().coordinate,
-                    next.Position);
+                this.SendMotionSegmentFollow("patrol-start", start, next.Position, now);
                 this.StartMovement();
                 LogUtil.Debug(DebugInfoDetail.Movement, "Walking to: " + this.followCoordinates);
             }
