@@ -245,7 +245,7 @@ namespace AORebirth.Core.Playfields
         private const int CapturedCleaningRobotSpecialAttackWeaponValue = 8;
         private const int CapturedCleaningRobotSpecialAttackWeaponLastValue = 0;
 
-        private const int CapturedAretePlayfieldInstance = 0xFF02D;
+        private const int PrivateAretePlayfieldInstance = 6553;
 
         private static readonly int[][] CapturedCleaningRobotLootOutcomes =
         {
@@ -511,7 +511,7 @@ namespace AORebirth.Core.Playfields
 
         private void LoadCapturedAreteMobSpawns(Identity playfieldIdentity)
         {
-            if (playfieldIdentity.Instance != CapturedAretePlayfieldInstance)
+            if (playfieldIdentity.Instance != PrivateAretePlayfieldInstance)
             {
                 return;
             }
