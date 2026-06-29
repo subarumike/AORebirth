@@ -230,7 +230,7 @@ namespace AORebirth.Core.Playfields
 
         private const int CapturedCleaningRobotCorpseCatMesh = 297018;
 
-        private const int CapturedCleaningRobotCorpseCredits = 5;
+        private const int CapturedCleaningRobotCorpseCredits = 0;
 
         private const double CapturedCleaningRobotFollowStopDistance = 0.0;
 
@@ -244,6 +244,28 @@ namespace AORebirth.Core.Playfields
         private const int CapturedCleaningRobotRightWeaponTag = 0x4C495731;
         private const int CapturedCleaningRobotSpecialAttackWeaponValue = 8;
         private const int CapturedCleaningRobotSpecialAttackWeaponLastValue = 0;
+
+        private static readonly int[][] CapturedCleaningRobotLootOutcomes =
+        {
+            new[] { 42620 },
+            new int[0],
+            new[] { 36779, 84142 },
+            new int[0],
+            new[] { 297289 },
+            new int[0],
+            new int[0],
+            new[] { 70558, 155685 },
+            new[] { 297289, 150306 },
+            new int[0],
+            new[] { 155666 },
+            new int[0],
+            new[] { 70564 },
+            new[] { 155666 },
+            new[] { 155687 },
+            new[] { 70565 },
+            new[] { 155684 },
+            new int[0]
+        };
 
         private const int UnarmedAttackInfoAmmoCount = -1;
 
@@ -4127,7 +4149,7 @@ namespace AORebirth.Core.Playfields
 
             if (IsCapturedCleaningRobot(target))
             {
-                return lootItems;
+                return this.RollCapturedCleaningRobotLootItems();
             }
 
             int monsterData = target.Stats[StatIds.monsterdata].Value;
@@ -4194,6 +4216,42 @@ namespace AORebirth.Core.Playfields
                     npcFamily,
                     lootItems.Count,
                     lootSource));
+
+            return lootItems;
+        }
+
+        private List<CorpseLootItem> RollCapturedCleaningRobotLootItems()
+        {
+            var lootItems = new List<CorpseLootItem>();
+            int[] outcome = CapturedCleaningRobotLootOutcomes[NextLootRandom(CapturedCleaningRobotLootOutcomes.Length)];
+
+            foreach (int templateId in outcome)
+            {
+                Item item = CreateLootItem(new[] { templateId }, 1);
+                if (item == null)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        string.Format(
+                            "Captured cleaning robot loot skipped missing item template templateId={0}",
+                            templateId));
+                    continue;
+                }
+
+                lootItems.Add(
+                    new CorpseLootItem
+                    {
+                        Slot = lootItems.Count,
+                        Item = item,
+                        LootIdentity = this.AllocateCorpseLootItemIdentity()
+                    });
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    "Captured cleaning robot loot rolled items={0} source=live-capture-20260629-142800",
+                    lootItems.Count));
 
             return lootItems;
         }
