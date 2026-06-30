@@ -89,6 +89,15 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             character.SetTarget(message.Target);
+            if (!this.CanReachTarget(character, target))
+            {
+                character.SetFightingTarget(Identity.None);
+                this.ResetCombatTick(character);
+                this.SendAttackState(character, Identity.None, 0);
+                client.Server.Info(client, "Attack ignored because target is out of range.");
+                return;
+            }
+
             character.SetFightingTarget(message.Target);
             this.ResetCombatTick(character);
             this.EngageNpcTarget(character, target);
@@ -109,6 +118,12 @@ namespace ZoneEngine.Core.MessageHandlers
             return target != null
                    && (target.Stats[StatIds.flags].Value & SimpleCharFullUpdateIsImmuneFlag)
                    == SimpleCharFullUpdateIsImmuneFlag;
+        }
+
+        private bool CanReachTarget(ICharacter character, ICharacter target)
+        {
+            Playfield playfield = character.Playfield as Playfield;
+            return playfield == null || playfield.CanReachCombatTarget(character, target);
         }
 
         private void EngageNpcTarget(ICharacter character, ICharacter target)
