@@ -100,6 +100,16 @@ namespace ZoneEngine.Core.Controllers
 
         private const double WalkFollowSpeedPerSecond = 1.5;
 
+        private const string CapturedCleaningRobotName = "Malfunctioning Cleaning Robot";
+
+        private const int CapturedCleaningRobotMonsterData = 297023;
+
+        private const double CapturedCleaningRobotPatrolUpdateSeconds = 0.25;
+
+        private const double CapturedCleaningRobotPatrolLookaheadDistance = 1.15;
+
+        private const double CapturedCleaningRobotPatrolArrivalDistance = 1.0;
+
         public NpcAiProfile AiProfile { get; set; } = NpcAiProfile.Passive;
 
         private struct NpcMotionSegment
@@ -253,6 +263,26 @@ namespace ZoneEngine.Core.Controllers
             return MoveToward(start, targetPosition, distance - this.followStopDistance);
         }
 
+        private bool IsCapturedCleaningRobotIdlePatrol()
+        {
+            return this.state == CharacterState.Patrolling
+                   && this.followIdentity.Equals(Identity.None)
+                   && this.Character != null
+                   && string.Equals(this.Character.Name, CapturedCleaningRobotName, StringComparison.OrdinalIgnoreCase)
+                   && this.Character.Stats[StatIds.monsterdata].Value == CapturedCleaningRobotMonsterData;
+        }
+
+        private Vector3 BuildCapturedCleaningRobotPatrolDestination(Vector3 start, Vector3 targetPosition)
+        {
+            double distance = start.Distance2D(targetPosition);
+            if (distance <= CapturedCleaningRobotPatrolArrivalDistance)
+            {
+                return start;
+            }
+
+            return MoveToward(start, targetPosition, Math.Min(CapturedCleaningRobotPatrolLookaheadDistance, distance));
+        }
+
         private void SetMotionSegment(Vector3 start, Vector3 destination, DateTime now)
         {
             this.followMotionSegment = new NpcMotionSegment
@@ -266,6 +296,11 @@ namespace ZoneEngine.Core.Controllers
 
         private bool ShouldSendMotionSegmentUpdate(Vector3 currentPosition, Vector3 targetPosition, DateTime now)
         {
+            if (this.IsCapturedCleaningRobotIdlePatrol())
+            {
+                return (now - this.lastMotionPacketUtc).TotalSeconds >= CapturedCleaningRobotPatrolUpdateSeconds;
+            }
+
             if (!this.followMotionSegment.Active || !this.hasMotionPacket)
             {
                 return true;
@@ -289,7 +324,9 @@ namespace ZoneEngine.Core.Controllers
 
         private void SendMotionSegmentFollow(string phase, Vector3 start, Vector3 targetPosition, DateTime now)
         {
-            Vector3 destination = this.BuildVisibleFollowDestination(start, targetPosition);
+            Vector3 destination = this.IsCapturedCleaningRobotIdlePatrol()
+                                      ? this.BuildCapturedCleaningRobotPatrolDestination(start, targetPosition)
+                                      : this.BuildVisibleFollowDestination(start, targetPosition);
             if (!this.followIdentity.Equals(Identity.None))
             {
                 this.Run();
@@ -308,13 +345,19 @@ namespace ZoneEngine.Core.Controllers
         private bool TryCompleteCoordinateFollow(Vector3 current, Vector3 targetPosition)
         {
             if (!this.followIdentity.Equals(Identity.None)
-                || current.Distance2D(targetPosition) > CoordinateFollowArrivalDistance)
+                || current.Distance2D(targetPosition)
+                > (this.IsCapturedCleaningRobotIdlePatrol()
+                       ? CapturedCleaningRobotPatrolArrivalDistance
+                       : CoordinateFollowArrivalDistance))
             {
                 return false;
             }
 
             this.StopMovement();
-            this.Character.Coordinates(targetPosition);
+            this.Character.Coordinates(
+                this.IsCapturedCleaningRobotIdlePatrol()
+                    ? current
+                    : targetPosition);
             this.StopFollow();
             return true;
         }
