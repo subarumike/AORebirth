@@ -219,7 +219,7 @@ namespace AORebirth.Core.Playfields
 
         private static readonly TimeSpan CorpseSpawnDelay = TimeSpan.FromMilliseconds(600);
 
-        private const double MaxMeleeCombatDistance = 3.0;
+        private const double MaxMeleeCombatDistance = 5.0;
 
         private const double MaxMeleeFollowHoldDistance = 3.0;
 
