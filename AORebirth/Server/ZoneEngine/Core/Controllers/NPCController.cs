@@ -80,6 +80,12 @@ namespace ZoneEngine.Core.Controllers
 
         private Vector3 lastMotionPacketDestination = new Vector3();
 
+        private CapturedPatrolReplaySegment[] capturedPatrolReplaySegments = new CapturedPatrolReplaySegment[0];
+
+        private int capturedPatrolReplayIndex;
+
+        private DateTime nextCapturedPatrolReplayUtc = DateTime.MinValue;
+
         private bool hasMotionPacket;
 
         private bool suppressMotionSegmentUpdates;
@@ -104,13 +110,30 @@ namespace ZoneEngine.Core.Controllers
 
         private const int CapturedCleaningRobotMonsterData = 297023;
 
-        private const double CapturedCleaningRobotPatrolUpdateSeconds = 0.25;
-
-        private const double CapturedCleaningRobotPatrolLookaheadDistance = 1.15;
-
-        private const double CapturedCleaningRobotPatrolArrivalDistance = 1.0;
-
         public NpcAiProfile AiProfile { get; set; } = NpcAiProfile.Passive;
+
+        public sealed class CapturedPatrolReplaySegment
+        {
+            public CapturedPatrolReplaySegment(
+                double delayAfterSeconds,
+                float startX,
+                float startY,
+                float startZ,
+                float endX,
+                float endY,
+                float endZ)
+            {
+                this.DelayAfterSeconds = delayAfterSeconds;
+                this.Start = new Vector3(startX, startY, startZ);
+                this.End = new Vector3(endX, endY, endZ);
+            }
+
+            public double DelayAfterSeconds { get; private set; }
+
+            public Vector3 Start { get; private set; }
+
+            public Vector3 End { get; private set; }
+        }
 
         private struct NpcMotionSegment
         {
@@ -272,15 +295,52 @@ namespace ZoneEngine.Core.Controllers
                    && this.Character.Stats[StatIds.monsterdata].Value == CapturedCleaningRobotMonsterData;
         }
 
-        private Vector3 BuildCapturedCleaningRobotPatrolDestination(Vector3 start, Vector3 targetPosition)
+        public void SetCapturedPatrolReplaySegments(CapturedPatrolReplaySegment[] segments)
         {
-            double distance = start.Distance2D(targetPosition);
-            if (distance <= CapturedCleaningRobotPatrolArrivalDistance)
+            this.capturedPatrolReplaySegments = segments ?? new CapturedPatrolReplaySegment[0];
+            this.capturedPatrolReplayIndex = 0;
+            this.nextCapturedPatrolReplayUtc = DateTime.MinValue;
+        }
+
+        private bool HasCapturedPatrolReplay()
+        {
+            return this.capturedPatrolReplaySegments != null && this.capturedPatrolReplaySegments.Length > 0;
+        }
+
+        private bool TrySendCapturedPatrolReplay()
+        {
+            if (!this.IsCapturedCleaningRobotIdlePatrol() || !this.HasCapturedPatrolReplay())
             {
-                return start;
+                return false;
             }
 
-            return MoveToward(start, targetPosition, Math.Min(CapturedCleaningRobotPatrolLookaheadDistance, distance));
+            DateTime now = DateTime.UtcNow;
+            if (this.nextCapturedPatrolReplayUtc != DateTime.MinValue && now < this.nextCapturedPatrolReplayUtc)
+            {
+                return true;
+            }
+
+            if (this.capturedPatrolReplayIndex >= this.capturedPatrolReplaySegments.Length)
+            {
+                this.capturedPatrolReplayIndex = 0;
+            }
+
+            CapturedPatrolReplaySegment segment = this.capturedPatrolReplaySegments[this.capturedPatrolReplayIndex];
+            this.Walk();
+            this.followCoordinates = segment.End;
+            this.Character.Coordinates(segment.Start);
+            this.FaceToward(segment.Start, segment.End);
+            this.LogChase("captured-patrol-replay", segment.Start, segment.End);
+            FollowTargetMessageHandler.Default.Send(this.Character, segment.Start, segment.End);
+            this.SetMotionSegment(segment.Start, segment.End, now);
+            this.lastMotionPacketUtc = now;
+            this.lastMotionPacketDestination = segment.End;
+            this.hasMotionPacket = true;
+
+            this.capturedPatrolReplayIndex = (this.capturedPatrolReplayIndex + 1) % this.capturedPatrolReplaySegments.Length;
+            this.nextCapturedPatrolReplayUtc =
+                now + TimeSpan.FromSeconds(Math.Max(0.01, segment.DelayAfterSeconds));
+            return true;
         }
 
         private void SetMotionSegment(Vector3 start, Vector3 destination, DateTime now)
@@ -296,11 +356,6 @@ namespace ZoneEngine.Core.Controllers
 
         private bool ShouldSendMotionSegmentUpdate(Vector3 currentPosition, Vector3 targetPosition, DateTime now)
         {
-            if (this.IsCapturedCleaningRobotIdlePatrol())
-            {
-                return (now - this.lastMotionPacketUtc).TotalSeconds >= CapturedCleaningRobotPatrolUpdateSeconds;
-            }
-
             if (!this.followMotionSegment.Active || !this.hasMotionPacket)
             {
                 return true;
@@ -324,9 +379,7 @@ namespace ZoneEngine.Core.Controllers
 
         private void SendMotionSegmentFollow(string phase, Vector3 start, Vector3 targetPosition, DateTime now)
         {
-            Vector3 destination = this.IsCapturedCleaningRobotIdlePatrol()
-                                      ? this.BuildCapturedCleaningRobotPatrolDestination(start, targetPosition)
-                                      : this.BuildVisibleFollowDestination(start, targetPosition);
+            Vector3 destination = this.BuildVisibleFollowDestination(start, targetPosition);
             if (!this.followIdentity.Equals(Identity.None))
             {
                 this.Run();
@@ -345,19 +398,13 @@ namespace ZoneEngine.Core.Controllers
         private bool TryCompleteCoordinateFollow(Vector3 current, Vector3 targetPosition)
         {
             if (!this.followIdentity.Equals(Identity.None)
-                || current.Distance2D(targetPosition)
-                > (this.IsCapturedCleaningRobotIdlePatrol()
-                       ? CapturedCleaningRobotPatrolArrivalDistance
-                       : CoordinateFollowArrivalDistance))
+                || current.Distance2D(targetPosition) > CoordinateFollowArrivalDistance)
             {
                 return false;
             }
 
             this.StopMovement();
-            this.Character.Coordinates(
-                this.IsCapturedCleaningRobotIdlePatrol()
-                    ? current
-                    : targetPosition);
+            this.Character.Coordinates(targetPosition);
             this.StopFollow();
             return true;
         }
@@ -722,6 +769,11 @@ namespace ZoneEngine.Core.Controllers
 
         public void DoFollow()
         {
+            if (this.TrySendCapturedPatrolReplay())
+            {
+                return;
+            }
+
             Vector3 targetPosition = this.followCoordinates;
             if (!this.followIdentity.Equals(Identity.None))
             {
@@ -772,6 +824,11 @@ namespace ZoneEngine.Core.Controllers
 
         public void StartPatrolling()
         {
+            if (this.TrySendCapturedPatrolReplay())
+            {
+                return;
+            }
+
             Waypoint next = this.FindNextWaypoint();
 
             // If a suitable waypoint is found
