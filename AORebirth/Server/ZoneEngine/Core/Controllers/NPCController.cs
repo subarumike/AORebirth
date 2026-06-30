@@ -100,6 +100,10 @@ namespace ZoneEngine.Core.Controllers
 
         private const double WalkFollowSpeedPerSecond = 1.5;
 
+        private const double CoordinateFollowLookaheadDistance = 1.0;
+
+        private const double CoordinateFollowTargetDelta = 0.3;
+
         public NpcAiProfile AiProfile { get; set; } = NpcAiProfile.Passive;
 
         private struct NpcMotionSegment
@@ -239,6 +243,17 @@ namespace ZoneEngine.Core.Controllers
 
         private Vector3 BuildVisibleFollowDestination(Vector3 start, Vector3 targetPosition)
         {
+            if (this.followIdentity.Equals(Identity.None) && this.followStopDistance <= 0.0)
+            {
+                double coordinateFollowDistance = start.Distance2D(targetPosition);
+                if (coordinateFollowDistance <= CoordinateFollowLookaheadDistance)
+                {
+                    return targetPosition;
+                }
+
+                return MoveToward(start, targetPosition, CoordinateFollowLookaheadDistance);
+            }
+
             if (this.followStopDistance <= 0.0)
             {
                 return targetPosition;
@@ -274,6 +289,17 @@ namespace ZoneEngine.Core.Controllers
             if ((now - this.lastMotionPacketUtc).TotalSeconds < MinVisibleFollowUpdateSeconds)
             {
                 return false;
+            }
+
+            if (this.followIdentity.Equals(Identity.None))
+            {
+                if (currentPosition.Distance2D(this.followMotionSegment.End) <= CoordinateFollowArrivalDistance)
+                {
+                    return true;
+                }
+
+                Vector3 coordinateDestination = this.BuildVisibleFollowDestination(currentPosition, targetPosition);
+                return this.lastMotionPacketDestination.Distance2D(coordinateDestination) >= CoordinateFollowTargetDelta;
             }
 
             Vector3 destination = this.BuildVisibleFollowDestination(currentPosition, targetPosition);
