@@ -80,6 +80,12 @@ namespace AORebirth.Stats.SpecialStats
         {
             get
             {
+                if (this.Stats[StatIds.npcfamily].BaseValue != 0
+                    || this.Stats[StatIds.monsterdata].BaseValue != 0)
+                {
+                    return base.GetBaseValue;
+                }
+
                 // Hitpoints by Profession and TitleLevel
                 int[,] tableProfessionHitPoints =
                 {
