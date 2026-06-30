@@ -2625,17 +2625,6 @@ namespace AORebirth.Core.Playfields
             return GetCombatDistance(attacker, target) <= range;
         }
 
-        public bool CanReachCombatTarget(ICharacter attacker, ICharacter target)
-        {
-            if (attacker == null || target == null)
-            {
-                return false;
-            }
-
-            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
-            return this.IsInCombatRange(attacker, target, attackSource.Range);
-        }
-
         private static AORebirth.Core.Vector.Vector3 GetCombatAttackerPosition(ICharacter character)
         {
             if (character.Controller is PlayerController)
