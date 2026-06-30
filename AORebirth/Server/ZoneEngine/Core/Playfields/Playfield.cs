@@ -564,6 +564,7 @@ namespace AORebirth.Core.Playfields
             AssignCapturedPatrolWaypoints(mobCharacter, spawn);
             npcController.SetCapturedPatrolReplaySegments(GetCapturedCleaningRobotPatrolReplaySegments(spawn.SourceInstance));
             mobCharacter.DoNotDoTimers = false;
+            this.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
