@@ -2545,23 +2545,10 @@ namespace AORebirth.Core.Playfields
 
             if (!this.IsInCombatRange(attacker, target, attackSource.Range))
             {
-                if (attacker.Controller is NPCController)
-                {
-                    this.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
-                    this.nextCombatTicks[attacker.Identity.Instance] =
-                        DateTime.UtcNow + TimeSpan.FromSeconds(OutOfRangeRetrySeconds);
-                }
-                else
-                {
-                    this.StopOutOfRangePlayerAttack(attacker, target);
-                }
-
+                this.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
+                this.nextCombatTicks[attacker.Identity.Instance] =
+                    DateTime.UtcNow + TimeSpan.FromSeconds(OutOfRangeRetrySeconds);
                 return;
-            }
-
-            if (attacker.Controller is PlayerController)
-            {
-                this.EngageNpcTarget(attacker, target);
             }
 
             if (attacker.Controller is NPCController && attackSource.Range <= MaxMeleeCombatDistance)
@@ -2638,60 +2625,15 @@ namespace AORebirth.Core.Playfields
             return GetCombatDistance(attacker, target) <= range;
         }
 
-        private void StopOutOfRangePlayerAttack(ICharacter attacker, ICharacter target)
+        public bool CanReachCombatTarget(ICharacter attacker, ICharacter target)
         {
-            attacker.SetFightingTarget(Identity.None);
-            this.nextCombatTicks.Remove(attacker.Identity.Instance);
-            this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
-            this.lastNpcUnarmedAttackInfoSlots.Remove(attacker.Identity.Instance);
-            this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
-            this.SendCombatStopMessage(attacker);
-
-            if (target != null
-                && target.Controller is NPCController
-                && target.FightingTarget == attacker.Identity)
+            if (attacker == null || target == null)
             {
-                target.SetTarget(Identity.None);
-                target.SetFightingTarget(Identity.None);
-                this.nextCombatTicks.Remove(target.Identity.Instance);
-                this.lastCombatWeaponSlots.Remove(target.Identity.Instance);
-                this.lastNpcUnarmedAttackInfoSlots.Remove(target.Identity.Instance);
-                this.lastNpcSpecialAttackWeaponTargets.Remove(target.Identity.Instance);
-                ((NPCController)target.Controller).StopFollow();
-                this.SendCombatStopMessage(target);
+                return false;
             }
 
-            LogUtil.Debug(
-                DebugInfoDetail.Network,
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Combat player attack stopped out-of-range attacker={0} target={1}",
-                    attacker.Identity,
-                    target == null ? Identity.None : target.Identity));
-        }
-
-        private void EngageNpcTarget(ICharacter character, ICharacter target)
-        {
-            NPCController npcController = target.Controller as NPCController;
-            if (npcController == null
-                || npcController.KnuBot != null
-                || !NpcAiProfiles.CanRetaliate(npcController.AiProfile)
-                || target.Stats[StatIds.health].Value <= 0
-                || target.FightingTarget.Instance != 0)
-            {
-                return;
-            }
-
-            target.SetTarget(character.Identity);
-            target.SetFightingTarget(character.Identity);
-            this.ResetCombatTick(target.Identity);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Network,
-                string.Format(
-                    "NPC combat engaged attacker={0} npc={1}",
-                    character.Identity.ToString(true),
-                    target.Identity.ToString(true)));
+            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
+            return this.IsInCombatRange(attacker, target, attackSource.Range);
         }
 
         private static AORebirth.Core.Vector.Vector3 GetCombatAttackerPosition(ICharacter character)

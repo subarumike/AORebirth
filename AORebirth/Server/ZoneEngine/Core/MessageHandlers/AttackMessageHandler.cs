@@ -89,8 +89,18 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             character.SetTarget(message.Target);
+            if (!this.CanReachTarget(character, target))
+            {
+                character.SetFightingTarget(Identity.None);
+                this.ResetCombatTick(character);
+                this.SendAttackState(character, Identity.None, 0);
+                client.Server.Info(client, "Attack ignored because target is out of range.");
+                return;
+            }
+
             character.SetFightingTarget(message.Target);
             this.ResetCombatTick(character);
+            this.EngageNpcTarget(character, target);
             this.SendAttackState(character, message.Target, message.Action);
         }
 
@@ -108,6 +118,36 @@ namespace ZoneEngine.Core.MessageHandlers
             return target != null
                    && (target.Stats[StatIds.flags].Value & SimpleCharFullUpdateIsImmuneFlag)
                    == SimpleCharFullUpdateIsImmuneFlag;
+        }
+
+        private bool CanReachTarget(ICharacter character, ICharacter target)
+        {
+            Playfield playfield = character.Playfield as Playfield;
+            return playfield == null || playfield.CanReachCombatTarget(character, target);
+        }
+
+        private void EngageNpcTarget(ICharacter character, ICharacter target)
+        {
+            NPCController npcController = target.Controller as NPCController;
+            if (npcController == null
+                || npcController.KnuBot != null
+                || !NpcAiProfiles.CanRetaliate(npcController.AiProfile)
+                || target.Stats[StatIds.health].Value <= 0
+                || target.FightingTarget.Instance != 0)
+            {
+                return;
+            }
+
+            target.SetTarget(character.Identity);
+            target.SetFightingTarget(character.Identity);
+            this.ResetCombatTick(target);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "NPC combat engaged attacker={0} npc={1}",
+                    character.Identity.ToString(true),
+                    target.Identity.ToString(true)));
         }
 
         private void SendAttackState(ICharacter character, Identity target, byte action)
