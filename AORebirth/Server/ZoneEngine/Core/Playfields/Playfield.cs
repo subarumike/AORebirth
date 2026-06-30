@@ -219,7 +219,7 @@ namespace AORebirth.Core.Playfields
 
         private static readonly TimeSpan CorpseSpawnDelay = TimeSpan.FromMilliseconds(600);
 
-        private const double MaxMeleeCombatDistance = 8.0;
+        private const double MaxMeleeCombatDistance = 3.0;
 
         private const double MaxMeleeFollowHoldDistance = 3.0;
 
@@ -2625,13 +2625,21 @@ namespace AORebirth.Core.Playfields
             return GetCombatDistance(attacker, target) <= range;
         }
 
+        private static AORebirth.Core.Vector.Vector3 GetCombatAttackerPosition(ICharacter character)
+        {
+            if (character.Controller is PlayerController)
+            {
+                return GetRawCombatPosition(character);
+            }
+
+            return GetCombatPosition(character);
+        }
+
         private static AORebirth.Core.Vector.Vector3 GetCombatPosition(ICharacter character)
         {
             if (character.Controller is PlayerController)
             {
-                Vector3 raw = character.RawCoordinates;
-                AORebirth.Core.Vector.Vector3 rawPosition =
-                    new AORebirth.Core.Vector.Vector3(raw.X, raw.Y, raw.Z);
+                AORebirth.Core.Vector.Vector3 rawPosition = GetRawCombatPosition(character);
                 AORebirth.Core.Vector.Vector3 predictedPosition = character.Coordinates().coordinate;
                 return MoveCombatPositionToward(
                     rawPosition,
@@ -2640,6 +2648,12 @@ namespace AORebirth.Core.Playfields
             }
 
             return character.Coordinates().coordinate;
+        }
+
+        private static AORebirth.Core.Vector.Vector3 GetRawCombatPosition(ICharacter character)
+        {
+            Vector3 raw = character.RawCoordinates;
+            return new AORebirth.Core.Vector.Vector3(raw.X, raw.Y, raw.Z);
         }
 
         private static AORebirth.Core.Vector.Vector3 MoveCombatPositionToward(
@@ -2663,7 +2677,7 @@ namespace AORebirth.Core.Playfields
 
         private static double GetCombatDistance(ICharacter attacker, ICharacter target)
         {
-            return GetCombatPosition(attacker).Distance2D(GetCombatPosition(target));
+            return GetCombatAttackerPosition(attacker).Distance2D(GetCombatPosition(target));
         }
 
         private static double BuildNpcCombatStopDistance(double range)
