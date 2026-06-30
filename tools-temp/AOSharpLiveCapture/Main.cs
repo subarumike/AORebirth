@@ -104,6 +104,7 @@ namespace AOSharpLiveCapture
         private StreamWriter enemyFullUpdatesLog;
         private StreamWriter enemyCombatLog;
         private StreamWriter enemyMovementLog;
+        private StreamWriter movementPacketsLog;
         private StreamWriter enemyStatUpdatesLog;
         private StreamWriter enemyFightEventsLog;
         private bool enabled;
@@ -132,6 +133,12 @@ namespace AOSharpLiveCapture
         private int enemyFullUpdateRowCount;
         private int enemyCombatRowCount;
         private int enemyMovementRowCount;
+        private int movementPacketRowCount;
+        private int movementFollowTargetPacketCount;
+        private int movementUsableFollowTargetPacketCount;
+        private int movementSetPosPacketCount;
+        private int movementStopMovingCmdPacketCount;
+        private int movementDecodeErrorCount;
         private int enemyStatUpdateRowCount;
         private DateTime nextFlushUtc;
         private DateTime nextSnapshotUtc;
@@ -185,11 +192,14 @@ namespace AOSharpLiveCapture
             this.enemyCombatLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail");
             this.enemyMovementLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-movement.csv"));
             this.enemyMovementLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,MoveType,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,Unknown1,Unknown2,Unknown3,Detail");
+            this.movementPacketsLog = CreateWriter(Path.Combine(this.sessionDirectory, "movement-packets.csv"));
+            this.movementPacketsLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,SourceType,SourceInstance,SourceIdentity,SourceName,TargetType,TargetInstance,TargetIdentity,TargetName,FollowKind,CurrentX,CurrentY,CurrentZ,DestinationX,DestinationY,DestinationZ,Speed,Animation,Flags,PathCount,RawParams,RawTailHex");
             this.enemyStatUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-stat-updates.csv"));
             this.enemyStatUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,Stat,StatId,Value,PositionX,PositionY,PositionZ,StatsCount,Detail");
             this.enemyFightEventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-fight-events.log"));
             this.WriteEnemyStateJson();
             this.WriteEnemyDossierJson();
+            this.WriteMovementSummaryJson();
             this.WriteCaptureSessionMetadata(this.captureStartUtc, this.captureStartLocal);
             this.WriteCaptureInfo(null, CaptureValidation.Running());
             this.enabled = true;
@@ -226,6 +236,7 @@ namespace AOSharpLiveCapture
             this.LogEvent("PLUGIN", "Enemy full update CSV: " + Path.Combine(this.sessionDirectory, "enemy-full-updates.csv"));
             this.LogEvent("PLUGIN", "Enemy combat CSV: " + Path.Combine(this.sessionDirectory, "enemy-combat.csv"));
             this.LogEvent("PLUGIN", "Enemy movement CSV: " + Path.Combine(this.sessionDirectory, "enemy-movement.csv"));
+            this.LogEvent("PLUGIN", "Movement packet CSV: " + Path.Combine(this.sessionDirectory, "movement-packets.csv"));
             this.LogEvent("PLUGIN", "Enemy stat update CSV: " + Path.Combine(this.sessionDirectory, "enemy-stat-updates.csv"));
             this.LogEvent("PLUGIN", "Enemy fight events log: " + Path.Combine(this.sessionDirectory, "enemy-fight-events.log"));
             this.LogEvent("PLUGIN", "Enemy dossier JSON: " + Path.Combine(this.sessionDirectory, "enemy-dossier.json"));
@@ -310,6 +321,7 @@ namespace AOSharpLiveCapture
                     this.Flush();
                     this.WriteEnemyStateJson();
                     this.WriteEnemyDossierJson();
+                    this.WriteMovementSummaryJson();
                     CaptureValidation stopValidation = this.ValidateCapture();
                     this.WriteCaptureHealth(stopValidation);
                     this.WriteCaptureInfo(DateTime.UtcNow, stopValidation);
@@ -1081,6 +1093,463 @@ namespace AOSharpLiveCapture
                         packet == null ? 0 : packet.Length,
                         this.DescribeRawPacket(packet),
                         ToHex(packet)));
+            }
+
+            this.ExportMovementPacket(direction, sequence, packet);
+        }
+
+        private void ExportMovementPacket(string direction, int sequence, byte[] packet)
+        {
+            if (packet == null || packet.Length < 29)
+            {
+                return;
+            }
+
+            try
+            {
+                int messageType = ReadInt32BigEndian(packet, 16);
+                if (messageType == (int)N3MessageType.FollowTarget)
+                {
+                    this.ExportFollowTargetPacket(direction, sequence, packet);
+                    return;
+                }
+
+                if (messageType == (int)N3MessageType.SetPos)
+                {
+                    this.ExportSetPosPacket(direction, sequence, packet);
+                    return;
+                }
+
+                if (messageType == (int)N3MessageType.StopMovingCmd)
+                {
+                    this.ExportStopMovingCmdPacket(direction, sequence, packet);
+                }
+            }
+            catch (Exception ex)
+            {
+                lock (this.syncRoot)
+                {
+                    this.movementDecodeErrorCount++;
+                }
+
+                if (this.movementDecodeErrorCount <= 5)
+                {
+                    this.LogEvent(
+                        "MOVEMENT-DECODE-ERROR",
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "{0} #{1}: {2}",
+                            direction,
+                            sequence,
+                            ex.Message));
+                }
+            }
+        }
+
+        private void ExportFollowTargetPacket(string direction, int sequence, byte[] packet)
+        {
+            uint sourceType;
+            uint sourceInstance;
+            if (!TryReadRawIdentity(packet, 20, out sourceType, out sourceInstance))
+            {
+                return;
+            }
+
+            byte baseUnknown = packet[28];
+            if (packet.Length < 31)
+            {
+                this.WriteMovementPacketRow(
+                    direction,
+                    sequence,
+                    "FollowTarget",
+                    sourceType,
+                    sourceInstance,
+                    this.ResolveDynelName(sourceType, sourceInstance),
+                    null,
+                    null,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    "base_unknown=" + baseUnknown.ToString(CultureInfo.InvariantCulture),
+                    string.Empty,
+                    "base_unknown=" + baseUnknown.ToString(CultureInfo.InvariantCulture),
+                    GetRawTailHex(packet, 29));
+                return;
+            }
+
+            byte followType = packet[29];
+            byte followUnknown = packet[30];
+            string flags = string.Format(
+                CultureInfo.InvariantCulture,
+                "base_unknown={0};follow_type={1};follow_unknown={2}",
+                baseUnknown,
+                followType,
+                followUnknown);
+
+            lock (this.syncRoot)
+            {
+                this.movementFollowTargetPacketCount++;
+            }
+
+            if (followType == 1)
+            {
+                this.ExportFollowTargetNpcPathPacket(direction, sequence, packet, sourceType, sourceInstance, followUnknown, flags);
+                return;
+            }
+
+            if (followType == 2)
+            {
+                this.ExportFollowTargetTargetPacket(direction, sequence, packet, sourceType, sourceInstance, followUnknown, flags);
+                return;
+            }
+
+            this.WriteMovementPacketRow(
+                direction,
+                sequence,
+                "FollowTarget",
+                sourceType,
+                sourceInstance,
+                this.ResolveDynelName(sourceType, sourceInstance),
+                null,
+                null,
+                "Type" + followType.ToString(CultureInfo.InvariantCulture),
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                followUnknown.ToString(CultureInfo.InvariantCulture),
+                flags,
+                string.Empty,
+                flags,
+                GetRawTailHex(packet, 31));
+        }
+
+        private void ExportFollowTargetNpcPathPacket(
+            string direction,
+            int sequence,
+            byte[] packet,
+            uint sourceType,
+            uint sourceInstance,
+            byte followUnknown,
+            string flags)
+        {
+            if (packet.Length < 32)
+            {
+                this.WriteMovementPacketRow(
+                    direction,
+                    sequence,
+                    "FollowTarget",
+                    sourceType,
+                    sourceInstance,
+                    this.ResolveDynelName(sourceType, sourceInstance),
+                    null,
+                    null,
+                    "NpcPath",
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    followUnknown.ToString(CultureInfo.InvariantCulture),
+                    flags,
+                    string.Empty,
+                    flags + ";path_count=missing",
+                    string.Empty);
+                return;
+            }
+
+            int pathCount = packet[31];
+            int coordinateOffset = 32;
+            int availableCoordinates = Math.Max(0, (packet.Length - coordinateOffset) / 12);
+            int decodedCoordinates = Math.Min(pathCount, availableCoordinates);
+            int tailOffset = coordinateOffset + decodedCoordinates * 12;
+
+            float? currentX = null;
+            float? currentY = null;
+            float? currentZ = null;
+            float? destinationX = null;
+            float? destinationY = null;
+            float? destinationZ = null;
+
+            if (decodedCoordinates > 0)
+            {
+                currentX = ReadSingleBigEndian(packet, coordinateOffset);
+                currentY = ReadSingleBigEndian(packet, coordinateOffset + 4);
+                currentZ = ReadSingleBigEndian(packet, coordinateOffset + 8);
+
+                int destinationOffset = coordinateOffset + (decodedCoordinates - 1) * 12;
+                destinationX = ReadSingleBigEndian(packet, destinationOffset);
+                destinationY = ReadSingleBigEndian(packet, destinationOffset + 4);
+                destinationZ = ReadSingleBigEndian(packet, destinationOffset + 8);
+            }
+
+            if (pathCount > 0 && decodedCoordinates == pathCount)
+            {
+                lock (this.syncRoot)
+                {
+                    this.movementUsableFollowTargetPacketCount++;
+                }
+            }
+
+            string rawParams = string.Format(
+                CultureInfo.InvariantCulture,
+                "{0};path_count={1};decoded_path_count={2}",
+                flags,
+                pathCount,
+                decodedCoordinates);
+            if (decodedCoordinates != pathCount)
+            {
+                rawParams += ";truncated=true";
+            }
+
+            this.WriteMovementPacketRow(
+                direction,
+                sequence,
+                "FollowTarget",
+                sourceType,
+                sourceInstance,
+                this.ResolveDynelName(sourceType, sourceInstance),
+                null,
+                null,
+                "NpcPath",
+                FormatNullableFloat(currentX),
+                FormatNullableFloat(currentY),
+                FormatNullableFloat(currentZ),
+                FormatNullableFloat(destinationX),
+                FormatNullableFloat(destinationY),
+                FormatNullableFloat(destinationZ),
+                string.Empty,
+                followUnknown.ToString(CultureInfo.InvariantCulture),
+                flags,
+                pathCount.ToString(CultureInfo.InvariantCulture),
+                rawParams,
+                GetRawTailHex(packet, tailOffset));
+        }
+
+        private void ExportFollowTargetTargetPacket(
+            string direction,
+            int sequence,
+            byte[] packet,
+            uint sourceType,
+            uint sourceInstance,
+            byte followUnknown,
+            string flags)
+        {
+            uint targetType;
+            uint targetInstance;
+            uint? nullableTargetType = null;
+            uint? nullableTargetInstance = null;
+            string rawParams = flags;
+            int tailOffset = 31;
+
+            if (TryReadRawIdentity(packet, 31, out targetType, out targetInstance))
+            {
+                nullableTargetType = targetType;
+                nullableTargetInstance = targetInstance;
+                tailOffset = 39;
+                rawParams += ";target=" + FormatRawIdentity(targetType, targetInstance);
+            }
+
+            if (packet.Length >= 55)
+            {
+                rawParams += string.Format(
+                    CultureInfo.InvariantCulture,
+                    ";target_unknown1={0};target_unknown2={1};target_unknown3={2};target_unknown4={3}",
+                    ReadInt32BigEndian(packet, 39),
+                    ReadInt32BigEndian(packet, 43),
+                    ReadInt32BigEndian(packet, 47),
+                    ReadInt32BigEndian(packet, 51));
+                tailOffset = 55;
+            }
+
+            this.WriteMovementPacketRow(
+                direction,
+                sequence,
+                "FollowTarget",
+                sourceType,
+                sourceInstance,
+                this.ResolveDynelName(sourceType, sourceInstance),
+                nullableTargetType,
+                nullableTargetInstance,
+                "Target",
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                followUnknown.ToString(CultureInfo.InvariantCulture),
+                flags,
+                string.Empty,
+                rawParams,
+                GetRawTailHex(packet, tailOffset));
+        }
+
+        private void ExportSetPosPacket(string direction, int sequence, byte[] packet)
+        {
+            if (packet.Length < 41)
+            {
+                return;
+            }
+
+            uint sourceType;
+            uint sourceInstance;
+            if (!TryReadRawIdentity(packet, 20, out sourceType, out sourceInstance))
+            {
+                return;
+            }
+
+            byte baseUnknown = packet[28];
+            string flags = "base_unknown=" + baseUnknown.ToString(CultureInfo.InvariantCulture);
+
+            lock (this.syncRoot)
+            {
+                this.movementSetPosPacketCount++;
+            }
+
+            this.WriteMovementPacketRow(
+                direction,
+                sequence,
+                "SetPos",
+                sourceType,
+                sourceInstance,
+                this.ResolveDynelName(sourceType, sourceInstance),
+                null,
+                null,
+                string.Empty,
+                FormatFloat(ReadSingleBigEndian(packet, 29)),
+                FormatFloat(ReadSingleBigEndian(packet, 33)),
+                FormatFloat(ReadSingleBigEndian(packet, 37)),
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                flags,
+                string.Empty,
+                flags,
+                GetRawTailHex(packet, 41));
+        }
+
+        private void ExportStopMovingCmdPacket(string direction, int sequence, byte[] packet)
+        {
+            if (packet.Length < 41)
+            {
+                return;
+            }
+
+            uint sourceType;
+            uint sourceInstance;
+            if (!TryReadRawIdentity(packet, 20, out sourceType, out sourceInstance))
+            {
+                return;
+            }
+
+            byte baseUnknown = packet[28];
+            string rawParams = string.Format(
+                CultureInfo.InvariantCulture,
+                "base_unknown={0};unknown1={1};unknown2={2};unknown3={3}",
+                baseUnknown,
+                ReadInt32BigEndian(packet, 29),
+                ReadInt32BigEndian(packet, 33),
+                ReadInt32BigEndian(packet, 37));
+
+            lock (this.syncRoot)
+            {
+                this.movementStopMovingCmdPacketCount++;
+            }
+
+            this.WriteMovementPacketRow(
+                direction,
+                sequence,
+                "StopMovingCmd",
+                sourceType,
+                sourceInstance,
+                this.ResolveDynelName(sourceType, sourceInstance),
+                null,
+                null,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                "base_unknown=" + baseUnknown.ToString(CultureInfo.InvariantCulture),
+                string.Empty,
+                rawParams,
+                GetRawTailHex(packet, 41));
+        }
+
+        private void WriteMovementPacketRow(
+            string direction,
+            int sequence,
+            string messageType,
+            uint sourceType,
+            uint sourceInstance,
+            string sourceName,
+            uint? targetType,
+            uint? targetInstance,
+            string followKind,
+            string currentX,
+            string currentY,
+            string currentZ,
+            string destinationX,
+            string destinationY,
+            string destinationZ,
+            string speed,
+            string animation,
+            string flags,
+            string pathCount,
+            string rawParams,
+            string rawTailHex)
+        {
+            lock (this.syncRoot)
+            {
+                this.movementPacketRowCount++;
+                this.movementPacketsLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv(direction),
+                        sequence.ToString(CultureInfo.InvariantCulture),
+                        Csv(messageType),
+                        Csv(FormatRawIdentityType(sourceType)),
+                        Csv(FormatRawInstance(sourceInstance)),
+                        Csv(FormatRawIdentity(sourceType, sourceInstance)),
+                        Csv(sourceName),
+                        Csv(targetType.HasValue ? FormatRawIdentityType(targetType.Value) : string.Empty),
+                        Csv(targetInstance.HasValue ? FormatRawInstance(targetInstance.Value) : string.Empty),
+                        Csv(targetType.HasValue && targetInstance.HasValue ? FormatRawIdentity(targetType.Value, targetInstance.Value) : string.Empty),
+                        Csv(targetType.HasValue && targetInstance.HasValue ? this.ResolveDynelName(targetType.Value, targetInstance.Value) : string.Empty),
+                        Csv(followKind),
+                        Csv(currentX),
+                        Csv(currentY),
+                        Csv(currentZ),
+                        Csv(destinationX),
+                        Csv(destinationY),
+                        Csv(destinationZ),
+                        Csv(speed),
+                        Csv(animation),
+                        Csv(flags),
+                        Csv(pathCount),
+                        Csv(rawParams),
+                        Csv(rawTailHex)));
+                this.movementPacketsLog.Flush();
             }
         }
 
@@ -2800,6 +3269,7 @@ namespace AOSharpLiveCapture
             this.Flush();
             this.WriteEnemyStateJson();
             this.WriteEnemyDossierJson();
+            this.WriteMovementSummaryJson();
 
             CaptureValidation validation = this.ValidateCapture();
             this.WriteCaptureHealth(validation);
@@ -2875,6 +3345,33 @@ namespace AOSharpLiveCapture
             else if (this.enemyCombatEventCount == 0 && this.enemyCombatRowCount == 0)
             {
                 notes.Add("No enemy combat packets were observed.");
+            }
+
+            if (this.movementFollowTargetPacketCount > 0 && this.movementUsableFollowTargetPacketCount == 0)
+            {
+                issues.Add("FollowTarget packets were observed, but none decoded with usable path coordinates.");
+            }
+            else if (this.movementUsableFollowTargetPacketCount > 0)
+            {
+                notes.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "FollowTarget movement decode usable: {0}/{1} packets had source and path coordinates.",
+                        this.movementUsableFollowTargetPacketCount,
+                        this.movementFollowTargetPacketCount));
+            }
+            else
+            {
+                notes.Add("No FollowTarget movement packets were observed.");
+            }
+
+            if (this.movementDecodeErrorCount > 0)
+            {
+                notes.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Movement packet decode errors: {0}.",
+                        this.movementDecodeErrorCount));
             }
 
             string status = issues.Count == 0 ? "complete" : "incomplete";
@@ -3095,6 +3592,51 @@ namespace AOSharpLiveCapture
             }
         }
 
+        private void WriteMovementSummaryJson()
+        {
+            try
+            {
+                string path = Path.Combine(this.sessionDirectory, "movement-summary.json");
+                StringBuilder json = new StringBuilder();
+                json.AppendLine("{");
+                json.Append("  \"generatedUtc\": ");
+                json.Append(Json(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)));
+                json.AppendLine(",");
+                json.Append("  \"movementPacketsCsv\": ");
+                json.Append(Json(Path.Combine(this.sessionDirectory, "movement-packets.csv")));
+                json.AppendLine(",");
+                json.Append("  \"followTargetDecodedWithUsablePath\": ");
+                json.Append(this.movementUsableFollowTargetPacketCount > 0 ? "true" : "false");
+                json.AppendLine(",");
+                json.AppendLine("  \"counts\": {");
+                json.Append("    \"movementPacketRows\": ");
+                json.Append(this.movementPacketRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"followTargetPackets\": ");
+                json.Append(this.movementFollowTargetPacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"usableFollowTargetPackets\": ");
+                json.Append(this.movementUsableFollowTargetPacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"setPosPackets\": ");
+                json.Append(this.movementSetPosPacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"stopMovingCmdPackets\": ");
+                json.Append(this.movementStopMovingCmdPacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"decodeErrors\": ");
+                json.Append(this.movementDecodeErrorCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine();
+                json.AppendLine("  }");
+                json.AppendLine("}");
+                File.WriteAllText(path, json.ToString(), Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                this.LogEvent("MOVEMENT-SUMMARY-ERROR", ex.ToString());
+            }
+        }
+
         private void WriteCaptureInfo(DateTime? captureEndUtc, CaptureValidation validation)
         {
             try
@@ -3190,6 +3732,24 @@ namespace AOSharpLiveCapture
                 json.AppendLine(",");
                 json.Append("    \"enemyMovementRows\": ");
                 json.Append(this.enemyMovementRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"movementPacketRows\": ");
+                json.Append(this.movementPacketRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"movementFollowTargetPackets\": ");
+                json.Append(this.movementFollowTargetPacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"movementUsableFollowTargetPackets\": ");
+                json.Append(this.movementUsableFollowTargetPacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"movementSetPosPackets\": ");
+                json.Append(this.movementSetPosPacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"movementStopMovingCmdPackets\": ");
+                json.Append(this.movementStopMovingCmdPacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"movementDecodeErrors\": ");
+                json.Append(this.movementDecodeErrorCount.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine(",");
                 json.Append("    \"enemyStatUpdateRows\": ");
                 json.Append(this.enemyStatUpdateRowCount.ToString(CultureInfo.InvariantCulture));
@@ -3615,6 +4175,99 @@ namespace AOSharpLiveCapture
             return "n3=" + typeName;
         }
 
+        private string ResolveDynelName(uint identityType, uint identityInstance)
+        {
+            try
+            {
+                if (DynelManager.AllDynels == null)
+                {
+                    return string.Empty;
+                }
+
+                foreach (Dynel dynel in DynelManager.AllDynels)
+                {
+                    if (dynel == null)
+                    {
+                        continue;
+                    }
+
+                    uint dynelType = unchecked((uint)(int)dynel.Identity.Type);
+                    uint dynelInstance = unchecked((uint)dynel.Identity.Instance);
+                    if (dynelType == identityType && dynelInstance == identityInstance)
+                    {
+                        return dynel.Name;
+                    }
+                }
+            }
+            catch
+            {
+                return string.Empty;
+            }
+
+            return string.Empty;
+        }
+
+        private static bool TryReadRawIdentity(byte[] bytes, int offset, out uint identityType, out uint identityInstance)
+        {
+            identityType = 0;
+            identityInstance = 0;
+            if (bytes == null || offset < 0 || bytes.Length < offset + 8)
+            {
+                return false;
+            }
+
+            identityType = ReadUInt32BigEndian(bytes, offset);
+            identityInstance = ReadUInt32BigEndian(bytes, offset + 4);
+            return true;
+        }
+
+        private static string FormatRawIdentity(uint identityType, uint identityInstance)
+        {
+            return FormatRawIdentityType(identityType) + ":" + FormatRawInstance(identityInstance);
+        }
+
+        private static string FormatRawIdentityType(uint identityType)
+        {
+            if (identityType <= int.MaxValue && Enum.IsDefined(typeof(IdentityType), (int)identityType))
+            {
+                return ((IdentityType)(int)identityType).ToString();
+            }
+
+            return identityType.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private static string FormatRawInstance(uint identityInstance)
+        {
+            return identityInstance.ToString("X8", CultureInfo.InvariantCulture);
+        }
+
+        private static string FormatNullableFloat(float? value)
+        {
+            return value.HasValue ? FormatFloat(value.Value) : string.Empty;
+        }
+
+        private static string FormatFloat(float value)
+        {
+            return value.ToString("G9", CultureInfo.InvariantCulture);
+        }
+
+        private static string GetRawTailHex(byte[] bytes, int offset)
+        {
+            if (bytes == null || offset >= bytes.Length)
+            {
+                return string.Empty;
+            }
+
+            if (offset < 0)
+            {
+                offset = 0;
+            }
+
+            byte[] tail = new byte[bytes.Length - offset];
+            Buffer.BlockCopy(bytes, offset, tail, 0, tail.Length);
+            return ToHex(tail);
+        }
+
         private string DescribeDynel(Dynel dynel)
         {
             if (dynel == null)
@@ -3979,6 +4632,7 @@ namespace AOSharpLiveCapture
                 this.enemyFullUpdatesLog.Flush();
                 this.enemyCombatLog.Flush();
                 this.enemyMovementLog.Flush();
+                this.movementPacketsLog.Flush();
                 this.enemyStatUpdatesLog.Flush();
                 this.enemyFightEventsLog.Flush();
             }
@@ -4000,6 +4654,7 @@ namespace AOSharpLiveCapture
                 this.enemyFullUpdatesLog?.Flush();
                 this.enemyCombatLog?.Flush();
                 this.enemyMovementLog?.Flush();
+                this.movementPacketsLog?.Flush();
                 this.enemyStatUpdatesLog?.Flush();
                 this.enemyFightEventsLog?.Flush();
                 this.eventsLog?.Dispose();
@@ -4014,6 +4669,7 @@ namespace AOSharpLiveCapture
                 this.enemyFullUpdatesLog?.Dispose();
                 this.enemyCombatLog?.Dispose();
                 this.enemyMovementLog?.Dispose();
+                this.movementPacketsLog?.Dispose();
                 this.enemyStatUpdatesLog?.Dispose();
                 this.enemyFightEventsLog?.Dispose();
                 this.eventsLog = null;
@@ -4028,6 +4684,7 @@ namespace AOSharpLiveCapture
                 this.enemyFullUpdatesLog = null;
                 this.enemyCombatLog = null;
                 this.enemyMovementLog = null;
+                this.movementPacketsLog = null;
                 this.enemyStatUpdatesLog = null;
                 this.enemyFightEventsLog = null;
             }
@@ -4270,12 +4927,30 @@ namespace AOSharpLiveCapture
             return result.ToString();
         }
 
+        private static uint ReadUInt32BigEndian(byte[] bytes, int offset)
+        {
+            return ((uint)bytes[offset] << 24)
+                | ((uint)bytes[offset + 1] << 16)
+                | ((uint)bytes[offset + 2] << 8)
+                | bytes[offset + 3];
+        }
+
         private static int ReadInt32BigEndian(byte[] bytes, int offset)
         {
             return (bytes[offset] << 24)
                 | (bytes[offset + 1] << 16)
                 | (bytes[offset + 2] << 8)
                 | bytes[offset + 3];
+        }
+
+        private static float ReadSingleBigEndian(byte[] bytes, int offset)
+        {
+            byte[] value = new byte[4];
+            value[0] = bytes[offset + 3];
+            value[1] = bytes[offset + 2];
+            value[2] = bytes[offset + 1];
+            value[3] = bytes[offset];
+            return BitConverter.ToSingle(value, 0);
         }
     }
 }
