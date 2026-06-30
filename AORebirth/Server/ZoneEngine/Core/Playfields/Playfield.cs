@@ -235,6 +235,8 @@ namespace AORebirth.Core.Playfields
 
         private const double CapturedCleaningRobotFollowStopDistance = 0.0;
 
+        private const double CapturedCleaningRobotCombatTickSeconds = 2.7;
+
         private const int CapturedCleaningRobotRightHandDamage = 10;
 
         private const int CapturedCleaningRobotLeftHandDamage = 8;
@@ -272,13 +274,13 @@ namespace AORebirth.Core.Playfields
 
         private static readonly CapturedMobSpawn[] CapturedAreteCleaningRobotSpawns =
         {
-            new CapturedMobSpawn(0x79225E7C, 3617.86938f, 51.7449989f, 784.657471f, 12, 1, 5, 3622.77563f, 52.5f, 798.800964f),
-            new CapturedMobSpawn(0x79225E78, 3607.81494f, 52.1349983f, 782.811768f, 12, 1, 5, 3610.72632f, 52.5f, 777.876892f),
-            new CapturedMobSpawn(0x79225E77, 3620.60229f, 51.7449989f, 799.248657f, 12, 1, 5, 3602.23779f, 52.5f, 787.8172f),
-            new CapturedMobSpawn(0x79225E7D, 3605.55493f, 51.7449989f, 773.164246f, 12, 1, 5, 3602.2915f, 52.5f, 787.929504f),
-            new CapturedMobSpawn(0x79225E7A, 3597.80811f, 51.7449989f, 773.061829f, 12, 1, 5, 3596.97949f, 52.5f, 772.299316f),
-            new CapturedMobSpawn(0x79225E79, 3606.77197f, 53.2449989f, 801.493652f, 12, 1, 5, 3597.17847f, 52.5f, 772.241089f),
-            new CapturedMobSpawn(0x79225E76, 3595.23218f, 51.7449989f, 799.648132f, 12, 1, 5, 3594.29102f, 52.5f, 800.072754f)
+            new CapturedMobSpawn(0x79225E7C, 3617.86938f, 51.7449989f, 784.657471f, 12, 1, 6, 3622.77563f, 52.5f, 798.800964f),
+            new CapturedMobSpawn(0x79225E78, 3607.81494f, 52.1349983f, 782.811768f, 12, 1, 6, 3610.72632f, 52.5f, 777.876892f),
+            new CapturedMobSpawn(0x79225E77, 3620.60229f, 51.7449989f, 799.248657f, 12, 1, 6, 3602.23779f, 52.5f, 787.8172f),
+            new CapturedMobSpawn(0x79225E7D, 3605.55493f, 51.7449989f, 773.164246f, 12, 1, 6, 3602.2915f, 52.5f, 787.929504f),
+            new CapturedMobSpawn(0x79225E7A, 3597.80811f, 51.7449989f, 773.061829f, 12, 1, 6, 3596.97949f, 52.5f, 772.299316f),
+            new CapturedMobSpawn(0x79225E79, 3606.77197f, 53.2449989f, 801.493652f, 12, 1, 6, 3597.17847f, 52.5f, 772.241089f),
+            new CapturedMobSpawn(0x79225E76, 3595.23218f, 51.7449989f, 799.648132f, 12, 1, 6, 3594.29102f, 52.5f, 800.072754f)
         };
 
         private const string CapturedCleaningRobotPatrolReplayRelativePath =
@@ -2289,7 +2291,17 @@ namespace AORebirth.Core.Playfields
 
         public void ResetCombatTick(Identity attacker)
         {
-            this.nextCombatTicks.Remove(attacker.Instance);
+            ICharacter character = this.FindByIdentity<ICharacter>(attacker);
+            if (IsCapturedCleaningRobot(character))
+            {
+                this.nextCombatTicks[attacker.Instance] =
+                    DateTime.UtcNow + TimeSpan.FromSeconds(CapturedCleaningRobotCombatTickSeconds);
+            }
+            else
+            {
+                this.nextCombatTicks.Remove(attacker.Instance);
+            }
+
             this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Instance);
         }
 
@@ -2511,9 +2523,22 @@ namespace AORebirth.Core.Playfields
 
             CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
             DateTime nextTick;
+            DateTime now = DateTime.UtcNow;
             if (this.nextCombatTicks.TryGetValue(attacker.Identity.Instance, out nextTick)
-                && nextTick > DateTime.UtcNow)
+                && nextTick > now)
             {
+                if (IsCapturedCleaningRobot(attacker) && attacker.Controller is NPCController)
+                {
+                    if (!this.IsInCombatRange(attacker, target, attackSource.Range))
+                    {
+                        this.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
+                    }
+                    else if (attackSource.Range <= MaxMeleeCombatDistance)
+                    {
+                        this.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);
+                    }
+                }
+
                 return;
             }
 
@@ -2903,7 +2928,9 @@ namespace AORebirth.Core.Playfields
                            MaxDamage = attackInfoDamage,
                            DamageBonus = NormalizeCombatItemStat(attacker.Stats[StatIds.damagebonus].Value, 0),
                            Range = MaxMeleeCombatDistance,
-                           RechargeSeconds = DefaultCombatTickSeconds,
+                           RechargeSeconds = IsCapturedCleaningRobot(attacker)
+                                                 ? CapturedCleaningRobotCombatTickSeconds
+                                                 : DefaultCombatTickSeconds,
                            UsesEquippedWeapon = false,
                            AttackInfoAmmoCount = UnarmedAttackInfoAmmoCount,
                            AttackInfoWeaponSlot = attackInfoWeaponSlot,

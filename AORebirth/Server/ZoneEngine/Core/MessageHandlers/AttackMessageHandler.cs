@@ -125,6 +125,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
             target.SetTarget(character.Identity);
             target.SetFightingTarget(character.Identity);
+            this.ResetCombatTick(target);
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,

@@ -42,7 +42,7 @@ namespace ZoneEngine.Core
             TemplateHash,
             "Malfunctioning Cleaning Robot",
             1,
-            120,
+            12,
             297023,
             MissingVisualId,
             200,
@@ -51,7 +51,7 @@ namespace ZoneEngine.Core
             5,
             new[] { 1044525 },
             0x1F,
-            5,
+            6,
             500,
             NpcAiProfile.Passive);
 
