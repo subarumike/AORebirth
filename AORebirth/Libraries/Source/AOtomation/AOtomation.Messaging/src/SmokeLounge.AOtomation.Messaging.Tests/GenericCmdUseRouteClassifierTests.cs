@@ -232,6 +232,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void RexB18DRulesExposeCurrentPreDispatchRouteDecision()
+        {
+            Assert.AreEqual(
+                RexB18DInteractionRouteMode.RexB18DBoxProgress,
+                RexB18DInteractionRules.ResolveRouteMode(true));
+            Assert.AreEqual(
+                RexB18DInteractionRouteMode.None,
+                RexB18DInteractionRules.ResolveRouteMode(false));
+        }
+
+        [TestMethod]
+        public void RexB18DRouteKeepsFirstPrecedenceBeforeLowerUseRoutes()
+        {
+            AssertRoute(
+                GenericCmdUseRoute.RexB18DBoxProgress,
+                new Identity { Type = IdentityType.Inventory, Instance = 0x40 },
+                rexB18DBoxProgressMatched: true,
+                poolContainsTarget: true);
+        }
+
+        [TestMethod]
         public void InventoryContainerRulesExposeCurrentRouteModeDecisions()
         {
             Assert.AreEqual(

@@ -97,7 +97,8 @@ namespace ZoneEngine.Core.MessageHandlers
         {
             Identity target = context.Target;
 
-            if (context.RexB18DBoxProgressMatched)
+            if (RexB18DInteractionRules.ResolveRouteMode(context.RexB18DBoxProgressMatched)
+                == RexB18DInteractionRouteMode.RexB18DBoxProgress)
             {
                 return GenericCmdUseRoute.RexB18DBoxProgress;
             }
