@@ -92,6 +92,12 @@ namespace ZoneEngine.Core.Playfields
 
         public const string FlowCleaningRobotDeathCorpseDespawn = "cleaning-robot-death-corpse-despawn";
 
+        public const string FlowCleaningRobotNpcAttack = "cleaning-robot-npc-attack";
+
+        public const string MessageAttack = "Attack";
+
+        public const string MessageAttackInfo = "AttackInfo";
+
         public const string MessageCharInPlay = "CharInPlay";
 
         public const string MessageCharacterActionDeath = "CharacterAction Death";
@@ -109,6 +115,8 @@ namespace ZoneEngine.Core.Playfields
         public const string MessageSimpleCharFullUpdate = "SimpleCharFullUpdate";
 
         public const string MessageStat = "Stat";
+
+        public const string MessageSpecialAttackWeapon = "SpecialAttackWeapon";
 
         public const string MessageStopFight = "StopFight";
 
@@ -166,6 +174,12 @@ namespace ZoneEngine.Core.Playfields
 
         public const string StageCorpseFullUpdate = "corpse-full-update";
 
+        public const string StageRobotSpecialAttackWeaponContext = "robot-special-attack-weapon-context";
+
+        public const string StageRobotAttackStartContext = "robot-attack-start-context";
+
+        public const string StageRobotAttackInfo = "robot-attack-info";
+
         public static readonly string[] ExpectedPrivateCityReadyInitOrder =
         {
             StagePrivateCitySimpleCharFullUpdateBroadcast,
@@ -208,6 +222,13 @@ namespace ZoneEngine.Core.Playfields
             StageCorpseSpawnScheduled,
             StageDeadNpcDespawnScheduled,
             StageCorpseFullUpdate
+        };
+
+        public static readonly string[] ExpectedCleaningRobotNpcAttackOrder =
+        {
+            StageRobotSpecialAttackWeaponContext,
+            StageRobotAttackStartContext,
+            StageRobotAttackInfo
         };
 
         [ThreadStatic]

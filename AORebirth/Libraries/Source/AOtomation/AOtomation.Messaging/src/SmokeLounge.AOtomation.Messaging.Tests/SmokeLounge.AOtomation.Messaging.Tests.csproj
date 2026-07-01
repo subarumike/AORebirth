@@ -102,6 +102,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\UseItemOnItemInteractionRules.cs">
       <Link>UseItemOnItemInteractionRules.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs">
+      <Link>NpcCombatAttackRules.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcCorpseLifecycleRules.cs">
       <Link>NpcCorpseLifecycleRules.cs</Link>
     </Compile>
