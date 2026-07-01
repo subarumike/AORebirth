@@ -5,6 +5,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     #region Usings ...
 
     using System.Collections.Generic;
+    using System.IO;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -259,10 +260,66 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CapturedAreteRobotContentProvider.PatrolReplayRelativePath);
 
             var provider = new CapturedAreteRobotContentProvider(
-                new[] { @"Z:\AORebirthMissingCapture\movement-packets.csv" });
+                new[] { Path.Combine(Path.GetTempPath(), Path.GetRandomFileName(), "movement-packets.csv") });
 
             Assert.AreEqual(string.Empty, provider.FindPatrolReplayPath());
             Assert.AreEqual(0, provider.GetPatrolReplaySegments(0x79225E7C).Length);
+        }
+
+        [TestMethod]
+        public void NpcPatrolReplayCoordinatorAssignsCapturedReplaySegmentsFromProvider()
+        {
+            string path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            File.WriteAllLines(
+                path,
+                new[]
+                {
+                    "CapturedUtc,MessageType,SourceInstance,FollowKind,CurrentX,CurrentY,CurrentZ,DestinationX,DestinationY,DestinationZ",
+                    "2026-06-29T19:31:21.0000000Z,FollowTarget,79225E7C,NpcPath,1,2,3,4,5,6",
+                    "2026-06-29T19:31:22.5000000Z,FollowTarget,79225E7C,NpcPath,4,5,6,7,8,9"
+                });
+
+            try
+            {
+                var provider = new CapturedAreteRobotContentProvider(new[] { path });
+                var coordinator = new NpcPatrolReplayCoordinator(provider);
+                NpcPatrolReplaySegment[] assigned = null;
+
+                coordinator.AssignCapturedAreteRobotReplay(
+                    0x79225E7C,
+                    segments => assigned = segments);
+
+                Assert.IsNotNull(assigned);
+                Assert.AreEqual(2, assigned.Length);
+                Assert.AreEqual(1.5, assigned[0].DelayAfterSeconds);
+                Assert.AreEqual(1f, assigned[0].StartX);
+                Assert.AreEqual(2f, assigned[0].StartY);
+                Assert.AreEqual(3f, assigned[0].StartZ);
+                Assert.AreEqual(4f, assigned[0].EndX);
+                Assert.AreEqual(5f, assigned[0].EndY);
+                Assert.AreEqual(6f, assigned[0].EndZ);
+                Assert.AreEqual(0.25, assigned[1].DelayAfterSeconds);
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
+        [TestMethod]
+        public void NpcPatrolReplayCoordinatorAssignsEmptyReplayForMissingProviderData()
+        {
+            var provider = new CapturedAreteRobotContentProvider(
+                new[] { Path.Combine(Path.GetTempPath(), Path.GetRandomFileName(), "movement-packets.csv") });
+            var coordinator = new NpcPatrolReplayCoordinator(provider);
+            NpcPatrolReplaySegment[] assigned = null;
+
+            coordinator.AssignCapturedAreteRobotReplay(
+                0x79225E7C,
+                segments => assigned = segments);
+
+            Assert.IsNotNull(assigned);
+            Assert.AreEqual(0, assigned.Length);
         }
 
         private static void AssertExpectedOrder(

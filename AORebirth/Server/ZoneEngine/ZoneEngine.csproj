@@ -280,6 +280,7 @@
     <Compile Include="Core\Playfields\NpcCombatTickCoordinator.cs" />
     <Compile Include="Core\Playfields\NpcCorpseLifecycleCoordinator.cs" />
     <Compile Include="Core\Playfields\NpcCorpseLifecycleRules.cs" />
+    <Compile Include="Core\Playfields\NpcPatrolReplayCoordinator.cs" />
     <Compile Include="Core\Playfields\Playfield.cs" />
     <Compile Include="Core\Playfields\PlayfieldLifecycleTrace.cs" />
     <Compile Include="Core\Playfields\Playfields.cs" />
