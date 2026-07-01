@@ -61,7 +61,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
         public const int CapturedNonOrgCityControllerInstance = 0x009CA011;
 
-        public const int CapturedBorealisGridTerminalInstance = unchecked((int)0xC0040320);
+        public const int CapturedBorealisGridTerminalInstance =
+            GridTerminalInteractionRules.CapturedBorealisGridTerminalInstance;
 
         public const int CapturedSurgeryClinicTerminalInstance = unchecked((int)0xC00204A2);
 
@@ -132,12 +133,16 @@ namespace ZoneEngine.Core.MessageHandlers
                 return GenericCmdUseRoute.DeadNpcCorpse;
             }
 
-            if (context.CapturedGridTerminalRouteMatched)
+            GridTerminalInteractionRouteMode gridTerminalRouteMode =
+                GridTerminalInteractionRules.ResolveRouteMode(
+                    context.CapturedGridTerminalRouteMatched,
+                    context.GridEnterTerminalMatched);
+            if (gridTerminalRouteMode == GridTerminalInteractionRouteMode.CapturedGridTerminal)
             {
                 return GenericCmdUseRoute.CapturedGridTerminal;
             }
 
-            if (context.GridEnterTerminalMatched)
+            if (gridTerminalRouteMode == GridTerminalInteractionRouteMode.GridEnterTerminal)
             {
                 return GenericCmdUseRoute.GridEnterTerminal;
             }

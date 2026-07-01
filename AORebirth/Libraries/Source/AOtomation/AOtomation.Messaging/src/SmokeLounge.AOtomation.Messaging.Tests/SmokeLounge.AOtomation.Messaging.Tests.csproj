@@ -78,6 +78,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\GenericCmdUseRouteClassifier.cs">
       <Link>GenericCmdUseRouteClassifier.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\GridTerminalInteractionRules.cs">
+      <Link>GridTerminalInteractionRules.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\GuestKeyGeneratorInteractionRules.cs">
       <Link>GuestKeyGeneratorInteractionRules.cs</Link>
     </Compile>
