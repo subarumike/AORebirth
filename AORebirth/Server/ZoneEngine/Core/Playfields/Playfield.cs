@@ -1195,6 +1195,12 @@ namespace AORebirth.Core.Playfields
             string organizationName = ResolveOrganizationName(organizationInstance);
             if (!string.IsNullOrEmpty(organizationName))
             {
+                PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                    PlayfieldLifecycleTrace.StagePrivateCityOrgInfoPacket,
+                    PlayfieldLifecycleTrace.MessageOrgInfoPacket,
+                    character.Identity,
+                    organizationName);
                 client.SendCompressed(
                     new OrgInfoPacketMessage
                     {
@@ -1618,9 +1624,21 @@ namespace AORebirth.Core.Playfields
                     if (temp != null)
                     {
                         SimpleCharFullUpdateMessage simpleCharFullUpdate = SimpleCharFullUpdate.ConstructMessage(temp);
+                        PlayfieldLifecycleTrace.Record(
+                            PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                            PlayfieldLifecycleTrace.StageExistingCharacterSimpleCharFullUpdate,
+                            PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
+                            temp.Identity,
+                            "recipient=" + recipient.Identity);
                         sendSCFUs.toClient.SendCompressed(simpleCharFullUpdate);
 
                         var charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 };
+                        PlayfieldLifecycleTrace.Record(
+                            PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                            PlayfieldLifecycleTrace.StageExistingCharacterCharInPlay,
+                            PlayfieldLifecycleTrace.MessageCharInPlay,
+                            temp.Identity,
+                            "recipient=" + recipient.Identity);
                         sendSCFUs.toClient.SendCompressed(charInPlay);
                         sent = true;
                     }
@@ -1656,7 +1674,17 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                PlayfieldLifecycleTrace.StageJoiningCharacterSimpleCharFullUpdateBroadcast,
+                PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
+                temp.Identity);
             this.Announce(SimpleCharFullUpdate.ConstructMessage(temp));
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                PlayfieldLifecycleTrace.StageJoiningCharacterCharInPlayBroadcast,
+                PlayfieldLifecycleTrace.MessageCharInPlay,
+                temp.Identity);
             this.Announce(new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 });
         }
 
@@ -3198,6 +3226,12 @@ namespace AORebirth.Core.Playfields
             }
 
             this.deadNpcDespawnTicks[target.Identity.Instance] = DateTime.UtcNow + DeadNpcDespawnDelay;
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
+                PlayfieldLifecycleTrace.StageDeadNpcDespawnScheduled,
+                "DeadNpcDespawnScheduled",
+                target.Identity,
+                "delayMs=" + ((int)DeadNpcDespawnDelay.TotalMilliseconds));
 
             LogUtil.Debug(DebugInfoDetail.Network, string.Format("NPC died target={0}", target.Identity));
         }
@@ -3219,6 +3253,11 @@ namespace AORebirth.Core.Playfields
 
             if (IsCapturedCleaningRobot(target))
             {
+                PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
+                    PlayfieldLifecycleTrace.StageRobotStopFight,
+                    PlayfieldLifecycleTrace.MessageStopFight,
+                    target.Identity);
                 this.SendCombatStopMessage(target);
             }
         }
@@ -3899,6 +3938,12 @@ namespace AORebirth.Core.Playfields
 
         private void SendNpcDeathAnimation(ICharacter target)
         {
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
+                PlayfieldLifecycleTrace.StageCharacterActionDeathParameter2,
+                PlayfieldLifecycleTrace.MessageCharacterActionDeath,
+                target.Identity,
+                "Parameter2=" + DeathAnimationKeyFor(target));
             this.Announce(
                 new CharacterActionMessage
                 {
@@ -3982,6 +4027,11 @@ namespace AORebirth.Core.Playfields
                     Identity = playfieldIdentity,
                     Unknown1 = new TowerProxyBase[0]
                 });
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllTowers,
+                PlayfieldLifecycleTrace.MessagePlayfieldAllTowers,
+                playfieldIdentity);
 
             client.SendCompressed(
                 new PlayfieldAllCitiesMessage
@@ -3990,6 +4040,11 @@ namespace AORebirth.Core.Playfields
                     Unknown = cityUnknown,
                     Payload = cityPayload ?? new byte[0]
                 });
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllCities,
+                PlayfieldLifecycleTrace.MessagePlayfieldAllCities,
+                playfieldIdentity);
         }
 
         private void SendPrivateCityStat(ZoneClient client, ICharacter character, StatIds statId, byte unknown)
@@ -4004,6 +4059,22 @@ namespace AORebirth.Core.Playfields
             uint value,
             byte unknown)
         {
+            string stage = PlayfieldLifecycleTrace.StagePrivateCitySocialStatus;
+            if (statId == StatIds.clan)
+            {
+                stage = PlayfieldLifecycleTrace.StagePrivateCityClan;
+            }
+            else if (statId == StatIds.clanlevel)
+            {
+                stage = PlayfieldLifecycleTrace.StagePrivateCityClanLevel;
+            }
+
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                stage,
+                PlayfieldLifecycleTrace.MessageStat,
+                character.Identity,
+                statId + "=" + value);
             client.SendCompressed(
                 new StatMessage
                 {
@@ -4215,6 +4286,12 @@ namespace AORebirth.Core.Playfields
                 }
 
                 this.RegisterCorpse(target, corpse.CorpseIdentity);
+                PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
+                    PlayfieldLifecycleTrace.StageCorpseFullUpdate,
+                    PlayfieldLifecycleTrace.MessageCorpseFullUpdate,
+                    corpse.CorpseIdentity,
+                    "deadNpc=" + corpse.DeadNpcIdentity);
                 this.SendCorpseFullUpdate(target, corpse.CorpseIdentity);
             }
         }
@@ -4232,6 +4309,12 @@ namespace AORebirth.Core.Playfields
                     CreatedAtUtc = DateTime.UtcNow,
                     SpawnsAtUtc = spawnsAtUtc
                 };
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
+                PlayfieldLifecycleTrace.StageCorpseSpawnScheduled,
+                "CorpseSpawnScheduled",
+                corpseIdentity,
+                "deadNpc=" + target.Identity + " delayMs=" + ((int)CorpseSpawnDelay.TotalMilliseconds));
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,
@@ -4529,6 +4612,12 @@ namespace AORebirth.Core.Playfields
                     this.lastCombatWeaponSlots.Remove(character.Identity.Instance);
                     this.lastNpcUnarmedAttackInfoSlots.Remove(character.Identity.Instance);
                     this.lastNpcSpecialAttackWeaponTargets.Remove(character.Identity.Instance);
+                    PlayfieldLifecycleTrace.Record(
+                        PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
+                        PlayfieldLifecycleTrace.StageAttackerStopFight,
+                        PlayfieldLifecycleTrace.MessageStopFight,
+                        character.Identity,
+                        "deadTarget=" + deadTarget);
                     this.SendCombatStopMessage(character);
                 }
             }

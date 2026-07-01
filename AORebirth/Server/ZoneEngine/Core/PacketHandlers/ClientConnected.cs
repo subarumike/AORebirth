@@ -52,6 +52,7 @@ namespace ZoneEngine.Core.PacketHandlers
     using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
+    using ZoneEngine.Core.Playfields;
     using ZoneEngine.Script;
 
     using Utility;
@@ -171,6 +172,11 @@ client.Controller.Character.Playfield.Identity,
             // Stat.SendDirect(client, 521, 0, false);
 
             /* visual */
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCitySimpleCharFullUpdateBroadcast,
+                PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
+                identity);
             SimpleCharFullUpdate.SendToPlayfield(client);
 
             /* inventory, items and all that */
@@ -182,6 +188,11 @@ client.Controller.Character.Playfield.Identity,
                 currentPlayfield.SendPrivateCityPreFullCharacterReadyBlock(client, client.Controller.Character);
             }
 
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityFullCharacter,
+                PlayfieldLifecycleTrace.MessageFullCharacter,
+                identity);
             FullCharacterMessageHandler.Default.Send(client.Controller.Character);
             if (currentPlayfield != null)
             {
@@ -240,6 +251,11 @@ client.Controller.Character.Playfield.Identity,
 
             if (currentPlayfield != null)
             {
+                PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                    PlayfieldLifecycleTrace.StageVisibilityJoinerReady,
+                    "ClientConnected",
+                    client.Controller.Character.Identity);
                 currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character);
                 currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });
             }
