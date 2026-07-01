@@ -158,7 +158,8 @@ namespace ZoneEngine.Core.MessageHandlers
                 return GenericCmdUseRoute.SurgeryClinic;
             }
 
-            if (context.PoolContainsTarget)
+            if (StaticDynelInteractionRules.ResolveRouteMode(context.PoolContainsTarget)
+                == StaticDynelInteractionRouteMode.PoolOnUseOrTrade)
             {
                 return GenericCmdUseRoute.PoolOnUseOrTrade;
             }
