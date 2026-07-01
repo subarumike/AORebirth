@@ -261,6 +261,25 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 StaticDynelInteractionRules.ResolveRouteMode(false));
         }
 
+        [TestMethod]
+        public void StatelRulesExposeCurrentFallbackRouteModeDecision()
+        {
+            Assert.AreEqual(
+                StatelInteractionRouteMode.StatelFallback,
+                StatelInteractionRules.ResolveRouteMode(true));
+            Assert.AreEqual(
+                StatelInteractionRouteMode.None,
+                StatelInteractionRules.ResolveRouteMode(false));
+        }
+
+        [TestMethod]
+        public void StatelFallbackKeepsLowestPrecedenceAfterHigherPriorityRoutes()
+        {
+            AssertRoute(GenericCmdUseRoute.SurgeryClinic, Terminal(0x01020309), surgeryClinicTerminalMatched: true);
+            AssertRoute(GenericCmdUseRoute.PoolOnUseOrTrade, Terminal(0x0102030A), poolContainsTarget: true);
+            AssertRoute(GenericCmdUseRoute.StatelFallback, Terminal(0x0102030B));
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,

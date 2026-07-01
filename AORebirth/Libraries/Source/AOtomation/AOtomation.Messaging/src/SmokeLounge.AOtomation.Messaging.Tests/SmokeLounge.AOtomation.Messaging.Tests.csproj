@@ -93,6 +93,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\StaticDynelInteractionRules.cs">
       <Link>StaticDynelInteractionRules.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\StatelInteractionRules.cs">
+      <Link>StatelInteractionRules.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleTrace.cs">
       <Link>PlayfieldLifecycleTrace.cs</Link>
     </Compile>
