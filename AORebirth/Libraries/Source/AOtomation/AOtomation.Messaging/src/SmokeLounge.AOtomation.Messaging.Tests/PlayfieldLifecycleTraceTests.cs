@@ -7,6 +7,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Runtime.CompilerServices;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -547,6 +548,37 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
+        [TestMethod]
+        public void PlayfieldContentModulesDoNotOwnRuntimeSystems()
+        {
+            string contentDirectory = Path.Combine(
+                FindRepositoryRoot(),
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\Content");
+            string[] sourceFiles = Directory.GetFiles(contentDirectory, "*.cs", SearchOption.AllDirectories);
+
+            Assert.IsTrue(sourceFiles.Length >= 4, "Expected current Playfield content-module files to be scanned.");
+
+            foreach (string sourceFile in sourceFiles)
+            {
+                string text = File.ReadAllText(sourceFile);
+                Assert.IsTrue(
+                    text.Contains("namespace ZoneEngine.Core.Playfields.Content"),
+                    "Content guardrail only applies to the content namespace: " + sourceFile);
+
+                for (int i = 0; i < ForbiddenContentModuleReferences.Length; i++)
+                {
+                    ForbiddenReference forbidden = ForbiddenContentModuleReferences[i];
+                    Assert.IsFalse(
+                        text.IndexOf(forbidden.Pattern, StringComparison.Ordinal) >= 0,
+                        string.Format(
+                            "Playfield content modules must define content only; forbidden {0} reference '{1}' found in {2}.",
+                            forbidden.Category,
+                            forbidden.Pattern,
+                            sourceFile));
+                }
+            }
+        }
+
         private static void AssertExpectedOrder(
             IList<PlayfieldLifecycleEvent> events,
             string flow,
@@ -648,6 +680,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             return -1;
         }
 
+        private static string FindRepositoryRoot([CallerFilePath] string sourcePath = null)
+        {
+            string current = Path.GetDirectoryName(sourcePath);
+            while (!string.IsNullOrEmpty(current))
+            {
+                string candidate = Path.Combine(
+                    current,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content");
+                if (Directory.Exists(candidate))
+                {
+                    return current;
+                }
+
+                DirectoryInfo parent = Directory.GetParent(current);
+                current = parent == null ? null : parent.FullName;
+            }
+
+            Assert.Fail("Unable to find AORebirth repository root from " + sourcePath + ".");
+            return string.Empty;
+        }
+
         private static void RecordExpected(string flow, string[] stages)
         {
             Identity identity = new Identity { Type = IdentityType.CanbeAffected, Instance = 1 };
@@ -746,6 +799,53 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 PlayfieldLifecycleTrace.StagePrivateCityReadyBlockEnd,
                 PlayfieldLifecycleTrace.MessagePrivateCityReadyBlockEnd,
                 character);
+        }
+
+        private static readonly ForbiddenReference[] ForbiddenContentModuleReferences =
+            new[]
+            {
+                new ForbiddenReference("combat logic", "NpcCombatTickCoordinator"),
+                new ForbiddenReference("combat logic", "NpcCombatAttackRules"),
+                new ForbiddenReference("combat logic", "CombatDamageRules"),
+                new ForbiddenReference("combat packets", "AttackInfoMessage"),
+                new ForbiddenReference("combat packets", "SpecialAttackWeaponMessage"),
+                new ForbiddenReference("corpse lifecycle", "NpcCorpseLifecycleCoordinator"),
+                new ForbiddenReference("corpse lifecycle", "NpcCorpseLifecycleRules"),
+                new ForbiddenReference("player visibility", "CharInPlayMessageHandler"),
+                new ForbiddenReference("player visibility", "SimpleCharFullUpdate"),
+                new ForbiddenReference("player visibility", "FullCharacterMessageHandler"),
+                new ForbiddenReference("GenericCmd routing", "GenericCmd"),
+                new ForbiddenReference("GenericCmd routing", "GenericCmdMessageHandler"),
+                new ForbiddenReference("inventory logic", "Inventory"),
+                new ForbiddenReference("inventory logic", "ContainerAddItem"),
+                new ForbiddenReference("inventory logic", "ClientMoveItem"),
+                new ForbiddenReference("org commands", "OrgClient"),
+                new ForbiddenReference("org commands", "OrgClientMessageHandler"),
+                new ForbiddenReference("org commands", "OrgServer"),
+                new ForbiddenReference("packet serialization internals", "SendCompressed"),
+                new ForbiddenReference("packet serialization internals", "N3Messages"),
+                new ForbiddenReference("packet serialization internals", "SystemMessages"),
+                new ForbiddenReference("packet serialization internals", "Serializer"),
+                new ForbiddenReference("database import", "AORebirth.Database"),
+                new ForbiddenReference("database import", "ItemLoader"),
+                new ForbiddenReference("database import", "NanoLoader"),
+                new ForbiddenReference("database import", "CheckDatabase"),
+                new ForbiddenReference("database import", "MessagePackZip"),
+                new ForbiddenReference("capture tooling", "AOSharpLiveCapture"),
+                new ForbiddenReference("capture tooling", "tools-temp")
+            };
+
+        private sealed class ForbiddenReference
+        {
+            public ForbiddenReference(string category, string pattern)
+            {
+                this.Category = category;
+                this.Pattern = pattern;
+            }
+
+            public string Category { get; private set; }
+
+            public string Pattern { get; private set; }
         }
     }
 }
