@@ -68,46 +68,6 @@ namespace ZoneEngine.Core.MessageHandlers
     [MessageHandler(MessageHandlerDirection.All)]
     public class GenericCmdMessageHandler : BaseMessageHandler<GenericCmdMessage, GenericCmdMessageHandler>
     {
-        private static readonly IDictionary<string, Profession> OfabProfessionVendorRequirements =
-            new Dictionary<string, Profession>(StringComparer.OrdinalIgnoreCase)
-            {
-                { "OFADV", Profession.Adventurer },
-                { "OFAGT", Profession.Agent },
-                { "OFCRT", Profession.Bureaucrat },
-                { "OFDOC", Profession.Doctor },
-                { "OFENF", Profession.Enforcer },
-                { "OFENG", Profession.Engineer },
-                { "OFFIX", Profession.Fixer },
-                { "OFKEE", Profession.Keeper },
-                { "OFMA", Profession.MartialArtist },
-                { "OFNT", Profession.Nanotechnician },
-                { "OFPMQ3T", Profession.Metaphysicist },
-                { "OFSHD", Profession.Shade },
-                { "OFSOL", Profession.Soldier },
-                { "OFTRD", Profession.Trader }
-            };
-
-        private static readonly IDictionary<Profession, string> ProfessionFeedbackNames =
-            new Dictionary<Profession, string>
-            {
-                { Profession.Adventurer, "Adventurer" },
-                { Profession.Agent, "Agent" },
-                { Profession.Bureaucrat, "Bureaucrat" },
-                { Profession.Doctor, "Doctor" },
-                { Profession.Enforcer, "Enforcer" },
-                { Profession.Engineer, "Engineer" },
-                { Profession.Fixer, "Fixer" },
-                { Profession.Keeper, "Keeper" },
-                { Profession.MartialArtist, "Martial Artist" },
-                { Profession.Metaphysicist, "Meta-Physicist" },
-                { Profession.Nanotechnician, "Nano-Technician" },
-                { Profession.Shade, "Shade" },
-                { Profession.Soldier, "Soldier" },
-                { Profession.Trader, "Trader" }
-            };
-
-        private const string OfabGmRequirementFeedback = "Your GM capabilities is required to be at least 1!";
-
         #region Inbound
 
         /// <summary>
@@ -175,83 +135,24 @@ namespace ZoneEngine.Core.MessageHandlers
                     {
                         break;
                     }
+                    else if (StaticDynelInteractionHandler.Default.TryHandleUse(client, message, target))
+                    {
+                        break;
+                    }
                     else
                     {
-                        if (Pool.Instance.Contains(target))
-                        {
-                            // TODO: Call OnUse of the targets controller
-                            // Static dynels first
-                            IEventHolder temp = null;
-                            try
-                            {
-                                temp =
-                                    Pool.Instance.GetObject<IEventHolder>(
-                                        client.Controller.Character.Playfield.Identity,
-                                        target);
-                            }
-                            catch (Exception)
-                            {
-                            }
-                            if (temp != null)
-                            {
-                                var entity = temp as IEntity;
-                                if (entity != null)
-                                {
-                                    Event ev = temp.Events.FirstOrDefault(x => x.EventType == EventType.OnUse);
-                                    if (ev != null)
-                                    {
-                                        ev.Perform(client.Controller.Character, entity);
-                                        this.Acknowledge(client.Controller.Character, message);
-                                    }
-                                    else
-                                    {
-                                        ev = temp.Events.FirstOrDefault(x => x.EventType == EventType.OnTrade);
-                                        if (ev != null)
-                                        {
-                                            var vendor = entity as Vendor;
-                                            if (vendor != null
-                                                && this.TryDenyOfabProfessionVendor(client, message, vendor))
-                                            {
-                                                break;
-                                            }
-
-                                            ev.Perform(client.Controller.Character, entity);
-
-                                            TemporaryBag tempBag = new TemporaryBag(
-                                                client.Controller.Character.Identity,
-                                                new Identity()
-                                                {
-                                                    Type = IdentityType.TempBag,
-                                                    Instance =
-                                                Pool.Instance.GetFreeInstance<TemporaryBag>(
-                                                    0,
-                                                    IdentityType.TempBag)
-                                                },
-                                                client.Controller.Character.Identity,
-                                                target);
-                                            client.Controller.Character.ShoppingBag = tempBag;
-                                            TradeMessageHandler.Default.Send(client.Controller.Character, tempBag);
-                                            this.Acknowledge(client.Controller.Character, message);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // Use statel (doors, grid terminals etc)
+                        // Use statel (doors, grid terminals etc)
 #if DEBUG
-                            string s = string.Format(
-                                "Generic Command received:\r\nAction: {0} ({1}){2}Target: {3} {4}",
-                                message.Action,
-                                (int)message.Action,
-                                Environment.NewLine,
-                                target.Type,
-                                target.ToString(true));
-                            ChatTextMessageHandler.Default.Send(client.Controller.Character, s);
+                        string s = string.Format(
+                            "Generic Command received:\r\nAction: {0} ({1}){2}Target: {3} {4}",
+                            message.Action,
+                            (int)message.Action,
+                            Environment.NewLine,
+                            target.Type,
+                            target.ToString(true));
+                        ChatTextMessageHandler.Default.Send(client.Controller.Character, s);
 #endif
-                            client.Controller.UseStatel(target);
-                        }
+                        client.Controller.UseStatel(target);
                     }
 
                     break;
@@ -387,49 +288,6 @@ namespace ZoneEngine.Core.MessageHandlers
 
         #endregion
 
-        private bool TryDenyOfabProfessionVendor(IZoneClient client, GenericCmdMessage message, Vendor vendor)
-        {
-            Profession requiredProfession;
-            if (string.IsNullOrEmpty(vendor.TemplateHash)
-                || !OfabProfessionVendorRequirements.TryGetValue(vendor.TemplateHash, out requiredProfession))
-            {
-                return false;
-            }
-
-            ICharacter character = client.Controller.Character;
-            Profession characterProfession = (Profession)character.Stats[StatIds.profession].Value;
-            if (characterProfession == requiredProfession)
-            {
-                return false;
-            }
-
-            client.Server.Info(
-                client,
-                "OFAB profession vendor denied character={0} profession={1} required={2} vendor={3} hash={4}",
-                character.Identity,
-                characterProfession,
-                requiredProfession,
-                vendor.Identity,
-                vendor.TemplateHash);
-
-            this.SendOfabProfessionDeniedFeedback(character, requiredProfession);
-            this.AcknowledgeDenied(character, message);
-            return true;
-        }
-
-        private void SendOfabProfessionDeniedFeedback(ICharacter character, Profession requiredProfession)
-        {
-            string professionName;
-            if (!ProfessionFeedbackNames.TryGetValue(requiredProfession, out professionName))
-            {
-                professionName = requiredProfession.ToString();
-            }
-
-            ChatTextMessageHandler.Default.Send(
-                character,
-                "This effect can only be utilitized by " + professionName + ".");
-            ChatTextMessageHandler.Default.Send(character, OfabGmRequirementFeedback);
-        }
     }
 
 }

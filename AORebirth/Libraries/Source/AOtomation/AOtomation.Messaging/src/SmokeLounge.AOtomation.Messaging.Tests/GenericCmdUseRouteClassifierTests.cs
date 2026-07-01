@@ -250,6 +250,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 InventoryContainerInteractionRules.ResolveRouteMode(Terminal(0x01020308)));
         }
 
+        [TestMethod]
+        public void StaticDynelRulesExposeCurrentRouteModeDecisions()
+        {
+            Assert.AreEqual(
+                StaticDynelInteractionRouteMode.PoolOnUseOrTrade,
+                StaticDynelInteractionRules.ResolveRouteMode(true));
+            Assert.AreEqual(
+                StaticDynelInteractionRouteMode.None,
+                StaticDynelInteractionRules.ResolveRouteMode(false));
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,
