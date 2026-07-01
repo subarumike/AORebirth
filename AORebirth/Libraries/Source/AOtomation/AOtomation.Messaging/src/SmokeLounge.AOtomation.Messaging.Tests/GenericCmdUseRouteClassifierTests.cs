@@ -230,6 +230,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertRoute(GenericCmdUseRoute.StatelFallback, Terminal(0x01020308));
         }
 
+        [TestMethod]
+        public void InventoryContainerRulesExposeCurrentRouteModeDecisions()
+        {
+            Assert.AreEqual(
+                InventoryContainerInteractionRouteMode.InventoryItem,
+                InventoryContainerInteractionRules.ResolveRouteMode(new Identity { Type = IdentityType.Inventory, Instance = 0x40 }));
+            Assert.AreEqual(
+                InventoryContainerInteractionRouteMode.WearOrSocialBackpack,
+                InventoryContainerInteractionRules.ResolveRouteMode(new Identity { Type = IdentityType.ArmorPage, Instance = 0x41 }));
+            Assert.AreEqual(
+                InventoryContainerInteractionRouteMode.WearOrSocialBackpack,
+                InventoryContainerInteractionRules.ResolveRouteMode(new Identity { Type = IdentityType.SocialPage, Instance = 0x42 }));
+            Assert.AreEqual(
+                InventoryContainerInteractionRouteMode.BackpackContainer,
+                InventoryContainerInteractionRules.ResolveRouteMode(new Identity { Type = IdentityType.Container, Instance = 0x43 }));
+            Assert.AreEqual(
+                InventoryContainerInteractionRouteMode.None,
+                InventoryContainerInteractionRules.ResolveRouteMode(Terminal(0x01020308)));
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,

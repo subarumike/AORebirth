@@ -147,29 +147,9 @@ namespace ZoneEngine.Core.MessageHandlers
                     {
                         this.Acknowledge(client.Controller.Character, message);
                     }
-                    else if (target.Type == IdentityType.Inventory)
+                    else if (InventoryContainerInteractionHandler.Default.TryHandleUse(client, message, target))
                     {
-                        client.Controller.UseItem(target);
-
-                        // Acknowledge action
-                        this.Acknowledge(client.Controller.Character, message);
-                    }
-                    else if (target.Type == IdentityType.ArmorPage || target.Type == IdentityType.SocialPage)
-                    {
-                        if (client.Controller.TryUseBackpackContainer(target))
-                        {
-                            this.Acknowledge(client.Controller.Character, message);
-                        }
-                    }
-                    else if (target.Type == IdentityType.Container)
-                    {
-                        IInventoryPage backpackPage;
-                        if (client.Controller.Character.BaseInventory.TryGetBackpackPage(target, out backpackPage))
-                        {
-                            BackpackContainerActionMessageHandler.Default.SendClose(client.Controller.Character, target);
-                            client.Controller.Character.BaseInventory.MarkBackpackClosed(target);
-                            this.Acknowledge(client.Controller.Character, message);
-                        }
+                        break;
                     }
                     else if (GuestKeyGeneratorInteractionHandler.Default.TryHandleUse(client, message, target))
                     {
