@@ -49,9 +49,11 @@ namespace ZoneEngine.Core.MessageHandlers
 
     public static class GenericCmdUseRouteClassifier
     {
-        public const int CapturedPrivateCityGuestKeyTerminalInstance = unchecked((int)0x5751538B);
+        public const int CapturedPrivateCityGuestKeyTerminalInstance =
+            GuestKeyGeneratorInteractionRules.CapturedPrivateCityGuestKeyTerminalInstance;
 
-        public const int RuntimePrivateCityGuestKeyTerminalInstance = unchecked((int)0x574B84AB);
+        public const int RuntimePrivateCityGuestKeyTerminalInstance =
+            GuestKeyGeneratorInteractionRules.RuntimePrivateCityGuestKeyTerminalInstance;
 
         public const int CapturedCityControllerInstance = 0x009C182E;
 
@@ -155,9 +157,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
         public static bool IsPrivateCityGuestKeyTerminalTarget(Identity target)
         {
-            return target.Type == IdentityType.Terminal
-                   && (target.Instance == CapturedPrivateCityGuestKeyTerminalInstance
-                       || target.Instance == RuntimePrivateCityGuestKeyTerminalInstance);
+            return GuestKeyGeneratorInteractionRules.IsPrivateCityGuestKeyTerminalTarget(target);
         }
 
         public static bool IsPrivateCityControllerTarget(Identity target)

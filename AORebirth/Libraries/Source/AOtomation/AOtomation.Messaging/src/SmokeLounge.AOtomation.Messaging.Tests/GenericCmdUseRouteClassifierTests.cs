@@ -69,6 +69,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void GuestKeyGeneratorRulesExposeCurrentCapturedConstants()
+        {
+            Assert.AreEqual(
+                unchecked((int)0x5751538B),
+                GuestKeyGeneratorInteractionRules.CapturedPrivateCityGuestKeyTerminalInstance);
+            Assert.AreEqual(
+                unchecked((int)0x574B84AB),
+                GuestKeyGeneratorInteractionRules.RuntimePrivateCityGuestKeyTerminalInstance);
+            Assert.AreEqual(280642, GuestKeyGeneratorInteractionRules.CapturedCityAccessCardTemplateId);
+            Assert.AreEqual(0x6F, GuestKeyGeneratorInteractionRules.CapturedCityAccessCardOverflowSlot);
+            Assert.AreEqual(15 * 60 * 1000, GuestKeyGeneratorInteractionRules.CityAccessCardLifetimeMilliseconds);
+            Assert.IsTrue(
+                GuestKeyGeneratorInteractionRules.IsPrivateCityGuestKeyTerminalTarget(
+                    Terminal(GuestKeyGeneratorInteractionRules.RuntimePrivateCityGuestKeyTerminalInstance)));
+        }
+
+        [TestMethod]
         public void CityControllerMenuModeMatchesCurrentOwnerAndLimitedRules()
         {
             Assert.AreEqual(

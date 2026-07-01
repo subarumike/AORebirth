@@ -180,7 +180,7 @@ client.Controller.Character.Playfield.Identity,
             SimpleCharFullUpdate.SendToPlayfield(client);
 
             /* inventory, items and all that */
-            GenericCmdMessageHandler.ProcessCityAccessCardLifetimes(client.Controller.Character);
+            GuestKeyGeneratorInteractionHandler.ProcessCityAccessCardLifetimes(client.Controller.Character);
             Packets.WeaponItemFullUpdate.SendWeaponDefinitions(client.Controller.Character);
             Playfield currentPlayfield = client.Controller.Character.Playfield as Playfield;
             if (currentPlayfield != null)
