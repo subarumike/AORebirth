@@ -77,6 +77,7 @@ namespace AORebirth.Core.Playfields
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
+    using ZoneEngine.Core.Playfields.Content;
     using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Script;
 
@@ -253,14 +254,8 @@ namespace AORebirth.Core.Playfields
             new int[0]
         };
 
-        private static readonly CapturedAreteRobotContentProvider CapturedAreteRobotContent =
-            new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
-
-        private static readonly NpcPatrolReplayCoordinator NpcPatrolReplay =
-            new NpcPatrolReplayCoordinator(CapturedAreteRobotContent);
-
-        private static readonly CapturedAreteRobotSpawnOrchestrator CapturedAreteRobotSpawns =
-            new CapturedAreteRobotSpawnOrchestrator(CapturedAreteRobotContent, NpcPatrolReplay);
+        private static readonly PlayfieldContentCoordinator PlayfieldContent =
+            new PlayfieldContentCoordinator(new AreteContentModule());
 
         private const int UnarmedAttackInfoAmmoCount = -1;
 
@@ -355,7 +350,7 @@ namespace AORebirth.Core.Playfields
 
             this.statels = ResolvePlayfieldStatels(playfieldIdentity);
             this.LoadMobSpawns(playfieldIdentity);
-            CapturedAreteRobotSpawns.SpawnForPlayfield(this, playfieldIdentity);
+            PlayfieldContent.RegisterContent(this, playfieldIdentity);
             this.LoadVendors(playfieldIdentity);
             this.LoadStaticDynels(playfieldIdentity);
         }
@@ -483,11 +478,6 @@ namespace AORebirth.Core.Playfields
                 default:
                     return false;
             }
-        }
-
-        private static void LogCapturedAreteRobotContent(bool isError, string message)
-        {
-            LogUtil.Debug(isError ? DebugInfoDetail.Error : DebugInfoDetail.Engine, message);
         }
 
         #endregion
