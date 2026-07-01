@@ -69,6 +69,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void CityControllerMenuModeMatchesCurrentOwnerAndLimitedRules()
+        {
+            Assert.AreEqual(
+                CityControllerMenuMode.OwnerMember,
+                CityControllerInteractionRules.ResolveMenuMode(1970177, 1970177));
+
+            Assert.AreEqual(
+                CityControllerMenuMode.NonOrgLimited,
+                CityControllerInteractionRules.ResolveMenuMode(0, 1970177));
+
+            Assert.AreEqual(
+                CityControllerMenuMode.NonOrgLimited,
+                CityControllerInteractionRules.ResolveMenuMode(1, 1970177));
+        }
+
+        [TestMethod]
         public void CorpseRoutesKeepDeadNpcFallbackBehindDirectCorpse()
         {
             AssertRoute(GenericCmdUseRoute.DirectCorpse, new Identity { Type = IdentityType.Corpse, Instance = 0x20 });
