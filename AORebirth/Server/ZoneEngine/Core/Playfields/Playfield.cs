@@ -116,10 +116,10 @@ namespace AORebirth.Core.Playfields
 
         private readonly NpcCorpseLifecycleCoordinator npcCorpseLifecycle;
 
+        private readonly NpcCombatTickCoordinator npcCombatTick;
+
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
         private readonly Dictionary<int, int> lastCombatWeaponSlots = new Dictionary<int, int>();
-        private readonly Dictionary<int, int> lastNpcUnarmedAttackInfoSlots = new Dictionary<int, int>();
-        private readonly Dictionary<int, int> lastNpcSpecialAttackWeaponTargets = new Dictionary<int, int>();
 
         private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
 
@@ -215,7 +215,7 @@ namespace AORebirth.Core.Playfields
 
         private const float UserConfirmedMontroyalExitDestinationZ = 812.8f;
 
-        private const double MaxMeleeCombatDistance = 8.0;
+        private const double MaxMeleeCombatDistance = NpcCombatAttackRules.MaxMeleeCombatDistance;
 
         private const double MaxMeleeFollowHoldDistance = 3.0;
 
@@ -230,18 +230,6 @@ namespace AORebirth.Core.Playfields
         private const int CapturedCleaningRobotCorpseCredits = 5;
 
         private const double CapturedCleaningRobotFollowStopDistance = 0.0;
-
-        private const double CapturedCleaningRobotCombatTickSeconds = 2.7;
-
-        private const int CapturedCleaningRobotRightHandDamage = 10;
-
-        private const int CapturedCleaningRobotLeftHandDamage = 8;
-        private const int CapturedCleaningRobotLeftWeaponTemplate = 0x0001E960;
-        private const int CapturedCleaningRobotRightWeaponTemplate = 0x0001E95D;
-        private const int CapturedCleaningRobotLeftWeaponTag = 0x4C495732;
-        private const int CapturedCleaningRobotRightWeaponTag = 0x4C495731;
-        private const int CapturedCleaningRobotSpecialAttackWeaponValue = 8;
-        private const int CapturedCleaningRobotSpecialAttackWeaponLastValue = 0;
 
         private const int PrivateAretePlayfieldInstance = 6553;
 
@@ -291,21 +279,13 @@ namespace AORebirth.Core.Playfields
 
         private const int PlayerUnarmedAttackInfoWeaponInstance = 100;
 
-        private const int NpcUnarmedRightAttackInfoWeaponSlot = 0;
-
-        private const int NpcUnarmedLeftAttackInfoWeaponSlot = 1;
-
-        private const int NpcUnarmedRightAttackInfoWeaponInstance = 1279874865;
-
-        private const int NpcUnarmedLeftAttackInfoWeaponInstance = 1279874866;
-
-        private const int NormalAttackInfoHitType = 3;
+        private const int NormalAttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType;
 
         private const int MissingItemStatValue = 1234567890;
 
-        private const double DefaultCombatTickSeconds = 2.0;
+        private const double DefaultCombatTickSeconds = NpcCombatAttackRules.DefaultCombatTickSeconds;
 
-        private const double OutOfRangeRetrySeconds = 1.0;
+        private const double OutOfRangeRetrySeconds = NpcCombatAttackRules.OutOfRangeRetrySeconds;
 
         private const int RubiKaStartPlayfield = 4582;
 
@@ -366,6 +346,7 @@ namespace AORebirth.Core.Playfields
             this.server = zoneServer;
             this.playfieldBus = BusSetup.StartWith<AsyncConfiguration>().Construct();
             this.npcCorpseLifecycle = new NpcCorpseLifecycleCoordinator(this);
+            this.npcCombatTick = new NpcCombatTickCoordinator(this);
 
             this.memBusDisposeContainer.Add(
                 this.playfieldBus.Subscribe<IMSendAOtomationMessageToClient>(SendAOtomationMessageToClient));
@@ -2318,17 +2299,14 @@ namespace AORebirth.Core.Playfields
         public void ResetCombatTick(Identity attacker)
         {
             ICharacter character = this.FindByIdentity<ICharacter>(attacker);
-            if (IsCapturedCleaningRobot(character))
+            if (character != null && character.Controller is NPCController)
             {
-                this.nextCombatTicks[attacker.Instance] =
-                    DateTime.UtcNow + TimeSpan.FromSeconds(CapturedCleaningRobotCombatTickSeconds);
+                this.npcCombatTick.ResetCombatTick(character);
             }
             else
             {
                 this.nextCombatTicks.Remove(attacker.Instance);
             }
-
-            this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Instance);
         }
 
         public void RespawnPlayer(ICharacter character)
@@ -2389,10 +2367,7 @@ namespace AORebirth.Core.Playfields
             character.StopMovement();
             character.SetTarget(Identity.None);
             character.SetFightingTarget(Identity.None);
-            this.nextCombatTicks.Remove(character.Identity.Instance);
-            this.lastCombatWeaponSlots.Remove(character.Identity.Instance);
-            this.lastNpcUnarmedAttackInfoSlots.Remove(character.Identity.Instance);
-            this.lastNpcSpecialAttackWeaponTargets.Remove(character.Identity.Instance);
+            this.ClearCombatTracking(character.Identity);
             this.StopFightingDeadTarget(character.Identity);
             this.SendCombatStopMessage(character);
             character.SendChangedStats();
@@ -2510,12 +2485,15 @@ namespace AORebirth.Core.Playfields
 
         private void DoCombatTick(ICharacter attacker)
         {
+            if (attacker.Controller is NPCController)
+            {
+                this.npcCombatTick.ProcessCombatTick(attacker);
+                return;
+            }
+
             if (attacker.FightingTarget.Instance == 0)
             {
-                this.nextCombatTicks.Remove(attacker.Identity.Instance);
-                this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
-                this.lastNpcUnarmedAttackInfoSlots.Remove(attacker.Identity.Instance);
-                this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
+                this.ClearCombatTracking(attacker.Identity);
                 return;
             }
 
@@ -2531,19 +2509,8 @@ namespace AORebirth.Core.Playfields
                         target != null,
                         target != null && target.InPlayfield(this.Identity),
                         target == null ? 0 : target.Stats[StatIds.health].Value));
-                if (attacker.Controller is NPCController)
-                {
-                    double invalidDistance = target == null
-                                                 ? -1.0
-                                                 : GetCombatDistance(attacker, target);
-                    LogNpcBrain("Idle", "target-invalid", attacker, target, 0.0, invalidDistance);
-                }
-
                 attacker.SetFightingTarget(Identity.None);
-                this.nextCombatTicks.Remove(attacker.Identity.Instance);
-                this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
-                this.lastNpcUnarmedAttackInfoSlots.Remove(attacker.Identity.Instance);
-                this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
+                this.ClearCombatTracking(attacker.Identity);
                 return;
             }
 
@@ -2553,18 +2520,6 @@ namespace AORebirth.Core.Playfields
             if (this.nextCombatTicks.TryGetValue(attacker.Identity.Instance, out nextTick)
                 && nextTick > now)
             {
-                if (IsCapturedCleaningRobot(attacker) && attacker.Controller is NPCController)
-                {
-                    if (!this.IsInCombatRange(attacker, target, attackSource.Range))
-                    {
-                        this.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
-                    }
-                    else if (attackSource.Range <= MaxMeleeCombatDistance)
-                    {
-                        this.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);
-                    }
-                }
-
                 return;
             }
 
@@ -2576,17 +2531,11 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            if (attacker.Controller is NPCController && attackSource.Range <= MaxMeleeCombatDistance)
-            {
-                this.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);
-            }
-
             int currentHealth = target.Stats[StatIds.health].Value;
             int damage = this.CalculateCombatDamage(attacker, attackSource);
             int newHealth = Math.Max(0, currentHealth - damage);
             bool killingHit = newHealth == 0;
 
-            this.AnnounceNpcSpecialAttackWeaponContextIfNeeded(attacker, target, attackSource);
             target.Stats[StatIds.health].Value = newHealth;
             this.AnnounceCombatDamage(
                 attacker,
@@ -2611,23 +2560,7 @@ namespace AORebirth.Core.Playfields
 
             if (killingHit)
             {
-                if (target.Controller is NPCController)
-                {
-                    this.KillNpcTarget(attacker, target);
-                }
-                else if (target.Controller is PlayerController)
-                {
-                    this.KillPlayerTarget(target);
-                }
-                else
-                {
-                    attacker.SetFightingTarget(Identity.None);
-                    this.nextCombatTicks.Remove(attacker.Identity.Instance);
-                    this.lastCombatWeaponSlots.Remove(attacker.Identity.Instance);
-                    this.lastNpcUnarmedAttackInfoSlots.Remove(attacker.Identity.Instance);
-                    this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
-                }
-
+                this.HandleCombatKillingHit(attacker, target);
                 return;
             }
 
@@ -2645,7 +2578,7 @@ namespace AORebirth.Core.Playfields
                 attacker.Controller is PlayerController);
         }
 
-        private bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)
+        internal bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)
         {
             return GetCombatDistance(attacker, target) <= range;
         }
@@ -2686,7 +2619,7 @@ namespace AORebirth.Core.Playfields
                 start.z + ((destination.z - start.z) * factor));
         }
 
-        private static double GetCombatDistance(ICharacter attacker, ICharacter target)
+        internal static double GetCombatDistance(ICharacter attacker, ICharacter target)
         {
             return GetCombatPosition(attacker).Distance2D(GetCombatPosition(target));
         }
@@ -2768,63 +2701,14 @@ namespace AORebirth.Core.Playfields
             LogNpcBrain("FollowTargetContinue", reason, attacker, target, range, distance);
         }
 
-        private static bool IsCapturedCleaningRobot(ICharacter character)
+        internal static bool IsCapturedCleaningRobot(ICharacter character)
         {
             return character != null
                    && string.Equals(character.Name, CapturedCleaningRobotName, StringComparison.OrdinalIgnoreCase)
                    && character.Stats[StatIds.monsterdata].Value == CapturedCleaningRobotMonsterData;
         }
 
-        private void AnnounceNpcSpecialAttackWeaponContextIfNeeded(
-            ICharacter attacker,
-            ICharacter target,
-            CombatAttackSource attackSource)
-        {
-            if (!IsCapturedCleaningRobot(attacker) || attackSource.UsesEquippedWeapon)
-            {
-                return;
-            }
-
-            int attackerInstance = attacker.Identity.Instance;
-            int targetInstance = target.Identity.Instance;
-            int previousTargetInstance;
-            if (this.lastNpcSpecialAttackWeaponTargets.TryGetValue(attackerInstance, out previousTargetInstance)
-                && previousTargetInstance == targetInstance)
-            {
-                return;
-            }
-
-            this.lastNpcSpecialAttackWeaponTargets[attackerInstance] = targetInstance;
-            this.Announce(
-                new SpecialAttackWeaponMessage
-                {
-                    Identity = attacker.Identity,
-                    Specials = CreateCapturedCleaningRobotSpecialAttacks(),
-                    Unknown1 = CapturedCleaningRobotSpecialAttackWeaponValue,
-                    Unknown2 = CapturedCleaningRobotSpecialAttackWeaponValue,
-                    Unknown3 = CapturedCleaningRobotSpecialAttackWeaponValue,
-                    Unknown4 = CapturedCleaningRobotSpecialAttackWeaponValue,
-                    Unknown5 = CapturedCleaningRobotSpecialAttackWeaponLastValue
-                });
-            this.Announce(
-                new AttackMessage
-                {
-                    Identity = attacker.Identity,
-                    Target = target.Identity,
-                    Action = 0
-                });
-
-            LogUtil.Debug(
-                DebugInfoDetail.Network,
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "CombatNpcAttackStartContextSend attacker={0} target={1} monsterData={2}",
-                    attacker.Identity,
-                    target.Identity,
-                    attacker.Stats[StatIds.monsterdata].Value));
-        }
-
-        private static void LogNpcBrain(string state, string reason, ICharacter attacker, ICharacter target, double range, double distance)
+        internal static void LogNpcBrain(string state, string reason, ICharacter attacker, ICharacter target, double range, double distance)
         {
             LogUtil.Debug(
                 DebugInfoDetail.Network,
@@ -2955,7 +2839,7 @@ namespace AORebirth.Core.Playfields
                            DamageBonus = NormalizeCombatItemStat(attacker.Stats[StatIds.damagebonus].Value, 0),
                            Range = MaxMeleeCombatDistance,
                            RechargeSeconds = IsCapturedCleaningRobot(attacker)
-                                                 ? CapturedCleaningRobotCombatTickSeconds
+                                                 ? NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds
                                                  : DefaultCombatTickSeconds,
                            UsesEquippedWeapon = false,
                            AttackInfoAmmoCount = UnarmedAttackInfoAmmoCount,
@@ -3003,32 +2887,11 @@ namespace AORebirth.Core.Playfields
 
         private int GetUnarmedAttackInfoWeaponSlot(ICharacter attacker)
         {
-            if (!(attacker.Controller is NPCController))
-            {
-                return PlayerUnarmedAttackInfoWeaponSlot;
-            }
-
-            int lastSlot;
-            if (this.lastNpcUnarmedAttackInfoSlots.TryGetValue(attacker.Identity.Instance, out lastSlot)
-                && lastSlot == NpcUnarmedRightAttackInfoWeaponSlot)
-            {
-                this.lastNpcUnarmedAttackInfoSlots[attacker.Identity.Instance] = NpcUnarmedLeftAttackInfoWeaponSlot;
-                return NpcUnarmedLeftAttackInfoWeaponSlot;
-            }
-
-            this.lastNpcUnarmedAttackInfoSlots[attacker.Identity.Instance] = NpcUnarmedRightAttackInfoWeaponSlot;
-            return NpcUnarmedRightAttackInfoWeaponSlot;
+            return PlayerUnarmedAttackInfoWeaponSlot;
         }
 
         private int GetUnarmedAttackDamage(ICharacter attacker, int attackInfoWeaponSlot)
         {
-            if (IsCapturedCleaningRobot(attacker))
-            {
-                return attackInfoWeaponSlot == NpcUnarmedLeftAttackInfoWeaponSlot
-                           ? CapturedCleaningRobotLeftHandDamage
-                           : CapturedCleaningRobotRightHandDamage;
-            }
-
             return Math.Max(
                 NormalizeCombatItemStat(attacker.Stats[StatIds.mindamage].Value, 0),
                 NormalizeCombatItemStat(attacker.Stats[StatIds.maxdamage].Value, 0));
@@ -3036,19 +2899,7 @@ namespace AORebirth.Core.Playfields
 
         private int GetUnarmedAttackInfoWeaponInstance(ICharacter attacker)
         {
-            if (!(attacker.Controller is NPCController))
-            {
-                return PlayerUnarmedAttackInfoWeaponInstance;
-            }
-
-            int slot;
-            if (!this.lastNpcUnarmedAttackInfoSlots.TryGetValue(attacker.Identity.Instance, out slot)
-                || slot == NpcUnarmedRightAttackInfoWeaponSlot)
-            {
-                return NpcUnarmedRightAttackInfoWeaponInstance;
-            }
-
-            return NpcUnarmedLeftAttackInfoWeaponInstance;
+            return PlayerUnarmedAttackInfoWeaponInstance;
         }
 
         private EquippedCombatWeapon GetEquippedCombatWeapon(ICharacter attacker)
@@ -3148,7 +2999,7 @@ namespace AORebirth.Core.Playfields
             return Math.Max(0.25, totalCentiseconds / 100.0);
         }
 
-        private void UpdateNpcMeleeFollowHold(ICharacter attacker, ICharacter target, double range)
+        internal void UpdateNpcMeleeFollowHold(ICharacter attacker, ICharacter target, double range)
         {
             NPCController npcController = attacker.Controller as NPCController;
             if (npcController == null)
@@ -3166,7 +3017,7 @@ namespace AORebirth.Core.Playfields
             this.MoveNpcTowardCombatTarget(attacker, target, range, "melee-separated");
         }
 
-        private void TryMoveNpcIntoCombatRange(ICharacter attacker, ICharacter target, double range)
+        internal void TryMoveNpcIntoCombatRange(ICharacter attacker, ICharacter target, double range)
         {
             NPCController npcController = attacker.Controller as NPCController;
             if (npcController == null)
@@ -3187,14 +3038,28 @@ namespace AORebirth.Core.Playfields
             this.npcCorpseLifecycle.BeginNpcDeath(attacker, target);
         }
 
+        internal void HandleCombatKillingHit(ICharacter attacker, ICharacter target)
+        {
+            if (target.Controller is NPCController)
+            {
+                this.KillNpcTarget(attacker, target);
+            }
+            else if (target.Controller is PlayerController)
+            {
+                this.KillPlayerTarget(target);
+            }
+            else
+            {
+                attacker.SetFightingTarget(Identity.None);
+                this.ClearCombatTracking(attacker.Identity);
+            }
+        }
+
         internal void StopDyingNpcCombatState(ICharacter target)
         {
             target.SetTarget(Identity.None);
             target.SetFightingTarget(Identity.None);
-            this.nextCombatTicks.Remove(target.Identity.Instance);
-            this.lastCombatWeaponSlots.Remove(target.Identity.Instance);
-            this.lastNpcUnarmedAttackInfoSlots.Remove(target.Identity.Instance);
-            this.lastNpcSpecialAttackWeaponTargets.Remove(target.Identity.Instance);
+            this.ClearCombatTracking(target.Identity);
 
             NPCController npcController = target.Controller as NPCController;
             if (npcController != null)
@@ -3287,10 +3152,7 @@ namespace AORebirth.Core.Playfields
             target.SendChangedStats();
             target.SetTarget(Identity.None);
             target.SetFightingTarget(Identity.None);
-            this.nextCombatTicks.Remove(target.Identity.Instance);
-            this.lastCombatWeaponSlots.Remove(target.Identity.Instance);
-            this.lastNpcUnarmedAttackInfoSlots.Remove(target.Identity.Instance);
-            this.lastNpcSpecialAttackWeaponTargets.Remove(target.Identity.Instance);
+            this.ClearCombatTracking(target.Identity);
             this.StopFightingDeadTarget(target.Identity);
             this.SendCombatStopMessage(target);
             this.SendPlayerDeathAnimation(target);
@@ -4071,33 +3933,11 @@ namespace AORebirth.Core.Playfields
                    };
         }
 
-        private static SpecialAttack[] CreateCapturedCleaningRobotSpecialAttacks()
-        {
-            return new[]
-                   {
-                       new SpecialAttack
-                       {
-                           Unknown1 = CapturedCleaningRobotLeftWeaponTemplate,
-                           Unknown2 = CapturedCleaningRobotLeftWeaponTemplate,
-                           Unknown3 = CapturedCleaningRobotLeftWeaponTag,
-                           Unknown4 = "LIW2"
-                       },
-                       new SpecialAttack
-                       {
-                           Unknown1 = CapturedCleaningRobotRightWeaponTemplate,
-                           Unknown2 = CapturedCleaningRobotRightWeaponTemplate,
-                           Unknown3 = CapturedCleaningRobotRightWeaponTag,
-                           Unknown4 = "LIW1"
-                       }
-                   };
-        }
-
         internal void ClearCombatTracking(Identity identity)
         {
             this.nextCombatTicks.Remove(identity.Instance);
             this.lastCombatWeaponSlots.Remove(identity.Instance);
-            this.lastNpcUnarmedAttackInfoSlots.Remove(identity.Instance);
-            this.lastNpcSpecialAttackWeaponTargets.Remove(identity.Instance);
+            this.npcCombatTick.ClearTracking(identity);
         }
 
         internal void RemoveNpcHome(Identity identity)
@@ -4534,10 +4374,7 @@ namespace AORebirth.Core.Playfields
                 if (character.FightingTarget == deadTarget)
                 {
                     character.SetFightingTarget(Identity.None);
-                    this.nextCombatTicks.Remove(character.Identity.Instance);
-                    this.lastCombatWeaponSlots.Remove(character.Identity.Instance);
-                    this.lastNpcUnarmedAttackInfoSlots.Remove(character.Identity.Instance);
-                    this.lastNpcSpecialAttackWeaponTargets.Remove(character.Identity.Instance);
+                    this.ClearCombatTracking(character.Identity);
                     PlayfieldLifecycleTrace.Record(
                         PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
                         PlayfieldLifecycleTrace.StageAttackerStopFight,

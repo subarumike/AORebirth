@@ -144,6 +144,48 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void CleaningRobotNpcAttackOrderKeepsSpecialAttackWeaponBeforeAttackInfo()
+        {
+            Identity robot = new Identity { Type = IdentityType.CanbeAffected, Instance = 2001 };
+            Identity target = new Identity { Type = IdentityType.CanbeAffected, Instance = 1001 };
+
+            using (PlayfieldLifecycleCapture capture = PlayfieldLifecycleTrace.Capture())
+            {
+                PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowCleaningRobotNpcAttack,
+                    PlayfieldLifecycleTrace.StageRobotSpecialAttackWeaponContext,
+                    PlayfieldLifecycleTrace.MessageSpecialAttackWeapon,
+                    robot,
+                    "target=" + target);
+                PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowCleaningRobotNpcAttack,
+                    PlayfieldLifecycleTrace.StageRobotAttackStartContext,
+                    PlayfieldLifecycleTrace.MessageAttack,
+                    robot,
+                    "target=" + target);
+                PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowCleaningRobotNpcAttack,
+                    PlayfieldLifecycleTrace.StageRobotAttackInfo,
+                    PlayfieldLifecycleTrace.MessageAttackInfo,
+                    robot,
+                    "target=" + target);
+
+                AssertExpectedOrder(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.FlowCleaningRobotNpcAttack,
+                    PlayfieldLifecycleTrace.ExpectedCleaningRobotNpcAttackOrder);
+                AssertStageBefore(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StageRobotSpecialAttackWeaponContext,
+                    PlayfieldLifecycleTrace.StageRobotAttackStartContext);
+                AssertStageBefore(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StageRobotAttackStartContext,
+                    PlayfieldLifecycleTrace.StageRobotAttackInfo);
+            }
+        }
+
+        [TestMethod]
         public void NpcCorpseLifecycleRulesPreserveCapturedCleaningRobotDeathTimings()
         {
             Assert.AreEqual(
@@ -158,6 +200,34 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 500,
                 NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2,
                 "Cleaning robot CharacterAction Death Parameter2 must stay capture-backed.");
+        }
+
+        [TestMethod]
+        public void NpcCombatAttackRulesPreserveCapturedCleaningRobotContextDecision()
+        {
+            Assert.AreEqual(10, NpcCombatAttackRules.CapturedCleaningRobotRightHandDamage);
+            Assert.AreEqual(8, NpcCombatAttackRules.CapturedCleaningRobotLeftHandDamage);
+            Assert.AreEqual(
+                2700,
+                (int)(NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds * 1000));
+            Assert.IsTrue(
+                NpcCombatAttackRules.ShouldSendCapturedCleaningRobotAttackStartContext(
+                    true,
+                    false,
+                    null,
+                    1001));
+            Assert.IsFalse(
+                NpcCombatAttackRules.ShouldSendCapturedCleaningRobotAttackStartContext(
+                    true,
+                    false,
+                    1001,
+                    1001));
+            Assert.IsFalse(
+                NpcCombatAttackRules.ShouldSendCapturedCleaningRobotAttackStartContext(
+                    true,
+                    true,
+                    null,
+                    1001));
         }
 
         private static void AssertExpectedOrder(
