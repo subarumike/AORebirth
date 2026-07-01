@@ -111,6 +111,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcCorpseLifecycleRules.cs">
       <Link>NpcCorpseLifecycleRules.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcPatrolReplayCoordinator.cs">
+      <Link>NpcPatrolReplayCoordinator.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleTrace.cs">
       <Link>PlayfieldLifecycleTrace.cs</Link>
     </Compile>

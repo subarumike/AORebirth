@@ -56,6 +56,7 @@ namespace ZoneEngine.Core.Controllers
     using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.KnuBot;
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Playfields;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
@@ -80,7 +81,7 @@ namespace ZoneEngine.Core.Controllers
 
         private Vector3 lastMotionPacketDestination = new Vector3();
 
-        private CapturedPatrolReplaySegment[] capturedPatrolReplaySegments = new CapturedPatrolReplaySegment[0];
+        private NpcPatrolReplaySegment[] capturedPatrolReplaySegments = new NpcPatrolReplaySegment[0];
 
         private int capturedPatrolReplayIndex;
 
@@ -111,29 +112,6 @@ namespace ZoneEngine.Core.Controllers
         private const int CapturedCleaningRobotMonsterData = 297023;
 
         public NpcAiProfile AiProfile { get; set; } = NpcAiProfile.Passive;
-
-        public sealed class CapturedPatrolReplaySegment
-        {
-            public CapturedPatrolReplaySegment(
-                double delayAfterSeconds,
-                float startX,
-                float startY,
-                float startZ,
-                float endX,
-                float endY,
-                float endZ)
-            {
-                this.DelayAfterSeconds = delayAfterSeconds;
-                this.Start = new Vector3(startX, startY, startZ);
-                this.End = new Vector3(endX, endY, endZ);
-            }
-
-            public double DelayAfterSeconds { get; private set; }
-
-            public Vector3 Start { get; private set; }
-
-            public Vector3 End { get; private set; }
-        }
 
         private struct NpcMotionSegment
         {
@@ -295,9 +273,9 @@ namespace ZoneEngine.Core.Controllers
                    && this.Character.Stats[StatIds.monsterdata].Value == CapturedCleaningRobotMonsterData;
         }
 
-        public void SetCapturedPatrolReplaySegments(CapturedPatrolReplaySegment[] segments)
+        public void SetCapturedPatrolReplaySegments(NpcPatrolReplaySegment[] segments)
         {
-            this.capturedPatrolReplaySegments = segments ?? new CapturedPatrolReplaySegment[0];
+            this.capturedPatrolReplaySegments = segments ?? new NpcPatrolReplaySegment[0];
             this.capturedPatrolReplayIndex = 0;
             this.nextCapturedPatrolReplayUtc = DateTime.MinValue;
         }
@@ -325,16 +303,18 @@ namespace ZoneEngine.Core.Controllers
                 this.capturedPatrolReplayIndex = 0;
             }
 
-            CapturedPatrolReplaySegment segment = this.capturedPatrolReplaySegments[this.capturedPatrolReplayIndex];
+            NpcPatrolReplaySegment segment = this.capturedPatrolReplaySegments[this.capturedPatrolReplayIndex];
             this.Walk();
-            this.followCoordinates = segment.End;
-            this.Character.Coordinates(segment.Start);
-            this.FaceToward(segment.Start, segment.End);
-            this.LogChase("captured-patrol-replay", segment.Start, segment.End);
-            FollowTargetMessageHandler.Default.Send(this.Character, segment.Start, segment.End);
-            this.SetMotionSegment(segment.Start, segment.End, now);
+            var start = new Vector3(segment.StartX, segment.StartY, segment.StartZ);
+            var end = new Vector3(segment.EndX, segment.EndY, segment.EndZ);
+            this.followCoordinates = end;
+            this.Character.Coordinates(start);
+            this.FaceToward(start, end);
+            this.LogChase("captured-patrol-replay", start, end);
+            FollowTargetMessageHandler.Default.Send(this.Character, start, end);
+            this.SetMotionSegment(start, end, now);
             this.lastMotionPacketUtc = now;
-            this.lastMotionPacketDestination = segment.End;
+            this.lastMotionPacketDestination = end;
             this.hasMotionPacket = true;
 
             this.capturedPatrolReplayIndex = (this.capturedPatrolReplayIndex + 1) % this.capturedPatrolReplaySegments.Length;

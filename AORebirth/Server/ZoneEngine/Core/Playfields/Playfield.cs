@@ -258,6 +258,9 @@ namespace AORebirth.Core.Playfields
         private static readonly CapturedAreteRobotContentProvider CapturedAreteRobotContent =
             new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
 
+        private static readonly NpcPatrolReplayCoordinator NpcPatrolReplay =
+            new NpcPatrolReplayCoordinator(CapturedAreteRobotContent);
+
         private const int UnarmedAttackInfoAmmoCount = -1;
 
         private const int PlayerUnarmedAttackInfoWeaponSlot = 0;
@@ -529,7 +532,7 @@ namespace AORebirth.Core.Playfields
             SetCapturedMobStat(mobCharacter, StatIds.runspeed, spawn.RunSpeed);
             mobCharacter.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
             AssignCapturedPatrolWaypoints(mobCharacter, spawn);
-            npcController.SetCapturedPatrolReplaySegments(GetCapturedCleaningRobotPatrolReplaySegments(spawn.SourceInstance));
+            NpcPatrolReplay.AssignCapturedAreteRobotReplay(spawn.SourceInstance, npcController.SetCapturedPatrolReplaySegments);
             mobCharacter.DoNotDoTimers = false;
             this.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));
 
@@ -564,26 +567,6 @@ namespace AORebirth.Core.Playfields
         {
             mobCharacter.Stats[stat].Value = value;
             mobCharacter.Stats[stat].BaseValue = (uint)value;
-        }
-
-        private static NPCController.CapturedPatrolReplaySegment[] GetCapturedCleaningRobotPatrolReplaySegments(int sourceInstance)
-        {
-            CapturedAreteRobotPatrolReplaySegment[] segments =
-                CapturedAreteRobotContent.GetPatrolReplaySegments(sourceInstance);
-            var result = new NPCController.CapturedPatrolReplaySegment[segments.Length];
-            for (int i = 0; i < segments.Length; i++)
-            {
-                result[i] = new NPCController.CapturedPatrolReplaySegment(
-                    segments[i].DelayAfterSeconds,
-                    segments[i].StartX,
-                    segments[i].StartY,
-                    segments[i].StartZ,
-                    segments[i].EndX,
-                    segments[i].EndY,
-                    segments[i].EndZ);
-            }
-
-            return result;
         }
 
         #endregion
