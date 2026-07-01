@@ -84,6 +84,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\GuestKeyGeneratorInteractionRules.cs">
       <Link>GuestKeyGeneratorInteractionRules.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\InventoryContainerInteractionRules.cs">
+      <Link>InventoryContainerInteractionRules.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\SurgeryClinicInteractionRules.cs">
       <Link>SurgeryClinicInteractionRules.cs</Link>
     </Compile>

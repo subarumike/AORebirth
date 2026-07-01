@@ -102,17 +102,19 @@ namespace ZoneEngine.Core.MessageHandlers
                 return GenericCmdUseRoute.RexB18DBoxProgress;
             }
 
-            if (target.Type == IdentityType.Inventory)
+            InventoryContainerInteractionRouteMode inventoryRouteMode =
+                InventoryContainerInteractionRules.ResolveRouteMode(target);
+            if (inventoryRouteMode == InventoryContainerInteractionRouteMode.InventoryItem)
             {
                 return GenericCmdUseRoute.InventoryItem;
             }
 
-            if (target.Type == IdentityType.ArmorPage || target.Type == IdentityType.SocialPage)
+            if (inventoryRouteMode == InventoryContainerInteractionRouteMode.WearOrSocialBackpack)
             {
                 return GenericCmdUseRoute.WearOrSocialBackpack;
             }
 
-            if (target.Type == IdentityType.Container)
+            if (inventoryRouteMode == InventoryContainerInteractionRouteMode.BackpackContainer)
             {
                 return GenericCmdUseRoute.BackpackContainer;
             }
