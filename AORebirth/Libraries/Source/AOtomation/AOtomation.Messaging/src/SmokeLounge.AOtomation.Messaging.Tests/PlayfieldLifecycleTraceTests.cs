@@ -601,12 +601,41 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(moduleText.Contains("public bool Supports(Identity playfieldIdentity)"));
             Assert.IsTrue(moduleText.Contains("public void Register(PlayfieldContentRegistration registration)"));
             Assert.IsTrue(
-                playfieldText.Contains(
-                    "new PlayfieldContentCoordinator(new AreteContentModule(), new PrivateCityContentModule())"),
+                playfieldText.Contains("new PrivateCityContentModule()"),
                 "Playfield content coordinator must register the private-city content module skeleton.");
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\Content\PrivateCityContentModule.cs"),
                 "ZoneEngine project must compile the private-city content module skeleton.");
+        }
+
+        [TestMethod]
+        public void MontroyalContentModuleSkeletonIsRegisteredWithoutRuntimeOwnership()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string modulePath = Path.Combine(
+                repositoryRoot,
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\MontroyalContentModule.cs");
+            string playfieldPath = Path.Combine(
+                repositoryRoot,
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+            string projectPath = Path.Combine(
+                repositoryRoot,
+                @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
+
+            string moduleText = File.ReadAllText(modulePath);
+            string playfieldText = File.ReadAllText(playfieldPath);
+            string projectText = File.ReadAllText(projectPath);
+
+            Assert.IsTrue(moduleText.Contains("public sealed class MontroyalContentModule : IPlayfieldContentModule"));
+            Assert.IsTrue(moduleText.Contains("private const int MontroyalPlayfieldInstance = 655"));
+            Assert.IsTrue(moduleText.Contains("public bool Supports(Identity playfieldIdentity)"));
+            Assert.IsTrue(moduleText.Contains("public void Register(PlayfieldContentRegistration registration)"));
+            Assert.IsTrue(
+                playfieldText.Contains("new MontroyalContentModule()"),
+                "Playfield content coordinator must register the Montroyal content module skeleton.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\Content\MontroyalContentModule.cs"),
+                "ZoneEngine project must compile the Montroyal content module skeleton.");
         }
 
         private static void AssertExpectedOrder(
