@@ -586,23 +586,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string modulePath = Path.Combine(
                 repositoryRoot,
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PrivateCityContentModule.cs");
-            string playfieldPath = Path.Combine(
+            string runtimeSystemsPath = Path.Combine(
                 repositoryRoot,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs");
             string projectPath = Path.Combine(
                 repositoryRoot,
                 @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
 
             string moduleText = File.ReadAllText(modulePath);
-            string playfieldText = File.ReadAllText(playfieldPath);
+            string runtimeSystemsText = File.ReadAllText(runtimeSystemsPath);
             string projectText = File.ReadAllText(projectPath);
 
             Assert.IsTrue(moduleText.Contains("public sealed class PrivateCityContentModule : IPlayfieldContentModule"));
             Assert.IsTrue(moduleText.Contains("public bool Supports(Identity playfieldIdentity)"));
             Assert.IsTrue(moduleText.Contains("public void Register(PlayfieldContentRegistration registration)"));
             Assert.IsTrue(
-                playfieldText.Contains("new PrivateCityContentModule()"),
-                "Playfield content coordinator must register the private-city content module skeleton.");
+                runtimeSystemsText.Contains("new PrivateCityContentModule()"),
+                "PlayfieldRuntimeSystems content coordinator must register the private-city content module skeleton.");
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\Content\PrivateCityContentModule.cs"),
                 "ZoneEngine project must compile the private-city content module skeleton.");
@@ -615,15 +615,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string modulePath = Path.Combine(
                 repositoryRoot,
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\MontroyalContentModule.cs");
-            string playfieldPath = Path.Combine(
+            string runtimeSystemsPath = Path.Combine(
                 repositoryRoot,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs");
             string projectPath = Path.Combine(
                 repositoryRoot,
                 @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
 
             string moduleText = File.ReadAllText(modulePath);
-            string playfieldText = File.ReadAllText(playfieldPath);
+            string runtimeSystemsText = File.ReadAllText(runtimeSystemsPath);
             string projectText = File.ReadAllText(projectPath);
 
             Assert.IsTrue(moduleText.Contains("public sealed class MontroyalContentModule : IPlayfieldContentModule"));
@@ -631,8 +631,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(moduleText.Contains("public bool Supports(Identity playfieldIdentity)"));
             Assert.IsTrue(moduleText.Contains("public void Register(PlayfieldContentRegistration registration)"));
             Assert.IsTrue(
-                playfieldText.Contains("new MontroyalContentModule()"),
-                "Playfield content coordinator must register the Montroyal content module skeleton.");
+                runtimeSystemsText.Contains("new MontroyalContentModule()"),
+                "PlayfieldRuntimeSystems content coordinator must register the Montroyal content module skeleton.");
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\Content\MontroyalContentModule.cs"),
                 "ZoneEngine project must compile the Montroyal content module skeleton.");
@@ -644,6 +644,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string repositoryRoot = FindRepositoryRoot();
             string playfieldText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string runtimeSystemsText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
             string coordinatorText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -661,13 +663,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 };
 
             Assert.IsTrue(
-                playfieldText.Contains("private static readonly PlayfieldContentCoordinator PlayfieldContent"),
-                "Playfield must keep content module registration behind PlayfieldContentCoordinator.");
+                playfieldText.Contains("private readonly PlayfieldRuntimeSystems runtimeSystems"),
+                "Playfield must own runtime systems through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
-                playfieldText.Contains("PlayfieldContent.RegisterContent(this, playfieldIdentity);"),
-                "Playfield must enter content registration through PlayfieldContentCoordinator.RegisterContent.");
+                playfieldText.Contains("this.runtimeSystems.RegisterContent(playfieldIdentity);"),
+                "Playfield must enter content registration through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("private readonly PlayfieldContentCoordinator content"),
+                "PlayfieldRuntimeSystems must own PlayfieldContentCoordinator.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("this.content.RegisterContent(this.playfield, playfieldIdentity);"),
+                "PlayfieldRuntimeSystems must delegate content registration through PlayfieldContentCoordinator.");
 
-            int coordinatorIndex = playfieldText.IndexOf("new PlayfieldContentCoordinator(", StringComparison.Ordinal);
+            int coordinatorIndex = runtimeSystemsText.IndexOf("new PlayfieldContentCoordinator(", StringComparison.Ordinal);
             Assert.IsTrue(coordinatorIndex >= 0, "Missing PlayfieldContentCoordinator construction.");
 
             int previousIndex = coordinatorIndex;
@@ -676,10 +684,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 string constructor = "new " + expectedModules[i] + "()";
                 Assert.AreEqual(
                     1,
-                    CountOccurrences(playfieldText, constructor),
+                    CountOccurrences(runtimeSystemsText, constructor),
                     expectedModules[i] + " must be registered exactly once.");
+                Assert.AreEqual(
+                    0,
+                    CountOccurrences(playfieldText, constructor),
+                    "Playfield must not directly construct " + expectedModules[i] + ".");
 
-                int moduleIndex = playfieldText.IndexOf(constructor, coordinatorIndex, StringComparison.Ordinal);
+                int moduleIndex = runtimeSystemsText.IndexOf(constructor, coordinatorIndex, StringComparison.Ordinal);
                 Assert.IsTrue(moduleIndex > previousIndex, expectedModules[i] + " is not in expected coordinator order.");
                 previousIndex = moduleIndex;
             }
@@ -696,11 +708,59 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void PlayfieldRuntimeSystemsFacadeOwnsSeparatedRuntimeCoordinators()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string runtimeSystemsText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+            string projectText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
+
+            string[] runtimeCoordinatorConstructors =
+                {
+                    "new NpcCorpseLifecycleCoordinator(playfield)",
+                    "new NpcCombatTickCoordinator(playfield)",
+                    "new PrivateCityReadyInitCoordinator("
+                };
+            for (int i = 0; i < runtimeCoordinatorConstructors.Length; i++)
+            {
+                Assert.AreEqual(
+                    1,
+                    CountOccurrences(runtimeSystemsText, runtimeCoordinatorConstructors[i]),
+                    "PlayfieldRuntimeSystems must own " + runtimeCoordinatorConstructors[i] + ".");
+                Assert.AreEqual(
+                    0,
+                    CountOccurrences(playfieldText, runtimeCoordinatorConstructors[i]),
+                    "Playfield must not directly construct " + runtimeCoordinatorConstructors[i] + ".");
+            }
+
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.SendPrivateCityPlayfieldReadyBlock(client, character);"),
+                "Playfield must delegate private-city ready block sending through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.ProcessNpcCombatTick(attacker);"),
+                "Playfield must delegate NPC combat ticks through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.BeginNpcDeath(attacker, target);"),
+                "Playfield must delegate NPC corpse lifecycle start through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.ProcessDeadNpc(dynel)"),
+                "Playfield heartbeat must delegate dead NPC processing through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldRuntimeSystems.cs"),
+                "ZoneEngine project must compile PlayfieldRuntimeSystems.");
+        }
+
+        [TestMethod]
         public void AreteCleaningRobotDbSpawnSuppressionKeepsCapturedPathAndLegacyDbBoundary()
         {
             string repositoryRoot = FindRepositoryRoot();
             string playfieldText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string runtimeSystemsText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
             string areteContentText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -753,10 +813,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 coordinatorText.Contains("module.ShouldSuppressDbMobSpawn(playfieldInstance, mobSpawnId)"),
                 "PlayfieldContentCoordinator must dispatch DB spawn suppression through content modules.");
             Assert.IsTrue(
-                playfieldText.Contains("return PlayfieldContent.ShouldSuppressDbMobSpawn(mob.Playfield, mob.Id);"),
-                "Playfield DB mob loading must ask the content coordinator for DB spawn suppression.");
+                runtimeSystemsText.Contains("return this.content.ShouldSuppressDbMobSpawn(mob.Playfield, mob.Id);"),
+                "PlayfieldRuntimeSystems must ask the content coordinator for DB spawn suppression.");
 
-            int filterIndex = playfieldText.IndexOf("if (ShouldSuppressDbMobSpawn(mob))", StringComparison.Ordinal);
+            int filterIndex = playfieldText.IndexOf("if (this.runtimeSystems.ShouldSuppressDbMobSpawn(mob))", StringComparison.Ordinal);
             Assert.IsTrue(filterIndex >= 0, "Playfield DB mob loading must still call the Arete robot suppression guard.");
             int continueIndex = playfieldText.IndexOf("continue;", filterIndex, StringComparison.Ordinal);
             int loadStatsIndex = playfieldText.IndexOf("MobSpawnStatDao.Instance.GetWhere", filterIndex, StringComparison.Ordinal);
