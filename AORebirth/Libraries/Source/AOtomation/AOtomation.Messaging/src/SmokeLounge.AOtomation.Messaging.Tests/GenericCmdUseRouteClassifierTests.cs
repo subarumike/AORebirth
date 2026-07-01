@@ -7,6 +7,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core.MessageHandlers;
 
@@ -278,6 +279,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertRoute(GenericCmdUseRoute.SurgeryClinic, Terminal(0x01020309), surgeryClinicTerminalMatched: true);
             AssertRoute(GenericCmdUseRoute.PoolOnUseOrTrade, Terminal(0x0102030A), poolContainsTarget: true);
             AssertRoute(GenericCmdUseRoute.StatelFallback, Terminal(0x0102030B));
+        }
+
+        [TestMethod]
+        public void UseItemOnItemRulesExposeCurrentActionDecision()
+        {
+            Assert.AreEqual(
+                UseItemOnItemInteractionRouteMode.UseItemOnItem,
+                UseItemOnItemInteractionRules.ResolveRouteMode(GenericCmdAction.UseItemOnItem));
+            Assert.AreEqual(
+                UseItemOnItemInteractionRouteMode.None,
+                UseItemOnItemInteractionRules.ResolveRouteMode(GenericCmdAction.Use));
         }
 
         private static void AssertRoute(
