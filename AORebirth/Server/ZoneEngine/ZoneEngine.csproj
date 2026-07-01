@@ -277,6 +277,7 @@
     <Compile Include="Core\Packets\WeaponItemFullUpdate.cs" />
     <Compile Include="Core\Playfields\Content\AreteContentModule.cs" />
     <Compile Include="Core\Playfields\Content\IPlayfieldContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\MontroyalContentModule.cs" />
     <Compile Include="Core\Playfields\Content\PlayfieldContentCoordinator.cs" />
     <Compile Include="Core\Playfields\Content\PlayfieldContentRegistration.cs" />
     <Compile Include="Core\Playfields\Content\PrivateCityContentModule.cs" />
