@@ -114,12 +114,12 @@ namespace AORebirth.Core.Playfields
         /// </summary>
         private readonly Timer heartBeat;
 
+        private readonly NpcCorpseLifecycleCoordinator npcCorpseLifecycle;
+
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
         private readonly Dictionary<int, int> lastCombatWeaponSlots = new Dictionary<int, int>();
         private readonly Dictionary<int, int> lastNpcUnarmedAttackInfoSlots = new Dictionary<int, int>();
         private readonly Dictionary<int, int> lastNpcSpecialAttackWeaponTargets = new Dictionary<int, int>();
-
-        private readonly Dictionary<int, DateTime> deadNpcDespawnTicks = new Dictionary<int, DateTime>();
 
         private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
 
@@ -215,10 +215,6 @@ namespace AORebirth.Core.Playfields
 
         private const float UserConfirmedMontroyalExitDestinationZ = 812.8f;
 
-        private static readonly TimeSpan DeadNpcDespawnDelay = TimeSpan.FromSeconds(10);
-
-        private static readonly TimeSpan CorpseSpawnDelay = TimeSpan.FromMilliseconds(600);
-
         private const double MaxMeleeCombatDistance = 8.0;
 
         private const double MaxMeleeFollowHoldDistance = 3.0;
@@ -240,7 +236,6 @@ namespace AORebirth.Core.Playfields
         private const int CapturedCleaningRobotRightHandDamage = 10;
 
         private const int CapturedCleaningRobotLeftHandDamage = 8;
-        private const int CapturedCleaningRobotDeathActionParameter2 = 500;
         private const int CapturedCleaningRobotLeftWeaponTemplate = 0x0001E960;
         private const int CapturedCleaningRobotRightWeaponTemplate = 0x0001E95D;
         private const int CapturedCleaningRobotLeftWeaponTag = 0x4C495732;
@@ -370,6 +365,7 @@ namespace AORebirth.Core.Playfields
         {
             this.server = zoneServer;
             this.playfieldBus = BusSetup.StartWith<AsyncConfiguration>().Construct();
+            this.npcCorpseLifecycle = new NpcCorpseLifecycleCoordinator(this);
 
             this.memBusDisposeContainer.Add(
                 this.playfieldBus.Subscribe<IMSendAOtomationMessageToClient>(SendAOtomationMessageToClient));
@@ -985,7 +981,7 @@ namespace AORebirth.Core.Playfields
 
             this.StopFightingDeadTarget(target.Identity);
             this.pendingCorpseSpawns.Remove(target.Identity.Instance);
-            this.FinalizeNpcDespawn(target);
+            this.npcCorpseLifecycle.FinalizeNpcDespawn(target);
         }
 
         public void RegisterNpcHome(ICharacter character)
@@ -2199,7 +2195,8 @@ namespace AORebirth.Core.Playfields
                         .Where(
                             xx =>
                                 xx.InPlayfield(this.Identity)
-                                && (!xx.DoNotDoTimers || this.deadNpcDespawnTicks.ContainsKey(xx.Identity.Instance)))
+                                && (!xx.DoNotDoTimers
+                                    || this.npcCorpseLifecycle.HasPendingDeadNpcDespawn(xx.Identity)))
                         .ToList();
 
                 foreach (ICharacter dynel in dynels)
@@ -2211,7 +2208,7 @@ namespace AORebirth.Core.Playfields
                             continue;
                         }
 
-                        if (this.ProcessDeadNpc(dynel))
+                        if (this.npcCorpseLifecycle.ProcessDeadNpc(dynel))
                         {
                             continue;
                         }
@@ -3187,56 +3184,10 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            this.BeginNpcDeath(attacker, target);
+            this.npcCorpseLifecycle.BeginNpcDeath(attacker, target);
         }
 
-        private void BeginNpcDeath(ICharacter attacker, ICharacter target)
-        {
-            if (!(target.Controller is NPCController)
-                || this.deadNpcDespawnTicks.ContainsKey(target.Identity.Instance))
-            {
-                return;
-            }
-
-            Identity corpseIdentity = Identity.None;
-            if (this.CanBuildKnownCorpseVisual(target))
-            {
-                corpseIdentity = this.AllocateCorpseIdentity();
-            }
-
-            this.MarkNpcDead(target);
-            this.StopFightingDeadTarget(target.Identity);
-            this.StopDyingNpcCombatState(target);
-            this.SendNpcDeathAnimation(target);
-            if (attacker != null)
-            {
-                RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);
-                this.AwardCombatXp(attacker, target);
-            }
-
-            if (corpseIdentity != Identity.None)
-            {
-                this.ScheduleCorpseSpawn(target, corpseIdentity);
-            }
-            else
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format("Skipping corpse visual spawn for {0}; no known MonsterData-to-CATMesh mapping.", target.Identity));
-            }
-
-            this.deadNpcDespawnTicks[target.Identity.Instance] = DateTime.UtcNow + DeadNpcDespawnDelay;
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
-                PlayfieldLifecycleTrace.StageDeadNpcDespawnScheduled,
-                "DeadNpcDespawnScheduled",
-                target.Identity,
-                "delayMs=" + ((int)DeadNpcDespawnDelay.TotalMilliseconds));
-
-            LogUtil.Debug(DebugInfoDetail.Network, string.Format("NPC died target={0}", target.Identity));
-        }
-
-        private void StopDyingNpcCombatState(ICharacter target)
+        internal void StopDyingNpcCombatState(ICharacter target)
         {
             target.SetTarget(Identity.None);
             target.SetFightingTarget(Identity.None);
@@ -3262,7 +3213,7 @@ namespace AORebirth.Core.Playfields
             }
         }
 
-        private void AwardCombatXp(ICharacter attacker, ICharacter target)
+        internal void AwardCombatXp(ICharacter attacker, ICharacter target)
         {
             if (attacker == null || target == null || !(attacker.Controller is PlayerController))
             {
@@ -3666,31 +3617,7 @@ namespace AORebirth.Core.Playfields
                 looter.Identity.Instance);
         }
 
-        private bool ProcessDeadNpc(ICharacter character)
-        {
-            if (!(character.Controller is NPCController)
-                || character.Stats[StatIds.health].Value > 0)
-            {
-                return false;
-            }
-
-            DateTime despawnTick;
-            if (!this.deadNpcDespawnTicks.TryGetValue(character.Identity.Instance, out despawnTick))
-            {
-                this.BeginNpcDeath(null, character);
-                return true;
-            }
-
-            if (despawnTick > DateTime.UtcNow)
-            {
-                return true;
-            }
-
-            this.FinalizeNpcDespawn(character);
-            return true;
-        }
-
-        private void MarkNpcDead(ICharacter target)
+        internal void MarkNpcDead(ICharacter target)
         {
             target.Stats[StatIds.health].Value = 0;
             target.Stats[StatIds.state].Value = 0;
@@ -3936,14 +3863,14 @@ namespace AORebirth.Core.Playfields
                                    };
         }
 
-        private void SendNpcDeathAnimation(ICharacter target)
+        internal void SendNpcDeathAnimation(ICharacter target)
         {
             PlayfieldLifecycleTrace.Record(
                 PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
                 PlayfieldLifecycleTrace.StageCharacterActionDeathParameter2,
                 PlayfieldLifecycleTrace.MessageCharacterActionDeath,
                 target.Identity,
-                "Parameter2=" + DeathAnimationKeyFor(target));
+                    "Parameter2=" + DeathAnimationKeyFor(target));
             this.Announce(
                 new CharacterActionMessage
                 {
@@ -4165,19 +4092,17 @@ namespace AORebirth.Core.Playfields
                    };
         }
 
-        private void FinalizeNpcDespawn(ICharacter target)
+        internal void ClearCombatTracking(Identity identity)
         {
-            target.DoNotDoTimers = true;
-            this.nextCombatTicks.Remove(target.Identity.Instance);
-            this.lastCombatWeaponSlots.Remove(target.Identity.Instance);
-            this.lastNpcUnarmedAttackInfoSlots.Remove(target.Identity.Instance);
-            this.lastNpcSpecialAttackWeaponTargets.Remove(target.Identity.Instance);
-            this.deadNpcDespawnTicks.Remove(target.Identity.Instance);
-            this.npcHomeStates.Remove(target.Identity.Instance);
-            this.Despawn(target.Identity);
-            Pool.Instance.RemoveObject((Character)target);
+            this.nextCombatTicks.Remove(identity.Instance);
+            this.lastCombatWeaponSlots.Remove(identity.Instance);
+            this.lastNpcUnarmedAttackInfoSlots.Remove(identity.Instance);
+            this.lastNpcSpecialAttackWeaponTargets.Remove(identity.Instance);
+        }
 
-            LogUtil.Debug(DebugInfoDetail.Network, string.Format("NPC despawned target={0}", target.Identity));
+        internal void RemoveNpcHome(Identity identity)
+        {
+            this.npcHomeStates.Remove(identity.Instance);
         }
 
         private void SendPlayerCorpseFullUpdate(ICharacter target, Identity corpseIdentity)
@@ -4296,9 +4221,9 @@ namespace AORebirth.Core.Playfields
             }
         }
 
-        private void ScheduleCorpseSpawn(ICharacter target, Identity corpseIdentity)
+        internal void ScheduleCorpseSpawn(ICharacter target, Identity corpseIdentity)
         {
-            DateTime spawnsAtUtc = DateTime.UtcNow + CorpseSpawnDelay;
+            DateTime spawnsAtUtc = DateTime.UtcNow + NpcCorpseLifecycleRules.CorpseSpawnDelay;
             this.pendingCorpseSpawns[target.Identity.Instance] =
                 new CorpseState
                 {
@@ -4314,7 +4239,8 @@ namespace AORebirth.Core.Playfields
                 PlayfieldLifecycleTrace.StageCorpseSpawnScheduled,
                 "CorpseSpawnScheduled",
                 corpseIdentity,
-                "deadNpc=" + target.Identity + " delayMs=" + ((int)CorpseSpawnDelay.TotalMilliseconds));
+                "deadNpc=" + target.Identity + " delayMs="
+                + ((int)NpcCorpseLifecycleRules.CorpseSpawnDelay.TotalMilliseconds));
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,
@@ -4322,7 +4248,7 @@ namespace AORebirth.Core.Playfields
                     "Corpse scheduled corpse={0} deadNpc={1} delayMs={2}",
                     corpseIdentity,
                     target.Identity,
-                    (int)CorpseSpawnDelay.TotalMilliseconds));
+                    (int)NpcCorpseLifecycleRules.CorpseSpawnDelay.TotalMilliseconds));
         }
 
         private void RegisterCorpse(ICharacter target, Identity corpseIdentity)
@@ -4519,7 +4445,7 @@ namespace AORebirth.Core.Playfields
             public AORebirth.Core.Vector.Vector3 End { get; set; }
         }
 
-        private Identity AllocateCorpseIdentity()
+        internal Identity AllocateCorpseIdentity()
         {
             this.nextCorpseInstance++;
             if (this.nextCorpseInstance > 0x00F0FFFF)
@@ -4560,7 +4486,7 @@ namespace AORebirth.Core.Playfields
             };
         }
 
-        private bool CanBuildKnownCorpseVisual(ICharacter target)
+        internal bool CanBuildKnownCorpseVisual(ICharacter target)
         {
             return IsCapturedCleaningRobot(target)
                    || CombatCorpseVisuals.IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
@@ -4584,7 +4510,7 @@ namespace AORebirth.Core.Playfields
         {
             if (IsCapturedCleaningRobot(target))
             {
-                return CapturedCleaningRobotDeathActionParameter2;
+                return NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2;
             }
 
             return CombatCorpseVisuals.DeathAnimationKeyFor(
@@ -4600,7 +4526,7 @@ namespace AORebirth.Core.Playfields
                 CorpseCatMeshFor(target));
         }
 
-        private void StopFightingDeadTarget(Identity deadTarget)
+        internal void StopFightingDeadTarget(Identity deadTarget)
         {
             foreach (ICharacter character in
                 Pool.Instance.GetAll<ICharacter>(this.Identity, (int)IdentityType.CanbeAffected))
