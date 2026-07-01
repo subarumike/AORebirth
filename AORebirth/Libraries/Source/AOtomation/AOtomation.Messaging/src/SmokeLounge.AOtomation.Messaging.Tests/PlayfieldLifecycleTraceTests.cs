@@ -230,6 +230,41 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     1001));
         }
 
+        [TestMethod]
+        public void CapturedAreteRobotContentProviderPreservesSpawnDefinitions()
+        {
+            var provider = new CapturedAreteRobotContentProvider();
+            CapturedAreteRobotSpawnDefinition[] spawns = provider.GetSpawnDefinitions();
+
+            Assert.AreEqual(7, spawns.Length);
+            Assert.AreEqual("Malfunctioning Cleaning Robot", CapturedAreteRobotContentProvider.RobotName);
+            Assert.AreEqual(297023, CapturedAreteRobotContentProvider.MonsterData);
+            Assert.AreEqual(0x79225E7C, spawns[0].SourceInstance);
+            Assert.AreEqual(12, spawns[0].Health);
+            Assert.AreEqual(1, spawns[0].Level);
+            Assert.AreEqual(6, spawns[0].RunSpeed);
+            Assert.AreEqual(3617.86938f, spawns[0].X);
+            Assert.AreEqual(51.7449989f, spawns[0].Y);
+            Assert.AreEqual(784.657471f, spawns[0].Z);
+            Assert.AreEqual(3622.77563f, spawns[0].PatrolX);
+            Assert.AreEqual(52.5f, spawns[0].PatrolY);
+            Assert.AreEqual(798.800964f, spawns[0].PatrolZ);
+        }
+
+        [TestMethod]
+        public void CapturedAreteRobotContentProviderPreservesPatrolReplayPathAndMissingFileFallback()
+        {
+            Assert.AreEqual(
+                @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260629-193121\movement-packets.csv",
+                CapturedAreteRobotContentProvider.PatrolReplayRelativePath);
+
+            var provider = new CapturedAreteRobotContentProvider(
+                new[] { @"Z:\AORebirthMissingCapture\movement-packets.csv" });
+
+            Assert.AreEqual(string.Empty, provider.FindPatrolReplayPath());
+            Assert.AreEqual(0, provider.GetPatrolReplaySegments(0x79225E7C).Length);
+        }
+
         private static void AssertExpectedOrder(
             IList<PlayfieldLifecycleEvent> events,
             string flow,

@@ -275,6 +275,7 @@
     <Compile Include="Core\Packets\TradeSkillPacket.cs" />
     <Compile Include="Core\Packets\UnEquip.cs" />
     <Compile Include="Core\Packets\WeaponItemFullUpdate.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteRobotContentProvider.cs" />
     <Compile Include="Core\Playfields\NpcCombatAttackRules.cs" />
     <Compile Include="Core\Playfields\NpcCombatTickCoordinator.cs" />
     <Compile Include="Core\Playfields\NpcCorpseLifecycleCoordinator.cs" />
