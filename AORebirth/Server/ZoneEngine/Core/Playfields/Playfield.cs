@@ -119,6 +119,8 @@ namespace AORebirth.Core.Playfields
 
         private readonly NpcCombatTickCoordinator npcCombatTick;
 
+        private readonly PrivateCityReadyInitCoordinator privateCityReadyInit;
+
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
         private readonly Dictionary<int, int> lastCombatWeaponSlots = new Dictionary<int, int>();
 
@@ -331,6 +333,14 @@ namespace AORebirth.Core.Playfields
             this.playfieldBus = BusSetup.StartWith<AsyncConfiguration>().Construct();
             this.npcCorpseLifecycle = new NpcCorpseLifecycleCoordinator(this);
             this.npcCombatTick = new NpcCombatTickCoordinator(this);
+            this.privateCityReadyInit =
+                new PrivateCityReadyInitCoordinator(
+                    this.Identity,
+                    IsPrivateCityPlayfieldCandidate,
+                    IsCapturedMontroyalPrivateCityInstance,
+                    ResolveCharacterOrganizationInstance,
+                    ResolveOrganizationName,
+                    ResolveCharacterStatWireValue);
 
             this.memBusDisposeContainer.Add(
                 this.playfieldBus.Subscribe<IMSendAOtomationMessageToClient>(SendAOtomationMessageToClient));
@@ -826,77 +836,12 @@ namespace AORebirth.Core.Playfields
 
         public void SendPrivateCityPlayfieldReadyBlock(ZoneClient client, ICharacter character)
         {
-            if (client == null || character == null || !IsPrivateCityPlayfieldCandidate(this.Identity))
-            {
-                return;
-            }
-
-            if (IsCapturedMontroyalPrivateCityInstance(this.Identity.Instance))
-            {
-                this.SendEmptyPlayfieldTowersAndCities(client);
-            }
-            else
-            {
-                this.SendPlayfieldTowersAndCities(client, 1, CreateCapturedPrivateCityAllCitiesPayload());
-            }
-
-            client.Server.Info(
-                client,
-                "Private city ready block sent character={0} playfield={1} evidence=live_capture_20260622-092054 live_capture_20260622-093540 live_capture_20260622-101935 live_capture_20260623-021643",
-                character.Identity,
-                this.Identity);
+            this.privateCityReadyInit.SendPlayfieldReadyBlock(client, character);
         }
 
         public void SendPrivateCityPreFullCharacterReadyBlock(ZoneClient client, ICharacter character)
         {
-            if (client == null || character == null || !IsPrivateCityPlayfieldCandidate(this.Identity))
-            {
-                return;
-            }
-
-            int organizationInstance = ResolveCharacterOrganizationInstance(character);
-            if (organizationInstance <= 0)
-            {
-                return;
-            }
-
-            string organizationName = ResolveOrganizationName(organizationInstance);
-            if (!string.IsNullOrEmpty(organizationName))
-            {
-                PlayfieldLifecycleTrace.Record(
-                    PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
-                    PlayfieldLifecycleTrace.StagePrivateCityOrgInfoPacket,
-                    PlayfieldLifecycleTrace.MessageOrgInfoPacket,
-                    character.Identity,
-                    organizationName);
-                client.SendCompressed(
-                    new OrgInfoPacketMessage
-                    {
-                        Identity = character.Identity,
-                        Name = organizationName
-                    });
-            }
-
-            this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
-            this.SendPrivateCityStat(client, character, StatIds.clan, 0);
-            this.SendPrivateCityStat(client, character, StatIds.clanlevel, 0);
-            this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
-            this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
-            this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
-                PlayfieldLifecycleTrace.StagePrivateCityOrgInitSent,
-                PlayfieldLifecycleTrace.MessagePrivateCityOrgInitSent,
-                character.Identity,
-                "org=" + organizationInstance + " orgName=" + organizationName + " socialStatus=4 repeats=4");
-
-            client.Server.Info(
-                client,
-                "Private city owned org init sent character={0} playfield={1} org={2} orgInfoSent={3} socialStatus=4 repeats=4 evidence=live_capture_20260623-021643 live_capture_20260623-042326",
-                character.Identity,
-                this.Identity,
-                organizationInstance,
-                !string.IsNullOrEmpty(organizationName));
+            this.privateCityReadyInit.SendPreFullCharacterReadyBlock(client, character);
         }
 
         /// <summary>
@@ -3537,75 +3482,6 @@ namespace AORebirth.Core.Playfields
                 PlayfieldLifecycleTrace.MessagePrivateCityTowersCitiesSent,
                 playfieldIdentity,
                 "cityUnknown=" + cityUnknown + " cityPayloadBytes=" + (cityPayload == null ? 0 : cityPayload.Length));
-        }
-
-        private void SendPrivateCityStat(ZoneClient client, ICharacter character, StatIds statId, byte unknown)
-        {
-            this.SendPrivateCityStatValue(client, character, statId, ResolveCharacterStatWireValue(character, statId), unknown);
-        }
-
-        private void SendPrivateCityStatValue(
-            ZoneClient client,
-            ICharacter character,
-            StatIds statId,
-            uint value,
-            byte unknown)
-        {
-            string stage = PlayfieldLifecycleTrace.StagePrivateCitySocialStatus;
-            if (statId == StatIds.clan)
-            {
-                stage = PlayfieldLifecycleTrace.StagePrivateCityClan;
-            }
-            else if (statId == StatIds.clanlevel)
-            {
-                stage = PlayfieldLifecycleTrace.StagePrivateCityClanLevel;
-            }
-
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
-                stage,
-                PlayfieldLifecycleTrace.MessageStat,
-                character.Identity,
-                statId + "=" + value);
-            client.SendCompressed(
-                new StatMessage
-                {
-                    Identity = character.Identity,
-                    Unknown = unknown,
-                    Stats =
-                        new[]
-                        {
-                            new GameTuple<CharacterStat, uint>
-                            {
-                                Value1 = (CharacterStat)statId,
-                                Value2 = value
-                            }
-                        }
-                });
-        }
-
-        private static byte[] CreateCapturedPrivateCityAllCitiesPayload()
-        {
-            return new byte[]
-                   {
-                       0x00, 0x00, 0x00, 0x05, 0x44, 0x5C, 0x00, 0x00,
-                       0x40, 0xA0, 0x00, 0x00, 0x44, 0xB5, 0x80, 0x00,
-                       0x00, 0x00, 0x00, 0xB4, 0x00, 0x00, 0x0F, 0x42,
-                       0x68, 0x00, 0x6A, 0x00, 0x6D, 0x44, 0x62, 0x00,
-                       0x00, 0x40, 0xA0, 0x00, 0x00, 0x44, 0xB0, 0x80,
-                       0x00, 0x00, 0x00, 0x00, 0xB4, 0x00, 0x00, 0x0F,
-                       0x42, 0x68, 0x00, 0x6A, 0x00, 0x6E, 0x44, 0x80,
-                       0x80, 0x00, 0x40, 0xA0, 0x00, 0x00, 0x44, 0xA9,
-                       0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                       0x0F, 0x42, 0x68, 0x00, 0x6A, 0x00, 0x68, 0x44,
-                       0x85, 0x80, 0x00, 0x40, 0xA0, 0x00, 0x00, 0x44,
-                       0xB0, 0x80, 0x00, 0x00, 0x00, 0x00, 0x5A, 0x00,
-                       0x00, 0x0F, 0x42, 0x68, 0x00, 0x6A, 0x00, 0x66,
-                       0x44, 0x87, 0x80, 0x00, 0x40, 0xA0, 0x00, 0x00,
-                       0x44, 0xA9, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
-                       0x00, 0x00, 0x0F, 0x42, 0x68, 0x00, 0x6A, 0x00,
-                       0x75
-                   };
         }
 
         private static SpecialAttack[] CreateDefaultPlayerSpecialAttacks()
