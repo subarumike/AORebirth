@@ -122,12 +122,12 @@ namespace ZoneEngine.Core.MessageHandlers
                 return GenericCmdUseRoute.PrivateCityController;
             }
 
-            if (target.Type == IdentityType.Corpse)
+            if (CorpseInteractionRules.IsDirectCorpseTarget(target))
             {
                 return GenericCmdUseRoute.DirectCorpse;
             }
 
-            if (target.Type == IdentityType.CanbeAffected && context.DeadNpcCorpseRouted)
+            if (CorpseInteractionRules.IsDeadNpcCorpseTarget(target, context.DeadNpcCorpseRouted))
             {
                 return GenericCmdUseRoute.DeadNpcCorpse;
             }
