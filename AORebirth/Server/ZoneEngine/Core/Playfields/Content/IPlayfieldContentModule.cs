@@ -11,5 +11,7 @@ namespace ZoneEngine.Core.Playfields.Content
         bool Supports(Identity playfieldIdentity);
 
         void Register(PlayfieldContentRegistration registration);
+
+        bool ShouldSuppressDbMobSpawn(int playfieldInstance, int mobSpawnId);
     }
 }

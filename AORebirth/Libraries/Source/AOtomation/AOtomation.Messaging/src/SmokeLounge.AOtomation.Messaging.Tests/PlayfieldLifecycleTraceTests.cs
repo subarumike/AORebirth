@@ -705,6 +705,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\AreteContentModule.cs"));
+            string montroyalContentText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\MontroyalContentModule.cs"));
+            string privateCityContentText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PrivateCityContentModule.cs"));
+            string coordinatorText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PlayfieldContentCoordinator.cs"));
             string providerText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -734,7 +746,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 orchestratorText.Contains("foreach (CapturedAreteRobotSpawnDefinition spawn in spawns)"),
                 "CapturedAreteRobotSpawnOrchestrator must spawn each captured robot definition.");
 
-            int filterIndex = playfieldText.IndexOf("if (IsAreteCleaningRobotTestSpawn(mob))", StringComparison.Ordinal);
+            Assert.IsFalse(
+                playfieldText.Contains("private static bool IsAreteCleaningRobotTestSpawn"),
+                "Arete DB suppression predicate must not remain inline in Playfield.");
+            Assert.IsTrue(
+                coordinatorText.Contains("module.ShouldSuppressDbMobSpawn(playfieldInstance, mobSpawnId)"),
+                "PlayfieldContentCoordinator must dispatch DB spawn suppression through content modules.");
+            Assert.IsTrue(
+                playfieldText.Contains("return PlayfieldContent.ShouldSuppressDbMobSpawn(mob.Playfield, mob.Id);"),
+                "Playfield DB mob loading must ask the content coordinator for DB spawn suppression.");
+
+            int filterIndex = playfieldText.IndexOf("if (ShouldSuppressDbMobSpawn(mob))", StringComparison.Ordinal);
             Assert.IsTrue(filterIndex >= 0, "Playfield DB mob loading must still call the Arete robot suppression guard.");
             int continueIndex = playfieldText.IndexOf("continue;", filterIndex, StringComparison.Ordinal);
             int loadStatsIndex = playfieldText.IndexOf("MobSpawnStatDao.Instance.GetWhere", filterIndex, StringComparison.Ordinal);
@@ -742,16 +764,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 continueIndex > filterIndex && continueIndex < loadStatsIndex,
                 "Suppressed legacy DB rows must be skipped before DB spawn stats are loaded.");
 
-            string suppressionMethod = ExtractMethodBlock(playfieldText, "private static bool IsAreteCleaningRobotTestSpawn");
-            int playfieldGateIndex = suppressionMethod.IndexOf("mob.Playfield != 6553", StringComparison.Ordinal);
+            string suppressionMethod = ExtractMethodBlock(areteContentText, "public bool ShouldSuppressDbMobSpawn");
+            string coordinatorMethod = ExtractMethodBlock(coordinatorText, "public bool ShouldSuppressDbMobSpawn");
+            int playfieldGateIndex = suppressionMethod.IndexOf(
+                "playfieldInstance != PrivateAretePlayfieldInstance",
+                StringComparison.Ordinal);
             int idSwitchIndex = suppressionMethod.IndexOf("switch (mob.Id)", StringComparison.Ordinal);
+            if (idSwitchIndex < 0)
+            {
+                idSwitchIndex = suppressionMethod.IndexOf("switch (mobSpawnId)", StringComparison.Ordinal);
+            }
+
+            Assert.IsTrue(
+                areteContentText.Contains("private const int PrivateAretePlayfieldInstance = 6553"),
+                "Suppression must preserve the Arete PF 6553 constant.");
             Assert.IsTrue(playfieldGateIndex >= 0, "Suppression must remain gated to Arete PF 6553.");
             Assert.IsTrue(
                 idSwitchIndex > playfieldGateIndex,
                 "Suppression must check the Arete PF 6553 gate before matching DB mob row ids.");
             Assert.IsTrue(
-                suppressionMethod.Contains("if (mob == null || mob.Playfield != 6553)"),
-                "Suppression must return false for null mobs and non-Arete playfields.");
+                coordinatorMethod.Contains("return true;") && coordinatorMethod.Contains("return false;"),
+                "Coordinator must suppress only when a content module owns the DB row.");
             Assert.AreEqual(5, CountOccurrences(suppressionMethod, "case "), "Only the captured legacy DB rows may be suppressed.");
 
             string[] suppressedDbRows =
@@ -770,6 +803,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Legacy Arete DB row " + suppressedDbRows[i] + " must remain suppressed exactly once.");
             }
 
+            Assert.IsFalse(
+                montroyalContentText.Contains("case 2027138231:"),
+                "Montroyal module must not suppress Arete DB rows.");
+            Assert.IsFalse(
+                privateCityContentText.Contains("case 2027138231:"),
+                "Private-city module must not suppress Arete DB rows.");
+            Assert.IsTrue(
+                montroyalContentText.Contains("public bool ShouldSuppressDbMobSpawn")
+                && montroyalContentText.Contains("return false;"),
+                "Montroyal module must leave DB spawns unaffected.");
+            Assert.IsTrue(
+                privateCityContentText.Contains("public bool ShouldSuppressDbMobSpawn")
+                && privateCityContentText.Contains("return false;"),
+                "Private-city module must leave DB spawns unaffected.");
             Assert.IsTrue(
                 suppressionMethod.Contains("default:") && suppressionMethod.Contains("return false;"),
                 "Non-matching DB spawns, including non-Arete DB spawns, must remain unaffected.");
