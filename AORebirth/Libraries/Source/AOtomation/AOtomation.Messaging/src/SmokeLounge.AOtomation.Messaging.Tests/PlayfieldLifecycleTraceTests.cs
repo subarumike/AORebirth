@@ -143,6 +143,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
+        [TestMethod]
+        public void NpcCorpseLifecycleRulesPreserveCapturedCleaningRobotDeathTimings()
+        {
+            Assert.AreEqual(
+                600,
+                (int)NpcCorpseLifecycleRules.CorpseSpawnDelay.TotalMilliseconds,
+                "Cleaning robot corpse spawn delay must stay capture-backed.");
+            Assert.AreEqual(
+                10000,
+                (int)NpcCorpseLifecycleRules.DeadNpcDespawnDelay.TotalMilliseconds,
+                "Dead NPC despawn delay must stay capture-backed.");
+            Assert.AreEqual(
+                500,
+                NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2,
+                "Cleaning robot CharacterAction Death Parameter2 must stay capture-backed.");
+        }
+
         private static void AssertExpectedOrder(
             IList<PlayfieldLifecycleEvent> events,
             string flow,

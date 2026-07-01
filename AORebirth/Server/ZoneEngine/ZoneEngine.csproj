@@ -275,6 +275,8 @@
     <Compile Include="Core\Packets\TradeSkillPacket.cs" />
     <Compile Include="Core\Packets\UnEquip.cs" />
     <Compile Include="Core\Packets\WeaponItemFullUpdate.cs" />
+    <Compile Include="Core\Playfields\NpcCorpseLifecycleCoordinator.cs" />
+    <Compile Include="Core\Playfields\NpcCorpseLifecycleRules.cs" />
     <Compile Include="Core\Playfields\Playfield.cs" />
     <Compile Include="Core\Playfields\PlayfieldLifecycleTrace.cs" />
     <Compile Include="Core\Playfields\Playfields.cs" />
