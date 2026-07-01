@@ -638,6 +638,63 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "ZoneEngine project must compile the Montroyal content module skeleton.");
         }
 
+        [TestMethod]
+        public void KnownPlayfieldContentModulesAreRegisteredExactlyOnceThroughCoordinatorPath()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string coordinatorText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PlayfieldContentCoordinator.cs"));
+            string registrationText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PlayfieldContentRegistration.cs"));
+
+            string[] expectedModules =
+                {
+                    "AreteContentModule",
+                    "MontroyalContentModule",
+                    "PrivateCityContentModule"
+                };
+
+            Assert.IsTrue(
+                playfieldText.Contains("private static readonly PlayfieldContentCoordinator PlayfieldContent"),
+                "Playfield must keep content module registration behind PlayfieldContentCoordinator.");
+            Assert.IsTrue(
+                playfieldText.Contains("PlayfieldContent.RegisterContent(this, playfieldIdentity);"),
+                "Playfield must enter content registration through PlayfieldContentCoordinator.RegisterContent.");
+
+            int coordinatorIndex = playfieldText.IndexOf("new PlayfieldContentCoordinator(", StringComparison.Ordinal);
+            Assert.IsTrue(coordinatorIndex >= 0, "Missing PlayfieldContentCoordinator construction.");
+
+            int previousIndex = coordinatorIndex;
+            for (int i = 0; i < expectedModules.Length; i++)
+            {
+                string constructor = "new " + expectedModules[i] + "()";
+                Assert.AreEqual(
+                    1,
+                    CountOccurrences(playfieldText, constructor),
+                    expectedModules[i] + " must be registered exactly once.");
+
+                int moduleIndex = playfieldText.IndexOf(constructor, coordinatorIndex, StringComparison.Ordinal);
+                Assert.IsTrue(moduleIndex > previousIndex, expectedModules[i] + " is not in expected coordinator order.");
+                previousIndex = moduleIndex;
+            }
+
+            Assert.IsTrue(
+                coordinatorText.Contains("new PlayfieldContentRegistration(playfield, playfieldIdentity)"),
+                "PlayfieldContentCoordinator must create PlayfieldContentRegistration.");
+            Assert.IsTrue(
+                coordinatorText.Contains("module.Register(registration)"),
+                "PlayfieldContentCoordinator must dispatch registrations through PlayfieldContentRegistration.");
+            Assert.IsTrue(
+                registrationText.Contains("public sealed class PlayfieldContentRegistration"),
+                "PlayfieldContentRegistration must remain the registration boundary.");
+        }
+
         private static void AssertExpectedOrder(
             IList<PlayfieldLifecycleEvent> events,
             string flow,
@@ -737,6 +794,25 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             return -1;
+        }
+
+        private static int CountOccurrences(string text, string pattern)
+        {
+            int count = 0;
+            int start = 0;
+            while (start < text.Length)
+            {
+                int index = text.IndexOf(pattern, start, StringComparison.Ordinal);
+                if (index < 0)
+                {
+                    return count;
+                }
+
+                count++;
+                start = index + pattern.Length;
+            }
+
+            return count;
         }
 
         private static string FindRepositoryRoot([CallerFilePath] string sourcePath = null)
