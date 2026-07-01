@@ -18,6 +18,12 @@ namespace ZoneEngine.Core.Playfields
         public const int MonsterData = 297023;
 
         public const string PatrolReplayRelativePath =
+            @"Content\Captured\Arete\cleaning_robot_patrol_replay.csv";
+
+        public const string PatrolReplaySourceRelativePath =
+            @"AORebirth\Server\ZoneEngine\Content\Captured\Arete\cleaning_robot_patrol_replay.csv";
+
+        public const string EvidenceCapturePatrolReplayRelativePath =
             @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260629-193121\movement-packets.csv";
 
         private static readonly CapturedAreteRobotSpawnDefinition[] SpawnDefinitions =
@@ -108,10 +114,22 @@ namespace ZoneEngine.Core.Playfields
                     return candidate;
                 }
 
+                candidate = Path.Combine(directory.FullName, PatrolReplaySourceRelativePath);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+
                 directory = directory.Parent;
             }
 
             string currentDirectoryCandidate = Path.Combine(Directory.GetCurrentDirectory(), PatrolReplayRelativePath);
+            if (File.Exists(currentDirectoryCandidate))
+            {
+                return currentDirectoryCandidate;
+            }
+
+            currentDirectoryCandidate = Path.Combine(Directory.GetCurrentDirectory(), PatrolReplaySourceRelativePath);
             return File.Exists(currentDirectoryCandidate) ? currentDirectoryCandidate : string.Empty;
         }
 

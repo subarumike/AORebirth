@@ -256,14 +256,52 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void CapturedAreteRobotContentProviderPreservesPatrolReplayPathAndMissingFileFallback()
         {
             Assert.AreEqual(
-                @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260629-193121\movement-packets.csv",
+                @"Content\Captured\Arete\cleaning_robot_patrol_replay.csv",
                 CapturedAreteRobotContentProvider.PatrolReplayRelativePath);
+            Assert.AreEqual(
+                @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260629-193121\movement-packets.csv",
+                CapturedAreteRobotContentProvider.EvidenceCapturePatrolReplayRelativePath);
 
             var provider = new CapturedAreteRobotContentProvider(
                 new[] { Path.Combine(Path.GetTempPath(), Path.GetRandomFileName(), "movement-packets.csv") });
 
             Assert.AreEqual(string.Empty, provider.FindPatrolReplayPath());
             Assert.AreEqual(0, provider.GetPatrolReplaySegments(0x79225E7C).Length);
+        }
+
+        [TestMethod]
+        public void CapturedAreteRobotContentProviderLoadsCommittedPatrolReplayData()
+        {
+            var provider = new CapturedAreteRobotContentProvider();
+
+            Assert.IsTrue(File.Exists(provider.FindPatrolReplayPath()));
+
+            Assert.AreEqual(35, provider.GetPatrolReplaySegments(0x79225E7D).Length);
+            Assert.AreEqual(40, provider.GetPatrolReplaySegments(0x79225E7C).Length);
+            Assert.AreEqual(38, provider.GetPatrolReplaySegments(0x79225E77).Length);
+            Assert.AreEqual(31, provider.GetPatrolReplaySegments(0x79225E7A).Length);
+            Assert.AreEqual(39, provider.GetPatrolReplaySegments(0x79225E78).Length);
+            Assert.AreEqual(29, provider.GetPatrolReplaySegments(0x79225E79).Length);
+            Assert.AreEqual(18, provider.GetPatrolReplaySegments(0x79225E76).Length);
+
+            CapturedAreteRobotPatrolReplaySegment first =
+                provider.GetPatrolReplaySegments(0x79225E7D)[0];
+            Assert.AreEqual(3605.55493f, first.StartX);
+            Assert.AreEqual(51.7449989f, first.StartY);
+            Assert.AreEqual(773.164246f, first.StartZ);
+            Assert.AreEqual(3602.2915f, first.EndX);
+            Assert.AreEqual(52.5f, first.EndY);
+            Assert.AreEqual(787.929504f, first.EndZ);
+
+            CapturedAreteRobotPatrolReplaySegment[] lastRoute =
+                provider.GetPatrolReplaySegments(0x79225E7C);
+            CapturedAreteRobotPatrolReplaySegment last = lastRoute[lastRoute.Length - 1];
+            Assert.AreEqual(3612.93481f, last.StartX);
+            Assert.AreEqual(52.1349983f, last.StartY);
+            Assert.AreEqual(787.84082f, last.StartZ);
+            Assert.AreEqual(3611.29053f, last.EndX);
+            Assert.AreEqual(52.5f, last.EndY);
+            Assert.AreEqual(778.074585f, last.EndZ);
         }
 
         [TestMethod]
