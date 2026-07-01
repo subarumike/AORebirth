@@ -48,6 +48,8 @@ namespace ZoneEngine.Core.Packets
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Playfields;
+
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
@@ -449,6 +451,11 @@ namespace ZoneEngine.Core.Packets
         public static void SendToPlayfield(IZoneClient client)
         {
             SimpleCharFullUpdateMessage message = ConstructMessage(client);
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                PlayfieldLifecycleTrace.StageJoiningCharacterSimpleCharFullUpdateBroadcast,
+                PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
+                client.Controller.Character.Identity);
             client.Controller.Character.Playfield.Announce(message);
         }
 

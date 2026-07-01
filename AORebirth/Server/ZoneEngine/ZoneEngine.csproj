@@ -255,6 +255,7 @@
     <Compile Include="Core\Packets\UnEquip.cs" />
     <Compile Include="Core\Packets\WeaponItemFullUpdate.cs" />
     <Compile Include="Core\Playfields\Playfield.cs" />
+    <Compile Include="Core\Playfields\PlayfieldLifecycleTrace.cs" />
     <Compile Include="Core\Playfields\Playfields.cs" />
     <Compile Include="Core\Playfields\WallCollision.cs" />
     <Compile Include="Core\Playfields\WallCollisionResult.cs" />

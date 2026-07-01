@@ -47,6 +47,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using Utility;
     using ZoneEngine.Core.Packets;
+    using ZoneEngine.Core.Playfields;
 
     #endregion
 
@@ -72,6 +73,11 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         protected override void Read(CharInPlayMessage message, IZoneClient client)
         {
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                PlayfieldLifecycleTrace.StageCharInPlayReceived,
+                PlayfieldLifecycleTrace.MessageCharInPlay,
+                client.Controller.Character.Identity);
             LogUtil.Debug(
                 DebugInfoDetail.NetworkMessages,
                 string.Format(
@@ -84,10 +90,20 @@ namespace ZoneEngine.Core.MessageHandlers
             // wants to enter the world. After we
             // reply to this, the character will really be in game
             var announce = new CharInPlayMessage { Identity = client.Controller.Character.Identity, Unknown = 0x00 };
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                PlayfieldLifecycleTrace.StageCharInPlayAnnounce,
+                PlayfieldLifecycleTrace.MessageCharInPlay,
+                client.Controller.Character.Identity);
             client.Controller.Character.Playfield.Announce(announce);
 
             // Player is in game now, starting is over, set stats normally now
             client.Controller.Character.Starting = false;
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                PlayfieldLifecycleTrace.StageCharInPlayReady,
+                "CharacterReady",
+                client.Controller.Character.Identity);
 
             client.Controller.Character.Stats.ClearChangedFlags();
 
@@ -126,14 +142,29 @@ namespace ZoneEngine.Core.MessageHandlers
 
             IEnumerable<StaticDynel> list =
                 Pool.Instance.GetAll<StaticDynel>(client.Controller.Character.Playfield.Identity);
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                PlayfieldLifecycleTrace.StageStaticDynelSnapshot,
+                "StaticDynelSnapshot",
+                client.Controller.Character.Identity);
             foreach (StaticDynel sd in list)
             {
                 SimpleItemFullUpdateMessageHandler.Default.Send(client.Controller.Character, sd);
             }
 
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                PlayfieldLifecycleTrace.StageWeaponDefinitions,
+                "WeaponItemFullUpdate",
+                client.Controller.Character.Identity);
             WeaponItemFullUpdate.SendWeaponDefinitions(client.Controller.Character);
             Playfield.ArmPostZoneCollisionGrace(client.Controller.Character);
             client.Controller.Character.DoNotDoTimers = false;
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                PlayfieldLifecycleTrace.StageTimersEnabled,
+                "TimersEnabled",
+                client.Controller.Character.Identity);
         }
 
         #endregion
