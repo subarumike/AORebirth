@@ -117,6 +117,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void CorpseInteractionRulesExposeCurrentRouteModeDecisions()
+        {
+            Assert.AreEqual(
+                CorpseInteractionRouteMode.DirectCorpse,
+                CorpseInteractionRules.ResolveRouteMode(
+                    new Identity { Type = IdentityType.Corpse, Instance = 0x20 },
+                    false));
+
+            Assert.AreEqual(
+                CorpseInteractionRouteMode.DeadNpcCorpse,
+                CorpseInteractionRules.ResolveRouteMode(
+                    new Identity { Type = IdentityType.CanbeAffected, Instance = 0x30 },
+                    true));
+
+            Assert.AreEqual(
+                CorpseInteractionRouteMode.None,
+                CorpseInteractionRules.ResolveRouteMode(
+                    new Identity { Type = IdentityType.CanbeAffected, Instance = 0x30 },
+                    false));
+
+            Assert.AreEqual(550, CorpseInteractionRules.CorpseUseAcknowledgeDelayMilliseconds);
+        }
+
+        [TestMethod]
         public void GridAndSurgeryRoutesKeepCurrentPrecedence()
         {
             AssertRoute(

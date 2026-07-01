@@ -72,6 +72,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\CityControllerInteractionRules.cs">
       <Link>CityControllerInteractionRules.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\CorpseInteractionRules.cs">
+      <Link>CorpseInteractionRules.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\GenericCmdUseRouteClassifier.cs">
       <Link>GenericCmdUseRouteClassifier.cs</Link>
     </Compile>
