@@ -1,0 +1,155 @@
+// This source code is licensed under the MIT license that can be found in the LICENSE file.
+
+namespace SmokeLounge.AOtomation.Messaging.Tests
+{
+    #region Usings ...
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
+    using ZoneEngine.Core.MessageHandlers;
+
+    #endregion
+
+    [TestClass]
+    public class GenericCmdUseRouteClassifierTests
+    {
+        [TestMethod]
+        public void CurrentRouteOrderMatchesGenericCmdUseBranchOrder()
+        {
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    GenericCmdUseRoute.RexB18DBoxProgress,
+                    GenericCmdUseRoute.InventoryItem,
+                    GenericCmdUseRoute.WearOrSocialBackpack,
+                    GenericCmdUseRoute.BackpackContainer,
+                    GenericCmdUseRoute.PrivateCityGuestKeyGenerator,
+                    GenericCmdUseRoute.PrivateCityController,
+                    GenericCmdUseRoute.DirectCorpse,
+                    GenericCmdUseRoute.DeadNpcCorpse,
+                    GenericCmdUseRoute.CapturedGridTerminal,
+                    GenericCmdUseRoute.GridEnterTerminal,
+                    GenericCmdUseRoute.SurgeryClinic,
+                    GenericCmdUseRoute.PoolOnUseOrTrade,
+                    GenericCmdUseRoute.StatelFallback
+                },
+                GenericCmdUseRouteClassifier.CurrentRouteOrder);
+        }
+
+        [TestMethod]
+        public void KnownPrivateCityTargetsSelectCurrentCapturedRoutes()
+        {
+            AssertRoute(
+                GenericCmdUseRoute.PrivateCityGuestKeyGenerator,
+                Terminal(GenericCmdUseRouteClassifier.RuntimePrivateCityGuestKeyTerminalInstance),
+                isPrivateCityPlayfield: true);
+
+            AssertRoute(
+                GenericCmdUseRoute.PrivateCityGuestKeyGenerator,
+                Terminal(GenericCmdUseRouteClassifier.CapturedPrivateCityGuestKeyTerminalInstance),
+                isPrivateCityPlayfield: true);
+
+            AssertRoute(
+                GenericCmdUseRoute.StatelFallback,
+                Terminal(GenericCmdUseRouteClassifier.RuntimePrivateCityGuestKeyTerminalInstance));
+
+            AssertRoute(
+                GenericCmdUseRoute.PrivateCityController,
+                CityController(GenericCmdUseRouteClassifier.RuntimeCityControllerInstance));
+
+            AssertRoute(
+                GenericCmdUseRoute.PrivateCityController,
+                CityController(GenericCmdUseRouteClassifier.CapturedCityControllerInstance));
+
+            AssertRoute(
+                GenericCmdUseRoute.PrivateCityController,
+                CityController(GenericCmdUseRouteClassifier.CapturedNonOrgCityControllerInstance));
+        }
+
+        [TestMethod]
+        public void CorpseRoutesKeepDeadNpcFallbackBehindDirectCorpse()
+        {
+            AssertRoute(GenericCmdUseRoute.DirectCorpse, new Identity { Type = IdentityType.Corpse, Instance = 0x20 });
+
+            AssertRoute(
+                GenericCmdUseRoute.DeadNpcCorpse,
+                new Identity { Type = IdentityType.CanbeAffected, Instance = 0x30 },
+                deadNpcCorpseRouted: true);
+
+            AssertRoute(
+                GenericCmdUseRoute.StatelFallback,
+                new Identity { Type = IdentityType.CanbeAffected, Instance = 0x30 });
+        }
+
+        [TestMethod]
+        public void GridAndSurgeryRoutesKeepCurrentPrecedence()
+        {
+            AssertRoute(
+                GenericCmdUseRoute.CapturedGridTerminal,
+                Terminal(GenericCmdUseRouteClassifier.CapturedBorealisGridTerminalInstance),
+                capturedGridTerminalRouteMatched: true,
+                gridEnterTerminalMatched: true,
+                surgeryClinicTerminalMatched: true);
+
+            AssertRoute(
+                GenericCmdUseRoute.GridEnterTerminal,
+                Terminal(0x01020304),
+                gridEnterTerminalMatched: true,
+                surgeryClinicTerminalMatched: true);
+
+            AssertRoute(
+                GenericCmdUseRoute.SurgeryClinic,
+                Terminal(GenericCmdUseRouteClassifier.CapturedSurgeryClinicTerminalInstance),
+                surgeryClinicTerminalMatched: true);
+        }
+
+        [TestMethod]
+        public void GenericInventoryAndFallbackRoutesKeepCurrentPrecedence()
+        {
+            AssertRoute(GenericCmdUseRoute.RexB18DBoxProgress, Terminal(0x01020306), rexB18DBoxProgressMatched: true);
+            AssertRoute(GenericCmdUseRoute.InventoryItem, new Identity { Type = IdentityType.Inventory, Instance = 0x40 });
+            AssertRoute(GenericCmdUseRoute.WearOrSocialBackpack, new Identity { Type = IdentityType.ArmorPage, Instance = 0x41 });
+            AssertRoute(GenericCmdUseRoute.WearOrSocialBackpack, new Identity { Type = IdentityType.SocialPage, Instance = 0x42 });
+            AssertRoute(GenericCmdUseRoute.BackpackContainer, new Identity { Type = IdentityType.Container, Instance = 0x43 });
+            AssertRoute(GenericCmdUseRoute.PoolOnUseOrTrade, Terminal(0x01020307), poolContainsTarget: true);
+            AssertRoute(GenericCmdUseRoute.StatelFallback, Terminal(0x01020308));
+        }
+
+        private static void AssertRoute(
+            GenericCmdUseRoute expected,
+            Identity target,
+            bool rexB18DBoxProgressMatched = false,
+            bool isPrivateCityPlayfield = false,
+            bool deadNpcCorpseRouted = false,
+            bool capturedGridTerminalRouteMatched = false,
+            bool gridEnterTerminalMatched = false,
+            bool surgeryClinicTerminalMatched = false,
+            bool poolContainsTarget = false)
+        {
+            var context = new GenericCmdUseRouteContext(target)
+                          {
+                              RexB18DBoxProgressMatched = rexB18DBoxProgressMatched,
+                              IsPrivateCityPlayfield = isPrivateCityPlayfield,
+                              DeadNpcCorpseRouted = deadNpcCorpseRouted,
+                              CapturedGridTerminalRouteMatched = capturedGridTerminalRouteMatched,
+                              GridEnterTerminalMatched = gridEnterTerminalMatched,
+                              SurgeryClinicTerminalMatched = surgeryClinicTerminalMatched,
+                              PoolContainsTarget = poolContainsTarget
+                          };
+
+            Assert.AreEqual(expected, GenericCmdUseRouteClassifier.Classify(context));
+        }
+
+        private static Identity Terminal(int instance)
+        {
+            return new Identity { Type = IdentityType.Terminal, Instance = instance };
+        }
+
+        private static Identity CityController(int instance)
+        {
+            return new Identity { Type = IdentityType.CityController, Instance = instance };
+        }
+    }
+}

@@ -65,9 +65,13 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="DebuggingSerializerTests.cs" />
+    <Compile Include="GenericCmdUseRouteClassifierTests.cs" />
     <Compile Include="InfoPacketTests.cs" />
     <Compile Include="N3RecoveredContractTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\GenericCmdUseRouteClassifier.cs">
+      <Link>GenericCmdUseRouteClassifier.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleTrace.cs">
       <Link>PlayfieldLifecycleTrace.cs</Link>
     </Compile>
