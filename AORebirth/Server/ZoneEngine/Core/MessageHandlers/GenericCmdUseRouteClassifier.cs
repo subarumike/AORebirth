@@ -164,6 +164,11 @@ namespace ZoneEngine.Core.MessageHandlers
                 return GenericCmdUseRoute.PoolOnUseOrTrade;
             }
 
+            if (StatelInteractionRules.ResolveRouteMode(true) == StatelInteractionRouteMode.StatelFallback)
+            {
+                return GenericCmdUseRoute.StatelFallback;
+            }
+
             return GenericCmdUseRoute.StatelFallback;
         }
 

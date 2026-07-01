@@ -139,20 +139,9 @@ namespace ZoneEngine.Core.MessageHandlers
                     {
                         break;
                     }
-                    else
+                    else if (StatelInteractionHandler.Default.TryHandleUse(client, message, target))
                     {
-                        // Use statel (doors, grid terminals etc)
-#if DEBUG
-                        string s = string.Format(
-                            "Generic Command received:\r\nAction: {0} ({1}){2}Target: {3} {4}",
-                            message.Action,
-                            (int)message.Action,
-                            Environment.NewLine,
-                            target.Type,
-                            target.ToString(true));
-                        ChatTextMessageHandler.Default.Send(client.Controller.Character, s);
-#endif
-                        client.Controller.UseStatel(target);
+                        break;
                     }
 
                     break;

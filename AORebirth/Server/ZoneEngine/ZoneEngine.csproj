@@ -249,6 +249,8 @@
     <Compile Include="Core\MessageHandlers\SurgeryClinicInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\StaticDynelInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\StaticDynelInteractionRules.cs" />
+    <Compile Include="Core\MessageHandlers\StatelInteractionHandler.cs" />
+    <Compile Include="Core\MessageHandlers\StatelInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\StatMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\StopFightMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\TeleportMessageHandler.cs" />
