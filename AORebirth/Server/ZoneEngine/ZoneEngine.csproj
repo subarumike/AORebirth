@@ -219,6 +219,8 @@
     <Compile Include="Core\MessageHandlers\FullCharacterMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\GenericCmdMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\GenericCmdUseRouteClassifier.cs" />
+    <Compile Include="Core\MessageHandlers\GridTerminalInteractionHandler.cs" />
+    <Compile Include="Core\MessageHandlers\GridTerminalInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\GuestKeyGeneratorInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\GuestKeyGeneratorInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\InventoryUpdatedMessageHandler.cs" />

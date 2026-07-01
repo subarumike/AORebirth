@@ -163,6 +163,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void GridTerminalRulesExposeCurrentRouteModePrecedence()
+        {
+            Assert.AreEqual(
+                GridTerminalInteractionRouteMode.CapturedGridTerminal,
+                GridTerminalInteractionRules.ResolveRouteMode(true, true));
+
+            Assert.AreEqual(
+                GridTerminalInteractionRouteMode.GridEnterTerminal,
+                GridTerminalInteractionRules.ResolveRouteMode(false, true));
+
+            Assert.AreEqual(
+                GridTerminalInteractionRouteMode.None,
+                GridTerminalInteractionRules.ResolveRouteMode(false, false));
+
+            Assert.AreEqual(
+                unchecked((int)0xC0040320),
+                GridTerminalInteractionRules.CapturedBorealisGridTerminalInstance);
+            Assert.AreEqual(152, GridTerminalInteractionRules.CapturedGridPlayfieldId);
+            Assert.AreEqual(95350, GridTerminalInteractionRules.GridEnterTerminalTemplateId);
+            Assert.AreEqual(95351, GridTerminalInteractionRules.GridExitTerminalTemplateId);
+        }
+
+        [TestMethod]
         public void GenericInventoryAndFallbackRoutesKeepCurrentPrecedence()
         {
             AssertRoute(GenericCmdUseRoute.RexB18DBoxProgress, Terminal(0x01020306), rexB18DBoxProgressMatched: true);
