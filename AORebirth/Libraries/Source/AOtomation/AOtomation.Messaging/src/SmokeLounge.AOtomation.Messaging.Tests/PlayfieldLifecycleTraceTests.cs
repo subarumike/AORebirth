@@ -579,6 +579,36 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
+        [TestMethod]
+        public void PrivateCityContentModuleSkeletonIsRegisteredWithoutRuntimeOwnership()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string modulePath = Path.Combine(
+                repositoryRoot,
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PrivateCityContentModule.cs");
+            string playfieldPath = Path.Combine(
+                repositoryRoot,
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+            string projectPath = Path.Combine(
+                repositoryRoot,
+                @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
+
+            string moduleText = File.ReadAllText(modulePath);
+            string playfieldText = File.ReadAllText(playfieldPath);
+            string projectText = File.ReadAllText(projectPath);
+
+            Assert.IsTrue(moduleText.Contains("public sealed class PrivateCityContentModule : IPlayfieldContentModule"));
+            Assert.IsTrue(moduleText.Contains("public bool Supports(Identity playfieldIdentity)"));
+            Assert.IsTrue(moduleText.Contains("public void Register(PlayfieldContentRegistration registration)"));
+            Assert.IsTrue(
+                playfieldText.Contains(
+                    "new PlayfieldContentCoordinator(new AreteContentModule(), new PrivateCityContentModule())"),
+                "Playfield content coordinator must register the private-city content module skeleton.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\Content\PrivateCityContentModule.cs"),
+                "ZoneEngine project must compile the private-city content module skeleton.");
+        }
+
         private static void AssertExpectedOrder(
             IList<PlayfieldLifecycleEvent> events,
             string flow,

@@ -257,7 +257,7 @@ namespace AORebirth.Core.Playfields
         };
 
         private static readonly PlayfieldContentCoordinator PlayfieldContent =
-            new PlayfieldContentCoordinator(new AreteContentModule());
+            new PlayfieldContentCoordinator(new AreteContentModule(), new PrivateCityContentModule());
 
         private const int UnarmedAttackInfoAmmoCount = -1;
 
