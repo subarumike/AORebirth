@@ -213,11 +213,9 @@ namespace Utility
         /// </returns>
         public static List<T> UncompressData<T>(string fname)
         {
-            // Need to build the serializer/deserializer prior to Task invocations
-            MessagePackSerializer<List<T>> constructor = MessagePackSerializer.Create<List<T>>();
             List<T> resultList = new List<T>();
 
-            using (Stream fileStream = new FileStream(fname, FileMode.Open))
+            using (Stream fileStream = new FileStream(fname, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 BinaryReader binaryReader = new BinaryReader(fileStream);
 
@@ -239,33 +237,57 @@ namespace Utility
                 int capacity = binaryReader.ReadInt32();
 
                 int slices = binaryReader.ReadInt32();
-
-                TaskedSerializer<T>[] tasked = new TaskedSerializer<T>[slices];
-
-                Task[] tasks = new Task[slices];
+                resultList = new List<T>(capacity);
 
                 for (int i = 0; i < slices; i++)
                 {
                     int size = binaryReader.ReadInt32();
-                    byte[] tempBuffer = binaryReader.ReadBytes(size);
-                    using (MemoryStream tempStream = new MemoryStream(tempBuffer))
+                    if (size < 0 || size > fileStream.Length - fileStream.Position)
                     {
-                        tasked[i] = new TaskedSerializer<T>(tempStream);
+                        throw new InvalidDataException(
+                            string.Format(
+                                "Invalid MessagePackZip slice size while reading {0}: slice {1}/{2}, size={3}, remaining={4}.",
+                                fname,
+                                i + 1,
+                                slices,
+                                size,
+                                fileStream.Length - fileStream.Position));
                     }
-                    int i1 = i;
-                    tasks[i] = new Task(() => tasked[i1].Deserialize());
-                    tasks[i].Start();
-                }
 
-                Task.WaitAll(tasks);
+                    byte[] tempBuffer = binaryReader.ReadBytes(size);
+                    if (tempBuffer.Length != size)
+                    {
+                        throw new EndOfStreamException(
+                            string.Format(
+                                "Unexpected end of MessagePackZip data while reading {0}: slice {1}/{2}, expected={3}, actual={4}.",
+                                fname,
+                                i + 1,
+                                slices,
+                                size,
+                                tempBuffer.Length));
+                    }
 
-                resultList = new List<T>(capacity);
-                for (int i = 0; i < slices; i++)
-                {
-                    resultList.AddRange(tasked[i].DataSlice);
-                    tasked[i].DataSlice.Clear();
-                    tasks[i].Dispose();
-                    tasked[i].Dispose();
+                    var task = new TaskedSerializer<T>(tempBuffer);
+                    try
+                    {
+                        task.Deserialize();
+                        resultList.AddRange(task.DataSlice);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidDataException(
+                            string.Format(
+                                "Failed to deserialize MessagePackZip slice while reading {0}: slice {1}/{2}, size={3}.",
+                                fname,
+                                i + 1,
+                                slices,
+                                size),
+                            ex);
+                    }
+                    finally
+                    {
+                        task.Dispose();
+                    }
                 }
             }
 
@@ -370,15 +392,13 @@ namespace Utility
         internal void Deserialize()
         {
             MessagePackSerializer<List<T>> messagePackSerializer = MessagePackSerializer.Create<List<T>>();
-            ZlibStream zs = new ZlibStream(this.Stream, CompressionMode.Decompress);
-            MemoryStream ms = new MemoryStream();
-
-            zs.CopyTo(ms);
-            zs.Flush();
-            ms.Flush();
-            ms.Position = 0;
-            this.DataSlice = messagePackSerializer.Unpack(ms);
-            ms.Close();
+            using (ZlibStream zs = new ZlibStream(this.Stream, CompressionMode.Decompress))
+            using (MemoryStream ms = new MemoryStream())
+            {
+                zs.CopyTo(ms);
+                ms.Position = 0;
+                this.DataSlice = messagePackSerializer.Unpack(ms);
+            }
         }
 
         public virtual void Dispose(bool disposing)
