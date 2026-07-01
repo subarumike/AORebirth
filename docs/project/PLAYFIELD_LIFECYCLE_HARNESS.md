@@ -6,7 +6,7 @@ This harness exists to guard packet-order-sensitive `Playfield` flows without ch
 
 Current covered flows:
 
-- Private city ready/init order around org init, `FullCharacter`, `PlayfieldAllTowers`, and `PlayfieldAllCities`.
+- Private city ready/init order around ready-block begin/end, org init, `FullCharacter`, `PlayfieldAllTowers`, `PlayfieldAllCities`, and towers/cities summary markers.
 - Same-playfield visibility order around `CharInPlay`, joiner visibility broadcast, and existing-player snapshot.
 - Cleaning robot death/corpse/despawn order around attacker stop fight, robot stop fight, death action `Parameter2=500`, corpse scheduling, despawn scheduling, and `CorpseFullUpdate`.
 

@@ -209,6 +209,15 @@ namespace MsgPack
 				return;
 			}
 
+			if ( this._unpacked.Count == 0 )
+			{
+				// Generated serializers can fully consume a subtree before Dispose drains it.
+				// Treat that state as already drained instead of faulting on Stack.Peek().
+				this._itemsCount.Clear();
+				this._isMap.Clear();
+				return;
+			}
+
 			while ( this._unpacked.Peek() == this._itemsCount.Peek() )
 			{
 				this._itemsCount.Pop();

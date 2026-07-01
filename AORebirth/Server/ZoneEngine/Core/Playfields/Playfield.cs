@@ -883,6 +883,12 @@ namespace AORebirth.Core.Playfields
             this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
             this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
             this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityOrgInitSent,
+                PlayfieldLifecycleTrace.MessagePrivateCityOrgInitSent,
+                character.Identity,
+                "org=" + organizationInstance + " orgName=" + organizationName + " socialStatus=4 repeats=4");
 
             client.Server.Info(
                 client,
@@ -3525,6 +3531,12 @@ namespace AORebirth.Core.Playfields
                 PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllCities,
                 PlayfieldLifecycleTrace.MessagePlayfieldAllCities,
                 playfieldIdentity);
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityTowersCitiesSent,
+                PlayfieldLifecycleTrace.MessagePrivateCityTowersCitiesSent,
+                playfieldIdentity,
+                "cityUnknown=" + cityUnknown + " cityPayloadBytes=" + (cityPayload == null ? 0 : cityPayload.Length));
         }
 
         private void SendPrivateCityStat(ZoneClient client, ICharacter character, StatIds statId, byte unknown)
