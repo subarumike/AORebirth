@@ -4,6 +4,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 {
     #region Usings ...
 
+    using System;
     using System.Collections.Generic;
     using System.IO;
 
@@ -273,8 +274,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void CapturedAreteRobotContentProviderLoadsCommittedPatrolReplayData()
         {
             var provider = new CapturedAreteRobotContentProvider();
+            string replayPath = provider.FindPatrolReplayPath();
 
-            Assert.IsTrue(File.Exists(provider.FindPatrolReplayPath()));
+            Assert.IsTrue(File.Exists(replayPath));
+            Assert.IsTrue(
+                replayPath.IndexOf("tools-temp", StringComparison.OrdinalIgnoreCase) < 0,
+                "Runtime replay data must load from committed content, not tools-temp captures.");
 
             Assert.AreEqual(35, provider.GetPatrolReplaySegments(0x79225E7D).Length);
             Assert.AreEqual(40, provider.GetPatrolReplaySegments(0x79225E7C).Length);
@@ -358,6 +363,104 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsNotNull(assigned);
             Assert.AreEqual(0, assigned.Length);
+        }
+
+        [TestMethod]
+        public void CapturedAreteRobotSpawnOrchestrationTraceKeepsSetupReplayAndScfuOrder()
+        {
+            var provider = new CapturedAreteRobotContentProvider();
+            var coordinator = new NpcPatrolReplayCoordinator(provider);
+            CapturedAreteRobotSpawnDefinition[] spawns = provider.GetSpawnDefinitions();
+            CapturedAreteRobotSpawnDefinition spawn = spawns[0];
+            Identity playfield = new Identity { Type = IdentityType.Playfield, Instance = 6553 };
+            Identity robot = new Identity { Type = IdentityType.CanbeAffected, Instance = 2001 };
+            string spawnCreatedDetail =
+                PlayfieldLifecycleTrace.FormatCapturedAreteRobotSpawnCreatedDetail(
+                    spawn.SourceInstance,
+                    CapturedAreteRobotContentProvider.MonsterData,
+                    spawn.Health,
+                    spawn.Level,
+                    spawn.RunSpeed,
+                    spawn.X,
+                    spawn.Y,
+                    spawn.Z,
+                    spawn.PatrolX,
+                    spawn.PatrolY,
+                    spawn.PatrolZ);
+
+            using (PlayfieldLifecycleCapture capture = PlayfieldLifecycleTrace.Capture())
+            {
+                PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
+                    PlayfieldLifecycleTrace.StageCapturedAreteRobotSpawnRowsLoaded,
+                    PlayfieldLifecycleTrace.MessageCapturedAreteRobotSpawnRowsLoaded,
+                    playfield,
+                    PlayfieldLifecycleTrace.FormatCapturedAreteRobotSpawnRowsDetail(
+                        spawns.Length,
+                        CapturedAreteRobotContentProvider.MonsterData));
+                PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
+                    PlayfieldLifecycleTrace.StageCapturedAreteRobotSpawnCreated,
+                    PlayfieldLifecycleTrace.MessageCapturedAreteRobotSpawnCreated,
+                    robot,
+                    spawnCreatedDetail);
+
+                NpcPatrolReplaySegment[] assigned = null;
+                coordinator.AssignCapturedAreteRobotReplay(spawn.SourceInstance, segments => assigned = segments);
+                Assert.IsNotNull(assigned);
+                Assert.AreEqual(40, assigned.Length);
+
+                PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
+                    PlayfieldLifecycleTrace.StageCapturedAreteRobotPatrolReplayAssigned,
+                    PlayfieldLifecycleTrace.MessageCapturedAreteRobotPatrolReplayAssigned,
+                    robot,
+                    PlayfieldLifecycleTrace.FormatCapturedAreteRobotPatrolReplayAssignedDetail(
+                        spawn.SourceInstance,
+                        assigned.Length));
+                PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
+                    PlayfieldLifecycleTrace.StageCapturedAreteRobotSimpleCharFullUpdateBroadcast,
+                    PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
+                    robot,
+                    PlayfieldLifecycleTrace.FormatCapturedAreteRobotSimpleCharFullUpdateDetail(spawn.SourceInstance));
+
+                AssertExpectedOrder(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
+                    PlayfieldLifecycleTrace.ExpectedCapturedAreteRobotSpawnOrder);
+                AssertStageBefore(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StageCapturedAreteRobotSpawnRowsLoaded,
+                    PlayfieldLifecycleTrace.StageCapturedAreteRobotSpawnCreated);
+                AssertStageBefore(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StageCapturedAreteRobotSpawnCreated,
+                    PlayfieldLifecycleTrace.StageCapturedAreteRobotPatrolReplayAssigned);
+                AssertStageBefore(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StageCapturedAreteRobotPatrolReplayAssigned,
+                    PlayfieldLifecycleTrace.StageCapturedAreteRobotSimpleCharFullUpdateBroadcast);
+                Assert.IsTrue(
+                    HasDetail(
+                        capture.Events,
+                        PlayfieldLifecycleTrace.StageCapturedAreteRobotSpawnRowsLoaded,
+                        "count=7 monsterData=297023"));
+                Assert.IsTrue(
+                    HasDetail(
+                        capture.Events,
+                        PlayfieldLifecycleTrace.StageCapturedAreteRobotSpawnCreated,
+                        spawnCreatedDetail));
+                Assert.IsTrue(
+                    spawnCreatedDetail.IndexOf(
+                        "sourceInstance=79225E7C monsterData=297023 hp=12 level=1 runSpeed=6",
+                        StringComparison.Ordinal) >= 0);
+                Assert.IsTrue(
+                    HasDetail(
+                        capture.Events,
+                        PlayfieldLifecycleTrace.StageCapturedAreteRobotPatrolReplayAssigned,
+                        "sourceInstance=79225E7C segments=40"));
+            }
         }
 
         private static void AssertExpectedOrder(

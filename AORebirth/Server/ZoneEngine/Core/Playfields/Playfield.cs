@@ -496,7 +496,17 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            foreach (CapturedAreteRobotSpawnDefinition spawn in CapturedAreteRobotContent.GetSpawnDefinitions())
+            CapturedAreteRobotSpawnDefinition[] spawns = CapturedAreteRobotContent.GetSpawnDefinitions();
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
+                PlayfieldLifecycleTrace.StageCapturedAreteRobotSpawnRowsLoaded,
+                PlayfieldLifecycleTrace.MessageCapturedAreteRobotSpawnRowsLoaded,
+                playfieldIdentity,
+                PlayfieldLifecycleTrace.FormatCapturedAreteRobotSpawnRowsDetail(
+                    spawns.Length,
+                    CapturedCleaningRobotMonsterData));
+
+            foreach (CapturedAreteRobotSpawnDefinition spawn in spawns)
             {
                 this.SpawnCapturedAreteCleaningRobot(playfieldIdentity, spawn);
             }
@@ -532,8 +542,48 @@ namespace AORebirth.Core.Playfields
             SetCapturedMobStat(mobCharacter, StatIds.runspeed, spawn.RunSpeed);
             mobCharacter.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
             AssignCapturedPatrolWaypoints(mobCharacter, spawn);
-            NpcPatrolReplay.AssignCapturedAreteRobotReplay(spawn.SourceInstance, npcController.SetCapturedPatrolReplaySegments);
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
+                PlayfieldLifecycleTrace.StageCapturedAreteRobotSpawnCreated,
+                PlayfieldLifecycleTrace.MessageCapturedAreteRobotSpawnCreated,
+                mobCharacter.Identity,
+                PlayfieldLifecycleTrace.FormatCapturedAreteRobotSpawnCreatedDetail(
+                    spawn.SourceInstance,
+                    CapturedCleaningRobotMonsterData,
+                    spawn.Health,
+                    spawn.Level,
+                    spawn.RunSpeed,
+                    spawn.X,
+                    spawn.Y,
+                    spawn.Z,
+                    spawn.PatrolX,
+                    spawn.PatrolY,
+                    spawn.PatrolZ));
+
+            int replaySegmentCount = 0;
+            NpcPatrolReplay.AssignCapturedAreteRobotReplay(
+                spawn.SourceInstance,
+                segments =>
+                {
+                    replaySegmentCount = segments == null ? 0 : segments.Length;
+                    npcController.SetCapturedPatrolReplaySegments(segments);
+                });
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
+                PlayfieldLifecycleTrace.StageCapturedAreteRobotPatrolReplayAssigned,
+                PlayfieldLifecycleTrace.MessageCapturedAreteRobotPatrolReplayAssigned,
+                mobCharacter.Identity,
+                PlayfieldLifecycleTrace.FormatCapturedAreteRobotPatrolReplayAssignedDetail(
+                    spawn.SourceInstance,
+                    replaySegmentCount));
+
             mobCharacter.DoNotDoTimers = false;
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
+                PlayfieldLifecycleTrace.StageCapturedAreteRobotSimpleCharFullUpdateBroadcast,
+                PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
+                mobCharacter.Identity,
+                PlayfieldLifecycleTrace.FormatCapturedAreteRobotSimpleCharFullUpdateDetail(spawn.SourceInstance));
             this.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));
 
             LogUtil.Debug(

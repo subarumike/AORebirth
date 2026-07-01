@@ -6,6 +6,7 @@ namespace ZoneEngine.Core.Playfields
 
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Threading;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -94,9 +95,18 @@ namespace ZoneEngine.Core.Playfields
 
         public const string FlowCleaningRobotNpcAttack = "cleaning-robot-npc-attack";
 
+        public const string FlowCapturedAreteRobotSpawn = "captured-arete-robot-spawn";
+
         public const string MessageAttack = "Attack";
 
         public const string MessageAttackInfo = "AttackInfo";
+
+        public const string MessageCapturedAreteRobotPatrolReplayAssigned =
+            "CapturedAreteRobotPatrolReplayAssigned";
+
+        public const string MessageCapturedAreteRobotSpawnCreated = "CapturedAreteRobotSpawnCreated";
+
+        public const string MessageCapturedAreteRobotSpawnRowsLoaded = "CapturedAreteRobotSpawnRowsLoaded";
 
         public const string MessageCharInPlay = "CharInPlay";
 
@@ -180,6 +190,17 @@ namespace ZoneEngine.Core.Playfields
 
         public const string StageRobotAttackInfo = "robot-attack-info";
 
+        public const string StageCapturedAreteRobotSpawnRowsLoaded =
+            "captured-arete-robot-spawn-rows-loaded";
+
+        public const string StageCapturedAreteRobotSpawnCreated = "captured-arete-robot-spawn-created";
+
+        public const string StageCapturedAreteRobotPatrolReplayAssigned =
+            "captured-arete-robot-patrol-replay-assigned";
+
+        public const string StageCapturedAreteRobotSimpleCharFullUpdateBroadcast =
+            "captured-arete-robot-simple-char-full-update-broadcast";
+
         public static readonly string[] ExpectedPrivateCityReadyInitOrder =
         {
             StagePrivateCitySimpleCharFullUpdateBroadcast,
@@ -229,6 +250,14 @@ namespace ZoneEngine.Core.Playfields
             StageRobotSpecialAttackWeaponContext,
             StageRobotAttackStartContext,
             StageRobotAttackInfo
+        };
+
+        public static readonly string[] ExpectedCapturedAreteRobotSpawnOrder =
+        {
+            StageCapturedAreteRobotSpawnRowsLoaded,
+            StageCapturedAreteRobotSpawnCreated,
+            StageCapturedAreteRobotPatrolReplayAssigned,
+            StageCapturedAreteRobotSimpleCharFullUpdateBroadcast
         };
 
         [ThreadStatic]
@@ -302,6 +331,56 @@ namespace ZoneEngine.Core.Playfields
 
             int order = Interlocked.Increment(ref currentOrder);
             recorder.Record(new PlayfieldLifecycleEvent(order, flow, stage, messageType, identity, detail));
+        }
+
+        public static string FormatCapturedAreteRobotSpawnRowsDetail(int count, int monsterData)
+        {
+            return string.Format(CultureInfo.InvariantCulture, "count={0} monsterData={1}", count, monsterData);
+        }
+
+        public static string FormatCapturedAreteRobotSpawnCreatedDetail(
+            int sourceInstance,
+            int monsterData,
+            int health,
+            int level,
+            int runSpeed,
+            float x,
+            float y,
+            float z,
+            float patrolX,
+            float patrolY,
+            float patrolZ)
+        {
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "sourceInstance={0:X8} monsterData={1} hp={2} level={3} runSpeed={4} pos={5:0.#####},{6:0.#####},{7:0.#####} patrol={8:0.#####},{9:0.#####},{10:0.#####}",
+                sourceInstance,
+                monsterData,
+                health,
+                level,
+                runSpeed,
+                x,
+                y,
+                z,
+                patrolX,
+                patrolY,
+                patrolZ);
+        }
+
+        public static string FormatCapturedAreteRobotPatrolReplayAssignedDetail(
+            int sourceInstance,
+            int segmentCount)
+        {
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "sourceInstance={0:X8} segments={1}",
+                sourceInstance,
+                segmentCount);
+        }
+
+        public static string FormatCapturedAreteRobotSimpleCharFullUpdateDetail(int sourceInstance)
+        {
+            return string.Format(CultureInfo.InvariantCulture, "sourceInstance={0:X8}", sourceInstance);
         }
 
         internal static void Restore(IPlayfieldLifecycleRecorder recorder, int order)
