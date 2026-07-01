@@ -27,5 +27,10 @@ namespace ZoneEngine.Core.Playfields.Content
         public void Register(PlayfieldContentRegistration registration)
         {
         }
+
+        public bool ShouldSuppressDbMobSpawn(int playfieldInstance, int mobSpawnId)
+        {
+            return false;
+        }
     }
 }

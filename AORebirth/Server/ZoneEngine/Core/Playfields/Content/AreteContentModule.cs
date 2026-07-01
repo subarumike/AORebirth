@@ -40,6 +40,26 @@ namespace ZoneEngine.Core.Playfields.Content
             registration.RegisterCapturedNpcSpawns(CapturedAreteRobotSpawns.SpawnForPlayfield);
         }
 
+        public bool ShouldSuppressDbMobSpawn(int playfieldInstance, int mobSpawnId)
+        {
+            if (playfieldInstance != PrivateAretePlayfieldInstance)
+            {
+                return false;
+            }
+
+            switch (mobSpawnId)
+            {
+                case 2027138231:
+                case 2027138245:
+                case 2027138246:
+                case 2027138249:
+                case 2027138259:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         private static void LogCapturedAreteRobotContent(bool isError, string message)
         {
             LogUtil.Debug(isError ? DebugInfoDetail.Error : DebugInfoDetail.Engine, message);

@@ -447,7 +447,7 @@ namespace AORebirth.Core.Playfields
             IEnumerable<DBMobSpawn> mobs = MobSpawnDao.Instance.GetWhere(new { Playfield = playfieldIdentity.Instance });
             foreach (DBMobSpawn mob in mobs)
             {
-                if (IsAreteCleaningRobotTestSpawn(mob))
+                if (ShouldSuppressDbMobSpawn(mob))
                 {
                     continue;
                 }
@@ -473,24 +473,14 @@ namespace AORebirth.Core.Playfields
             }
         }
 
-        private static bool IsAreteCleaningRobotTestSpawn(DBMobSpawn mob)
+        private static bool ShouldSuppressDbMobSpawn(DBMobSpawn mob)
         {
-            if (mob == null || mob.Playfield != 6553)
+            if (mob == null)
             {
                 return false;
             }
 
-            switch (mob.Id)
-            {
-                case 2027138231:
-                case 2027138245:
-                case 2027138246:
-                case 2027138249:
-                case 2027138259:
-                    return true;
-                default:
-                    return false;
-            }
+            return PlayfieldContent.ShouldSuppressDbMobSpawn(mob.Playfield, mob.Id);
         }
 
         #endregion

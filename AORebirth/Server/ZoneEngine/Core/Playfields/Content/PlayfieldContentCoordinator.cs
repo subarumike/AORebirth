@@ -30,5 +30,18 @@ namespace ZoneEngine.Core.Playfields.Content
                 module.Register(registration);
             }
         }
+
+        public bool ShouldSuppressDbMobSpawn(int playfieldInstance, int mobSpawnId)
+        {
+            foreach (IPlayfieldContentModule module in this.modules)
+            {
+                if (module.ShouldSuppressDbMobSpawn(playfieldInstance, mobSpawnId))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
