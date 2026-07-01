@@ -77,7 +77,6 @@ namespace AORebirth.Core.Playfields
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
-    using ZoneEngine.Core.Playfields.Content;
     using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Script;
 
@@ -115,11 +114,7 @@ namespace AORebirth.Core.Playfields
         /// </summary>
         private readonly Timer heartBeat;
 
-        private readonly NpcCorpseLifecycleCoordinator npcCorpseLifecycle;
-
-        private readonly NpcCombatTickCoordinator npcCombatTick;
-
-        private readonly PrivateCityReadyInitCoordinator privateCityReadyInit;
+        private readonly PlayfieldRuntimeSystems runtimeSystems;
 
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
         private readonly Dictionary<int, int> lastCombatWeaponSlots = new Dictionary<int, int>();
@@ -256,12 +251,6 @@ namespace AORebirth.Core.Playfields
             new int[0]
         };
 
-        private static readonly PlayfieldContentCoordinator PlayfieldContent =
-            new PlayfieldContentCoordinator(
-                new AreteContentModule(),
-                new MontroyalContentModule(),
-                new PrivateCityContentModule());
-
         private const int UnarmedAttackInfoAmmoCount = -1;
 
         private const int PlayerUnarmedAttackInfoWeaponSlot = 0;
@@ -334,10 +323,9 @@ namespace AORebirth.Core.Playfields
         {
             this.server = zoneServer;
             this.playfieldBus = BusSetup.StartWith<AsyncConfiguration>().Construct();
-            this.npcCorpseLifecycle = new NpcCorpseLifecycleCoordinator(this);
-            this.npcCombatTick = new NpcCombatTickCoordinator(this);
-            this.privateCityReadyInit =
-                new PrivateCityReadyInitCoordinator(
+            this.runtimeSystems =
+                new PlayfieldRuntimeSystems(
+                    this,
                     this.Identity,
                     IsPrivateCityPlayfieldCandidate,
                     IsCapturedMontroyalPrivateCityInstance,
@@ -363,7 +351,7 @@ namespace AORebirth.Core.Playfields
 
             this.statels = ResolvePlayfieldStatels(playfieldIdentity);
             this.LoadMobSpawns(playfieldIdentity);
-            PlayfieldContent.RegisterContent(this, playfieldIdentity);
+            this.runtimeSystems.RegisterContent(playfieldIdentity);
             this.LoadVendors(playfieldIdentity);
             this.LoadStaticDynels(playfieldIdentity);
         }
@@ -447,7 +435,7 @@ namespace AORebirth.Core.Playfields
             IEnumerable<DBMobSpawn> mobs = MobSpawnDao.Instance.GetWhere(new { Playfield = playfieldIdentity.Instance });
             foreach (DBMobSpawn mob in mobs)
             {
-                if (ShouldSuppressDbMobSpawn(mob))
+                if (this.runtimeSystems.ShouldSuppressDbMobSpawn(mob))
                 {
                     continue;
                 }
@@ -471,16 +459,6 @@ namespace AORebirth.Core.Playfields
                     }*/
                 }
             }
-        }
-
-        private static bool ShouldSuppressDbMobSpawn(DBMobSpawn mob)
-        {
-            if (mob == null)
-            {
-                return false;
-            }
-
-            return PlayfieldContent.ShouldSuppressDbMobSpawn(mob.Playfield, mob.Id);
         }
 
         #endregion
@@ -656,7 +634,7 @@ namespace AORebirth.Core.Playfields
 
             this.StopFightingDeadTarget(target.Identity);
             this.pendingCorpseSpawns.Remove(target.Identity.Instance);
-            this.npcCorpseLifecycle.FinalizeNpcDespawn(target);
+            this.runtimeSystems.FinalizeNpcDespawn(target);
         }
 
         public void RegisterNpcHome(ICharacter character)
@@ -829,12 +807,12 @@ namespace AORebirth.Core.Playfields
 
         public void SendPrivateCityPlayfieldReadyBlock(ZoneClient client, ICharacter character)
         {
-            this.privateCityReadyInit.SendPlayfieldReadyBlock(client, character);
+            this.runtimeSystems.SendPrivateCityPlayfieldReadyBlock(client, character);
         }
 
         public void SendPrivateCityPreFullCharacterReadyBlock(ZoneClient client, ICharacter character)
         {
-            this.privateCityReadyInit.SendPreFullCharacterReadyBlock(client, character);
+            this.runtimeSystems.SendPrivateCityPreFullCharacterReadyBlock(client, character);
         }
 
         /// <summary>
@@ -1812,7 +1790,7 @@ namespace AORebirth.Core.Playfields
                             xx =>
                                 xx.InPlayfield(this.Identity)
                                 && (!xx.DoNotDoTimers
-                                    || this.npcCorpseLifecycle.HasPendingDeadNpcDespawn(xx.Identity)))
+                                    || this.runtimeSystems.HasPendingDeadNpcDespawn(xx.Identity)))
                         .ToList();
 
                 foreach (ICharacter dynel in dynels)
@@ -1824,7 +1802,7 @@ namespace AORebirth.Core.Playfields
                             continue;
                         }
 
-                        if (this.npcCorpseLifecycle.ProcessDeadNpc(dynel))
+                        if (this.runtimeSystems.ProcessDeadNpc(dynel))
                         {
                             continue;
                         }
@@ -1936,7 +1914,7 @@ namespace AORebirth.Core.Playfields
             ICharacter character = this.FindByIdentity<ICharacter>(attacker);
             if (character != null && character.Controller is NPCController)
             {
-                this.npcCombatTick.ResetCombatTick(character);
+                this.runtimeSystems.ResetNpcCombatTick(character);
             }
             else
             {
@@ -2122,7 +2100,7 @@ namespace AORebirth.Core.Playfields
         {
             if (attacker.Controller is NPCController)
             {
-                this.npcCombatTick.ProcessCombatTick(attacker);
+                this.runtimeSystems.ProcessNpcCombatTick(attacker);
                 return;
             }
 
@@ -2670,7 +2648,7 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            this.npcCorpseLifecycle.BeginNpcDeath(attacker, target);
+            this.runtimeSystems.BeginNpcDeath(attacker, target);
         }
 
         internal void HandleCombatKillingHit(ICharacter attacker, ICharacter target)
@@ -3509,7 +3487,7 @@ namespace AORebirth.Core.Playfields
         {
             this.nextCombatTicks.Remove(identity.Instance);
             this.lastCombatWeaponSlots.Remove(identity.Instance);
-            this.npcCombatTick.ClearTracking(identity);
+            this.runtimeSystems.ClearNpcCombatTracking(identity);
         }
 
         internal void RemoveNpcHome(Identity identity)
