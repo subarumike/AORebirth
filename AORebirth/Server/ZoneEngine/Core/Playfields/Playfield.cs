@@ -255,23 +255,8 @@ namespace AORebirth.Core.Playfields
             new int[0]
         };
 
-        private static readonly CapturedMobSpawn[] CapturedAreteCleaningRobotSpawns =
-        {
-            new CapturedMobSpawn(0x79225E7C, 3617.86938f, 51.7449989f, 784.657471f, 12, 1, 6, 3622.77563f, 52.5f, 798.800964f),
-            new CapturedMobSpawn(0x79225E78, 3607.81494f, 52.1349983f, 782.811768f, 12, 1, 6, 3610.72632f, 52.5f, 777.876892f),
-            new CapturedMobSpawn(0x79225E77, 3620.60229f, 51.7449989f, 799.248657f, 12, 1, 6, 3602.23779f, 52.5f, 787.8172f),
-            new CapturedMobSpawn(0x79225E7D, 3605.55493f, 51.7449989f, 773.164246f, 12, 1, 6, 3602.2915f, 52.5f, 787.929504f),
-            new CapturedMobSpawn(0x79225E7A, 3597.80811f, 51.7449989f, 773.061829f, 12, 1, 6, 3596.97949f, 52.5f, 772.299316f),
-            new CapturedMobSpawn(0x79225E79, 3606.77197f, 53.2449989f, 801.493652f, 12, 1, 6, 3597.17847f, 52.5f, 772.241089f),
-            new CapturedMobSpawn(0x79225E76, 3595.23218f, 51.7449989f, 799.648132f, 12, 1, 6, 3594.29102f, 52.5f, 800.072754f)
-        };
-
-        private const string CapturedCleaningRobotPatrolReplayRelativePath =
-            @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260629-193121\movement-packets.csv";
-
-        private static readonly object CapturedCleaningRobotPatrolReplayLock = new object();
-
-        private static Dictionary<int, NPCController.CapturedPatrolReplaySegment[]> capturedCleaningRobotPatrolReplaySegments;
+        private static readonly CapturedAreteRobotContentProvider CapturedAreteRobotContent =
+            new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
 
         private const int UnarmedAttackInfoAmmoCount = -1;
 
@@ -496,6 +481,11 @@ namespace AORebirth.Core.Playfields
             }
         }
 
+        private static void LogCapturedAreteRobotContent(bool isError, string message)
+        {
+            LogUtil.Debug(isError ? DebugInfoDetail.Error : DebugInfoDetail.Engine, message);
+        }
+
         private void LoadCapturedAreteMobSpawns(Identity playfieldIdentity)
         {
             if (playfieldIdentity.Instance != PrivateAretePlayfieldInstance)
@@ -503,13 +493,13 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            foreach (CapturedMobSpawn spawn in CapturedAreteCleaningRobotSpawns)
+            foreach (CapturedAreteRobotSpawnDefinition spawn in CapturedAreteRobotContent.GetSpawnDefinitions())
             {
                 this.SpawnCapturedAreteCleaningRobot(playfieldIdentity, spawn);
             }
         }
 
-        private void SpawnCapturedAreteCleaningRobot(Identity playfieldIdentity, CapturedMobSpawn spawn)
+        private void SpawnCapturedAreteCleaningRobot(Identity playfieldIdentity, CapturedAreteRobotSpawnDefinition spawn)
         {
             var npcController = new NPCController();
             Character mobCharacter = NonPlayerCharacterHandler.SpawnMobFromTemplate(
@@ -558,7 +548,7 @@ namespace AORebirth.Core.Playfields
                     spawn.RunSpeed));
         }
 
-        private static void AssignCapturedPatrolWaypoints(ICharacter mobCharacter, CapturedMobSpawn spawn)
+        private static void AssignCapturedPatrolWaypoints(ICharacter mobCharacter, CapturedAreteRobotSpawnDefinition spawn)
         {
             mobCharacter.Waypoints.Clear();
             mobCharacter.AddWaypoint(
@@ -578,215 +568,22 @@ namespace AORebirth.Core.Playfields
 
         private static NPCController.CapturedPatrolReplaySegment[] GetCapturedCleaningRobotPatrolReplaySegments(int sourceInstance)
         {
-            Dictionary<int, NPCController.CapturedPatrolReplaySegment[]> routes = GetCapturedCleaningRobotPatrolReplayRoutes();
-            NPCController.CapturedPatrolReplaySegment[] route;
-            return routes.TryGetValue(sourceInstance, out route)
-                       ? route
-                       : new NPCController.CapturedPatrolReplaySegment[0];
-        }
-
-        private static Dictionary<int, NPCController.CapturedPatrolReplaySegment[]> GetCapturedCleaningRobotPatrolReplayRoutes()
-        {
-            lock (CapturedCleaningRobotPatrolReplayLock)
+            CapturedAreteRobotPatrolReplaySegment[] segments =
+                CapturedAreteRobotContent.GetPatrolReplaySegments(sourceInstance);
+            var result = new NPCController.CapturedPatrolReplaySegment[segments.Length];
+            for (int i = 0; i < segments.Length; i++)
             {
-                if (capturedCleaningRobotPatrolReplaySegments == null)
-                {
-                    capturedCleaningRobotPatrolReplaySegments = LoadCapturedCleaningRobotPatrolReplayRoutes();
-                }
-
-                return capturedCleaningRobotPatrolReplaySegments;
-            }
-        }
-
-        private static Dictionary<int, NPCController.CapturedPatrolReplaySegment[]> LoadCapturedCleaningRobotPatrolReplayRoutes()
-        {
-            var routes = new Dictionary<int, List<CapturedPatrolReplayCsvRow>>();
-            string path = FindCapturedCleaningRobotPatrolReplayPath();
-            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
-            {
-                LogUtil.Debug(DebugInfoDetail.Engine, "Captured cleaning robot patrol replay CSV not found; using waypoint fallback.");
-                return new Dictionary<int, NPCController.CapturedPatrolReplaySegment[]>();
-            }
-
-            string[] lines = File.ReadAllLines(path);
-            if (lines.Length < 2)
-            {
-                return new Dictionary<int, NPCController.CapturedPatrolReplaySegment[]>();
-            }
-
-            string[] header = SplitCapturedMovementCsvLine(lines[0]);
-            int capturedUtcIndex = FindCsvColumn(header, "CapturedUtc");
-            int messageTypeIndex = FindCsvColumn(header, "MessageType");
-            int sourceInstanceIndex = FindCsvColumn(header, "SourceInstance");
-            int followKindIndex = FindCsvColumn(header, "FollowKind");
-            int currentXIndex = FindCsvColumn(header, "CurrentX");
-            int currentYIndex = FindCsvColumn(header, "CurrentY");
-            int currentZIndex = FindCsvColumn(header, "CurrentZ");
-            int destinationXIndex = FindCsvColumn(header, "DestinationX");
-            int destinationYIndex = FindCsvColumn(header, "DestinationY");
-            int destinationZIndex = FindCsvColumn(header, "DestinationZ");
-
-            if (capturedUtcIndex < 0 || messageTypeIndex < 0 || sourceInstanceIndex < 0 || followKindIndex < 0
-                || currentXIndex < 0 || currentYIndex < 0 || currentZIndex < 0
-                || destinationXIndex < 0 || destinationYIndex < 0 || destinationZIndex < 0)
-            {
-                LogUtil.Debug(DebugInfoDetail.Error, "Captured cleaning robot patrol replay CSV header is missing required columns.");
-                return new Dictionary<int, NPCController.CapturedPatrolReplaySegment[]>();
-            }
-
-            for (int i = 1; i < lines.Length; i++)
-            {
-                string[] fields = SplitCapturedMovementCsvLine(lines[i]);
-                if (fields.Length <= destinationZIndex
-                    || !string.Equals(fields[messageTypeIndex], "FollowTarget", StringComparison.OrdinalIgnoreCase)
-                    || !string.Equals(fields[followKindIndex], "NpcPath", StringComparison.OrdinalIgnoreCase)
-                    || string.IsNullOrWhiteSpace(fields[currentXIndex])
-                    || string.IsNullOrWhiteSpace(fields[destinationXIndex]))
-                {
-                    continue;
-                }
-
-                int sourceInstance;
-                DateTime capturedUtc;
-                float currentX;
-                float currentY;
-                float currentZ;
-                float destinationX;
-                float destinationY;
-                float destinationZ;
-
-                if (!int.TryParse(fields[sourceInstanceIndex], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out sourceInstance)
-                    || !DateTime.TryParse(fields[capturedUtcIndex], CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out capturedUtc)
-                    || !float.TryParse(fields[currentXIndex], NumberStyles.Float, CultureInfo.InvariantCulture, out currentX)
-                    || !float.TryParse(fields[currentYIndex], NumberStyles.Float, CultureInfo.InvariantCulture, out currentY)
-                    || !float.TryParse(fields[currentZIndex], NumberStyles.Float, CultureInfo.InvariantCulture, out currentZ)
-                    || !float.TryParse(fields[destinationXIndex], NumberStyles.Float, CultureInfo.InvariantCulture, out destinationX)
-                    || !float.TryParse(fields[destinationYIndex], NumberStyles.Float, CultureInfo.InvariantCulture, out destinationY)
-                    || !float.TryParse(fields[destinationZIndex], NumberStyles.Float, CultureInfo.InvariantCulture, out destinationZ))
-                {
-                    continue;
-                }
-
-                List<CapturedPatrolReplayCsvRow> route;
-                if (!routes.TryGetValue(sourceInstance, out route))
-                {
-                    route = new List<CapturedPatrolReplayCsvRow>();
-                    routes[sourceInstance] = route;
-                }
-
-                route.Add(
-                    new CapturedPatrolReplayCsvRow
-                    {
-                        CapturedUtc = capturedUtc,
-                        Start = new AORebirth.Core.Vector.Vector3(currentX, currentY, currentZ),
-                        End = new AORebirth.Core.Vector.Vector3(destinationX, destinationY, destinationZ)
-                    });
-            }
-
-            var result = new Dictionary<int, NPCController.CapturedPatrolReplaySegment[]>();
-            foreach (KeyValuePair<int, List<CapturedPatrolReplayCsvRow>> route in routes)
-            {
-                result[route.Key] = BuildCapturedCleaningRobotPatrolReplay(route.Value);
-            }
-
-            return result;
-        }
-
-        private static NPCController.CapturedPatrolReplaySegment[] BuildCapturedCleaningRobotPatrolReplay(
-            List<CapturedPatrolReplayCsvRow> rows)
-        {
-            if (rows == null || rows.Count == 0)
-            {
-                return new NPCController.CapturedPatrolReplaySegment[0];
-            }
-
-            rows.Sort((x, y) => x.CapturedUtc.CompareTo(y.CapturedUtc));
-            var result = new NPCController.CapturedPatrolReplaySegment[rows.Count];
-            for (int i = 0; i < rows.Count; i++)
-            {
-                double delayAfterSeconds = 0.25;
-                if (i + 1 < rows.Count)
-                {
-                    delayAfterSeconds = Math.Max(0.01, (rows[i + 1].CapturedUtc - rows[i].CapturedUtc).TotalSeconds);
-                }
-
                 result[i] = new NPCController.CapturedPatrolReplaySegment(
-                    delayAfterSeconds,
-                    rows[i].Start.xf,
-                    rows[i].Start.yf,
-                    rows[i].Start.zf,
-                    rows[i].End.xf,
-                    rows[i].End.yf,
-                    rows[i].End.zf);
+                    segments[i].DelayAfterSeconds,
+                    segments[i].StartX,
+                    segments[i].StartY,
+                    segments[i].StartZ,
+                    segments[i].EndX,
+                    segments[i].EndY,
+                    segments[i].EndZ);
             }
 
             return result;
-        }
-
-        private static string FindCapturedCleaningRobotPatrolReplayPath()
-        {
-            DirectoryInfo directory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            for (int i = 0; i < 8 && directory != null; i++)
-            {
-                string candidate = Path.Combine(directory.FullName, CapturedCleaningRobotPatrolReplayRelativePath);
-                if (File.Exists(candidate))
-                {
-                    return candidate;
-                }
-
-                directory = directory.Parent;
-            }
-
-            string currentDirectoryCandidate = Path.Combine(Directory.GetCurrentDirectory(), CapturedCleaningRobotPatrolReplayRelativePath);
-            return File.Exists(currentDirectoryCandidate) ? currentDirectoryCandidate : string.Empty;
-        }
-
-        private static int FindCsvColumn(string[] header, string name)
-        {
-            for (int i = 0; i < header.Length; i++)
-            {
-                if (string.Equals(header[i], name, StringComparison.OrdinalIgnoreCase))
-                {
-                    return i;
-                }
-            }
-
-            return -1;
-        }
-
-        private static string[] SplitCapturedMovementCsvLine(string line)
-        {
-            var result = new List<string>();
-            var current = new System.Text.StringBuilder();
-            bool quoted = false;
-            for (int i = 0; i < line.Length; i++)
-            {
-                char c = line[i];
-                if (c == '"')
-                {
-                    if (quoted && i + 1 < line.Length && line[i + 1] == '"')
-                    {
-                        current.Append('"');
-                        i++;
-                    }
-                    else
-                    {
-                        quoted = !quoted;
-                    }
-                }
-                else if (c == ',' && !quoted)
-                {
-                    result.Add(current.ToString());
-                    current.Length = 0;
-                }
-                else
-                {
-                    current.Append(c);
-                }
-            }
-
-            result.Add(current.ToString());
-            return result.ToArray();
         }
 
         #endregion
@@ -4227,62 +4024,6 @@ namespace AORebirth.Core.Playfields
             public int CorpseInstance { get; set; }
 
             public DateTime DueAtUtc { get; set; }
-        }
-
-        private class CapturedMobSpawn
-        {
-            public CapturedMobSpawn(
-                int sourceInstance,
-                float x,
-                float y,
-                float z,
-                int health,
-                int level,
-                int runSpeed,
-                float patrolX,
-                float patrolY,
-                float patrolZ)
-            {
-                this.SourceInstance = sourceInstance;
-                this.X = x;
-                this.Y = y;
-                this.Z = z;
-                this.Health = health;
-                this.Level = level;
-                this.RunSpeed = runSpeed;
-                this.PatrolX = patrolX;
-                this.PatrolY = patrolY;
-                this.PatrolZ = patrolZ;
-            }
-
-            public int SourceInstance { get; private set; }
-
-            public float X { get; private set; }
-
-            public float Y { get; private set; }
-
-            public float Z { get; private set; }
-
-            public int Health { get; private set; }
-
-            public int Level { get; private set; }
-
-            public int RunSpeed { get; private set; }
-
-            public float PatrolX { get; private set; }
-
-            public float PatrolY { get; private set; }
-
-            public float PatrolZ { get; private set; }
-        }
-
-        private class CapturedPatrolReplayCsvRow
-        {
-            public DateTime CapturedUtc { get; set; }
-
-            public AORebirth.Core.Vector.Vector3 Start { get; set; }
-
-            public AORebirth.Core.Vector.Vector3 End { get; set; }
         }
 
         internal Identity AllocateCorpseIdentity()
