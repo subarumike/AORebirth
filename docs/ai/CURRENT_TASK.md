@@ -2,67 +2,51 @@
 
 ## Active Task
 
-Captured Cleaning Robot Combat Parity.
+Playfield content-module foundation: private-city ready/init guardrails.
 
-The active scope is enemy combat behavior for the captured `Malfunctioning Cleaning Robot`. Old private-city, org-command, city-controller, guest-key, and player-visibility work is not active implementation scope for this task.
+This is a foundation/test-harness scope. Do not make gameplay behavior changes while this task is active.
 
 ## Current Target
 
-- Enemy: `Malfunctioning Cleaning Robot`
-- MonsterData: `297023`
-- HP: `12`
-- RunSpeed: `5/6`
-- Primary evidence folder: `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260625-192827`
+- Flow: private-city ready/init packet and lifecycle ordering
+- Primary owner today: `Playfield.cs` plus the `ClientConnected` ready flow
+- Harness: `PlayfieldLifecycleTrace`
+- Regression target: private-city org/init state before `FullCharacter`, followed by towers/cities ready-block packets
 
-## Proven Live Combat Sequence
+## Completed Foundation Work
 
-- `Attack`
-- `AttackInfo`
-- `FollowTarget`
-- occasional `SetPos`
-- `StopFight`
-- `CharacterAction Death`
-- `CorpseFullUpdate`
-- delayed despawn
+- `6dc792d7` added the first Playfield content-module boundary.
+- `a6fb22a2` fixed the unrelated item/nano loader startup blocker.
+- Private-city ready/init now has trace-only begin/end and summary markers for the current ready sequence.
+- Playfield lifecycle tests now assert the private-city ready/init packet message order and key org/towers/cities details.
 
-## Completed Enemy Work
+## Next Foundation Work
 
-- Cleaning robot combat chase uses continuous `FollowTarget` behavior.
-- Cleaning robot damage text path sends captured `SpecialAttackWeapon` `LIW2`/`LIW1` context before robot `AttackInfo`.
+Recommended next task:
 
-Recent enemy commits:
+`Extract Private City Ready Init Sequencing From Playfield`
 
-- `d9a9b9d2` - cleaning robot continuous `FollowTarget` chase.
-- `c8f517b8` - cleaning robot `SpecialAttackWeapon` damage context before `AttackInfo`.
-
-## Next Enemy Work
-
-- Mike live-tests robot incoming damage text and reports whether the AO client still shows `nanobots` or `unknown damage`.
-- Patch death, corpse, and despawn parity:
-  - `StopFight`
-  - `CharacterAction Death Parameter2=500`
-  - `CorpseFullUpdate`
-  - delayed despawn
+Keep the extraction behavior-preserving. Do not implement CityAdvantages, org command flows, ownership management, city purchase logic, guest-key lifecycle, combat tuning, or capture tooling changes.
 
 ## Regression Risks Only
 
-These systems are not active implementation scope for this task. Preserve them while changing enemy combat behavior:
+Preserve these while changing private-city ready/init boundaries:
 
-- Private-city zoning, guest-key generator, city-controller open/close, and private-city org initialization.
+- Private-city zoning, guest-key generator, City Controller open/close, and private-city org initialization.
 - `/org info` behavior.
 - Same-playfield player visibility and movement rendering.
+- Cleaning robot combat, patrol, death, corpse, despawn, and loot behavior.
 
 ## Validation Plan
 
-For docs-only task updates:
+For trace/test-only changes:
 
 - `cmd /d /c git diff --check`
+- focused Playfield lifecycle tests
 
-For future code changes affecting server binaries:
+For production trace code changes:
 
-- `cmd /d /c stop-engines.cmd`
 - `cmd /d /c tools\build_aorebirth_debug.cmd`
 - `cmd /d /c restart-engines.cmd`
-- `cmd /d /c git diff --check`
 
 Mike performs live AO client playtesting. Do not claim live validation unless Mike reports it.

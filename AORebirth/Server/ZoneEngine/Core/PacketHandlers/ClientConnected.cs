@@ -174,6 +174,11 @@ client.Controller.Character.Playfield.Identity,
             /* visual */
             PlayfieldLifecycleTrace.Record(
                 PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityReadyBlockBegin,
+                PlayfieldLifecycleTrace.MessagePrivateCityReadyBlockBegin,
+                identity);
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
                 PlayfieldLifecycleTrace.StagePrivateCitySimpleCharFullUpdateBroadcast,
                 PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
                 identity);
@@ -198,6 +203,11 @@ client.Controller.Character.Playfield.Identity,
             {
                 currentPlayfield.SendPrivateCityPlayfieldReadyBlock(client, client.Controller.Character);
             }
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityReadyBlockEnd,
+                PlayfieldLifecycleTrace.MessagePrivateCityReadyBlockEnd,
+                identity);
 
             var specials = new[]
                            {

@@ -122,6 +122,14 @@ namespace ZoneEngine.Core.Playfields
 
         public const string MessagePlayfieldAllTowers = "PlayfieldAllTowers";
 
+        public const string MessagePrivateCityOrgInitSent = "PrivateCityOrgInitSent";
+
+        public const string MessagePrivateCityReadyBlockBegin = "PrivateCityReadyBlockBegin";
+
+        public const string MessagePrivateCityReadyBlockEnd = "PrivateCityReadyBlockEnd";
+
+        public const string MessagePrivateCityTowersCitiesSent = "PrivateCityTowersCitiesSent";
+
         public const string MessageSimpleCharFullUpdate = "SimpleCharFullUpdate";
 
         public const string MessageStat = "Stat";
@@ -133,6 +141,8 @@ namespace ZoneEngine.Core.Playfields
         public const string StagePrivateCitySimpleCharFullUpdateBroadcast =
             "private-city-simple-char-full-update-broadcast";
 
+        public const string StagePrivateCityReadyBlockBegin = "private-city-ready-block-begin";
+
         public const string StagePrivateCityOrgInfoPacket = "private-city-org-info-packet";
 
         public const string StagePrivateCitySocialStatus = "private-city-social-status";
@@ -143,9 +153,15 @@ namespace ZoneEngine.Core.Playfields
 
         public const string StagePrivateCityFullCharacter = "private-city-full-character";
 
+        public const string StagePrivateCityOrgInitSent = "private-city-org-init-sent";
+
         public const string StagePrivateCityPlayfieldAllTowers = "private-city-playfield-all-towers";
 
         public const string StagePrivateCityPlayfieldAllCities = "private-city-playfield-all-cities";
+
+        public const string StagePrivateCityTowersCitiesSent = "private-city-towers-cities-sent";
+
+        public const string StagePrivateCityReadyBlockEnd = "private-city-ready-block-end";
 
         public const string StageCharInPlayReceived = "char-in-play-received";
 
@@ -203,6 +219,7 @@ namespace ZoneEngine.Core.Playfields
 
         public static readonly string[] ExpectedPrivateCityReadyInitOrder =
         {
+            StagePrivateCityReadyBlockBegin,
             StagePrivateCitySimpleCharFullUpdateBroadcast,
             StagePrivateCityOrgInfoPacket,
             StagePrivateCitySocialStatus,
@@ -211,9 +228,12 @@ namespace ZoneEngine.Core.Playfields
             StagePrivateCitySocialStatus,
             StagePrivateCitySocialStatus,
             StagePrivateCitySocialStatus,
+            StagePrivateCityOrgInitSent,
             StagePrivateCityFullCharacter,
             StagePrivateCityPlayfieldAllTowers,
-            StagePrivateCityPlayfieldAllCities
+            StagePrivateCityPlayfieldAllCities,
+            StagePrivateCityTowersCitiesSent,
+            StagePrivateCityReadyBlockEnd
         };
 
         public static readonly string[] ExpectedCharInPlayEntryOrder =

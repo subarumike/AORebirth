@@ -34,7 +34,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     PlayfieldLifecycleTrace.ExpectedPrivateCityReadyInitOrder);
                 AssertStageBefore(
                     capture.Events,
+                    PlayfieldLifecycleTrace.StagePrivateCityReadyBlockBegin,
+                    PlayfieldLifecycleTrace.StagePrivateCityOrgInfoPacket);
+                AssertStageBefore(
+                    capture.Events,
                     PlayfieldLifecycleTrace.StagePrivateCityOrgInfoPacket,
+                    PlayfieldLifecycleTrace.StagePrivateCityFullCharacter);
+                AssertStageBefore(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StagePrivateCityOrgInitSent,
                     PlayfieldLifecycleTrace.StagePrivateCityFullCharacter);
                 AssertStageBefore(
                     capture.Events,
@@ -44,6 +52,82 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     capture.Events,
                     PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllTowers,
                     PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllCities);
+                AssertStageBefore(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllCities,
+                    PlayfieldLifecycleTrace.StagePrivateCityTowersCitiesSent);
+                AssertStageBefore(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StagePrivateCityTowersCitiesSent,
+                    PlayfieldLifecycleTrace.StagePrivateCityReadyBlockEnd);
+            }
+        }
+
+        [TestMethod]
+        public void PrivateCityReadyInitRecorderGuardsPacketMessageOrderAndDetails()
+        {
+            using (PlayfieldLifecycleCapture capture = PlayfieldLifecycleTrace.Capture())
+            {
+                RecordPrivateCityReadyInitCurrentPacketSequence();
+
+                AssertExpectedOrder(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                    PlayfieldLifecycleTrace.ExpectedPrivateCityReadyInitOrder);
+                Assert.AreEqual(
+                    PlayfieldLifecycleTrace.ExpectedPrivateCityReadyInitOrder.Length,
+                    CountFlow(capture.Events, PlayfieldLifecycleTrace.FlowPrivateCityReadyInit));
+                Assert.AreEqual(
+                    4,
+                    CountStage(capture.Events, PlayfieldLifecycleTrace.StagePrivateCitySocialStatus),
+                    "Private-city org init must preserve the captured repeated SocialStatus=4 sequence.");
+
+                AssertMessageForStage(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StagePrivateCityReadyBlockBegin,
+                    PlayfieldLifecycleTrace.MessagePrivateCityReadyBlockBegin);
+                AssertMessageForStage(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StagePrivateCitySimpleCharFullUpdateBroadcast,
+                    PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate);
+                AssertMessageForStage(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StagePrivateCityOrgInfoPacket,
+                    PlayfieldLifecycleTrace.MessageOrgInfoPacket);
+                AssertMessageForStage(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StagePrivateCityOrgInitSent,
+                    PlayfieldLifecycleTrace.MessagePrivateCityOrgInitSent);
+                AssertMessageForStage(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StagePrivateCityFullCharacter,
+                    PlayfieldLifecycleTrace.MessageFullCharacter);
+                AssertMessageForStage(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllTowers,
+                    PlayfieldLifecycleTrace.MessagePlayfieldAllTowers);
+                AssertMessageForStage(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllCities,
+                    PlayfieldLifecycleTrace.MessagePlayfieldAllCities);
+                AssertMessageForStage(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StagePrivateCityTowersCitiesSent,
+                    PlayfieldLifecycleTrace.MessagePrivateCityTowersCitiesSent);
+                AssertMessageForStage(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StagePrivateCityReadyBlockEnd,
+                    PlayfieldLifecycleTrace.MessagePrivateCityReadyBlockEnd);
+
+                Assert.IsTrue(
+                    HasDetail(capture.Events, PlayfieldLifecycleTrace.StagePrivateCityOrgInfoPacket, "Est. 2024"),
+                    "Private-city org info must remain before FullCharacter.");
+                Assert.IsTrue(
+                    HasDetailContains(capture.Events, PlayfieldLifecycleTrace.StagePrivateCityOrgInitSent, "org=1970177"),
+                    "Private-city org init summary must preserve the captured organization identity.");
+                Assert.IsTrue(
+                    HasDetailContains(capture.Events, PlayfieldLifecycleTrace.StagePrivateCityTowersCitiesSent, "cityPayloadBytes=0"),
+                    "Captured Montroyal private-city ready block currently sends the empty towers/cities fallback.");
             }
         }
 
@@ -499,6 +583,58 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             return false;
         }
 
+        private static bool HasDetailContains(IList<PlayfieldLifecycleEvent> events, string stage, string detail)
+        {
+            for (int i = 0; i < events.Count; i++)
+            {
+                if (events[i].Stage == stage
+                    && events[i].Detail.IndexOf(detail, StringComparison.Ordinal) >= 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static void AssertMessageForStage(
+            IList<PlayfieldLifecycleEvent> events,
+            string stage,
+            string messageType)
+        {
+            int index = IndexOfStage(events, stage);
+            Assert.IsTrue(index >= 0, "Missing lifecycle stage " + stage + ".");
+            Assert.AreEqual(messageType, events[index].MessageType, "Unexpected message type for stage " + stage + ".");
+        }
+
+        private static int CountFlow(IList<PlayfieldLifecycleEvent> events, string flow)
+        {
+            int count = 0;
+            for (int i = 0; i < events.Count; i++)
+            {
+                if (events[i].Flow == flow)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        private static int CountStage(IList<PlayfieldLifecycleEvent> events, string stage)
+        {
+            int count = 0;
+            for (int i = 0; i < events.Count; i++)
+            {
+                if (events[i].Stage == stage)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
         private static int IndexOfStage(IList<PlayfieldLifecycleEvent> events, string stage)
         {
             for (int i = 0; i < events.Count; i++)
@@ -519,6 +655,97 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             {
                 PlayfieldLifecycleTrace.Record(flow, stages[i], stages[i], identity);
             }
+        }
+
+        private static void RecordPrivateCityReadyInitCurrentPacketSequence()
+        {
+            Identity character = new Identity { Type = IdentityType.CanbeAffected, Instance = 1001 };
+            Identity playfield = new Identity { Type = IdentityType.Playfield2, Instance = 1196034 };
+
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityReadyBlockBegin,
+                PlayfieldLifecycleTrace.MessagePrivateCityReadyBlockBegin,
+                character);
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCitySimpleCharFullUpdateBroadcast,
+                PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
+                character);
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityOrgInfoPacket,
+                PlayfieldLifecycleTrace.MessageOrgInfoPacket,
+                character,
+                "Est. 2024");
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCitySocialStatus,
+                PlayfieldLifecycleTrace.MessageStat,
+                character,
+                "socialstatus=4");
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityClan,
+                PlayfieldLifecycleTrace.MessageStat,
+                character,
+                "clan=1970177");
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityClanLevel,
+                PlayfieldLifecycleTrace.MessageStat,
+                character,
+                "clanlevel=1");
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCitySocialStatus,
+                PlayfieldLifecycleTrace.MessageStat,
+                character,
+                "socialstatus=4");
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCitySocialStatus,
+                PlayfieldLifecycleTrace.MessageStat,
+                character,
+                "socialstatus=4");
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCitySocialStatus,
+                PlayfieldLifecycleTrace.MessageStat,
+                character,
+                "socialstatus=4");
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityOrgInitSent,
+                PlayfieldLifecycleTrace.MessagePrivateCityOrgInitSent,
+                character,
+                "org=1970177 orgName=Est. 2024 socialStatus=4 repeats=4");
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityFullCharacter,
+                PlayfieldLifecycleTrace.MessageFullCharacter,
+                character);
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllTowers,
+                PlayfieldLifecycleTrace.MessagePlayfieldAllTowers,
+                playfield);
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllCities,
+                PlayfieldLifecycleTrace.MessagePlayfieldAllCities,
+                playfield);
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityTowersCitiesSent,
+                PlayfieldLifecycleTrace.MessagePrivateCityTowersCitiesSent,
+                playfield,
+                "cityUnknown=0 cityPayloadBytes=0");
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                PlayfieldLifecycleTrace.StagePrivateCityReadyBlockEnd,
+                PlayfieldLifecycleTrace.MessagePrivateCityReadyBlockEnd,
+                character);
         }
     }
 }
