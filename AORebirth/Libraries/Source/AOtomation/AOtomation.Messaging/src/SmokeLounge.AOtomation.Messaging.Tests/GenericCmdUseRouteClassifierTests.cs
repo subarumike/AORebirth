@@ -186,6 +186,39 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void SurgeryClinicRulesExposeCurrentCapturedConstantsAndTargetDecisions()
+        {
+            Assert.IsTrue(
+                SurgeryClinicInteractionRules.IsCapturedSurgeryClinicTerminal(
+                    Terminal(SurgeryClinicInteractionRules.CapturedSurgeryClinicTerminalInstance),
+                    0));
+            Assert.IsTrue(
+                SurgeryClinicInteractionRules.IsCapturedSurgeryClinicTerminal(
+                    Terminal(SurgeryClinicInteractionRules.CapturedAlternateSurgeryClinicTerminalInstance),
+                    0));
+            Assert.IsTrue(
+                SurgeryClinicInteractionRules.IsCapturedSurgeryClinicTerminal(
+                    Terminal(0x01020304),
+                    SurgeryClinicInteractionRules.CapturedSurgeryClinicTemplateId));
+            Assert.IsTrue(
+                SurgeryClinicInteractionRules.IsCapturedSurgeryClinicTerminal(
+                    Terminal(0x01020304),
+                    SurgeryClinicInteractionRules.CapturedImprovedSurgeryClinicTemplateId));
+            Assert.IsFalse(
+                SurgeryClinicInteractionRules.IsCapturedSurgeryClinicTerminal(
+                    new Identity { Type = IdentityType.Container, Instance = 0x01020304 },
+                    SurgeryClinicInteractionRules.CapturedSurgeryClinicTemplateId));
+
+            Assert.AreEqual(300, SurgeryClinicInteractionRules.SurgeryClinicCreditCost);
+            Assert.AreEqual(0x26732, SurgeryClinicInteractionRules.SurgeryClinicNanoId);
+            Assert.AreEqual(90000, SurgeryClinicInteractionRules.SurgeryClinicNanoDuration);
+            Assert.AreEqual(300, SurgeryClinicInteractionRules.SurgeryClinicImplantAccessSeconds);
+            Assert.AreEqual(124, SurgeryClinicInteractionRules.SurgeryClinicSpecialStatId);
+            Assert.AreEqual(5, SurgeryClinicInteractionRules.SurgeryClinicSpecialLockSeconds);
+            Assert.AreEqual(3500, SurgeryClinicInteractionRules.SurgeryClinicSpecialAvailableDelayMilliseconds);
+        }
+
+        [TestMethod]
         public void GenericInventoryAndFallbackRoutesKeepCurrentPrecedence()
         {
             AssertRoute(GenericCmdUseRoute.RexB18DBoxProgress, Terminal(0x01020306), rexB18DBoxProgressMatched: true);

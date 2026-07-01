@@ -68,30 +68,6 @@ namespace ZoneEngine.Core.MessageHandlers
     [MessageHandler(MessageHandlerDirection.All)]
     public class GenericCmdMessageHandler : BaseMessageHandler<GenericCmdMessage, GenericCmdMessageHandler>
     {
-        private static readonly TimeSpan SurgeryClinicSpecialAvailableDelay = TimeSpan.FromMilliseconds(3500);
-
-        private static readonly ISet<int> CapturedSurgeryClinicTemplateIds =
-            new HashSet<int>
-            {
-                43553,
-                295742
-            };
-
-        private const int SurgeryClinicNanoId = 0x26732;
-
-        private const int SurgeryClinicNanoDuration = 90000;
-
-        private const int SurgeryClinicImplantAccessSeconds = 300;
-
-        private const int SurgeryClinicSpecialStatId = 124;
-
-        private const int SurgeryClinicSpecialLockSeconds = 5;
-
-        private const int SurgeryClinicCreditCost = 300;
-
-        private const string SurgeryClinicFeedback =
-            "~&!!!\":!!!)<sHYou have 5 minutes (or until you leave the playfield) to swap implants.";
-
         private static readonly IDictionary<string, Profession> OfabProfessionVendorRequirements =
             new Dictionary<string, Profession>(StringComparer.OrdinalIgnoreCase)
             {
@@ -215,7 +191,7 @@ namespace ZoneEngine.Core.MessageHandlers
                     {
                         break;
                     }
-                    else if (this.TryHandleSurgeryClinicTerminalUse(client, message, target))
+                    else if (SurgeryClinicInteractionHandler.Default.TryHandleUse(client, message, target))
                     {
                         break;
                     }
@@ -330,168 +306,6 @@ namespace ZoneEngine.Core.MessageHandlers
                     }
                     break;
             }
-        }
-
-        private bool TryHandleSurgeryClinicTerminalUse(
-            IZoneClient client,
-            GenericCmdMessage message,
-            Identity target)
-        {
-            ICharacter character = client.Controller.Character;
-            StatelData statelData = this.GetStatelData(character, target);
-
-            if (!this.IsCapturedSurgeryClinicTerminal(target, statelData))
-            {
-                return false;
-            }
-
-            int cashBefore = CashStatRules.Clamp(character.Stats[StatIds.cash].BaseValue);
-            if (cashBefore < SurgeryClinicCreditCost)
-            {
-                client.Server.Info(
-                    client,
-                    "Surgery clinic terminal use blocked by insufficient captured-state support char={0} target={1} cash={2} cost={3}",
-                    character.Identity,
-                    target,
-                    cashBefore,
-                    SurgeryClinicCreditCost);
-                return false;
-            }
-
-            int cashAfter = CashStatRules.Clamp((long)cashBefore - SurgeryClinicCreditCost);
-            character.Stats[StatIds.cash].Set((uint)cashAfter);
-            StatMessageHandler.Default.SendSingle(character, (int)StatIds.cash, (uint)cashAfter);
-            this.SendSurgeryClinicFeedback(character);
-            this.SendSurgeryClinicCastNano(character);
-            CharacterActionMessageHandler.Default.SetNanoDuration(
-                character,
-                character.Identity,
-                SurgeryClinicNanoId,
-                SurgeryClinicNanoDuration);
-            this.GrantSurgeryClinicImplantAccess(character);
-            this.SendSurgeryClinicSpecialUsed(character);
-            this.Acknowledge(character, message);
-            this.SendSurgeryClinicSpecialAvailableDelayed(character);
-
-            client.Server.Info(
-                client,
-                "Surgery clinic terminal use handled char={0} target={1} statelTemplate={2} cashBefore={3} cashAfter={4} nano={5} duration={6} implantAccessSeconds={7} evidence={8}",
-                character.Identity,
-                target,
-                statelData == null ? 0 : statelData.TemplateId,
-                cashBefore,
-                cashAfter,
-                SurgeryClinicNanoId.ToString("X", CultureInfo.InvariantCulture),
-                SurgeryClinicNanoDuration,
-                SurgeryClinicImplantAccessSeconds,
-                "captures/20260620-213807/events.log:51-52;captures/20260621-062224/events.log:52-71");
-
-            return true;
-        }
-
-        private StatelData GetStatelData(ICharacter character, Identity target)
-        {
-            if (character == null || character.Playfield == null)
-            {
-                return null;
-            }
-
-            AORebirth.Core.Playfields.PlayfieldData playfieldData;
-            if (!PlayfieldLoader.PFData.TryGetValue(character.Playfield.Identity.Instance, out playfieldData))
-            {
-                return null;
-            }
-
-            return playfieldData.Statels.FirstOrDefault(
-                x => x.Identity.Type == target.Type && x.Identity.Instance == target.Instance);
-        }
-
-        private bool IsCapturedSurgeryClinicTerminal(Identity target, StatelData statelData)
-        {
-            if (target.Type != IdentityType.Terminal)
-            {
-                return false;
-            }
-
-            uint instance = unchecked((uint)target.Instance);
-            if (instance == 0xC00204A2u || instance == 0xC00004A2u)
-            {
-                return true;
-            }
-
-            return statelData != null && CapturedSurgeryClinicTemplateIds.Contains(statelData.TemplateId);
-        }
-
-        private void GrantSurgeryClinicImplantAccess(ICharacter character)
-        {
-            Character concreteCharacter = character as Character;
-            if (concreteCharacter == null)
-            {
-                return;
-            }
-
-            concreteCharacter.GrantImplantAccess(SurgeryClinicImplantAccessSeconds);
-        }
-
-        private void SendSurgeryClinicFeedback(ICharacter character)
-        {
-            character.Controller.Client.SendCompressed(
-                new FormatFeedbackMessage
-                {
-                    Identity = character.Identity,
-                    Unknown = 1,
-                    Unknown1 = 0,
-                    FormattedMessage = SurgeryClinicFeedback,
-                    Unknown2 = 0
-                },
-                character.Identity.Instance);
-        }
-
-        private void SendSurgeryClinicCastNano(ICharacter character)
-        {
-            character.Controller.Client.SendCompressed(
-                new CastNanoSpellMessage
-                {
-                    Identity = character.Identity,
-                    Unknown = 0,
-                    NanoId = SurgeryClinicNanoId,
-                    Target = character.Identity,
-                    Unknown1 = 1,
-                    Caster = character.Identity
-                });
-        }
-
-        private void SendSurgeryClinicSpecialUsed(ICharacter character)
-        {
-            character.Controller.Client.SendCompressed(
-                new CharacterActionMessage
-                {
-                    Identity = character.Identity,
-                    Unknown = 0,
-                    Action = CharacterActionType.SpecialUsed,
-                    Unknown1 = 0,
-                    Target = Identity.None,
-                    Parameter1 = SurgeryClinicSpecialStatId,
-                    Parameter2 = SurgeryClinicSpecialLockSeconds,
-                    Unknown2 = 0
-                });
-        }
-
-        private void SendSurgeryClinicSpecialAvailableDelayed(ICharacter character)
-        {
-            ThreadPool.QueueUserWorkItem(
-                _ =>
-                {
-                    Thread.Sleep(SurgeryClinicSpecialAvailableDelay);
-                    if (character == null || character.Controller == null || character.Controller.Client == null)
-                    {
-                        return;
-                    }
-
-                    CharacterActionMessageHandler.Default.SendSkillAvailable(
-                        character,
-                        SurgeryClinicSpecialStatId);
-                });
         }
 
         #endregion

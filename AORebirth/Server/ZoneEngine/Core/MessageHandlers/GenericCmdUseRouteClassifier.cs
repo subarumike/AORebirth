@@ -64,13 +64,17 @@ namespace ZoneEngine.Core.MessageHandlers
         public const int CapturedBorealisGridTerminalInstance =
             GridTerminalInteractionRules.CapturedBorealisGridTerminalInstance;
 
-        public const int CapturedSurgeryClinicTerminalInstance = unchecked((int)0xC00204A2);
+        public const int CapturedSurgeryClinicTerminalInstance =
+            SurgeryClinicInteractionRules.CapturedSurgeryClinicTerminalInstance;
 
-        public const int CapturedAlternateSurgeryClinicTerminalInstance = unchecked((int)0xC00004A2);
+        public const int CapturedAlternateSurgeryClinicTerminalInstance =
+            SurgeryClinicInteractionRules.CapturedAlternateSurgeryClinicTerminalInstance;
 
-        public const int CapturedSurgeryClinicTemplateId = 43553;
+        public const int CapturedSurgeryClinicTemplateId =
+            SurgeryClinicInteractionRules.CapturedSurgeryClinicTemplateId;
 
-        public const int CapturedImprovedSurgeryClinicTemplateId = 295742;
+        public const int CapturedImprovedSurgeryClinicTemplateId =
+            SurgeryClinicInteractionRules.CapturedImprovedSurgeryClinicTemplateId;
 
         public static readonly GenericCmdUseRoute[] CurrentRouteOrder =
         {
