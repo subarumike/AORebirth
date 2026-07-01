@@ -695,6 +695,86 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "PlayfieldContentRegistration must remain the registration boundary.");
         }
 
+        [TestMethod]
+        public void AreteCleaningRobotDbSpawnSuppressionKeepsCapturedPathAndLegacyDbBoundary()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string areteContentText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\AreteContentModule.cs"));
+            string providerText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotContentProvider.cs"));
+            string orchestratorText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs"));
+
+            Assert.IsTrue(
+                areteContentText.Contains("new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
+                "Arete captured robot spawns must keep using CapturedAreteRobotContentProvider.");
+            Assert.IsTrue(
+                areteContentText.Contains(
+                    "new CapturedAreteRobotSpawnOrchestrator(CapturedAreteRobotContent, NpcPatrolReplay)"),
+                "Arete captured robot spawns must keep using CapturedAreteRobotSpawnOrchestrator.");
+            Assert.IsTrue(
+                areteContentText.Contains("registration.RegisterCapturedNpcSpawns(CapturedAreteRobotSpawns.SpawnForPlayfield)"),
+                "Arete captured robot spawns must enter through content-module registration.");
+            Assert.IsTrue(
+                providerText.Contains("public CapturedAreteRobotSpawnDefinition[] GetSpawnDefinitions()"),
+                "CapturedAreteRobotContentProvider must expose captured spawn definitions.");
+            Assert.IsTrue(
+                orchestratorText.Contains("CapturedAreteRobotSpawnDefinition[] spawns = this.capturedRobotContent.GetSpawnDefinitions();"),
+                "CapturedAreteRobotSpawnOrchestrator must load captured spawns from the provider.");
+            Assert.IsTrue(
+                orchestratorText.Contains("foreach (CapturedAreteRobotSpawnDefinition spawn in spawns)"),
+                "CapturedAreteRobotSpawnOrchestrator must spawn each captured robot definition.");
+
+            int filterIndex = playfieldText.IndexOf("if (IsAreteCleaningRobotTestSpawn(mob))", StringComparison.Ordinal);
+            Assert.IsTrue(filterIndex >= 0, "Playfield DB mob loading must still call the Arete robot suppression guard.");
+            int continueIndex = playfieldText.IndexOf("continue;", filterIndex, StringComparison.Ordinal);
+            int loadStatsIndex = playfieldText.IndexOf("MobSpawnStatDao.Instance.GetWhere", filterIndex, StringComparison.Ordinal);
+            Assert.IsTrue(
+                continueIndex > filterIndex && continueIndex < loadStatsIndex,
+                "Suppressed legacy DB rows must be skipped before DB spawn stats are loaded.");
+
+            string suppressionMethod = ExtractMethodBlock(playfieldText, "private static bool IsAreteCleaningRobotTestSpawn");
+            int playfieldGateIndex = suppressionMethod.IndexOf("mob.Playfield != 6553", StringComparison.Ordinal);
+            int idSwitchIndex = suppressionMethod.IndexOf("switch (mob.Id)", StringComparison.Ordinal);
+            Assert.IsTrue(playfieldGateIndex >= 0, "Suppression must remain gated to Arete PF 6553.");
+            Assert.IsTrue(
+                idSwitchIndex > playfieldGateIndex,
+                "Suppression must check the Arete PF 6553 gate before matching DB mob row ids.");
+            Assert.IsTrue(
+                suppressionMethod.Contains("if (mob == null || mob.Playfield != 6553)"),
+                "Suppression must return false for null mobs and non-Arete playfields.");
+            Assert.AreEqual(5, CountOccurrences(suppressionMethod, "case "), "Only the captured legacy DB rows may be suppressed.");
+
+            string[] suppressedDbRows =
+                {
+                    "2027138231",
+                    "2027138245",
+                    "2027138246",
+                    "2027138249",
+                    "2027138259"
+                };
+            for (int i = 0; i < suppressedDbRows.Length; i++)
+            {
+                Assert.AreEqual(
+                    1,
+                    CountOccurrences(suppressionMethod, "case " + suppressedDbRows[i] + ":"),
+                    "Legacy Arete DB row " + suppressedDbRows[i] + " must remain suppressed exactly once.");
+            }
+
+            Assert.IsTrue(
+                suppressionMethod.Contains("default:") && suppressionMethod.Contains("return false;"),
+                "Non-matching DB spawns, including non-Arete DB spawns, must remain unaffected.");
+        }
+
         private static void AssertExpectedOrder(
             IList<PlayfieldLifecycleEvent> events,
             string flow,
@@ -813,6 +893,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             return count;
+        }
+
+        private static string ExtractMethodBlock(string text, string methodMarker)
+        {
+            int signatureIndex = text.IndexOf(methodMarker, StringComparison.Ordinal);
+            Assert.IsTrue(signatureIndex >= 0, "Missing method " + methodMarker + ".");
+
+            int startIndex = text.IndexOf("{", signatureIndex, StringComparison.Ordinal);
+            Assert.IsTrue(startIndex >= 0, "Missing method body for " + methodMarker + ".");
+
+            int depth = 0;
+            for (int i = startIndex; i < text.Length; i++)
+            {
+                if (text[i] == '{')
+                {
+                    depth++;
+                }
+                else if (text[i] == '}')
+                {
+                    depth--;
+                    if (depth == 0)
+                    {
+                        return text.Substring(startIndex, i - startIndex + 1);
+                    }
+                }
+            }
+
+            Assert.Fail("Unterminated method body for " + methodMarker + ".");
+            return string.Empty;
         }
 
         private static string FindRepositoryRoot([CallerFilePath] string sourcePath = null)
