@@ -58,7 +58,6 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Core.Playfields;
 
     #endregion
@@ -101,11 +100,9 @@ namespace ZoneEngine.Core.MessageHandlers
                 case GenericCmdAction.Drop:
                     break;
                 case GenericCmdAction.Use:
-                    if (RexB18DBoxProgressTracker.TryObserveBoxUse(
-                        client.Controller.Character,
-                        target))
+                    if (RexB18DInteractionHandler.Default.TryHandleUse(client, message, target))
                     {
-                        this.Acknowledge(client.Controller.Character, message);
+                        break;
                     }
                     else if (InventoryContainerInteractionHandler.Default.TryHandleUse(client, message, target))
                     {

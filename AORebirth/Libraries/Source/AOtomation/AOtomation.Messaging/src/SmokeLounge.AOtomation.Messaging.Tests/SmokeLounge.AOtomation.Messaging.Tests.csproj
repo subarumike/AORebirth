@@ -87,6 +87,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\InventoryContainerInteractionRules.cs">
       <Link>InventoryContainerInteractionRules.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\RexB18DInteractionRules.cs">
+      <Link>RexB18DInteractionRules.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\SurgeryClinicInteractionRules.cs">
       <Link>SurgeryClinicInteractionRules.cs</Link>
     </Compile>
