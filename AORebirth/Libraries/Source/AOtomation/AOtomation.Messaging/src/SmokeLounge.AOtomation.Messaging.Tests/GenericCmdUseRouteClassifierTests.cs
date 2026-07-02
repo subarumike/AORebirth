@@ -500,6 +500,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(clientMoveHandler, "private void WaitForEquipVisualSync");
         }
 
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsCharacterStateInventoryPageBoundary()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string fullCharacterHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\FullCharacterMessageHandler.cs");
+            string weaponItemFullUpdate =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Packets\WeaponItemFullUpdate.cs");
+
+            AssertContains(service, "public IEnumerable<IInventoryPage> CharacterStateInventoryPages");
+            AssertContains(service, "foreach (IInventoryPage page in character.BaseInventory.Pages.Values)");
+            AssertContains(service, "page is BankInventoryPage");
+
+            AssertContains(
+                fullCharacterHandler,
+                "InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character)");
+            AssertContains(
+                weaponItemFullUpdate,
+                "InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character)");
+            AssertDoesNotContain(fullCharacterHandler, "ivp is BankInventoryPage");
+            AssertDoesNotContain(weaponItemFullUpdate, "page is BankInventoryPage");
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,

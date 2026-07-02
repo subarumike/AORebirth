@@ -46,6 +46,8 @@ namespace ZoneEngine.Core.Packets
 
     using Utility;
 
+    using ZoneEngine.Core;
+
     #endregion
 
     /// <summary>
@@ -78,13 +80,8 @@ namespace ZoneEngine.Core.Packets
                 return;
             }
 
-            foreach (IInventoryPage page in character.BaseInventory.Pages.Values)
+            foreach (IInventoryPage page in InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character))
             {
-                if (page is BankInventoryPage)
-                {
-                    continue;
-                }
-
                 for (int slot = page.FirstSlotNumber; slot < page.FirstSlotNumber + page.MaxSlots; slot++)
                 {
                     IItem item = page[slot];
@@ -105,13 +102,8 @@ namespace ZoneEngine.Core.Packets
                 return;
             }
 
-            foreach (IInventoryPage page in character.BaseInventory.Pages.Values)
+            foreach (IInventoryPage page in InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character))
             {
-                if (page is BankInventoryPage)
-                {
-                    continue;
-                }
-
                 for (int slot = page.FirstSlotNumber; slot < page.FirstSlotNumber + page.MaxSlots; slot++)
                 {
                     if (object.ReferenceEquals(page[slot], item))
