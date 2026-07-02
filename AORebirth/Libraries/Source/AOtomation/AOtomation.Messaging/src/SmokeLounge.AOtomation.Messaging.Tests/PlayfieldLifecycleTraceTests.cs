@@ -1258,6 +1258,105 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void ZoneClientSessionLifecycleFinalPhaseOwnershipGuardrailKeepsRuntimeMechanicsOut()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string coordinatorText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\ZoneClientSessionLifecycleCoordinator.cs"));
+            string zoneClientText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
+            string clientConnectedText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+
+            string[] namedPhaseMethods =
+                {
+                    "EnterPlayfieldLoadingForCharacterLoadOrZoningExit",
+                    "EnterReadyBlockForSessionInit",
+                    "EnterFullCharacterBoundaryForSessionInit",
+                    "EnterCharInPlayForVisibilityEntry",
+                    "CompleteInPlayForSessionInit",
+                    "EnterZoningForPlayfieldTransfer",
+                    "EnterDisconnectingForSessionDispose"
+                };
+            for (int i = 0; i < namedPhaseMethods.Length; i++)
+            {
+                Assert.IsTrue(
+                    coordinatorText.Contains("public void " + namedPhaseMethods[i] + "()"),
+                    "Coordinator must expose named lifecycle phase ownership method " + namedPhaseMethods[i] + ".");
+            }
+
+            string runtimeSurfaces = zoneClientText + clientConnectedText + playfieldText;
+            Assert.IsFalse(
+                runtimeSurfaces.Contains("TransitionTo("),
+                "Runtime packet/session surfaces must not call the raw phase transition helper.");
+            Assert.IsFalse(
+                runtimeSurfaces.Contains("ZoneClientSessionPhase."),
+                "Runtime packet/session surfaces must not own direct lifecycle phase enum transitions.");
+
+            Assert.IsTrue(
+                zoneClientText.Contains("this.SessionLifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();")
+                && zoneClientText.Contains("this.sessionLifecycle.EnterDisconnectingForSessionDispose();"),
+                "ZoneClient must use named coordinator methods for playfield-loading/zoning-exit and disconnect phases.");
+            Assert.IsTrue(
+                clientConnectedText.Contains("client.SessionLifecycle.EnterReadyBlockForSessionInit();")
+                && clientConnectedText.Contains("client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit();")
+                && clientConnectedText.Contains("client.SessionLifecycle.EnterCharInPlayForVisibilityEntry();")
+                && clientConnectedText.Contains("client.SessionLifecycle.CompleteInPlayForSessionInit();"),
+                "ClientConnected must use named coordinator methods for ready/full-character/CharInPlay/InPlay phases.");
+            Assert.IsTrue(
+                playfieldText.Contains("lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer();"),
+                "Playfield teleport must use the named coordinator method for zoning entry.");
+
+            string[] forbiddenCoordinatorMechanics =
+                {
+                    "SendCompressed",
+                    "TeleportMessageHandler",
+                    "ZoneRedirectionMessage",
+                    "PrivateCityReadyInitCoordinator",
+                    "SendPrivateCity",
+                    "SimpleCharFullUpdate",
+                    "CharInPlayMessage",
+                    "AnnouncePlayerVisibility",
+                    "SendSCFUsToClient",
+                    "stopDispatcher",
+                    "zStream",
+                    "netStream"
+                };
+            for (int i = 0; i < forbiddenCoordinatorMechanics.Length; i++)
+            {
+                Assert.IsFalse(
+                    coordinatorText.Contains(forbiddenCoordinatorMechanics[i]),
+                    "Coordinator must not own packet, teleport, visibility, private-city, or disposal mechanics: "
+                    + forbiddenCoordinatorMechanics[i]);
+            }
+
+            Assert.IsTrue(
+                playfieldText.Contains("TeleportMessageHandler.Default.Send(")
+                && playfieldText.Contains("new ZoneRedirectionMessage")
+                && playfieldText.Contains("client.SendCompressed(redirect);"),
+                "Teleport/redirection packet mechanics must remain in Playfield.");
+            Assert.IsTrue(
+                playfieldText.Contains("SendPrivateCityPreFullCharacterReadyBlock")
+                && playfieldText.Contains("SendPrivateCityPlayfieldReadyBlock")
+                && playfieldText.Contains("this.runtimeSystems.SendPrivateCity"),
+                "Private-city ready/init packet construction and delegation must remain outside the lifecycle coordinator.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.Announce(SimpleCharFullUpdate.ConstructMessage(temp));")
+                && playfieldText.Contains("this.Announce(new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 });")
+                && playfieldText.Contains("public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)"),
+                "SCFU and CharInPlay broadcast mechanics must remain in Playfield.");
+            Assert.IsTrue(
+                zoneClientText.Contains("this.stopDispatcher = true;")
+                && zoneClientText.Contains("this.zStream.Close();")
+                && zoneClientText.Contains("this.netStream.Close();"),
+                "Engine/client disposal mechanics must remain in ZoneClient.");
+        }
+
+        [TestMethod]
         public void PlayfieldDynelRegistryIsOwnedByRuntimeSystemsAndFeedsSafeLookupPaths()
         {
             string repositoryRoot = FindRepositoryRoot();
