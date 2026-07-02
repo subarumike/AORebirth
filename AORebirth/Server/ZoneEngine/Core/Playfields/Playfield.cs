@@ -1986,7 +1986,7 @@ namespace AORebirth.Core.Playfields
             FullCharacterMessageHandler.Default.Send(character);
             this.SendDeathRespawnPlayfieldReadyBlock(client, character);
             this.SendDeathRespawnAction(character);
-            ClientMoveItemToInventoryMessageHandler.EnsureWeaponVisualMeshes(character, false);
+            InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(character, false);
             AppearanceUpdateMessageHandler.Default.Send(character);
 
             LogUtil.Debug(

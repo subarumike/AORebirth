@@ -15,6 +15,7 @@ namespace ZoneEngine.Core
     using AORebirth.Core.Items;
     using AORebirth.Core.Network;
     using AORebirth.Core.Statels;
+    using AORebirth.Core.Textures;
     using AORebirth.Enums;
     using AORebirth.ObjectManager;
 
@@ -56,6 +57,40 @@ namespace ZoneEngine.Core
                 }
 
                 yield return page;
+            }
+        }
+
+        public void EnsureWeaponVisualMeshes(ICharacter character, bool announceAppearanceUpdate)
+        {
+            IInventoryPage weaponPage;
+            if (!character.BaseInventory.Pages.TryGetValue((int)IdentityType.WeaponPage, out weaponPage))
+            {
+                return;
+            }
+
+            bool changed = false;
+            changed |= this.EnsureWeaponMesh(
+                character,
+                weaponPage,
+                (int)WeaponSlots.Righthand,
+                1,
+                StatIds.weaponmeshright,
+                StatIds.overridetextureweaponright);
+            changed |= this.EnsureWeaponMesh(
+                character,
+                weaponPage,
+                (int)WeaponSlots.LeftHand,
+                2,
+                StatIds.weaponmeshleft,
+                StatIds.overridetextureweaponleft);
+
+            if (changed)
+            {
+                character.ChangedAppearance = true;
+                if (announceAppearanceUpdate)
+                {
+                    character.Playfield.AnnounceAppearanceUpdate(character);
+                }
             }
         }
 
@@ -883,7 +918,7 @@ namespace ZoneEngine.Core
                     ackTargetPlacement);
                 Equip.Send(client, receivingPage, toPlacement);
                 character.CalculateSkills();
-                ClientMoveItemToInventoryMessageHandler.EnsureWeaponVisualMeshes(character, true);
+                this.EnsureWeaponVisualMeshes(character, true);
                 this.PersistClientMoveItemToInventory(character, "equip");
                 return true;
             }
@@ -908,7 +943,7 @@ namespace ZoneEngine.Core
                     message.SourceContainer,
                     ackTargetPlacement);
                 character.CalculateSkills();
-                ClientMoveItemToInventoryMessageHandler.EnsureWeaponVisualMeshes(character, true);
+                this.EnsureWeaponVisualMeshes(character, true);
                 this.PersistClientMoveItemToInventory(character, "unequip");
                 return true;
             }
@@ -1211,6 +1246,98 @@ namespace ZoneEngine.Core
         private static bool IsItemUsable(Item item)
         {
             return (item.GetAttribute((int)StatIds.can) & (int)CanFlags.Use) == (int)CanFlags.Use;
+        }
+
+        private bool EnsureWeaponMesh(
+            ICharacter character,
+            IInventoryPage weaponPage,
+            int slot,
+            int meshPosition,
+            StatIds meshStat,
+            StatIds overrideTextureStat)
+        {
+            IItem equippedItem = weaponPage[slot];
+            if (equippedItem == null)
+            {
+                return false;
+            }
+
+            AOMeshs existing = character.MeshLayer.GetMeshAtPosition(meshPosition);
+
+            int meshId = NormalizeItemVisualValue(equippedItem.GetAttribute((int)meshStat));
+            if (meshId <= 0)
+            {
+                meshId = NormalizeItemVisualValue(equippedItem.GetAttribute(209));
+            }
+
+            if (meshId <= 0)
+            {
+                bool hasToWieldAction = equippedItem.ItemActions.Any(x => x.ActionType == ActionType.ToWield);
+                string wearFunctions = string.Join(
+                    ",",
+                    equippedItem.Events
+                        .Where(x => x.EventType == EventType.OnWear || x.EventType == EventType.OnWield)
+                        .SelectMany(x => x.Functions)
+                        .Select(x => x.FunctionType.ToString())
+                        .ToArray());
+
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "EnsureWeaponMesh skipped: item has no valid mesh stat char={0} slot={1} meshStat={2} raw={3} item={4}/{5} ql={6} hasToWield={7} wearFuncs=[{8}] meshR={9} meshL={10} ovR={11} ovL={12} weaponMeshHolder={13}",
+                        character.Identity,
+                        slot,
+                        meshStat,
+                        equippedItem.GetAttribute((int)meshStat),
+                        equippedItem.LowID,
+                        equippedItem.HighID,
+                        equippedItem.Quality,
+                        hasToWieldAction ? 1 : 0,
+                        wearFunctions,
+                        equippedItem.GetAttribute((int)StatIds.weaponmeshright),
+                        equippedItem.GetAttribute((int)StatIds.weaponmeshleft),
+                        equippedItem.GetAttribute((int)StatIds.overridetextureweaponright),
+                        equippedItem.GetAttribute((int)StatIds.overridetextureweaponleft),
+                        equippedItem.GetAttribute(209)));
+                return false;
+            }
+
+            if (existing != null)
+            {
+                if (existing.Mesh > 0 && existing.Mesh != 1234567890)
+                {
+                    return false;
+                }
+
+                character.MeshLayer.RemoveMesh(existing.Position, existing.Mesh, existing.OverrideTexture, existing.Layer);
+            }
+
+            int overrideTexture = NormalizeItemVisualValue(equippedItem.GetAttribute((int)overrideTextureStat));
+            int layer = MeshLayers.GetLayer(slot);
+            character.MeshLayer.AddMesh(meshPosition, meshId, overrideTexture, layer);
+            character.Stats[meshStat].Value = meshId;
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "EnsureWeaponMesh applied char={0} slot={1} position={2} mesh={3} override={4} layer={5}",
+                    character.Identity,
+                    slot,
+                    meshPosition,
+                    meshId,
+                    overrideTexture,
+                    layer));
+            return true;
+        }
+
+        private static int NormalizeItemVisualValue(int value)
+        {
+            if (value <= 0 || value == 1234567890)
+            {
+                return 0;
+            }
+
+            return value;
         }
 
         private static AOAction ResolveContainerAddItemAction(IInventoryPage page, IItem item)
