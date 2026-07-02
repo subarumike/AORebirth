@@ -996,13 +996,13 @@ namespace ZoneEngine.Core.MessageHandlers
             ICharacter vendor = Pool.Instance.GetObject<ICharacter>(shoppingBag.Vendor);
             if (shopper != null)
             {
-                this.ReturnPlayerTradeOffers(shopper, shoppingBag);
+                InventoryContainerRuntimeService.Default.ReturnPlayerTradeOffers(shopper, shoppingBag);
                 InventoryContainerRuntimeService.Default.PersistCharacterInventory(shopper, "player trade decline");
             }
 
             if (vendor != null)
             {
-                this.ReturnPlayerTradeOffers(vendor, shoppingBag);
+                InventoryContainerRuntimeService.Default.ReturnPlayerTradeOffers(vendor, shoppingBag);
                 InventoryContainerRuntimeService.Default.PersistCharacterInventory(vendor, "player trade decline");
             }
 
@@ -1610,39 +1610,6 @@ namespace ZoneEngine.Core.MessageHandlers
             character.Stats[StatIds.cash].Set((uint)CashStatRules.Clamp(cash));
         }
 
-        private void ReturnPlayerTradeOffers(ICharacter owner, TemporaryBag shoppingBag)
-        {
-            IInventoryPage offerPage = shoppingBag.GetPlayerOfferPage(owner.Identity);
-            if (offerPage == null)
-            {
-                return;
-            }
-
-            foreach (KeyValuePair<int, IItem> offer in offerPage.List().ToList())
-            {
-                int targetSlot = owner.BaseInventory[owner.BaseInventory.StandardPage].FindFreeSlot();
-                if (targetSlot < 0)
-                {
-                    continue;
-                }
-
-                offerPage.Remove(offer.Key);
-                owner.BaseInventory[owner.BaseInventory.StandardPage].Add(targetSlot, offer.Value);
-                LogUtil.Debug(
-                    DebugInfoDetail.Shopping,
-                    "TRADE_DECLINE_RETURN owner=" + owner.Identity.ToString(true)
-                    + " name=" + owner.Name
-                    + " sourceSlot=" + offer.Key
-                    + " targetSlot=" + targetSlot
-                    + " item=" + offer.Value.LowID + "/" + offer.Value.HighID + ":" + offer.Value.Quality);
-                InventoryContainerRuntimeService.Default.SendTradeWindowMoveToInventory(
-                    owner,
-                    IdentityType.KnuBotTradeWindow,
-                    offer.Key,
-                    targetSlot);
-            }
-        }
-
         private void ReturnAllPlayerTradeOffers(TemporaryBag shoppingBag, string reason)
         {
             ICharacter shopper = Pool.Instance.GetObject<ICharacter>(shoppingBag.Shopper);
@@ -1650,13 +1617,13 @@ namespace ZoneEngine.Core.MessageHandlers
 
             if (shopper != null)
             {
-                this.ReturnPlayerTradeOffers(shopper, shoppingBag);
+                InventoryContainerRuntimeService.Default.ReturnPlayerTradeOffers(shopper, shoppingBag);
                 InventoryContainerRuntimeService.Default.PersistCharacterInventory(shopper, reason);
             }
 
             if (vendor != null)
             {
-                this.ReturnPlayerTradeOffers(vendor, shoppingBag);
+                InventoryContainerRuntimeService.Default.ReturnPlayerTradeOffers(vendor, shoppingBag);
                 InventoryContainerRuntimeService.Default.PersistCharacterInventory(vendor, reason);
             }
         }

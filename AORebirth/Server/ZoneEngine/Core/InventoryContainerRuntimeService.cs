@@ -1444,6 +1444,35 @@ namespace ZoneEngine.Core
                 });
         }
 
+        public void ReturnPlayerTradeOffers(ICharacter owner, TemporaryBag shoppingBag)
+        {
+            IInventoryPage offerPage = shoppingBag.GetPlayerOfferPage(owner.Identity);
+            if (offerPage == null)
+            {
+                return;
+            }
+
+            foreach (KeyValuePair<int, IItem> offer in offerPage.List().ToList())
+            {
+                int targetSlot = owner.BaseInventory[owner.BaseInventory.StandardPage].FindFreeSlot();
+                if (targetSlot < 0)
+                {
+                    continue;
+                }
+
+                offerPage.Remove(offer.Key);
+                owner.BaseInventory[owner.BaseInventory.StandardPage].Add(targetSlot, offer.Value);
+                LogUtil.Debug(
+                    DebugInfoDetail.Shopping,
+                    "TRADE_DECLINE_RETURN owner=" + owner.Identity.ToString(true)
+                    + " name=" + owner.Name
+                    + " sourceSlot=" + offer.Key
+                    + " targetSlot=" + targetSlot
+                    + " item=" + offer.Value.LowID + "/" + offer.Value.HighID + ":" + offer.Value.Quality);
+                this.SendTradeWindowMoveToInventory(owner, IdentityType.KnuBotTradeWindow, offer.Key, targetSlot);
+            }
+        }
+
         public void PersistCharacterInventory(ICharacter character, string reason)
         {
             character.BaseInventory.Write();
