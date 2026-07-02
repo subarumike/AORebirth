@@ -66,6 +66,20 @@ namespace ZoneEngine.Core
             Execute(sendExistingCharacterSnapshots, "sendExistingCharacterSnapshots");
         }
 
+        public void RunSimpleCharFullUpdateCharInPlaySequence(
+            Action recordSimpleCharFullUpdate,
+            Action sendSimpleCharFullUpdate,
+            Action prepareCharInPlay,
+            Action recordCharInPlay,
+            Action sendCharInPlay)
+        {
+            Execute(recordSimpleCharFullUpdate, "recordSimpleCharFullUpdate");
+            Execute(sendSimpleCharFullUpdate, "sendSimpleCharFullUpdate");
+            Execute(prepareCharInPlay, "prepareCharInPlay");
+            Execute(recordCharInPlay, "recordCharInPlay");
+            Execute(sendCharInPlay, "sendCharInPlay");
+        }
+
         public void CompleteSessionInitialization(Action completeInPlay)
         {
             Execute(completeInPlay, "completeInPlay");

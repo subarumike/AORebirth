@@ -1346,8 +1346,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playfieldText.Contains("this.runtimeSystems.SendPrivateCity"),
                 "Private-city ready/init packet construction and delegation must remain outside the lifecycle coordinator.");
             Assert.IsTrue(
-                playfieldText.Contains("this.Announce(SimpleCharFullUpdate.ConstructMessage(temp));")
-                && playfieldText.Contains("this.Announce(new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 });")
+                playfieldText.Contains("this.Announce(SimpleCharFullUpdate.ConstructMessage(temp))")
+                && playfieldText.Contains("charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 };")
+                && playfieldText.Contains("this.Announce(charInPlay)")
                 && playfieldText.Contains("public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)"),
                 "SCFU and CharInPlay broadcast mechanics must remain in Playfield.");
             Assert.IsTrue(
@@ -1367,6 +1368,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
             string clientConnectedText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string runtimeSystemsText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
             string projectText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
@@ -1380,6 +1385,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 zoneClientText.Contains("private readonly PacketSequencingCoordinator packetSequencing")
                 && zoneClientText.Contains("public PacketSequencingCoordinator PacketSequencing"),
                 "ZoneClient must own and expose the packet sequencing coordinator.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("private readonly PacketSequencingCoordinator packetSequencing")
+                && runtimeSystemsText.Contains("internal PacketSequencingCoordinator PacketSequencing"),
+                "PlayfieldRuntimeSystems must expose the packet sequencing coordinator for playfield-local sequencing.");
             Assert.IsTrue(
                 clientConnectedText.Contains("client.PacketSequencing.BeginSessionReadyBlock(")
                 && clientConnectedText.Contains("client.PacketSequencing.RunSessionReadyFullCharacterSequence(")
@@ -1407,6 +1416,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(visibilitySequence, "Execute(enterCharInPlay", "Execute(announceJoiningCharacter");
             AssertTextBefore(visibilitySequence, "Execute(announceJoiningCharacter", "Execute(sendExistingCharacterSnapshots");
 
+            string simpleCharFullUpdateCharInPlaySequence = ExtractMethodBlock(
+                coordinatorText,
+                "public void RunSimpleCharFullUpdateCharInPlaySequence");
+            AssertTextBefore(simpleCharFullUpdateCharInPlaySequence, "Execute(recordSimpleCharFullUpdate", "Execute(sendSimpleCharFullUpdate");
+            AssertTextBefore(simpleCharFullUpdateCharInPlaySequence, "Execute(sendSimpleCharFullUpdate", "Execute(prepareCharInPlay");
+            AssertTextBefore(simpleCharFullUpdateCharInPlaySequence, "Execute(prepareCharInPlay", "Execute(recordCharInPlay");
+            AssertTextBefore(simpleCharFullUpdateCharInPlaySequence, "Execute(recordCharInPlay", "Execute(sendCharInPlay");
+
             AssertTextBefore(
                 clientConnectedText,
                 "() => SimpleCharFullUpdate.SendToPlayfield(client)",
@@ -1419,6 +1436,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 clientConnectedText,
                 "client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,",
                 "() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)");
+            Assert.AreEqual(
+                2,
+                CountOccurrences(playfieldText, "this.runtimeSystems.PacketSequencing.RunSimpleCharFullUpdateCharInPlaySequence("),
+                "Playfield must route both existing-player and joining-player SCFU/CharInPlay pairs through PacketSequencingCoordinator.");
 
             string[] packetAndRuntimePatterns =
                 {
@@ -1447,7 +1468,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 clientConnectedText.Contains("() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)")
                 && clientConnectedText.Contains("() => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character)")
                 && clientConnectedText.Contains("() => currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client })"),
-                "Packet send expressions must remain in ClientConnected for this first sequencing slice.");
+                "Session packet send expressions must remain in ClientConnected for these sequencing slices.");
+            Assert.IsTrue(
+                playfieldText.Contains("SimpleCharFullUpdateMessage simpleCharFullUpdate = SimpleCharFullUpdate.ConstructMessage(temp);")
+                && playfieldText.Contains("() => sendSCFUs.toClient.SendCompressed(simpleCharFullUpdate)")
+                && playfieldText.Contains("charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 };")
+                && playfieldText.Contains("() => sendSCFUs.toClient.SendCompressed(charInPlay)")
+                && playfieldText.Contains("() => this.Announce(SimpleCharFullUpdate.ConstructMessage(temp))")
+                && playfieldText.Contains("() => this.Announce(charInPlay)"),
+                "Visibility packet construction and send expressions must remain in Playfield.");
         }
 
         [TestMethod]

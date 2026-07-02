@@ -34,6 +34,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly NpcCombatTickCoordinator npcCombatTick;
 
+        private readonly PacketSequencingCoordinator packetSequencing;
+
         private readonly PrivateCityReadyInitCoordinator privateCityReadyInit;
 
         internal PlayfieldRuntimeSystems(
@@ -59,6 +61,7 @@ namespace ZoneEngine.Core.Playfields
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.npcCorpseLifecycle = new NpcCorpseLifecycleCoordinator(playfield);
             this.npcCombatTick = new NpcCombatTickCoordinator(playfield);
+            this.packetSequencing = new PacketSequencingCoordinator();
             this.privateCityReadyInit =
                 new PrivateCityReadyInitCoordinator(
                     playfieldIdentity,
@@ -160,6 +163,14 @@ namespace ZoneEngine.Core.Playfields
         internal ReadOnlyCollection<StaticDynel> StaticDynels()
         {
             return this.dynelRegistry.StaticDynels();
+        }
+
+        internal PacketSequencingCoordinator PacketSequencing
+        {
+            get
+            {
+                return this.packetSequencing;
+            }
         }
 
         internal void SendPrivateCityPlayfieldReadyBlock(ZoneClient client, ICharacter character)
