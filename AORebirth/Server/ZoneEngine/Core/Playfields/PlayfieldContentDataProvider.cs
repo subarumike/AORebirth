@@ -8,6 +8,7 @@ namespace ZoneEngine.Core.Playfields
     using System.Linq;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Events;
     using AORebirth.Core.Items;
     using AORebirth.Core.Playfields;
     using AORebirth.Core.Statels;
@@ -60,18 +61,29 @@ namespace ZoneEngine.Core.Playfields
             return PlayfieldLoader.PFData[playfieldIdentity.Instance].Statels;
         }
 
-        internal bool TryResolveVendorStatels(Identity playfieldIdentity, out StatelData[] vendorStatels)
+        internal bool TryResolveVendorStatels(
+            Identity playfieldIdentity,
+            IEnumerable<StatelData> statels,
+            out StatelData[] vendorStatels)
         {
-            PlayfieldData playfieldData;
-            if (!PlayfieldLoader.PFData.TryGetValue(playfieldIdentity.Instance, out playfieldData))
+            if (!PlayfieldLoader.PFData.ContainsKey(playfieldIdentity.Instance))
             {
                 vendorStatels = null;
                 return false;
             }
 
-            vendorStatels =
-                playfieldData.Statels.Where(x => x.Identity.Type == IdentityType.VendingMachine).ToArray();
+            vendorStatels = this.ResolveVendorStatels(statels);
             return true;
+        }
+
+        internal StatelData[] ResolveCollisionStatels(IEnumerable<StatelData> statels)
+        {
+            if (statels == null)
+            {
+                return new StatelData[0];
+            }
+
+            return statels.Where(HandlesCollisionEvent).ToArray();
         }
 
         internal IEnumerable<PlayfieldStaticDynelDefinition> ResolveStaticDynels(Identity playfieldIdentity)
@@ -103,6 +115,26 @@ namespace ZoneEngine.Core.Playfields
                         W = staticDynel.HeadingW
                     });
             }
+        }
+
+        private StatelData[] ResolveVendorStatels(IEnumerable<StatelData> statels)
+        {
+            if (statels == null)
+            {
+                return new StatelData[0];
+            }
+
+            return statels.Where(x => x.Identity.Type == IdentityType.VendingMachine).ToArray();
+        }
+
+        private static bool HandlesCollisionEvent(StatelData statel)
+        {
+            return statel != null
+                   && statel.Events.Any(
+                       x =>
+                           x.EventType == EventType.OnCollide
+                           || x.EventType == EventType.OnEnter
+                           || x.EventType == EventType.OnTargetInVicinity);
         }
     }
 

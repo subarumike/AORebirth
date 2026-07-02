@@ -79,9 +79,17 @@ namespace ZoneEngine.Core.Playfields
             return this.contentData.ResolveStatels(playfieldIdentity);
         }
 
-        internal bool TryResolveVendorStatels(Identity playfieldIdentity, out StatelData[] vendorStatels)
+        internal bool TryResolveVendorStatels(
+            Identity playfieldIdentity,
+            IEnumerable<StatelData> statels,
+            out StatelData[] vendorStatels)
         {
-            return this.contentData.TryResolveVendorStatels(playfieldIdentity, out vendorStatels);
+            return this.contentData.TryResolveVendorStatels(playfieldIdentity, statels, out vendorStatels);
+        }
+
+        internal StatelData[] ResolveCollisionStatels(IEnumerable<StatelData> statels)
+        {
+            return this.contentData.ResolveCollisionStatels(statels);
         }
 
         internal IEnumerable<PlayfieldStaticDynelDefinition> ResolveStaticDynels(Identity playfieldIdentity)

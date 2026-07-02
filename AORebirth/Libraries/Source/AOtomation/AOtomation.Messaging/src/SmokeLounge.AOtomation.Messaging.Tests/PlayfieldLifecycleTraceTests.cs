@@ -774,8 +774,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Provider must own statel resolution.");
             Assert.IsTrue(
                 providerText.Contains(
-                    "internal bool TryResolveVendorStatels(Identity playfieldIdentity, out StatelData[] vendorStatels)"),
+                    "internal bool TryResolveVendorStatels("),
                 "Provider must own vendor statel resolution.");
+            Assert.IsTrue(
+                providerText.Contains("internal StatelData[] ResolveCollisionStatels(IEnumerable<StatelData> statels)"),
+                "Provider must own collision-capable statel filtering.");
             Assert.IsTrue(
                 providerText.Contains(
                     "internal IEnumerable<PlayfieldStaticDynelDefinition> ResolveStaticDynels(Identity playfieldIdentity)"),
@@ -793,6 +796,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 providerText.Contains("IdentityType.VendingMachine"),
                 "Provider must preserve the existing vendor statel filter.");
             Assert.IsTrue(
+                providerText.Contains("x.EventType == EventType.OnCollide")
+                && providerText.Contains("x.EventType == EventType.OnEnter")
+                && providerText.Contains("x.EventType == EventType.OnTargetInVicinity"),
+                "Provider must preserve the existing collision statel event filter.");
+            Assert.IsTrue(
                 providerText.Contains("internal sealed class PlayfieldStaticDynelDefinition"),
                 "Provider must expose static dynel definitions rather than spawning runtime objects.");
 
@@ -808,8 +816,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Runtime systems must delegate statel data resolution to the provider.");
             Assert.IsTrue(
                 runtimeSystemsText.Contains(
-                    "return this.contentData.TryResolveVendorStatels(playfieldIdentity, out vendorStatels);"),
+                    "return this.contentData.TryResolveVendorStatels(playfieldIdentity, statels, out vendorStatels);"),
                 "Runtime systems must delegate vendor statel data resolution to the provider.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("return this.contentData.ResolveCollisionStatels(statels);"),
+                "Runtime systems must delegate collision statel filtering to the provider.");
             Assert.IsTrue(
                 runtimeSystemsText.Contains("return this.contentData.ResolveStaticDynels(playfieldIdentity);"),
                 "Runtime systems must delegate static dynel data resolution to the provider.");
@@ -822,6 +833,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(
                 constructor,
                 "this.runtimeSystems.RegisterStatels(this.statels);",
+                "this.collisionStatels = this.runtimeSystems.ResolveCollisionStatels(this.statels);");
+            AssertTextBefore(
+                constructor,
+                "this.collisionStatels = this.runtimeSystems.ResolveCollisionStatels(this.statels);",
                 "this.LoadMobSpawns(playfieldIdentity);");
             AssertTextBefore(
                 constructor,
@@ -842,11 +857,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string loadVendors = ExtractMethodBlock(playfieldText, "private void LoadVendors(Identity playfieldIdentity)");
             Assert.IsTrue(
-                loadVendors.Contains("this.runtimeSystems.TryResolveVendorStatels(playfieldIdentity, out vendorStatels)"),
+                loadVendors.Contains("this.runtimeSystems.TryResolveVendorStatels(playfieldIdentity, this.statels, out vendorStatels)"),
                 "Playfield vendor loading must ask runtime systems for vendor statels.");
             Assert.IsFalse(
                 loadVendors.Contains("PlayfieldLoader.PFData"),
                 "Playfield vendor loading must not own PlayfieldLoader access.");
+            Assert.IsFalse(
+                loadVendors.Contains("IdentityType.VendingMachine"),
+                "Playfield vendor loading must not own vendor statel filtering.");
+
+            string checkStatelCollision = ExtractMethodBlock(playfieldText, "private void CheckStatelCollision(ICharacter dynel)");
+            string primeStatelCollisionContacts =
+                ExtractMethodBlock(playfieldText, "private void PrimeStatelCollisionContacts(ICharacter dynel)");
+            Assert.IsTrue(
+                playfieldText.Contains("private readonly StatelData[] collisionStatels"),
+                "Playfield must keep a provider-filtered collision statel view.");
+            Assert.IsTrue(
+                checkStatelCollision.Contains("foreach (StatelData sd in this.collisionStatels)"),
+                "CheckStatelCollision must use provider-filtered collision statels.");
+            Assert.IsTrue(
+                primeStatelCollisionContacts.Contains("foreach (StatelData sd in this.collisionStatels)"),
+                "PrimeStatelCollisionContacts must use provider-filtered collision statels.");
+            Assert.IsFalse(
+                primeStatelCollisionContacts.Contains("sd.Events.Any"),
+                "PrimeStatelCollisionContacts must not own collision-capable statel selection.");
 
             string loadStaticDynels =
                 ExtractMethodBlock(playfieldText, "private void LoadStaticDynels(Identity playfieldIdentity)");
