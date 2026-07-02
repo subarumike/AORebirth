@@ -389,6 +389,19 @@ namespace ZoneEngine.Core
             return true;
         }
 
+        public void MoveNonEquipmentContainerItem(
+            ICharacter character,
+            ContainerAddItemMessage message,
+            IInventoryPage sendingPage,
+            IInventoryPage receivingPage,
+            int fromPlacement)
+        {
+            message.TargetPlacement = receivingPage.FindFreeSlot();
+            IItem item = sendingPage.Remove(fromPlacement);
+            receivingPage.Add(message.TargetPlacement, item);
+            character.Send(message);
+        }
+
         public bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
             switch (InventoryContainerInteractionRules.ResolveRouteMode(target))
