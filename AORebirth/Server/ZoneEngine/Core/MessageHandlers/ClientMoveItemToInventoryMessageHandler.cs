@@ -69,7 +69,10 @@ namespace ZoneEngine.Core.MessageHandlers
             IZoneClient client)
         {
             IInventoryPage sendingPage;
-            if (!this.TryGetSourcePage(character, message.SourceContainer, out sendingPage))
+            if (!InventoryContainerRuntimeService.Default.TryResolveMoveSourcePage(
+                character,
+                message.SourceContainer,
+                out sendingPage))
             {
                 return false;
             }
@@ -98,7 +101,8 @@ namespace ZoneEngine.Core.MessageHandlers
                     out backpackContainerIdentity);
             }
 
-            IInventoryPage receivingPage = this.GetTargetPage(character, message.TargetPlacement);
+            IInventoryPage receivingPage =
+                InventoryContainerRuntimeService.Default.ResolveMoveTargetPage(character, message.TargetPlacement);
             if (receivingPage == null)
             {
                 return false;
@@ -243,44 +247,6 @@ namespace ZoneEngine.Core.MessageHandlers
                 ackTargetPlacement);
             InventoryContainerRuntimeService.Default.PersistClientMoveItemToInventory(character, "move");
             return true;
-        }
-
-        private bool TryGetSourcePage(ICharacter character, Identity sourceContainer, out IInventoryPage sendingPage)
-        {
-            sendingPage = null;
-
-            if (character.BaseInventory.Pages.ContainsKey((int)sourceContainer.Type))
-            {
-                sendingPage = character.BaseInventory.Pages[(int)sourceContainer.Type];
-                return true;
-            }
-
-            try
-            {
-                sendingPage = character.BaseInventory.PageFromSlot(sourceContainer.Instance);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        private IInventoryPage GetTargetPage(ICharacter character, int targetPlacement)
-        {
-            if (targetPlacement == (int)IdentityType.TradeWindow)
-            {
-                return character.BaseInventory.Pages[character.BaseInventory.StandardPage];
-            }
-
-            try
-            {
-                return character.BaseInventory.PageFromSlot(targetPlacement);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
         }
 
         private bool CanEquipToPage(ICharacter character, IInventoryPage page, IItem item)
