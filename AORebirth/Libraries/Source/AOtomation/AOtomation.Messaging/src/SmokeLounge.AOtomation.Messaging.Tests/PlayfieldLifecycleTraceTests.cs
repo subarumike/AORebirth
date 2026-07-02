@@ -769,7 +769,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new CapturedAreteRobotSpawnOrchestrator(this.capturedAreteRobotContent, this.patrolReplay)"),
                 "NPCRuntimeService must own captured Arete robot spawn orchestration construction.");
             Assert.IsTrue(
+                npcRuntimeText.Contains(
+                    "private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();"),
+                "NPCRuntimeService must own NPC home state storage.");
+            Assert.IsFalse(
+                playfieldText.Contains("private readonly Dictionary<int, NpcHomeState> npcHomeStates"),
+                "Playfield must not own NPC home state storage.");
+            Assert.IsTrue(
                 runtimeSystemsText.Contains("private readonly NPCRuntimeService npcRuntime")
+                && runtimeSystemsText.Contains("this.npcRuntime.RegisterNpcHome(character);")
+                && runtimeSystemsText.Contains("this.npcRuntime.RemoveNpcHome(identity);")
                 && runtimeSystemsText.Contains("this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);")
                 && runtimeSystemsText.Contains("this.npcRuntime.BeginNpcDeath(attacker, target);")
                 && runtimeSystemsText.Contains("return this.npcRuntime.ProcessDeadNpc(character);")
@@ -786,6 +795,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.SpawnCapturedNpcContent(playfieldIdentity);"),
                 "Playfield must delegate captured NPC spawn orchestration through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.RegisterNpcHome(character);"),
+                "Playfield must delegate NPC home registration through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.RemoveNpcHome(identity);"),
+                "Playfield must delegate NPC home removal through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.BeginNpcDeath(attacker, target);"),
                 "Playfield must delegate NPC corpse lifecycle start through PlayfieldRuntimeSystems.");
