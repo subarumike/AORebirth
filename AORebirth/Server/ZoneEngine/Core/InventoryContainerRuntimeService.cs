@@ -524,6 +524,21 @@ namespace ZoneEngine.Core
             return issuer.BaseInventory.GetItemInContainer((int)IdentityType.Inventory, slot);
         }
 
+        public bool HasInventoryPage(IItemContainer owner, Identity container)
+        {
+            return owner.BaseInventory.Pages.ContainsKey((int)container.Type);
+        }
+
+        public IItem RemoveInventoryItem(IItemContainer owner, Identity container)
+        {
+            return owner.BaseInventory.RemoveItem((int)container.Type, container.Instance);
+        }
+
+        public InventoryError RestoreInventoryItem(IItemContainer owner, Identity container, IItem item)
+        {
+            return owner.BaseInventory.AddToPage((int)container.Type, container.Instance, item);
+        }
+
         public void MoveNonEquipmentContainerItem(
             ICharacter character,
             ContainerAddItemMessage message,

@@ -720,6 +720,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "public bool TryGetTradeAddItem");
             AssertContains(service, "\"Trade AddItem lookup failed issuer=\" + issuer.Identity.ToString(true)");
             AssertContains(service, "public IItem GetVendorTradeItem");
+            AssertContains(service, "public bool HasInventoryPage");
+            AssertContains(service, "return owner.BaseInventory.Pages.ContainsKey((int)container.Type);");
+            AssertContains(service, "public IItem RemoveInventoryItem");
+            AssertContains(service, "return owner.BaseInventory.RemoveItem((int)container.Type, container.Instance);");
+            AssertContains(service, "public InventoryError RestoreInventoryItem");
+            AssertContains(service, "return owner.BaseInventory.AddToPage((int)container.Type, container.Instance, item);");
             AssertContains(service, "public void PersistCharacterInventory");
             AssertContains(service, "\"Persisted inventory after \" + reason + \" char=\"");
 
@@ -732,6 +738,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.TransferPlayerTradeOffers(");
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.TryGetTradeAddItem(");
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.GetVendorTradeItem(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.HasInventoryPage(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.RemoveInventoryItem(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.RestoreInventoryItem(");
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.PersistCharacterInventory(");
             AssertDoesNotContain(tradeHandler, "private bool HasFreeInventorySlots");
             AssertDoesNotContain(tradeHandler, "private void SendTradeWindowMoveToInventory");
