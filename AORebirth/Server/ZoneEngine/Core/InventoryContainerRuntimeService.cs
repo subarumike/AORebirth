@@ -428,6 +428,36 @@ namespace ZoneEngine.Core
             return true;
         }
 
+        public void HandleClientContainerAddItem(IZoneClient client, ClientContainerAddItemMessage message)
+        {
+            ICharacter character = client != null && client.Controller != null
+                ? client.Controller.Character
+                : null;
+
+            if (character == null || character.BaseInventory == null)
+            {
+                return;
+            }
+
+            if (this.TryMoveInventoryItemToBackpack(character, message))
+            {
+                return;
+            }
+
+            if (this.TryDepositInventoryItemToBank(character, message))
+            {
+                return;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "Unhandled ClientContainerAddItem char={0} source={1} target={2}",
+                    character.Identity,
+                    message.Source,
+                    message.Target));
+        }
+
         public void MoveNonEquipmentContainerItem(
             ICharacter character,
             ContainerAddItemMessage message,

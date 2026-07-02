@@ -569,10 +569,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "Persisted inventory after ClientContainerAddItem backpack move");
             AssertContains(service, "private void TryRemoveBackpackRollback");
 
-            AssertContains(
-                clientContainerAddItemHandler,
-                "InventoryContainerRuntimeService.Default.TryMoveInventoryItemToBackpack(character, message)");
+            AssertContains(service, "this.TryMoveInventoryItemToBackpack(character, message)");
             AssertDoesNotContain(clientContainerAddItemHandler, "private bool TryMoveInventoryItemToBackpack");
+            AssertDoesNotContain(clientContainerAddItemHandler, "TryMoveInventoryItemToBackpack");
             AssertDoesNotContain(clientContainerAddItemHandler, "TryRemoveBackpackRollback");
             AssertDoesNotContain(clientContainerAddItemHandler, "InventoryItemRules.IsBackpackContainerItem");
         }
@@ -594,13 +593,34 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "private void TryRemoveBankRollback");
             AssertContains(service, "Persisted inventory after ClientContainerAddItem bank deposit");
 
-            AssertContains(
-                clientContainerAddItemHandler,
-                "InventoryContainerRuntimeService.Default.TryDepositInventoryItemToBank(character, message)");
+            AssertContains(service, "this.TryDepositInventoryItemToBank(character, message)");
+            AssertDoesNotContain(clientContainerAddItemHandler, "TryDepositInventoryItemToBank");
             AssertDoesNotContain(clientContainerAddItemHandler, "private bool IsInventoryToBankDeposit");
             AssertDoesNotContain(clientContainerAddItemHandler, "private void TryRemoveBankRollback");
             AssertDoesNotContain(clientContainerAddItemHandler, "character.BaseInventory.Pages.TryGetValue((int)IdentityType.Bank");
             AssertDoesNotContain(clientContainerAddItemHandler, "Persisted inventory after ClientContainerAddItem bank deposit");
+        }
+
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsClientContainerAddItemReadOrchestration()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string clientContainerAddItemHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientContainerAddItemMessageHandler.cs");
+
+            AssertContains(service, "public void HandleClientContainerAddItem");
+            AssertContains(service, "this.TryMoveInventoryItemToBackpack(character, message)");
+            AssertContains(service, "this.TryDepositInventoryItemToBank(character, message)");
+            AssertContains(service, "\"Unhandled ClientContainerAddItem char={0} source={1} target={2}\"");
+
+            AssertContains(
+                clientContainerAddItemHandler,
+                "InventoryContainerRuntimeService.Default.HandleClientContainerAddItem(client, message);");
+            AssertDoesNotContain(clientContainerAddItemHandler, "TryMoveInventoryItemToBackpack");
+            AssertDoesNotContain(clientContainerAddItemHandler, "TryDepositInventoryItemToBank");
+            AssertDoesNotContain(clientContainerAddItemHandler, "Unhandled ClientContainerAddItem");
         }
 
         [TestMethod]
