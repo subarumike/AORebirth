@@ -18,6 +18,7 @@ namespace ZoneEngine.Core
     using AORebirth.Core.Requirements;
     using AORebirth.Core.Statels;
     using AORebirth.Core.Textures;
+    using AORebirth.Database.Dao;
     using AORebirth.Enums;
     using AORebirth.ObjectManager;
 
@@ -560,6 +561,42 @@ namespace ZoneEngine.Core
 
             item.PerformAction(character, EventType.OnUse, itemPosition.Instance);
             return true;
+        }
+
+        public void DeleteInventoryItemAction(ICharacter character, CharacterActionMessage message)
+        {
+            ItemDao.Instance.Delete(
+                new
+                {
+                    containertype = (int)message.Target.Type,
+                    containerinstance = character.Identity.Instance,
+                    Id = message.Target.Instance
+                });
+
+            character.BaseInventory.RemoveItem(
+                (int)message.Target.Type,
+                message.Target.Instance);
+        }
+
+        public void SplitInventoryItemStackAction(ICharacter character, CharacterActionMessage message)
+        {
+            IItem item = character.BaseInventory.Pages[(int)message.Target.Type][message.Target.Instance];
+            item.MultipleCount -= message.Parameter2;
+            Item newItem = new Item(item.Quality, item.LowID, item.HighID);
+            newItem.MultipleCount = message.Parameter2;
+
+            character.BaseInventory.Pages[(int)message.Target.Type].Add(
+                character.BaseInventory.Pages[(int)message.Target.Type].FindFreeSlot(),
+                newItem);
+            character.BaseInventory.Pages[(int)message.Target.Type].Write();
+        }
+
+        public void MergeInventoryItemStackAction(ICharacter character, CharacterActionMessage message)
+        {
+            character.BaseInventory.Pages[(int)message.Target.Type][message.Target.Instance].MultipleCount +=
+                character.BaseInventory.Pages[(int)message.Target.Type][message.Parameter2].MultipleCount;
+            character.BaseInventory.Pages[(int)message.Target.Type].Remove(message.Parameter2);
+            character.BaseInventory.Pages[(int)message.Target.Type].Write();
         }
 
         public bool TryRejectInventoryPageAccess(ICharacter character, IInventoryPage page)
