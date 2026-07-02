@@ -1065,6 +1065,34 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsTradeskillInventoryOrchestration()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string tradeSkillReceiver =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\PacketHandlers\TradeSkillReceiver.cs");
+
+            AssertContains(service, "public Item GetTradeSkillItem(");
+            AssertContains(service, "public InventoryError AddTradeSkillResultItem(");
+            AssertContains(service, "public void RemoveTradeSkillItem(");
+            AssertContains(service, "public Item SetTradeSkillSource(");
+            AssertContains(service, "public Item SetTradeSkillTarget(");
+            AssertContains(service, "public void ClearTradeSkillSource(");
+            AssertContains(service, "public void ClearTradeSkillTarget(");
+            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.GetTradeSkillItem(");
+            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.AddTradeSkillResultItem(");
+            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.RemoveTradeSkillItem(");
+            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.SetTradeSkillSource(");
+            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.SetTradeSkillTarget(");
+            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.ClearTradeSkillSource(");
+            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.ClearTradeSkillTarget(");
+
+            AssertDoesNotContain(tradeSkillReceiver, "BaseInventory");
+            AssertDoesNotContain(tradeSkillReceiver, "TradeSkillSource =");
+            AssertDoesNotContain(tradeSkillReceiver, "TradeSkillTarget =");
+        }
+
+        [TestMethod]
         public void InventoryContainerRuntimeServiceGuardsRemainingHandlerControllerInventoryOwnership()
         {
             string repositoryRoot = FindRepositoryRoot();
