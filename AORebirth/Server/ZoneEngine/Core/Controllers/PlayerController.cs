@@ -364,45 +364,12 @@ namespace ZoneEngine.Core.Controllers
         /// </exception>
         public bool ContainerAddItem(int sourceContainerType, int sourcePlacement, Identity target, int targetPlacement)
         {
-            // Procedure:
-            // 1. Check if source location has item
-            // 2. Check if target container exists
-            // 3. Switch source with target
-
-            // Source container exists
-            if (this.Character.BaseInventory.Pages.ContainsKey(sourceContainerType))
-            {
-                IInventoryPage sourcePage = this.Character.BaseInventory.Pages[sourceContainerType];
-
-                // Source is not null
-                if (sourcePage[sourcePlacement] != null)
-                {
-                    if (this.Character.Identity == target)
-                    {
-                        IInventoryPage targetPage = this.Character.BaseInventory.PageFromSlot(targetPlacement);
-                        if (targetPage != null)
-                        {
-                            IItem itemSource = sourcePage.Remove(sourcePlacement);
-                            IItem itemTarget = targetPage.Remove(targetPlacement);
-                            if (itemTarget != null)
-                            {
-                                sourcePage.Add(sourcePlacement, itemTarget);
-                            }
-
-                            if (itemSource != null)
-                            {
-                                targetPage.Add(targetPlacement, itemSource);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Put it into the other players/npcs trade window?
-                    }
-                }
-            }
-
-            return true;
+            return InventoryContainerRuntimeService.Default.MovePlayerControllerContainerItem(
+                this.Character,
+                sourceContainerType,
+                sourcePlacement,
+                target,
+                targetPlacement);
         }
 
         /// <summary>
@@ -548,16 +515,10 @@ namespace ZoneEngine.Core.Controllers
         /// </exception>
         public bool DeleteItem(int container, int slotNumber)
         {
-            // Procedure:
-            // 1. Check container id (only bags and main inventory are valid for deleting)
-            // 2. Remove item from inventory/bag
-
-            if (this.Character.BaseInventory.Pages.ContainsKey(container))
-            {
-                this.Character.BaseInventory.Pages[container].Remove(slotNumber);
-            }
-
-            return true;
+            return InventoryContainerRuntimeService.Default.DeletePlayerControllerContainerItem(
+                this.Character,
+                container,
+                slotNumber);
         }
 
         /// <summary>

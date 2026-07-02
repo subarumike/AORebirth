@@ -670,6 +670,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsPlayerControllerContainerHelpers()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string playerController =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Controllers\PlayerController.cs");
+
+            AssertContains(service, "public bool MovePlayerControllerContainerItem");
+            AssertContains(service, "IInventoryPage sourcePage = character.BaseInventory.Pages[sourceContainerType];");
+            AssertContains(service, "IInventoryPage targetPage = character.BaseInventory.PageFromSlot(targetPlacement);");
+            AssertContains(service, "IItem itemSource = sourcePage.Remove(sourcePlacement);");
+            AssertContains(service, "public bool DeletePlayerControllerContainerItem");
+            AssertContains(service, "character.BaseInventory.Pages[container].Remove(slotNumber);");
+
+            AssertContains(playerController, "InventoryContainerRuntimeService.Default.MovePlayerControllerContainerItem(");
+            AssertContains(playerController, "InventoryContainerRuntimeService.Default.DeletePlayerControllerContainerItem(");
+            AssertDoesNotContain(playerController, "IInventoryPage sourcePage = this.Character.BaseInventory.Pages[sourceContainerType];");
+            AssertDoesNotContain(playerController, "IItem itemSource = sourcePage.Remove(sourcePlacement);");
+            AssertDoesNotContain(playerController, "this.Character.BaseInventory.Pages[container].Remove(slotNumber);");
+        }
+
+        [TestMethod]
         public void InventoryContainerRuntimeServiceOwnsBackpackOpenCloseLifecycle()
         {
             string service =
