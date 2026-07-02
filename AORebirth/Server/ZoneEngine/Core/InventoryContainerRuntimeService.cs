@@ -402,6 +402,77 @@ namespace ZoneEngine.Core
             character.Send(message);
         }
 
+        public bool TryUseBackpackContainer(ICharacter character, Identity itemPosition)
+        {
+            Item item = null;
+            try
+            {
+                item = character.BaseInventory.GetItemInContainer((int)itemPosition.Type, itemPosition.Instance);
+            }
+            catch (Exception)
+            {
+            }
+
+            return item != null && this.TryOpenBackpackContainer(character, itemPosition, item);
+        }
+
+        public bool TryOpenBackpackContainer(ICharacter character, Identity itemPosition, Item item)
+        {
+            if (!IsBackpackUseSlot(itemPosition.Type))
+            {
+                return false;
+            }
+
+            Identity containerIdentity;
+            if (!TryResolveBackpackContainerIdentity(character, itemPosition, item, out containerIdentity))
+            {
+                return false;
+            }
+
+            if (!IsItemUsable(item))
+            {
+                return false;
+            }
+
+            if (character.BaseInventory.IsBackpackOpen(containerIdentity))
+            {
+                BackpackContainerActionMessageHandler.Default.SendClose(character, containerIdentity);
+                character.BaseInventory.MarkBackpackClosed(containerIdentity);
+                return true;
+            }
+
+            IInventoryPage backpackPage;
+            bool pageAlreadyKnown = character.BaseInventory.TryGetBackpackPage(containerIdentity, out backpackPage);
+            if (pageAlreadyKnown)
+            {
+                BackpackContainerActionMessageHandler.Default.SendOpen(character, containerIdentity);
+                character.BaseInventory.MarkBackpackOpen(containerIdentity);
+            }
+            else
+            {
+                backpackPage = character.BaseInventory.GetOrCreateBackpackPage(containerIdentity);
+
+                if (backpackPage.List().Any())
+                {
+                    int openHandle = InventoryUpdateMessageHandler.Default.ReserveBackpackInventoryHandle();
+                    ChestItemFullUpdateMessageHandler.Default.Send(character, item, itemPosition, backpackPage.Identity);
+                    InventoryUpdateMessageHandler.Default.SendContainerOpen(character, backpackPage, openHandle);
+                }
+                else
+                {
+                    int introduceHandle = InventoryUpdateMessageHandler.Default.ReserveBackpackInventoryHandle();
+                    int openHandle = InventoryUpdateMessageHandler.Default.ReserveBackpackInventoryHandle();
+                    InventoryUpdateMessageHandler.Default.SendContainerIntroduce(character, backpackPage, introduceHandle);
+                    ChestItemFullUpdateMessageHandler.Default.Send(character, item, itemPosition, backpackPage.Identity);
+                    InventoryUpdateMessageHandler.Default.SendFreshContainerOpen(character, backpackPage, openHandle);
+                }
+
+                character.BaseInventory.MarkBackpackOpen(containerIdentity);
+            }
+
+            return true;
+        }
+
         public bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
             switch (InventoryContainerInteractionRules.ResolveRouteMode(target))
@@ -412,7 +483,7 @@ namespace ZoneEngine.Core
                     return true;
 
                 case InventoryContainerInteractionRouteMode.WearOrSocialBackpack:
-                    if (client.Controller.TryUseBackpackContainer(target))
+                    if (this.TryUseBackpackContainer(client.Controller.Character, target))
                     {
                         GenericCmdMessageHandler.Default.Acknowledge(client.Controller.Character, message);
                     }
@@ -921,6 +992,33 @@ namespace ZoneEngine.Core
         {
             return message.Source.Type == IdentityType.Inventory
                    && message.Target.Type == IdentityType.IncomingTradeWindow;
+        }
+
+        private static bool IsBackpackUseSlot(IdentityType identityType)
+        {
+            return identityType == IdentityType.Inventory
+                   || identityType == IdentityType.ArmorPage
+                   || identityType == IdentityType.SocialPage;
+        }
+
+        private static bool TryResolveBackpackContainerIdentity(
+            ICharacter character,
+            Identity itemPosition,
+            Item item,
+            out Identity containerIdentity)
+        {
+            containerIdentity = Identity.None;
+
+            return InventoryItemRules.TryEnsureBackpackContainerIdentity(
+                item,
+                character.Identity,
+                itemPosition,
+                out containerIdentity);
+        }
+
+        private static bool IsItemUsable(Item item)
+        {
+            return (item.GetAttribute((int)StatIds.can) & (int)CanFlags.Use) == (int)CanFlags.Use;
         }
 
         private void TryRemoveBankRollback(IInventoryPage bankPage, int bankSlot)
