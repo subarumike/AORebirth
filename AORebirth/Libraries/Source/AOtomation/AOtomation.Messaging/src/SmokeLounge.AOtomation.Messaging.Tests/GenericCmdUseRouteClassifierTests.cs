@@ -555,6 +555,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(containerAddItemHandler, "itemReceiver.BaseInventory.Pages[(int)IdentityType.Bank]");
         }
 
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsInventoryToBackpackMove()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string clientContainerAddItemHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientContainerAddItemMessageHandler.cs");
+
+            AssertContains(service, "public bool TryMoveInventoryItemToBackpack");
+            AssertContains(service, "message.Target.Type != IdentityType.Container");
+            AssertContains(service, "character.BaseInventory.TryGetBackpackPage(message.Target, out backpackPage)");
+            AssertContains(service, "InventoryItemRules.IsBackpackContainerItem(item)");
+            AssertContains(service, "new ContainerAddItemMessage");
+            AssertContains(service, "Persisted inventory after ClientContainerAddItem backpack move");
+            AssertContains(service, "private void TryRemoveBackpackRollback");
+
+            AssertContains(
+                clientContainerAddItemHandler,
+                "InventoryContainerRuntimeService.Default.TryMoveInventoryItemToBackpack(character, message)");
+            AssertDoesNotContain(clientContainerAddItemHandler, "private bool TryMoveInventoryItemToBackpack");
+            AssertDoesNotContain(clientContainerAddItemHandler, "TryRemoveBackpackRollback");
+            AssertDoesNotContain(clientContainerAddItemHandler, "InventoryItemRules.IsBackpackContainerItem");
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,
