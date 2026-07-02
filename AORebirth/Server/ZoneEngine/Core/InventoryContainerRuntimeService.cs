@@ -487,6 +487,43 @@ namespace ZoneEngine.Core
                 message.Container.Instance);
         }
 
+        public bool TryGetTradeAddItem(IItemContainer issuer, TradeMessage message, out IItem item)
+        {
+            item = null;
+
+            try
+            {
+                if (issuer is Vendor)
+                {
+                    item = issuer.BaseInventory.GetItemInContainer(
+                        (int)IdentityType.Inventory,
+                        message.Container.Instance);
+                }
+                else
+                {
+                    item = issuer.BaseInventory.GetItemInContainer(
+                        (int)message.Container.Type,
+                        message.Container.Instance);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Shopping,
+                    "Trade AddItem lookup failed issuer=" + issuer.Identity.ToString(true)
+                    + " source=" + message.Container.ToString(true)
+                    + " error=" + ex.Message);
+                return false;
+            }
+
+            return item != null;
+        }
+
+        public IItem GetVendorTradeItem(IItemContainer issuer, int slot)
+        {
+            return issuer.BaseInventory.GetItemInContainer((int)IdentityType.Inventory, slot);
+        }
+
         public void MoveNonEquipmentContainerItem(
             ICharacter character,
             ContainerAddItemMessage message,
