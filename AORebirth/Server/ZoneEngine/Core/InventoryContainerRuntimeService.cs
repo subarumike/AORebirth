@@ -494,6 +494,57 @@ namespace ZoneEngine.Core
             character.Send(message);
         }
 
+        public bool MovePlayerControllerContainerItem(
+            ICharacter character,
+            int sourceContainerType,
+            int sourcePlacement,
+            Identity target,
+            int targetPlacement)
+        {
+            if (character.BaseInventory.Pages.ContainsKey(sourceContainerType))
+            {
+                IInventoryPage sourcePage = character.BaseInventory.Pages[sourceContainerType];
+
+                if (sourcePage[sourcePlacement] != null)
+                {
+                    if (character.Identity == target)
+                    {
+                        IInventoryPage targetPage = character.BaseInventory.PageFromSlot(targetPlacement);
+                        if (targetPage != null)
+                        {
+                            IItem itemSource = sourcePage.Remove(sourcePlacement);
+                            IItem itemTarget = targetPage.Remove(targetPlacement);
+                            if (itemTarget != null)
+                            {
+                                sourcePage.Add(sourcePlacement, itemTarget);
+                            }
+
+                            if (itemSource != null)
+                            {
+                                targetPage.Add(targetPlacement, itemSource);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Put it into the other players/npcs trade window?
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public bool DeletePlayerControllerContainerItem(ICharacter character, int container, int slotNumber)
+        {
+            if (character.BaseInventory.Pages.ContainsKey(container))
+            {
+                character.BaseInventory.Pages[container].Remove(slotNumber);
+            }
+
+            return true;
+        }
+
         public bool TryUseBackpackContainer(ICharacter character, Identity itemPosition)
         {
             Item item = null;
