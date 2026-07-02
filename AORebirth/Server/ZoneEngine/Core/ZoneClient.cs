@@ -85,6 +85,8 @@ namespace ZoneEngine.Core
 
         private readonly ZoneClientSessionLifecycleCoordinator sessionLifecycle;
 
+        private readonly PacketSequencingCoordinator packetSequencing;
+
         /// <summary>
         /// </summary>
         private IController controller;
@@ -138,6 +140,7 @@ namespace ZoneEngine.Core
             this.messageSerializer = messageSerializer;
             this.bus = bus;
             this.sessionLifecycle = new ZoneClientSessionLifecycleCoordinator();
+            this.packetSequencing = new PacketSequencingCoordinator();
             this.dispatcherThread = new Thread(this.DispatchMessages);
             this.dispatcherThread.Start();
         }
@@ -163,6 +166,14 @@ namespace ZoneEngine.Core
             get
             {
                 return this.sessionLifecycle;
+            }
+        }
+
+        public PacketSequencingCoordinator PacketSequencing
+        {
+            get
+            {
+                return this.packetSequencing;
             }
         }
 

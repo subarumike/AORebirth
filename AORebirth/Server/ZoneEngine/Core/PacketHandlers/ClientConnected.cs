@@ -90,7 +90,7 @@ namespace ZoneEngine.Core.PacketHandlers
 
             // Character is created and read when Client connects in Client.cs->CreateCharacter
             // client.CreateCharacter(charID);
-            client.SessionLifecycle.EnterReadyBlockForSessionInit();
+            client.PacketSequencing.BeginSessionReadyBlock(client.SessionLifecycle.EnterReadyBlockForSessionInit);
             client.Server.Info(
                 client,
                 "Client connected. ID: {0} IP: {1} Character name: {2}",
@@ -173,43 +173,52 @@ client.Controller.Character.Playfield.Identity,
             // Stat.SendDirect(client, 521, 0, false);
 
             /* visual */
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
-                PlayfieldLifecycleTrace.StagePrivateCityReadyBlockBegin,
-                PlayfieldLifecycleTrace.MessagePrivateCityReadyBlockBegin,
-                identity);
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
-                PlayfieldLifecycleTrace.StagePrivateCitySimpleCharFullUpdateBroadcast,
-                PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
-                identity);
-            SimpleCharFullUpdate.SendToPlayfield(client);
-
-            /* inventory, items and all that */
-            GuestKeyGeneratorInteractionHandler.ProcessCityAccessCardLifetimes(client.Controller.Character);
-            Packets.WeaponItemFullUpdate.SendWeaponDefinitions(client.Controller.Character);
-            Playfield currentPlayfield = client.Controller.Character.Playfield as Playfield;
-            if (currentPlayfield != null)
-            {
-                currentPlayfield.SendPrivateCityPreFullCharacterReadyBlock(client, client.Controller.Character);
-            }
-
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
-                PlayfieldLifecycleTrace.StagePrivateCityFullCharacter,
-                PlayfieldLifecycleTrace.MessageFullCharacter,
-                identity);
-            client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit();
-            FullCharacterMessageHandler.Default.Send(client.Controller.Character);
-            if (currentPlayfield != null)
-            {
-                currentPlayfield.SendPrivateCityPlayfieldReadyBlock(client, client.Controller.Character);
-            }
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
-                PlayfieldLifecycleTrace.StagePrivateCityReadyBlockEnd,
-                PlayfieldLifecycleTrace.MessagePrivateCityReadyBlockEnd,
-                identity);
+            Playfield currentPlayfield = null;
+            client.PacketSequencing.RunSessionReadyFullCharacterSequence(
+                () => PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                    PlayfieldLifecycleTrace.StagePrivateCityReadyBlockBegin,
+                    PlayfieldLifecycleTrace.MessagePrivateCityReadyBlockBegin,
+                    identity),
+                () => PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                    PlayfieldLifecycleTrace.StagePrivateCitySimpleCharFullUpdateBroadcast,
+                    PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
+                    identity),
+                () => SimpleCharFullUpdate.SendToPlayfield(client),
+                () =>
+                {
+                    /* inventory, items and all that */
+                    GuestKeyGeneratorInteractionHandler.ProcessCityAccessCardLifetimes(client.Controller.Character);
+                    Packets.WeaponItemFullUpdate.SendWeaponDefinitions(client.Controller.Character);
+                    currentPlayfield = client.Controller.Character.Playfield as Playfield;
+                },
+                () =>
+                {
+                    if (currentPlayfield != null)
+                    {
+                        currentPlayfield.SendPrivateCityPreFullCharacterReadyBlock(client, client.Controller.Character);
+                    }
+                },
+                () => PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                    PlayfieldLifecycleTrace.StagePrivateCityFullCharacter,
+                    PlayfieldLifecycleTrace.MessageFullCharacter,
+                    identity),
+                client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,
+                () => FullCharacterMessageHandler.Default.Send(client.Controller.Character),
+                () =>
+                {
+                    if (currentPlayfield != null)
+                    {
+                        currentPlayfield.SendPrivateCityPlayfieldReadyBlock(client, client.Controller.Character);
+                    }
+                },
+                () => PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                    PlayfieldLifecycleTrace.StagePrivateCityReadyBlockEnd,
+                    PlayfieldLifecycleTrace.MessagePrivateCityReadyBlockEnd,
+                    identity));
 
             var specials = new[]
                            {
@@ -263,14 +272,15 @@ client.Controller.Character.Playfield.Identity,
 
             if (currentPlayfield != null)
             {
-                PlayfieldLifecycleTrace.Record(
-                    PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
-                    PlayfieldLifecycleTrace.StageVisibilityJoinerReady,
-                    "ClientConnected",
-                    client.Controller.Character.Identity);
-                client.SessionLifecycle.EnterCharInPlayForVisibilityEntry();
-                currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character);
-                currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });
+                client.PacketSequencing.RunVisibilityInitializationSequence(
+                    () => PlayfieldLifecycleTrace.Record(
+                        PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                        PlayfieldLifecycleTrace.StageVisibilityJoinerReady,
+                        "ClientConnected",
+                        client.Controller.Character.Identity),
+                    client.SessionLifecycle.EnterCharInPlayForVisibilityEntry,
+                    () => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character),
+                    () => currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client }));
             }
 
             AppearanceUpdateMessageHandler.Default.Send(client.Controller.Character);
@@ -282,7 +292,8 @@ client.Controller.Character.Playfield.Identity,
             ScriptCompiler.Instance.CallMethod("OnConnect", client.Controller.Character);
 
             // Timers are allowed to update client stats now.
-            client.SessionLifecycle.CompleteInPlayForSessionInit();
+            client.PacketSequencing.CompleteSessionInitialization(
+                client.SessionLifecycle.CompleteInPlayForSessionInit);
             client.Controller.Character.DoNotDoTimers = false;
         }
 

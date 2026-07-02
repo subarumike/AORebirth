@@ -1132,19 +1132,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "this.server.PlayfieldById(");
             AssertTextBefore(
                 clientConnectedText,
-                "client.SessionLifecycle.EnterReadyBlockForSessionInit();",
+                "client.PacketSequencing.BeginSessionReadyBlock(",
                 "PlayfieldAnarchyFMessageHandler.Default.Send");
             AssertTextBefore(
                 clientConnectedText,
-                "client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit();",
-                "FullCharacterMessageHandler.Default.Send(client.Controller.Character);");
+                "client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,",
+                "() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)");
             AssertTextBefore(
                 clientConnectedText,
-                "client.SessionLifecycle.EnterCharInPlayForVisibilityEntry();",
-                "currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character);");
+                "client.SessionLifecycle.EnterCharInPlayForVisibilityEntry,",
+                "() => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character)");
             AssertTextBefore(
                 clientConnectedText,
-                "client.SessionLifecycle.CompleteInPlayForSessionInit();",
+                "client.PacketSequencing.CompleteSessionInitialization(",
                 "client.Controller.Character.DoNotDoTimers = false;");
             AssertTextBefore(
                 teleportMethod,
@@ -1228,10 +1228,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.IsTrue(
-                clientConnectedText.Contains("FullCharacterMessageHandler.Default.Send(client.Controller.Character);"),
+                clientConnectedText.Contains("() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)"),
                 "FullCharacter packet emission must still remain outside the lifecycle coordinator.");
             Assert.IsTrue(
-                clientConnectedText.Contains("currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character);"),
+                clientConnectedText.Contains("() => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character)"),
                 "CharInPlay/visibility packet emission must still remain outside the lifecycle coordinator.");
             Assert.IsTrue(
                 playfieldText.Contains("TeleportMessageHandler.Default.Send("),
@@ -1302,11 +1302,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && zoneClientText.Contains("this.sessionLifecycle.EnterDisconnectingForSessionDispose();"),
                 "ZoneClient must use named coordinator methods for playfield-loading/zoning-exit and disconnect phases.");
             Assert.IsTrue(
-                clientConnectedText.Contains("client.SessionLifecycle.EnterReadyBlockForSessionInit();")
-                && clientConnectedText.Contains("client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit();")
-                && clientConnectedText.Contains("client.SessionLifecycle.EnterCharInPlayForVisibilityEntry();")
-                && clientConnectedText.Contains("client.SessionLifecycle.CompleteInPlayForSessionInit();"),
-                "ClientConnected must use named coordinator methods for ready/full-character/CharInPlay/InPlay phases.");
+                clientConnectedText.Contains("client.PacketSequencing.BeginSessionReadyBlock(client.SessionLifecycle.EnterReadyBlockForSessionInit);")
+                && clientConnectedText.Contains("client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,")
+                && clientConnectedText.Contains("client.SessionLifecycle.EnterCharInPlayForVisibilityEntry,")
+                && clientConnectedText.Contains("client.PacketSequencing.CompleteSessionInitialization(")
+                && clientConnectedText.Contains("client.SessionLifecycle.CompleteInPlayForSessionInit);"),
+                "ClientConnected must route ready/full-character/CharInPlay/InPlay phases through named coordinator methods.");
             Assert.IsTrue(
                 playfieldText.Contains("lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer();"),
                 "Playfield teleport must use the named coordinator method for zoning entry.");
@@ -1318,7 +1319,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "ZoneRedirectionMessage",
                     "PrivateCityReadyInitCoordinator",
                     "SendPrivateCity",
-                    "SimpleCharFullUpdate",
+                    "SimpleCharFullUpdate.",
                     "CharInPlayMessage",
                     "AnnouncePlayerVisibility",
                     "SendSCFUsToClient",
@@ -1354,6 +1355,99 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && zoneClientText.Contains("this.zStream.Close();")
                 && zoneClientText.Contains("this.netStream.Close();"),
                 "Engine/client disposal mechanics must remain in ZoneClient.");
+        }
+
+        [TestMethod]
+        public void PacketSequencingCoordinatorOwnsSessionInitializationOrderWithoutOwningPackets()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string coordinatorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketSequencingCoordinator.cs"));
+            string zoneClientText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
+            string clientConnectedText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
+            string projectText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
+
+            Assert.IsTrue(
+                coordinatorText.Contains("public sealed class PacketSequencingCoordinator"),
+                "PacketSequencingCoordinator must be the named session packet sequencing boundary.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\PacketSequencingCoordinator.cs"),
+                "ZoneEngine project must compile the packet sequencing coordinator.");
+            Assert.IsTrue(
+                zoneClientText.Contains("private readonly PacketSequencingCoordinator packetSequencing")
+                && zoneClientText.Contains("public PacketSequencingCoordinator PacketSequencing"),
+                "ZoneClient must own and expose the packet sequencing coordinator.");
+            Assert.IsTrue(
+                clientConnectedText.Contains("client.PacketSequencing.BeginSessionReadyBlock(")
+                && clientConnectedText.Contains("client.PacketSequencing.RunSessionReadyFullCharacterSequence(")
+                && clientConnectedText.Contains("client.PacketSequencing.RunVisibilityInitializationSequence(")
+                && clientConnectedText.Contains("client.PacketSequencing.CompleteSessionInitialization("),
+                "ClientConnected must route session packet sequencing through PacketSequencingCoordinator.");
+
+            string readyFullCharacterSequence = ExtractMethodBlock(
+                coordinatorText,
+                "public void RunSessionReadyFullCharacterSequence");
+            AssertTextBefore(readyFullCharacterSequence, "Execute(recordReadyBlockBegin", "Execute(recordSimpleCharFullUpdate");
+            AssertTextBefore(readyFullCharacterSequence, "Execute(recordSimpleCharFullUpdate", "Execute(sendSimpleCharFullUpdate");
+            AssertTextBefore(readyFullCharacterSequence, "Execute(sendSimpleCharFullUpdate", "Execute(prepareFullCharacterState");
+            AssertTextBefore(readyFullCharacterSequence, "Execute(prepareFullCharacterState", "Execute(sendPreFullCharacterReadyBlock");
+            AssertTextBefore(readyFullCharacterSequence, "Execute(sendPreFullCharacterReadyBlock", "Execute(recordFullCharacter");
+            AssertTextBefore(readyFullCharacterSequence, "Execute(recordFullCharacter", "Execute(enterFullCharacterBoundary");
+            AssertTextBefore(readyFullCharacterSequence, "Execute(enterFullCharacterBoundary", "Execute(sendFullCharacter");
+            AssertTextBefore(readyFullCharacterSequence, "Execute(sendFullCharacter", "Execute(sendPlayfieldReadyBlock");
+            AssertTextBefore(readyFullCharacterSequence, "Execute(sendPlayfieldReadyBlock", "Execute(recordReadyBlockEnd");
+
+            string visibilitySequence = ExtractMethodBlock(
+                coordinatorText,
+                "public void RunVisibilityInitializationSequence");
+            AssertTextBefore(visibilitySequence, "Execute(recordJoinerReady", "Execute(enterCharInPlay");
+            AssertTextBefore(visibilitySequence, "Execute(enterCharInPlay", "Execute(announceJoiningCharacter");
+            AssertTextBefore(visibilitySequence, "Execute(announceJoiningCharacter", "Execute(sendExistingCharacterSnapshots");
+
+            AssertTextBefore(
+                clientConnectedText,
+                "() => SimpleCharFullUpdate.SendToPlayfield(client)",
+                "GuestKeyGeneratorInteractionHandler.ProcessCityAccessCardLifetimes(client.Controller.Character);");
+            AssertTextBefore(
+                clientConnectedText,
+                "Packets.WeaponItemFullUpdate.SendWeaponDefinitions(client.Controller.Character);",
+                "currentPlayfield.SendPrivateCityPreFullCharacterReadyBlock(client, client.Controller.Character);");
+            AssertTextBefore(
+                clientConnectedText,
+                "client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,",
+                "() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)");
+
+            string[] packetAndRuntimePatterns =
+                {
+                    "SendCompressed",
+                    "PlayfieldAnarchyFMessageHandler",
+                    "FullCharacterMessageHandler",
+                    "SimpleCharFullUpdate.",
+                    "CharInPlayMessage",
+                    "PlayfieldAllTowersMessage",
+                    "PlayfieldAllCitiesMessage",
+                    "PrivateCityReadyInitCoordinator",
+                    "GenericCmd",
+                    "InventoryContainerRuntimeService",
+                    "OrgClient",
+                    "AOSharpLiveCapture"
+                };
+            for (int i = 0; i < packetAndRuntimePatterns.Length; i++)
+            {
+                Assert.IsFalse(
+                    coordinatorText.Contains(packetAndRuntimePatterns[i]),
+                    "PacketSequencingCoordinator must own sequencing only, not packet construction/runtime systems: "
+                    + packetAndRuntimePatterns[i]);
+            }
+
+            Assert.IsTrue(
+                clientConnectedText.Contains("() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)")
+                && clientConnectedText.Contains("() => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character)")
+                && clientConnectedText.Contains("() => currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client })"),
+                "Packet send expressions must remain in ClientConnected for this first sequencing slice.");
         }
 
         [TestMethod]
