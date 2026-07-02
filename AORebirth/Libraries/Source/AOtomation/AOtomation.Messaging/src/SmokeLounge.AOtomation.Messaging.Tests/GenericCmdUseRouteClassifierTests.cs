@@ -412,8 +412,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "character.BaseInventory.TryGetBackpackPageByHandle");
             AssertContains(service, "receivingPage.Add(toPlacement, itemFrom)");
             AssertContains(service, "backpackPage.Remove(fromPlacement)");
-            AssertContains(service, "this.SendMoveAck(character, message.SourceContainer, message.TargetPlacement);");
-            AssertContains(service, "this.PersistCharacterInventory(character, \"backpack move\");");
+            AssertContains(
+                service,
+                "this.SendMoveItemToInventoryAck(character, message.SourceContainer, message.TargetPlacement);");
+            AssertContains(service, "this.PersistClientMoveItemToInventory(character, \"backpack move\");");
 
             AssertContains(
                 clientMoveHandler,
@@ -422,6 +424,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(clientMoveHandler, "TryGetBackpackPageByHandle");
             AssertDoesNotContain(clientMoveHandler, "DecodeBackpackHandle");
             AssertDoesNotContain(clientMoveHandler, "TryRemoveInventoryRollback");
+        }
+
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsMoveAckAndPersistenceSurfaces()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string clientMoveHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
+
+            AssertContains(service, "public void SendMoveItemToInventoryAck");
+            AssertContains(service, "new ContainerAddItemMessage");
+            AssertContains(service, "public void PersistClientMoveItemToInventory");
+            AssertContains(service, "character.BaseInventory.Write();");
+
+            AssertContains(
+                clientMoveHandler,
+                "InventoryContainerRuntimeService.Default.SendMoveItemToInventoryAck");
+            AssertContains(
+                clientMoveHandler,
+                "InventoryContainerRuntimeService.Default.PersistClientMoveItemToInventory");
+            AssertDoesNotContain(clientMoveHandler, "private void SendMoveAck");
+            AssertDoesNotContain(clientMoveHandler, "private void PersistCharacterInventory");
+            AssertDoesNotContain(clientMoveHandler, "new ContainerAddItemMessage");
+            AssertDoesNotContain(clientMoveHandler, "character.BaseInventory.Write();");
         }
 
         private static void AssertRoute(

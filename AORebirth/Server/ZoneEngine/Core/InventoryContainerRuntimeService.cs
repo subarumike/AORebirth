@@ -235,8 +235,8 @@ namespace ZoneEngine.Core
                 return true;
             }
 
-            this.SendMoveAck(character, message.SourceContainer, message.TargetPlacement);
-            this.PersistCharacterInventory(character, "backpack move");
+            this.SendMoveItemToInventoryAck(character, message.SourceContainer, message.TargetPlacement);
+            this.PersistClientMoveItemToInventory(character, "backpack move");
             return true;
         }
 
@@ -257,7 +257,7 @@ namespace ZoneEngine.Core
             }
         }
 
-        private void SendMoveAck(ICharacter character, Identity sourceContainer, int targetPlacement)
+        public void SendMoveItemToInventoryAck(ICharacter character, Identity sourceContainer, int targetPlacement)
         {
             character.Send(
                 new ContainerAddItemMessage
@@ -270,7 +270,7 @@ namespace ZoneEngine.Core
                 });
         }
 
-        private void PersistCharacterInventory(ICharacter character, string reason)
+        public void PersistClientMoveItemToInventory(ICharacter character, string reason)
         {
             character.BaseInventory.Write();
             LogUtil.Debug(
