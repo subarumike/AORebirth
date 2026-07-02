@@ -400,7 +400,9 @@ namespace ZoneEngine.Core.MessageHandlers
                                 break;
                             }
 
-                            if (!this.HasFreeInventorySlots(client.Controller.Character, boughtItems.Length))
+                            if (!InventoryContainerRuntimeService.Default.HasFreeInventorySlots(
+                                    client.Controller.Character,
+                                    boughtItems.Length))
                             {
                                 ChatTextMessageHandler.Default.Send(
                                     client.Controller.Character,
@@ -751,7 +753,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 otherCharacter,
                 removedItem,
                 message.Container);
-            this.PersistCharacterInventory(character, "player trade add");
+            InventoryContainerRuntimeService.Default.PersistCharacterInventory(character, "player trade add");
 
             LogUtil.Debug(
                 DebugInfoDetail.Shopping,
@@ -808,7 +810,11 @@ namespace ZoneEngine.Core.MessageHandlers
                 return true;
             }
 
-            this.SendTradeWindowMoveToInventory(character, IdentityType.KnuBotTradeWindow, tradeSlot, 0x6f);
+            InventoryContainerRuntimeService.Default.SendTradeWindowMoveToInventory(
+                character,
+                IdentityType.KnuBotTradeWindow,
+                tradeSlot,
+                0x6f);
             this.AcknowledgeTradeAction(character, message);
             this.SendPlayerTradeAction(
                 otherCharacter,
@@ -817,7 +823,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 message.Container);
             InventoryUpdatedMessageHandler.Default.Send(character, otherCharacter.Identity);
             InventoryUpdatedMessageHandler.Default.Send(character, character.Identity);
-            this.PersistCharacterInventory(character, "player trade remove");
+            InventoryContainerRuntimeService.Default.PersistCharacterInventory(character, "player trade remove");
 
             return true;
         }
@@ -965,8 +971,8 @@ namespace ZoneEngine.Core.MessageHandlers
             this.SendPlayerTradeCompleteClose(vendor, shopper);
             this.SendPlayerTradeSocialStatus(shopper);
             this.SendPlayerTradeSocialStatus(vendor);
-            this.PersistCharacterInventory(shopper, "player trade complete");
-            this.PersistCharacterInventory(vendor, "player trade complete");
+            InventoryContainerRuntimeService.Default.PersistCharacterInventory(shopper, "player trade complete");
+            InventoryContainerRuntimeService.Default.PersistCharacterInventory(vendor, "player trade complete");
 
             LogUtil.Debug(
                 DebugInfoDetail.Shopping,
@@ -991,13 +997,13 @@ namespace ZoneEngine.Core.MessageHandlers
             if (shopper != null)
             {
                 this.ReturnPlayerTradeOffers(shopper, shoppingBag);
-                this.PersistCharacterInventory(shopper, "player trade decline");
+                InventoryContainerRuntimeService.Default.PersistCharacterInventory(shopper, "player trade decline");
             }
 
             if (vendor != null)
             {
                 this.ReturnPlayerTradeOffers(vendor, shoppingBag);
-                this.PersistCharacterInventory(vendor, "player trade decline");
+                InventoryContainerRuntimeService.Default.PersistCharacterInventory(vendor, "player trade decline");
             }
 
             this.SendPlayerTradeDeclineClose(character, otherCharacter);
@@ -1289,41 +1295,17 @@ namespace ZoneEngine.Core.MessageHandlers
             };
         }
 
-        private bool HasFreeInventorySlots(ICharacter character, int neededSlots)
-        {
-            if (neededSlots <= 0)
-            {
-                return true;
-            }
-
-            IInventoryPage page = character.BaseInventory[character.BaseInventory.StandardPage];
-            int freeSlots = 0;
-            for (int slot = page.FirstSlotNumber; slot < page.FirstSlotNumber + page.MaxSlots; slot++)
-            {
-                if (page[slot] == null)
-                {
-                    freeSlots++;
-                    if (freeSlots >= neededSlots)
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
         private string GetPlayerTradeCompletionFailure(ICharacter shopper, ICharacter vendor, TemporaryBag shoppingBag)
         {
             int shopperItems = shoppingBag.GetPlayerOffers(shopper.Identity).Length;
             int vendorItems = shoppingBag.GetPlayerOffers(vendor.Identity).Length;
 
-            if (!this.HasFreeInventorySlots(vendor, shopperItems))
+            if (!InventoryContainerRuntimeService.Default.HasFreeInventorySlots(vendor, shopperItems))
             {
                 return vendor.Name + " does not have enough free inventory slots.";
             }
 
-            if (!this.HasFreeInventorySlots(shopper, vendorItems))
+            if (!InventoryContainerRuntimeService.Default.HasFreeInventorySlots(shopper, vendorItems))
             {
                 return shopper.Name + " does not have enough free inventory slots.";
             }
@@ -1653,7 +1635,11 @@ namespace ZoneEngine.Core.MessageHandlers
                     + " sourceSlot=" + offer.Key
                     + " targetSlot=" + targetSlot
                     + " item=" + offer.Value.LowID + "/" + offer.Value.HighID + ":" + offer.Value.Quality);
-                this.SendTradeWindowMoveToInventory(owner, IdentityType.KnuBotTradeWindow, offer.Key, targetSlot);
+                InventoryContainerRuntimeService.Default.SendTradeWindowMoveToInventory(
+                    owner,
+                    IdentityType.KnuBotTradeWindow,
+                    offer.Key,
+                    targetSlot);
             }
         }
 
@@ -1665,44 +1651,14 @@ namespace ZoneEngine.Core.MessageHandlers
             if (shopper != null)
             {
                 this.ReturnPlayerTradeOffers(shopper, shoppingBag);
-                this.PersistCharacterInventory(shopper, reason);
+                InventoryContainerRuntimeService.Default.PersistCharacterInventory(shopper, reason);
             }
 
             if (vendor != null)
             {
                 this.ReturnPlayerTradeOffers(vendor, shoppingBag);
-                this.PersistCharacterInventory(vendor, reason);
+                InventoryContainerRuntimeService.Default.PersistCharacterInventory(vendor, reason);
             }
-        }
-
-        private void SendTradeWindowMoveToInventory(
-            ICharacter character,
-            IdentityType sourceType,
-            int sourceSlot,
-            int targetSlot)
-        {
-            character.Send(
-                new ContainerAddItemMessage
-                {
-                    Identity = character.Identity,
-                    Unknown = 0,
-                    SourceContainer =
-                        new Identity
-                        {
-                            Type = sourceType,
-                            Instance = sourceSlot
-                        },
-                    Target = character.Identity,
-                    TargetPlacement = targetSlot
-                });
-        }
-
-        private void PersistCharacterInventory(ICharacter character, string reason)
-        {
-            character.BaseInventory.Write();
-            LogUtil.Debug(
-                DebugInfoDetail.Database,
-                "Persisted inventory after " + reason + " char=" + character.Identity.ToString(true));
         }
 
         private ICharacter GetOtherPlayerTradeCharacter(ICharacter character, TemporaryBag shoppingBag)

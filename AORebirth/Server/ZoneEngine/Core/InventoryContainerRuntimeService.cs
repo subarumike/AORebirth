@@ -1392,6 +1392,60 @@ namespace ZoneEngine.Core
                 });
         }
 
+        public bool HasFreeInventorySlots(ICharacter character, int neededSlots)
+        {
+            if (neededSlots <= 0)
+            {
+                return true;
+            }
+
+            IInventoryPage page = character.BaseInventory[character.BaseInventory.StandardPage];
+            int freeSlots = 0;
+            for (int slot = page.FirstSlotNumber; slot < page.FirstSlotNumber + page.MaxSlots; slot++)
+            {
+                if (page[slot] == null)
+                {
+                    freeSlots++;
+                    if (freeSlots >= neededSlots)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public void SendTradeWindowMoveToInventory(
+            ICharacter character,
+            IdentityType sourceType,
+            int sourceSlot,
+            int targetSlot)
+        {
+            character.Send(
+                new ContainerAddItemMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 0,
+                    SourceContainer =
+                        new Identity
+                        {
+                            Type = sourceType,
+                            Instance = sourceSlot
+                        },
+                    Target = character.Identity,
+                    TargetPlacement = targetSlot
+                });
+        }
+
+        public void PersistCharacterInventory(ICharacter character, string reason)
+        {
+            character.BaseInventory.Write();
+            LogUtil.Debug(
+                DebugInfoDetail.Database,
+                "Persisted inventory after " + reason + " char=" + character.Identity.ToString(true));
+        }
+
         public void PersistClientMoveItemToInventory(ICharacter character, string reason)
         {
             character.BaseInventory.Write();
