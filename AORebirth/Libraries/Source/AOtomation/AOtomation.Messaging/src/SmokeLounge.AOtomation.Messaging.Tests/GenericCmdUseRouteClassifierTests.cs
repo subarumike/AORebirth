@@ -734,7 +734,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.HasFreeInventorySlots(");
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.FindFreeStandardInventorySlot(");
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.AddToStandardInventoryPage(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.AddToStandardInventoryPageUnchecked(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.ReturnItemsToStandardInventoryUnchecked(");
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.SendTradeWindowMoveToInventory(");
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.ReturnPlayerTradeOffers(");
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.TransferPlayerTradeOffers(");
@@ -1032,6 +1032,36 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(marcusB18F, "source.BaseInventory");
             AssertDoesNotContain(marcusB18F, "private static bool CharacterHasItemInCarriedInventory(");
             AssertDoesNotContain(marcusB18F, "private static bool InventoryPageHasItem(");
+        }
+
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsVendorShopInventoryHelpers()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string shophash =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\shophash.cs");
+            string tradeHandler =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\TradeMessageHandler.cs");
+
+            AssertContains(service, "public bool VendorShopNeedsDatabaseEntry(");
+            AssertContains(service, "public IInventoryPage GetVendorStandardInventoryPage(");
+            AssertContains(service, "public void AddVendorPurchaseOffer(");
+            AssertContains(service, "public void AddVendorSaleOffer(");
+            AssertContains(service, "public void RemoveVendorPurchaseOffer(");
+            AssertContains(service, "public InventoryItemAddResult TryAddStandardInventoryItem(");
+            AssertContains(service, "public void ReturnItemsToStandardInventoryUnchecked(");
+            AssertContains(service, "private static IItem CloneShopItem(");
+            AssertContains(shophash, "InventoryContainerRuntimeService.Default.VendorShopNeedsDatabaseEntry(temp)");
+            AssertContains(shophash, "InventoryContainerRuntimeService.Default.GetVendorStandardInventoryPage((Vendor)caller)");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.AddVendorPurchaseOffer(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.AddVendorSaleOffer(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.RemoveVendorPurchaseOffer(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.TryAddStandardInventoryItem(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.ReturnItemsToStandardInventoryUnchecked(");
+
+            AssertDoesNotContain(shophash, "temp.BaseInventory");
+            AssertDoesNotContain(tradeHandler, "private static IItem CloneShopItem(");
         }
 
         [TestMethod]

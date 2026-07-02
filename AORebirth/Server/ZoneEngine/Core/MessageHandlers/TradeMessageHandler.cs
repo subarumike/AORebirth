@@ -178,17 +178,17 @@ namespace ZoneEngine.Core.MessageHandlers
 
                             if (issuer is Vendor)
                             {
-                                shoppingBag.Add(
-                                    new Identity() { Instance = message.Container.Instance },
-                                    CloneShopItem(item));
+                                InventoryContainerRuntimeService.Default.AddVendorPurchaseOffer(
+                                    shoppingBag,
+                                    message,
+                                    item);
                             }
                             else
                             {
-                                shoppingBag.Add(
-                                    message.Target,
-                                    InventoryContainerRuntimeService.Default.RemoveInventoryItem(
-                                        issuer,
-                                        message.Container));
+                                InventoryContainerRuntimeService.Default.AddVendorSaleOffer(
+                                    shoppingBag,
+                                    message,
+                                    issuer);
                             }
                             this.AcknowledgeTradeAction(client.Controller.Character, message);
                         }
@@ -238,9 +238,7 @@ namespace ZoneEngine.Core.MessageHandlers
                         {
                             if (issuer is Vendor)
                             {
-                                shoppingBag.Remove(
-                                    new Identity() { Instance = message.Container.Instance },
-                                    message.Container.Instance);
+                                InventoryContainerRuntimeService.Default.RemoveVendorPurchaseOffer(shoppingBag, message);
 
                                 this.Send(
                                     client.Controller.Character,
@@ -254,26 +252,23 @@ namespace ZoneEngine.Core.MessageHandlers
                                 IItem returnedItem = shoppingBag.Remove(message.Target, message.Container.Instance);
                                 if (returnedItem != null)
                                 {
-                                    int targetSlot = InventoryContainerRuntimeService.Default.FindFreeStandardInventorySlot(
-                                        client.Controller.Character);
-                                    InventoryError err =
-                                        InventoryContainerRuntimeService.Default.AddToStandardInventoryPage(
+                                    InventoryItemAddResult addResult =
+                                        InventoryContainerRuntimeService.Default.TryAddStandardInventoryItem(
                                             client.Controller.Character,
-                                            targetSlot,
                                             returnedItem);
 
-                                    if (err == InventoryError.OK)
+                                    if (addResult.Succeeded)
                                     {
                                         ContainerAddItemMessageHandler.Default.Send(
                                             client.Controller.Character,
                                             new Identity()
                                             {
                                                 Type = IdentityType.KnuBotTradeWindow,
-                                                Instance = message.Container.Instance
-                                            },
-                                            0x6f); // 0x6f = Next free slot in main inventory
+                                                    Instance = message.Container.Instance
+                                                },
+                                                0x6f); // 0x6f = Next free slot in main inventory
                                     }
-                                    else
+                                    else if (addResult.Status == InventoryItemAddStatus.Failed)
                                     {
                                         // Cant return item code here
                                     }
@@ -388,24 +383,17 @@ namespace ZoneEngine.Core.MessageHandlers
 
                             foreach (IItem item in boughtItems)
                             {
-                                int nextSlot = InventoryContainerRuntimeService.Default.FindFreeStandardInventorySlot(
-                                    issuer);
-                                if (nextSlot != -1)
+                                InventoryItemAddResult addResult =
+                                    InventoryContainerRuntimeService.Default.TryAddStandardInventoryItem(issuer, item);
+                                if (addResult.Succeeded)
                                 {
-                                    InventoryError err = InventoryContainerRuntimeService.Default.AddToStandardInventoryPage(
-                                        issuer,
-                                        nextSlot,
-                                        item);
-                                    if (err == InventoryError.OK)
-                                    {
-                                        AddTemplateMessageHandler.Default.Send(client.Controller.Character, (Item)item);
-                                    }
-                                    else
-                                    {
-                                        ChatTextMessageHandler.Default.Send(
-                                            client.Controller.Character,
-                                            "Could not add item to inventory. (" + err + ")");
-                                    }
+                                    AddTemplateMessageHandler.Default.Send(client.Controller.Character, (Item)item);
+                                }
+                                else if (addResult.Status == InventoryItemAddStatus.Failed)
+                                {
+                                    ChatTextMessageHandler.Default.Send(
+                                        client.Controller.Character,
+                                        "Could not add item to inventory. (" + addResult.InventoryError + ")");
                                 }
                             }
 
@@ -467,18 +455,7 @@ namespace ZoneEngine.Core.MessageHandlers
                         try
                         {
                             IItem[] items = shoppingBag.GetSoldItems();
-                            foreach (IItem item in items)
-                            {
-                                int nextSlot = InventoryContainerRuntimeService.Default.FindFreeStandardInventorySlot(
-                                    issuer);
-                                if (nextSlot != -1)
-                                {
-                                    InventoryContainerRuntimeService.Default.AddToStandardInventoryPageUnchecked(
-                                        issuer,
-                                        nextSlot,
-                                        item);
-                                }
-                            }
+                            InventoryContainerRuntimeService.Default.ReturnItemsToStandardInventoryUnchecked(issuer, items);
                         }
                         finally
                         {
@@ -1602,19 +1579,6 @@ namespace ZoneEngine.Core.MessageHandlers
         private void Send(ICharacter character, TradeAction tradeAction, Identity identity1, Identity identity2)
         {
             this.Send(character, this.EndTrade(character, tradeAction, identity1, identity2));
-        }
-
-        private static IItem CloneShopItem(IItem item)
-        {
-            Item concreteItem = item as Item;
-            if (concreteItem == null)
-            {
-                return item;
-            }
-
-            Item copy = new Item(concreteItem.Quality, concreteItem.LowID, concreteItem.HighID);
-            copy.MultipleCount = concreteItem.MultipleCount;
-            return copy;
         }
 
         private void SendVendorShopDeclineClose(ICharacter character)

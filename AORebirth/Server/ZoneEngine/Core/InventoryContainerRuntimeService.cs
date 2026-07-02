@@ -524,6 +524,64 @@ namespace ZoneEngine.Core
             return issuer.BaseInventory.GetItemInContainer((int)IdentityType.Inventory, slot);
         }
 
+        public bool VendorShopNeedsDatabaseEntry(Vendor vendor)
+        {
+            return vendor.BaseInventory.Pages[vendor.BaseInventory.StandardPage].List().Count == 0
+                   && string.IsNullOrEmpty(vendor.TemplateHash);
+        }
+
+        public IInventoryPage GetVendorStandardInventoryPage(Vendor vendor)
+        {
+            return vendor.BaseInventory.Pages[vendor.BaseInventory.StandardPage];
+        }
+
+        public void AddVendorPurchaseOffer(TemporaryBag shoppingBag, TradeMessage message, IItem item)
+        {
+            shoppingBag.Add(
+                new Identity { Instance = message.Container.Instance },
+                CloneShopItem(item));
+        }
+
+        public void AddVendorSaleOffer(TemporaryBag shoppingBag, TradeMessage message, IItemContainer issuer)
+        {
+            shoppingBag.Add(
+                message.Target,
+                this.RemoveInventoryItem(issuer, message.Container));
+        }
+
+        public void RemoveVendorPurchaseOffer(TemporaryBag shoppingBag, TradeMessage message)
+        {
+            shoppingBag.Remove(
+                new Identity { Instance = message.Container.Instance },
+                message.Container.Instance);
+        }
+
+        public InventoryItemAddResult TryAddStandardInventoryItem(IItemContainer owner, IItem item)
+        {
+            int targetSlot = this.FindFreeStandardInventorySlot(owner);
+            if (targetSlot < 0)
+            {
+                return InventoryItemAddResult.NoFreeSlot();
+            }
+
+            InventoryError error = this.AddToStandardInventoryPage(owner, targetSlot, item);
+            return error == InventoryError.OK
+                       ? InventoryItemAddResult.Success(targetSlot)
+                       : InventoryItemAddResult.Failed(targetSlot, error);
+        }
+
+        public void ReturnItemsToStandardInventoryUnchecked(IItemContainer owner, IEnumerable<IItem> items)
+        {
+            foreach (IItem item in items)
+            {
+                int nextSlot = this.FindFreeStandardInventorySlot(owner);
+                if (nextSlot != -1)
+                {
+                    this.AddToStandardInventoryPageUnchecked(owner, nextSlot, item);
+                }
+            }
+        }
+
         public bool HasInventoryPage(IItemContainer owner, Identity container)
         {
             return owner.BaseInventory.Pages.ContainsKey((int)container.Type);
@@ -1768,6 +1826,19 @@ namespace ZoneEngine.Core
             return false;
         }
 
+        private static IItem CloneShopItem(IItem item)
+        {
+            Item concreteItem = item as Item;
+            if (concreteItem == null)
+            {
+                return item;
+            }
+
+            Item copy = new Item(concreteItem.Quality, concreteItem.LowID, concreteItem.HighID);
+            copy.MultipleCount = concreteItem.MultipleCount;
+            return copy;
+        }
+
         private static int DecodeBackpackSlot(Identity sourceContainer)
         {
             return (int)((uint)sourceContainer.Instance & 0xffff);
@@ -2147,5 +2218,64 @@ namespace ZoneEngine.Core
         InventoryAddFailed = 1,
         PersistFailed = 2,
         PersistReturnedFalse = 3
+    }
+
+    public sealed class InventoryItemAddResult
+    {
+        private InventoryItemAddResult()
+        {
+            this.TargetSlot = -1;
+            this.InventoryError = InventoryError.OK;
+        }
+
+        public InventoryItemAddStatus Status { get; private set; }
+
+        public int TargetSlot { get; private set; }
+
+        public InventoryError InventoryError { get; private set; }
+
+        public bool Succeeded
+        {
+            get
+            {
+                return this.Status == InventoryItemAddStatus.Success;
+            }
+        }
+
+        public static InventoryItemAddResult Success(int targetSlot)
+        {
+            return new InventoryItemAddResult
+                   {
+                       Status = InventoryItemAddStatus.Success,
+                       TargetSlot = targetSlot,
+                       InventoryError = InventoryError.OK
+                   };
+        }
+
+        public static InventoryItemAddResult NoFreeSlot()
+        {
+            return new InventoryItemAddResult
+                   {
+                       Status = InventoryItemAddStatus.NoFreeSlot,
+                       InventoryError = InventoryError.OK
+                   };
+        }
+
+        public static InventoryItemAddResult Failed(int targetSlot, InventoryError inventoryError)
+        {
+            return new InventoryItemAddResult
+                   {
+                       Status = InventoryItemAddStatus.Failed,
+                       TargetSlot = targetSlot,
+                       InventoryError = inventoryError
+                   };
+        }
+    }
+
+    public enum InventoryItemAddStatus
+    {
+        Success = 0,
+        NoFreeSlot = 1,
+        Failed = 2
     }
 }

@@ -41,6 +41,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.MessageHandlers;
 
     #endregion
@@ -64,8 +65,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             Vendor temp = caller as Vendor;
             if (temp != null)
             {
-                if ((temp.BaseInventory.Pages[temp.BaseInventory.StandardPage].List().Count == 0)
-                    && string.IsNullOrEmpty(temp.TemplateHash))
+                if (InventoryContainerRuntimeService.Default.VendorShopNeedsDatabaseEntry(temp))
                 {
                     if (temp.OriginalIdentity.Equals(Identity.None))
                     {
@@ -83,7 +83,10 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 }
                 else
                 {
-                    ShopUpdateMessageHandler.Default.Send((ICharacter)self, caller, ((Vendor)caller).BaseInventory.Pages[((Vendor)caller).BaseInventory.StandardPage]);
+                    ShopUpdateMessageHandler.Default.Send(
+                        (ICharacter)self,
+                        caller,
+                        InventoryContainerRuntimeService.Default.GetVendorStandardInventoryPage((Vendor)caller));
                 }
             }
             return true;
