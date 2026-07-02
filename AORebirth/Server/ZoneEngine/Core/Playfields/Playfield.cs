@@ -1749,9 +1749,8 @@ namespace AORebirth.Core.Playfields
                 this.ProcessCorpseDespawns();
                 this.ProcessPendingCorpseCreditAwards();
 
-                IEnumerable<IEntity> dynels = null;
-                dynels =
-                    Pool.Instance.GetAll<ICharacter>((int)IdentityType.CanbeAffected)
+                IEnumerable<ICharacter> dynels =
+                    this.runtimeSystems.Characters()
                         .Where(
                             xx =>
                                 xx.InPlayfield(this.Identity)
@@ -3479,8 +3478,7 @@ namespace AORebirth.Core.Playfields
             int corpseCatMesh = CorpseCatMeshFor(target);
             int corpseMonsterData = CorpseMonsterDataFor(target);
 
-            foreach (ICharacter character in
-                Pool.Instance.GetAll<ICharacter>(this.Identity, (int)IdentityType.CanbeAffected))
+            foreach (ICharacter character in this.runtimeSystems.Characters())
             {
                 ZoneClient client = character.Controller.Client as ZoneClient;
                 if (client == null)
@@ -3828,8 +3826,7 @@ namespace AORebirth.Core.Playfields
 
         internal void StopFightingDeadTarget(Identity deadTarget)
         {
-            foreach (ICharacter character in
-                Pool.Instance.GetAll<ICharacter>(this.Identity, (int)IdentityType.CanbeAffected))
+            foreach (ICharacter character in this.runtimeSystems.Characters())
             {
                 if (character.FightingTarget == deadTarget)
                 {
