@@ -36,8 +36,9 @@ namespace ZoneEngine.Core.MessageHandlers
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
 
-    using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+
+    using ZoneEngine.Core;
 
     #endregion
 
@@ -68,7 +69,7 @@ namespace ZoneEngine.Core.MessageHandlers
             return x =>
             {
                 x.Identity = character.Identity;
-                x.BankSlots = character.BaseInventory.Pages[(int)IdentityType.Bank].ToInventoryArray();
+                x.BankSlots = InventoryContainerRuntimeService.Default.ResolveBankSlots(character);
             };
         }
 

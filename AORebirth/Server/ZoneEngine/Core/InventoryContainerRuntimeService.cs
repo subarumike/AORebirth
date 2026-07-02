@@ -28,6 +28,16 @@ namespace ZoneEngine.Core
         {
         }
 
+        public void OpenBank(ICharacter character)
+        {
+            BankMessageHandler.Default.Send(character);
+        }
+
+        public BankSlot[] ResolveBankSlots(ICharacter character)
+        {
+            return character.BaseInventory.Pages[(int)IdentityType.Bank].ToInventoryArray();
+        }
+
         public bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
             switch (InventoryContainerInteractionRules.ResolveRouteMode(target))

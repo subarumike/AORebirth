@@ -5,6 +5,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     #region Usings ...
 
     using System;
+    using System.Diagnostics;
     using System.IO;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -371,6 +372,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsBankOpenAndSlotSelection()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string bankHandler =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\BankMessageHandler.cs");
+            string openBankFunction =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\openbank.cs");
+
+            AssertContains(service, "public void OpenBank(ICharacter character)");
+            AssertContains(service, "BankMessageHandler.Default.Send(character);");
+            AssertContains(service, "public BankSlot[] ResolveBankSlots(ICharacter character)");
+            AssertContains(service, "character.BaseInventory.Pages[(int)IdentityType.Bank].ToInventoryArray();");
+
+            AssertContains(
+                bankHandler,
+                "x.BankSlots = InventoryContainerRuntimeService.Default.ResolveBankSlots(character);");
+            AssertDoesNotContain(bankHandler, "Pages[(int)IdentityType.Bank]");
+
+            AssertContains(
+                openBankFunction,
+                "InventoryContainerRuntimeService.Default.OpenBank((ICharacter)self);");
+            AssertDoesNotContain(openBankFunction, "BankMessageHandler.Default.Send");
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,
@@ -419,6 +446,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 return currentDirectory;
             }
 
+            string sourceFile = new StackTrace(true).GetFrame(0).GetFileName();
+            string sourceRoot = FindRepositoryRootFromPath(sourceFile);
+            if (!string.IsNullOrEmpty(sourceRoot))
+            {
+                return sourceRoot;
+            }
+
             string current = AppDomain.CurrentDomain.BaseDirectory;
             while (!string.IsNullOrEmpty(current))
             {
@@ -438,6 +472,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.Fail("Could not find repository root for source guardrail.");
             return string.Empty;
+        }
+
+        private static string FindRepositoryRootFromPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return null;
+            }
+
+            FileInfo fileInfo = new FileInfo(path);
+            DirectoryInfo current = fileInfo.Directory;
+            while (current != null)
+            {
+                if (File.Exists(Path.Combine(current.FullName, "AI_START_HERE.md")))
+                {
+                    return current.FullName;
+                }
+
+                current = current.Parent;
+            }
+
+            return null;
         }
 
         private static void AssertContains(string text, string expected)
