@@ -660,6 +660,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(playerController, "private bool IsItemUsable");
         }
 
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsContainerEquipAccessAndRequirementChecks()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string containerAddItemHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs");
+
+            AssertContains(service, "public bool TryRejectInventoryPageAccess");
+            AssertContains(service, "public bool CanMoveContainerItemToPage");
+            AssertContains(service, "private static AOAction ResolveContainerAddItemAction");
+            AssertContains(service, "item.ItemActions.SingleOrDefault(x => x.ActionType == ActionType.ToWear)");
+            AssertContains(service, "item.ItemActions.SingleOrDefault(x => x.ActionType == ActionType.ToWield)");
+            AssertContains(service, "No suitable action found for equipping to this page");
+
+            AssertContains(
+                containerAddItemHandler,
+                "InventoryContainerRuntimeService.Default.TryRejectInventoryPageAccess(");
+            AssertContains(
+                containerAddItemHandler,
+                "InventoryContainerRuntimeService.Default.CanMoveContainerItemToPage(");
+            AssertDoesNotContain(containerAddItemHandler, "private AOAction getAction");
+            AssertDoesNotContain(containerAddItemHandler, "private bool RequiresImplantAccess");
+            AssertDoesNotContain(containerAddItemHandler, "private bool HasImplantAccess");
+            AssertDoesNotContain(containerAddItemHandler, "private void SendImplantAccessDenied");
+            AssertDoesNotContain(containerAddItemHandler, "item.ItemActions.SingleOrDefault");
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,
