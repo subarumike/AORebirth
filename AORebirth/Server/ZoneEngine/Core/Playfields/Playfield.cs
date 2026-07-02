@@ -2884,7 +2884,7 @@ namespace AORebirth.Core.Playfields
                 return true;
             }
 
-            if (CharacterHasUniqueItemAlready(looter, lootItem.Item))
+            if (InventoryContainerRuntimeService.Default.CharacterHasUniqueItemAlready(looter, lootItem.Item))
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
@@ -2900,9 +2900,9 @@ namespace AORebirth.Core.Playfields
                 return true;
             }
 
-            int targetPageNumber;
-            int targetSlot;
-            if (!this.TryResolveLootTargetSlot(looter, targetPlacement, out targetPageNumber, out targetSlot))
+            CorpseLootInventoryTransferResult transferResult =
+                InventoryContainerRuntimeService.Default.TryAddCorpseLootItem(looter, lootItem.Item, targetPlacement);
+            if (transferResult.Status == CorpseLootInventoryTransferStatus.NoFreeSlot)
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
@@ -2914,12 +2914,7 @@ namespace AORebirth.Core.Playfields
                 return true;
             }
 
-            InventoryError inventoryError;
-            try
-            {
-                inventoryError = looter.BaseInventory.AddToPage(targetPageNumber, targetSlot, lootItem.Item);
-            }
-            catch (Exception e)
+            if (transferResult.Status == CorpseLootInventoryTransferStatus.AddFailed)
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
@@ -2927,13 +2922,13 @@ namespace AORebirth.Core.Playfields
                         "CorpseLoot inventory add failed corpse={0} looter={1} targetSlot={2} error={3}",
                         corpse.CorpseIdentity,
                         looter.Identity,
-                        targetSlot,
-                        e.Message));
+                        transferResult.TargetSlot,
+                        transferResult.ExceptionMessage));
                 this.SendUseActionFinished(looter);
                 return true;
             }
 
-            if (inventoryError != InventoryError.OK)
+            if (transferResult.Status == CorpseLootInventoryTransferStatus.AddRejected)
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
@@ -2941,11 +2936,11 @@ namespace AORebirth.Core.Playfields
                         "CorpseLoot inventory add rejected corpse={0} looter={1} targetPage={2} targetSlot={3} error={4}",
                         corpse.CorpseIdentity,
                         looter.Identity,
-                        targetPageNumber,
-                        targetSlot,
-                        inventoryError));
+                        transferResult.TargetPageNumber,
+                        transferResult.TargetSlot,
+                        transferResult.InventoryError));
 
-                if (inventoryError == InventoryError.HaveUniqueAlready)
+                if (transferResult.InventoryError == InventoryError.HaveUniqueAlready)
                 {
                     ChatTextMessageHandler.Default.Send(looter, "You already have this unique item.");
                 }
@@ -2954,7 +2949,6 @@ namespace AORebirth.Core.Playfields
                 return true;
             }
 
-            looter.BaseInventory.Write();
             lootItem.Looted = true;
             corpse.Opened = true;
             // Live corpse looting echoes the corpse/backpack source and original
@@ -2981,24 +2975,12 @@ namespace AORebirth.Core.Playfields
                     looter.Identity,
                     sourceContainer,
                     lootItem.Slot,
-                    targetSlot,
-                    targetSlot,
+                    transferResult.TargetSlot,
+                    transferResult.TargetSlot,
                     looter.Stats[StatIds.cash].BaseValue,
                     corpse.LootItems.Count(x => !x.Looted)));
 
             return true;
-        }
-
-        private static bool CharacterHasUniqueItemAlready(ICharacter character, IItem item)
-        {
-            if (character == null || character.BaseInventory == null)
-            {
-                return false;
-            }
-
-            return InventoryItemRules.HasSameUniqueItem(
-                item,
-                character.BaseInventory.Pages.Values.SelectMany(page => page.List()).Select(existing => existing.Value));
         }
 
         private void SendCorpseContainerAddItem(ICharacter looter, Identity sourceContainer, int targetPlacement)
@@ -4173,52 +4155,6 @@ namespace AORebirth.Core.Playfields
                 requestedLootSlot,
                 x => x.Slot,
                 x => x.Looted);
-        }
-
-        private bool TryResolveLootTargetSlot(
-            ICharacter looter,
-            int targetPlacement,
-            out int targetPageNumber,
-            out int targetSlot)
-        {
-            targetPageNumber = -1;
-            targetSlot = -1;
-
-            if (targetPlacement == CombatCorpseRules.MoveToInventoryPlacement)
-            {
-                targetPageNumber = looter.BaseInventory.StandardPage;
-                IInventoryPage targetPage = looter.BaseInventory.Pages[targetPageNumber];
-                targetSlot = targetPage.FindFreeSlot();
-                return targetSlot >= 0;
-            }
-
-            try
-            {
-                IInventoryPage targetPage = looter.BaseInventory.PageFromSlot(targetPlacement);
-                if (targetPage == null)
-                {
-                    return false;
-                }
-
-                foreach (KeyValuePair<int, IInventoryPage> page in looter.BaseInventory.Pages)
-                {
-                    if (object.ReferenceEquals(page.Value, targetPage))
-                    {
-                        targetPageNumber = page.Key;
-                        targetSlot = targetPlacement;
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-            catch (Exception)
-            {
-                targetPageNumber = looter.BaseInventory.StandardPage;
-                IInventoryPage targetPage = looter.BaseInventory.Pages[targetPageNumber];
-                targetSlot = targetPage.FindFreeSlot();
-                return targetSlot >= 0;
-            }
         }
 
         private static InventoryEntry CreateCorpseInventoryEntry(CorpseLootItem lootItem)

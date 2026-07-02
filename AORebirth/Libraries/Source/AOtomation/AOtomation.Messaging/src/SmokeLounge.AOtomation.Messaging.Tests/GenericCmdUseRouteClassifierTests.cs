@@ -995,6 +995,25 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsCorpseLootInventoryTransfer()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string playfield =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+
+            AssertContains(service, "public CorpseLootInventoryTransferResult TryAddCorpseLootItem(");
+            AssertContains(service, "private bool TryResolveCorpseLootTargetSlot(");
+            AssertContains(service, "public bool CharacterHasUniqueItemAlready(");
+            AssertContains(playfield, "InventoryContainerRuntimeService.Default.TryAddCorpseLootItem(");
+            AssertContains(playfield, "InventoryContainerRuntimeService.Default.CharacterHasUniqueItemAlready(");
+
+            AssertDoesNotContain(playfield, "private bool TryResolveLootTargetSlot(");
+            AssertDoesNotContain(playfield, "looter.BaseInventory.AddToPage(targetPageNumber, targetSlot, lootItem.Item)");
+            AssertDoesNotContain(playfield, "looter.BaseInventory.Write();");
+        }
+
+        [TestMethod]
         public void InventoryContainerRuntimeServiceGuardsRemainingHandlerControllerInventoryOwnership()
         {
             string repositoryRoot = FindRepositoryRoot();
