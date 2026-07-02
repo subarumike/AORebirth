@@ -739,6 +739,36 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(containerAddItemHandler, "CalculateSkills();");
         }
 
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsWeaponVisualMeshRepair()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string clientMoveHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
+            string clientConnected =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs");
+            string playfield =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+
+            AssertContains(service, "public void EnsureWeaponVisualMeshes");
+            AssertContains(service, "private bool EnsureWeaponMesh");
+            AssertContains(service, "private static int NormalizeItemVisualValue");
+            AssertContains(service, "character.MeshLayer.AddMesh");
+            AssertContains(service, "character.Playfield.AnnounceAppearanceUpdate(character);");
+            AssertContains(service, "this.EnsureWeaponVisualMeshes(character, true);");
+
+            AssertDoesNotContain(clientMoveHandler, "public static void EnsureWeaponVisualMeshes");
+            AssertDoesNotContain(clientMoveHandler, "private bool EnsureWeaponMesh");
+            AssertContains(
+                clientConnected,
+                "InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(client.Controller.Character, false);");
+            AssertContains(
+                playfield,
+                "InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(character, false);");
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,

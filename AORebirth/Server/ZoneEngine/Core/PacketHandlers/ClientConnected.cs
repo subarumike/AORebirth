@@ -259,7 +259,7 @@ client.Controller.Character.Playfield.Identity,
             // TODO: create a better alternative to ProcessTimers
             // client.Character.ProcessTimers(DateTime.Now + TimeSpan.FromMilliseconds(200));
             client.Controller.Character.CalculateSkills();
-            ClientMoveItemToInventoryMessageHandler.EnsureWeaponVisualMeshes(client.Controller.Character, false);
+            InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(client.Controller.Character, false);
 
             if (currentPlayfield != null)
             {
