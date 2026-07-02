@@ -39,7 +39,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
     using MsgPack;
 
-    using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core;
 
     #endregion
 
@@ -81,7 +81,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             IInstancedEntity target,
             MessagePackObject[] arguments)
         {
-            BankMessageHandler.Default.Send((ICharacter)self);
+            InventoryContainerRuntimeService.Default.OpenBank((ICharacter)self);
             return true;
         }
 
