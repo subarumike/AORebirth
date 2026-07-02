@@ -1003,12 +1003,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             {
                 Assert.AreEqual(expected[i], lifecycle.PhaseHistory[i]);
             }
+            Assert.AreEqual("ZoneClientSession.Disconnecting", lifecycle.PhaseTraceName);
 
             string repositoryRoot = FindRepositoryRoot();
             string coordinatorText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\ZoneClientSessionLifecycleCoordinator.cs"));
+            Assert.IsTrue(
+                coordinatorText.Contains("public bool CanTransitionTo(ZoneClientSessionPhase phase)"),
+                "Coordinator must own lifecycle transition validation.");
+            Assert.IsTrue(
+                coordinatorText.Contains("Invalid ZoneClient session transition"),
+                "Coordinator must reject invalid lifecycle transitions.");
+            Assert.IsTrue(
+                coordinatorText.Contains("case ZoneClientSessionPhase.Zoning:"),
+                "Coordinator must explicitly model zoning return transitions.");
 
             string[] forbiddenRuntimeOwnershipPatterns =
                 {
@@ -1032,6 +1042,55 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "ZoneClient session lifecycle coordinator must not own packet, gameplay, DB, or capture behavior: "
                     + forbiddenRuntimeOwnershipPatterns[i]);
             }
+        }
+
+        [TestMethod]
+        public void ZoneClientSessionLifecycleCoordinatorRejectsInvalidTransitions()
+        {
+            var lifecycle = new ZoneClientSessionLifecycleCoordinator();
+
+            Assert.IsFalse(lifecycle.CanTransitionTo(ZoneClientSessionPhase.ReadyBlock));
+            AssertInvalidTransition(
+                lifecycle.BeginReadyBlock,
+                "ZoneClientSession.Connected to ZoneClientSession.ReadyBlock");
+
+            lifecycle.BeginCharacterLoading();
+            Assert.IsFalse(lifecycle.CanTransitionTo(ZoneClientSessionPhase.FullCharacterBoundary));
+            AssertInvalidTransition(
+                lifecycle.BeginFullCharacterBoundary,
+                "ZoneClientSession.CharacterLoading to ZoneClientSession.FullCharacterBoundary");
+
+            lifecycle.BeginPlayfieldLoading();
+            lifecycle.BeginReadyBlock();
+            Assert.IsFalse(lifecycle.CanTransitionTo(ZoneClientSessionPhase.InPlay));
+            AssertInvalidTransition(
+                lifecycle.MarkInPlay,
+                "ZoneClientSession.ReadyBlock to ZoneClientSession.InPlay");
+        }
+
+        [TestMethod]
+        public void ZoneClientSessionLifecycleCoordinatorAllowsZoningReturnOptionsAndDisconnects()
+        {
+            var zoningToPlayfieldLoading = CreateInPlayLifecycle();
+            zoningToPlayfieldLoading.BeginZoning();
+            Assert.IsTrue(zoningToPlayfieldLoading.CanTransitionTo(ZoneClientSessionPhase.PlayfieldLoading));
+            zoningToPlayfieldLoading.BeginPlayfieldLoading();
+            Assert.AreEqual(ZoneClientSessionPhase.PlayfieldLoading, zoningToPlayfieldLoading.Phase);
+
+            var zoningToReadyBlock = CreateInPlayLifecycle();
+            zoningToReadyBlock.BeginZoning();
+            Assert.IsTrue(zoningToReadyBlock.CanTransitionTo(ZoneClientSessionPhase.ReadyBlock));
+            zoningToReadyBlock.BeginReadyBlock();
+            Assert.AreEqual(ZoneClientSessionPhase.ReadyBlock, zoningToReadyBlock.Phase);
+
+            var disconnectingFromConnected = new ZoneClientSessionLifecycleCoordinator();
+            disconnectingFromConnected.BeginDisconnecting();
+            Assert.AreEqual(ZoneClientSessionPhase.Disconnecting, disconnectingFromConnected.Phase);
+
+            var disconnectingFromZoning = CreateInPlayLifecycle();
+            disconnectingFromZoning.BeginZoning();
+            disconnectingFromZoning.BeginDisconnecting();
+            Assert.AreEqual(ZoneClientSessionPhase.Disconnecting, disconnectingFromZoning.Phase);
         }
 
         [TestMethod]
@@ -1486,6 +1545,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(first >= 0, "Missing lifecycle stage " + firstStage + ".");
             Assert.IsTrue(second >= 0, "Missing lifecycle stage " + secondStage + ".");
             Assert.IsTrue(first < second, firstStage + " must occur before " + secondStage + ".");
+        }
+
+        private static ZoneClientSessionLifecycleCoordinator CreateInPlayLifecycle()
+        {
+            var lifecycle = new ZoneClientSessionLifecycleCoordinator();
+            lifecycle.BeginCharacterLoading();
+            lifecycle.BeginPlayfieldLoading();
+            lifecycle.BeginReadyBlock();
+            lifecycle.BeginFullCharacterBoundary();
+            lifecycle.MarkCharInPlay();
+            lifecycle.MarkInPlay();
+            return lifecycle;
+        }
+
+        private static void AssertInvalidTransition(Action transition, string expectedMessage)
+        {
+            try
+            {
+                transition();
+            }
+            catch (InvalidOperationException exception)
+            {
+                Assert.IsTrue(
+                    exception.Message.Contains(expectedMessage),
+                    "Invalid transition message must identify the rejected transition.");
+                return;
+            }
+
+            Assert.Fail("Expected invalid lifecycle transition to be rejected.");
         }
 
         private static void AssertTextBefore(string text, string firstText, string secondText)
