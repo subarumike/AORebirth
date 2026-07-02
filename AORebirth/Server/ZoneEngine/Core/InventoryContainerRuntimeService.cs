@@ -490,6 +490,39 @@ namespace ZoneEngine.Core
             return action.CheckRequirements(character);
         }
 
+        public bool ShouldSkipContainerAppearanceUpdate(IInventoryPage receivingPage, IInventoryPage sendingPage)
+        {
+            return !this.IsAppearanceEquipmentPage(receivingPage)
+                   && !this.IsAppearanceEquipmentPage(sendingPage);
+        }
+
+        public void WaitForContainerHotSwapVisualSync(
+            IItem itemFrom,
+            IItem itemTo,
+            bool skipAppearanceUpdate)
+        {
+            int delay = 20;
+            if (!skipAppearanceUpdate)
+            {
+                delay = this.GetEquipDelay(itemFrom, false) + this.GetEquipDelay(itemTo, false);
+            }
+
+            Thread.Sleep(delay * 10);
+        }
+
+        public void WaitForContainerEquipVisualSync(
+            IItem item,
+            IInventoryPage equipmentPage,
+            bool skipAppearanceUpdate)
+        {
+            if (skipAppearanceUpdate)
+            {
+                return;
+            }
+
+            Thread.Sleep(this.GetEquipDelay(item, equipmentPage is SocialArmorInventoryPage) * 10);
+        }
+
         public bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
             switch (InventoryContainerInteractionRules.ResolveRouteMode(target))

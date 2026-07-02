@@ -689,6 +689,36 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(containerAddItemHandler, "item.ItemActions.SingleOrDefault");
         }
 
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsContainerVisualSyncTiming()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string containerAddItemHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs");
+
+            AssertContains(service, "public bool ShouldSkipContainerAppearanceUpdate");
+            AssertContains(service, "public void WaitForContainerHotSwapVisualSync");
+            AssertContains(service, "public void WaitForContainerEquipVisualSync");
+            AssertContains(service, "delay = this.GetEquipDelay(itemFrom, false) + this.GetEquipDelay(itemTo, false);");
+            AssertContains(service, "Thread.Sleep(delay * 10);");
+            AssertContains(service, "Thread.Sleep(this.GetEquipDelay(item, equipmentPage is SocialArmorInventoryPage) * 10);");
+
+            AssertContains(
+                containerAddItemHandler,
+                "InventoryContainerRuntimeService.Default.ShouldSkipContainerAppearanceUpdate(");
+            AssertContains(
+                containerAddItemHandler,
+                "InventoryContainerRuntimeService.Default.WaitForContainerHotSwapVisualSync(");
+            AssertContains(
+                containerAddItemHandler,
+                "InventoryContainerRuntimeService.Default.WaitForContainerEquipVisualSync(");
+            AssertDoesNotContain(containerAddItemHandler, "Thread.Sleep(");
+            AssertDoesNotContain(containerAddItemHandler, "GetAttribute(211)");
+            AssertDoesNotContain(containerAddItemHandler, "delay =");
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,

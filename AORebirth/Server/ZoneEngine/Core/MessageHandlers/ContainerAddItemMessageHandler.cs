@@ -35,8 +35,6 @@ namespace ZoneEngine.Core.MessageHandlers
 
     // TODO: Change Actions to something more suitable (maybe EntityAction?)
     using System;
-    using System.Threading;
-
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
     using AORebirth.Core.Inventory;
@@ -150,19 +148,14 @@ namespace ZoneEngine.Core.MessageHandlers
                 itemTo = null;
             }
 
-            // Calculating delay for equip/unequip/switch gear
-            int delay = 20;
-
             client.Controller.Character.DoNotDoTimers = true;
             IItemSlotHandler equipTo = receivingPage as IItemSlotHandler;
             IItemSlotHandler unequipFrom = sendingPage as IItemSlotHandler;
 
             noAppearanceUpdate =
-                !((equipTo is WeaponInventoryPage) || (equipTo is ArmorInventoryPage)
-                  || (equipTo is SocialArmorInventoryPage));
-            noAppearanceUpdate &=
-                !((unequipFrom is WeaponInventoryPage) || (unequipFrom is ArmorInventoryPage)
-                  || (unequipFrom is SocialArmorInventoryPage));
+                InventoryContainerRuntimeService.Default.ShouldSkipContainerAppearanceUpdate(
+                    receivingPage,
+                    sendingPage);
 
             if (equipTo != null)
             {
@@ -184,19 +177,10 @@ namespace ZoneEngine.Core.MessageHandlers
                             itemFrom))
                         {
                             UnEquip.Send(client, receivingPage, toPlacement);
-                            if (!noAppearanceUpdate)
-                            {
-                                // Equipmentpages need delays
-                                // Delay when equipping/unequipping
-                                // has to be redone, jumping breaks the equiping/unequiping 
-                                // and other messages have to be done too
-                                // like heartbeat timer, damage from environment and such
-
-                                delay = (itemFrom.GetAttribute(211) == 1234567890 ? 20 : itemFrom.GetAttribute(211))
-                                        + (itemTo.GetAttribute(211) == 1234567890 ? 20 : itemTo.GetAttribute(211));
-                            }
-
-                            Thread.Sleep(delay * 10); // social has to wait for 0.2 secs too (for helmet update)
+                            InventoryContainerRuntimeService.Default.WaitForContainerHotSwapVisualSync(
+                                itemFrom,
+                                itemTo,
+                                noAppearanceUpdate);
 
                             client.Controller.Character.Send(message);
                             equipTo.HotSwap(sendingPage, fromPlacement, toPlacement);
@@ -218,22 +202,10 @@ namespace ZoneEngine.Core.MessageHandlers
                             receivingPage,
                             itemFrom))
                         {
-                            if (!noAppearanceUpdate)
-                            {
-                                // Equipmentpages need delays
-                                // Delay when equipping/unequipping
-                                // has to be redone, jumping breaks the equiping/unequiping 
-                                // and other messages have to be done too
-                                // like heartbeat timer, damage from environment and such
-
-                                delay = itemFrom.GetAttribute(211);
-                                if ((equipTo is SocialArmorInventoryPage) || (delay == 1234567890))
-                                {
-                                    delay = 20;
-                                }
-
-                                Thread.Sleep(delay * 10);
-                            }
+                            InventoryContainerRuntimeService.Default.WaitForContainerEquipVisualSync(
+                                itemFrom,
+                                receivingPage,
+                                noAppearanceUpdate);
 
                             if (sendingPage == receivingPage)
                             {
@@ -261,22 +233,10 @@ namespace ZoneEngine.Core.MessageHandlers
                     }
 
                     // Send to client first
-                    if (!noAppearanceUpdate)
-                    {
-                        // Equipmentpages need delays
-                        // Delay when equipping/unequipping
-                        // has to be redone, jumping breaks the equiping/unequiping 
-                        // and other messages have to be done too
-                        // like heartbeat timer, damage from environment and such
-
-                        delay = itemFrom.GetAttribute(211);
-                        if ((unequipFrom is SocialArmorInventoryPage) || (delay == 1234567890))
-                        {
-                            delay = 20;
-                        }
-
-                        Thread.Sleep(delay * 10);
-                    }
+                    InventoryContainerRuntimeService.Default.WaitForContainerEquipVisualSync(
+                        itemFrom,
+                        sendingPage,
+                        noAppearanceUpdate);
 
                     UnEquip.Send(client, sendingPage, fromPlacement);
                     unequipFrom.Unequip(fromPlacement, receivingPage, toPlacement);
