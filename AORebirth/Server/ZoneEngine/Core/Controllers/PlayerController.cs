@@ -58,6 +58,7 @@ namespace ZoneEngine.Core.Controllers
 
     using Utility;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Functions;
     using ZoneEngine.Core.Functions.GameFunctions;
     using ZoneEngine.Core.MessageHandlers;
@@ -523,7 +524,7 @@ namespace ZoneEngine.Core.Controllers
                 throw new NullReferenceException("No item found at " + itemPosition);
             }
 
-            if (this.TryOpenBackpackContainer(itemPosition, item))
+            if (InventoryContainerRuntimeService.Default.TryOpenBackpackContainer(this.Character, itemPosition, item))
             {
                 return true;
             }
@@ -564,96 +565,7 @@ namespace ZoneEngine.Core.Controllers
 
         public bool TryUseBackpackContainer(Identity itemPosition)
         {
-            Item item = null;
-            try
-            {
-                item = this.Character.BaseInventory.GetItemInContainer((int)itemPosition.Type, itemPosition.Instance);
-            }
-            catch (Exception)
-            {
-            }
-
-            return item != null && this.TryOpenBackpackContainer(itemPosition, item);
-        }
-
-        private bool TryOpenBackpackContainer(Identity itemPosition, Item item)
-        {
-            if (!this.IsBackpackUseSlot(itemPosition.Type))
-            {
-                return false;
-            }
-
-            Identity containerIdentity;
-            if (!this.TryResolveBackpackContainerIdentity(itemPosition, item, out containerIdentity))
-            {
-                return false;
-            }
-
-            if (!this.IsItemUsable(item))
-            {
-                return false;
-            }
-
-            if (this.Character.BaseInventory.IsBackpackOpen(containerIdentity))
-            {
-                BackpackContainerActionMessageHandler.Default.SendClose(this.Character, containerIdentity);
-                this.Character.BaseInventory.MarkBackpackClosed(containerIdentity);
-                return true;
-            }
-
-            IInventoryPage backpackPage;
-            bool pageAlreadyKnown = this.Character.BaseInventory.TryGetBackpackPage(containerIdentity, out backpackPage);
-            if (pageAlreadyKnown)
-            {
-                BackpackContainerActionMessageHandler.Default.SendOpen(this.Character, containerIdentity);
-                this.Character.BaseInventory.MarkBackpackOpen(containerIdentity);
-            }
-            else
-            {
-                backpackPage = this.Character.BaseInventory.GetOrCreateBackpackPage(containerIdentity);
-
-                if (backpackPage.List().Any())
-                {
-                    int openHandle = InventoryUpdateMessageHandler.Default.ReserveBackpackInventoryHandle();
-                    ChestItemFullUpdateMessageHandler.Default.Send(this.Character, item, itemPosition, backpackPage.Identity);
-                    InventoryUpdateMessageHandler.Default.SendContainerOpen(this.Character, backpackPage, openHandle);
-                }
-                else
-                {
-                    int introduceHandle = InventoryUpdateMessageHandler.Default.ReserveBackpackInventoryHandle();
-                    int openHandle = InventoryUpdateMessageHandler.Default.ReserveBackpackInventoryHandle();
-                    InventoryUpdateMessageHandler.Default.SendContainerIntroduce(this.Character, backpackPage, introduceHandle);
-                    ChestItemFullUpdateMessageHandler.Default.Send(this.Character, item, itemPosition, backpackPage.Identity);
-                    InventoryUpdateMessageHandler.Default.SendFreshContainerOpen(this.Character, backpackPage, openHandle);
-                }
-
-                this.Character.BaseInventory.MarkBackpackOpen(containerIdentity);
-            }
-
-            return true;
-        }
-
-        private bool IsBackpackUseSlot(IdentityType identityType)
-        {
-            return identityType == IdentityType.Inventory
-                   || identityType == IdentityType.ArmorPage
-                   || identityType == IdentityType.SocialPage;
-        }
-
-        private bool TryResolveBackpackContainerIdentity(Identity itemPosition, Item item, out Identity containerIdentity)
-        {
-            containerIdentity = Identity.None;
-
-            return InventoryItemRules.TryEnsureBackpackContainerIdentity(
-                item,
-                this.Character.Identity,
-                itemPosition,
-                out containerIdentity);
-        }
-
-        private bool IsItemUsable(Item item)
-        {
-            return (item.GetAttribute((int)StatIds.can) & (int)CanFlags.Use) == (int)CanFlags.Use;
+            return InventoryContainerRuntimeService.Default.TryUseBackpackContainer(this.Character, itemPosition);
         }
 
         private bool IsUseBlockedBySkillLock(Item item)
