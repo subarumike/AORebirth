@@ -1608,9 +1608,108 @@ namespace ZoneEngine.Core
                 string.Format("Persisted inventory after ClientMoveItemToInventory {0} char={1}", reason, character.Identity));
         }
 
+        public bool CharacterHasUniqueItemAlready(ICharacter character, IItem item)
+        {
+            if (character == null || character.BaseInventory == null)
+            {
+                return false;
+            }
+
+            return InventoryItemRules.HasSameUniqueItem(
+                item,
+                character.BaseInventory.Pages.Values.SelectMany(page => page.List()).Select(existing => existing.Value));
+        }
+
+        public CorpseLootInventoryTransferResult TryAddCorpseLootItem(
+            ICharacter looter,
+            IItem item,
+            int targetPlacement)
+        {
+            var result = new CorpseLootInventoryTransferResult();
+            int targetPageNumber;
+            int targetSlot;
+            if (!this.TryResolveCorpseLootTargetSlot(looter, targetPlacement, out targetPageNumber, out targetSlot))
+            {
+                result.Status = CorpseLootInventoryTransferStatus.NoFreeSlot;
+                return result;
+            }
+
+            result.TargetPageNumber = targetPageNumber;
+            result.TargetSlot = targetSlot;
+
+            InventoryError inventoryError;
+            try
+            {
+                inventoryError = looter.BaseInventory.AddToPage(targetPageNumber, targetSlot, item);
+            }
+            catch (Exception e)
+            {
+                result.Status = CorpseLootInventoryTransferStatus.AddFailed;
+                result.ExceptionMessage = e.Message;
+                return result;
+            }
+
+            result.InventoryError = inventoryError;
+            if (inventoryError != InventoryError.OK)
+            {
+                result.Status = CorpseLootInventoryTransferStatus.AddRejected;
+                return result;
+            }
+
+            looter.BaseInventory.Write();
+            result.Status = CorpseLootInventoryTransferStatus.Success;
+            return result;
+        }
+
         private static int DecodeBackpackHandle(Identity sourceContainer)
         {
             return (int)(((uint)sourceContainer.Instance >> 16) & 0xffff);
+        }
+
+        private bool TryResolveCorpseLootTargetSlot(
+            ICharacter looter,
+            int targetPlacement,
+            out int targetPageNumber,
+            out int targetSlot)
+        {
+            targetPageNumber = -1;
+            targetSlot = -1;
+
+            if (targetPlacement == CombatCorpseRules.MoveToInventoryPlacement)
+            {
+                targetPageNumber = looter.BaseInventory.StandardPage;
+                IInventoryPage targetPage = looter.BaseInventory.Pages[targetPageNumber];
+                targetSlot = targetPage.FindFreeSlot();
+                return targetSlot >= 0;
+            }
+
+            try
+            {
+                IInventoryPage targetPage = looter.BaseInventory.PageFromSlot(targetPlacement);
+                if (targetPage == null)
+                {
+                    return false;
+                }
+
+                foreach (KeyValuePair<int, IInventoryPage> page in looter.BaseInventory.Pages)
+                {
+                    if (object.ReferenceEquals(page.Value, targetPage))
+                    {
+                        targetPageNumber = page.Key;
+                        targetSlot = targetPlacement;
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                targetPageNumber = looter.BaseInventory.StandardPage;
+                IInventoryPage targetPage = looter.BaseInventory.Pages[targetPageNumber];
+                targetSlot = targetPage.FindFreeSlot();
+                return targetSlot >= 0;
+            }
         }
 
         private static int DecodeBackpackSlot(Identity sourceContainer)
@@ -1897,5 +1996,42 @@ namespace ZoneEngine.Core
                         exception.Message));
             }
         }
+    }
+
+    public sealed class CorpseLootInventoryTransferResult
+    {
+        public CorpseLootInventoryTransferResult()
+        {
+            this.Status = CorpseLootInventoryTransferStatus.NoFreeSlot;
+            this.TargetPageNumber = -1;
+            this.TargetSlot = -1;
+            this.InventoryError = InventoryError.OK;
+        }
+
+        public CorpseLootInventoryTransferStatus Status { get; set; }
+
+        public int TargetPageNumber { get; set; }
+
+        public int TargetSlot { get; set; }
+
+        public InventoryError InventoryError { get; set; }
+
+        public string ExceptionMessage { get; set; }
+
+        public bool Succeeded
+        {
+            get
+            {
+                return this.Status == CorpseLootInventoryTransferStatus.Success;
+            }
+        }
+    }
+
+    public enum CorpseLootInventoryTransferStatus
+    {
+        Success = 0,
+        NoFreeSlot = 1,
+        AddFailed = 2,
+        AddRejected = 3
     }
 }
