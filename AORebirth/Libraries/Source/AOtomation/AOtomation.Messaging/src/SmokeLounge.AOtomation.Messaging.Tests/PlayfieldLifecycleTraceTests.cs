@@ -975,10 +975,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             lifecycle.BeginCharacterLoading();
             lifecycle.BeginPlayfieldLoading();
-            lifecycle.BeginReadyBlock();
-            lifecycle.BeginFullCharacterBoundary();
-            lifecycle.MarkCharInPlay();
-            lifecycle.MarkInPlay();
+            lifecycle.EnterReadyBlockForSessionInit();
+            lifecycle.EnterFullCharacterBoundaryForSessionInit();
+            lifecycle.EnterCharInPlayForVisibilityEntry();
+            lifecycle.CompleteInPlayForSessionInit();
             lifecycle.BeginZoning();
             lifecycle.BeginDisconnecting();
             lifecycle.BeginDisconnecting();
@@ -1051,20 +1051,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsFalse(lifecycle.CanTransitionTo(ZoneClientSessionPhase.ReadyBlock));
             AssertInvalidTransition(
-                lifecycle.BeginReadyBlock,
+                lifecycle.EnterReadyBlockForSessionInit,
                 "ZoneClientSession.Connected to ZoneClientSession.ReadyBlock");
 
             lifecycle.BeginCharacterLoading();
             Assert.IsFalse(lifecycle.CanTransitionTo(ZoneClientSessionPhase.FullCharacterBoundary));
             AssertInvalidTransition(
-                lifecycle.BeginFullCharacterBoundary,
+                lifecycle.EnterFullCharacterBoundaryForSessionInit,
                 "ZoneClientSession.CharacterLoading to ZoneClientSession.FullCharacterBoundary");
 
             lifecycle.BeginPlayfieldLoading();
-            lifecycle.BeginReadyBlock();
+            lifecycle.EnterReadyBlockForSessionInit();
             Assert.IsFalse(lifecycle.CanTransitionTo(ZoneClientSessionPhase.InPlay));
             AssertInvalidTransition(
-                lifecycle.MarkInPlay,
+                lifecycle.CompleteInPlayForSessionInit,
                 "ZoneClientSession.ReadyBlock to ZoneClientSession.InPlay");
         }
 
@@ -1080,7 +1080,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             var zoningToReadyBlock = CreateInPlayLifecycle();
             zoningToReadyBlock.BeginZoning();
             Assert.IsTrue(zoningToReadyBlock.CanTransitionTo(ZoneClientSessionPhase.ReadyBlock));
-            zoningToReadyBlock.BeginReadyBlock();
+            zoningToReadyBlock.EnterReadyBlockForSessionInit();
             Assert.AreEqual(ZoneClientSessionPhase.ReadyBlock, zoningToReadyBlock.Phase);
 
             var disconnectingFromConnected = new ZoneClientSessionLifecycleCoordinator();
@@ -1131,19 +1131,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "this.server.PlayfieldById(");
             AssertTextBefore(
                 clientConnectedText,
-                "client.SessionLifecycle.BeginReadyBlock();",
+                "client.SessionLifecycle.EnterReadyBlockForSessionInit();",
                 "PlayfieldAnarchyFMessageHandler.Default.Send");
             AssertTextBefore(
                 clientConnectedText,
-                "client.SessionLifecycle.BeginFullCharacterBoundary();",
+                "client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit();",
                 "FullCharacterMessageHandler.Default.Send(client.Controller.Character);");
             AssertTextBefore(
                 clientConnectedText,
-                "client.SessionLifecycle.MarkCharInPlay();",
+                "client.SessionLifecycle.EnterCharInPlayForVisibilityEntry();",
                 "currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character);");
             AssertTextBefore(
                 clientConnectedText,
-                "client.SessionLifecycle.MarkInPlay();",
+                "client.SessionLifecycle.CompleteInPlayForSessionInit();",
                 "client.Controller.Character.DoNotDoTimers = false;");
             AssertTextBefore(
                 teleportMethod,
@@ -1182,6 +1182,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 coordinatorText.Contains("throw new InvalidOperationException("),
                 "ZoneClientSessionLifecycleCoordinator must guard invalid transitions.");
+            Assert.IsTrue(
+                coordinatorText.Contains("public void EnterReadyBlockForSessionInit()")
+                && coordinatorText.Contains("public void EnterFullCharacterBoundaryForSessionInit()")
+                && coordinatorText.Contains("public void EnterCharInPlayForVisibilityEntry()")
+                && coordinatorText.Contains("public void CompleteInPlayForSessionInit()"),
+                "ZoneClientSessionLifecycleCoordinator must own named ready/full-character/CharInPlay sequencing surfaces.");
 
             string[] packetAndRuntimePatterns =
                 {
@@ -1228,6 +1234,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(
                 markerSurfaces.Contains("CanTransitionTo("),
                 "Packet/runtime surfaces must call named coordinator transition methods instead of owning transition validity.");
+            Assert.IsFalse(
+                markerSurfaces.Contains("BeginReadyBlock()")
+                || markerSurfaces.Contains("BeginFullCharacterBoundary()")
+                || markerSurfaces.Contains("MarkCharInPlay()")
+                || markerSurfaces.Contains("MarkInPlay()"),
+                "Packet/runtime surfaces must not use loose ready/full-character/CharInPlay lifecycle marker names.");
         }
 
         [TestMethod]
@@ -1631,10 +1643,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             var lifecycle = new ZoneClientSessionLifecycleCoordinator();
             lifecycle.BeginCharacterLoading();
             lifecycle.BeginPlayfieldLoading();
-            lifecycle.BeginReadyBlock();
-            lifecycle.BeginFullCharacterBoundary();
-            lifecycle.MarkCharInPlay();
-            lifecycle.MarkInPlay();
+            lifecycle.EnterReadyBlockForSessionInit();
+            lifecycle.EnterFullCharacterBoundaryForSessionInit();
+            lifecycle.EnterCharInPlayForVisibilityEntry();
+            lifecycle.CompleteInPlayForSessionInit();
             return lifecycle;
         }
 

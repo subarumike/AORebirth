@@ -90,7 +90,7 @@ namespace ZoneEngine.Core.PacketHandlers
 
             // Character is created and read when Client connects in Client.cs->CreateCharacter
             // client.CreateCharacter(charID);
-            client.SessionLifecycle.BeginReadyBlock();
+            client.SessionLifecycle.EnterReadyBlockForSessionInit();
             client.Server.Info(
                 client,
                 "Client connected. ID: {0} IP: {1} Character name: {2}",
@@ -199,7 +199,7 @@ client.Controller.Character.Playfield.Identity,
                 PlayfieldLifecycleTrace.StagePrivateCityFullCharacter,
                 PlayfieldLifecycleTrace.MessageFullCharacter,
                 identity);
-            client.SessionLifecycle.BeginFullCharacterBoundary();
+            client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit();
             FullCharacterMessageHandler.Default.Send(client.Controller.Character);
             if (currentPlayfield != null)
             {
@@ -268,7 +268,7 @@ client.Controller.Character.Playfield.Identity,
                     PlayfieldLifecycleTrace.StageVisibilityJoinerReady,
                     "ClientConnected",
                     client.Controller.Character.Identity);
-                client.SessionLifecycle.MarkCharInPlay();
+                client.SessionLifecycle.EnterCharInPlayForVisibilityEntry();
                 currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character);
                 currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });
             }
@@ -282,7 +282,7 @@ client.Controller.Character.Playfield.Identity,
             ScriptCompiler.Instance.CallMethod("OnConnect", client.Controller.Character);
 
             // Timers are allowed to update client stats now.
-            client.SessionLifecycle.MarkInPlay();
+            client.SessionLifecycle.CompleteInPlayForSessionInit();
             client.Controller.Character.DoNotDoTimers = false;
         }
 
