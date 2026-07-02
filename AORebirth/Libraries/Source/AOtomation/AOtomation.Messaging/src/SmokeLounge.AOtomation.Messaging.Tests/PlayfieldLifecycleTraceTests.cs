@@ -912,7 +912,37 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Visibility lookup blocks must not scan Pool directly.");
                 Assert.IsFalse(
                     visibilityLookupBlocks[i].Contains("Pool.Instance.GetObject"),
-                    "Visibility lookup blocks must not use direct Pool identity lookup.");
+                "Visibility lookup blocks must not use direct Pool identity lookup.");
+            }
+        }
+
+        [TestMethod]
+        public void PlayfieldRemainingSafeCharacterLoopsUseDynelRegistryBoundary()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+
+            string heartBeat = ExtractMethodBlock(playfieldText, "private void HeartBeatTimer(object sender)");
+            string corpseFullUpdate =
+                ExtractMethodBlock(playfieldText, "private void SendCorpseFullUpdate(ICharacter target, Identity corpseIdentity)");
+            string stopFightingDeadTarget =
+                ExtractMethodBlock(playfieldText, "internal void StopFightingDeadTarget(Identity deadTarget)");
+
+            string[] movedLoopBlocks =
+                {
+                    heartBeat,
+                    corpseFullUpdate,
+                    stopFightingDeadTarget
+                };
+            for (int i = 0; i < movedLoopBlocks.Length; i++)
+            {
+                Assert.IsTrue(
+                    movedLoopBlocks[i].Contains("this.runtimeSystems.Characters()"),
+                    "Current-playfield character loop must use registry-backed character view.");
+                Assert.IsFalse(
+                    movedLoopBlocks[i].Contains("Pool.Instance.GetAll"),
+                    "Current-playfield character loop must not scan Pool directly.");
             }
         }
 
