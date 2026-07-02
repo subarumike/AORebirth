@@ -1626,6 +1626,110 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void PacketSequencingCoordinatorFinalOwnershipGuardrailKeepsRuntimeMechanicsOut()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string coordinatorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketSequencingCoordinator.cs"));
+            string clientConnectedText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string privateCityReadyInitText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PrivateCityReadyInitCoordinator.cs"));
+
+            string[] ownedSequenceMethods =
+                {
+                    "public void BeginSessionReadyBlock(",
+                    "public void RunSessionReadyFullCharacterSequence(",
+                    "public void RunVisibilityInitializationSequence(",
+                    "public void RunSimpleCharFullUpdateCharInPlaySequence(",
+                    "public void RunPrivateCityPreFullCharacterOrgInitSequence(",
+                    "public void RunPrivateCityPlayfieldReadyBlockSequence(",
+                    "public void RunPlayfieldTransferBeginSequence(",
+                    "public void CompleteSessionInitialization("
+                };
+            for (int i = 0; i < ownedSequenceMethods.Length; i++)
+            {
+                Assert.IsTrue(
+                    coordinatorText.Contains(ownedSequenceMethods[i]),
+                    "PacketSequencingCoordinator must own sequence method " + ownedSequenceMethods[i]);
+            }
+
+            Assert.IsTrue(
+                clientConnectedText.Contains("client.PacketSequencing.RunSessionReadyFullCharacterSequence(")
+                && clientConnectedText.Contains("client.PacketSequencing.RunVisibilityInitializationSequence("),
+                "PacketSequencingCoordinator must own session ready/full-character/visibility initialization sequencing.");
+            Assert.AreEqual(
+                2,
+                CountOccurrences(playfieldText, "this.runtimeSystems.PacketSequencing.RunSimpleCharFullUpdateCharInPlaySequence("),
+                "PacketSequencingCoordinator must own both SCFU -> CharInPlay visibility pair sequences.");
+            Assert.IsTrue(
+                privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPreFullCharacterOrgInitSequence(")
+                && privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPlayfieldReadyBlockSequence("),
+                "PacketSequencingCoordinator must own private-city org/stat and towers/cities sequencing.");
+            Assert.IsTrue(
+                playfieldText.Contains("lifecycleClient.PacketSequencing.RunPlayfieldTransferBeginSequence("),
+                "PacketSequencingCoordinator must own zoning entry before teleport packet sequencing.");
+
+            string[] forbiddenCoordinatorOwnership =
+                {
+                    "new OrgInfoPacketMessage",
+                    "new PlayfieldAllTowersMessage",
+                    "new PlayfieldAllCitiesMessage",
+                    "SimpleCharFullUpdate.",
+                    "new CharInPlayMessage",
+                    "FullCharacterMessageHandler",
+                    "SendCompressed",
+                    "MessageSerializer",
+                    "NetworkStream",
+                    "zStream",
+                    "netStream",
+                    "PlayfieldById",
+                    "new Playfield(",
+                    "DespawnMessageHandler",
+                    "AnnounceOthers",
+                    "RawCoordinates",
+                    "RawHeading",
+                    "Controller.Client = null",
+                    "IsTeleporting",
+                    "dynel.Dispose",
+                    "ZoneRedirectionMessage",
+                    "SendLocal"
+                };
+            for (int i = 0; i < forbiddenCoordinatorOwnership.Length; i++)
+            {
+                Assert.IsFalse(
+                    coordinatorText.Contains(forbiddenCoordinatorOwnership[i]),
+                    "PacketSequencingCoordinator must not own runtime mechanics or packet construction: "
+                    + forbiddenCoordinatorOwnership[i]);
+            }
+
+            string teleportMethod = ExtractMethodBlock(
+                playfieldText,
+                "public void Teleport(Dynel dynel, Coordinate destination, IQuaternion heading, Identity playfield)");
+            string localTeleportMethod = ExtractMethodBlock(
+                playfieldText,
+                "private bool TryCompleteGridTeleportInCurrentPlayfield(");
+
+            Assert.IsTrue(
+                teleportMethod.Contains("IPlayfield newPlayfield = this.server.PlayfieldById(playfield);")
+                && teleportMethod.Contains("newPlayfield = new Playfield(this.server, playfield);")
+                && teleportMethod.Contains("DespawnMessage despawnMessage = DespawnMessageHandler.Default.Create(dynel.Identity);")
+                && teleportMethod.Contains("this.AnnounceOthers(despawnMessage, dynel.Identity);")
+                && teleportMethod.Contains("dynel.RawCoordinates = new Vector3()")
+                && teleportMethod.Contains("dynel.RawHeading = new Vector.Quaternion")
+                && teleportMethod.Contains("dynel.Controller.Client = null;")
+                && teleportMethod.Contains("dynel.Dispose();")
+                && teleportMethod.Contains("var redirect = new ZoneRedirectionMessage")
+                && teleportMethod.Contains("client.SendCompressed(redirect);"),
+                "Destination lookup, despawn broadcast, coordinate mutation, client detach/dispose, and redirect must remain in Playfield.");
+            Assert.IsTrue(
+                localTeleportMethod.Contains("TeleportMessageHandler.Default.SendLocal("),
+                "Same-playfield local teleport packet path must remain outside PacketSequencingCoordinator.");
+        }
+
+        [TestMethod]
         public void PlayfieldDynelRegistryIsOwnedByRuntimeSystemsAndFeedsSafeLookupPaths()
         {
             string repositoryRoot = FindRepositoryRoot();
