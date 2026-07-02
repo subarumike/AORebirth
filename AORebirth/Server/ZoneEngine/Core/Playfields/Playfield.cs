@@ -1148,22 +1148,23 @@ namespace AORebirth.Core.Playfields
                     if (temp != null)
                     {
                         SimpleCharFullUpdateMessage simpleCharFullUpdate = SimpleCharFullUpdate.ConstructMessage(temp);
-                        PlayfieldLifecycleTrace.Record(
-                            PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
-                            PlayfieldLifecycleTrace.StageExistingCharacterSimpleCharFullUpdate,
-                            PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
-                            temp.Identity,
-                            "recipient=" + recipient.Identity);
-                        sendSCFUs.toClient.SendCompressed(simpleCharFullUpdate);
-
-                        var charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 };
-                        PlayfieldLifecycleTrace.Record(
-                            PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
-                            PlayfieldLifecycleTrace.StageExistingCharacterCharInPlay,
-                            PlayfieldLifecycleTrace.MessageCharInPlay,
-                            temp.Identity,
-                            "recipient=" + recipient.Identity);
-                        sendSCFUs.toClient.SendCompressed(charInPlay);
+                        CharInPlayMessage charInPlay = null;
+                        this.runtimeSystems.PacketSequencing.RunSimpleCharFullUpdateCharInPlaySequence(
+                            () => PlayfieldLifecycleTrace.Record(
+                                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                                PlayfieldLifecycleTrace.StageExistingCharacterSimpleCharFullUpdate,
+                                PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
+                                temp.Identity,
+                                "recipient=" + recipient.Identity),
+                            () => sendSCFUs.toClient.SendCompressed(simpleCharFullUpdate),
+                            () => { charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 }; },
+                            () => PlayfieldLifecycleTrace.Record(
+                                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                                PlayfieldLifecycleTrace.StageExistingCharacterCharInPlay,
+                                PlayfieldLifecycleTrace.MessageCharInPlay,
+                                temp.Identity,
+                                "recipient=" + recipient.Identity),
+                            () => sendSCFUs.toClient.SendCompressed(charInPlay));
                         sent = true;
                     }
                 }
@@ -1198,18 +1199,21 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
-                PlayfieldLifecycleTrace.StageJoiningCharacterSimpleCharFullUpdateBroadcast,
-                PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
-                temp.Identity);
-            this.Announce(SimpleCharFullUpdate.ConstructMessage(temp));
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
-                PlayfieldLifecycleTrace.StageJoiningCharacterCharInPlayBroadcast,
-                PlayfieldLifecycleTrace.MessageCharInPlay,
-                temp.Identity);
-            this.Announce(new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 });
+            CharInPlayMessage charInPlay = null;
+            this.runtimeSystems.PacketSequencing.RunSimpleCharFullUpdateCharInPlaySequence(
+                () => PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                    PlayfieldLifecycleTrace.StageJoiningCharacterSimpleCharFullUpdateBroadcast,
+                    PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
+                    temp.Identity),
+                () => this.Announce(SimpleCharFullUpdate.ConstructMessage(temp)),
+                () => { charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 }; },
+                () => PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                    PlayfieldLifecycleTrace.StageJoiningCharacterCharInPlayBroadcast,
+                    PlayfieldLifecycleTrace.MessageCharInPlay,
+                    temp.Identity),
+                () => this.Announce(charInPlay));
         }
 
         #endregion
