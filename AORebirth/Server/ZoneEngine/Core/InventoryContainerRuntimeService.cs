@@ -523,6 +523,148 @@ namespace ZoneEngine.Core
             Thread.Sleep(this.GetEquipDelay(item, equipmentPage is SocialArmorInventoryPage) * 10);
         }
 
+        public void HandleContainerAddItem(IZoneClient client, ContainerAddItemMessage message)
+        {
+            ICharacter character = client.Controller.Character;
+            IInventoryPage sendingPage = Pool.Instance.GetObject<IInventoryPage>(
+                message.Identity,
+                new Identity()
+                {
+                    Type = (IdentityType)message.Identity.Instance,
+                    Instance = (int)message.SourceContainer.Type
+                });
+            int fromPlacement = message.SourceContainer.Instance;
+            Identity toIdentity = message.Target;
+            int toPlacement = message.TargetPlacement;
+
+            IItem itemFrom = sendingPage[fromPlacement];
+            toIdentity = this.ResolveContainerAddItemTargetIdentity(toIdentity);
+
+            IItemContainer itemReceiver = character.Playfield.FindByIdentity(toIdentity) as IItemContainer;
+            if (itemReceiver == null)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "No Entity found: " + message.Target.Type.ToString() + ":" + message.Target.Instance);
+            }
+
+            IInventoryPage receivingPage =
+                this.ResolveContainerAddItemReceivingPage(
+                    itemReceiver,
+                    character,
+                    message.Target,
+                    toPlacement);
+
+            if (receivingPage == null)
+            {
+                throw new ArgumentOutOfRangeException("No inventorypage found.");
+            }
+
+            toPlacement = this.ResolveContainerAddItemTargetPlacement(receivingPage, toPlacement);
+
+            IItem itemTo;
+            try
+            {
+                itemTo = receivingPage[toPlacement];
+            }
+            catch (Exception)
+            {
+                itemTo = null;
+            }
+
+            character.DoNotDoTimers = true;
+            IItemSlotHandler equipTo = receivingPage as IItemSlotHandler;
+            IItemSlotHandler unequipFrom = sendingPage as IItemSlotHandler;
+
+            bool noAppearanceUpdate = this.ShouldSkipContainerAppearanceUpdate(receivingPage, sendingPage);
+
+            if (equipTo != null)
+            {
+                if (this.TryRejectInventoryPageAccess(character, receivingPage))
+                {
+                    character.DoNotDoTimers = false;
+                    return;
+                }
+
+                if (itemTo != null)
+                {
+                    if (receivingPage.NeedsItemCheck)
+                    {
+                        if (this.CanMoveContainerItemToPage(character, sendingPage, itemFrom))
+                        {
+                            UnEquip.Send(client, receivingPage, toPlacement);
+                            this.WaitForContainerHotSwapVisualSync(
+                                itemFrom,
+                                itemTo,
+                                noAppearanceUpdate);
+
+                            character.Send(message);
+                            equipTo.HotSwap(sendingPage, fromPlacement, toPlacement);
+                            Equip.Send(client, receivingPage, toPlacement);
+                        }
+                    }
+                }
+                else
+                {
+                    if (receivingPage.NeedsItemCheck)
+                    {
+                        if (itemFrom == null)
+                        {
+                            throw new NullReferenceException("itemFrom can not be null, possible inventory error");
+                        }
+
+                        if (this.CanMoveContainerItemToPage(character, receivingPage, itemFrom))
+                        {
+                            this.WaitForContainerEquipVisualSync(
+                                itemFrom,
+                                receivingPage,
+                                noAppearanceUpdate);
+
+                            if (sendingPage == receivingPage)
+                            {
+                                UnEquip.Send(client, sendingPage, fromPlacement);
+                            }
+
+                            character.Send(message);
+                            equipTo.Equip(sendingPage, fromPlacement, toPlacement);
+                            Equip.Send(client, receivingPage, toPlacement);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (unequipFrom != null)
+                {
+                    if (this.TryRejectInventoryPageAccess(character, sendingPage))
+                    {
+                        character.DoNotDoTimers = false;
+                        return;
+                    }
+
+                    this.WaitForContainerEquipVisualSync(
+                        itemFrom,
+                        sendingPage,
+                        noAppearanceUpdate);
+
+                    UnEquip.Send(client, sendingPage, fromPlacement);
+                    unequipFrom.Unequip(fromPlacement, receivingPage, toPlacement);
+                    character.Send(message);
+                }
+                else
+                {
+                    this.MoveNonEquipmentContainerItem(
+                        character,
+                        message,
+                        sendingPage,
+                        receivingPage,
+                        fromPlacement);
+                }
+            }
+
+            character.DoNotDoTimers = false;
+            character.CalculateSkills();
+        }
+
         public bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
             switch (InventoryContainerInteractionRules.ResolveRouteMode(target))

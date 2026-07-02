@@ -542,15 +542,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "itemReceiver.BaseInventory.Pages[(int)IdentityType.Bank]");
             AssertContains(service, "public int ResolveContainerAddItemTargetPlacement");
 
-            AssertContains(
-                containerAddItemHandler,
-                "InventoryContainerRuntimeService.Default.ResolveContainerAddItemTargetIdentity");
-            AssertContains(
-                containerAddItemHandler,
-                "InventoryContainerRuntimeService.Default.ResolveContainerAddItemReceivingPage");
-            AssertContains(
-                containerAddItemHandler,
-                "InventoryContainerRuntimeService.Default.ResolveContainerAddItemTargetPlacement");
+            AssertContains(service, "this.ResolveContainerAddItemTargetIdentity(toIdentity)");
+            AssertContains(service, "this.ResolveContainerAddItemReceivingPage(");
+            AssertContains(service, "this.ResolveContainerAddItemTargetPlacement(receivingPage, toPlacement)");
+            AssertDoesNotContain(containerAddItemHandler, "ResolveContainerAddItemTargetIdentity");
+            AssertDoesNotContain(containerAddItemHandler, "ResolveContainerAddItemReceivingPage");
+            AssertDoesNotContain(containerAddItemHandler, "ResolveContainerAddItemTargetPlacement");
             AssertDoesNotContain(containerAddItemHandler, "toIdentity.Type = IdentityType.CanbeAffected;");
             AssertDoesNotContain(containerAddItemHandler, "itemReceiver.BaseInventory.Pages[(int)IdentityType.Bank]");
         }
@@ -621,9 +618,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "receivingPage.Add(message.TargetPlacement, item);");
             AssertContains(service, "character.Send(message);");
 
-            AssertContains(
-                containerAddItemHandler,
-                "InventoryContainerRuntimeService.Default.MoveNonEquipmentContainerItem(");
+            AssertContains(service, "this.MoveNonEquipmentContainerItem(");
+            AssertDoesNotContain(containerAddItemHandler, "MoveNonEquipmentContainerItem(");
             AssertDoesNotContain(containerAddItemHandler, "message.TargetPlacement = receivingPage.FindFreeSlot();");
             AssertDoesNotContain(containerAddItemHandler, "IItem item = sendingPage.Remove(fromPlacement);");
             AssertDoesNotContain(containerAddItemHandler, "receivingPage.Add(message.TargetPlacement, item);");
@@ -676,12 +672,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "item.ItemActions.SingleOrDefault(x => x.ActionType == ActionType.ToWield)");
             AssertContains(service, "No suitable action found for equipping to this page");
 
-            AssertContains(
-                containerAddItemHandler,
-                "InventoryContainerRuntimeService.Default.TryRejectInventoryPageAccess(");
-            AssertContains(
-                containerAddItemHandler,
-                "InventoryContainerRuntimeService.Default.CanMoveContainerItemToPage(");
+            AssertContains(service, "this.TryRejectInventoryPageAccess(character, receivingPage)");
+            AssertContains(service, "this.TryRejectInventoryPageAccess(character, sendingPage)");
+            AssertContains(service, "this.CanMoveContainerItemToPage(character, sendingPage, itemFrom)");
+            AssertContains(service, "this.CanMoveContainerItemToPage(character, receivingPage, itemFrom)");
+            AssertDoesNotContain(containerAddItemHandler, "TryRejectInventoryPageAccess(");
+            AssertDoesNotContain(containerAddItemHandler, "CanMoveContainerItemToPage(");
             AssertDoesNotContain(containerAddItemHandler, "private AOAction getAction");
             AssertDoesNotContain(containerAddItemHandler, "private bool RequiresImplantAccess");
             AssertDoesNotContain(containerAddItemHandler, "private bool HasImplantAccess");
@@ -705,18 +701,42 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "Thread.Sleep(delay * 10);");
             AssertContains(service, "Thread.Sleep(this.GetEquipDelay(item, equipmentPage is SocialArmorInventoryPage) * 10);");
 
-            AssertContains(
-                containerAddItemHandler,
-                "InventoryContainerRuntimeService.Default.ShouldSkipContainerAppearanceUpdate(");
-            AssertContains(
-                containerAddItemHandler,
-                "InventoryContainerRuntimeService.Default.WaitForContainerHotSwapVisualSync(");
-            AssertContains(
-                containerAddItemHandler,
-                "InventoryContainerRuntimeService.Default.WaitForContainerEquipVisualSync(");
+            AssertContains(service, "this.ShouldSkipContainerAppearanceUpdate(receivingPage, sendingPage)");
+            AssertContains(service, "this.WaitForContainerHotSwapVisualSync(");
+            AssertContains(service, "this.WaitForContainerEquipVisualSync(");
+            AssertDoesNotContain(containerAddItemHandler, "ShouldSkipContainerAppearanceUpdate(");
+            AssertDoesNotContain(containerAddItemHandler, "WaitForContainerHotSwapVisualSync(");
+            AssertDoesNotContain(containerAddItemHandler, "WaitForContainerEquipVisualSync(");
             AssertDoesNotContain(containerAddItemHandler, "Thread.Sleep(");
             AssertDoesNotContain(containerAddItemHandler, "GetAttribute(211)");
             AssertDoesNotContain(containerAddItemHandler, "delay =");
+        }
+
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsContainerAddItemReadOrchestration()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string containerAddItemHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs");
+
+            AssertContains(service, "public void HandleContainerAddItem");
+            AssertContains(service, "Pool.Instance.GetObject<IInventoryPage>");
+            AssertContains(service, "this.ResolveContainerAddItemTargetIdentity(toIdentity)");
+            AssertContains(service, "this.ResolveContainerAddItemReceivingPage(");
+            AssertContains(service, "this.MoveNonEquipmentContainerItem(");
+            AssertContains(service, "character.DoNotDoTimers = false;");
+            AssertContains(service, "character.CalculateSkills();");
+
+            AssertContains(
+                containerAddItemHandler,
+                "InventoryContainerRuntimeService.Default.HandleContainerAddItem(client, message);");
+            AssertContains(containerAddItemHandler, "TryLootCorpseItem(");
+            AssertDoesNotContain(containerAddItemHandler, "Pool.Instance.GetObject<IInventoryPage>");
+            AssertDoesNotContain(containerAddItemHandler, "IItemSlotHandler equipTo");
+            AssertDoesNotContain(containerAddItemHandler, "character.DoNotDoTimers");
+            AssertDoesNotContain(containerAddItemHandler, "CalculateSkills();");
         }
 
         private static void AssertRoute(
