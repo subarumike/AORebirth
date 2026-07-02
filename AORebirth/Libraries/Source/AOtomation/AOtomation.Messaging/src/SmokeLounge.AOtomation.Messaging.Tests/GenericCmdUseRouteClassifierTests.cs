@@ -686,6 +686,37 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsCharacterActionInventoryMutations()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string characterActionHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CharacterActionMessageHandler.cs");
+
+            AssertContains(service, "public void DeleteInventoryItemAction");
+            AssertContains(service, "ItemDao.Instance.Delete(");
+            AssertContains(service, "character.BaseInventory.RemoveItem(");
+            AssertContains(service, "public void SplitInventoryItemStackAction");
+            AssertContains(service, "new Item(item.Quality, item.LowID, item.HighID)");
+            AssertContains(service, "public void MergeInventoryItemStackAction");
+            AssertContains(service, "character.BaseInventory.Pages[(int)message.Target.Type].Write();");
+
+            AssertContains(
+                characterActionHandler,
+                "InventoryContainerRuntimeService.Default.DeleteInventoryItemAction(client.Controller.Character, message);");
+            AssertContains(
+                characterActionHandler,
+                "InventoryContainerRuntimeService.Default.SplitInventoryItemStackAction(client.Controller.Character, message);");
+            AssertContains(
+                characterActionHandler,
+                "InventoryContainerRuntimeService.Default.MergeInventoryItemStackAction(client.Controller.Character, message);");
+            AssertDoesNotContain(characterActionHandler, "ItemDao.Instance.Delete(");
+            AssertDoesNotContain(characterActionHandler, "new Item(it.Quality, it.LowID, it.HighID)");
+            AssertDoesNotContain(characterActionHandler, ".BaseInventory.RemoveItem(");
+        }
+
+        [TestMethod]
         public void InventoryContainerRuntimeServiceOwnsContainerEquipAccessAndRequirementChecks()
         {
             string service =

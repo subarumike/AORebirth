@@ -37,10 +37,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
-    using AORebirth.Core.Items;
     using AORebirth.Core.Network;
     using AORebirth.Core.Playfields;
-    using AORebirth.Database.Dao;
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -103,8 +101,6 @@ namespace ZoneEngine.Core.MessageHandlers
             // int args1 = message.Parameter1;
             // int nanoId = message.Parameter2;
             // short unknown2 = message.Unknown2;
-
-            IdentityType targetIdentityType = message.Target.Type;
 
             switch (message.Action)
             {
@@ -324,43 +320,17 @@ namespace ZoneEngine.Core.MessageHandlers
                     break;
 
                 case CharacterActionType.DeleteItem: // Remove/Delete item
-                    ItemDao.Instance.Delete(
-                        new
-                        {
-                            containertype = (int)targetIdentityType,
-                            containerinstance = client.Controller.Character.Identity.Instance,
-                            Id = message.Target.Instance
-                        });
-                    client.Controller.Character.BaseInventory.RemoveItem(
-                        (int)targetIdentityType,
-                        message.Target.Instance);
-
+                    InventoryContainerRuntimeService.Default.DeleteInventoryItemAction(client.Controller.Character, message);
                     this.AcknowledgeDelete(client.Controller.Character, message);
                     break;
 
                 case CharacterActionType.Split: // Split?
-                    IItem it =
-                        client.Controller.Character.BaseInventory.Pages[(int)targetIdentityType][message.Target.Instance
-                            ];
-                    it.MultipleCount -= message.Parameter2;
-                    Item newItem = new Item(it.Quality, it.LowID, it.HighID);
-                    newItem.MultipleCount = message.Parameter2;
-
-                    client.Controller.Character.BaseInventory.Pages[(int)targetIdentityType].Add(
-                        client.Controller.Character.BaseInventory.Pages[(int)targetIdentityType].FindFreeSlot(),
-                        newItem);
-                    client.Controller.Character.BaseInventory.Pages[(int)targetIdentityType].Write();
-
+                    InventoryContainerRuntimeService.Default.SplitInventoryItemStackAction(client.Controller.Character, message);
                     // Does it need to Acknowledge? Need to check that - Algorithman
                     break;
 
                 case CharacterActionType.AcceptTeamRequest:
-                    client.Controller.Character.BaseInventory.Pages[(int)targetIdentityType][message.Target.Instance]
-                        .MultipleCount +=
-                        client.Controller.Character.BaseInventory.Pages[(int)targetIdentityType][message.Parameter2]
-                            .MultipleCount;
-                    client.Controller.Character.BaseInventory.Pages[(int)targetIdentityType].Remove(message.Parameter2);
-                    client.Controller.Character.BaseInventory.Pages[(int)targetIdentityType].Write();
+                    InventoryContainerRuntimeService.Default.MergeInventoryItemStackAction(client.Controller.Character, message);
                     this.Acknowledge(client.Controller.Character, message);
                     break;
 
