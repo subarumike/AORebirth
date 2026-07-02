@@ -716,13 +716,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string runtimeSystemsText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+            string npcRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
             string projectText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
             string[] runtimeCoordinatorConstructors =
                 {
-                    "new NpcCorpseLifecycleCoordinator(playfield)",
-                    "new NpcCombatTickCoordinator(playfield)",
+                    "new NPCRuntimeService(playfield)",
                     "new PrivateCityReadyInitCoordinator("
                 };
             for (int i = 0; i < runtimeCoordinatorConstructors.Length; i++)
@@ -737,6 +738,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Playfield must not directly construct " + runtimeCoordinatorConstructors[i] + ".");
             }
 
+            Assert.AreEqual(
+                0,
+                CountOccurrences(runtimeSystemsText, "new NpcCorpseLifecycleCoordinator(playfield)"),
+                "PlayfieldRuntimeSystems must delegate NPC corpse coordinator construction to NPCRuntimeService.");
+            Assert.AreEqual(
+                0,
+                CountOccurrences(runtimeSystemsText, "new NpcCombatTickCoordinator(playfield)"),
+                "PlayfieldRuntimeSystems must delegate NPC combat coordinator construction to NPCRuntimeService.");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(npcRuntimeText, "new NpcCorpseLifecycleCoordinator(playfield)"),
+                "NPCRuntimeService must own NPC corpse lifecycle coordinator construction.");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(npcRuntimeText, "new NpcCombatTickCoordinator(playfield)"),
+                "NPCRuntimeService must own NPC combat tick coordinator construction.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("private readonly NPCRuntimeService npcRuntime")
+                && runtimeSystemsText.Contains("this.npcRuntime.BeginNpcDeath(attacker, target);")
+                && runtimeSystemsText.Contains("return this.npcRuntime.ProcessDeadNpc(character);")
+                && runtimeSystemsText.Contains("this.npcRuntime.ProcessCombatTick(attacker);")
+                && runtimeSystemsText.Contains("this.npcRuntime.ClearCombatTracking(identity);"),
+                "PlayfieldRuntimeSystems must delegate NPC runtime entry points through NPCRuntimeService.");
+
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.SendPrivateCityPlayfieldReadyBlock(client, character);"),
                 "Playfield must delegate private-city ready block sending through PlayfieldRuntimeSystems.");
@@ -750,8 +775,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldText.Contains("this.runtimeSystems.ProcessDeadNpc(dynel)"),
                 "Playfield heartbeat must delegate dead NPC processing through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldRuntimeSystems.cs"),
-                "ZoneEngine project must compile PlayfieldRuntimeSystems.");
+                projectText.Contains(@"Core\Playfields\PlayfieldRuntimeSystems.cs")
+                && projectText.Contains(@"Core\Playfields\NPCRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldRuntimeSystems and NPCRuntimeService.");
         }
 
         [TestMethod]
