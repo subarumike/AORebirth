@@ -1101,6 +1101,60 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void InventoryContainerRuntimeServiceFinalOwnershipGuardrailAllowsOnlyNamedRemainingReferences()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+
+            string[] requiredServiceSurfaces =
+            {
+                "public bool TryUseBackpackContainer",
+                "public void OpenBank",
+                "public void HandleContainerAddItem",
+                "public void HandleClientMoveItemToInventory",
+                "public bool UseInventoryItem",
+                "public IEnumerable<IInventoryPage> CharacterStateInventoryPages",
+                "public void ReturnPlayerTradeOffers",
+                "public CorpseLootInventoryTransferResult TryAddCorpseLootItem",
+                "public QuestRewardInventoryGrantResult TryGrantQuestRewardItem",
+                "public void AddVendorPurchaseOffer",
+                "public Item GetTradeSkillItem",
+                "public IItem GetKnuBotTradeItem"
+            };
+
+            foreach (string requiredSurface in requiredServiceSurfaces)
+            {
+                AssertContains(service, requiredSurface);
+            }
+
+            string[] allowedRemainingBaseInventoryReferences =
+            {
+                @"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs",
+                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\GuestKeyGeneratorInteractionHandler.cs",
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs",
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs",
+                @"AORebirth\Server\ZoneEngine\Core\Packets\WeaponItemFullUpdate.cs"
+            };
+
+            HashSet<string> allowed =
+                new HashSet<string>(
+                    allowedRemainingBaseInventoryReferences.Select(
+                        path => Path.GetFullPath(Path.Combine(repositoryRoot, path))));
+
+            string coreRoot = Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core");
+            string[] offenders =
+                Directory.GetFiles(coreRoot, "*.cs", SearchOption.AllDirectories)
+                    .Where(path => File.ReadAllText(path).Contains("BaseInventory"))
+                    .Where(path => !allowed.Contains(Path.GetFullPath(path)))
+                    .Select(path => MakeRelativePath(repositoryRoot, path))
+                    .OrderBy(path => path)
+                    .ToArray();
+
+            CollectionAssert.AreEqual(new string[0], offenders);
+        }
+
+        [TestMethod]
         public void InventoryContainerRuntimeServiceGuardsRemainingHandlerControllerInventoryOwnership()
         {
             string repositoryRoot = FindRepositoryRoot();
