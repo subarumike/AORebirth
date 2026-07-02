@@ -753,20 +753,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsKnuBotTradeItemRemove()
+        public void InventoryContainerRuntimeServiceOwnsKnuBotTradeItemLookupAndRemove()
         {
             string service =
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string baseKnuBot =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\KnuBot\BaseKnuBot.cs");
             string knuBotTradeHandler =
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\KnuBotTradeMessageHandler.cs");
 
             AssertContains(service, "public void HandleKnuBotTradeItemRemove");
+            AssertContains(service, "public IItem GetKnuBotTradeItem(");
             AssertContains(
                 service,
                 "client.Controller.Character.BaseInventory.Pages[(int)message.Container.Type].Remove(");
+            AssertContains(service, "return character.BaseInventory.Pages[(int)container][slotNumber];");
+            AssertContains(
+                baseKnuBot,
+                "InventoryContainerRuntimeService.Default.GetKnuBotTradeItem(");
             AssertContains(
                 knuBotTradeHandler,
                 "InventoryContainerRuntimeService.Default.HandleKnuBotTradeItemRemove(client, message);");
+            AssertDoesNotContain(baseKnuBot, "BaseInventory.Pages[(int)container][slotNumber]");
             AssertDoesNotContain(knuBotTradeHandler, "BaseInventory.Pages[(int)message.Container.Type].Remove");
         }
 

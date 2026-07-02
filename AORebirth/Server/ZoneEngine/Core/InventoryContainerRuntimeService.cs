@@ -487,6 +487,11 @@ namespace ZoneEngine.Core
                 message.Container.Instance);
         }
 
+        public IItem GetKnuBotTradeItem(ICharacter character, IdentityType container, int slotNumber)
+        {
+            return character.BaseInventory.Pages[(int)container][slotNumber];
+        }
+
         public bool TryGetTradeAddItem(IItemContainer issuer, TradeMessage message, out IItem item)
         {
             item = null;
