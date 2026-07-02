@@ -2,6 +2,7 @@ namespace ZoneEngine.Core
 {
     #region Usings ...
 
+    using System;
     using System.Linq;
 
     using AORebirth.Core.Entities;
@@ -15,6 +16,8 @@ namespace ZoneEngine.Core
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+
+    using Utility;
 
     using ZoneEngine.Core.MessageHandlers;
 
@@ -108,6 +111,201 @@ namespace ZoneEngine.Core
             }
 
             return true;
+        }
+
+        public bool TryMoveBackpackItemToInventory(ICharacter character, ClientMoveItemToInventoryMessage message)
+        {
+            if (message.SourceContainer.Type != IdentityType.Backpack)
+            {
+                return false;
+            }
+
+            int handle = DecodeBackpackHandle(message.SourceContainer);
+            int fromPlacement = DecodeBackpackSlot(message.SourceContainer);
+
+            IInventoryPage backpackPage;
+            if (!character.BaseInventory.TryGetBackpackPageByHandle(handle, out backpackPage))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Network,
+                    string.Format(
+                        "Rejected ClientMoveItemToInventory backpack move because handle is unknown char={0} source={1} handle={2} targetPlacement={3}",
+                        character.Identity,
+                        message.SourceContainer,
+                        handle,
+                        message.TargetPlacement));
+                return true;
+            }
+
+            IItem itemFrom = backpackPage[fromPlacement];
+            if (itemFrom == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Rejected ClientMoveItemToInventory backpack move because source slot is empty char={0} source={1} slot={2} targetPlacement={3}",
+                        character.Identity,
+                        message.SourceContainer,
+                        fromPlacement,
+                        message.TargetPlacement));
+                return true;
+            }
+
+            IInventoryPage inventoryPage;
+            IInventoryPage receivingPage = this.GetTargetPage(character, message.TargetPlacement);
+            if (!character.BaseInventory.Pages.TryGetValue((int)IdentityType.Inventory, out inventoryPage)
+                || receivingPage == null
+                || !object.ReferenceEquals(receivingPage, inventoryPage))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Network,
+                    string.Format(
+                        "Rejected ClientMoveItemToInventory backpack move for non-inventory target char={0} source={1} targetPlacement={2}",
+                        character.Identity,
+                        message.SourceContainer,
+                        message.TargetPlacement));
+                return true;
+            }
+
+            int toPlacement = message.TargetPlacement;
+            if (toPlacement == (int)IdentityType.TradeWindow)
+            {
+                toPlacement = receivingPage.FindFreeSlot();
+            }
+
+            if (toPlacement < 0)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Rejected ClientMoveItemToInventory backpack move because inventory is full char={0} source={1} targetPlacement={2}",
+                        character.Identity,
+                        message.SourceContainer,
+                        message.TargetPlacement));
+                return true;
+            }
+
+            try
+            {
+                InventoryError addError = receivingPage.Add(toPlacement, itemFrom);
+                if (addError != InventoryError.OK)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        string.Format(
+                            "Rejected ClientMoveItemToInventory backpack move add failed char={0} source={1} targetPlacement={2} resolvedTarget={3} error={4}",
+                            character.Identity,
+                            message.SourceContainer,
+                            message.TargetPlacement,
+                            toPlacement,
+                            addError));
+                    return true;
+                }
+            }
+            catch (Exception exception)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Rejected ClientMoveItemToInventory backpack move add threw char={0} source={1} targetPlacement={2} resolvedTarget={3} error={4}",
+                        character.Identity,
+                        message.SourceContainer,
+                        message.TargetPlacement,
+                        toPlacement,
+                        exception.Message));
+                return true;
+            }
+
+            try
+            {
+                backpackPage.Remove(fromPlacement);
+            }
+            catch (Exception exception)
+            {
+                this.TryRemoveInventoryRollback(receivingPage, toPlacement);
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Rejected ClientMoveItemToInventory backpack move remove source threw char={0} source={1} slot={2} targetPlacement={3} error={4}",
+                        character.Identity,
+                        message.SourceContainer,
+                        fromPlacement,
+                        message.TargetPlacement,
+                        exception.Message));
+                return true;
+            }
+
+            this.SendMoveAck(character, message.SourceContainer, message.TargetPlacement);
+            this.PersistCharacterInventory(character, "backpack move");
+            return true;
+        }
+
+        private IInventoryPage GetTargetPage(ICharacter character, int targetPlacement)
+        {
+            if (targetPlacement == (int)IdentityType.TradeWindow)
+            {
+                return character.BaseInventory.Pages[character.BaseInventory.StandardPage];
+            }
+
+            try
+            {
+                return character.BaseInventory.PageFromSlot(targetPlacement);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private void SendMoveAck(ICharacter character, Identity sourceContainer, int targetPlacement)
+        {
+            character.Send(
+                new ContainerAddItemMessage
+                {
+                    Identity = character.Identity,
+                    SourceContainer = sourceContainer,
+                    Target = character.Identity,
+                    TargetPlacement = targetPlacement,
+                    Unknown = 0
+                });
+        }
+
+        private void PersistCharacterInventory(ICharacter character, string reason)
+        {
+            character.BaseInventory.Write();
+            LogUtil.Debug(
+                DebugInfoDetail.Database,
+                string.Format("Persisted inventory after ClientMoveItemToInventory {0} char={1}", reason, character.Identity));
+        }
+
+        private static int DecodeBackpackHandle(Identity sourceContainer)
+        {
+            return (int)(((uint)sourceContainer.Instance >> 16) & 0xffff);
+        }
+
+        private static int DecodeBackpackSlot(Identity sourceContainer)
+        {
+            return (int)((uint)sourceContainer.Instance & 0xffff);
+        }
+
+        private void TryRemoveInventoryRollback(IInventoryPage inventoryPage, int inventorySlot)
+        {
+            try
+            {
+                if (inventoryPage[inventorySlot] != null)
+                {
+                    inventoryPage.Remove(inventorySlot);
+                }
+            }
+            catch (Exception exception)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "ClientMoveItemToInventory backpack move rollback failed slot={0} error={1}",
+                        inventorySlot,
+                        exception.Message));
+            }
         }
     }
 }
