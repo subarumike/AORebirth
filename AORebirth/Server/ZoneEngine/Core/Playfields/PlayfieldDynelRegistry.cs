@@ -232,6 +232,15 @@ namespace ZoneEngine.Core.Playfields
             }
         }
 
+        internal ReadOnlyCollection<Character> CharacterEntities()
+        {
+            this.RefreshFromPool();
+            lock (this.sync)
+            {
+                return this.characters.Values.OfType<Character>().ToList().AsReadOnly();
+            }
+        }
+
         internal ReadOnlyCollection<ICharacter> Players()
         {
             this.RefreshFromPool();

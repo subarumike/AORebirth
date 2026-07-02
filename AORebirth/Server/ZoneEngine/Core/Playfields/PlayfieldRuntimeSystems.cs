@@ -121,6 +121,16 @@ namespace ZoneEngine.Core.Playfields
             return this.dynelRegistry.FindCharactersInRange(dynel, range);
         }
 
+        internal ReadOnlyCollection<ICharacter> Characters()
+        {
+            return this.dynelRegistry.Characters();
+        }
+
+        internal ReadOnlyCollection<Character> CharacterEntities()
+        {
+            return this.dynelRegistry.CharacterEntities();
+        }
+
         internal ReadOnlyCollection<StaticDynel> StaticDynels()
         {
             return this.dynelRegistry.StaticDynels();
