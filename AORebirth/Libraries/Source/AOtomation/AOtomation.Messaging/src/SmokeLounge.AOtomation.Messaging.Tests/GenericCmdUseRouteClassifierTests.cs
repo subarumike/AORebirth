@@ -692,6 +692,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsTradeInventoryHelpers()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string tradeHandler =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\TradeMessageHandler.cs");
+
+            AssertContains(service, "public bool HasFreeInventorySlots");
+            AssertContains(service, "IInventoryPage page = character.BaseInventory[character.BaseInventory.StandardPage];");
+            AssertContains(service, "public void SendTradeWindowMoveToInventory");
+            AssertContains(service, "new ContainerAddItemMessage");
+            AssertContains(service, "public void PersistCharacterInventory");
+            AssertContains(service, "\"Persisted inventory after \" + reason + \" char=\"");
+
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.HasFreeInventorySlots(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.SendTradeWindowMoveToInventory(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.PersistCharacterInventory(");
+            AssertDoesNotContain(tradeHandler, "private bool HasFreeInventorySlots");
+            AssertDoesNotContain(tradeHandler, "private void SendTradeWindowMoveToInventory");
+            AssertDoesNotContain(tradeHandler, "private void PersistCharacterInventory");
+        }
+
+        [TestMethod]
         public void InventoryContainerRuntimeServiceOwnsBackpackOpenCloseLifecycle()
         {
             string service =
