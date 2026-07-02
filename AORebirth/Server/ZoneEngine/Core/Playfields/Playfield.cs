@@ -302,6 +302,8 @@ namespace AORebirth.Core.Playfields
         /// </summary>
         private readonly List<StatelData> statels = new List<StatelData>();
 
+        private readonly StatelData[] collisionStatels = new StatelData[0];
+
         /// <summary>
         /// </summary>
         private float x;
@@ -351,6 +353,7 @@ namespace AORebirth.Core.Playfields
 
             this.statels = this.runtimeSystems.ResolveStatels(playfieldIdentity);
             this.runtimeSystems.RegisterStatels(this.statels);
+            this.collisionStatels = this.runtimeSystems.ResolveCollisionStatels(this.statels);
             this.LoadMobSpawns(playfieldIdentity);
             this.runtimeSystems.RegisterContent(playfieldIdentity);
             this.LoadVendors(playfieldIdentity);
@@ -384,7 +387,7 @@ namespace AORebirth.Core.Playfields
         private void LoadVendors(Identity playfieldIdentity)
         {
             StatelData[] vendorStatels;
-            if (!this.runtimeSystems.TryResolveVendorStatels(playfieldIdentity, out vendorStatels))
+            if (!this.runtimeSystems.TryResolveVendorStatels(playfieldIdentity, this.statels, out vendorStatels))
             {
                 return;
             }
@@ -1237,7 +1240,7 @@ namespace AORebirth.Core.Playfields
                 this.statelEnterContacts[dynelId] = activeEnterContacts;
             }
 
-            foreach (StatelData sd in this.statels)
+            foreach (StatelData sd in this.collisionStatels)
             {
                 string statelKey = BuildStatelContactKey(sd);
                 bool inRange = IsInStatelCollisionRange(sd, dynel);
@@ -1313,14 +1316,9 @@ namespace AORebirth.Core.Playfields
                 this.statelEnterContacts[dynelId] = activeEnterContacts;
             }
 
-            foreach (StatelData sd in this.statels)
+            foreach (StatelData sd in this.collisionStatels)
             {
-                bool handlesCollision =
-                    sd.Events.Any(
-                        x =>
-                            (x.EventType == EventType.OnCollide) || (x.EventType == EventType.OnEnter)
-                            || (x.EventType == EventType.OnTargetInVicinity));
-                if (!handlesCollision || !IsInStatelCollisionRange(sd, dynel))
+                if (!IsInStatelCollisionRange(sd, dynel))
                 {
                     continue;
                 }
