@@ -903,6 +903,71 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void PlayfieldContentDataProviderDoesNotOwnRuntimeSystemsOrPacketFlows()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string providerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldContentDataProvider.cs"));
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+
+            Assert.IsTrue(
+                providerText.Contains("StaticDynelDao.Instance.GetWhere"),
+                "Provider must own static dynel definition data selection.");
+            Assert.IsTrue(
+                providerText.Contains("private StatelData[] ResolveVendorStatels(IEnumerable<StatelData> statels)"),
+                "Provider must own vendor statel filtering.");
+            Assert.IsTrue(
+                providerText.Contains("internal StatelData[] ResolveCollisionStatels(IEnumerable<StatelData> statels)"),
+                "Provider must own collision-capable statel filtering.");
+
+            string[] forbiddenRuntimeOwnershipPatterns =
+                {
+                    "new StaticDynel",
+                    "VendorHandler.SpawnVendorsForPlayfield",
+                    "SendCompressed",
+                    "N3Messages",
+                    "SystemMessages",
+                    "MessageHandler",
+                    "GenericCmd",
+                    "NpcCombat",
+                    "CombatDamageRules",
+                    "NpcCorpse",
+                    "Inventory",
+                    "ContainerAddItem",
+                    "ClientMoveItem",
+                    "OrgClient",
+                    "OrgServer",
+                    "PrivateCityReadyInitCoordinator",
+                    "AOSharpLiveCapture",
+                    "tools-temp"
+                };
+            for (int i = 0; i < forbiddenRuntimeOwnershipPatterns.Length; i++)
+            {
+                Assert.IsFalse(
+                    providerText.Contains(forbiddenRuntimeOwnershipPatterns[i]),
+                    "PlayfieldContentDataProvider must not own runtime or packet behavior: "
+                    + forbiddenRuntimeOwnershipPatterns[i]);
+            }
+
+            string loadVendors = ExtractMethodBlock(playfieldText, "private void LoadVendors(Identity playfieldIdentity)");
+            string loadStaticDynels =
+                ExtractMethodBlock(playfieldText, "private void LoadStaticDynels(Identity playfieldIdentity)");
+            string checkStatelCollision = ExtractMethodBlock(playfieldText, "private void CheckStatelCollision(ICharacter dynel)");
+
+            Assert.IsTrue(
+                loadVendors.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels);"),
+                "Playfield must remain the vendor runtime spawning owner.");
+            Assert.IsTrue(
+                loadStaticDynels.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
+                "Playfield must remain the StaticDynel runtime construction owner.");
+            Assert.IsTrue(
+                checkStatelCollision.Contains("IsInStatelCollisionRange(sd, dynel)")
+                && checkStatelCollision.Contains("ev.Perform(dynel, sd);"),
+                "Playfield must remain the statel collision runtime check/event owner.");
+        }
+
+        [TestMethod]
         public void PlayfieldDynelRegistryIsOwnedByRuntimeSystemsAndFeedsSafeLookupPaths()
         {
             string repositoryRoot = FindRepositoryRoot();
