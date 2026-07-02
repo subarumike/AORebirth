@@ -13,6 +13,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Playfields;
 
     #endregion
@@ -965,6 +966,130 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 checkStatelCollision.Contains("IsInStatelCollisionRange(sd, dynel)")
                 && checkStatelCollision.Contains("ev.Perform(dynel, sd);"),
                 "Playfield must remain the statel collision runtime check/event owner.");
+        }
+
+        [TestMethod]
+        public void ZoneClientSessionLifecycleCoordinatorModelsSessionPhasesWithoutPacketOwnership()
+        {
+            var lifecycle = new ZoneClientSessionLifecycleCoordinator();
+
+            lifecycle.BeginCharacterLoading();
+            lifecycle.BeginPlayfieldLoading();
+            lifecycle.BeginReadyBlock();
+            lifecycle.BeginFullCharacterBoundary();
+            lifecycle.MarkCharInPlay();
+            lifecycle.MarkInPlay();
+            lifecycle.BeginZoning();
+            lifecycle.BeginDisconnecting();
+            lifecycle.BeginDisconnecting();
+
+            var expected =
+                new[]
+                {
+                    ZoneClientSessionPhase.Connected,
+                    ZoneClientSessionPhase.CharacterLoading,
+                    ZoneClientSessionPhase.PlayfieldLoading,
+                    ZoneClientSessionPhase.ReadyBlock,
+                    ZoneClientSessionPhase.FullCharacterBoundary,
+                    ZoneClientSessionPhase.CharInPlay,
+                    ZoneClientSessionPhase.InPlay,
+                    ZoneClientSessionPhase.Zoning,
+                    ZoneClientSessionPhase.Disconnecting
+                };
+
+            Assert.AreEqual(expected[expected.Length - 1], lifecycle.Phase);
+            Assert.AreEqual(expected.Length, lifecycle.PhaseHistory.Count);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                Assert.AreEqual(expected[i], lifecycle.PhaseHistory[i]);
+            }
+
+            string repositoryRoot = FindRepositoryRoot();
+            string coordinatorText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\ZoneClientSessionLifecycleCoordinator.cs"));
+
+            string[] forbiddenRuntimeOwnershipPatterns =
+                {
+                    "SendCompressed",
+                    "MessageHandler",
+                    "GenericCmd",
+                    "NpcCombat",
+                    "Inventory",
+                    "OrgClient",
+                    "CityController",
+                    "GuestKey",
+                    "MessagePackZip",
+                    "Dao.Instance",
+                    "AOSharpLiveCapture",
+                    "tools-temp"
+                };
+            for (int i = 0; i < forbiddenRuntimeOwnershipPatterns.Length; i++)
+            {
+                Assert.IsFalse(
+                    coordinatorText.Contains(forbiddenRuntimeOwnershipPatterns[i]),
+                    "ZoneClient session lifecycle coordinator must not own packet, gameplay, DB, or capture behavior: "
+                    + forbiddenRuntimeOwnershipPatterns[i]);
+            }
+        }
+
+        [TestMethod]
+        public void ZoneClientSessionLifecycleBoundaryIsWiredAroundExistingLoginReadyAndZoningFlow()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string zoneClientText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
+            string zoneLoginText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ZoneLoginMessageHandler.cs"));
+            string clientConnectedText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string projectText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
+            string teleportMethod = ExtractMethodBlock(
+                playfieldText,
+                "public void Teleport(Dynel dynel, Coordinate destination, IQuaternion heading, Identity playfield)");
+
+            Assert.IsTrue(
+                zoneClientText.Contains("private readonly ZoneClientSessionLifecycleCoordinator sessionLifecycle"),
+                "ZoneClient must own the session lifecycle coordinator.");
+            Assert.IsTrue(
+                zoneClientText.Contains("public ZoneClientSessionLifecycleCoordinator SessionLifecycle"),
+                "ZoneClient must expose the session lifecycle boundary to existing handlers.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\ZoneClientSessionLifecycleCoordinator.cs"),
+                "ZoneEngine project must compile the session lifecycle coordinator.");
+
+            AssertTextBefore(
+                zoneLoginText,
+                "zc.SessionLifecycle.BeginCharacterLoading();",
+                "zc.CreateCharacter(message.CharacterId);");
+            AssertTextBefore(
+                zoneClientText,
+                "this.SessionLifecycle.BeginPlayfieldLoading();",
+                "this.server.PlayfieldById(");
+            AssertTextBefore(
+                clientConnectedText,
+                "client.SessionLifecycle.BeginReadyBlock();",
+                "PlayfieldAnarchyFMessageHandler.Default.Send");
+            AssertTextBefore(
+                clientConnectedText,
+                "client.SessionLifecycle.BeginFullCharacterBoundary();",
+                "FullCharacterMessageHandler.Default.Send(client.Controller.Character);");
+            AssertTextBefore(
+                clientConnectedText,
+                "client.SessionLifecycle.MarkCharInPlay();",
+                "currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character);");
+            AssertTextBefore(
+                clientConnectedText,
+                "client.SessionLifecycle.MarkInPlay();",
+                "client.Controller.Character.DoNotDoTimers = false;");
+            AssertTextBefore(
+                teleportMethod,
+                "lifecycleClient.SessionLifecycle.BeginZoning();",
+                "TeleportMessageHandler.Default.Send(");
         }
 
         [TestMethod]

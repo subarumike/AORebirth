@@ -83,6 +83,8 @@ namespace ZoneEngine.Core
         /// </summary>
         private readonly IBus bus;
 
+        private readonly ZoneClientSessionLifecycleCoordinator sessionLifecycle;
+
         /// <summary>
         /// </summary>
         private IController controller;
@@ -135,6 +137,7 @@ namespace ZoneEngine.Core
             this.server = server;
             this.messageSerializer = messageSerializer;
             this.bus = bus;
+            this.sessionLifecycle = new ZoneClientSessionLifecycleCoordinator();
             this.dispatcherThread = new Thread(this.DispatchMessages);
             this.dispatcherThread.Start();
         }
@@ -152,6 +155,14 @@ namespace ZoneEngine.Core
             set
             {
                 this.controller = value;
+            }
+        }
+
+        public ZoneClientSessionLifecycleCoordinator SessionLifecycle
+        {
+            get
+            {
+                return this.sessionLifecycle;
             }
         }
 
@@ -217,6 +228,8 @@ namespace ZoneEngine.Core
             {
                 throw new Exception("Character " + charId + " not found.");
             }
+
+            this.SessionLifecycle.BeginPlayfieldLoading();
 
             // TODO: Save playfield type into Character table and use it accordingly
             IPlayfield pf =
@@ -406,6 +419,8 @@ namespace ZoneEngine.Core
             {
                 if (!this.disposed)
                 {
+                    this.sessionLifecycle.BeginDisconnecting();
+
                     this.stopDispatcher = true;
 
                     while (this.stopDispatcher)
