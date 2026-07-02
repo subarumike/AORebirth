@@ -1513,6 +1513,108 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void ZoningTeleportSequencingGuardrailKeepsRuntimeHandoffAndRedirectOrder()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string zoneClientText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
+            string packetSequencingText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketSequencingCoordinator.cs"));
+
+            string teleportMethod = ExtractMethodBlock(
+                playfieldText,
+                "public void Teleport(Dynel dynel, Coordinate destination, IQuaternion heading, Identity playfield)");
+            string createCharacterMethod = ExtractMethodBlock(
+                zoneClientText,
+                "public void CreateCharacter(int charId)");
+
+            AssertTextBefore(
+                teleportMethod,
+                "if (this.TryCompleteGridTeleportInCurrentPlayfield(dynel, destination, heading, playfield))",
+                "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer();");
+            AssertTextBefore(
+                teleportMethod,
+                "dynel.DoNotDoTimers = true;",
+                "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer();");
+            AssertTextBefore(
+                teleportMethod,
+                "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer();",
+                "TeleportMessageHandler.Default.Send(");
+            AssertTextBefore(
+                teleportMethod,
+                "TeleportMessageHandler.Default.Send(",
+                "DespawnMessage despawnMessage = DespawnMessageHandler.Default.Create(dynel.Identity);");
+            AssertTextBefore(
+                teleportMethod,
+                "DespawnMessage despawnMessage = DespawnMessageHandler.Default.Create(dynel.Identity);",
+                "this.AnnounceOthers(despawnMessage, dynel.Identity);");
+            AssertTextBefore(
+                teleportMethod,
+                "this.AnnounceOthers(despawnMessage, dynel.Identity);",
+                "dynel.RawCoordinates = new Vector3()");
+            AssertTextBefore(
+                teleportMethod,
+                "ZoneClient client = (ZoneClient)dynel.Controller.Client;",
+                "IPlayfield newPlayfield = this.server.PlayfieldById(playfield);");
+            AssertTextBefore(
+                teleportMethod,
+                "IPlayfield newPlayfield = this.server.PlayfieldById(playfield);",
+                "Pool.Instance.GetObject<Playfield>(");
+            AssertTextBefore(
+                teleportMethod,
+                "Pool.Instance.GetObject<Playfield>(",
+                "if (newPlayfield == null)");
+            AssertTextBefore(
+                teleportMethod,
+                "newPlayfield = new Playfield(this.server, playfield);",
+                "dynel.Playfield = newPlayfield;");
+            AssertTextBefore(
+                teleportMethod,
+                "dynel.Playfield = newPlayfield;",
+                "dynel.Controller.Client = null;");
+            AssertTextBefore(
+                teleportMethod,
+                "dynel.Controller.Client = null;",
+                "dynel.IsTeleporting = true;");
+            AssertTextBefore(
+                teleportMethod,
+                "dynel.IsTeleporting = true;",
+                "dynel.Dispose();");
+            AssertTextBefore(
+                teleportMethod,
+                "dynel.Dispose();",
+                "var redirect = new ZoneRedirectionMessage");
+            AssertTextBefore(
+                teleportMethod,
+                "var redirect = new ZoneRedirectionMessage",
+                "client.SendCompressed(redirect);");
+
+            AssertTextBefore(
+                createCharacterMethod,
+                "this.SessionLifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();",
+                "this.server.PlayfieldById(");
+            AssertTextBefore(
+                createCharacterMethod,
+                "this.server.PlayfieldById(",
+                "this.Controller.Character = new Character(");
+
+            Assert.IsFalse(
+                teleportMethod.Contains("PacketSequencing"),
+                "Cross-playfield teleport runtime handoff must stay outside PacketSequencingCoordinator until guarded extraction.");
+            Assert.IsFalse(
+                packetSequencingText.Contains("TeleportMessageHandler")
+                || packetSequencingText.Contains("ZoneRedirectionMessage")
+                || packetSequencingText.Contains("PlayfieldById")
+                || packetSequencingText.Contains("dynel.Dispose"),
+                "PacketSequencingCoordinator must not own teleport packet construction, destination lookup, or disposal mechanics.");
+            Assert.IsFalse(
+                teleportMethod.Contains("PlayfieldLifecycleTrace."),
+                "No zoning PlayfieldLifecycleTrace points exist yet; this guardrail protects current lifecycle/order text instead.");
+        }
+
+        [TestMethod]
         public void PlayfieldDynelRegistryIsOwnedByRuntimeSystemsAndFeedsSafeLookupPaths()
         {
             string repositoryRoot = FindRepositoryRoot();
