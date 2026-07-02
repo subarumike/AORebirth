@@ -1152,6 +1152,85 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void ZoneClientSessionLifecycleCheckpointKeepsPhaseOwnershipOutOfPacketCode()
+        {
+            var lifecycle = new ZoneClientSessionLifecycleCoordinator();
+            lifecycle.BeginCharacterLoading();
+            lifecycle.BeginCharacterLoading();
+
+            Assert.AreEqual(ZoneClientSessionPhase.CharacterLoading, lifecycle.Phase);
+            Assert.AreEqual(2, lifecycle.PhaseHistory.Count, "Duplicate same-phase transitions must remain no-op.");
+
+            string repositoryRoot = FindRepositoryRoot();
+            string coordinatorText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\ZoneClientSessionLifecycleCoordinator.cs"));
+            string zoneLoginText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ZoneLoginMessageHandler.cs"));
+            string clientConnectedText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+
+            Assert.IsTrue(
+                coordinatorText.Contains("private static bool IsAllowedTransition(ZoneClientSessionPhase from, ZoneClientSessionPhase to)"),
+                "ZoneClientSessionLifecycleCoordinator must own allowed transition rules.");
+            Assert.IsTrue(
+                coordinatorText.Contains("if (from == to)") && coordinatorText.Contains("return true;"),
+                "ZoneClientSessionLifecycleCoordinator must keep duplicate same-phase transitions legal.");
+            Assert.IsTrue(
+                coordinatorText.Contains("throw new InvalidOperationException("),
+                "ZoneClientSessionLifecycleCoordinator must guard invalid transitions.");
+
+            string[] packetAndRuntimePatterns =
+                {
+                    "SendCompressed",
+                    "PlayfieldAnarchyFMessageHandler",
+                    "FullCharacterMessageHandler",
+                    "CharInPlayMessage",
+                    "TeleportMessageHandler",
+                    "PrivateCityReadyInitCoordinator",
+                    "NpcCombat",
+                    "NpcPatrol",
+                    "Movement",
+                    "GenericCmd",
+                    "Inventory",
+                    "OrgClient",
+                    "OrgServer",
+                    "MessagePackZip",
+                    "Dao.Instance",
+                    "AOSharpLiveCapture",
+                    "tools-temp"
+                };
+            for (int i = 0; i < packetAndRuntimePatterns.Length; i++)
+            {
+                Assert.IsFalse(
+                    coordinatorText.Contains(packetAndRuntimePatterns[i]),
+                    "ZoneClient session lifecycle coordinator must remain phase-only before packet sequencing moves: "
+                    + packetAndRuntimePatterns[i]);
+            }
+
+            Assert.IsTrue(
+                clientConnectedText.Contains("FullCharacterMessageHandler.Default.Send(client.Controller.Character);"),
+                "FullCharacter packet emission must still remain outside the lifecycle coordinator.");
+            Assert.IsTrue(
+                clientConnectedText.Contains("currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character);"),
+                "CharInPlay/visibility packet emission must still remain outside the lifecycle coordinator.");
+            Assert.IsTrue(
+                playfieldText.Contains("TeleportMessageHandler.Default.Send("),
+                "Teleport packet emission must still remain outside the lifecycle coordinator.");
+
+            string markerSurfaces = zoneLoginText + clientConnectedText + playfieldText;
+            Assert.IsFalse(
+                markerSurfaces.Contains("ZoneClientSessionPhase."),
+                "Packet/runtime surfaces must not own lifecycle enum transition rules directly.");
+            Assert.IsFalse(
+                markerSurfaces.Contains("CanTransitionTo("),
+                "Packet/runtime surfaces must call named coordinator transition methods instead of owning transition validity.");
+        }
+
+        [TestMethod]
         public void PlayfieldDynelRegistryIsOwnedByRuntimeSystemsAndFeedsSafeLookupPaths()
         {
             string repositoryRoot = FindRepositoryRoot();
