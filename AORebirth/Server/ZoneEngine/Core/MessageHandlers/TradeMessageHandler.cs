@@ -279,11 +279,12 @@ namespace ZoneEngine.Core.MessageHandlers
                                 IItem returnedItem = shoppingBag.Remove(message.Target, message.Container.Instance);
                                 if (returnedItem != null)
                                 {
+                                    int targetSlot = InventoryContainerRuntimeService.Default.FindFreeStandardInventorySlot(
+                                        client.Controller.Character);
                                     InventoryError err =
-                                        client.Controller.Character.BaseInventory.AddToPage(
-                                            client.Controller.Character.BaseInventory.StandardPage,
-                                            client.Controller.Character.BaseInventory.Pages[
-                                                client.Controller.Character.BaseInventory.StandardPage].FindFreeSlot(),
+                                        InventoryContainerRuntimeService.Default.AddToStandardInventoryPage(
+                                            client.Controller.Character,
+                                            targetSlot,
                                             returnedItem);
 
                                     if (err == InventoryError.OK)
@@ -412,11 +413,12 @@ namespace ZoneEngine.Core.MessageHandlers
 
                             foreach (IItem item in boughtItems)
                             {
-                                int nextSlot = issuer.BaseInventory[issuer.BaseInventory.StandardPage].FindFreeSlot();
+                                int nextSlot = InventoryContainerRuntimeService.Default.FindFreeStandardInventorySlot(
+                                    issuer);
                                 if (nextSlot != -1)
                                 {
-                                    InventoryError err = issuer.BaseInventory.AddToPage(
-                                        issuer.BaseInventory.StandardPage,
+                                    InventoryError err = InventoryContainerRuntimeService.Default.AddToStandardInventoryPage(
+                                        issuer,
                                         nextSlot,
                                         item);
                                     if (err == InventoryError.OK)
@@ -492,10 +494,14 @@ namespace ZoneEngine.Core.MessageHandlers
                             IItem[] items = shoppingBag.GetSoldItems();
                             foreach (IItem item in items)
                             {
-                                int nextSlot = issuer.BaseInventory[issuer.BaseInventory.StandardPage].FindFreeSlot();
+                                int nextSlot = InventoryContainerRuntimeService.Default.FindFreeStandardInventorySlot(
+                                    issuer);
                                 if (nextSlot != -1)
                                 {
-                                    issuer.BaseInventory[issuer.BaseInventory.StandardPage].Add(nextSlot, item);
+                                    InventoryContainerRuntimeService.Default.AddToStandardInventoryPageUnchecked(
+                                        issuer,
+                                        nextSlot,
+                                        item);
                                 }
                             }
                         }
@@ -793,7 +799,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 return true;
             }
 
-            int inventorySlot = character.BaseInventory[character.BaseInventory.StandardPage].FindFreeSlot();
+            int inventorySlot = InventoryContainerRuntimeService.Default.FindFreeStandardInventorySlot(character);
             if (inventorySlot < 0)
             {
                 shoppingBag.AddPlayerOffer(character.Identity, returnedItem);
@@ -802,7 +808,7 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             InventoryError err =
-                character.BaseInventory.AddToPage(character.BaseInventory.StandardPage, inventorySlot, returnedItem);
+                InventoryContainerRuntimeService.Default.AddToStandardInventoryPage(character, inventorySlot, returnedItem);
             if (err != InventoryError.OK)
             {
                 shoppingBag.AddPlayerOffer(character.Identity, returnedItem);

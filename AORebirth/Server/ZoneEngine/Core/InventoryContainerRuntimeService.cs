@@ -1422,6 +1422,21 @@ namespace ZoneEngine.Core
             return false;
         }
 
+        public int FindFreeStandardInventorySlot(IItemContainer owner)
+        {
+            return owner.BaseInventory[owner.BaseInventory.StandardPage].FindFreeSlot();
+        }
+
+        public InventoryError AddToStandardInventoryPage(IItemContainer owner, int targetSlot, IItem item)
+        {
+            return owner.BaseInventory.AddToPage(owner.BaseInventory.StandardPage, targetSlot, item);
+        }
+
+        public void AddToStandardInventoryPageUnchecked(IItemContainer owner, int targetSlot, IItem item)
+        {
+            owner.BaseInventory[owner.BaseInventory.StandardPage].Add(targetSlot, item);
+        }
+
         public void SendTradeWindowMoveToInventory(
             ICharacter character,
             IdentityType sourceType,
