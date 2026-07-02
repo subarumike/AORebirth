@@ -827,15 +827,23 @@ namespace AORebirth.Core.Playfields
             ZoneClient lifecycleClient = dynel.Controller == null ? null : dynel.Controller.Client as ZoneClient;
             if (lifecycleClient != null)
             {
-                lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer();
+                lifecycleClient.PacketSequencing.RunPlayfieldTransferBeginSequence(
+                    lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer,
+                    () => TeleportMessageHandler.Default.Send(
+                        dynel as ICharacter,
+                        destination.coordinate,
+                        (Vector.Quaternion)heading,
+                        playfield));
             }
-
-            // Teleport to another playfield
-            TeleportMessageHandler.Default.Send(
-                dynel as ICharacter,
-                destination.coordinate,
-                (Vector.Quaternion)heading,
-                playfield);
+            else
+            {
+                // Teleport to another playfield
+                TeleportMessageHandler.Default.Send(
+                    dynel as ICharacter,
+                    destination.coordinate,
+                    (Vector.Quaternion)heading,
+                    playfield);
+            }
 
             // Send packet, disconnect, and other playfield waits for connect
 

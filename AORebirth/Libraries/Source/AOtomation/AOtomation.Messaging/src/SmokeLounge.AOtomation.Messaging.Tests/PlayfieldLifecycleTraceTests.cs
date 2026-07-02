@@ -1148,7 +1148,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "client.Controller.Character.DoNotDoTimers = false;");
             AssertTextBefore(
                 teleportMethod,
-                "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer();",
+                "lifecycleClient.PacketSequencing.RunPlayfieldTransferBeginSequence(",
                 "TeleportMessageHandler.Default.Send(");
             AssertTextBefore(
                 disposeMethod,
@@ -1309,8 +1309,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && clientConnectedText.Contains("client.SessionLifecycle.CompleteInPlayForSessionInit);"),
                 "ClientConnected must route ready/full-character/CharInPlay/InPlay phases through named coordinator methods.");
             Assert.IsTrue(
-                playfieldText.Contains("lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer();"),
-                "Playfield teleport must use the named coordinator method for zoning entry.");
+                playfieldText.Contains("lifecycleClient.PacketSequencing.RunPlayfieldTransferBeginSequence(")
+                && playfieldText.Contains("lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer,"),
+                "Playfield teleport must route zoning entry through the named coordinator method.");
 
             string[] forbiddenCoordinatorMechanics =
                 {
@@ -1446,6 +1447,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPreFullCharacterOrgInitSequence(")
                 && privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPlayfieldReadyBlockSequence("),
                 "PrivateCityReadyInitCoordinator must route private-city ready/init packet order through PacketSequencingCoordinator.");
+            Assert.IsTrue(
+                playfieldText.Contains("lifecycleClient.PacketSequencing.RunPlayfieldTransferBeginSequence(")
+                && playfieldText.Contains("lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer,")
+                && playfieldText.Contains("() => TeleportMessageHandler.Default.Send("),
+                "Playfield must route zoning phase entry before teleport packet send through PacketSequencingCoordinator.");
 
             string privateCityOrgInitSequence = ExtractMethodBlock(
                 coordinatorText,
@@ -1465,6 +1471,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(privateCityReadyBlockSequence, "Execute(recordPlayfieldAllTowers", "Execute(sendPlayfieldAllCities");
             AssertTextBefore(privateCityReadyBlockSequence, "Execute(sendPlayfieldAllCities", "Execute(recordPlayfieldAllCities");
             AssertTextBefore(privateCityReadyBlockSequence, "Execute(recordPlayfieldAllCities", "Execute(recordTowersCitiesSent");
+
+            string playfieldTransferBeginSequence = ExtractMethodBlock(
+                coordinatorText,
+                "public void RunPlayfieldTransferBeginSequence");
+            AssertTextBefore(playfieldTransferBeginSequence, "Execute(enterZoningPhase", "Execute(sendTeleportPacket");
 
             string[] packetAndRuntimePatterns =
                 {
@@ -1533,14 +1544,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(
                 teleportMethod,
                 "if (this.TryCompleteGridTeleportInCurrentPlayfield(dynel, destination, heading, playfield))",
-                "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer();");
+                "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer,");
             AssertTextBefore(
                 teleportMethod,
                 "dynel.DoNotDoTimers = true;",
-                "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer();");
+                "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer,");
             AssertTextBefore(
                 teleportMethod,
-                "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer();",
+                "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer,",
                 "TeleportMessageHandler.Default.Send(");
             AssertTextBefore(
                 teleportMethod,
@@ -1600,9 +1611,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "this.server.PlayfieldById(",
                 "this.Controller.Character = new Character(");
 
-            Assert.IsFalse(
-                teleportMethod.Contains("PacketSequencing"),
-                "Cross-playfield teleport runtime handoff must stay outside PacketSequencingCoordinator until guarded extraction.");
+            Assert.IsTrue(
+                teleportMethod.Contains("lifecycleClient.PacketSequencing.RunPlayfieldTransferBeginSequence("),
+                "The guarded zoning phase-entry and teleport-send order may be routed through PacketSequencingCoordinator.");
             Assert.IsFalse(
                 packetSequencingText.Contains("TeleportMessageHandler")
                 || packetSequencingText.Contains("ZoneRedirectionMessage")
