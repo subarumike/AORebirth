@@ -45,6 +45,7 @@ namespace ZoneEngine.Core.KnuBot
 
     using Utility;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.MessageHandlers;
 
     #endregion
@@ -301,7 +302,10 @@ namespace ZoneEngine.Core.KnuBot
         /// </param>
         protected void Trade(IdentityType container, int slotNumber)
         {
-            IItem temp = this.GetCharacter().BaseInventory.Pages[(int)container][slotNumber];
+            IItem temp = InventoryContainerRuntimeService.Default.GetKnuBotTradeItem(
+                this.GetCharacter(),
+                container,
+                slotNumber);
             // TODO: Remove item from Character's inventory and check against script reqs
             LogUtil.Debug(
                 DebugInfoDetail.KnuBot,
