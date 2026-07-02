@@ -199,11 +199,14 @@ namespace ZoneEngine.Core.MessageHandlers
                     equipTo.Equip(sendingPage, fromPlacement, toPlacement);
                 }
 
-                this.SendMoveAck(character, message.SourceContainer, ackTargetPlacement);
+                InventoryContainerRuntimeService.Default.SendMoveItemToInventoryAck(
+                    character,
+                    message.SourceContainer,
+                    ackTargetPlacement);
                 Equip.Send(client, receivingPage, toPlacement);
                 character.CalculateSkills();
                 EnsureWeaponVisualMeshes(character, true);
-                this.PersistCharacterInventory(character, "equip");
+                InventoryContainerRuntimeService.Default.PersistClientMoveItemToInventory(character, "equip");
                 return true;
             }
 
@@ -222,17 +225,23 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 UnEquip.Send(client, sendingPage, fromPlacement);
                 unequipFrom.Unequip(fromPlacement, receivingPage, toPlacement);
-                this.SendMoveAck(character, message.SourceContainer, ackTargetPlacement);
+                InventoryContainerRuntimeService.Default.SendMoveItemToInventoryAck(
+                    character,
+                    message.SourceContainer,
+                    ackTargetPlacement);
                 character.CalculateSkills();
                 EnsureWeaponVisualMeshes(character, true);
-                this.PersistCharacterInventory(character, "unequip");
+                InventoryContainerRuntimeService.Default.PersistClientMoveItemToInventory(character, "unequip");
                 return true;
             }
 
             sendingPage.Remove(fromPlacement);
             receivingPage.Add(toPlacement, itemFrom);
-            this.SendMoveAck(character, message.SourceContainer, ackTargetPlacement);
-            this.PersistCharacterInventory(character, "move");
+            InventoryContainerRuntimeService.Default.SendMoveItemToInventoryAck(
+                character,
+                message.SourceContainer,
+                ackTargetPlacement);
+            InventoryContainerRuntimeService.Default.PersistClientMoveItemToInventory(character, "move");
             return true;
         }
 
@@ -305,19 +314,6 @@ namespace ZoneEngine.Core.MessageHandlers
             ChatTextMessageHandler.Default.Send(character, "Accessing implants requires technical supervision.");
         }
 
-        private void SendMoveAck(ICharacter character, Identity sourceContainer, int targetPlacement)
-        {
-            character.Send(
-                new ContainerAddItemMessage
-                {
-                    Identity = character.Identity,
-                    SourceContainer = sourceContainer,
-                    Target = character.Identity,
-                    TargetPlacement = targetPlacement,
-                    Unknown = 0
-                });
-        }
-
         private bool IsAppearanceEquipmentPage(IInventoryPage page)
         {
             return page is WeaponInventoryPage || page is ArmorInventoryPage || page is SocialArmorInventoryPage;
@@ -326,14 +322,6 @@ namespace ZoneEngine.Core.MessageHandlers
         private bool IsWeaponPage(IInventoryPage page)
         {
             return page is WeaponInventoryPage;
-        }
-
-        private void PersistCharacterInventory(ICharacter character, string reason)
-        {
-            character.BaseInventory.Write();
-            LogUtil.Debug(
-                DebugInfoDetail.Database,
-                string.Format("Persisted inventory after ClientMoveItemToInventory {0} char={1}", reason, character.Identity));
         }
 
         private void WaitForEquipVisualSync(IItem primary, IItem secondary, bool isSocial)
