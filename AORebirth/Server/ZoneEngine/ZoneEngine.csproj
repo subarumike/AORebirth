@@ -290,6 +290,7 @@
     <Compile Include="Core\Playfields\NpcPatrolReplayCoordinator.cs" />
     <Compile Include="Core\Playfields\PrivateCityReadyInitCoordinator.cs" />
     <Compile Include="Core\Playfields\Playfield.cs" />
+    <Compile Include="Core\Playfields\PlayfieldDynelRegistry.cs" />
     <Compile Include="Core\Playfields\PlayfieldLifecycleTrace.cs" />
     <Compile Include="Core\Playfields\PlayfieldRuntimeSystems.cs" />
     <Compile Include="Core\Playfields\Playfields.cs" />
