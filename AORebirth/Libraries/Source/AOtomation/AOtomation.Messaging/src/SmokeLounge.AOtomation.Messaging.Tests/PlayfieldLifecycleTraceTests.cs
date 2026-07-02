@@ -947,6 +947,57 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void PlayfieldDirectPoolUsageIsLimitedToNamedGlobalAndCrossPlayfieldExceptions()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+
+            string disconnectAllClients = ExtractMethodBlock(playfieldText, "public void DisconnectAllClients()");
+            string numberOfDynels = ExtractMethodBlock(playfieldText, "public int NumberOfDynels()");
+            string numberOfPlayers = ExtractMethodBlock(playfieldText, "public int NumberOfPlayers()");
+            string teleport = ExtractMethodBlock(
+                playfieldText,
+                "public void Teleport(Dynel dynel, Coordinate destination, IQuaternion heading, Identity playfield)");
+
+            string[] intentionalGlobalOrCrossPlayfieldExceptions =
+                {
+                    "DisconnectAllClients: global CanbeAffected character scan for server shutdown/dispose.",
+                    "NumberOfDynels: global CanbeAffected count, not playfield-local registry count.",
+                    "NumberOfPlayers: global CanbeAffected Character count, not playfield-local registry count.",
+                    "Teleport: cross-playfield Pool.GetObject<Playfield> handoff path."
+                };
+            Assert.AreEqual(
+                4,
+                intentionalGlobalOrCrossPlayfieldExceptions.Length,
+                "Every direct Playfield Pool exception must be named with ownership scope.");
+
+            Assert.IsTrue(
+                disconnectAllClients.Contains(
+                    "Pool.Instance.GetAll<Character>((int)IdentityType.CanbeAffected).ToList()"),
+                intentionalGlobalOrCrossPlayfieldExceptions[0]);
+            Assert.IsTrue(
+                numberOfDynels.Contains("Pool.Instance.GetAll((int)IdentityType.CanbeAffected).Count()"),
+                intentionalGlobalOrCrossPlayfieldExceptions[1]);
+            Assert.IsTrue(
+                numberOfPlayers.Contains(
+                    "Pool.Instance.GetAll<Character>((int)IdentityType.CanbeAffected).Count()"),
+                intentionalGlobalOrCrossPlayfieldExceptions[2]);
+            Assert.IsTrue(
+                teleport.Contains("Pool.Instance.GetObject<Playfield>("),
+                intentionalGlobalOrCrossPlayfieldExceptions[3]);
+
+            Assert.AreEqual(
+                3,
+                CountOccurrences(playfieldText, "Pool.Instance.GetAll"),
+                "Future direct Playfield Pool scans are blocked unless added to this explicit exception list.");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(playfieldText, "Pool.Instance.GetObject"),
+                "Future direct Playfield Pool identity lookups are blocked unless added to this explicit exception list.");
+        }
+
+        [TestMethod]
         public void AreteCleaningRobotDbSpawnSuppressionKeepsCapturedPathAndLegacyDbBoundary()
         {
             string repositoryRoot = FindRepositoryRoot();
