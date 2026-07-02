@@ -11,9 +11,11 @@ namespace ZoneEngine.Core
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
     using AORebirth.Core.Events;
+    using AORebirth.Core.Functions;
     using AORebirth.Core.Inventory;
     using AORebirth.Core.Items;
     using AORebirth.Core.Network;
+    using AORebirth.Core.Requirements;
     using AORebirth.Core.Statels;
     using AORebirth.Core.Textures;
     using AORebirth.Enums;
@@ -26,6 +28,7 @@ namespace ZoneEngine.Core
 
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
+    using ZoneEngine.Core.Functions.GameFunctions;
 
     #endregion
 
@@ -508,6 +511,57 @@ namespace ZoneEngine.Core
             return true;
         }
 
+        public bool UseInventoryItem(ICharacter character, Identity itemPosition)
+        {
+            Item item = null;
+            try
+            {
+                item = character.BaseInventory.GetItemInContainer((int)itemPosition.Type, itemPosition.Instance);
+            }
+            catch (Exception)
+            {
+            }
+
+            if (item == null)
+            {
+                throw new NullReferenceException("No item found at " + itemPosition);
+            }
+
+            if (this.TryOpenBackpackContainer(character, itemPosition, item))
+            {
+                return true;
+            }
+
+            if (this.IsUseBlockedBySkillLock(character, item))
+            {
+                return false;
+            }
+
+            TemplateActionMessageHandler.Default.Send(
+                character,
+                item,
+                (int)itemPosition.Type,
+                itemPosition.Instance);
+
+            if (ItemLoader.ItemList[item.HighID].IsConsumable())
+            {
+                item.MultipleCount--;
+                if (item.MultipleCount <= 0)
+                {
+                    character.BaseInventory.RemoveItem(
+                        (int)itemPosition.Type,
+                        itemPosition.Instance);
+                    CharacterActionMessageHandler.Default.SendDeleteItem(
+                        character,
+                        (int)itemPosition.Type,
+                        itemPosition.Instance);
+                }
+            }
+
+            item.PerformAction(character, EventType.OnUse, itemPosition.Instance);
+            return true;
+        }
+
         public bool TryRejectInventoryPageAccess(ICharacter character, IInventoryPage page)
         {
             if (this.RequiresImplantAccess(page) && !this.HasImplantAccess(character))
@@ -705,7 +759,7 @@ namespace ZoneEngine.Core
             switch (InventoryContainerInteractionRules.ResolveRouteMode(target))
             {
                 case InventoryContainerInteractionRouteMode.InventoryItem:
-                    client.Controller.UseItem(target);
+                    this.UseInventoryItem(client.Controller.Character, target);
                     GenericCmdMessageHandler.Default.Acknowledge(client.Controller.Character, message);
                     return true;
 
@@ -1246,6 +1300,60 @@ namespace ZoneEngine.Core
         private static bool IsItemUsable(Item item)
         {
             return (item.GetAttribute((int)StatIds.can) & (int)CanFlags.Use) == (int)CanFlags.Use;
+        }
+
+        private bool IsUseBlockedBySkillLock(ICharacter characterEntity, Item item)
+        {
+            Character character = characterEntity as Character;
+            if (character == null)
+            {
+                return false;
+            }
+
+            foreach (Event itemEvent in item.Events.Where(x => x.EventType == EventType.OnUse))
+            {
+                foreach (Function itemFunction in itemEvent.Functions.Where(
+                    x => x.FunctionType == (int)FunctionType.LockSkill))
+                {
+                    if (!ItemFunctionRequirementsPass(characterEntity, itemFunction))
+                    {
+                        continue;
+                    }
+
+                    int statId;
+                    int durationSeconds;
+                    if (!lockskill.TryReadArguments(itemFunction.Arguments.Values.ToArray(), out statId, out durationSeconds))
+                    {
+                        continue;
+                    }
+
+                    int remainingSeconds = character.GetSkillLockRemainingSeconds(statId);
+                    if (remainingSeconds <= 0)
+                    {
+                        continue;
+                    }
+
+                    CharacterActionMessageHandler.Default.SendSkillUnavailable(character, statId, remainingSeconds);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool ItemFunctionRequirementsPass(ICharacter character, Function itemFunction)
+        {
+            bool result = true;
+            foreach (Requirement requirement in itemFunction.Requirements)
+            {
+                result &= requirement.CheckRequirement(character);
+                if (!result)
+                {
+                    break;
+                }
+            }
+
+            return result;
         }
 
         private bool EnsureWeaponMesh(

@@ -334,7 +334,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "public sealed class InventoryContainerRuntimeService");
             AssertContains(service, "TryHandleGenericCmdUse");
             AssertContains(service, "TryHandleUseItemOnItem");
-            AssertContains(service, "client.Controller.UseItem(target);");
+            AssertContains(service, "this.UseInventoryItem(client.Controller.Character, target);");
             AssertContains(service, "this.TryUseBackpackContainer(client.Controller.Character, target)");
             AssertContains(service, "BackpackContainerActionMessageHandler.Default.SendClose");
             AssertContains(service, "client.Controller.UseStatel(message.Target[1], EventType.OnUseItemOn);");
@@ -644,9 +644,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "private static bool IsItemUsable");
             AssertContains(service, "this.TryUseBackpackContainer(client.Controller.Character, target)");
 
+            AssertContains(service, "this.TryOpenBackpackContainer(character, itemPosition, item)");
             AssertContains(
                 playerController,
-                "InventoryContainerRuntimeService.Default.TryOpenBackpackContainer(this.Character, itemPosition, item)");
+                "InventoryContainerRuntimeService.Default.UseInventoryItem(this.Character, itemPosition)");
             AssertContains(
                 playerController,
                 "InventoryContainerRuntimeService.Default.TryUseBackpackContainer(this.Character, itemPosition)");
@@ -654,6 +655,34 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(playerController, "private bool IsBackpackUseSlot");
             AssertDoesNotContain(playerController, "private bool TryResolveBackpackContainerIdentity");
             AssertDoesNotContain(playerController, "private bool IsItemUsable");
+        }
+
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsInventoryItemUseLifecycle()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string playerController =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Controllers\PlayerController.cs");
+
+            AssertContains(service, "public bool UseInventoryItem");
+            AssertContains(service, "this.TryOpenBackpackContainer(character, itemPosition, item)");
+            AssertContains(service, "private bool IsUseBlockedBySkillLock");
+            AssertContains(service, "private static bool ItemFunctionRequirementsPass");
+            AssertContains(service, "TemplateActionMessageHandler.Default.Send(");
+            AssertContains(service, "ItemLoader.ItemList[item.HighID].IsConsumable()");
+            AssertContains(service, "character.BaseInventory.RemoveItem(");
+            AssertContains(service, "CharacterActionMessageHandler.Default.SendDeleteItem(");
+            AssertContains(service, "item.PerformAction(character, EventType.OnUse, itemPosition.Instance);");
+            AssertContains(service, "this.UseInventoryItem(client.Controller.Character, target);");
+
+            AssertContains(
+                playerController,
+                "return InventoryContainerRuntimeService.Default.UseInventoryItem(this.Character, itemPosition);");
+            AssertDoesNotContain(playerController, "private bool IsUseBlockedBySkillLock");
+            AssertDoesNotContain(playerController, "private bool ItemFunctionRequirementsPass");
+            AssertDoesNotContain(playerController, "TemplateActionMessageHandler.Default.Send(");
+            AssertDoesNotContain(playerController, "ItemLoader.ItemList[item.HighID].IsConsumable()");
         }
 
         [TestMethod]
