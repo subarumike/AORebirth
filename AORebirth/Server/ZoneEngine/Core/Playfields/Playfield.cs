@@ -827,7 +827,7 @@ namespace AORebirth.Core.Playfields
             ZoneClient lifecycleClient = dynel.Controller == null ? null : dynel.Controller.Client as ZoneClient;
             if (lifecycleClient != null)
             {
-                lifecycleClient.SessionLifecycle.BeginZoning();
+                lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer();
             }
 
             // Teleport to another playfield

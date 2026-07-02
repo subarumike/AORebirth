@@ -229,7 +229,7 @@ namespace ZoneEngine.Core
                 throw new Exception("Character " + charId + " not found.");
             }
 
-            this.SessionLifecycle.BeginPlayfieldLoading();
+            this.SessionLifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();
 
             // TODO: Save playfield type into Character table and use it accordingly
             IPlayfield pf =
@@ -419,7 +419,7 @@ namespace ZoneEngine.Core
             {
                 if (!this.disposed)
                 {
-                    this.sessionLifecycle.BeginDisconnecting();
+                    this.sessionLifecycle.EnterDisconnectingForSessionDispose();
 
                     this.stopDispatcher = true;
 
