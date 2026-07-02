@@ -440,12 +440,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "public void PersistClientMoveItemToInventory");
             AssertContains(service, "character.BaseInventory.Write();");
 
-            AssertContains(
-                clientMoveHandler,
-                "InventoryContainerRuntimeService.Default.SendMoveItemToInventoryAck");
-            AssertContains(
-                clientMoveHandler,
-                "InventoryContainerRuntimeService.Default.PersistClientMoveItemToInventory");
+            AssertContains(service, "this.SendMoveItemToInventoryAck(");
+            AssertContains(service, "this.PersistClientMoveItemToInventory(");
+            AssertDoesNotContain(clientMoveHandler, "InventoryContainerRuntimeService.Default.SendMoveItemToInventoryAck");
+            AssertDoesNotContain(clientMoveHandler, "InventoryContainerRuntimeService.Default.PersistClientMoveItemToInventory");
             AssertDoesNotContain(clientMoveHandler, "private void SendMoveAck");
             AssertDoesNotContain(clientMoveHandler, "private void PersistCharacterInventory");
             AssertDoesNotContain(clientMoveHandler, "new ContainerAddItemMessage");
@@ -467,14 +465,39 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "public IInventoryPage ResolveMoveTargetPage");
             AssertContains(service, "character.BaseInventory.PageFromSlot(targetPlacement)");
 
-            AssertContains(
-                clientMoveHandler,
-                "InventoryContainerRuntimeService.Default.TryResolveMoveSourcePage");
-            AssertContains(
-                clientMoveHandler,
-                "InventoryContainerRuntimeService.Default.ResolveMoveTargetPage");
+            AssertContains(service, "this.TryResolveMoveSourcePage(");
+            AssertContains(service, "this.ResolveMoveTargetPage(");
+            AssertDoesNotContain(clientMoveHandler, "InventoryContainerRuntimeService.Default.TryResolveMoveSourcePage");
+            AssertDoesNotContain(clientMoveHandler, "InventoryContainerRuntimeService.Default.ResolveMoveTargetPage");
             AssertDoesNotContain(clientMoveHandler, "private bool TryGetSourcePage");
             AssertDoesNotContain(clientMoveHandler, "private IInventoryPage GetTargetPage");
+        }
+
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsOwnedInventoryMoveBranch()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string clientMoveHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
+
+            AssertContains(service, "public bool TryMoveOwnedInventoryItem");
+            AssertContains(service, "WeaponItemFullUpdate.SendWeaponDefinition(character, itemFrom);");
+            AssertContains(service, "equipTo.HotSwap(sendingPage, fromPlacement, toPlacement);");
+            AssertContains(service, "equipTo.Equip(sendingPage, fromPlacement, toPlacement);");
+            AssertContains(service, "unequipFrom.Unequip(fromPlacement, receivingPage, toPlacement);");
+            AssertContains(service, "sendingPage.Remove(fromPlacement);");
+            AssertContains(service, "receivingPage.Add(toPlacement, itemFrom);");
+
+            AssertContains(
+                clientMoveHandler,
+                "InventoryContainerRuntimeService.Default.TryMoveOwnedInventoryItem(character, message, client)");
+            AssertDoesNotContain(clientMoveHandler, "private bool TryMoveOwnedInventoryItem");
+            AssertDoesNotContain(clientMoveHandler, "private bool CanEquipToPage");
+            AssertDoesNotContain(clientMoveHandler, "private bool RequiresImplantAccess");
+            AssertDoesNotContain(clientMoveHandler, "private void SendImplantAccessDenied");
+            AssertDoesNotContain(clientMoveHandler, "private void WaitForEquipVisualSync");
         }
 
         private static void AssertRoute(
