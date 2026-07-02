@@ -283,10 +283,12 @@ namespace ZoneEngine.Core.MessageHandlers
                 else
                 {
                     // No equipment page involved, just send ContainerAddItemMessage back
-                    message.TargetPlacement = receivingPage.FindFreeSlot();
-                    IItem item = sendingPage.Remove(fromPlacement);
-                    receivingPage.Add(message.TargetPlacement, item);
-                    client.Controller.Character.Send(message);
+                    InventoryContainerRuntimeService.Default.MoveNonEquipmentContainerItem(
+                        client.Controller.Character,
+                        message,
+                        sendingPage,
+                        receivingPage,
+                        fromPlacement);
                 }
             }
 

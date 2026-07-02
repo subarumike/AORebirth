@@ -606,6 +606,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(clientContainerAddItemHandler, "Persisted inventory after ClientContainerAddItem bank deposit");
         }
 
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsNonEquipmentContainerTransfer()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string containerAddItemHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs");
+
+            AssertContains(service, "public void MoveNonEquipmentContainerItem");
+            AssertContains(service, "message.TargetPlacement = receivingPage.FindFreeSlot();");
+            AssertContains(service, "IItem item = sendingPage.Remove(fromPlacement);");
+            AssertContains(service, "receivingPage.Add(message.TargetPlacement, item);");
+            AssertContains(service, "character.Send(message);");
+
+            AssertContains(
+                containerAddItemHandler,
+                "InventoryContainerRuntimeService.Default.MoveNonEquipmentContainerItem(");
+            AssertDoesNotContain(containerAddItemHandler, "message.TargetPlacement = receivingPage.FindFreeSlot();");
+            AssertDoesNotContain(containerAddItemHandler, "IItem item = sendingPage.Remove(fromPlacement);");
+            AssertDoesNotContain(containerAddItemHandler, "receivingPage.Add(message.TargetPlacement, item);");
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,
