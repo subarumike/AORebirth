@@ -580,6 +580,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(clientContainerAddItemHandler, "InventoryItemRules.IsBackpackContainerItem");
         }
 
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsInventoryToBankDeposit()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string clientContainerAddItemHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientContainerAddItemMessageHandler.cs");
+
+            AssertContains(service, "public bool TryDepositInventoryItemToBank");
+            AssertContains(service, "private static bool IsInventoryToBankDeposit");
+            AssertContains(service, "message.Target.Type == IdentityType.IncomingTradeWindow");
+            AssertContains(service, "message.Target.Instance != character.Identity.Instance");
+            AssertContains(service, "character.BaseInventory.Pages.TryGetValue((int)IdentityType.Bank, out bankPage)");
+            AssertContains(service, "private void TryRemoveBankRollback");
+            AssertContains(service, "Persisted inventory after ClientContainerAddItem bank deposit");
+
+            AssertContains(
+                clientContainerAddItemHandler,
+                "InventoryContainerRuntimeService.Default.TryDepositInventoryItemToBank(character, message)");
+            AssertDoesNotContain(clientContainerAddItemHandler, "private bool IsInventoryToBankDeposit");
+            AssertDoesNotContain(clientContainerAddItemHandler, "private void TryRemoveBankRollback");
+            AssertDoesNotContain(clientContainerAddItemHandler, "character.BaseInventory.Pages.TryGetValue((int)IdentityType.Bank");
+            AssertDoesNotContain(clientContainerAddItemHandler, "Persisted inventory after ClientContainerAddItem bank deposit");
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,

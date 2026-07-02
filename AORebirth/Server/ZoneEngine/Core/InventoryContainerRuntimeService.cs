@@ -253,6 +253,142 @@ namespace ZoneEngine.Core
             return true;
         }
 
+        public bool TryDepositInventoryItemToBank(ICharacter character, ClientContainerAddItemMessage message)
+        {
+            if (!IsInventoryToBankDeposit(message))
+            {
+                return false;
+            }
+
+            if (message.Target.Instance != character.Identity.Instance)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Rejected ClientContainerAddItem bank deposit for mismatched target char={0} target={1} source={2}",
+                        character.Identity,
+                        message.Target,
+                        message.Source));
+                return true;
+            }
+
+            IInventoryPage inventoryPage;
+            IInventoryPage bankPage;
+            if (!character.BaseInventory.Pages.TryGetValue((int)IdentityType.Inventory, out inventoryPage)
+                || !character.BaseInventory.Pages.TryGetValue((int)IdentityType.Bank, out bankPage))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Rejected ClientContainerAddItem bank deposit because inventory pages are missing char={0}",
+                        character.Identity));
+                return true;
+            }
+
+            int sourceSlot = message.Source.Instance;
+            if (!inventoryPage.ValidSlot(sourceSlot))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Rejected ClientContainerAddItem bank deposit for invalid source slot char={0} source={1}",
+                        character.Identity,
+                        message.Source));
+                return true;
+            }
+
+            IItem item = inventoryPage[sourceSlot];
+            if (item == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Rejected ClientContainerAddItem bank deposit because source slot is empty char={0} source={1}",
+                        character.Identity,
+                        message.Source));
+                return true;
+            }
+
+            int bankSlot = bankPage.FindFreeSlot();
+            if (bankSlot < 0)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Rejected ClientContainerAddItem bank deposit because bank is full char={0} source={1}",
+                        character.Identity,
+                        message.Source));
+                return true;
+            }
+
+            try
+            {
+                InventoryError addError = bankPage.Add(bankSlot, item);
+                if (addError != InventoryError.OK)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        string.Format(
+                            "Rejected ClientContainerAddItem bank deposit add failed char={0} source={1} bankSlot={2} error={3}",
+                            character.Identity,
+                            message.Source,
+                            bankSlot,
+                            addError));
+                    return true;
+                }
+            }
+            catch (Exception exception)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Rejected ClientContainerAddItem bank deposit add threw char={0} source={1} bankSlot={2} error={3}",
+                        character.Identity,
+                        message.Source,
+                        bankSlot,
+                        exception.Message));
+                return true;
+            }
+
+            try
+            {
+                inventoryPage.Remove(sourceSlot);
+            }
+            catch (Exception exception)
+            {
+                this.TryRemoveBankRollback(bankPage, bankSlot);
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Rejected ClientContainerAddItem bank deposit remove source threw char={0} source={1} bankSlot={2} error={3}",
+                        character.Identity,
+                        message.Source,
+                        bankSlot,
+                        exception.Message));
+                return true;
+            }
+
+            character.Send(
+                new ContainerAddItemMessage
+                    {
+                        Identity = character.Identity,
+                        Unknown = 0,
+                        SourceContainer = message.Source,
+                        Target = message.Target,
+                        TargetPlacement = bankSlot
+                    });
+
+            character.BaseInventory.Write();
+            LogUtil.Debug(
+                DebugInfoDetail.Database,
+                string.Format(
+                    "Persisted inventory after ClientContainerAddItem bank deposit char={0} source={1} bankSlot={2}",
+                    character.Identity,
+                    message.Source,
+                    bankSlot));
+            return true;
+        }
+
         public bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
             switch (InventoryContainerInteractionRules.ResolveRouteMode(target))
@@ -766,6 +902,32 @@ namespace ZoneEngine.Core
         private static int DecodeBackpackSlot(Identity sourceContainer)
         {
             return (int)((uint)sourceContainer.Instance & 0xffff);
+        }
+
+        private static bool IsInventoryToBankDeposit(ClientContainerAddItemMessage message)
+        {
+            return message.Source.Type == IdentityType.Inventory
+                   && message.Target.Type == IdentityType.IncomingTradeWindow;
+        }
+
+        private void TryRemoveBankRollback(IInventoryPage bankPage, int bankSlot)
+        {
+            try
+            {
+                if (bankPage[bankSlot] != null)
+                {
+                    bankPage.Remove(bankSlot);
+                }
+            }
+            catch (Exception exception)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "ClientContainerAddItem bank deposit rollback failed bankSlot={0} error={1}",
+                        bankSlot,
+                        exception.Message));
+            }
         }
 
         private void TryRemoveBackpackRollback(IInventoryPage backpackPage, int backpackSlot)
