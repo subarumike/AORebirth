@@ -163,32 +163,7 @@ namespace ZoneEngine.Core.MessageHandlers
                     {
                         IItem item;
 
-                        try
-                        {
-                            if (issuer is Vendor)
-                            {
-                                item = issuer.BaseInventory.GetItemInContainer(
-                                    (int)IdentityType.Inventory,
-                                    message.Container.Instance);
-                            }
-                            else
-                            {
-                                item = issuer.BaseInventory.GetItemInContainer(
-                                    (int)message.Container.Type,
-                                    message.Container.Instance);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            LogUtil.Debug(
-                                DebugInfoDetail.Shopping,
-                                "Trade AddItem lookup failed issuer=" + issuer.Identity.ToString(true)
-                                + " source=" + message.Container.ToString(true)
-                                + " error=" + ex.Message);
-                            break;
-                        }
-
-                        if (item != null)
+                        if (InventoryContainerRuntimeService.Default.TryGetTradeAddItem(issuer, message, out item))
                         {
                             if (!vendorShopBag
                                 && !(issuer is Vendor)
@@ -251,8 +226,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
                         if (issuer is Vendor)
                         {
-                            item = issuer.BaseInventory.GetItemInContainer(
-                                (int)IdentityType.Inventory,
+                            item = InventoryContainerRuntimeService.Default.GetVendorTradeItem(
+                                issuer,
                                 message.Container.Instance);
                         }
                         else
