@@ -127,6 +127,16 @@ namespace ZoneEngine.Core.Playfields
             this.dynelRegistry.Unregister(identity);
         }
 
+        internal void RegisterNpcHome(ICharacter character)
+        {
+            this.npcRuntime.RegisterNpcHome(character);
+        }
+
+        internal void RemoveNpcHome(Identity identity)
+        {
+            this.npcRuntime.RemoveNpcHome(identity);
+        }
+
         internal void RegisterStatels(IEnumerable<StatelData> statels)
         {
             this.dynelRegistry.RegisterStatels(statels);

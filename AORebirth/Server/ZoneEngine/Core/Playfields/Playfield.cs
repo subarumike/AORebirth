@@ -119,8 +119,6 @@ namespace AORebirth.Core.Playfields
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
         private readonly Dictionary<int, int> lastCombatWeaponSlots = new Dictionary<int, int>();
 
-        private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
-
         private readonly Dictionary<int, DateTime> corpseDespawnTicks = new Dictionary<int, DateTime>();
 
         private readonly Dictionary<int, HashSet<string>> statelEnterContacts = new Dictionary<int, HashSet<string>>();
@@ -606,16 +604,7 @@ namespace AORebirth.Core.Playfields
 
         public void RegisterNpcHome(ICharacter character)
         {
-            if (character == null || !(character.Controller is NPCController))
-            {
-                return;
-            }
-
-            this.npcHomeStates[character.Identity.Instance] =
-                new NpcHomeState
-                {
-                    Coordinates = new Coordinate(character.Coordinates())
-                };
+            this.runtimeSystems.RegisterNpcHome(character);
         }
 
         public int DespawnCorpses(Func<string, Identity, bool> shouldDespawn)
@@ -3419,7 +3408,7 @@ namespace AORebirth.Core.Playfields
 
         internal void RemoveNpcHome(Identity identity)
         {
-            this.npcHomeStates.Remove(identity.Instance);
+            this.runtimeSystems.RemoveNpcHome(identity);
         }
 
         private void SendPlayerCorpseFullUpdate(ICharacter target, Identity corpseIdentity)
@@ -4484,11 +4473,6 @@ namespace AORebirth.Core.Playfields
             this.disposed = true;
 
             base.Dispose(disposing);
-        }
-
-        private class NpcHomeState
-        {
-            public Coordinate Coordinates { get; set; }
         }
 
         private class CombatAttackSource
