@@ -4,6 +4,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 {
     #region Usings ...
 
+    using System;
+    using System.IO;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -313,6 +316,61 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 UseItemOnItemInteractionRules.ResolveRouteMode(GenericCmdAction.Use));
         }
 
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsGenericCmdInventoryOrchestration()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string inventoryHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\InventoryContainerInteractionHandler.cs");
+            string useItemOnItemHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\UseItemOnItemInteractionHandler.cs");
+            string genericCmdHandler =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\GenericCmdMessageHandler.cs");
+
+            AssertContains(service, "public sealed class InventoryContainerRuntimeService");
+            AssertContains(service, "TryHandleGenericCmdUse");
+            AssertContains(service, "TryHandleUseItemOnItem");
+            AssertContains(service, "client.Controller.UseItem(target);");
+            AssertContains(service, "client.Controller.TryUseBackpackContainer(target)");
+            AssertContains(service, "BackpackContainerActionMessageHandler.Default.SendClose");
+            AssertContains(service, "client.Controller.UseStatel(message.Target[1], EventType.OnUseItemOn);");
+
+            AssertContains(
+                inventoryHandler,
+                "return InventoryContainerRuntimeService.Default.TryHandleGenericCmdUse(client, message, target);");
+            AssertDoesNotContain(inventoryHandler, "client.Controller.UseItem(target);");
+            AssertDoesNotContain(inventoryHandler, "client.Controller.TryUseBackpackContainer(target)");
+            AssertDoesNotContain(inventoryHandler, "BackpackContainerActionMessageHandler.Default.SendClose");
+
+            AssertContains(
+                useItemOnItemHandler,
+                "return InventoryContainerRuntimeService.Default.TryHandleUseItemOnItem(client, message);");
+            AssertDoesNotContain(useItemOnItemHandler, "Pool.Instance.GetObject<IInventoryPage>");
+            AssertDoesNotContain(useItemOnItemHandler, "client.Controller.UseStatel");
+
+            AssertContains(genericCmdHandler, "InventoryContainerInteractionHandler.Default.TryHandleUse");
+            AssertContains(genericCmdHandler, "UseItemOnItemInteractionHandler.Default.TryHandle");
+
+            foreach (string forbiddenReference in new[]
+                                                {
+                                                    "NpcCombat",
+                                                    "NpcCorpseLifecycle",
+                                                    "NpcPatrol",
+                                                    "PrivateCityReadyInit",
+                                                    "OrgClient",
+                                                    "CityController",
+                                                    "GuestKey",
+                                                    "AOSharpLiveCapture",
+                                                    "CheckDatabase"
+                                                })
+            {
+                AssertDoesNotContain(service, forbiddenReference);
+            }
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,
@@ -346,6 +404,50 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static Identity CityController(int instance)
         {
             return new Identity { Type = IdentityType.CityController, Instance = instance };
+        }
+
+        private static string ReadRepositoryFile(string relativePath)
+        {
+            return File.ReadAllText(Path.Combine(FindRepositoryRoot(), relativePath));
+        }
+
+        private static string FindRepositoryRoot()
+        {
+            string currentDirectory = Directory.GetCurrentDirectory();
+            if (File.Exists(Path.Combine(currentDirectory, "AI_START_HERE.md")))
+            {
+                return currentDirectory;
+            }
+
+            string current = AppDomain.CurrentDomain.BaseDirectory;
+            while (!string.IsNullOrEmpty(current))
+            {
+                if (File.Exists(Path.Combine(current, "AI_START_HERE.md")))
+                {
+                    return current;
+                }
+
+                DirectoryInfo parent = Directory.GetParent(current);
+                if (parent == null)
+                {
+                    break;
+                }
+
+                current = parent.FullName;
+            }
+
+            Assert.Fail("Could not find repository root for source guardrail.");
+            return string.Empty;
+        }
+
+        private static void AssertContains(string text, string expected)
+        {
+            Assert.IsTrue(text.Contains(expected), "Expected source to contain: " + expected);
+        }
+
+        private static void AssertDoesNotContain(string text, string unexpected)
+        {
+            Assert.IsFalse(text.Contains(unexpected), "Expected source not to contain: " + unexpected);
         }
     }
 }

@@ -223,6 +223,7 @@
     <Compile Include="Core\MessageHandlers\GridTerminalInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\GuestKeyGeneratorInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\GuestKeyGeneratorInteractionRules.cs" />
+    <Compile Include="Core\InventoryContainerRuntimeService.cs" />
     <Compile Include="Core\MessageHandlers\InventoryContainerInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\InventoryContainerInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\InventoryUpdatedMessageHandler.cs" />
