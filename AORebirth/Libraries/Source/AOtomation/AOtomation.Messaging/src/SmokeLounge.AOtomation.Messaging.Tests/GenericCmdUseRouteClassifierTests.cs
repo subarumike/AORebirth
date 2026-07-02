@@ -452,6 +452,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(clientMoveHandler, "character.BaseInventory.Write();");
         }
 
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsMovePageLookupSurfaces()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string clientMoveHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
+
+            AssertContains(service, "public bool TryResolveMoveSourcePage");
+            AssertContains(service, "character.BaseInventory.Pages.ContainsKey((int)sourceContainer.Type)");
+            AssertContains(service, "character.BaseInventory.PageFromSlot(sourceContainer.Instance)");
+            AssertContains(service, "public IInventoryPage ResolveMoveTargetPage");
+            AssertContains(service, "character.BaseInventory.PageFromSlot(targetPlacement)");
+
+            AssertContains(
+                clientMoveHandler,
+                "InventoryContainerRuntimeService.Default.TryResolveMoveSourcePage");
+            AssertContains(
+                clientMoveHandler,
+                "InventoryContainerRuntimeService.Default.ResolveMoveTargetPage");
+            AssertDoesNotContain(clientMoveHandler, "private bool TryGetSourcePage");
+            AssertDoesNotContain(clientMoveHandler, "private IInventoryPage GetTargetPage");
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,

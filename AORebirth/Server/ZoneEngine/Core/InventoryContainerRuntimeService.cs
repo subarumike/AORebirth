@@ -152,7 +152,7 @@ namespace ZoneEngine.Core
             }
 
             IInventoryPage inventoryPage;
-            IInventoryPage receivingPage = this.GetTargetPage(character, message.TargetPlacement);
+            IInventoryPage receivingPage = this.ResolveMoveTargetPage(character, message.TargetPlacement);
             if (!character.BaseInventory.Pages.TryGetValue((int)IdentityType.Inventory, out inventoryPage)
                 || receivingPage == null
                 || !object.ReferenceEquals(receivingPage, inventoryPage))
@@ -240,7 +240,31 @@ namespace ZoneEngine.Core
             return true;
         }
 
-        private IInventoryPage GetTargetPage(ICharacter character, int targetPlacement)
+        public bool TryResolveMoveSourcePage(
+            ICharacter character,
+            Identity sourceContainer,
+            out IInventoryPage sendingPage)
+        {
+            sendingPage = null;
+
+            if (character.BaseInventory.Pages.ContainsKey((int)sourceContainer.Type))
+            {
+                sendingPage = character.BaseInventory.Pages[(int)sourceContainer.Type];
+                return true;
+            }
+
+            try
+            {
+                sendingPage = character.BaseInventory.PageFromSlot(sourceContainer.Instance);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public IInventoryPage ResolveMoveTargetPage(ICharacter character, int targetPlacement)
         {
             if (targetPlacement == (int)IdentityType.TradeWindow)
             {
