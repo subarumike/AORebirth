@@ -502,124 +502,12 @@ namespace ZoneEngine.Core.Controllers
         /// </exception>
         public bool UseItem(Identity itemPosition)
         {
-            // Procedure:
-            // 1. Check if item exists at this position
-            // 2. Check if item is usable and/or consumable
-            // 2. Decrease stack if consumable
-            // 3. Delete consumable item if stack==0
-            // 4. Send the TemplateAction to client
-            // 5. Execute the item's gamefunctions
-
-            Item item = null;
-            try
-            {
-                item = this.Character.BaseInventory.GetItemInContainer((int)itemPosition.Type, itemPosition.Instance);
-            }
-            catch (Exception)
-            {
-            }
-
-            if (item == null)
-            {
-                throw new NullReferenceException("No item found at " + itemPosition);
-            }
-
-            if (InventoryContainerRuntimeService.Default.TryOpenBackpackContainer(this.Character, itemPosition, item))
-            {
-                return true;
-            }
-
-            if (this.IsUseBlockedBySkillLock(item))
-            {
-                return false;
-            }
-
-            TemplateActionMessageHandler.Default.Send(
-                this.Character,
-                item,
-                (int)itemPosition.Type,
-                // container
-                itemPosition.Instance // placement
-                );
-
-            if (ItemLoader.ItemList[item.HighID].IsConsumable())
-            {
-                item.MultipleCount--;
-                if (item.MultipleCount <= 0)
-                {
-                    this.Character.BaseInventory.RemoveItem(
-                        (int)itemPosition.Type,
-                        // pageNum
-                        itemPosition.Instance // slotNum
-                        );
-                    CharacterActionMessageHandler.Default.SendDeleteItem(
-                        this.Character,
-                        (int)itemPosition.Type,
-                        itemPosition.Instance);
-                }
-            }
-
-            item.PerformAction(this.Character, EventType.OnUse, itemPosition.Instance);
-            return true;
+            return InventoryContainerRuntimeService.Default.UseInventoryItem(this.Character, itemPosition);
         }
 
         public bool TryUseBackpackContainer(Identity itemPosition)
         {
             return InventoryContainerRuntimeService.Default.TryUseBackpackContainer(this.Character, itemPosition);
-        }
-
-        private bool IsUseBlockedBySkillLock(Item item)
-        {
-            Character character = this.Character as Character;
-            if (character == null)
-            {
-                return false;
-            }
-
-            foreach (Event itemEvent in item.Events.Where(x => x.EventType == EventType.OnUse))
-            {
-                foreach (Function itemFunction in itemEvent.Functions.Where(
-                    x => x.FunctionType == (int)FunctionType.LockSkill))
-                {
-                    if (!this.ItemFunctionRequirementsPass(itemFunction))
-                    {
-                        continue;
-                    }
-
-                    int statId;
-                    int durationSeconds;
-                    if (!lockskill.TryReadArguments(itemFunction.Arguments.Values.ToArray(), out statId, out durationSeconds))
-                    {
-                        continue;
-                    }
-
-                    int remainingSeconds = character.GetSkillLockRemainingSeconds(statId);
-                    if (remainingSeconds <= 0)
-                    {
-                        continue;
-                    }
-
-                    CharacterActionMessageHandler.Default.SendSkillUnavailable(character, statId, remainingSeconds);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private bool ItemFunctionRequirementsPass(Function itemFunction)
-        {
-            bool result = true;
-            foreach (Requirement requirement in itemFunction.Requirements)
-            {
-                result &= requirement.CheckRequirement(this.Character);
-                if (!result)
-                {
-                    break;
-                }
-            }
-
-            return result;
         }
 
         public bool UseStatel(Identity identity, EventType eventType = EventType.OnUse)
