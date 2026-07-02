@@ -3,6 +3,7 @@ namespace ZoneEngine.Core
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
 
@@ -43,6 +44,19 @@ namespace ZoneEngine.Core
         public BankSlot[] ResolveBankSlots(ICharacter character)
         {
             return character.BaseInventory.Pages[(int)IdentityType.Bank].ToInventoryArray();
+        }
+
+        public IEnumerable<IInventoryPage> CharacterStateInventoryPages(ICharacter character)
+        {
+            foreach (IInventoryPage page in character.BaseInventory.Pages.Values)
+            {
+                if (page is BankInventoryPage)
+                {
+                    continue;
+                }
+
+                yield return page;
+            }
         }
 
         public bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)

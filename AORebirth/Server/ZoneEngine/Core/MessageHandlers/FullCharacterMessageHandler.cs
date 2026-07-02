@@ -47,6 +47,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Packets;
 
     #endregion
@@ -90,13 +91,8 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 /* part 1 of data */
                 List<InventorySlot> inventory = new List<InventorySlot>();
-                foreach (IInventoryPage ivp in character.BaseInventory.Pages.Values)
+                foreach (IInventoryPage ivp in InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character))
                 {
-                    if (ivp is BankInventoryPage)
-                    {
-                        continue;
-                    }
-
                     foreach (KeyValuePair<int, IItem> kv in ivp.List())
                     {
                         var temp = new InventorySlot
