@@ -715,6 +715,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsKnuBotTradeItemRemove()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string knuBotTradeHandler =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\KnuBotTradeMessageHandler.cs");
+
+            AssertContains(service, "public void HandleKnuBotTradeItemRemove");
+            AssertContains(
+                service,
+                "client.Controller.Character.BaseInventory.Pages[(int)message.Container.Type].Remove(");
+            AssertContains(
+                knuBotTradeHandler,
+                "InventoryContainerRuntimeService.Default.HandleKnuBotTradeItemRemove(client, message);");
+            AssertDoesNotContain(knuBotTradeHandler, "BaseInventory.Pages[(int)message.Container.Type].Remove");
+        }
+
+        [TestMethod]
         public void InventoryContainerRuntimeServiceOwnsBackpackOpenCloseLifecycle()
         {
             string service =

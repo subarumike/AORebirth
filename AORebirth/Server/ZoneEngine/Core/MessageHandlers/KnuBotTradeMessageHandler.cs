@@ -53,9 +53,7 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         protected override void Read(KnuBotTradeMessage message, IZoneClient client)
         {
-            // Remove the item from the inventory
-            client.Controller.Character.BaseInventory.Pages[(int)message.Container.Type].Remove(
-                message.Container.Instance);
+            InventoryContainerRuntimeService.Default.HandleKnuBotTradeItemRemove(client, message);
 
             // client.Character.Knubot.
         }
