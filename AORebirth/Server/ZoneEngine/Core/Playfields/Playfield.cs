@@ -384,6 +384,11 @@ namespace AORebirth.Core.Playfields
             }
         }
 
+        internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
+        {
+            this.runtimeSystems.SpawnCapturedNpcContent(playfieldIdentity);
+        }
+
         private void LoadVendors(Identity playfieldIdentity)
         {
             StatelData[] vendorStatels;
