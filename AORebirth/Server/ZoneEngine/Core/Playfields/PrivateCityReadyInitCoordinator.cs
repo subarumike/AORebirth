@@ -105,34 +105,37 @@ namespace ZoneEngine.Core.Playfields
             }
 
             string organizationName = this.resolveOrganizationName(organizationInstance);
-            if (!string.IsNullOrEmpty(organizationName))
-            {
-                PlayfieldLifecycleTrace.Record(
-                    PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
-                    PlayfieldLifecycleTrace.StagePrivateCityOrgInfoPacket,
-                    PlayfieldLifecycleTrace.MessageOrgInfoPacket,
-                    character.Identity,
-                    organizationName);
-                client.SendCompressed(
-                    new OrgInfoPacketMessage
+            client.PacketSequencing.RunPrivateCityPreFullCharacterOrgInitSequence(
+                () =>
+                {
+                    if (!string.IsNullOrEmpty(organizationName))
                     {
-                        Identity = character.Identity,
-                        Name = organizationName
-                    });
-            }
-
-            this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
-            this.SendPrivateCityStat(client, character, StatIds.clan, 0);
-            this.SendPrivateCityStat(client, character, StatIds.clanlevel, 0);
-            this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
-            this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
-            this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1);
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
-                PlayfieldLifecycleTrace.StagePrivateCityOrgInitSent,
-                PlayfieldLifecycleTrace.MessagePrivateCityOrgInitSent,
-                character.Identity,
-                "org=" + organizationInstance + " orgName=" + organizationName + " socialStatus=4 repeats=4");
+                        PlayfieldLifecycleTrace.Record(
+                            PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                            PlayfieldLifecycleTrace.StagePrivateCityOrgInfoPacket,
+                            PlayfieldLifecycleTrace.MessageOrgInfoPacket,
+                            character.Identity,
+                            organizationName);
+                        client.SendCompressed(
+                            new OrgInfoPacketMessage
+                            {
+                                Identity = character.Identity,
+                                Name = organizationName
+                            });
+                    }
+                },
+                () => this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1),
+                () => this.SendPrivateCityStat(client, character, StatIds.clan, 0),
+                () => this.SendPrivateCityStat(client, character, StatIds.clanlevel, 0),
+                () => this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1),
+                () => this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1),
+                () => this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1),
+                () => PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                    PlayfieldLifecycleTrace.StagePrivateCityOrgInitSent,
+                    PlayfieldLifecycleTrace.MessagePrivateCityOrgInitSent,
+                    character.Identity,
+                    "org=" + organizationInstance + " orgName=" + organizationName + " socialStatus=4 repeats=4"));
 
             client.Server.Info(
                 client,
@@ -152,39 +155,40 @@ namespace ZoneEngine.Core.Playfields
         {
             var playfieldIdentity = new Identity
                                     {
-                                        Type = IdentityType.Playfield2,
-                                        Instance = this.playfieldIdentity.Instance
-                                    };
+                                            Type = IdentityType.Playfield2,
+                                            Instance = this.playfieldIdentity.Instance
+                                        };
 
-            client.SendCompressed(
-                new PlayfieldAllTowersMessage
-                {
-                    Identity = playfieldIdentity,
-                    Unknown1 = new TowerProxyBase[0]
-                });
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
-                PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllTowers,
-                PlayfieldLifecycleTrace.MessagePlayfieldAllTowers,
-                playfieldIdentity);
-            client.SendCompressed(
-                new PlayfieldAllCitiesMessage
-                {
-                    Identity = playfieldIdentity,
-                    Unknown = cityUnknown,
-                    Payload = cityPayload ?? new byte[0]
-                });
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
-                PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllCities,
-                PlayfieldLifecycleTrace.MessagePlayfieldAllCities,
-                playfieldIdentity);
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
-                PlayfieldLifecycleTrace.StagePrivateCityTowersCitiesSent,
-                PlayfieldLifecycleTrace.MessagePrivateCityTowersCitiesSent,
-                playfieldIdentity,
-                "cityUnknown=" + cityUnknown + " cityPayloadBytes=" + (cityPayload == null ? 0 : cityPayload.Length));
+            client.PacketSequencing.RunPrivateCityPlayfieldReadyBlockSequence(
+                () => client.SendCompressed(
+                    new PlayfieldAllTowersMessage
+                    {
+                        Identity = playfieldIdentity,
+                        Unknown1 = new TowerProxyBase[0]
+                    }),
+                () => PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                    PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllTowers,
+                    PlayfieldLifecycleTrace.MessagePlayfieldAllTowers,
+                    playfieldIdentity),
+                () => client.SendCompressed(
+                    new PlayfieldAllCitiesMessage
+                    {
+                        Identity = playfieldIdentity,
+                        Unknown = cityUnknown,
+                        Payload = cityPayload ?? new byte[0]
+                    }),
+                () => PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                    PlayfieldLifecycleTrace.StagePrivateCityPlayfieldAllCities,
+                    PlayfieldLifecycleTrace.MessagePlayfieldAllCities,
+                    playfieldIdentity),
+                () => PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
+                    PlayfieldLifecycleTrace.StagePrivateCityTowersCitiesSent,
+                    PlayfieldLifecycleTrace.MessagePrivateCityTowersCitiesSent,
+                    playfieldIdentity,
+                    "cityUnknown=" + cityUnknown + " cityPayloadBytes=" + (cityPayload == null ? 0 : cityPayload.Length)));
         }
 
         private void SendPrivateCityStat(ZoneClient client, ICharacter character, StatIds statId, byte unknown)

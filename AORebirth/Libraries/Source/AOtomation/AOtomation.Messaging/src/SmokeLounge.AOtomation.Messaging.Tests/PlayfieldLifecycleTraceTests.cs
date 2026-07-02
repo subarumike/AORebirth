@@ -1372,6 +1372,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string runtimeSystemsText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+            string privateCityReadyInitText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PrivateCityReadyInitCoordinator.cs"));
             string projectText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
@@ -1440,6 +1442,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 2,
                 CountOccurrences(playfieldText, "this.runtimeSystems.PacketSequencing.RunSimpleCharFullUpdateCharInPlaySequence("),
                 "Playfield must route both existing-player and joining-player SCFU/CharInPlay pairs through PacketSequencingCoordinator.");
+            Assert.IsTrue(
+                privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPreFullCharacterOrgInitSequence(")
+                && privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPlayfieldReadyBlockSequence("),
+                "PrivateCityReadyInitCoordinator must route private-city ready/init packet order through PacketSequencingCoordinator.");
+
+            string privateCityOrgInitSequence = ExtractMethodBlock(
+                coordinatorText,
+                "public void RunPrivateCityPreFullCharacterOrgInitSequence");
+            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendOrgInfoPacket", "Execute(sendInitialSocialStatus");
+            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendInitialSocialStatus", "Execute(sendOrganizationId");
+            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendOrganizationId", "Execute(sendOrganizationRank");
+            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendOrganizationRank", "Execute(sendSocialStatusRepeat1");
+            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendSocialStatusRepeat1", "Execute(sendSocialStatusRepeat2");
+            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendSocialStatusRepeat2", "Execute(sendSocialStatusRepeat3");
+            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendSocialStatusRepeat3", "Execute(recordOrgInitSent");
+
+            string privateCityReadyBlockSequence = ExtractMethodBlock(
+                coordinatorText,
+                "public void RunPrivateCityPlayfieldReadyBlockSequence");
+            AssertTextBefore(privateCityReadyBlockSequence, "Execute(sendPlayfieldAllTowers", "Execute(recordPlayfieldAllTowers");
+            AssertTextBefore(privateCityReadyBlockSequence, "Execute(recordPlayfieldAllTowers", "Execute(sendPlayfieldAllCities");
+            AssertTextBefore(privateCityReadyBlockSequence, "Execute(sendPlayfieldAllCities", "Execute(recordPlayfieldAllCities");
+            AssertTextBefore(privateCityReadyBlockSequence, "Execute(recordPlayfieldAllCities", "Execute(recordTowersCitiesSent");
 
             string[] packetAndRuntimePatterns =
                 {
@@ -1477,6 +1502,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playfieldText.Contains("() => this.Announce(SimpleCharFullUpdate.ConstructMessage(temp))")
                 && playfieldText.Contains("() => this.Announce(charInPlay)"),
                 "Visibility packet construction and send expressions must remain in Playfield.");
+            Assert.IsTrue(
+                privateCityReadyInitText.Contains("new OrgInfoPacketMessage")
+                && privateCityReadyInitText.Contains("new PlayfieldAllTowersMessage")
+                && privateCityReadyInitText.Contains("new PlayfieldAllCitiesMessage")
+                && privateCityReadyInitText.Contains("this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1)")
+                && privateCityReadyInitText.Contains("this.SendPrivateCityStat(client, character, StatIds.clan, 0)")
+                && privateCityReadyInitText.Contains("this.SendPrivateCityStat(client, character, StatIds.clanlevel, 0)"),
+                "Private-city packet construction and stat send expressions must remain in PrivateCityReadyInitCoordinator.");
         }
 
         [TestMethod]
