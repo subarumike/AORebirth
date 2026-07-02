@@ -481,6 +481,12 @@ namespace ZoneEngine.Core
                     character.Identity));
         }
 
+        public void HandleKnuBotTradeItemRemove(IZoneClient client, KnuBotTradeMessage message)
+        {
+            client.Controller.Character.BaseInventory.Pages[(int)message.Container.Type].Remove(
+                message.Container.Instance);
+        }
+
         public void MoveNonEquipmentContainerItem(
             ICharacter character,
             ContainerAddItemMessage message,
