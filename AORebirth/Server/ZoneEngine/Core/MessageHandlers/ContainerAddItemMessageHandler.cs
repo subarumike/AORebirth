@@ -113,10 +113,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
             // Receiver of the item (IInstancedEntity, can be mostly all from NPC, Character or Bag, later even playfields)
             // Turn 0xDEAD into C350 if instance is the same
-            if (toIdentity.Type == IdentityType.IncomingTradeWindow)
-            {
-                toIdentity.Type = IdentityType.CanbeAffected;
-            }
+            toIdentity = InventoryContainerRuntimeService.Default.ResolveContainerAddItemTargetIdentity(toIdentity);
 
             IItemContainer itemReceiver =
                 client.Controller.Character.Playfield.FindByIdentity(toIdentity) as IItemContainer;
@@ -127,32 +124,22 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             // On which inventorypage should the item be added?
-            IInventoryPage receivingPage;
-            if ((toPlacement == 0x6f) && (message.Target.Type == IdentityType.IncomingTradeWindow))
-            {
-                receivingPage = itemReceiver.BaseInventory.Pages[(int)IdentityType.Bank];
-            }
-            else
-            {
-                receivingPage = itemReceiver.BaseInventory.PageFromSlot(toPlacement);
-            }
-
-            // Get standard page if toplacement cant be found (0x6F for next free slot)
-            // TODO: If Entities are not the same (other player, bag etc) then always add to the standard page
-            if ((receivingPage == null) || (itemReceiver.GetType() != client.Controller.Character.GetType()))
-            {
-                receivingPage = itemReceiver.BaseInventory.Pages[itemReceiver.BaseInventory.StandardPage];
-            }
+            IInventoryPage receivingPage =
+                InventoryContainerRuntimeService.Default.ResolveContainerAddItemReceivingPage(
+                    itemReceiver,
+                    client.Controller.Character,
+                    message.Target,
+                    toPlacement);
 
             if (receivingPage == null)
             {
                 throw new ArgumentOutOfRangeException("No inventorypage found.");
             }
 
-            if (toPlacement == 0x6f)
-            {
-                toPlacement = receivingPage.FindFreeSlot();
-            }
+            toPlacement =
+                InventoryContainerRuntimeService.Default.ResolveContainerAddItemTargetPlacement(
+                    receivingPage,
+                    toPlacement);
 
             // Is there already a item?
             IItem itemTo;
