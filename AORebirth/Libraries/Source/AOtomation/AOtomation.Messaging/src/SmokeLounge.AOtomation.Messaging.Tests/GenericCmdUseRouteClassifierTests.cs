@@ -417,9 +417,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "this.SendMoveItemToInventoryAck(character, message.SourceContainer, message.TargetPlacement);");
             AssertContains(service, "this.PersistClientMoveItemToInventory(character, \"backpack move\");");
 
-            AssertContains(
-                clientMoveHandler,
-                "InventoryContainerRuntimeService.Default.TryMoveBackpackItemToInventory(character, message)");
+            AssertContains(service, "this.TryMoveBackpackItemToInventory(character, message)");
+            AssertDoesNotContain(clientMoveHandler, "TryMoveBackpackItemToInventory");
             AssertDoesNotContain(clientMoveHandler, "private bool TryMoveBackpackItemToInventory");
             AssertDoesNotContain(clientMoveHandler, "TryGetBackpackPageByHandle");
             AssertDoesNotContain(clientMoveHandler, "DecodeBackpackHandle");
@@ -490,14 +489,39 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "sendingPage.Remove(fromPlacement);");
             AssertContains(service, "receivingPage.Add(toPlacement, itemFrom);");
 
-            AssertContains(
-                clientMoveHandler,
-                "InventoryContainerRuntimeService.Default.TryMoveOwnedInventoryItem(character, message, client)");
+            AssertContains(service, "this.TryMoveOwnedInventoryItem(character, message, client)");
+            AssertDoesNotContain(clientMoveHandler, "TryMoveOwnedInventoryItem");
             AssertDoesNotContain(clientMoveHandler, "private bool TryMoveOwnedInventoryItem");
             AssertDoesNotContain(clientMoveHandler, "private bool CanEquipToPage");
             AssertDoesNotContain(clientMoveHandler, "private bool RequiresImplantAccess");
             AssertDoesNotContain(clientMoveHandler, "private void SendImplantAccessDenied");
             AssertDoesNotContain(clientMoveHandler, "private void WaitForEquipVisualSync");
+        }
+
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsClientMoveItemToInventoryReadOrchestration()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string clientMoveHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
+
+            AssertContains(service, "public void HandleClientMoveItemToInventory");
+            AssertContains(service, "this.TryMoveBackpackItemToInventory(character, message)");
+            AssertContains(service, "this.TryMoveOwnedInventoryItem(character, message, client)");
+            AssertContains(
+                service,
+                "\"Unhandled ClientMoveItemToInventory source={0} targetPlacement={1} character={2}\"");
+
+            AssertContains(
+                clientMoveHandler,
+                "InventoryContainerRuntimeService.Default.HandleClientMoveItemToInventory(client, message);");
+            AssertContains(clientMoveHandler, "character.Playfield.TryLootCorpseItem(");
+            AssertDoesNotContain(clientMoveHandler, "TryMoveBackpackItemToInventory");
+            AssertDoesNotContain(clientMoveHandler, "TryMoveOwnedInventoryItem");
+            AssertDoesNotContain(clientMoveHandler, "Unhandled ClientMoveItemToInventory");
+            AssertDoesNotContain(clientMoveHandler, "SyncEquippedWeaponCombatStats");
         }
 
         [TestMethod]

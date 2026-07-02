@@ -458,6 +458,29 @@ namespace ZoneEngine.Core
                     message.Target));
         }
 
+        public void HandleClientMoveItemToInventory(IZoneClient client, ClientMoveItemToInventoryMessage message)
+        {
+            ICharacter character = client.Controller.Character;
+
+            if (this.TryMoveBackpackItemToInventory(character, message))
+            {
+                return;
+            }
+
+            if (this.TryMoveOwnedInventoryItem(character, message, client))
+            {
+                return;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "Unhandled ClientMoveItemToInventory source={0} targetPlacement={1} character={2}",
+                    message.SourceContainer,
+                    message.TargetPlacement,
+                    character.Identity));
+        }
+
         public void MoveNonEquipmentContainerItem(
             ICharacter character,
             ContainerAddItemMessage message,
