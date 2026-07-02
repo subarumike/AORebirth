@@ -7,7 +7,6 @@ namespace ZoneEngine.Core.Arete.Quests
     using System.Globalization;
 
     using AORebirth.Core.Entities;
-    using AORebirth.Core.Inventory;
     using AORebirth.Core.Items;
     using AORebirth.Enums;
 
@@ -244,7 +243,7 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static MarcusItemHandoutResult TryGrantCompactFireSuppressant(ICharacter source)
         {
-            if (source == null || source.BaseInventory == null)
+            if (!InventoryContainerRuntimeService.Default.HasCharacterInventory(source))
             {
                 return MarcusItemHandoutResult.Failed("sourceInventoryAvailable=false");
             }
@@ -254,7 +253,9 @@ namespace ZoneEngine.Core.Arete.Quests
                 return MarcusItemHandoutResult.Failed("sourceClientAvailable=false");
             }
 
-            if (CharacterHasItemInCarriedInventory(source, CompactFireSuppressantItemId))
+            if (InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                source,
+                CompactFireSuppressantItemId))
             {
                 return MarcusItemHandoutResult.Succeeded(
                     "item296780GrantSkipped=true reason=already-in-inventory");
@@ -279,25 +280,21 @@ namespace ZoneEngine.Core.Arete.Quests
                     "item296780CreateFailed=true error=\"" + e.Message + "\"");
             }
 
-            InventoryError inventoryError = source.BaseInventory.TryAdd(item);
-            if (inventoryError != InventoryError.OK)
+            QuestRewardInventoryGrantResult inventoryGrant =
+                InventoryContainerRuntimeService.Default.TryGrantQuestRewardItem(source, item);
+            if (inventoryGrant.Status == QuestRewardInventoryGrantStatus.InventoryAddFailed)
             {
                 return MarcusItemHandoutResult.Failed(
-                    "item296780InventoryAddFailed=true error=" + inventoryError);
+                    "item296780InventoryAddFailed=true error=" + inventoryGrant.InventoryError);
             }
 
-            bool persisted;
-            try
-            {
-                persisted = source.BaseInventory.Write();
-            }
-            catch (Exception e)
+            if (inventoryGrant.Status == QuestRewardInventoryGrantStatus.PersistFailed)
             {
                 return MarcusItemHandoutResult.Failed(
-                    "item296780InventoryPersistFailed=true error=\"" + e.Message + "\"");
+                    "item296780InventoryPersistFailed=true error=\"" + inventoryGrant.ExceptionMessage + "\"");
             }
 
-            if (!persisted)
+            if (inventoryGrant.Status == QuestRewardInventoryGrantStatus.PersistReturnedFalse)
             {
                 return MarcusItemHandoutResult.Failed("item296780InventoryPersistFailed=true writeReturnedFalse=true");
             }
@@ -342,33 +339,6 @@ namespace ZoneEngine.Core.Arete.Quests
                     Target = new Identity { Type = IdentityType.OverflowWindow, Instance = source.Identity.Instance },
                     TargetPlacement = CapturedOverflowNextFreeSlot
                 });
-        }
-
-        private static bool CharacterHasItemInCarriedInventory(ICharacter source, int itemId)
-        {
-            IInventoryPage page;
-            if (source.BaseInventory.Pages.TryGetValue((int)IdentityType.Inventory, out page)
-                && InventoryPageHasItem(page, itemId))
-            {
-                return true;
-            }
-
-            return source.BaseInventory.Pages.TryGetValue((int)IdentityType.OverflowWindow, out page)
-                   && InventoryPageHasItem(page, itemId);
-        }
-
-        private static bool InventoryPageHasItem(IInventoryPage page, int itemId)
-        {
-            foreach (KeyValuePair<int, IItem> itemEntry in page.List())
-            {
-                IItem item = itemEntry.Value;
-                if (item != null && (item.LowID == itemId || item.HighID == itemId))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private static MarcusB18FCompletionState GetOrCreateState(Identity identity)

@@ -1620,6 +1620,48 @@ namespace ZoneEngine.Core
                 character.BaseInventory.Pages.Values.SelectMany(page => page.List()).Select(existing => existing.Value));
         }
 
+        public bool HasCharacterInventory(ICharacter character)
+        {
+            return character != null && character.BaseInventory != null;
+        }
+
+        public bool CharacterHasItemInCarriedInventory(ICharacter source, int itemId)
+        {
+            IInventoryPage page;
+            if (source.BaseInventory.Pages.TryGetValue((int)IdentityType.Inventory, out page)
+                && InventoryPageHasItem(page, itemId))
+            {
+                return true;
+            }
+
+            return source.BaseInventory.Pages.TryGetValue((int)IdentityType.OverflowWindow, out page)
+                   && InventoryPageHasItem(page, itemId);
+        }
+
+        public QuestRewardInventoryGrantResult TryGrantQuestRewardItem(ICharacter source, Item item)
+        {
+            InventoryError inventoryError = source.BaseInventory.TryAdd(item);
+            if (inventoryError != InventoryError.OK)
+            {
+                return QuestRewardInventoryGrantResult.InventoryAddFailed(inventoryError);
+            }
+
+            try
+            {
+                bool persisted = source.BaseInventory.Write();
+                if (!persisted)
+                {
+                    return QuestRewardInventoryGrantResult.PersistReturnedFalse();
+                }
+            }
+            catch (Exception e)
+            {
+                return QuestRewardInventoryGrantResult.PersistFailed(e.Message);
+            }
+
+            return QuestRewardInventoryGrantResult.Succeeded();
+        }
+
         public CorpseLootInventoryTransferResult TryAddCorpseLootItem(
             ICharacter looter,
             IItem item,
@@ -1710,6 +1752,20 @@ namespace ZoneEngine.Core
                 targetSlot = targetPage.FindFreeSlot();
                 return targetSlot >= 0;
             }
+        }
+
+        private static bool InventoryPageHasItem(IInventoryPage page, int itemId)
+        {
+            foreach (KeyValuePair<int, IItem> itemEntry in page.List())
+            {
+                IItem item = itemEntry.Value;
+                if (item != null && (item.LowID == itemId || item.HighID == itemId))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static int DecodeBackpackSlot(Identity sourceContainer)
@@ -2033,5 +2089,63 @@ namespace ZoneEngine.Core
         NoFreeSlot = 1,
         AddFailed = 2,
         AddRejected = 3
+    }
+
+    public sealed class QuestRewardInventoryGrantResult
+    {
+        private QuestRewardInventoryGrantResult()
+        {
+        }
+
+        public QuestRewardInventoryGrantStatus Status { get; private set; }
+
+        public InventoryError InventoryError { get; private set; }
+
+        public string ExceptionMessage { get; private set; }
+
+        public static QuestRewardInventoryGrantResult Succeeded()
+        {
+            return new QuestRewardInventoryGrantResult
+                   {
+                       Status = QuestRewardInventoryGrantStatus.Success,
+                       InventoryError = InventoryError.OK
+                   };
+        }
+
+        public static QuestRewardInventoryGrantResult InventoryAddFailed(InventoryError inventoryError)
+        {
+            return new QuestRewardInventoryGrantResult
+                   {
+                       Status = QuestRewardInventoryGrantStatus.InventoryAddFailed,
+                       InventoryError = inventoryError
+                   };
+        }
+
+        public static QuestRewardInventoryGrantResult PersistFailed(string exceptionMessage)
+        {
+            return new QuestRewardInventoryGrantResult
+                   {
+                       Status = QuestRewardInventoryGrantStatus.PersistFailed,
+                       InventoryError = InventoryError.OK,
+                       ExceptionMessage = exceptionMessage
+                   };
+        }
+
+        public static QuestRewardInventoryGrantResult PersistReturnedFalse()
+        {
+            return new QuestRewardInventoryGrantResult
+                   {
+                       Status = QuestRewardInventoryGrantStatus.PersistReturnedFalse,
+                       InventoryError = InventoryError.OK
+                   };
+        }
+    }
+
+    public enum QuestRewardInventoryGrantStatus
+    {
+        Success = 0,
+        InventoryAddFailed = 1,
+        PersistFailed = 2,
+        PersistReturnedFalse = 3
     }
 }

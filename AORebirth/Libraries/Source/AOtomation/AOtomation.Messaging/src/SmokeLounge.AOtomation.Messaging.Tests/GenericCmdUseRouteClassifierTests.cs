@@ -1014,6 +1014,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsQuestRewardInventoryGrant()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string marcusB18F =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Arete\Quests\MarcusB18FCompletionHandler.cs");
+
+            AssertContains(service, "public bool HasCharacterInventory(");
+            AssertContains(service, "public bool CharacterHasItemInCarriedInventory(");
+            AssertContains(service, "public QuestRewardInventoryGrantResult TryGrantQuestRewardItem(");
+            AssertContains(service, "private static bool InventoryPageHasItem(");
+            AssertContains(marcusB18F, "InventoryContainerRuntimeService.Default.HasCharacterInventory(source)");
+            AssertContains(marcusB18F, "InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(");
+            AssertContains(marcusB18F, "InventoryContainerRuntimeService.Default.TryGrantQuestRewardItem(source, item)");
+
+            AssertDoesNotContain(marcusB18F, "source.BaseInventory");
+            AssertDoesNotContain(marcusB18F, "private static bool CharacterHasItemInCarriedInventory(");
+            AssertDoesNotContain(marcusB18F, "private static bool InventoryPageHasItem(");
+        }
+
+        [TestMethod]
         public void InventoryContainerRuntimeServiceGuardsRemainingHandlerControllerInventoryOwnership()
         {
             string repositoryRoot = FindRepositoryRoot();
