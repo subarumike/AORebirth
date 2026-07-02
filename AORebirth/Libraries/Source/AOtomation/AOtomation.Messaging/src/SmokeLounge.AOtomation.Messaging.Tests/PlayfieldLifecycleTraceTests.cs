@@ -974,14 +974,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             var lifecycle = new ZoneClientSessionLifecycleCoordinator();
 
             lifecycle.BeginCharacterLoading();
-            lifecycle.BeginPlayfieldLoading();
+            lifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();
             lifecycle.EnterReadyBlockForSessionInit();
             lifecycle.EnterFullCharacterBoundaryForSessionInit();
             lifecycle.EnterCharInPlayForVisibilityEntry();
             lifecycle.CompleteInPlayForSessionInit();
-            lifecycle.BeginZoning();
-            lifecycle.BeginDisconnecting();
-            lifecycle.BeginDisconnecting();
+            lifecycle.EnterZoningForPlayfieldTransfer();
+            lifecycle.EnterDisconnectingForSessionDispose();
+            lifecycle.EnterDisconnectingForSessionDispose();
 
             var expected =
                 new[]
@@ -1060,7 +1060,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 lifecycle.EnterFullCharacterBoundaryForSessionInit,
                 "ZoneClientSession.CharacterLoading to ZoneClientSession.FullCharacterBoundary");
 
-            lifecycle.BeginPlayfieldLoading();
+            lifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();
             lifecycle.EnterReadyBlockForSessionInit();
             Assert.IsFalse(lifecycle.CanTransitionTo(ZoneClientSessionPhase.InPlay));
             AssertInvalidTransition(
@@ -1072,24 +1072,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void ZoneClientSessionLifecycleCoordinatorAllowsZoningReturnOptionsAndDisconnects()
         {
             var zoningToPlayfieldLoading = CreateInPlayLifecycle();
-            zoningToPlayfieldLoading.BeginZoning();
+            zoningToPlayfieldLoading.EnterZoningForPlayfieldTransfer();
             Assert.IsTrue(zoningToPlayfieldLoading.CanTransitionTo(ZoneClientSessionPhase.PlayfieldLoading));
-            zoningToPlayfieldLoading.BeginPlayfieldLoading();
+            zoningToPlayfieldLoading.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();
             Assert.AreEqual(ZoneClientSessionPhase.PlayfieldLoading, zoningToPlayfieldLoading.Phase);
 
             var zoningToReadyBlock = CreateInPlayLifecycle();
-            zoningToReadyBlock.BeginZoning();
+            zoningToReadyBlock.EnterZoningForPlayfieldTransfer();
             Assert.IsTrue(zoningToReadyBlock.CanTransitionTo(ZoneClientSessionPhase.ReadyBlock));
             zoningToReadyBlock.EnterReadyBlockForSessionInit();
             Assert.AreEqual(ZoneClientSessionPhase.ReadyBlock, zoningToReadyBlock.Phase);
 
             var disconnectingFromConnected = new ZoneClientSessionLifecycleCoordinator();
-            disconnectingFromConnected.BeginDisconnecting();
+            disconnectingFromConnected.EnterDisconnectingForSessionDispose();
             Assert.AreEqual(ZoneClientSessionPhase.Disconnecting, disconnectingFromConnected.Phase);
 
             var disconnectingFromZoning = CreateInPlayLifecycle();
-            disconnectingFromZoning.BeginZoning();
-            disconnectingFromZoning.BeginDisconnecting();
+            disconnectingFromZoning.EnterZoningForPlayfieldTransfer();
+            disconnectingFromZoning.EnterDisconnectingForSessionDispose();
             Assert.AreEqual(ZoneClientSessionPhase.Disconnecting, disconnectingFromZoning.Phase);
         }
 
@@ -1110,6 +1110,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string teleportMethod = ExtractMethodBlock(
                 playfieldText,
                 "public void Teleport(Dynel dynel, Coordinate destination, IQuaternion heading, Identity playfield)");
+            string disposeMethod = ExtractMethodBlock(zoneClientText, "protected override void Dispose(bool disposing)");
 
             Assert.IsTrue(
                 zoneClientText.Contains("private readonly ZoneClientSessionLifecycleCoordinator sessionLifecycle"),
@@ -1127,7 +1128,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "zc.CreateCharacter(message.CharacterId);");
             AssertTextBefore(
                 zoneClientText,
-                "this.SessionLifecycle.BeginPlayfieldLoading();",
+                "this.SessionLifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();",
                 "this.server.PlayfieldById(");
             AssertTextBefore(
                 clientConnectedText,
@@ -1147,8 +1148,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "client.Controller.Character.DoNotDoTimers = false;");
             AssertTextBefore(
                 teleportMethod,
-                "lifecycleClient.SessionLifecycle.BeginZoning();",
+                "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer();",
                 "TeleportMessageHandler.Default.Send(");
+            AssertTextBefore(
+                disposeMethod,
+                "this.sessionLifecycle.EnterDisconnectingForSessionDispose();",
+                "this.stopDispatcher = true;");
         }
 
         [TestMethod]
@@ -1188,6 +1193,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && coordinatorText.Contains("public void EnterCharInPlayForVisibilityEntry()")
                 && coordinatorText.Contains("public void CompleteInPlayForSessionInit()"),
                 "ZoneClientSessionLifecycleCoordinator must own named ready/full-character/CharInPlay sequencing surfaces.");
+            Assert.IsTrue(
+                coordinatorText.Contains("public void EnterPlayfieldLoadingForCharacterLoadOrZoningExit()")
+                && coordinatorText.Contains("public void EnterZoningForPlayfieldTransfer()")
+                && coordinatorText.Contains("public void EnterDisconnectingForSessionDispose()"),
+                "ZoneClientSessionLifecycleCoordinator must own named playfield-loading/zoning/disconnect sequencing surfaces.");
 
             string[] packetAndRuntimePatterns =
                 {
@@ -1240,6 +1250,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || markerSurfaces.Contains("MarkCharInPlay()")
                 || markerSurfaces.Contains("MarkInPlay()"),
                 "Packet/runtime surfaces must not use loose ready/full-character/CharInPlay lifecycle marker names.");
+            Assert.IsFalse(
+                markerSurfaces.Contains("BeginPlayfieldLoading()")
+                || markerSurfaces.Contains("BeginZoning()")
+                || markerSurfaces.Contains("BeginDisconnecting()"),
+                "Packet/runtime surfaces must not use loose playfield-loading/zoning/disconnect lifecycle marker names.");
         }
 
         [TestMethod]
@@ -1642,7 +1657,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             var lifecycle = new ZoneClientSessionLifecycleCoordinator();
             lifecycle.BeginCharacterLoading();
-            lifecycle.BeginPlayfieldLoading();
+            lifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();
             lifecycle.EnterReadyBlockForSessionInit();
             lifecycle.EnterFullCharacterBoundaryForSessionInit();
             lifecycle.EnterCharInPlayForVisibilityEntry();

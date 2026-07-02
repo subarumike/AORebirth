@@ -54,7 +54,7 @@ namespace ZoneEngine.Core
             this.TransitionTo(ZoneClientSessionPhase.CharacterLoading);
         }
 
-        public void BeginPlayfieldLoading()
+        public void EnterPlayfieldLoadingForCharacterLoadOrZoningExit()
         {
             this.TransitionTo(ZoneClientSessionPhase.PlayfieldLoading);
         }
@@ -79,12 +79,12 @@ namespace ZoneEngine.Core
             this.TransitionTo(ZoneClientSessionPhase.InPlay);
         }
 
-        public void BeginZoning()
+        public void EnterZoningForPlayfieldTransfer()
         {
             this.TransitionTo(ZoneClientSessionPhase.Zoning);
         }
 
-        public void BeginDisconnecting()
+        public void EnterDisconnectingForSessionDispose()
         {
             this.TransitionTo(ZoneClientSessionPhase.Disconnecting);
         }
