@@ -544,9 +544,7 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void Announce(MessageBody messageBody)
         {
-            foreach (Character entity in
-                Pool.Instance.GetAll<Character>((int)IdentityType.CanbeAffected)
-                    .Where(x => x.InPlayfield(this.Identity)))
+            foreach (Character entity in this.runtimeSystems.CharacterEntities())
             {
                 if (entity != null)
                 {
@@ -594,9 +592,7 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void AnnounceOthers(MessageBody messageBody, Identity dontSend)
         {
-            foreach (Character entity in
-                Pool.Instance.GetAll<Character>((int)IdentityType.CanbeAffected)
-                    .Where(xx => xx.InPlayfield(this.Identity)))
+            foreach (Character entity in this.runtimeSystems.CharacterEntities())
             {
                 if (entity != null)
                 {
@@ -625,7 +621,7 @@ namespace AORebirth.Core.Playfields
 
         private Coordinate DynelDropPosition(Identity identity)
         {
-            IDynel dynel = Pool.Instance.GetObject<IDynel>(identity);
+            IDynel dynel = this.runtimeSystems.FindByIdentity<IDynel>(identity);
             return dynel != null ? dynel.Coordinates() : new Coordinate();
         }
 
@@ -1087,7 +1083,7 @@ namespace AORebirth.Core.Playfields
         /// </returns>
         public INamedEntity FindNamedEntityByIdentity(Identity identity)
         {
-            return Pool.Instance.GetObject<INamedEntity>(identity);
+            return this.runtimeSystems.FindByIdentity<INamedEntity>(identity);
         }
 
         /// <summary>
@@ -1173,8 +1169,7 @@ namespace AORebirth.Core.Playfields
             ICharacter recipient = sendSCFUs.toClient.Controller.Character;
             Identity dontSendTo = recipient.Identity;
             Identity playfieldIdentity = recipient.Playfield.Identity;
-            foreach (ICharacter entity in
-                Pool.Instance.GetAll<ICharacter>((int)IdentityType.CanbeAffected))
+            foreach (ICharacter entity in this.runtimeSystems.Characters())
             {
                 bool senderEqualsRecipient = entity.Identity == dontSendTo;
                 bool senderInRecipientPlayfield = entity.InPlayfield(playfieldIdentity);

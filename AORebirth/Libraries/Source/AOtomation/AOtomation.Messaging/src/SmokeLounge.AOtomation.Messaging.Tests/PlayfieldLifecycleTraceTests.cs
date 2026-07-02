@@ -777,6 +777,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "internal ReadOnlyCollection<IDynel> FindDynelsInRange(IDynel dynel, float range)",
                     "internal ReadOnlyCollection<ICharacter> FindCharactersInRange(IDynel dynel, float range)",
                     "internal ReadOnlyCollection<ICharacter> Characters()",
+                    "internal ReadOnlyCollection<Character> CharacterEntities()",
                     "internal ReadOnlyCollection<ICharacter> Players()",
                     "internal ReadOnlyCollection<ICharacter> Npcs()",
                     "internal ReadOnlyCollection<Vendor> Vendors()",
@@ -818,6 +819,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "return this.dynelRegistry.FindByIdentity<T>(identity);",
                     "return this.dynelRegistry.FindDynelsInRange(dynel, range);",
                     "return this.dynelRegistry.FindCharactersInRange(dynel, range);",
+                    "return this.dynelRegistry.Characters();",
+                    "return this.dynelRegistry.CharacterEntities();",
                     "return this.dynelRegistry.StaticDynels();"
                 };
             for (int i = 0; i < runtimeDelegations.Length; i++)
@@ -837,6 +840,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "return this.runtimeSystems.FindByIdentity<T>(identity);",
                     "return this.runtimeSystems.FindDynelsInRange(dynel, range).ToList();",
                     "return this.runtimeSystems.FindCharactersInRange(dynel, range).ToList();",
+                    "this.runtimeSystems.CharacterEntities()",
+                    "this.runtimeSystems.Characters()",
                     "this.runtimeSystems.StaticDynels()"
                 };
             for (int i = 0; i < playfieldDelegations.Length; i++)
@@ -850,6 +855,65 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldDynelRegistry.cs"),
                 "ZoneEngine project must compile PlayfieldDynelRegistry.");
+        }
+
+        [TestMethod]
+        public void PlayfieldVisibilityLookupsUseDynelRegistryBoundary()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string runtimeSystemsText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("internal ReadOnlyCollection<ICharacter> Characters()")
+                && runtimeSystemsText.Contains("return this.dynelRegistry.Characters();"),
+                "PlayfieldRuntimeSystems must expose current-playfield character visibility views.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("internal ReadOnlyCollection<Character> CharacterEntities()")
+                && runtimeSystemsText.Contains("return this.dynelRegistry.CharacterEntities();"),
+                "PlayfieldRuntimeSystems must expose concrete Character views for existing broadcast paths.");
+
+            string announce = ExtractMethodBlock(playfieldText, "public void Announce(MessageBody messageBody)");
+            string announceOthers = ExtractMethodBlock(playfieldText, "public void AnnounceOthers(MessageBody messageBody, Identity dontSend)");
+            string sendScfus = ExtractMethodBlock(playfieldText, "public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)");
+            string dynelDropPosition = ExtractMethodBlock(playfieldText, "private Coordinate DynelDropPosition(Identity identity)");
+            string findNamed = ExtractMethodBlock(playfieldText, "public INamedEntity FindNamedEntityByIdentity(Identity identity)");
+
+            Assert.IsTrue(
+                announce.Contains("this.runtimeSystems.CharacterEntities()"),
+                "Announce must use registry-backed character visibility views.");
+            Assert.IsTrue(
+                announceOthers.Contains("this.runtimeSystems.CharacterEntities()"),
+                "AnnounceOthers must use registry-backed character visibility views.");
+            Assert.IsTrue(
+                sendScfus.Contains("this.runtimeSystems.Characters()"),
+                "SendSCFUsToClient must use registry-backed current-playfield character views.");
+            Assert.IsTrue(
+                dynelDropPosition.Contains("this.runtimeSystems.FindByIdentity<IDynel>(identity)"),
+                "Dynel drop lookup must use registry-backed identity lookup.");
+            Assert.IsTrue(
+                findNamed.Contains("this.runtimeSystems.FindByIdentity<INamedEntity>(identity)"),
+                "Named entity lookup must use registry-backed typed identity lookup.");
+
+            string[] visibilityLookupBlocks =
+                {
+                    announce,
+                    announceOthers,
+                    sendScfus,
+                    dynelDropPosition,
+                    findNamed
+                };
+            for (int i = 0; i < visibilityLookupBlocks.Length; i++)
+            {
+                Assert.IsFalse(
+                    visibilityLookupBlocks[i].Contains("Pool.Instance.GetAll"),
+                    "Visibility lookup blocks must not scan Pool directly.");
+                Assert.IsFalse(
+                    visibilityLookupBlocks[i].Contains("Pool.Instance.GetObject"),
+                    "Visibility lookup blocks must not use direct Pool identity lookup.");
+            }
         }
 
         [TestMethod]
