@@ -2,28 +2,13 @@ namespace ZoneEngine.Core.Playfields.Content
 {
     #region Usings ...
 
-    using AORebirth.Core.Playfields;
-
     using SmokeLounge.AOtomation.Messaging.GameData;
-
-    using Utility;
-
-    using ZoneEngine.Core.Playfields;
 
     #endregion
 
     public sealed class AreteContentModule : IPlayfieldContentModule
     {
         private const int PrivateAretePlayfieldInstance = 6553;
-
-        private static readonly CapturedAreteRobotContentProvider CapturedAreteRobotContent =
-            new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
-
-        private static readonly NpcPatrolReplayCoordinator NpcPatrolReplay =
-            new NpcPatrolReplayCoordinator(CapturedAreteRobotContent);
-
-        private static readonly CapturedAreteRobotSpawnOrchestrator CapturedAreteRobotSpawns =
-            new CapturedAreteRobotSpawnOrchestrator(CapturedAreteRobotContent, NpcPatrolReplay);
 
         public bool Supports(Identity playfieldIdentity)
         {
@@ -37,7 +22,7 @@ namespace ZoneEngine.Core.Playfields.Content
                 return;
             }
 
-            registration.RegisterCapturedNpcSpawns(CapturedAreteRobotSpawns.SpawnForPlayfield);
+            registration.RegisterCapturedNpcSpawns();
         }
 
         public bool ShouldSuppressDbMobSpawn(int playfieldInstance, int mobSpawnId)
@@ -58,11 +43,6 @@ namespace ZoneEngine.Core.Playfields.Content
                 default:
                     return false;
             }
-        }
-
-        private static void LogCapturedAreteRobotContent(bool isError, string message)
-        {
-            LogUtil.Debug(isError ? DebugInfoDetail.Error : DebugInfoDetail.Engine, message);
         }
     }
 }

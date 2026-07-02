@@ -754,8 +754,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 1,
                 CountOccurrences(npcRuntimeText, "new NpcCombatTickCoordinator(playfield)"),
                 "NPCRuntimeService must own NPC combat tick coordinator construction.");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(npcRuntimeText, "new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
+                "NPCRuntimeService must own captured Arete robot content provider construction.");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(npcRuntimeText, "new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent)"),
+                "NPCRuntimeService must own NPC patrol replay coordinator construction.");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(
+                    npcRuntimeText,
+                    "new CapturedAreteRobotSpawnOrchestrator(this.capturedAreteRobotContent, this.patrolReplay)"),
+                "NPCRuntimeService must own captured Arete robot spawn orchestration construction.");
             Assert.IsTrue(
                 runtimeSystemsText.Contains("private readonly NPCRuntimeService npcRuntime")
+                && runtimeSystemsText.Contains("this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);")
                 && runtimeSystemsText.Contains("this.npcRuntime.BeginNpcDeath(attacker, target);")
                 && runtimeSystemsText.Contains("return this.npcRuntime.ProcessDeadNpc(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ProcessCombatTick(attacker);")
@@ -768,6 +783,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.ProcessNpcCombatTick(attacker);"),
                 "Playfield must delegate NPC combat ticks through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.SpawnCapturedNpcContent(playfieldIdentity);"),
+                "Playfield must delegate captured NPC spawn orchestration through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.BeginNpcDeath(attacker, target);"),
                 "Playfield must delegate NPC corpse lifecycle start through PlayfieldRuntimeSystems.");
@@ -2023,6 +2041,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PlayfieldContentCoordinator.cs"));
+            string registrationText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PlayfieldContentRegistration.cs"));
+            string npcRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
             string providerText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -2033,15 +2057,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs"));
 
             Assert.IsTrue(
-                areteContentText.Contains("new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
+                npcRuntimeText.Contains("new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
                 "Arete captured robot spawns must keep using CapturedAreteRobotContentProvider.");
             Assert.IsTrue(
-                areteContentText.Contains(
-                    "new CapturedAreteRobotSpawnOrchestrator(CapturedAreteRobotContent, NpcPatrolReplay)"),
+                npcRuntimeText.Contains(
+                    "new CapturedAreteRobotSpawnOrchestrator(this.capturedAreteRobotContent, this.patrolReplay)"),
                 "Arete captured robot spawns must keep using CapturedAreteRobotSpawnOrchestrator.");
             Assert.IsTrue(
-                areteContentText.Contains("registration.RegisterCapturedNpcSpawns(CapturedAreteRobotSpawns.SpawnForPlayfield)"),
+                areteContentText.Contains("registration.RegisterCapturedNpcSpawns();"),
                 "Arete captured robot spawns must enter through content-module registration.");
+            Assert.IsTrue(
+                registrationText.Contains("this.playfield.SpawnCapturedNpcContent(this.playfieldIdentity);"),
+                "Captured NPC spawn registration must route through Playfield into NPCRuntimeService.");
+            Assert.IsFalse(
+                areteContentText.Contains("CapturedAreteRobotSpawnOrchestrator"),
+                "AreteContentModule must not own captured NPC runtime orchestration.");
+            Assert.IsFalse(
+                areteContentText.Contains("NpcPatrolReplayCoordinator"),
+                "AreteContentModule must not own patrol replay runtime coordination.");
             Assert.IsTrue(
                 providerText.Contains("public CapturedAreteRobotSpawnDefinition[] GetSpawnDefinitions()"),
                 "CapturedAreteRobotContentProvider must expose captured spawn definitions.");

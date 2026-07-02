@@ -2,8 +2,6 @@ namespace ZoneEngine.Core.Playfields.Content
 {
     #region Usings ...
 
-    using System;
-
     using AORebirth.Core.Playfields;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -38,14 +36,9 @@ namespace ZoneEngine.Core.Playfields.Content
             }
         }
 
-        public void RegisterCapturedNpcSpawns(Action<Playfield, Identity> spawnContent)
+        public void RegisterCapturedNpcSpawns()
         {
-            if (spawnContent == null)
-            {
-                return;
-            }
-
-            spawnContent(this.playfield, this.playfieldIdentity);
+            this.playfield.SpawnCapturedNpcContent(this.playfieldIdentity);
         }
     }
 }

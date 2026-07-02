@@ -74,6 +74,11 @@ namespace ZoneEngine.Core.Playfields
             this.content.RegisterContent(this.playfield, playfieldIdentity);
         }
 
+        internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
+        {
+            this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);
+        }
+
         internal List<StatelData> ResolveStatels(Identity playfieldIdentity)
         {
             return this.contentData.ResolveStatels(playfieldIdentity);
