@@ -186,9 +186,9 @@ namespace ZoneEngine.Core.MessageHandlers
                             {
                                 shoppingBag.Add(
                                     message.Target,
-                                    issuer.BaseInventory.RemoveItem(
-                                        (int)message.Container.Type,
-                                        message.Container.Instance));
+                                    InventoryContainerRuntimeService.Default.RemoveInventoryItem(
+                                        issuer,
+                                        message.Container));
                             }
                             this.AcknowledgeTradeAction(client.Controller.Character, message);
                         }
@@ -682,7 +682,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 return true;
             }
 
-            if (!issuer.BaseInventory.Pages.ContainsKey((int)message.Container.Type))
+            if (!InventoryContainerRuntimeService.Default.HasInventoryPage(issuer, message.Container))
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Shopping,
@@ -693,9 +693,9 @@ namespace ZoneEngine.Core.MessageHandlers
             IItem removedItem;
             try
             {
-                removedItem = issuer.BaseInventory.RemoveItem(
-                    (int)message.Container.Type,
-                    message.Container.Instance);
+                removedItem = InventoryContainerRuntimeService.Default.RemoveInventoryItem(
+                    issuer,
+                    message.Container);
             }
             catch (ArgumentOutOfRangeException ex)
             {
@@ -721,10 +721,7 @@ namespace ZoneEngine.Core.MessageHandlers
             int tradeSlot = shoppingBag.AddPlayerOffer(character.Identity, removedItem);
             if (tradeSlot < 0)
             {
-                issuer.BaseInventory.AddToPage(
-                    (int)message.Container.Type,
-                    message.Container.Instance,
-                    removedItem);
+                InventoryContainerRuntimeService.Default.RestoreInventoryItem(issuer, message.Container, removedItem);
                 ChatTextMessageHandler.Default.Send(character, "Trade window is full.");
                 return true;
             }
