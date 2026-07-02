@@ -35,10 +35,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
     // TODO: Change Actions to something more suitable (maybe EntityAction?)
     using System;
-    using System.Linq;
     using System.Threading;
 
-    using AORebirth.Core.Actions;
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
     using AORebirth.Core.Inventory;
@@ -168,9 +166,10 @@ namespace ZoneEngine.Core.MessageHandlers
 
             if (equipTo != null)
             {
-                if (this.RequiresImplantAccess(receivingPage) && !this.HasImplantAccess(client.Controller.Character))
+                if (InventoryContainerRuntimeService.Default.TryRejectInventoryPageAccess(
+                    client.Controller.Character,
+                    receivingPage))
                 {
-                    this.SendImplantAccessDenied(client.Controller.Character);
                     client.Controller.Character.DoNotDoTimers = false;
                     return;
                 }
@@ -179,9 +178,10 @@ namespace ZoneEngine.Core.MessageHandlers
                 {
                     if (receivingPage.NeedsItemCheck)
                     {
-                        AOAction action = this.getAction(sendingPage, itemFrom);
-
-                        if (action.CheckRequirements(client.Controller.Character))
+                        if (InventoryContainerRuntimeService.Default.CanMoveContainerItemToPage(
+                            client.Controller.Character,
+                            sendingPage,
+                            itemFrom))
                         {
                             UnEquip.Send(client, receivingPage, toPlacement);
                             if (!noAppearanceUpdate)
@@ -213,9 +213,10 @@ namespace ZoneEngine.Core.MessageHandlers
                             throw new NullReferenceException("itemFrom can not be null, possible inventory error");
                         }
 
-                        AOAction action = this.getAction(receivingPage, itemFrom);
-
-                        if (action.CheckRequirements(client.Controller.Character))
+                        if (InventoryContainerRuntimeService.Default.CanMoveContainerItemToPage(
+                            client.Controller.Character,
+                            receivingPage,
+                            itemFrom))
                         {
                             if (!noAppearanceUpdate)
                             {
@@ -251,9 +252,10 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 if (unequipFrom != null)
                 {
-                    if (this.RequiresImplantAccess(sendingPage) && !this.HasImplantAccess(client.Controller.Character))
+                    if (InventoryContainerRuntimeService.Default.TryRejectInventoryPageAccess(
+                        client.Controller.Character,
+                        sendingPage))
                     {
-                        this.SendImplantAccessDenied(client.Controller.Character);
                         client.Controller.Character.DoNotDoTimers = false;
                         return;
                     }
@@ -303,74 +305,6 @@ namespace ZoneEngine.Core.MessageHandlers
                 AppearanceUpdateMessageHandler.Default.Send(client.Controller.Character);
             }
             */
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="page">
-        /// </param>
-        /// <param name="item">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        private AOAction getAction(IInventoryPage page, IItem item)
-        {
-            AOAction action = null;
-
-            // TODO: Add special check for social page
-            if ((page is ArmorInventoryPage) || (page is ImplantInventoryPage))
-            {
-                action = item.ItemActions.SingleOrDefault(x => x.ActionType == ActionType.ToWear);
-                if (action == null)
-                {
-                    return new AOAction();
-                }
-            }
-
-            if (page is WeaponInventoryPage)
-            {
-                action = item.ItemActions.SingleOrDefault(x => x.ActionType == ActionType.ToWield);
-                if (action == null)
-                {
-                    return new AOAction();
-                }
-            }
-
-            if (page is PlayerInventoryPage)
-            {
-                // No checks needed for unequipping
-                return new AOAction();
-            }
-
-            if (page is SocialArmorInventoryPage)
-            {
-                // TODO: Check for side, sex, breed conditionals
-                return new AOAction();
-            }
-
-            if (action == null)
-            {
-                throw new NotSupportedException(
-                    "No suitable action found for equipping to this page: " + page.GetType());
-            }
-
-            return action;
-        }
-
-        private bool RequiresImplantAccess(IInventoryPage page)
-        {
-            return page is ImplantInventoryPage;
-        }
-
-        private bool HasImplantAccess(ICharacter character)
-        {
-            Character concreteCharacter = character as Character;
-            return concreteCharacter != null && concreteCharacter.HasImplantAccess();
-        }
-
-        private void SendImplantAccessDenied(ICharacter character)
-        {
-            ChatTextMessageHandler.Default.Send(character, "Accessing implants requires technical supervision.");
         }
 
         public void Send(ICharacter character, Identity sourceContainer, int slot)

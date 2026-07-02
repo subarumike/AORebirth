@@ -473,6 +473,23 @@ namespace ZoneEngine.Core
             return true;
         }
 
+        public bool TryRejectInventoryPageAccess(ICharacter character, IInventoryPage page)
+        {
+            if (this.RequiresImplantAccess(page) && !this.HasImplantAccess(character))
+            {
+                this.SendImplantAccessDenied(character);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool CanMoveContainerItemToPage(ICharacter character, IInventoryPage page, IItem item)
+        {
+            AOAction action = ResolveContainerAddItemAction(page, item);
+            return action.CheckRequirements(character);
+        }
+
         public bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
             switch (InventoryContainerInteractionRules.ResolveRouteMode(target))
@@ -1019,6 +1036,47 @@ namespace ZoneEngine.Core
         private static bool IsItemUsable(Item item)
         {
             return (item.GetAttribute((int)StatIds.can) & (int)CanFlags.Use) == (int)CanFlags.Use;
+        }
+
+        private static AOAction ResolveContainerAddItemAction(IInventoryPage page, IItem item)
+        {
+            AOAction action = null;
+
+            if ((page is ArmorInventoryPage) || (page is ImplantInventoryPage))
+            {
+                action = item.ItemActions.SingleOrDefault(x => x.ActionType == ActionType.ToWear);
+                if (action == null)
+                {
+                    return new AOAction();
+                }
+            }
+
+            if (page is WeaponInventoryPage)
+            {
+                action = item.ItemActions.SingleOrDefault(x => x.ActionType == ActionType.ToWield);
+                if (action == null)
+                {
+                    return new AOAction();
+                }
+            }
+
+            if (page is PlayerInventoryPage)
+            {
+                return new AOAction();
+            }
+
+            if (page is SocialArmorInventoryPage)
+            {
+                return new AOAction();
+            }
+
+            if (action == null)
+            {
+                throw new NotSupportedException(
+                    "No suitable action found for equipping to this page: " + page.GetType());
+            }
+
+            return action;
         }
 
         private void TryRemoveBankRollback(IInventoryPage bankPage, int bankSlot)
