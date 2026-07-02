@@ -26,6 +26,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldContentCoordinator content;
 
+        private readonly PlayfieldContentDataProvider contentData;
+
         private readonly PlayfieldDynelRegistry dynelRegistry;
 
         private readonly NpcCorpseLifecycleCoordinator npcCorpseLifecycle;
@@ -53,6 +55,7 @@ namespace ZoneEngine.Core.Playfields
                 new AreteContentModule(),
                 new MontroyalContentModule(),
                 new PrivateCityContentModule());
+            this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.npcCorpseLifecycle = new NpcCorpseLifecycleCoordinator(playfield);
             this.npcCombatTick = new NpcCombatTickCoordinator(playfield);
@@ -69,6 +72,21 @@ namespace ZoneEngine.Core.Playfields
         internal void RegisterContent(Identity playfieldIdentity)
         {
             this.content.RegisterContent(this.playfield, playfieldIdentity);
+        }
+
+        internal List<StatelData> ResolveStatels(Identity playfieldIdentity)
+        {
+            return this.contentData.ResolveStatels(playfieldIdentity);
+        }
+
+        internal bool TryResolveVendorStatels(Identity playfieldIdentity, out StatelData[] vendorStatels)
+        {
+            return this.contentData.TryResolveVendorStatels(playfieldIdentity, out vendorStatels);
+        }
+
+        internal IEnumerable<PlayfieldStaticDynelDefinition> ResolveStaticDynels(Identity playfieldIdentity)
+        {
+            return this.contentData.ResolveStaticDynels(playfieldIdentity);
         }
 
         internal bool ShouldSuppressDbMobSpawn(DBMobSpawn mob)

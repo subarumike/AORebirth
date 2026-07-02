@@ -349,7 +349,7 @@ namespace AORebirth.Core.Playfields
             this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<IMExecuteFunction>(this.ExecuteFunction));
             this.heartBeat = new Timer(this.HeartBeatTimer, null, 10, 0);
 
-            this.statels = ResolvePlayfieldStatels(playfieldIdentity);
+            this.statels = this.runtimeSystems.ResolveStatels(playfieldIdentity);
             this.runtimeSystems.RegisterStatels(this.statels);
             this.LoadMobSpawns(playfieldIdentity);
             this.runtimeSystems.RegisterContent(playfieldIdentity);
@@ -358,79 +358,38 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.RefreshDynelRegistry();
         }
 
-        private static List<StatelData> ResolvePlayfieldStatels(Identity playfieldIdentity)
-        {
-            PlayfieldData playfieldData;
-            if (PlayfieldLoader.PFData.TryGetValue(playfieldIdentity.Instance, out playfieldData))
-            {
-                return playfieldData.Statels;
-            }
-
-            if (IsPrivateCityPlayfieldCandidate(playfieldIdentity))
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Zoning,
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Dynamic private city instance created without PFData statels instance={0} evidence=live_capture_20260622-101935",
-                        playfieldIdentity));
-                return new List<StatelData>();
-            }
-
-            return PlayfieldLoader.PFData[playfieldIdentity.Instance].Statels;
-        }
-
         private void LoadStaticDynels(Identity playfieldIdentity)
         {
-            IEnumerable<DBStaticDynel> dynels =
-                StaticDynelDao.Instance.GetWhere(new { Playfield = playfieldIdentity.Instance });
-            foreach (DBStaticDynel sd in dynels)
+            foreach (PlayfieldStaticDynelDefinition staticDynel in
+                this.runtimeSystems.ResolveStaticDynels(playfieldIdentity))
             {
-                List<GameTuple<CharacterStat, uint>> tempStats =
-                    MessagePackZip.DeserializeData<GameTuple<CharacterStat, uint>>(sd.stats.ToArray());
+                StaticDynel sdy = new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template);
 
-                if (tempStats.Any(x => x.Value1 == (CharacterStat)StatIds.acgitemtemplateid))
+                foreach (GameTuple<CharacterStat, uint> stat in staticDynel.Stats)
                 {
-                    int id = (int)tempStats.First(x => x.Value1 == (CharacterStat)StatIds.acgitemtemplateid).Value2;
-                    StaticDynel sdy = new StaticDynel(
-                        this.Identity,
-                        new Identity() { Type = (IdentityType)sd.Type, Instance = sd.Instance },
-                        ItemLoader.ItemList[id]);
-
-                    foreach (GameTuple<CharacterStat, uint> stat in tempStats)
+                    if (sdy.Stats.ContainsKey((int)stat.Value1))
                     {
-                        if (sdy.Stats.ContainsKey((int)stat.Value1))
-                        {
-                            sdy.Stats[(int)stat.Value1] = (int)stat.Value2;
-                            continue;
-                        }
-                        sdy.Stats.Add((int)stat.Value1, (int)stat.Value2);
+                        sdy.Stats[(int)stat.Value1] = (int)stat.Value2;
+                        continue;
                     }
-
-                    sdy.Coordinate = new Coordinate(sd.X, sd.Y, sd.Z);
-                    sdy.Heading = new Quaternion()
-                                  {
-                                      X = sd.HeadingX,
-                                      Y = sd.HeadingY,
-                                      Z = sd.HeadingZ,
-                                      W = sd.HeadingW
-                                  };
-                    this.runtimeSystems.RegisterDynel(sdy);
+                    sdy.Stats.Add((int)stat.Value1, (int)stat.Value2);
                 }
+
+                sdy.Coordinate = staticDynel.Coordinate;
+                sdy.Heading = staticDynel.Heading;
+                this.runtimeSystems.RegisterDynel(sdy);
             }
         }
 
         private void LoadVendors(Identity playfieldIdentity)
         {
-            PlayfieldData playfieldData;
-            if (!PlayfieldLoader.PFData.TryGetValue(playfieldIdentity.Instance, out playfieldData))
+            StatelData[] vendorStatels;
+            if (!this.runtimeSystems.TryResolveVendorStatels(playfieldIdentity, out vendorStatels))
             {
                 return;
             }
 
-            VendorHandler.SpawnVendorsForPlayfield(
-                this,
-                playfieldData.Statels.Where(x => x.Identity.Type == IdentityType.VendingMachine).ToArray());
+            VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels);
         }
 
         private void LoadMobSpawns(Identity playfieldIdentity)
