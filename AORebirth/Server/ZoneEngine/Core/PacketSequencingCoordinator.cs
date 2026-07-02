@@ -114,6 +114,12 @@ namespace ZoneEngine.Core
             Execute(recordTowersCitiesSent, "recordTowersCitiesSent");
         }
 
+        public void RunPlayfieldTransferBeginSequence(Action enterZoningPhase, Action sendTeleportPacket)
+        {
+            Execute(enterZoningPhase, "enterZoningPhase");
+            Execute(sendTeleportPacket, "sendTeleportPacket");
+        }
+
         public void CompleteSessionInitialization(Action completeInPlay)
         {
             Execute(completeInPlay, "completeInPlay");
