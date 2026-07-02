@@ -582,6 +582,43 @@ namespace ZoneEngine.Core
             }
         }
 
+        public Item GetTradeSkillItem(ICharacter character, TradeSkillInfo info)
+        {
+            return character.BaseInventory.GetItemInContainer(info.Container, info.Placement);
+        }
+
+        public InventoryError AddTradeSkillResultItem(ICharacter character, Item item)
+        {
+            return character.BaseInventory.TryAdd(item);
+        }
+
+        public void RemoveTradeSkillItem(ICharacter character, TradeSkillInfo info)
+        {
+            character.BaseInventory.RemoveItem(info.Container, info.Placement);
+        }
+
+        public Item SetTradeSkillSource(ICharacter character, int container, int placement)
+        {
+            character.TradeSkillSource = new TradeSkillInfo(0, container, placement);
+            return character.BaseInventory.GetItemInContainer(container, placement);
+        }
+
+        public Item SetTradeSkillTarget(ICharacter character, int container, int placement)
+        {
+            character.TradeSkillTarget = new TradeSkillInfo(0, container, placement);
+            return character.BaseInventory.GetItemInContainer(container, placement);
+        }
+
+        public void ClearTradeSkillSource(ICharacter character)
+        {
+            character.TradeSkillSource = null;
+        }
+
+        public void ClearTradeSkillTarget(ICharacter character)
+        {
+            character.TradeSkillTarget = null;
+        }
+
         public bool HasInventoryPage(IItemContainer owner, Identity container)
         {
             return owner.BaseInventory.Pages.ContainsKey((int)container.Type);

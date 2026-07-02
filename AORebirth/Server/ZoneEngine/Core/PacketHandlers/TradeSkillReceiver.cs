@@ -40,6 +40,7 @@ namespace ZoneEngine.Core.PacketHandlers
     using AORebirth.Core.Network;
     using AORebirth.Enums;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
 
@@ -90,12 +91,10 @@ namespace ZoneEngine.Core.PacketHandlers
             TradeSkillInfo source = client.Controller.Character.TradeSkillSource;
             TradeSkillInfo target = client.Controller.Character.TradeSkillTarget;
 
-            Item sourceItem = client.Controller.Character.BaseInventory.GetItemInContainer(
-                source.Container,
-                source.Placement);
-            Item targetItem = client.Controller.Character.BaseInventory.GetItemInContainer(
-                target.Container,
-                target.Placement);
+            Item sourceItem =
+                InventoryContainerRuntimeService.Default.GetTradeSkillItem(client.Controller.Character, source);
+            Item targetItem =
+                InventoryContainerRuntimeService.Default.GetTradeSkillItem(client.Controller.Character, target);
 
             TradeSkillEntry ts = TradeSkill.Instance.GetTradeSkillEntry(sourceItem.HighID, targetItem.HighID);
 
@@ -105,7 +104,10 @@ namespace ZoneEngine.Core.PacketHandlers
                 if (WindowBuild(client, quality, ts, sourceItem, targetItem))
                 {
                     Item newItem = new Item(quality, ts.ResultLowId, ts.ResultHighId);
-                    InventoryError inventoryError = client.Controller.Character.BaseInventory.TryAdd(newItem);
+                    InventoryError inventoryError =
+                        InventoryContainerRuntimeService.Default.AddTradeSkillResultItem(
+                            client.Controller.Character,
+                            newItem);
                     if (inventoryError == InventoryError.OK)
                     {
                         AddTemplateMessageHandler.Default.Send(client.Controller.Character, newItem);
@@ -113,7 +115,9 @@ namespace ZoneEngine.Core.PacketHandlers
                         // Delete source?
                         if ((ts.DeleteFlag & 1) == 1)
                         {
-                            client.Controller.Character.BaseInventory.RemoveItem(source.Container, source.Placement);
+                            InventoryContainerRuntimeService.Default.RemoveTradeSkillItem(
+                                client.Controller.Character,
+                                source);
                             CharacterActionMessageHandler.Default.SendDeleteItem(
                                 client.Controller.Character,
                                 source.Container,
@@ -123,7 +127,9 @@ namespace ZoneEngine.Core.PacketHandlers
                         // Delete target?
                         if ((ts.DeleteFlag & 2) == 2)
                         {
-                            client.Controller.Character.BaseInventory.RemoveItem(target.Container, target.Placement);
+                            InventoryContainerRuntimeService.Default.RemoveTradeSkillItem(
+                                client.Controller.Character,
+                                target);
                             CharacterActionMessageHandler.Default.SendDeleteItem(
                                 client.Controller.Character,
                                 target.Container,
@@ -159,9 +165,10 @@ namespace ZoneEngine.Core.PacketHandlers
         {
             if ((container != 0) && (placement != 0))
             {
-                client.Controller.Character.TradeSkillSource = new TradeSkillInfo(0, container, placement);
-
-                Item item = client.Controller.Character.BaseInventory.GetItemInContainer(container, placement);
+                Item item = InventoryContainerRuntimeService.Default.SetTradeSkillSource(
+                    client.Controller.Character,
+                    container,
+                    placement);
                 TradeSkillPacket.SendSource(
                     client.Controller.Character,
                     TradeSkill.Instance.SourceProcessesCount(item.HighID));
@@ -170,7 +177,7 @@ namespace ZoneEngine.Core.PacketHandlers
             }
             else
             {
-                client.Controller.Character.TradeSkillSource = null;
+                InventoryContainerRuntimeService.Default.ClearTradeSkillSource(client.Controller.Character);
             }
         }
 
@@ -186,9 +193,10 @@ namespace ZoneEngine.Core.PacketHandlers
         {
             if ((container != 0) && (placement != 0))
             {
-                client.Controller.Character.TradeSkillTarget = new TradeSkillInfo(0, container, placement);
-
-                Item item = client.Controller.Character.BaseInventory.GetItemInContainer(container, placement);
+                Item item = InventoryContainerRuntimeService.Default.SetTradeSkillTarget(
+                    client.Controller.Character,
+                    container,
+                    placement);
                 TradeSkillPacket.SendTarget(
                     client.Controller.Character,
                     TradeSkill.Instance.TargetProcessesCount(item.HighID));
@@ -197,7 +205,7 @@ namespace ZoneEngine.Core.PacketHandlers
             }
             else
             {
-                client.Controller.Character.TradeSkillTarget = null;
+                InventoryContainerRuntimeService.Default.ClearTradeSkillTarget(client.Controller.Character);
             }
         }
 
@@ -239,12 +247,10 @@ namespace ZoneEngine.Core.PacketHandlers
 
             if ((source != null) && (target != null))
             {
-                Item sourceItem = client.Controller.Character.BaseInventory.GetItemInContainer(
-                    source.Container,
-                    source.Placement);
-                Item targetItem = client.Controller.Character.BaseInventory.GetItemInContainer(
-                    target.Container,
-                    target.Placement);
+                Item sourceItem =
+                    InventoryContainerRuntimeService.Default.GetTradeSkillItem(client.Controller.Character, source);
+                Item targetItem =
+                    InventoryContainerRuntimeService.Default.GetTradeSkillItem(client.Controller.Character, target);
 
                 TradeSkillEntry ts = TradeSkill.Instance.GetTradeSkillEntry(sourceItem.HighID, targetItem.HighID);
                 if (ts != null)
