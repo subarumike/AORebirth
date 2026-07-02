@@ -66,7 +66,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
         public void SendContainerOpen(ICharacter character, IInventoryPage page, int handle)
         {
-            this.RegisterBackpackHandle(character, page, handle);
+            InventoryContainerRuntimeService.Default.RegisterBackpackInventoryHandle(character, page, handle);
             this.Send(character, this.FillContainerData(character, page, handle, 1));
         }
 
@@ -77,7 +77,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
         public void SendContainerIntroduce(ICharacter character, IInventoryPage page, int handle)
         {
-            this.RegisterBackpackHandle(character, page, handle);
+            InventoryContainerRuntimeService.Default.RegisterBackpackInventoryHandle(character, page, handle);
             this.Send(character, this.FillContainerData(character, page, handle, 0));
         }
 
@@ -88,7 +88,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
         public void SendFreshContainerOpen(ICharacter character, IInventoryPage page, int handle)
         {
-            this.RegisterBackpackHandle(character, page, handle);
+            InventoryContainerRuntimeService.Default.RegisterBackpackInventoryHandle(character, page, handle);
             this.Send(character, this.FillContainerData(character, page, handle, 1));
         }
 
@@ -181,15 +181,5 @@ namespace ZoneEngine.Core.MessageHandlers
             return item.MultipleCount > 0 ? item.MultipleCount : 1;
         }
 
-        private void RegisterBackpackHandle(ICharacter character, IInventoryPage page, int handle)
-        {
-            if ((character == null) || (character.BaseInventory == null) || (page == null)
-                || (page.Identity == null) || (page.Identity.Type != IdentityType.Container))
-            {
-                return;
-            }
-
-            character.BaseInventory.RegisterBackpackHandle(handle, page.Identity);
-        }
     }
 }
