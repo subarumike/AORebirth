@@ -59,22 +59,22 @@ namespace ZoneEngine.Core
             this.TransitionTo(ZoneClientSessionPhase.PlayfieldLoading);
         }
 
-        public void BeginReadyBlock()
+        public void EnterReadyBlockForSessionInit()
         {
             this.TransitionTo(ZoneClientSessionPhase.ReadyBlock);
         }
 
-        public void BeginFullCharacterBoundary()
+        public void EnterFullCharacterBoundaryForSessionInit()
         {
             this.TransitionTo(ZoneClientSessionPhase.FullCharacterBoundary);
         }
 
-        public void MarkCharInPlay()
+        public void EnterCharInPlayForVisibilityEntry()
         {
             this.TransitionTo(ZoneClientSessionPhase.CharInPlay);
         }
 
-        public void MarkInPlay()
+        public void CompleteInPlayForSessionInit()
         {
             this.TransitionTo(ZoneClientSessionPhase.InPlay);
         }
