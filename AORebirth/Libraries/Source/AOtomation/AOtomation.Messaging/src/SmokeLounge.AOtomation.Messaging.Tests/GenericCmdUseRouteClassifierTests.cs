@@ -703,14 +703,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "IInventoryPage page = character.BaseInventory[character.BaseInventory.StandardPage];");
             AssertContains(service, "public void SendTradeWindowMoveToInventory");
             AssertContains(service, "new ContainerAddItemMessage");
+            AssertContains(service, "public void ReturnPlayerTradeOffers");
+            AssertContains(service, "IInventoryPage offerPage = shoppingBag.GetPlayerOfferPage(owner.Identity);");
+            AssertContains(service, "owner.BaseInventory[owner.BaseInventory.StandardPage].Add(targetSlot, offer.Value);");
+            AssertContains(service, "this.SendTradeWindowMoveToInventory(owner, IdentityType.KnuBotTradeWindow, offer.Key, targetSlot);");
             AssertContains(service, "public void PersistCharacterInventory");
             AssertContains(service, "\"Persisted inventory after \" + reason + \" char=\"");
 
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.HasFreeInventorySlots(");
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.SendTradeWindowMoveToInventory(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.ReturnPlayerTradeOffers(");
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.PersistCharacterInventory(");
             AssertDoesNotContain(tradeHandler, "private bool HasFreeInventorySlots");
             AssertDoesNotContain(tradeHandler, "private void SendTradeWindowMoveToInventory");
+            AssertDoesNotContain(tradeHandler, "private void ReturnPlayerTradeOffers");
             AssertDoesNotContain(tradeHandler, "private void PersistCharacterInventory");
         }
 
