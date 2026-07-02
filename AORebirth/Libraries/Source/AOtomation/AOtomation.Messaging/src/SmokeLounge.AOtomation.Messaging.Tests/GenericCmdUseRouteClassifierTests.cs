@@ -786,6 +786,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsBackpackInventoryHandleRegistration()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string inventoryUpdateHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\InventoryUpdateMessageHandler.cs");
+
+            AssertContains(service, "public void RegisterBackpackInventoryHandle");
+            AssertContains(service, "page.Identity.Type != IdentityType.Container");
+            AssertContains(service, "character.BaseInventory.RegisterBackpackHandle(handle, page.Identity);");
+
+            AssertContains(
+                inventoryUpdateHandler,
+                "InventoryContainerRuntimeService.Default.RegisterBackpackInventoryHandle(character, page, handle);");
+            AssertDoesNotContain(inventoryUpdateHandler, "private void RegisterBackpackHandle");
+            AssertDoesNotContain(inventoryUpdateHandler, "character.BaseInventory.RegisterBackpackHandle");
+        }
+
+        [TestMethod]
         public void InventoryContainerRuntimeServiceOwnsInventoryItemUseLifecycle()
         {
             string service =

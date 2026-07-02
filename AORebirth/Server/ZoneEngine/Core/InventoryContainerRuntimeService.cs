@@ -622,6 +622,17 @@ namespace ZoneEngine.Core
             return true;
         }
 
+        public void RegisterBackpackInventoryHandle(ICharacter character, IInventoryPage page, int handle)
+        {
+            if ((character == null) || (character.BaseInventory == null) || (page == null)
+                || (page.Identity == null) || (page.Identity.Type != IdentityType.Container))
+            {
+                return;
+            }
+
+            character.BaseInventory.RegisterBackpackHandle(handle, page.Identity);
+        }
+
         public bool UseInventoryItem(ICharacter character, Identity itemPosition)
         {
             Item item = null;
