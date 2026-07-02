@@ -5,8 +5,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -992,6 +994,37 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(character, false);");
         }
 
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceGuardsRemainingHandlerControllerInventoryOwnership()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string[] roots =
+            {
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers"),
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Controllers")
+            };
+
+            string[] allowedRelativeFiles =
+            {
+                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\GuestKeyGeneratorInteractionHandler.cs",
+                @"AORebirth\Server\ZoneEngine\Core\Controllers\NPCController.cs"
+            };
+
+            HashSet<string> allowed =
+                new HashSet<string>(
+                    allowedRelativeFiles.Select(path => Path.GetFullPath(Path.Combine(repositoryRoot, path))));
+
+            string[] offenders =
+                roots.SelectMany(root => Directory.GetFiles(root, "*.cs", SearchOption.TopDirectoryOnly))
+                    .Where(path => !allowed.Contains(Path.GetFullPath(path)))
+                    .Where(path => File.ReadAllText(path).Contains("BaseInventory"))
+                    .Select(path => MakeRelativePath(repositoryRoot, path))
+                    .OrderBy(path => path)
+                    .ToArray();
+
+            CollectionAssert.AreEqual(new string[0], offenders);
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,
@@ -1066,6 +1099,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.Fail("Could not find repository root for source guardrail.");
             return string.Empty;
+        }
+
+        private static string MakeRelativePath(string root, string path)
+        {
+            Uri rootUri = new Uri(AppendDirectorySeparator(Path.GetFullPath(root)));
+            Uri pathUri = new Uri(Path.GetFullPath(path));
+            return Uri.UnescapeDataString(rootUri.MakeRelativeUri(pathUri).ToString()).Replace('/', '\\');
+        }
+
+        private static string AppendDirectorySeparator(string path)
+        {
+            if (path.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
+            {
+                return path;
+            }
+
+            return path + Path.DirectorySeparatorChar;
         }
 
         private static string FindRepositoryRootFromPath(string path)
