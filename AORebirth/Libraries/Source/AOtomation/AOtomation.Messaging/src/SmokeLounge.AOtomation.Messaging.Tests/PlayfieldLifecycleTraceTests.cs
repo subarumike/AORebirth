@@ -754,6 +754,121 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void PlayfieldContentDataProviderOwnsStaticContentDataResolution()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string runtimeSystemsText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+            string providerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldContentDataProvider.cs"));
+            string projectText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
+
+            Assert.IsTrue(
+                providerText.Contains("internal sealed class PlayfieldContentDataProvider"),
+                "PlayfieldContentDataProvider must be the named content data boundary.");
+            Assert.IsTrue(
+                providerText.Contains("internal List<StatelData> ResolveStatels(Identity playfieldIdentity)"),
+                "Provider must own statel resolution.");
+            Assert.IsTrue(
+                providerText.Contains(
+                    "internal bool TryResolveVendorStatels(Identity playfieldIdentity, out StatelData[] vendorStatels)"),
+                "Provider must own vendor statel resolution.");
+            Assert.IsTrue(
+                providerText.Contains(
+                    "internal IEnumerable<PlayfieldStaticDynelDefinition> ResolveStaticDynels(Identity playfieldIdentity)"),
+                "Provider must own static dynel definition resolution.");
+            Assert.IsTrue(
+                providerText.Contains("PlayfieldLoader.PFData.TryGetValue"),
+                "Provider must own PlayfieldLoader statel data access.");
+            Assert.IsTrue(
+                providerText.Contains("StaticDynelDao.Instance.GetWhere"),
+                "Provider must own static dynel DB row access.");
+            Assert.IsTrue(
+                providerText.Contains("MessagePackZip.DeserializeData"),
+                "Provider must own static dynel stat payload deserialization.");
+            Assert.IsTrue(
+                providerText.Contains("IdentityType.VendingMachine"),
+                "Provider must preserve the existing vendor statel filter.");
+            Assert.IsTrue(
+                providerText.Contains("internal sealed class PlayfieldStaticDynelDefinition"),
+                "Provider must expose static dynel definitions rather than spawning runtime objects.");
+
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("private readonly PlayfieldContentDataProvider contentData"),
+                "PlayfieldRuntimeSystems must own PlayfieldContentDataProvider.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains(
+                    "this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);"),
+                "PlayfieldRuntimeSystems must construct the content data provider.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("return this.contentData.ResolveStatels(playfieldIdentity);"),
+                "Runtime systems must delegate statel data resolution to the provider.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains(
+                    "return this.contentData.TryResolveVendorStatels(playfieldIdentity, out vendorStatels);"),
+                "Runtime systems must delegate vendor statel data resolution to the provider.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("return this.contentData.ResolveStaticDynels(playfieldIdentity);"),
+                "Runtime systems must delegate static dynel data resolution to the provider.");
+
+            string constructor = ExtractMethodBlock(playfieldText, "public Playfield(ZoneServer zoneServer, Identity playfieldIdentity)");
+            AssertTextBefore(
+                constructor,
+                "this.runtimeSystems.ResolveStatels(playfieldIdentity)",
+                "this.runtimeSystems.RegisterStatels(this.statels);");
+            AssertTextBefore(
+                constructor,
+                "this.runtimeSystems.RegisterStatels(this.statels);",
+                "this.LoadMobSpawns(playfieldIdentity);");
+            AssertTextBefore(
+                constructor,
+                "this.LoadMobSpawns(playfieldIdentity);",
+                "this.runtimeSystems.RegisterContent(playfieldIdentity);");
+            AssertTextBefore(
+                constructor,
+                "this.runtimeSystems.RegisterContent(playfieldIdentity);",
+                "this.LoadVendors(playfieldIdentity);");
+            AssertTextBefore(
+                constructor,
+                "this.LoadVendors(playfieldIdentity);",
+                "this.LoadStaticDynels(playfieldIdentity);");
+            AssertTextBefore(
+                constructor,
+                "this.LoadStaticDynels(playfieldIdentity);",
+                "this.runtimeSystems.RefreshDynelRegistry();");
+
+            string loadVendors = ExtractMethodBlock(playfieldText, "private void LoadVendors(Identity playfieldIdentity)");
+            Assert.IsTrue(
+                loadVendors.Contains("this.runtimeSystems.TryResolveVendorStatels(playfieldIdentity, out vendorStatels)"),
+                "Playfield vendor loading must ask runtime systems for vendor statels.");
+            Assert.IsFalse(
+                loadVendors.Contains("PlayfieldLoader.PFData"),
+                "Playfield vendor loading must not own PlayfieldLoader access.");
+
+            string loadStaticDynels =
+                ExtractMethodBlock(playfieldText, "private void LoadStaticDynels(Identity playfieldIdentity)");
+            Assert.IsTrue(
+                loadStaticDynels.Contains("this.runtimeSystems.ResolveStaticDynels(playfieldIdentity)"),
+                "Playfield static dynel loading must ask runtime systems for static dynel definitions.");
+            Assert.IsTrue(
+                loadStaticDynels.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
+                "Playfield must remain the runtime static dynel construction owner in this slice.");
+            Assert.IsFalse(
+                loadStaticDynels.Contains("StaticDynelDao.Instance.GetWhere"),
+                "Playfield static dynel loading must not own DB row access.");
+            Assert.IsFalse(
+                loadStaticDynels.Contains("MessagePackZip.DeserializeData"),
+                "Playfield static dynel loading must not own static dynel stat deserialization.");
+
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldContentDataProvider.cs"),
+                "ZoneEngine project must compile PlayfieldContentDataProvider.");
+        }
+
+        [TestMethod]
         public void PlayfieldDynelRegistryIsOwnedByRuntimeSystemsAndFeedsSafeLookupPaths()
         {
             string repositoryRoot = FindRepositoryRoot();
@@ -1147,6 +1262,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(first >= 0, "Missing lifecycle stage " + firstStage + ".");
             Assert.IsTrue(second >= 0, "Missing lifecycle stage " + secondStage + ".");
             Assert.IsTrue(first < second, firstStage + " must occur before " + secondStage + ".");
+        }
+
+        private static void AssertTextBefore(string text, string firstText, string secondText)
+        {
+            int first = text.IndexOf(firstText, StringComparison.Ordinal);
+            int second = text.IndexOf(secondText, StringComparison.Ordinal);
+            Assert.IsTrue(first >= 0, "Missing text " + firstText + ".");
+            Assert.IsTrue(second >= 0, "Missing text " + secondText + ".");
+            Assert.IsTrue(first < second, firstText + " must occur before " + secondText + ".");
         }
 
         private static bool HasDetail(IList<PlayfieldLifecycleEvent> events, string stage, string detail)
