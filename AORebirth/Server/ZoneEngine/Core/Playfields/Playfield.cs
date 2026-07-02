@@ -824,6 +824,12 @@ namespace AORebirth.Core.Playfields
             dynel.DoNotDoTimers = true;
             Thread.Sleep(1000);
 
+            ZoneClient lifecycleClient = dynel.Controller == null ? null : dynel.Controller.Client as ZoneClient;
+            if (lifecycleClient != null)
+            {
+                lifecycleClient.SessionLifecycle.BeginZoning();
+            }
+
             // Teleport to another playfield
             TeleportMessageHandler.Default.Send(
                 dynel as ICharacter,

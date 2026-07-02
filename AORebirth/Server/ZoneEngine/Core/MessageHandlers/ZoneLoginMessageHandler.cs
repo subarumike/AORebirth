@@ -64,6 +64,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
             zc.Controller = pc;
 
+            zc.SessionLifecycle.BeginCharacterLoading();
             zc.CreateCharacter(message.CharacterId);
             zc.SendInitiateCompressionMessage(new InitiateCompressionMessage());
 

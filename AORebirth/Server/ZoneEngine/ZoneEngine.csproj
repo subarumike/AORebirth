@@ -301,6 +301,7 @@
     <Compile Include="Core\TradeSkillEntry.cs" />
     <Compile Include="Core\TradeSkillSkill.cs" />
     <Compile Include="Core\ZoneClient.cs" />
+    <Compile Include="Core\ZoneClientSessionLifecycleCoordinator.cs" />
     <Compile Include="Core\ZoneServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
