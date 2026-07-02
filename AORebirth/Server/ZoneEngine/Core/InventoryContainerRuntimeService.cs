@@ -4,7 +4,10 @@ namespace ZoneEngine.Core
 
     using System;
     using System.Linq;
+    using System.Threading;
 
+    using AORebirth.Core.Actions;
+    using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
     using AORebirth.Core.Events;
     using AORebirth.Core.Inventory;
@@ -20,6 +23,7 @@ namespace ZoneEngine.Core
     using Utility;
 
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Packets;
 
     #endregion
 
@@ -110,6 +114,192 @@ namespace ZoneEngine.Core
                 client.Controller.UseStatel(message.Target[1], EventType.OnUseItemOn);
             }
 
+            return true;
+        }
+
+        public bool TryMoveOwnedInventoryItem(
+            ICharacter character,
+            ClientMoveItemToInventoryMessage message,
+            IZoneClient client)
+        {
+            IInventoryPage sendingPage;
+            if (!this.TryResolveMoveSourcePage(
+                character,
+                message.SourceContainer,
+                out sendingPage))
+            {
+                return false;
+            }
+
+            int fromPlacement = message.SourceContainer.Instance;
+            IItem itemFrom = sendingPage[fromPlacement];
+            if (itemFrom == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "ClientMoveItemToInventory source slot is empty source={0} targetPlacement={1} character={2}",
+                        message.SourceContainer,
+                        message.TargetPlacement,
+                        character.Identity));
+                return true;
+            }
+
+            if (message.SourceContainer.Type == IdentityType.Inventory)
+            {
+                Identity backpackContainerIdentity;
+                InventoryItemRules.TryEnsureBackpackContainerIdentity(
+                    itemFrom,
+                    character.Identity,
+                    message.SourceContainer,
+                    out backpackContainerIdentity);
+            }
+
+            IInventoryPage receivingPage = this.ResolveMoveTargetPage(character, message.TargetPlacement);
+            if (receivingPage == null)
+            {
+                return false;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "ClientMoveItemToInventory resolved char={0} fromPage={1} fromSlot={2} toPage={3} rawTarget={4} item={5}/{6} ql={7}",
+                    character.Identity,
+                    sendingPage.GetType().Name,
+                    fromPlacement,
+                    receivingPage.GetType().Name,
+                    message.TargetPlacement,
+                    itemFrom.LowID,
+                    itemFrom.HighID,
+                    itemFrom.Quality));
+
+            int ackTargetPlacement = message.TargetPlacement;
+            int toPlacement = message.TargetPlacement;
+            if (toPlacement == (int)IdentityType.TradeWindow)
+            {
+                toPlacement = receivingPage.FindFreeSlot();
+            }
+
+            if (toPlacement < 0)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "ClientMoveItemToInventory target inventory is full source={0} targetPlacement={1} character={2}",
+                        message.SourceContainer,
+                        message.TargetPlacement,
+                        character.Identity));
+                return true;
+            }
+
+            IItemSlotHandler equipTo = receivingPage as IItemSlotHandler;
+            IItemSlotHandler unequipFrom = sendingPage as IItemSlotHandler;
+            IItem itemTo = receivingPage[toPlacement];
+            bool affectsAppearance = this.IsAppearanceEquipmentPage(receivingPage)
+                                     || this.IsAppearanceEquipmentPage(sendingPage);
+
+            if (equipTo != null)
+            {
+                if (this.RequiresImplantAccess(receivingPage) && !this.HasImplantAccess(character))
+                {
+                    this.SendImplantAccessDenied(character);
+                    return true;
+                }
+
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "ClientMoveItemToInventory equip path char={0} targetSlot={1} itemToPresent={2}",
+                        character.Identity,
+                        toPlacement,
+                        itemTo != null ? 1 : 0));
+
+                if (receivingPage.NeedsItemCheck && !this.CanEquipToPage(character, receivingPage, itemFrom))
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        string.Format(
+                            "ClientMoveItemToInventory equip requirements failed item={0}/{1}:{2} source={3} targetPlacement={4} character={5}",
+                            itemFrom.LowID,
+                            itemFrom.HighID,
+                            itemFrom.Quality,
+                            message.SourceContainer,
+                            toPlacement,
+                            character.Identity));
+                    return true;
+                }
+
+                WeaponItemFullUpdate.SendWeaponDefinition(character, itemFrom);
+
+                if (itemTo != null)
+                {
+                    if (affectsAppearance)
+                    {
+                        this.WaitForEquipVisualSync(itemFrom, itemTo, receivingPage is SocialArmorInventoryPage);
+                    }
+
+                    UnEquip.Send(client, receivingPage, toPlacement);
+                    equipTo.HotSwap(sendingPage, fromPlacement, toPlacement);
+                }
+                else
+                {
+                    if (affectsAppearance)
+                    {
+                        this.WaitForEquipVisualSync(itemFrom, null, receivingPage is SocialArmorInventoryPage);
+                    }
+
+                    if (sendingPage == receivingPage)
+                    {
+                        UnEquip.Send(client, sendingPage, fromPlacement);
+                    }
+
+                    equipTo.Equip(sendingPage, fromPlacement, toPlacement);
+                }
+
+                this.SendMoveItemToInventoryAck(
+                    character,
+                    message.SourceContainer,
+                    ackTargetPlacement);
+                Equip.Send(client, receivingPage, toPlacement);
+                character.CalculateSkills();
+                ClientMoveItemToInventoryMessageHandler.EnsureWeaponVisualMeshes(character, true);
+                this.PersistClientMoveItemToInventory(character, "equip");
+                return true;
+            }
+
+            if (unequipFrom != null)
+            {
+                if (this.RequiresImplantAccess(sendingPage) && !this.HasImplantAccess(character))
+                {
+                    this.SendImplantAccessDenied(character);
+                    return true;
+                }
+
+                if (affectsAppearance)
+                {
+                    this.WaitForEquipVisualSync(itemFrom, null, sendingPage is SocialArmorInventoryPage);
+                }
+
+                UnEquip.Send(client, sendingPage, fromPlacement);
+                unequipFrom.Unequip(fromPlacement, receivingPage, toPlacement);
+                this.SendMoveItemToInventoryAck(
+                    character,
+                    message.SourceContainer,
+                    ackTargetPlacement);
+                character.CalculateSkills();
+                ClientMoveItemToInventoryMessageHandler.EnsureWeaponVisualMeshes(character, true);
+                this.PersistClientMoveItemToInventory(character, "unequip");
+                return true;
+            }
+
+            sendingPage.Remove(fromPlacement);
+            receivingPage.Add(toPlacement, itemFrom);
+            this.SendMoveItemToInventoryAck(
+                character,
+                message.SourceContainer,
+                ackTargetPlacement);
+            this.PersistClientMoveItemToInventory(character, "move");
             return true;
         }
 
@@ -279,6 +469,64 @@ namespace ZoneEngine.Core
             {
                 return null;
             }
+        }
+
+        private bool CanEquipToPage(ICharacter character, IInventoryPage page, IItem item)
+        {
+            AOAction action = null;
+            if ((page is ArmorInventoryPage) || (page is ImplantInventoryPage))
+            {
+                action = item.ItemActions.SingleOrDefault(x => x.ActionType == ActionType.ToWear);
+            }
+            else if (page is WeaponInventoryPage)
+            {
+                action = item.ItemActions.SingleOrDefault(x => x.ActionType == ActionType.ToWield);
+            }
+
+            return action == null || action.CheckRequirements(character);
+        }
+
+        private bool RequiresImplantAccess(IInventoryPage page)
+        {
+            return page is ImplantInventoryPage;
+        }
+
+        private bool HasImplantAccess(ICharacter character)
+        {
+            Character concreteCharacter = character as Character;
+            return concreteCharacter != null && concreteCharacter.HasImplantAccess();
+        }
+
+        private void SendImplantAccessDenied(ICharacter character)
+        {
+            ChatTextMessageHandler.Default.Send(character, "Accessing implants requires technical supervision.");
+        }
+
+        private bool IsAppearanceEquipmentPage(IInventoryPage page)
+        {
+            return page is WeaponInventoryPage || page is ArmorInventoryPage || page is SocialArmorInventoryPage;
+        }
+
+        private void WaitForEquipVisualSync(IItem primary, IItem secondary, bool isSocial)
+        {
+            int delay = this.GetEquipDelay(primary, isSocial);
+            if (secondary != null)
+            {
+                delay += this.GetEquipDelay(secondary, isSocial);
+            }
+
+            Thread.Sleep(delay * 10);
+        }
+
+        private int GetEquipDelay(IItem item, bool isSocial)
+        {
+            if (item == null || isSocial)
+            {
+                return 20;
+            }
+
+            int delay = item.GetAttribute(211);
+            return delay == 1234567890 ? 20 : delay;
         }
 
         public void SendMoveItemToInventoryAck(ICharacter character, Identity sourceContainer, int targetPlacement)
