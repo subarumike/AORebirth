@@ -701,6 +701,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             AssertContains(service, "public bool HasFreeInventorySlots");
             AssertContains(service, "IInventoryPage page = character.BaseInventory[character.BaseInventory.StandardPage];");
+            AssertContains(service, "public int FindFreeStandardInventorySlot");
+            AssertContains(service, "return owner.BaseInventory[owner.BaseInventory.StandardPage].FindFreeSlot();");
+            AssertContains(service, "public InventoryError AddToStandardInventoryPage");
+            AssertContains(service, "return owner.BaseInventory.AddToPage(owner.BaseInventory.StandardPage, targetSlot, item);");
+            AssertContains(service, "public void AddToStandardInventoryPageUnchecked");
+            AssertContains(service, "owner.BaseInventory[owner.BaseInventory.StandardPage].Add(targetSlot, item);");
             AssertContains(service, "public void SendTradeWindowMoveToInventory");
             AssertContains(service, "new ContainerAddItemMessage");
             AssertContains(service, "public void ReturnPlayerTradeOffers");
@@ -715,6 +721,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "\"Persisted inventory after \" + reason + \" char=\"");
 
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.HasFreeInventorySlots(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.FindFreeStandardInventorySlot(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.AddToStandardInventoryPage(");
+            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.AddToStandardInventoryPageUnchecked(");
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.SendTradeWindowMoveToInventory(");
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.ReturnPlayerTradeOffers(");
             AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.TransferPlayerTradeOffers(");
