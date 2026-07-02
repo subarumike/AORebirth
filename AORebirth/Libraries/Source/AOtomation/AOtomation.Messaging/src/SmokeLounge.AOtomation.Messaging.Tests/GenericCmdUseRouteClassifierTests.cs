@@ -525,6 +525,36 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(weaponItemFullUpdate, "page is BankInventoryPage");
         }
 
+        [TestMethod]
+        public void InventoryContainerRuntimeServiceOwnsContainerAddItemTargetPageResolution()
+        {
+            string service =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
+            string containerAddItemHandler =
+                ReadRepositoryFile(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs");
+
+            AssertContains(service, "public Identity ResolveContainerAddItemTargetIdentity");
+            AssertContains(service, "toIdentity.Type == IdentityType.IncomingTradeWindow");
+            AssertContains(service, "toIdentity.Type = IdentityType.CanbeAffected;");
+            AssertContains(service, "public IInventoryPage ResolveContainerAddItemReceivingPage");
+            AssertContains(service, "target.Type == IdentityType.IncomingTradeWindow");
+            AssertContains(service, "itemReceiver.BaseInventory.Pages[(int)IdentityType.Bank]");
+            AssertContains(service, "public int ResolveContainerAddItemTargetPlacement");
+
+            AssertContains(
+                containerAddItemHandler,
+                "InventoryContainerRuntimeService.Default.ResolveContainerAddItemTargetIdentity");
+            AssertContains(
+                containerAddItemHandler,
+                "InventoryContainerRuntimeService.Default.ResolveContainerAddItemReceivingPage");
+            AssertContains(
+                containerAddItemHandler,
+                "InventoryContainerRuntimeService.Default.ResolveContainerAddItemTargetPlacement");
+            AssertDoesNotContain(containerAddItemHandler, "toIdentity.Type = IdentityType.CanbeAffected;");
+            AssertDoesNotContain(containerAddItemHandler, "itemReceiver.BaseInventory.Pages[(int)IdentityType.Bank]");
+        }
+
         private static void AssertRoute(
             GenericCmdUseRoute expected,
             Identity target,

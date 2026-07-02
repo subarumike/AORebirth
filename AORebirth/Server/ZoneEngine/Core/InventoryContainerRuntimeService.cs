@@ -59,6 +59,51 @@ namespace ZoneEngine.Core
             }
         }
 
+        public Identity ResolveContainerAddItemTargetIdentity(Identity target)
+        {
+            Identity toIdentity = target;
+            if (toIdentity.Type == IdentityType.IncomingTradeWindow)
+            {
+                toIdentity.Type = IdentityType.CanbeAffected;
+            }
+
+            return toIdentity;
+        }
+
+        public IInventoryPage ResolveContainerAddItemReceivingPage(
+            IItemContainer itemReceiver,
+            ICharacter character,
+            Identity target,
+            int toPlacement)
+        {
+            IInventoryPage receivingPage;
+            if ((toPlacement == 0x6f) && (target.Type == IdentityType.IncomingTradeWindow))
+            {
+                receivingPage = itemReceiver.BaseInventory.Pages[(int)IdentityType.Bank];
+            }
+            else
+            {
+                receivingPage = itemReceiver.BaseInventory.PageFromSlot(toPlacement);
+            }
+
+            if ((receivingPage == null) || (itemReceiver.GetType() != character.GetType()))
+            {
+                receivingPage = itemReceiver.BaseInventory.Pages[itemReceiver.BaseInventory.StandardPage];
+            }
+
+            return receivingPage;
+        }
+
+        public int ResolveContainerAddItemTargetPlacement(IInventoryPage receivingPage, int toPlacement)
+        {
+            if (toPlacement == 0x6f)
+            {
+                return receivingPage.FindFreeSlot();
+            }
+
+            return toPlacement;
+        }
+
         public bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
             switch (InventoryContainerInteractionRules.ResolveRouteMode(target))
