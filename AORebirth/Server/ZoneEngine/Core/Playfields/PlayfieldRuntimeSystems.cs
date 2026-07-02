@@ -30,9 +30,7 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldDynelRegistry dynelRegistry;
 
-        private readonly NpcCorpseLifecycleCoordinator npcCorpseLifecycle;
-
-        private readonly NpcCombatTickCoordinator npcCombatTick;
+        private readonly NPCRuntimeService npcRuntime;
 
         private readonly PacketSequencingCoordinator packetSequencing;
 
@@ -59,8 +57,7 @@ namespace ZoneEngine.Core.Playfields
                 new PrivateCityContentModule());
             this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
-            this.npcCorpseLifecycle = new NpcCorpseLifecycleCoordinator(playfield);
-            this.npcCombatTick = new NpcCombatTickCoordinator(playfield);
+            this.npcRuntime = new NPCRuntimeService(playfield);
             this.packetSequencing = new PacketSequencingCoordinator();
             this.privateCityReadyInit =
                 new PrivateCityReadyInitCoordinator(
@@ -185,37 +182,37 @@ namespace ZoneEngine.Core.Playfields
 
         internal bool HasPendingDeadNpcDespawn(Identity identity)
         {
-            return this.npcCorpseLifecycle.HasPendingDeadNpcDespawn(identity);
+            return this.npcRuntime.HasPendingDeadNpcDespawn(identity);
         }
 
         internal void BeginNpcDeath(ICharacter attacker, ICharacter target)
         {
-            this.npcCorpseLifecycle.BeginNpcDeath(attacker, target);
+            this.npcRuntime.BeginNpcDeath(attacker, target);
         }
 
         internal bool ProcessDeadNpc(ICharacter character)
         {
-            return this.npcCorpseLifecycle.ProcessDeadNpc(character);
+            return this.npcRuntime.ProcessDeadNpc(character);
         }
 
         internal void FinalizeNpcDespawn(ICharacter target)
         {
-            this.npcCorpseLifecycle.FinalizeNpcDespawn(target);
+            this.npcRuntime.FinalizeNpcDespawn(target);
         }
 
         internal void ResetNpcCombatTick(ICharacter attacker)
         {
-            this.npcCombatTick.ResetCombatTick(attacker);
+            this.npcRuntime.ResetCombatTick(attacker);
         }
 
         internal void ProcessNpcCombatTick(ICharacter attacker)
         {
-            this.npcCombatTick.ProcessCombatTick(attacker);
+            this.npcRuntime.ProcessCombatTick(attacker);
         }
 
         internal void ClearNpcCombatTracking(Identity identity)
         {
-            this.npcCombatTick.ClearTracking(identity);
+            this.npcRuntime.ClearCombatTracking(identity);
         }
     }
 }
