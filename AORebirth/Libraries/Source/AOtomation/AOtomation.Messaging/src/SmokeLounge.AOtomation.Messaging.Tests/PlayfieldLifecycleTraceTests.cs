@@ -754,6 +754,105 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void PlayfieldDynelRegistryIsOwnedByRuntimeSystemsAndFeedsSafeLookupPaths()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string runtimeSystemsText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+            string registryText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldDynelRegistry.cs"));
+            string projectText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
+
+            string[] registryApi =
+                {
+                    "internal void RefreshFromPool()",
+                    "internal void Register(IEntity entity)",
+                    "internal void Unregister(Identity identity)",
+                    "internal void RegisterStatels(IEnumerable<StatelData> playfieldStatels)",
+                    "internal IInstancedEntity FindByIdentity(Identity identity)",
+                    "internal T FindByIdentity<T>(Identity identity)",
+                    "internal ReadOnlyCollection<IDynel> FindDynelsInRange(IDynel dynel, float range)",
+                    "internal ReadOnlyCollection<ICharacter> FindCharactersInRange(IDynel dynel, float range)",
+                    "internal ReadOnlyCollection<ICharacter> Characters()",
+                    "internal ReadOnlyCollection<ICharacter> Players()",
+                    "internal ReadOnlyCollection<ICharacter> Npcs()",
+                    "internal ReadOnlyCollection<Vendor> Vendors()",
+                    "internal ReadOnlyCollection<StaticDynel> StaticDynels()",
+                    "internal ReadOnlyCollection<StatelData> Statels()",
+                    "internal ReadOnlyCollection<StatelData> Terminals()",
+                    "internal ReadOnlyCollection<StatelData> Doors()"
+                };
+
+            Assert.IsTrue(
+                registryText.Contains("internal sealed class PlayfieldDynelRegistry"),
+                "PlayfieldDynelRegistry must be the named server-side dynel registry boundary.");
+            for (int i = 0; i < registryApi.Length; i++)
+            {
+                Assert.IsTrue(
+                    registryText.Contains(registryApi[i]),
+                    "Missing PlayfieldDynelRegistry API: " + registryApi[i]);
+            }
+
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("private readonly PlayfieldDynelRegistry dynelRegistry"),
+                "PlayfieldRuntimeSystems must own PlayfieldDynelRegistry.");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(runtimeSystemsText, "new PlayfieldDynelRegistry(playfieldIdentity)"),
+                "PlayfieldRuntimeSystems must construct one dynel registry.");
+            Assert.AreEqual(
+                0,
+                CountOccurrences(playfieldText, "new PlayfieldDynelRegistry("),
+                "Playfield must not directly construct PlayfieldDynelRegistry.");
+
+            string[] runtimeDelegations =
+                {
+                    "this.dynelRegistry.RefreshFromPool();",
+                    "this.dynelRegistry.Register(entity);",
+                    "this.dynelRegistry.Unregister(identity);",
+                    "this.dynelRegistry.RegisterStatels(statels);",
+                    "return this.dynelRegistry.FindByIdentity(identity);",
+                    "return this.dynelRegistry.FindByIdentity<T>(identity);",
+                    "return this.dynelRegistry.FindDynelsInRange(dynel, range);",
+                    "return this.dynelRegistry.FindCharactersInRange(dynel, range);",
+                    "return this.dynelRegistry.StaticDynels();"
+                };
+            for (int i = 0; i < runtimeDelegations.Length; i++)
+            {
+                Assert.IsTrue(
+                    runtimeSystemsText.Contains(runtimeDelegations[i]),
+                    "PlayfieldRuntimeSystems must delegate through registry: " + runtimeDelegations[i]);
+            }
+
+            string[] playfieldDelegations =
+                {
+                    "this.runtimeSystems.RegisterStatels(this.statels);",
+                    "this.runtimeSystems.RegisterDynel(cmob);",
+                    "this.runtimeSystems.RegisterDynel(sdy);",
+                    "this.runtimeSystems.RefreshDynelRegistry();",
+                    "return this.runtimeSystems.FindByIdentity(identity);",
+                    "return this.runtimeSystems.FindByIdentity<T>(identity);",
+                    "return this.runtimeSystems.FindDynelsInRange(dynel, range).ToList();",
+                    "return this.runtimeSystems.FindCharactersInRange(dynel, range).ToList();",
+                    "this.runtimeSystems.StaticDynels()"
+                };
+            for (int i = 0; i < playfieldDelegations.Length; i++)
+            {
+                Assert.IsTrue(
+                    playfieldText.Contains(playfieldDelegations[i]),
+                    "Playfield must route the first safe dynel lookup slice through runtime systems: "
+                    + playfieldDelegations[i]);
+            }
+
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldDynelRegistry.cs"),
+                "ZoneEngine project must compile PlayfieldDynelRegistry.");
+        }
+
+        [TestMethod]
         public void AreteCleaningRobotDbSpawnSuppressionKeepsCapturedPathAndLegacyDbBoundary()
         {
             string repositoryRoot = FindRepositoryRoot();

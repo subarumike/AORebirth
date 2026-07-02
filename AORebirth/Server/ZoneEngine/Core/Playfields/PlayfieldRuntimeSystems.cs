@@ -3,11 +3,15 @@ namespace ZoneEngine.Core.Playfields
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.Playfields;
+    using AORebirth.Core.Statels;
     using AORebirth.Database.Entities;
     using AORebirth.Enums;
+    using AORebirth.Interfaces;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -21,6 +25,8 @@ namespace ZoneEngine.Core.Playfields
         private readonly Playfield playfield;
 
         private readonly PlayfieldContentCoordinator content;
+
+        private readonly PlayfieldDynelRegistry dynelRegistry;
 
         private readonly NpcCorpseLifecycleCoordinator npcCorpseLifecycle;
 
@@ -47,6 +53,7 @@ namespace ZoneEngine.Core.Playfields
                 new AreteContentModule(),
                 new MontroyalContentModule(),
                 new PrivateCityContentModule());
+            this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.npcCorpseLifecycle = new NpcCorpseLifecycleCoordinator(playfield);
             this.npcCombatTick = new NpcCombatTickCoordinator(playfield);
             this.privateCityReadyInit =
@@ -72,6 +79,51 @@ namespace ZoneEngine.Core.Playfields
             }
 
             return this.content.ShouldSuppressDbMobSpawn(mob.Playfield, mob.Id);
+        }
+
+        internal void RefreshDynelRegistry()
+        {
+            this.dynelRegistry.RefreshFromPool();
+        }
+
+        internal void RegisterDynel(IEntity entity)
+        {
+            this.dynelRegistry.Register(entity);
+        }
+
+        internal void UnregisterDynel(Identity identity)
+        {
+            this.dynelRegistry.Unregister(identity);
+        }
+
+        internal void RegisterStatels(IEnumerable<StatelData> statels)
+        {
+            this.dynelRegistry.RegisterStatels(statels);
+        }
+
+        internal IInstancedEntity FindByIdentity(Identity identity)
+        {
+            return this.dynelRegistry.FindByIdentity(identity);
+        }
+
+        internal T FindByIdentity<T>(Identity identity) where T : class, IEntity
+        {
+            return this.dynelRegistry.FindByIdentity<T>(identity);
+        }
+
+        internal ReadOnlyCollection<IDynel> FindDynelsInRange(IDynel dynel, float range)
+        {
+            return this.dynelRegistry.FindDynelsInRange(dynel, range);
+        }
+
+        internal ReadOnlyCollection<ICharacter> FindCharactersInRange(IDynel dynel, float range)
+        {
+            return this.dynelRegistry.FindCharactersInRange(dynel, range);
+        }
+
+        internal ReadOnlyCollection<StaticDynel> StaticDynels()
+        {
+            return this.dynelRegistry.StaticDynels();
         }
 
         internal void SendPrivateCityPlayfieldReadyBlock(ZoneClient client, ICharacter character)

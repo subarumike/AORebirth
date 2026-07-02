@@ -350,10 +350,12 @@ namespace AORebirth.Core.Playfields
             this.heartBeat = new Timer(this.HeartBeatTimer, null, 10, 0);
 
             this.statels = ResolvePlayfieldStatels(playfieldIdentity);
+            this.runtimeSystems.RegisterStatels(this.statels);
             this.LoadMobSpawns(playfieldIdentity);
             this.runtimeSystems.RegisterContent(playfieldIdentity);
             this.LoadVendors(playfieldIdentity);
             this.LoadStaticDynels(playfieldIdentity);
+            this.runtimeSystems.RefreshDynelRegistry();
         }
 
         private static List<StatelData> ResolvePlayfieldStatels(Identity playfieldIdentity)
@@ -413,6 +415,7 @@ namespace AORebirth.Core.Playfields
                                       Z = sd.HeadingZ,
                                       W = sd.HeadingW
                                   };
+                    this.runtimeSystems.RegisterDynel(sdy);
                 }
             }
         }
@@ -446,6 +449,7 @@ namespace AORebirth.Core.Playfields
                     stats.ToArray(),
                     new NPCController(),
                     this);
+                this.runtimeSystems.RegisterDynel(cmob);
                 if (mob.KnuBotScriptName != "")
                 {
                     ((NPCController)cmob.Controller).SetKnuBot(
@@ -707,7 +711,7 @@ namespace AORebirth.Core.Playfields
         /// </returns>
         public IInstancedEntity FindByIdentity(Identity identity)
         {
-            return Pool.Instance.GetObject<IInstancedEntity>(identity);
+            return this.runtimeSystems.FindByIdentity(identity);
         }
 
         /// <summary>
@@ -720,7 +724,7 @@ namespace AORebirth.Core.Playfields
         /// </returns>
         public T FindByIdentity<T>(Identity identity) where T : class, IEntity
         {
-            return Pool.Instance.GetObject<T>(identity);
+            return this.runtimeSystems.FindByIdentity<T>(identity);
         }
 
         /// <summary>
@@ -733,23 +737,7 @@ namespace AORebirth.Core.Playfields
         /// </returns>
         public List<IDynel> FindInRange(IDynel dynel, float range)
         {
-            List<IDynel> temp = new List<IDynel>();
-            Coordinate coord = dynel.Coordinates();
-            foreach (Dynel entity in
-                Pool.Instance.GetAll<Dynel>((int)IdentityType.CanbeAffected).Where(xx => xx.InPlayfield(this.Identity)))
-            {
-                if (entity == dynel)
-                {
-                    continue;
-                }
-
-                if (entity.Coordinates().Distance2D(coord) <= range)
-                {
-                    temp.Add(entity);
-                }
-            }
-
-            return temp;
+            return this.runtimeSystems.FindDynelsInRange(dynel, range).ToList();
         }
 
         /// <summary>
@@ -1088,24 +1076,7 @@ namespace AORebirth.Core.Playfields
 
         public List<ICharacter> FindCharacterInRange(IDynel dynel, float range)
         {
-            List<ICharacter> temp = new List<ICharacter>();
-            Coordinate coord = dynel.Coordinates();
-            foreach (ICharacter entity in
-                Pool.Instance.GetAll<ICharacter>((int)IdentityType.CanbeAffected)
-                    .Where(xx => xx.InPlayfield(this.Identity)))
-            {
-                if (entity == dynel)
-                {
-                    continue;
-                }
-
-                if (((Character)entity).Coordinates().Distance2D(coord) <= range)
-                {
-                    temp.Add((Character)entity);
-                }
-            }
-
-            return temp;
+            return this.runtimeSystems.FindCharactersInRange(dynel, range).ToList();
         }
 
         /// <summary>
@@ -2047,7 +2018,7 @@ namespace AORebirth.Core.Playfields
             var sendSCFUs = new IMSendPlayerSCFUs { toClient = client };
             this.SendSCFUsToClient(sendSCFUs);
 
-            foreach (StaticDynel staticDynel in Pool.Instance.GetAll<StaticDynel>(this.Identity))
+            foreach (StaticDynel staticDynel in this.runtimeSystems.StaticDynels())
             {
                 SimpleItemFullUpdateMessageHandler.Default.Send(character, staticDynel);
             }
