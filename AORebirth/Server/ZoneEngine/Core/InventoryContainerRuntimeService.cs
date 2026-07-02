@@ -1473,6 +1473,47 @@ namespace ZoneEngine.Core
             }
         }
 
+        public void TransferPlayerTradeOffers(ICharacter from, ICharacter to, TemporaryBag shoppingBag)
+        {
+            IInventoryPage offerPage = shoppingBag.GetPlayerOfferPage(from.Identity);
+            foreach (KeyValuePair<int, IItem> offer in offerPage.List().ToList())
+            {
+                int targetSlot = to.BaseInventory[to.BaseInventory.StandardPage].FindFreeSlot();
+                if (targetSlot < 0)
+                {
+                    continue;
+                }
+
+                offerPage.Remove(offer.Key);
+                InventoryError err = to.BaseInventory.AddToPage(to.BaseInventory.StandardPage, targetSlot, offer.Value);
+                if (err == InventoryError.OK)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Shopping,
+                        "Player trade transfer committed from=" + from.Identity.ToString(true)
+                        + " to=" + to.Identity.ToString(true)
+                        + " tradeSlot=" + offer.Key
+                        + " targetSlot=" + targetSlot
+                        + " item=" + offer.Value.LowID + "/" + offer.Value.HighID + ":" + offer.Value.Quality);
+
+                    LogUtil.Debug(
+                        DebugInfoDetail.Shopping,
+                        "TRADE_ITEM_COMMIT from=" + from.Identity.ToString(true)
+                        + " fromName=" + from.Name
+                        + " to=" + to.Identity.ToString(true)
+                        + " toName=" + to.Name
+                        + " sourceSlot=" + offer.Key
+                        + " targetSlot=" + targetSlot
+                        + " item=" + offer.Value.LowID + "/" + offer.Value.HighID + ":" + offer.Value.Quality);
+                }
+                else
+                {
+                    offerPage.Add(offer.Key, offer.Value);
+                    ChatTextMessageHandler.Default.Send(to, "Could not receive trade item. (" + err + ")");
+                }
+            }
+        }
+
         public void PersistCharacterInventory(ICharacter character, string reason)
         {
             character.BaseInventory.Write();

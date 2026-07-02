@@ -964,8 +964,8 @@ namespace ZoneEngine.Core.MessageHandlers
                 return true;
             }
 
-            this.TransferPlayerTradeOffers(shopper, vendor, shoppingBag);
-            this.TransferPlayerTradeOffers(vendor, shopper, shoppingBag);
+            InventoryContainerRuntimeService.Default.TransferPlayerTradeOffers(shopper, vendor, shoppingBag);
+            InventoryContainerRuntimeService.Default.TransferPlayerTradeOffers(vendor, shopper, shoppingBag);
 
             this.SendPlayerTradeCompleteClose(shopper, vendor);
             this.SendPlayerTradeCompleteClose(vendor, shopper);
@@ -1334,47 +1334,6 @@ namespace ZoneEngine.Core.MessageHandlers
                    + " credits but only has "
                    + availableCredits
                    + ".";
-        }
-
-        private void TransferPlayerTradeOffers(ICharacter from, ICharacter to, TemporaryBag shoppingBag)
-        {
-            IInventoryPage offerPage = shoppingBag.GetPlayerOfferPage(from.Identity);
-            foreach (KeyValuePair<int, IItem> offer in offerPage.List().ToList())
-            {
-                int targetSlot = to.BaseInventory[to.BaseInventory.StandardPage].FindFreeSlot();
-                if (targetSlot < 0)
-                {
-                    continue;
-                }
-
-                offerPage.Remove(offer.Key);
-                InventoryError err = to.BaseInventory.AddToPage(to.BaseInventory.StandardPage, targetSlot, offer.Value);
-                if (err == InventoryError.OK)
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Shopping,
-                        "Player trade transfer committed from=" + from.Identity.ToString(true)
-                        + " to=" + to.Identity.ToString(true)
-                        + " tradeSlot=" + offer.Key
-                        + " targetSlot=" + targetSlot
-                        + " item=" + offer.Value.LowID + "/" + offer.Value.HighID + ":" + offer.Value.Quality);
-
-                    LogUtil.Debug(
-                        DebugInfoDetail.Shopping,
-                        "TRADE_ITEM_COMMIT from=" + from.Identity.ToString(true)
-                        + " fromName=" + from.Name
-                        + " to=" + to.Identity.ToString(true)
-                        + " toName=" + to.Name
-                        + " sourceSlot=" + offer.Key
-                        + " targetSlot=" + targetSlot
-                        + " item=" + offer.Value.LowID + "/" + offer.Value.HighID + ":" + offer.Value.Quality);
-                }
-                else
-                {
-                    offerPage.Add(offer.Key, offer.Value);
-                    ChatTextMessageHandler.Default.Send(to, "Could not receive trade item. (" + err + ")");
-                }
-            }
         }
 
         private bool TransferPlayerTradeCredits(ICharacter shopper, ICharacter vendor, TemporaryBag shoppingBag)
