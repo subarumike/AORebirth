@@ -57,7 +57,7 @@ namespace ZoneEngine.Core.Playfields
                 new PrivateCityContentModule());
             this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
-            this.npcRuntime = new NPCRuntimeService(playfield);
+            this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry);
             this.packetSequencing = new PacketSequencingCoordinator();
             this.privateCityReadyInit =
                 new PrivateCityReadyInitCoordinator(
@@ -125,6 +125,11 @@ namespace ZoneEngine.Core.Playfields
         internal void UnregisterDynel(Identity identity)
         {
             this.dynelRegistry.Unregister(identity);
+        }
+
+        internal void ActivateNpc(ICharacter character)
+        {
+            this.npcRuntime.ActivateNpc(character);
         }
 
         internal void RegisterNpcHome(ICharacter character)

@@ -723,7 +723,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string[] runtimeCoordinatorConstructors =
                 {
-                    "new NPCRuntimeService(playfield)",
+                    "new NPCRuntimeService(playfield, this.dynelRegistry)",
                     "new PrivateCityReadyInitCoordinator("
                 };
             for (int i = 0; i < runtimeCoordinatorConstructors.Length; i++)
@@ -754,6 +754,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 1,
                 CountOccurrences(npcRuntimeText, "new NpcCombatTickCoordinator(playfield)"),
                 "NPCRuntimeService must own NPC combat tick coordinator construction.");
+            Assert.IsTrue(
+                npcRuntimeText.Contains("private readonly PlayfieldDynelRegistry dynelRegistry;"),
+                "NPCRuntimeService must own NPC registry integration.");
             Assert.AreEqual(
                 1,
                 CountOccurrences(npcRuntimeText, "new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
@@ -777,6 +780,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Playfield must not own NPC home state storage.");
             Assert.IsTrue(
                 runtimeSystemsText.Contains("private readonly NPCRuntimeService npcRuntime")
+                && runtimeSystemsText.Contains("this.npcRuntime.ActivateNpc(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.RegisterNpcHome(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.RemoveNpcHome(identity);")
                 && runtimeSystemsText.Contains("this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);")
@@ -795,6 +799,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.SpawnCapturedNpcContent(playfieldIdentity);"),
                 "Playfield must delegate captured NPC spawn orchestration through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.ActivateNpc(cmob);"),
+                "Playfield must delegate DB-spawned NPC activation through PlayfieldRuntimeSystems.");
+            Assert.IsFalse(
+                playfieldText.Contains("this.runtimeSystems.RegisterDynel(cmob);"),
+                "Playfield must not route DB-spawned NPC activation through the generic dynel registration path.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.RegisterNpcHome(character);"),
                 "Playfield must delegate NPC home registration through PlayfieldRuntimeSystems.");
@@ -1868,7 +1878,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string[] playfieldDelegations =
                 {
                     "this.runtimeSystems.RegisterStatels(this.statels);",
-                    "this.runtimeSystems.RegisterDynel(cmob);",
+                    "this.runtimeSystems.ActivateNpc(cmob);",
                     "this.runtimeSystems.RegisterDynel(sdy);",
                     "this.runtimeSystems.RefreshDynelRegistry();",
                     "return this.runtimeSystems.FindByIdentity(identity);",
