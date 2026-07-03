@@ -2,6 +2,7 @@ namespace AORebirth.Core.Playfields
 {
     #region Usings ...
 
+    using System;
     using System.Globalization;
 
     using AORebirth.Core.Entities;
@@ -29,12 +30,16 @@ namespace AORebirth.Core.Playfields
 
         private readonly NpcPatrolReplayCoordinator patrolReplay;
 
+        private readonly Action<ICharacter> activateNpc;
+
         internal CapturedAreteRobotSpawnOrchestrator(
             CapturedAreteRobotContentProvider capturedRobotContent,
-            NpcPatrolReplayCoordinator patrolReplay)
+            NpcPatrolReplayCoordinator patrolReplay,
+            Action<ICharacter> activateNpc)
         {
             this.capturedRobotContent = capturedRobotContent;
             this.patrolReplay = patrolReplay;
+            this.activateNpc = activateNpc;
         }
 
         internal void SpawnForPlayfield(Playfield playfield, Identity playfieldIdentity)
@@ -129,6 +134,7 @@ namespace AORebirth.Core.Playfields
                     replaySegmentCount));
 
             mobCharacter.DoNotDoTimers = false;
+            this.activateNpc(mobCharacter);
             PlayfieldLifecycleTrace.Record(
                 PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
                 PlayfieldLifecycleTrace.StageCapturedAreteRobotSimpleCharFullUpdateBroadcast,

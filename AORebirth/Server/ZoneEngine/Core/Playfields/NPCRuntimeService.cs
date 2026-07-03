@@ -44,7 +44,10 @@ namespace AORebirth.Core.Playfields
             this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
             this.patrolReplay = new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent);
             this.capturedAreteRobotSpawns =
-                new CapturedAreteRobotSpawnOrchestrator(this.capturedAreteRobotContent, this.patrolReplay);
+                new CapturedAreteRobotSpawnOrchestrator(
+                    this.capturedAreteRobotContent,
+                    this.patrolReplay,
+                    this.ActivateNpc);
         }
 
         internal void ActivateNpc(ICharacter character)
