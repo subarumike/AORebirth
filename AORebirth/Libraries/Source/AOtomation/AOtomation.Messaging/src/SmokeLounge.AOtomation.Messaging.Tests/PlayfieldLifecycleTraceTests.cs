@@ -769,8 +769,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 1,
                 CountOccurrences(
                     npcRuntimeText,
-                    "new CapturedAreteRobotSpawnOrchestrator(this.capturedAreteRobotContent, this.patrolReplay)"),
+                    "new CapturedAreteRobotSpawnOrchestrator("),
                 "NPCRuntimeService must own captured Arete robot spawn orchestration construction.");
+            Assert.IsTrue(
+                npcRuntimeText.Contains("this.ActivateNpc"),
+                "NPCRuntimeService must pass NPC activation ownership into captured robot spawning.");
             Assert.IsTrue(
                 npcRuntimeText.Contains(
                     "private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();"),
@@ -2086,8 +2089,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Arete captured robot spawns must keep using CapturedAreteRobotContentProvider.");
             Assert.IsTrue(
                 npcRuntimeText.Contains(
-                    "new CapturedAreteRobotSpawnOrchestrator(this.capturedAreteRobotContent, this.patrolReplay)"),
+                    "new CapturedAreteRobotSpawnOrchestrator("),
                 "Arete captured robot spawns must keep using CapturedAreteRobotSpawnOrchestrator.");
+            Assert.IsTrue(
+                orchestratorText.Contains("private readonly Action<ICharacter> activateNpc;")
+                && orchestratorText.Contains("this.activateNpc(mobCharacter);"),
+                "Captured robot spawns must activate through the NPCRuntimeService-owned callback.");
             Assert.IsTrue(
                 areteContentText.Contains("registration.RegisterCapturedNpcSpawns();"),
                 "Arete captured robot spawns must enter through content-module registration.");
