@@ -414,7 +414,7 @@ namespace AORebirth.Core.Playfields
                     stats.ToArray(),
                     new NPCController(),
                     this);
-                this.runtimeSystems.RegisterDynel(cmob);
+                this.runtimeSystems.ActivateNpc(cmob);
                 if (mob.KnuBotScriptName != "")
                 {
                     ((NPCController)cmob.Controller).SetKnuBot(

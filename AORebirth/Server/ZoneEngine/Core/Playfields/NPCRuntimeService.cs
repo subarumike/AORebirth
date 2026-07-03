@@ -21,6 +21,8 @@ namespace AORebirth.Core.Playfields
     {
         private readonly Playfield playfield;
 
+        private readonly PlayfieldDynelRegistry dynelRegistry;
+
         private readonly NpcCorpseLifecycleCoordinator corpseLifecycle;
 
         private readonly NpcCombatTickCoordinator combatTick;
@@ -33,15 +35,21 @@ namespace AORebirth.Core.Playfields
 
         private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
 
-        internal NPCRuntimeService(Playfield playfield)
+        internal NPCRuntimeService(Playfield playfield, PlayfieldDynelRegistry dynelRegistry)
         {
             this.playfield = playfield;
+            this.dynelRegistry = dynelRegistry;
             this.corpseLifecycle = new NpcCorpseLifecycleCoordinator(playfield);
             this.combatTick = new NpcCombatTickCoordinator(playfield);
             this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
             this.patrolReplay = new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent);
             this.capturedAreteRobotSpawns =
                 new CapturedAreteRobotSpawnOrchestrator(this.capturedAreteRobotContent, this.patrolReplay);
+        }
+
+        internal void ActivateNpc(ICharacter character)
+        {
+            this.dynelRegistry.Register(character);
         }
 
         internal void RegisterNpcHome(ICharacter character)
@@ -86,6 +94,7 @@ namespace AORebirth.Core.Playfields
         internal void FinalizeNpcDespawn(ICharacter target)
         {
             this.corpseLifecycle.FinalizeNpcDespawn(target);
+            this.dynelRegistry.Unregister(target.Identity);
         }
 
         internal void ResetCombatTick(ICharacter attacker)
