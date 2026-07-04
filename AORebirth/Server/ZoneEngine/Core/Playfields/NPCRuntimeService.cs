@@ -40,7 +40,7 @@ namespace AORebirth.Core.Playfields
         {
             this.playfield = playfield;
             this.dynelRegistry = dynelRegistry;
-            this.corpseLifecycle = new NpcCorpseLifecycleCoordinator(playfield);
+            this.corpseLifecycle = new NpcCorpseLifecycleCoordinator(playfield, this.RemoveNpcHome);
             this.combatTick = new NpcCombatTickCoordinator(playfield);
             this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
             this.patrolReplay = new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent);

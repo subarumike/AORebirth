@@ -26,9 +26,12 @@ namespace AORebirth.Core.Playfields
 
         private readonly Playfield playfield;
 
-        internal NpcCorpseLifecycleCoordinator(Playfield playfield)
+        private readonly Action<Identity> removeNpcHome;
+
+        internal NpcCorpseLifecycleCoordinator(Playfield playfield, Action<Identity> removeNpcHome)
         {
             this.playfield = playfield;
+            this.removeNpcHome = removeNpcHome;
         }
 
         internal bool HasPendingDeadNpcDespawn(Identity identity)
@@ -112,7 +115,7 @@ namespace AORebirth.Core.Playfields
             target.DoNotDoTimers = true;
             this.playfield.ClearCombatTracking(target.Identity);
             this.deadNpcDespawnTicks.Remove(target.Identity.Instance);
-            this.playfield.RemoveNpcHome(target.Identity);
+            this.removeNpcHome(target.Identity);
             this.playfield.Despawn(target.Identity);
             Pool.Instance.RemoveObject((Character)target);
 
