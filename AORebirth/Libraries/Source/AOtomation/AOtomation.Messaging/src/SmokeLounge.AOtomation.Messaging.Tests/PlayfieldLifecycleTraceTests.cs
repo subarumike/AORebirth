@@ -786,6 +786,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.npcRuntime.ActivateNpc(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.RegisterNpcHome(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.RemoveNpcHome(identity);")
+                && runtimeSystemsText.Contains(
+                    "this.npcRuntime.RemoveNpcImmediately(target, stopFightingDeadTarget, cancelPendingCorpseSpawn);")
                 && runtimeSystemsText.Contains("this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);")
                 && runtimeSystemsText.Contains("this.npcRuntime.BeginNpcDeath(attacker, target);")
                 && runtimeSystemsText.Contains("return this.npcRuntime.ProcessDeadNpc(character);")
@@ -815,6 +817,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldText.Contains("this.runtimeSystems.RemoveNpcHome(identity);"),
                 "Playfield must delegate NPC home removal through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.RemoveNpcImmediately("),
+                "Playfield must delegate immediate NPC removal through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.BeginNpcDeath(attacker, target);"),
                 "Playfield must delegate NPC corpse lifecycle start through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
@@ -824,6 +829,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 projectText.Contains(@"Core\Playfields\PlayfieldRuntimeSystems.cs")
                 && projectText.Contains(@"Core\Playfields\NPCRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldRuntimeSystems and NPCRuntimeService.");
+
+            string immediateRemove = ExtractMethodBlock(npcRuntimeText, "internal void RemoveNpcImmediately");
+            Assert.IsTrue(
+                immediateRemove.Contains("target == null || target.Identity.Type != IdentityType.CanbeAffected"),
+                "NPCRuntimeService must preserve the immediate NPC removal guard.");
+            int stopFightIndex = immediateRemove.IndexOf(
+                "stopFightingDeadTarget(target.Identity);",
+                StringComparison.Ordinal);
+            int cancelCorpseIndex = immediateRemove.IndexOf(
+                "cancelPendingCorpseSpawn(target.Identity);",
+                StringComparison.Ordinal);
+            int finalizeIndex = immediateRemove.IndexOf(
+                "this.FinalizeNpcDespawn(target);",
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                stopFightIndex >= 0 && stopFightIndex < cancelCorpseIndex && cancelCorpseIndex < finalizeIndex,
+                "Immediate NPC removal must preserve stop-fight, pending-corpse cancellation, then final despawn order.");
+
+            string playfieldImmediateRemove = ExtractMethodBlock(playfieldText, "public void DespawnNpcImmediately");
+            Assert.IsFalse(
+                playfieldImmediateRemove.Contains("this.StopFightingDeadTarget(target.Identity);")
+                || playfieldImmediateRemove.Contains("this.pendingCorpseSpawns.Remove(target.Identity.Instance);")
+                || playfieldImmediateRemove.Contains("this.runtimeSystems.FinalizeNpcDespawn(target);"),
+                "Playfield DespawnNpcImmediately must not own immediate NPC removal sequencing.");
         }
 
         [TestMethod]

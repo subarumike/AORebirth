@@ -2,6 +2,7 @@ namespace AORebirth.Core.Playfields
 {
     #region Usings ...
 
+    using System;
     using System.Collections.Generic;
 
     using AORebirth.Core.Entities;
@@ -72,6 +73,21 @@ namespace AORebirth.Core.Playfields
         internal void RemoveNpcHome(Identity identity)
         {
             this.npcHomeStates.Remove(identity.Instance);
+        }
+
+        internal void RemoveNpcImmediately(
+            ICharacter target,
+            Action<Identity> stopFightingDeadTarget,
+            Action<Identity> cancelPendingCorpseSpawn)
+        {
+            if (target == null || target.Identity.Type != IdentityType.CanbeAffected)
+            {
+                return;
+            }
+
+            stopFightingDeadTarget(target.Identity);
+            cancelPendingCorpseSpawn(target.Identity);
+            this.FinalizeNpcDespawn(target);
         }
 
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)

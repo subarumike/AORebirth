@@ -592,14 +592,15 @@ namespace AORebirth.Core.Playfields
 
         public void DespawnNpcImmediately(ICharacter target)
         {
-            if (target == null || target.Identity.Type != IdentityType.CanbeAffected)
-            {
-                return;
-            }
+            this.runtimeSystems.RemoveNpcImmediately(
+                target,
+                this.StopFightingDeadTarget,
+                this.CancelPendingNpcCorpseSpawn);
+        }
 
-            this.StopFightingDeadTarget(target.Identity);
-            this.pendingCorpseSpawns.Remove(target.Identity.Instance);
-            this.runtimeSystems.FinalizeNpcDespawn(target);
+        private void CancelPendingNpcCorpseSpawn(Identity deadNpcIdentity)
+        {
+            this.pendingCorpseSpawns.Remove(deadNpcIdentity.Instance);
         }
 
         public void RegisterNpcHome(ICharacter character)
