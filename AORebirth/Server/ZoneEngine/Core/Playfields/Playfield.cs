@@ -3407,11 +3407,6 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.ClearNpcCombatTracking(identity);
         }
 
-        internal void RemoveNpcHome(Identity identity)
-        {
-            this.runtimeSystems.RemoveNpcHome(identity);
-        }
-
         private void SendPlayerCorpseFullUpdate(ICharacter target, Identity corpseIdentity)
         {
             this.SendCorpseFullUpdate(target, corpseIdentity);

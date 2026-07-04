@@ -137,11 +137,6 @@ namespace ZoneEngine.Core.Playfields
             this.npcRuntime.RegisterNpcHome(character);
         }
 
-        internal void RemoveNpcHome(Identity identity)
-        {
-            this.npcRuntime.RemoveNpcHome(identity);
-        }
-
         internal void RemoveNpcImmediately(
             ICharacter target,
             Action<Identity> stopFightingDeadTarget,
