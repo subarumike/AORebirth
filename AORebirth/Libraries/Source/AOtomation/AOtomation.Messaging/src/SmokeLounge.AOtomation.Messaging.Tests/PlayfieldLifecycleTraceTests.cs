@@ -796,7 +796,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 runtimeSystemsText.Contains("private readonly NPCRuntimeService npcRuntime")
                 && runtimeSystemsText.Contains("this.npcRuntime.ActivateNpc(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.RegisterNpcHome(character);")
-                && runtimeSystemsText.Contains("this.npcRuntime.RemoveNpcHome(identity);")
                 && runtimeSystemsText.Contains(
                     "this.npcRuntime.RemoveNpcImmediately(target, stopFightingDeadTarget, cancelPendingCorpseSpawn);")
                 && runtimeSystemsText.Contains("this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);")
@@ -824,9 +823,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.RegisterNpcHome(character);"),
                 "Playfield must delegate NPC home registration through PlayfieldRuntimeSystems.");
-            Assert.IsTrue(
+            Assert.IsFalse(
                 playfieldText.Contains("this.runtimeSystems.RemoveNpcHome(identity);"),
-                "Playfield must delegate NPC home removal through PlayfieldRuntimeSystems.");
+                "Playfield must not own NPC home removal after NPCRuntimeService callback wiring.");
+            Assert.IsFalse(
+                runtimeSystemsText.Contains("this.npcRuntime.RemoveNpcHome(identity);"),
+                "PlayfieldRuntimeSystems must not expose unused NPC home removal after callback wiring.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.RemoveNpcImmediately("),
                 "Playfield must delegate immediate NPC removal through PlayfieldRuntimeSystems.");
