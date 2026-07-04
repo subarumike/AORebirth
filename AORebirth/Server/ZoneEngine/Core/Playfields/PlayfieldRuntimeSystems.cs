@@ -142,6 +142,14 @@ namespace ZoneEngine.Core.Playfields
             this.npcRuntime.RemoveNpcHome(identity);
         }
 
+        internal void RemoveNpcImmediately(
+            ICharacter target,
+            Action<Identity> stopFightingDeadTarget,
+            Action<Identity> cancelPendingCorpseSpawn)
+        {
+            this.npcRuntime.RemoveNpcImmediately(target, stopFightingDeadTarget, cancelPendingCorpseSpawn);
+        }
+
         internal void RegisterStatels(IEnumerable<StatelData> statels)
         {
             this.dynelRegistry.RegisterStatels(statels);
