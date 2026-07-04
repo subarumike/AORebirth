@@ -718,6 +718,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
             string npcRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+            string corpseLifecycleText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCorpseLifecycleCoordinator.cs"));
             string projectText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
@@ -740,7 +744,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.AreEqual(
                 0,
-                CountOccurrences(runtimeSystemsText, "new NpcCorpseLifecycleCoordinator(playfield)"),
+                CountOccurrences(runtimeSystemsText, "new NpcCorpseLifecycleCoordinator("),
                 "PlayfieldRuntimeSystems must delegate NPC corpse coordinator construction to NPCRuntimeService.");
             Assert.AreEqual(
                 0,
@@ -748,8 +752,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "PlayfieldRuntimeSystems must delegate NPC combat coordinator construction to NPCRuntimeService.");
             Assert.AreEqual(
                 1,
-                CountOccurrences(npcRuntimeText, "new NpcCorpseLifecycleCoordinator(playfield)"),
+                CountOccurrences(npcRuntimeText, "new NpcCorpseLifecycleCoordinator(playfield, this.RemoveNpcHome)"),
                 "NPCRuntimeService must own NPC corpse lifecycle coordinator construction.");
+            Assert.IsTrue(
+                corpseLifecycleText.Contains("private readonly Action<Identity> removeNpcHome;")
+                && corpseLifecycleText.Contains("this.removeNpcHome(target.Identity);"),
+                "NpcCorpseLifecycleCoordinator must delegate home-state cleanup through NPCRuntimeService.");
+            Assert.IsFalse(
+                corpseLifecycleText.Contains("this.playfield.RemoveNpcHome(target.Identity);"),
+                "NpcCorpseLifecycleCoordinator must not route NPC home cleanup back through Playfield.");
             Assert.AreEqual(
                 1,
                 CountOccurrences(npcRuntimeText, "new NpcCombatTickCoordinator(playfield)"),
