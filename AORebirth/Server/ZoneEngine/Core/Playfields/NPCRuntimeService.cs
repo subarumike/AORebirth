@@ -149,6 +149,30 @@ namespace AORebirth.Core.Playfields
             this.combatTick.ProcessCombatTick(attacker);
         }
 
+        internal void ClearInvalidCombatTarget(ICharacter attacker)
+        {
+            this.ClearFightingTarget(attacker);
+        }
+
+        internal void ClearFightingTarget(ICharacter character)
+        {
+            character.SetFightingTarget(Identity.None);
+            this.ClearCombatTracking(character.Identity);
+        }
+
+        internal void StopDyingNpcCombatState(ICharacter target)
+        {
+            target.SetTarget(Identity.None);
+            target.SetFightingTarget(Identity.None);
+            this.ClearCombatTracking(target.Identity);
+
+            NPCController npcController = target.Controller as NPCController;
+            if (npcController != null)
+            {
+                npcController.StopFollow();
+            }
+        }
+
         internal void AcquireAggro(ICharacter attacker, ICharacter target)
         {
             NPCController npcController = target.Controller as NPCController;

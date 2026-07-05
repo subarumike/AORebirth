@@ -720,6 +720,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
             string npcRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+            string npcCombatTickText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
             string corpseLifecycleText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -814,6 +816,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.npcRuntime.BeginNpcDeath(attacker, target);")
                 && runtimeSystemsText.Contains("return this.npcRuntime.ProcessDeadNpc(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ProcessCombatTick(attacker);")
+                && runtimeSystemsText.Contains("this.npcRuntime.ClearInvalidCombatTarget(attacker);")
+                && runtimeSystemsText.Contains("this.npcRuntime.ClearFightingTarget(character);")
+                && runtimeSystemsText.Contains("this.npcRuntime.StopDyingNpcCombatState(target);")
                 && runtimeSystemsText.Contains("this.npcRuntime.AcquireAggro(attacker, target);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ProcessPatrolTick(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ClearCombatTracking(identity);"),
@@ -825,6 +830,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.ProcessNpcCombatTick(attacker);"),
                 "Playfield must delegate NPC combat ticks through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.ClearInvalidNpcCombatTarget(attacker);")
+                && playfieldText.Contains("this.runtimeSystems.ClearNpcCombatTracking(identity);")
+                && playfieldText.Contains("this.runtimeSystems.ClearNpcFightingTarget(character);")
+                && playfieldText.Contains("this.runtimeSystems.StopDyingNpcCombatState(target);"),
+                "Playfield must delegate NPC combat stop/clear orchestration through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                npcCombatTickText.Contains("this.playfield.ClearNpcCombatTracking(attacker.Identity);")
+                && npcCombatTickText.Contains("this.playfield.ClearInvalidNpcCombatTarget(attacker);"),
+                "NpcCombatTickCoordinator must route NPC combat clear decisions through the runtime ownership boundary.");
+            Assert.IsTrue(
+                npcRuntimeText.Contains("internal void ClearInvalidCombatTarget(ICharacter attacker)")
+                && npcRuntimeText.Contains("internal void ClearFightingTarget(ICharacter character)")
+                && npcRuntimeText.Contains("internal void StopDyingNpcCombatState(ICharacter target)")
+                && npcRuntimeText.Contains("character.SetFightingTarget(Identity.None);")
+                && npcRuntimeText.Contains("target.SetTarget(Identity.None);")
+                && npcRuntimeText.Contains("npcController.StopFollow();"),
+                "NPCRuntimeService must own NPC combat stop/clear state orchestration.");
             Assert.IsTrue(
                 attackHandlerText.Contains("playfield.AcquireNpcAggro(character, target);")
                 && playfieldText.Contains("this.runtimeSystems.AcquireNpcAggro(attacker, target);"),

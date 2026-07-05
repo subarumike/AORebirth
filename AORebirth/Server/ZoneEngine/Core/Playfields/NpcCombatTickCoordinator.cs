@@ -70,7 +70,7 @@ namespace AORebirth.Core.Playfields
         {
             if (attacker.FightingTarget.Instance == 0)
             {
-                this.ClearTracking(attacker.Identity);
+                this.playfield.ClearNpcCombatTracking(attacker.Identity);
                 return;
             }
 
@@ -91,8 +91,7 @@ namespace AORebirth.Core.Playfields
                                              : Playfield.GetCombatDistance(attacker, target);
                 Playfield.LogNpcBrain("Idle", "target-invalid", attacker, target, 0.0, invalidDistance);
 
-                attacker.SetFightingTarget(Identity.None);
-                this.ClearTracking(attacker.Identity);
+                this.playfield.ClearInvalidNpcCombatTarget(attacker);
                 return;
             }
 
