@@ -106,12 +106,12 @@ namespace AORebirth.Core.Playfields
             return this.corpseLifecycle.HasPendingDeadNpcDespawn(identity);
         }
 
-        internal void ScheduleCorpseDespawn(Identity corpseIdentity, DateTime expiresAtUtc)
+        internal void ScheduleNpcCorpseDespawn(Identity corpseIdentity, DateTime expiresAtUtc)
         {
             this.corpseDespawnTicks[corpseIdentity.Instance] = expiresAtUtc;
         }
 
-        internal int[] DueCorpseDespawns(DateTime utcNow)
+        internal int[] DueNpcCorpseDespawns(DateTime utcNow)
         {
             return this.corpseDespawnTicks
                 .Where(x => x.Value <= utcNow)
@@ -119,7 +119,7 @@ namespace AORebirth.Core.Playfields
                 .ToArray();
         }
 
-        internal void ClearCorpseDespawn(int corpseInstance)
+        internal void ClearNpcCorpseDespawn(int corpseInstance)
         {
             this.corpseDespawnTicks.Remove(corpseInstance);
         }
@@ -143,14 +143,14 @@ namespace AORebirth.Core.Playfields
             this.playfield.StopDyingNpcCombatState(target);
             this.playfield.SendNpcDeathAnimation(target);
             this.RunNpcDeathRewardHooks(attacker, target);
-            this.ScheduleNpcDeathLootContainer(target, corpseIdentity);
+            this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);
 
-            this.corpseLifecycle.ScheduleDeadNpcDespawn(target);
+            this.ScheduleDeadNpcDespawn(target);
 
             LogUtil.Debug(DebugInfoDetail.Network, string.Format("NPC died target={0}", target.Identity));
         }
 
-        internal bool ProcessDeadNpc(ICharacter character)
+        internal bool ProcessDeadNpcDespawn(ICharacter character)
         {
             if (!(character.Controller is NPCController)
                 || character.Stats[StatIds.health].Value > 0)
@@ -278,7 +278,7 @@ namespace AORebirth.Core.Playfields
             this.playfield.AwardCombatXp(attacker, target);
         }
 
-        private void ScheduleNpcDeathLootContainer(ICharacter target, Identity corpseIdentity)
+        private void ScheduleNpcDeathCorpseSpawn(ICharacter target, Identity corpseIdentity)
         {
             if (corpseIdentity != Identity.None)
             {
@@ -289,6 +289,11 @@ namespace AORebirth.Core.Playfields
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 string.Format("Skipping corpse visual spawn for {0}; no known MonsterData-to-CATMesh mapping.", target.Identity));
+        }
+
+        private void ScheduleDeadNpcDespawn(ICharacter target)
+        {
+            this.corpseLifecycle.ScheduleDeadNpcDespawn(target);
         }
 
         private static void LogCapturedAreteRobotContent(bool isError, string message)

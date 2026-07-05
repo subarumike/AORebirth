@@ -809,12 +809,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.npcRuntime.RegisterNpcHome(character);")
                 && runtimeSystemsText.Contains(
                     "this.npcRuntime.RemoveNpcImmediately(target, stopFightingDeadTarget, cancelPendingCorpseSpawn);")
-                && runtimeSystemsText.Contains("this.npcRuntime.ScheduleCorpseDespawn(corpseIdentity, expiresAtUtc);")
-                && runtimeSystemsText.Contains("return this.npcRuntime.DueCorpseDespawns(utcNow);")
-                && runtimeSystemsText.Contains("this.npcRuntime.ClearCorpseDespawn(corpseInstance);")
+                && runtimeSystemsText.Contains("this.npcRuntime.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
+                && runtimeSystemsText.Contains("return this.npcRuntime.DueNpcCorpseDespawns(utcNow);")
+                && runtimeSystemsText.Contains("this.npcRuntime.ClearNpcCorpseDespawn(corpseInstance);")
                 && runtimeSystemsText.Contains("this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);")
                 && runtimeSystemsText.Contains("this.npcRuntime.BeginNpcDeath(attacker, target);")
-                && runtimeSystemsText.Contains("return this.npcRuntime.ProcessDeadNpc(character);")
+                && runtimeSystemsText.Contains("return this.npcRuntime.ProcessDeadNpcDespawn(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ProcessCombatTick(attacker);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ClearInvalidCombatTarget(attacker);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ClearFightingTarget(character);")
@@ -856,8 +856,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && npcRuntimeText.Contains("this.playfield.StopDyingNpcCombatState(target);")
                 && npcRuntimeText.Contains("this.playfield.SendNpcDeathAnimation(target);")
                 && npcRuntimeText.Contains("this.RunNpcDeathRewardHooks(attacker, target);")
-                && npcRuntimeText.Contains("this.ScheduleNpcDeathLootContainer(target, corpseIdentity);")
-                && npcRuntimeText.Contains("this.corpseLifecycle.ScheduleDeadNpcDespawn(target);"),
+                && npcRuntimeText.Contains("this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);")
+                && npcRuntimeText.Contains("this.ScheduleDeadNpcDespawn(target);"),
                 "NPCRuntimeService must own NPC death lifecycle orchestration order.");
             Assert.IsTrue(
                 npcRuntimeText.Contains("private void RunNpcDeathRewardHooks(ICharacter attacker, ICharacter target)")
@@ -865,16 +865,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && npcRuntimeText.Contains("this.playfield.AwardCombatXp(attacker, target);"),
                 "NPCRuntimeService must own named NPC death reward hook orchestration.");
             Assert.IsTrue(
-                npcRuntimeText.Contains("private void ScheduleNpcDeathLootContainer(ICharacter target, Identity corpseIdentity)")
+                npcRuntimeText.Contains("private void ScheduleNpcDeathCorpseSpawn(ICharacter target, Identity corpseIdentity)")
                 && npcRuntimeText.Contains("this.playfield.ScheduleCorpseSpawn(target, corpseIdentity);")
                 && npcRuntimeText.Contains("Skipping corpse visual spawn for {0}; no known MonsterData-to-CATMesh mapping."),
-                "NPCRuntimeService must own named NPC death loot/corpse hook orchestration.");
+                "NPCRuntimeService must own named NPC death corpse spawn hook orchestration.");
             Assert.IsTrue(
-                npcRuntimeText.Contains("internal bool ProcessDeadNpc(ICharacter character)")
+                npcRuntimeText.Contains("internal bool ProcessDeadNpcDespawn(ICharacter character)")
                 && npcRuntimeText.Contains("this.corpseLifecycle.TryGetDeadNpcDespawn(character.Identity, out despawnTick)")
                 && npcRuntimeText.Contains("this.BeginNpcDeath(null, character);")
                 && npcRuntimeText.Contains("this.FinalizeNpcDespawn(character);"),
                 "NPCRuntimeService must own dead NPC processing orchestration.");
+            Assert.IsTrue(
+                npcRuntimeText.Contains("internal void ScheduleNpcCorpseDespawn(Identity corpseIdentity, DateTime expiresAtUtc)")
+                && npcRuntimeText.Contains("internal int[] DueNpcCorpseDespawns(DateTime utcNow)")
+                && npcRuntimeText.Contains("internal void ClearNpcCorpseDespawn(int corpseInstance)")
+                && npcRuntimeText.Contains("private void ScheduleDeadNpcDespawn(ICharacter target)")
+                && npcRuntimeText.Contains("this.corpseLifecycle.ScheduleDeadNpcDespawn(target);"),
+                "NPCRuntimeService must expose named NPC corpse/despawn timing orchestration methods.");
             Assert.IsTrue(
                 corpseLifecycleText.Contains("internal void ScheduleDeadNpcDespawn(ICharacter target)")
                 && corpseLifecycleText.Contains("internal bool TryGetDeadNpcDespawn(Identity identity, out DateTime despawnTick)")
