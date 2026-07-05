@@ -248,6 +248,11 @@ namespace ZoneEngine.Core.Playfields
             this.npcRuntime.ProcessCombatTick(attacker);
         }
 
+        internal void ProcessNpcPatrolTick(ICharacter character)
+        {
+            this.npcRuntime.ProcessPatrolTick(character);
+        }
+
         internal void ClearNpcCombatTracking(Identity identity)
         {
             this.npcRuntime.ClearCombatTracking(identity);

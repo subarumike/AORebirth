@@ -1778,18 +1778,15 @@ namespace AORebirth.Core.Playfields
 
                         this.DoCombatTick(dynel);
 
-                        if (dynel.Controller.IsFollowing())
+                        if (dynel.Controller is NPCController)
                         {
-                            dynel.Controller.DoFollow();
+                            this.runtimeSystems.ProcessNpcPatrolTick(dynel);
                         }
                         else
                         {
-                            if (dynel.Controller is NPCController)
+                            if (dynel.Controller.IsFollowing())
                             {
-                                if (dynel.Controller.State == CharacterState.Patrolling)
-                                {
-                                    dynel.Controller.StartPatrolling();
-                                }
+                                dynel.Controller.DoFollow();
                             }
                         }
 
