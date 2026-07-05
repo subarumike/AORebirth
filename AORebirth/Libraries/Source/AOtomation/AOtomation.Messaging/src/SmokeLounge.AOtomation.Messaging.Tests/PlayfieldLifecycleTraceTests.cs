@@ -319,6 +319,83 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void PlayerCombatLifecycleOwnershipCheckpointDocumentsCurrentSeams()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string attackHandlerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\AttackMessageHandler.cs"));
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string runtimeSystemsText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+            string npcRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+            string checkpointText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"docs\generated\player_combat_lifecycle_ownership_checkpoint_20260705.md"));
+
+            Assert.IsTrue(
+                attackHandlerText.Contains("character.SetTarget(message.Target);")
+                && attackHandlerText.Contains("character.SetFightingTarget(message.Target);")
+                && attackHandlerText.Contains("this.ResetCombatTick(character);")
+                && attackHandlerText.Contains("this.SendAttackState(character, message.Target, message.Action);"),
+                "AttackMessageHandler currently owns player attack start state and client attack-state echo.");
+            Assert.IsTrue(
+                attackHandlerText.Contains("target == null")
+                && attackHandlerText.Contains("ContentDrivenNpcDialogueRouter.ShouldSuppressCombat(target)")
+                && attackHandlerText.Contains("character.SetFightingTarget(Identity.None);")
+                && attackHandlerText.Contains("this.SendAttackState(character, Identity.None, 0);"),
+                "AttackMessageHandler currently owns invalid/suppressed player attack cancellation.");
+            Assert.IsTrue(
+                attackHandlerText.Contains("playfield.AcquireNpcAggro(character, target);"),
+                "AttackMessageHandler must keep NPC aggro delegated through Playfield after player attack start.");
+            Assert.IsFalse(
+                attackHandlerText.Contains("AnnounceCombatDamage")
+                || attackHandlerText.Contains("HandleCombatKillingHit")
+                || attackHandlerText.Contains("KillPlayerTarget"),
+                "AttackMessageHandler must not own combat damage, killing-hit, or death lifecycle behavior.");
+
+            string combatTick = ExtractMethodBlock(playfieldText, "private void DoCombatTick");
+            Assert.IsTrue(
+                combatTick.Contains("if (attacker.Controller is NPCController)")
+                && combatTick.Contains("this.runtimeSystems.ProcessNpcCombatTick(attacker);")
+                && combatTick.Contains("if (attacker.FightingTarget.Instance == 0)")
+                && combatTick.Contains("attacker.SetFightingTarget(Identity.None);")
+                && combatTick.Contains("this.HandleCombatKillingHit(attacker, target);"),
+                "Playfield currently owns player combat tick, target validation, clear, and killing-hit routing.");
+            Assert.IsTrue(
+                playfieldText.Contains("private void KillPlayerTarget(ICharacter target)")
+                && playfieldText.Contains("this.MarkPlayerDead(target);")
+                && playfieldText.Contains("target.SetFightingTarget(Identity.None);")
+                && playfieldText.Contains("this.StopFightingDeadTarget(target.Identity);")
+                && playfieldText.Contains("this.SendCombatStopMessage(target);")
+                && playfieldText.Contains("this.SendPlayerDeathAnimation(target);"),
+                "Playfield currently owns player death-side combat stop and death packet sequencing.");
+            Assert.IsTrue(
+                playfieldText.Contains("internal void StopFightingDeadTarget(Identity deadTarget)")
+                && playfieldText.Contains("if (character.Controller is NPCController)")
+                && playfieldText.Contains("this.ClearNpcFightingTarget(character);")
+                && playfieldText.Contains("character.SetFightingTarget(Identity.None);")
+                && playfieldText.Contains("this.SendCombatStopMessage(character);"),
+                "Playfield currently owns mixed player/NPC target clear and stop-fight packet emission.");
+            Assert.IsTrue(
+                playfieldText.Contains("internal void ClearCombatTracking(Identity identity)")
+                && playfieldText.Contains("this.nextCombatTicks.Remove(identity.Instance);")
+                && playfieldText.Contains("this.runtimeSystems.ClearNpcCombatTracking(identity);"),
+                "Playfield currently owns shared combat tick tracking while delegating NPC tracking cleanup.");
+
+            Assert.IsFalse(
+                runtimeSystemsText.Contains("PlayerCombat")
+                || npcRuntimeText.Contains("PlayerCombat"),
+                "No player combat runtime boundary exists yet; this test documents the pre-extraction ownership seam.");
+            Assert.IsTrue(
+                checkpointText.Contains("Current ownership seams")
+                && checkpointText.Contains("AttackMessageHandler")
+                && checkpointText.Contains("Playfield")
+                && checkpointText.Contains("Intended next boundary"),
+                "The player combat lifecycle checkpoint doc must name current seams and the intended next boundary.");
+        }
+
+        [TestMethod]
         public void CapturedAreteRobotContentProviderPreservesSpawnDefinitions()
         {
             var provider = new CapturedAreteRobotContentProvider();
