@@ -73,26 +73,49 @@ namespace ZoneEngine.Core.MessageHandlers
 
             if (target == null)
             {
-                character.SetFightingTarget(Identity.None);
-                this.ResetCombatTick(character);
+                this.CancelPlayerAttack(character);
                 this.SendAttackState(character, Identity.None, 0);
                 return;
             }
 
             if (ContentDrivenNpcDialogueRouter.ShouldSuppressCombat(target) || IsImmuneTarget(target))
             {
-                character.SetFightingTarget(Identity.None);
-                this.ResetCombatTick(character);
+                this.CancelPlayerAttack(character);
                 this.SendAttackState(character, Identity.None, 0);
                 client.Server.Info(client, "Attack ignored for non-attackable target.");
                 return;
             }
 
-            character.SetTarget(message.Target);
-            character.SetFightingTarget(message.Target);
-            this.ResetCombatTick(character);
+            this.StartPlayerAttack(character, message.Target);
             this.EngageNpcTarget(character, target);
             this.SendAttackState(character, message.Target, message.Action);
+        }
+
+        private void StartPlayerAttack(ICharacter character, Identity target)
+        {
+            Playfield playfield = character.Playfield as Playfield;
+            if (playfield != null)
+            {
+                playfield.StartPlayerAttack(character, target);
+                return;
+            }
+
+            character.SetTarget(target);
+            character.SetFightingTarget(target);
+            this.ResetCombatTick(character);
+        }
+
+        private void CancelPlayerAttack(ICharacter character)
+        {
+            Playfield playfield = character.Playfield as Playfield;
+            if (playfield != null)
+            {
+                playfield.CancelPlayerAttack(character);
+                return;
+            }
+
+            character.SetFightingTarget(Identity.None);
+            this.ResetCombatTick(character);
         }
 
         private void ResetCombatTick(ICharacter character)

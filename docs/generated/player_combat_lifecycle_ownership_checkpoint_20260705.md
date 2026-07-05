@@ -1,22 +1,39 @@
 # Player Combat Lifecycle Ownership Checkpoint - 2026-07-05
 
-This checkpoint documents the current player combat lifecycle seams before any
-player-combat runtime boundary extraction. It is an audit and guardrail slice
-only. It does not change gameplay behavior.
+This checkpoint documents the first player combat runtime boundary slice. It is
+an orchestration-only pass-through facade. It does not change gameplay behavior,
+packet order, or combat rules.
+
+## Pass-through boundary
+
+`PlayerCombatRuntimeService` is wired through `PlayfieldRuntimeSystems` and
+names the current player combat lifecycle seams:
+
+- player attack start
+- player attack cancellation
+- player combat tick reset
+- player combat tick entry
+- player fighting-target clear
+- player death entry
+
+The service delegates each seam back to existing Playfield or handler callbacks.
+It does not own algorithms, packet construction, packet emission, damage rules,
+NPC runtime behavior, inventory, loot, credits, corpses, movement, or database
+loading.
 
 ## Current ownership seams
 
 ### AttackMessageHandler
 
-- Owns player attack start state assignment from the incoming Attack message.
-- Clears the player's fighting target for missing, suppressed, or immune targets.
-- Resets the current combat tick through Playfield.
+- Calls Playfield player combat entry points for attack start and cancellation.
 - Echoes attack state back to the playfield.
 - Delegates NPC aggro acquisition through Playfield after the player attack
   state is set.
 
 ### Playfield
 
+- Keeps the actual player attack start/cancel state mutations behind
+  PlayerCombatRuntimeService callbacks.
 - Owns player combat ticking inside the non-NPC branch of DoCombatTick.
 - Owns player fighting-target validation and clearing.
 - Owns damage application, AttackInfo emission, and killing-hit routing.
@@ -27,8 +44,19 @@ only. It does not change gameplay behavior.
 
 ### PlayfieldRuntimeSystems and NPCRuntimeService
 
-- Own NPC combat lifecycle ownership only.
-- Do not currently own player combat lifecycle orchestration.
+- `PlayfieldRuntimeSystems` owns the `PlayerCombatRuntimeService` facade.
+- `NPCRuntimeService` remains NPC-only and does not own player combat lifecycle
+  orchestration.
+
+## What still remains outside
+
+- Attack and damage algorithms remain in Playfield.
+- Packet construction and packet emission remain in Playfield and handlers.
+- StopFight emission remains in Playfield.
+- NPC aggro and combat behavior remain in NPCRuntimeService.
+- XP, rewards, loot, credits, inventory, and corpse containers remain in their
+  current owners.
+- Movement/pathing and database loading remain outside this service.
 
 ## Intentional exclusions
 
@@ -44,12 +72,11 @@ The next boundary must not change:
 
 ## Intended next boundary
 
-The next safe architecture slice should introduce a named player combat
-lifecycle boundary, or a broader combat runtime boundary, that can own player
-attack start, stop, target clear, combat tick, and player death orchestration
-without changing packet payloads, packet order, damage rules, NPC combat rules,
-or existing Playfield lifecycle traces.
+The next safe architecture slice should move one player combat lifecycle
+orchestration path at a time behind `PlayerCombatRuntimeService` without moving
+damage calculation, packet emission, NPC combat rules, or existing Playfield
+lifecycle traces.
 
 Guardrail:
 
-- `PlayfieldLifecycleTraceTests.PlayerCombatLifecycleOwnershipCheckpointDocumentsCurrentSeams`
+- `PlayfieldLifecycleTraceTests.PlayerCombatRuntimeServiceIntroducesPassThroughBoundaryWithoutOwningAlgorithms`

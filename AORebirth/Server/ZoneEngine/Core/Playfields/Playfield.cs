@@ -1868,8 +1868,36 @@ namespace AORebirth.Core.Playfields
             }
             else
             {
-                this.nextCombatTicks.Remove(attacker.Instance);
+                this.runtimeSystems.ResetPlayerCombatTick(attacker, this.ResetPlayerCombatTick);
             }
+        }
+
+        public void StartPlayerAttack(ICharacter character, Identity target)
+        {
+            this.runtimeSystems.StartPlayerAttack(character, target, this.ApplyPlayerAttackStart);
+        }
+
+        public void CancelPlayerAttack(ICharacter character)
+        {
+            this.runtimeSystems.CancelPlayerAttack(character, this.ApplyPlayerAttackCancel);
+        }
+
+        private void ApplyPlayerAttackStart(ICharacter character, Identity target)
+        {
+            character.SetTarget(target);
+            character.SetFightingTarget(target);
+            this.ResetCombatTick(character.Identity);
+        }
+
+        private void ApplyPlayerAttackCancel(ICharacter character)
+        {
+            character.SetFightingTarget(Identity.None);
+            this.ResetCombatTick(character.Identity);
+        }
+
+        private void ResetPlayerCombatTick(Identity attacker)
+        {
+            this.nextCombatTicks.Remove(attacker.Instance);
         }
 
         public void RespawnPlayer(ICharacter character)
@@ -2054,6 +2082,11 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            this.runtimeSystems.ProcessPlayerCombatTick(attacker, this.ProcessPlayerCombatTick);
+        }
+
+        private void ProcessPlayerCombatTick(ICharacter attacker)
+        {
             if (attacker.FightingTarget.Instance == 0)
             {
                 this.ClearCombatTracking(attacker.Identity);
@@ -2072,8 +2105,7 @@ namespace AORebirth.Core.Playfields
                         target != null,
                         target != null && target.InPlayfield(this.Identity),
                         target == null ? 0 : target.Stats[StatIds.health].Value));
-                attacker.SetFightingTarget(Identity.None);
-                this.ClearCombatTracking(attacker.Identity);
+                this.runtimeSystems.ClearPlayerFightingTarget(attacker, this.ClearPlayerFightingTarget);
                 return;
             }
 
@@ -2609,7 +2641,7 @@ namespace AORebirth.Core.Playfields
             }
             else if (target.Controller is PlayerController)
             {
-                this.KillPlayerTarget(target);
+                this.runtimeSystems.BeginPlayerDeath(target, this.KillPlayerTarget);
             }
             else
             {
@@ -2619,8 +2651,7 @@ namespace AORebirth.Core.Playfields
                 }
                 else
                 {
-                    attacker.SetFightingTarget(Identity.None);
-                    this.ClearCombatTracking(attacker.Identity);
+                    this.runtimeSystems.ClearPlayerFightingTarget(attacker, this.ClearPlayerFightingTarget);
                 }
             }
         }
@@ -3791,8 +3822,7 @@ namespace AORebirth.Core.Playfields
                     }
                     else
                     {
-                        character.SetFightingTarget(Identity.None);
-                        this.ClearCombatTracking(character.Identity);
+                        this.runtimeSystems.ClearPlayerFightingTarget(character, this.ClearPlayerFightingTarget);
                     }
 
                     PlayfieldLifecycleTrace.Record(
@@ -3811,6 +3841,12 @@ namespace AORebirth.Core.Playfields
             var stopFight = new StopFightMessage { Identity = character.Identity, Unknown1 = 1 };
 
             this.Announce(stopFight);
+        }
+
+        private void ClearPlayerFightingTarget(ICharacter character)
+        {
+            character.SetFightingTarget(Identity.None);
+            this.ClearCombatTracking(character.Identity);
         }
 
         private List<CorpseLootItem> RollCorpseLootItems(ICharacter target)
