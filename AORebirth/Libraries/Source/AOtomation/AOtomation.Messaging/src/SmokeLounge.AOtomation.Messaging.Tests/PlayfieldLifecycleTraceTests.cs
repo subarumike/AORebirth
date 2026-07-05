@@ -955,6 +955,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playfieldText.Contains("this.SendCorpseFullUpdate(target, corpse.CorpseIdentity);"),
                 "Playfield intentionally keeps pending corpse spawn packet/loot construction.");
             Assert.IsTrue(
+                playfieldText.Contains("private void SendCorpseFullUpdate(ICharacter target, Identity corpseIdentity)")
+                && playfieldText.Contains("client.SendCompressed(")
+                && playfieldText.Contains("CorpseFullUpdate.Build("),
+                "Playfield intentionally keeps corpse packet emission outside NPCRuntimeService.");
+            Assert.IsTrue(
+                playfieldText.Contains("private void RegisterCorpse(ICharacter target, Identity corpseIdentity)")
+                && playfieldText.Contains("this.corpses[corpseIdentity.Instance] = state;")
+                && playfieldText.Contains("private void DespawnCorpse(int corpseInstance)")
+                && playfieldText.Contains("this.corpses.Remove(corpseInstance);"),
+                "Playfield intentionally keeps corpse collection mutation outside NPCRuntimeService.");
+            Assert.IsTrue(
+                playfieldText.Contains("private List<CorpseLootItem> RollCorpseLootItems(ICharacter target)")
+                && playfieldText.Contains("private static int RollCorpseCredits(ICharacter target)")
+                && playfieldText.Contains("private void SendCorpseInventoryUpdate(ICharacter looter, CorpseState corpse)")
+                && playfieldText.Contains("private void AwardCorpseCredits(ICharacter looter, CorpseState corpse)"),
+                "Playfield intentionally keeps loot, credit, and corpse container construction outside NPCRuntimeService.");
+            Assert.IsFalse(
+                npcRuntimeText.Contains("SendCompressed")
+                || npcRuntimeText.Contains("CorpseFullUpdate.Build(")
+                || npcRuntimeText.Contains("this.corpses[")
+                || npcRuntimeText.Contains("RollCorpseLootItems")
+                || npcRuntimeText.Contains("RollCorpseCredits")
+                || npcRuntimeText.Contains("SendCorpseInventoryUpdate")
+                || npcRuntimeText.Contains("AwardCorpseCredits"),
+                "NPCRuntimeService must not own packet emission, corpse storage, loot, credits, or corpse containers.");
+            Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.BeginNpcDeath(attacker, target);"),
                 "Playfield must delegate NPC corpse lifecycle start through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
