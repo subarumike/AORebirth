@@ -1755,7 +1755,7 @@ namespace AORebirth.Core.Playfields
                             continue;
                         }
 
-                        if (this.runtimeSystems.ProcessDeadNpc(dynel))
+                        if (this.runtimeSystems.ProcessDeadNpcDespawn(dynel))
                         {
                             continue;
                         }
@@ -3495,7 +3495,7 @@ namespace AORebirth.Core.Playfields
 
         private void ProcessCorpseDespawns()
         {
-            this.runtimeSystems.ProcessDueCorpseDespawns(DateTime.UtcNow, this.DespawnCorpse);
+            this.runtimeSystems.ProcessDueNpcCorpseDespawns(DateTime.UtcNow, this.DespawnCorpse);
         }
 
         private void ProcessPendingCorpseSpawns()
@@ -3581,7 +3581,7 @@ namespace AORebirth.Core.Playfields
             };
 
             this.corpses[corpseIdentity.Instance] = state;
-            this.runtimeSystems.ScheduleCorpseDespawn(corpseIdentity, expiresAtUtc);
+            this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
@@ -3598,7 +3598,7 @@ namespace AORebirth.Core.Playfields
         {
             Identity corpseIdentity = new Identity { Type = IdentityType.Corpse, Instance = corpseInstance };
             this.Despawn(corpseIdentity);
-            this.runtimeSystems.ClearCorpseDespawn(corpseInstance);
+            this.runtimeSystems.ClearNpcCorpseDespawn(corpseInstance);
             this.corpses.Remove(corpseInstance);
             this.pendingCorpseCreditAwards.Remove(corpseInstance);
             LogUtil.Debug(DebugInfoDetail.Engine, string.Format("Corpse despawned corpse={0}", corpseIdentity));
@@ -3608,7 +3608,7 @@ namespace AORebirth.Core.Playfields
         {
             DateTime expiresAtUtc = DateTime.UtcNow + delay;
             corpse.ExpiresAtUtc = expiresAtUtc;
-            this.runtimeSystems.ScheduleCorpseDespawn(corpse.CorpseIdentity, expiresAtUtc);
+            this.runtimeSystems.ScheduleNpcCorpseDespawn(corpse.CorpseIdentity, expiresAtUtc);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
@@ -3629,7 +3629,7 @@ namespace AORebirth.Core.Playfields
             }
 
             corpse.ExpiresAtUtc = expiresAtUtc;
-            this.runtimeSystems.ScheduleCorpseDespawn(corpse.CorpseIdentity, expiresAtUtc);
+            this.runtimeSystems.ScheduleNpcCorpseDespawn(corpse.CorpseIdentity, expiresAtUtc);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
