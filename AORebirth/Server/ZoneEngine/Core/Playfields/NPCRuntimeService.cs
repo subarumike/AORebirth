@@ -15,6 +15,7 @@ namespace AORebirth.Core.Playfields
 
     using Utility;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.Playfields;
 
@@ -146,6 +147,30 @@ namespace AORebirth.Core.Playfields
         internal void ProcessCombatTick(ICharacter attacker)
         {
             this.combatTick.ProcessCombatTick(attacker);
+        }
+
+        internal void AcquireAggro(ICharacter attacker, ICharacter target)
+        {
+            NPCController npcController = target.Controller as NPCController;
+            if (npcController == null
+                || npcController.KnuBot != null
+                || !NpcAiProfiles.CanRetaliate(npcController.AiProfile)
+                || target.Stats[StatIds.health].Value <= 0
+                || target.FightingTarget.Instance != 0)
+            {
+                return;
+            }
+
+            target.SetTarget(attacker.Identity);
+            target.SetFightingTarget(attacker.Identity);
+            this.ResetCombatTick(target);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "NPC combat engaged attacker={0} npc={1}",
+                    attacker.Identity.ToString(true),
+                    target.Identity.ToString(true)));
         }
 
         internal void ProcessPatrolTick(ICharacter character)
