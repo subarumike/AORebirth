@@ -15,6 +15,7 @@ namespace AORebirth.Core.Playfields
 
     using Utility;
 
+    using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.Playfields;
@@ -125,12 +126,66 @@ namespace AORebirth.Core.Playfields
 
         internal void BeginNpcDeath(ICharacter attacker, ICharacter target)
         {
-            this.corpseLifecycle.BeginNpcDeath(attacker, target);
+            if (!(target.Controller is NPCController)
+                || this.corpseLifecycle.HasPendingDeadNpcDespawn(target.Identity))
+            {
+                return;
+            }
+
+            Identity corpseIdentity = Identity.None;
+            if (this.playfield.CanBuildKnownCorpseVisual(target))
+            {
+                corpseIdentity = this.playfield.AllocateCorpseIdentity();
+            }
+
+            this.playfield.MarkNpcDead(target);
+            this.playfield.StopFightingDeadTarget(target.Identity);
+            this.playfield.StopDyingNpcCombatState(target);
+            this.playfield.SendNpcDeathAnimation(target);
+            if (attacker != null)
+            {
+                RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);
+                this.playfield.AwardCombatXp(attacker, target);
+            }
+
+            if (corpseIdentity != Identity.None)
+            {
+                this.playfield.ScheduleCorpseSpawn(target, corpseIdentity);
+            }
+            else
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format("Skipping corpse visual spawn for {0}; no known MonsterData-to-CATMesh mapping.", target.Identity));
+            }
+
+            this.corpseLifecycle.ScheduleDeadNpcDespawn(target);
+
+            LogUtil.Debug(DebugInfoDetail.Network, string.Format("NPC died target={0}", target.Identity));
         }
 
         internal bool ProcessDeadNpc(ICharacter character)
         {
-            return this.corpseLifecycle.ProcessDeadNpc(character);
+            if (!(character.Controller is NPCController)
+                || character.Stats[StatIds.health].Value > 0)
+            {
+                return false;
+            }
+
+            DateTime despawnTick;
+            if (!this.corpseLifecycle.TryGetDeadNpcDespawn(character.Identity, out despawnTick))
+            {
+                this.BeginNpcDeath(null, character);
+                return true;
+            }
+
+            if (despawnTick > DateTime.UtcNow)
+            {
+                return true;
+            }
+
+            this.FinalizeNpcDespawn(character);
+            return true;
         }
 
         internal void FinalizeNpcDespawn(ICharacter target)

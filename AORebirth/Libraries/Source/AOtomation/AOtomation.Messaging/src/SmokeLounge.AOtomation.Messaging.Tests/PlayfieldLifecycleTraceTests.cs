@@ -849,6 +849,34 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && npcRuntimeText.Contains("npcController.StopFollow();"),
                 "NPCRuntimeService must own NPC combat stop/clear state orchestration.");
             Assert.IsTrue(
+                npcRuntimeText.Contains("internal void BeginNpcDeath(ICharacter attacker, ICharacter target)")
+                && npcRuntimeText.Contains("this.corpseLifecycle.HasPendingDeadNpcDespawn(target.Identity)")
+                && npcRuntimeText.Contains("this.playfield.MarkNpcDead(target);")
+                && npcRuntimeText.Contains("this.playfield.StopFightingDeadTarget(target.Identity);")
+                && npcRuntimeText.Contains("this.playfield.StopDyingNpcCombatState(target);")
+                && npcRuntimeText.Contains("this.playfield.SendNpcDeathAnimation(target);")
+                && npcRuntimeText.Contains("RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);")
+                && npcRuntimeText.Contains("this.playfield.AwardCombatXp(attacker, target);")
+                && npcRuntimeText.Contains("this.playfield.ScheduleCorpseSpawn(target, corpseIdentity);")
+                && npcRuntimeText.Contains("this.corpseLifecycle.ScheduleDeadNpcDespawn(target);"),
+                "NPCRuntimeService must own NPC death lifecycle orchestration order.");
+            Assert.IsTrue(
+                npcRuntimeText.Contains("internal bool ProcessDeadNpc(ICharacter character)")
+                && npcRuntimeText.Contains("this.corpseLifecycle.TryGetDeadNpcDespawn(character.Identity, out despawnTick)")
+                && npcRuntimeText.Contains("this.BeginNpcDeath(null, character);")
+                && npcRuntimeText.Contains("this.FinalizeNpcDespawn(character);"),
+                "NPCRuntimeService must own dead NPC processing orchestration.");
+            Assert.IsTrue(
+                corpseLifecycleText.Contains("internal void ScheduleDeadNpcDespawn(ICharacter target)")
+                && corpseLifecycleText.Contains("internal bool TryGetDeadNpcDespawn(Identity identity, out DateTime despawnTick)")
+                && corpseLifecycleText.Contains("this.deadNpcDespawnTicks[target.Identity.Instance]"),
+                "NpcCorpseLifecycleCoordinator must remain the dead-NPC timing state helper.");
+            Assert.IsFalse(
+                corpseLifecycleText.Contains("this.playfield.MarkNpcDead(target);")
+                || corpseLifecycleText.Contains("RexB18CObjectiveProgressTracker.TryObserveNpcDeath")
+                || corpseLifecycleText.Contains("this.playfield.ScheduleCorpseSpawn(target, corpseIdentity);"),
+                "NpcCorpseLifecycleCoordinator must not own NPC death lifecycle orchestration.");
+            Assert.IsTrue(
                 attackHandlerText.Contains("playfield.AcquireNpcAggro(character, target);")
                 && playfieldText.Contains("this.runtimeSystems.AcquireNpcAggro(attacker, target);"),
                 "Attack handling must route NPC aggro acquisition through PlayfieldRuntimeSystems.");
