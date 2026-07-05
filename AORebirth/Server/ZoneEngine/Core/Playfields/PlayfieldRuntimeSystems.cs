@@ -213,14 +213,14 @@ namespace ZoneEngine.Core.Playfields
             this.npcRuntime.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);
         }
 
-        internal int[] DueCorpseDespawns(DateTime utcNow)
-        {
-            return this.npcRuntime.DueNpcCorpseDespawns(utcNow);
-        }
-
         internal void ClearCorpseDespawn(int corpseInstance)
         {
             this.npcRuntime.ClearNpcCorpseDespawn(corpseInstance);
+        }
+
+        internal void ProcessDueCorpseDespawns(DateTime utcNow, Action<int> despawnCorpse)
+        {
+            this.npcRuntime.ProcessDueNpcCorpseDespawns(utcNow, despawnCorpse);
         }
 
         internal void BeginNpcDeath(ICharacter attacker, ICharacter target)
