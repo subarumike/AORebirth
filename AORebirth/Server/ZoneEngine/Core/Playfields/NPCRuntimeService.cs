@@ -119,6 +119,14 @@ namespace AORebirth.Core.Playfields
                 .ToArray();
         }
 
+        internal void ProcessDueNpcCorpseDespawns(DateTime utcNow, Action<int> despawnCorpse)
+        {
+            foreach (int corpseInstance in this.DueNpcCorpseDespawns(utcNow))
+            {
+                despawnCorpse(corpseInstance);
+            }
+        }
+
         internal void ClearNpcCorpseDespawn(int corpseInstance)
         {
             this.corpseDespawnTicks.Remove(corpseInstance);

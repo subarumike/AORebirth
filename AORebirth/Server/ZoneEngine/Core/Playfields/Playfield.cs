@@ -3495,10 +3495,7 @@ namespace AORebirth.Core.Playfields
 
         private void ProcessCorpseDespawns()
         {
-            foreach (int corpseInstance in this.runtimeSystems.DueCorpseDespawns(DateTime.UtcNow))
-            {
-                this.DespawnCorpse(corpseInstance);
-            }
+            this.runtimeSystems.ProcessDueCorpseDespawns(DateTime.UtcNow, this.DespawnCorpse);
         }
 
         private void ProcessPendingCorpseSpawns()

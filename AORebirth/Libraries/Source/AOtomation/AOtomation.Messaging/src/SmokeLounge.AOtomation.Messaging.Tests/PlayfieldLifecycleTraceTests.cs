@@ -810,8 +810,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains(
                     "this.npcRuntime.RemoveNpcImmediately(target, stopFightingDeadTarget, cancelPendingCorpseSpawn);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
-                && runtimeSystemsText.Contains("return this.npcRuntime.DueNpcCorpseDespawns(utcNow);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ClearNpcCorpseDespawn(corpseInstance);")
+                && runtimeSystemsText.Contains("this.npcRuntime.ProcessDueNpcCorpseDespawns(utcNow, despawnCorpse);")
                 && runtimeSystemsText.Contains("this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);")
                 && runtimeSystemsText.Contains("this.npcRuntime.BeginNpcDeath(attacker, target);")
                 && runtimeSystemsText.Contains("return this.npcRuntime.ProcessDeadNpcDespawn(character);")
@@ -878,6 +878,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 npcRuntimeText.Contains("internal void ScheduleNpcCorpseDespawn(Identity corpseIdentity, DateTime expiresAtUtc)")
                 && npcRuntimeText.Contains("internal int[] DueNpcCorpseDespawns(DateTime utcNow)")
+                && npcRuntimeText.Contains("internal void ProcessDueNpcCorpseDespawns(DateTime utcNow, Action<int> despawnCorpse)")
+                && npcRuntimeText.Contains("despawnCorpse(corpseInstance);")
                 && npcRuntimeText.Contains("internal void ClearNpcCorpseDespawn(int corpseInstance)")
                 && npcRuntimeText.Contains("private void ScheduleDeadNpcDespawn(ICharacter target)")
                 && npcRuntimeText.Contains("this.corpseLifecycle.ScheduleDeadNpcDespawn(target);"),
@@ -938,11 +940,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldText.Contains("this.runtimeSystems.RemoveNpcImmediately("),
                 "Playfield must delegate immediate NPC removal through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.DueCorpseDespawns(DateTime.UtcNow)")
+                playfieldText.Contains("this.runtimeSystems.ProcessDueCorpseDespawns(DateTime.UtcNow, this.DespawnCorpse);")
                 && playfieldText.Contains("this.runtimeSystems.ScheduleCorpseDespawn(corpseIdentity, expiresAtUtc);")
                 && playfieldText.Contains("this.runtimeSystems.ScheduleCorpseDespawn(corpse.CorpseIdentity, expiresAtUtc);")
                 && playfieldText.Contains("this.runtimeSystems.ClearCorpseDespawn(corpseInstance);"),
                 "Playfield must delegate corpse despawn scheduling and due checks through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                playfieldText.Contains("private void ProcessPendingCorpseSpawns()")
+                && playfieldText.Contains("this.RegisterCorpse(target, corpse.CorpseIdentity);")
+                && playfieldText.Contains("this.SendCorpseFullUpdate(target, corpse.CorpseIdentity);"),
+                "Playfield intentionally keeps pending corpse spawn packet/loot construction.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.BeginNpcDeath(attacker, target);"),
                 "Playfield must delegate NPC corpse lifecycle start through PlayfieldRuntimeSystems.");
