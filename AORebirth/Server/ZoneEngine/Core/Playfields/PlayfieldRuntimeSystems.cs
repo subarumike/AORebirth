@@ -248,6 +248,21 @@ namespace ZoneEngine.Core.Playfields
             this.npcRuntime.ProcessCombatTick(attacker);
         }
 
+        internal void ClearInvalidNpcCombatTarget(ICharacter attacker)
+        {
+            this.npcRuntime.ClearInvalidCombatTarget(attacker);
+        }
+
+        internal void ClearNpcFightingTarget(ICharacter character)
+        {
+            this.npcRuntime.ClearFightingTarget(character);
+        }
+
+        internal void StopDyingNpcCombatState(ICharacter target)
+        {
+            this.npcRuntime.StopDyingNpcCombatState(target);
+        }
+
         internal void AcquireNpcAggro(ICharacter attacker, ICharacter target)
         {
             this.npcRuntime.AcquireAggro(attacker, target);

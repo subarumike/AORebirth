@@ -611,6 +611,21 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.AcquireNpcAggro(attacker, target);
         }
 
+        internal void ClearInvalidNpcCombatTarget(ICharacter attacker)
+        {
+            this.runtimeSystems.ClearInvalidNpcCombatTarget(attacker);
+        }
+
+        internal void ClearNpcCombatTracking(Identity identity)
+        {
+            this.runtimeSystems.ClearNpcCombatTracking(identity);
+        }
+
+        internal void ClearNpcFightingTarget(ICharacter character)
+        {
+            this.runtimeSystems.ClearNpcFightingTarget(character);
+        }
+
         public int DespawnCorpses(Func<string, Identity, bool> shouldDespawn)
         {
             if (shouldDespawn == null)
@@ -2598,22 +2613,21 @@ namespace AORebirth.Core.Playfields
             }
             else
             {
-                attacker.SetFightingTarget(Identity.None);
-                this.ClearCombatTracking(attacker.Identity);
+                if (attacker.Controller is NPCController)
+                {
+                    this.ClearNpcFightingTarget(attacker);
+                }
+                else
+                {
+                    attacker.SetFightingTarget(Identity.None);
+                    this.ClearCombatTracking(attacker.Identity);
+                }
             }
         }
 
         internal void StopDyingNpcCombatState(ICharacter target)
         {
-            target.SetTarget(Identity.None);
-            target.SetFightingTarget(Identity.None);
-            this.ClearCombatTracking(target.Identity);
-
-            NPCController npcController = target.Controller as NPCController;
-            if (npcController != null)
-            {
-                npcController.StopFollow();
-            }
+            this.runtimeSystems.StopDyingNpcCombatState(target);
 
             if (IsCapturedCleaningRobot(target))
             {
@@ -3774,8 +3788,16 @@ namespace AORebirth.Core.Playfields
             {
                 if (character.FightingTarget == deadTarget)
                 {
-                    character.SetFightingTarget(Identity.None);
-                    this.ClearCombatTracking(character.Identity);
+                    if (character.Controller is NPCController)
+                    {
+                        this.ClearNpcFightingTarget(character);
+                    }
+                    else
+                    {
+                        character.SetFightingTarget(Identity.None);
+                        this.ClearCombatTracking(character.Identity);
+                    }
+
                     PlayfieldLifecycleTrace.Record(
                         PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
                         PlayfieldLifecycleTrace.StageAttackerStopFight,
