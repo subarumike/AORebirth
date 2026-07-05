@@ -161,16 +161,7 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            target.SetTarget(attacker.Identity);
-            target.SetFightingTarget(attacker.Identity);
-            this.ResetCombatTick(target);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Network,
-                string.Format(
-                    "NPC combat engaged attacker={0} npc={1}",
-                    attacker.Identity.ToString(true),
-                    target.Identity.ToString(true)));
+            this.StartCombatWithAcquiredTarget(attacker, target);
         }
 
         internal void ProcessPatrolTick(ICharacter character)
@@ -195,6 +186,20 @@ namespace AORebirth.Core.Playfields
         internal void ClearCombatTracking(Identity identity)
         {
             this.combatTick.ClearTracking(identity);
+        }
+
+        private void StartCombatWithAcquiredTarget(ICharacter attacker, ICharacter target)
+        {
+            target.SetTarget(attacker.Identity);
+            target.SetFightingTarget(attacker.Identity);
+            this.ResetCombatTick(target);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "NPC combat engaged attacker={0} npc={1}",
+                    attacker.Identity.ToString(true),
+                    target.Identity.ToString(true)));
         }
 
         private static void LogCapturedAreteRobotContent(bool isError, string message)

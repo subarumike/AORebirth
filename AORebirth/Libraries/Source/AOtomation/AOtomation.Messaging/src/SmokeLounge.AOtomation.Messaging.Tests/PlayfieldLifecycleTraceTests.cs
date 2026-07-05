@@ -836,9 +836,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 npcRuntimeText.Contains("internal void AcquireAggro(ICharacter attacker, ICharacter target)")
                 && npcRuntimeText.Contains("NpcAiProfiles.CanRetaliate(npcController.AiProfile)")
+                && npcRuntimeText.Contains("this.StartCombatWithAcquiredTarget(attacker, target);")
+                && npcRuntimeText.Contains("private void StartCombatWithAcquiredTarget(ICharacter attacker, ICharacter target)")
                 && npcRuntimeText.Contains("target.SetFightingTarget(attacker.Identity);")
                 && npcRuntimeText.Contains("this.ResetCombatTick(target);"),
-                "NPCRuntimeService must own NPC aggro acquisition orchestration.");
+                "NPCRuntimeService must own NPC aggro acquisition and combat-start orchestration.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.ProcessNpcPatrolTick(dynel);"),
                 "Playfield heartbeat must delegate NPC patrol/follow ticks through PlayfieldRuntimeSystems.");
