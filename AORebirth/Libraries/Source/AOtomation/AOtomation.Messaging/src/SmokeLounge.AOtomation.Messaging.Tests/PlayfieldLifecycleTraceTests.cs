@@ -714,6 +714,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string repositoryRoot = FindRepositoryRoot();
             string playfieldText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string attackHandlerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\AttackMessageHandler.cs"));
             string runtimeSystemsText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
             string npcRuntimeText = File.ReadAllText(
@@ -812,6 +814,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.npcRuntime.BeginNpcDeath(attacker, target);")
                 && runtimeSystemsText.Contains("return this.npcRuntime.ProcessDeadNpc(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ProcessCombatTick(attacker);")
+                && runtimeSystemsText.Contains("this.npcRuntime.AcquireAggro(attacker, target);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ProcessPatrolTick(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ClearCombatTracking(identity);"),
                 "PlayfieldRuntimeSystems must delegate NPC runtime entry points through NPCRuntimeService.");
@@ -822,6 +825,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.ProcessNpcCombatTick(attacker);"),
                 "Playfield must delegate NPC combat ticks through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                attackHandlerText.Contains("playfield.AcquireNpcAggro(character, target);")
+                && playfieldText.Contains("this.runtimeSystems.AcquireNpcAggro(attacker, target);"),
+                "Attack handling must route NPC aggro acquisition through PlayfieldRuntimeSystems.");
+            Assert.IsFalse(
+                attackHandlerText.Contains("target.SetFightingTarget(character.Identity);")
+                || attackHandlerText.Contains("NpcAiProfiles.CanRetaliate"),
+                "AttackMessageHandler must not own NPC aggro acquisition rules.");
+            Assert.IsTrue(
+                npcRuntimeText.Contains("internal void AcquireAggro(ICharacter attacker, ICharacter target)")
+                && npcRuntimeText.Contains("NpcAiProfiles.CanRetaliate(npcController.AiProfile)")
+                && npcRuntimeText.Contains("target.SetFightingTarget(attacker.Identity);")
+                && npcRuntimeText.Contains("this.ResetCombatTick(target);"),
+                "NPCRuntimeService must own NPC aggro acquisition orchestration.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.ProcessNpcPatrolTick(dynel);"),
                 "Playfield heartbeat must delegate NPC patrol/follow ticks through PlayfieldRuntimeSystems.");

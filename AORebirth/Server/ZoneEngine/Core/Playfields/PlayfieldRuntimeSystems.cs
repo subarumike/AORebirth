@@ -248,6 +248,11 @@ namespace ZoneEngine.Core.Playfields
             this.npcRuntime.ProcessCombatTick(attacker);
         }
 
+        internal void AcquireNpcAggro(ICharacter attacker, ICharacter target)
+        {
+            this.npcRuntime.AcquireAggro(attacker, target);
+        }
+
         internal void ProcessNpcPatrolTick(ICharacter character)
         {
             this.npcRuntime.ProcessPatrolTick(character);

@@ -606,6 +606,11 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.RegisterNpcHome(character);
         }
 
+        public void AcquireNpcAggro(ICharacter attacker, ICharacter target)
+        {
+            this.runtimeSystems.AcquireNpcAggro(attacker, target);
+        }
+
         public int DespawnCorpses(Func<string, Identity, bool> shouldDespawn)
         {
             if (shouldDespawn == null)

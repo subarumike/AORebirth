@@ -113,26 +113,11 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private void EngageNpcTarget(ICharacter character, ICharacter target)
         {
-            NPCController npcController = target.Controller as NPCController;
-            if (npcController == null
-                || npcController.KnuBot != null
-                || !NpcAiProfiles.CanRetaliate(npcController.AiProfile)
-                || target.Stats[StatIds.health].Value <= 0
-                || target.FightingTarget.Instance != 0)
+            Playfield playfield = target.Playfield as Playfield;
+            if (playfield != null)
             {
-                return;
+                playfield.AcquireNpcAggro(character, target);
             }
-
-            target.SetTarget(character.Identity);
-            target.SetFightingTarget(character.Identity);
-            this.ResetCombatTick(target);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Network,
-                string.Format(
-                    "NPC combat engaged attacker={0} npc={1}",
-                    character.Identity.ToString(true),
-                    target.Identity.ToString(true)));
         }
 
         private void SendAttackState(ICharacter character, Identity target, byte action)
