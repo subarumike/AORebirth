@@ -789,6 +789,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 npcRuntimeText.Contains(
                     "private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();"),
                 "NPCRuntimeService must own NPC home state storage.");
+            Assert.IsTrue(
+                npcRuntimeText.Contains(
+                    "private readonly Dictionary<int, DateTime> corpseDespawnTicks = new Dictionary<int, DateTime>();"),
+                "NPCRuntimeService must own corpse despawn scheduling state.");
+            Assert.IsFalse(
+                playfieldText.Contains("private readonly Dictionary<int, DateTime> corpseDespawnTicks"),
+                "Playfield must not own corpse despawn scheduling state.");
             Assert.IsFalse(
                 playfieldText.Contains("private readonly Dictionary<int, NpcHomeState> npcHomeStates"),
                 "Playfield must not own NPC home state storage.");
@@ -798,6 +805,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.npcRuntime.RegisterNpcHome(character);")
                 && runtimeSystemsText.Contains(
                     "this.npcRuntime.RemoveNpcImmediately(target, stopFightingDeadTarget, cancelPendingCorpseSpawn);")
+                && runtimeSystemsText.Contains("this.npcRuntime.ScheduleCorpseDespawn(corpseIdentity, expiresAtUtc);")
+                && runtimeSystemsText.Contains("return this.npcRuntime.DueCorpseDespawns(utcNow);")
+                && runtimeSystemsText.Contains("this.npcRuntime.ClearCorpseDespawn(corpseInstance);")
                 && runtimeSystemsText.Contains("this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);")
                 && runtimeSystemsText.Contains("this.npcRuntime.BeginNpcDeath(attacker, target);")
                 && runtimeSystemsText.Contains("return this.npcRuntime.ProcessDeadNpc(character);")
@@ -832,6 +842,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.RemoveNpcImmediately("),
                 "Playfield must delegate immediate NPC removal through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.DueCorpseDespawns(DateTime.UtcNow)")
+                && playfieldText.Contains("this.runtimeSystems.ScheduleCorpseDespawn(corpseIdentity, expiresAtUtc);")
+                && playfieldText.Contains("this.runtimeSystems.ScheduleCorpseDespawn(corpse.CorpseIdentity, expiresAtUtc);")
+                && playfieldText.Contains("this.runtimeSystems.ClearCorpseDespawn(corpseInstance);"),
+                "Playfield must delegate corpse despawn scheduling and due checks through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.BeginNpcDeath(attacker, target);"),
                 "Playfield must delegate NPC corpse lifecycle start through PlayfieldRuntimeSystems.");

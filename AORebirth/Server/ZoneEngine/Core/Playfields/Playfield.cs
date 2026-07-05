@@ -119,8 +119,6 @@ namespace AORebirth.Core.Playfields
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
         private readonly Dictionary<int, int> lastCombatWeaponSlots = new Dictionary<int, int>();
 
-        private readonly Dictionary<int, DateTime> corpseDespawnTicks = new Dictionary<int, DateTime>();
-
         private readonly Dictionary<int, HashSet<string>> statelEnterContacts = new Dictionary<int, HashSet<string>>();
 
         private readonly HashSet<int> statelCollisionInitializedCharacters = new HashSet<int>();
@@ -3481,10 +3479,7 @@ namespace AORebirth.Core.Playfields
 
         private void ProcessCorpseDespawns()
         {
-            foreach (int corpseInstance in this.corpseDespawnTicks
-                .Where(x => x.Value <= DateTime.UtcNow)
-                .Select(x => x.Key)
-                .ToList())
+            foreach (int corpseInstance in this.runtimeSystems.DueCorpseDespawns(DateTime.UtcNow))
             {
                 this.DespawnCorpse(corpseInstance);
             }
@@ -3573,7 +3568,7 @@ namespace AORebirth.Core.Playfields
             };
 
             this.corpses[corpseIdentity.Instance] = state;
-            this.corpseDespawnTicks[corpseIdentity.Instance] = expiresAtUtc;
+            this.runtimeSystems.ScheduleCorpseDespawn(corpseIdentity, expiresAtUtc);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
@@ -3590,7 +3585,7 @@ namespace AORebirth.Core.Playfields
         {
             Identity corpseIdentity = new Identity { Type = IdentityType.Corpse, Instance = corpseInstance };
             this.Despawn(corpseIdentity);
-            this.corpseDespawnTicks.Remove(corpseInstance);
+            this.runtimeSystems.ClearCorpseDespawn(corpseInstance);
             this.corpses.Remove(corpseInstance);
             this.pendingCorpseCreditAwards.Remove(corpseInstance);
             LogUtil.Debug(DebugInfoDetail.Engine, string.Format("Corpse despawned corpse={0}", corpseIdentity));
@@ -3600,7 +3595,7 @@ namespace AORebirth.Core.Playfields
         {
             DateTime expiresAtUtc = DateTime.UtcNow + delay;
             corpse.ExpiresAtUtc = expiresAtUtc;
-            this.corpseDespawnTicks[corpse.CorpseIdentity.Instance] = expiresAtUtc;
+            this.runtimeSystems.ScheduleCorpseDespawn(corpse.CorpseIdentity, expiresAtUtc);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
@@ -3621,7 +3616,7 @@ namespace AORebirth.Core.Playfields
             }
 
             corpse.ExpiresAtUtc = expiresAtUtc;
-            this.corpseDespawnTicks[corpse.CorpseIdentity.Instance] = expiresAtUtc;
+            this.runtimeSystems.ScheduleCorpseDespawn(corpse.CorpseIdentity, expiresAtUtc);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
