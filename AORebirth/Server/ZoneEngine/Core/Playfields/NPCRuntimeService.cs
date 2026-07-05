@@ -8,6 +8,7 @@ namespace AORebirth.Core.Playfields
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.Vector;
+    using AORebirth.Enums;
     using AORebirth.Interfaces;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -145,6 +146,25 @@ namespace AORebirth.Core.Playfields
         internal void ProcessCombatTick(ICharacter attacker)
         {
             this.combatTick.ProcessCombatTick(attacker);
+        }
+
+        internal void ProcessPatrolTick(ICharacter character)
+        {
+            if (character == null || !(character.Controller is NPCController))
+            {
+                return;
+            }
+
+            if (character.Controller.IsFollowing())
+            {
+                character.Controller.DoFollow();
+                return;
+            }
+
+            if (character.Controller.State == CharacterState.Patrolling)
+            {
+                character.Controller.StartPatrolling();
+            }
         }
 
         internal void ClearCombatTracking(Identity identity)

@@ -812,6 +812,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.npcRuntime.BeginNpcDeath(attacker, target);")
                 && runtimeSystemsText.Contains("return this.npcRuntime.ProcessDeadNpc(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ProcessCombatTick(attacker);")
+                && runtimeSystemsText.Contains("this.npcRuntime.ProcessPatrolTick(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ClearCombatTracking(identity);"),
                 "PlayfieldRuntimeSystems must delegate NPC runtime entry points through NPCRuntimeService.");
 
@@ -821,6 +822,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.ProcessNpcCombatTick(attacker);"),
                 "Playfield must delegate NPC combat ticks through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.ProcessNpcPatrolTick(dynel);"),
+                "Playfield heartbeat must delegate NPC patrol/follow ticks through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                npcRuntimeText.Contains("internal void ProcessPatrolTick(ICharacter character)")
+                && npcRuntimeText.Contains("character.Controller.DoFollow();")
+                && npcRuntimeText.Contains("character.Controller.StartPatrolling();"),
+                "NPCRuntimeService must own NPC patrol/follow tick orchestration while controllers keep behavior.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.SpawnCapturedNpcContent(playfieldIdentity);"),
                 "Playfield must delegate captured NPC spawn orchestration through PlayfieldRuntimeSystems.");
