@@ -208,17 +208,17 @@ namespace ZoneEngine.Core.Playfields
             return this.npcRuntime.HasPendingDeadNpcDespawn(identity);
         }
 
-        internal void ScheduleCorpseDespawn(Identity corpseIdentity, DateTime expiresAtUtc)
+        internal void ScheduleNpcCorpseDespawn(Identity corpseIdentity, DateTime expiresAtUtc)
         {
             this.npcRuntime.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);
         }
 
-        internal void ClearCorpseDespawn(int corpseInstance)
+        internal void ClearNpcCorpseDespawn(int corpseInstance)
         {
             this.npcRuntime.ClearNpcCorpseDespawn(corpseInstance);
         }
 
-        internal void ProcessDueCorpseDespawns(DateTime utcNow, Action<int> despawnCorpse)
+        internal void ProcessDueNpcCorpseDespawns(DateTime utcNow, Action<int> despawnCorpse)
         {
             this.npcRuntime.ProcessDueNpcCorpseDespawns(utcNow, despawnCorpse);
         }
@@ -228,7 +228,7 @@ namespace ZoneEngine.Core.Playfields
             this.npcRuntime.BeginNpcDeath(attacker, target);
         }
 
-        internal bool ProcessDeadNpc(ICharacter character)
+        internal bool ProcessDeadNpcDespawn(ICharacter character)
         {
             return this.npcRuntime.ProcessDeadNpcDespawn(character);
         }
