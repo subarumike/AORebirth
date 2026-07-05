@@ -4,6 +4,7 @@ namespace AORebirth.Core.Playfields
 
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.Vector;
@@ -35,6 +36,8 @@ namespace AORebirth.Core.Playfields
         private readonly CapturedAreteRobotSpawnOrchestrator capturedAreteRobotSpawns;
 
         private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
+
+        private readonly Dictionary<int, DateTime> corpseDespawnTicks = new Dictionary<int, DateTime>();
 
         internal NPCRuntimeService(Playfield playfield, PlayfieldDynelRegistry dynelRegistry)
         {
@@ -98,6 +101,24 @@ namespace AORebirth.Core.Playfields
         internal bool HasPendingDeadNpcDespawn(Identity identity)
         {
             return this.corpseLifecycle.HasPendingDeadNpcDespawn(identity);
+        }
+
+        internal void ScheduleCorpseDespawn(Identity corpseIdentity, DateTime expiresAtUtc)
+        {
+            this.corpseDespawnTicks[corpseIdentity.Instance] = expiresAtUtc;
+        }
+
+        internal int[] DueCorpseDespawns(DateTime utcNow)
+        {
+            return this.corpseDespawnTicks
+                .Where(x => x.Value <= utcNow)
+                .Select(x => x.Key)
+                .ToArray();
+        }
+
+        internal void ClearCorpseDespawn(int corpseInstance)
+        {
+            this.corpseDespawnTicks.Remove(corpseInstance);
         }
 
         internal void BeginNpcDeath(ICharacter attacker, ICharacter target)
