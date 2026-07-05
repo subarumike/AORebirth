@@ -142,22 +142,8 @@ namespace AORebirth.Core.Playfields
             this.playfield.StopFightingDeadTarget(target.Identity);
             this.playfield.StopDyingNpcCombatState(target);
             this.playfield.SendNpcDeathAnimation(target);
-            if (attacker != null)
-            {
-                RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);
-                this.playfield.AwardCombatXp(attacker, target);
-            }
-
-            if (corpseIdentity != Identity.None)
-            {
-                this.playfield.ScheduleCorpseSpawn(target, corpseIdentity);
-            }
-            else
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format("Skipping corpse visual spawn for {0}; no known MonsterData-to-CATMesh mapping.", target.Identity));
-            }
+            this.RunNpcDeathRewardHooks(attacker, target);
+            this.ScheduleNpcDeathLootContainer(target, corpseIdentity);
 
             this.corpseLifecycle.ScheduleDeadNpcDespawn(target);
 
@@ -279,6 +265,30 @@ namespace AORebirth.Core.Playfields
                     "NPC combat engaged attacker={0} npc={1}",
                     attacker.Identity.ToString(true),
                     target.Identity.ToString(true)));
+        }
+
+        private void RunNpcDeathRewardHooks(ICharacter attacker, ICharacter target)
+        {
+            if (attacker == null)
+            {
+                return;
+            }
+
+            RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);
+            this.playfield.AwardCombatXp(attacker, target);
+        }
+
+        private void ScheduleNpcDeathLootContainer(ICharacter target, Identity corpseIdentity)
+        {
+            if (corpseIdentity != Identity.None)
+            {
+                this.playfield.ScheduleCorpseSpawn(target, corpseIdentity);
+                return;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format("Skipping corpse visual spawn for {0}; no known MonsterData-to-CATMesh mapping.", target.Identity));
         }
 
         private static void LogCapturedAreteRobotContent(bool isError, string message)

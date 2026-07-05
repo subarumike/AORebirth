@@ -855,11 +855,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && npcRuntimeText.Contains("this.playfield.StopFightingDeadTarget(target.Identity);")
                 && npcRuntimeText.Contains("this.playfield.StopDyingNpcCombatState(target);")
                 && npcRuntimeText.Contains("this.playfield.SendNpcDeathAnimation(target);")
-                && npcRuntimeText.Contains("RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);")
-                && npcRuntimeText.Contains("this.playfield.AwardCombatXp(attacker, target);")
-                && npcRuntimeText.Contains("this.playfield.ScheduleCorpseSpawn(target, corpseIdentity);")
+                && npcRuntimeText.Contains("this.RunNpcDeathRewardHooks(attacker, target);")
+                && npcRuntimeText.Contains("this.ScheduleNpcDeathLootContainer(target, corpseIdentity);")
                 && npcRuntimeText.Contains("this.corpseLifecycle.ScheduleDeadNpcDespawn(target);"),
                 "NPCRuntimeService must own NPC death lifecycle orchestration order.");
+            Assert.IsTrue(
+                npcRuntimeText.Contains("private void RunNpcDeathRewardHooks(ICharacter attacker, ICharacter target)")
+                && npcRuntimeText.Contains("RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);")
+                && npcRuntimeText.Contains("this.playfield.AwardCombatXp(attacker, target);"),
+                "NPCRuntimeService must own named NPC death reward hook orchestration.");
+            Assert.IsTrue(
+                npcRuntimeText.Contains("private void ScheduleNpcDeathLootContainer(ICharacter target, Identity corpseIdentity)")
+                && npcRuntimeText.Contains("this.playfield.ScheduleCorpseSpawn(target, corpseIdentity);")
+                && npcRuntimeText.Contains("Skipping corpse visual spawn for {0}; no known MonsterData-to-CATMesh mapping."),
+                "NPCRuntimeService must own named NPC death loot/corpse hook orchestration.");
             Assert.IsTrue(
                 npcRuntimeText.Contains("internal bool ProcessDeadNpc(ICharacter character)")
                 && npcRuntimeText.Contains("this.corpseLifecycle.TryGetDeadNpcDespawn(character.Identity, out despawnTick)")
