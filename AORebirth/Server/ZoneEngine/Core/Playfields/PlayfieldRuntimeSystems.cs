@@ -32,6 +32,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly NPCRuntimeService npcRuntime;
 
+        private readonly PlayerCombatRuntimeService playerCombat;
+
         private readonly PacketSequencingCoordinator packetSequencing;
 
         private readonly PrivateCityReadyInitCoordinator privateCityReadyInit;
@@ -58,6 +60,7 @@ namespace ZoneEngine.Core.Playfields
             this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry);
+            this.playerCombat = new PlayerCombatRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
             this.privateCityReadyInit =
                 new PrivateCityReadyInitCoordinator(
@@ -276,6 +279,39 @@ namespace ZoneEngine.Core.Playfields
         internal void ClearNpcCombatTracking(Identity identity)
         {
             this.npcRuntime.ClearCombatTracking(identity);
+        }
+
+        internal void StartPlayerAttack(
+            ICharacter character,
+            Identity target,
+            Action<ICharacter, Identity> startAttack)
+        {
+            this.playerCombat.StartAttack(character, target, startAttack);
+        }
+
+        internal void CancelPlayerAttack(ICharacter character, Action<ICharacter> cancelAttack)
+        {
+            this.playerCombat.CancelAttack(character, cancelAttack);
+        }
+
+        internal void ResetPlayerCombatTick(Identity attacker, Action<Identity> resetCombatTick)
+        {
+            this.playerCombat.ResetCombatTick(attacker, resetCombatTick);
+        }
+
+        internal void ProcessPlayerCombatTick(ICharacter attacker, Action<ICharacter> processCombatTick)
+        {
+            this.playerCombat.ProcessCombatTick(attacker, processCombatTick);
+        }
+
+        internal void ClearPlayerFightingTarget(ICharacter character, Action<ICharacter> clearFightingTarget)
+        {
+            this.playerCombat.ClearFightingTarget(character, clearFightingTarget);
+        }
+
+        internal void BeginPlayerDeath(ICharacter target, Action<ICharacter> beginDeath)
+        {
+            this.playerCombat.BeginDeath(target, beginDeath);
         }
     }
 }
