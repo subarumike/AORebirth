@@ -46,6 +46,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldLifecycleRuntimeService lifecycle;
 
+        private readonly PlayfieldPlayerDeathRespawnRuntimeService playerDeathRespawn;
+
         private readonly PlayfieldInteractionRuntimeService interaction;
 
         private readonly PlayerCombatRuntimeService playerCombat;
@@ -85,6 +87,7 @@ namespace ZoneEngine.Core.Playfields
             this.rewards = new PlayfieldRewardRuntimeService();
             this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry, this.rewards);
             this.lifecycle = new PlayfieldLifecycleRuntimeService();
+            this.playerDeathRespawn = new PlayfieldPlayerDeathRespawnRuntimeService();
             this.interaction = new PlayfieldInteractionRuntimeService();
             this.playerCombat = new PlayerCombatRuntimeService();
             this.statelTransitions = new PlayfieldStatelTransitionRuntimeService();
@@ -337,7 +340,7 @@ namespace ZoneEngine.Core.Playfields
             Action<Identity> stopFightingDeadTarget,
             Action<ICharacter> sendCombatStop)
         {
-            this.lifecycle.ProcessPlayerRespawn(
+            this.playerDeathRespawn.ProcessPlayerRespawn(
                 character,
                 dynel,
                 corpseIdentity,
