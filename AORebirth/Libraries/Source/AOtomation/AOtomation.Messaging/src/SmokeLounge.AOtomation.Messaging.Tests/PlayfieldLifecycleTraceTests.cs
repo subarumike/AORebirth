@@ -1692,6 +1692,120 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void CorpseLootCreditGuardrailPreservesAccessTransferAndCreditOwnership()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string runtimeSystemsText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+            string corpseAccessText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs"));
+            string inventoryRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs"));
+
+            string playfieldUseCorpse = ExtractMethodBlock(playfieldText, "public bool TryUseCorpse");
+            string playfieldLootCorpseItem = ExtractMethodBlock(playfieldText, "public bool TryLootCorpseItem");
+            string playfieldPendingCredits = ExtractMethodBlock(playfieldText, "private void ProcessPendingCorpseCreditAwards");
+            string corpseUse = ExtractMethodBlock(corpseAccessText, "internal bool TryUseCorpse<TCorpseState>(");
+            string corpseLoot = ExtractMethodBlock(corpseAccessText, "internal bool TryLootCorpseItem<TCorpseState, TCorpseLootItem>(");
+            string inventoryAndCredits =
+                ExtractMethodBlock(corpseAccessText, "private void SendCorpseInventoryUpdateAndCredits<TCorpseState>(");
+            string sendCorpseInventoryUpdate =
+                ExtractMethodBlock(playfieldText, "private void SendCorpseInventoryUpdate");
+            string sendCorpseContainerAddItem =
+                ExtractMethodBlock(playfieldText, "private void SendCorpseContainerAddItem");
+            string scheduleCorpseCreditAward =
+                ExtractMethodBlock(playfieldText, "private void ScheduleCorpseCreditAward");
+            string awardCorpseCredits = ExtractMethodBlock(playfieldText, "private void AwardCorpseCredits");
+            string sendCorpseLootAccessAction =
+                ExtractMethodBlock(playfieldText, "private void SendCorpseLootAccessAction");
+
+            Assert.IsTrue(
+                playfieldUseCorpse.Contains("this.runtimeSystems.TryUseCorpse(")
+                && playfieldUseCorpse.Contains("this.SendCorpseLootAccessAction")
+                && playfieldUseCorpse.Contains("this.SendUseActionFinished")
+                && playfieldUseCorpse.Contains("this.SendCorpseInventoryUpdate")
+                && playfieldUseCorpse.Contains("this.ScheduleCorpseCreditAward"),
+                "Playfield must delegate corpse access sequencing while retaining packet and credit callbacks.");
+            Assert.IsTrue(
+                corpseUse.Contains("sendCorpseLootAccessAction(looter, corpse);")
+                && corpseUse.Contains("sendUseActionFinished(looter);")
+                && corpseUse.Contains("this.SendCorpseInventoryUpdateAndCredits("),
+                "Corpse access service must own access-action, inventory-update, and credit-scheduling orchestration.");
+            AssertTextBefore(corpseUse, "sendCorpseLootAccessAction(looter, corpse);", "sendUseActionFinished(looter);");
+            AssertTextBefore(
+                inventoryAndCredits,
+                "sendCorpseInventoryUpdate(looter, corpse);",
+                "scheduleCorpseCreditAward(looter, corpse);");
+
+            Assert.IsTrue(
+                playfieldLootCorpseItem.Contains("this.runtimeSystems.TryLootCorpseItem(")
+                && playfieldLootCorpseItem.Contains("this.runtimeSystems.CharacterHasUniqueItemAlready")
+                && playfieldLootCorpseItem.Contains("this.runtimeSystems.TryAddCorpseLootItem")
+                && playfieldLootCorpseItem.Contains("this.SendCorpseContainerAddItem"),
+                "Playfield must delegate corpse item transfer sequencing while retaining packet callbacks.");
+            AssertTextBefore(
+                corpseLoot,
+                "characterHasUniqueItemAlready(looter, item)",
+                "tryAddCorpseLootItem(looter, item, targetPlacement)");
+            AssertTextBefore(
+                corpseLoot,
+                "tryAddCorpseLootItem(looter, item, targetPlacement)",
+                "setLooted(corpseLootItem, true);");
+            AssertTextBefore(corpseLoot, "setLooted(corpseLootItem, true);", "setOpened(corpse, true);");
+            AssertTextBefore(
+                corpseLoot,
+                "setOpened(corpse, true);",
+                "sendCorpseContainerAddItem(looter, sourceContainer, targetPlacement);");
+            Assert.IsTrue(
+                inventoryRuntimeText.Contains("public bool CharacterHasUniqueItemAlready(")
+                && inventoryRuntimeText.Contains("public CorpseLootInventoryTransferResult TryAddCorpseLootItem(")
+                && runtimeSystemsText.Contains("return this.inventoryContainer.CharacterHasUniqueItemAlready(character, item);")
+                && runtimeSystemsText.Contains("return this.inventoryContainer.TryAddCorpseLootItem(looter, item, targetPlacement);"),
+                "InventoryContainerRuntimeService must own unique validation and inventory insertion helpers.");
+
+            Assert.IsTrue(
+                playfieldPendingCredits.Contains("this.runtimeSystems.ProcessPendingCorpseCreditAwards(")
+                && playfieldPendingCredits.Contains("this.pendingCorpseCreditAwards")
+                && playfieldPendingCredits.Contains("this.AwardCorpseCredits"),
+                "Playfield must delegate due credit-award iteration through runtime systems while retaining the credit award callback.");
+            Assert.IsTrue(
+                scheduleCorpseCreditAward.Contains("this.pendingCorpseCreditAwards.ContainsKey(corpse.CorpseIdentity.Instance)")
+                && scheduleCorpseCreditAward.Contains("this.pendingCorpseCreditAwards[corpse.CorpseIdentity.Instance]"),
+                "Playfield must keep pending corpse credit storage ownership.");
+            Assert.IsTrue(
+                awardCorpseCredits.Contains("corpse.CreditsLooted = true;")
+                && awardCorpseCredits.Contains("looter.Stats[StatIds.cash].Set((uint)cashAfter);")
+                && awardCorpseCredits.Contains("StatMessageHandler.Default.SendChanged(looter);")
+                && awardCorpseCredits.Contains("looter.Stats.Write();"),
+                "Playfield must keep corpse credit mutation, packet notification, and persistence ownership.");
+
+            Assert.IsTrue(
+                playfieldText.Contains("private readonly Dictionary<int, CorpseState> corpses")
+                && playfieldText.Contains("private readonly Dictionary<int, PendingCorpseCreditAward> pendingCorpseCreditAwards"),
+                "Playfield must keep corpse and pending credit state storage for now.");
+            Assert.IsTrue(
+                sendCorpseInventoryUpdate.Contains("new InventoryUpdateMessage")
+                && sendCorpseContainerAddItem.Contains("new ContainerAddItemMessage")
+                && sendCorpseLootAccessAction.Contains("new ActionMessage"),
+                "Playfield must keep corpse packet construction ownership for now.");
+            Assert.IsFalse(
+                corpseAccessText.Contains("InventoryUpdateMessage")
+                || corpseAccessText.Contains("ContainerAddItemMessage")
+                || corpseAccessText.Contains("ActionMessage")
+                || corpseAccessText.Contains("SendCompressed")
+                || corpseAccessText.Contains("Stats[StatIds.cash].Set")
+                || corpseAccessText.Contains("Stats.Write")
+                || corpseAccessText.Contains("private readonly Dictionary<int, PendingCorpseCreditAward>")
+                || corpseAccessText.Contains("new PendingCorpseCreditAward")
+                || corpseAccessText.Contains("new Item("),
+                "PlayfieldCorpseAccessRuntimeService must not own packets, credit mutation, pending-credit storage, or item materialization.");
+        }
+
+        [TestMethod]
         public void PlayfieldContentDataProviderOwnsStaticContentDataResolution()
         {
             string repositoryRoot = FindRepositoryRoot();
