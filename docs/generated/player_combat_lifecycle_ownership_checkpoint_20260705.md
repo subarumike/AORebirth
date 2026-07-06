@@ -24,9 +24,11 @@ delegate tick/tracking cleanup back to Playfield. Player combat tick now owns
 the no-target, target lookup, target validation, invalid-target clear, and
 validated-tick dispatch orchestration while delegating lookup, logging,
 tracking cleanup, timing, damage, packet emission, and world mutation back to
-Playfield. Other seams remain callback pass-throughs. The service does not own
-algorithms, packet construction, packet emission, damage rules, NPC runtime
-behavior, inventory, loot, credits, corpses, movement, or database loading.
+Playfield. Invalid target cleanup is named in `ClearInvalidCombatTarget` and
+preserves the existing log-before-clear order. Other seams remain callback
+pass-throughs. The service does not own algorithms, packet construction, packet
+emission, damage rules, NPC runtime behavior, inventory, loot, credits, corpses,
+movement, or database loading.
 
 ## Current ownership seams
 
