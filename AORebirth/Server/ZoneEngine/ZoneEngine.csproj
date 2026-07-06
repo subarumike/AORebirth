@@ -293,6 +293,7 @@
     <Compile Include="Core\Playfields\NpcPatrolReplayCoordinator.cs" />
     <Compile Include="Core\Playfields\PlayerCombatRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldInteractionRuntimeService.cs" />
+    <Compile Include="Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldRewardRuntimeService.cs" />
     <Compile Include="Core\Playfields\PrivateCityReadyInitCoordinator.cs" />
     <Compile Include="Core\Playfields\Playfield.cs" />

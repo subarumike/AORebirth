@@ -1004,7 +1004,7 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void DisconnectClient(IInstancedEntity entity)
         {
-            Pool.Instance.RemoveObject(entity);
+            this.runtimeSystems.RemoveInstancedEntity(entity);
         }
 
         /// <summary>
@@ -3633,12 +3633,12 @@ namespace AORebirth.Core.Playfields
 
         private void DespawnCorpse(int corpseInstance)
         {
-            Identity corpseIdentity = new Identity { Type = IdentityType.Corpse, Instance = corpseInstance };
-            this.Despawn(corpseIdentity);
-            this.runtimeSystems.ClearNpcCorpseDespawn(corpseInstance);
-            this.corpses.Remove(corpseInstance);
-            this.pendingCorpseCreditAwards.Remove(corpseInstance);
-            LogUtil.Debug(DebugInfoDetail.Engine, string.Format("Corpse despawned corpse={0}", corpseIdentity));
+            this.runtimeSystems.DespawnCorpse(
+                corpseInstance,
+                this.Despawn,
+                this.runtimeSystems.ClearNpcCorpseDespawn,
+                x => this.corpses.Remove(x),
+                x => this.pendingCorpseCreditAwards.Remove(x));
         }
 
         private void ScheduleCorpseDespawn(CorpseState corpse, TimeSpan delay, string reason)
