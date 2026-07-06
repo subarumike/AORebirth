@@ -11,6 +11,8 @@ NPC spawn, activation, immediate removal, home-state cleanup, dead-NPC processin
 The next safe object-lifecycle seams were:
 
 - instanced object removal from `Pool`
+- public corpse-despawn predicate routing
+- pending corpse spawn due-check and callback ordering
 - corpse despawn cleanup ordering
 
 ## Boundary Change
@@ -18,13 +20,23 @@ The next safe object-lifecycle seams were:
 `PlayfieldObjectLifecycleRuntimeService` now owns:
 
 - `Pool.Instance.RemoveObject(entity)` routing for `Playfield.DisconnectClient`
+- explicit corpse-despawn predicate routing:
+  1. remove matching pending corpse spawns
+  2. despawn matching live corpse objects through the existing callback
+- pending corpse spawn processing:
+  1. select due pending corpse spawns
+  2. remove pending spawn state
+  3. find the dead NPC
+  4. call existing corpse registration callback
+  5. call existing trace callback
+  6. call existing corpse full-update callback
 - corpse despawn cleanup order:
   1. send existing despawn callback
   2. clear NPC corpse despawn schedule
   3. remove corpse state
   4. remove pending corpse credit award
 
-`Playfield` still supplies callbacks for packet emission and its corpse-state collections.
+`Playfield` still supplies callbacks for packet emission, corpse registration data construction, and its corpse-state collections.
 
 ## Intentionally Outside This Boundary
 
