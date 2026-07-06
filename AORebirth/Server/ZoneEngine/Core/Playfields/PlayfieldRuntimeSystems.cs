@@ -50,6 +50,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayerCombatRuntimeService playerCombat;
 
+        private readonly PlayfieldStatelTransitionRuntimeService statelTransitions;
+
         private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle;
 
         private readonly PacketSequencingCoordinator packetSequencing;
@@ -85,6 +87,7 @@ namespace ZoneEngine.Core.Playfields
             this.lifecycle = new PlayfieldLifecycleRuntimeService();
             this.interaction = new PlayfieldInteractionRuntimeService();
             this.playerCombat = new PlayerCombatRuntimeService();
+            this.statelTransitions = new PlayfieldStatelTransitionRuntimeService();
             this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
             this.privateCityReadyInit =
@@ -359,6 +362,39 @@ namespace ZoneEngine.Core.Playfields
             Action<Dynel> disableTimers)
         {
             this.lifecycle.PreparePlayfieldTransfer(dynel, clearTransferContactState, disableTimers);
+        }
+
+        internal void ClearStatelTransitionContactState(int dynelId)
+        {
+            this.statelTransitions.ClearContactState(dynelId);
+        }
+
+        internal void PrimeStatelCollisionContacts(
+            ICharacter dynel,
+            IEnumerable<StatelData> collisionStatels)
+        {
+            this.statelTransitions.PrimeStatelCollisionContacts(dynel, collisionStatels);
+        }
+
+        internal void CheckStatelCollision(
+            ICharacter dynel,
+            Identity playfieldIdentity,
+            IEnumerable<StatelData> collisionStatels,
+            Func<ICharacter, int> resolvePrivateCityDestinationPlayfield,
+            Func<ICharacter, int> resolveCharacterOrganizationInstance,
+            Action<ICharacter> stopMovement,
+            Action<ICharacter> sendCapturedPrivateCityEntrySocialStatus,
+            Action<Dynel, Coordinate, AORebirth.Core.Vector.Quaternion, int> teleportToPlayfield)
+        {
+            this.statelTransitions.CheckStatelCollision(
+                dynel,
+                playfieldIdentity,
+                collisionStatels,
+                resolvePrivateCityDestinationPlayfield,
+                resolveCharacterOrganizationInstance,
+                stopMovement,
+                sendCapturedPrivateCityEntrySocialStatus,
+                teleportToPlayfield);
         }
 
         internal bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)

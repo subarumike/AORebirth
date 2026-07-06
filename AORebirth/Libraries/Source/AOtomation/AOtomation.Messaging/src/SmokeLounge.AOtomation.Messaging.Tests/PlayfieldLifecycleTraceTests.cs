@@ -971,6 +971,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleRuntimeService.cs"));
+            string statelTransitionText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
             string timedLifecycleText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -991,6 +995,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new PlayfieldRewardRuntimeService()",
                     "new NPCRuntimeService(playfield, this.dynelRegistry, this.rewards)",
                     "new PlayfieldLifecycleRuntimeService()",
+                    "new PlayfieldStatelTransitionRuntimeService()",
                     "new PlayfieldTimedLifecycleRuntimeService()",
                     "new PrivateCityReadyInitCoordinator("
                 };
@@ -1080,6 +1085,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 runtimeSystemsText.Contains("private readonly NPCRuntimeService npcRuntime")
                 && runtimeSystemsText.Contains("private readonly PlayfieldCorpseAccessRuntimeService corpseAccess")
                 && runtimeSystemsText.Contains("private readonly PlayfieldLifecycleRuntimeService lifecycle")
+                && runtimeSystemsText.Contains("private readonly PlayfieldStatelTransitionRuntimeService statelTransitions")
                 && runtimeSystemsText.Contains("private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle")
                 && runtimeSystemsText.Contains("internal void ProcessHeartbeatTimedLifecycle(")
                 && runtimeSystemsText.Contains("this.timedLifecycle.ProcessHeartbeatLifecycle(")
@@ -1117,8 +1123,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("return this.corpseAccess.TryUseCorpse(")
                 && runtimeSystemsText.Contains("return this.corpseAccess.TryUseDeadNpcCorpse(")
                 && runtimeSystemsText.Contains("return this.corpseAccess.TryLootCorpseItem(")
-                && runtimeSystemsText.Contains("this.corpseAccess.ProcessPendingCorpseCreditAwards("),
-                "PlayfieldRuntimeSystems must delegate NPC runtime entry points through NPCRuntimeService.");
+                && runtimeSystemsText.Contains("this.corpseAccess.ProcessPendingCorpseCreditAwards(")
+                && runtimeSystemsText.Contains("this.statelTransitions.CheckStatelCollision(")
+                && runtimeSystemsText.Contains("this.statelTransitions.PrimeStatelCollisionContacts(")
+                && runtimeSystemsText.Contains("this.statelTransitions.ClearContactState(dynelId);"),
+                "PlayfieldRuntimeSystems must delegate runtime entry points through named runtime services.");
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldLifecycleRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldLifecycleRuntimeService.");
@@ -1156,6 +1165,39 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || lifecycleText.Contains("PlayfieldById")
                 || lifecycleText.Contains("Announce("),
                 "PlayfieldLifecycleRuntimeService must not own packet construction, object lookup, stats algorithms, or transport.");
+            Assert.IsTrue(
+                statelTransitionText.Contains("internal sealed class PlayfieldStatelTransitionRuntimeService")
+                && statelTransitionText.Contains("internal void CheckStatelCollision(")
+                && statelTransitionText.Contains("internal void PrimeStatelCollisionContacts(")
+                && statelTransitionText.Contains("internal void ClearContactState(int dynelId)")
+                && statelTransitionText.Contains("internal static void ArmPostZoneCollisionGrace(ICharacter character)")
+                && statelTransitionText.Contains("private bool TryHandleCapturedMontroyalPrivateCityEntry(")
+                && statelTransitionText.Contains("private bool TryHandleUserConfirmedMontroyalPrivateCityExit(")
+                && statelTransitionText.Contains("ev.Perform(dynel, sd);"),
+                "PlayfieldStatelTransitionRuntimeService must own statel contact, grace, event, and private-city transition orchestration.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.CheckStatelCollision(")
+                && playfieldText.Contains("this.runtimeSystems.PrimeStatelCollisionContacts(dynel, this.collisionStatels);")
+                && playfieldText.Contains("this.runtimeSystems.ClearStatelTransitionContactState(dynelId);")
+                && playfieldText.Contains("PlayfieldStatelTransitionRuntimeService.ArmPostZoneCollisionGrace(character);"),
+                "Playfield must delegate statel collision/contact/grace orchestration through PlayfieldRuntimeSystems.");
+            Assert.IsFalse(
+                playfieldText.Contains("private readonly Dictionary<int, HashSet<string>> statelEnterContacts")
+                || playfieldText.Contains("private readonly HashSet<int> statelCollisionInitializedCharacters")
+                || playfieldText.Contains("private static readonly Dictionary<int, DateTime> postZoneCollisionGraceUntil")
+                || playfieldText.Contains("private bool TryHandleCapturedMontroyalPrivateCityEntry")
+                || playfieldText.Contains("private bool TryHandleUserConfirmedMontroyalPrivateCityExit")
+                || playfieldText.Contains("private static string BuildStatelContactKey")
+                || playfieldText.Contains("private static bool IsInStatelCollisionRange"),
+                "Playfield must not retain moved statel transition orchestration state or helpers.");
+            Assert.IsFalse(
+                statelTransitionText.Contains("TeleportMessageHandler")
+                || statelTransitionText.Contains("ZoneRedirectionMessage")
+                || statelTransitionText.Contains("SendCompressed")
+                || statelTransitionText.Contains("PlayfieldLoader")
+                || statelTransitionText.Contains("OrganizationDao")
+                || statelTransitionText.Contains("new Identity"),
+                "PlayfieldStatelTransitionRuntimeService must not own packet construction, transport, playfield lookup, DB lookup, or handoff identity construction.");
             Assert.IsTrue(
                 timedLifecycleText.Contains("internal sealed class PlayfieldTimedLifecycleRuntimeService")
                 && timedLifecycleText.Contains("internal void ProcessHeartbeatLifecycle(")
@@ -1518,8 +1560,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && projectText.Contains(@"Core\Playfields\NPCRuntimeService.cs")
                 && projectText.Contains(@"Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs")
                 && projectText.Contains(@"Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs")
+                && projectText.Contains(@"Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs")
                 && projectText.Contains(@"Core\Playfields\PlayfieldRewardRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldRuntimeSystems, NPCRuntimeService, object lifecycle, corpse access, and reward runtime services.");
+                "ZoneEngine project must compile PlayfieldRuntimeSystems, NPCRuntimeService, object lifecycle, corpse access, statel transition, and reward runtime services.");
 
             string immediateRemove = ExtractMethodBlock(npcRuntimeText, "internal void DespawnNpcImmediately");
             Assert.IsTrue(
@@ -1554,6 +1597,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string runtimeSystemsText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+            string statelTransitionText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
             string providerText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldContentDataProvider.cs"));
             string projectText = File.ReadAllText(
@@ -1666,14 +1713,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldText.Contains("private readonly StatelData[] collisionStatels"),
                 "Playfield must keep a provider-filtered collision statel view.");
             Assert.IsTrue(
-                checkStatelCollision.Contains("foreach (StatelData sd in this.collisionStatels)"),
-                "CheckStatelCollision must use provider-filtered collision statels.");
+                checkStatelCollision.Contains("this.collisionStatels"),
+                "Playfield CheckStatelCollision must pass provider-filtered collision statels to runtime systems.");
             Assert.IsTrue(
-                primeStatelCollisionContacts.Contains("foreach (StatelData sd in this.collisionStatels)"),
-                "PrimeStatelCollisionContacts must use provider-filtered collision statels.");
+                primeStatelCollisionContacts.Contains("this.collisionStatels"),
+                "Playfield PrimeStatelCollisionContacts must pass provider-filtered collision statels to runtime systems.");
             Assert.IsFalse(
-                primeStatelCollisionContacts.Contains("sd.Events.Any"),
-                "PrimeStatelCollisionContacts must not own collision-capable statel selection.");
+                primeStatelCollisionContacts.Contains("sd.Events.Any")
+                || checkStatelCollision.Contains("foreach (StatelData sd in this.collisionStatels)"),
+                "Playfield must not own collision-capable statel selection or the statel collision loop.");
+            Assert.IsTrue(
+                statelTransitionText.Contains("foreach (StatelData sd in collisionStatels)")
+                && statelTransitionText.Contains("ev.Perform(dynel, sd);"),
+                "PlayfieldStatelTransitionRuntimeService must own collision statel iteration and event firing.");
 
             string loadStaticDynels =
                 ExtractMethodBlock(playfieldText, "private void LoadStaticDynels(Identity playfieldIdentity)");
@@ -1703,6 +1755,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldContentDataProvider.cs"));
             string playfieldText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string statelTransitionText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
 
             Assert.IsTrue(
                 providerText.Contains("StaticDynelDao.Instance.GetWhere"),
@@ -1755,9 +1811,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 loadStaticDynels.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
                 "Playfield must remain the StaticDynel runtime construction owner.");
             Assert.IsTrue(
-                checkStatelCollision.Contains("IsInStatelCollisionRange(sd, dynel)")
-                && checkStatelCollision.Contains("ev.Perform(dynel, sd);"),
-                "Playfield must remain the statel collision runtime check/event owner.");
+                checkStatelCollision.Contains("this.runtimeSystems.CheckStatelCollision(")
+                && checkStatelCollision.Contains("this.TeleportToPlayfield"),
+                "Playfield must delegate statel collision runtime orchestration while keeping teleport callback ownership.");
+            Assert.IsTrue(
+                statelTransitionText.Contains("IsInStatelCollisionRange(sd, dynel)")
+                && statelTransitionText.Contains("ev.Perform(dynel, sd);"),
+                "PlayfieldStatelTransitionRuntimeService must own statel collision runtime check/event orchestration.");
+            Assert.IsFalse(
+                statelTransitionText.Contains("VendorHandler.SpawnVendorsForPlayfield")
+                || statelTransitionText.Contains("new StaticDynel")
+                || statelTransitionText.Contains("StaticDynelDao.Instance.GetWhere"),
+                "PlayfieldStatelTransitionRuntimeService must not own content data, static dynel construction, or vendor spawning.");
         }
 
         [TestMethod]
