@@ -19,10 +19,13 @@ change gameplay behavior.
 ## PlayfieldRuntimeSystems owns
 
 - The facade methods that expose NPC runtime ownership to Playfield.
-- NPC-specific delegation names such as ProcessNpcCombatTick,
+- NPC-specific delegation names such as DespawnNpcImmediately, ProcessNpcCombatTick,
   ProcessNpcPatrolTick, BeginNpcDeath, ProcessDeadNpcDespawn,
   ScheduleNpcCorpseDespawn, ClearNpcCorpseDespawn, and
   ProcessDueNpcCorpseDespawns.
+
+`ProcessDueNpcCorpseDespawns` owns the due-corpse selection and callback loop
+directly. There is no separate list-returning due-despawn facade method.
 
 ## Playfield intentionally still owns
 

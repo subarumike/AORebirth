@@ -1088,8 +1088,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.lifecycle.PreparePlayfieldTransfer(")
                 && runtimeSystemsText.Contains("this.npcRuntime.ActivateNpc(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.RegisterNpcHome(character);")
+                && runtimeSystemsText.Contains("internal void DespawnNpcImmediately(")
                 && runtimeSystemsText.Contains(
-                    "this.npcRuntime.RemoveNpcImmediately(target, stopFightingDeadTarget, cancelPendingCorpseSpawn);")
+                    "this.npcRuntime.DespawnNpcImmediately(target, stopFightingDeadTarget, cancelPendingCorpseSpawn);")
                 && runtimeSystemsText.Contains("internal void ScheduleNpcCorpseDespawn(Identity corpseIdentity, DateTime expiresAtUtc)")
                 && runtimeSystemsText.Contains("this.npcRuntime.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
                 && runtimeSystemsText.Contains("internal void ClearNpcCorpseDespawn(int corpseInstance)")
@@ -1297,8 +1298,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "NPCRuntimeService must own dead NPC processing orchestration.");
             Assert.IsTrue(
                 npcRuntimeText.Contains("internal void ScheduleNpcCorpseDespawn(Identity corpseIdentity, DateTime expiresAtUtc)")
-                && npcRuntimeText.Contains("internal int[] DueNpcCorpseDespawns(DateTime utcNow)")
                 && npcRuntimeText.Contains("internal void ProcessDueNpcCorpseDespawns(DateTime utcNow, Action<int> despawnCorpse)")
+                && npcRuntimeText.Contains("this.corpseDespawnTicks")
                 && npcRuntimeText.Contains("despawnCorpse(corpseInstance);")
                 && npcRuntimeText.Contains("internal void ClearNpcCorpseDespawn(int corpseInstance)")
                 && npcRuntimeText.Contains("private void ScheduleDeadNpcDespawn(ICharacter target)")
@@ -1357,8 +1358,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 runtimeSystemsText.Contains("this.npcRuntime.RemoveNpcHome(identity);"),
                 "PlayfieldRuntimeSystems must not expose unused NPC home removal after callback wiring.");
             Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.RemoveNpcImmediately("),
-                "Playfield must delegate immediate NPC removal through PlayfieldRuntimeSystems.");
+                playfieldText.Contains("this.runtimeSystems.DespawnNpcImmediately("),
+                "Playfield must delegate immediate NPC despawn through PlayfieldRuntimeSystems.");
+            Assert.IsFalse(
+                runtimeSystemsText.Contains("RemoveNpcImmediately")
+                || npcRuntimeText.Contains("RemoveNpcImmediately")
+                || playfieldText.Contains("this.runtimeSystems.RemoveNpcImmediately("),
+                "Immediate NPC despawn APIs must use despawn naming instead of generic removal naming.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.ProcessDueNpcCorpseDespawns(DateTime.UtcNow, this.DespawnCorpse);")
                 && playfieldText.Contains("this.runtimeSystems.ProcessPendingCorpseSpawns(")
@@ -1469,7 +1475,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && projectText.Contains(@"Core\Playfields\PlayfieldRewardRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldRuntimeSystems, NPCRuntimeService, object lifecycle, and reward runtime services.");
 
-            string immediateRemove = ExtractMethodBlock(npcRuntimeText, "internal void RemoveNpcImmediately");
+            string immediateRemove = ExtractMethodBlock(npcRuntimeText, "internal void DespawnNpcImmediately");
             Assert.IsTrue(
                 immediateRemove.Contains("target == null || target.Identity.Type != IdentityType.CanbeAffected"),
                 "NPCRuntimeService must preserve the immediate NPC removal guard.");

@@ -86,7 +86,7 @@ namespace AORebirth.Core.Playfields
             this.npcHomeStates.Remove(identity.Instance);
         }
 
-        internal void RemoveNpcImmediately(
+        internal void DespawnNpcImmediately(
             ICharacter target,
             Action<Identity> stopFightingDeadTarget,
             Action<Identity> cancelPendingCorpseSpawn)
@@ -116,17 +116,12 @@ namespace AORebirth.Core.Playfields
             this.corpseDespawnTicks[corpseIdentity.Instance] = expiresAtUtc;
         }
 
-        internal int[] DueNpcCorpseDespawns(DateTime utcNow)
-        {
-            return this.corpseDespawnTicks
-                .Where(x => x.Value <= utcNow)
-                .Select(x => x.Key)
-                .ToArray();
-        }
-
         internal void ProcessDueNpcCorpseDespawns(DateTime utcNow, Action<int> despawnCorpse)
         {
-            foreach (int corpseInstance in this.DueNpcCorpseDespawns(utcNow))
+            foreach (int corpseInstance in this.corpseDespawnTicks
+                .Where(x => x.Value <= utcNow)
+                .Select(x => x.Key)
+                .ToArray())
             {
                 despawnCorpse(corpseInstance);
             }
