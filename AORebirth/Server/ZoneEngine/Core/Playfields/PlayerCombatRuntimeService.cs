@@ -36,10 +36,35 @@ namespace ZoneEngine.Core.Playfields
             resetCombatTick(attacker);
         }
 
-        internal void ProcessCombatTick(ICharacter attacker, Action<ICharacter> processCombatTick)
+        internal void ProcessCombatTick(
+            ICharacter attacker,
+            Action<Identity> clearCombatTracking,
+            Func<Identity, ICharacter> findTarget,
+            Func<ICharacter, bool> isValidTarget,
+            Action<ICharacter, ICharacter> logInvalidTarget,
+            Action<ICharacter, ICharacter> processValidatedCombatTick)
         {
-            Require(processCombatTick, "processCombatTick");
-            processCombatTick(attacker);
+            Require(clearCombatTracking, "clearCombatTracking");
+            Require(findTarget, "findTarget");
+            Require(isValidTarget, "isValidTarget");
+            Require(logInvalidTarget, "logInvalidTarget");
+            Require(processValidatedCombatTick, "processValidatedCombatTick");
+
+            if (attacker.FightingTarget.Instance == 0)
+            {
+                clearCombatTracking(attacker.Identity);
+                return;
+            }
+
+            ICharacter target = findTarget(attacker.FightingTarget);
+            if (!isValidTarget(target))
+            {
+                logInvalidTarget(attacker, target);
+                this.ClearFightingTarget(attacker, clearCombatTracking);
+                return;
+            }
+
+            processValidatedCombatTick(attacker, target);
         }
 
         internal void ClearFightingTarget(ICharacter character, Action<Identity> clearCombatTracking)

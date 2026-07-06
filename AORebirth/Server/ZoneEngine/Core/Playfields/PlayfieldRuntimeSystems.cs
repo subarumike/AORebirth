@@ -299,9 +299,21 @@ namespace ZoneEngine.Core.Playfields
             this.playerCombat.ResetCombatTick(attacker, resetCombatTick);
         }
 
-        internal void ProcessPlayerCombatTick(ICharacter attacker, Action<ICharacter> processCombatTick)
+        internal void ProcessPlayerCombatTick(
+            ICharacter attacker,
+            Action<Identity> clearCombatTracking,
+            Func<Identity, ICharacter> findTarget,
+            Func<ICharacter, bool> isValidTarget,
+            Action<ICharacter, ICharacter> logInvalidTarget,
+            Action<ICharacter, ICharacter> processValidatedCombatTick)
         {
-            this.playerCombat.ProcessCombatTick(attacker, processCombatTick);
+            this.playerCombat.ProcessCombatTick(
+                attacker,
+                clearCombatTracking,
+                findTarget,
+                isValidTarget,
+                logInvalidTarget,
+                processValidatedCombatTick);
         }
 
         internal void ClearPlayerFightingTarget(ICharacter character, Action<Identity> clearCombatTracking)
