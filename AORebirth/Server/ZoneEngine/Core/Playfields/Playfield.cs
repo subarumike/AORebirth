@@ -774,6 +774,11 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.SendPrivateCityPreFullCharacterReadyBlock(client, character);
         }
 
+        public bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
+        {
+            return this.runtimeSystems.TryHandleGenericCmdUse(client, message, target);
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="obj">
