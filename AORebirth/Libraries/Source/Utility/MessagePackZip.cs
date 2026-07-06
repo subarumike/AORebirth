@@ -397,8 +397,280 @@ namespace Utility
             {
                 zs.CopyTo(ms);
                 ms.Position = 0;
-                this.DataSlice = messagePackSerializer.Unpack(ms);
+                byte[] normalizedData = NormalizeNegativeFixIntEncoding(ms.ToArray());
+                using (MemoryStream normalizedStream = new MemoryStream(normalizedData))
+                {
+                    this.DataSlice = messagePackSerializer.Unpack(normalizedStream);
+                }
             }
+        }
+
+        private static byte[] NormalizeNegativeFixIntEncoding(byte[] data)
+        {
+            using (MemoryStream input = new MemoryStream(data))
+            using (MemoryStream output = new MemoryStream(data.Length))
+            {
+                NormalizeMessagePackObject(input, output);
+                if (input.Position != input.Length)
+                {
+                    throw new InvalidDataException(
+                        string.Format(
+                            "Unexpected trailing MessagePack data after normalization: trailing={0}.",
+                            input.Length - input.Position));
+                }
+
+                return output.ToArray();
+            }
+        }
+
+        private static void NormalizeMessagePackObject(Stream input, Stream output)
+        {
+            int header = ReadRequiredByte(input);
+
+            if (header <= 0x7f)
+            {
+                output.WriteByte((byte)header);
+                return;
+            }
+
+            if (header >= 0xe0)
+            {
+                output.WriteByte(0xd0);
+                output.WriteByte((byte)header);
+                return;
+            }
+
+            if (header >= 0xa0 && header <= 0xbf)
+            {
+                output.WriteByte((byte)header);
+                CopyExact(input, output, header & 0x1f);
+                return;
+            }
+
+            if (header >= 0x90 && header <= 0x9f)
+            {
+                output.WriteByte((byte)header);
+                NormalizeMessagePackArray(input, output, header & 0x0f);
+                return;
+            }
+
+            if (header >= 0x80 && header <= 0x8f)
+            {
+                output.WriteByte((byte)header);
+                NormalizeMessagePackMap(input, output, header & 0x0f);
+                return;
+            }
+
+            switch (header)
+            {
+                case 0xc0:
+                case 0xc2:
+                case 0xc3:
+                    output.WriteByte((byte)header);
+                    return;
+
+                case 0xcc:
+                case 0xd0:
+                    CopyHeaderAndExact(input, output, header, 1);
+                    return;
+
+                case 0xcd:
+                case 0xd1:
+                    CopyHeaderAndExact(input, output, header, 2);
+                    return;
+
+                case 0xce:
+                case 0xd2:
+                case 0xca:
+                    CopyHeaderAndExact(input, output, header, 4);
+                    return;
+
+                case 0xcf:
+                case 0xd3:
+                case 0xcb:
+                    CopyHeaderAndExact(input, output, header, 8);
+                    return;
+
+                case 0xc4:
+                case 0xd9:
+                    CopyVariableLengthRaw(input, output, header, 1);
+                    return;
+
+                case 0xc5:
+                case 0xda:
+                    CopyVariableLengthRaw(input, output, header, 2);
+                    return;
+
+                case 0xc6:
+                case 0xdb:
+                    CopyVariableLengthRaw(input, output, header, 4);
+                    return;
+
+                case 0xdc:
+                    output.WriteByte((byte)header);
+                    NormalizeMessagePackArray(input, output, ReadAndCopyUInt16(input, output));
+                    return;
+
+                case 0xdd:
+                    output.WriteByte((byte)header);
+                    NormalizeMessagePackArray(input, output, ReadAndCopyUInt32(input, output));
+                    return;
+
+                case 0xde:
+                    output.WriteByte((byte)header);
+                    NormalizeMessagePackMap(input, output, ReadAndCopyUInt16(input, output));
+                    return;
+
+                case 0xdf:
+                    output.WriteByte((byte)header);
+                    NormalizeMessagePackMap(input, output, ReadAndCopyUInt32(input, output));
+                    return;
+
+                case 0xd4:
+                    CopyHeaderAndExact(input, output, header, 2);
+                    return;
+
+                case 0xd5:
+                    CopyHeaderAndExact(input, output, header, 3);
+                    return;
+
+                case 0xd6:
+                    CopyHeaderAndExact(input, output, header, 5);
+                    return;
+
+                case 0xd7:
+                    CopyHeaderAndExact(input, output, header, 9);
+                    return;
+
+                case 0xd8:
+                    CopyHeaderAndExact(input, output, header, 17);
+                    return;
+
+                case 0xc7:
+                    CopyVariableLengthExt(input, output, header, 1);
+                    return;
+
+                case 0xc8:
+                    CopyVariableLengthExt(input, output, header, 2);
+                    return;
+
+                case 0xc9:
+                    CopyVariableLengthExt(input, output, header, 4);
+                    return;
+
+                default:
+                    throw new InvalidDataException(
+                        string.Format("Unsupported MessagePack header 0x{0:X2} during normalization.", header));
+            }
+        }
+
+        private static void NormalizeMessagePackArray(Stream input, Stream output, long count)
+        {
+            for (long index = 0; index < count; index++)
+            {
+                NormalizeMessagePackObject(input, output);
+            }
+        }
+
+        private static void NormalizeMessagePackMap(Stream input, Stream output, long count)
+        {
+            for (long index = 0; index < count; index++)
+            {
+                NormalizeMessagePackObject(input, output);
+                NormalizeMessagePackObject(input, output);
+            }
+        }
+
+        private static void CopyHeaderAndExact(Stream input, Stream output, int header, int count)
+        {
+            output.WriteByte((byte)header);
+            CopyExact(input, output, count);
+        }
+
+        private static void CopyVariableLengthRaw(Stream input, Stream output, int header, int lengthBytes)
+        {
+            output.WriteByte((byte)header);
+            long length = ReadAndCopyLength(input, output, lengthBytes);
+            CopyExact(input, output, length);
+        }
+
+        private static void CopyVariableLengthExt(Stream input, Stream output, int header, int lengthBytes)
+        {
+            output.WriteByte((byte)header);
+            long length = ReadAndCopyLength(input, output, lengthBytes);
+            CopyExact(input, output, length + 1);
+        }
+
+        private static long ReadAndCopyLength(Stream input, Stream output, int lengthBytes)
+        {
+            if (lengthBytes == 1)
+            {
+                int value = ReadRequiredByte(input);
+                output.WriteByte((byte)value);
+                return value;
+            }
+
+            if (lengthBytes == 2)
+            {
+                return ReadAndCopyUInt16(input, output);
+            }
+
+            return ReadAndCopyUInt32(input, output);
+        }
+
+        private static int ReadAndCopyUInt16(Stream input, Stream output)
+        {
+            byte[] buffer = ReadExact(input, 2);
+            output.Write(buffer, 0, buffer.Length);
+            return (buffer[0] << 8) | buffer[1];
+        }
+
+        private static long ReadAndCopyUInt32(Stream input, Stream output)
+        {
+            byte[] buffer = ReadExact(input, 4);
+            output.Write(buffer, 0, buffer.Length);
+            return ((long)buffer[0] << 24) | ((long)buffer[1] << 16) | ((long)buffer[2] << 8) | buffer[3];
+        }
+
+        private static int ReadRequiredByte(Stream input)
+        {
+            int value = input.ReadByte();
+            if (value < 0)
+            {
+                throw new EndOfStreamException("Unexpected end of MessagePack data during normalization.");
+            }
+
+            return value;
+        }
+
+        private static byte[] ReadExact(Stream input, int count)
+        {
+            byte[] buffer = new byte[count];
+            int offset = 0;
+            while (offset < count)
+            {
+                int read = input.Read(buffer, offset, count - offset);
+                if (read <= 0)
+                {
+                    throw new EndOfStreamException("Unexpected end of MessagePack data during normalization.");
+                }
+
+                offset += read;
+            }
+
+            return buffer;
+        }
+
+        private static void CopyExact(Stream input, Stream output, long count)
+        {
+            if (count < 0 || count > int.MaxValue)
+            {
+                throw new InvalidDataException(
+                    string.Format("Unsupported MessagePack payload length during normalization: {0}.", count));
+            }
+
+            byte[] buffer = ReadExact(input, (int)count);
+            output.Write(buffer, 0, buffer.Length);
         }
 
         public virtual void Dispose(bool disposing)

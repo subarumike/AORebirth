@@ -103,11 +103,23 @@ namespace MsgPack
 		{
 			if ( disposing )
 			{
-				// Drain...
-				while ( this.ReadCore() )
+				try
 				{
-					// nop
+					// Drain...
+					while ( this.ReadCore() )
+					{
+						// nop
+					}
 				}
+				catch ( NullReferenceException )
+				{
+					// Generated serializers can consume the subtree before Dispose drains it.
+					// The old stack bookkeeping may then fault while draining an already-finished subtree.
+					this._itemsCount.Clear();
+					this._unpacked.Clear();
+					this._isMap.Clear();
+				}
+
 				if ( this._parent != null )
 				{
 					this._parent.EndReadSubtree();
@@ -229,6 +241,13 @@ namespace MsgPack
 #if DEBUG
 					Contract.Assert( this._unpacked.Count == 0 );
 #endif
+					break;
+				}
+
+				if ( this._unpacked.Count == 0 )
+				{
+					this._itemsCount.Clear();
+					this._isMap.Clear();
 					break;
 				}
 
