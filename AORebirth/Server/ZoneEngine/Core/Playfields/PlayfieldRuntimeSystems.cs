@@ -9,6 +9,7 @@ namespace ZoneEngine.Core.Playfields
     using AORebirth.Core.Entities;
     using AORebirth.Core.Playfields;
     using AORebirth.Core.Statels;
+    using AORebirth.Core.Vector;
     using AORebirth.Database.Entities;
     using AORebirth.Enums;
     using AORebirth.Interfaces;
@@ -31,6 +32,8 @@ namespace ZoneEngine.Core.Playfields
         private readonly PlayfieldDynelRegistry dynelRegistry;
 
         private readonly NPCRuntimeService npcRuntime;
+
+        private readonly PlayfieldLifecycleRuntimeService lifecycle;
 
         private readonly PlayerCombatRuntimeService playerCombat;
 
@@ -62,6 +65,7 @@ namespace ZoneEngine.Core.Playfields
             this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry);
+            this.lifecycle = new PlayfieldLifecycleRuntimeService();
             this.playerCombat = new PlayerCombatRuntimeService();
             this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
@@ -209,7 +213,7 @@ namespace ZoneEngine.Core.Playfields
             this.privateCityReadyInit.SendPreFullCharacterReadyBlock(client, character);
         }
 
-        internal void ProcessTimedLifecycle(
+        internal void ProcessHeartbeatTimedLifecycle(
             Identity playfieldIdentity,
             Action processPendingCorpseSpawns,
             Action processCorpseDespawns,
@@ -232,6 +236,53 @@ namespace ZoneEngine.Core.Playfields
                 this.ProcessNpcPatrolTick,
                 processFollow,
                 processPlayerCollision);
+        }
+
+        internal void ProcessPlayerRespawn(
+            ICharacter character,
+            Dynel dynel,
+            Identity corpseIdentity,
+            Coordinate destination,
+            Identity destinationPlayfield,
+            Action<ICharacter, Identity> logCorpseVisualSkipped,
+            Action<ICharacter> sendDeathSocialStatus,
+            Action<ICharacter> markPlayerRespawned,
+            Action<ICharacter> sendDeathRespawnStateStats,
+            Action<ICharacter> stopMovement,
+            Action<ICharacter> sendChangedStats,
+            Action<ICharacter, Identity, Identity, Coordinate> logRespawnRequested,
+            Action<ICharacter> enableTimers,
+            Func<Dynel, Coordinate, IQuaternion, Identity, bool> tryCompleteCurrentPlayfieldRespawn,
+            Action<Dynel, Coordinate, IQuaternion, Identity> transferToRespawnPlayfield,
+            Action<Identity> clearCombatTracking,
+            Action<Identity> stopFightingDeadTarget,
+            Action<ICharacter> sendCombatStop)
+        {
+            this.lifecycle.ProcessPlayerRespawn(
+                character,
+                dynel,
+                corpseIdentity,
+                destination,
+                destinationPlayfield,
+                logCorpseVisualSkipped,
+                sendDeathSocialStatus,
+                markPlayerRespawned,
+                sendDeathRespawnStateStats,
+                stopMovement,
+                x => this.CleanupPlayerDeathCombat(x, clearCombatTracking, stopFightingDeadTarget, sendCombatStop),
+                sendChangedStats,
+                logRespawnRequested,
+                enableTimers,
+                tryCompleteCurrentPlayfieldRespawn,
+                transferToRespawnPlayfield);
+        }
+
+        internal void PreparePlayfieldTransfer(
+            Dynel dynel,
+            Action<int> clearTransferContactState,
+            Action<Dynel> disableTimers)
+        {
+            this.lifecycle.PreparePlayfieldTransfer(dynel, clearTransferContactState, disableTimers);
         }
 
         internal bool HasPendingDeadNpcDespawn(Identity identity)
