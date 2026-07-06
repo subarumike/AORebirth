@@ -20,10 +20,13 @@ The service delegates each seam back to existing Playfield or handler callbacks.
 Attack start now owns the existing player target/fighting-target mutation and
 delegates tick reset back to Playfield. Attack cancellation and player
 fighting-target stop/clear now own the existing fighting-target clear and
-delegate tick/tracking cleanup back to Playfield. Other seams remain callback
-pass-throughs. The service does not own algorithms, packet construction, packet
-emission, damage rules, NPC runtime behavior, inventory, loot, credits, corpses,
-movement, or database loading.
+delegate tick/tracking cleanup back to Playfield. Player combat tick now owns
+the no-target, target lookup, target validation, invalid-target clear, and
+validated-tick dispatch orchestration while delegating lookup, logging,
+tracking cleanup, timing, damage, packet emission, and world mutation back to
+Playfield. Other seams remain callback pass-throughs. The service does not own
+algorithms, packet construction, packet emission, damage rules, NPC runtime
+behavior, inventory, loot, credits, corpses, movement, or database loading.
 
 ## Current ownership seams
 
@@ -38,9 +41,11 @@ movement, or database loading.
 
 - Keeps player combat tick reset/tracking storage behind PlayerCombatRuntimeService
   callbacks.
-- Owns player combat ticking inside the non-NPC branch of DoCombatTick.
-- Owns player fighting-target validation while PlayerCombatRuntimeService owns
-  player fighting-target clear orchestration.
+- Keeps target lookup, invalid-target logging, attack timing, damage application,
+  AttackInfo emission, and world mutation behind PlayerCombatRuntimeService
+  callbacks.
+- Routes player combat ticking through PlayfieldRuntimeSystems while
+  PlayerCombatRuntimeService owns the tick orchestration decision flow.
 - Owns damage application, AttackInfo emission, and killing-hit routing.
 - Owns player death-side combat stop sequencing.
 - Owns StopFight packet emission for player and mixed player/NPC target clear.

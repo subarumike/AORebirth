@@ -2069,33 +2069,40 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            this.runtimeSystems.ProcessPlayerCombatTick(attacker, this.ProcessPlayerCombatTick);
+            this.runtimeSystems.ProcessPlayerCombatTick(
+                attacker,
+                this.ClearCombatTracking,
+                this.FindPlayerCombatTarget,
+                this.IsValidPlayerCombatTarget,
+                this.LogInvalidPlayerCombatTickTarget,
+                this.ProcessValidatedPlayerCombatTick);
         }
 
-        private void ProcessPlayerCombatTick(ICharacter attacker)
+        private ICharacter FindPlayerCombatTarget(Identity target)
         {
-            if (attacker.FightingTarget.Instance == 0)
-            {
-                this.ClearCombatTracking(attacker.Identity);
-                return;
-            }
+            return this.FindByIdentity<ICharacter>(target);
+        }
 
-            ICharacter target = this.FindByIdentity<ICharacter>(attacker.FightingTarget);
-            if (target == null || !target.InPlayfield(this.Identity) || target.Stats[StatIds.health].Value <= 0)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    string.Format(
-                        "CombatTickTargetInvalid attacker={0} target={1} found={2} inPlayfield={3} health={4}",
-                        attacker.Identity,
-                        attacker.FightingTarget,
-                        target != null,
-                        target != null && target.InPlayfield(this.Identity),
-                        target == null ? 0 : target.Stats[StatIds.health].Value));
-                this.runtimeSystems.ClearPlayerFightingTarget(attacker, this.ClearCombatTracking);
-                return;
-            }
+        private bool IsValidPlayerCombatTarget(ICharacter target)
+        {
+            return target != null && target.InPlayfield(this.Identity) && target.Stats[StatIds.health].Value > 0;
+        }
 
+        private void LogInvalidPlayerCombatTickTarget(ICharacter attacker, ICharacter target)
+        {
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "CombatTickTargetInvalid attacker={0} target={1} found={2} inPlayfield={3} health={4}",
+                    attacker.Identity,
+                    attacker.FightingTarget,
+                    target != null,
+                    target != null && target.InPlayfield(this.Identity),
+                    target == null ? 0 : target.Stats[StatIds.health].Value));
+        }
+
+        private void ProcessValidatedPlayerCombatTick(ICharacter attacker, ICharacter target)
+        {
             CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
             DateTime nextTick;
             DateTime now = DateTime.UtcNow;
