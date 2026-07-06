@@ -904,14 +904,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldText.Contains("private readonly PlayfieldRuntimeSystems runtimeSystems"),
                 "Playfield must own runtime systems through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.RegisterContent(playfieldIdentity);"),
-                "Playfield must enter content registration through PlayfieldRuntimeSystems.");
+                playfieldText.Contains("this.runtimeSystems.MaterializeStartupObjects("),
+                "Playfield must enter startup content materialization through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 runtimeSystemsText.Contains("private readonly PlayfieldContentCoordinator content"),
                 "PlayfieldRuntimeSystems must own PlayfieldContentCoordinator.");
             Assert.IsTrue(
                 runtimeSystemsText.Contains("this.content.RegisterContent(this.playfield, playfieldIdentity);"),
                 "PlayfieldRuntimeSystems must delegate content registration through PlayfieldContentCoordinator.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("this.RegisterContent,"),
+                "PlayfieldRuntimeSystems must pass content registration into startup materialization.");
 
             int coordinatorIndex = runtimeSystemsText.IndexOf("new PlayfieldContentCoordinator(", StringComparison.Ordinal);
             Assert.IsTrue(coordinatorIndex >= 0, "Missing PlayfieldContentCoordinator construction.");
@@ -961,6 +964,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs"));
+            string objectMaterializationText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
             string corpseAccessText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -979,6 +986,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
+            string materializationText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
             string timedLifecycleText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -995,6 +1006,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string[] runtimeCoordinatorConstructors =
                 {
                     "new PlayfieldObjectLifecycleRuntimeService()",
+                    "new PlayfieldObjectMaterializationRuntimeService()",
                     "new PlayfieldCorpseAccessRuntimeService()",
                     "new PlayfieldRewardRuntimeService()",
                     "new NPCRuntimeService(playfield, this.dynelRegistry, this.rewards)",
@@ -1055,6 +1067,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(
                 playfieldText.Contains("Pool.Instance.RemoveObject(entity);"),
                 "Playfield must not directly remove instanced entities from Pool.");
+            Assert.IsTrue(
+                objectMaterializationText.Contains("internal sealed class PlayfieldObjectMaterializationRuntimeService")
+                && objectMaterializationText.Contains("internal void MaterializeStartupObjects(")
+                && objectMaterializationText.Contains("this.MaterializeDbMobSpawns(")
+                && objectMaterializationText.Contains("registerContent(playfieldIdentity);")
+                && objectMaterializationText.Contains("this.MaterializeVendors(")
+                && objectMaterializationText.Contains("this.MaterializeStaticDynels(")
+                && objectMaterializationText.Contains("refreshDynelRegistry();"),
+                "PlayfieldObjectMaterializationRuntimeService must own startup object materialization sequencing.");
+            Assert.IsFalse(
+                objectMaterializationText.Contains("MobSpawnDao")
+                || objectMaterializationText.Contains("MobSpawnStatDao")
+                || objectMaterializationText.Contains("NonPlayerCharacterHandler")
+                || objectMaterializationText.Contains("new NPCController")
+                || objectMaterializationText.Contains("ScriptCompiler")
+                || objectMaterializationText.Contains("VendorHandler")
+                || objectMaterializationText.Contains("new StaticDynel")
+                || objectMaterializationText.Contains("SendCompressed")
+                || objectMaterializationText.Contains("Announce(")
+                || objectMaterializationText.Contains("Stats["),
+                "PlayfieldObjectMaterializationRuntimeService must not own DB loading, object construction, script creation, vendor spawning, packets, or stat algorithms.");
             Assert.AreEqual(
                 1,
                 CountOccurrences(npcRuntimeText, "new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
@@ -1090,6 +1123,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 runtimeSystemsText.Contains("private readonly NPCRuntimeService npcRuntime")
                 && runtimeSystemsText.Contains("private readonly PlayfieldCorpseAccessRuntimeService corpseAccess")
                 && runtimeSystemsText.Contains("private readonly PlayfieldLifecycleRuntimeService lifecycle")
+                && runtimeSystemsText.Contains("private readonly PlayfieldObjectMaterializationRuntimeService objectMaterialization")
                 && runtimeSystemsText.Contains("private readonly PlayfieldPlayerDeathRespawnRuntimeService playerDeathRespawn")
                 && runtimeSystemsText.Contains("private readonly PlayfieldStatelTransitionRuntimeService statelTransitions")
                 && runtimeSystemsText.Contains("private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle")
@@ -1105,6 +1139,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("internal void PreparePlayfieldTransfer(")
                 && runtimeSystemsText.Contains("this.lifecycle.PreparePlayfieldTransfer(")
                 && runtimeSystemsText.Contains("this.npcRuntime.ActivateNpc(character);")
+                && runtimeSystemsText.Contains("internal void MaterializeStartupObjects(")
+                && runtimeSystemsText.Contains("this.objectMaterialization.MaterializeStartupObjects(")
+                && runtimeSystemsText.Contains("this.RegisterContent,")
+                && runtimeSystemsText.Contains("this.TryResolveVendorStatels,")
+                && runtimeSystemsText.Contains("this.ResolveStaticDynels,")
+                && runtimeSystemsText.Contains("this.RefreshDynelRegistry);")
                 && runtimeSystemsText.Contains("this.npcRuntime.RegisterNpcHome(character);")
                 && runtimeSystemsText.Contains("internal void DespawnNpcImmediately(")
                 && runtimeSystemsText.Contains(
@@ -1454,8 +1494,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldText.Contains("this.runtimeSystems.SpawnCapturedNpcContent(playfieldIdentity);"),
                 "Playfield must delegate captured NPC spawn orchestration through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.ActivateNpc(cmob);"),
-                "Playfield must delegate DB-spawned NPC activation through PlayfieldRuntimeSystems.");
+                playfieldText.Contains("this.runtimeSystems.MaterializeStartupObjects(")
+                && runtimeSystemsText.Contains("this.ActivateNpc,")
+                && runtimeSystemsText.Contains("this.objectMaterialization.MaterializeStartupObjects("),
+                "Playfield must delegate DB-spawned NPC activation through PlayfieldRuntimeSystems materialization callbacks.");
             Assert.IsFalse(
                 playfieldText.Contains("this.runtimeSystems.RegisterDynel(cmob);"),
                 "Playfield must not route DB-spawned NPC activation through the generic dynel registration path.");
@@ -1618,6 +1660,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 projectText.Contains(@"Core\Playfields\PlayfieldRuntimeSystems.cs")
                 && projectText.Contains(@"Core\Playfields\NPCRuntimeService.cs")
                 && projectText.Contains(@"Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs")
+                && projectText.Contains(@"Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs")
                 && projectText.Contains(@"Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs")
                 && projectText.Contains(@"Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs")
                 && projectText.Contains(@"Core\Playfields\PlayfieldRewardRuntimeService.cs"),
@@ -1662,6 +1705,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
             string providerText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldContentDataProvider.cs"));
+            string materializationText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
             string projectText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
@@ -1723,6 +1770,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 runtimeSystemsText.Contains("return this.contentData.ResolveStaticDynels(playfieldIdentity);"),
                 "Runtime systems must delegate static dynel data resolution to the provider.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("private readonly PlayfieldObjectMaterializationRuntimeService objectMaterialization")
+                && runtimeSystemsText.Contains("this.objectMaterialization.MaterializeStartupObjects("),
+                "Runtime systems must own startup object materialization through the materialization service.");
 
             string constructor = ExtractMethodBlock(playfieldText, "public Playfield(ZoneServer zoneServer, Identity playfieldIdentity)");
             AssertTextBefore(
@@ -1736,34 +1787,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(
                 constructor,
                 "this.collisionStatels = this.runtimeSystems.ResolveCollisionStatels(this.statels);",
-                "this.LoadMobSpawns(playfieldIdentity);");
-            AssertTextBefore(
-                constructor,
-                "this.LoadMobSpawns(playfieldIdentity);",
-                "this.runtimeSystems.RegisterContent(playfieldIdentity);");
-            AssertTextBefore(
-                constructor,
-                "this.runtimeSystems.RegisterContent(playfieldIdentity);",
-                "this.LoadVendors(playfieldIdentity);");
-            AssertTextBefore(
-                constructor,
-                "this.LoadVendors(playfieldIdentity);",
-                "this.LoadStaticDynels(playfieldIdentity);");
-            AssertTextBefore(
-                constructor,
-                "this.LoadStaticDynels(playfieldIdentity);",
-                "this.runtimeSystems.RefreshDynelRegistry();");
+                "this.runtimeSystems.MaterializeStartupObjects(");
+            Assert.IsFalse(
+                constructor.Contains("this.LoadMobSpawns(playfieldIdentity);")
+                || constructor.Contains("this.runtimeSystems.RegisterContent(playfieldIdentity);")
+                || constructor.Contains("this.LoadVendors(playfieldIdentity);")
+                || constructor.Contains("this.LoadStaticDynels(playfieldIdentity);")
+                || constructor.Contains("this.runtimeSystems.RefreshDynelRegistry();"),
+                "Playfield constructor must not directly own startup object materialization sequence.");
 
-            string loadVendors = ExtractMethodBlock(playfieldText, "private void LoadVendors(Identity playfieldIdentity)");
-            Assert.IsTrue(
-                loadVendors.Contains("this.runtimeSystems.TryResolveVendorStatels(playfieldIdentity, this.statels, out vendorStatels)"),
-                "Playfield vendor loading must ask runtime systems for vendor statels.");
-            Assert.IsFalse(
-                loadVendors.Contains("PlayfieldLoader.PFData"),
-                "Playfield vendor loading must not own PlayfieldLoader access.");
-            Assert.IsFalse(
-                loadVendors.Contains("IdentityType.VendingMachine"),
-                "Playfield vendor loading must not own vendor statel filtering.");
+            AssertTextBefore(
+                materializationText,
+                "this.MaterializeDbMobSpawns(",
+                "registerContent(playfieldIdentity);");
+            AssertTextBefore(
+                materializationText,
+                "registerContent(playfieldIdentity);",
+                "this.MaterializeVendors(");
+            AssertTextBefore(
+                materializationText,
+                "this.MaterializeVendors(",
+                "this.MaterializeStaticDynels(");
+            AssertTextBefore(
+                materializationText,
+                "this.MaterializeStaticDynels(",
+                "refreshDynelRegistry();");
 
             string checkStatelCollision = ExtractMethodBlock(playfieldText, "private void CheckStatelCollision(ICharacter dynel)");
             string primeStatelCollisionContacts =
@@ -1786,24 +1834,45 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && statelTransitionText.Contains("ev.Perform(dynel, sd);"),
                 "PlayfieldStatelTransitionRuntimeService must own collision statel iteration and event firing.");
 
-            string loadStaticDynels =
-                ExtractMethodBlock(playfieldText, "private void LoadStaticDynels(Identity playfieldIdentity)");
+            string createStaticDynel =
+                ExtractMethodBlock(playfieldText, "private IEntity CreateStaticDynel(PlayfieldStaticDynelDefinition staticDynel)");
             Assert.IsTrue(
-                loadStaticDynels.Contains("this.runtimeSystems.ResolveStaticDynels(playfieldIdentity)"),
-                "Playfield static dynel loading must ask runtime systems for static dynel definitions.");
-            Assert.IsTrue(
-                loadStaticDynels.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
+                createStaticDynel.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
                 "Playfield must remain the runtime static dynel construction owner in this slice.");
             Assert.IsFalse(
-                loadStaticDynels.Contains("StaticDynelDao.Instance.GetWhere"),
+                createStaticDynel.Contains("StaticDynelDao.Instance.GetWhere"),
                 "Playfield static dynel loading must not own DB row access.");
             Assert.IsFalse(
-                loadStaticDynels.Contains("MessagePackZip.DeserializeData"),
+                createStaticDynel.Contains("MessagePackZip.DeserializeData"),
                 "Playfield static dynel loading must not own static dynel stat deserialization.");
+            Assert.IsTrue(
+                playfieldText.Contains("private IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions(Identity playfieldIdentity)")
+                && playfieldText.Contains("MobSpawnDao.Instance.GetWhere")
+                && playfieldText.Contains("private IEnumerable<DBMobSpawnStat> LoadMobSpawnStats(DBMobSpawn mob)")
+                && playfieldText.Contains("MobSpawnStatDao.Instance.GetWhere")
+                && playfieldText.Contains("private ICharacter InstantiateDbMobSpawn(DBMobSpawn mob, DBMobSpawnStat[] stats)")
+                && playfieldText.Contains("NonPlayerCharacterHandler.InstantiateMobSpawn")
+                && playfieldText.Contains("new NPCController()")
+                && playfieldText.Contains("private void AttachMobSpawnKnuBot(DBMobSpawn mob, ICharacter cmob)")
+                && playfieldText.Contains("ScriptCompiler.Instance.CreateKnuBot")
+                && playfieldText.Contains("private void SpawnVendors(StatelData[] vendorStatels)")
+                && playfieldText.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels)"),
+                "Playfield must keep DB loading, object construction, script creation, and vendor spawning callbacks.");
+            Assert.IsFalse(
+                materializationText.Contains("MobSpawnDao")
+                || materializationText.Contains("MobSpawnStatDao")
+                || materializationText.Contains("NonPlayerCharacterHandler")
+                || materializationText.Contains("new NPCController")
+                || materializationText.Contains("ScriptCompiler")
+                || materializationText.Contains("VendorHandler")
+                || materializationText.Contains("new StaticDynel")
+                || materializationText.Contains("StaticDynelDao"),
+                "Materialization service must not own DB loading or object construction.");
 
             Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldContentDataProvider.cs"),
-                "ZoneEngine project must compile PlayfieldContentDataProvider.");
+                projectText.Contains(@"Core\Playfields\PlayfieldContentDataProvider.cs")
+                && projectText.Contains(@"Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldContentDataProvider and PlayfieldObjectMaterializationRuntimeService.");
         }
 
         [TestMethod]
@@ -1818,6 +1887,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
+            string materializationText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
 
             Assert.IsTrue(
                 providerText.Contains("StaticDynelDao.Instance.GetWhere"),
@@ -1858,17 +1931,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     + forbiddenRuntimeOwnershipPatterns[i]);
             }
 
-            string loadVendors = ExtractMethodBlock(playfieldText, "private void LoadVendors(Identity playfieldIdentity)");
-            string loadStaticDynels =
-                ExtractMethodBlock(playfieldText, "private void LoadStaticDynels(Identity playfieldIdentity)");
+            string spawnVendors = ExtractMethodBlock(playfieldText, "private void SpawnVendors(StatelData[] vendorStatels)");
+            string createStaticDynel =
+                ExtractMethodBlock(playfieldText, "private IEntity CreateStaticDynel(PlayfieldStaticDynelDefinition staticDynel)");
             string checkStatelCollision = ExtractMethodBlock(playfieldText, "private void CheckStatelCollision(ICharacter dynel)");
 
             Assert.IsTrue(
-                loadVendors.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels);"),
+                spawnVendors.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels);"),
                 "Playfield must remain the vendor runtime spawning owner.");
             Assert.IsTrue(
-                loadStaticDynels.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
+                createStaticDynel.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
                 "Playfield must remain the StaticDynel runtime construction owner.");
+            Assert.IsTrue(
+                materializationText.Contains("tryResolveVendorStatels(playfieldIdentity, statels, out vendorStatels)")
+                && materializationText.Contains("spawnVendors(vendorStatels);")
+                && materializationText.Contains("registerDynel(instantiateStaticDynel(staticDynel));"),
+                "PlayfieldObjectMaterializationRuntimeService must own vendor and static dynel materialization loops.");
             Assert.IsTrue(
                 checkStatelCollision.Contains("this.runtimeSystems.CheckStatelCollision(")
                 && checkStatelCollision.Contains("this.TeleportToPlayfield"),
@@ -1882,6 +1960,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || statelTransitionText.Contains("new StaticDynel")
                 || statelTransitionText.Contains("StaticDynelDao.Instance.GetWhere"),
                 "PlayfieldStatelTransitionRuntimeService must not own content data, static dynel construction, or vendor spawning.");
+            Assert.IsFalse(
+                materializationText.Contains("VendorHandler.SpawnVendorsForPlayfield")
+                || materializationText.Contains("new StaticDynel")
+                || materializationText.Contains("StaticDynelDao.Instance.GetWhere"),
+                "PlayfieldObjectMaterializationRuntimeService must not own vendor implementation, static dynel construction, or content DB selection.");
         }
 
         [TestMethod]
@@ -2733,9 +2816,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string[] playfieldDelegations =
                 {
                     "this.runtimeSystems.RegisterStatels(this.statels);",
-                    "this.runtimeSystems.ActivateNpc(cmob);",
-                    "this.runtimeSystems.RegisterDynel(sdy);",
-                    "this.runtimeSystems.RefreshDynelRegistry();",
+                    "this.runtimeSystems.MaterializeStartupObjects(",
                     "return this.runtimeSystems.FindByIdentity(identity);",
                     "return this.runtimeSystems.FindByIdentity<T>(identity);",
                     "return this.runtimeSystems.FindDynelsInRange(dynel, range).ToList();",
@@ -2751,6 +2832,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Playfield must route the first safe dynel lookup slice through runtime systems: "
                     + playfieldDelegations[i]);
             }
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("this.ActivateNpc,")
+                && runtimeSystemsText.Contains("this.RegisterDynel,")
+                && runtimeSystemsText.Contains("this.RefreshDynelRegistry);"),
+                "PlayfieldRuntimeSystems must route materialized NPC activation, dynel registration, and registry refresh through the registry boundary.");
 
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldDynelRegistry.cs"),
@@ -2954,6 +3040,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs"));
+            string materializationText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
 
             Assert.IsTrue(
                 npcRuntimeText.Contains("new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
@@ -2997,11 +3087,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 runtimeSystemsText.Contains("return this.content.ShouldSuppressDbMobSpawn(mob.Playfield, mob.Id);"),
                 "PlayfieldRuntimeSystems must ask the content coordinator for DB spawn suppression.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("this.ShouldSuppressDbMobSpawn,"),
+                "PlayfieldRuntimeSystems must pass the DB spawn suppression guard into object materialization.");
 
-            int filterIndex = playfieldText.IndexOf("if (this.runtimeSystems.ShouldSuppressDbMobSpawn(mob))", StringComparison.Ordinal);
-            Assert.IsTrue(filterIndex >= 0, "Playfield DB mob loading must still call the Arete robot suppression guard.");
-            int continueIndex = playfieldText.IndexOf("continue;", filterIndex, StringComparison.Ordinal);
-            int loadStatsIndex = playfieldText.IndexOf("MobSpawnStatDao.Instance.GetWhere", filterIndex, StringComparison.Ordinal);
+            string materializeDbMobSpawns =
+                ExtractMethodBlock(materializationText, "private void MaterializeDbMobSpawns");
+            int filterIndex = materializeDbMobSpawns.IndexOf("if (shouldSuppressDbMobSpawn(mob))", StringComparison.Ordinal);
+            Assert.IsTrue(
+                filterIndex >= 0,
+                "Object materialization must still call the Arete robot suppression guard before mob stat loading.");
+            int continueIndex = materializeDbMobSpawns.IndexOf("continue;", filterIndex, StringComparison.Ordinal);
+            int loadStatsIndex =
+                materializeDbMobSpawns.IndexOf("loadMobSpawnStats(mob).ToArray()", filterIndex, StringComparison.Ordinal);
             Assert.IsTrue(
                 continueIndex > filterIndex && continueIndex < loadStatsIndex,
                 "Suppressed legacy DB rows must be skipped before DB spawn stats are loaded.");

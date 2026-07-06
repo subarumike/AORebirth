@@ -293,34 +293,34 @@ namespace AORebirth.Core.Playfields
             this.statels = this.runtimeSystems.ResolveStatels(playfieldIdentity);
             this.runtimeSystems.RegisterStatels(this.statels);
             this.collisionStatels = this.runtimeSystems.ResolveCollisionStatels(this.statels);
-            this.LoadMobSpawns(playfieldIdentity);
-            this.runtimeSystems.RegisterContent(playfieldIdentity);
-            this.LoadVendors(playfieldIdentity);
-            this.LoadStaticDynels(playfieldIdentity);
-            this.runtimeSystems.RefreshDynelRegistry();
+            this.runtimeSystems.MaterializeStartupObjects(
+                playfieldIdentity,
+                this.statels,
+                this.LoadMobSpawnDefinitions,
+                this.LoadMobSpawnStats,
+                this.InstantiateDbMobSpawn,
+                this.AttachMobSpawnKnuBot,
+                this.SpawnVendors,
+                this.CreateStaticDynel);
         }
 
-        private void LoadStaticDynels(Identity playfieldIdentity)
+        private IEntity CreateStaticDynel(PlayfieldStaticDynelDefinition staticDynel)
         {
-            foreach (PlayfieldStaticDynelDefinition staticDynel in
-                this.runtimeSystems.ResolveStaticDynels(playfieldIdentity))
+            StaticDynel sdy = new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template);
+
+            foreach (GameTuple<CharacterStat, uint> stat in staticDynel.Stats)
             {
-                StaticDynel sdy = new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template);
-
-                foreach (GameTuple<CharacterStat, uint> stat in staticDynel.Stats)
+                if (sdy.Stats.ContainsKey((int)stat.Value1))
                 {
-                    if (sdy.Stats.ContainsKey((int)stat.Value1))
-                    {
-                        sdy.Stats[(int)stat.Value1] = (int)stat.Value2;
-                        continue;
-                    }
-                    sdy.Stats.Add((int)stat.Value1, (int)stat.Value2);
+                    sdy.Stats[(int)stat.Value1] = (int)stat.Value2;
+                    continue;
                 }
-
-                sdy.Coordinate = staticDynel.Coordinate;
-                sdy.Heading = staticDynel.Heading;
-                this.runtimeSystems.RegisterDynel(sdy);
+                sdy.Stats.Add((int)stat.Value1, (int)stat.Value2);
             }
+
+            sdy.Coordinate = staticDynel.Coordinate;
+            sdy.Heading = staticDynel.Heading;
+            return sdy;
         }
 
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
@@ -328,46 +328,36 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.SpawnCapturedNpcContent(playfieldIdentity);
         }
 
-        private void LoadVendors(Identity playfieldIdentity)
+        private void SpawnVendors(StatelData[] vendorStatels)
         {
-            StatelData[] vendorStatels;
-            if (!this.runtimeSystems.TryResolveVendorStatels(playfieldIdentity, this.statels, out vendorStatels))
-            {
-                return;
-            }
-
             VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels);
         }
 
-        private void LoadMobSpawns(Identity playfieldIdentity)
+        private IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions(Identity playfieldIdentity)
         {
-            IEnumerable<DBMobSpawn> mobs = MobSpawnDao.Instance.GetWhere(new { Playfield = playfieldIdentity.Instance });
-            foreach (DBMobSpawn mob in mobs)
+            return MobSpawnDao.Instance.GetWhere(new { Playfield = playfieldIdentity.Instance });
+        }
+
+        private IEnumerable<DBMobSpawnStat> LoadMobSpawnStats(DBMobSpawn mob)
+        {
+            return MobSpawnStatDao.Instance.GetWhere(new { mob.Id, mob.Playfield });
+        }
+
+        private ICharacter InstantiateDbMobSpawn(DBMobSpawn mob, DBMobSpawnStat[] stats)
+        {
+            return NonPlayerCharacterHandler.InstantiateMobSpawn(
+                mob,
+                stats,
+                new NPCController(),
+                this);
+        }
+
+        private void AttachMobSpawnKnuBot(DBMobSpawn mob, ICharacter cmob)
+        {
+            if (mob.KnuBotScriptName != "")
             {
-                if (this.runtimeSystems.ShouldSuppressDbMobSpawn(mob))
-                {
-                    continue;
-                }
-
-                IEnumerable<DBMobSpawnStat> stats = MobSpawnStatDao.Instance.GetWhere(new { mob.Id, mob.Playfield });
-                ICharacter cmob = NonPlayerCharacterHandler.InstantiateMobSpawn(
-                    mob,
-                    stats.ToArray(),
-                    new NPCController(),
-                    this);
-                this.runtimeSystems.ActivateNpc(cmob);
-                if (mob.KnuBotScriptName != "")
-                {
-                    ((NPCController)cmob.Controller).SetKnuBot(
-                        ScriptCompiler.Instance.CreateKnuBot(mob.KnuBotScriptName, cmob.Identity));
-
-                    /*                    if ((cmob.Stats[0].Value
-                        & (int)SimpleCharFullUpdateFlags.IsImmune) == (int)SimpleCharFullUpdateFlags.IsImmune)
-                    {
-                        cmob.Stats[0].Value -= (int)SimpleCharFullUpdateFlags.IsImmune;
-                        cmob.Stats[0].Value |= (int)SimpleCharFullUpdateFlags.UnknownFlag5;
-                    }*/
-                }
+                ((NPCController)cmob.Controller).SetKnuBot(
+                    ScriptCompiler.Instance.CreateKnuBot(mob.KnuBotScriptName, cmob.Identity));
             }
         }
 
