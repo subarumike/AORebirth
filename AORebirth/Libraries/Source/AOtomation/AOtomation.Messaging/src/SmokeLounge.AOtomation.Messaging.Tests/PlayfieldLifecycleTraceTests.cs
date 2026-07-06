@@ -347,17 +347,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playerCombatText.Contains("internal void BeginDeath("),
                 "PlayerCombatRuntimeService must expose named player combat lifecycle seams.");
             Assert.IsTrue(
-                playerCombatText.Contains("cancelAttack(character);")
-                && playerCombatText.Contains("resetCombatTick(attacker);")
+                playerCombatText.Contains("resetCombatTick(attacker);")
                 && playerCombatText.Contains("processCombatTick(attacker);")
-                && playerCombatText.Contains("clearFightingTarget(character);")
                 && playerCombatText.Contains("beginDeath(target);"),
-                "PlayerCombatRuntimeService must leave non-start seams as pass-through orchestration.");
+                "PlayerCombatRuntimeService must leave tick and death seams as pass-through orchestration.");
             Assert.IsTrue(
                 playerCombatText.Contains("character.SetTarget(target);")
                 && playerCombatText.Contains("character.SetFightingTarget(target);")
                 && playerCombatText.Contains("resetCombatTick(character.Identity);"),
                 "PlayerCombatRuntimeService must own player attack-start state mutation and tick reset orchestration.");
+            Assert.IsTrue(
+                playerCombatText.Contains("internal void CancelAttack(ICharacter character, Action<Identity> resetCombatTick)")
+                && playerCombatText.Contains("character.SetFightingTarget(Identity.None);")
+                && CountOccurrences(playerCombatText, "resetCombatTick(character.Identity);") == 2,
+                "PlayerCombatRuntimeService must own player attack cancel state clear and tick reset orchestration.");
+            Assert.IsTrue(
+                playerCombatText.Contains("internal void ClearFightingTarget(ICharacter character, Action<Identity> clearCombatTracking)")
+                && playerCombatText.Contains("clearCombatTracking(character.Identity);"),
+                "PlayerCombatRuntimeService must own player fighting-target stop/clear orchestration.");
             Assert.IsFalse(
                 playerCombatText.Contains("CombatDamageRules")
                 || playerCombatText.Contains("Announce(")
@@ -373,10 +380,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 runtimeSystemsText.Contains("private readonly PlayerCombatRuntimeService playerCombat;")
                 && runtimeSystemsText.Contains("this.playerCombat = new PlayerCombatRuntimeService();")
                 && runtimeSystemsText.Contains("this.playerCombat.StartAttack(character, target, resetCombatTick);")
-                && runtimeSystemsText.Contains("this.playerCombat.CancelAttack(character, cancelAttack);")
+                && runtimeSystemsText.Contains("this.playerCombat.CancelAttack(character, resetCombatTick);")
                 && runtimeSystemsText.Contains("this.playerCombat.ResetCombatTick(attacker, resetCombatTick);")
                 && runtimeSystemsText.Contains("this.playerCombat.ProcessCombatTick(attacker, processCombatTick);")
-                && runtimeSystemsText.Contains("this.playerCombat.ClearFightingTarget(character, clearFightingTarget);")
+                && runtimeSystemsText.Contains("this.playerCombat.ClearFightingTarget(character, clearCombatTracking);")
                 && runtimeSystemsText.Contains("this.playerCombat.BeginDeath(target, beginDeath);"),
                 "PlayfieldRuntimeSystems must own and expose the player combat runtime facade.");
             Assert.IsTrue(
@@ -420,7 +427,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playerCombatTick.Contains("if (attacker.FightingTarget.Instance == 0)")
                 && playerCombatTick.Contains("this.ClearCombatTracking(attacker.Identity);")
-                && playerCombatTick.Contains("this.runtimeSystems.ClearPlayerFightingTarget(attacker, this.ClearPlayerFightingTarget);")
+                && playerCombatTick.Contains("this.runtimeSystems.ClearPlayerFightingTarget(attacker, this.ClearCombatTracking);")
                 && playerCombatTick.Contains("CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);")
                 && playerCombatTick.Contains("this.HandleCombatKillingHit(attacker, target);"),
                 "Playfield must keep player combat tick algorithms while routing the lifecycle seam through the facade.");
@@ -431,11 +438,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Playfield must route player attack-start orchestration through the player combat facade.");
             Assert.IsTrue(
                 playfieldText.Contains("public void CancelPlayerAttack(ICharacter character)")
-                && playfieldText.Contains("this.runtimeSystems.CancelPlayerAttack(character, this.ApplyPlayerAttackCancel);")
-                && playfieldText.Contains("private void ApplyPlayerAttackCancel(ICharacter character)")
+                && playfieldText.Contains("this.runtimeSystems.CancelPlayerAttack(character, this.ResetCombatTick);")
+                && !playfieldText.Contains("private void ApplyPlayerAttackCancel(ICharacter character)")
                 && playfieldText.Contains("private void ResetPlayerCombatTick(Identity attacker)")
                 && playfieldText.Contains("this.runtimeSystems.ResetPlayerCombatTick(attacker, this.ResetPlayerCombatTick);"),
-                "Playfield must keep cancel/reset mutation behind the pass-through facade.");
+                "Playfield must route player attack cancel orchestration through the player combat facade.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.BeginPlayerDeath(target, this.KillPlayerTarget);")
                 && playfieldText.Contains("private void KillPlayerTarget(ICharacter target)")
@@ -447,7 +454,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldText.Contains("internal void StopFightingDeadTarget(Identity deadTarget)")
                 && playfieldText.Contains("if (character.Controller is NPCController)")
                 && playfieldText.Contains("this.ClearNpcFightingTarget(character);")
-                && playfieldText.Contains("this.runtimeSystems.ClearPlayerFightingTarget(character, this.ClearPlayerFightingTarget);")
+                && playfieldText.Contains("this.runtimeSystems.ClearPlayerFightingTarget(character, this.ClearCombatTracking);")
                 && playfieldText.Contains("this.SendCombatStopMessage(character);"),
                 "Playfield must keep mixed player/NPC StopFight packet emission while routing player target clear through the facade.");
             Assert.IsTrue(

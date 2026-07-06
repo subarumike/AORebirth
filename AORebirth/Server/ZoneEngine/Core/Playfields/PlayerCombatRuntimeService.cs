@@ -23,10 +23,11 @@ namespace ZoneEngine.Core.Playfields
             resetCombatTick(character.Identity);
         }
 
-        internal void CancelAttack(ICharacter character, Action<ICharacter> cancelAttack)
+        internal void CancelAttack(ICharacter character, Action<Identity> resetCombatTick)
         {
-            Require(cancelAttack, "cancelAttack");
-            cancelAttack(character);
+            Require(resetCombatTick, "resetCombatTick");
+            character.SetFightingTarget(Identity.None);
+            resetCombatTick(character.Identity);
         }
 
         internal void ResetCombatTick(Identity attacker, Action<Identity> resetCombatTick)
@@ -41,10 +42,11 @@ namespace ZoneEngine.Core.Playfields
             processCombatTick(attacker);
         }
 
-        internal void ClearFightingTarget(ICharacter character, Action<ICharacter> clearFightingTarget)
+        internal void ClearFightingTarget(ICharacter character, Action<Identity> clearCombatTracking)
         {
-            Require(clearFightingTarget, "clearFightingTarget");
-            clearFightingTarget(character);
+            Require(clearCombatTracking, "clearCombatTracking");
+            character.SetFightingTarget(Identity.None);
+            clearCombatTracking(character.Identity);
         }
 
         internal void BeginDeath(ICharacter target, Action<ICharacter> beginDeath)

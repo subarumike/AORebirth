@@ -289,9 +289,9 @@ namespace ZoneEngine.Core.Playfields
             this.playerCombat.StartAttack(character, target, resetCombatTick);
         }
 
-        internal void CancelPlayerAttack(ICharacter character, Action<ICharacter> cancelAttack)
+        internal void CancelPlayerAttack(ICharacter character, Action<Identity> resetCombatTick)
         {
-            this.playerCombat.CancelAttack(character, cancelAttack);
+            this.playerCombat.CancelAttack(character, resetCombatTick);
         }
 
         internal void ResetPlayerCombatTick(Identity attacker, Action<Identity> resetCombatTick)
@@ -304,9 +304,9 @@ namespace ZoneEngine.Core.Playfields
             this.playerCombat.ProcessCombatTick(attacker, processCombatTick);
         }
 
-        internal void ClearPlayerFightingTarget(ICharacter character, Action<ICharacter> clearFightingTarget)
+        internal void ClearPlayerFightingTarget(ICharacter character, Action<Identity> clearCombatTracking)
         {
-            this.playerCombat.ClearFightingTarget(character, clearFightingTarget);
+            this.playerCombat.ClearFightingTarget(character, clearCombatTracking);
         }
 
         internal void BeginPlayerDeath(ICharacter target, Action<ICharacter> beginDeath)
