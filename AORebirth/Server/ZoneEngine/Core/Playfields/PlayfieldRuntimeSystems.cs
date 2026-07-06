@@ -38,6 +38,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldObjectLifecycleRuntimeService objectLifecycle;
 
+        private readonly PlayfieldObjectMaterializationRuntimeService objectMaterialization;
+
         private readonly InventoryContainerRuntimeService inventoryContainer;
 
         private readonly NPCRuntimeService npcRuntime;
@@ -83,6 +85,7 @@ namespace ZoneEngine.Core.Playfields
             this.corpseAccess = new PlayfieldCorpseAccessRuntimeService();
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.objectLifecycle = new PlayfieldObjectLifecycleRuntimeService();
+            this.objectMaterialization = new PlayfieldObjectMaterializationRuntimeService();
             this.inventoryContainer = InventoryContainerRuntimeService.Default;
             this.rewards = new PlayfieldRewardRuntimeService();
             this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry, this.rewards);
@@ -106,6 +109,34 @@ namespace ZoneEngine.Core.Playfields
         internal void RegisterContent(Identity playfieldIdentity)
         {
             this.content.RegisterContent(this.playfield, playfieldIdentity);
+        }
+
+        internal void MaterializeStartupObjects(
+            Identity playfieldIdentity,
+            IEnumerable<StatelData> statels,
+            Func<Identity, IEnumerable<DBMobSpawn>> loadMobSpawns,
+            Func<DBMobSpawn, IEnumerable<DBMobSpawnStat>> loadMobSpawnStats,
+            Func<DBMobSpawn, DBMobSpawnStat[], ICharacter> instantiateDbMobSpawn,
+            Action<DBMobSpawn, ICharacter> attachMobSpawnScript,
+            Action<StatelData[]> spawnVendors,
+            Func<PlayfieldStaticDynelDefinition, IEntity> instantiateStaticDynel)
+        {
+            this.objectMaterialization.MaterializeStartupObjects(
+                playfieldIdentity,
+                statels,
+                loadMobSpawns,
+                this.ShouldSuppressDbMobSpawn,
+                loadMobSpawnStats,
+                instantiateDbMobSpawn,
+                this.ActivateNpc,
+                attachMobSpawnScript,
+                this.RegisterContent,
+                this.TryResolveVendorStatels,
+                spawnVendors,
+                this.ResolveStaticDynels,
+                instantiateStaticDynel,
+                this.RegisterDynel,
+                this.RefreshDynelRegistry);
         }
 
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
