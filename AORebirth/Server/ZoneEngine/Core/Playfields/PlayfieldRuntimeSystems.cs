@@ -325,5 +325,18 @@ namespace ZoneEngine.Core.Playfields
         {
             this.playerCombat.BeginDeath(target, beginDeath);
         }
+
+        internal void CleanupPlayerDeathCombat(
+            ICharacter target,
+            Action<Identity> clearCombatTracking,
+            Action<Identity> stopFightingDeadTarget,
+            Action<ICharacter> sendCombatStop)
+        {
+            this.playerCombat.CleanupDeathCombat(
+                target,
+                clearCombatTracking,
+                stopFightingDeadTarget,
+                sendCombatStop);
+        }
     }
 }

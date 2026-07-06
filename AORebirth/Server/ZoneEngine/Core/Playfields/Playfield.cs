@@ -2737,11 +2737,11 @@ namespace AORebirth.Core.Playfields
 
             this.MarkPlayerDead(target);
             target.SendChangedStats();
-            target.SetTarget(Identity.None);
-            target.SetFightingTarget(Identity.None);
-            this.ClearCombatTracking(target.Identity);
-            this.StopFightingDeadTarget(target.Identity);
-            this.SendCombatStopMessage(target);
+            this.runtimeSystems.CleanupPlayerDeathCombat(
+                target,
+                this.ClearCombatTracking,
+                this.StopFightingDeadTarget,
+                this.SendCombatStopMessage);
             this.SendPlayerDeathAnimation(target);
 
             LogUtil.Debug(DebugInfoDetail.Network, string.Format("Player died target={0}", target.Identity));

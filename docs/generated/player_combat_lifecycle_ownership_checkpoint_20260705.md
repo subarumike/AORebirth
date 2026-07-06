@@ -25,10 +25,12 @@ the no-target, target lookup, target validation, invalid-target clear, and
 validated-tick dispatch orchestration while delegating lookup, logging,
 tracking cleanup, timing, damage, packet emission, and world mutation back to
 Playfield. Invalid target cleanup is named in `ClearInvalidCombatTarget` and
-preserves the existing log-before-clear order. Other seams remain callback
-pass-throughs. The service does not own algorithms, packet construction, packet
-emission, damage rules, NPC runtime behavior, inventory, loot, credits, corpses,
-movement, or database loading.
+preserves the existing log-before-clear order. Player death combat cleanup is
+named in `CleanupDeathCombat` and preserves the target clear, fighting-target
+clear, tracking cleanup, stop-fighting-dead-target, and StopFight callback
+order. Other seams remain callback pass-throughs. The service does not own
+algorithms, packet construction, packet emission, damage rules, NPC runtime
+behavior, inventory, loot, credits, corpses, movement, or database loading.
 
 ## Current ownership seams
 
@@ -46,10 +48,14 @@ movement, or database loading.
 - Keeps target lookup, invalid-target logging, attack timing, damage application,
   AttackInfo emission, and world mutation behind PlayerCombatRuntimeService
   callbacks.
+- Keeps player death marking, stat sending, death animation, and death logging
+  outside PlayerCombatRuntimeService while routing death-side combat cleanup
+  through the service.
 - Routes player combat ticking through PlayfieldRuntimeSystems while
   PlayerCombatRuntimeService owns the tick orchestration decision flow.
 - Owns damage application, AttackInfo emission, and killing-hit routing.
-- Owns player death-side combat stop sequencing.
+- Owns player death lifecycle behavior outside the service; PlayerCombatRuntimeService
+  owns only death-side combat cleanup ordering.
 - Owns StopFight packet emission for player and mixed player/NPC target clear.
 - Owns the shared combat tick dictionaries while delegating NPC tracking cleanup
   through PlayfieldRuntimeSystems.

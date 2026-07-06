@@ -92,6 +92,22 @@ namespace ZoneEngine.Core.Playfields
             beginDeath(target);
         }
 
+        internal void CleanupDeathCombat(
+            ICharacter target,
+            Action<Identity> clearCombatTracking,
+            Action<Identity> stopFightingDeadTarget,
+            Action<ICharacter> sendCombatStop)
+        {
+            Require(clearCombatTracking, "clearCombatTracking");
+            Require(stopFightingDeadTarget, "stopFightingDeadTarget");
+            Require(sendCombatStop, "sendCombatStop");
+
+            target.SetTarget(Identity.None);
+            this.ClearFightingTarget(target, clearCombatTracking);
+            stopFightingDeadTarget(target.Identity);
+            sendCombatStop(target);
+        }
+
         private static void Require(Delegate callback, string name)
         {
             if (callback == null)

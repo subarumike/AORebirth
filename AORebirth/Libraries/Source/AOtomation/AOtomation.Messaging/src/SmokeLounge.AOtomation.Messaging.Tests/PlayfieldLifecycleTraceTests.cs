@@ -345,6 +345,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playerCombatText.Contains("internal void ProcessCombatTick(")
                 && playerCombatText.Contains("internal void ClearFightingTarget(")
                 && playerCombatText.Contains("internal void ClearInvalidCombatTarget(")
+                && playerCombatText.Contains("internal void CleanupDeathCombat(")
                 && playerCombatText.Contains("internal void BeginDeath("),
                 "PlayerCombatRuntimeService must expose named player combat lifecycle seams.");
             Assert.IsTrue(
@@ -389,6 +390,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 invalidTargetClear,
                 "logInvalidTarget(attacker, target);",
                 "this.ClearFightingTarget(attacker, clearCombatTracking);");
+            string deathCombatCleanup = ExtractMethodBlock(playerCombatText, "internal void CleanupDeathCombat");
+            Assert.IsTrue(
+                deathCombatCleanup.Contains("Require(clearCombatTracking, \"clearCombatTracking\");")
+                && deathCombatCleanup.Contains("Require(stopFightingDeadTarget, \"stopFightingDeadTarget\");")
+                && deathCombatCleanup.Contains("Require(sendCombatStop, \"sendCombatStop\");")
+                && deathCombatCleanup.Contains("target.SetTarget(Identity.None);")
+                && deathCombatCleanup.Contains("this.ClearFightingTarget(target, clearCombatTracking);")
+                && deathCombatCleanup.Contains("stopFightingDeadTarget(target.Identity);")
+                && deathCombatCleanup.Contains("sendCombatStop(target);"),
+                "PlayerCombatRuntimeService must own player death combat cleanup orchestration.");
+            AssertTextBefore(
+                deathCombatCleanup,
+                "target.SetTarget(Identity.None);",
+                "this.ClearFightingTarget(target, clearCombatTracking);");
+            AssertTextBefore(
+                deathCombatCleanup,
+                "this.ClearFightingTarget(target, clearCombatTracking);",
+                "stopFightingDeadTarget(target.Identity);");
+            AssertTextBefore(
+                deathCombatCleanup,
+                "stopFightingDeadTarget(target.Identity);",
+                "sendCombatStop(target);");
             Assert.IsFalse(
                 playerCombatText.Contains("CombatDamageRules")
                 || playerCombatText.Contains("Announce(")
@@ -409,6 +432,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.playerCombat.ProcessCombatTick(")
                 && runtimeSystemsText.Contains("processValidatedCombatTick);")
                 && runtimeSystemsText.Contains("this.playerCombat.ClearFightingTarget(character, clearCombatTracking);")
+                && runtimeSystemsText.Contains("this.playerCombat.CleanupDeathCombat(")
                 && runtimeSystemsText.Contains("this.playerCombat.BeginDeath(target, beginDeath);"),
                 "PlayfieldRuntimeSystems must own and expose the player combat runtime facade.");
             Assert.IsTrue(
@@ -476,9 +500,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldText.Contains("this.runtimeSystems.BeginPlayerDeath(target, this.KillPlayerTarget);")
                 && playfieldText.Contains("private void KillPlayerTarget(ICharacter target)")
                 && playfieldText.Contains("this.MarkPlayerDead(target);")
-                && playfieldText.Contains("this.SendCombatStopMessage(target);")
+                && playfieldText.Contains("this.runtimeSystems.CleanupPlayerDeathCombat(")
                 && playfieldText.Contains("this.SendPlayerDeathAnimation(target);"),
                 "Playfield must keep player death behavior while routing death lifecycle entry through the facade.");
+            string playerDeath = ExtractMethodBlock(playfieldText, "private void KillPlayerTarget");
+            AssertTextBefore(
+                playerDeath,
+                "this.MarkPlayerDead(target);",
+                "target.SendChangedStats();");
+            AssertTextBefore(
+                playerDeath,
+                "target.SendChangedStats();",
+                "this.runtimeSystems.CleanupPlayerDeathCombat(");
+            AssertTextBefore(
+                playerDeath,
+                "this.runtimeSystems.CleanupPlayerDeathCombat(",
+                "this.SendPlayerDeathAnimation(target);");
             Assert.IsTrue(
                 playfieldText.Contains("internal void StopFightingDeadTarget(Identity deadTarget)")
                 && playfieldText.Contains("if (character.Controller is NPCController)")
