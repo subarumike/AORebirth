@@ -302,6 +302,7 @@
     <Compile Include="Core\Playfields\PlayfieldDynelRegistry.cs" />
     <Compile Include="Core\Playfields\PlayfieldLifecycleRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldLifecycleTrace.cs" />
+    <Compile Include="Core\Playfields\PlayfieldPlayerDeathRespawnRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldRuntimeSystems.cs" />
     <Compile Include="Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs" />
