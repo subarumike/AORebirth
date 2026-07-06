@@ -344,6 +344,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playerCombatText.Contains("internal void ResetCombatTick(")
                 && playerCombatText.Contains("internal void ProcessCombatTick(")
                 && playerCombatText.Contains("internal void ClearFightingTarget(")
+                && playerCombatText.Contains("internal void ClearInvalidCombatTarget(")
                 && playerCombatText.Contains("internal void BeginDeath("),
                 "PlayerCombatRuntimeService must expose named player combat lifecycle seams.");
             Assert.IsTrue(
@@ -373,10 +374,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playerCombatText.Contains("clearCombatTracking(attacker.Identity);")
                 && playerCombatText.Contains("ICharacter target = findTarget(attacker.FightingTarget);")
                 && playerCombatText.Contains("if (!isValidTarget(target))")
-                && playerCombatText.Contains("logInvalidTarget(attacker, target);")
-                && playerCombatText.Contains("this.ClearFightingTarget(attacker, clearCombatTracking);")
+                && playerCombatText.Contains(
+                    "this.ClearInvalidCombatTarget(attacker, target, logInvalidTarget, clearCombatTracking);")
                 && playerCombatText.Contains("processValidatedCombatTick(attacker, target);"),
                 "PlayerCombatRuntimeService must own player combat tick target/clear orchestration.");
+            string invalidTargetClear = ExtractMethodBlock(playerCombatText, "internal void ClearInvalidCombatTarget");
+            Assert.IsTrue(
+                invalidTargetClear.Contains("Require(logInvalidTarget, \"logInvalidTarget\");")
+                && invalidTargetClear.Contains("Require(clearCombatTracking, \"clearCombatTracking\");")
+                && invalidTargetClear.Contains("logInvalidTarget(attacker, target);")
+                && invalidTargetClear.Contains("this.ClearFightingTarget(attacker, clearCombatTracking);"),
+                "PlayerCombatRuntimeService must own invalid player combat target cleanup.");
+            AssertTextBefore(
+                invalidTargetClear,
+                "logInvalidTarget(attacker, target);",
+                "this.ClearFightingTarget(attacker, clearCombatTracking);");
             Assert.IsFalse(
                 playerCombatText.Contains("CombatDamageRules")
                 || playerCombatText.Contains("Announce(")

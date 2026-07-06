@@ -59,12 +59,24 @@ namespace ZoneEngine.Core.Playfields
             ICharacter target = findTarget(attacker.FightingTarget);
             if (!isValidTarget(target))
             {
-                logInvalidTarget(attacker, target);
-                this.ClearFightingTarget(attacker, clearCombatTracking);
+                this.ClearInvalidCombatTarget(attacker, target, logInvalidTarget, clearCombatTracking);
                 return;
             }
 
             processValidatedCombatTick(attacker, target);
+        }
+
+        internal void ClearInvalidCombatTarget(
+            ICharacter attacker,
+            ICharacter target,
+            Action<ICharacter, ICharacter> logInvalidTarget,
+            Action<Identity> clearCombatTracking)
+        {
+            Require(logInvalidTarget, "logInvalidTarget");
+            Require(clearCombatTracking, "clearCombatTracking");
+
+            logInvalidTarget(attacker, target);
+            this.ClearFightingTarget(attacker, clearCombatTracking);
         }
 
         internal void ClearFightingTarget(ICharacter character, Action<Identity> clearCombatTracking)
