@@ -961,6 +961,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs"));
+            string corpseAccessText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs"));
             string rewardRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRewardRuntimeService.cs"));
             string lifecycleText = File.ReadAllText(
@@ -983,6 +987,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string[] runtimeCoordinatorConstructors =
                 {
                     "new PlayfieldObjectLifecycleRuntimeService()",
+                    "new PlayfieldCorpseAccessRuntimeService()",
                     "new PlayfieldRewardRuntimeService()",
                     "new NPCRuntimeService(playfield, this.dynelRegistry, this.rewards)",
                     "new PlayfieldLifecycleRuntimeService()",
@@ -1073,6 +1078,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Playfield must not own NPC home state storage.");
             Assert.IsTrue(
                 runtimeSystemsText.Contains("private readonly NPCRuntimeService npcRuntime")
+                && runtimeSystemsText.Contains("private readonly PlayfieldCorpseAccessRuntimeService corpseAccess")
                 && runtimeSystemsText.Contains("private readonly PlayfieldLifecycleRuntimeService lifecycle")
                 && runtimeSystemsText.Contains("private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle")
                 && runtimeSystemsText.Contains("internal void ProcessHeartbeatTimedLifecycle(")
@@ -1107,7 +1113,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.npcRuntime.StopDyingNpcCombatState(target);")
                 && runtimeSystemsText.Contains("this.npcRuntime.AcquireAggro(attacker, target);")
                 && runtimeSystemsText.Contains("this.npcRuntime.ProcessPatrolTick(character);")
-                && runtimeSystemsText.Contains("this.npcRuntime.ClearCombatTracking(identity);"),
+                && runtimeSystemsText.Contains("this.npcRuntime.ClearCombatTracking(identity);")
+                && runtimeSystemsText.Contains("return this.corpseAccess.TryUseCorpse(")
+                && runtimeSystemsText.Contains("return this.corpseAccess.TryUseDeadNpcCorpse(")
+                && runtimeSystemsText.Contains("return this.corpseAccess.TryLootCorpseItem(")
+                && runtimeSystemsText.Contains("this.corpseAccess.ProcessPendingCorpseCreditAwards("),
                 "PlayfieldRuntimeSystems must delegate NPC runtime entry points through NPCRuntimeService.");
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldLifecycleRuntimeService.cs"),
@@ -1444,6 +1454,41 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playfieldText.Contains("private void SendCorpseInventoryUpdate(ICharacter looter, CorpseState corpse)")
                 && playfieldText.Contains("private void AwardCorpseCredits(ICharacter looter, CorpseState corpse)"),
                 "Playfield intentionally keeps loot, credit, and corpse container construction outside NPCRuntimeService.");
+            Assert.IsTrue(
+                corpseAccessText.Contains("internal sealed class PlayfieldCorpseAccessRuntimeService")
+                && corpseAccessText.Contains("internal bool TryUseCorpse<TCorpseState>(")
+                && corpseAccessText.Contains("internal bool TryUseDeadNpcCorpse<TCorpseState>(")
+                && corpseAccessText.Contains("internal bool TryLootCorpseItem<TCorpseState, TCorpseLootItem>(")
+                && corpseAccessText.Contains("internal void ProcessPendingCorpseCreditAwards<TAward, TCorpseState>("),
+                "PlayfieldCorpseAccessRuntimeService must own corpse use, loot, and pending credit orchestration entry points.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.TryUseCorpse(")
+                && playfieldText.Contains("this.runtimeSystems.TryUseDeadNpcCorpse(")
+                && playfieldText.Contains("this.runtimeSystems.TryLootCorpseItem(")
+                && playfieldText.Contains("this.runtimeSystems.ProcessPendingCorpseCreditAwards("),
+                "Playfield must route corpse access and loot orchestration through PlayfieldRuntimeSystems.");
+            AssertTextBefore(
+                corpseAccessText,
+                "sendCorpseInventoryUpdate(looter, corpse);",
+                "scheduleCorpseCreditAward(looter, corpse);");
+            AssertTextBefore(
+                corpseAccessText,
+                "setLooted(corpseLootItem, true);",
+                "sendCorpseContainerAddItem(looter, sourceContainer, targetPlacement);");
+            Assert.IsFalse(
+                playfieldText.Contains("private void SendCorpseInventoryUpdateAndCredits"),
+                "Playfield must not keep the combined corpse inventory/credits orchestration helper.");
+            Assert.IsFalse(
+                corpseAccessText.Contains("SendCompressed")
+                || corpseAccessText.Contains("InventoryUpdateMessage")
+                || corpseAccessText.Contains("ContainerAddItemMessage")
+                || corpseAccessText.Contains("new Item(")
+                || corpseAccessText.Contains("BaseInventory")
+                || corpseAccessText.Contains("Stats.Write")
+                || corpseAccessText.Contains("RollCorpseLootItems")
+                || corpseAccessText.Contains("RollCorpseCredits")
+                || corpseAccessText.Contains("AwardCorpseCredits"),
+                "PlayfieldCorpseAccessRuntimeService must not own packet construction, item materialization, inventory algorithms, persistence, loot, or credit math.");
             Assert.IsFalse(
                 npcRuntimeText.Contains("SendCompressed")
                 || npcRuntimeText.Contains("CorpseFullUpdate.Build(")
@@ -1472,8 +1517,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 projectText.Contains(@"Core\Playfields\PlayfieldRuntimeSystems.cs")
                 && projectText.Contains(@"Core\Playfields\NPCRuntimeService.cs")
                 && projectText.Contains(@"Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs")
+                && projectText.Contains(@"Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs")
                 && projectText.Contains(@"Core\Playfields\PlayfieldRewardRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldRuntimeSystems, NPCRuntimeService, object lifecycle, and reward runtime services.");
+                "ZoneEngine project must compile PlayfieldRuntimeSystems, NPCRuntimeService, object lifecycle, corpse access, and reward runtime services.");
 
             string immediateRemove = ExtractMethodBlock(npcRuntimeText, "internal void DespawnNpcImmediately");
             Assert.IsTrue(
