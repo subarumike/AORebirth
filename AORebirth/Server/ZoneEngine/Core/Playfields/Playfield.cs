@@ -2035,7 +2035,7 @@ namespace AORebirth.Core.Playfields
             FullCharacterMessageHandler.Default.Send(character);
             this.SendDeathRespawnPlayfieldReadyBlock(client, character);
             this.SendDeathRespawnAction(character);
-            InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(character, false);
+            this.runtimeSystems.EnsureWeaponVisualMeshes(character, false);
             AppearanceUpdateMessageHandler.Default.Send(character);
 
             LogUtil.Debug(
@@ -2942,7 +2942,7 @@ namespace AORebirth.Core.Playfields
                 return true;
             }
 
-            if (InventoryContainerRuntimeService.Default.CharacterHasUniqueItemAlready(looter, lootItem.Item))
+            if (this.runtimeSystems.CharacterHasUniqueItemAlready(looter, lootItem.Item))
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
@@ -2959,7 +2959,7 @@ namespace AORebirth.Core.Playfields
             }
 
             CorpseLootInventoryTransferResult transferResult =
-                InventoryContainerRuntimeService.Default.TryAddCorpseLootItem(looter, lootItem.Item, targetPlacement);
+                this.runtimeSystems.TryAddCorpseLootItem(looter, lootItem.Item, targetPlacement);
             if (transferResult.Status == CorpseLootInventoryTransferStatus.NoFreeSlot)
             {
                 LogUtil.Debug(

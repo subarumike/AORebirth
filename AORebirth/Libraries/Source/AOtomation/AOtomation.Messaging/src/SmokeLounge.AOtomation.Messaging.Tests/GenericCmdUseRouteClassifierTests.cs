@@ -1061,6 +1061,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs");
             string playfield =
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+            string runtimeSystems =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs");
 
             AssertContains(service, "public void EnsureWeaponVisualMeshes");
             AssertContains(service, "private bool EnsureWeaponMesh");
@@ -1076,6 +1078,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(client.Controller.Character, false);");
             AssertContains(
                 playfield,
+                "this.runtimeSystems.EnsureWeaponVisualMeshes(character, false);");
+            AssertContains(
+                runtimeSystems,
+                "internal void EnsureWeaponVisualMeshes(ICharacter character, bool announceAppearanceUpdate)");
+            AssertContains(
+                runtimeSystems,
+                "this.inventoryContainer.EnsureWeaponVisualMeshes(character, announceAppearanceUpdate);");
+            AssertDoesNotContain(
+                playfield,
                 "InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(character, false);");
         }
 
@@ -1086,12 +1097,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
             string playfield =
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+            string runtimeSystems =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs");
 
             AssertContains(service, "public CorpseLootInventoryTransferResult TryAddCorpseLootItem(");
             AssertContains(service, "private bool TryResolveCorpseLootTargetSlot(");
             AssertContains(service, "public bool CharacterHasUniqueItemAlready(");
-            AssertContains(playfield, "InventoryContainerRuntimeService.Default.TryAddCorpseLootItem(");
-            AssertContains(playfield, "InventoryContainerRuntimeService.Default.CharacterHasUniqueItemAlready(");
+            AssertContains(playfield, "this.runtimeSystems.TryAddCorpseLootItem(");
+            AssertContains(playfield, "this.runtimeSystems.CharacterHasUniqueItemAlready(");
+            AssertContains(runtimeSystems, "internal CorpseLootInventoryTransferResult TryAddCorpseLootItem(");
+            AssertContains(runtimeSystems, "internal bool CharacterHasUniqueItemAlready(ICharacter character, IItem item)");
+            AssertContains(runtimeSystems, "return this.inventoryContainer.TryAddCorpseLootItem(looter, item, targetPlacement);");
+            AssertContains(runtimeSystems, "return this.inventoryContainer.CharacterHasUniqueItemAlready(character, item);");
+            AssertDoesNotContain(playfield, "InventoryContainerRuntimeService.Default.TryAddCorpseLootItem(");
+            AssertDoesNotContain(playfield, "InventoryContainerRuntimeService.Default.CharacterHasUniqueItemAlready(");
 
             AssertDoesNotContain(playfield, "private bool TryResolveLootTargetSlot(");
             AssertDoesNotContain(playfield, "looter.BaseInventory.AddToPage(targetPageNumber, targetSlot, lootItem.Item)");

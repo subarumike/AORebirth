@@ -7,6 +7,7 @@ namespace ZoneEngine.Core.Playfields
     using System.Collections.ObjectModel;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Items;
     using AORebirth.Core.Network;
     using AORebirth.Core.Playfields;
     using AORebirth.Core.Statels;
@@ -32,6 +33,8 @@ namespace ZoneEngine.Core.Playfields
         private readonly PlayfieldContentDataProvider contentData;
 
         private readonly PlayfieldDynelRegistry dynelRegistry;
+
+        private readonly InventoryContainerRuntimeService inventoryContainer;
 
         private readonly NPCRuntimeService npcRuntime;
 
@@ -68,6 +71,7 @@ namespace ZoneEngine.Core.Playfields
                 new PrivateCityContentModule());
             this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
+            this.inventoryContainer = InventoryContainerRuntimeService.Default;
             this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry);
             this.lifecycle = new PlayfieldLifecycleRuntimeService();
             this.interaction = new PlayfieldInteractionRuntimeService();
@@ -293,6 +297,24 @@ namespace ZoneEngine.Core.Playfields
         internal bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
             return this.interaction.TryHandleGenericCmdUse(client, message, target);
+        }
+
+        internal void EnsureWeaponVisualMeshes(ICharacter character, bool announceAppearanceUpdate)
+        {
+            this.inventoryContainer.EnsureWeaponVisualMeshes(character, announceAppearanceUpdate);
+        }
+
+        internal bool CharacterHasUniqueItemAlready(ICharacter character, IItem item)
+        {
+            return this.inventoryContainer.CharacterHasUniqueItemAlready(character, item);
+        }
+
+        internal CorpseLootInventoryTransferResult TryAddCorpseLootItem(
+            ICharacter looter,
+            IItem item,
+            int targetPlacement)
+        {
+            return this.inventoryContainer.TryAddCorpseLootItem(looter, item, targetPlacement);
         }
 
         internal bool HasPendingDeadNpcDespawn(Identity identity)
