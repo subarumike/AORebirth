@@ -590,7 +590,7 @@ namespace AORebirth.Core.Playfields
 
         public void DespawnNpcImmediately(ICharacter target)
         {
-            this.runtimeSystems.RemoveNpcImmediately(
+            this.runtimeSystems.DespawnNpcImmediately(
                 target,
                 this.StopFightingDeadTarget,
                 this.CancelPendingNpcCorpseSpawn);
