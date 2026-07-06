@@ -2743,284 +2743,72 @@ namespace AORebirth.Core.Playfields
 
         public bool TryUseCorpse(ICharacter looter, Identity corpseIdentity)
         {
-            if (looter == null || corpseIdentity.Type != IdentityType.Corpse)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format(
-                        "CorpseUse reject invalid looter={0} corpse={1}",
-                        looter == null ? Identity.None : looter.Identity,
-                        corpseIdentity));
-                return false;
-            }
-
-            CorpseState corpse;
-            if (!this.corpses.TryGetValue(corpseIdentity.Instance, out corpse))
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format(
-                        "CorpseUse reject unknown corpse={0} looter={1} registeredCount={2}",
-                        corpseIdentity,
-                        looter.Identity,
-                        this.corpses.Count));
-                return false;
-            }
-
-            if (corpse.ExpiresAtUtc <= DateTime.UtcNow)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format("CorpseUse reject expired corpse={0} looter={1}", corpseIdentity, looter.Identity));
-                this.DespawnCorpse(corpseIdentity.Instance);
-                return false;
-            }
-
-            bool wasOpened = corpse.Opened;
-            corpse.Opened = true;
-
-            if (corpse.HasUnlootedItems)
-            {
-                this.ExtendCorpseLifetime(corpse, CombatCorpseRules.ItemLootCorpseLifetime, "corpse-use");
-                if (corpse.NextUseSendsAccessActionOnly)
-                {
-                    this.SendCorpseLootAccessAction(looter, corpse);
-                    this.SendUseActionFinished(looter);
-                    corpse.NextUseSendsAccessActionOnly = false;
-                }
-                else
-                {
-                    this.SendCorpseInventoryUpdateAndCredits(looter, corpse);
-                    corpse.NextUseSendsAccessActionOnly = true;
-                }
-            }
-            else if (!wasOpened)
-            {
-                this.SendCorpseInventoryUpdateAndCredits(looter, corpse);
-            }
-            else
-            {
-                this.SendUseActionFinished(looter);
-            }
-
-            if (!corpse.HasUnlootedItems)
-            {
-                this.ScheduleCorpseDespawn(
-                    corpse,
-                    CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay,
-                    "opened-empty");
-            }
-
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                string.Format(
-                    "CorpseUse accepted corpse={0} deadNpc={1} looter={2} opened={3} lootClass={4}",
-                    corpseIdentity,
-                    corpse.DeadNpcIdentity,
-                    looter.Identity,
-                    corpse.Opened,
-                    corpse.LootClass));
-
-            return true;
+            return this.runtimeSystems.TryUseCorpse(
+                looter,
+                corpseIdentity,
+                this.corpses,
+                CombatCorpseRules.ItemLootCorpseLifetime,
+                CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay,
+                corpse => corpse.DeadNpcIdentity,
+                corpse => corpse.ExpiresAtUtc,
+                corpse => corpse.HasUnlootedItems,
+                corpse => corpse.Opened,
+                (corpse, opened) => { corpse.Opened = opened; },
+                corpse => corpse.NextUseSendsAccessActionOnly,
+                (corpse, nextUseSendsAccessActionOnly) =>
+                    { corpse.NextUseSendsAccessActionOnly = nextUseSendsAccessActionOnly; },
+                corpse => corpse.LootClass,
+                this.DespawnCorpse,
+                this.ExtendCorpseLifetime,
+                this.SendCorpseLootAccessAction,
+                this.SendUseActionFinished,
+                this.SendCorpseInventoryUpdate,
+                this.ScheduleCorpseCreditAward,
+                this.ScheduleCorpseDespawn);
         }
 
         public bool TryUseDeadNpcCorpse(ICharacter looter, Identity deadNpcIdentity, out Identity corpseIdentity)
         {
-            corpseIdentity = Identity.None;
-
-            if (looter == null || deadNpcIdentity.Type != IdentityType.CanbeAffected)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format(
-                        "DeadNpcCorpseUse reject invalid looter={0} deadNpc={1}",
-                        looter == null ? Identity.None : looter.Identity,
-                        deadNpcIdentity));
-                return false;
-            }
-
-            CorpseState corpse = this.corpses.Values
-                .Where(
-                    x => x.DeadNpcIdentity.Type == deadNpcIdentity.Type
-                         && x.DeadNpcIdentity.Instance == deadNpcIdentity.Instance)
-                .OrderByDescending(x => x.CreatedAtUtc)
-                .ThenByDescending(x => x.CorpseIdentity.Instance)
-                .FirstOrDefault();
-
-            if (corpse == null)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format(
-                        "DeadNpcCorpseUse reject unknown deadNpc={0} looter={1} registeredCount={2}",
-                        deadNpcIdentity,
-                        looter.Identity,
-                        this.corpses.Count));
-                return false;
-            }
-
-            corpseIdentity = corpse.CorpseIdentity;
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                string.Format(
-                    "DeadNpcCorpseUse route deadNpc={0} corpse={1} looter={2} created={3:o}",
-                    deadNpcIdentity,
-                    corpseIdentity,
-                    looter.Identity,
-                    corpse.CreatedAtUtc));
-            return this.TryUseCorpse(looter, corpse.CorpseIdentity);
+            return this.runtimeSystems.TryUseDeadNpcCorpse(
+                looter,
+                deadNpcIdentity,
+                this.corpses.Values,
+                corpse => corpse.CorpseIdentity,
+                corpse => corpse.DeadNpcIdentity,
+                corpse => corpse.CreatedAtUtc,
+                this.TryUseCorpse,
+                out corpseIdentity);
         }
 
         public bool TryLootCorpseItem(ICharacter looter, Identity sourceContainer, Identity target, int targetPlacement)
         {
-            if (looter == null || sourceContainer.Type != IdentityType.Backpack)
-            {
-                return false;
-            }
-
-            int corpseInventoryHandle = (sourceContainer.Instance >> 16) & 0xffff;
-            CorpseState corpse = this.corpses.Values.FirstOrDefault(
-                x => x.InventoryHandle == corpseInventoryHandle);
-
-            if (corpse == null)
-            {
-                return false;
-            }
-
-            if (corpse.ExpiresAtUtc <= DateTime.UtcNow)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format("CorpseLoot reject expired corpse={0} looter={1}", corpse.CorpseIdentity, looter.Identity));
-                this.DespawnCorpse(corpse.CorpseIdentity.Instance);
-                return true;
-            }
-
-            if (target != looter.Identity)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format(
-                        "CorpseLoot reject target mismatch source={0} target={1} looter={2}",
-                        sourceContainer,
-                        target,
-                        looter.Identity));
-                this.SendUseActionFinished(looter);
-                return true;
-            }
-
             int requestedLootSlot = sourceContainer.Instance & 0xffff;
-            CorpseLootItem lootItem = FindCorpseLootItem(corpse, requestedLootSlot);
-            if (lootItem == null)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format(
-                        "CorpseLoot reject missing item corpse={0} source={1} requestedSlot={2}",
-                        corpse.CorpseIdentity,
-                        sourceContainer,
-                        requestedLootSlot));
-                this.SendUseActionFinished(looter);
-                return true;
-            }
-
-            if (this.runtimeSystems.CharacterHasUniqueItemAlready(looter, lootItem.Item))
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format(
-                        "CorpseLoot reject duplicate unique corpse={0} looter={1} source={2} item={3}/{4}",
-                        corpse.CorpseIdentity,
-                        looter.Identity,
-                        sourceContainer,
-                        lootItem.Item.LowID,
-                        lootItem.Item.HighID));
-                ChatTextMessageHandler.Default.Send(looter, "You already have this unique item.");
-                this.SendUseActionFinished(looter);
-                return true;
-            }
-
-            CorpseLootInventoryTransferResult transferResult =
-                this.runtimeSystems.TryAddCorpseLootItem(looter, lootItem.Item, targetPlacement);
-            if (transferResult.Status == CorpseLootInventoryTransferStatus.NoFreeSlot)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format(
-                        "CorpseLoot reject no free inventory slot corpse={0} looter={1}",
-                        corpse.CorpseIdentity,
-                        looter.Identity));
-                this.SendUseActionFinished(looter);
-                return true;
-            }
-
-            if (transferResult.Status == CorpseLootInventoryTransferStatus.AddFailed)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    string.Format(
-                        "CorpseLoot inventory add failed corpse={0} looter={1} targetSlot={2} error={3}",
-                        corpse.CorpseIdentity,
-                        looter.Identity,
-                        transferResult.TargetSlot,
-                        transferResult.ExceptionMessage));
-                this.SendUseActionFinished(looter);
-                return true;
-            }
-
-            if (transferResult.Status == CorpseLootInventoryTransferStatus.AddRejected)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format(
-                        "CorpseLoot inventory add rejected corpse={0} looter={1} targetPage={2} targetSlot={3} error={4}",
-                        corpse.CorpseIdentity,
-                        looter.Identity,
-                        transferResult.TargetPageNumber,
-                        transferResult.TargetSlot,
-                        transferResult.InventoryError));
-
-                if (transferResult.InventoryError == InventoryError.HaveUniqueAlready)
-                {
-                    ChatTextMessageHandler.Default.Send(looter, "You already have this unique item.");
-                }
-
-                this.SendUseActionFinished(looter);
-                return true;
-            }
-
-            lootItem.Looted = true;
-            corpse.Opened = true;
-            // Live corpse looting echoes the corpse/backpack source and original
-            // 0x6F target placement; the server-side resolved slot is only for DB state.
-            this.SendCorpseContainerAddItem(looter, sourceContainer, targetPlacement);
-
-            if (!corpse.HasUnlootedItems)
-            {
-                this.ScheduleCorpseDespawn(
-                    corpse,
-                    CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay,
-                    "looted-empty");
-            }
-            else
-            {
-                this.ExtendCorpseLifetime(corpse, CombatCorpseRules.ItemLootCorpseLifetime, "loot-remaining");
-            }
-
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                string.Format(
-                    "CorpseLoot accepted corpse={0} looter={1} source={2} lootSlot={3} targetSlot={4} ackPlacement={5} cashResync={6} remaining={7}",
-                    corpse.CorpseIdentity,
-                    looter.Identity,
-                    sourceContainer,
-                    lootItem.Slot,
-                    transferResult.TargetSlot,
-                    transferResult.TargetSlot,
-                    looter.Stats[StatIds.cash].BaseValue,
-                    corpse.LootItems.Count(x => !x.Looted)));
-
-            return true;
+            return this.runtimeSystems.TryLootCorpseItem(
+                looter,
+                sourceContainer,
+                target,
+                targetPlacement,
+                this.corpses.Values,
+                corpse => corpse.InventoryHandle,
+                corpse => corpse.CorpseIdentity,
+                corpse => corpse.ExpiresAtUtc,
+                corpse => corpse.HasUnlootedItems,
+                corpse => corpse.LootItems.Count(x => !x.Looted),
+                corpse => FindCorpseLootItem(corpse, requestedLootSlot),
+                lootItem => lootItem.Item,
+                lootItem => lootItem.Slot,
+                (lootItem, looted) => { lootItem.Looted = looted; },
+                (corpse, opened) => { corpse.Opened = opened; },
+                this.runtimeSystems.CharacterHasUniqueItemAlready,
+                (character, text) => ChatTextMessageHandler.Default.Send(character, text),
+                this.SendUseActionFinished,
+                this.runtimeSystems.TryAddCorpseLootItem,
+                this.SendCorpseContainerAddItem,
+                this.ScheduleCorpseDespawn,
+                this.ExtendCorpseLifetime,
+                this.DespawnCorpse,
+                CombatCorpseRules.ItemLootCorpseLifetime,
+                CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay);
         }
 
         private void SendCorpseContainerAddItem(ICharacter looter, Identity sourceContainer, int targetPlacement)
@@ -4240,12 +4028,6 @@ namespace AORebirth.Core.Playfields
                     entries.Length));
         }
 
-        private void SendCorpseInventoryUpdateAndCredits(ICharacter looter, CorpseState corpse)
-        {
-            this.SendCorpseInventoryUpdate(looter, corpse);
-            this.ScheduleCorpseCreditAward(looter, corpse);
-        }
-
         private void ScheduleCorpseCreditAward(ICharacter looter, CorpseState corpse)
         {
             if (looter == null || corpse == null || corpse.CreditsLooted || corpse.Credits <= 0)
@@ -4280,33 +4062,16 @@ namespace AORebirth.Core.Playfields
 
         private void ProcessPendingCorpseCreditAwards()
         {
-            List<PendingCorpseCreditAward> dueAwards =
-                this.pendingCorpseCreditAwards.Values.Where(x => x.DueAtUtc <= DateTime.UtcNow).ToList();
-
-            foreach (PendingCorpseCreditAward award in dueAwards)
-            {
-                this.pendingCorpseCreditAwards.Remove(award.CorpseInstance);
-
-                CorpseState corpse;
-                if (!this.corpses.TryGetValue(award.CorpseInstance, out corpse))
-                {
-                    continue;
-                }
-
-                ICharacter looter = this.FindByIdentity<ICharacter>(award.LooterIdentity);
-                if (looter == null || !looter.InPlayfield(this.Identity))
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Engine,
-                        string.Format(
-                            "Corpse credits skipped; looter missing corpse={0} looter={1}",
-                            corpse.CorpseIdentity,
-                            award.LooterIdentity));
-                    continue;
-                }
-
-                this.AwardCorpseCredits(looter, corpse);
-            }
+            this.runtimeSystems.ProcessPendingCorpseCreditAwards(
+                this.pendingCorpseCreditAwards,
+                this.corpses,
+                award => award.DueAtUtc,
+                award => award.CorpseInstance,
+                award => award.LooterIdentity,
+                corpse => corpse.CorpseIdentity,
+                identity => this.FindByIdentity<ICharacter>(identity),
+                looter => looter.InPlayfield(this.Identity),
+                this.AwardCorpseCredits);
         }
 
         private void AwardCorpseCredits(ICharacter looter, CorpseState corpse)

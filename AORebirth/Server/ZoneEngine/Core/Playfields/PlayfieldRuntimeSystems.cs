@@ -32,6 +32,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldContentDataProvider contentData;
 
+        private readonly PlayfieldCorpseAccessRuntimeService corpseAccess;
+
         private readonly PlayfieldDynelRegistry dynelRegistry;
 
         private readonly PlayfieldObjectLifecycleRuntimeService objectLifecycle;
@@ -74,6 +76,7 @@ namespace ZoneEngine.Core.Playfields
                 new MontroyalContentModule(),
                 new PrivateCityContentModule());
             this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);
+            this.corpseAccess = new PlayfieldCorpseAccessRuntimeService();
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.objectLifecycle = new PlayfieldObjectLifecycleRuntimeService();
             this.inventoryContainer = InventoryContainerRuntimeService.Default;
@@ -379,6 +382,156 @@ namespace ZoneEngine.Core.Playfields
             int targetPlacement)
         {
             return this.inventoryContainer.TryAddCorpseLootItem(looter, item, targetPlacement);
+        }
+
+        internal bool TryUseCorpse<TCorpseState>(
+            ICharacter looter,
+            Identity corpseIdentity,
+            IDictionary<int, TCorpseState> corpses,
+            TimeSpan itemLootLifetime,
+            TimeSpan emptyCleanupDelay,
+            Func<TCorpseState, Identity> deadNpcIdentity,
+            Func<TCorpseState, DateTime> expiresAtUtc,
+            Func<TCorpseState, bool> hasUnlootedItems,
+            Func<TCorpseState, bool> opened,
+            Action<TCorpseState, bool> setOpened,
+            Func<TCorpseState, bool> nextUseSendsAccessActionOnly,
+            Action<TCorpseState, bool> setNextUseSendsAccessActionOnly,
+            Func<TCorpseState, object> lootClass,
+            Action<int> despawnCorpse,
+            Action<TCorpseState, TimeSpan, string> extendCorpseLifetime,
+            Action<ICharacter, TCorpseState> sendCorpseLootAccessAction,
+            Action<ICharacter> sendUseActionFinished,
+            Action<ICharacter, TCorpseState> sendCorpseInventoryUpdate,
+            Action<ICharacter, TCorpseState> scheduleCorpseCreditAward,
+            Action<TCorpseState, TimeSpan, string> scheduleCorpseDespawn)
+            where TCorpseState : class
+        {
+            return this.corpseAccess.TryUseCorpse(
+                looter,
+                corpseIdentity,
+                corpses,
+                itemLootLifetime,
+                emptyCleanupDelay,
+                deadNpcIdentity,
+                expiresAtUtc,
+                hasUnlootedItems,
+                opened,
+                setOpened,
+                nextUseSendsAccessActionOnly,
+                setNextUseSendsAccessActionOnly,
+                lootClass,
+                despawnCorpse,
+                extendCorpseLifetime,
+                sendCorpseLootAccessAction,
+                sendUseActionFinished,
+                sendCorpseInventoryUpdate,
+                scheduleCorpseCreditAward,
+                scheduleCorpseDespawn);
+        }
+
+        internal bool TryUseDeadNpcCorpse<TCorpseState>(
+            ICharacter looter,
+            Identity deadNpcIdentity,
+            IEnumerable<TCorpseState> corpses,
+            Func<TCorpseState, Identity> corpseIdentity,
+            Func<TCorpseState, Identity> corpseDeadNpcIdentity,
+            Func<TCorpseState, DateTime> createdAtUtc,
+            Func<ICharacter, Identity, bool> tryUseCorpse,
+            out Identity routedCorpseIdentity)
+            where TCorpseState : class
+        {
+            return this.corpseAccess.TryUseDeadNpcCorpse(
+                looter,
+                deadNpcIdentity,
+                corpses,
+                corpseIdentity,
+                corpseDeadNpcIdentity,
+                createdAtUtc,
+                tryUseCorpse,
+                out routedCorpseIdentity);
+        }
+
+        internal bool TryLootCorpseItem<TCorpseState, TCorpseLootItem>(
+            ICharacter looter,
+            Identity sourceContainer,
+            Identity target,
+            int targetPlacement,
+            IEnumerable<TCorpseState> corpses,
+            Func<TCorpseState, int> corpseInventoryHandle,
+            Func<TCorpseState, Identity> corpseIdentity,
+            Func<TCorpseState, DateTime> expiresAtUtc,
+            Func<TCorpseState, bool> hasUnlootedItems,
+            Func<TCorpseState, int> remainingUnlootedItems,
+            Func<TCorpseState, TCorpseLootItem> findCorpseLootItem,
+            Func<TCorpseLootItem, Item> lootItem,
+            Func<TCorpseLootItem, int> lootItemSlot,
+            Action<TCorpseLootItem, bool> setLooted,
+            Action<TCorpseState, bool> setOpened,
+            Func<ICharacter, Item, bool> characterHasUniqueItemAlready,
+            Action<ICharacter, string> sendChatText,
+            Action<ICharacter> sendUseActionFinished,
+            Func<ICharacter, Item, int, CorpseLootInventoryTransferResult> tryAddCorpseLootItem,
+            Action<ICharacter, Identity, int> sendCorpseContainerAddItem,
+            Action<TCorpseState, TimeSpan, string> scheduleCorpseDespawn,
+            Action<TCorpseState, TimeSpan, string> extendCorpseLifetime,
+            Action<int> despawnCorpse,
+            TimeSpan itemLootLifetime,
+            TimeSpan emptyCleanupDelay)
+            where TCorpseState : class
+            where TCorpseLootItem : class
+        {
+            return this.corpseAccess.TryLootCorpseItem(
+                looter,
+                sourceContainer,
+                target,
+                targetPlacement,
+                corpses,
+                corpseInventoryHandle,
+                corpseIdentity,
+                expiresAtUtc,
+                hasUnlootedItems,
+                remainingUnlootedItems,
+                findCorpseLootItem,
+                lootItem,
+                lootItemSlot,
+                setLooted,
+                setOpened,
+                characterHasUniqueItemAlready,
+                sendChatText,
+                sendUseActionFinished,
+                tryAddCorpseLootItem,
+                sendCorpseContainerAddItem,
+                scheduleCorpseDespawn,
+                extendCorpseLifetime,
+                despawnCorpse,
+                itemLootLifetime,
+                emptyCleanupDelay);
+        }
+
+        internal void ProcessPendingCorpseCreditAwards<TAward, TCorpseState>(
+            IDictionary<int, TAward> pendingCorpseCreditAwards,
+            IDictionary<int, TCorpseState> corpses,
+            Func<TAward, DateTime> dueAtUtc,
+            Func<TAward, int> corpseInstance,
+            Func<TAward, Identity> looterIdentity,
+            Func<TCorpseState, Identity> corpseIdentity,
+            Func<Identity, ICharacter> findLooter,
+            Func<ICharacter, bool> looterInPlayfield,
+            Action<ICharacter, TCorpseState> awardCorpseCredits)
+            where TAward : class
+            where TCorpseState : class
+        {
+            this.corpseAccess.ProcessPendingCorpseCreditAwards(
+                pendingCorpseCreditAwards,
+                corpses,
+                dueAtUtc,
+                corpseInstance,
+                looterIdentity,
+                corpseIdentity,
+                findLooter,
+                looterInPlayfield,
+                awardCorpseCredits);
         }
 
         internal bool HasPendingDeadNpcDespawn(Identity identity)

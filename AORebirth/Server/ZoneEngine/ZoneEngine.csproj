@@ -298,6 +298,7 @@
     <Compile Include="Core\Playfields\PrivateCityReadyInitCoordinator.cs" />
     <Compile Include="Core\Playfields\Playfield.cs" />
     <Compile Include="Core\Playfields\PlayfieldContentDataProvider.cs" />
+    <Compile Include="Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldDynelRegistry.cs" />
     <Compile Include="Core\Playfields\PlayfieldLifecycleRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldLifecycleTrace.cs" />

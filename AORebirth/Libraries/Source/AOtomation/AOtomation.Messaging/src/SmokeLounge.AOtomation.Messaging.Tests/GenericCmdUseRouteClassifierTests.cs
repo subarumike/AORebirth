@@ -1097,24 +1097,47 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
             string playfield =
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+            string corpseAccess =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs");
             string runtimeSystems =
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs");
 
             AssertContains(service, "public CorpseLootInventoryTransferResult TryAddCorpseLootItem(");
             AssertContains(service, "private bool TryResolveCorpseLootTargetSlot(");
             AssertContains(service, "public bool CharacterHasUniqueItemAlready(");
-            AssertContains(playfield, "this.runtimeSystems.TryAddCorpseLootItem(");
-            AssertContains(playfield, "this.runtimeSystems.CharacterHasUniqueItemAlready(");
+            AssertContains(playfield, "this.runtimeSystems.TryAddCorpseLootItem,");
+            AssertContains(playfield, "this.runtimeSystems.CharacterHasUniqueItemAlready,");
+            AssertContains(playfield, "this.runtimeSystems.TryUseCorpse(");
+            AssertContains(playfield, "this.runtimeSystems.TryUseDeadNpcCorpse(");
+            AssertContains(playfield, "this.runtimeSystems.TryLootCorpseItem(");
+            AssertContains(playfield, "this.runtimeSystems.ProcessPendingCorpseCreditAwards(");
             AssertContains(runtimeSystems, "internal CorpseLootInventoryTransferResult TryAddCorpseLootItem(");
             AssertContains(runtimeSystems, "internal bool CharacterHasUniqueItemAlready(ICharacter character, IItem item)");
             AssertContains(runtimeSystems, "return this.inventoryContainer.TryAddCorpseLootItem(looter, item, targetPlacement);");
             AssertContains(runtimeSystems, "return this.inventoryContainer.CharacterHasUniqueItemAlready(character, item);");
+            AssertContains(runtimeSystems, "return this.corpseAccess.TryLootCorpseItem(");
+            AssertContains(runtimeSystems, "this.corpseAccess.ProcessPendingCorpseCreditAwards(");
+            AssertContains(corpseAccess, "internal bool TryUseCorpse<TCorpseState>(");
+            AssertContains(corpseAccess, "internal bool TryUseDeadNpcCorpse<TCorpseState>(");
+            AssertContains(corpseAccess, "internal bool TryLootCorpseItem<TCorpseState, TCorpseLootItem>(");
+            AssertContains(
+                corpseAccess,
+                "CorpseLootInventoryTransferResult transferResult = tryAddCorpseLootItem(looter, item, targetPlacement);");
+            AssertTextBefore(
+                corpseAccess,
+                "setLooted(corpseLootItem, true);",
+                "sendCorpseContainerAddItem(looter, sourceContainer, targetPlacement);");
             AssertDoesNotContain(playfield, "InventoryContainerRuntimeService.Default.TryAddCorpseLootItem(");
             AssertDoesNotContain(playfield, "InventoryContainerRuntimeService.Default.CharacterHasUniqueItemAlready(");
 
             AssertDoesNotContain(playfield, "private bool TryResolveLootTargetSlot(");
             AssertDoesNotContain(playfield, "looter.BaseInventory.AddToPage(targetPageNumber, targetSlot, lootItem.Item)");
             AssertDoesNotContain(playfield, "looter.BaseInventory.Write();");
+            AssertDoesNotContain(playfield, "private void SendCorpseInventoryUpdateAndCredits");
+            AssertDoesNotContain(corpseAccess, "BaseInventory");
+            AssertDoesNotContain(corpseAccess, "InventoryUpdateMessage");
+            AssertDoesNotContain(corpseAccess, "ContainerAddItemMessage");
+            AssertDoesNotContain(corpseAccess, "AwardCorpseCredits");
         }
 
         [TestMethod]
