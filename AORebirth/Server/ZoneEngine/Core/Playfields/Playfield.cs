@@ -1943,11 +1943,11 @@ namespace AORebirth.Core.Playfields
             this.MarkPlayerRespawned(character);
             this.SendDeathRespawnStateStats(character);
             character.StopMovement();
-            character.SetTarget(Identity.None);
-            character.SetFightingTarget(Identity.None);
-            this.ClearCombatTracking(character.Identity);
-            this.StopFightingDeadTarget(character.Identity);
-            this.SendCombatStopMessage(character);
+            this.runtimeSystems.CleanupPlayerDeathCombat(
+                character,
+                this.ClearCombatTracking,
+                this.StopFightingDeadTarget,
+                this.SendCombatStopMessage);
             character.SendChangedStats();
 
             LogUtil.Debug(

@@ -319,7 +319,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void PlayerCombatRuntimeServiceIntroducesPassThroughBoundaryWithoutOwningAlgorithms()
+        public void PlayerCombatRuntimeServiceFinalBoundaryOwnsLifecycleOrchestrationOnly()
         {
             string repositoryRoot = FindRepositoryRoot();
             string attackHandlerText = File.ReadAllText(
@@ -516,6 +516,25 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playerDeath,
                 "this.runtimeSystems.CleanupPlayerDeathCombat(",
                 "this.SendPlayerDeathAnimation(target);");
+            string playerRespawn = ExtractMethodBlock(playfieldText, "public void RespawnPlayer");
+            Assert.IsTrue(
+                playerRespawn.Contains("character.StopMovement();")
+                && playerRespawn.Contains("this.runtimeSystems.CleanupPlayerDeathCombat(")
+                && playerRespawn.Contains("character.SendChangedStats();")
+                && !playerRespawn.Contains("character.SetTarget(Identity.None);")
+                && !playerRespawn.Contains("character.SetFightingTarget(Identity.None);")
+                && !playerRespawn.Contains("this.ClearCombatTracking(character.Identity);")
+                && !playerRespawn.Contains("this.StopFightingDeadTarget(character.Identity);")
+                && !playerRespawn.Contains("this.SendCombatStopMessage(character);"),
+                "Player death respawn combat cleanup must route through the player combat facade.");
+            AssertTextBefore(
+                playerRespawn,
+                "character.StopMovement();",
+                "this.runtimeSystems.CleanupPlayerDeathCombat(");
+            AssertTextBefore(
+                playerRespawn,
+                "this.runtimeSystems.CleanupPlayerDeathCombat(",
+                "character.SendChangedStats();");
             Assert.IsTrue(
                 playfieldText.Contains("internal void StopFightingDeadTarget(Identity deadTarget)")
                 && playfieldText.Contains("if (character.Controller is NPCController)")
@@ -531,10 +550,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsTrue(
                 checkpointText.Contains("PlayerCombatRuntimeService")
-                && checkpointText.Contains("Pass-through boundary")
-                && checkpointText.Contains("What still remains outside")
-                && checkpointText.Contains("Intended next boundary"),
-                "The player combat lifecycle checkpoint doc must describe the new pass-through boundary.");
+                && checkpointText.Contains("Final boundary")
+                && checkpointText.Contains("attack start")
+                && checkpointText.Contains("cancel/stop clear")
+                && checkpointText.Contains("combat tick orchestration")
+                && checkpointText.Contains("invalid-target cleanup")
+                && checkpointText.Contains("death combat cleanup")
+                && checkpointText.Contains("Playfield still owns")
+                && checkpointText.Contains("NPCRuntimeService remains NPC-only"),
+                "The player combat lifecycle checkpoint doc must describe the final player combat boundary.");
         }
 
         [TestMethod]

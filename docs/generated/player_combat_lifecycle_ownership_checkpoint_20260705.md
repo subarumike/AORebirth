@@ -1,36 +1,43 @@
 # Player Combat Lifecycle Ownership Checkpoint - 2026-07-05
 
-This checkpoint documents the first player combat runtime boundary slice. It is
-an orchestration-only pass-through facade. It does not change gameplay behavior,
-packet order, or combat rules.
+This checkpoint documents the final player combat runtime ownership boundary
+after the initial PlayerCombatRuntimeService extraction series. The service owns
+player combat lifecycle orchestration only. It does not change gameplay
+behavior, packet order, or combat rules.
 
-## Pass-through boundary
+## Final boundary
 
 `PlayerCombatRuntimeService` is wired through `PlayfieldRuntimeSystems` and
-names the current player combat lifecycle seams:
+owns player attack start, cancel/stop clear, combat tick orchestration,
+invalid-target cleanup, and death combat cleanup.
+
+Named owned seams:
 
 - player attack start
 - player attack cancellation
 - player combat tick reset
 - player combat tick entry
+- player invalid-target cleanup
 - player fighting-target clear
-- player death entry
+- player death-side combat cleanup
+- player respawn-side combat cleanup
 
-The service delegates each seam back to existing Playfield or handler callbacks.
-Attack start now owns the existing player target/fighting-target mutation and
+Attack start owns the existing player target/fighting-target mutation and
 delegates tick reset back to Playfield. Attack cancellation and player
-fighting-target stop/clear now own the existing fighting-target clear and
-delegate tick/tracking cleanup back to Playfield. Player combat tick now owns
-the no-target, target lookup, target validation, invalid-target clear, and
-validated-tick dispatch orchestration while delegating lookup, logging,
-tracking cleanup, timing, damage, packet emission, and world mutation back to
-Playfield. Invalid target cleanup is named in `ClearInvalidCombatTarget` and
-preserves the existing log-before-clear order. Player death combat cleanup is
-named in `CleanupDeathCombat` and preserves the target clear, fighting-target
-clear, tracking cleanup, stop-fighting-dead-target, and StopFight callback
-order. Other seams remain callback pass-throughs. The service does not own
-algorithms, packet construction, packet emission, damage rules, NPC runtime
-behavior, inventory, loot, credits, corpses, movement, or database loading.
+fighting-target stop/clear own the existing fighting-target clear and delegate
+tick/tracking cleanup back to Playfield. Player combat tick owns the no-target,
+target lookup, target validation, invalid-target clear, and validated-tick
+dispatch orchestration while delegating lookup, logging, tracking cleanup,
+timing, damage, packet emission, and world mutation back to Playfield.
+Invalid-target cleanup is named in `ClearInvalidCombatTarget` and preserves the
+existing log-before-clear order. Death combat cleanup is named in
+`CleanupDeathCombat` and preserves the target clear, fighting-target clear,
+tracking cleanup, stop-fighting-dead-target, and StopFight callback order for
+both player death and player respawn cleanup paths.
+
+The service does not own algorithms, packet construction, packet emission,
+damage rules, NPC runtime behavior, inventory, loot, credits, corpses,
+movement, or database loading.
 
 ## Current ownership seams
 
@@ -40,23 +47,25 @@ behavior, inventory, loot, credits, corpses, movement, or database loading.
 - Echoes attack state back to the playfield.
 - Delegates NPC aggro acquisition through Playfield after the player attack
   state is set.
+- Keeps only the legacy non-Playfield fallback for attack state mutation.
 
 ### Playfield
 
 - Keeps player combat tick reset/tracking storage behind PlayerCombatRuntimeService
   callbacks.
-- Keeps target lookup, invalid-target logging, attack timing, damage application,
-  AttackInfo emission, and world mutation behind PlayerCombatRuntimeService
-  callbacks.
-- Keeps player death marking, stat sending, death animation, and death logging
-  outside PlayerCombatRuntimeService while routing death-side combat cleanup
-  through the service.
+- Keeps target lookup, invalid-target logging, attack timing, range checks,
+  damage application, AttackInfo emission, and world mutation behind
+  PlayerCombatRuntimeService callbacks.
+- Keeps player death lifecycle outside PlayerCombatRuntimeService while routing
+  death-side and respawn-side combat cleanup through the service.
 - Routes player combat ticking through PlayfieldRuntimeSystems while
   PlayerCombatRuntimeService owns the tick orchestration decision flow.
 - Owns damage application, AttackInfo emission, and killing-hit routing.
 - Owns player death lifecycle behavior outside the service; PlayerCombatRuntimeService
   owns only death-side combat cleanup ordering.
 - Owns StopFight packet emission for player and mixed player/NPC target clear.
+- Owns packet emission, damage/range/timing algorithms, world mutation, death
+  lifecycle, and object lookups.
 - Owns the shared combat tick dictionaries while delegating NPC tracking cleanup
   through PlayfieldRuntimeSystems.
 
@@ -69,8 +78,11 @@ behavior, inventory, loot, credits, corpses, movement, or database loading.
 ## What still remains outside
 
 - Attack and damage algorithms remain in Playfield.
+- Combat timing and range checks remain in Playfield.
 - Packet construction and packet emission remain in Playfield and handlers.
 - StopFight emission remains in Playfield.
+- Object lookups and world-state mutation remain in Playfield.
+- Player death lifecycle remains in Playfield.
 - NPC aggro and combat behavior remain in NPCRuntimeService.
 - XP, rewards, loot, credits, inventory, and corpse containers remain in their
   current owners.
@@ -78,7 +90,7 @@ behavior, inventory, loot, credits, corpses, movement, or database loading.
 
 ## Intentional exclusions
 
-The next boundary must not change:
+This boundary must not change:
 
 - Attack or damage algorithms.
 - NPC runtime ownership.
@@ -88,13 +100,12 @@ The next boundary must not change:
 - Movement/pathing.
 - Database loading or object construction.
 
-## Intended next boundary
+## Final guardrail
 
-The next safe architecture slice should move one player combat lifecycle
-orchestration path at a time behind `PlayerCombatRuntimeService` without moving
-damage calculation, packet emission, NPC combat rules, or existing Playfield
-lifecycle traces.
+The final guardrail asserts that PlayerCombatRuntimeService owns player combat
+lifecycle orchestration only, Playfield still owns packet emission and combat
+algorithms, and NPCRuntimeService remains NPC-only.
 
 Guardrail:
 
-- `PlayfieldLifecycleTraceTests.PlayerCombatRuntimeServiceIntroducesPassThroughBoundaryWithoutOwningAlgorithms`
+- `PlayfieldLifecycleTraceTests.PlayerCombatRuntimeServiceFinalBoundaryOwnsLifecycleOrchestrationOnly`
