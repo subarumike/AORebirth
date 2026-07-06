@@ -15,10 +15,12 @@ namespace ZoneEngine.Core.Playfields
         internal void StartAttack(
             ICharacter character,
             Identity target,
-            Action<ICharacter, Identity> startAttack)
+            Action<Identity> resetCombatTick)
         {
-            Require(startAttack, "startAttack");
-            startAttack(character, target);
+            Require(resetCombatTick, "resetCombatTick");
+            character.SetTarget(target);
+            character.SetFightingTarget(target);
+            resetCombatTick(character.Identity);
         }
 
         internal void CancelAttack(ICharacter character, Action<ICharacter> cancelAttack)

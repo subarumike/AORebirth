@@ -1874,19 +1874,12 @@ namespace AORebirth.Core.Playfields
 
         public void StartPlayerAttack(ICharacter character, Identity target)
         {
-            this.runtimeSystems.StartPlayerAttack(character, target, this.ApplyPlayerAttackStart);
+            this.runtimeSystems.StartPlayerAttack(character, target, this.ResetCombatTick);
         }
 
         public void CancelPlayerAttack(ICharacter character)
         {
             this.runtimeSystems.CancelPlayerAttack(character, this.ApplyPlayerAttackCancel);
-        }
-
-        private void ApplyPlayerAttackStart(ICharacter character, Identity target)
-        {
-            character.SetTarget(target);
-            character.SetFightingTarget(target);
-            this.ResetCombatTick(character.Identity);
         }
 
         private void ApplyPlayerAttackCancel(ICharacter character)

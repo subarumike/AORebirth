@@ -284,9 +284,9 @@ namespace ZoneEngine.Core.Playfields
         internal void StartPlayerAttack(
             ICharacter character,
             Identity target,
-            Action<ICharacter, Identity> startAttack)
+            Action<Identity> resetCombatTick)
         {
-            this.playerCombat.StartAttack(character, target, startAttack);
+            this.playerCombat.StartAttack(character, target, resetCombatTick);
         }
 
         internal void CancelPlayerAttack(ICharacter character, Action<ICharacter> cancelAttack)
