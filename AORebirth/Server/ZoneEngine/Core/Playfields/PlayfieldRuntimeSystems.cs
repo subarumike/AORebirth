@@ -38,6 +38,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly NPCRuntimeService npcRuntime;
 
+        private readonly PlayfieldRewardRuntimeService rewards;
+
         private readonly PlayfieldLifecycleRuntimeService lifecycle;
 
         private readonly PlayfieldInteractionRuntimeService interaction;
@@ -72,7 +74,8 @@ namespace ZoneEngine.Core.Playfields
             this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.inventoryContainer = InventoryContainerRuntimeService.Default;
-            this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry);
+            this.rewards = new PlayfieldRewardRuntimeService();
+            this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry, this.rewards);
             this.lifecycle = new PlayfieldLifecycleRuntimeService();
             this.interaction = new PlayfieldInteractionRuntimeService();
             this.playerCombat = new PlayerCombatRuntimeService();

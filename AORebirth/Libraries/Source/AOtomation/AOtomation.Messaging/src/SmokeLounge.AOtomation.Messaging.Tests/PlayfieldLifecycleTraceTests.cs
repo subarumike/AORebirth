@@ -957,6 +957,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
             string npcRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+            string rewardRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRewardRuntimeService.cs"));
             string lifecycleText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -976,7 +978,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string[] runtimeCoordinatorConstructors =
                 {
-                    "new NPCRuntimeService(playfield, this.dynelRegistry)",
+                    "new PlayfieldRewardRuntimeService()",
+                    "new NPCRuntimeService(playfield, this.dynelRegistry, this.rewards)",
                     "new PlayfieldLifecycleRuntimeService()",
                     "new PlayfieldTimedLifecycleRuntimeService()",
                     "new PrivateCityReadyInitCoordinator("
@@ -1238,15 +1241,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && npcRuntimeText.Contains("this.playfield.StopFightingDeadTarget(target.Identity);")
                 && npcRuntimeText.Contains("this.playfield.StopDyingNpcCombatState(target);")
                 && npcRuntimeText.Contains("this.playfield.SendNpcDeathAnimation(target);")
-                && npcRuntimeText.Contains("this.RunNpcDeathRewardHooks(attacker, target);")
+                && npcRuntimeText.Contains("this.rewards.RunNpcDeathRewardHooks(attacker, target, this.playfield.AwardCombatXp);")
                 && npcRuntimeText.Contains("this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);")
                 && npcRuntimeText.Contains("this.ScheduleDeadNpcDespawn(target);"),
                 "NPCRuntimeService must own NPC death lifecycle orchestration order.");
             Assert.IsTrue(
-                npcRuntimeText.Contains("private void RunNpcDeathRewardHooks(ICharacter attacker, ICharacter target)")
-                && npcRuntimeText.Contains("RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);")
-                && npcRuntimeText.Contains("this.playfield.AwardCombatXp(attacker, target);"),
-                "NPCRuntimeService must own named NPC death reward hook orchestration.");
+                rewardRuntimeText.Contains("internal sealed class PlayfieldRewardRuntimeService")
+                && rewardRuntimeText.Contains("internal void RunNpcDeathRewardHooks(")
+                && rewardRuntimeText.Contains("RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);")
+                && rewardRuntimeText.Contains("awardCombatXp(attacker, target);"),
+                "PlayfieldRewardRuntimeService must own named NPC death reward hook orchestration.");
+            AssertTextBefore(
+                rewardRuntimeText,
+                "RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);",
+                "awardCombatXp(attacker, target);");
+            Assert.IsFalse(
+                npcRuntimeText.Contains("RexB18CObjectiveProgressTracker.TryObserveNpcDeath")
+                || npcRuntimeText.Contains("private void RunNpcDeathRewardHooks"),
+                "NPCRuntimeService must delegate quest/XP reward hook orchestration to PlayfieldRewardRuntimeService.");
+            Assert.IsFalse(
+                rewardRuntimeText.Contains("CalculateCombatXpReward")
+                || rewardRuntimeText.Contains("SendCompressed")
+                || rewardRuntimeText.Contains("Stats.Write")
+                || rewardRuntimeText.Contains("RollCorpseLootItems")
+                || rewardRuntimeText.Contains("AwardCorpseCredits"),
+                "PlayfieldRewardRuntimeService must not own XP algorithms, packet emission, persistence, loot, or credits.");
             Assert.IsTrue(
                 npcRuntimeText.Contains("private void ScheduleNpcDeathCorpseSpawn(ICharacter target, Identity corpseIdentity)")
                 && npcRuntimeText.Contains("this.playfield.ScheduleCorpseSpawn(target, corpseIdentity);")
@@ -1368,8 +1387,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Timed lifecycle scheduling must delegate dead NPC processing through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldRuntimeSystems.cs")
-                && projectText.Contains(@"Core\Playfields\NPCRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldRuntimeSystems and NPCRuntimeService.");
+                && projectText.Contains(@"Core\Playfields\NPCRuntimeService.cs")
+                && projectText.Contains(@"Core\Playfields\PlayfieldRewardRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldRuntimeSystems, NPCRuntimeService, and reward runtime service.");
 
             string immediateRemove = ExtractMethodBlock(npcRuntimeText, "internal void RemoveNpcImmediately");
             Assert.IsTrue(
