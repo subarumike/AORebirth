@@ -7,6 +7,7 @@ namespace ZoneEngine.Core.Playfields
     using System.Collections.ObjectModel;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Network;
     using AORebirth.Core.Playfields;
     using AORebirth.Core.Statels;
     using AORebirth.Core.Vector;
@@ -15,6 +16,7 @@ namespace ZoneEngine.Core.Playfields
     using AORebirth.Interfaces;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Playfields.Content;
@@ -34,6 +36,8 @@ namespace ZoneEngine.Core.Playfields
         private readonly NPCRuntimeService npcRuntime;
 
         private readonly PlayfieldLifecycleRuntimeService lifecycle;
+
+        private readonly PlayfieldInteractionRuntimeService interaction;
 
         private readonly PlayerCombatRuntimeService playerCombat;
 
@@ -66,6 +70,7 @@ namespace ZoneEngine.Core.Playfields
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry);
             this.lifecycle = new PlayfieldLifecycleRuntimeService();
+            this.interaction = new PlayfieldInteractionRuntimeService();
             this.playerCombat = new PlayerCombatRuntimeService();
             this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
@@ -283,6 +288,11 @@ namespace ZoneEngine.Core.Playfields
             Action<Dynel> disableTimers)
         {
             this.lifecycle.PreparePlayfieldTransfer(dynel, clearTransferContactState, disableTimers);
+        }
+
+        internal bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
+        {
+            return this.interaction.TryHandleGenericCmdUse(client, message, target);
         }
 
         internal bool HasPendingDeadNpcDespawn(Identity identity)

@@ -100,43 +100,8 @@ namespace ZoneEngine.Core.MessageHandlers
                 case GenericCmdAction.Drop:
                     break;
                 case GenericCmdAction.Use:
-                    if (RexB18DInteractionHandler.Default.TryHandleUse(client, message, target))
-                    {
-                        break;
-                    }
-                    else if (InventoryContainerInteractionHandler.Default.TryHandleUse(client, message, target))
-                    {
-                        break;
-                    }
-                    else if (GuestKeyGeneratorInteractionHandler.Default.TryHandleUse(client, message, target))
-                    {
-                        break;
-                    }
-                    else if (CityControllerInteractionHandler.Default.TryHandleUse(client, message, target))
-                    {
-                        break;
-                    }
-                    else if (CorpseInteractionHandler.Default.TryHandleUse(client, message, target))
-                    {
-                        break;
-                    }
-                    else if (GridTerminalInteractionHandler.Default.TryHandleCapturedUse(client, target))
-                    {
-                        break;
-                    }
-                    else if (GridTerminalInteractionHandler.Default.TryHandleGridEnterUse(client, target))
-                    {
-                        break;
-                    }
-                    else if (SurgeryClinicInteractionHandler.Default.TryHandleUse(client, message, target))
-                    {
-                        break;
-                    }
-                    else if (StaticDynelInteractionHandler.Default.TryHandleUse(client, message, target))
-                    {
-                        break;
-                    }
-                    else if (StatelInteractionHandler.Default.TryHandleUse(client, message, target))
+                    var playfield = client.Controller.Character.Playfield as AORebirth.Core.Playfields.Playfield;
+                    if (playfield != null && playfield.TryHandleGenericCmdUse(client, message, target))
                     {
                         break;
                     }

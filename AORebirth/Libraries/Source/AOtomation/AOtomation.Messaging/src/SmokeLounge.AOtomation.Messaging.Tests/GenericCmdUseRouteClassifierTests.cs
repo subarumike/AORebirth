@@ -46,6 +46,82 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void PlayfieldInteractionRuntimeServiceOwnsGenericCmdUseDispatchOrder()
+        {
+            string interactionService =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldInteractionRuntimeService.cs");
+            string runtimeSystems =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs");
+            string playfield =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+            string genericCmdHandler =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\GenericCmdMessageHandler.cs");
+            string project =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
+
+            AssertContains(interactionService, "internal sealed class PlayfieldInteractionRuntimeService");
+            AssertContains(interactionService, "internal bool TryHandleGenericCmdUse(");
+            AssertTextBefore(
+                interactionService,
+                "RexB18DInteractionHandler.Default.TryHandleUse",
+                "InventoryContainerInteractionHandler.Default.TryHandleUse");
+            AssertTextBefore(
+                interactionService,
+                "InventoryContainerInteractionHandler.Default.TryHandleUse",
+                "GuestKeyGeneratorInteractionHandler.Default.TryHandleUse");
+            AssertTextBefore(
+                interactionService,
+                "GuestKeyGeneratorInteractionHandler.Default.TryHandleUse",
+                "CityControllerInteractionHandler.Default.TryHandleUse");
+            AssertTextBefore(
+                interactionService,
+                "CityControllerInteractionHandler.Default.TryHandleUse",
+                "CorpseInteractionHandler.Default.TryHandleUse");
+            AssertTextBefore(
+                interactionService,
+                "CorpseInteractionHandler.Default.TryHandleUse",
+                "GridTerminalInteractionHandler.Default.TryHandleCapturedUse");
+            AssertTextBefore(
+                interactionService,
+                "GridTerminalInteractionHandler.Default.TryHandleCapturedUse",
+                "GridTerminalInteractionHandler.Default.TryHandleGridEnterUse");
+            AssertTextBefore(
+                interactionService,
+                "GridTerminalInteractionHandler.Default.TryHandleGridEnterUse",
+                "SurgeryClinicInteractionHandler.Default.TryHandleUse");
+            AssertTextBefore(
+                interactionService,
+                "SurgeryClinicInteractionHandler.Default.TryHandleUse",
+                "StaticDynelInteractionHandler.Default.TryHandleUse");
+            AssertTextBefore(
+                interactionService,
+                "StaticDynelInteractionHandler.Default.TryHandleUse",
+                "StatelInteractionHandler.Default.TryHandleUse");
+
+            AssertContains(runtimeSystems, "private readonly PlayfieldInteractionRuntimeService interaction");
+            AssertContains(runtimeSystems, "this.interaction = new PlayfieldInteractionRuntimeService();");
+            AssertContains(runtimeSystems, "internal bool TryHandleGenericCmdUse(");
+            AssertContains(runtimeSystems, "return this.interaction.TryHandleGenericCmdUse(client, message, target);");
+
+            AssertContains(playfield, "public bool TryHandleGenericCmdUse(");
+            AssertContains(playfield, "return this.runtimeSystems.TryHandleGenericCmdUse(client, message, target);");
+
+            AssertContains(genericCmdHandler, "playfield.TryHandleGenericCmdUse(client, message, target)");
+            AssertDoesNotContain(genericCmdHandler, "RexB18DInteractionHandler.Default.TryHandleUse");
+            AssertDoesNotContain(genericCmdHandler, "InventoryContainerInteractionHandler.Default.TryHandleUse");
+            AssertDoesNotContain(genericCmdHandler, "GuestKeyGeneratorInteractionHandler.Default.TryHandleUse");
+            AssertDoesNotContain(genericCmdHandler, "CityControllerInteractionHandler.Default.TryHandleUse");
+            AssertDoesNotContain(genericCmdHandler, "CorpseInteractionHandler.Default.TryHandleUse");
+            AssertDoesNotContain(genericCmdHandler, "GridTerminalInteractionHandler.Default.TryHandleCapturedUse");
+            AssertDoesNotContain(genericCmdHandler, "GridTerminalInteractionHandler.Default.TryHandleGridEnterUse");
+            AssertDoesNotContain(genericCmdHandler, "SurgeryClinicInteractionHandler.Default.TryHandleUse");
+            AssertDoesNotContain(genericCmdHandler, "StaticDynelInteractionHandler.Default.TryHandleUse");
+            AssertDoesNotContain(genericCmdHandler, "StatelInteractionHandler.Default.TryHandleUse");
+
+            AssertContains(project, @"Core\Playfields\PlayfieldInteractionRuntimeService.cs");
+        }
+
+        [TestMethod]
         public void KnownPrivateCityTargetsSelectCurrentCapturedRoutes()
         {
             AssertRoute(
@@ -354,7 +430,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(useItemOnItemHandler, "Pool.Instance.GetObject<IInventoryPage>");
             AssertDoesNotContain(useItemOnItemHandler, "client.Controller.UseStatel");
 
-            AssertContains(genericCmdHandler, "InventoryContainerInteractionHandler.Default.TryHandleUse");
+            AssertContains(genericCmdHandler, "playfield.TryHandleGenericCmdUse(client, message, target)");
+            AssertDoesNotContain(genericCmdHandler, "InventoryContainerInteractionHandler.Default.TryHandleUse");
             AssertContains(genericCmdHandler, "UseItemOnItemInteractionHandler.Default.TryHandle");
 
             foreach (string forbiddenReference in new[]
@@ -1303,6 +1380,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static void AssertContains(string text, string expected)
         {
             Assert.IsTrue(text.Contains(expected), "Expected source to contain: " + expected);
+        }
+
+        private static void AssertTextBefore(string text, string first, string second)
+        {
+            int firstIndex = text.IndexOf(first, StringComparison.Ordinal);
+            int secondIndex = text.IndexOf(second, StringComparison.Ordinal);
+
+            Assert.IsTrue(firstIndex >= 0, "Expected source to contain: " + first);
+            Assert.IsTrue(secondIndex >= 0, "Expected source to contain: " + second);
+            Assert.IsTrue(firstIndex < secondIndex, "Expected " + first + " before " + second + ".");
         }
 
         private static void AssertDoesNotContain(string text, string unexpected)
