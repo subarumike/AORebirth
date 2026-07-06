@@ -1361,10 +1361,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Playfield must delegate immediate NPC removal through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.ProcessDueNpcCorpseDespawns(DateTime.UtcNow, this.DespawnCorpse);")
+                && playfieldText.Contains("this.runtimeSystems.ProcessPendingCorpseSpawns(")
+                && playfieldText.Contains("this.runtimeSystems.DespawnCorpses(")
                 && playfieldText.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
                 && playfieldText.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpse.CorpseIdentity, expiresAtUtc);")
                 && playfieldText.Contains("this.runtimeSystems.DespawnCorpse("),
-                "Playfield must delegate corpse despawn scheduling, due checks, and cleanup ordering through PlayfieldRuntimeSystems.");
+                "Playfield must delegate corpse spawn/despawn scheduling, due checks, and cleanup ordering through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                objectLifecycleText.Contains("internal int DespawnCorpses<TCorpseState>(")
+                && objectLifecycleText.Contains("pendingCorpseSpawns.Remove(deadNpcIdentity(corpse).Instance);")
+                && objectLifecycleText.Contains("despawnCorpse(corpseInstance);"),
+                "PlayfieldObjectLifecycleRuntimeService must own explicit corpse-despawn predicate routing.");
+            AssertTextBefore(
+                objectLifecycleText,
+                "pendingCorpseSpawns.Remove(deadNpcIdentity(corpse).Instance);",
+                "despawnCorpse(corpseInstance);");
             Assert.IsTrue(
                 objectLifecycleText.Contains("internal void DespawnCorpse(")
                 && objectLifecycleText.Contains("sendDespawn(corpseIdentity);")
@@ -1385,10 +1396,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "removeCorpseState(corpseInstance);",
                 "removePendingCorpseCreditAward(corpseInstance);");
             Assert.IsTrue(
-                playfieldText.Contains("private void ProcessPendingCorpseSpawns()")
-                && playfieldText.Contains("this.RegisterCorpse(target, corpse.CorpseIdentity);")
-                && playfieldText.Contains("this.SendCorpseFullUpdate(target, corpse.CorpseIdentity);"),
-                "Playfield intentionally keeps pending corpse spawn packet/loot construction.");
+                objectLifecycleText.Contains("internal void ProcessPendingCorpseSpawns<TCorpseState>(")
+                && objectLifecycleText.Contains("registerCorpse(target, corpseId);")
+                && objectLifecycleText.Contains("traceCorpseFullUpdate(corpseId, deadNpcId);")
+                && objectLifecycleText.Contains("sendCorpseFullUpdate(target, corpseId);"),
+                "PlayfieldObjectLifecycleRuntimeService must own pending corpse spawn callback ordering.");
+            AssertTextBefore(
+                objectLifecycleText,
+                "registerCorpse(target, corpseId);",
+                "traceCorpseFullUpdate(corpseId, deadNpcId);");
+            AssertTextBefore(
+                objectLifecycleText,
+                "traceCorpseFullUpdate(corpseId, deadNpcId);",
+                "sendCorpseFullUpdate(target, corpseId);");
+            string processPendingCorpseSpawns = ExtractMethodBlock(playfieldText, "private void ProcessPendingCorpseSpawns");
+            Assert.IsTrue(
+                processPendingCorpseSpawns.Contains("this.runtimeSystems.ProcessPendingCorpseSpawns(")
+                && processPendingCorpseSpawns.Contains("this.RegisterCorpse")
+                && processPendingCorpseSpawns.Contains("this.TraceCorpseFullUpdate")
+                && processPendingCorpseSpawns.Contains("this.SendCorpseFullUpdate"),
+                "Playfield must delegate pending corpse spawn orchestration and keep packet/loot callbacks.");
+            Assert.IsFalse(
+                processPendingCorpseSpawns.Contains("foreach (CorpseState corpse")
+                || processPendingCorpseSpawns.Contains("this.pendingCorpseSpawns.Remove"),
+                "Playfield must not own pending corpse spawn loop orchestration.");
             Assert.IsTrue(
                 playfieldText.Contains("private void SendCorpseFullUpdate(ICharacter target, Identity corpseIdentity)")
                 && playfieldText.Contains("client.SendCompressed(")

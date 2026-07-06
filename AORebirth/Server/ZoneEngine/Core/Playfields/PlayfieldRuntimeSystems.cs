@@ -157,6 +157,23 @@ namespace ZoneEngine.Core.Playfields
             this.objectLifecycle.RemoveInstancedEntity(entity);
         }
 
+        internal int DespawnCorpses<TCorpseState>(
+            IDictionary<int, TCorpseState> pendingCorpseSpawns,
+            IDictionary<int, TCorpseState> corpses,
+            Func<string, Identity, bool> shouldDespawn,
+            Func<TCorpseState, string> corpseName,
+            Func<TCorpseState, Identity> deadNpcIdentity,
+            Action<int> despawnCorpse)
+        {
+            return this.objectLifecycle.DespawnCorpses(
+                pendingCorpseSpawns,
+                corpses,
+                shouldDespawn,
+                corpseName,
+                deadNpcIdentity,
+                despawnCorpse);
+        }
+
         internal void DespawnCorpse(
             int corpseInstance,
             Action<Identity> sendDespawn,
@@ -170,6 +187,27 @@ namespace ZoneEngine.Core.Playfields
                 clearNpcCorpseDespawn,
                 removeCorpseState,
                 removePendingCorpseCreditAward);
+        }
+
+        internal void ProcessPendingCorpseSpawns<TCorpseState>(
+            IDictionary<int, TCorpseState> pendingCorpseSpawns,
+            Func<TCorpseState, DateTime> spawnsAtUtc,
+            Func<TCorpseState, Identity> corpseIdentity,
+            Func<TCorpseState, Identity> deadNpcIdentity,
+            Func<Identity, ICharacter> findDeadNpc,
+            Action<ICharacter, Identity> registerCorpse,
+            Action<Identity, Identity> traceCorpseFullUpdate,
+            Action<ICharacter, Identity> sendCorpseFullUpdate)
+        {
+            this.objectLifecycle.ProcessPendingCorpseSpawns(
+                pendingCorpseSpawns,
+                spawnsAtUtc,
+                corpseIdentity,
+                deadNpcIdentity,
+                findDeadNpc,
+                registerCorpse,
+                traceCorpseFullUpdate,
+                sendCorpseFullUpdate);
         }
 
         internal void ActivateNpc(ICharacter character)

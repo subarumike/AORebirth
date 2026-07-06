@@ -628,31 +628,13 @@ namespace AORebirth.Core.Playfields
 
         public int DespawnCorpses(Func<string, Identity, bool> shouldDespawn)
         {
-            if (shouldDespawn == null)
-            {
-                return 0;
-            }
-
-            int removed = 0;
-            foreach (CorpseState corpse in this.pendingCorpseSpawns
-                .Where(x => shouldDespawn(x.Value.Name, x.Value.DeadNpcIdentity))
-                .Select(x => x.Value)
-                .ToList())
-            {
-                this.pendingCorpseSpawns.Remove(corpse.DeadNpcIdentity.Instance);
-                removed++;
-            }
-
-            foreach (int corpseInstance in this.corpses
-                .Where(x => shouldDespawn(x.Value.Name, x.Value.DeadNpcIdentity))
-                .Select(x => x.Key)
-                .ToList())
-            {
-                this.DespawnCorpse(corpseInstance);
-                removed++;
-            }
-
-            return removed;
+            return this.runtimeSystems.DespawnCorpses(
+                this.pendingCorpseSpawns,
+                this.corpses,
+                shouldDespawn,
+                corpse => corpse.Name,
+                corpse => corpse.DeadNpcIdentity,
+                this.DespawnCorpse);
         }
 
         /// <summary>
@@ -3537,34 +3519,15 @@ namespace AORebirth.Core.Playfields
 
         private void ProcessPendingCorpseSpawns()
         {
-            foreach (CorpseState corpse in this.pendingCorpseSpawns
-                .Where(x => x.Value.SpawnsAtUtc <= DateTime.UtcNow)
-                .Select(x => x.Value)
-                .ToList())
-            {
-                this.pendingCorpseSpawns.Remove(corpse.DeadNpcIdentity.Instance);
-
-                ICharacter target = this.FindByIdentity<ICharacter>(corpse.DeadNpcIdentity);
-                if (target == null)
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Network,
-                        string.Format(
-                            "Skipping corpse spawn corpse={0}; dead NPC no longer exists deadNpc={1}",
-                            corpse.CorpseIdentity,
-                            corpse.DeadNpcIdentity));
-                    continue;
-                }
-
-                this.RegisterCorpse(target, corpse.CorpseIdentity);
-                PlayfieldLifecycleTrace.Record(
-                    PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
-                    PlayfieldLifecycleTrace.StageCorpseFullUpdate,
-                    PlayfieldLifecycleTrace.MessageCorpseFullUpdate,
-                    corpse.CorpseIdentity,
-                    "deadNpc=" + corpse.DeadNpcIdentity);
-                this.SendCorpseFullUpdate(target, corpse.CorpseIdentity);
-            }
+            this.runtimeSystems.ProcessPendingCorpseSpawns(
+                this.pendingCorpseSpawns,
+                corpse => corpse.SpawnsAtUtc,
+                corpse => corpse.CorpseIdentity,
+                corpse => corpse.DeadNpcIdentity,
+                identity => this.FindByIdentity<ICharacter>(identity),
+                this.RegisterCorpse,
+                this.TraceCorpseFullUpdate,
+                this.SendCorpseFullUpdate);
         }
 
         internal void ScheduleCorpseSpawn(ICharacter target, Identity corpseIdentity)
@@ -3629,6 +3592,16 @@ namespace AORebirth.Core.Playfields
                     (int)lifetime.TotalSeconds,
                     state.LootClass,
                     state.Credits));
+        }
+
+        private void TraceCorpseFullUpdate(Identity corpseIdentity, Identity deadNpcIdentity)
+        {
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
+                PlayfieldLifecycleTrace.StageCorpseFullUpdate,
+                PlayfieldLifecycleTrace.MessageCorpseFullUpdate,
+                corpseIdentity,
+                "deadNpc=" + deadNpcIdentity);
         }
 
         private void DespawnCorpse(int corpseInstance)
