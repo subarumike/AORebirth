@@ -18,7 +18,9 @@ names the current player combat lifecycle seams:
 
 The service delegates each seam back to existing Playfield or handler callbacks.
 Attack start now owns the existing player target/fighting-target mutation and
-delegates tick reset back to Playfield. Other seams remain callback
+delegates tick reset back to Playfield. Attack cancellation and player
+fighting-target stop/clear now own the existing fighting-target clear and
+delegate tick/tracking cleanup back to Playfield. Other seams remain callback
 pass-throughs. The service does not own algorithms, packet construction, packet
 emission, damage rules, NPC runtime behavior, inventory, loot, credits, corpses,
 movement, or database loading.
@@ -34,10 +36,11 @@ movement, or database loading.
 
 ### Playfield
 
-- Keeps player attack cancellation state mutation and player combat tick reset
-  storage behind PlayerCombatRuntimeService callbacks.
+- Keeps player combat tick reset/tracking storage behind PlayerCombatRuntimeService
+  callbacks.
 - Owns player combat ticking inside the non-NPC branch of DoCombatTick.
-- Owns player fighting-target validation and clearing.
+- Owns player fighting-target validation while PlayerCombatRuntimeService owns
+  player fighting-target clear orchestration.
 - Owns damage application, AttackInfo emission, and killing-hit routing.
 - Owns player death-side combat stop sequencing.
 - Owns StopFight packet emission for player and mixed player/NPC target clear.

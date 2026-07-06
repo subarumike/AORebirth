@@ -1879,13 +1879,7 @@ namespace AORebirth.Core.Playfields
 
         public void CancelPlayerAttack(ICharacter character)
         {
-            this.runtimeSystems.CancelPlayerAttack(character, this.ApplyPlayerAttackCancel);
-        }
-
-        private void ApplyPlayerAttackCancel(ICharacter character)
-        {
-            character.SetFightingTarget(Identity.None);
-            this.ResetCombatTick(character.Identity);
+            this.runtimeSystems.CancelPlayerAttack(character, this.ResetCombatTick);
         }
 
         private void ResetPlayerCombatTick(Identity attacker)
@@ -2098,7 +2092,7 @@ namespace AORebirth.Core.Playfields
                         target != null,
                         target != null && target.InPlayfield(this.Identity),
                         target == null ? 0 : target.Stats[StatIds.health].Value));
-                this.runtimeSystems.ClearPlayerFightingTarget(attacker, this.ClearPlayerFightingTarget);
+                this.runtimeSystems.ClearPlayerFightingTarget(attacker, this.ClearCombatTracking);
                 return;
             }
 
@@ -2644,7 +2638,7 @@ namespace AORebirth.Core.Playfields
                 }
                 else
                 {
-                    this.runtimeSystems.ClearPlayerFightingTarget(attacker, this.ClearPlayerFightingTarget);
+                    this.runtimeSystems.ClearPlayerFightingTarget(attacker, this.ClearCombatTracking);
                 }
             }
         }
@@ -3815,7 +3809,7 @@ namespace AORebirth.Core.Playfields
                     }
                     else
                     {
-                        this.runtimeSystems.ClearPlayerFightingTarget(character, this.ClearPlayerFightingTarget);
+                        this.runtimeSystems.ClearPlayerFightingTarget(character, this.ClearCombatTracking);
                     }
 
                     PlayfieldLifecycleTrace.Record(
@@ -3834,12 +3828,6 @@ namespace AORebirth.Core.Playfields
             var stopFight = new StopFightMessage { Identity = character.Identity, Unknown1 = 1 };
 
             this.Announce(stopFight);
-        }
-
-        private void ClearPlayerFightingTarget(ICharacter character)
-        {
-            character.SetFightingTarget(Identity.None);
-            this.ClearCombatTracking(character.Identity);
         }
 
         private List<CorpseLootItem> RollCorpseLootItems(ICharacter target)
