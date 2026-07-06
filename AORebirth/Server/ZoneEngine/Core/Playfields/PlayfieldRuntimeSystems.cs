@@ -34,6 +34,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldDynelRegistry dynelRegistry;
 
+        private readonly PlayfieldObjectLifecycleRuntimeService objectLifecycle;
+
         private readonly InventoryContainerRuntimeService inventoryContainer;
 
         private readonly NPCRuntimeService npcRuntime;
@@ -73,6 +75,7 @@ namespace ZoneEngine.Core.Playfields
                 new PrivateCityContentModule());
             this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
+            this.objectLifecycle = new PlayfieldObjectLifecycleRuntimeService();
             this.inventoryContainer = InventoryContainerRuntimeService.Default;
             this.rewards = new PlayfieldRewardRuntimeService();
             this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry, this.rewards);
@@ -147,6 +150,26 @@ namespace ZoneEngine.Core.Playfields
         internal void UnregisterDynel(Identity identity)
         {
             this.dynelRegistry.Unregister(identity);
+        }
+
+        internal void RemoveInstancedEntity(IInstancedEntity entity)
+        {
+            this.objectLifecycle.RemoveInstancedEntity(entity);
+        }
+
+        internal void DespawnCorpse(
+            int corpseInstance,
+            Action<Identity> sendDespawn,
+            Action<int> clearNpcCorpseDespawn,
+            Action<int> removeCorpseState,
+            Action<int> removePendingCorpseCreditAward)
+        {
+            this.objectLifecycle.DespawnCorpse(
+                corpseInstance,
+                sendDespawn,
+                clearNpcCorpseDespawn,
+                removeCorpseState,
+                removePendingCorpseCreditAward);
         }
 
         internal void ActivateNpc(ICharacter character)
