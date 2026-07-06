@@ -1733,90 +1733,15 @@ namespace AORebirth.Core.Playfields
         {
             try
             {
-                this.ProcessPendingCorpseSpawns();
-                this.ProcessCorpseDespawns();
-                this.ProcessPendingCorpseCreditAwards();
-
-                IEnumerable<ICharacter> dynels =
-                    this.runtimeSystems.Characters()
-                        .Where(
-                            xx =>
-                                xx.InPlayfield(this.Identity)
-                                && (!xx.DoNotDoTimers
-                                    || this.runtimeSystems.HasPendingDeadNpcDespawn(xx.Identity)))
-                        .ToList();
-
-                foreach (ICharacter dynel in dynels)
-                {
-                    if (dynel != null)
-                    {
-                        if (dynel.Starting)
-                        {
-                            continue;
-                        }
-
-                        if (this.runtimeSystems.ProcessDeadNpcDespawn(dynel))
-                        {
-                            continue;
-                        }
-
-                        if (dynel.DoNotDoTimers)
-                        {
-                            continue;
-                        }
-
-                        bool changed = false;
-                        StatHealInterval healInterval = (StatHealInterval)dynel.Stats[StatIds.healinterval];
-                        int healIntervalSeconds = healInterval.Value;
-                        int healDelta = dynel.Stats[StatIds.healdelta].Value;
-                        if (healIntervalSeconds > 0
-                            && healDelta != 0
-                            && healInterval.LastTick < DateTime.UtcNow)
-                        {
-                            dynel.Stats[StatIds.health].Value =
-                                Math.Min(dynel.Stats[StatIds.life].Value, dynel.Stats[StatIds.health].Value + healDelta);
-                            healInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(healIntervalSeconds);
-                            changed = true;
-                        }
-
-                        StatNanoInterval nanoInterval = (StatNanoInterval)dynel.Stats[StatIds.nanointerval];
-                        int nanoIntervalSeconds = nanoInterval.Value;
-                        int nanoDelta = dynel.Stats[StatIds.nanodelta].Value;
-                        if (nanoIntervalSeconds > 0
-                            && nanoDelta != 0
-                            && nanoInterval.LastTick < DateTime.UtcNow)
-                        {
-                            dynel.Stats[StatIds.currentnano].Value += nanoDelta;
-                            nanoInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(nanoIntervalSeconds);
-                            changed = true;
-                        }
-
-                        if (changed)
-                        {
-                            dynel.SendChangedStats();
-                        }
-
-                        this.DoCombatTick(dynel);
-
-                        if (dynel.Controller is NPCController)
-                        {
-                            this.runtimeSystems.ProcessNpcPatrolTick(dynel);
-                        }
-                        else
-                        {
-                            if (dynel.Controller.IsFollowing())
-                            {
-                                dynel.Controller.DoFollow();
-                            }
-                        }
-
-                        if (dynel.Controller is PlayerController)
-                        {
-                            this.CheckWallCollision(dynel);
-                            this.CheckStatelCollision(dynel);
-                        }
-                    }
-                }
+                this.runtimeSystems.ProcessTimedLifecycle(
+                    this.Identity,
+                    this.ProcessPendingCorpseSpawns,
+                    this.ProcessCorpseDespawns,
+                    this.ProcessPendingCorpseCreditAwards,
+                    this.ProcessCharacterRegeneration,
+                    this.DoCombatTick,
+                    this.ProcessCharacterFollow,
+                    this.ProcessPlayerCollisionChecks);
             }
             catch (Exception e)
             {
@@ -1832,6 +1757,54 @@ namespace AORebirth.Core.Playfields
                 {
                 }
             }
+        }
+
+        private void ProcessCharacterRegeneration(ICharacter dynel)
+        {
+            bool changed = false;
+            StatHealInterval healInterval = (StatHealInterval)dynel.Stats[StatIds.healinterval];
+            int healIntervalSeconds = healInterval.Value;
+            int healDelta = dynel.Stats[StatIds.healdelta].Value;
+            if (healIntervalSeconds > 0
+                && healDelta != 0
+                && healInterval.LastTick < DateTime.UtcNow)
+            {
+                dynel.Stats[StatIds.health].Value =
+                    Math.Min(dynel.Stats[StatIds.life].Value, dynel.Stats[StatIds.health].Value + healDelta);
+                healInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(healIntervalSeconds);
+                changed = true;
+            }
+
+            StatNanoInterval nanoInterval = (StatNanoInterval)dynel.Stats[StatIds.nanointerval];
+            int nanoIntervalSeconds = nanoInterval.Value;
+            int nanoDelta = dynel.Stats[StatIds.nanodelta].Value;
+            if (nanoIntervalSeconds > 0
+                && nanoDelta != 0
+                && nanoInterval.LastTick < DateTime.UtcNow)
+            {
+                dynel.Stats[StatIds.currentnano].Value += nanoDelta;
+                nanoInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(nanoIntervalSeconds);
+                changed = true;
+            }
+
+            if (changed)
+            {
+                dynel.SendChangedStats();
+            }
+        }
+
+        private void ProcessCharacterFollow(ICharacter dynel)
+        {
+            if (dynel.Controller.IsFollowing())
+            {
+                dynel.Controller.DoFollow();
+            }
+        }
+
+        private void ProcessPlayerCollisionChecks(ICharacter dynel)
+        {
+            this.CheckWallCollision(dynel);
+            this.CheckStatelCollision(dynel);
         }
 
         private static bool IsPostZoneCollisionGraceActive(ICharacter dynel)

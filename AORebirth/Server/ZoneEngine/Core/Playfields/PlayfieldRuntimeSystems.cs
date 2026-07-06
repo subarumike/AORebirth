@@ -34,6 +34,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayerCombatRuntimeService playerCombat;
 
+        private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle;
+
         private readonly PacketSequencingCoordinator packetSequencing;
 
         private readonly PrivateCityReadyInitCoordinator privateCityReadyInit;
@@ -61,6 +63,7 @@ namespace ZoneEngine.Core.Playfields
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry);
             this.playerCombat = new PlayerCombatRuntimeService();
+            this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
             this.privateCityReadyInit =
                 new PrivateCityReadyInitCoordinator(
@@ -204,6 +207,31 @@ namespace ZoneEngine.Core.Playfields
         internal void SendPrivateCityPreFullCharacterReadyBlock(ZoneClient client, ICharacter character)
         {
             this.privateCityReadyInit.SendPreFullCharacterReadyBlock(client, character);
+        }
+
+        internal void ProcessTimedLifecycle(
+            Identity playfieldIdentity,
+            Action processPendingCorpseSpawns,
+            Action processCorpseDespawns,
+            Action processPendingCorpseCreditAwards,
+            Action<ICharacter> processRegeneration,
+            Action<ICharacter> processCombatTick,
+            Action<ICharacter> processFollow,
+            Action<ICharacter> processPlayerCollision)
+        {
+            this.timedLifecycle.ProcessHeartbeatLifecycle(
+                playfieldIdentity,
+                this.Characters,
+                this.HasPendingDeadNpcDespawn,
+                processPendingCorpseSpawns,
+                processCorpseDespawns,
+                processPendingCorpseCreditAwards,
+                this.ProcessDeadNpcDespawn,
+                processRegeneration,
+                processCombatTick,
+                this.ProcessNpcPatrolTick,
+                processFollow,
+                processPlayerCollision);
         }
 
         internal bool HasPendingDeadNpcDespawn(Identity identity)
