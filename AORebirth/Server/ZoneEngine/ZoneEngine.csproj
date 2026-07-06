@@ -298,6 +298,7 @@
     <Compile Include="Core\Playfields\PlayfieldDynelRegistry.cs" />
     <Compile Include="Core\Playfields\PlayfieldLifecycleTrace.cs" />
     <Compile Include="Core\Playfields\PlayfieldRuntimeSystems.cs" />
+    <Compile Include="Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs" />
     <Compile Include="Core\Playfields\Playfields.cs" />
     <Compile Include="Core\Playfields\WallCollision.cs" />
     <Compile Include="Core\Playfields\WallCollisionResult.cs" />
