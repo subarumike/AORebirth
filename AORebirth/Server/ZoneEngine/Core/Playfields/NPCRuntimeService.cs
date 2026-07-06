@@ -15,7 +15,6 @@ namespace AORebirth.Core.Playfields
 
     using Utility;
 
-    using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.Playfields;
@@ -27,6 +26,8 @@ namespace AORebirth.Core.Playfields
         private readonly Playfield playfield;
 
         private readonly PlayfieldDynelRegistry dynelRegistry;
+
+        private readonly PlayfieldRewardRuntimeService rewards;
 
         private readonly NpcCorpseLifecycleCoordinator corpseLifecycle;
 
@@ -42,10 +43,14 @@ namespace AORebirth.Core.Playfields
 
         private readonly Dictionary<int, DateTime> corpseDespawnTicks = new Dictionary<int, DateTime>();
 
-        internal NPCRuntimeService(Playfield playfield, PlayfieldDynelRegistry dynelRegistry)
+        internal NPCRuntimeService(
+            Playfield playfield,
+            PlayfieldDynelRegistry dynelRegistry,
+            PlayfieldRewardRuntimeService rewards)
         {
             this.playfield = playfield;
             this.dynelRegistry = dynelRegistry;
+            this.rewards = rewards ?? new PlayfieldRewardRuntimeService();
             this.corpseLifecycle = new NpcCorpseLifecycleCoordinator(playfield, this.RemoveNpcHome);
             this.combatTick = new NpcCombatTickCoordinator(playfield);
             this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
@@ -150,7 +155,7 @@ namespace AORebirth.Core.Playfields
             this.playfield.StopFightingDeadTarget(target.Identity);
             this.playfield.StopDyingNpcCombatState(target);
             this.playfield.SendNpcDeathAnimation(target);
-            this.RunNpcDeathRewardHooks(attacker, target);
+            this.rewards.RunNpcDeathRewardHooks(attacker, target, this.playfield.AwardCombatXp);
             this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);
 
             this.ScheduleDeadNpcDespawn(target);
@@ -273,17 +278,6 @@ namespace AORebirth.Core.Playfields
                     "NPC combat engaged attacker={0} npc={1}",
                     attacker.Identity.ToString(true),
                     target.Identity.ToString(true)));
-        }
-
-        private void RunNpcDeathRewardHooks(ICharacter attacker, ICharacter target)
-        {
-            if (attacker == null)
-            {
-                return;
-            }
-
-            RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);
-            this.playfield.AwardCombatXp(attacker, target);
         }
 
         private void ScheduleNpcDeathCorpseSpawn(ICharacter target, Identity corpseIdentity)
