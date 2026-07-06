@@ -518,23 +518,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "this.SendPlayerDeathAnimation(target);");
             string playerRespawn = ExtractMethodBlock(playfieldText, "public void RespawnPlayer");
             Assert.IsTrue(
-                playerRespawn.Contains("character.StopMovement();")
-                && playerRespawn.Contains("this.runtimeSystems.CleanupPlayerDeathCombat(")
-                && playerRespawn.Contains("character.SendChangedStats();")
+                playerRespawn.Contains("this.runtimeSystems.ProcessPlayerRespawn(")
+                && playerRespawn.Contains("this.ClearCombatTracking")
+                && playerRespawn.Contains("this.StopFightingDeadTarget")
+                && playerRespawn.Contains("this.SendCombatStopMessage")
+                && runtimeSystemsText.Contains("x => this.CleanupPlayerDeathCombat(x, clearCombatTracking, stopFightingDeadTarget, sendCombatStop)")
                 && !playerRespawn.Contains("character.SetTarget(Identity.None);")
                 && !playerRespawn.Contains("character.SetFightingTarget(Identity.None);")
                 && !playerRespawn.Contains("this.ClearCombatTracking(character.Identity);")
                 && !playerRespawn.Contains("this.StopFightingDeadTarget(character.Identity);")
                 && !playerRespawn.Contains("this.SendCombatStopMessage(character);"),
                 "Player death respawn combat cleanup must route through the player combat facade.");
-            AssertTextBefore(
-                playerRespawn,
-                "character.StopMovement();",
-                "this.runtimeSystems.CleanupPlayerDeathCombat(");
-            AssertTextBefore(
-                playerRespawn,
-                "this.runtimeSystems.CleanupPlayerDeathCombat(",
-                "character.SendChangedStats();");
             Assert.IsTrue(
                 playfieldText.Contains("internal void StopFightingDeadTarget(Identity deadTarget)")
                 && playfieldText.Contains("if (character.Controller is NPCController)")
@@ -963,6 +957,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
             string npcRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+            string lifecycleText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleRuntimeService.cs"));
             string timedLifecycleText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -979,6 +977,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string[] runtimeCoordinatorConstructors =
                 {
                     "new NPCRuntimeService(playfield, this.dynelRegistry)",
+                    "new PlayfieldLifecycleRuntimeService()",
                     "new PlayfieldTimedLifecycleRuntimeService()",
                     "new PrivateCityReadyInitCoordinator("
                 };
@@ -1053,13 +1052,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Playfield must not own NPC home state storage.");
             Assert.IsTrue(
                 runtimeSystemsText.Contains("private readonly NPCRuntimeService npcRuntime")
+                && runtimeSystemsText.Contains("private readonly PlayfieldLifecycleRuntimeService lifecycle")
                 && runtimeSystemsText.Contains("private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle")
-                && runtimeSystemsText.Contains("internal void ProcessTimedLifecycle(")
+                && runtimeSystemsText.Contains("internal void ProcessHeartbeatTimedLifecycle(")
                 && runtimeSystemsText.Contains("this.timedLifecycle.ProcessHeartbeatLifecycle(")
                 && runtimeSystemsText.Contains("this.Characters")
                 && runtimeSystemsText.Contains("this.HasPendingDeadNpcDespawn")
                 && runtimeSystemsText.Contains("this.ProcessDeadNpcDespawn")
                 && runtimeSystemsText.Contains("this.ProcessNpcPatrolTick")
+                && runtimeSystemsText.Contains("internal void ProcessPlayerRespawn(")
+                && runtimeSystemsText.Contains("this.lifecycle.ProcessPlayerRespawn(")
+                && runtimeSystemsText.Contains("x => this.CleanupPlayerDeathCombat(x, clearCombatTracking, stopFightingDeadTarget, sendCombatStop)")
+                && runtimeSystemsText.Contains("internal void PreparePlayfieldTransfer(")
+                && runtimeSystemsText.Contains("this.lifecycle.PreparePlayfieldTransfer(")
                 && runtimeSystemsText.Contains("this.npcRuntime.ActivateNpc(character);")
                 && runtimeSystemsText.Contains("this.npcRuntime.RegisterNpcHome(character);")
                 && runtimeSystemsText.Contains(
@@ -1083,8 +1088,42 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.npcRuntime.ClearCombatTracking(identity);"),
                 "PlayfieldRuntimeSystems must delegate NPC runtime entry points through NPCRuntimeService.");
             Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldLifecycleRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldLifecycleRuntimeService.");
+            Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldTimedLifecycleRuntimeService.");
+            Assert.IsTrue(
+                lifecycleText.Contains("internal sealed class PlayfieldLifecycleRuntimeService")
+                && lifecycleText.Contains("internal void ProcessPlayerRespawn(")
+                && lifecycleText.Contains("logCorpseVisualSkipped(character, corpseIdentity);")
+                && lifecycleText.Contains("sendDeathSocialStatus(character);")
+                && lifecycleText.Contains("markPlayerRespawned(character);")
+                && lifecycleText.Contains("sendDeathRespawnStateStats(character);")
+                && lifecycleText.Contains("stopMovement(character);")
+                && lifecycleText.Contains("cleanupDeathCombat(character);")
+                && lifecycleText.Contains("sendChangedStats(character);")
+                && lifecycleText.Contains("logRespawnRequested(character, corpseIdentity, destinationPlayfield, destination);")
+                && lifecycleText.Contains("enableTimers(character);")
+                && lifecycleText.Contains("tryCompleteCurrentPlayfieldRespawn(dynel, destination, character.RawHeading, destinationPlayfield)")
+                && lifecycleText.Contains("transferToRespawnPlayfield(dynel, destination, character.RawHeading, destinationPlayfield);")
+                && lifecycleText.Contains("internal void PreparePlayfieldTransfer(")
+                && lifecycleText.Contains("Thread.Sleep(200);")
+                && lifecycleText.Contains("clearTransferContactState(dynel.Identity.Instance);")
+                && lifecycleText.Contains("disableTimers(dynel);")
+                && lifecycleText.Contains("Thread.Sleep(1000);"),
+                "PlayfieldLifecycleRuntimeService must own player respawn and playfield-transfer sequencing.");
+            Assert.IsFalse(
+                lifecycleText.Contains("SendCompressed")
+                || lifecycleText.Contains("TeleportMessageHandler")
+                || lifecycleText.Contains("ZoneRedirectionMessage")
+                || lifecycleText.Contains("FullCharacterMessageHandler")
+                || lifecycleText.Contains("SimpleCharFullUpdate")
+                || lifecycleText.Contains("Stats[")
+                || lifecycleText.Contains("Pool.Instance")
+                || lifecycleText.Contains("PlayfieldById")
+                || lifecycleText.Contains("Announce("),
+                "PlayfieldLifecycleRuntimeService must not own packet construction, object lookup, stats algorithms, or transport.");
             Assert.IsTrue(
                 timedLifecycleText.Contains("internal sealed class PlayfieldTimedLifecycleRuntimeService")
                 && timedLifecycleText.Contains("internal void ProcessHeartbeatLifecycle(")
@@ -1116,7 +1155,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string heartbeatTimer = ExtractMethodBlock(playfieldText, "private void HeartBeatTimer");
             Assert.IsTrue(
-                heartbeatTimer.Contains("this.runtimeSystems.ProcessTimedLifecycle(")
+                heartbeatTimer.Contains("this.runtimeSystems.ProcessHeartbeatTimedLifecycle(")
                 && heartbeatTimer.Contains("this.ProcessPendingCorpseSpawns")
                 && heartbeatTimer.Contains("this.ProcessCorpseDespawns")
                 && heartbeatTimer.Contains("this.ProcessPendingCorpseCreditAwards")
@@ -1140,6 +1179,33 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playfieldText.Contains("this.CheckWallCollision(dynel);")
                 && playfieldText.Contains("this.CheckStatelCollision(dynel);"),
                 "Playfield must retain regeneration, follow, and collision behavior behind scheduler callbacks.");
+            string respawnPlayer = ExtractMethodBlock(playfieldText, "public void RespawnPlayer");
+            Assert.IsTrue(
+                respawnPlayer.Contains("this.ResolvePlayerRespawnLocation(character, out destination, out destinationPlayfield);")
+                && respawnPlayer.Contains("Identity corpseIdentity = this.AllocateCorpseIdentity();")
+                && respawnPlayer.Contains("this.runtimeSystems.ProcessPlayerRespawn(")
+                && respawnPlayer.Contains("this.LogSkippedPlayerCorpseVisual")
+                && respawnPlayer.Contains("this.TryCompleteDeathRespawnInCurrentPlayfield")
+                && respawnPlayer.Contains("this.Teleport"),
+                "Playfield must route player respawn sequencing through PlayfieldRuntimeSystems.");
+            Assert.IsFalse(
+                respawnPlayer.Contains("character.StopMovement();")
+                || respawnPlayer.Contains("character.DoNotDoTimers = false;")
+                || respawnPlayer.Contains("character.SendChangedStats();"),
+                "Playfield RespawnPlayer must not directly own moved player respawn sequencing.");
+            string teleport = ExtractMethodBlock(playfieldText, "public void Teleport");
+            Assert.IsTrue(
+                teleport.Contains("this.runtimeSystems.PreparePlayfieldTransfer(")
+                && teleport.Contains("this.ClearPlayfieldTransferContactState")
+                && teleport.Contains("DisableTimersForPlayfieldTransfer"),
+                "Playfield teleport must route transfer cleanup sequencing through PlayfieldRuntimeSystems.");
+            Assert.IsFalse(
+                teleport.Contains("Thread.Sleep(200)")
+                || teleport.Contains("Thread.Sleep(1000)")
+                || teleport.Contains("this.statelEnterContacts.Remove(dynelId)")
+                || teleport.Contains("this.statelCollisionInitializedCharacters.Remove(dynelId)")
+                || teleport.Contains("dynel.DoNotDoTimers = true"),
+                "Playfield teleport must not directly own moved transfer cleanup sequencing.");
 
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.SendPrivateCityPlayfieldReadyBlock(client, character);"),
@@ -2109,6 +2175,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
             string packetSequencingText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketSequencingCoordinator.cs"));
+            string lifecycleText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleRuntimeService.cs"));
 
             string teleportMethod = ExtractMethodBlock(
                 playfieldText,
@@ -2120,11 +2190,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(
                 teleportMethod,
                 "if (this.TryCompleteGridTeleportInCurrentPlayfield(dynel, destination, heading, playfield))",
-                "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer,");
+                "this.runtimeSystems.PreparePlayfieldTransfer(");
             AssertTextBefore(
                 teleportMethod,
-                "dynel.DoNotDoTimers = true;",
+                "this.runtimeSystems.PreparePlayfieldTransfer(",
                 "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer,");
+            AssertTextBefore(
+                lifecycleText,
+                "clearTransferContactState(dynel.Identity.Instance);",
+                "disableTimers(dynel);");
             AssertTextBefore(
                 teleportMethod,
                 "lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer,",
@@ -2482,14 +2556,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs"));
 
             string heartBeat = ExtractMethodBlock(playfieldText, "private void HeartBeatTimer(object sender)");
-            string runtimeTimedLifecycle = ExtractMethodBlock(runtimeSystemsText, "internal void ProcessTimedLifecycle");
+            string runtimeTimedLifecycle = ExtractMethodBlock(runtimeSystemsText, "internal void ProcessHeartbeatTimedLifecycle");
             string corpseFullUpdate =
                 ExtractMethodBlock(playfieldText, "private void SendCorpseFullUpdate(ICharacter target, Identity corpseIdentity)");
             string stopFightingDeadTarget =
                 ExtractMethodBlock(playfieldText, "internal void StopFightingDeadTarget(Identity deadTarget)");
 
             Assert.IsTrue(
-                heartBeat.Contains("this.runtimeSystems.ProcessTimedLifecycle("),
+                heartBeat.Contains("this.runtimeSystems.ProcessHeartbeatTimedLifecycle("),
                 "Playfield heartbeat must route current-playfield character loops through the timed lifecycle boundary.");
             Assert.IsTrue(
                 runtimeTimedLifecycle.Contains("this.Characters")

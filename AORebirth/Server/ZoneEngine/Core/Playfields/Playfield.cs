@@ -828,14 +828,10 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            Thread.Sleep(200);
-            int dynelId = dynel.Identity.Instance;
-            this.statelEnterContacts.Remove(dynelId);
-            this.statelCollisionInitializedCharacters.Remove(dynelId);
-
-            // Disable sending stat changes and wait a bit to clear the queue
-            dynel.DoNotDoTimers = true;
-            Thread.Sleep(1000);
+            this.runtimeSystems.PreparePlayfieldTransfer(
+                dynel,
+                this.ClearPlayfieldTransferContactState,
+                DisableTimersForPlayfieldTransfer);
 
             ZoneClient lifecycleClient = dynel.Controller == null ? null : dynel.Controller.Client as ZoneClient;
             if (lifecycleClient != null)
@@ -918,6 +914,17 @@ namespace AORebirth.Core.Playfields
                 client.SendCompressed(redirect);
             }
             // client.Server.DisconnectClient(client);
+        }
+
+        private void ClearPlayfieldTransferContactState(int dynelId)
+        {
+            this.statelEnterContacts.Remove(dynelId);
+            this.statelCollisionInitializedCharacters.Remove(dynelId);
+        }
+
+        private static void DisableTimersForPlayfieldTransfer(Dynel dynel)
+        {
+            dynel.DoNotDoTimers = true;
         }
 
         private bool TryCompleteGridTeleportInCurrentPlayfield(
@@ -1733,7 +1740,7 @@ namespace AORebirth.Core.Playfields
         {
             try
             {
-                this.runtimeSystems.ProcessTimedLifecycle(
+                this.runtimeSystems.ProcessHeartbeatTimedLifecycle(
                     this.Identity,
                     this.ProcessPendingCorpseSpawns,
                     this.ProcessCorpseDespawns,
@@ -1905,6 +1912,29 @@ namespace AORebirth.Core.Playfields
             this.ResolvePlayerRespawnLocation(character, out destination, out destinationPlayfield);
 
             Identity corpseIdentity = this.AllocateCorpseIdentity();
+            this.runtimeSystems.ProcessPlayerRespawn(
+                character,
+                dynel,
+                corpseIdentity,
+                destination,
+                destinationPlayfield,
+                this.LogSkippedPlayerCorpseVisual,
+                this.SendDeathSocialStatus,
+                this.MarkPlayerRespawned,
+                this.SendDeathRespawnStateStats,
+                StopCharacterMovement,
+                SendChangedStats,
+                this.LogPlayerRespawnRequested,
+                EnableCharacterTimers,
+                this.TryCompleteDeathRespawnInCurrentPlayfield,
+                this.Teleport,
+                this.ClearCombatTracking,
+                this.StopFightingDeadTarget,
+                this.SendCombatStopMessage);
+        }
+
+        private void LogSkippedPlayerCorpseVisual(ICharacter character, Identity corpseIdentity)
+        {
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
@@ -1912,17 +1942,14 @@ namespace AORebirth.Core.Playfields
                     "Player corpse visual skipped target={0} corpse={1}; current CorpseFullUpdate template is NPC-loot oriented and breaks modern death teleport flow.",
                     character.Identity,
                     corpseIdentity));
-            this.SendDeathSocialStatus(character);
-            this.MarkPlayerRespawned(character);
-            this.SendDeathRespawnStateStats(character);
-            character.StopMovement();
-            this.runtimeSystems.CleanupPlayerDeathCombat(
-                character,
-                this.ClearCombatTracking,
-                this.StopFightingDeadTarget,
-                this.SendCombatStopMessage);
-            character.SendChangedStats();
+        }
 
+        private void LogPlayerRespawnRequested(
+            ICharacter character,
+            Identity corpseIdentity,
+            Identity destinationPlayfield,
+            Coordinate destination)
+        {
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
@@ -1935,14 +1962,21 @@ namespace AORebirth.Core.Playfields
                     destination.x,
                     destination.y,
                     destination.z));
+        }
 
+        private static void StopCharacterMovement(ICharacter character)
+        {
+            character.StopMovement();
+        }
+
+        private static void SendChangedStats(ICharacter character)
+        {
+            character.SendChangedStats();
+        }
+
+        private static void EnableCharacterTimers(ICharacter character)
+        {
             character.DoNotDoTimers = false;
-            if (this.TryCompleteDeathRespawnInCurrentPlayfield(dynel, destination, character.RawHeading, destinationPlayfield))
-            {
-                return;
-            }
-
-            this.Teleport(dynel, destination, character.RawHeading, destinationPlayfield);
         }
 
         private bool TryCompleteDeathRespawnInCurrentPlayfield(
