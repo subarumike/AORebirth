@@ -61,6 +61,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldStatelTransitionRuntimeService statelTransitions;
 
+        private readonly PlayfieldStatUpdateRuntimeService statUpdates;
+
         private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle;
 
         private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout;
@@ -102,6 +104,7 @@ namespace ZoneEngine.Core.Playfields
             this.interaction = new PlayfieldInteractionRuntimeService();
             this.playerCombat = new PlayerCombatRuntimeService();
             this.statelTransitions = new PlayfieldStatelTransitionRuntimeService();
+            this.statUpdates = new PlayfieldStatUpdateRuntimeService();
             this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
             this.visibilityFanout = new PlayfieldVisibilityFanoutRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
@@ -359,6 +362,40 @@ namespace ZoneEngine.Core.Playfields
             Action<MessageBody, Identity> announceOthers)
         {
             this.publishFanout.DispatchMessageToPlayfieldOthers(body, excludedIdentity, announceOthers);
+        }
+
+        internal void SendChangedStats(ICharacter character, Action<ICharacter> sendChangedStats)
+        {
+            this.statUpdates.SendChangedStats(character, sendChangedStats);
+        }
+
+        internal void SendChangedStatsIfChanged(
+            ICharacter character,
+            bool changed,
+            Action<ICharacter> sendChangedStats)
+        {
+            this.statUpdates.SendChangedStatsIfChanged(character, changed, sendChangedStats);
+        }
+
+        internal void SendChangedStatsIfClient(
+            ICharacter character,
+            Func<ICharacter, bool> hasClient,
+            Action<ICharacter> sendChangedStats)
+        {
+            this.statUpdates.SendChangedStatsIfClient(character, hasClient, sendChangedStats);
+        }
+
+        internal void RunPlayerDeathStatUpdateSequence(
+            ICharacter target,
+            Action<ICharacter> sendChangedStats,
+            Action<ICharacter> cleanupDeathCombat,
+            Action<ICharacter> sendDeathAnimation)
+        {
+            this.statUpdates.RunPlayerDeathStatUpdateSequence(
+                target,
+                sendChangedStats,
+                cleanupDeathCombat,
+                sendDeathAnimation);
         }
 
         internal ReadOnlyCollection<StaticDynel> StaticDynels()
