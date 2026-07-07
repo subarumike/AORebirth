@@ -21,6 +21,7 @@ namespace ZoneEngine.Core.Playfields
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core;
+    using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.Playfields.Content;
 
     #endregion
@@ -38,6 +39,8 @@ namespace ZoneEngine.Core.Playfields
         private readonly PlayfieldDbMobSpawnRuntimeService dbMobSpawns;
 
         private readonly PlayfieldDynelRegistry dynelRegistry;
+
+        private readonly PlayfieldEnvironmentFunctionRuntimeService environmentFunctions;
 
         private readonly PlayfieldObjectLifecycleRuntimeService objectLifecycle;
 
@@ -98,6 +101,7 @@ namespace ZoneEngine.Core.Playfields
             this.corpseAccess = new PlayfieldCorpseAccessRuntimeService();
             this.dbMobSpawns = new PlayfieldDbMobSpawnRuntimeService();
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
+            this.environmentFunctions = new PlayfieldEnvironmentFunctionRuntimeService();
             this.objectLifecycle = new PlayfieldObjectLifecycleRuntimeService();
             this.objectMaterialization = new PlayfieldObjectMaterializationRuntimeService();
             this.publishFanout = new PlayfieldPublishFanoutRuntimeService();
@@ -578,6 +582,17 @@ namespace ZoneEngine.Core.Playfields
         internal bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
             return this.interaction.TryHandleGenericCmdUse(client, message, target);
+        }
+
+        internal void ExecuteFunction(
+            IMExecuteFunction imExecuteFunction,
+            Func<Identity, INamedEntity> findNamedEntity,
+            Action<Character, string> sendNoValidTargetMessage)
+        {
+            this.environmentFunctions.ExecuteFunction(
+                imExecuteFunction,
+                findNamedEntity,
+                sendNoValidTargetMessage);
         }
 
         internal void EnsureWeaponVisualMeshes(ICharacter character, bool announceAppearanceUpdate)

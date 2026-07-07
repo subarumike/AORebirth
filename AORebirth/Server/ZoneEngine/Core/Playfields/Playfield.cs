@@ -874,60 +874,15 @@ namespace AORebirth.Core.Playfields
         /// </exception>
         public void ExecuteFunction(IMExecuteFunction imExecuteFunction)
         {
-            var user = (ITargetingEntity)this.FindNamedEntityByIdentity(imExecuteFunction.User);
-            INamedEntity target;
+            this.runtimeSystems.ExecuteFunction(
+                imExecuteFunction,
+                this.FindNamedEntityByIdentity,
+                SendNoValidFunctionTargetMessage);
+        }
 
-            // TODO: Go over the targets, they can return item templates, inventory entries etc too
-            switch (imExecuteFunction.Function.Target)
-            {
-                case 1:
-                    target = (INamedEntity)user;
-                    break;
-                case 2:
-                    throw new NotImplementedException("Target Wearer not implemented yet");
-                case 3:
-                    target = this.FindNamedEntityByIdentity(user.SelectedTarget);
-                    break;
-                case 14:
-                    target = this.FindNamedEntityByIdentity(user.FightingTarget);
-                    break;
-                case 19: // Perhaps (if issued from a item) its the item itself
-                    target = (INamedEntity)user;
-                    break;
-                case 23:
-                    target = this.FindNamedEntityByIdentity(user.SelectedTarget);
-                    break;
-                case 26:
-                    target = (INamedEntity)user;
-                    break;
-                case 100:
-                    target = (INamedEntity)user;
-                    break;
-                default:
-                    throw new NotImplementedException(
-                        "Unknown target encountered: Target#:" + imExecuteFunction.Function.Target);
-            }
-
-            if (target == null)
-            {
-                var temp = user as Character;
-                if (temp != null)
-                {
-                    if (temp.Controller.Client != null)
-                    {
-                        temp.Controller.Client.SendCompressed(
-                            new ChatTextMessage { Identity = temp.Identity, Text = "No valid target found" });
-                    }
-                    return;
-                }
-            }
-
-            FunctionCollection.Instance.CallFunction(
-                imExecuteFunction.Function.FunctionType,
-                (INamedEntity)user,
-                (INamedEntity)user,
-                target,
-                imExecuteFunction.Function.Arguments.Values.ToArray());
+        private static void SendNoValidFunctionTargetMessage(Character character, string text)
+        {
+            character.Controller.Client.SendCompressed(new ChatTextMessage { Identity = character.Identity, Text = text });
         }
 
         public List<ICharacter> FindCharacterInRange(IDynel dynel, float range)

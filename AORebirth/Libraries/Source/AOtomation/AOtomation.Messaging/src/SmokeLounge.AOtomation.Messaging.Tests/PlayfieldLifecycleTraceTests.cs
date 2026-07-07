@@ -977,6 +977,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs"));
+            string environmentFunctionText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldEnvironmentFunctionRuntimeService.cs"));
             string corpseAccessText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -1033,6 +1037,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new PlayfieldObjectLifecycleRuntimeService()",
                     "new PlayfieldObjectMaterializationRuntimeService()",
                     "new PlayfieldDbMobSpawnRuntimeService()",
+                    "new PlayfieldEnvironmentFunctionRuntimeService()",
                     "new PlayfieldNpcCombatMovementRuntimeService()",
                     "new PlayfieldPacketSequencingRuntimeService(this.packetSequencing)",
                     "new PlayfieldCorpseAccessRuntimeService()",
@@ -1148,6 +1153,45 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldDbMobSpawnRuntimeService.");
+            Assert.IsTrue(
+                environmentFunctionText.Contains("internal sealed class PlayfieldEnvironmentFunctionRuntimeService")
+                && environmentFunctionText.Contains("internal void ExecuteFunction(")
+                && environmentFunctionText.Contains("switch (imExecuteFunction.Function.Target)")
+                && environmentFunctionText.Contains("case 1:")
+                && environmentFunctionText.Contains("case 2:")
+                && environmentFunctionText.Contains("case 3:")
+                && environmentFunctionText.Contains("case 14:")
+                && environmentFunctionText.Contains("case 19:")
+                && environmentFunctionText.Contains("case 23:")
+                && environmentFunctionText.Contains("case 26:")
+                && environmentFunctionText.Contains("case 100:")
+                && environmentFunctionText.Contains("sendNoValidTargetMessage(character, \"No valid target found\");")
+                && environmentFunctionText.Contains("FunctionCollection.Instance.CallFunction("),
+                "PlayfieldEnvironmentFunctionRuntimeService must own environment function target routing and function dispatch.");
+            Assert.IsFalse(
+                environmentFunctionText.Contains("ChatTextMessage")
+                || environmentFunctionText.Contains("SendCompressed")
+                || environmentFunctionText.Contains("Pool.Instance")
+                || environmentFunctionText.Contains("Teleport("),
+                "PlayfieldEnvironmentFunctionRuntimeService must not own packet construction, sends, Pool lookup, or teleport mechanics.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("private readonly PlayfieldEnvironmentFunctionRuntimeService environmentFunctions")
+                && runtimeSystemsText.Contains("this.environmentFunctions = new PlayfieldEnvironmentFunctionRuntimeService();")
+                && runtimeSystemsText.Contains("internal void ExecuteFunction(")
+                && runtimeSystemsText.Contains("this.environmentFunctions.ExecuteFunction("),
+                "PlayfieldRuntimeSystems must route environment function execution through the environment function runtime service.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.ExecuteFunction(")
+                && playfieldText.Contains("private static void SendNoValidFunctionTargetMessage(Character character, string text)")
+                && playfieldText.Contains("new ChatTextMessage { Identity = character.Identity, Text = text }"),
+                "Playfield must delegate environment function routing while keeping client feedback packet construction.");
+            Assert.IsFalse(
+                playfieldText.Contains("FunctionCollection.Instance.CallFunction(")
+                || playfieldText.Contains("switch (imExecuteFunction.Function.Target)"),
+                "Playfield must not directly own environment function dispatch or target routing.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldEnvironmentFunctionRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldEnvironmentFunctionRuntimeService.");
             Assert.AreEqual(
                 1,
                 CountOccurrences(npcRuntimeText, "new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
