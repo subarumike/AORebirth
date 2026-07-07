@@ -224,6 +224,43 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void OmniTrainingGroundCaptureKeepsCorpseOpenOrderingFixture()
+        {
+            string fixture = ReadRepositoryFile("docs\\generated\\omni_training_ground_capture_20260622_182442_reference.json");
+            string report = ReadRepositoryFile("docs\\generated\\omni_training_ground_capture_20260622_182442_inventory.md");
+
+            AssertContains(fixture, "\"emptyCorpseOpen\": [");
+            AssertContains(fixture, "\"messageType\": \"GenericCmd\"");
+            AssertContains(fixture, "\"target\": \"(Corpse:F6C003)\"");
+            AssertContains(fixture, "\"inventoryIdentity\": \"(Corpse:F6C003)\"");
+            AssertContains(fixture, "\"messageType\": \"InventoryUpdate\"");
+            AssertContains(fixture, "\"sequence\": 122");
+            AssertContains(fixture, "\"handle\": 112");
+            AssertContains(fixture, "\"unknown1\": 21");
+            AssertContains(fixture, "\"unknown2\": 2");
+            AssertContains(fixture, "\"unknown3\": 1");
+            AssertContains(fixture, "\"itemCount\": 0");
+            AssertContains(fixture, "\"summary\": \"Action=Use Temp1=1 Count=5 Unknown=0\"");
+            AssertTextBefore(fixture, "\"source\": \"events.log:239\"", "\"messageType\": \"InventoryUpdate\"");
+            AssertTextBefore(fixture, "\"messageType\": \"InventoryUpdate\"", "\"summary\": \"Action=Use Temp1=1 Count=5 Unknown=0\"");
+
+            AssertContains(fixture, "\"corpseInventoryWithItems\": {");
+            AssertContains(fixture, "\"inventoryIdentity\": \"(Corpse:F6C009)\"");
+            AssertContains(fixture, "\"sequence\": 2001");
+            AssertContains(fixture, "\"handle\": 133");
+            AssertContains(fixture, "\"lowId\": 201135");
+            AssertContains(fixture, "\"highId\": 201136");
+            AssertContains(fixture, "\"quality\": 14");
+
+            AssertContains(report, "`OUT GenericCmd Use`");
+            AssertContains(report, "`IN InventoryUpdate`");
+            AssertContains(report, "`IN GenericCmd` success ack");
+            AssertTextBefore(report, "`OUT GenericCmd Use`", "`IN InventoryUpdate`");
+            AssertTextBefore(report, "`IN InventoryUpdate`", "`IN GenericCmd` success ack");
+            AssertContains(report, "Treat this capture as corpse access/open/content evidence");
+        }
+
+        [TestMethod]
         public void GridAndSurgeryRoutesKeepCurrentPrecedence()
         {
             AssertRoute(
