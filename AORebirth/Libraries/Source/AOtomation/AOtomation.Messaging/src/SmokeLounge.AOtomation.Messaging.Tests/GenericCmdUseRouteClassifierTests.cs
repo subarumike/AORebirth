@@ -1023,6 +1023,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void SocialArmorPageSupportsBackAndShoulderMeshFunctions()
+        {
+            string socialArmorPage =
+                ReadRepositoryFile(@"AORebirth\Libraries\Source\AORebirth.Core\Inventory\SocialArmorInventoryPage.cs");
+            string shoulderMesh =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\shouldermesh.cs");
+            string project =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
+
+            AssertContains(socialArmorPage, "(int)FunctionType.HeadMesh");
+            AssertContains(socialArmorPage, "(int)FunctionType.BackMesh");
+            AssertContains(socialArmorPage, "(int)FunctionType.Shouldermesh");
+            AssertContains(socialArmorPage, "(int)FunctionType.Texture");
+            AssertContains(socialArmorPage, "(int)FunctionType.ChangeBodyMesh");
+
+            AssertContains(shoulderMesh, "internal class shouldermesh : FunctionPrototype");
+            AssertContains(shoulderMesh, "FunctionType.Shouldermesh");
+            AssertContains(shoulderMesh, "character.SocialMeshLayer.AddMesh(position, meshId, overrideTexture, layer);");
+            AssertContains(shoulderMesh, "character.Stats[StatIds.shouldermeshright].Value = meshId;");
+            AssertContains(shoulderMesh, "character.Stats[StatIds.shouldermeshleft].Value = meshId;");
+            AssertContains(shoulderMesh, "if (target == null)");
+            AssertContains(project, @"Core\Functions\GameFunctions\shouldermesh.cs");
+        }
+
+        [TestMethod]
         public void InventoryContainerRuntimeServiceOwnsContainerAddItemReadOrchestration()
         {
             string service =
