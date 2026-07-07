@@ -58,6 +58,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle;
 
+        private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout;
+
         private readonly PacketSequencingCoordinator packetSequencing;
 
         private readonly PrivateCityReadyInitCoordinator privateCityReadyInit;
@@ -95,6 +97,7 @@ namespace ZoneEngine.Core.Playfields
             this.playerCombat = new PlayerCombatRuntimeService();
             this.statelTransitions = new PlayfieldStatelTransitionRuntimeService();
             this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
+            this.visibilityFanout = new PlayfieldVisibilityFanoutRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
             this.privateCityReadyInit =
                 new PrivateCityReadyInitCoordinator(
@@ -301,6 +304,31 @@ namespace ZoneEngine.Core.Playfields
         internal ReadOnlyCollection<Character> CharacterEntities()
         {
             return this.dynelRegistry.CharacterEntities();
+        }
+
+        internal void AnnounceToCharacterClients(Action<Character> publishToCharacterClient)
+        {
+            this.visibilityFanout.AnnounceToCharacterClients(this.CharacterEntities(), publishToCharacterClient);
+        }
+
+        internal void AnnounceToOtherCharacterClients(Identity excludedIdentity, Action<Character> publishToCharacterClient)
+        {
+            this.visibilityFanout.AnnounceToOtherCharacterClients(
+                this.CharacterEntities(),
+                excludedIdentity,
+                publishToCharacterClient);
+        }
+
+        internal void FanoutExistingCharactersForScfu(
+            ICharacter recipient,
+            Func<ICharacter, bool> sendExistingCharacter,
+            Action<ICharacter, bool, bool, bool> logVisibilityCandidate)
+        {
+            this.visibilityFanout.FanoutExistingCharactersForScfu(
+                recipient,
+                this.Characters(),
+                sendExistingCharacter,
+                logVisibilityCandidate);
         }
 
         internal ReadOnlyCollection<StaticDynel> StaticDynels()
