@@ -92,8 +92,6 @@ namespace AORebirth.Core.Playfields
     {
         #region Fields
 
-        private readonly List<StaticDynel> staticDynels = new List<StaticDynel>();
-
         /// <summary>
         /// </summary>
         private readonly DisposeContainer memBusDisposeContainer = new DisposeContainer();
@@ -296,27 +294,7 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.MaterializeStartupObjects(
                 playfieldIdentity,
                 this.statels,
-                this.SpawnVendors,
-                this.CreateStaticDynel);
-        }
-
-        private IEntity CreateStaticDynel(PlayfieldStaticDynelDefinition staticDynel)
-        {
-            StaticDynel sdy = new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template);
-
-            foreach (GameTuple<CharacterStat, uint> stat in staticDynel.Stats)
-            {
-                if (sdy.Stats.ContainsKey((int)stat.Value1))
-                {
-                    sdy.Stats[(int)stat.Value1] = (int)stat.Value2;
-                    continue;
-                }
-                sdy.Stats.Add((int)stat.Value1, (int)stat.Value2);
-            }
-
-            sdy.Coordinate = staticDynel.Coordinate;
-            sdy.Heading = staticDynel.Heading;
-            return sdy;
+                this.SpawnVendors);
         }
 
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)

@@ -70,6 +70,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldStatUpdateRuntimeService statUpdates;
 
+        private readonly PlayfieldStaticDynelRuntimeService staticDynelRuntime;
+
         private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle;
 
         private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout;
@@ -115,6 +117,7 @@ namespace ZoneEngine.Core.Playfields
             this.playerCombat = new PlayerCombatRuntimeService();
             this.statelTransitions = new PlayfieldStatelTransitionRuntimeService();
             this.statUpdates = new PlayfieldStatUpdateRuntimeService();
+            this.staticDynelRuntime = new PlayfieldStaticDynelRuntimeService();
             this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
             this.visibilityFanout = new PlayfieldVisibilityFanoutRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
@@ -137,8 +140,7 @@ namespace ZoneEngine.Core.Playfields
         internal void MaterializeStartupObjects(
             Identity playfieldIdentity,
             IEnumerable<StatelData> statels,
-            Action<StatelData[]> spawnVendors,
-            Func<PlayfieldStaticDynelDefinition, IEntity> instantiateStaticDynel)
+            Action<StatelData[]> spawnVendors)
         {
             this.objectMaterialization.MaterializeStartupObjects(
                 playfieldIdentity,
@@ -153,7 +155,7 @@ namespace ZoneEngine.Core.Playfields
                 this.TryResolveVendorStatels,
                 spawnVendors,
                 this.ResolveStaticDynels,
-                instantiateStaticDynel,
+                staticDynel => this.staticDynelRuntime.CreateStaticDynel(playfieldIdentity, staticDynel),
                 this.RegisterDynel,
                 this.RefreshDynelRegistry);
         }

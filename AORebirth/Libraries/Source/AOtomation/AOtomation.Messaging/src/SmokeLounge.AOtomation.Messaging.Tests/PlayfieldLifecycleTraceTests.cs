@@ -981,6 +981,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldEnvironmentFunctionRuntimeService.cs"));
+            string staticDynelRuntimeText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"));
             string corpseAccessText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -1047,6 +1051,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new PlayfieldPlayerDeathRespawnRuntimeService()",
                     "new PlayfieldStatelTransitionRuntimeService()",
                     "new PlayfieldStatUpdateRuntimeService()",
+                    "new PlayfieldStaticDynelRuntimeService()",
                     "new PlayfieldTimedLifecycleRuntimeService()",
                     "new PlayfieldVisibilityFanoutRuntimeService()",
                     "new PlayfieldPublishFanoutRuntimeService()",
@@ -1192,6 +1197,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldEnvironmentFunctionRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldEnvironmentFunctionRuntimeService.");
+            Assert.IsTrue(
+                staticDynelRuntimeText.Contains("internal sealed class PlayfieldStaticDynelRuntimeService")
+                && staticDynelRuntimeText.Contains("internal IEntity CreateStaticDynel(Identity playfieldIdentity, PlayfieldStaticDynelDefinition staticDynel)")
+                && staticDynelRuntimeText.Contains("new StaticDynel(playfieldIdentity, staticDynel.Identity, staticDynel.Template)")
+                && staticDynelRuntimeText.Contains("foreach (GameTuple<CharacterStat, uint> stat in staticDynel.Stats)")
+                && staticDynelRuntimeText.Contains("sdy.Stats[(int)stat.Value1] = (int)stat.Value2;")
+                && staticDynelRuntimeText.Contains("sdy.Stats.Add((int)stat.Value1, (int)stat.Value2);")
+                && staticDynelRuntimeText.Contains("sdy.Coordinate = staticDynel.Coordinate;")
+                && staticDynelRuntimeText.Contains("sdy.Heading = staticDynel.Heading;"),
+                "PlayfieldStaticDynelRuntimeService must own static dynel runtime construction from content definitions.");
+            Assert.IsFalse(
+                staticDynelRuntimeText.Contains("StaticDynelDao")
+                || staticDynelRuntimeText.Contains("MessagePackZip.DeserializeData")
+                || staticDynelRuntimeText.Contains("SendCompressed")
+                || staticDynelRuntimeText.Contains("Pool.Instance")
+                || staticDynelRuntimeText.Contains("VendorHandler"),
+                "PlayfieldStaticDynelRuntimeService must not own content DB loading, deserialization, packets, Pool registration, or vendor spawning.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("private readonly PlayfieldStaticDynelRuntimeService staticDynelRuntime")
+                && runtimeSystemsText.Contains("this.staticDynelRuntime = new PlayfieldStaticDynelRuntimeService();")
+                && runtimeSystemsText.Contains("staticDynel => this.staticDynelRuntime.CreateStaticDynel(playfieldIdentity, staticDynel)"),
+                "PlayfieldRuntimeSystems must route static dynel construction through the static dynel runtime service.");
+            Assert.IsFalse(
+                playfieldText.Contains("private IEntity CreateStaticDynel(")
+                || playfieldText.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
+                "Playfield must not directly own static dynel runtime construction.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldStaticDynelRuntimeService.");
             Assert.AreEqual(
                 1,
                 CountOccurrences(npcRuntimeText, "new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
@@ -1233,6 +1267,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("private readonly PlayfieldPlayerDeathRespawnRuntimeService playerDeathRespawn")
                 && runtimeSystemsText.Contains("private readonly PlayfieldStatelTransitionRuntimeService statelTransitions")
                 && runtimeSystemsText.Contains("private readonly PlayfieldStatUpdateRuntimeService statUpdates")
+                && runtimeSystemsText.Contains("private readonly PlayfieldStaticDynelRuntimeService staticDynelRuntime")
                 && runtimeSystemsText.Contains("private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle")
                 && runtimeSystemsText.Contains("private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout")
                 && runtimeSystemsText.Contains("private readonly PlayfieldPublishFanoutRuntimeService publishFanout")
@@ -2130,6 +2165,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs"));
+            string staticDynelRuntimeText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"));
             string projectText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
@@ -2255,17 +2294,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && statelTransitionText.Contains("ev.Perform(dynel, sd);"),
                 "PlayfieldStatelTransitionRuntimeService must own collision statel iteration and event firing.");
 
-            string createStaticDynel =
-                ExtractMethodBlock(playfieldText, "private IEntity CreateStaticDynel(PlayfieldStaticDynelDefinition staticDynel)");
             Assert.IsTrue(
-                createStaticDynel.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
-                "Playfield must remain the runtime static dynel construction owner in this slice.");
+                staticDynelRuntimeText.Contains("new StaticDynel(playfieldIdentity, staticDynel.Identity, staticDynel.Template)")
+                && staticDynelRuntimeText.Contains("foreach (GameTuple<CharacterStat, uint> stat in staticDynel.Stats)")
+                && staticDynelRuntimeText.Contains("sdy.Coordinate = staticDynel.Coordinate;")
+                && staticDynelRuntimeText.Contains("sdy.Heading = staticDynel.Heading;"),
+                "PlayfieldStaticDynelRuntimeService must own runtime static dynel construction.");
             Assert.IsFalse(
-                createStaticDynel.Contains("StaticDynelDao.Instance.GetWhere"),
-                "Playfield static dynel loading must not own DB row access.");
+                staticDynelRuntimeText.Contains("StaticDynelDao.Instance.GetWhere"),
+                "Static dynel runtime construction must not own DB row access.");
             Assert.IsFalse(
-                createStaticDynel.Contains("MessagePackZip.DeserializeData"),
-                "Playfield static dynel loading must not own static dynel stat deserialization.");
+                staticDynelRuntimeText.Contains("MessagePackZip.DeserializeData"),
+                "Static dynel runtime construction must not own static dynel stat deserialization.");
+            Assert.IsFalse(
+                playfieldText.Contains("private IEntity CreateStaticDynel(")
+                || playfieldText.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
+                "Playfield must not directly own static dynel runtime construction.");
             Assert.IsTrue(
                 dbMobSpawnText.Contains("internal IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions(Identity playfieldIdentity)")
                 && dbMobSpawnText.Contains("MobSpawnDao.Instance.GetWhere")
@@ -2299,8 +2343,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldContentDataProvider.cs")
                 && projectText.Contains(@"Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs")
-                && projectText.Contains(@"Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldContentDataProvider, PlayfieldObjectMaterializationRuntimeService, and PlayfieldDbMobSpawnRuntimeService.");
+                && projectText.Contains(@"Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs")
+                && projectText.Contains(@"Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldContentDataProvider, PlayfieldObjectMaterializationRuntimeService, PlayfieldDbMobSpawnRuntimeService, and PlayfieldStaticDynelRuntimeService.");
         }
 
         [TestMethod]
@@ -2319,6 +2364,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
+            string staticDynelRuntimeText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"));
 
             Assert.IsTrue(
                 providerText.Contains("StaticDynelDao.Instance.GetWhere"),
@@ -2360,16 +2409,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             string spawnVendors = ExtractMethodBlock(playfieldText, "private void SpawnVendors(StatelData[] vendorStatels)");
-            string createStaticDynel =
-                ExtractMethodBlock(playfieldText, "private IEntity CreateStaticDynel(PlayfieldStaticDynelDefinition staticDynel)");
             string checkStatelCollision = ExtractMethodBlock(playfieldText, "private void CheckStatelCollision(ICharacter dynel)");
 
             Assert.IsTrue(
                 spawnVendors.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels);"),
                 "Playfield must remain the vendor runtime spawning owner.");
             Assert.IsTrue(
-                createStaticDynel.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
-                "Playfield must remain the StaticDynel runtime construction owner.");
+                staticDynelRuntimeText.Contains("new StaticDynel(playfieldIdentity, staticDynel.Identity, staticDynel.Template)")
+                && staticDynelRuntimeText.Contains("foreach (GameTuple<CharacterStat, uint> stat in staticDynel.Stats)"),
+                "PlayfieldStaticDynelRuntimeService must own StaticDynel runtime construction.");
+            Assert.IsFalse(
+                playfieldText.Contains("private IEntity CreateStaticDynel(")
+                || playfieldText.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
+                "Playfield must not directly own StaticDynel runtime construction.");
             Assert.IsTrue(
                 materializationText.Contains("tryResolveVendorStatels(playfieldIdentity, statels, out vendorStatels)")
                 && materializationText.Contains("spawnVendors(vendorStatels);")
