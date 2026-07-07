@@ -985,6 +985,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"));
+            string vendorRuntimeText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVendorRuntimeService.cs"));
             string corpseAccessText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -1053,6 +1057,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new PlayfieldStatUpdateRuntimeService()",
                     "new PlayfieldStaticDynelRuntimeService()",
                     "new PlayfieldTimedLifecycleRuntimeService()",
+                    "new PlayfieldVendorRuntimeService()",
                     "new PlayfieldVisibilityFanoutRuntimeService()",
                     "new PlayfieldPublishFanoutRuntimeService()",
                     "new PrivateCityReadyInitCoordinator("
@@ -1226,6 +1231,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldStaticDynelRuntimeService.");
+            Assert.IsTrue(
+                vendorRuntimeText.Contains("internal sealed class PlayfieldVendorRuntimeService")
+                && vendorRuntimeText.Contains("internal void SpawnVendors(Playfield playfield, StatelData[] vendorStatels)")
+                && vendorRuntimeText.Contains("VendorHandler.SpawnVendorsForPlayfield(playfield, vendorStatels);"),
+                "PlayfieldVendorRuntimeService must own vendor runtime spawning.");
+            Assert.IsFalse(
+                vendorRuntimeText.Contains("StaticDynelDao")
+                || vendorRuntimeText.Contains("MessagePackZip.DeserializeData")
+                || vendorRuntimeText.Contains("new StaticDynel")
+                || vendorRuntimeText.Contains("SendCompressed")
+                || vendorRuntimeText.Contains("Pool.Instance"),
+                "PlayfieldVendorRuntimeService must not own content DB loading, static dynel construction, packets, or Pool registration.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("private readonly PlayfieldVendorRuntimeService vendors")
+                && runtimeSystemsText.Contains("this.vendors = new PlayfieldVendorRuntimeService();")
+                && runtimeSystemsText.Contains("vendorStatels => this.vendors.SpawnVendors(this.playfield, vendorStatels)"),
+                "PlayfieldRuntimeSystems must route vendor spawning through the vendor runtime service.");
+            Assert.IsFalse(
+                playfieldText.Contains("private void SpawnVendors(StatelData[] vendorStatels)")
+                || playfieldText.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels)"),
+                "Playfield must not directly own vendor runtime spawning.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldVendorRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldVendorRuntimeService.");
             Assert.AreEqual(
                 1,
                 CountOccurrences(npcRuntimeText, "new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
@@ -1269,6 +1298,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("private readonly PlayfieldStatUpdateRuntimeService statUpdates")
                 && runtimeSystemsText.Contains("private readonly PlayfieldStaticDynelRuntimeService staticDynelRuntime")
                 && runtimeSystemsText.Contains("private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle")
+                && runtimeSystemsText.Contains("private readonly PlayfieldVendorRuntimeService vendors")
                 && runtimeSystemsText.Contains("private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout")
                 && runtimeSystemsText.Contains("private readonly PlayfieldPublishFanoutRuntimeService publishFanout")
                 && runtimeSystemsText.Contains("internal void ProcessHeartbeatTimedLifecycle(")
@@ -2169,6 +2199,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"));
+            string vendorRuntimeText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVendorRuntimeService.cs"));
             string projectText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
@@ -2320,15 +2354,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && dbMobSpawnText.Contains("new NPCController()")
                 && dbMobSpawnText.Contains("internal void AttachMobSpawnKnuBot(DBMobSpawn mob, ICharacter cmob)")
                 && dbMobSpawnText.Contains("ScriptCompiler.Instance.CreateKnuBot")
-                && playfieldText.Contains("private void SpawnVendors(StatelData[] vendorStatels)")
-                && playfieldText.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels)"),
-                "DB mob spawn runtime service must own DB loading, object construction, and script creation callbacks while Playfield keeps vendor spawning.");
+                && vendorRuntimeText.Contains("internal void SpawnVendors(Playfield playfield, StatelData[] vendorStatels)")
+                && vendorRuntimeText.Contains("VendorHandler.SpawnVendorsForPlayfield(playfield, vendorStatels);"),
+                "DB mob spawn runtime service must own DB loading, object construction, and script creation callbacks while vendor runtime service owns vendor spawning.");
             Assert.IsFalse(
                 playfieldText.Contains("private IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions")
                 || playfieldText.Contains("private IEnumerable<DBMobSpawnStat> LoadMobSpawnStats")
                 || playfieldText.Contains("private ICharacter InstantiateDbMobSpawn")
-                || playfieldText.Contains("private void AttachMobSpawnKnuBot"),
-                "Playfield must not directly own DB mob spawn loading or construction callbacks.");
+                || playfieldText.Contains("private void AttachMobSpawnKnuBot")
+                || playfieldText.Contains("private void SpawnVendors(StatelData[] vendorStatels)")
+                || playfieldText.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels)"),
+                "Playfield must not directly own DB mob spawn loading, construction callbacks, or vendor spawning callbacks.");
             Assert.IsFalse(
                 materializationText.Contains("MobSpawnDao")
                 || materializationText.Contains("MobSpawnStatDao")
@@ -2344,8 +2380,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 projectText.Contains(@"Core\Playfields\PlayfieldContentDataProvider.cs")
                 && projectText.Contains(@"Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs")
                 && projectText.Contains(@"Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs")
-                && projectText.Contains(@"Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldContentDataProvider, PlayfieldObjectMaterializationRuntimeService, PlayfieldDbMobSpawnRuntimeService, and PlayfieldStaticDynelRuntimeService.");
+                && projectText.Contains(@"Core\Playfields\PlayfieldStaticDynelRuntimeService.cs")
+                && projectText.Contains(@"Core\Playfields\PlayfieldVendorRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldContentDataProvider, PlayfieldObjectMaterializationRuntimeService, PlayfieldDbMobSpawnRuntimeService, PlayfieldStaticDynelRuntimeService, and PlayfieldVendorRuntimeService.");
         }
 
         [TestMethod]
@@ -2368,6 +2405,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"));
+            string vendorRuntimeText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVendorRuntimeService.cs"));
 
             Assert.IsTrue(
                 providerText.Contains("StaticDynelDao.Instance.GetWhere"),
@@ -2408,12 +2449,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     + forbiddenRuntimeOwnershipPatterns[i]);
             }
 
-            string spawnVendors = ExtractMethodBlock(playfieldText, "private void SpawnVendors(StatelData[] vendorStatels)");
             string checkStatelCollision = ExtractMethodBlock(playfieldText, "private void CheckStatelCollision(ICharacter dynel)");
 
             Assert.IsTrue(
-                spawnVendors.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels);"),
-                "Playfield must remain the vendor runtime spawning owner.");
+                vendorRuntimeText.Contains("VendorHandler.SpawnVendorsForPlayfield(playfield, vendorStatels);"),
+                "PlayfieldVendorRuntimeService must own vendor runtime spawning.");
+            Assert.IsFalse(
+                playfieldText.Contains("private void SpawnVendors(StatelData[] vendorStatels)")
+                || playfieldText.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels)"),
+                "Playfield must not directly own vendor runtime spawning.");
             Assert.IsTrue(
                 staticDynelRuntimeText.Contains("new StaticDynel(playfieldIdentity, staticDynel.Identity, staticDynel.Template)")
                 && staticDynelRuntimeText.Contains("foreach (GameTuple<CharacterStat, uint> stat in staticDynel.Stats)"),

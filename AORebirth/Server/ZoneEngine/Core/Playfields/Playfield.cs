@@ -51,7 +51,6 @@ namespace AORebirth.Core.Playfields
     using AORebirth.Core.NPCHandler;
     using AORebirth.Core.Statels;
     using AORebirth.Core.Vector;
-    using AORebirth.Core.VendorHandler;
     using AORebirth.Database.Dao;
     using AORebirth.Database.Entities;
     using AORebirth.Enums;
@@ -293,18 +292,12 @@ namespace AORebirth.Core.Playfields
             this.collisionStatels = this.runtimeSystems.ResolveCollisionStatels(this.statels);
             this.runtimeSystems.MaterializeStartupObjects(
                 playfieldIdentity,
-                this.statels,
-                this.SpawnVendors);
+                this.statels);
         }
 
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
         {
             this.runtimeSystems.SpawnCapturedNpcContent(playfieldIdentity);
-        }
-
-        private void SpawnVendors(StatelData[] vendorStatels)
-        {
-            VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels);
         }
 
         #endregion

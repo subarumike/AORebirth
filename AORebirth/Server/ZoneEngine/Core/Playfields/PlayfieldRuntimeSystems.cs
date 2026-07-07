@@ -74,6 +74,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle;
 
+        private readonly PlayfieldVendorRuntimeService vendors;
+
         private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout;
 
         private readonly PacketSequencingCoordinator packetSequencing;
@@ -119,6 +121,7 @@ namespace ZoneEngine.Core.Playfields
             this.statUpdates = new PlayfieldStatUpdateRuntimeService();
             this.staticDynelRuntime = new PlayfieldStaticDynelRuntimeService();
             this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
+            this.vendors = new PlayfieldVendorRuntimeService();
             this.visibilityFanout = new PlayfieldVisibilityFanoutRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
             this.packetSequences = new PlayfieldPacketSequencingRuntimeService(this.packetSequencing);
@@ -139,8 +142,7 @@ namespace ZoneEngine.Core.Playfields
 
         internal void MaterializeStartupObjects(
             Identity playfieldIdentity,
-            IEnumerable<StatelData> statels,
-            Action<StatelData[]> spawnVendors)
+            IEnumerable<StatelData> statels)
         {
             this.objectMaterialization.MaterializeStartupObjects(
                 playfieldIdentity,
@@ -153,7 +155,7 @@ namespace ZoneEngine.Core.Playfields
                 this.dbMobSpawns.AttachMobSpawnKnuBot,
                 this.RegisterContent,
                 this.TryResolveVendorStatels,
-                spawnVendors,
+                vendorStatels => this.vendors.SpawnVendors(this.playfield, vendorStatels),
                 this.ResolveStaticDynels,
                 staticDynel => this.staticDynelRuntime.CreateStaticDynel(playfieldIdentity, staticDynel),
                 this.RegisterDynel,
