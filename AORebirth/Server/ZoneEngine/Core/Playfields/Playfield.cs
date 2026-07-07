@@ -1430,10 +1430,7 @@ namespace AORebirth.Core.Playfields
                 changed = true;
             }
 
-            if (changed)
-            {
-                dynel.SendChangedStats();
-            }
+            this.runtimeSystems.SendChangedStatsIfChanged(dynel, changed, SendChangedStats);
         }
 
         private void ProcessCharacterFollow(ICharacter dynel)
@@ -1752,7 +1749,7 @@ namespace AORebirth.Core.Playfields
                 attackSource.UsesEquippedWeapon
                     ? CombatDamageSource.WeaponAutoAttack
                     : CombatDamageSource.UnarmedAutoAttack);
-            target.SendChangedStats();
+            this.runtimeSystems.SendChangedStats(target, SendChangedStats);
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
@@ -2354,13 +2351,15 @@ namespace AORebirth.Core.Playfields
             }
 
             this.MarkPlayerDead(target);
-            target.SendChangedStats();
-            this.runtimeSystems.CleanupPlayerDeathCombat(
+            this.runtimeSystems.RunPlayerDeathStatUpdateSequence(
                 target,
-                this.ClearCombatTracking,
-                this.StopFightingDeadTarget,
-                this.SendCombatStopMessage);
-            this.SendPlayerDeathAnimation(target);
+                SendChangedStats,
+                x => this.runtimeSystems.CleanupPlayerDeathCombat(
+                    x,
+                    this.ClearCombatTracking,
+                    this.StopFightingDeadTarget,
+                    this.SendCombatStopMessage),
+                this.SendPlayerDeathAnimation);
 
             LogUtil.Debug(DebugInfoDetail.Network, string.Format("Player died target={0}", target.Identity));
         }
@@ -3711,10 +3710,7 @@ namespace AORebirth.Core.Playfields
             int cashAfter = CashStatRules.Clamp((long)cashBefore + corpse.Credits);
 
             looter.Stats[StatIds.cash].Set((uint)cashAfter);
-            if (looter.Controller != null && looter.Controller.Client != null)
-            {
-                StatMessageHandler.Default.SendChanged(looter);
-            }
+            this.runtimeSystems.SendChangedStatsIfClient(looter, CharacterHasClient, SendStatChangedMessage);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
@@ -3728,6 +3724,16 @@ namespace AORebirth.Core.Playfields
                     corpse.InventoryHandle));
 
             looter.Stats.Write();
+        }
+
+        private static bool CharacterHasClient(ICharacter character)
+        {
+            return character.Controller != null && character.Controller.Client != null;
+        }
+
+        private static void SendStatChangedMessage(ICharacter character)
+        {
+            StatMessageHandler.Default.SendChanged(character);
         }
 
         private void SendCorpseLootAccessAction(ICharacter looter, CorpseState corpse)

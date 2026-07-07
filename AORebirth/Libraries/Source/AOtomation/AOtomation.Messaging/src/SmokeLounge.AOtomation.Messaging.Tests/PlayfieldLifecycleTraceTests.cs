@@ -500,22 +500,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldText.Contains("this.runtimeSystems.BeginPlayerDeath(target, this.KillPlayerTarget);")
                 && playfieldText.Contains("private void KillPlayerTarget(ICharacter target)")
                 && playfieldText.Contains("this.MarkPlayerDead(target);")
+                && playfieldText.Contains("this.runtimeSystems.RunPlayerDeathStatUpdateSequence(")
                 && playfieldText.Contains("this.runtimeSystems.CleanupPlayerDeathCombat(")
-                && playfieldText.Contains("this.SendPlayerDeathAnimation(target);"),
-                "Playfield must keep player death behavior while routing death lifecycle entry through the facade.");
+                && playfieldText.Contains("this.SendPlayerDeathAnimation"),
+                "Playfield must keep player death behavior while routing death stat-update ordering through the facade.");
             string playerDeath = ExtractMethodBlock(playfieldText, "private void KillPlayerTarget");
             AssertTextBefore(
                 playerDeath,
                 "this.MarkPlayerDead(target);",
-                "target.SendChangedStats();");
+                "this.runtimeSystems.RunPlayerDeathStatUpdateSequence(");
             AssertTextBefore(
                 playerDeath,
-                "target.SendChangedStats();",
+                "SendChangedStats,",
                 "this.runtimeSystems.CleanupPlayerDeathCombat(");
             AssertTextBefore(
                 playerDeath,
                 "this.runtimeSystems.CleanupPlayerDeathCombat(",
-                "this.SendPlayerDeathAnimation(target);");
+                "this.SendPlayerDeathAnimation");
             string playerRespawn = ExtractMethodBlock(playfieldText, "public void RespawnPlayer");
             Assert.IsTrue(
                 playerRespawn.Contains("this.runtimeSystems.ProcessPlayerRespawn(")
@@ -986,6 +987,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
+            string statUpdateText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatUpdateRuntimeService.cs"));
             string materializationText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -1026,6 +1031,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new PlayfieldLifecycleRuntimeService()",
                     "new PlayfieldPlayerDeathRespawnRuntimeService()",
                     "new PlayfieldStatelTransitionRuntimeService()",
+                    "new PlayfieldStatUpdateRuntimeService()",
                     "new PlayfieldTimedLifecycleRuntimeService()",
                     "new PlayfieldVisibilityFanoutRuntimeService()",
                     "new PlayfieldPublishFanoutRuntimeService()",
@@ -1142,6 +1148,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("private readonly PlayfieldPacketSequencingRuntimeService packetSequences")
                 && runtimeSystemsText.Contains("private readonly PlayfieldPlayerDeathRespawnRuntimeService playerDeathRespawn")
                 && runtimeSystemsText.Contains("private readonly PlayfieldStatelTransitionRuntimeService statelTransitions")
+                && runtimeSystemsText.Contains("private readonly PlayfieldStatUpdateRuntimeService statUpdates")
                 && runtimeSystemsText.Contains("private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle")
                 && runtimeSystemsText.Contains("private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout")
                 && runtimeSystemsText.Contains("private readonly PlayfieldPublishFanoutRuntimeService publishFanout")
@@ -1198,6 +1205,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.publishFanout.PublishMessageToClient(")
                 && runtimeSystemsText.Contains("this.publishFanout.DispatchMessageToPlayfield(")
                 && runtimeSystemsText.Contains("this.publishFanout.DispatchMessageToPlayfieldOthers(")
+                && runtimeSystemsText.Contains("this.statUpdates.SendChangedStats(")
+                && runtimeSystemsText.Contains("this.statUpdates.SendChangedStatsIfChanged(")
+                && runtimeSystemsText.Contains("this.statUpdates.SendChangedStatsIfClient(")
+                && runtimeSystemsText.Contains("this.statUpdates.RunPlayerDeathStatUpdateSequence(")
                 && runtimeSystemsText.Contains("this.packetSequences.RunVisibilityPacketPairSequence(")
                 && runtimeSystemsText.Contains("this.packetSequences.RunPlayfieldTransferBeginSequence("),
                 "PlayfieldRuntimeSystems must delegate runtime entry points through named runtime services.");
@@ -1270,6 +1281,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || publishFanoutText.Contains("PacketSequencing")
                 || publishFanoutText.Contains("Pool.Instance"),
                 "PlayfieldPublishFanoutRuntimeService must not own packet construction, direct sends, sequencing, or Pool lookups.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldStatUpdateRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldStatUpdateRuntimeService.");
+            Assert.IsTrue(
+                statUpdateText.Contains("internal sealed class PlayfieldStatUpdateRuntimeService")
+                && statUpdateText.Contains("internal void SendChangedStats(")
+                && statUpdateText.Contains("internal void SendChangedStatsIfChanged(")
+                && statUpdateText.Contains("internal void SendChangedStatsIfClient(")
+                && statUpdateText.Contains("internal void RunPlayerDeathStatUpdateSequence(")
+                && statUpdateText.Contains("sendChangedStats(target);")
+                && statUpdateText.Contains("cleanupDeathCombat(target);")
+                && statUpdateText.Contains("sendDeathAnimation(target);"),
+                "PlayfieldStatUpdateRuntimeService must own stat-update callback and death stat-send ordering.");
+            Assert.IsFalse(
+                statUpdateText.Contains("Stats[")
+                || statUpdateText.Contains("StatMessage")
+                || statUpdateText.Contains("SendCompressed")
+                || statUpdateText.Contains("Stats.Write")
+                || statUpdateText.Contains("CashStatRules")
+                || statUpdateText.Contains("CombatDamageRules")
+                || statUpdateText.Contains("Pool.Instance"),
+                "PlayfieldStatUpdateRuntimeService must not own stat math, packet construction, persistence, combat rules, or Pool lookups.");
             Assert.IsTrue(
                 lifecycleText.Contains("internal sealed class PlayfieldLifecycleRuntimeService")
                 && lifecycleText.Contains("internal void PreparePlayfieldTransfer(")
@@ -1432,13 +1465,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("private void ProcessCharacterRegeneration(ICharacter dynel)")
                 && playfieldText.Contains("dynel.Stats[StatIds.health].Value")
-                && playfieldText.Contains("dynel.SendChangedStats();")
+                && playfieldText.Contains("this.runtimeSystems.SendChangedStatsIfChanged(dynel, changed, SendChangedStats);")
                 && playfieldText.Contains("private void ProcessCharacterFollow(ICharacter dynel)")
                 && playfieldText.Contains("dynel.Controller.DoFollow();")
                 && playfieldText.Contains("private void ProcessPlayerCollisionChecks(ICharacter dynel)")
                 && playfieldText.Contains("this.CheckWallCollision(dynel);")
                 && playfieldText.Contains("this.CheckStatelCollision(dynel);"),
-                "Playfield must retain regeneration, follow, and collision behavior behind scheduler callbacks.");
+                "Playfield must retain regeneration math, follow, and collision behavior behind scheduler callbacks.");
             string respawnPlayer = ExtractMethodBlock(playfieldText, "public void RespawnPlayer");
             Assert.IsTrue(
                 respawnPlayer.Contains("this.ResolvePlayerRespawnLocation(character, out destination, out destinationPlayfield);")
@@ -1807,6 +1840,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string scheduleCorpseCreditAward =
                 ExtractMethodBlock(playfieldText, "private void ScheduleCorpseCreditAward");
             string awardCorpseCredits = ExtractMethodBlock(playfieldText, "private void AwardCorpseCredits");
+            string sendStatChangedMessage = ExtractMethodBlock(playfieldText, "private static void SendStatChangedMessage");
             string sendCorpseLootAccessAction =
                 ExtractMethodBlock(playfieldText, "private void SendCorpseLootAccessAction");
 
@@ -1866,9 +1900,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 awardCorpseCredits.Contains("corpse.CreditsLooted = true;")
                 && awardCorpseCredits.Contains("looter.Stats[StatIds.cash].Set((uint)cashAfter);")
-                && awardCorpseCredits.Contains("StatMessageHandler.Default.SendChanged(looter);")
+                && awardCorpseCredits.Contains("this.runtimeSystems.SendChangedStatsIfClient(")
+                && sendStatChangedMessage.Contains("StatMessageHandler.Default.SendChanged(character);")
                 && awardCorpseCredits.Contains("looter.Stats.Write();"),
-                "Playfield must keep corpse credit mutation, packet notification, and persistence ownership.");
+                "Playfield must keep corpse credit mutation, stat packet callback, and persistence ownership.");
 
             Assert.IsTrue(
                 playfieldText.Contains("private readonly Dictionary<int, CorpseState> corpses")
