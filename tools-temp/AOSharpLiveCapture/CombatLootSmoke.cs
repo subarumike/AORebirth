@@ -1036,6 +1036,7 @@ namespace AOSharpLiveCapture
         {
             return SafeArray(() => Inventory.Items.ToArray())
                 .Where(this.IsCleanupTestLootItem)
+                .Where(this.IsInventoryCleanupSlot)
                 .OrderBy(item => Safe(() => item.Name))
                 .ThenBy(item => ItemSlotKey(item))
                 .ToList();
@@ -1046,6 +1047,13 @@ namespace AOSharpLiveCapture
             return item != null
                 && (TestLootCleanupItemIds.Contains(item.Id)
                     || TestLootCleanupItemIds.Contains(item.HighId));
+        }
+
+        private bool IsInventoryCleanupSlot(Item item)
+        {
+            string slot = ItemSlotKey(item);
+            return slot.StartsWith("Inventory:", StringComparison.OrdinalIgnoreCase)
+                || slot.StartsWith("OverflowWindow:", StringComparison.OrdinalIgnoreCase);
         }
 
         private void DeleteInventoryTestLoot(string reason)
