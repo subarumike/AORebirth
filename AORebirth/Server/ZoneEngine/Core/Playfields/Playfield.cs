@@ -739,7 +739,7 @@ namespace AORebirth.Core.Playfields
             ZoneClient lifecycleClient = dynel.Controller == null ? null : dynel.Controller.Client as ZoneClient;
             if (lifecycleClient != null)
             {
-                lifecycleClient.PacketSequencing.RunPlayfieldTransferBeginSequence(
+                this.runtimeSystems.RunPlayfieldTransferBeginSequence(
                     lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer,
                     () => TeleportMessageHandler.Default.Send(
                         dynel as ICharacter,
@@ -1078,7 +1078,7 @@ namespace AORebirth.Core.Playfields
 
                         SimpleCharFullUpdateMessage simpleCharFullUpdate = SimpleCharFullUpdate.ConstructMessage(temp);
                         CharInPlayMessage charInPlay = null;
-                        this.runtimeSystems.PacketSequencing.RunSimpleCharFullUpdateCharInPlaySequence(
+                        this.runtimeSystems.RunVisibilityPacketPairSequence(
                             () => PlayfieldLifecycleTrace.Record(
                                 PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
                                 PlayfieldLifecycleTrace.StageExistingCharacterSimpleCharFullUpdate,
@@ -1125,7 +1125,7 @@ namespace AORebirth.Core.Playfields
             }
 
             CharInPlayMessage charInPlay = null;
-            this.runtimeSystems.PacketSequencing.RunSimpleCharFullUpdateCharInPlaySequence(
+            this.runtimeSystems.RunVisibilityPacketPairSequence(
                 () => PlayfieldLifecycleTrace.Record(
                     PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
                     PlayfieldLifecycleTrace.StageJoiningCharacterSimpleCharFullUpdateBroadcast,
