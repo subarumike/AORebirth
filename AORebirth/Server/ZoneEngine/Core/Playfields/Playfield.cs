@@ -3643,19 +3643,6 @@ namespace AORebirth.Core.Playfields
                     text));
         }
 
-        private void SendCorpseCreditFeedback(ICharacter character, string text)
-        {
-            ChatTextMessageHandler.Default.Send(character, text);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Corpse credit feedback sent char={0} text={1}",
-                    character.Identity,
-                    text));
-        }
-
         private void SendUseActionFinished(ICharacter character)
         {
             if (character.Controller.Client == null)
