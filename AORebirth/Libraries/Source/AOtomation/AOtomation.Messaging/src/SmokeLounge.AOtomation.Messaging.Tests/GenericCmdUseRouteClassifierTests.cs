@@ -1163,16 +1163,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs");
             string runtimeSystems =
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs");
+            string clientMoveHandler =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
+            string containerAddItemHandler =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs");
 
             AssertContains(service, "public CorpseLootInventoryTransferResult TryAddCorpseLootItem(");
             AssertContains(service, "private bool TryResolveCorpseLootTargetSlot(");
             AssertContains(service, "public bool CharacterHasUniqueItemAlready(");
+            AssertContains(service, "public bool TryMoveBackpackItemToInventory(");
+            AssertContains(service, "this.TryMoveOwnedInventoryItem(character, message, client)");
             AssertContains(playfield, "this.runtimeSystems.TryAddCorpseLootItem,");
             AssertContains(playfield, "this.runtimeSystems.CharacterHasUniqueItemAlready,");
             AssertContains(playfield, "this.runtimeSystems.TryUseCorpse(");
             AssertContains(playfield, "this.runtimeSystems.TryUseDeadNpcCorpse(");
             AssertContains(playfield, "this.runtimeSystems.TryLootCorpseItem(");
             AssertContains(playfield, "this.runtimeSystems.ProcessPendingCorpseCreditAwards(");
+            AssertContains(playfield, "corpse => FindCorpseLootItem(corpse, requestedLootSlot)");
+            AssertContains(playfield, "private static CorpseLootItem FindCorpseLootItem(CorpseState corpse, int requestedLootSlot)");
+            AssertContains(playfield, "return CombatCorpseRules.FindLootItem(");
+            AssertContains(playfield, "x => x.Looted);");
             AssertContains(runtimeSystems, "internal CorpseLootInventoryTransferResult TryAddCorpseLootItem(");
             AssertContains(runtimeSystems, "internal bool CharacterHasUniqueItemAlready(ICharacter character, IItem item)");
             AssertContains(runtimeSystems, "return this.inventoryContainer.TryAddCorpseLootItem(looter, item, targetPlacement);");
@@ -1182,13 +1192,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(corpseAccess, "internal bool TryUseCorpse<TCorpseState>(");
             AssertContains(corpseAccess, "internal bool TryUseDeadNpcCorpse<TCorpseState>(");
             AssertContains(corpseAccess, "internal bool TryLootCorpseItem<TCorpseState, TCorpseLootItem>(");
+            AssertContains(corpseAccess, "sourceContainer.Type != IdentityType.Backpack");
+            AssertContains(corpseAccess, "int corpseInventoryHandleValue = (sourceContainer.Instance >> 16) & 0xffff;");
+            AssertContains(corpseAccess, "int requestedLootSlot = sourceContainer.Instance & 0xffff;");
+            AssertContains(corpseAccess, "if (corpseLootItem == null)");
+            AssertContains(corpseAccess, "sendUseActionFinished(looter);");
             AssertContains(
                 corpseAccess,
                 "CorpseLootInventoryTransferResult transferResult = tryAddCorpseLootItem(looter, item, targetPlacement);");
             AssertTextBefore(
                 corpseAccess,
+                "CorpseLootInventoryTransferResult transferResult = tryAddCorpseLootItem(looter, item, targetPlacement);",
+                "setLooted(corpseLootItem, true);");
+            AssertTextBefore(
+                corpseAccess,
                 "setLooted(corpseLootItem, true);",
-                "sendCorpseContainerAddItem(looter, sourceContainer, targetPlacement);");
+                "sendCorpseContainerAddItem(looter, sourceContainer, transferResult.TargetSlot);");
+            AssertContains(corpseAccess, "scheduleCorpseDespawn(corpse, emptyCleanupDelay, \"looted-empty\");");
+            AssertContains(corpseAccess, "extendCorpseLifetime(corpse, itemLootLifetime, \"loot-remaining\");");
+            AssertTextBefore(
+                clientMoveHandler,
+                "character.Playfield.TryLootCorpseItem(",
+                "InventoryContainerRuntimeService.Default.HandleClientMoveItemToInventory(client, message);");
+            AssertTextBefore(
+                containerAddItemHandler,
+                "client.Controller.Character.Playfield.TryLootCorpseItem(",
+                "InventoryContainerRuntimeService.Default.HandleContainerAddItem(client, message);");
             AssertDoesNotContain(playfield, "InventoryContainerRuntimeService.Default.TryAddCorpseLootItem(");
             AssertDoesNotContain(playfield, "InventoryContainerRuntimeService.Default.CharacterHasUniqueItemAlready(");
 

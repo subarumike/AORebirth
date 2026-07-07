@@ -311,7 +311,7 @@ namespace AORebirth.Core.Playfields
 
             setLooted(corpseLootItem, true);
             setOpened(corpse, true);
-            sendCorpseContainerAddItem(looter, sourceContainer, targetPlacement);
+            sendCorpseContainerAddItem(looter, sourceContainer, transferResult.TargetSlot);
 
             if (!hasUnlootedItems(corpse))
             {

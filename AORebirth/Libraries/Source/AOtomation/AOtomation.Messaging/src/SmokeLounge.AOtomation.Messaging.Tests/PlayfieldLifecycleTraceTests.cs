@@ -1790,7 +1790,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(
                 corpseAccessText,
                 "setLooted(corpseLootItem, true);",
-                "sendCorpseContainerAddItem(looter, sourceContainer, targetPlacement);");
+                "sendCorpseContainerAddItem(looter, sourceContainer, transferResult.TargetSlot);");
             Assert.IsFalse(
                 playfieldText.Contains("private void SendCorpseInventoryUpdateAndCredits"),
                 "Playfield must not keep the combined corpse inventory/credits orchestration helper.");
@@ -1933,7 +1933,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(
                 corpseLoot,
                 "setOpened(corpse, true);",
-                "sendCorpseContainerAddItem(looter, sourceContainer, targetPlacement);");
+                "sendCorpseContainerAddItem(looter, sourceContainer, transferResult.TargetSlot);");
+            Assert.IsTrue(
+                corpseLoot.Contains("sourceContainer.Type != IdentityType.Backpack")
+                && corpseLoot.Contains("int corpseInventoryHandleValue = (sourceContainer.Instance >> 16) & 0xffff;")
+                && corpseLoot.Contains("int requestedLootSlot = sourceContainer.Instance & 0xffff;"),
+                "Corpse loot transfer must accept the opened corpse container source encoding and decode handle plus slot.");
+            Assert.IsTrue(
+                corpseLoot.Contains("if (corpseLootItem == null)")
+                && corpseLoot.Contains("sendUseActionFinished(looter);"),
+                "Missing, already-looted, or empty corpse slots must fail safely without producing items.");
+            AssertTextBefore(
+                corpseLoot,
+                "CorpseLootInventoryTransferResult transferResult = tryAddCorpseLootItem(looter, item, targetPlacement);",
+                "setLooted(corpseLootItem, true);");
             Assert.IsTrue(
                 inventoryRuntimeText.Contains("public bool CharacterHasUniqueItemAlready(")
                 && inventoryRuntimeText.Contains("public CorpseLootInventoryTransferResult TryAddCorpseLootItem(")
