@@ -2269,16 +2269,10 @@ namespace AORebirth.Core.Playfields
                 corpse => corpse.DeadNpcIdentity,
                 corpse => corpse.ExpiresAtUtc,
                 corpse => corpse.HasUnlootedItems,
-                corpse => corpse.Opened,
                 (corpse, opened) => { corpse.Opened = opened; },
-                corpse => corpse.NextUseSendsAccessActionOnly,
-                (corpse, nextUseSendsAccessActionOnly) =>
-                    { corpse.NextUseSendsAccessActionOnly = nextUseSendsAccessActionOnly; },
                 corpse => corpse.LootClass,
                 this.DespawnCorpse,
                 this.ExtendCorpseLifetime,
-                this.SendCorpseLootAccessAction,
-                this.SendUseActionFinished,
                 this.SendCorpseInventoryUpdate,
                 this.ScheduleCorpseCreditAward,
                 this.ScheduleCorpseDespawn);
@@ -2982,8 +2976,6 @@ namespace AORebirth.Core.Playfields
 
             public bool Opened { get; set; }
 
-            public bool NextUseSendsAccessActionOnly { get; set; }
-
             public bool HasUnlootedItems
             {
                 get
@@ -3628,31 +3620,6 @@ namespace AORebirth.Core.Playfields
         private static void SendStatChangedMessage(ICharacter character)
         {
             StatMessageHandler.Default.SendChanged(character);
-        }
-
-        private void SendCorpseLootAccessAction(ICharacter looter, CorpseState corpse)
-        {
-            if (looter.Controller.Client == null)
-            {
-                return;
-            }
-
-            looter.Controller.Client.SendCompressed(
-                new ActionMessage
-                {
-                    Identity = corpse.CorpseIdentity,
-                    Unknown = 1,
-                    ActionCode = 1,
-                    ActionIdentity = 0x66,
-                    Target = looter.Identity
-                });
-
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                string.Format(
-                    "Corpse loot access Action sent looter={0} corpse={1} action=0x66",
-                    looter.Identity,
-                    corpse.CorpseIdentity));
         }
 
         private void SendRewardFeedback(ICharacter character, string text)
