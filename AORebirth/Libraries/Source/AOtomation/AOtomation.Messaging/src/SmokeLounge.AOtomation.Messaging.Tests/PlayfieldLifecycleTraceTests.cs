@@ -1876,6 +1876,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs"));
+            string corpseInteractionRulesText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CorpseInteractionRules.cs"));
             string inventoryRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs"));
 
@@ -1914,6 +1916,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 inventoryAndCredits,
                 "sendCorpseInventoryUpdate(looter, corpse);",
                 "scheduleCorpseCreditAward(looter, corpse);");
+            Assert.IsTrue(
+                playfieldText.Contains("private static readonly TimeSpan CorpseCreditAwardDelay = TimeSpan.FromMilliseconds(500);")
+                && corpseInteractionRulesText.Contains("public const int CorpseUseAcknowledgeDelayMilliseconds = 550;"),
+                "Capture-backed corpse credit payout must stay after InventoryUpdate and before the delayed GenericCmd success ack.");
 
             Assert.IsTrue(
                 playfieldLootCorpseItem.Contains("this.runtimeSystems.TryLootCorpseItem(")
@@ -1961,15 +1967,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Playfield must delegate due credit-award iteration through runtime systems while retaining the credit award callback.");
             Assert.IsTrue(
                 scheduleCorpseCreditAward.Contains("this.pendingCorpseCreditAwards.ContainsKey(corpse.CorpseIdentity.Instance)")
+                && scheduleCorpseCreditAward.Contains("corpse.CreditsLooted || corpse.Credits <= 0")
                 && scheduleCorpseCreditAward.Contains("this.pendingCorpseCreditAwards[corpse.CorpseIdentity.Instance]"),
-                "Playfield must keep pending corpse credit storage ownership.");
+                "Playfield must keep pending corpse credit storage ownership and must not schedule duplicate or zero-credit payouts.");
             Assert.IsTrue(
                 awardCorpseCredits.Contains("corpse.CreditsLooted = true;")
+                && awardCorpseCredits.Contains("CashStatRules.Clamp")
                 && awardCorpseCredits.Contains("looter.Stats[StatIds.cash].Set((uint)cashAfter);")
                 && awardCorpseCredits.Contains("this.runtimeSystems.SendChangedStatsIfClient(")
                 && sendStatChangedMessage.Contains("StatMessageHandler.Default.SendChanged(character);")
                 && awardCorpseCredits.Contains("looter.Stats.Write();"),
                 "Playfield must keep corpse credit mutation, stat packet callback, and persistence ownership.");
+            Assert.IsFalse(
+                awardCorpseCredits.Contains("FormatFeedbackMessage")
+                || awardCorpseCredits.Contains("ChatTextMessageHandler")
+                || awardCorpseCredits.Contains("SendRewardFeedback")
+                || awardCorpseCredits.Contains("StatIds.xp")
+                || awardCorpseCredits.Contains("UnsavedXP"),
+                "Corpse credit payout must be Cash stat only; capture did not prove chat feedback or XP from corpse interaction.");
+            Assert.IsFalse(
+                corpseLoot.Contains("AwardCorpseCredits")
+                || corpseLoot.Contains("Stats[StatIds.cash].Set")
+                || corpseLoot.Contains("CashStatRules"),
+                "Item loot transfer must not independently award corpse credits.");
 
             Assert.IsTrue(
                 playfieldText.Contains("private readonly Dictionary<int, CorpseState> corpses")
@@ -1994,6 +2014,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playfieldText.Contains("HighId = lootItem.Item.HighID")
                 && playfieldText.Contains("Quality = lootItem.Item.Quality"),
                 "Corpse InventoryUpdate entries must expose item ids and quality from corpse state.");
+            Assert.IsFalse(
+                playfieldText.Contains("SendCorpseCreditFeedback"),
+                "Corpse credit payout must not retain an unproven chat/feedback helper.");
             Assert.IsFalse(
                 corpseAccessText.Contains("InventoryUpdateMessage")
                 || corpseAccessText.Contains("ContainerAddItemMessage")
