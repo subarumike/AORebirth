@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 
 // Copyright (c) 2005-2014, CellAO Team
 // 
@@ -56,6 +56,11 @@ namespace ZoneEngine.Core.PacketHandlers
     using ZoneEngine.Script;
 
     using Utility;
+    using AORebirth.Database.Dao;
+    using AORebirth.Stats;
+    using System.Collections.Generic;
+    using AORebirth.Database.Entities;
+    using System.Linq;
 
     #endregion
 
@@ -336,17 +341,82 @@ client.Controller.Character.Playfield.Identity,
                 SetStat(client, StatIds.prevmovementmode, (int)MoveModes.Run);
             }
 
+
+            // Start adding GM/Expansion in stats
+            var character = client.Controller.Character;
+
+            // 1. take a character from the DB (the only valid way for you)
+            var characterData = CharacterDao.Instance
+                .GetAll(new { })
+                .FirstOrDefault(c => c.Id == character.Identity.Instance);
+
+            if (characterData == null)
+            {
+                Console.WriteLine($"[GM/EXP DEBUG] Character NOT FOUND ID={character.Identity.Instance}");
+                return;
+            }
+
+            // 2. get login data via Username
+            var login = LoginDataDao.Instance.GetByUsername(characterData.Username);
+
+            if (login == null)
+            {
+                Console.WriteLine($"[GM/EXP DEBUG] LOGIN NOT FOUND for {characterData.Username}");
+                return;
+            }
+
+            Console.WriteLine($"[GM/EXP DEBUG] CharacterID = {character.Identity.Instance}");
+            Console.WriteLine($"[GM/EXP DEBUG] Username = {characterData.Username}");
+            Console.WriteLine($"[GM/EXP DEBUG] GM = {login.GM}");
+            Console.WriteLine($"[GM/EXP DEBUG] EXP = {login.Expansions}");
+
+            // 3. REGISTRATION IN STATS (CORRECT FOR IStatList - NO Add/Contains)
+            SetStat(client, StatIds.gmlevel, login.GM);
+            SetStat(client, StatIds.expansion, login.Expansions);
+
+            UpsertCharacterStat(character.Identity.Instance, StatIds.gmlevel, login.GM);
+            UpsertCharacterStat(character.Identity.Instance, StatIds.expansion, login.Expansions);
+
+            // optional safety reset (if engine ask refresh)
+            client.Controller.SendChangedStats();
+
+            // End Here
+
+
             SetStat(client, StatIds.currentstate, 0);
             SetStat(client, StatIds.waitstate, 0);
             SetStat(client, StatIds.socialstatus, 4);
             SetStat(client, StatIds.specialcondition, 3);
             SetStat(client, StatIds.actioncategory, 0);
+         
         }
 
         private static void SetStat(ZoneClient client, StatIds stat, int value)
         {
             client.Controller.Character.Stats[stat].Value = value;
             client.Controller.Character.Stats[stat].BaseValue = (uint)value;
+        }
+
+        private static void UpsertCharacterStat(int characterId, StatIds statId, int value)
+        {
+            DBStats stat = StatDao.Instance
+                .GetAll(new { Type = 50000, Instance = characterId, StatId = (int)statId })
+                .FirstOrDefault();
+
+            if (stat == null)
+            {
+                StatDao.Instance.Add(new DBStats
+                {
+                    Type = 50000,
+                    Instance = characterId,
+                    StatId = (int)statId,
+                    StatValue = value
+                });
+                return;
+            }
+
+            stat.StatValue = value;
+            StatDao.Instance.Save(stat);
         }
 
         private static void SendAliveDeadTimerBaseline(ZoneClient client)
