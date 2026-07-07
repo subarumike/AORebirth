@@ -35,6 +35,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldCorpseAccessRuntimeService corpseAccess;
 
+        private readonly PlayfieldDbMobSpawnRuntimeService dbMobSpawns;
+
         private readonly PlayfieldDynelRegistry dynelRegistry;
 
         private readonly PlayfieldObjectLifecycleRuntimeService objectLifecycle;
@@ -94,6 +96,7 @@ namespace ZoneEngine.Core.Playfields
                 new PrivateCityContentModule());
             this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);
             this.corpseAccess = new PlayfieldCorpseAccessRuntimeService();
+            this.dbMobSpawns = new PlayfieldDbMobSpawnRuntimeService();
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.objectLifecycle = new PlayfieldObjectLifecycleRuntimeService();
             this.objectMaterialization = new PlayfieldObjectMaterializationRuntimeService();
@@ -130,22 +133,18 @@ namespace ZoneEngine.Core.Playfields
         internal void MaterializeStartupObjects(
             Identity playfieldIdentity,
             IEnumerable<StatelData> statels,
-            Func<Identity, IEnumerable<DBMobSpawn>> loadMobSpawns,
-            Func<DBMobSpawn, IEnumerable<DBMobSpawnStat>> loadMobSpawnStats,
-            Func<DBMobSpawn, DBMobSpawnStat[], ICharacter> instantiateDbMobSpawn,
-            Action<DBMobSpawn, ICharacter> attachMobSpawnScript,
             Action<StatelData[]> spawnVendors,
             Func<PlayfieldStaticDynelDefinition, IEntity> instantiateStaticDynel)
         {
             this.objectMaterialization.MaterializeStartupObjects(
                 playfieldIdentity,
                 statels,
-                loadMobSpawns,
+                this.dbMobSpawns.LoadMobSpawnDefinitions,
                 this.ShouldSuppressDbMobSpawn,
-                loadMobSpawnStats,
-                instantiateDbMobSpawn,
+                this.dbMobSpawns.LoadMobSpawnStats,
+                (mob, stats) => this.dbMobSpawns.InstantiateDbMobSpawn(mob, stats, this.playfield),
                 this.ActivateNpc,
-                attachMobSpawnScript,
+                this.dbMobSpawns.AttachMobSpawnKnuBot,
                 this.RegisterContent,
                 this.TryResolveVendorStatels,
                 spawnVendors,
