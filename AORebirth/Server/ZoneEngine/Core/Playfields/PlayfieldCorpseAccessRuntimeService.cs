@@ -29,15 +29,10 @@ namespace AORebirth.Core.Playfields
             Func<TCorpseState, Identity> deadNpcIdentity,
             Func<TCorpseState, DateTime> expiresAtUtc,
             Func<TCorpseState, bool> hasUnlootedItems,
-            Func<TCorpseState, bool> opened,
             Action<TCorpseState, bool> setOpened,
-            Func<TCorpseState, bool> nextUseSendsAccessActionOnly,
-            Action<TCorpseState, bool> setNextUseSendsAccessActionOnly,
             Func<TCorpseState, object> lootClass,
             Action<int> despawnCorpse,
             Action<TCorpseState, TimeSpan, string> extendCorpseLifetime,
-            Action<ICharacter, TCorpseState> sendCorpseLootAccessAction,
-            Action<ICharacter> sendUseActionFinished,
             Action<ICharacter, TCorpseState> sendCorpseInventoryUpdate,
             Action<ICharacter, TCorpseState> scheduleCorpseCreditAward,
             Action<TCorpseState, TimeSpan, string> scheduleCorpseDespawn)
@@ -76,30 +71,11 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            bool wasOpened = opened(corpse);
             setOpened(corpse, true);
 
             if (hasUnlootedItems(corpse))
             {
                 extendCorpseLifetime(corpse, itemLootLifetime, "corpse-use");
-                if (nextUseSendsAccessActionOnly(corpse))
-                {
-                    sendCorpseLootAccessAction(looter, corpse);
-                    sendUseActionFinished(looter);
-                    setNextUseSendsAccessActionOnly(corpse, false);
-                }
-                else
-                {
-                    this.SendCorpseInventoryUpdateAndCredits(
-                        looter,
-                        corpse,
-                        sendCorpseInventoryUpdate,
-                        scheduleCorpseCreditAward);
-                    setNextUseSendsAccessActionOnly(corpse, true);
-                }
-            }
-            else if (!wasOpened)
-            {
                 this.SendCorpseInventoryUpdateAndCredits(
                     looter,
                     corpse,
@@ -108,7 +84,11 @@ namespace AORebirth.Core.Playfields
             }
             else
             {
-                sendUseActionFinished(looter);
+                this.SendCorpseInventoryUpdateAndCredits(
+                    looter,
+                    corpse,
+                    sendCorpseInventoryUpdate,
+                    scheduleCorpseCreditAward);
             }
 
             if (!hasUnlootedItems(corpse))
@@ -123,7 +103,7 @@ namespace AORebirth.Core.Playfields
                     corpseIdentity,
                     deadNpcIdentity(corpse),
                     looter.Identity,
-                    opened(corpse),
+                    true,
                     lootClass(corpse)));
 
             return true;

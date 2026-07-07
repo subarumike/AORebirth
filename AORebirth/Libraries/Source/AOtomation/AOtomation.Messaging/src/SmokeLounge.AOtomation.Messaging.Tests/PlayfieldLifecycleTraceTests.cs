@@ -1894,22 +1894,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ExtractMethodBlock(playfieldText, "private void ScheduleCorpseCreditAward");
             string awardCorpseCredits = ExtractMethodBlock(playfieldText, "private void AwardCorpseCredits");
             string sendStatChangedMessage = ExtractMethodBlock(playfieldText, "private static void SendStatChangedMessage");
-            string sendCorpseLootAccessAction =
-                ExtractMethodBlock(playfieldText, "private void SendCorpseLootAccessAction");
 
             Assert.IsTrue(
                 playfieldUseCorpse.Contains("this.runtimeSystems.TryUseCorpse(")
-                && playfieldUseCorpse.Contains("this.SendCorpseLootAccessAction")
-                && playfieldUseCorpse.Contains("this.SendUseActionFinished")
                 && playfieldUseCorpse.Contains("this.SendCorpseInventoryUpdate")
                 && playfieldUseCorpse.Contains("this.ScheduleCorpseCreditAward"),
                 "Playfield must delegate corpse access sequencing while retaining packet and credit callbacks.");
             Assert.IsTrue(
-                corpseUse.Contains("sendCorpseLootAccessAction(looter, corpse);")
-                && corpseUse.Contains("sendUseActionFinished(looter);")
-                && corpseUse.Contains("this.SendCorpseInventoryUpdateAndCredits("),
-                "Corpse access service must own access-action, inventory-update, and credit-scheduling orchestration.");
-            AssertTextBefore(corpseUse, "sendCorpseLootAccessAction(looter, corpse);", "sendUseActionFinished(looter);");
+                corpseUse.Contains("this.SendCorpseInventoryUpdateAndCredits(")
+                && corpseUse.Contains("if (hasUnlootedItems(corpse))")
+                && corpseUse.Contains("else"),
+                "Corpse access service must use the captured InventoryUpdate open path for item-bearing and empty corpses.");
+            Assert.IsFalse(
+                corpseUse.Contains("sendCorpseLootAccessAction")
+                || corpseUse.Contains("sendUseActionFinished")
+                || corpseUse.Contains("NextUseSendsAccessActionOnly"),
+                "Corpse Use must not take the old unproven action-only path instead of the captured InventoryUpdate open path.");
             AssertTextBefore(
                 inventoryAndCredits,
                 "sendCorpseInventoryUpdate(looter, corpse);",
@@ -1965,8 +1965,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 sendCorpseInventoryUpdate.Contains("new InventoryUpdateMessage")
                 && sendCorpseContainerAddItem.Contains("new ContainerAddItemMessage")
-                && sendCorpseLootAccessAction.Contains("new ActionMessage"),
+                && sendCorpseInventoryUpdate.Contains("NumberOfSlots = CombatCorpseRules.CorpseInventorySlots")
+                && sendCorpseInventoryUpdate.Contains("Unknown1 = 2")
+                && sendCorpseInventoryUpdate.Contains("BagIdentity = corpse.CorpseIdentity")
+                && sendCorpseInventoryUpdate.Contains("SlotnumberInMainInventory = corpse.InventoryHandle")
+                && sendCorpseInventoryUpdate.Contains("Unknown2 = 1"),
                 "Playfield must keep corpse packet construction ownership for now.");
+            Assert.IsTrue(
+                sendCorpseInventoryUpdate.Contains("corpse.LootItems == null")
+                && sendCorpseInventoryUpdate.Contains("new InventoryEntry[0]")
+                && sendCorpseInventoryUpdate.Contains("corpse.LootItems.Where(x => !x.Looted).Select(CreateCorpseInventoryEntry).ToArray()"),
+                "Empty corpses must open with zero inventory entries, while item-bearing corpses expose current unlooted corpse items.");
+            Assert.IsTrue(
+                playfieldText.Contains("LowId = lootItem.Item.LowID")
+                && playfieldText.Contains("HighId = lootItem.Item.HighID")
+                && playfieldText.Contains("Quality = lootItem.Item.Quality"),
+                "Corpse InventoryUpdate entries must expose item ids and quality from corpse state.");
             Assert.IsFalse(
                 corpseAccessText.Contains("InventoryUpdateMessage")
                 || corpseAccessText.Contains("ContainerAddItemMessage")
