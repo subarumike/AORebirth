@@ -296,6 +296,7 @@
     <Compile Include="Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldPacketSequencingRuntimeService.cs" />
+    <Compile Include="Core\Playfields\PlayfieldPublishFanoutRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldRewardRuntimeService.cs" />
     <Compile Include="Core\Playfields\PrivateCityReadyInitCoordinator.cs" />
     <Compile Include="Core\Playfields\Playfield.cs" />
