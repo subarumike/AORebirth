@@ -1,0 +1,178 @@
+{
+  "capture": {
+    "name": "Omni-Tek Virtual Training Ground",
+    "submittedFolder": "For Repo/Omni-Tek Virtual Training Ground - 138.0, 100.9, 13.5 (138.0 100.9 y 13.5 1108028)",
+    "originalCaptureFolder": "C:\\Users\\kegzi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260622-182442",
+    "characterName": "Hiredhitman",
+    "playfieldIdentity": "(Playfield2:10E83C)",
+    "playfieldId": 1108028,
+    "captureStartUtc": "2026-06-22T16:24:42.8184746Z",
+    "captureEndUtc": "2026-06-22T16:54:07.1170882Z",
+    "validationStatus": "complete",
+    "processingAllowed": true
+  },
+  "inspectedFiles": [
+    "capture_info.json",
+    "capture-health.json",
+    "capture-session.json",
+    "events.log",
+    "packets.hex.log",
+    "npc-interactions.log",
+    "inventory-updates.csv",
+    "shop-updates.csv",
+    "vendor-full-updates.csv",
+    "enemy-state.csv",
+    "enemy-state.json",
+    "chat-dialogue.log",
+    "system-messages.log"
+  ],
+  "referenceSequences": {
+    "emptyCorpseOpen": [
+      {
+        "source": "events.log:239",
+        "direction": "OUT-N3",
+        "sequence": 81,
+        "messageType": "GenericCmd",
+        "identity": "(SimpleChar:67341BED)",
+        "target": "(Corpse:F6C003)",
+        "summary": "Action=Use Temp1=0 Count=5 Unknown=1"
+      },
+      {
+        "source": "events.log:242-243",
+        "direction": "IN-N3",
+        "sequence": 122,
+        "messageType": "InventoryUpdate",
+        "identity": "(SimpleChar:67341BED)",
+        "inventoryIdentity": "(Corpse:F6C003)",
+        "handle": 112,
+        "unknown1": 21,
+        "unknown2": 2,
+        "unknown3": 1,
+        "itemCount": 0
+      },
+      {
+        "source": "events.log:244",
+        "direction": "IN-N3",
+        "sequence": 123,
+        "messageType": "GenericCmd",
+        "identity": "(SimpleChar:67341BED)",
+        "target": "(Corpse:F6C003)",
+        "summary": "Action=Use Temp1=1 Count=5 Unknown=0"
+      }
+    ],
+    "corpseInventoryWithItems": {
+      "source": "inventory-updates.csv:11-17",
+      "direction": "IN-N3",
+      "sequence": 2001,
+      "inventoryIdentity": "(Corpse:F6C009)",
+      "handle": 133,
+      "unknownObserved": 0,
+      "items": [
+        { "slot": 0, "placement": 0, "flags": 33, "count": 1, "lowId": 201135, "highId": 201136, "quality": 4 },
+        { "slot": 1, "placement": 1, "flags": 33, "count": 1, "lowId": 85655, "highId": 22104, "quality": 4 },
+        { "slot": 2, "placement": 2, "flags": 33, "count": 1, "lowId": 124579, "highId": 124580, "quality": 4 },
+        { "slot": 3, "placement": 3, "flags": 33, "count": 1, "lowId": 154070, "highId": 150196, "quality": 4 },
+        { "slot": 4, "placement": 4, "flags": 33, "count": 1, "lowId": 160448, "highId": 160441, "quality": 4 },
+        { "slot": 5, "placement": 5, "flags": 33, "count": 1, "lowId": 162623, "highId": 162623, "quality": 14 },
+        { "slot": 6, "placement": 6, "flags": 33, "count": 1, "lowId": 162623, "highId": 162623, "quality": 14 }
+      ]
+    },
+    "npcDeathCorpseDespawn": [
+      {
+        "source": "events.log:79",
+        "direction": "OUT-N3",
+        "sequence": 19,
+        "messageType": "Attack",
+        "identity": "(SimpleChar:67341BED)",
+        "target": "(SimpleChar:78F93437)"
+      },
+      {
+        "source": "events.log:83-84",
+        "direction": "IN-N3",
+        "messageTypes": ["SpecialAttackWeapon", "Attack"],
+        "identity": "(SimpleChar:67341BED)",
+        "target": "(SimpleChar:78F93437)"
+      },
+      {
+        "source": "events.log:174",
+        "direction": "IN-N3",
+        "sequence": 81,
+        "messageType": "AttackInfo",
+        "identity": "(SimpleChar:67341BED)",
+        "target": "(SimpleChar:78F93437)",
+        "amount": 4593,
+        "hitType": "Critical",
+        "weaponSlot": 6
+      },
+      {
+        "source": "events.log:186-187",
+        "direction": "IN-N3",
+        "sequence": 87,
+        "messageType": "CharacterAction",
+        "identity": "(SimpleChar:78F93437)",
+        "action": "Death",
+        "parameter2": 500
+      },
+      {
+        "source": "events.log:196,199",
+        "direction": "IN-N3",
+        "sequence": 96,
+        "messageType": "CorpseFullUpdate",
+        "identity": "(Corpse:F6C003)",
+        "name": "Remains of Grass Snake",
+        "sourceNpc": "(SimpleChar:78F93437)"
+      },
+      {
+        "source": "events.log:276-277",
+        "direction": "IN-N3",
+        "sequence": 142,
+        "messageType": "Despawn",
+        "identity": "(Corpse:F6C003)",
+        "unknown": 1
+      }
+    ],
+    "vendorAndShop": {
+      "vendorFullUpdates": [
+        {
+          "source": "vendor-full-updates.csv:4",
+          "sequence": 4626,
+          "identity": "(VendingMachine:12EA61A0)",
+          "template": 100035,
+          "playfieldId": 1108028,
+          "position": { "x": 60.0, "y": 13.9999981, "z": 50.0 },
+          "statsCount": 8
+        },
+        {
+          "source": "vendor-full-updates.csv:2",
+          "sequence": 2711,
+          "identity": "(VendingMachine:12EA61A1)",
+          "template": 209286,
+          "playfieldId": 1108028,
+          "ownerType": 50000,
+          "ownerInstance": 2029597735,
+          "statsCount": 8
+        }
+      ],
+      "shopUpdate": {
+        "source": "shop-updates.csv:2-8",
+        "sequence": 10153,
+        "identity": "(VendingMachine:12EA61A0)",
+        "items": [
+          { "slot": 0, "lowId": 31837, "highId": 31837, "quality": 1 },
+          { "slot": 1, "lowId": 291082, "highId": 291082, "quality": 1 },
+          { "slot": 2, "lowId": 291043, "highId": 291043, "quality": 1 },
+          { "slot": 3, "lowId": 95577, "highId": 95577, "quality": 1 },
+          { "slot": 4, "lowId": 28564, "highId": 28564, "quality": 1 },
+          { "slot": 5, "lowId": 161699, "highId": 161699, "quality": 1 },
+          { "slot": 6, "lowId": 99228, "highId": 99228, "quality": 1 }
+        ]
+      }
+    }
+  },
+  "notProvenByThisFixture": [
+    "corpse item transfer into player inventory",
+    "corpse credit award",
+    "vendor GenericCmd Use request routing",
+    "gameplay data import safety for vendor stock or NPC spawns"
+  ]
+}
