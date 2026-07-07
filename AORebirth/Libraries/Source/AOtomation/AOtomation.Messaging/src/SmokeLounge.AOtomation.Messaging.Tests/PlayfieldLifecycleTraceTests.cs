@@ -961,6 +961,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
             string npcRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+            string npcCombatMovementText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs"));
             string objectLifecycleText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -1024,6 +1028,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 {
                     "new PlayfieldObjectLifecycleRuntimeService()",
                     "new PlayfieldObjectMaterializationRuntimeService()",
+                    "new PlayfieldNpcCombatMovementRuntimeService()",
                     "new PlayfieldPacketSequencingRuntimeService(this.packetSequencing)",
                     "new PlayfieldCorpseAccessRuntimeService()",
                     "new PlayfieldRewardRuntimeService()",
@@ -1144,6 +1149,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 runtimeSystemsText.Contains("private readonly NPCRuntimeService npcRuntime")
                 && runtimeSystemsText.Contains("private readonly PlayfieldCorpseAccessRuntimeService corpseAccess")
                 && runtimeSystemsText.Contains("private readonly PlayfieldLifecycleRuntimeService lifecycle")
+                && runtimeSystemsText.Contains("private readonly PlayfieldNpcCombatMovementRuntimeService npcCombatMovement")
                 && runtimeSystemsText.Contains("private readonly PlayfieldObjectMaterializationRuntimeService objectMaterialization")
                 && runtimeSystemsText.Contains("private readonly PlayfieldPacketSequencingRuntimeService packetSequences")
                 && runtimeSystemsText.Contains("private readonly PlayfieldPlayerDeathRespawnRuntimeService playerDeathRespawn")
@@ -1205,6 +1211,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.publishFanout.PublishMessageToClient(")
                 && runtimeSystemsText.Contains("this.publishFanout.DispatchMessageToPlayfield(")
                 && runtimeSystemsText.Contains("this.publishFanout.DispatchMessageToPlayfieldOthers(")
+                && runtimeSystemsText.Contains("this.npcCombatMovement.IsInCombatRange(")
+                && runtimeSystemsText.Contains("this.npcCombatMovement.UpdateNpcMeleeFollowHold(")
+                && runtimeSystemsText.Contains("this.npcCombatMovement.TryMoveNpcIntoCombatRange(")
                 && runtimeSystemsText.Contains("this.statUpdates.SendChangedStats(")
                 && runtimeSystemsText.Contains("this.statUpdates.SendChangedStatsIfChanged(")
                 && runtimeSystemsText.Contains("this.statUpdates.SendChangedStatsIfClient(")
@@ -1303,6 +1312,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || statUpdateText.Contains("CombatDamageRules")
                 || statUpdateText.Contains("Pool.Instance"),
                 "PlayfieldStatUpdateRuntimeService must not own stat math, packet construction, persistence, combat rules, or Pool lookups.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldNpcCombatMovementRuntimeService.");
+            Assert.IsTrue(
+                npcCombatMovementText.Contains("internal sealed class PlayfieldNpcCombatMovementRuntimeService")
+                && npcCombatMovementText.Contains("internal bool IsInCombatRange(")
+                && npcCombatMovementText.Contains("internal void UpdateNpcMeleeFollowHold(")
+                && npcCombatMovementText.Contains("internal void TryMoveNpcIntoCombatRange(")
+                && npcCombatMovementText.Contains("internal static double GetCombatDistance(")
+                && npcCombatMovementText.Contains("internal static bool IsCapturedCleaningRobot(")
+                && npcCombatMovementText.Contains("private void MoveNpcTowardCombatTarget(")
+                && npcCombatMovementText.Contains("private void MoveCapturedCleaningRobotTowardCombatTarget("),
+                "PlayfieldNpcCombatMovementRuntimeService must own NPC range, chase, and follow-target movement decisions.");
+            Assert.IsFalse(
+                npcCombatMovementText.Contains("SetPosMessage")
+                || npcCombatMovementText.Contains("this.Announce(")
+                || npcCombatMovementText.Contains("SendCompressed")
+                || npcCombatMovementText.Contains("AttackInfo")
+                || npcCombatMovementText.Contains("Stats.Write")
+                || npcCombatMovementText.Contains("Pool.Instance"),
+                "PlayfieldNpcCombatMovementRuntimeService must not own packet construction, sends, attack packets, persistence, or Pool lookups.");
             Assert.IsTrue(
                 lifecycleText.Contains("internal sealed class PlayfieldLifecycleRuntimeService")
                 && lifecycleText.Contains("internal void PreparePlayfieldTransfer(")
@@ -1516,6 +1546,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 npcCombatTickText.Contains("this.playfield.ClearNpcCombatTracking(attacker.Identity);")
                 && npcCombatTickText.Contains("this.playfield.ClearInvalidNpcCombatTarget(attacker);"),
                 "NpcCombatTickCoordinator must route NPC combat clear decisions through the runtime ownership boundary.");
+            Assert.IsTrue(
+                playfieldText.Contains("internal bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)")
+                && playfieldText.Contains("return this.runtimeSystems.IsInNpcCombatRange(attacker, target, range);")
+                && playfieldText.Contains("this.runtimeSystems.UpdateNpcMeleeFollowHold(")
+                && playfieldText.Contains("this.runtimeSystems.TryMoveNpcIntoCombatRange(")
+                && playfieldText.Contains("private void MoveNpcToCombatPosition(")
+                && playfieldText.Contains("new SetPosMessage"),
+                "Playfield must delegate NPC combat movement decisions while retaining SetPos packet construction.");
+            Assert.IsTrue(
+                npcCombatMovementText.Contains("MoveCombatPositionToward(")
+                && npcCombatMovementText.Contains("EnemyBehaviorContract.MaxPlayerChaseProjectionDistance")
+                && npcCombatMovementText.Contains("EnemyBehaviorContract.MaxNpcFollowSpeedPerSecond")
+                && npcCombatMovementText.Contains("npcController.Follow(target.Identity, stopDistance);")
+                && npcCombatMovementText.Contains("npcController.StopFollow();")
+                && npcCombatMovementText.Contains("logNpcBrain(\"Chasing\"")
+                && npcCombatMovementText.Contains("logNpcBrain(\"FollowTargetStart\"")
+                && npcCombatMovementText.Contains("logNpcBrain(\"FollowTargetContinue\""),
+                "NPC combat movement service must own chase distance, follow start, follow continuation, and stop-follow decisions.");
+            Assert.IsFalse(
+                playfieldText.Contains("private void MoveNpcTowardCombatTarget(")
+                || playfieldText.Contains("private void MoveCapturedCleaningRobotTowardCombatTarget(")
+                || playfieldText.Contains("private static AORebirth.Core.Vector.Vector3 GetCombatPosition("),
+                "Playfield must not retain moved NPC combat movement helpers.");
             Assert.IsTrue(
                 npcRuntimeText.Contains("internal void ClearInvalidCombatTarget(ICharacter attacker)")
                 && npcRuntimeText.Contains("internal void ClearFightingTarget(ICharacter character)")
