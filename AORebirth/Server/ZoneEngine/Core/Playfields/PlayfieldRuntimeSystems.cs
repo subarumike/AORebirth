@@ -40,6 +40,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldObjectMaterializationRuntimeService objectMaterialization;
 
+        private readonly PlayfieldPacketSequencingRuntimeService packetSequences;
+
         private readonly InventoryContainerRuntimeService inventoryContainer;
 
         private readonly NPCRuntimeService npcRuntime;
@@ -99,6 +101,7 @@ namespace ZoneEngine.Core.Playfields
             this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
             this.visibilityFanout = new PlayfieldVisibilityFanoutRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
+            this.packetSequences = new PlayfieldPacketSequencingRuntimeService(this.packetSequencing);
             this.privateCityReadyInit =
                 new PrivateCityReadyInitCoordinator(
                     playfieldIdentity,
@@ -336,12 +339,24 @@ namespace ZoneEngine.Core.Playfields
             return this.dynelRegistry.StaticDynels();
         }
 
-        internal PacketSequencingCoordinator PacketSequencing
+        internal void RunVisibilityPacketPairSequence(
+            Action recordSimpleCharFullUpdate,
+            Action sendSimpleCharFullUpdate,
+            Action prepareCharInPlay,
+            Action recordCharInPlay,
+            Action sendCharInPlay)
         {
-            get
-            {
-                return this.packetSequencing;
-            }
+            this.packetSequences.RunVisibilityPacketPairSequence(
+                recordSimpleCharFullUpdate,
+                sendSimpleCharFullUpdate,
+                prepareCharInPlay,
+                recordCharInPlay,
+                sendCharInPlay);
+        }
+
+        internal void RunPlayfieldTransferBeginSequence(Action enterZoningPhase, Action sendTeleportPacket)
+        {
+            this.packetSequences.RunPlayfieldTransferBeginSequence(enterZoningPhase, sendTeleportPacket);
         }
 
         internal void SendPrivateCityPlayfieldReadyBlock(ZoneClient client, ICharacter character)

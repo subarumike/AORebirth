@@ -994,6 +994,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs"));
+            string packetSequencesText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldPacketSequencingRuntimeService.cs"));
             string visibilityFanoutText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -1011,6 +1015,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 {
                     "new PlayfieldObjectLifecycleRuntimeService()",
                     "new PlayfieldObjectMaterializationRuntimeService()",
+                    "new PlayfieldPacketSequencingRuntimeService(this.packetSequencing)",
                     "new PlayfieldCorpseAccessRuntimeService()",
                     "new PlayfieldRewardRuntimeService()",
                     "new NPCRuntimeService(playfield, this.dynelRegistry, this.rewards)",
@@ -1129,6 +1134,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("private readonly PlayfieldCorpseAccessRuntimeService corpseAccess")
                 && runtimeSystemsText.Contains("private readonly PlayfieldLifecycleRuntimeService lifecycle")
                 && runtimeSystemsText.Contains("private readonly PlayfieldObjectMaterializationRuntimeService objectMaterialization")
+                && runtimeSystemsText.Contains("private readonly PlayfieldPacketSequencingRuntimeService packetSequences")
                 && runtimeSystemsText.Contains("private readonly PlayfieldPlayerDeathRespawnRuntimeService playerDeathRespawn")
                 && runtimeSystemsText.Contains("private readonly PlayfieldStatelTransitionRuntimeService statelTransitions")
                 && runtimeSystemsText.Contains("private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle")
@@ -1181,7 +1187,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.statelTransitions.ClearContactState(dynelId);")
                 && runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToCharacterClients(")
                 && runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToOtherCharacterClients(")
-                && runtimeSystemsText.Contains("this.visibilityFanout.FanoutExistingCharactersForScfu("),
+                && runtimeSystemsText.Contains("this.visibilityFanout.FanoutExistingCharactersForScfu(")
+                && runtimeSystemsText.Contains("this.packetSequences.RunVisibilityPacketPairSequence(")
+                && runtimeSystemsText.Contains("this.packetSequences.RunPlayfieldTransferBeginSequence("),
                 "PlayfieldRuntimeSystems must delegate runtime entry points through named runtime services.");
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldLifecycleRuntimeService.cs"),
@@ -1192,6 +1200,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldTimedLifecycleRuntimeService.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldPacketSequencingRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldPacketSequencingRuntimeService.");
+            Assert.IsTrue(
+                packetSequencesText.Contains("internal sealed class PlayfieldPacketSequencingRuntimeService")
+                && packetSequencesText.Contains("internal void RunVisibilityPacketPairSequence(")
+                && packetSequencesText.Contains("this.packetSequencing.RunSimpleCharFullUpdateCharInPlaySequence(")
+                && packetSequencesText.Contains("internal void RunPlayfieldTransferBeginSequence(")
+                && packetSequencesText.Contains("this.packetSequencing.RunPlayfieldTransferBeginSequence("),
+                "PlayfieldPacketSequencingRuntimeService must own playfield-local packet order orchestration.");
+            Assert.IsFalse(
+                packetSequencesText.Contains("SimpleCharFullUpdate.")
+                || packetSequencesText.Contains("SimpleCharFullUpdateMessage")
+                || packetSequencesText.Contains("CharInPlayMessage")
+                || packetSequencesText.Contains("TeleportMessageHandler")
+                || packetSequencesText.Contains("ZoneRedirectionMessage")
+                || packetSequencesText.Contains("SendCompressed")
+                || packetSequencesText.Contains("Publish(")
+                || packetSequencesText.Contains("Pool.Instance"),
+                "PlayfieldPacketSequencingRuntimeService must not own packet construction, sends, transport, or Pool lookups.");
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldVisibilityFanoutRuntimeService.");
@@ -2289,7 +2317,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "client.Controller.Character.DoNotDoTimers = false;");
             AssertTextBefore(
                 teleportMethod,
-                "lifecycleClient.PacketSequencing.RunPlayfieldTransferBeginSequence(",
+                "this.runtimeSystems.RunPlayfieldTransferBeginSequence(",
                 "TeleportMessageHandler.Default.Send(");
             AssertTextBefore(
                 disposeMethod,
@@ -2450,7 +2478,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && clientConnectedText.Contains("client.SessionLifecycle.CompleteInPlayForSessionInit);"),
                 "ClientConnected must route ready/full-character/CharInPlay/InPlay phases through named coordinator methods.");
             Assert.IsTrue(
-                playfieldText.Contains("lifecycleClient.PacketSequencing.RunPlayfieldTransferBeginSequence(")
+                playfieldText.Contains("this.runtimeSystems.RunPlayfieldTransferBeginSequence(")
                 && playfieldText.Contains("lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer,"),
                 "Playfield teleport must route zoning entry through the named coordinator method.");
 
@@ -2531,8 +2559,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "ZoneClient must own and expose the packet sequencing coordinator.");
             Assert.IsTrue(
                 runtimeSystemsText.Contains("private readonly PacketSequencingCoordinator packetSequencing")
-                && runtimeSystemsText.Contains("internal PacketSequencingCoordinator PacketSequencing"),
-                "PlayfieldRuntimeSystems must expose the packet sequencing coordinator for playfield-local sequencing.");
+                && runtimeSystemsText.Contains("internal void RunVisibilityPacketPairSequence(")
+                && runtimeSystemsText.Contains("internal void RunPlayfieldTransferBeginSequence("),
+                "PlayfieldRuntimeSystems must expose named runtime packet sequencing methods for playfield-local sequencing.");
             Assert.IsTrue(
                 clientConnectedText.Contains("client.PacketSequencing.BeginSessionReadyBlock(")
                 && clientConnectedText.Contains("client.PacketSequencing.RunSessionReadyFullCharacterSequence(")
@@ -2582,14 +2611,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)");
             Assert.AreEqual(
                 2,
-                CountOccurrences(playfieldText, "this.runtimeSystems.PacketSequencing.RunSimpleCharFullUpdateCharInPlaySequence("),
-                "Playfield must route both existing-player and joining-player SCFU/CharInPlay pairs through PacketSequencingCoordinator.");
+                CountOccurrences(playfieldText, "this.runtimeSystems.RunVisibilityPacketPairSequence("),
+                "Playfield must route both existing-player and joining-player SCFU/CharInPlay pairs through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPreFullCharacterOrgInitSequence(")
                 && privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPlayfieldReadyBlockSequence("),
                 "PrivateCityReadyInitCoordinator must route private-city ready/init packet order through PacketSequencingCoordinator.");
             Assert.IsTrue(
-                playfieldText.Contains("lifecycleClient.PacketSequencing.RunPlayfieldTransferBeginSequence(")
+                playfieldText.Contains("this.runtimeSystems.RunPlayfieldTransferBeginSequence(")
                 && playfieldText.Contains("lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer,")
                 && playfieldText.Contains("() => TeleportMessageHandler.Default.Send("),
                 "Playfield must route zoning phase entry before teleport packet send through PacketSequencingCoordinator.");
@@ -2761,7 +2790,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "this.Controller.Character = new Character(");
 
             Assert.IsTrue(
-                teleportMethod.Contains("lifecycleClient.PacketSequencing.RunPlayfieldTransferBeginSequence("),
+                teleportMethod.Contains("this.runtimeSystems.RunPlayfieldTransferBeginSequence("),
                 "The guarded zoning phase-entry and teleport-send order may be routed through PacketSequencingCoordinator.");
             Assert.IsFalse(
                 packetSequencingText.Contains("TeleportMessageHandler")
@@ -2811,15 +2840,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "PacketSequencingCoordinator must own session ready/full-character/visibility initialization sequencing.");
             Assert.AreEqual(
                 2,
-                CountOccurrences(playfieldText, "this.runtimeSystems.PacketSequencing.RunSimpleCharFullUpdateCharInPlaySequence("),
-                "PacketSequencingCoordinator must own both SCFU -> CharInPlay visibility pair sequences.");
+                CountOccurrences(playfieldText, "this.runtimeSystems.RunVisibilityPacketPairSequence("),
+                "PlayfieldRuntimeSystems must own both SCFU -> CharInPlay visibility pair sequence entry points.");
             Assert.IsTrue(
                 privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPreFullCharacterOrgInitSequence(")
                 && privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPlayfieldReadyBlockSequence("),
                 "PacketSequencingCoordinator must own private-city org/stat and towers/cities sequencing.");
             Assert.IsTrue(
-                playfieldText.Contains("lifecycleClient.PacketSequencing.RunPlayfieldTransferBeginSequence("),
-                "PacketSequencingCoordinator must own zoning entry before teleport packet sequencing.");
+                playfieldText.Contains("this.runtimeSystems.RunPlayfieldTransferBeginSequence("),
+                "PlayfieldRuntimeSystems must own zoning entry before teleport packet sequencing.");
 
             string[] forbiddenCoordinatorOwnership =
                 {
