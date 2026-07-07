@@ -440,22 +440,17 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void Announce(MessageBody messageBody)
         {
-            foreach (Character entity in this.runtimeSystems.CharacterEntities())
-            {
-                if (entity != null)
-                {
-                    // Make this whole thing unblocking with publishing single internal messages
-                    if (entity.Controller.Client != null)
+            this.runtimeSystems.AnnounceToCharacterClients(
+                entity =>
                     {
+                        // Make this whole thing unblocking with publishing single internal messages
                         this.Publish(
-                            new IMSendAOtomationMessageBodyToClient()
+                            new IMSendAOtomationMessageBodyToClient
                             {
                                 client = entity.Controller.Client,
                                 Body = messageBody
                             });
-                    }
-                }
-            }
+                    });
         }
 
         /// <summary>
@@ -480,22 +475,18 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void AnnounceOthers(MessageBody messageBody, Identity dontSend)
         {
-            foreach (Character entity in this.runtimeSystems.CharacterEntities())
-            {
-                if (entity != null)
-                {
-                    if (entity.Identity != dontSend)
+            this.runtimeSystems.AnnounceToOtherCharacterClients(
+                dontSend,
+                entity =>
                     {
                         // Make this whole thing unblocking with publishing single internal messages
                         this.Publish(
-                            new IMSendAOtomationMessageBodyToClient()
+                            new IMSendAOtomationMessageBodyToClient
                             {
                                 client = entity.Controller.Client,
                                 Body = messageBody
                             });
-                    }
-                }
-            }
+                    });
         }
 
         /// <summary>
@@ -1074,18 +1065,17 @@ namespace AORebirth.Core.Playfields
         public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)
         {
             ICharacter recipient = sendSCFUs.toClient.Controller.Character;
-            Identity dontSendTo = recipient.Identity;
             Identity playfieldIdentity = recipient.Playfield.Identity;
-            foreach (ICharacter entity in this.runtimeSystems.Characters())
-            {
-                bool senderEqualsRecipient = entity.Identity == dontSendTo;
-                bool senderInRecipientPlayfield = entity.InPlayfield(playfieldIdentity);
-                bool sent = false;
-                if (senderInRecipientPlayfield && !senderEqualsRecipient)
-                {
-                    var temp = entity as Character;
-                    if (temp != null)
+            this.runtimeSystems.FanoutExistingCharactersForScfu(
+                recipient,
+                entity =>
                     {
+                        var temp = entity as Character;
+                        if (temp == null)
+                        {
+                            return false;
+                        }
+
                         SimpleCharFullUpdateMessage simpleCharFullUpdate = SimpleCharFullUpdate.ConstructMessage(temp);
                         CharInPlayMessage charInPlay = null;
                         this.runtimeSystems.PacketSequencing.RunSimpleCharFullUpdateCharInPlaySequence(
@@ -1104,30 +1094,26 @@ namespace AORebirth.Core.Playfields
                                 temp.Identity,
                                 "recipient=" + recipient.Identity),
                             () => sendSCFUs.toClient.SendCompressed(charInPlay));
-                        sent = true;
-                    }
-                }
-
-                bool senderIsPlayer = entity.Controller != null && entity.Controller.Client != null;
-                if (senderIsPlayer || senderEqualsRecipient)
-                {
-                    Identity senderPlayfield = entity.Playfield == null ? Identity.None : entity.Playfield.Identity;
-                    LogUtil.Debug(
-                        DebugInfoDetail.NetworkMessages,
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "PlayerVisibilitySCFU sender={0}/{1} recipient={2}/{3} senderPf={4} recipientPf={5} self={6} inPlayfield={7} rangeRejected=False sent={8}",
-                            entity.Identity,
-                            entity.Name,
-                            recipient.Identity,
-                            recipient.Name,
-                            senderPlayfield,
-                            playfieldIdentity,
-                            senderEqualsRecipient,
-                            senderInRecipientPlayfield,
-                            sent));
-                }
-            }
+                        return true;
+                    },
+                (entity, senderEqualsRecipient, senderInRecipientPlayfield, sent) =>
+                    {
+                        Identity senderPlayfield = entity.Playfield == null ? Identity.None : entity.Playfield.Identity;
+                        LogUtil.Debug(
+                            DebugInfoDetail.NetworkMessages,
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                "PlayerVisibilitySCFU sender={0}/{1} recipient={2}/{3} senderPf={4} recipientPf={5} self={6} inPlayfield={7} rangeRejected=False sent={8}",
+                                entity.Identity,
+                                entity.Name,
+                                recipient.Identity,
+                                recipient.Name,
+                                senderPlayfield,
+                                playfieldIdentity,
+                                senderEqualsRecipient,
+                                senderInRecipientPlayfield,
+                                sent));
+                    });
         }
 
         public void AnnouncePlayerVisibility(ICharacter character)

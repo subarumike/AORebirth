@@ -307,6 +307,7 @@
     <Compile Include="Core\Playfields\PlayfieldRuntimeSystems.cs" />
     <Compile Include="Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs" />
+    <Compile Include="Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs" />
     <Compile Include="Core\Playfields\Playfields.cs" />
     <Compile Include="Core\Playfields\WallCollision.cs" />
     <Compile Include="Core\Playfields\WallCollisionResult.cs" />
