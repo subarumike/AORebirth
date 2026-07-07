@@ -17,6 +17,7 @@ namespace ZoneEngine.Core.Playfields
     using AORebirth.Interfaces;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core;
@@ -41,6 +42,8 @@ namespace ZoneEngine.Core.Playfields
         private readonly PlayfieldObjectMaterializationRuntimeService objectMaterialization;
 
         private readonly PlayfieldPacketSequencingRuntimeService packetSequences;
+
+        private readonly PlayfieldPublishFanoutRuntimeService publishFanout;
 
         private readonly InventoryContainerRuntimeService inventoryContainer;
 
@@ -90,6 +93,7 @@ namespace ZoneEngine.Core.Playfields
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.objectLifecycle = new PlayfieldObjectLifecycleRuntimeService();
             this.objectMaterialization = new PlayfieldObjectMaterializationRuntimeService();
+            this.publishFanout = new PlayfieldPublishFanoutRuntimeService();
             this.inventoryContainer = InventoryContainerRuntimeService.Default;
             this.rewards = new PlayfieldRewardRuntimeService();
             this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry, this.rewards);
@@ -332,6 +336,29 @@ namespace ZoneEngine.Core.Playfields
                 this.Characters(),
                 sendExistingCharacter,
                 logVisibilityCandidate);
+        }
+
+        internal void PublishMessageBodyToClient(IZoneClient client, MessageBody body, Action<object> publish)
+        {
+            this.publishFanout.PublishMessageBodyToClient(client, body, publish);
+        }
+
+        internal void PublishMessageToClient(IZoneClient client, Message message, Action<object> publish)
+        {
+            this.publishFanout.PublishMessageToClient(client, message, publish);
+        }
+
+        internal void DispatchMessageToPlayfield(MessageBody body, Action<MessageBody> announce)
+        {
+            this.publishFanout.DispatchMessageToPlayfield(body, announce);
+        }
+
+        internal void DispatchMessageToPlayfieldOthers(
+            MessageBody body,
+            Identity excludedIdentity,
+            Action<MessageBody, Identity> announceOthers)
+        {
+            this.publishFanout.DispatchMessageToPlayfieldOthers(body, excludedIdentity, announceOthers);
         }
 
         internal ReadOnlyCollection<StaticDynel> StaticDynels()

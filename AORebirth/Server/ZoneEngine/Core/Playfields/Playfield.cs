@@ -443,13 +443,10 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.AnnounceToCharacterClients(
                 entity =>
                     {
-                        // Make this whole thing unblocking with publishing single internal messages
-                        this.Publish(
-                            new IMSendAOtomationMessageBodyToClient
-                            {
-                                client = entity.Controller.Client,
-                                Body = messageBody
-                            });
+                        this.runtimeSystems.PublishMessageBodyToClient(
+                            entity.Controller.Client,
+                            messageBody,
+                            this.Publish);
                     });
         }
 
@@ -479,13 +476,10 @@ namespace AORebirth.Core.Playfields
                 dontSend,
                 entity =>
                     {
-                        // Make this whole thing unblocking with publishing single internal messages
-                        this.Publish(
-                            new IMSendAOtomationMessageBodyToClient
-                            {
-                                client = entity.Controller.Client,
-                                Body = messageBody
-                            });
+                        this.runtimeSystems.PublishMessageBodyToClient(
+                            entity.Controller.Client,
+                            messageBody,
+                            this.Publish);
                     });
         }
 
@@ -694,7 +688,7 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void Send(IZoneClient client, MessageBody body)
         {
-            this.Publish(new IMSendAOtomationMessageBodyToClient() { client = client, Body = body });
+            this.runtimeSystems.PublishMessageBodyToClient(client, body, this.Publish);
         }
 
         /// <summary>
@@ -705,7 +699,7 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void Send(IZoneClient client, Message message)
         {
-            this.Publish(new IMSendAOtomationMessageToClient() { client = client, message = message });
+            this.runtimeSystems.PublishMessageToClient(client, message, this.Publish);
         }
 
         /// <summary>
@@ -1046,7 +1040,7 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void SendAOtomationMessageToPlayfield(IMSendAOtomationMessageToPlayfield clientMessage)
         {
-            this.Announce(clientMessage.Body);
+            this.runtimeSystems.DispatchMessageToPlayfield(clientMessage.Body, this.Announce);
         }
 
         /// <summary>
@@ -1055,7 +1049,10 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void SendAOtomationMessageToPlayfieldOthers(IMSendAOtomationMessageToPlayfieldOthers clientMessage)
         {
-            this.AnnounceOthers(clientMessage.Body, clientMessage.Identity);
+            this.runtimeSystems.DispatchMessageToPlayfieldOthers(
+                clientMessage.Body,
+                clientMessage.Identity,
+                this.AnnounceOthers);
         }
 
         /// <summary>
