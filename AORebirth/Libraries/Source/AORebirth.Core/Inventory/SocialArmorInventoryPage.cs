@@ -121,7 +121,14 @@ namespace AORebirth.Core.Inventory
         private bool IsSocialTabFunction(int p)
         {
             // Functions applyable on social page: (List not complete yet)
-            int[] goodFunctions = { 53035, 53039, 53054 };
+            int[] goodFunctions =
+            {
+                (int)FunctionType.HeadMesh,
+                (int)FunctionType.BackMesh,
+                (int)FunctionType.Shouldermesh,
+                (int)FunctionType.Texture,
+                (int)FunctionType.ChangeBodyMesh
+            };
             return goodFunctions.Any(x => x == p);
         }
 
