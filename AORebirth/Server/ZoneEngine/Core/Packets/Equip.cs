@@ -177,7 +177,7 @@ namespace ZoneEngine.Core.Packets
                                                     Unknown1 = 1,
                                                     Unknown2 =
                                                         page is SocialArmorInventoryPage
-                                                            ? 7
+                                                            ? 3
                                                             : 6,
                                                     Placement =
                                                         new Identity()

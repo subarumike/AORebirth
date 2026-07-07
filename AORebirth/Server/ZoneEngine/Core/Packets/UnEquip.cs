@@ -113,7 +113,10 @@ namespace ZoneEngine.Core.Packets
                                                     ItemLowId = item.LowID,
                                                     Quality = item.Quality,
                                                     Unknown1 = 1,
-                                                    Unknown2 = 7,
+                                                    Unknown2 =
+                                                        page is SocialArmorInventoryPage
+                                                            ? 3
+                                                            : 7,
                                                     Placement =
                                                         new Identity()
                                                         {
