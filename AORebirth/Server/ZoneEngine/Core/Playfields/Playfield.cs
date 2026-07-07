@@ -1784,132 +1784,17 @@ namespace AORebirth.Core.Playfields
 
         internal bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)
         {
-            return GetCombatDistance(attacker, target) <= range;
-        }
-
-        private static AORebirth.Core.Vector.Vector3 GetCombatPosition(ICharacter character)
-        {
-            if (character.Controller is PlayerController)
-            {
-                Vector3 raw = character.RawCoordinates;
-                AORebirth.Core.Vector.Vector3 rawPosition =
-                    new AORebirth.Core.Vector.Vector3(raw.X, raw.Y, raw.Z);
-                AORebirth.Core.Vector.Vector3 predictedPosition = character.Coordinates().coordinate;
-                return MoveCombatPositionToward(
-                    rawPosition,
-                    predictedPosition,
-                    EnemyBehaviorContract.MaxPlayerChaseProjectionDistance);
-            }
-
-            return character.Coordinates().coordinate;
-        }
-
-        private static AORebirth.Core.Vector.Vector3 MoveCombatPositionToward(
-            AORebirth.Core.Vector.Vector3 start,
-            AORebirth.Core.Vector.Vector3 destination,
-            double maxDistance)
-        {
-            double distance = start.Distance2D(destination);
-            if (distance < 0.001 || maxDistance <= 0)
-            {
-                return new AORebirth.Core.Vector.Vector3(start.x, start.y, start.z);
-            }
-
-            double step = Math.Min(distance, maxDistance);
-            double factor = step / distance;
-            return new AORebirth.Core.Vector.Vector3(
-                start.x + ((destination.x - start.x) * factor),
-                start.y + ((destination.y - start.y) * factor),
-                start.z + ((destination.z - start.z) * factor));
+            return this.runtimeSystems.IsInNpcCombatRange(attacker, target, range);
         }
 
         internal static double GetCombatDistance(ICharacter attacker, ICharacter target)
         {
-            return GetCombatPosition(attacker).Distance2D(GetCombatPosition(target));
-        }
-
-        private static double BuildNpcCombatStopDistance(double range)
-        {
-            return range > MaxMeleeCombatDistance ? range : MaxMeleeFollowHoldDistance;
-        }
-
-        private void MoveNpcTowardCombatTarget(ICharacter attacker, ICharacter target, double range, string reason)
-        {
-            NPCController npcController = attacker.Controller as NPCController;
-            if (npcController == null)
-            {
-                return;
-            }
-
-            if (IsCapturedCleaningRobot(attacker))
-            {
-                this.MoveCapturedCleaningRobotTowardCombatTarget(attacker, target, range, reason, npcController);
-                return;
-            }
-
-            npcController.StopFollow();
-
-            AORebirth.Core.Vector.Vector3 attackerPosition = GetCombatPosition(attacker);
-            AORebirth.Core.Vector.Vector3 targetPosition = GetCombatPosition(target);
-            double stopDistance = BuildNpcCombatStopDistance(range);
-            double distance = attackerPosition.Distance2D(targetPosition);
-            double travelDistance = Math.Min(
-                EnemyBehaviorContract.MaxNpcFollowSpeedPerSecond * OutOfRangeRetrySeconds,
-                Math.Max(0.0, distance - stopDistance));
-
-            if (travelDistance < MinNpcCombatMoveDistance)
-            {
-                return;
-            }
-
-            AORebirth.Core.Vector.Vector3 nextPosition =
-                MoveCombatPositionToward(attackerPosition, targetPosition, travelDistance);
-
-            attacker.Coordinates(nextPosition);
-            this.Announce(
-                new SetPosMessage
-                {
-                    Identity = attacker.Identity,
-                    Coordinates =
-                        new Vector3
-                        {
-                            X = nextPosition.xf,
-                            Y = nextPosition.yf,
-                            Z = nextPosition.zf
-                        },
-                    Unknown1 = 0
-                });
-
-            LogNpcBrain("Chasing", reason, attacker, target, range, distance);
-        }
-
-        private void MoveCapturedCleaningRobotTowardCombatTarget(
-            ICharacter attacker,
-            ICharacter target,
-            double range,
-            string reason,
-            NPCController npcController)
-        {
-            AORebirth.Core.Vector.Vector3 attackerPosition = GetCombatPosition(attacker);
-            AORebirth.Core.Vector.Vector3 targetPosition = GetCombatPosition(target);
-            double stopDistance = CapturedCleaningRobotFollowStopDistance;
-            double distance = attackerPosition.Distance2D(targetPosition);
-
-            if (!npcController.IsFollowing(target.Identity))
-            {
-                npcController.Follow(target.Identity, stopDistance);
-                LogNpcBrain("FollowTargetStart", reason, attacker, target, range, distance);
-                return;
-            }
-
-            LogNpcBrain("FollowTargetContinue", reason, attacker, target, range, distance);
+            return PlayfieldNpcCombatMovementRuntimeService.GetCombatDistance(attacker, target);
         }
 
         internal static bool IsCapturedCleaningRobot(ICharacter character)
         {
-            return character != null
-                   && string.Equals(character.Name, CapturedCleaningRobotName, StringComparison.OrdinalIgnoreCase)
-                   && character.Stats[StatIds.monsterdata].Value == CapturedCleaningRobotMonsterData;
+            return PlayfieldNpcCombatMovementRuntimeService.IsCapturedCleaningRobot(character);
         }
 
         internal static void LogNpcBrain(string state, string reason, ICharacter attacker, ICharacter target, double range, double distance)
@@ -2205,31 +2090,40 @@ namespace AORebirth.Core.Playfields
 
         internal void UpdateNpcMeleeFollowHold(ICharacter attacker, ICharacter target, double range)
         {
-            NPCController npcController = attacker.Controller as NPCController;
-            if (npcController == null)
-            {
-                return;
-            }
-
-            double distance = GetCombatDistance(attacker, target);
-            if (distance <= MaxMeleeFollowHoldDistance)
-            {
-                npcController.StopFollow();
-                return;
-            }
-
-            this.MoveNpcTowardCombatTarget(attacker, target, range, "melee-separated");
+            this.runtimeSystems.UpdateNpcMeleeFollowHold(
+                attacker,
+                target,
+                range,
+                this.MoveNpcToCombatPosition,
+                LogNpcBrain);
         }
 
         internal void TryMoveNpcIntoCombatRange(ICharacter attacker, ICharacter target, double range)
         {
-            NPCController npcController = attacker.Controller as NPCController;
-            if (npcController == null)
-            {
-                return;
-            }
+            this.runtimeSystems.TryMoveNpcIntoCombatRange(
+                attacker,
+                target,
+                range,
+                this.MoveNpcToCombatPosition,
+                LogNpcBrain);
+        }
 
-            this.MoveNpcTowardCombatTarget(attacker, target, range, "out-of-range");
+        private void MoveNpcToCombatPosition(ICharacter attacker, AORebirth.Core.Vector.Vector3 nextPosition)
+        {
+            attacker.Coordinates(nextPosition);
+            this.Announce(
+                new SetPosMessage
+                {
+                    Identity = attacker.Identity,
+                    Coordinates =
+                        new Vector3
+                        {
+                            X = nextPosition.xf,
+                            Y = nextPosition.yf,
+                            Z = nextPosition.zf
+                        },
+                    Unknown1 = 0
+                });
         }
 
         private void KillNpcTarget(ICharacter attacker, ICharacter target)

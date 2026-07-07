@@ -49,6 +49,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly NPCRuntimeService npcRuntime;
 
+        private readonly PlayfieldNpcCombatMovementRuntimeService npcCombatMovement;
+
         private readonly PlayfieldRewardRuntimeService rewards;
 
         private readonly PlayfieldLifecycleRuntimeService lifecycle;
@@ -99,6 +101,7 @@ namespace ZoneEngine.Core.Playfields
             this.inventoryContainer = InventoryContainerRuntimeService.Default;
             this.rewards = new PlayfieldRewardRuntimeService();
             this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry, this.rewards);
+            this.npcCombatMovement = new PlayfieldNpcCombatMovementRuntimeService();
             this.lifecycle = new PlayfieldLifecycleRuntimeService();
             this.playerDeathRespawn = new PlayfieldPlayerDeathRespawnRuntimeService();
             this.interaction = new PlayfieldInteractionRuntimeService();
@@ -362,6 +365,41 @@ namespace ZoneEngine.Core.Playfields
             Action<MessageBody, Identity> announceOthers)
         {
             this.publishFanout.DispatchMessageToPlayfieldOthers(body, excludedIdentity, announceOthers);
+        }
+
+        internal bool IsInNpcCombatRange(ICharacter attacker, ICharacter target, double range)
+        {
+            return this.npcCombatMovement.IsInCombatRange(attacker, target, range);
+        }
+
+        internal void UpdateNpcMeleeFollowHold(
+            ICharacter attacker,
+            ICharacter target,
+            double range,
+            Action<ICharacter, AORebirth.Core.Vector.Vector3> moveNpcToPosition,
+            Action<string, string, ICharacter, ICharacter, double, double> logNpcBrain)
+        {
+            this.npcCombatMovement.UpdateNpcMeleeFollowHold(
+                attacker,
+                target,
+                range,
+                moveNpcToPosition,
+                logNpcBrain);
+        }
+
+        internal void TryMoveNpcIntoCombatRange(
+            ICharacter attacker,
+            ICharacter target,
+            double range,
+            Action<ICharacter, AORebirth.Core.Vector.Vector3> moveNpcToPosition,
+            Action<string, string, ICharacter, ICharacter, double, double> logNpcBrain)
+        {
+            this.npcCombatMovement.TryMoveNpcIntoCombatRange(
+                attacker,
+                target,
+                range,
+                moveNpcToPosition,
+                logNpcBrain);
         }
 
         internal void SendChangedStats(ICharacter character, Action<ICharacter> sendChangedStats)
