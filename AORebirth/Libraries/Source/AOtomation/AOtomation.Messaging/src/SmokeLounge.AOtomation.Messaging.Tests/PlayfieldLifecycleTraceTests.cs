@@ -973,6 +973,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
+            string dbMobSpawnText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs"));
             string corpseAccessText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -1028,6 +1032,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 {
                     "new PlayfieldObjectLifecycleRuntimeService()",
                     "new PlayfieldObjectMaterializationRuntimeService()",
+                    "new PlayfieldDbMobSpawnRuntimeService()",
                     "new PlayfieldNpcCombatMovementRuntimeService()",
                     "new PlayfieldPacketSequencingRuntimeService(this.packetSequencing)",
                     "new PlayfieldCorpseAccessRuntimeService()",
@@ -1114,6 +1119,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || objectMaterializationText.Contains("Announce(")
                 || objectMaterializationText.Contains("Stats["),
                 "PlayfieldObjectMaterializationRuntimeService must not own DB loading, object construction, script creation, vendor spawning, packets, or stat algorithms.");
+            Assert.IsTrue(
+                dbMobSpawnText.Contains("internal sealed class PlayfieldDbMobSpawnRuntimeService")
+                && dbMobSpawnText.Contains("internal IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions(Identity playfieldIdentity)")
+                && dbMobSpawnText.Contains("MobSpawnDao.Instance.GetWhere(new { Playfield = playfieldIdentity.Instance })")
+                && dbMobSpawnText.Contains("internal IEnumerable<DBMobSpawnStat> LoadMobSpawnStats(DBMobSpawn mob)")
+                && dbMobSpawnText.Contains("MobSpawnStatDao.Instance.GetWhere(new { mob.Id, mob.Playfield })")
+                && dbMobSpawnText.Contains("internal ICharacter InstantiateDbMobSpawn(DBMobSpawn mob, DBMobSpawnStat[] stats, Playfield playfield)")
+                && dbMobSpawnText.Contains("NonPlayerCharacterHandler.InstantiateMobSpawn(")
+                && dbMobSpawnText.Contains("new NPCController()")
+                && dbMobSpawnText.Contains("internal void AttachMobSpawnKnuBot(DBMobSpawn mob, ICharacter cmob)")
+                && dbMobSpawnText.Contains("ScriptCompiler.Instance.CreateKnuBot(mob.KnuBotScriptName, cmob.Identity)"),
+                "PlayfieldDbMobSpawnRuntimeService must own DB mob spawn data loading, NPC construction callback, and KnuBot attachment.");
+            Assert.IsFalse(
+                playfieldText.Contains("private IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions")
+                || playfieldText.Contains("private IEnumerable<DBMobSpawnStat> LoadMobSpawnStats")
+                || playfieldText.Contains("private ICharacter InstantiateDbMobSpawn")
+                || playfieldText.Contains("private void AttachMobSpawnKnuBot"),
+                "Playfield must not directly own DB mob spawn loading or construction callbacks.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("private readonly PlayfieldDbMobSpawnRuntimeService dbMobSpawns")
+                && runtimeSystemsText.Contains("this.dbMobSpawns = new PlayfieldDbMobSpawnRuntimeService();")
+                && runtimeSystemsText.Contains("this.dbMobSpawns.LoadMobSpawnDefinitions")
+                && runtimeSystemsText.Contains("this.dbMobSpawns.LoadMobSpawnStats")
+                && runtimeSystemsText.Contains("(mob, stats) => this.dbMobSpawns.InstantiateDbMobSpawn(mob, stats, this.playfield)")
+                && runtimeSystemsText.Contains("this.dbMobSpawns.AttachMobSpawnKnuBot"),
+                "PlayfieldRuntimeSystems must route DB mob spawn materialization through the DB mob spawn runtime service.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldDbMobSpawnRuntimeService.");
             Assert.AreEqual(
                 1,
                 CountOccurrences(npcRuntimeText, "new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
@@ -2048,6 +2082,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
+            string dbMobSpawnText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs"));
             string projectText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
@@ -2185,18 +2223,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 createStaticDynel.Contains("MessagePackZip.DeserializeData"),
                 "Playfield static dynel loading must not own static dynel stat deserialization.");
             Assert.IsTrue(
-                playfieldText.Contains("private IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions(Identity playfieldIdentity)")
-                && playfieldText.Contains("MobSpawnDao.Instance.GetWhere")
-                && playfieldText.Contains("private IEnumerable<DBMobSpawnStat> LoadMobSpawnStats(DBMobSpawn mob)")
-                && playfieldText.Contains("MobSpawnStatDao.Instance.GetWhere")
-                && playfieldText.Contains("private ICharacter InstantiateDbMobSpawn(DBMobSpawn mob, DBMobSpawnStat[] stats)")
-                && playfieldText.Contains("NonPlayerCharacterHandler.InstantiateMobSpawn")
-                && playfieldText.Contains("new NPCController()")
-                && playfieldText.Contains("private void AttachMobSpawnKnuBot(DBMobSpawn mob, ICharacter cmob)")
-                && playfieldText.Contains("ScriptCompiler.Instance.CreateKnuBot")
+                dbMobSpawnText.Contains("internal IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions(Identity playfieldIdentity)")
+                && dbMobSpawnText.Contains("MobSpawnDao.Instance.GetWhere")
+                && dbMobSpawnText.Contains("internal IEnumerable<DBMobSpawnStat> LoadMobSpawnStats(DBMobSpawn mob)")
+                && dbMobSpawnText.Contains("MobSpawnStatDao.Instance.GetWhere")
+                && dbMobSpawnText.Contains("internal ICharacter InstantiateDbMobSpawn(DBMobSpawn mob, DBMobSpawnStat[] stats, Playfield playfield)")
+                && dbMobSpawnText.Contains("NonPlayerCharacterHandler.InstantiateMobSpawn")
+                && dbMobSpawnText.Contains("new NPCController()")
+                && dbMobSpawnText.Contains("internal void AttachMobSpawnKnuBot(DBMobSpawn mob, ICharacter cmob)")
+                && dbMobSpawnText.Contains("ScriptCompiler.Instance.CreateKnuBot")
                 && playfieldText.Contains("private void SpawnVendors(StatelData[] vendorStatels)")
                 && playfieldText.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels)"),
-                "Playfield must keep DB loading, object construction, script creation, and vendor spawning callbacks.");
+                "DB mob spawn runtime service must own DB loading, object construction, and script creation callbacks while Playfield keeps vendor spawning.");
+            Assert.IsFalse(
+                playfieldText.Contains("private IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions")
+                || playfieldText.Contains("private IEnumerable<DBMobSpawnStat> LoadMobSpawnStats")
+                || playfieldText.Contains("private ICharacter InstantiateDbMobSpawn")
+                || playfieldText.Contains("private void AttachMobSpawnKnuBot"),
+                "Playfield must not directly own DB mob spawn loading or construction callbacks.");
             Assert.IsFalse(
                 materializationText.Contains("MobSpawnDao")
                 || materializationText.Contains("MobSpawnStatDao")
@@ -2210,8 +2254,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldContentDataProvider.cs")
-                && projectText.Contains(@"Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldContentDataProvider and PlayfieldObjectMaterializationRuntimeService.");
+                && projectText.Contains(@"Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs")
+                && projectText.Contains(@"Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldContentDataProvider, PlayfieldObjectMaterializationRuntimeService, and PlayfieldDbMobSpawnRuntimeService.");
         }
 
         [TestMethod]

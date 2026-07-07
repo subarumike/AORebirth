@@ -296,10 +296,6 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.MaterializeStartupObjects(
                 playfieldIdentity,
                 this.statels,
-                this.LoadMobSpawnDefinitions,
-                this.LoadMobSpawnStats,
-                this.InstantiateDbMobSpawn,
-                this.AttachMobSpawnKnuBot,
                 this.SpawnVendors,
                 this.CreateStaticDynel);
         }
@@ -331,34 +327,6 @@ namespace AORebirth.Core.Playfields
         private void SpawnVendors(StatelData[] vendorStatels)
         {
             VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels);
-        }
-
-        private IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions(Identity playfieldIdentity)
-        {
-            return MobSpawnDao.Instance.GetWhere(new { Playfield = playfieldIdentity.Instance });
-        }
-
-        private IEnumerable<DBMobSpawnStat> LoadMobSpawnStats(DBMobSpawn mob)
-        {
-            return MobSpawnStatDao.Instance.GetWhere(new { mob.Id, mob.Playfield });
-        }
-
-        private ICharacter InstantiateDbMobSpawn(DBMobSpawn mob, DBMobSpawnStat[] stats)
-        {
-            return NonPlayerCharacterHandler.InstantiateMobSpawn(
-                mob,
-                stats,
-                new NPCController(),
-                this);
-        }
-
-        private void AttachMobSpawnKnuBot(DBMobSpawn mob, ICharacter cmob)
-        {
-            if (mob.KnuBotScriptName != "")
-            {
-                ((NPCController)cmob.Controller).SetKnuBot(
-                    ScriptCompiler.Instance.CreateKnuBot(mob.KnuBotScriptName, cmob.Identity));
-            }
         }
 
         #endregion

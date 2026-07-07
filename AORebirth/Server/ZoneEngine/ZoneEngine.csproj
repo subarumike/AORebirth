@@ -294,6 +294,7 @@
     <Compile Include="Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs" />
     <Compile Include="Core\Playfields\NpcPatrolReplayCoordinator.cs" />
     <Compile Include="Core\Playfields\PlayerCombatRuntimeService.cs" />
+    <Compile Include="Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldInteractionRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs" />
