@@ -2851,6 +2851,113 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void TeleportZoningHandoffGuardrailKeepsStatelAndPrivateCityRoutingStable()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string statelTransitionText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
+
+            string checkStatelCollisionMethod = ExtractMethodBlock(playfieldText, "private void CheckStatelCollision");
+            string teleportToPlayfieldMethod = ExtractMethodBlock(playfieldText, "private void TeleportToPlayfield");
+            string localTeleportMethod = ExtractMethodBlock(
+                playfieldText,
+                "private bool TryCompleteGridTeleportInCurrentPlayfield(");
+            string checkStatelCollisionRuntimeMethod = ExtractMethodBlock(
+                statelTransitionText,
+                "internal void CheckStatelCollision(");
+            string privateCityEntryMethod = ExtractMethodBlock(
+                statelTransitionText,
+                "private bool TryHandleCapturedMontroyalPrivateCityEntry(");
+            string privateCityExitMethod = ExtractMethodBlock(
+                statelTransitionText,
+                "private bool TryHandleUserConfirmedMontroyalPrivateCityExit(");
+
+            Assert.IsTrue(
+                checkStatelCollisionMethod.Contains("this.runtimeSystems.CheckStatelCollision(")
+                && checkStatelCollisionMethod.Contains("ResolveCapturedMontroyalPrivateCityInstance")
+                && checkStatelCollisionMethod.Contains("ResolveCharacterOrganizationInstance")
+                && checkStatelCollisionMethod.Contains("x => x.StopMovement()")
+                && checkStatelCollisionMethod.Contains("this.SendCapturedPrivateCityEntrySocialStatus")
+                && checkStatelCollisionMethod.Contains("this.TeleportToPlayfield"),
+                "Playfield must keep statel collision as orchestration callbacks into the runtime boundary.");
+            Assert.IsTrue(
+                teleportToPlayfieldMethod.Contains("this.Teleport(")
+                && teleportToPlayfieldMethod.Contains("new Identity { Type = IdentityType.Playfield, Instance = playfieldInstance }"),
+                "Playfield must keep destination identity construction at the teleport handoff boundary.");
+
+            AssertTextBefore(
+                checkStatelCollisionRuntimeMethod,
+                "if (IsPostZoneCollisionGraceActive(dynel))",
+                "this.TryHandleCapturedMontroyalPrivateCityEntry(");
+            AssertTextBefore(
+                checkStatelCollisionRuntimeMethod,
+                "this.TryHandleCapturedMontroyalPrivateCityEntry(",
+                "this.TryHandleUserConfirmedMontroyalPrivateCityExit(");
+            AssertTextBefore(
+                checkStatelCollisionRuntimeMethod,
+                "this.TryHandleUserConfirmedMontroyalPrivateCityExit(",
+                "foreach (StatelData sd in collisionStatels)");
+
+            AssertTextBefore(
+                privateCityEntryMethod,
+                "int destinationPlayfieldId = resolvePrivateCityDestinationPlayfield(character);",
+                "Coordinate destination = ResolveCapturedMontroyalEntryDestination(destinationPlayfieldId);");
+            AssertTextBefore(
+                privateCityEntryMethod,
+                "Coordinate destination = ResolveCapturedMontroyalEntryDestination(destinationPlayfieldId);",
+                "stopMovement(character);");
+            AssertTextBefore(
+                privateCityEntryMethod,
+                "stopMovement(character);",
+                "sendCapturedPrivateCityEntrySocialStatus(character);");
+            AssertTextBefore(
+                privateCityEntryMethod,
+                "sendCapturedPrivateCityEntrySocialStatus(character);",
+                "teleportToPlayfield(dynel, destination, heading, destinationPlayfieldId);");
+
+            AssertTextBefore(
+                privateCityExitMethod,
+                "var destination = new Coordinate(",
+                "stopMovement(character);");
+            AssertTextBefore(
+                privateCityExitMethod,
+                "stopMovement(character);",
+                "teleportToPlayfield(dynel, destination, heading, CapturedMontroyalEntrySourcePlayfieldId);");
+
+            AssertTextBefore(
+                localTeleportMethod,
+                "TeleportMessageHandler.Default.SendLocal(",
+                "dynel.RawCoordinates = new AORebirth.Core.Vector.Vector3");
+            AssertTextBefore(
+                localTeleportMethod,
+                "dynel.RawHeading = new AORebirth.Core.Vector.Quaternion",
+                "this.PrimeStatelCollisionContacts(character);");
+
+            string[] forbiddenStatelRuntimeOwnership =
+                {
+                    "ZoneRedirectionMessage",
+                    "TeleportMessageHandler.Default.Send(",
+                    "TeleportMessageHandler.Default.SendLocal(",
+                    "PlayfieldById",
+                    "new Playfield(",
+                    "client.SendCompressed",
+                    "dynel.Dispose",
+                    "Pool.Instance"
+                };
+            for (int i = 0; i < forbiddenStatelRuntimeOwnership.Length; i++)
+            {
+                Assert.IsFalse(
+                    statelTransitionText.Contains(forbiddenStatelRuntimeOwnership[i]),
+                    "Statel transition runtime must not own Playfield handoff mechanics: "
+                    + forbiddenStatelRuntimeOwnership[i]);
+            }
+        }
+
+        [TestMethod]
         public void PlayfieldDynelRegistryIsOwnedByRuntimeSystemsAndFeedsSafeLookupPaths()
         {
             string repositoryRoot = FindRepositoryRoot();

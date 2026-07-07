@@ -47,7 +47,7 @@ No runtime behavior is changed by this checkpoint.
 
 - Combat algorithm extraction: damage, weapon selection, range/timing, attack packet construction, and NPC combat movement remain tightly coupled to packet-visible behavior.
 - Corpse loot/credit internals: loot table selection, item materialization, credit mutation, corpse inventory packet construction, and persistence remain behavior-sensitive.
-- Teleport/zoning handoff: packet emission, coordinate/heading mutation, client detach/dispose, playfield lookup/creation, and redirection remain interleaved.
+- Teleport/zoning handoff: packet emission, coordinate/heading mutation, client detach/dispose, playfield lookup/creation, and redirection remain interleaved. Guardrails now cover statel collision routing, Montroyal/private-city entry and exit callback order, same-playfield local teleport send before coordinate mutation, cross-playfield zoning entry before teleport send, destination lookup/handoff order, and the mechanics that must remain in `Playfield` for now.
 - Packet construction ownership: many packet builders remain intentionally near Playfield callbacks until fixture-backed packet-shape tests exist.
 - DB/data loading and import behavior: DAO calls and loader/import semantics should not move without a separate data-provider/import boundary plan.
 - Visibility packet fanout: current registry and sequencing guardrails exist, but broadcast mechanics still carry packet-order risk.
@@ -58,13 +58,13 @@ No runtime behavior is changed by this checkpoint.
    - Target current `RollCorpseLootItems`, `ScheduleCorpseCreditAward`, `AwardCorpseCredits`, `SendCorpseInventoryUpdate`, and corpse loot packet callbacks.
    - Do not move loot algorithms or packet construction in the first slice.
 
-2. Add a teleport/zoning handoff guardrail focused on remaining Playfield-owned mechanics.
-   - Target same-playfield teleport, cross-playfield teleport, redirection send, coordinate/heading mutation, client detach/dispose, and playfield lookup ordering.
-   - Do not extract packet emission until the order is fully guarded.
-
-3. Audit combat packet/damage boundary before extracting algorithms.
+2. Audit combat packet/damage boundary before extracting algorithms.
    - Target player and NPC attack packet construction, damage announcement, health damage, weapon-slot selection, range/timing, and movement-to-target callbacks.
    - Prefer guardrail coverage first; extract only if a cohesive orchestration seam is obvious.
+
+3. Revisit teleport/zoning only after a behavior-preserving extraction plan exists.
+   - Keep packet construction, `PlayfieldById` handoff, coordinate/heading mutation, client detach/dispose, same-playfield local teleport, and `ZoneRedirectionMessage` send in `Playfield` until a fixture-backed packet-state harness exists.
+   - Do not extract packet emission from this path based only on string-order guardrails.
 
 ## Validation Scope For This Checkpoint
 
