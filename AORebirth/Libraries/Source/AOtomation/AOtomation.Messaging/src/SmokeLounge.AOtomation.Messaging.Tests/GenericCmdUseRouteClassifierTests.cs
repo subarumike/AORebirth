@@ -1167,6 +1167,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
             string containerAddItemHandler =
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs");
+            string combatLootSmoke =
+                ReadRepositoryFile(@"tools-temp\AOSharpLiveCapture\CombatLootSmoke.cs");
 
             AssertContains(service, "public CorpseLootInventoryTransferResult TryAddCorpseLootItem(");
             AssertContains(service, "private bool TryResolveCorpseLootTargetSlot(");
@@ -1218,6 +1220,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 containerAddItemHandler,
                 "client.Controller.Character.Playfield.TryLootCorpseItem(",
                 "InventoryContainerRuntimeService.Default.HandleContainerAddItem(client, message);");
+            AssertContains(combatLootSmoke, "private const int MoveToInventoryPlacement = 0x6F;");
+            AssertContains(combatLootSmoke, "N3MessageType.InventoryUpdate");
+            AssertContains(combatLootSmoke, "N3MessageType.ClientMoveItemToInventory");
+            AssertContains(combatLootSmoke, "N3MessageType.ContainerAddItem");
+            AssertContains(combatLootSmoke, "item.MoveToInventory(MoveToInventoryPlacement);");
+            AssertContains(combatLootSmoke, "if (items.Count < this.itemCountBeforeMove)");
+            AssertContains(combatLootSmoke, "OnlyUnlootableDuplicateUniqueItems(items)");
+            AssertTextBefore(
+                combatLootSmoke,
+                "item.MoveToInventory(MoveToInventoryPlacement);",
+                "this.Transition(SmokeState.WaitFirstMoved, \"first move sent\");");
             AssertDoesNotContain(playfield, "InventoryContainerRuntimeService.Default.TryAddCorpseLootItem(");
             AssertDoesNotContain(playfield, "InventoryContainerRuntimeService.Default.CharacterHasUniqueItemAlready(");
 
