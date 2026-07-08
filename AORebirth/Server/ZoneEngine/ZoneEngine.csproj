@@ -172,6 +172,7 @@
     <Compile Include="Core\Functions\GameFunctions\modifypercentage.cs" />
     <Compile Include="Core\Functions\GameFunctions\openbank.cs" />
     <Compile Include="Core\Functions\GameFunctions\shouldermesh.cs" />
+    <Compile Include="Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs" />
     <Compile Include="Core\Functions\GameFunctions\teleportproxy.cs">
       <SubType>Code</SubType>
     </Compile>
