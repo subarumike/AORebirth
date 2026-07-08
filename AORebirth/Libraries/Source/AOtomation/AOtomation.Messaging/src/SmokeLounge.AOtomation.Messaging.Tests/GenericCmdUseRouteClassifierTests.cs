@@ -200,6 +200,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void SubwayTeleportProxyOverridePreservesCapturedEntranceStairsLanding()
+        {
+            string rules =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs");
+            string teleportProxy = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\teleportproxy.cs");
+            string teleportProxy2 = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\teleportproxy2.cs");
+            string project = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
+
+            AssertContains(rules, "public const int CapturedSubwayPlayfieldId = 127;");
+            AssertContains(rules, "public const int CapturedEntranceDoorInstance = unchecked((int)0xC006007F);");
+            AssertContains(rules, "public const float CapturedEntranceLandingX = 71.4f;");
+            AssertContains(rules, "public const float CapturedEntranceLandingY = 115.6f;");
+            AssertContains(rules, "public const float CapturedEntranceLandingZ = 319.0f;");
+            AssertContains(rules, "public const float CapturedEntranceHeadingX = 0.707102f;");
+            AssertContains(rules, "public const float CapturedEntranceHeadingZ = 0.707112f;");
+            AssertContains(rules, "public static bool TryResolveDestinationOverride(");
+            AssertContains(teleportProxy, "SubwayTeleportProxyDestinationRules.TryResolveDestinationOverride");
+            AssertContains(teleportProxy2, "SubwayTeleportProxyDestinationRules.TryResolveDestinationOverride");
+            AssertContains(project, @"Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs");
+        }
+
+        [TestMethod]
         public void CorpseInteractionRulesExposeCurrentRouteModeDecisions()
         {
             Assert.AreEqual(

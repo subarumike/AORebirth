@@ -83,6 +83,35 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
             if (arguments[1].AsInt32() > 0)
             {
+                Coordinate overrideDestination;
+                Quaternion overrideHeading;
+                if (SubwayTeleportProxyDestinationRules.TryResolveDestinationOverride(
+                    arguments[1].AsInt32(),
+                    statelId,
+                    out overrideDestination,
+                    out overrideHeading))
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Zoning,
+                        string.Format(
+                            "TeleportProxy caller={0} fromPf={1} from=({2:F2},{3:F2},{4:F2}) destDoor=SubwayEntranceOverride destPf={5} dest=({6:F2},{7:F2},{8:F2})",
+                            caller.Identity.ToString(true),
+                            character.Playfield.Identity.Instance,
+                            character.RawCoordinates.X,
+                            character.RawCoordinates.Y,
+                            character.RawCoordinates.Z,
+                            arguments[1].AsInt32(),
+                            overrideDestination.x,
+                            overrideDestination.y,
+                            overrideDestination.z));
+                    character.Playfield.Teleport(
+                        (Dynel)character,
+                        overrideDestination,
+                        overrideHeading,
+                        new Identity() { Type = (IdentityType)arguments[0].AsInt32(), Instance = arguments[1].AsInt32() });
+                    return true;
+                }
+
                 StatelData sd = PlayfieldLoader.PFData[arguments[1].AsInt32()].GetDoor(statelId);
                 if (sd == null)
                 {
