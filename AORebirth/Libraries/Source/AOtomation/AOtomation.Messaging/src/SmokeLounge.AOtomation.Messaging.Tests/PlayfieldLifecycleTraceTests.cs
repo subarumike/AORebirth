@@ -1043,6 +1043,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldPublishFanoutRuntimeService.cs"));
+            string characterHeartbeatText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCharacterHeartbeatRuntimeService.cs"));
             string aotomationDeliveryText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -1063,6 +1067,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new PlayfieldDbMobSpawnRuntimeService()",
                     "new PlayfieldEnvironmentFunctionRuntimeService()",
                     "new PlayfieldNpcCombatMovementRuntimeService()",
+                    "new PlayfieldCharacterHeartbeatRuntimeService()",
                     "new PlayfieldPacketSequencingRuntimeService(this.packetSequencing)",
                     "new PlayfieldCorpseAccessRuntimeService()",
                     "new PlayfieldRewardRuntimeService()",
@@ -1318,6 +1323,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("private readonly PlayfieldStatUpdateRuntimeService statUpdates")
                 && runtimeSystemsText.Contains("private readonly PlayfieldStaticDynelRuntimeService staticDynelRuntime")
                 && runtimeSystemsText.Contains("private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle")
+                && runtimeSystemsText.Contains("private readonly PlayfieldCharacterHeartbeatRuntimeService characterHeartbeat")
                 && runtimeSystemsText.Contains("private readonly PlayfieldVendorRuntimeService vendors")
                 && runtimeSystemsText.Contains("private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout")
                 && runtimeSystemsText.Contains("private readonly PlayfieldVisibilityPacketRuntimeService visibilityPackets")
@@ -1390,6 +1396,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.npcCombatMovement.IsInCombatRange(")
                 && runtimeSystemsText.Contains("this.npcCombatMovement.UpdateNpcMeleeFollowHold(")
                 && runtimeSystemsText.Contains("this.npcCombatMovement.TryMoveNpcIntoCombatRange(")
+                && runtimeSystemsText.Contains("this.characterHeartbeat.ProcessRegeneration(")
+                && runtimeSystemsText.Contains("this.characterHeartbeat.ProcessFollow(")
+                && runtimeSystemsText.Contains("this.characterHeartbeat.ProcessPlayerCollisionChecks(")
                 && runtimeSystemsText.Contains("this.statUpdates.SendChangedStats(")
                 && runtimeSystemsText.Contains("this.statUpdates.SendChangedStatsIfChanged(")
                 && runtimeSystemsText.Contains("this.statUpdates.SendChangedStatsIfClient(")
@@ -1403,8 +1412,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 projectText.Contains(@"Core\Playfields\PlayfieldPlayerDeathRespawnRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldPlayerDeathRespawnRuntimeService.");
             Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldCharacterHeartbeatRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldCharacterHeartbeatRuntimeService.");
+            Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldTimedLifecycleRuntimeService.");
+            Assert.IsTrue(
+                characterHeartbeatText.Contains("internal sealed class PlayfieldCharacterHeartbeatRuntimeService")
+                && characterHeartbeatText.Contains("internal void ProcessRegeneration(ICharacter dynel, Action<ICharacter> sendChangedStats)")
+                && characterHeartbeatText.Contains("StatHealInterval healInterval")
+                && characterHeartbeatText.Contains("StatNanoInterval nanoInterval")
+                && characterHeartbeatText.Contains("sendChangedStats(dynel);")
+                && characterHeartbeatText.Contains("internal void ProcessFollow(ICharacter dynel)")
+                && characterHeartbeatText.Contains("dynel.Controller.DoFollow();")
+                && characterHeartbeatText.Contains("internal void ProcessPlayerCollisionChecks(")
+                && characterHeartbeatText.Contains("checkWallCollision(dynel);")
+                && characterHeartbeatText.Contains("checkStatelCollision(dynel);"),
+                "PlayfieldCharacterHeartbeatRuntimeService must own regeneration, follow, and player-collision callback sequencing.");
+            Assert.IsFalse(
+                characterHeartbeatText.Contains("DoCombatTick")
+                || characterHeartbeatText.Contains("WallCollision.CheckCollision(")
+                || characterHeartbeatText.Contains("TeleportMessageHandler")
+                || characterHeartbeatText.Contains("CorpseFullUpdate")
+                || characterHeartbeatText.Contains("Inventory"),
+                "PlayfieldCharacterHeartbeatRuntimeService must not own combat, wall-routing internals, packets, or inventory.");
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldPacketSequencingRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldPacketSequencingRuntimeService.");
@@ -1765,10 +1796,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && heartbeatTimer.Contains("this.ProcessPendingCorpseSpawns")
                 && heartbeatTimer.Contains("this.ProcessCorpseDespawns")
                 && heartbeatTimer.Contains("this.ProcessPendingCorpseCreditAwards")
-                && heartbeatTimer.Contains("this.ProcessCharacterRegeneration")
+                && heartbeatTimer.Contains("this.runtimeSystems.ProcessCharacterRegeneration(dynel, SendChangedStats)")
                 && heartbeatTimer.Contains("this.DoCombatTick")
-                && heartbeatTimer.Contains("this.ProcessCharacterFollow")
-                && heartbeatTimer.Contains("this.ProcessPlayerCollisionChecks"),
+                && heartbeatTimer.Contains("this.runtimeSystems.ProcessCharacterFollow")
+                && heartbeatTimer.Contains("this.runtimeSystems.ProcessPlayerCollisionChecks("),
                 "Playfield heartbeat must delegate timed lifecycle sequencing through PlayfieldRuntimeSystems.");
             Assert.IsFalse(
                 heartbeatTimer.Contains("foreach (ICharacter dynel in dynels)")
@@ -1776,15 +1807,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || heartbeatTimer.Contains("this.runtimeSystems.ProcessNpcPatrolTick(dynel)"),
                 "Playfield heartbeat must not directly own character lifecycle loop sequencing.");
             Assert.IsTrue(
-                playfieldText.Contains("private void ProcessCharacterRegeneration(ICharacter dynel)")
-                && playfieldText.Contains("dynel.Stats[StatIds.health].Value")
-                && playfieldText.Contains("this.runtimeSystems.SendChangedStatsIfChanged(dynel, changed, SendChangedStats);")
-                && playfieldText.Contains("private void ProcessCharacterFollow(ICharacter dynel)")
-                && playfieldText.Contains("dynel.Controller.DoFollow();")
-                && playfieldText.Contains("private void ProcessPlayerCollisionChecks(ICharacter dynel)")
-                && playfieldText.Contains("this.CheckWallCollision(dynel);")
-                && playfieldText.Contains("this.CheckStatelCollision(dynel);"),
-                "Playfield must retain regeneration math, follow, and collision behavior behind scheduler callbacks.");
+                !playfieldText.Contains("private void ProcessCharacterRegeneration(ICharacter dynel)")
+                && !playfieldText.Contains("private void ProcessCharacterFollow(ICharacter dynel)")
+                && !playfieldText.Contains("private void ProcessPlayerCollisionChecks(ICharacter dynel)")
+                && characterHeartbeatText.Contains("dynel.Stats[StatIds.health].Value")
+                && characterHeartbeatText.Contains("dynel.Controller.DoFollow();")
+                && characterHeartbeatText.Contains("checkWallCollision(dynel);")
+                && characterHeartbeatText.Contains("checkStatelCollision(dynel);"),
+                "Playfield must delegate non-combat character heartbeat behavior to PlayfieldCharacterHeartbeatRuntimeService.");
             string checkWallCollision = ExtractMethodBlock(playfieldText, "private void CheckWallCollision(ICharacter dynel)");
             Assert.IsTrue(
                 checkWallCollision.Contains("this.runtimeSystems.CheckWallCollision(")

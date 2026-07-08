@@ -56,7 +56,6 @@ namespace AORebirth.Core.Playfields
     using AORebirth.Enums;
     using AORebirth.Interfaces;
     using AORebirth.ObjectManager;
-    using AORebirth.Stats.SpecialStats;
 
     using MemBus;
     using MemBus.Configurators;
@@ -1021,10 +1020,13 @@ namespace AORebirth.Core.Playfields
                     this.ProcessPendingCorpseSpawns,
                     this.ProcessCorpseDespawns,
                     this.ProcessPendingCorpseCreditAwards,
-                    this.ProcessCharacterRegeneration,
+                    dynel => this.runtimeSystems.ProcessCharacterRegeneration(dynel, SendChangedStats),
                     this.DoCombatTick,
-                    this.ProcessCharacterFollow,
-                    this.ProcessPlayerCollisionChecks);
+                    this.runtimeSystems.ProcessCharacterFollow,
+                    dynel => this.runtimeSystems.ProcessPlayerCollisionChecks(
+                        dynel,
+                        this.CheckWallCollision,
+                        this.CheckStatelCollision));
             }
             catch (Exception e)
             {
@@ -1040,51 +1042,6 @@ namespace AORebirth.Core.Playfields
                 {
                 }
             }
-        }
-
-        private void ProcessCharacterRegeneration(ICharacter dynel)
-        {
-            bool changed = false;
-            StatHealInterval healInterval = (StatHealInterval)dynel.Stats[StatIds.healinterval];
-            int healIntervalSeconds = healInterval.Value;
-            int healDelta = dynel.Stats[StatIds.healdelta].Value;
-            if (healIntervalSeconds > 0
-                && healDelta != 0
-                && healInterval.LastTick < DateTime.UtcNow)
-            {
-                dynel.Stats[StatIds.health].Value =
-                    Math.Min(dynel.Stats[StatIds.life].Value, dynel.Stats[StatIds.health].Value + healDelta);
-                healInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(healIntervalSeconds);
-                changed = true;
-            }
-
-            StatNanoInterval nanoInterval = (StatNanoInterval)dynel.Stats[StatIds.nanointerval];
-            int nanoIntervalSeconds = nanoInterval.Value;
-            int nanoDelta = dynel.Stats[StatIds.nanodelta].Value;
-            if (nanoIntervalSeconds > 0
-                && nanoDelta != 0
-                && nanoInterval.LastTick < DateTime.UtcNow)
-            {
-                dynel.Stats[StatIds.currentnano].Value += nanoDelta;
-                nanoInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(nanoIntervalSeconds);
-                changed = true;
-            }
-
-            this.runtimeSystems.SendChangedStatsIfChanged(dynel, changed, SendChangedStats);
-        }
-
-        private void ProcessCharacterFollow(ICharacter dynel)
-        {
-            if (dynel.Controller.IsFollowing())
-            {
-                dynel.Controller.DoFollow();
-            }
-        }
-
-        private void ProcessPlayerCollisionChecks(ICharacter dynel)
-        {
-            this.CheckWallCollision(dynel);
-            this.CheckStatelCollision(dynel);
         }
 
         public void ResetCombatTick(Identity attacker)
