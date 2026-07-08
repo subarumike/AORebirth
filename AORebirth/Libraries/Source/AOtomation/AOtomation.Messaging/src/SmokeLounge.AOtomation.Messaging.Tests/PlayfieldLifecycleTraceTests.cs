@@ -1031,6 +1031,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldPublishFanoutRuntimeService.cs"));
+            string aotomationDeliveryText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldAOtomationDeliveryRuntimeService.cs"));
             string npcCombatTickText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
             string corpseLifecycleText = File.ReadAllText(
@@ -1060,6 +1064,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new PlayfieldVendorRuntimeService()",
                     "new PlayfieldVisibilityFanoutRuntimeService()",
                     "new PlayfieldPublishFanoutRuntimeService()",
+                    "new PlayfieldAOtomationDeliveryRuntimeService()",
                     "new PrivateCityReadyInitCoordinator("
                 };
             for (int i = 0; i < runtimeCoordinatorConstructors.Length; i++)
@@ -1301,6 +1306,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("private readonly PlayfieldVendorRuntimeService vendors")
                 && runtimeSystemsText.Contains("private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout")
                 && runtimeSystemsText.Contains("private readonly PlayfieldPublishFanoutRuntimeService publishFanout")
+                && runtimeSystemsText.Contains("private readonly PlayfieldAOtomationDeliveryRuntimeService aotomationDelivery")
                 && runtimeSystemsText.Contains("internal void ProcessHeartbeatTimedLifecycle(")
                 && runtimeSystemsText.Contains("this.timedLifecycle.ProcessHeartbeatLifecycle(")
                 && runtimeSystemsText.Contains("this.Characters")
@@ -1354,6 +1360,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.publishFanout.PublishMessageToClient(")
                 && runtimeSystemsText.Contains("this.publishFanout.DispatchMessageToPlayfield(")
                 && runtimeSystemsText.Contains("this.publishFanout.DispatchMessageToPlayfieldOthers(")
+                && runtimeSystemsText.Contains("this.aotomationDelivery.SendMessageToClient(")
+                && runtimeSystemsText.Contains("this.aotomationDelivery.SendMessageBodyToClient(")
+                && runtimeSystemsText.Contains("this.aotomationDelivery.SendMessageBodiesToClient(")
+                && runtimeSystemsText.Contains("this.aotomationDelivery.SendMessageToPlayfield(")
+                && runtimeSystemsText.Contains("this.aotomationDelivery.SendMessageToPlayfieldOthers(")
                 && runtimeSystemsText.Contains("this.npcCombatMovement.IsInCombatRange(")
                 && runtimeSystemsText.Contains("this.npcCombatMovement.UpdateNpcMeleeFollowHold(")
                 && runtimeSystemsText.Contains("this.npcCombatMovement.TryMoveNpcIntoCombatRange(")
@@ -1433,6 +1444,44 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || publishFanoutText.Contains("PacketSequencing")
                 || publishFanoutText.Contains("Pool.Instance"),
                 "PlayfieldPublishFanoutRuntimeService must not own packet construction, direct sends, sequencing, or Pool lookups.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldAOtomationDeliveryRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldAOtomationDeliveryRuntimeService.");
+            Assert.IsTrue(
+                aotomationDeliveryText.Contains("internal sealed class PlayfieldAOtomationDeliveryRuntimeService")
+                && aotomationDeliveryText.Contains("internal void SendMessageToClient(")
+                && aotomationDeliveryText.Contains("clientMessage.client.SendCompressed(clientMessage.message.Body);")
+                && aotomationDeliveryText.Contains("internal void SendMessageBodyToClient(")
+                && aotomationDeliveryText.Contains("message.client.SendCompressed(message.Body);")
+                && aotomationDeliveryText.Contains("internal void SendMessageBodiesToClient(")
+                && aotomationDeliveryText.Contains("foreach (MessageBody messageBody in message.Bodies)")
+                && aotomationDeliveryText.Contains("internal void SendMessageToPlayfield(")
+                && aotomationDeliveryText.Contains("dispatchToPlayfield(clientMessage.Body);")
+                && aotomationDeliveryText.Contains("internal void SendMessageToPlayfieldOthers(")
+                && aotomationDeliveryText.Contains("dispatchToPlayfieldOthers(clientMessage.Body, clientMessage.Identity);"),
+                "PlayfieldAOtomationDeliveryRuntimeService must own AOtomation bus message delivery.");
+            Assert.IsFalse(
+                aotomationDeliveryText.Contains("SimpleCharFullUpdate")
+                || aotomationDeliveryText.Contains("CharInPlayMessage")
+                || aotomationDeliveryText.Contains("TeleportMessageHandler")
+                || aotomationDeliveryText.Contains("ZoneRedirectionMessage")
+                || aotomationDeliveryText.Contains("PacketSequencing")
+                || aotomationDeliveryText.Contains("Pool.Instance"),
+                "PlayfieldAOtomationDeliveryRuntimeService must not own packet construction, sequencing, or Pool lookups.");
+            Assert.IsTrue(
+                playfieldText.Contains("this.runtimeSystems.DeliverAOtomationMessageToClient")
+                && playfieldText.Contains("this.runtimeSystems.DeliverAOtomationMessageBodyToClient")
+                && playfieldText.Contains("this.runtimeSystems.DeliverAOtomationMessageBodiesToClient")
+                && playfieldText.Contains("this.runtimeSystems.DeliverAOtomationMessageToPlayfield(message, this.Announce)")
+                && playfieldText.Contains("this.runtimeSystems.DeliverAOtomationMessageToPlayfieldOthers("),
+                "Playfield bus subscriptions must delegate AOtomation delivery through PlayfieldRuntimeSystems.");
+            Assert.IsFalse(
+                playfieldText.Contains("public static void SendAOtomationMessageToClient")
+                || playfieldText.Contains("public void SendAOtomationMessageBodyToClient")
+                || playfieldText.Contains("public void SendAOtomationMessageBodiesToClient")
+                || playfieldText.Contains("public void SendAOtomationMessageToPlayfield")
+                || playfieldText.Contains("public void SendAOtomationMessageToPlayfieldOthers"),
+                "Playfield must not retain AOtomation delivery handlers after extraction.");
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldStatUpdateRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldStatUpdateRuntimeService.");

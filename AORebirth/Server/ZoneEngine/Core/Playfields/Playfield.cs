@@ -272,17 +272,22 @@ namespace AORebirth.Core.Playfields
                     ResolveCharacterStatWireValue);
 
             this.memBusDisposeContainer.Add(
-                this.playfieldBus.Subscribe<IMSendAOtomationMessageToClient>(SendAOtomationMessageToClient));
+                this.playfieldBus.Subscribe<IMSendAOtomationMessageToClient>(
+                    this.runtimeSystems.DeliverAOtomationMessageToClient));
             this.memBusDisposeContainer.Add(
-                this.playfieldBus.Subscribe<IMSendAOtomationMessageToPlayfield>(this.SendAOtomationMessageToPlayfield));
+                this.playfieldBus.Subscribe<IMSendAOtomationMessageToPlayfield>(
+                    message => this.runtimeSystems.DeliverAOtomationMessageToPlayfield(message, this.Announce)));
             this.memBusDisposeContainer.Add(
                 this.playfieldBus.Subscribe<IMSendAOtomationMessageToPlayfieldOthers>(
-                    this.SendAOtomationMessageToPlayfieldOthers));
+                    message => this.runtimeSystems.DeliverAOtomationMessageToPlayfieldOthers(
+                        message,
+                        this.AnnounceOthers)));
             this.memBusDisposeContainer.Add(
-                this.playfieldBus.Subscribe<IMSendAOtomationMessageBodyToClient>(this.SendAOtomationMessageBodyToClient));
+                this.playfieldBus.Subscribe<IMSendAOtomationMessageBodyToClient>(
+                    this.runtimeSystems.DeliverAOtomationMessageBodyToClient));
             this.memBusDisposeContainer.Add(
                 this.playfieldBus.Subscribe<IMSendAOtomationMessageBodiesToClient>(
-                    this.SendAOtomationMessageBodiesToClient));
+                    this.runtimeSystems.DeliverAOtomationMessageBodiesToClient));
             this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<IMSendPlayerSCFUs>(this.SendSCFUsToClient));
             this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<IMExecuteFunction>(this.ExecuteFunction));
             this.heartBeat = new Timer(this.HeartBeatTimer, null, 10, 0);
@@ -820,16 +825,6 @@ namespace AORebirth.Core.Playfields
 
         /// <summary>
         /// </summary>
-        /// <param name="clientMessage">
-        /// </param>
-        public static void SendAOtomationMessageToClient(IMSendAOtomationMessageToClient clientMessage)
-        {
-            LogUtil.Debug(DebugInfoDetail.AoTomation, clientMessage.message.Body.GetType().ToString());
-            clientMessage.client.SendCompressed(clientMessage.message.Body);
-        }
-
-        /// <summary>
-        /// </summary>
         /// <param name="entity">
         /// </param>
         public void DisconnectClient(IInstancedEntity entity)
@@ -881,72 +876,6 @@ namespace AORebirth.Core.Playfields
         public Dictionary<Identity, string> ListAvailablePlayfields(bool global = true)
         {
             return this.server.ListAvailablePlayfields(global);
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="msg">
-        /// </param>
-        public void SendAOtMessageBodyToClient(IMSendAOtomationMessageBodyToClient msg)
-        {
-            msg.client.SendCompressed(msg.Body);
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="msg">
-        /// </param>
-        public void SendAOtomationMessageBodiesToClient(IMSendAOtomationMessageBodiesToClient msg)
-        {
-            foreach (MessageBody mb in msg.Bodies)
-            {
-                msg.client.SendCompressed(mb);
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="msg">
-        /// </param>
-        public void SendAOtomationMessageBodyToClient(IMSendAOtomationMessageBodyToClient msg)
-        {
-            if (msg.client != null)
-            {
-                try
-                {
-                    LogUtil.Debug(DebugInfoDetail.AoTomation, msg.Body.GetType().ToString());
-                    msg.client.SendCompressed(msg.Body);
-                }
-                catch (Exception e)
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Error,
-                        msg.Body.GetType().ToString() + Environment.NewLine + e.Message);
-                    // /!\ This happens sometimes, dont know why tho, need more investigation
-                    // throw;
-                }
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="clientMessage">
-        /// </param>
-        public void SendAOtomationMessageToPlayfield(IMSendAOtomationMessageToPlayfield clientMessage)
-        {
-            this.runtimeSystems.DispatchMessageToPlayfield(clientMessage.Body, this.Announce);
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="clientMessage">
-        /// </param>
-        public void SendAOtomationMessageToPlayfieldOthers(IMSendAOtomationMessageToPlayfieldOthers clientMessage)
-        {
-            this.runtimeSystems.DispatchMessageToPlayfieldOthers(
-                clientMessage.Body,
-                clientMessage.Identity,
-                this.AnnounceOthers);
         }
 
         /// <summary>
