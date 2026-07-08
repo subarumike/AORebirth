@@ -919,7 +919,7 @@ namespace AOSharpLiveCapture
             }
 
             this.LogEvent("CHAR-IN-PLAY", this.DescribeCharacter(character));
-            this.TrackEnemyFromCharacter(character, "spawn");
+            this.TrackEnemyFromCharacter(character, "spawn", "CHAR-IN-PLAY");
         }
 
         private void OnPlayfieldInit(object sender, uint playfieldId)
@@ -982,7 +982,7 @@ namespace AOSharpLiveCapture
                     if (this.knownCharacters.Add(key))
                     {
                         this.LogEvent("CHAR-SEEN", this.DescribeCharacter(character));
-                        this.TrackEnemyFromCharacter(character, "spawn");
+                        this.TrackEnemyFromCharacter(character, "spawn", "CHAR-SEEN");
                     }
                 }
 
@@ -2742,7 +2742,7 @@ namespace AOSharpLiveCapture
 
             try
             {
-                this.TrackEnemyFromCharacter(dynel.Cast<SimpleChar>(), requestedEventType);
+                this.TrackEnemyFromCharacter(dynel.Cast<SimpleChar>(), requestedEventType, "DYNEL-SPAWNED");
             }
             catch
             {
@@ -2750,14 +2750,16 @@ namespace AOSharpLiveCapture
             }
         }
 
-        private void TrackEnemyFromCharacter(SimpleChar character, string requestedEventType)
+        private void TrackEnemyFromCharacter(SimpleChar character, string requestedEventType, string evidenceSource)
         {
             if (!this.IsEnemyCharacter(character))
             {
                 return;
             }
 
-            if (!this.enemyFightCaptureEnabled && !this.IsFocusedEnemyIdentity(character.Identity))
+            bool isCombatOrFocused = this.enemyFightCaptureEnabled || this.IsFocusedEnemyIdentity(character.Identity);
+            bool isPopulationEvidence = !isCombatOrFocused && this.IsDungeonEnemyPopulationEvidence(character);
+            if (!isCombatOrFocused && !isPopulationEvidence)
             {
                 return;
             }
@@ -2768,6 +2770,11 @@ namespace AOSharpLiveCapture
                 bool created;
                 EnemyEntityState state = this.GetOrCreateEnemyState(character.Identity, timestamp, out created);
                 this.UpdateEnemyStaticStateFromCharacter(state, character);
+                if (isPopulationEvidence)
+                {
+                    this.MarkEnemyPopulationEvidence(state, evidenceSource);
+                }
+
                 state.Level = TryGetCharacterStat(character, Stat.Level);
                 state.CurrentHealth = TryGetCharacterStat(character, Stat.Health);
                 state.MaxHealth = TryGetCharacterStat(character, Stat.MaxHealth);
@@ -2777,14 +2784,17 @@ namespace AOSharpLiveCapture
                     this.enemyPositionUpdateCount++;
                 }
 
-                this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : requestedEventType == "spawn" ? "update" : requestedEventType);
+                string eventType = created
+                    ? (isPopulationEvidence ? "population" : "spawn")
+                    : (requestedEventType == "spawn" ? (isPopulationEvidence ? "population-update" : "update") : requestedEventType);
+                this.RecordEnemyStateEvent(state, timestamp, eventType);
                 this.RecordEnemyDeathIfNeeded(state, timestamp);
             }
         }
 
         private void TrackEnemyGone(string entityId)
         {
-            if (!this.enemyFightCaptureEnabled && !this.IsFocusedEnemyIdentityText(entityId))
+            if (!this.enemyFightCaptureEnabled && !this.IsFocusedEnemyIdentityText(entityId) && !this.IsTrackedEnemyState(entityId))
             {
                 return;
             }
@@ -2991,6 +3001,19 @@ namespace AOSharpLiveCapture
             }
         }
 
+        private bool IsTrackedEnemyState(string identityText)
+        {
+            if (string.IsNullOrEmpty(identityText))
+            {
+                return false;
+            }
+
+            lock (this.syncRoot)
+            {
+                return this.enemyStates.ContainsKey(identityText);
+            }
+        }
+
         private static bool TryGetIdentity(object identityValue, out Identity identity)
         {
             if (identityValue is Identity)
@@ -3126,6 +3149,45 @@ namespace AOSharpLiveCapture
             }
 
             return SafeBool(() => character.IsNpc) || SafeBool(() => character.IsPet);
+        }
+
+        private bool IsDungeonEnemyPopulationEvidence(SimpleChar character)
+        {
+            if (!this.IsDungeonPopulationCaptureContext())
+            {
+                return false;
+            }
+
+            if (!SafeBool(() => character.IsNpc) || SafeBool(() => character.IsPet) || SafeBool(() => character.IsPlayer))
+            {
+                return false;
+            }
+
+            int monsterData;
+            return int.TryParse(SafeStat(character, Stat.MonsterData), NumberStyles.Integer, CultureInfo.InvariantCulture, out monsterData)
+                && monsterData > 0;
+        }
+
+        private bool IsDungeonPopulationCaptureContext()
+        {
+            int runtimePlayfieldId;
+            if (int.TryParse(this.lastPlayfieldId, NumberStyles.Integer, CultureInfo.InvariantCulture, out runtimePlayfieldId)
+                && runtimePlayfieldId >= 1000000)
+            {
+                return true;
+            }
+
+            return string.Equals(this.GetDetectedResourcePlayfieldId(), "127", StringComparison.Ordinal);
+        }
+
+        private void MarkEnemyPopulationEvidence(EnemyEntityState state, string evidenceSource)
+        {
+            state.PopulationEvidenceObserved = true;
+            state.PopulationEvidenceSource = PreferEnemyStateString(state.PopulationEvidenceSource, evidenceSource);
+            state.ResourcePlayfieldId = PreferEnemyStateString(state.ResourcePlayfieldId, this.GetDetectedResourcePlayfieldId());
+            state.RuntimePlayfieldId = PreferEnemyStateString(state.RuntimePlayfieldId, this.lastPlayfieldId);
+            state.CapturePlayfieldIdentity = PreferEnemyStateString(state.CapturePlayfieldIdentity, this.GetCapturePlayfieldIdentity());
+            state.CapturePlayfieldObjectId = PreferEnemyStateString(state.CapturePlayfieldObjectId, this.GetCapturePlayfieldObjectId());
         }
 
         private static bool ContainsEnemyStateStats(GameTuple<Stat, uint>[] stats)
@@ -3414,6 +3476,18 @@ namespace AOSharpLiveCapture
                     json.Append("  \"captureFolder\": ");
                     json.Append(Json(this.sessionDirectory));
                     json.AppendLine(",");
+                    json.Append("  \"resourcePlayfieldId\": ");
+                    json.Append(Json(this.GetDetectedResourcePlayfieldId()));
+                    json.AppendLine(",");
+                    json.Append("  \"runtimePlayfieldId\": ");
+                    json.Append(Json(this.GetDetectedPlayfieldId()));
+                    json.AppendLine(",");
+                    json.Append("  \"capturePlayfieldIdentity\": ");
+                    json.Append(Json(this.GetCapturePlayfieldIdentity()));
+                    json.AppendLine(",");
+                    json.Append("  \"capturePlayfieldObjectId\": ");
+                    json.Append(Json(this.GetCapturePlayfieldObjectId()));
+                    json.AppendLine(",");
                     json.Append("  \"autoCaptureEnabled\": ");
                     json.Append(this.enemyFightAutoCaptureEnabled ? "true" : "false");
                     json.AppendLine(",");
@@ -3472,6 +3546,11 @@ namespace AOSharpLiveCapture
             AppendJsonField(json, indent + "  ", "defaultAttackType", state.DefaultAttackType, true);
             AppendJsonField(json, indent + "  ", "attackDelay", state.AttackDelay, true);
             AppendJsonField(json, indent + "  ", "rechargeDelay", state.RechargeDelay, true);
+            AppendJsonField(json, indent + "  ", "populationEvidenceSource", state.PopulationEvidenceSource, true);
+            AppendJsonField(json, indent + "  ", "resourcePlayfieldId", state.ResourcePlayfieldId, true);
+            AppendJsonField(json, indent + "  ", "runtimePlayfieldId", state.RuntimePlayfieldId, true);
+            AppendJsonField(json, indent + "  ", "capturePlayfieldIdentity", state.CapturePlayfieldIdentity, true);
+            AppendJsonField(json, indent + "  ", "capturePlayfieldObjectId", state.CapturePlayfieldObjectId, true);
             json.Append(indent);
             json.Append("  \"level\": ");
             AppendJsonNullableInt(json, state.Level);
@@ -3503,6 +3582,10 @@ namespace AOSharpLiveCapture
             json.Append(indent);
             json.Append("  \"deathObserved\": ");
             json.Append(state.DeathLogged ? "true" : "false");
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"populationEvidenceObserved\": ");
+            json.Append(state.PopulationEvidenceObserved ? "true" : "false");
             json.AppendLine(",");
             json.Append(indent);
             json.Append("  \"eventCount\": ");
@@ -3819,6 +3902,27 @@ namespace AOSharpLiveCapture
             return Safe(() => Playfield.Identity.ToString());
         }
 
+        private string GetCapturePlayfieldIdentity()
+        {
+            return Safe(() => Playfield.Identity.ToString());
+        }
+
+        private string GetCapturePlayfieldObjectId()
+        {
+            return Safe(() => Playfield.Identity.Instance.ToString(CultureInfo.InvariantCulture));
+        }
+
+        private string GetDetectedResourcePlayfieldId()
+        {
+            string capturePlayfieldObjectId = this.GetCapturePlayfieldObjectId();
+            if (string.Equals(capturePlayfieldObjectId, "122002", StringComparison.Ordinal))
+            {
+                return "127";
+            }
+
+            return string.Empty;
+        }
+
         private sealed class CaptureValidation
         {
             public CaptureValidation(string status, bool processingAllowed, List<string> issues, List<string> notes)
@@ -4062,6 +4166,18 @@ namespace AOSharpLiveCapture
             public DateTime LastUpdateUtc { get; set; }
 
             public bool DeathLogged { get; set; }
+
+            public bool PopulationEvidenceObserved { get; set; }
+
+            public string PopulationEvidenceSource { get; set; }
+
+            public string ResourcePlayfieldId { get; set; }
+
+            public string RuntimePlayfieldId { get; set; }
+
+            public string CapturePlayfieldIdentity { get; set; }
+
+            public string CapturePlayfieldObjectId { get; set; }
         }
 
         private sealed class EnemyStateEvent
