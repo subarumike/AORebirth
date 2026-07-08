@@ -35,9 +35,13 @@ namespace AORebirth.Core.Playfields
 
         private readonly CapturedAreteRobotContentProvider capturedAreteRobotContent;
 
+        private readonly CapturedSubwayContentProvider capturedSubwayContent;
+
         private readonly NpcPatrolReplayCoordinator patrolReplay;
 
         private readonly CapturedAreteRobotSpawnOrchestrator capturedAreteRobotSpawns;
+
+        private readonly CapturedSubwaySpawnOrchestrator capturedSubwaySpawns;
 
         private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
 
@@ -54,11 +58,16 @@ namespace AORebirth.Core.Playfields
             this.corpseLifecycle = new NpcCorpseLifecycleCoordinator(playfield, this.RemoveNpcHome);
             this.combatTick = new NpcCombatTickCoordinator(playfield);
             this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
+            this.capturedSubwayContent = new CapturedSubwayContentProvider();
             this.patrolReplay = new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent);
             this.capturedAreteRobotSpawns =
                 new CapturedAreteRobotSpawnOrchestrator(
                     this.capturedAreteRobotContent,
                     this.patrolReplay,
+                    this.ActivateNpc);
+            this.capturedSubwaySpawns =
+                new CapturedSubwaySpawnOrchestrator(
+                    this.capturedSubwayContent,
                     this.ActivateNpc);
         }
 
@@ -104,6 +113,7 @@ namespace AORebirth.Core.Playfields
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
         {
             this.capturedAreteRobotSpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
+            this.capturedSubwaySpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
         }
 
         internal bool HasPendingDeadNpcDespawn(Identity identity)

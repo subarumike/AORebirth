@@ -878,6 +878,69 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void SubwayContentModuleRegistersCapturedNpcSpawnsWithoutOwningRuntimeSystems()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string moduleText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\SubwayContentModule.cs"));
+            string runtimeSystemsText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+            string projectText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
+            string npcRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+            string providerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+            string orchestratorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwaySpawnOrchestrator.cs"));
+
+            Assert.IsTrue(moduleText.Contains("public sealed class SubwayContentModule : IPlayfieldContentModule"));
+            Assert.IsTrue(moduleText.Contains("private const int SubwayPlayfieldInstance = 122002"));
+            Assert.IsTrue(moduleText.Contains("registration.RegisterCapturedNpcSpawns();"));
+            Assert.IsTrue(
+                moduleText.Contains("return false;"),
+                "Subway content module must not suppress unrelated DB mob spawns in this first slice.");
+            Assert.IsFalse(
+                moduleText.Contains("CapturedSubwaySpawnOrchestrator")
+                || moduleText.Contains("NonPlayerCharacterHandler"),
+                "Subway content module must stay content-only and not own NPC runtime orchestration.");
+
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("new SubwayContentModule()"),
+                "PlayfieldRuntimeSystems content coordinator must register the Subway content module.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\Content\SubwayContentModule.cs")
+                && projectText.Contains(@"Core\Playfields\CapturedSubwayContentProvider.cs")
+                && projectText.Contains(@"Core\Playfields\CapturedSubwaySpawnOrchestrator.cs"),
+                "ZoneEngine project must compile the Subway content files.");
+
+            Assert.IsTrue(
+                npcRuntimeText.Contains("new CapturedSubwayContentProvider()")
+                && npcRuntimeText.Contains("new CapturedSubwaySpawnOrchestrator(")
+                && npcRuntimeText.Contains("this.capturedSubwaySpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);"),
+                "NPCRuntimeService must own the Subway captured spawn path.");
+
+            Assert.IsTrue(
+                providerText.Contains("\"Filth Flea\"")
+                && providerText.Contains("\"Discarded Pet\"")
+                && providerText.Contains("\"Violent Vagabond\"")
+                && providerText.Contains("\"Mugger\""),
+                "CapturedSubwayContentProvider must contain the first visible Subway mob families.");
+            Assert.IsTrue(
+                providerText.Contains("17657")
+                && providerText.Contains("17720")
+                && providerText.Contains("203733")
+                && providerText.Contains("203734"),
+                "CapturedSubwayContentProvider must preserve the captured monsterData values.");
+            Assert.IsTrue(
+                orchestratorText.Contains("SetMobStat(mobCharacter, StatIds.catmesh, spawn.MonsterData);")
+                && orchestratorText.Contains("playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));"),
+                "Captured Subway spawns must remain visible, attackable NPCs using existing runtime/corpse paths.");
+        }
+
+        [TestMethod]
         public void KnownPlayfieldContentModulesAreRegisteredExactlyOnceThroughCoordinatorPath()
         {
             string repositoryRoot = FindRepositoryRoot();
@@ -898,6 +961,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 {
                     "AreteContentModule",
                     "MontroyalContentModule",
+                    "SubwayContentModule",
                     "PrivateCityContentModule"
                 };
 
