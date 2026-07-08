@@ -869,81 +869,14 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)
         {
-            ICharacter recipient = sendSCFUs.toClient.Controller.Character;
-            Identity playfieldIdentity = recipient.Playfield.Identity;
-            this.runtimeSystems.FanoutExistingCharactersForScfu(
-                recipient,
-                entity =>
-                    {
-                        var temp = entity as Character;
-                        if (temp == null)
-                        {
-                            return false;
-                        }
-
-                        SimpleCharFullUpdateMessage simpleCharFullUpdate = SimpleCharFullUpdate.ConstructMessage(temp);
-                        CharInPlayMessage charInPlay = null;
-                        this.runtimeSystems.RunVisibilityPacketPairSequence(
-                            () => PlayfieldLifecycleTrace.Record(
-                                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
-                                PlayfieldLifecycleTrace.StageExistingCharacterSimpleCharFullUpdate,
-                                PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
-                                temp.Identity,
-                                "recipient=" + recipient.Identity),
-                            () => sendSCFUs.toClient.SendCompressed(simpleCharFullUpdate),
-                            () => { charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 }; },
-                            () => PlayfieldLifecycleTrace.Record(
-                                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
-                                PlayfieldLifecycleTrace.StageExistingCharacterCharInPlay,
-                                PlayfieldLifecycleTrace.MessageCharInPlay,
-                                temp.Identity,
-                                "recipient=" + recipient.Identity),
-                            () => sendSCFUs.toClient.SendCompressed(charInPlay));
-                        return true;
-                    },
-                (entity, senderEqualsRecipient, senderInRecipientPlayfield, sent) =>
-                    {
-                        Identity senderPlayfield = entity.Playfield == null ? Identity.None : entity.Playfield.Identity;
-                        LogUtil.Debug(
-                            DebugInfoDetail.NetworkMessages,
-                            string.Format(
-                                CultureInfo.InvariantCulture,
-                                "PlayerVisibilitySCFU sender={0}/{1} recipient={2}/{3} senderPf={4} recipientPf={5} self={6} inPlayfield={7} rangeRejected=False sent={8}",
-                                entity.Identity,
-                                entity.Name,
-                                recipient.Identity,
-                                recipient.Name,
-                                senderPlayfield,
-                                playfieldIdentity,
-                                senderEqualsRecipient,
-                                senderInRecipientPlayfield,
-                                sent));
-                    });
+            this.runtimeSystems.SendExistingCharacterVisibilityToClient(
+                sendSCFUs.toClient.Controller.Character,
+                body => sendSCFUs.toClient.SendCompressed(body));
         }
 
         public void AnnouncePlayerVisibility(ICharacter character)
         {
-            var temp = character as Character;
-            if (temp == null)
-            {
-                return;
-            }
-
-            CharInPlayMessage charInPlay = null;
-            this.runtimeSystems.RunVisibilityPacketPairSequence(
-                () => PlayfieldLifecycleTrace.Record(
-                    PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
-                    PlayfieldLifecycleTrace.StageJoiningCharacterSimpleCharFullUpdateBroadcast,
-                    PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
-                    temp.Identity),
-                () => this.Announce(SimpleCharFullUpdate.ConstructMessage(temp)),
-                () => { charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 }; },
-                () => PlayfieldLifecycleTrace.Record(
-                    PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
-                    PlayfieldLifecycleTrace.StageJoiningCharacterCharInPlayBroadcast,
-                    PlayfieldLifecycleTrace.MessageCharInPlay,
-                    temp.Identity),
-                () => this.Announce(charInPlay));
+            this.runtimeSystems.AnnounceJoiningCharacterVisibility(character, body => this.Announce(body));
         }
 
         #endregion

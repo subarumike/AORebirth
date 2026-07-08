@@ -82,6 +82,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout;
 
+        private readonly PlayfieldVisibilityPacketRuntimeService visibilityPackets;
+
         private readonly PlayfieldWallCollisionRuntimeService wallCollision;
 
         private readonly PacketSequencingCoordinator packetSequencing;
@@ -131,9 +133,10 @@ namespace ZoneEngine.Core.Playfields
             this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
             this.vendors = new PlayfieldVendorRuntimeService();
             this.visibilityFanout = new PlayfieldVisibilityFanoutRuntimeService();
-            this.wallCollision = new PlayfieldWallCollisionRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
             this.packetSequences = new PlayfieldPacketSequencingRuntimeService(this.packetSequencing);
+            this.visibilityPackets = new PlayfieldVisibilityPacketRuntimeService(this.visibilityFanout, this.packetSequences);
+            this.wallCollision = new PlayfieldWallCollisionRuntimeService();
             this.privateCityReadyInit =
                 new PrivateCityReadyInitCoordinator(
                     playfieldIdentity,
@@ -370,16 +373,21 @@ namespace ZoneEngine.Core.Playfields
                 sendMessageBodyToClient);
         }
 
-        internal void FanoutExistingCharactersForScfu(
+        internal void SendExistingCharacterVisibilityToClient(
             ICharacter recipient,
-            Func<ICharacter, bool> sendExistingCharacter,
-            Action<ICharacter, bool, bool, bool> logVisibilityCandidate)
+            Action<MessageBody> sendVisibilityMessage)
         {
-            this.visibilityFanout.FanoutExistingCharactersForScfu(
+            this.visibilityPackets.SendExistingCharacterVisibilityToClient(
                 recipient,
                 this.Characters(),
-                sendExistingCharacter,
-                logVisibilityCandidate);
+                sendVisibilityMessage);
+        }
+
+        internal void AnnounceJoiningCharacterVisibility(
+            ICharacter character,
+            Action<MessageBody> announceVisibilityMessage)
+        {
+            this.visibilityPackets.AnnounceJoiningCharacterVisibility(character, announceVisibilityMessage);
         }
 
         internal void PublishMessageBodyToClient(IZoneClient client, MessageBody body, Action<object> publish)
@@ -511,21 +519,6 @@ namespace ZoneEngine.Core.Playfields
         internal ReadOnlyCollection<StaticDynel> StaticDynels()
         {
             return this.dynelRegistry.StaticDynels();
-        }
-
-        internal void RunVisibilityPacketPairSequence(
-            Action recordSimpleCharFullUpdate,
-            Action sendSimpleCharFullUpdate,
-            Action prepareCharInPlay,
-            Action recordCharInPlay,
-            Action sendCharInPlay)
-        {
-            this.packetSequences.RunVisibilityPacketPairSequence(
-                recordSimpleCharFullUpdate,
-                sendSimpleCharFullUpdate,
-                prepareCharInPlay,
-                recordCharInPlay,
-                sendCharInPlay);
         }
 
         internal void RunPlayfieldTransferBeginSequence(Action enterZoningPhase, Action sendTeleportPacket)
