@@ -999,6 +999,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleRuntimeService.cs"));
+            string transferText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldTransferRuntimeService.cs"));
             string playerDeathRespawnText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -1323,6 +1327,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("private readonly PlayfieldStatUpdateRuntimeService statUpdates")
                 && runtimeSystemsText.Contains("private readonly PlayfieldStaticDynelRuntimeService staticDynelRuntime")
                 && runtimeSystemsText.Contains("private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle")
+                && runtimeSystemsText.Contains("private readonly PlayfieldTransferRuntimeService transfers")
                 && runtimeSystemsText.Contains("private readonly PlayfieldCharacterHeartbeatRuntimeService characterHeartbeat")
                 && runtimeSystemsText.Contains("private readonly PlayfieldVendorRuntimeService vendors")
                 && runtimeSystemsText.Contains("private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout")
@@ -1403,7 +1408,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.statUpdates.SendChangedStatsIfChanged(")
                 && runtimeSystemsText.Contains("this.statUpdates.SendChangedStatsIfClient(")
                 && runtimeSystemsText.Contains("this.statUpdates.RunPlayerDeathStatUpdateSequence(")
-                && runtimeSystemsText.Contains("this.packetSequences.RunPlayfieldTransferBeginSequence("),
+                && runtimeSystemsText.Contains("this.packetSequences.RunPlayfieldTransferBeginSequence(")
+                && runtimeSystemsText.Contains("internal void CompletePlayfieldTransfer(")
+                && runtimeSystemsText.Contains("this.transfers.CompletePlayfieldTransfer("),
                 "PlayfieldRuntimeSystems must delegate runtime entry points through named runtime services.");
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldLifecycleRuntimeService.cs"),
@@ -1417,6 +1424,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldTimedLifecycleRuntimeService.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldTransferRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldTransferRuntimeService.");
             Assert.IsTrue(
                 characterHeartbeatText.Contains("internal sealed class PlayfieldCharacterHeartbeatRuntimeService")
                 && characterHeartbeatText.Contains("internal void ProcessRegeneration(ICharacter dynel, Action<ICharacter> sendChangedStats)")
@@ -1647,6 +1657,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || lifecycleText.Contains("PlayfieldById")
                 || lifecycleText.Contains("Announce("),
                 "PlayfieldLifecycleRuntimeService must not own packet construction, object lookup, stats algorithms, or transport.");
+            Assert.IsTrue(
+                transferText.Contains("internal sealed class PlayfieldTransferRuntimeService")
+                && transferText.Contains("internal void CompletePlayfieldTransfer(")
+                && transferText.Contains("announceDespawn(dynel);")
+                && transferText.Contains("applyTransferState(dynel, destination, heading);")
+                && transferText.Contains("ZoneClient client = captureClient(dynel);")
+                && transferText.Contains("IPlayfield newPlayfield = resolveDestinationPlayfield(playfield);")
+                && transferText.Contains("finalizeTransferDispose(dynel, newPlayfield);")
+                && transferText.Contains("sendRedirect(client);"),
+                "PlayfieldTransferRuntimeService must own post-send cross-playfield handoff orchestration.");
+            Assert.IsFalse(
+                transferText.Contains("TeleportMessageHandler")
+                || transferText.Contains("ZoneRedirectionMessage")
+                || transferText.Contains("SendCompressed")
+                || transferText.Contains("PlayfieldById")
+                || transferText.Contains("new Playfield(")
+                || transferText.Contains("DespawnMessageHandler")
+                || transferText.Contains("AnnounceOthers")
+                || transferText.Contains("Pool.Instance"),
+                "PlayfieldTransferRuntimeService must not own packet construction, transport, lookup, or Playfield callbacks.");
             Assert.IsTrue(
                 playerDeathRespawnText.Contains("internal sealed class PlayfieldPlayerDeathRespawnRuntimeService")
                 && playerDeathRespawnText.Contains("internal void ProcessPlayerRespawn(")
@@ -3242,6 +3272,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleRuntimeService.cs"));
+            string transferText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldTransferRuntimeService.cs"));
 
             string teleportMethod = ExtractMethodBlock(
                 playfieldText,
@@ -3269,51 +3303,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(
                 teleportMethod,
                 "TeleportMessageHandler.Default.Send(",
-                "DespawnMessage despawnMessage = DespawnMessageHandler.Default.Create(dynel.Identity);");
+                "this.runtimeSystems.CompletePlayfieldTransfer(");
             AssertTextBefore(
-                teleportMethod,
-                "DespawnMessage despawnMessage = DespawnMessageHandler.Default.Create(dynel.Identity);",
-                "this.AnnounceOthers(despawnMessage, dynel.Identity);");
+                transferText,
+                "announceDespawn(dynel);",
+                "applyTransferState(dynel, destination, heading);");
             AssertTextBefore(
-                teleportMethod,
-                "this.AnnounceOthers(despawnMessage, dynel.Identity);",
-                "dynel.RawCoordinates = new Vector3()");
+                transferText,
+                "applyTransferState(dynel, destination, heading);",
+                "ZoneClient client = captureClient(dynel);");
             AssertTextBefore(
-                teleportMethod,
-                "ZoneClient client = (ZoneClient)dynel.Controller.Client;",
-                "IPlayfield newPlayfield = this.server.PlayfieldById(playfield);");
+                transferText,
+                "ZoneClient client = captureClient(dynel);",
+                "IPlayfield newPlayfield = resolveDestinationPlayfield(playfield);");
             AssertTextBefore(
-                teleportMethod,
-                "IPlayfield newPlayfield = this.server.PlayfieldById(playfield);",
-                "Pool.Instance.GetObject<Playfield>(");
+                transferText,
+                "IPlayfield newPlayfield = resolveDestinationPlayfield(playfield);",
+                "finalizeTransferDispose(dynel, newPlayfield);");
             AssertTextBefore(
-                teleportMethod,
-                "Pool.Instance.GetObject<Playfield>(",
-                "if (newPlayfield == null)");
-            AssertTextBefore(
-                teleportMethod,
-                "newPlayfield = new Playfield(this.server, playfield);",
-                "dynel.Playfield = newPlayfield;");
-            AssertTextBefore(
-                teleportMethod,
-                "dynel.Playfield = newPlayfield;",
-                "dynel.Controller.Client = null;");
-            AssertTextBefore(
-                teleportMethod,
-                "dynel.Controller.Client = null;",
-                "dynel.IsTeleporting = true;");
-            AssertTextBefore(
-                teleportMethod,
-                "dynel.IsTeleporting = true;",
-                "dynel.Dispose();");
-            AssertTextBefore(
-                teleportMethod,
-                "dynel.Dispose();",
-                "var redirect = new ZoneRedirectionMessage");
-            AssertTextBefore(
-                teleportMethod,
-                "var redirect = new ZoneRedirectionMessage",
-                "client.SendCompressed(redirect);");
+                transferText,
+                "finalizeTransferDispose(dynel, newPlayfield);",
+                "sendRedirect(client);");
 
             AssertTextBefore(
                 createCharacterMethod,
@@ -3327,12 +3337,40 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 teleportMethod.Contains("this.runtimeSystems.RunPlayfieldTransferBeginSequence("),
                 "The guarded zoning phase-entry and teleport-send order may be routed through PacketSequencingCoordinator.");
+            Assert.IsTrue(
+                teleportMethod.Contains("this.runtimeSystems.CompletePlayfieldTransfer("),
+                "Playfield must route post-send cross-playfield handoff through PlayfieldRuntimeSystems.");
             Assert.IsFalse(
                 packetSequencingText.Contains("TeleportMessageHandler")
                 || packetSequencingText.Contains("ZoneRedirectionMessage")
                 || packetSequencingText.Contains("PlayfieldById")
                 || packetSequencingText.Contains("dynel.Dispose"),
                 "PacketSequencingCoordinator must not own teleport packet construction, destination lookup, or disposal mechanics.");
+            Assert.IsFalse(
+                transferText.Contains("TeleportMessageHandler")
+                || transferText.Contains("ZoneRedirectionMessage")
+                || transferText.Contains("SendCompressed")
+                || transferText.Contains("PlayfieldById")
+                || transferText.Contains("new Playfield("),
+                "PlayfieldTransferRuntimeService must not own teleport packet construction, transport, or destination lookup.");
+            Assert.IsTrue(
+                playfieldText.Contains("private void AnnouncePlayfieldTransferDespawn(Dynel dynel)")
+                && playfieldText.Contains("DespawnMessage despawnMessage = DespawnMessageHandler.Default.Create(dynel.Identity);")
+                && playfieldText.Contains("this.AnnounceOthers(despawnMessage, dynel.Identity);")
+                && playfieldText.Contains("private static void ApplyPlayfieldTransferState(Dynel dynel, Coordinate destination, IQuaternion heading)")
+                && playfieldText.Contains("dynel.RawCoordinates = new Vector3()")
+                && playfieldText.Contains("dynel.RawHeading = new Vector.Quaternion")
+                && playfieldText.Contains("private IPlayfield ResolveOrCreatePlayfieldTransferDestination(Identity playfield)")
+                && playfieldText.Contains("IPlayfield newPlayfield = this.server.PlayfieldById(playfield);")
+                && playfieldText.Contains("newPlayfield = new Playfield(this.server, playfield);")
+                && playfieldText.Contains("private static void CompletePlayfieldTransferDispose(Dynel dynel, IPlayfield newPlayfield)")
+                && playfieldText.Contains("dynel.Controller.Client = null;")
+                && playfieldText.Contains("dynel.IsTeleporting = true;")
+                && playfieldText.Contains("dynel.Dispose();")
+                && playfieldText.Contains("private void SendPlayfieldTransferRedirect(ZoneClient client, Identity playfield)")
+                && playfieldText.Contains("var redirect = new ZoneRedirectionMessage")
+                && playfieldText.Contains("client.SendCompressed(redirect);"),
+                "Playfield must keep transfer callbacks that own despawn broadcast, state mutation, destination lookup, disposal, and redirect send.");
             Assert.IsFalse(
                 teleportMethod.Contains("PlayfieldLifecycleTrace."),
                 "No zoning PlayfieldLifecycleTrace points exist yet; this guardrail protects current lifecycle/order text instead.");
@@ -3428,17 +3466,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "private bool TryCompleteGridTeleportInCurrentPlayfield(");
 
             Assert.IsTrue(
-                teleportMethod.Contains("IPlayfield newPlayfield = this.server.PlayfieldById(playfield);")
-                && teleportMethod.Contains("newPlayfield = new Playfield(this.server, playfield);")
-                && teleportMethod.Contains("DespawnMessage despawnMessage = DespawnMessageHandler.Default.Create(dynel.Identity);")
-                && teleportMethod.Contains("this.AnnounceOthers(despawnMessage, dynel.Identity);")
-                && teleportMethod.Contains("dynel.RawCoordinates = new Vector3()")
-                && teleportMethod.Contains("dynel.RawHeading = new Vector.Quaternion")
-                && teleportMethod.Contains("dynel.Controller.Client = null;")
-                && teleportMethod.Contains("dynel.Dispose();")
-                && teleportMethod.Contains("var redirect = new ZoneRedirectionMessage")
-                && teleportMethod.Contains("client.SendCompressed(redirect);"),
-                "Destination lookup, despawn broadcast, coordinate mutation, client detach/dispose, and redirect must remain in Playfield.");
+                playfieldText.Contains("private void AnnouncePlayfieldTransferDespawn(Dynel dynel)")
+                && playfieldText.Contains("private static void ApplyPlayfieldTransferState(Dynel dynel, Coordinate destination, IQuaternion heading)")
+                && playfieldText.Contains("private IPlayfield ResolveOrCreatePlayfieldTransferDestination(Identity playfield)")
+                && playfieldText.Contains("private static void CompletePlayfieldTransferDispose(Dynel dynel, IPlayfield newPlayfield)")
+                && playfieldText.Contains("private void SendPlayfieldTransferRedirect(ZoneClient client, Identity playfield)"),
+                "Destination lookup, despawn broadcast, coordinate mutation, client detach/dispose, and redirect callbacks must remain in Playfield.");
             Assert.IsTrue(
                 localTeleportMethod.Contains("TeleportMessageHandler.Default.SendLocal("),
                 "Same-playfield local teleport packet path must remain outside PacketSequencingCoordinator.");
@@ -3874,16 +3907,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string disconnectAllClients = ExtractMethodBlock(playfieldText, "public void DisconnectAllClients()");
             string numberOfDynels = ExtractMethodBlock(playfieldText, "public int NumberOfDynels()");
             string numberOfPlayers = ExtractMethodBlock(playfieldText, "public int NumberOfPlayers()");
-            string teleport = ExtractMethodBlock(
+            string transferDestination = ExtractMethodBlock(
                 playfieldText,
-                "public void Teleport(Dynel dynel, Coordinate destination, IQuaternion heading, Identity playfield)");
+                "private IPlayfield ResolveOrCreatePlayfieldTransferDestination(Identity playfield)");
 
             string[] intentionalGlobalOrCrossPlayfieldExceptions =
                 {
                     "DisconnectAllClients: global CanbeAffected character scan for server shutdown/dispose.",
                     "NumberOfDynels: global CanbeAffected count, not playfield-local registry count.",
                     "NumberOfPlayers: global CanbeAffected Character count, not playfield-local registry count.",
-                    "Teleport: cross-playfield Pool.GetObject<Playfield> handoff path."
+                    "Playfield transfer destination helper: cross-playfield Pool.GetObject<Playfield> handoff path."
                 };
             Assert.AreEqual(
                 4,
@@ -3902,7 +3935,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Pool.Instance.GetAll<Character>((int)IdentityType.CanbeAffected).Count()"),
                 intentionalGlobalOrCrossPlayfieldExceptions[2]);
             Assert.IsTrue(
-                teleport.Contains("Pool.Instance.GetObject<Playfield>("),
+                transferDestination.Contains("Pool.Instance.GetObject<Playfield>("),
                 intentionalGlobalOrCrossPlayfieldExceptions[3]);
 
             Assert.AreEqual(
