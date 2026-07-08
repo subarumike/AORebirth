@@ -127,6 +127,10 @@ namespace AORebirth.Core.Playfields
             {
                 SetHeadMesh(mobCharacter, spawn.HeadMesh);
             }
+            else
+            {
+                ClearTemplateHeadMesh(mobCharacter);
+            }
         }
 
         private static void AssignCapturedPatrolWaypoint(Character mobCharacter, CapturedSubwaySpawnDefinition spawn)
@@ -156,6 +160,12 @@ namespace AORebirth.Core.Playfields
             SetMobStat(mobCharacter, StatIds.headmesh, headMesh);
             mobCharacter.MeshLayer.AddMesh(0, headMesh, 0, 4);
             mobCharacter.SocialMeshLayer.AddMesh(0, headMesh, 0, 4);
+        }
+
+        private static void ClearTemplateHeadMesh(Character mobCharacter)
+        {
+            mobCharacter.MeshLayer.RemoveMesh(0, 0, 0, 4);
+            mobCharacter.SocialMeshLayer.RemoveMesh(0, 0, 0, 4);
         }
 
         private static void SetMobStat(ICharacter mobCharacter, StatIds stat, int value)

@@ -956,6 +956,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 orchestratorText.Contains("SetMobStat(mobCharacter, StatIds.catmesh, spawn.MonsterData);")
                 || orchestratorText.Contains("SetMobStat(mobCharacter, StatIds.displaycatmesh, spawn.MonsterData);"),
                 "Captured Subway spawns must not overwrite template mesh stats with MonsterData ids.");
+            Assert.IsTrue(
+                orchestratorText.Contains("ClearTemplateHeadMesh(mobCharacter);")
+                && orchestratorText.Contains("mobCharacter.MeshLayer.RemoveMesh(0, 0, 0, 4);"),
+                "Captured Subway no-headmesh mobs must clear template zero mesh layers to preserve live Meshes=count=0 SCFU shape.");
         }
 
         [TestMethod]
