@@ -679,22 +679,48 @@ namespace AORebirth.Core.Playfields
                     playfield);
             }
 
-            // Send packet, disconnect, and other playfield waits for connect
+            this.runtimeSystems.CompletePlayfieldTransfer(
+                dynel,
+                destination,
+                heading,
+                playfield,
+                this.AnnouncePlayfieldTransferDespawn,
+                ApplyPlayfieldTransferState,
+                CapturePlayfieldTransferClient,
+                this.ResolveOrCreatePlayfieldTransferDestination,
+                CompletePlayfieldTransferDispose,
+                client => this.SendPlayfieldTransferRedirect(client, playfield));
+        }
 
+        private void ClearPlayfieldTransferContactState(int dynelId)
+        {
+            this.runtimeSystems.ClearStatelTransitionContactState(dynelId);
+        }
+
+        private static void DisableTimersForPlayfieldTransfer(Dynel dynel)
+        {
+            dynel.DoNotDoTimers = true;
+        }
+
+        private void AnnouncePlayfieldTransferDespawn(Dynel dynel)
+        {
             DespawnMessage despawnMessage = DespawnMessageHandler.Default.Create(dynel.Identity);
             this.AnnounceOthers(despawnMessage, dynel.Identity);
+        }
+
+        private static void ApplyPlayfieldTransferState(Dynel dynel, Coordinate destination, IQuaternion heading)
+        {
             dynel.RawCoordinates = new Vector3() { X = destination.x, Y = destination.y, Z = destination.z };
             dynel.RawHeading = new Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
+        }
 
-            // IMPORTANT!!
-            // Dispose the character object, save new playfield data and then recreate it
-            // else you would end up at weird coordinates in the same playfield
+        private static ZoneClient CapturePlayfieldTransferClient(Dynel dynel)
+        {
+            return (ZoneClient)dynel.Controller.Client;
+        }
 
-            // Save client object
-            ZoneClient client = (ZoneClient)dynel.Controller.Client;
-
-            // Set client=null so dynel can really dispose
-
+        private IPlayfield ResolveOrCreatePlayfieldTransferDestination(Identity playfield)
+        {
             IPlayfield newPlayfield = this.server.PlayfieldById(playfield);
             Pool.Instance.GetObject<Playfield>(
                 Identity.None,
@@ -705,11 +731,19 @@ namespace AORebirth.Core.Playfields
                 newPlayfield = new Playfield(this.server, playfield);
             }
 
+            return newPlayfield;
+        }
+
+        private static void CompletePlayfieldTransferDispose(Dynel dynel, IPlayfield newPlayfield)
+        {
             dynel.Playfield = newPlayfield;
             dynel.Controller.Client = null;
             dynel.IsTeleporting = true;
             dynel.Dispose();
+        }
 
+        private void SendPlayfieldTransferRedirect(ZoneClient client, Identity playfield)
+        {
             LogUtil.Debug(DebugInfoDetail.Database, "Saving to pf " + playfield.Instance);
 
             // TODO: Get new server ip from chatengine (which has to log all zoneengine's playfields)
@@ -739,16 +773,6 @@ namespace AORebirth.Core.Playfields
                 client.SendCompressed(redirect);
             }
             // client.Server.DisconnectClient(client);
-        }
-
-        private void ClearPlayfieldTransferContactState(int dynelId)
-        {
-            this.runtimeSystems.ClearStatelTransitionContactState(dynelId);
-        }
-
-        private static void DisableTimersForPlayfieldTransfer(Dynel dynel)
-        {
-            dynel.DoNotDoTimers = true;
         }
 
         private bool TryCompleteGridTeleportInCurrentPlayfield(

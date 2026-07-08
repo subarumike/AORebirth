@@ -318,6 +318,7 @@
     <Compile Include="Core\Playfields\PlayfieldStatUpdateRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldStaticDynelRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs" />
+    <Compile Include="Core\Playfields\PlayfieldTransferRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVendorRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs" />

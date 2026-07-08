@@ -80,6 +80,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle;
 
+        private readonly PlayfieldTransferRuntimeService transfers;
+
         private readonly PlayfieldVendorRuntimeService vendors;
 
         private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout;
@@ -134,6 +136,7 @@ namespace ZoneEngine.Core.Playfields
             this.statUpdates = new PlayfieldStatUpdateRuntimeService();
             this.staticDynelRuntime = new PlayfieldStaticDynelRuntimeService();
             this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
+            this.transfers = new PlayfieldTransferRuntimeService();
             this.vendors = new PlayfieldVendorRuntimeService();
             this.visibilityFanout = new PlayfieldVisibilityFanoutRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
@@ -627,6 +630,31 @@ namespace ZoneEngine.Core.Playfields
             Action<Dynel> disableTimers)
         {
             this.lifecycle.PreparePlayfieldTransfer(dynel, clearTransferContactState, disableTimers);
+        }
+
+        internal void CompletePlayfieldTransfer(
+            Dynel dynel,
+            Coordinate destination,
+            IQuaternion heading,
+            Identity playfield,
+            Action<Dynel> announceDespawn,
+            Action<Dynel, Coordinate, IQuaternion> applyTransferState,
+            Func<Dynel, ZoneClient> captureClient,
+            Func<Identity, IPlayfield> resolveDestinationPlayfield,
+            Action<Dynel, IPlayfield> finalizeTransferDispose,
+            Action<ZoneClient> sendRedirect)
+        {
+            this.transfers.CompletePlayfieldTransfer(
+                dynel,
+                destination,
+                heading,
+                playfield,
+                announceDespawn,
+                applyTransferState,
+                captureClient,
+                resolveDestinationPlayfield,
+                finalizeTransferDispose,
+                sendRedirect);
         }
 
         internal void ClearStatelTransitionContactState(int dynelId)
