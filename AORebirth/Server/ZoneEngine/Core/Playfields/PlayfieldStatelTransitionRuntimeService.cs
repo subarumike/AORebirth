@@ -71,6 +71,34 @@ namespace AORebirth.Core.Playfields
 
         private const int CapturedSubwayPlayfieldId = 127;
 
+        private const int CapturedSubwayEntrySourcePlayfieldId = 655;
+
+        private const uint CapturedSubwayEntrySourceDoorInstance = 0xC01A028F;
+
+        private const float CapturedSubwayEntrySourceX = 3305.5f;
+
+        private const float CapturedSubwayEntrySourceY = 35.3f;
+
+        private const float CapturedSubwayEntrySourceZ = 836.4f;
+
+        private const float CapturedSubwayEntryRadius = 4.0f;
+
+        private const float CapturedSubwayEntryVerticalTolerance = 8.0f;
+
+        private const float CapturedSubwayEntranceLandingX = 71.4f;
+
+        private const float CapturedSubwayEntranceLandingY = 115.6f;
+
+        private const float CapturedSubwayEntranceLandingZ = 319.0f;
+
+        private const float CapturedSubwayEntranceHeadingX = 0.707102f;
+
+        private const float CapturedSubwayEntranceHeadingY = 0.0f;
+
+        private const float CapturedSubwayEntranceHeadingZ = 0.707112f;
+
+        private const float CapturedSubwayEntranceHeadingW = 0.0f;
+
         private const float CapturedSubwayExitSourceX = 64.2f;
 
         private const float CapturedSubwayExitSourceY = 115.6f;
@@ -175,6 +203,15 @@ namespace AORebirth.Core.Playfields
             Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
         {
             if (IsPostZoneCollisionGraceActive(dynel))
+            {
+                return;
+            }
+
+            if (this.TryHandleCapturedSubwayProxyEntry(
+                dynel,
+                playfieldIdentity,
+                stopMovement,
+                teleportToPlayfield))
             {
                 return;
             }
@@ -343,6 +380,75 @@ namespace AORebirth.Core.Playfields
                 PostZoneCollisionGraceUntil.Remove(dynel.Identity.Instance);
                 return false;
             }
+        }
+
+        private bool TryHandleCapturedSubwayProxyEntry(
+            ICharacter character,
+            Identity playfieldIdentity,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
+        {
+            if (character == null
+                || playfieldIdentity.Instance != CapturedSubwayEntrySourcePlayfieldId
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            double deltaX = sourceX - CapturedSubwayEntrySourceX;
+            double deltaZ = sourceZ - CapturedSubwayEntrySourceZ;
+            double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
+            double verticalDistance = Math.Abs(sourceY - CapturedSubwayEntrySourceY);
+            if (horizontalDistanceSquared > CapturedSubwayEntryRadius * CapturedSubwayEntryRadius
+                || verticalDistance > CapturedSubwayEntryVerticalTolerance)
+            {
+                return false;
+            }
+
+            var destination = new Coordinate(
+                CapturedSubwayEntranceLandingX,
+                CapturedSubwayEntranceLandingY,
+                CapturedSubwayEntranceLandingZ);
+            var heading = new RuntimeQuaternion(
+                CapturedSubwayEntranceHeadingX,
+                CapturedSubwayEntranceHeadingY,
+                CapturedSubwayEntranceHeadingZ,
+                CapturedSubwayEntranceHeadingW);
+
+            character.Stats[StatIds.externaldoorinstance].BaseValue = CapturedSubwayEntrySourceDoorInstance;
+            character.Stats[StatIds.externalplayfieldinstance].BaseValue = CapturedSubwayEntrySourcePlayfieldId;
+
+            stopMovement(character);
+            teleportToPlayfield(dynel, destination, heading, CapturedSubwayPlayfieldId);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Subway proxy entry teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) sourceDoor={5:X8} destPf={6} dest=({7:F3},{8:F3},{9:F3}) evidence=server_log_20260708_1634 user_extended_location_20260708_2135",
+                    character.Identity.ToString(true),
+                    playfieldIdentity.Instance,
+                    sourceX,
+                    sourceY,
+                    sourceZ,
+                    CapturedSubwayEntrySourceDoorInstance,
+                    CapturedSubwayPlayfieldId,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
         }
 
         private bool TryHandleCapturedSubwayProxyExit(
