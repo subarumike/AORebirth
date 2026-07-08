@@ -949,9 +949,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 providerText.Contains("122002"),
                 "CapturedSubwayContentProvider must bind content to resource/playfield 127, not capture object Playfield2:122002.");
             Assert.IsTrue(
-                orchestratorText.Contains("SetMobStat(mobCharacter, StatIds.catmesh, spawn.MonsterData);")
+                orchestratorText.Contains("SetMobStat(mobCharacter, StatIds.monsterdata, spawn.MonsterData);")
                 && orchestratorText.Contains("playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));"),
                 "Captured Subway spawns must remain visible, attackable NPCs using existing runtime/corpse paths.");
+            Assert.IsFalse(
+                orchestratorText.Contains("SetMobStat(mobCharacter, StatIds.catmesh, spawn.MonsterData);")
+                || orchestratorText.Contains("SetMobStat(mobCharacter, StatIds.displaycatmesh, spawn.MonsterData);"),
+                "Captured Subway spawns must not overwrite template mesh stats with MonsterData ids.");
         }
 
         [TestMethod]

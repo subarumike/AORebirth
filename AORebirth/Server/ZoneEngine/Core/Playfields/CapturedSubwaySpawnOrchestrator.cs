@@ -116,8 +116,6 @@ namespace AORebirth.Core.Playfields
             SetMobStat(mobCharacter, StatIds.monsterdata, spawn.MonsterData);
             SetMobStat(mobCharacter, StatIds.monsterscale, spawn.MonsterScale);
             SetMobStat(mobCharacter, StatIds.visualflags, 31);
-            SetMobStat(mobCharacter, StatIds.catmesh, spawn.MonsterData);
-            SetMobStat(mobCharacter, StatIds.displaycatmesh, spawn.MonsterData);
             SetMobStat(mobCharacter, StatIds.currentmovementmode, (int)MoveModes.Run);
             SetMobStat(mobCharacter, StatIds.prevmovementmode, (int)MoveModes.Run);
             SetMobStat(mobCharacter, StatIds.runspeed, spawn.RunSpeed);
