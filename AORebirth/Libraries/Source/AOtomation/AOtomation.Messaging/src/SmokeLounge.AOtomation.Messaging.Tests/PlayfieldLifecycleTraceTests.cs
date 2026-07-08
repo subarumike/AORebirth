@@ -1031,6 +1031,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs"));
+            string visibilityPacketText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs"));
             string announcementText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -1071,6 +1075,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new PlayfieldTimedLifecycleRuntimeService()",
                     "new PlayfieldVendorRuntimeService()",
                     "new PlayfieldVisibilityFanoutRuntimeService()",
+                    "new PlayfieldVisibilityPacketRuntimeService(this.visibilityFanout, this.packetSequences)",
                     "new PlayfieldWallCollisionRuntimeService()",
                     "new PlayfieldAnnouncementRuntimeService()",
                     "new PlayfieldPublishFanoutRuntimeService()",
@@ -1315,6 +1320,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle")
                 && runtimeSystemsText.Contains("private readonly PlayfieldVendorRuntimeService vendors")
                 && runtimeSystemsText.Contains("private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout")
+                && runtimeSystemsText.Contains("private readonly PlayfieldVisibilityPacketRuntimeService visibilityPackets")
                 && runtimeSystemsText.Contains("private readonly PlayfieldWallCollisionRuntimeService wallCollision")
                 && runtimeSystemsText.Contains("private readonly PlayfieldAnnouncementRuntimeService announcements")
                 && runtimeSystemsText.Contains("private readonly PlayfieldPublishFanoutRuntimeService publishFanout")
@@ -1368,7 +1374,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.wallCollision.CheckWallCollision(")
                 && runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToCharacterClients(")
                 && runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToOtherCharacterClients(")
-                && runtimeSystemsText.Contains("this.visibilityFanout.FanoutExistingCharactersForScfu(")
+                && runtimeSystemsText.Contains("this.visibilityPackets.SendExistingCharacterVisibilityToClient(")
+                && runtimeSystemsText.Contains("this.visibilityPackets.AnnounceJoiningCharacterVisibility(")
                 && runtimeSystemsText.Contains("this.announcements.AnnounceToCharacterClients(")
                 && runtimeSystemsText.Contains("this.announcements.AnnounceToOtherCharacterClients(")
                 && runtimeSystemsText.Contains("this.publishFanout.PublishMessageBodyToClient(")
@@ -1387,7 +1394,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.statUpdates.SendChangedStatsIfChanged(")
                 && runtimeSystemsText.Contains("this.statUpdates.SendChangedStatsIfClient(")
                 && runtimeSystemsText.Contains("this.statUpdates.RunPlayerDeathStatUpdateSequence(")
-                && runtimeSystemsText.Contains("this.packetSequences.RunVisibilityPacketPairSequence(")
                 && runtimeSystemsText.Contains("this.packetSequences.RunPlayfieldTransferBeginSequence("),
                 "PlayfieldRuntimeSystems must delegate runtime entry points through named runtime services.");
             Assert.IsTrue(
@@ -1423,6 +1429,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 projectText.Contains(@"Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldVisibilityFanoutRuntimeService.");
             Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldVisibilityPacketRuntimeService.");
+            Assert.IsTrue(
                 visibilityFanoutText.Contains("internal sealed class PlayfieldVisibilityFanoutRuntimeService")
                 && visibilityFanoutText.Contains("internal void AnnounceToCharacterClients(")
                 && visibilityFanoutText.Contains("internal void AnnounceToOtherCharacterClients(")
@@ -1438,6 +1447,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || visibilityFanoutText.Contains("PacketSequencing")
                 || visibilityFanoutText.Contains("Pool.Instance"),
                 "PlayfieldVisibilityFanoutRuntimeService must not own packet construction, sends, logging, sequencing, or Pool scans.");
+            Assert.IsTrue(
+                visibilityPacketText.Contains("internal sealed class PlayfieldVisibilityPacketRuntimeService")
+                && visibilityPacketText.Contains("internal void SendExistingCharacterVisibilityToClient(")
+                && visibilityPacketText.Contains("this.visibilityFanout.FanoutExistingCharactersForScfu(")
+                && visibilityPacketText.Contains("SimpleCharFullUpdate.ConstructMessage(temp)")
+                && visibilityPacketText.Contains("this.packetSequences.RunVisibilityPacketPairSequence(")
+                && visibilityPacketText.Contains("LogUtil.Debug(")
+                && visibilityPacketText.Contains("internal void AnnounceJoiningCharacterVisibility(")
+                && visibilityPacketText.Contains("announceVisibilityMessage(SimpleCharFullUpdate.ConstructMessage(temp))")
+                && visibilityPacketText.Contains("announceVisibilityMessage(charInPlay)"),
+                "PlayfieldVisibilityPacketRuntimeService must own visibility packet-pair construction, sequencing delegation, and debug logging.");
+            Assert.IsFalse(
+                visibilityPacketText.Contains("SendCompressed")
+                || visibilityPacketText.Contains("Publish(")
+                || visibilityPacketText.Contains("Pool.Instance"),
+                "PlayfieldVisibilityPacketRuntimeService must not own direct transport, publish wrappers, or Pool scans.");
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldAnnouncementRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldAnnouncementRuntimeService.");
@@ -2997,11 +3022,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playfieldText.Contains("this.runtimeSystems.SendPrivateCity"),
                 "Private-city ready/init packet construction and delegation must remain outside the lifecycle coordinator.");
             Assert.IsTrue(
-                playfieldText.Contains("this.Announce(SimpleCharFullUpdate.ConstructMessage(temp))")
-                && playfieldText.Contains("charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 };")
-                && playfieldText.Contains("this.Announce(charInPlay)")
+                playfieldText.Contains("this.runtimeSystems.AnnounceJoiningCharacterVisibility(character, body => this.Announce(body));")
                 && playfieldText.Contains("public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)"),
-                "SCFU and CharInPlay broadcast mechanics must remain in Playfield.");
+                "SCFU and CharInPlay broadcast entry points must remain in Playfield.");
             Assert.IsTrue(
                 zoneClientText.Contains("this.stopDispatcher = true;")
                 && zoneClientText.Contains("this.zStream.Close();")
@@ -3023,6 +3046,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string runtimeSystemsText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+            string visibilityPacketText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs"));
             string privateCityReadyInitText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PrivateCityReadyInitCoordinator.cs"));
             string projectText = File.ReadAllText(
@@ -3040,9 +3065,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "ZoneClient must own and expose the packet sequencing coordinator.");
             Assert.IsTrue(
                 runtimeSystemsText.Contains("private readonly PacketSequencingCoordinator packetSequencing")
-                && runtimeSystemsText.Contains("internal void RunVisibilityPacketPairSequence(")
+                && runtimeSystemsText.Contains("internal void SendExistingCharacterVisibilityToClient(")
+                && runtimeSystemsText.Contains("internal void AnnounceJoiningCharacterVisibility(")
                 && runtimeSystemsText.Contains("internal void RunPlayfieldTransferBeginSequence("),
-                "PlayfieldRuntimeSystems must expose named runtime packet sequencing methods for playfield-local sequencing.");
+                "PlayfieldRuntimeSystems must expose named visibility and packet sequencing entry points for playfield-local sequencing.");
             Assert.IsTrue(
                 clientConnectedText.Contains("client.PacketSequencing.BeginSessionReadyBlock(")
                 && clientConnectedText.Contains("client.PacketSequencing.RunSessionReadyFullCharacterSequence(")
@@ -3092,7 +3118,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)");
             Assert.AreEqual(
                 2,
-                CountOccurrences(playfieldText, "this.runtimeSystems.RunVisibilityPacketPairSequence("),
+                CountOccurrences(playfieldText, "this.runtimeSystems.SendExistingCharacterVisibilityToClient(")
+                + CountOccurrences(playfieldText, "this.runtimeSystems.AnnounceJoiningCharacterVisibility("),
                 "Playfield must route both existing-player and joining-player SCFU/CharInPlay pairs through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPreFullCharacterOrgInitSequence(")
@@ -3157,13 +3184,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && clientConnectedText.Contains("() => currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client })"),
                 "Session packet send expressions must remain in ClientConnected for these sequencing slices.");
             Assert.IsTrue(
-                playfieldText.Contains("SimpleCharFullUpdateMessage simpleCharFullUpdate = SimpleCharFullUpdate.ConstructMessage(temp);")
-                && playfieldText.Contains("() => sendSCFUs.toClient.SendCompressed(simpleCharFullUpdate)")
-                && playfieldText.Contains("charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 };")
-                && playfieldText.Contains("() => sendSCFUs.toClient.SendCompressed(charInPlay)")
-                && playfieldText.Contains("() => this.Announce(SimpleCharFullUpdate.ConstructMessage(temp))")
-                && playfieldText.Contains("() => this.Announce(charInPlay)"),
-                "Visibility packet construction and send expressions must remain in Playfield.");
+                playfieldText.Contains("this.runtimeSystems.SendExistingCharacterVisibilityToClient(")
+                && playfieldText.Contains("body => sendSCFUs.toClient.SendCompressed(body)")
+                && playfieldText.Contains("this.runtimeSystems.AnnounceJoiningCharacterVisibility(character, body => this.Announce(body));"),
+                "Visibility packet send callbacks must remain in Playfield while packet construction moves behind runtime systems.");
             Assert.IsTrue(
                 privateCityReadyInitText.Contains("new OrgInfoPacketMessage")
                 && privateCityReadyInitText.Contains("new PlayfieldAllTowersMessage")
@@ -3319,10 +3343,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 clientConnectedText.Contains("client.PacketSequencing.RunSessionReadyFullCharacterSequence(")
                 && clientConnectedText.Contains("client.PacketSequencing.RunVisibilityInitializationSequence("),
                 "PacketSequencingCoordinator must own session ready/full-character/visibility initialization sequencing.");
+            string visibilityPacketSequenceText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs"));
             Assert.AreEqual(
                 2,
-                CountOccurrences(playfieldText, "this.runtimeSystems.RunVisibilityPacketPairSequence("),
-                "PlayfieldRuntimeSystems must own both SCFU -> CharInPlay visibility pair sequence entry points.");
+                CountOccurrences(visibilityPacketSequenceText, "this.packetSequences.RunVisibilityPacketPairSequence("),
+                "Playfield visibility packet runtime must own both SCFU -> CharInPlay visibility pair sequence entry points.");
             Assert.IsTrue(
                 privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPreFullCharacterOrgInitSequence(")
                 && privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPlayfieldReadyBlockSequence("),
@@ -3582,8 +3608,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "return this.runtimeSystems.FindCharactersInRange(dynel, range).ToList();",
                     "this.runtimeSystems.AnnounceMessageToCharacterClients(",
                     "this.runtimeSystems.AnnounceMessageToOtherCharacterClients(",
-                    "this.runtimeSystems.FanoutExistingCharactersForScfu(",
-                    "this.runtimeSystems.Characters()",
+                    "this.runtimeSystems.SendExistingCharacterVisibilityToClient(",
+                    "this.runtimeSystems.AnnounceJoiningCharacterVisibility(",
                     "this.runtimeSystems.StaticDynels()"
                 };
             for (int i = 0; i < playfieldDelegations.Length; i++)
@@ -3616,6 +3642,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs"));
+            string visibilityPacketText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs"));
             string announcementText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -3637,6 +3667,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string announce = ExtractMethodBlock(playfieldText, "public void Announce(MessageBody messageBody)");
             string announceOthers = ExtractMethodBlock(playfieldText, "public void AnnounceOthers(MessageBody messageBody, Identity dontSend)");
             string sendScfus = ExtractMethodBlock(playfieldText, "public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)");
+            string announcePlayerVisibility = ExtractMethodBlock(playfieldText, "public void AnnouncePlayerVisibility(ICharacter character)");
             string dynelDropPosition = ExtractMethodBlock(playfieldText, "private Coordinate DynelDropPosition(Identity identity)");
             string findNamed = ExtractMethodBlock(playfieldText, "public INamedEntity FindNamedEntityByIdentity(Identity identity)");
 
@@ -3650,18 +3681,25 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && !announceOthers.Contains("this.runtimeSystems.PublishMessageBodyToClient("),
                 "AnnounceOthers must delegate message fanout orchestration through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
-                sendScfus.Contains("this.runtimeSystems.FanoutExistingCharactersForScfu(")
-                && sendScfus.Contains("SimpleCharFullUpdate.ConstructMessage(temp)")
-                && sendScfus.Contains("sendSCFUs.toClient.SendCompressed(simpleCharFullUpdate)")
-                && sendScfus.Contains("new CharInPlayMessage")
-                && sendScfus.Contains("sendSCFUs.toClient.SendCompressed(charInPlay)")
-                && sendScfus.Contains("LogUtil.Debug("),
-                "SendSCFUsToClient must delegate recipient fanout while keeping packet construction, send, and log work in Playfield.");
+                sendScfus.Contains("this.runtimeSystems.SendExistingCharacterVisibilityToClient(")
+                && sendScfus.Contains("body => sendSCFUs.toClient.SendCompressed(body)")
+                && !sendScfus.Contains("SimpleCharFullUpdate.ConstructMessage(temp)")
+                && !sendScfus.Contains("LogUtil.Debug("),
+                "SendSCFUsToClient must delegate existing-character visibility packet orchestration through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                announcePlayerVisibility.Contains("this.runtimeSystems.AnnounceJoiningCharacterVisibility(character, body => this.Announce(body));")
+                && !announcePlayerVisibility.Contains("CharInPlayMessage")
+                && !announcePlayerVisibility.Contains("SimpleCharFullUpdate.ConstructMessage(temp)"),
+                "AnnouncePlayerVisibility must delegate joining-character visibility packet orchestration through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToCharacterClients(this.CharacterEntities(), publishToCharacterClient);")
                 && runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToOtherCharacterClients(")
-                && runtimeSystemsText.Contains("this.visibilityFanout.FanoutExistingCharactersForScfu("),
-                "PlayfieldRuntimeSystems must feed visibility fanout from registry-backed views.");
+                && runtimeSystemsText.Contains("this.visibilityPackets.SendExistingCharacterVisibilityToClient("),
+                "PlayfieldRuntimeSystems must feed visibility fanout and visibility packet orchestration from registry-backed views.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("this.visibilityPackets.SendExistingCharacterVisibilityToClient(")
+                && runtimeSystemsText.Contains("this.visibilityPackets.AnnounceJoiningCharacterVisibility("),
+                "PlayfieldRuntimeSystems must route visibility packet orchestration through PlayfieldVisibilityPacketRuntimeService.");
             Assert.IsTrue(
                 visibilityFanoutText.Contains("foreach (Character entity in characters)")
                 && visibilityFanoutText.Contains("if (entity.Controller.Client != null)")
@@ -3682,6 +3720,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || visibilityFanoutText.Contains("PacketSequencing")
                 || visibilityFanoutText.Contains("Pool.Instance"),
                 "Visibility fanout service must not own packet construction, sends, logging, sequencing, or Pool scans.");
+            Assert.IsTrue(
+                visibilityPacketText.Contains("this.visibilityFanout.FanoutExistingCharactersForScfu(")
+                && visibilityPacketText.Contains("this.packetSequences.RunVisibilityPacketPairSequence(")
+                && visibilityPacketText.Contains("sendVisibilityMessage(simpleCharFullUpdate)")
+                && visibilityPacketText.Contains("announceVisibilityMessage(charInPlay)")
+                && visibilityPacketText.Contains("LogUtil.Debug("),
+                "Visibility packet service must own packet pair orchestration and debug logging.");
+            Assert.IsFalse(
+                visibilityPacketText.Contains("SendCompressed")
+                || visibilityPacketText.Contains("Publish(")
+                || visibilityPacketText.Contains("Pool.Instance"),
+                "Visibility packet service must not own direct transport, publish wrappers, or Pool scans.");
             Assert.IsTrue(
                 announcementText.Contains("foreach (Character entity in characters)")
                 && announcementText.Contains("if (entity.Controller.Client != null)")

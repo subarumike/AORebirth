@@ -319,6 +319,7 @@
     <Compile Include="Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVendorRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs" />
+    <Compile Include="Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldWallCollisionRuntimeService.cs" />
     <Compile Include="Core\Playfields\Playfields.cs" />
     <Compile Include="Core\Playfields\WallCollision.cs" />
