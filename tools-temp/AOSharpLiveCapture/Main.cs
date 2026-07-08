@@ -148,6 +148,7 @@ namespace AOSharpLiveCapture
         private DateTime lastPacketUtc;
         private DateTime localEnemyCombatContextUntilUtc;
         private string lastPlayfieldId = string.Empty;
+        private string lastCapturePlayfieldIdentity = string.Empty;
         private CombatLootSmoke combatLootSmoke;
         private bool initialized;
         private bool enemyFightCaptureEnabled;
@@ -925,6 +926,7 @@ namespace AOSharpLiveCapture
         private void OnPlayfieldInit(object sender, uint playfieldId)
         {
             this.lastPlayfieldId = playfieldId.ToString(CultureInfo.InvariantCulture);
+            this.lastCapturePlayfieldIdentity = Safe(() => Playfield.Identity.ToString());
             this.LogEvent("PLAYFIELD-INIT", this.lastPlayfieldId);
             this.knownCharacters.Clear();
             this.knownCorpses.Clear();
@@ -1020,6 +1022,9 @@ namespace AOSharpLiveCapture
         {
             try
             {
+                string playfieldIdentity = Safe(() => Playfield.Identity.ToString());
+                this.lastCapturePlayfieldIdentity = playfieldIdentity;
+
                 string localPlayer = DynelManager.LocalPlayer == null
                     ? "local=null"
                     : this.DescribeCharacter(DynelManager.LocalPlayer);
@@ -1032,7 +1037,7 @@ namespace AOSharpLiveCapture
                         reason,
                         Safe(() => Game.ServerId.ToString(CultureInfo.InvariantCulture)),
                         Safe(() => Game.ClientInst.ToString(CultureInfo.InvariantCulture)),
-                        Safe(() => Playfield.Identity.ToString()),
+                        playfieldIdentity,
                         Safe(() => DynelManager.Characters.Count().ToString(CultureInfo.InvariantCulture)),
                         Safe(() => DynelManager.NPCs.Count().ToString(CultureInfo.InvariantCulture)),
                         Safe(() => DynelManager.Corpses.Count().ToString(CultureInfo.InvariantCulture)),
@@ -3904,11 +3909,24 @@ namespace AOSharpLiveCapture
 
         private string GetCapturePlayfieldIdentity()
         {
+            if (!string.IsNullOrWhiteSpace(this.lastCapturePlayfieldIdentity))
+            {
+                return this.lastCapturePlayfieldIdentity;
+            }
+
             return Safe(() => Playfield.Identity.ToString());
         }
 
         private string GetCapturePlayfieldObjectId()
         {
+            string identity = this.GetCapturePlayfieldIdentity();
+            int separator = identity.IndexOf(':');
+            int end = identity.IndexOf(')', separator + 1);
+            if (separator >= 0 && end > separator)
+            {
+                return identity.Substring(separator + 1, end - separator - 1);
+            }
+
             return Safe(() => Playfield.Identity.Instance.ToString(CultureInfo.InvariantCulture));
         }
 
@@ -4794,6 +4812,7 @@ namespace AOSharpLiveCapture
             this.enemyStatUpdateRowCount = 0;
             this.localEnemyCombatContextUntilUtc = default(DateTime);
             this.lastPlayfieldId = string.Empty;
+            this.lastCapturePlayfieldIdentity = string.Empty;
             this.enemyFightCaptureEnabled = false;
             this.enemyFightCaptureStarted = false;
         }
