@@ -1007,6 +1007,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
+            string wallCollisionText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldWallCollisionRuntimeService.cs"));
             string statUpdateText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -1067,6 +1071,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new PlayfieldTimedLifecycleRuntimeService()",
                     "new PlayfieldVendorRuntimeService()",
                     "new PlayfieldVisibilityFanoutRuntimeService()",
+                    "new PlayfieldWallCollisionRuntimeService()",
                     "new PlayfieldAnnouncementRuntimeService()",
                     "new PlayfieldPublishFanoutRuntimeService()",
                     "new PlayfieldAOtomationDeliveryRuntimeService()",
@@ -1310,6 +1315,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle")
                 && runtimeSystemsText.Contains("private readonly PlayfieldVendorRuntimeService vendors")
                 && runtimeSystemsText.Contains("private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout")
+                && runtimeSystemsText.Contains("private readonly PlayfieldWallCollisionRuntimeService wallCollision")
                 && runtimeSystemsText.Contains("private readonly PlayfieldAnnouncementRuntimeService announcements")
                 && runtimeSystemsText.Contains("private readonly PlayfieldPublishFanoutRuntimeService publishFanout")
                 && runtimeSystemsText.Contains("private readonly PlayfieldAOtomationDeliveryRuntimeService aotomationDelivery")
@@ -1359,6 +1365,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && runtimeSystemsText.Contains("this.statelTransitions.CheckStatelCollision(")
                 && runtimeSystemsText.Contains("this.statelTransitions.PrimeStatelCollisionContacts(")
                 && runtimeSystemsText.Contains("this.statelTransitions.ClearContactState(dynelId);")
+                && runtimeSystemsText.Contains("this.wallCollision.CheckWallCollision(")
                 && runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToCharacterClients(")
                 && runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToOtherCharacterClients(")
                 && runtimeSystemsText.Contains("this.visibilityFanout.FanoutExistingCharactersForScfu(")
@@ -1680,6 +1687,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || statelTransitionText.Contains("new Identity"),
                 "PlayfieldStatelTransitionRuntimeService must not own packet construction, transport, playfield lookup, DB lookup, or handoff identity construction.");
             Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\PlayfieldWallCollisionRuntimeService.cs"),
+                "ZoneEngine project must compile PlayfieldWallCollisionRuntimeService.");
+            Assert.IsTrue(
+                wallCollisionText.Contains("internal sealed class PlayfieldWallCollisionRuntimeService")
+                && wallCollisionText.Contains("internal void CheckWallCollision(")
+                && wallCollisionText.Contains("isPostZoneCollisionGraceActive(dynel)")
+                && wallCollisionText.Contains("WallCollision.CheckCollision(")
+                && wallCollisionText.Contains("PlayfieldLoader.PFData.ContainsKey(destPlayfield)")
+                && wallCollisionText.Contains("PlayfieldDestination dest = destinationPlayfieldData.Destinations[destinationIndex];")
+                && wallCollisionText.Contains("float dist = WallCollision.Distance(")
+                && wallCollisionText.Contains("teleportToPlayfield("),
+                "PlayfieldWallCollisionRuntimeService must own wall-collision routing and destination-coordinate orchestration.");
+            Assert.IsFalse(
+                wallCollisionText.Contains("TeleportMessageHandler")
+                || wallCollisionText.Contains("ZoneRedirectionMessage")
+                || wallCollisionText.Contains("SendCompressed")
+                || wallCollisionText.Contains("new Identity")
+                || wallCollisionText.Contains("Pool.Instance"),
+                "PlayfieldWallCollisionRuntimeService must not own packet construction, transport, identity construction, or Pool lookup.");
+            Assert.IsTrue(
                 timedLifecycleText.Contains("internal sealed class PlayfieldTimedLifecycleRuntimeService")
                 && timedLifecycleText.Contains("internal void ProcessHeartbeatLifecycle(")
                 && timedLifecycleText.Contains("processPendingCorpseSpawns();")
@@ -1700,7 +1727,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 timedLifecycleText.Contains("Stats[")
                 || timedLifecycleText.Contains("SendChangedStats")
                 || timedLifecycleText.Contains("DoCombatTick")
-                || timedLifecycleText.Contains("CheckWallCollision")
                 || timedLifecycleText.Contains("CheckStatelCollision")
                 || timedLifecycleText.Contains("Announce(")
                 || timedLifecycleText.Contains("AttackInfo")
@@ -1734,6 +1760,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playfieldText.Contains("this.CheckWallCollision(dynel);")
                 && playfieldText.Contains("this.CheckStatelCollision(dynel);"),
                 "Playfield must retain regeneration math, follow, and collision behavior behind scheduler callbacks.");
+            string checkWallCollision = ExtractMethodBlock(playfieldText, "private void CheckWallCollision(ICharacter dynel)");
+            Assert.IsTrue(
+                checkWallCollision.Contains("this.runtimeSystems.CheckWallCollision(")
+                && checkWallCollision.Contains("PlayfieldStatelTransitionRuntimeService.IsPostZoneCollisionGraceActive")
+                && checkWallCollision.Contains("this.TeleportToPlayfield"),
+                "Playfield must delegate wall-collision routing while keeping post-zone grace and teleport callbacks.");
+            Assert.IsFalse(
+                checkWallCollision.Contains("WallCollision.CheckCollision(")
+                || checkWallCollision.Contains("PlayfieldLoader.PFData")
+                || checkWallCollision.Contains("WallCollision.Distance(")
+                || checkWallCollision.Contains("new Identity"),
+                "Playfield must not retain wall-collision destination lookup, coordinate math, or teleport identity construction.");
             string respawnPlayer = ExtractMethodBlock(playfieldText, "public void RespawnPlayer");
             Assert.IsTrue(
                 respawnPlayer.Contains("this.ResolvePlayerRespawnLocation(character, out destination, out destinationPlayfield);")
