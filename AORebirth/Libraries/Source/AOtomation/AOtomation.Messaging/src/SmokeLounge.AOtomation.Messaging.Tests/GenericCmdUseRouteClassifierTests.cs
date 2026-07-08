@@ -206,6 +206,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs");
             string teleportProxy = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\teleportproxy.cs");
             string teleportProxy2 = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\teleportproxy2.cs");
+            string statelTransitions =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs");
+            string playfield = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
             string project = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
 
             AssertContains(rules, "public const int CapturedSubwayPlayfieldId = 127;");
@@ -218,6 +221,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(rules, "public static bool TryResolveDestinationOverride(");
             AssertContains(teleportProxy, "SubwayTeleportProxyDestinationRules.TryResolveDestinationOverride");
             AssertContains(teleportProxy2, "SubwayTeleportProxyDestinationRules.TryResolveDestinationOverride");
+            AssertContains(statelTransitions, "private const int CapturedSubwayPlayfieldId = 127;");
+            AssertContains(statelTransitions, "private const float CapturedSubwayExitSourceX = 64.2f;");
+            AssertContains(statelTransitions, "TryHandleCapturedSubwayProxyExit");
+            AssertContains(statelTransitions, "Func<ICharacter, ProxyPlayfieldExitDestination> resolveProxyExitDestination");
+            AssertContains(playfield, "ResolveProxyExitDestination");
+            AssertContains(playfield, "character.Stats[StatIds.externaldoorinstance].BaseValue");
+            AssertContains(playfield, "character.Stats[StatIds.externalplayfieldinstance].Value");
             AssertContains(project, @"Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs");
         }
 

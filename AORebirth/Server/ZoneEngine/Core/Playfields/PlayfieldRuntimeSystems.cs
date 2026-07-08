@@ -709,6 +709,7 @@ namespace ZoneEngine.Core.Playfields
             IEnumerable<StatelData> collisionStatels,
             Func<ICharacter, int> resolvePrivateCityDestinationPlayfield,
             Func<ICharacter, int> resolveCharacterOrganizationInstance,
+            Func<ICharacter, ProxyPlayfieldExitDestination> resolveProxyExitDestination,
             Action<ICharacter> stopMovement,
             Action<ICharacter> sendCapturedPrivateCityEntrySocialStatus,
             Action<Dynel, Coordinate, AORebirth.Core.Vector.Quaternion, int> teleportToPlayfield)
@@ -719,6 +720,7 @@ namespace ZoneEngine.Core.Playfields
                 collisionStatels,
                 resolvePrivateCityDestinationPlayfield,
                 resolveCharacterOrganizationInstance,
+                resolveProxyExitDestination,
                 stopMovement,
                 sendCapturedPrivateCityEntrySocialStatus,
                 teleportToPlayfield);
