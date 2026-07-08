@@ -897,7 +897,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwaySpawnOrchestrator.cs"));
 
             Assert.IsTrue(moduleText.Contains("public sealed class SubwayContentModule : IPlayfieldContentModule"));
-            Assert.IsTrue(moduleText.Contains("private const int SubwayPlayfieldInstance = 122002"));
+            Assert.IsTrue(moduleText.Contains("private const int SubwayPlayfieldInstance = 127"));
+            Assert.IsTrue(
+                providerText.Contains("public const int SubwayPlayfieldInstance = 127"),
+                "Captured Subway NPC spawns must bind to the live/client-visible PF127 Subway proxy resource.");
             Assert.IsTrue(moduleText.Contains("registration.RegisterCapturedNpcSpawns();"));
             Assert.IsTrue(
                 moduleText.Contains("return false;"),
