@@ -8,7 +8,7 @@ namespace ZoneEngine.Core.Playfields
 
     internal sealed class CapturedSubwayContentProvider
     {
-        public const int SubwayPlayfieldInstance = 122002;
+        public const int SubwayPlayfieldInstance = 127;
 
         private static readonly CapturedSubwaySpawnDefinition[] SpawnDefinitions =
         {

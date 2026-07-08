@@ -8,7 +8,7 @@ namespace ZoneEngine.Core.Playfields.Content
 
     public sealed class SubwayContentModule : IPlayfieldContentModule
     {
-        private const int SubwayPlayfieldInstance = 122002;
+        private const int SubwayPlayfieldInstance = 127;
 
         public bool Supports(Identity playfieldIdentity)
         {
