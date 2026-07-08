@@ -222,6 +222,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(teleportProxy, "SubwayTeleportProxyDestinationRules.TryResolveDestinationOverride");
             AssertContains(teleportProxy2, "SubwayTeleportProxyDestinationRules.TryResolveDestinationOverride");
             AssertContains(statelTransitions, "private const int CapturedSubwayPlayfieldId = 127;");
+            AssertContains(statelTransitions, "private const int CapturedSubwayEntrySourcePlayfieldId = 655;");
+            AssertContains(statelTransitions, "private const uint CapturedSubwayEntrySourceDoorInstance = 0xC01A028F;");
+            AssertContains(statelTransitions, "private const float CapturedSubwayEntranceLandingX = 71.4f;");
+            AssertContains(statelTransitions, "TryHandleCapturedSubwayProxyEntry");
             AssertContains(statelTransitions, "private const float CapturedSubwayExitSourceX = 64.2f;");
             AssertContains(statelTransitions, "TryHandleCapturedSubwayProxyExit");
             AssertContains(statelTransitions, "Func<ICharacter, ProxyPlayfieldExitDestination> resolveProxyExitDestination");
