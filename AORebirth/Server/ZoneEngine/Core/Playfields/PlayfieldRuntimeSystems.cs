@@ -136,11 +136,11 @@ namespace ZoneEngine.Core.Playfields
             this.statUpdates = new PlayfieldStatUpdateRuntimeService();
             this.staticDynelRuntime = new PlayfieldStaticDynelRuntimeService();
             this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
-            this.transfers = new PlayfieldTransferRuntimeService();
-            this.vendors = new PlayfieldVendorRuntimeService();
-            this.visibilityFanout = new PlayfieldVisibilityFanoutRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
             this.packetSequences = new PlayfieldPacketSequencingRuntimeService(this.packetSequencing);
+            this.transfers = new PlayfieldTransferRuntimeService(this.lifecycle, this.packetSequences);
+            this.vendors = new PlayfieldVendorRuntimeService();
+            this.visibilityFanout = new PlayfieldVisibilityFanoutRuntimeService();
             this.visibilityPackets = new PlayfieldVisibilityPacketRuntimeService(this.visibilityFanout, this.packetSequences);
             this.wallCollision = new PlayfieldWallCollisionRuntimeService();
             this.privateCityReadyInit =
@@ -630,6 +630,39 @@ namespace ZoneEngine.Core.Playfields
             Action<Dynel> disableTimers)
         {
             this.lifecycle.PreparePlayfieldTransfer(dynel, clearTransferContactState, disableTimers);
+        }
+
+        internal void TransferToPlayfield(
+            Dynel dynel,
+            Coordinate destination,
+            IQuaternion heading,
+            Identity playfield,
+            Action<int> clearTransferContactState,
+            Action<Dynel> disableTimers,
+            Func<Dynel, Action> captureEnterZoningPhase,
+            Action sendTeleportPacket,
+            Action<Dynel> announceDespawn,
+            Action<Dynel, Coordinate, IQuaternion> applyTransferState,
+            Func<Dynel, ZoneClient> captureClient,
+            Func<Identity, IPlayfield> resolveDestinationPlayfield,
+            Action<Dynel, IPlayfield> finalizeTransferDispose,
+            Action<ZoneClient> sendRedirect)
+        {
+            this.transfers.TransferToPlayfield(
+                dynel,
+                destination,
+                heading,
+                playfield,
+                clearTransferContactState,
+                disableTimers,
+                captureEnterZoningPhase,
+                sendTeleportPacket,
+                announceDespawn,
+                applyTransferState,
+                captureClient,
+                resolveDestinationPlayfield,
+                finalizeTransferDispose,
+                sendRedirect);
         }
 
         internal void CompletePlayfieldTransfer(
