@@ -232,6 +232,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(playfield, "ResolveProxyExitDestination");
             AssertContains(playfield, "character.Stats[StatIds.externaldoorinstance].BaseValue");
             AssertContains(playfield, "character.Stats[StatIds.externalplayfieldinstance].Value");
+            AssertContains(playfield, "externalPlayfieldId == 655 && externalDoorInstance == 0xC01A028F");
+            AssertContains(playfield, "position.x = 3294.2f;");
+            AssertContains(playfield, "position.z = 843.7f;");
             AssertContains(project, @"Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs");
         }
 
