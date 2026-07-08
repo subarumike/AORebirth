@@ -82,6 +82,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout;
 
+        private readonly PlayfieldWallCollisionRuntimeService wallCollision;
+
         private readonly PacketSequencingCoordinator packetSequencing;
 
         private readonly PrivateCityReadyInitCoordinator privateCityReadyInit;
@@ -129,6 +131,7 @@ namespace ZoneEngine.Core.Playfields
             this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
             this.vendors = new PlayfieldVendorRuntimeService();
             this.visibilityFanout = new PlayfieldVisibilityFanoutRuntimeService();
+            this.wallCollision = new PlayfieldWallCollisionRuntimeService();
             this.packetSequencing = new PacketSequencingCoordinator();
             this.packetSequences = new PlayfieldPacketSequencingRuntimeService(this.packetSequencing);
             this.privateCityReadyInit =
@@ -643,6 +646,14 @@ namespace ZoneEngine.Core.Playfields
                 stopMovement,
                 sendCapturedPrivateCityEntrySocialStatus,
                 teleportToPlayfield);
+        }
+
+        internal void CheckWallCollision(
+            ICharacter dynel,
+            Func<ICharacter, bool> isPostZoneCollisionGraceActive,
+            Action<Dynel, AORebirth.Core.Vector.Coordinate, AORebirth.Core.Vector.Quaternion, int> teleportToPlayfield)
+        {
+            this.wallCollision.CheckWallCollision(dynel, isPostZoneCollisionGraceActive, teleportToPlayfield);
         }
 
         internal bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
