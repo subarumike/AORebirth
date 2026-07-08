@@ -2,130 +2,206 @@
 
 Date: 2026-07-08
 Baseline: `675da7a7`
-
-Inspected:
+Files inspected:
 - `AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs`
 - `AORebirth/Server/ZoneEngine/Core/Playfields/PlayfieldRuntimeSystems.cs`
 
 ## Summary
 
-`Playfield` is no longer carrying the large runtime systems that have already been split out, but it still owns a mix of:
+`PlayfieldRuntimeSystems` now owns most extracted runtime domains. `Playfield` still directly owns a smaller set of high-coupling surfaces:
+- public facade entry points
+- packet construction/send callbacks
+- local and cross-playfield teleport handoff logic
+- some object/dynel facade methods
+- startup/heartbeat/disposal orchestration
+- remaining packet-heavy combat, corpse, and respawn internals that were intentionally left local
 
-- stable public façade entry points,
-- packet construction/send callbacks,
-- same-playfield teleport/grid handling,
-- global/cross-playfield lookup/shutdown hooks,
-- and excluded gameplay domains that are intentionally still local.
+The next extraction should not be another thin wrapper pass. The best remaining cohesive slice is the playfield transfer/teleport orchestration chain behind `Teleport(...)`.
 
-Most of the high-volume code still in `Playfield` is tied to excluded domains:
+## 1. Public API Entry Points
 
-- corpse systems,
-- NPC/player combat runtime,
-- private city initialization,
-- startup materialization,
-- wall collision,
-- visibility packet orchestration.
+### Should remain in Playfield
+- `Announce(...)`, `Publish(...)`, `Send(...)`
+- `FindByIdentity(...)`, `FindInRange(...)`, `FindCharacterInRange(...)`, `FindNamedEntityByIdentity(...)`
+- `NumberOfDynels()`, `NumberOfPlayers()`
+- `ListAvailablePlayfields(...)`
+- `IsInstancedPlayfield()`
 
-That leaves one clear non-excluded extraction seam with real payoff: same-playfield teleport/grid handling.
+Reason:
+- These are outward-facing facade methods over bus/session/playfield state.
+- They are appropriate as `Playfield` surface area even when implementation delegates inward.
 
-## Remaining Direct Responsibilities
+### Safe extraction candidates
+- none worth extracting by themselves
 
-### 1. Public API entry points
+### Risky extraction candidates
+- `TryUseCorpse(...)`, `TryUseDeadNpcCorpse(...)`, `TryLootCorpseItem(...)`
 
-| Responsibility | Examples in `Playfield.cs` | Status |
-|---|---|---|
-| Stable playfield façade for external callers | `Announce`, `AnnounceOthers`, `Publish`, `Send`, `FindByIdentity`, `FindInRange`, `FindCharacterInRange`, `FindNamedEntityByIdentity`, `ListAvailablePlayfields` | should remain in `Playfield` |
-| Public routing into already-extracted services | `TryHandleGenericCmdUse`, `ExecuteFunction`, `SendPrivateCityPlayfieldReadyBlock`, `SendPrivateCityPreFullCharacterReadyBlock`, `SendSCFUsToClient`, `AnnouncePlayerVisibility` | should remain in `Playfield` |
-| Public lifecycle entry points for excluded domains | `StartPlayerAttack`, `CancelPlayerAttack`, `RespawnPlayer`, `TryUseCorpse`, `TryLootCorpseItem`, `DespawnNpcImmediately`, `AcquireNpcAggro` | should remain in `Playfield` |
-| Cross-playfield teleport entry point | `Teleport` | risky extraction candidate once local same-playfield handling is separated |
+Reason:
+- These are public entry points but already delegate into extracted corpse services. Moving the public method ownership out of `Playfield` would add churn without reducing real local complexity.
 
-### 2. Packet send callbacks
+## 2. Packet Send Callbacks
 
-| Responsibility | Examples in `Playfield.cs` | Status |
-|---|---|---|
-| Playfield-local packet construction/send wrappers | `AnnounceAppearanceUpdate`, `Send`, `Announce`, `Publish` | should remain in `Playfield` |
-| Cross-playfield transfer callbacks kept local after the new extraction | `AnnouncePlayfieldTransferDespawn`, `SendPlayfieldTransferRedirect` | should remain in `Playfield` |
-| Same-playfield teleport packet send | `TryCompleteGridTeleportInCurrentPlayfield` with `TeleportMessageHandler.Default.SendLocal` | safe extraction candidate if packet send stays callback-owned by `Playfield` |
-| Death/respawn/combat/corpse packet helpers | `SendDeathRespawnPlayfieldReadyBlock`, `SendPlayfieldTowersAndCities`, `SendCorpseFullUpdate`, `SendCorpseInventoryUpdate`, `SendCombatStopMessage`, `SendRewardFeedback`, `SendUseActionFinished`, `SendTargetClearMessage`, `SendCombatIdleState` | risky extraction candidate; excluded or packet-shape-sensitive |
+### Should remain in Playfield
+- packet construction/send helpers passed into services:
+  - `SendPlayfieldTransferRedirect(...)`
+  - `SendDeathRespawnGameTime(...)`
+  - `SendDeathRespawnPlayfieldReadyBlock(...)`
+  - `SendPlayfieldTowersAndCities(...)`
+  - `SendEmptyPlayfieldTowersAndCities(...)`
+  - `SendRewardFeedback(...)`
+  - `SendUseActionFinished(...)`
+  - `SendTargetClearMessage(...)`
+  - `SendCombatIdleState(...)`
+  - `SendStatChangedMessage(...)`
 
-### 3. Local teleport / grid handling
+Reason:
+- These methods are packet-shape owners or packet-order-adjacent callbacks.
+- They are exactly the kind of code that should stay near packet construction until there is a larger packet-construction boundary, not another orchestration service.
 
-| Responsibility | Examples in `Playfield.cs` | Status |
-|---|---|---|
-| Same-playfield grid/local teleport completion | `TryCompleteGridTeleportInCurrentPlayfield` | safe extraction candidate |
-| Post-local-teleport contact priming | `PrimeStatelCollisionContacts` | safe extraction candidate |
-| Post-zone grace arming | `ArmPostZoneCollisionGrace` | safe extraction candidate |
-| Playfield-id construction for statel/wall routes | `TeleportToPlayfield` | safe extraction candidate |
-| Runtime collision routing into services | `CheckStatelCollision`, `CheckWallCollision` | should remain in `Playfield` as façade entry points |
+### Safe extraction candidates
+- none recommended as a standalone slice
 
-Notes:
-- This is the cleanest remaining cohesive seam not blocked by the task exclusions.
-- It is adjacent to the already-extracted cross-playfield handoff path, so the boundary is now clearer than before.
+### Risky extraction candidates
+- corpse/death visual send helpers:
+  - `SendCorpseFullUpdate(...)`
+  - `SendCorpseInventoryUpdate(...)`
+  - `SendPlayerCorpseFullUpdate(...)`
+  - `SendDeathRespawnAction(...)`
+  - `SendNpcDeathAnimation(...)`
+  - `SendPlayerDeathAnimation(...)`
 
-### 4. Object / dynel registration and global lookups
+Reason:
+- These are packet-heavy and still coupled to combat/death/corpse state.
+- They should move only as part of a larger packet-construction boundary, not piecemeal.
 
-| Responsibility | Examples in `Playfield.cs` | Status |
-|---|---|---|
-| Global shutdown/disconnect logic | `DisconnectAllClients`, `DisconnectClient` | should remain in `Playfield` |
-| Cross-playfield/global counts | `NumberOfDynels`, `NumberOfPlayers` | should remain in `Playfield` |
-| Registry-facing lookup façade | `FindByIdentity`, `FindInRange`, `FindCharacterInRange` | should remain in `Playfield` |
-| Direct object despawn façade | `Despawn` | risky extraction candidate; tied to object lifecycle callbacks and identity behavior |
+## 3. Local Teleport / Grid / Playfield Transfer Handling
 
-### 5. Lifecycle / startup ownership
+### Remaining direct ownership
+- `Teleport(...)`
+- `ClearPlayfieldTransferContactState(...)`
+- `DisableTimersForPlayfieldTransfer(...)`
+- `AnnouncePlayfieldTransferDespawn(...)`
+- `ApplyPlayfieldTransferState(...)`
+- `CapturePlayfieldTransferClient(...)`
+- `ResolveOrCreatePlayfieldTransferDestination(...)`
+- `CompletePlayfieldTransferDispose(...)`
+- `TryCompleteGridTeleportInCurrentPlayfield(...)`
+- `TeleportToPlayfield(...)`
 
-| Responsibility | Examples in `Playfield.cs` | Status |
-|---|---|---|
-| Constructor and playfield boot wiring | constructor, bus setup, startup registration | should remain in `Playfield` |
-| Startup object materialization orchestration | constructor call into `runtimeSystems.MaterializeStartupObjects(...)` | should remain in `Playfield` |
-| Heartbeat timer entry point | `HeartBeatTimer` | should remain in `Playfield` |
+### Should remain in Playfield
+- packet emission details in `SendPlayfieldTransferRedirect(...)`
+- local grid teleport packet send path inside `TryCompleteGridTeleportInCurrentPlayfield(...)`
 
-Notes:
-- These areas are already constrained by existing task exclusions around startup materialization and heartbeat callbacks.
+Reason:
+- both remain packet-sensitive and session-sensitive
 
-### 6. Excluded direct domains still intentionally local
+### Safe extraction candidates
+- the orchestration chain around non-local transfer handoff:
+  - transfer-begin sequencing
+  - destination resolve/create handoff
+  - despawn/disable/apply/complete callback ordering
 
-| Domain | Examples in `Playfield.cs` | Status |
-|---|---|---|
-| Corpse lifecycle / loot / credits | corpse dictionaries and helper cluster around `ScheduleCorpseSpawn`, `ProcessPendingCorpseSpawns`, `AwardCorpseCredits`, loot roll helpers | should remain in `Playfield` for this task scope |
-| Player/NPC combat algorithms | `DoCombatTick`, damage/range/weapon helpers, NPC movement-to-combat helpers | should remain in `Playfield` for this task scope |
-| Private-city init helpers | org/private-city resolver helpers and ready-block packet helpers | should remain in `Playfield` for this task scope |
+Reason:
+- `PlayfieldRuntimeSystems` already has `PlayfieldTransferRuntimeService`.
+- The runtime facade already exposes:
+  - `RunPlayfieldTransferBeginSequence(...)`
+  - `PreparePlayfieldTransfer(...)`
+  - `CompletePlayfieldTransfer(...)`
+- The missing reduction is the top-level `Playfield.Teleport(...)` decision tree and helper chain still being locally owned.
+
+### Risky extraction candidates
+- private-city special routing intertwined with teleport helpers:
+  - `ResolveCapturedMontroyalPrivateCityInstance(...)`
+  - `ResolveOrganizationCityId(...)`
+  - `ResolveOrganizationName(...)`
+
+Reason:
+- tied to special-case routing and prior private-city parity work
+- should not be the first transfer extraction
+
+## 4. Object / Dynel Registration And Removal Facade
+
+### Should remain in Playfield
+- `Despawn(...)`
+- `DisconnectClient(...)`
+- dynel lookup/count facade methods
+
+Reason:
+- these are playfield-facing lifecycle entry points over runtime systems and pool state
+
+### Safe extraction candidates
+- none with meaningful payoff
+
+### Risky extraction candidates
+- `DynelDropPosition(...)`
+
+Reason:
+- too small to justify another service; low payoff
+
+## 5. Lifecycle / Startup
+
+### Should remain in Playfield
+- constructor startup wiring
+- bus subscriptions
+- heartbeat timer ownership
+- `HeartBeatTimer(...)`
+- `Dispose(...)`
+- `ArmPostZoneCollisionGrace(...)`
+- `IsPrivateCityPlayfieldCandidate(...)`
+
+Reason:
+- these are playfield lifetime concerns, not subsystem runtime seams
+
+### Safe extraction candidates
+- none recommended
+
+### Risky extraction candidates
+- heartbeat callback breakup into more wrapper services
+
+Reason:
+- high churn, low ownership payoff
+
+## 6. Other Remaining Direct Responsibilities
+
+### Should remain in Playfield for now
+- combat math / weapon resolution / damage packet construction
+- corpse loot table roll and item materialization internals
+- respawn destination resolution and death/respawn packet construction
+
+### Safe extraction candidates
+- none in this audit slice
+
+### Risky extraction candidates
+- combat math block
+- corpse loot generation block
+- death/respawn packet chain
+
+Reason:
+- each is still packet-heavy, algorithm-heavy, or state-heavy
+- none is a clean next extraction after the current runtime-service decomposition
 
 ## Recommended Next Single Extraction
 
-### Extract next: same-playfield teleport/grid handling
+Extract the **non-local playfield transfer orchestration chain** behind `Playfield.Teleport(...)` into the existing `PlayfieldTransferRuntimeService`.
 
-Recommended boundary:
+### Why this one
+- It is the largest remaining cohesive runtime responsibility still directly owned by `Playfield`.
+- It already has an existing service boundary in `PlayfieldRuntimeSystems`.
+- It reduces real `Playfield` ownership instead of adding another one-method wrapper.
+- It avoids packet-construction movement if scoped correctly.
 
-- `TryCompleteGridTeleportInCurrentPlayfield`
-- `PrimeStatelCollisionContacts`
-- `ArmPostZoneCollisionGrace`
-- `TeleportToPlayfield`
+### Recommended scope
+- Move orchestration only:
+  - transfer-begin callback sequencing
+  - destination resolve/create routing
+  - transfer state mutation ordering
+  - despawn/dispose/handoff callback ordering
+- Keep in `Playfield`:
+  - redirect packet construction/send
+  - local current-grid teleport packet path
+  - private-city special-case packet details
 
-Recommended shape:
-
-- a focused runtime service such as `PlayfieldLocalTeleportRuntimeService` or `PlayfieldGridTeleportRuntimeService`
-- `Playfield` keeps packet construction/send callbacks and playfield-id construction where needed
-- runtime service owns the local teleport orchestration order:
-  - send-local teleport callback
-  - coordinate/heading mutation callback
-  - post-teleport contact priming callback
-  - post-zone grace sequencing
-
-Why this next:
-
-1. It is the clearest remaining cohesive responsibility not blocked by the current exclusions.
-2. It directly follows the just-completed cross-playfield transfer extraction.
-3. It removes real branching/orchestration from `Teleport` instead of adding wrapper churn elsewhere.
-4. Existing zoning/statel guardrails already cover the surrounding packet/order constraints.
-
-## Recommendation Against Next
-
-Do not extract next:
-
-- corpse/death packet helpers,
-- combat packet helpers,
-- shutdown/disconnect logic,
-- startup materialization,
-- global count/lookups.
-
-Those are either explicitly excluded, packet-shape-sensitive, or too coupled to world/state ownership for a clean next slice.
+### Why not choose packet callbacks next
+- Most remaining packet callbacks are construction owners, not orchestration seams.
+- Moving them now would create wrapper churn without reducing risk or complexity.
