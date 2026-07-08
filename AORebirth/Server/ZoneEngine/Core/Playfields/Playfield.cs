@@ -653,37 +653,19 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            this.runtimeSystems.PreparePlayfieldTransfer(
-                dynel,
-                this.ClearPlayfieldTransferContactState,
-                DisableTimersForPlayfieldTransfer);
-
-            ZoneClient lifecycleClient = dynel.Controller == null ? null : dynel.Controller.Client as ZoneClient;
-            if (lifecycleClient != null)
-            {
-                this.runtimeSystems.RunPlayfieldTransferBeginSequence(
-                    lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer,
-                    () => TeleportMessageHandler.Default.Send(
-                        dynel as ICharacter,
-                        destination.coordinate,
-                        (Vector.Quaternion)heading,
-                        playfield));
-            }
-            else
-            {
-                // Teleport to another playfield
-                TeleportMessageHandler.Default.Send(
-                    dynel as ICharacter,
-                    destination.coordinate,
-                    (Vector.Quaternion)heading,
-                    playfield);
-            }
-
-            this.runtimeSystems.CompletePlayfieldTransfer(
+            this.runtimeSystems.TransferToPlayfield(
                 dynel,
                 destination,
                 heading,
                 playfield,
+                this.ClearPlayfieldTransferContactState,
+                DisableTimersForPlayfieldTransfer,
+                CapturePlayfieldTransferEnterZoningPhase,
+                () => TeleportMessageHandler.Default.Send(
+                    dynel as ICharacter,
+                    destination.coordinate,
+                    (Vector.Quaternion)heading,
+                    playfield),
                 this.AnnouncePlayfieldTransferDespawn,
                 ApplyPlayfieldTransferState,
                 CapturePlayfieldTransferClient,
@@ -717,6 +699,14 @@ namespace AORebirth.Core.Playfields
         private static ZoneClient CapturePlayfieldTransferClient(Dynel dynel)
         {
             return (ZoneClient)dynel.Controller.Client;
+        }
+
+        private static Action CapturePlayfieldTransferEnterZoningPhase(Dynel dynel)
+        {
+            ZoneClient lifecycleClient = dynel.Controller == null ? null : dynel.Controller.Client as ZoneClient;
+            return lifecycleClient == null
+                       ? null
+                       : (Action)lifecycleClient.SessionLifecycle.EnterZoningForPlayfieldTransfer;
         }
 
         private IPlayfield ResolveOrCreatePlayfieldTransferDestination(Identity playfield)
