@@ -36,6 +36,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldCorpseAccessRuntimeService corpseAccess;
 
+        private readonly PlayfieldAOtomationDeliveryRuntimeService aotomationDelivery;
+
         private readonly PlayfieldDbMobSpawnRuntimeService dbMobSpawns;
 
         private readonly PlayfieldDynelRegistry dynelRegistry;
@@ -103,6 +105,7 @@ namespace ZoneEngine.Core.Playfields
                 new PrivateCityContentModule());
             this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);
             this.corpseAccess = new PlayfieldCorpseAccessRuntimeService();
+            this.aotomationDelivery = new PlayfieldAOtomationDeliveryRuntimeService();
             this.dbMobSpawns = new PlayfieldDbMobSpawnRuntimeService();
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.environmentFunctions = new PlayfieldEnvironmentFunctionRuntimeService();
@@ -372,6 +375,40 @@ namespace ZoneEngine.Core.Playfields
             Action<MessageBody, Identity> announceOthers)
         {
             this.publishFanout.DispatchMessageToPlayfieldOthers(body, excludedIdentity, announceOthers);
+        }
+
+        internal void DeliverAOtomationMessageToClient(IMSendAOtomationMessageToClient clientMessage)
+        {
+            this.aotomationDelivery.SendMessageToClient(clientMessage);
+        }
+
+        internal void DeliverAOtomationMessageBodyToClient(IMSendAOtomationMessageBodyToClient message)
+        {
+            this.aotomationDelivery.SendMessageBodyToClient(message);
+        }
+
+        internal void DeliverAOtomationMessageBodiesToClient(IMSendAOtomationMessageBodiesToClient message)
+        {
+            this.aotomationDelivery.SendMessageBodiesToClient(message);
+        }
+
+        internal void DeliverAOtomationMessageToPlayfield(
+            IMSendAOtomationMessageToPlayfield clientMessage,
+            Action<MessageBody> announce)
+        {
+            this.aotomationDelivery.SendMessageToPlayfield(
+                clientMessage,
+                body => this.publishFanout.DispatchMessageToPlayfield(body, announce));
+        }
+
+        internal void DeliverAOtomationMessageToPlayfieldOthers(
+            IMSendAOtomationMessageToPlayfieldOthers clientMessage,
+            Action<MessageBody, Identity> announceOthers)
+        {
+            this.aotomationDelivery.SendMessageToPlayfieldOthers(
+                clientMessage,
+                (body, excludedIdentity) =>
+                    this.publishFanout.DispatchMessageToPlayfieldOthers(body, excludedIdentity, announceOthers));
         }
 
         internal bool IsInNpcCombatRange(ICharacter attacker, ICharacter target, double range)
