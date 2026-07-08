@@ -955,6 +955,13 @@ namespace AORebirth.Core.Playfields
             position.x += normal.x * 2.5;
             position.z += normal.z * 2.5;
 
+            if (externalPlayfieldId == 655 && externalDoorInstance == 0xC01A028F)
+            {
+                position.x = 3294.2f;
+                position.y = 35.1f;
+                position.z = 843.7f;
+            }
+
             return new ProxyPlayfieldExitDestination(
                 externalPlayfieldId,
                 externalDoorInstance,
