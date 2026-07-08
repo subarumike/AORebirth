@@ -32,6 +32,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldAnnouncementRuntimeService announcements;
 
+        private readonly PlayfieldCharacterHeartbeatRuntimeService characterHeartbeat;
+
         private readonly PlayfieldContentCoordinator content;
 
         private readonly PlayfieldContentDataProvider contentData;
@@ -114,6 +116,7 @@ namespace ZoneEngine.Core.Playfields
             this.corpseAccess = new PlayfieldCorpseAccessRuntimeService();
             this.aotomationDelivery = new PlayfieldAOtomationDeliveryRuntimeService();
             this.dbMobSpawns = new PlayfieldDbMobSpawnRuntimeService();
+            this.characterHeartbeat = new PlayfieldCharacterHeartbeatRuntimeService();
             this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
             this.environmentFunctions = new PlayfieldEnvironmentFunctionRuntimeService();
             this.objectLifecycle = new PlayfieldObjectLifecycleRuntimeService();
@@ -559,6 +562,24 @@ namespace ZoneEngine.Core.Playfields
                 this.ProcessNpcPatrolTick,
                 processFollow,
                 processPlayerCollision);
+        }
+
+        internal void ProcessCharacterRegeneration(ICharacter dynel, Action<ICharacter> sendChangedStats)
+        {
+            this.characterHeartbeat.ProcessRegeneration(dynel, sendChangedStats);
+        }
+
+        internal void ProcessCharacterFollow(ICharacter dynel)
+        {
+            this.characterHeartbeat.ProcessFollow(dynel);
+        }
+
+        internal void ProcessPlayerCollisionChecks(
+            ICharacter dynel,
+            Action<ICharacter> checkWallCollision,
+            Action<ICharacter> checkStatelCollision)
+        {
+            this.characterHeartbeat.ProcessPlayerCollisionChecks(dynel, checkWallCollision, checkStatelCollision);
         }
 
         internal void ProcessPlayerRespawn(
