@@ -113,6 +113,7 @@ namespace ZoneEngine.Core.Playfields
             this.content = new PlayfieldContentCoordinator(
                 new AreteContentModule(),
                 new MontroyalContentModule(),
+                new SubwayContentModule(),
                 new PrivateCityContentModule());
             this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);
             this.corpseAccess = new PlayfieldCorpseAccessRuntimeService();
