@@ -30,6 +30,8 @@ namespace ZoneEngine.Core.Playfields
     {
         private readonly Playfield playfield;
 
+        private readonly PlayfieldAnnouncementRuntimeService announcements;
+
         private readonly PlayfieldContentCoordinator content;
 
         private readonly PlayfieldContentDataProvider contentData;
@@ -99,6 +101,7 @@ namespace ZoneEngine.Core.Playfields
             }
 
             this.playfield = playfield;
+            this.announcements = new PlayfieldAnnouncementRuntimeService();
             this.content = new PlayfieldContentCoordinator(
                 new AreteContentModule(),
                 new MontroyalContentModule(),
@@ -340,6 +343,28 @@ namespace ZoneEngine.Core.Playfields
                 this.CharacterEntities(),
                 excludedIdentity,
                 publishToCharacterClient);
+        }
+
+        internal void AnnounceMessageToCharacterClients(
+            MessageBody messageBody,
+            Action<IZoneClient, MessageBody> sendMessageBodyToClient)
+        {
+            this.announcements.AnnounceToCharacterClients(
+                this.CharacterEntities(),
+                messageBody,
+                sendMessageBodyToClient);
+        }
+
+        internal void AnnounceMessageToOtherCharacterClients(
+            MessageBody messageBody,
+            Identity excludedIdentity,
+            Action<IZoneClient, MessageBody> sendMessageBodyToClient)
+        {
+            this.announcements.AnnounceToOtherCharacterClients(
+                this.CharacterEntities(),
+                excludedIdentity,
+                messageBody,
+                sendMessageBodyToClient);
         }
 
         internal void FanoutExistingCharactersForScfu(

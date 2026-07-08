@@ -384,14 +384,7 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void Announce(MessageBody messageBody)
         {
-            this.runtimeSystems.AnnounceToCharacterClients(
-                entity =>
-                    {
-                        this.runtimeSystems.PublishMessageBodyToClient(
-                            entity.Controller.Client,
-                            messageBody,
-                            this.Publish);
-                    });
+            this.runtimeSystems.AnnounceMessageToCharacterClients(messageBody, this.Send);
         }
 
         /// <summary>
@@ -416,15 +409,7 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void AnnounceOthers(MessageBody messageBody, Identity dontSend)
         {
-            this.runtimeSystems.AnnounceToOtherCharacterClients(
-                dontSend,
-                entity =>
-                    {
-                        this.runtimeSystems.PublishMessageBodyToClient(
-                            entity.Controller.Client,
-                            messageBody,
-                            this.Publish);
-                    });
+            this.runtimeSystems.AnnounceMessageToOtherCharacterClients(messageBody, dontSend, this.Send);
         }
 
         /// <summary>
