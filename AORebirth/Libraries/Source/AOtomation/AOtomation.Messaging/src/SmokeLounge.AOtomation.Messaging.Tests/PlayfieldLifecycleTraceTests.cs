@@ -928,15 +928,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 providerText.Contains("\"Filth Flea\"")
                 && providerText.Contains("\"Discarded Pet\"")
+                && providerText.Contains("\"Disobedient Bot\"")
+                && providerText.Contains("\"Thief\"")
                 && providerText.Contains("\"Violent Vagabond\"")
                 && providerText.Contains("\"Mugger\""),
                 "CapturedSubwayContentProvider must contain the first visible Subway mob families.");
             Assert.IsTrue(
                 providerText.Contains("17657")
                 && providerText.Contains("17720")
+                && providerText.Contains("17649")
+                && providerText.Contains("26092")
                 && providerText.Contains("203733")
                 && providerText.Contains("203734"),
                 "CapturedSubwayContentProvider must preserve the captured monsterData values.");
+            Assert.AreEqual(
+                32,
+                CountOccurrences(providerText, "0x794"),
+                "CapturedSubwayContentProvider must contain the 32 visible Subway CHAR-SEEN spawn identities from capture 20260708-182237.");
+            Assert.IsFalse(
+                providerText.Contains("122002"),
+                "CapturedSubwayContentProvider must bind content to resource/playfield 127, not capture object Playfield2:122002.");
             Assert.IsTrue(
                 orchestratorText.Contains("SetMobStat(mobCharacter, StatIds.catmesh, spawn.MonsterData);")
                 && orchestratorText.Contains("playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));"),
