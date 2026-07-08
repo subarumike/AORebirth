@@ -92,6 +92,7 @@ namespace AOSharpLiveCapture
         };
 
         private string sessionDirectory;
+        private string pluginDirectory;
         private StreamWriter eventsLog;
         private StreamWriter packetsLog;
         private StreamWriter shopUpdatesLog;
@@ -168,43 +169,8 @@ namespace AOSharpLiveCapture
 
             try
             {
-            this.captureStartUtc = DateTime.UtcNow;
-            this.captureStartLocal = DateTime.Now;
-            this.lastPacketUtc = this.captureStartUtc;
-
-            this.sessionDirectory = CreateSessionDirectory(pluginDir);
-            this.eventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "events.log"));
-            this.packetsLog = CreateWriter(Path.Combine(this.sessionDirectory, "packets.hex.log"));
-            this.shopUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "shop-updates.csv"));
-            this.shopUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,TerminalIdentity,Slot,LowId,HighId,Quality");
-            this.vendorFullUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
-            this.vendorFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,Identity,OwnerType,OwnerInstance,PlayfieldId,PositionX,PositionY,PositionZ,Unknown7,Template,Mesh,BuyModifier,SellModifier,StatsCount");
-            this.systemMessagesLog = CreateWriter(Path.Combine(this.sessionDirectory, "system-messages.log"));
-            this.chatDialogueLog = CreateWriter(Path.Combine(this.sessionDirectory, "chat-dialogue.log"));
-            this.npcInteractionsLog = CreateWriter(Path.Combine(this.sessionDirectory, "npc-interactions.log"));
-            this.inventoryUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "inventory-updates.csv"));
-            this.inventoryUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,InventoryIdentity,Handle,Slot,Placement,Flags,Count,ItemIdentity,LowId,HighId,Quality,Unknown");
-            this.enemyStateLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-state.csv"));
-            this.enemyStateLog.WriteLine("timestamp,entityId,level,currentHealth,maxHealth,x,y,z,eventType");
-            this.enemyFullUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-full-updates.csv"));
-            this.enemyFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,Identity,Name,PlayfieldId,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,FightingTargetRole,FightingTargetIdentity,Version,Flags,CharacterFlags,AccountFlags,Expansions,CharacterInfoType,NPCFamily,LosHeight,Level,Health,HealthDamage,MonsterData,MonsterScale,VisualFlags,VisibleTitle,Unknown1Length,HeadMesh,RunSpeedBase,ActiveNanoCount,TextureCount,Textures,MeshCount,Meshes,Flags2,Unknown2,Detail");
-            this.enemyCombatLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-combat.csv"));
-            this.enemyCombatLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail");
-            this.enemyMovementLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-movement.csv"));
-            this.enemyMovementLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,MoveType,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,Unknown1,Unknown2,Unknown3,Detail");
-            this.movementPacketsLog = CreateWriter(Path.Combine(this.sessionDirectory, "movement-packets.csv"));
-            this.movementPacketsLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,SourceType,SourceInstance,SourceIdentity,SourceName,TargetType,TargetInstance,TargetIdentity,TargetName,FollowKind,CurrentX,CurrentY,CurrentZ,DestinationX,DestinationY,DestinationZ,Speed,Animation,Flags,PathCount,RawParams,RawTailHex");
-            this.enemyStatUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-stat-updates.csv"));
-            this.enemyStatUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,Stat,StatId,Value,PositionX,PositionY,PositionZ,StatsCount,Detail");
-            this.enemyFightEventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-fight-events.log"));
-            this.WriteEnemyStateJson();
-            this.WriteEnemyDossierJson();
-            this.WriteMovementSummaryJson();
-            this.WriteCaptureSessionMetadata(this.captureStartUtc, this.captureStartLocal);
-            this.WriteCaptureInfo(null, CaptureValidation.Running());
-            this.enabled = true;
-            this.nextFlushUtc = DateTime.UtcNow.AddSeconds(2);
-            this.nextSnapshotUtc = DateTime.UtcNow.AddSeconds(1);
+            this.pluginDirectory = pluginDir;
+            this.OpenFreshCaptureSession(pluginDir, true);
             this.combatLootSmoke = new CombatLootSmoke(pluginDir, this.LogSmokeEvent);
 
             Network.PacketReceived += this.OnPacketReceived;
@@ -310,7 +276,7 @@ namespace AOSharpLiveCapture
             switch (subCommand)
             {
                 case "start":
-                    this.enabled = true;
+                    this.OpenFreshCaptureSession(this.pluginDirectory, true);
                     this.LogEvent("COMMAND", "capture started");
                     chatWindow.WriteLine("AO capture started: " + this.sessionDirectory, ChatColor.Gold);
                     break;
@@ -4616,6 +4582,106 @@ namespace AOSharpLiveCapture
             return string.Empty;
         }
 
+        private void OpenFreshCaptureSession(string pluginDir, bool resetState)
+        {
+            this.enabled = false;
+            this.FlushAndClose();
+
+            if (resetState)
+            {
+                this.ResetCaptureState();
+            }
+
+            this.captureStartUtc = DateTime.UtcNow;
+            this.captureStartLocal = DateTime.Now;
+            this.lastPacketUtc = this.captureStartUtc;
+
+            this.sessionDirectory = CreateSessionDirectory(pluginDir);
+            this.eventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "events.log"));
+            this.packetsLog = CreateWriter(Path.Combine(this.sessionDirectory, "packets.hex.log"));
+            this.shopUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "shop-updates.csv"));
+            this.shopUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,TerminalIdentity,Slot,LowId,HighId,Quality");
+            this.vendorFullUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
+            this.vendorFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,Identity,OwnerType,OwnerInstance,PlayfieldId,PositionX,PositionY,PositionZ,Unknown7,Template,Mesh,BuyModifier,SellModifier,StatsCount");
+            this.systemMessagesLog = CreateWriter(Path.Combine(this.sessionDirectory, "system-messages.log"));
+            this.chatDialogueLog = CreateWriter(Path.Combine(this.sessionDirectory, "chat-dialogue.log"));
+            this.npcInteractionsLog = CreateWriter(Path.Combine(this.sessionDirectory, "npc-interactions.log"));
+            this.inventoryUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "inventory-updates.csv"));
+            this.inventoryUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,InventoryIdentity,Handle,Slot,Placement,Flags,Count,ItemIdentity,LowId,HighId,Quality,Unknown");
+            this.enemyStateLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-state.csv"));
+            this.enemyStateLog.WriteLine("timestamp,entityId,level,currentHealth,maxHealth,x,y,z,eventType");
+            this.enemyFullUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-full-updates.csv"));
+            this.enemyFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,Identity,Name,PlayfieldId,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,FightingTargetRole,FightingTargetIdentity,Version,Flags,CharacterFlags,AccountFlags,Expansions,CharacterInfoType,NPCFamily,LosHeight,Level,Health,HealthDamage,MonsterData,MonsterScale,VisualFlags,VisibleTitle,Unknown1Length,HeadMesh,RunSpeedBase,ActiveNanoCount,TextureCount,Textures,MeshCount,Meshes,Flags2,Unknown2,Detail");
+            this.enemyCombatLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-combat.csv"));
+            this.enemyCombatLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail");
+            this.enemyMovementLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-movement.csv"));
+            this.enemyMovementLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,MoveType,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,Unknown1,Unknown2,Unknown3,Detail");
+            this.movementPacketsLog = CreateWriter(Path.Combine(this.sessionDirectory, "movement-packets.csv"));
+            this.movementPacketsLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,SourceType,SourceInstance,SourceIdentity,SourceName,TargetType,TargetInstance,TargetIdentity,TargetName,FollowKind,CurrentX,CurrentY,CurrentZ,DestinationX,DestinationY,DestinationZ,Speed,Animation,Flags,PathCount,RawParams,RawTailHex");
+            this.enemyStatUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-stat-updates.csv"));
+            this.enemyStatUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,Stat,StatId,Value,PositionX,PositionY,PositionZ,StatsCount,Detail");
+            this.enemyFightEventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-fight-events.log"));
+            this.WriteEnemyStateJson();
+            this.WriteEnemyDossierJson();
+            this.WriteMovementSummaryJson();
+            this.WriteCaptureSessionMetadata(this.captureStartUtc, this.captureStartLocal);
+            this.WriteCaptureInfo(null, CaptureValidation.Running());
+            this.enabled = true;
+            this.nextFlushUtc = DateTime.UtcNow.AddSeconds(2);
+            this.nextSnapshotUtc = DateTime.UtcNow.AddSeconds(1);
+        }
+
+        private void ResetCaptureState()
+        {
+            this.knownCharacters.Clear();
+            this.knownCorpses.Clear();
+            this.exportedShopUpdateFingerprints.Clear();
+            this.vendorInteractionIdentities.Clear();
+            this.shopUpdateIdentities.Clear();
+            this.vendorFullUpdateIdentities.Clear();
+            this.focusedEnemyIdentities.Clear();
+            this.recentEnemyFullUpdates.Clear();
+            this.enemyStates.Clear();
+            this.enemyStateTimeline.Clear();
+
+            this.captureFinalized = false;
+            this.inboundPacketCount = 0;
+            this.outboundPacketCount = 0;
+            this.decodedInboundCount = 0;
+            this.decodedOutboundCount = 0;
+            this.shopUpdateMessageCount = 0;
+            this.shopUpdateRowCount = 0;
+            this.vendorFullUpdateMessageCount = 0;
+            this.systemMessageCount = 0;
+            this.chatDialogueMessageCount = 0;
+            this.npcInteractionCount = 0;
+            this.inventoryUpdateMessageCount = 0;
+            this.inventoryUpdateRowCount = 0;
+            this.vendorInteractionAttemptCount = 0;
+            this.enemyStateRowCount = 0;
+            this.enemyCombatEventCount = 0;
+            this.enemyDamageEventCount = 0;
+            this.enemyDeathEventCount = 0;
+            this.enemySpawnEventCount = 0;
+            this.enemyDespawnEventCount = 0;
+            this.enemyHealthUpdateCount = 0;
+            this.enemyPositionUpdateCount = 0;
+            this.enemyFullUpdateRowCount = 0;
+            this.enemyCombatRowCount = 0;
+            this.enemyMovementRowCount = 0;
+            this.movementPacketRowCount = 0;
+            this.movementFollowTargetPacketCount = 0;
+            this.movementUsableFollowTargetPacketCount = 0;
+            this.movementSetPosPacketCount = 0;
+            this.movementStopMovingCmdPacketCount = 0;
+            this.movementDecodeErrorCount = 0;
+            this.enemyStatUpdateRowCount = 0;
+            this.localEnemyCombatContextUntilUtc = default(DateTime);
+            this.lastPlayfieldId = string.Empty;
+            this.enemyFightCaptureEnabled = false;
+            this.enemyFightCaptureStarted = false;
+        }
+
         private void Flush()
         {
             lock (this.syncRoot)
@@ -4693,14 +4759,6 @@ namespace AOSharpLiveCapture
         private static StreamWriter CreateWriter(string path)
         {
             return new StreamWriter(new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite), Encoding.UTF8)
-            {
-                AutoFlush = false
-            };
-        }
-
-        private static StreamWriter CreateAppendWriter(string path)
-        {
-            return new StreamWriter(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite), Encoding.UTF8)
             {
                 AutoFlush = false
             };
