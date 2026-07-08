@@ -908,9 +908,58 @@ namespace AORebirth.Core.Playfields
                 this.collisionStatels,
                 ResolveCapturedMontroyalPrivateCityInstance,
                 ResolveCharacterOrganizationInstance,
+                ResolveProxyExitDestination,
                 x => x.StopMovement(),
                 this.SendCapturedPrivateCityEntrySocialStatus,
                 this.TeleportToPlayfield);
+        }
+
+        private static ProxyPlayfieldExitDestination ResolveProxyExitDestination(ICharacter character)
+        {
+            if (character == null)
+            {
+                return null;
+            }
+
+            uint externalDoorInstance = character.Stats[StatIds.externaldoorinstance].BaseValue;
+            int externalPlayfieldId = character.Stats[StatIds.externalplayfieldinstance].Value;
+            PlayfieldData externalPlayfield;
+            if (externalPlayfieldId <= 0
+                || externalDoorInstance == 0
+                || !PlayfieldLoader.PFData.TryGetValue(externalPlayfieldId, out externalPlayfield))
+            {
+                return null;
+            }
+
+            StatelData door =
+                externalPlayfield.Statels.FirstOrDefault(
+                    x =>
+                        (uint)x.Identity.Instance == externalDoorInstance
+                        && x.Identity.Type == IdentityType.Door);
+            if (door == null)
+            {
+                return null;
+            }
+
+            var position = new AORebirth.Core.Vector.Vector3(door.X, door.Y, door.Z);
+            var heading = new AORebirth.Core.Vector.Quaternion(
+                door.HeadingX,
+                door.HeadingY,
+                door.HeadingZ,
+                door.HeadingW);
+
+            AORebirth.Core.Vector.Quaternion.Normalize(heading);
+            AORebirth.Core.Vector.Vector3 normal =
+                (AORebirth.Core.Vector.Vector3)heading.RotateVector3(AORebirth.Core.Vector.Vector3.AxisZ);
+
+            position.x += normal.x * 2.5;
+            position.z += normal.z * 2.5;
+
+            return new ProxyPlayfieldExitDestination(
+                externalPlayfieldId,
+                externalDoorInstance,
+                new Coordinate(position),
+                heading);
         }
 
         private void PrimeStatelCollisionContacts(ICharacter dynel)
