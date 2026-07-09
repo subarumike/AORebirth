@@ -122,7 +122,7 @@ namespace AORebirth.Core.Playfields
                 segments =>
                 {
                     replaySegmentCount = segments == null ? 0 : segments.Length;
-                    npcController.SetCapturedPatrolReplaySegments(segments);
+                    npcController.SetCapturedPatrolReplaySegments(segments, true);
                 });
 
             if (replaySegmentCount > 0)

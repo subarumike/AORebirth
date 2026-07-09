@@ -230,6 +230,7 @@ namespace AORebirth.Core.Playfields
             NPCController npcController = target.Controller as NPCController;
             if (npcController != null)
             {
+                npcController.SnapshotCurrentMotionPosition();
                 npcController.StopFollow();
             }
         }

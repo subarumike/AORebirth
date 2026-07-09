@@ -85,6 +85,8 @@ namespace ZoneEngine.Core.Controllers
 
         private int capturedPatrolReplayIndex;
 
+        private bool capturedPatrolReplayUsesRuntimeStart;
+
         private DateTime nextCapturedPatrolReplayUtc = DateTime.MinValue;
 
         private bool hasMotionPacket;
@@ -265,13 +267,22 @@ namespace ZoneEngine.Core.Controllers
             return this.state == CharacterState.Patrolling
                    && this.followIdentity.Equals(Identity.None)
                    && this.Character != null
+                   && this.Character.FightingTarget.Equals(Identity.None)
                    && this.HasCapturedPatrolReplay();
         }
 
         public void SetCapturedPatrolReplaySegments(NpcPatrolReplaySegment[] segments)
         {
+            this.SetCapturedPatrolReplaySegments(segments, false);
+        }
+
+        public void SetCapturedPatrolReplaySegments(
+            NpcPatrolReplaySegment[] segments,
+            bool useRuntimeStart)
+        {
             this.capturedPatrolReplaySegments = segments ?? new NpcPatrolReplaySegment[0];
             this.capturedPatrolReplayIndex = 0;
+            this.capturedPatrolReplayUsesRuntimeStart = useRuntimeStart;
             this.nextCapturedPatrolReplayUtc = DateTime.MinValue;
         }
 
@@ -300,7 +311,10 @@ namespace ZoneEngine.Core.Controllers
 
             NpcPatrolReplaySegment segment = this.capturedPatrolReplaySegments[this.capturedPatrolReplayIndex];
             this.Walk();
-            var start = new Vector3(segment.StartX, segment.StartY, segment.StartZ);
+            var capturedStart = new Vector3(segment.StartX, segment.StartY, segment.StartZ);
+            Vector3 start = this.capturedPatrolReplayUsesRuntimeStart
+                                ? this.UpdateMotionSegmentPosition(now)
+                                : capturedStart;
             var end = new Vector3(segment.EndX, segment.EndY, segment.EndZ);
             this.followCoordinates = end;
             this.Character.Coordinates(start);
@@ -316,6 +330,16 @@ namespace ZoneEngine.Core.Controllers
             this.nextCapturedPatrolReplayUtc =
                 now + TimeSpan.FromSeconds(Math.Max(0.01, segment.DelayAfterSeconds));
             return true;
+        }
+
+        public void SnapshotCurrentMotionPosition()
+        {
+            if (this.Character == null || !this.hasMotionPacket)
+            {
+                return;
+            }
+
+            this.Character.Coordinates(this.UpdateMotionSegmentPosition(DateTime.UtcNow));
         }
 
         private void SetMotionSegment(Vector3 start, Vector3 destination, DateTime now)
