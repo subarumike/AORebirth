@@ -45,15 +45,11 @@ namespace AORebirth.Core.Playfields
 
         internal void ResetCombatTick(ICharacter attacker)
         {
-            if (Playfield.IsCapturedCleaningRobot(attacker))
-            {
-                this.nextCombatTicks[attacker.Identity.Instance] =
-                    DateTime.UtcNow + TimeSpan.FromSeconds(NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds);
-            }
-            else
-            {
-                this.nextCombatTicks.Remove(attacker.Identity.Instance);
-            }
+            double initialDelaySeconds = Playfield.IsCapturedCleaningRobot(attacker)
+                                             ? NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds
+                                             : NpcCombatAttackRules.DefaultCombatTickSeconds;
+            this.nextCombatTicks[attacker.Identity.Instance] =
+                DateTime.UtcNow + TimeSpan.FromSeconds(initialDelaySeconds);
 
             this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
         }
