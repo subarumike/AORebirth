@@ -274,6 +274,33 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void CombatStartPacketsUseLiveCompatibleBaseFlagAndDoNotEmitDefAggTutorialText()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string attackHandlerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\AttackMessageHandler.cs"));
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string npcCombatTickText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+
+            Assert.IsTrue(
+                attackHandlerText.Contains("x.Unknown = 0;"),
+                "Player attack-start echo must use the live-captured AttackMessage base Unknown=0 shape.");
+            Assert.IsTrue(
+                playfieldText.Contains("new AttackInfoMessage")
+                && playfieldText.Contains("Unknown = 0,")
+                && npcCombatTickText.Contains("new AttackInfoMessage")
+                && npcCombatTickText.Contains("Unknown = 0,"),
+                "Player and NPC AttackInfo packets must use the live-captured base Unknown=0 shape.");
+            Assert.IsFalse(
+                attackHandlerText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive.")
+                || playfieldText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive.")
+                || npcCombatTickText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive."),
+                "Combat-start paths must not server-emit the client Def-Agg tutorial text.");
+        }
+
+        [TestMethod]
         public void NpcCorpseLifecycleRulesPreserveCapturedCleaningRobotDeathTimings()
         {
             Assert.AreEqual(
