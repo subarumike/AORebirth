@@ -70,6 +70,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 message.Target,
                 target != null,
                 target == null ? 0 : target.Stats[StatIds.health].Value);
+            CombatStartPacketDiagnostics.LogAttackCommand(character, message.Target, message.Action, target);
 
             if (target == null)
             {
@@ -145,6 +146,17 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private void SendAttackState(ICharacter character, Identity target, byte action)
         {
+            CombatStartPacketDiagnostics.LogOutbound(
+                "AttackMessageHandler.SendAttackState",
+                new AttackMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 0,
+                    Target = target,
+                    Action = action
+                },
+                Identity.None);
+
             this.SendToPlayfield(
                 character,
                 x =>

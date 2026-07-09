@@ -383,6 +383,7 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void Announce(MessageBody messageBody)
         {
+            CombatStartPacketDiagnostics.LogOutbound("Playfield.Announce", messageBody, Identity.None);
             this.runtimeSystems.AnnounceMessageToCharacterClients(messageBody, this.Send);
         }
 
@@ -616,6 +617,12 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void Send(IZoneClient client, MessageBody body)
         {
+            CombatStartPacketDiagnostics.LogOutbound(
+                "Playfield.SendBodyToClient",
+                body,
+                client == null || client.Controller == null || client.Controller.Character == null
+                    ? Identity.None
+                    : client.Controller.Character.Identity);
             this.runtimeSystems.PublishMessageBodyToClient(client, body, this.Publish);
         }
 
