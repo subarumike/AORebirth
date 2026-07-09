@@ -2003,8 +2003,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && npcCombatMovementText.Contains("internal void TryMoveNpcIntoCombatRange(")
                 && npcCombatMovementText.Contains("internal static double GetCombatDistance(")
                 && npcCombatMovementText.Contains("internal static bool IsCapturedCleaningRobot(")
-                && npcCombatMovementText.Contains("private void MoveNpcTowardCombatTarget(")
-                && npcCombatMovementText.Contains("private void MoveCapturedCleaningRobotTowardCombatTarget("),
+                && npcCombatMovementText.Contains("private void MoveNpcTowardCombatTarget("),
                 "PlayfieldNpcCombatMovementRuntimeService must own NPC range, chase, and follow-target movement decisions.");
             Assert.IsFalse(
                 npcCombatMovementText.Contains("SetPosMessage")
@@ -2289,13 +2288,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 npcCombatMovementText.Contains("MoveCombatPositionToward(")
                 && npcCombatMovementText.Contains("EnemyBehaviorContract.MaxPlayerChaseProjectionDistance")
-                && npcCombatMovementText.Contains("EnemyBehaviorContract.MaxNpcFollowSpeedPerSecond")
+                && npcCombatMovementText.Contains("moveNpcToPosition(attacker, attackerPosition);")
                 && npcCombatMovementText.Contains("npcController.Follow(target.Identity, stopDistance);")
                 && npcCombatMovementText.Contains("npcController.StopFollow();")
-                && npcCombatMovementText.Contains("logNpcBrain(\"Chasing\"")
                 && npcCombatMovementText.Contains("logNpcBrain(\"FollowTargetStart\"")
                 && npcCombatMovementText.Contains("logNpcBrain(\"FollowTargetContinue\""),
-                "NPC combat movement service must own chase distance, follow start, follow continuation, and stop-follow decisions.");
+                "NPC combat movement service must own initial SetPos, continuous follow start/continuation, and stop-follow decisions.");
+            string moveNpcTowardCombatTarget = ExtractMethodBlock(
+                npcCombatMovementText,
+                "private void MoveNpcTowardCombatTarget(");
+            Assert.IsFalse(
+                moveNpcTowardCombatTarget.Contains("npcController.StopFollow();")
+                || moveNpcTowardCombatTarget.Contains("moveNpcToPosition(attacker, nextPosition)"),
+                "Generic NPC chase must not clear follow state and warp through periodic SetPos steps.");
             Assert.IsFalse(
                 playfieldText.Contains("private void MoveNpcTowardCombatTarget(")
                 || playfieldText.Contains("private void MoveCapturedCleaningRobotTowardCombatTarget(")

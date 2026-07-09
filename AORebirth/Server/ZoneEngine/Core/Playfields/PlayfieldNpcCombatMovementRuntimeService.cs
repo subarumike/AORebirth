@@ -20,15 +20,11 @@ namespace ZoneEngine.Core.Playfields
 
         private const double MaxMeleeFollowHoldDistance = 3.0;
 
-        private const double MinNpcCombatMoveDistance = 0.3;
-
         private const string CapturedCleaningRobotName = "Malfunctioning Cleaning Robot";
 
         private const int CapturedCleaningRobotMonsterData = 297023;
 
         private const double CapturedCleaningRobotFollowStopDistance = 0.0;
-
-        private const double OutOfRangeRetrySeconds = NpcCombatAttackRules.OutOfRangeRetrySeconds;
 
         internal bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)
         {
@@ -159,49 +155,18 @@ namespace ZoneEngine.Core.Playfields
                 return;
             }
 
-            if (IsCapturedCleaningRobot(attacker))
-            {
-                this.MoveCapturedCleaningRobotTowardCombatTarget(attacker, target, range, reason, npcController, logNpcBrain);
-                return;
-            }
-
-            npcController.StopFollow();
-
             AORebirth.Core.Vector.Vector3 attackerPosition = GetCombatPosition(attacker);
             AORebirth.Core.Vector.Vector3 targetPosition = GetCombatPosition(target);
-            double stopDistance = BuildNpcCombatStopDistance(range);
-            double distance = attackerPosition.Distance2D(targetPosition);
-            double travelDistance = Math.Min(
-                EnemyBehaviorContract.MaxNpcFollowSpeedPerSecond * OutOfRangeRetrySeconds,
-                Math.Max(0.0, distance - stopDistance));
-
-            if (travelDistance < MinNpcCombatMoveDistance)
-            {
-                return;
-            }
-
-            AORebirth.Core.Vector.Vector3 nextPosition =
-                MoveCombatPositionToward(attackerPosition, targetPosition, travelDistance);
-
-            moveNpcToPosition(attacker, nextPosition);
-            logNpcBrain("Chasing", reason, attacker, target, range, distance);
-        }
-
-        private void MoveCapturedCleaningRobotTowardCombatTarget(
-            ICharacter attacker,
-            ICharacter target,
-            double range,
-            string reason,
-            NPCController npcController,
-            Action<string, string, ICharacter, ICharacter, double, double> logNpcBrain)
-        {
-            AORebirth.Core.Vector.Vector3 attackerPosition = GetCombatPosition(attacker);
-            AORebirth.Core.Vector.Vector3 targetPosition = GetCombatPosition(target);
-            double stopDistance = CapturedCleaningRobotFollowStopDistance;
+            double stopDistance = IsCapturedCleaningRobot(attacker)
+                                      ? CapturedCleaningRobotFollowStopDistance
+                                      : BuildNpcCombatStopDistance(range);
             double distance = attackerPosition.Distance2D(targetPosition);
 
             if (!npcController.IsFollowing(target.Identity))
             {
+                // Live NPC combat starts with an authoritative current-position SetPos,
+                // immediately followed by continuous run-mode NpcPath updates.
+                moveNpcToPosition(attacker, attackerPosition);
                 npcController.Follow(target.Identity, stopDistance);
                 logNpcBrain("FollowTargetStart", reason, attacker, target, range, distance);
                 return;
