@@ -895,6 +895,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
             string orchestratorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwaySpawnOrchestrator.cs"));
+            string scfuPacketText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
+            string scfuMessageText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\Messages\N3Messages\SimpleCharFullUpdateMessage.cs"));
+            string scfuSerializerText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\Serialization\Serializers\Custom\SimpleCharFullUpdateSerializer.cs"));
 
             Assert.IsTrue(moduleText.Contains("public sealed class SubwayContentModule : IPlayfieldContentModule"));
             Assert.IsTrue(moduleText.Contains("private const int SubwayPlayfieldInstance = 127"));
@@ -960,6 +970,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 orchestratorText.Contains("ClearTemplateHeadMesh(mobCharacter);")
                 && orchestratorText.Contains("mobCharacter.MeshLayer.RemoveMesh(0, 0, 0, 4);"),
                 "Captured Subway no-headmesh mobs must clear template zero mesh layers to preserve live Meshes=count=0 SCFU shape.");
+            Assert.IsTrue(
+                scfuMessageText.Contains("public byte[] ExtendedTextureOverrideData { get; set; }")
+                && scfuSerializerText.Contains("SimpleCharFullUpdateFlags.HasExtendedTextures")
+                && scfuSerializerText.Contains("streamWriter.WriteBytes(scfu.ExtendedTextureOverrideData);"),
+                "SimpleCharFullUpdate must be able to emit captured extended texture override data.");
+            Assert.IsTrue(
+                scfuPacketText.Contains("private const int SubwayPlayfieldResource = 127;")
+                && scfuPacketText.Contains("private const int SubwayFilthFleaMonsterData = 17657;")
+                && scfuPacketText.Contains("private const string SubwayFilthFleaName = \"Filth Flea\"")
+                && scfuPacketText.Contains("CapturedSubwayFilthFleaExtendedTextureOverrideData")
+                && scfuPacketText.Contains("0x4D, 0x61, 0x74, 0x65,")
+                && scfuPacketText.Contains("0x72, 0x69, 0x61, 0x6C, 0x20, 0x23, 0x39")
+                && scfuPacketText.Contains("IsCapturedSubwayFilthFlea(charPlayfield, monsterData, charName)"),
+                "Captured Subway Filth Flea must emit the live Material #9 extended texture override block only for PF127 monsterData 17657.");
         }
 
         [TestMethod]
