@@ -2,17 +2,35 @@
 
 Primary Codex memory file for AO Rebirth. This top section is the current source of truth. Historical sections below are retained for evidence and provenance; older Rex/B18D/B18E/gate notes in those sections may be superseded by the current state here.
 
+## Current Focus
+
+- Active development priority: make the Subway dungeon, resource/playfield `127`, fully playable using capture-backed implementation.
+- Current implementation order:
+  1. Correct Subway NPC appearances.
+  2. Complete Subway entrance mob population.
+  3. Validate combat behavior.
+  4. Validate corpse/loot behavior.
+  5. Validate zoning into/out of Subway.
+  6. Complete additional Subway rooms from capture evidence.
+  7. Doors and scripted interactions.
+  8. Boss encounters.
+  9. Vendors and non-critical interactions.
+  10. Polish and parity against live captures.
+- Subway content binding uses resource/playfield `127`; live runtime instance ids such as `R=1187842` and capture/runtime output such as `Playfield2:122002` must not be used as the server content binding key.
+- Subway content work should use completed AOSharpLiveCapture folders supplied by Mike. Codex does not launch the AO client or capture tooling unless Mike explicitly instructs it in the current task.
+- Playfield runtime decomposition has completed through the latest extracted runtime services and is now maintenance work, not the active development focus.
+- Corpse open, item loot transfer, and corpse credit payout are capture-backed and live validated.
+- Filth Flea appearance has been corrected from capture-backed Subway SCFU texture evidence.
+- Subway content work is the primary development track.
+
 ## Current Baseline
 
-- HEAD baseline at start of seated-login persistence work: `1db78bc2`.
+- Current active handoff: `docs/ai/CURRENT_TASK.md` tracks Subway playability work.
 - Repository purpose: local C#/.NET Framework-era Anarchy Online server workspace for Mike's current AO client and local `cellao_codex_clean` MySQL database; this is a legacy database name retained for local compatibility.
 - Current stable approach: evidence-backed packet/gameplay/data repair, current-client parity over legacy assumptions, and identity-first capture-derived reconstruction.
 - Documentation split: `docs/ai/CURRENT_TASK.md` remains the active task handoff; this file is the stable project memory; `docs/generated/` contains historical result reports only.
-- Active cleanup note: `docs/ai/CURRENT_TASK.md` is focused on surgery-clinic implant-install behavior after terminal activation. Do not invent or reference `docs/generated/rex_default_enabled_gate_fix_result.md` until that file exists.
-- Last live-smoked committed quest baseline: `ecbca7d` (`Implement Marcus B18F to B194 transition`).
-- Current task result: surgery-clinic terminal use remains capture-backed, and post-terminal implant install now grants the existing 300-second implant-access state so the captured `ClientMoveItemToInventory` implant equip path can run. Live capture `20260621-063942` proved the install sequence, and private AO Rebirth smoke confirmed implant install/removal, zone-time NCU cleanup, and normal effect expiry.
-- Current uncommitted quest work: Marcus Phase 4B item `296780` handout exists in `MarcusB18FCompletionHandler.cs`, has focused ZoneEngine build/search validation, has not had live smoke, and is intentionally paused/uncommitted.
-- Quest system work is on the back burner. The next work item should be selected from non-quest gameplay bugs unless Mike explicitly resumes quest work.
+- Older active-task notes for surgery clinic, Rex/Marcus, private-city, org, corpse validation, and Playfield decomposition are retained below as historical project state, not the current priority.
+- Quest system work remains on the back burner unless Mike explicitly resumes quest work.
 
 ## Current Hard Rules
 
