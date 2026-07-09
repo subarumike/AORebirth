@@ -99,6 +99,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         [AoMember(21)]
         public short RunSpeedBase { get; set; }
 
+        public byte[] ExtendedTextureOverrideData { get; set; }
+
         [AoMember(22, SerializeSize = ArraySizeType.X3F1)]
         public ActiveNano[] ActiveNanos { get; set; }
 

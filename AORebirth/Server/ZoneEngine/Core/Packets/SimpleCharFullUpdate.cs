@@ -59,6 +59,21 @@ namespace ZoneEngine.Core.Packets
     /// </summary>
     public static class SimpleCharFullUpdate
     {
+        private const int SubwayPlayfieldResource = 127;
+        private const int SubwayFilthFleaMonsterData = 17657;
+        private const string SubwayFilthFleaName = "Filth Flea";
+
+        private static readonly byte[] CapturedSubwayFilthFleaExtendedTextureOverrideData =
+            new byte[]
+                {
+                    0x00, 0x00, 0x07, 0xE2, 0x4D, 0x61, 0x74, 0x65,
+                    0x72, 0x69, 0x61, 0x6C, 0x20, 0x23, 0x39, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3B, 0x81,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
+                };
+
         #region Public Methods and Operators
 
         /// <summary>
@@ -350,6 +365,11 @@ namespace ZoneEngine.Core.Packets
             // Runspeed
             scfu.RunSpeedBase = (short)runSpeedBaseValue;
 
+            if (IsCapturedSubwayFilthFlea(charPlayfield, monsterData, charName))
+            {
+                scfu.ExtendedTextureOverrideData = CapturedSubwayFilthFleaExtendedTextureOverrideData;
+            }
+
             scfu.ActiveNanos = (from nano in nanos
                 select
                     new ActiveNano
@@ -419,6 +439,13 @@ namespace ZoneEngine.Core.Packets
             scfu.Unknown2 = 0;
 
             return scfu;
+        }
+
+        private static bool IsCapturedSubwayFilthFlea(int playfieldInstance, int monsterData, string name)
+        {
+            return playfieldInstance == SubwayPlayfieldResource
+                && monsterData == SubwayFilthFleaMonsterData
+                && string.Equals(name, SubwayFilthFleaName, StringComparison.Ordinal);
         }
 
         /// <summary>

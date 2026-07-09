@@ -286,13 +286,11 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             }
             
 
-            /*
-            if (scfu.ExtendedTextures != null)
+            if (scfu.ExtendedTextureOverrideData != null && scfu.ExtendedTextureOverrideData.Length > 0)
             {
                 flags |= SimpleCharFullUpdateFlags.HasExtendedTextures;
-                // Write extended texture data here
+                streamWriter.WriteBytes(scfu.ExtendedTextureOverrideData);
             }
-            */
 
             /*
             if (scfu.PetId != 0)
