@@ -14,6 +14,9 @@
 
 namespace SmokeLounge.AOtomation.Messaging.Serialization
 {
+    using System.Globalization;
+    using System.IO;
+
     using SmokeLounge.AOtomation.Messaging.Messages;
 
     public class PacketInspector
@@ -44,6 +47,34 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization
                 if (current.KnownType == null)
                 {
                     return current;
+                }
+
+                int identifierLength;
+                switch (current.KnownType.IdentifierType)
+                {
+                    case IdentifierType.Byte:
+                        identifierLength = 1;
+                        break;
+                    case IdentifierType.Int16:
+                        identifierLength = 2;
+                        break;
+                    case IdentifierType.Int32:
+                        identifierLength = 4;
+                        break;
+                    default:
+                        return null;
+                }
+
+                if ((current.KnownType.Offset < 0)
+                    || (((long)current.KnownType.Offset + identifierLength) > reader.Length))
+                {
+                    throw new InvalidDataException(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Inbound message discriminator at offset {0} requires {1} bytes but the envelope contains {2}.",
+                            current.KnownType.Offset,
+                            identifierLength,
+                            reader.Length));
                 }
 
                 reader.Position = current.KnownType.Offset;
