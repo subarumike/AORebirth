@@ -108,6 +108,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotContentProvider.cs">
       <Link>CapturedAreteRobotContentProvider.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs">
+      <Link>CapturedSubwayContentProvider.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs">
       <Link>NpcCombatAttackRules.cs</Link>
     </Compile>

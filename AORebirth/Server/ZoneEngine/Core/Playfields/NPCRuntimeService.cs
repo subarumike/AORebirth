@@ -59,7 +59,8 @@ namespace AORebirth.Core.Playfields
             this.combatTick = new NpcCombatTickCoordinator(playfield);
             this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
             this.capturedSubwayContent = new CapturedSubwayContentProvider();
-            this.patrolReplay = new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent);
+            this.patrolReplay =
+                new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent, this.capturedSubwayContent);
             this.capturedAreteRobotSpawns =
                 new CapturedAreteRobotSpawnOrchestrator(
                     this.capturedAreteRobotContent,
@@ -68,6 +69,7 @@ namespace AORebirth.Core.Playfields
             this.capturedSubwaySpawns =
                 new CapturedSubwaySpawnOrchestrator(
                     this.capturedSubwayContent,
+                    this.patrolReplay,
                     this.ActivateNpc);
         }
 

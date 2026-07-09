@@ -107,10 +107,6 @@ namespace ZoneEngine.Core.Controllers
 
         private const double WalkFollowSpeedPerSecond = 1.5;
 
-        private const string CapturedCleaningRobotName = "Malfunctioning Cleaning Robot";
-
-        private const int CapturedCleaningRobotMonsterData = 297023;
-
         public NpcAiProfile AiProfile { get; set; } = NpcAiProfile.Passive;
 
         private struct NpcMotionSegment
@@ -264,13 +260,12 @@ namespace ZoneEngine.Core.Controllers
             return MoveToward(start, targetPosition, distance - this.followStopDistance);
         }
 
-        private bool IsCapturedCleaningRobotIdlePatrol()
+        private bool IsCapturedIdlePatrolReplay()
         {
             return this.state == CharacterState.Patrolling
                    && this.followIdentity.Equals(Identity.None)
                    && this.Character != null
-                   && string.Equals(this.Character.Name, CapturedCleaningRobotName, StringComparison.OrdinalIgnoreCase)
-                   && this.Character.Stats[StatIds.monsterdata].Value == CapturedCleaningRobotMonsterData;
+                   && this.HasCapturedPatrolReplay();
         }
 
         public void SetCapturedPatrolReplaySegments(NpcPatrolReplaySegment[] segments)
@@ -287,7 +282,7 @@ namespace ZoneEngine.Core.Controllers
 
         private bool TrySendCapturedPatrolReplay()
         {
-            if (!this.IsCapturedCleaningRobotIdlePatrol() || !this.HasCapturedPatrolReplay())
+            if (!this.IsCapturedIdlePatrolReplay())
             {
                 return false;
             }
