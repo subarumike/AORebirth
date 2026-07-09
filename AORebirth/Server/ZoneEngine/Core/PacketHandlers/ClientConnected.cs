@@ -328,7 +328,7 @@ client.Controller.Character.Playfield.Identity,
                                         || client.Controller.Character.MoveMode == MoveModes.Sit;
 
             // Match the captured live alive/actionable baseline.
-            SetStat(client, StatIds.state, 1000001);
+            SetStat(client, StatIds.state, 0);
 
             if (restoreSeatedPosture)
             {

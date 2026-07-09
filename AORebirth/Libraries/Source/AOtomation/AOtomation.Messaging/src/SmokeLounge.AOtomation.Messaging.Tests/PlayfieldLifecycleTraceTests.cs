@@ -283,10 +283,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string npcCombatTickText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            string clientConnectedText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
 
             Assert.IsTrue(
                 attackHandlerText.Contains("x.Unknown = 0;"),
                 "Player attack-start echo must use the live-captured AttackMessage base Unknown=0 shape.");
+            Assert.IsTrue(
+                clientConnectedText.Contains("SetStat(client, StatIds.state, 0);"),
+                "Login/actionable player state must keep the live-captured State=0 baseline before combat.");
+            Assert.IsFalse(
+                clientConnectedText.Contains("SetStat(client, StatIds.state, 1000001);"),
+                "Login/actionable player state must not prime the client with the invalid State=1000001 combat/tutorial condition.");
             Assert.IsTrue(
                 playfieldText.Contains("new AttackInfoMessage")
                 && playfieldText.Contains("Unknown = 0,")
@@ -301,7 +309,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(
                 attackHandlerText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive.")
                 || playfieldText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive.")
-                || npcCombatTickText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive."),
+                || npcCombatTickText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive.")
+                || clientConnectedText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive."),
                 "Combat-start paths must not server-emit the client Def-Agg tutorial text.");
         }
 
