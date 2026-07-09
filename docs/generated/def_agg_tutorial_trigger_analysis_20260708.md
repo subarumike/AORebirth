@@ -13,6 +13,7 @@ No combat packet field or timing was changed in this analysis because the exact 
 ## Captures inspected
 
 - Official live reference: `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600`
+- Post-`2e779266` AORebirth Subway Thief combat capture: `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-225850`
 - Fresh AORebirth Subway combat capture before `2e779266`: `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-223814`
 - Latest stored AORebirth Subway capture: `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-185543`
 - Older AORebirth combat reference, before the two fixes: `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260707-172254`
@@ -30,7 +31,7 @@ The latest stored AORebirth Subway capture, `20260708-185543`, is not a usable p
 
 Capture `20260708-223814` is a usable Subway Thief combat-start capture, but it was the evidence used before `2e779266`. It is not a post-`2e779266` retest capture.
 
-The capture folder list currently shows no newer completed capture after `20260708-223814`. Because of that, there is no current post-`2e779266` AORebirth packet timeline on disk showing the Subway Thief attack where Mike still saw the tutorial line.
+Capture `20260708-225850` is a usable post-`2e779266` Subway Thief combat and death capture. It does not contain the literal Def-Agg tutorial text in `events.log`; the only text rows near the fight are unrelated `ChatText` and the encoded XP `FormatFeedback` after death. This confirms the Def-Agg line is still client-local/tutorial UI behavior, not a server-emitted chat or feedback text packet.
 
 ## Official live combat-start timeline
 
@@ -169,6 +170,105 @@ The fresh AORebirth capture had only one `SpecialAttackWeapon` before combat in 
 
 `OUT Attack -> IN SpecialAttackWeapon(player) -> IN Attack(player echo) -> IN player AttackInfo -> IN SpecialAttackWeapon(target) -> IN Attack(target) -> IN NumFightingOpponents=1`
 
+## Post-`2e779266` AORebirth Subway Thief capture
+
+Reference: `20260708-225850`.
+
+Focused identity:
+
+- `SimpleChar:794F6173`
+- name `Thief`
+- monster data `26092`
+- level `5`
+- health `115/115`
+- position `(72.99, 115.6148, 312.8245)`
+
+Visibility evidence:
+
+1. `03:58:57.8418708Z` `DYNEL-SPAWNED` `SimpleChar:794F6173`, name `Thief`, monster data `26092`.
+2. `03:58:57.8463741Z` IN `SimpleCharFullUpdate` for `SimpleChar:794F6173`.
+3. `03:58:57.8463741Z` IN `WeaponItemFullUpdate` for weapon instance `25702383`, owner `SimpleChar:794F6173`.
+4. `03:58:57.8493749Z` `CHAR-SEEN` for the same Thief identity.
+
+Combat-start timeline:
+
+1. `03:59:00.9836064Z` OUT `CharacterAction InfoRequest`
+   - source `SimpleChar:7944C065`
+   - target `SimpleChar:794F6173`
+2. `03:59:00.9836064Z` OUT `LookAt`
+3. `03:59:01.0674714Z` IN `InfoPacket`
+   - target `SimpleChar:794F6173`
+4. `03:59:01.0724696Z` OUT `LookAt`
+5. `03:59:02.0524803Z` OUT `Attack`
+   - source `SimpleChar:7944C065`
+   - target `SimpleChar:794F6173`
+   - `Unknown1 = 0`
+   - base `Unknown = 0`
+6. `03:59:02.1435276Z` IN unrelated `FollowTarget` path rows for nearby mobs.
+7. `03:59:02.1435276Z` IN `SpecialAttackWeapon`
+   - source `SimpleChar:7944C065`
+8. `03:59:02.1435276Z` IN `Attack`
+   - source `SimpleChar:7944C065`
+   - target `SimpleChar:794F6173`
+   - `Unknown1 = 0`
+   - base `Unknown = 0`
+9. `03:59:03.5530377Z` IN `AttackInfo`
+   - source `SimpleChar:7944C065`
+   - target `SimpleChar:794F6173`
+   - `Amount = 55`
+   - `WeaponSlot = 8`
+   - `Unk1 = 0`
+   - base `Unknown = 0`
+10. `03:59:03.7531394Z` IN `SpecialAttackWeapon`
+    - source `SimpleChar:794F6173`
+11. `03:59:03.7531394Z` IN `Attack`
+    - source `SimpleChar:794F6173`
+    - target `SimpleChar:7944C065`
+    - `Unknown1 = 0`
+    - base `Unknown = 0`
+12. `03:59:03.7531394Z` IN `Stat`
+    - source `SimpleChar:7944C065`
+    - `NumFightingOpponents = 1`
+    - base `Unknown = 1`
+13. `03:59:03.9062332Z` IN `Stat`
+    - source `SimpleChar:794F6173`
+    - `Health = 91`
+    - base `Unknown = 0`
+
+Death/end timeline:
+
+1. `03:59:16.4533517Z` IN final player `AttackInfo`
+   - source `SimpleChar:7944C065`
+   - target `SimpleChar:794F6173`
+   - `Amount = 55`
+   - `WeaponSlot = 8`
+   - `Unk1 = 4`
+   - base `Unknown = 0`
+2. `03:59:16.7225175Z` IN `StopFight`
+   - source `SimpleChar:794F6173`
+3. `03:59:16.7225175Z` IN `Stat`
+   - source `SimpleChar:7944C065`
+   - `NumFightingOpponents = 0`
+   - base `Unknown = 1`
+4. `03:59:16.7235176Z` IN `CharacterAction Death`
+   - source `SimpleChar:794F6173`
+   - `Parameter2 = 503`
+5. `03:59:17.1838253Z` IN `Stat`
+   - source `SimpleChar:7944C065`
+   - `XP = 36223`
+6. `03:59:17.1838253Z` IN `FormatFeedback`
+   - encoded XP/reward feedback.
+7. `03:59:26.6046328Z` IN `Despawn`
+   - source `SimpleChar:794F6173`
+
+Post-`2e779266` conclusion:
+
+The previously suspected missing combat-start context is no longer missing in this capture. The post-fix AORebirth timeline now has the same high-level order as the official live combat-start sequence:
+
+`OUT Attack -> IN SpecialAttackWeapon(player) -> IN Attack(player echo) -> IN player AttackInfo -> IN SpecialAttackWeapon(target) -> IN Attack(target) -> IN NumFightingOpponents=1`
+
+The literal Def-Agg tutorial line is still not present in server text packets. No `FormatFeedback`, `ChatText`, tutorial/help text, or action-state row in `20260708-225850` directly proves a server-emitted Def-Agg trigger before the first hit.
+
 ## Packet differences established by available evidence
 
 The two already-fixed fields were real live-vs-AORebirth differences:
@@ -179,6 +279,8 @@ The two already-fixed fields were real live-vs-AORebirth differences:
 Mike's retest after both fixes proves those differences were not the complete trigger.
 
 The third change, `2e779266`, targeted another real live-vs-AORebirth difference in `20260708-223814`: the server produced target `AttackInfo` and player `Health` damage almost immediately after combat start, while the official live capture establishes a combat-start context before the target's sustained attack state. Mike's retest after `2e779266` proves this was also not the complete Def-Agg trigger.
+
+The post-`2e779266` capture proves that the delayed first NPC tick also restored the expected `SpecialAttackWeapon`/player `Attack`/player `AttackInfo`/target `SpecialAttackWeapon`/target `Attack`/`NumFightingOpponents` shape. The Def-Agg tutorial still appearing means this corrected shape is insufficient to identify the trigger.
 
 Other observed differences remain candidates only:
 
@@ -211,19 +313,23 @@ The failed assumptions are quarantined here: future work must not build on them 
 
 The exact trigger is unresolved.
 
-The most likely remaining candidates, in priority order, are:
+The post-`2e779266` capture removes these earlier candidates:
 
-1. Missing or mismatched player `SpecialAttackWeapon` context immediately before attack echo.
-2. Missing or mismatched target `SpecialAttackWeapon`/target attack-start context before the first target hit.
-3. Missing or late `NumFightingOpponents` client state update for sustained combat.
-4. Remaining packet order mismatch where AORebirth sends player attack echo before the captured live `SpecialAttackWeapon(player)` context.
-5. A login/full-character/tutorial client-state condition that is not visible in the currently inspected attack-start packets.
+- Missing player `SpecialAttackWeapon` before attack echo.
+- Missing target `SpecialAttackWeapon`/target attack-start context.
+- Missing `NumFightingOpponents = 1` after target attack start.
+- AORebirth attack echo arriving before player `SpecialAttackWeapon`.
 
-No code should be changed from this report alone. The next useful evidence is a fresh AORebirth capture, after commit `2e779266`, of exactly:
+The remaining candidates are now outside the decoded combat-start packet sequence:
 
-1. Zone into Subway.
-2. Target the Subway Thief.
-3. Start attack.
-4. Stop capture after the Def-Agg tutorial line appears and before additional unrelated actions.
+1. A login/full-character/tutorial client-state condition set before the attack window.
+2. A server packet field inside `SpecialAttackWeapon` or another under-decoded packet that is not visible in the current structured capture output.
+3. A client-side first-combat tutorial state that AORebirth does not initialize or clear the same way as live.
+4. A non-text feedback/action-state packet earlier in zone-in that primes the client to show the tutorial on first attack.
 
-That capture should be compared packet-by-packet against the `20260708-143600` live timeline above before changing another combat packet field.
+No code should be changed from this report alone. The next useful work is tooling/evidence, not another combat behavior guess:
+
+1. Decode `SpecialAttackWeapon` payload fields from `packets.hex.log` for both `20260708-225850` and `20260708-143600`.
+2. Compare Subway zone-in/full-character/tutorial/client-state packets before OUT `Attack`.
+3. Capture or locate a live official Thief fight if exact same-mob comparison is needed; `20260708-143600` contains live Thief spawn/SCFU evidence but its first captured fight is a Filth Flea.
+4. Only after a packet/field difference is confirmed should AORebirth code change again.
