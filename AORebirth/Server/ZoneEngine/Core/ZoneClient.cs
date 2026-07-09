@@ -488,13 +488,15 @@ namespace ZoneEngine.Core
         /// </returns>
         protected uint GetMessageNumber(BufferSegment segment)
         {
-            var messageNumberArray = new byte[4];
-            messageNumberArray[3] = segment.SegmentData[16];
-            messageNumberArray[2] = segment.SegmentData[17];
-            messageNumberArray[1] = segment.SegmentData[18];
-            messageNumberArray[0] = segment.SegmentData[19];
-            uint reply = BitConverter.ToUInt32(messageNumberArray, 0);
-            return reply;
+            if ((segment == null) || (segment.Length < 20))
+            {
+                return 0;
+            }
+
+            return ((uint)segment[16] << 24)
+                   | ((uint)segment[17] << 16)
+                   | ((uint)segment[18] << 8)
+                   | segment[19];
         }
 
         /// <summary>
@@ -505,13 +507,15 @@ namespace ZoneEngine.Core
         /// </returns>
         protected uint GetMessageNumber(byte[] segment)
         {
-            var messageNumberArray = new byte[4];
-            messageNumberArray[3] = segment[16];
-            messageNumberArray[2] = segment[17];
-            messageNumberArray[1] = segment[18];
-            messageNumberArray[0] = segment[19];
-            uint reply = BitConverter.ToUInt32(messageNumberArray, 0);
-            return reply;
+            if ((segment == null) || (segment.Length < 20))
+            {
+                return 0;
+            }
+
+            return ((uint)segment[16] << 24)
+                   | ((uint)segment[17] << 16)
+                   | ((uint)segment[18] << 8)
+                   | segment[19];
         }
 
         /// <summary>
