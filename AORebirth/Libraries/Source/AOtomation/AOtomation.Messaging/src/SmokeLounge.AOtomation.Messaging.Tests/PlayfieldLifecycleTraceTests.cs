@@ -293,6 +293,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && npcCombatTickText.Contains("new AttackInfoMessage")
                 && npcCombatTickText.Contains("Unknown = 0,"),
                 "Player and NPC AttackInfo packets must use the live-captured base Unknown=0 shape.");
+            Assert.IsTrue(
+                npcCombatTickText.Contains("NpcCombatAttackRules.DefaultCombatTickSeconds")
+                && npcCombatTickText.Contains("DateTime.UtcNow + TimeSpan.FromSeconds(initialDelaySeconds)")
+                && !npcCombatTickText.Contains("this.nextCombatTicks.Remove(attacker.Identity.Instance);"),
+                "NPC combat start must not emit immediate first-hit AttackInfo before the live-compatible combat-start window.");
             Assert.IsFalse(
                 attackHandlerText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive.")
                 || playfieldText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive.")
