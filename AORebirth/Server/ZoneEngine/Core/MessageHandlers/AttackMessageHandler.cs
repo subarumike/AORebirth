@@ -57,6 +57,11 @@ namespace ZoneEngine.Core.MessageHandlers
     public class AttackMessageHandler : BaseMessageHandler<AttackMessage, AttackMessageHandler>
     {
         private const int SimpleCharFullUpdateIsImmuneFlag = 0x00800000;
+        private const int CombatStartSpecialAttackUnknown1 = 13;
+        private const int CombatStartSpecialAttackUnknown2 = 25;
+        private const int CombatStartSpecialAttackUnknown3 = 13;
+        private const int CombatStartSpecialAttackUnknown4 = 33;
+        private const int CombatStartSpecialAttackUnknown5 = 100;
 
         protected override void Read(AttackMessage message, IZoneClient client)
         {
@@ -89,6 +94,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
             this.StartPlayerAttack(character, message.Target);
             this.EngageNpcTarget(character, target);
+            this.SendCombatStartSpecialAttackWeapon(character);
             this.SendAttackState(character, message.Target, message.Action);
         }
 
@@ -166,6 +172,54 @@ namespace ZoneEngine.Core.MessageHandlers
                     x.Target = target;
                     x.Action = action;
                 });
+        }
+
+        private void SendCombatStartSpecialAttackWeapon(ICharacter character)
+        {
+            var message = new SpecialAttackWeaponMessage
+                          {
+                              Identity = character.Identity,
+                              Specials = CreateDefaultPlayerSpecialAttacks(),
+                              Unknown1 = CombatStartSpecialAttackUnknown1,
+                              Unknown2 = CombatStartSpecialAttackUnknown2,
+                              Unknown3 = CombatStartSpecialAttackUnknown3,
+                              Unknown4 = CombatStartSpecialAttackUnknown4,
+                              Unknown5 = CombatStartSpecialAttackUnknown5
+                          };
+
+            CombatStartPacketDiagnostics.LogOutbound(
+                "AttackMessageHandler.SendCombatStartSpecialAttackWeapon",
+                message,
+                Identity.None);
+            character.Playfield.Announce(message);
+        }
+
+        private static SpecialAttack[] CreateDefaultPlayerSpecialAttacks()
+        {
+            return new[]
+                   {
+                       new SpecialAttack
+                       {
+                           Unknown1 = 0x0000AAC0,
+                           Unknown2 = 0x00023569,
+                           Unknown3 = 0x00000064,
+                           Unknown4 = "MAAT"
+                       },
+                       new SpecialAttack
+                       {
+                           Unknown1 = 0x0000A431,
+                           Unknown2 = 0x0000A430,
+                           Unknown3 = 0x00000090,
+                           Unknown4 = "DIIT"
+                       },
+                       new SpecialAttack
+                       {
+                           Unknown1 = 0x00011294,
+                           Unknown2 = 0x00011295,
+                           Unknown3 = 0x0000008E,
+                           Unknown4 = "BRAW"
+                       }
+                   };
         }
     }
 }

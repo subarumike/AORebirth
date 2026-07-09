@@ -490,9 +490,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && attackHandlerText.Contains("this.CancelPlayerAttack(character);")
                 && attackHandlerText.Contains("playfield.StartPlayerAttack(character, target);")
                 && attackHandlerText.Contains("playfield.CancelPlayerAttack(character);")
+                && attackHandlerText.Contains("this.SendCombatStartSpecialAttackWeapon(character);")
                 && attackHandlerText.Contains("this.SendAttackState(character, message.Target, message.Action);")
                 && attackHandlerText.Contains("x.Unknown = 0;"),
                 "AttackMessageHandler must route player attack start/cancel through the player combat boundary while keeping the live-compatible attack echo shape.");
+            int combatStartWeaponIndex = attackHandlerText.IndexOf(
+                "this.SendCombatStartSpecialAttackWeapon(character);",
+                StringComparison.Ordinal);
+            int attackEchoIndex = attackHandlerText.IndexOf(
+                "this.SendAttackState(character, message.Target, message.Action);",
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                combatStartWeaponIndex >= 0
+                && attackEchoIndex >= 0
+                && combatStartWeaponIndex < attackEchoIndex
+                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown1 = 13")
+                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown2 = 25")
+                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown3 = 13")
+                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown4 = 33")
+                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown5 = 100")
+                && attackHandlerText.Contains("Unknown4 = \"MAAT\"")
+                && attackHandlerText.Contains("Unknown4 = \"DIIT\"")
+                && attackHandlerText.Contains("Unknown4 = \"BRAW\""),
+                "AttackMessageHandler must send the live-captured player SpecialAttackWeapon state before the attack echo on valid combat start.");
             Assert.IsFalse(
                 attackHandlerText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive."),
                 "AttackMessageHandler must not server-emit the client Def-Agg tutorial text on combat start.");
