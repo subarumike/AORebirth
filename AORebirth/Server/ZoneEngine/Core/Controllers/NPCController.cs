@@ -310,7 +310,14 @@ namespace ZoneEngine.Core.Controllers
             }
 
             NpcPatrolReplaySegment segment = this.capturedPatrolReplaySegments[this.capturedPatrolReplayIndex];
-            this.Walk();
+            if (segment.MoveMode == EnemyBehaviorContract.RunMoveMode)
+            {
+                this.Run();
+            }
+            else
+            {
+                this.Walk();
+            }
             var capturedStart = new Vector3(segment.StartX, segment.StartY, segment.StartZ);
             Vector3 start = this.capturedPatrolReplayUsesRuntimeStart
                                 ? this.UpdateMotionSegmentPosition(now)

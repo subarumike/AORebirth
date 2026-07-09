@@ -1148,31 +1148,46 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.AreEqual(
-                22,
+                45,
                 CountOccurrences(providerText, "new CapturedSubwayPatrolReplaySegment("),
-                "The four moving mobs must load all 22 captured NpcPath segments from capture 20260708-182237.");
+                "The four moving mobs must load complete periodic NpcPath cycles from capture 20260709-164414.");
             Assert.IsTrue(
-                providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.8599795, 91.2642059f")
-                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.25, 120.158409f")
+                providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.665506, 90.9275284f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.683567, 122.601311f")
+                && providerText.Contains("249.100006f, 25)")
+                && providerText.Contains("239.65303f, 24)")
+                && providerText.Contains("248.1135f, 18)")
+                && providerText.Contains("257.187653f, 25)")
                 && providerText.Contains("GetPatrolReplaySegments(int sourceInstance)"),
-                "Captured patrol replay must preserve the first and last observed segment/timing evidence.");
+                "Captured patrol replay must preserve complete cycle timing, movement modes, and captured route speeds.");
             Assert.IsTrue(
                 orchestratorText.Contains("this.patrolReplay.AssignCapturedSubwayReplay(")
-                && orchestratorText.Contains("npcController.SetCapturedPatrolReplaySegments(segments, true);")
+                && orchestratorText.Contains("mobCharacter.AddWaypoint(start, false);")
+                && orchestratorText.Contains("mobCharacter.AddWaypoint(end, false);")
+                && orchestratorText.Contains("npcController.SetCapturedPatrolReplaySegments(segments, false);")
                 && orchestratorText.Contains("npcController.State = CharacterState.Patrolling;"),
-                "Subway spawn orchestration must assign captured patrol replay only when captured segments exist.");
+                "Subway spawn orchestration must announce live SCFU waypoints and retain exact captured segment starts.");
             Assert.IsTrue(
                 coordinatorText.Contains("BuildCapturedSubwaySegments(int sourceInstance)")
-                && coordinatorText.Contains("this.capturedSubwayContentProvider.GetPatrolReplaySegments(sourceInstance)"),
-                "NpcPatrolReplayCoordinator must convert captured Subway segments into runtime replay segments.");
+                && coordinatorText.Contains("this.capturedSubwayContentProvider.GetPatrolReplaySegments(sourceInstance)")
+                && coordinatorText.Contains("segments[i].MoveMode"),
+                "NpcPatrolReplayCoordinator must preserve captured Subway coordinates, timing, and movement mode.");
             Assert.IsTrue(
                 npcControllerText.Contains("private bool IsCapturedIdlePatrolReplay()")
                 && npcControllerText.Contains("&& this.HasCapturedPatrolReplay();")
                 && npcControllerText.Contains("&& this.Character.FightingTarget.Equals(Identity.None)")
-                && npcControllerText.Contains("capturedPatrolReplayUsesRuntimeStart")
-                && npcControllerText.Contains("? this.UpdateMotionSegmentPosition(now)")
+                && npcControllerText.Contains("segment.MoveMode == EnemyBehaviorContract.RunMoveMode")
+                && npcControllerText.Contains(": capturedStart")
                 && !npcControllerText.Contains("IsCapturedCleaningRobotIdlePatrol"),
-                "Subway replay must preserve runtime position continuity and stop when combat begins.");
+                "Subway replay must preserve captured starts/movement modes and stop when combat begins.");
+
+            string scfuPacketText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
+            Assert.IsTrue(
+                scfuPacketText.Contains("character.Waypoints.Count > 1")
+                && scfuPacketText.Contains("scfu.Version = 58;")
+                && scfuPacketText.Contains("scfu.Waypoints ="),
+                "Moving Subway NPC SCFU must match live version 58 with its initial two-point path.");
 
             string npcRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));

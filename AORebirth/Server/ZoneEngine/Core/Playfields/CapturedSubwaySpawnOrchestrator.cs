@@ -89,7 +89,7 @@ namespace AORebirth.Core.Playfields
             mobCharacter.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
             PrepareCapturedSubwayMob(mobCharacter, spawn);
             AssignCapturedPatrolWaypoint(mobCharacter, spawn);
-            this.AssignCapturedPatrolReplay(npcController, spawn);
+            this.AssignCapturedPatrolReplay(mobCharacter, npcController, spawn);
             mobCharacter.DoNotDoTimers = false;
             this.activateNpc(mobCharacter);
             playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));
@@ -113,6 +113,7 @@ namespace AORebirth.Core.Playfields
         }
 
         private void AssignCapturedPatrolReplay(
+            Character mobCharacter,
             NPCController npcController,
             CapturedSubwaySpawnDefinition spawn)
         {
@@ -122,7 +123,24 @@ namespace AORebirth.Core.Playfields
                 segments =>
                 {
                     replaySegmentCount = segments == null ? 0 : segments.Length;
-                    npcController.SetCapturedPatrolReplaySegments(segments, true);
+                    if (replaySegmentCount == 0)
+                    {
+                        return;
+                    }
+
+                    var start = new AORebirth.Core.Vector.Vector3(
+                        segments[0].StartX,
+                        segments[0].StartY,
+                        segments[0].StartZ);
+                    var end = new AORebirth.Core.Vector.Vector3(
+                        segments[0].EndX,
+                        segments[0].EndY,
+                        segments[0].EndZ);
+                    mobCharacter.Coordinates(start);
+                    mobCharacter.Waypoints.Clear();
+                    mobCharacter.AddWaypoint(start, false);
+                    mobCharacter.AddWaypoint(end, false);
+                    npcController.SetCapturedPatrolReplaySegments(segments, false);
                 });
 
             if (replaySegmentCount > 0)

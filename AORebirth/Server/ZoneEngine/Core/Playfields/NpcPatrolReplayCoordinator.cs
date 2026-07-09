@@ -64,7 +64,8 @@ namespace ZoneEngine.Core.Playfields
                     segments[i].StartZ,
                     segments[i].EndX,
                     segments[i].EndY,
-                    segments[i].EndZ);
+                    segments[i].EndZ,
+                    segments[i].MoveMode);
             }
 
             return result;
@@ -80,6 +81,8 @@ namespace ZoneEngine.Core.Playfields
 
     public sealed class NpcPatrolReplaySegment
     {
+        private const byte DefaultMoveMode = 24;
+
         public NpcPatrolReplaySegment(
             double delayAfterSeconds,
             float startX,
@@ -88,6 +91,27 @@ namespace ZoneEngine.Core.Playfields
             float endX,
             float endY,
             float endZ)
+            : this(
+                delayAfterSeconds,
+                startX,
+                startY,
+                startZ,
+                endX,
+                endY,
+                endZ,
+                DefaultMoveMode)
+        {
+        }
+
+        public NpcPatrolReplaySegment(
+            double delayAfterSeconds,
+            float startX,
+            float startY,
+            float startZ,
+            float endX,
+            float endY,
+            float endZ,
+            byte moveMode)
         {
             this.DelayAfterSeconds = delayAfterSeconds;
             this.StartX = startX;
@@ -96,6 +120,7 @@ namespace ZoneEngine.Core.Playfields
             this.EndX = endX;
             this.EndY = endY;
             this.EndZ = endZ;
+            this.MoveMode = moveMode;
         }
 
         public double DelayAfterSeconds { get; private set; }
@@ -111,5 +136,7 @@ namespace ZoneEngine.Core.Playfields
         public float EndY { get; private set; }
 
         public float EndZ { get; private set; }
+
+        public byte MoveMode { get; private set; }
     }
 }
