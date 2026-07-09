@@ -30,13 +30,17 @@ namespace AORebirth.Core.Playfields
 
         private readonly CapturedSubwayContentProvider capturedSubwayContent;
 
+        private readonly NpcPatrolReplayCoordinator patrolReplay;
+
         private readonly Action<ICharacter> activateNpc;
 
         internal CapturedSubwaySpawnOrchestrator(
             CapturedSubwayContentProvider capturedSubwayContent,
+            NpcPatrolReplayCoordinator patrolReplay,
             Action<ICharacter> activateNpc)
         {
             this.capturedSubwayContent = capturedSubwayContent;
+            this.patrolReplay = patrolReplay;
             this.activateNpc = activateNpc;
         }
 
@@ -85,6 +89,7 @@ namespace AORebirth.Core.Playfields
             mobCharacter.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
             PrepareCapturedSubwayMob(mobCharacter, spawn);
             AssignCapturedPatrolWaypoint(mobCharacter, spawn);
+            this.AssignCapturedPatrolReplay(npcController, spawn);
             mobCharacter.DoNotDoTimers = false;
             this.activateNpc(mobCharacter);
             playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));
@@ -93,7 +98,7 @@ namespace AORebirth.Core.Playfields
                 DebugInfoDetail.Engine,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Captured Subway mob spawned sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} name={2} monsterData={3} pos=({4},{5},{6}) health={7} level={8} runSpeed={9}",
+                    "Captured Subway mob spawned sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} name={2} monsterData={3} pos=({4},{5},{6}) health={7} level={8} runSpeed={9} section={10}",
                     spawn.SourceInstance,
                     mobCharacter.Identity,
                     spawn.Name,
@@ -103,7 +108,27 @@ namespace AORebirth.Core.Playfields
                     spawn.Z,
                     spawn.Health,
                     spawn.Level,
-                    spawn.RunSpeed));
+                    spawn.RunSpeed,
+                    spawn.ContentSection));
+        }
+
+        private void AssignCapturedPatrolReplay(
+            NPCController npcController,
+            CapturedSubwaySpawnDefinition spawn)
+        {
+            int replaySegmentCount = 0;
+            this.patrolReplay.AssignCapturedSubwayReplay(
+                spawn.SourceInstance,
+                segments =>
+                {
+                    replaySegmentCount = segments == null ? 0 : segments.Length;
+                    npcController.SetCapturedPatrolReplaySegments(segments);
+                });
+
+            if (replaySegmentCount > 0)
+            {
+                npcController.State = CharacterState.Patrolling;
+            }
         }
 
         private static void PrepareCapturedSubwayMob(Character mobCharacter, CapturedSubwaySpawnDefinition spawn)

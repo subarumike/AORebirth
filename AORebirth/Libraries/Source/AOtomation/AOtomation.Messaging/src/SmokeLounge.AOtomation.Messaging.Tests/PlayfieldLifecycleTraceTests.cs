@@ -1016,9 +1016,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && providerText.Contains("203733")
                 && providerText.Contains("203734"),
                 "CapturedSubwayContentProvider must preserve the captured monsterData values.");
+            int patrolReplayIndex = providerText.IndexOf(
+                "private static readonly Dictionary<int, CapturedSubwayPatrolReplaySegment[]>",
+                StringComparison.Ordinal);
+            Assert.IsTrue(patrolReplayIndex > 0, "Captured Subway patrol replay data must follow spawn definitions.");
+            string spawnDefinitionsText = providerText.Substring(0, patrolReplayIndex);
             Assert.AreEqual(
                 32,
-                CountOccurrences(providerText, "0x794"),
+                CountOccurrences(spawnDefinitionsText, "0x794"),
                 "CapturedSubwayContentProvider must contain the 32 visible Subway CHAR-SEEN spawn identities from capture 20260708-182237.");
             Assert.IsFalse(
                 providerText.Contains("122002"),
@@ -1095,6 +1100,76 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && scfuPacketText.Contains("scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;")
                 && scfuPacketText.Contains("IsCapturedSubwayThief(charPlayfield, monsterData, charName)"),
                 "Captured Subway Thief must emit the live version, appearance value, unknown movement bytes, and flag mask only for PF127 monsterData 26092.");
+        }
+
+        [TestMethod]
+        public void SubwayFirstLowerSectionLoadsCapturedPopulationAndPatrolReplay()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string providerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+            string orchestratorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwaySpawnOrchestrator.cs"));
+            string coordinatorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcPatrolReplayCoordinator.cs"));
+            string npcControllerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Controllers\NPCController.cs"));
+
+            Assert.AreEqual(
+                10,
+                CountOccurrences(providerText, "FirstLowerSectionSpawn(FilthFlea("),
+                "The captured first lower section must keep its ten Filth Flea spawns.");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(providerText, "FirstLowerSectionSpawn(DisobedientBot("),
+                "The captured first lower section must keep its one Disobedient Bot spawn.");
+
+            string[] firstLowerSectionSourceIdentities =
+                {
+                    "0x794DF703",
+                    "0x794DF719",
+                    "0x794DF71A",
+                    "0x794DF71D",
+                    "0x794DF72A",
+                    "0x794DF72E",
+                    "0x794DF730",
+                    "0x794DF749",
+                    "0x794E815F",
+                    "0x794E8167",
+                    "0x794E8179"
+                };
+            for (int i = 0; i < firstLowerSectionSourceIdentities.Length; i++)
+            {
+                Assert.IsTrue(
+                    providerText.Contains(firstLowerSectionSourceIdentities[i]),
+                    "Missing captured first-lower-section source identity "
+                    + firstLowerSectionSourceIdentities[i]
+                    + ".");
+            }
+
+            Assert.AreEqual(
+                22,
+                CountOccurrences(providerText, "new CapturedSubwayPatrolReplaySegment("),
+                "The four moving mobs must load all 22 captured NpcPath segments from capture 20260708-182237.");
+            Assert.IsTrue(
+                providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.8599795, 91.2642059f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.25, 120.158409f")
+                && providerText.Contains("GetPatrolReplaySegments(int sourceInstance)"),
+                "Captured patrol replay must preserve the first and last observed segment/timing evidence.");
+            Assert.IsTrue(
+                orchestratorText.Contains("this.patrolReplay.AssignCapturedSubwayReplay(")
+                && orchestratorText.Contains("npcController.SetCapturedPatrolReplaySegments(segments);")
+                && orchestratorText.Contains("npcController.State = CharacterState.Patrolling;"),
+                "Subway spawn orchestration must assign captured patrol replay only when captured segments exist.");
+            Assert.IsTrue(
+                coordinatorText.Contains("BuildCapturedSubwaySegments(int sourceInstance)")
+                && coordinatorText.Contains("this.capturedSubwayContentProvider.GetPatrolReplaySegments(sourceInstance)"),
+                "NpcPatrolReplayCoordinator must convert captured Subway segments into runtime replay segments.");
+            Assert.IsTrue(
+                npcControllerText.Contains("private bool IsCapturedIdlePatrolReplay()")
+                && npcControllerText.Contains("&& this.HasCapturedPatrolReplay();")
+                && !npcControllerText.Contains("IsCapturedCleaningRobotIdlePatrol"),
+                "Exact patrol replay must be available to assigned Subway NPCs without changing unassigned NPC patrols.");
         }
 
         [TestMethod]
@@ -1511,7 +1586,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "NPCRuntimeService must own captured Arete robot content provider construction.");
             Assert.AreEqual(
                 1,
-                CountOccurrences(npcRuntimeText, "new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent)"),
+                CountOccurrences(
+                    npcRuntimeText,
+                    "new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent, this.capturedSubwayContent)"),
                 "NPCRuntimeService must own NPC patrol replay coordinator construction.");
             Assert.AreEqual(
                 1,
