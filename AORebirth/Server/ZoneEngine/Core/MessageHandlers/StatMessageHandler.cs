@@ -124,6 +124,11 @@ namespace ZoneEngine.Core.MessageHandlers
 
             if (statsToClient.Count > 0)
             {
+                CombatStartPacketDiagnostics.LogStatBulk(
+                    "StatMessageHandler.SendBulk.client",
+                    character,
+                    statsToClient,
+                    false);
                 this.Send(character, this.FillerBulk(character, statsToClient));
             }
 
@@ -145,6 +150,11 @@ namespace ZoneEngine.Core.MessageHandlers
 
             if (statsToPlayfield.Count > 0)
             {
+                CombatStartPacketDiagnostics.LogStatBulk(
+                    "StatMessageHandler.SendBulk.playfield",
+                    character,
+                    statsToPlayfield,
+                    true);
                 this.Send(character, this.FillerBulk(character, statsToPlayfield), true);
             }
         }
