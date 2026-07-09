@@ -293,6 +293,7 @@ namespace AORebirth.Core.Playfields
                 new AttackInfoMessage
                 {
                     Identity = attacker.Identity,
+                    Unknown = 0,
                     Target = target.Identity,
                     Unknown1 = damage,
                     Unknown2 = attackSource.AttackInfoAmmoCount,
