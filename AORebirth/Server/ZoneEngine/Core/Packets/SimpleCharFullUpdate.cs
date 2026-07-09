@@ -244,7 +244,10 @@ namespace ZoneEngine.Core.Packets
             scfu.Identity = charId;
 
             scfu.Version = 57; // SCFU packet version (57/0x39)
-            if (IsCapturedSubwayThief(charPlayfield, monsterData, charName))
+            if (IsCapturedSubwayThief(charPlayfield, monsterData, charName)
+                || (charPlayfield == SubwayPlayfieldResource
+                    && character.Waypoints != null
+                    && character.Waypoints.Count > 1))
             {
                 scfu.Version = 58;
             }
