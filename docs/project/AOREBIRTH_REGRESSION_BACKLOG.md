@@ -8,9 +8,11 @@ This is a backlog, not an active implementation plan. Each item should become it
 
 ## Current Active Scope
 
-Current active gameplay scope: `Captured Cleaning Robot Combat Parity`.
+Current active gameplay scope: complete the Subway dungeon, resource/playfield `127`, through incremental capture-backed implementation.
 
-Private-city, org, player-visibility, database, and capture-tooling items are still important backlog items, but they are not automatically the active implementation task unless Mike explicitly selects one.
+Playfield decomposition, private-city, org, player-visibility, database, and capture-tooling items remain maintenance or backlog work. They are not active implementation scope unless Mike explicitly selects one.
+
+The Def-Agg investigation is closed. Live AO confirmed that level 1 characters receive the repeated Def-Agg chat hint when attacking enemies; this is normal client behavior, not an AORebirth regression.
 
 ## Priority Legend
 
