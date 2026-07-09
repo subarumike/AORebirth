@@ -87,6 +87,8 @@ namespace ZoneEngine.Core.Controllers
 
         private bool capturedPatrolReplayUsesRuntimeStart;
 
+        private bool capturedPatrolReplayBatchesZeroDelaySegments;
+
         private DateTime nextCapturedPatrolReplayUtc = DateTime.MinValue;
 
         private bool hasMotionPacket;
@@ -273,16 +275,25 @@ namespace ZoneEngine.Core.Controllers
 
         public void SetCapturedPatrolReplaySegments(NpcPatrolReplaySegment[] segments)
         {
-            this.SetCapturedPatrolReplaySegments(segments, false);
+            this.SetCapturedPatrolReplaySegments(segments, false, false);
         }
 
         public void SetCapturedPatrolReplaySegments(
             NpcPatrolReplaySegment[] segments,
             bool useRuntimeStart)
         {
+            this.SetCapturedPatrolReplaySegments(segments, useRuntimeStart, false);
+        }
+
+        public void SetCapturedPatrolReplaySegments(
+            NpcPatrolReplaySegment[] segments,
+            bool useRuntimeStart,
+            bool batchZeroDelaySegments)
+        {
             this.capturedPatrolReplaySegments = segments ?? new NpcPatrolReplaySegment[0];
             this.capturedPatrolReplayIndex = 0;
             this.capturedPatrolReplayUsesRuntimeStart = useRuntimeStart;
+            this.capturedPatrolReplayBatchesZeroDelaySegments = batchZeroDelaySegments;
             this.nextCapturedPatrolReplayUtc = DateTime.MinValue;
         }
 
@@ -304,38 +315,53 @@ namespace ZoneEngine.Core.Controllers
                 return true;
             }
 
-            if (this.capturedPatrolReplayIndex >= this.capturedPatrolReplaySegments.Length)
+            int sentSegments = 0;
+            while (sentSegments < this.capturedPatrolReplaySegments.Length)
             {
-                this.capturedPatrolReplayIndex = 0;
+                if (this.capturedPatrolReplayIndex >= this.capturedPatrolReplaySegments.Length)
+                {
+                    this.capturedPatrolReplayIndex = 0;
+                }
+
+                NpcPatrolReplaySegment segment = this.capturedPatrolReplaySegments[this.capturedPatrolReplayIndex];
+                if (segment.MoveMode == EnemyBehaviorContract.RunMoveMode)
+                {
+                    this.Run();
+                }
+                else
+                {
+                    this.Walk();
+                }
+
+                var capturedStart = new Vector3(segment.StartX, segment.StartY, segment.StartZ);
+                Vector3 start = this.capturedPatrolReplayUsesRuntimeStart
+                                    ? this.UpdateMotionSegmentPosition(now)
+                                    : capturedStart;
+                var end = new Vector3(segment.EndX, segment.EndY, segment.EndZ);
+                this.followCoordinates = end;
+                this.Character.Coordinates(start);
+                this.FaceToward(start, end);
+                this.LogChase("captured-patrol-replay", start, end);
+                FollowTargetMessageHandler.Default.Send(this.Character, start, end);
+                this.SetMotionSegment(start, end, now);
+                this.lastMotionPacketUtc = now;
+                this.lastMotionPacketDestination = end;
+                this.hasMotionPacket = true;
+
+                this.capturedPatrolReplayIndex =
+                    (this.capturedPatrolReplayIndex + 1) % this.capturedPatrolReplaySegments.Length;
+                sentSegments++;
+
+                if (!this.capturedPatrolReplayBatchesZeroDelaySegments
+                    || segment.DelayAfterSeconds > 0.0)
+                {
+                    this.nextCapturedPatrolReplayUtc =
+                        now + TimeSpan.FromSeconds(Math.Max(0.01, segment.DelayAfterSeconds));
+                    return true;
+                }
             }
 
-            NpcPatrolReplaySegment segment = this.capturedPatrolReplaySegments[this.capturedPatrolReplayIndex];
-            if (segment.MoveMode == EnemyBehaviorContract.RunMoveMode)
-            {
-                this.Run();
-            }
-            else
-            {
-                this.Walk();
-            }
-            var capturedStart = new Vector3(segment.StartX, segment.StartY, segment.StartZ);
-            Vector3 start = this.capturedPatrolReplayUsesRuntimeStart
-                                ? this.UpdateMotionSegmentPosition(now)
-                                : capturedStart;
-            var end = new Vector3(segment.EndX, segment.EndY, segment.EndZ);
-            this.followCoordinates = end;
-            this.Character.Coordinates(start);
-            this.FaceToward(start, end);
-            this.LogChase("captured-patrol-replay", start, end);
-            FollowTargetMessageHandler.Default.Send(this.Character, start, end);
-            this.SetMotionSegment(start, end, now);
-            this.lastMotionPacketUtc = now;
-            this.lastMotionPacketDestination = end;
-            this.hasMotionPacket = true;
-
-            this.capturedPatrolReplayIndex = (this.capturedPatrolReplayIndex + 1) % this.capturedPatrolReplaySegments.Length;
-            this.nextCapturedPatrolReplayUtc =
-                now + TimeSpan.FromSeconds(Math.Max(0.01, segment.DelayAfterSeconds));
+            this.nextCapturedPatrolReplayUtc = now + TimeSpan.FromSeconds(0.01);
             return true;
         }
 
