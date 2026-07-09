@@ -1030,7 +1030,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "CapturedSubwayContentProvider must bind content to resource/playfield 127, not capture object Playfield2:122002.");
             Assert.IsTrue(
                 orchestratorText.Contains("SetMobStat(mobCharacter, StatIds.monsterdata, spawn.MonsterData);")
-                && orchestratorText.Contains("playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));"),
+                && orchestratorText.Contains("var fullUpdate = SimpleCharFullUpdate.ConstructMessage(mobCharacter);")
+                && orchestratorText.Contains("playfield.Announce(fullUpdate);"),
                 "Captured Subway spawns must remain visible, attackable NPCs using existing runtime/corpse paths.");
             Assert.IsFalse(
                 orchestratorText.Contains("SetMobStat(mobCharacter, StatIds.catmesh, spawn.MonsterData);")
@@ -1164,7 +1165,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 orchestratorText.Contains("this.patrolReplay.AssignCapturedSubwayReplay(")
                 && orchestratorText.Contains("mobCharacter.AddWaypoint(start, false);")
                 && orchestratorText.Contains("mobCharacter.AddWaypoint(end, false);")
-                && orchestratorText.Contains("npcController.SetCapturedPatrolReplaySegments(segments, false);")
+                && orchestratorText.Contains("npcController.SetCapturedPatrolReplaySegments(segments, false, true);")
                 && orchestratorText.Contains("npcController.State = CharacterState.Patrolling;"),
                 "Subway spawn orchestration must announce live SCFU waypoints and retain exact captured segment starts.");
             Assert.IsTrue(
@@ -1178,8 +1179,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && npcControllerText.Contains("&& this.Character.FightingTarget.Equals(Identity.None)")
                 && npcControllerText.Contains("segment.MoveMode == EnemyBehaviorContract.RunMoveMode")
                 && npcControllerText.Contains(": capturedStart")
+                && npcControllerText.Contains("capturedPatrolReplayBatchesZeroDelaySegments")
+                && npcControllerText.Contains("segment.DelayAfterSeconds > 0.0")
                 && !npcControllerText.Contains("IsCapturedCleaningRobotIdlePatrol"),
-                "Subway replay must preserve captured starts/movement modes and stop when combat begins.");
+                "Subway replay must preserve captured starts/movement modes, batch same-time corrections, and stop when combat begins.");
+
+            AssertTextBefore(
+                ExtractMethodBlock(orchestratorText, "private void SpawnCapturedSubwayMob("),
+                "var fullUpdate = SimpleCharFullUpdate.ConstructMessage(mobCharacter);",
+                "this.activateNpc(mobCharacter);");
+            AssertTextBefore(
+                ExtractMethodBlock(orchestratorText, "private void SpawnCapturedSubwayMob("),
+                "this.activateNpc(mobCharacter);",
+                "playfield.Announce(fullUpdate);");
 
             string scfuPacketText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));

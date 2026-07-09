@@ -91,8 +91,9 @@ namespace AORebirth.Core.Playfields
             AssignCapturedPatrolWaypoint(mobCharacter, spawn);
             this.AssignCapturedPatrolReplay(mobCharacter, npcController, spawn);
             mobCharacter.DoNotDoTimers = false;
+            var fullUpdate = SimpleCharFullUpdate.ConstructMessage(mobCharacter);
             this.activateNpc(mobCharacter);
-            playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));
+            playfield.Announce(fullUpdate);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
@@ -140,7 +141,7 @@ namespace AORebirth.Core.Playfields
                     mobCharacter.Waypoints.Clear();
                     mobCharacter.AddWaypoint(start, false);
                     mobCharacter.AddWaypoint(end, false);
-                    npcController.SetCapturedPatrolReplaySegments(segments, false);
+                    npcController.SetCapturedPatrolReplaySegments(segments, false, true);
                 });
 
             if (replaySegmentCount > 0)
