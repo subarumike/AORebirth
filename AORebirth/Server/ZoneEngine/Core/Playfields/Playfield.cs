@@ -2431,6 +2431,7 @@ namespace AORebirth.Core.Playfields
         {
             int corpseCatMesh = CorpseCatMeshFor(target);
             int corpseMonsterData = CorpseMonsterDataFor(target);
+            int recipientCount = 0;
 
             foreach (ICharacter character in this.runtimeSystems.Characters())
             {
@@ -2449,12 +2450,14 @@ namespace AORebirth.Core.Playfields
                         corpseCatMesh,
                         corpseMonsterData,
                         this.CorpseCreditsFor(corpseIdentity)));
+                recipientCount++;
             }
 
             LogUtil.Debug(
-                DebugInfoDetail.Network,
+                DebugInfoDetail.Engine,
                 string.Format(
-                    "CorpseFullUpdate visual target={0} corpse={1} catMesh={2} monsterData={3} credits={4} scale={5} sex={6} breed={7} race={8}",
+                    CultureInfo.InvariantCulture,
+                    "CorpseFullUpdate visual target={0} corpse={1} catMesh={2} monsterData={3} credits={4} scale={5} sex={6} breed={7} race={8} recipients={9} pos=({10},{11},{12})",
                     target.Identity,
                     corpseIdentity,
                     corpseCatMesh,
@@ -2463,7 +2466,11 @@ namespace AORebirth.Core.Playfields
                     target.Stats[StatIds.monsterscale].Value,
                     target.Stats[StatIds.sex].Value,
                     target.Stats[StatIds.breed].Value,
-                    target.Stats[StatIds.race].Value));
+                    target.Stats[StatIds.race].Value,
+                    recipientCount,
+                    target.RawCoordinates.X,
+                    target.RawCoordinates.Y,
+                    target.RawCoordinates.Z));
         }
 
         private int CorpseCreditsFor(Identity corpseIdentity)

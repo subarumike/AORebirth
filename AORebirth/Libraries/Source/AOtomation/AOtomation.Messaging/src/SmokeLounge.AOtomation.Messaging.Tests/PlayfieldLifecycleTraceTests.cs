@@ -1158,7 +1158,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Captured patrol replay must preserve the first and last observed segment/timing evidence.");
             Assert.IsTrue(
                 orchestratorText.Contains("this.patrolReplay.AssignCapturedSubwayReplay(")
-                && orchestratorText.Contains("npcController.SetCapturedPatrolReplaySegments(segments);")
+                && orchestratorText.Contains("npcController.SetCapturedPatrolReplaySegments(segments, true);")
                 && orchestratorText.Contains("npcController.State = CharacterState.Patrolling;"),
                 "Subway spawn orchestration must assign captured patrol replay only when captured segments exist.");
             Assert.IsTrue(
@@ -1168,8 +1168,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 npcControllerText.Contains("private bool IsCapturedIdlePatrolReplay()")
                 && npcControllerText.Contains("&& this.HasCapturedPatrolReplay();")
+                && npcControllerText.Contains("&& this.Character.FightingTarget.Equals(Identity.None)")
+                && npcControllerText.Contains("capturedPatrolReplayUsesRuntimeStart")
+                && npcControllerText.Contains("? this.UpdateMotionSegmentPosition(now)")
                 && !npcControllerText.Contains("IsCapturedCleaningRobotIdlePatrol"),
-                "Exact patrol replay must be available to assigned Subway NPCs without changing unassigned NPC patrols.");
+                "Subway replay must preserve runtime position continuity and stop when combat begins.");
+
+            string npcRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+            AssertTextBefore(
+                ExtractMethodBlock(npcRuntimeText, "internal void StopDyingNpcCombatState"),
+                "npcController.SnapshotCurrentMotionPosition();",
+                "npcController.StopFollow();");
         }
 
         [TestMethod]
