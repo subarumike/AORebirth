@@ -324,7 +324,7 @@ namespace ZoneEngine.Core.MessageHandlers
         private static void Log(string details)
         {
             LogUtil.Debug(
-                DebugInfoDetail.Network,
+                DebugInfoDetail.Engine,
                 string.Format(
                     CultureInfo.InvariantCulture,
                     "COMBAT_START_DIAG utc={0:o} {1}",
