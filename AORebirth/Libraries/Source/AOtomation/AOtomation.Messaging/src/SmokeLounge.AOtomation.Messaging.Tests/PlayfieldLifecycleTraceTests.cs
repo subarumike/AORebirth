@@ -1183,6 +1183,45 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void SubwayFilthFleaCorpseUsesCapturedLiveVisualTemplate()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string corpsePacketText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\CorpseFullUpdate.cs"));
+
+            Assert.IsTrue(
+                corpsePacketText.Contains("SubwayPlayfieldResource = 127")
+                && corpsePacketText.Contains("SubwayFilthFleaMonsterData = 17657")
+                && corpsePacketText.Contains("SubwayFilthFleaName = \"Filth Flea\"")
+                && corpsePacketText.Contains("CapturedSubwayFilthFleaPacketLength = 457"),
+                "Subway Filth Flea corpse selection must stay scoped to the captured PF127 identity and packet length.");
+            Assert.IsTrue(
+                corpsePacketText.Contains("CapturedSubwayFilthFleaTemplate")
+                && corpsePacketText.Contains("01000007E24D617465726961")
+                && corpsePacketText.Contains("6C202339"),
+                "The live Material #9 flea corpse visual tail from capture 20260709-164414 must remain present.");
+
+            string buildMethod = ExtractMethodBlock(
+                corpsePacketText,
+                "public static byte[] Build(");
+            Assert.IsTrue(
+                buildMethod.Contains("IsCapturedSubwayFilthFlea(deadNpc)")
+                && buildMethod.Contains("return BuildCapturedSubwayFilthFlea("),
+                "PF127 Filth Flea corpses must select the capture-backed visual packet before generic corpse construction.");
+
+            string capturedBuildMethod = ExtractMethodBlock(
+                corpsePacketText,
+                "private static byte[] BuildCapturedSubwayFilthFlea(");
+            Assert.IsTrue(
+                capturedBuildMethod.Contains("CapturedSubwayFilthFleaTemplate.Clone()")
+                && capturedBuildMethod.Contains("WriteInt32(buffer, ReceiverInstanceOffset, receiver.Instance);")
+                && capturedBuildMethod.Contains("WriteInt32(buffer, CorpseInstanceOffset, corpseIdentity.Instance);")
+                && capturedBuildMethod.Contains("WriteInt32(buffer, DeadNpcInstanceOffset, deadNpc.Identity.Instance);")
+                && capturedBuildMethod.Contains("CapturedSubwayFilthFleaTailDeadNpcInstanceOffset"),
+                "Captured flea corpse construction must retain the live visual payload while patching runtime identities.");
+        }
+
+        [TestMethod]
         public void KnownPlayfieldContentModulesAreRegisteredExactlyOnceThroughCoordinatorPath()
         {
             string repositoryRoot = FindRepositoryRoot();
