@@ -34,6 +34,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         // 0000 0000 0000 0000 0000 0000 0010 0000
         HasFightingTarget = 0x00000020, 
 
+        UnknownFlag6 = 0x00000008,
+
         // 0000 0000 0000 0000 0000 0000 0100 0000
         HasPlayfieldId = 0x00000040, 
 

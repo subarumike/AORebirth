@@ -317,14 +317,19 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 streamWriter.WriteInt32(activeNano.Time2);
             }
 
-            /*
-            if (scfu.Waypoints != null)
+            if (scfu.Waypoints != null && scfu.Waypoints.Length > 0)
             {
                 flags |= SimpleCharFullUpdateFlags.HasWaypoints;
-                // Write waypoints
-                // SCFU Array of Coordinates (3 floats)
+                streamWriter.WriteInt32((int)scfu.Identity.Type);
+                streamWriter.WriteInt32(scfu.Identity.Instance);
+                streamWriter.WriteInt32(scfu.Waypoints.Length);
+                foreach (var waypoint in scfu.Waypoints)
+                {
+                    streamWriter.WriteSingle(waypoint.X);
+                    streamWriter.WriteSingle(waypoint.Y);
+                    streamWriter.WriteSingle(waypoint.Z);
+                }
             }
-            */
 
             streamWriter.WriteInt32((scfu.Textures.Length + 1) * 0x3F1);
             foreach (var texture in scfu.Textures)
@@ -363,6 +368,9 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
 
             streamWriter.WriteInt32(scfu.Flags2);
             streamWriter.WriteByte(scfu.Unknown2);
+
+            flags |= scfu.AdditionalFlags;
+            flags &= ~scfu.SuppressedFlags;
 
             var pos = streamWriter.Position;
             streamWriter.Position = 30;

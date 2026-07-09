@@ -984,6 +984,52 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && scfuPacketText.Contains("0x72, 0x69, 0x61, 0x6C, 0x20, 0x23, 0x39")
                 && scfuPacketText.Contains("IsCapturedSubwayFilthFlea(charPlayfield, monsterData, charName)"),
                 "Captured Subway Filth Flea must emit the live Material #9 extended texture override block only for PF127 monsterData 17657.");
+            string thiefFactory = ExtractMethodBlock(
+                providerText,
+                "private static CapturedSubwaySpawnDefinition Thief");
+            Assert.IsTrue(
+                thiefFactory.Contains("\"Thief\"")
+                && thiefFactory.Contains("26092")
+                && thiefFactory.Contains("93")
+                && thiefFactory.Contains("40694")
+                && thiefFactory.Contains("20")
+                && thiefFactory.Contains("138")
+                && providerText.Contains("86.76542f")
+                && providerText.Contains("115.9823f")
+                && providerText.Contains("322.6304f"),
+                "Captured Subway Thief must preserve live monsterData, scale, head mesh, run speed, NPC family, and first patrol endpoint.");
+            Assert.IsTrue(
+                orchestratorText.Contains("CapturedSubwayThiefMonsterData = 26092")
+                && orchestratorText.Contains("CapturedSubwayThiefBodyMesh = 160561")
+                && orchestratorText.Contains("CapturedSubwayThiefBackMesh = 7777")
+                && orchestratorText.Contains("mobCharacter.Textures.Add(new AOTextures(0, 0x24CA));")
+                && orchestratorText.Contains("mobCharacter.Textures.Add(new AOTextures(1, 0x2219));")
+                && orchestratorText.Contains("mobCharacter.Textures.Add(new AOTextures(2, 0x24CC));")
+                && orchestratorText.Contains("mobCharacter.Textures.Add(new AOTextures(3, 0x24CB));")
+                && orchestratorText.Contains("mobCharacter.Textures.Add(new AOTextures(4, 0x24CD));")
+                && orchestratorText.Contains("mobCharacter.MeshLayer.AddMesh(0, CapturedSubwayThiefBodyMesh, 0, 2);")
+                && orchestratorText.Contains("mobCharacter.MeshLayer.AddMesh(1, CapturedSubwayThiefBackMesh, 0, 2);"),
+                "Captured Subway Thief must apply the live texture IDs and three-mesh humanoid appearance shape.");
+            Assert.IsTrue(
+                scfuMessageText.Contains("public SimpleCharFullUpdateFlags AdditionalFlags { get; set; }")
+                && scfuMessageText.Contains("public SimpleCharFullUpdateFlags SuppressedFlags { get; set; }")
+                && scfuMessageText.Contains("public Vector3[] Waypoints { get; set; }")
+                && scfuSerializerText.Contains("SimpleCharFullUpdateFlags.HasWaypoints")
+                && scfuSerializerText.Contains("streamWriter.WriteInt32(scfu.Waypoints.Length);")
+                && scfuSerializerText.Contains("flags |= scfu.AdditionalFlags;")
+                && scfuSerializerText.Contains("flags &= ~scfu.SuppressedFlags;"),
+                "SimpleCharFullUpdate must be able to emit captured waypoint data and capture-only flag deltas.");
+            Assert.IsTrue(
+                scfuPacketText.Contains("private const int SubwayThiefMonsterData = 26092")
+                && scfuPacketText.Contains("private const string SubwayThiefName = \"Thief\"")
+                && scfuPacketText.Contains("CapturedSubwayThiefAppearanceValue = 0x00122002")
+                && scfuPacketText.Contains("CapturedSubwayThiefUnknown1")
+                && scfuPacketText.Contains("scfu.Version = 58;")
+                && scfuPacketText.Contains("scfu.Appearance.Value = CapturedSubwayThiefAppearanceValue;")
+                && scfuPacketText.Contains("SimpleCharFullUpdateFlags.UnknownFlag6 | SimpleCharFullUpdateFlags.IsPet")
+                && scfuPacketText.Contains("scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;")
+                && scfuPacketText.Contains("IsCapturedSubwayThief(charPlayfield, monsterData, charName)"),
+                "Captured Subway Thief must emit the live version, appearance value, unknown movement bytes, and flag mask only for PF127 monsterData 26092.");
         }
 
         [TestMethod]
