@@ -59,6 +59,11 @@ Do not spend command budget on these unless the approved workflow has already fa
 Active task discipline:
 
 - Stay on the active gameplay task.
+- Current active priority is completing the Subway dungeon, resource/playfield `127`, through incremental capture-backed implementation.
+- Prefer visible gameplay improvements over architectural refactoring.
+- Use live AO captures as the authoritative source for Subway behavior and content.
+- Do not resume Playfield decomposition unless Mike explicitly requests it.
+- Do not make speculative Subway fixes; require capture-backed evidence.
 - Do not switch to repo cleanup.
 - Do not switch to architecture reviews.
 - Do not switch to modernization work.

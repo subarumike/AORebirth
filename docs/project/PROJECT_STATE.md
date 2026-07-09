@@ -5,21 +5,19 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 ## Current Focus
 
 - Active development priority: make the Subway dungeon, resource/playfield `127`, fully playable using capture-backed implementation.
-- Current implementation order:
-  1. Correct Subway NPC appearances.
-  2. Complete Subway entrance mob population.
-  3. Validate combat behavior.
-  4. Validate corpse/loot behavior.
-  5. Validate zoning into/out of Subway.
-  6. Complete additional Subway rooms from capture evidence.
-  7. Doors and scripted interactions.
-  8. Boss encounters.
-  9. Vendors and non-critical interactions.
-  10. Polish and parity against live captures.
+- Current implementation roadmap:
+  1. Complete NPC population, appearances, patrol paths, and combat validation.
+  2. Complete static world objects, doors, containers, interactive objects, and environmental details.
+  3. Implement room-by-room parity, named NPCs, scripted events, boss encounters, and dungeon progression.
+  4. Add vendors, quest interactions, remaining polish, and capture parity validation.
 - Subway content binding uses resource/playfield `127`; live runtime instance ids such as `R=1187842` and capture/runtime output such as `Playfield2:122002` must not be used as the server content binding key.
 - Subway content work should use completed AOSharpLiveCapture folders supplied by Mike. Codex does not launch the AO client or capture tooling unless Mike explicitly instructs it in the current task.
+- Prefer visible Subway gameplay improvements over architectural refactoring, implement incrementally within playfield `127`, and do not resume Playfield decomposition unless Mike explicitly requests it.
+- Live AO captures are authoritative. Avoid speculative fixes and require capture-backed evidence for Subway behavior.
 - Playfield runtime decomposition has completed through the latest extracted runtime services and is now maintenance work, not the active development focus.
 - Corpse open, item loot transfer, and corpse credit payout are capture-backed and live validated.
+- The Def-Agg investigation is closed: live AO confirmed the repeated hint as normal level 1 client behavior.
+- Previous capture-backed enemy, movement, combat, zoning, and appearance milestones remain completed project history.
 - Filth Flea appearance has been corrected from capture-backed Subway SCFU texture evidence.
 - Subway content work is the primary development track.
 

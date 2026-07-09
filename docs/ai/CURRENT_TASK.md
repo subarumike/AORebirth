@@ -4,18 +4,45 @@
 
 Make the Subway dungeon, resource/playfield `127`, fully playable from capture-backed evidence.
 
-## Current Implementation Order
+## Implementation Roadmap
 
-1. Correct remaining Subway NPC appearances.
-2. Complete Subway entrance mob population.
-3. Validate combat behavior.
-4. Validate corpse/loot behavior.
-5. Validate zoning into/out of Subway.
-6. Complete additional Subway rooms from capture evidence.
-7. Doors and scripted interactions.
-8. Boss encounters.
-9. Vendors and non-critical interactions.
-10. Polish and parity against live captures.
+### Phase 1 - NPC Population And Combat
+
+- Complete the Subway NPC population.
+- Correct NPC appearances from captured SCFU evidence.
+- Correct patrol paths from captured movement evidence.
+- Validate combat behavior.
+
+### Phase 2 - Static World And Interactions
+
+- Complete static world objects.
+- Add doors.
+- Add containers.
+- Add interactive objects.
+- Add capture-backed environmental details.
+
+### Phase 3 - Dungeon Progression
+
+- Implement room-by-room parity with live captures.
+- Add named NPCs.
+- Add scripted events.
+- Add boss encounters.
+- Complete dungeon progression.
+
+### Phase 4 - Supporting Content And Polish
+
+- Add vendors.
+- Add quest interactions.
+- Complete remaining polish.
+- Validate parity against live captures.
+
+## Active Development Rules
+
+- Prefer visible gameplay improvements over architectural refactoring.
+- Use live AO captures as the authoritative implementation source.
+- Implement Subway incrementally within the single resource/playfield `127`.
+- Do not resume Playfield decomposition unless Mike explicitly requests it.
+- Avoid speculative fixes; implement behavior only from capture-backed evidence.
 
 ## Resolved Def-Agg Finding
 
@@ -45,6 +72,7 @@ is live-confirmed level 1 client behavior, not an AORebirth combat regression.
 
 - Playfield runtime decomposition is completed through the latest extracted runtime services and is maintenance work only unless Mike explicitly selects it.
 - Corpse open, item loot transfer, and corpse credit payout are capture-backed and live validated.
+- Previous capture-backed enemy, movement, combat, zoning, and appearance work remains completed project history.
 - Subway entry/exit placement has been repaired for the current tested route.
 - Filth Flea appearance has been corrected from capture-backed SCFU texture evidence.
 - Def-Agg level 1 combat hint has been closed as live-confirmed behavior, not a regression.
