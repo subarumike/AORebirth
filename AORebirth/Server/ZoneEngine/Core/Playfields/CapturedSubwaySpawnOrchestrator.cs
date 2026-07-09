@@ -7,6 +7,7 @@ namespace AORebirth.Core.Playfields
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.NPCHandler;
+    using AORebirth.Core.Textures;
     using AORebirth.Core.Vector;
     using AORebirth.Enums;
     using AORebirth.Interfaces;
@@ -23,6 +24,10 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class CapturedSubwaySpawnOrchestrator
     {
+        private const int CapturedSubwayThiefMonsterData = 26092;
+        private const int CapturedSubwayThiefBodyMesh = 160561;
+        private const int CapturedSubwayThiefBackMesh = 7777;
+
         private readonly CapturedSubwayContentProvider capturedSubwayContent;
 
         private readonly Action<ICharacter> activateNpc;
@@ -131,6 +136,11 @@ namespace AORebirth.Core.Playfields
             {
                 ClearTemplateHeadMesh(mobCharacter);
             }
+
+            if (spawn.MonsterData == CapturedSubwayThiefMonsterData)
+            {
+                ApplyCapturedSubwayThiefVisuals(mobCharacter, spawn.HeadMesh);
+            }
         }
 
         private static void AssignCapturedPatrolWaypoint(Character mobCharacter, CapturedSubwaySpawnDefinition spawn)
@@ -166,6 +176,23 @@ namespace AORebirth.Core.Playfields
         {
             mobCharacter.MeshLayer.RemoveMesh(0, 0, 0, 4);
             mobCharacter.SocialMeshLayer.RemoveMesh(0, 0, 0, 4);
+        }
+
+        private static void ApplyCapturedSubwayThiefVisuals(Character mobCharacter, int headMesh)
+        {
+            mobCharacter.Textures.Clear();
+            mobCharacter.Textures.Add(new AOTextures(0, 0x24CA));
+            mobCharacter.Textures.Add(new AOTextures(1, 0x2219));
+            mobCharacter.Textures.Add(new AOTextures(2, 0x24CC));
+            mobCharacter.Textures.Add(new AOTextures(3, 0x24CB));
+            mobCharacter.Textures.Add(new AOTextures(4, 0x24CD));
+
+            mobCharacter.MeshLayer.AddMesh(0, CapturedSubwayThiefBodyMesh, 0, 2);
+            mobCharacter.MeshLayer.AddMesh(0, headMesh, 0, 4);
+            mobCharacter.MeshLayer.AddMesh(1, CapturedSubwayThiefBackMesh, 0, 2);
+            mobCharacter.SocialMeshLayer.AddMesh(0, CapturedSubwayThiefBodyMesh, 0, 2);
+            mobCharacter.SocialMeshLayer.AddMesh(0, headMesh, 0, 4);
+            mobCharacter.SocialMeshLayer.AddMesh(1, CapturedSubwayThiefBackMesh, 0, 2);
         }
 
         private static void SetMobStat(ICharacter mobCharacter, StatIds stat, int value)

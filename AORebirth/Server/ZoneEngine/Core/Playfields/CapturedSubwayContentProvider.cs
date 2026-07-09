@@ -36,7 +36,16 @@ namespace ZoneEngine.Core.Playfields
             DisobedientBot(0x794DF749, 8, 183, 114.395836f, 107.61483f, 231.561676f),
             DisobedientBot(0x794DF7F1, 7, 160, 173.6774f, 107.61483f, 232.1588f),
             DisobedientBot(0x794E807A, 5, 115, 179.707809f, 107.61483f, 231.963226f),
-            Thief(0x794E80A1, 5, 115, 80.79672f, 115.765f, 323.7208f),
+            Thief(
+                0x794E80A1,
+                5,
+                115,
+                80.79672f,
+                115.765f,
+                323.7208f,
+                86.76542f,
+                115.9823f,
+                322.6304f),
             FilthFlea(0x794E815F, 4, 93, 100.812515f, 107.61483f, 239.3656f),
             FilthFlea(0x794E8162, 4, 93, 88.36062f, 115.615f, 300.164978f),
             FilthFlea(0x794E8163, 4, 93, 86.083015f, 111.615f, 270.3774f),
@@ -167,7 +176,10 @@ namespace ZoneEngine.Core.Playfields
             int health,
             float x,
             float y,
-            float z)
+            float z,
+            float patrolX,
+            float patrolY,
+            float patrolZ)
         {
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
@@ -176,16 +188,19 @@ namespace ZoneEngine.Core.Playfields
                 26092,
                 level,
                 health,
-                100,
+                93,
                 40694,
-                21,
-                3,
+                20,
+                138,
                 268964353,
                 1,
                 6,
                 x,
                 y,
-                z);
+                z,
+                patrolX,
+                patrolY,
+                patrolZ);
         }
 
         private static CapturedSubwaySpawnDefinition ViolentVagabond(
