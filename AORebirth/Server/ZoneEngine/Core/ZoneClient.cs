@@ -58,6 +58,7 @@ namespace ZoneEngine.Core
     using Utility;
 
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.MessageHandlers;
 
     using IBus = MemBus.IBus;
 
@@ -218,6 +219,12 @@ namespace ZoneEngine.Core
                           };
 
             byte[] buffer = this.messageSerializer.Serialize(message);
+            CombatStartPacketDiagnostics.LogSerializedOutbound(
+                "ZoneClient.SendCompressed",
+                messageBody,
+                sender,
+                this.Controller.Character.Identity,
+                buffer);
 
             lock (this.sendQueue)
             {

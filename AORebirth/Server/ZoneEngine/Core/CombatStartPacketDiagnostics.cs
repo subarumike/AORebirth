@@ -25,6 +25,10 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const string FlagFileName = "combat-packet-diagnostics.enabled";
 
+        private static readonly TimeSpan CombatStartWindow = TimeSpan.FromSeconds(6);
+
+        private static DateTime diagnosticWindowUntilUtc = DateTime.MinValue;
+
         internal static bool Enabled
         {
             get
@@ -51,6 +55,8 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 return;
             }
+
+            diagnosticWindowUntilUtc = DateTime.UtcNow.Add(CombatStartWindow);
 
             Log(
                 string.Format(
@@ -80,6 +86,11 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            if (!ShouldLogN3Message(n3Message))
+            {
+                return;
+            }
+
             Log(
                 string.Format(
                     CultureInfo.InvariantCulture,
@@ -89,13 +100,43 @@ namespace ZoneEngine.Core.MessageHandlers
                     DescribeN3Message(n3Message)));
         }
 
+        internal static void LogSerializedOutbound(
+            string route,
+            MessageBody body,
+            int sender,
+            Identity receiver,
+            byte[] buffer)
+        {
+            if (!Enabled)
+            {
+                return;
+            }
+
+            N3Message n3Message = body as N3Message;
+            if (n3Message == null || !ShouldLogN3Message(n3Message))
+            {
+                return;
+            }
+
+            Log(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "direction=OUT_RAW route={0} sender={1} receiver={2} {3} rawLen={4} rawHex={5}",
+                    route,
+                    sender,
+                    IdentityText(receiver),
+                    DescribeN3Message(n3Message),
+                    buffer == null ? 0 : buffer.Length,
+                    HexExcerpt(buffer)));
+        }
+
         internal static void LogStatBulk(
             string route,
             ICharacter character,
             Dictionary<int, uint> stats,
             bool announceToPlayfield)
         {
-            if (!Enabled || stats == null || stats.Count == 0)
+            if (!Enabled || stats == null || stats.Count == 0 || !IsInCombatStartWindow())
             {
                 return;
             }
@@ -217,6 +258,27 @@ namespace ZoneEngine.Core.MessageHandlers
                 message.Unknown);
         }
 
+        private static bool ShouldLogN3Message(N3Message message)
+        {
+            return IsInCombatStartWindow() || IsCombatPacket(message);
+        }
+
+        private static bool IsInCombatStartWindow()
+        {
+            return DateTime.UtcNow <= diagnosticWindowUntilUtc;
+        }
+
+        private static bool IsCombatPacket(N3Message message)
+        {
+            return message is AttackMessage
+                   || message is AttackInfoMessage
+                   || message is SpecialAttackWeaponMessage
+                   || message is StopFightMessage
+                   || message is CharacterActionMessage
+                   || message is FormatFeedbackMessage
+                   || message is FightModeUpdateMessage;
+        }
+
         private static string DescribeStats(GameTuple<CharacterStat, uint>[] stats)
         {
             if (stats == null || stats.Length == 0)
@@ -312,6 +374,28 @@ namespace ZoneEngine.Core.MessageHandlers
         private static string IdentityText(Identity identity)
         {
             return identity.ToString();
+        }
+
+        private static string HexExcerpt(byte[] buffer)
+        {
+            if (buffer == null || buffer.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            int byteCount = Math.Min(buffer.Length, 160);
+            var builder = new StringBuilder(byteCount * 2 + 3);
+            for (int i = 0; i < byteCount; i++)
+            {
+                builder.Append(buffer[i].ToString("X2", CultureInfo.InvariantCulture));
+            }
+
+            if (buffer.Length > byteCount)
+            {
+                builder.Append("...");
+            }
+
+            return builder.ToString();
         }
 
         private static bool IsEnabledValue(string value)
