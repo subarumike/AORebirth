@@ -150,6 +150,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 x =>
                 {
                     x.Identity = character.Identity;
+                    x.Unknown = 0;
                     x.Target = target;
                     x.Action = action;
                 });

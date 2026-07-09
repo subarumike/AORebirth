@@ -449,8 +449,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && attackHandlerText.Contains("this.CancelPlayerAttack(character);")
                 && attackHandlerText.Contains("playfield.StartPlayerAttack(character, target);")
                 && attackHandlerText.Contains("playfield.CancelPlayerAttack(character);")
-                && attackHandlerText.Contains("this.SendAttackState(character, message.Target, message.Action);"),
-                "AttackMessageHandler must route player attack start/cancel through the player combat boundary while keeping packet echo order.");
+                && attackHandlerText.Contains("this.SendAttackState(character, message.Target, message.Action);")
+                && attackHandlerText.Contains("x.Unknown = 0;"),
+                "AttackMessageHandler must route player attack start/cancel through the player combat boundary while keeping the live-compatible attack echo shape.");
+            Assert.IsFalse(
+                attackHandlerText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive."),
+                "AttackMessageHandler must not server-emit the client Def-Agg tutorial text on combat start.");
             Assert.IsTrue(
                 attackHandlerText.Contains("target == null")
                 && attackHandlerText.Contains("ContentDrivenNpcDialogueRouter.ShouldSuppressCombat(target)")
