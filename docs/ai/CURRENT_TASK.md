@@ -1,52 +1,57 @@
 # Current Task
 
-## Active Task
+## Current Focus
 
-Playfield content-module foundation: private-city ready/init guardrails.
+Make the Subway dungeon, resource/playfield `127`, fully playable using capture-backed implementation.
 
-This is a foundation/test-harness scope. Do not make gameplay behavior changes while this task is active.
+Subway work is the active development track. Playfield runtime decomposition is now maintenance work and should not be resumed unless Mike explicitly selects it.
 
-## Current Target
+## Current Implementation Order
 
-- Flow: private-city ready/init packet and lifecycle ordering
-- Primary owner today: `Playfield.cs` plus the `ClientConnected` ready flow
-- Harness: `PlayfieldLifecycleTrace`
-- Regression target: private-city org/init state before `FullCharacter`, followed by towers/cities ready-block packets
+1. Correct Subway NPC appearances.
+2. Complete Subway entrance mob population.
+3. Validate combat behavior.
+4. Validate corpse/loot behavior.
+5. Validate zoning into/out of Subway.
+6. Complete additional Subway rooms from capture evidence.
+7. Doors and scripted interactions.
+8. Boss encounters.
+9. Vendors and non-critical interactions.
+10. Polish and parity against live captures.
 
-## Completed Foundation Work
+## Current Subway State
 
-- `6dc792d7` added the first Playfield content-module boundary.
-- `a6fb22a2` fixed the unrelated item/nano loader startup blocker.
-- Private-city ready/init now has trace-only begin/end and summary markers for the current ready sequence.
-- Playfield lifecycle tests now assert the private-city ready/init packet message order and key org/towers/cities details.
+- Subway content binding uses resource/playfield `127`.
+- Runtime instance ids from live captures, such as `R=1187842`, are not server content binding ids.
+- `Playfield2:122002` is capture/runtime output and must not be used as the Subway content binding key.
+- Subway content work must stay capture-backed and should use completed AOSharpLiveCapture folders supplied by Mike.
+- Mike launches AO client and capture tooling. Codex analyzes completed capture folders only.
 
-## Next Foundation Work
+## Completed Work
 
-Recommended next task:
-
-`Extract Private City Ready Init Sequencing From Playfield`
-
-Keep the extraction behavior-preserving. Do not implement CityAdvantages, org command flows, ownership management, city purchase logic, guest-key lifecycle, combat tuning, or capture tooling changes.
+- Playfield runtime decomposition is completed through the latest extracted runtime services and is no longer the active focus.
+- Corpse open, item loot transfer, and corpse credit payout are capture-backed and live validated.
+- Subway entry/exit placement has been repaired for the current tested route.
+- Filth Flea appearance has been corrected from capture-backed SCFU texture evidence.
+- Subway content work is now the primary development track.
 
 ## Regression Risks Only
 
-Preserve these while changing private-city ready/init boundaries:
+Preserve these while working on Subway:
 
-- Private-city zoning, guest-key generator, City Controller open/close, and private-city org initialization.
-- `/org info` behavior.
-- Same-playfield player visibility and movement rendering.
-- Cleaning robot combat, patrol, death, corpse, despawn, and loot behavior.
+- Playfield runtime service boundaries and lifecycle guardrails.
+- Corpse open, loot transfer, corpse credit payout, and duplicate-loot prevention.
+- NPC runtime, player combat runtime, and existing combat/corpse/despawn behavior.
+- Existing private-city initialization, guest key, City Controller, and org behavior.
+- Existing zoning, teleport, and visibility packet ordering.
 
 ## Validation Plan
 
-For trace/test-only changes:
+For Subway content/code changes:
 
 - `cmd /d /c git diff --check`
-- focused Playfield lifecycle tests
-
-For production trace code changes:
-
+- focused Subway/content/SCFU tests when available
 - `cmd /d /c tools\build_aorebirth_debug.cmd`
-- `cmd /d /c restart-engines.cmd`
+- `cmd /d /c restart-engines.cmd` when runtime behavior changes
 
 Mike performs live AO client playtesting. Do not claim live validation unless Mike reports it.
