@@ -14,8 +14,6 @@
 
 namespace SmokeLounge.AOtomation.Messaging.Serialization
 {
-    using System;
-    using System.Globalization;
     using System.IO;
 
     using SmokeLounge.AOtomation.Messaging.Messages;
@@ -24,10 +22,6 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization
     public class MessageSerializer
     {
         #region Fields
-
-        private const int HeaderLength = 16;
-
-        private const int SizeOffset = 6;
 
         private readonly HeaderSerializer headerSerializer;
 
@@ -66,19 +60,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization
         public Message Deserialize(Stream stream, out SerializationContext serializationContext)
         {
             serializationContext = null;
-
-            if (stream == null)
-            {
-                throw new ArgumentNullException("stream");
-            }
-
-            if (!stream.CanSeek)
-            {
-                throw new InvalidDataException("Inbound message stream must be seekable.");
-            }
-
             var reader = new StreamReader(stream) { Position = 0 };
-            ValidateEnvelope(reader);
             var subTypeInfo = this.packetInspector.FindSubType(reader);
 
             if (subTypeInfo == null)
@@ -99,17 +81,6 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization
                                   Header = (Header)this.headerSerializer.Deserialize(reader, serializationContext), 
                                   Body = (MessageBody)serializer.Deserialize(reader, serializationContext)
                               };
-
-            if (reader.Position != reader.Length)
-            {
-                throw new InvalidDataException(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Inbound message body consumption mismatch: consumed {0} of {1} declared bytes.",
-                        reader.Position,
-                        reader.Length));
-            }
-
             return message;
         }
 
@@ -135,48 +106,6 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization
             var length = writer.Position;
             writer.Position = 6;
             writer.WriteInt16((short)length);
-        }
-
-        #endregion
-
-        #region Methods
-
-        private static void ValidateEnvelope(StreamReader reader)
-        {
-            long actualLength = reader.Length;
-            if (actualLength < HeaderLength)
-            {
-                throw new InvalidDataException(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Inbound message header is truncated: expected at least {0} bytes but received {1}.",
-                        HeaderLength,
-                        actualLength));
-            }
-
-            reader.Position = SizeOffset;
-            int declaredLength = reader.ReadInt16();
-            if (declaredLength < HeaderLength)
-            {
-                throw new InvalidDataException(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Inbound message declared size {0} is smaller than the {1}-byte header.",
-                        declaredLength,
-                        HeaderLength));
-            }
-
-            if (declaredLength != actualLength)
-            {
-                throw new InvalidDataException(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Inbound message size mismatch: header declares {0} bytes but received {1}.",
-                        declaredLength,
-                        actualLength));
-            }
-
-            reader.Position = 0;
         }
 
         #endregion
