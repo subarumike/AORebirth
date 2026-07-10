@@ -46,6 +46,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using Utility;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.PacketHandlers;
@@ -394,6 +395,10 @@ namespace ZoneEngine.Core.MessageHandlers
                     TradeSkillReceiver.TradeSkillBuildPressed(client, message.Target.Instance);
                     break;
 
+                case CharacterActionType.RemoveFriendlyNano:
+                    ActiveNanoRuntimeService.Default.TryHandleRemoveFriendlyNano(client, message);
+                    break;
+
                 default:
                 {
                     // unkown
@@ -504,7 +509,63 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public void SetNanoDuration(ICharacter character, Identity target, int unknown1, int duration = 0x249F0)
         {
+            if (duration > 0)
+            {
+                ActiveNanoRuntimeService.Default.ApplyActiveNano(character, unknown1, duration, target);
+                if (character.Controller != null && character.Controller.Client != null)
+                {
+                    SimpleCharFullUpdate.SendToOne(character, character.Controller.Client);
+                }
+            }
+
             this.Send(character, this.ConstructSetNanoDuration(character, target, unknown1, duration));
+        }
+
+        public void SendActiveNanoDuration(ICharacter character, Identity target, int nanoId, int duration)
+        {
+            this.SetNanoDuration(character, target, nanoId, duration);
+        }
+
+        public void AcknowledgeRemoveFriendlyNano(ICharacter character, CharacterActionMessage message, int nanoId)
+        {
+            if (nanoId > 0)
+            {
+                BuffMessageHandler.Default.SendRemoveNanoBuff(character, nanoId);
+            }
+        }
+
+        public void CompleteFriendlyNanoRemoval(
+            ICharacter character,
+            CharacterActionMessage message,
+            System.Collections.Generic.List<ActiveNanoRuntimeService.ActiveNanoRemovalTarget> removalTargets)
+        {
+            if (removalTargets == null)
+            {
+                return;
+            }
+
+            IZoneClient client = character.Controller != null ? character.Controller.Client as IZoneClient : null;
+            foreach (ActiveNanoRuntimeService.ActiveNanoRemovalTarget removalTarget in removalTargets)
+            {
+                BuffMessageHandler.Default.SendRemoveNanoBuff(character, removalTarget.NanoId);
+                if (client != null)
+                {
+                    client.Server.Info(
+                        client,
+                        "RemoveFriendlyNano outbound Buff remove nanoId={0} instance={1}",
+                        removalTarget.NanoId,
+                        removalTarget.NanoInstance);
+                }
+            }
+        }
+
+        public void CompleteFriendlyNanoRemoval(
+            ICharacter character,
+            int nanoId,
+            Identity identity,
+            int nanoInstance)
+        {
+            BuffMessageHandler.Default.SendRemoveNanoBuff(character, nanoId);
         }
 
         private MessageDataFiller SkillUnavailableAction(ICharacter character, int statId, int durationSeconds)

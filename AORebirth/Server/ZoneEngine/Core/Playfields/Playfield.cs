@@ -702,6 +702,12 @@ namespace AORebirth.Core.Playfields
 
         private static void ApplyPlayfieldTransferState(Dynel dynel, Coordinate destination, IQuaternion heading)
         {
+            ICharacter character = dynel as ICharacter;
+            if (character != null)
+            {
+                ActiveNanoRuntimeService.Default.HandlePlayfieldLeave(character);
+            }
+
             dynel.RawCoordinates = new Vector3() { X = destination.x, Y = destination.y, Z = destination.z };
             dynel.RawHeading = new Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
         }

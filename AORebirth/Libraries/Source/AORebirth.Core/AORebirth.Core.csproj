@@ -147,6 +147,7 @@
     <Compile Include="Nanos\NanoFormula.cs" />
     <Compile Include="Nanos\NanoLoader.cs" />
     <Compile Include="Nanos\UploadedNano.cs" />
+    <Compile Include="Nanos\ActiveNanoState.cs" />
     <Compile Include="Network\IZoneClient.cs" />
     <Compile Include="NPCHandler\NonPlayerCharacterHandler.cs" />
     <Compile Include="Pathfinding\General\Pair.cs" />
