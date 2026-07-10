@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2014, CellAO Team
 // 
@@ -33,6 +33,7 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 {
     #region Usings ...
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Serialization.MappingAttributes;
 
     #endregion
@@ -49,10 +50,7 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         public short Action { get; set; }
 
         [AoMember(2)]
-        public int Instance { get; set; }
-
-        [AoMember(3)]
-        public int NanoId { get; set; }
+        public Identity NanoProgram { get; set; }
 
     }
 }

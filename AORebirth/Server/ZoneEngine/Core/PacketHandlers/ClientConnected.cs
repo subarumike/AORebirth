@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2014, CellAO Team
 // 
@@ -102,6 +102,8 @@ namespace ZoneEngine.Core.PacketHandlers
                 client.Controller.Character.Identity.Instance,
                 client.ClientAddress,
                 client.Controller.Character.Name);
+
+            ActiveNanoRuntimeService.Default.PrepareCharacterForLogin(client.Controller.Character);
 
             // now we have to start sending packets like 
             // character stats, inventory, playfield info
@@ -224,6 +226,8 @@ client.Controller.Character.Playfield.Identity,
                     PlayfieldLifecycleTrace.StagePrivateCityReadyBlockEnd,
                     PlayfieldLifecycleTrace.MessagePrivateCityReadyBlockEnd,
                     identity));
+
+            ActiveNanoRuntimeService.Default.SchedulePostLoginNanoRestore(client);
 
             var specials = new[]
                            {

@@ -128,6 +128,7 @@
     <Compile Include="Dao\TeleportDao.cs" />
     <Compile Include="Dao\TradeSkillDao.cs" />
     <Compile Include="Dao\UploadedNanosDao.cs" />
+    <Compile Include="Dao\CharacterActiveNanosDao.cs" />
     <Compile Include="Dao\VendorDao.cs" />
     <Compile Include="Dao\VendorTemplateDao.cs" />
     <Compile Include="Entities\DBMobDroptable.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="Entities\DBStats.cs" />
     <Compile Include="Entities\DBTradeSkill.cs" />
     <Compile Include="Entities\DBUploadedNano.cs" />
+    <Compile Include="Entities\DBCharacterActiveNano.cs" />
     <Compile Include="Entities\DBVendor.cs" />
     <Compile Include="Entities\DBVendorTemplate.cs" />
     <Compile Include="Entities\ForeignKeyAttribute.cs" />

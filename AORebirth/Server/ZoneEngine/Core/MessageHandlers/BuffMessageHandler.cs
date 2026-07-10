@@ -27,7 +27,6 @@ namespace ZoneEngine.Core.MessageHandlers
             return x =>
             {
                 x.Identity = character.Identity;
-                x.Unknown = 0;
                 x.Action = 0;
                 x.NanoProgram = new Identity
                 {
