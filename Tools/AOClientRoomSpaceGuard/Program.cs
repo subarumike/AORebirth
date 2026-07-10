@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -28,7 +29,7 @@ internal static class Program
     private const uint PageExecuteReadWrite = 0x40;
     private const uint WaitObject0 = 0x00000000;
     private const uint WaitTimeout = 0x00000102;
-    private const int TelemetrySlotSize = 24;
+    private const int TelemetrySlotSize = 44;
     private const int TelemetryPageOffset = 0x1000;
     private const int GuardAllocationSize = 0x2000;
     private static readonly IntPtr InvalidHandleValue = new IntPtr(-1);
@@ -99,7 +100,14 @@ internal static class Program
                 try
                 {
                     int waitSeconds = ParsePositiveInt(GetArgument(args, "--wait-seconds"), 600);
-                    TargetProcess target = WaitForTarget(clientRoot, waitSeconds);
+                    var excludedProcessIds = new HashSet<int>();
+                    if (HasArgument(args, "--launch-client"))
+                    {
+                        excludedProcessIds = GetMatchingClientProcessIds(clientRoot);
+                        LaunchClient(clientRoot);
+                    }
+
+                    TargetProcess target = WaitForTarget(clientRoot, waitSeconds, excludedProcessIds);
                     ApplyTargetedGuard(target, profile);
                     return 0;
                 }
@@ -173,7 +181,10 @@ internal static class Program
             for (int index = 0; index < profile.CollisionCallRvas.Length; index++)
             {
                 uint sampleSlot = sampleTelemetryBase + (uint)(index * TelemetrySlotSize);
-                foreach (uint fieldOffset in new uint[] { 0u, 4u, 8u, 12u, 16u, 20u })
+                foreach (uint fieldOffset in new uint[]
+                {
+                    0u, 4u, 8u, 12u, 16u, 20u, 24u, 28u, 32u, 36u, 40u
+                })
                 {
                     Require(ContainsUInt32(wrapper, sampleSlot + fieldOffset),
                         profile.Name + " telemetry field address " + index + "+" + fieldOffset);
@@ -182,6 +193,11 @@ internal static class Program
                     sampleModuleBase + (uint)profile.CollisionCallRvas[index] + 5u),
                     profile.Name + " telemetry return address " + index);
             }
+
+            Require(wrapper[105] == 0x50, profile.Name + " failure result preservation");
+            Require(CountSequence(wrapper, new byte[] { 0x83, 0xC4, 0x04, 0xC3 }) ==
+                profile.CollisionCallRvas.Length + 1,
+                profile.Name + " telemetry stack cleanup");
         }
 
         Log("SELF-TEST PASS targetedProfiles=" + Profiles.Length);
@@ -208,7 +224,45 @@ internal static class Program
         return profile;
     }
 
-    private static TargetProcess WaitForTarget(string clientRoot, int waitSeconds)
+    private static HashSet<int> GetMatchingClientProcessIds(string clientRoot)
+    {
+        string expectedClient = NormalizePath(Path.Combine(clientRoot, "anarchyonline.exe"));
+        var processIds = new HashSet<int>();
+
+        foreach (Process process in Process.GetProcessesByName("anarchyonline"))
+        {
+            using (process)
+            {
+                string processPath = TryGetProcessPath(process.Id);
+                if (string.Equals(NormalizePath(processPath), expectedClient,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    processIds.Add(process.Id);
+                }
+            }
+        }
+
+        return processIds;
+    }
+
+    private static void LaunchClient(string clientRoot)
+    {
+        string launcherPath = Path.Combine(clientRoot, "Anarchy.exe");
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = launcherPath,
+            WorkingDirectory = clientRoot,
+            UseShellExecute = true
+        };
+
+        Process launcher = Process.Start(startInfo);
+        Require(launcher != null, "Failed to launch " + launcherPath + ".");
+        launcher.Dispose();
+        Log("LAUNCH PASS root=" + clientRoot);
+    }
+
+    private static TargetProcess WaitForTarget(string clientRoot, int waitSeconds,
+        ISet<int> excludedProcessIds)
     {
         string expectedClient = NormalizePath(Path.Combine(clientRoot, "anarchyonline.exe"));
         string expectedN3 = NormalizePath(Path.Combine(clientRoot, "N3.dll"));
@@ -222,6 +276,11 @@ internal static class Program
             {
                 using (process)
                 {
+                    if (excludedProcessIds.Contains(process.Id))
+                    {
+                        continue;
+                    }
+
                     string processPath = TryGetProcessPath(process.Id);
                     if (!string.Equals(NormalizePath(processPath), expectedClient,
                         StringComparison.OrdinalIgnoreCase))
@@ -477,6 +536,7 @@ internal static class Program
             0x85, 0xC0,
             0x79, 0x05,
             0xBA, 0x02, 0x00, 0x00, 0x00,
+            0x50,
             0x8B, 0x4D, 0x04
         });
 
@@ -491,7 +551,7 @@ internal static class Program
             bytes.AddRange(new byte[4]);
         }
 
-        bytes.Add(0xC3);
+        bytes.AddRange(new byte[] { 0x83, 0xC4, 0x04, 0xC3 });
 
         for (int index = 0; index < profile.CollisionCallRvas.Length; index++)
         {
@@ -521,6 +581,34 @@ internal static class Program
             AppendUInt32(bytes, slotAddress + 16u);
             bytes.AddRange(new byte[] { 0x89, 0x15 });
             AppendUInt32(bytes, slotAddress + 20u);
+
+            bytes.AddRange(new byte[] { 0x8B, 0x04, 0x24, 0xA3 });
+            AppendUInt32(bytes, slotAddress + 24u);
+            bytes.AddRange(new byte[] { 0x8B, 0x45, 0x08, 0xA3 });
+            AppendUInt32(bytes, slotAddress + 28u);
+
+            bytes.AddRange(new byte[] { 0x83, 0xFA, 0x02, 0x0F, 0x85 });
+            int reasonSkipDisplacement = bytes.Count;
+            bytes.AddRange(new byte[4]);
+            bytes.AddRange(new byte[] { 0x85, 0xC0, 0x0F, 0x84 });
+            int nullSkipDisplacement = bytes.Count;
+            bytes.AddRange(new byte[4]);
+
+            bytes.AddRange(new byte[] { 0x8B, 0x08, 0x89, 0x0D });
+            AppendUInt32(bytes, slotAddress + 32u);
+            bytes.AddRange(new byte[] { 0x8B, 0x48, 0x04, 0x89, 0x0D });
+            AppendUInt32(bytes, slotAddress + 36u);
+            bytes.AddRange(new byte[] { 0x8B, 0x48, 0x08, 0x89, 0x0D });
+            AppendUInt32(bytes, slotAddress + 40u);
+
+            int snapshotDoneOffset = bytes.Count;
+            PatchInt32(bytes, reasonSkipDisplacement, unchecked((int)(
+                wrapperBase + (uint)snapshotDoneOffset -
+                (wrapperBase + (uint)reasonSkipDisplacement + 4u))));
+            PatchInt32(bytes, nullSkipDisplacement, unchecked((int)(
+                wrapperBase + (uint)snapshotDoneOffset -
+                (wrapperBase + (uint)nullSkipDisplacement + 4u))));
+
             bytes.AddRange(new byte[] { 0xC7, 0x05 });
             AppendUInt32(bytes, slotAddress + 4u);
             AppendUInt32(bytes, 2u);
@@ -548,7 +636,7 @@ internal static class Program
                 (wrapperBase + (uint)countJumpDisplacement + 4u))));
             bytes.AddRange(new byte[] { 0xF0, 0xFF, 0x05 });
             AppendUInt32(bytes, slotAddress);
-            bytes.Add(0xC3);
+            bytes.AddRange(new byte[] { 0x83, 0xC4, 0x04, 0xC3 });
         }
     }
 
@@ -601,10 +689,16 @@ internal static class Program
                 uint roomSpace = BitConverter.ToUInt32(snapshot, offset + 12);
                 uint vtable = BitConverter.ToUInt32(snapshot, offset + 16);
                 uint reason = BitConverter.ToUInt32(snapshot, offset + 20);
+                int cellResult = BitConverter.ToInt32(snapshot, offset + 24);
+                uint queryVector = BitConverter.ToUInt32(snapshot, offset + 28);
+                float queryX = BitConverter.ToSingle(snapshot, offset + 32);
+                float queryY = BitConverter.ToSingle(snapshot, offset + 36);
+                float queryZ = BitConverter.ToSingle(snapshot, offset + 40);
                 if (lastCounts[index] == 0)
                 {
                     LogFirstTelemetryHit(process, processId, profile, index, count,
-                        captureState, playfield, roomSpace, vtable, reason);
+                        captureState, playfield, roomSpace, vtable, reason, cellResult,
+                        queryVector, queryX, queryY, queryZ);
                 }
 
                 lastCounts[index] = count;
@@ -618,11 +712,13 @@ internal static class Program
 
     private static void LogFirstTelemetryHit(IntPtr process, int processId,
         PatchProfile profile, int callsiteIndex, uint count, uint captureState,
-        uint playfield, uint roomSpace, uint vtable, uint reason)
+        uint playfield, uint roomSpace, uint vtable, uint reason, int cellResult,
+        uint queryVector, float queryX, float queryY, float queryZ)
     {
         uint currentRoomSpace = 0;
         bool currentReadable = playfield != 0 && TryReadUInt32(
             process, new IntPtr((long)playfield + 0x58), out currentRoomSpace);
+        bool queryCaptured = reason == 2 && queryVector != 0;
         Log("GUARD HIT first pid=" + processId + " profile=" + profile.Name +
             " callRva=0x" + profile.CollisionCallRvas[callsiteIndex].ToString("X") +
             " count=" + count +
@@ -632,12 +728,23 @@ internal static class Program
             " roomSpace=" + FormatAddress(roomSpace) +
             " currentRoomSpace=" + (currentReadable ? FormatAddress(currentRoomSpace) : "unreadable") +
             " fieldMatch=" + (currentReadable && currentRoomSpace == roomSpace) +
-            " eventVtable=" + FormatAddress(vtable));
+            " eventVtable=" + FormatAddress(vtable) +
+            " cellResult=" + (reason == 2 ?
+                cellResult.ToString(CultureInfo.InvariantCulture) : "not-called") +
+            " queryVector=" + FormatAddress(queryVector) +
+            " queryXYZ=" + (queryCaptured ?
+                "(" + FormatFloat(queryX) + "," + FormatFloat(queryY) + "," +
+                    FormatFloat(queryZ) + ")" : "not-captured"));
     }
 
     private static string FormatAddress(uint address)
     {
         return "0x" + address.ToString("X8");
+    }
+
+    private static string FormatFloat(float value)
+    {
+        return value.ToString("R", CultureInfo.InvariantCulture);
     }
 
     private static byte[] BuildRelativeCall(uint callAddress, uint destination)
@@ -702,6 +809,30 @@ internal static class Program
         }
 
         return false;
+    }
+
+    private static int CountSequence(byte[] bytes, byte[] sequence)
+    {
+        int count = 0;
+        for (int offset = 0; offset <= bytes.Length - sequence.Length; offset++)
+        {
+            bool match = true;
+            for (int index = 0; index < sequence.Length; index++)
+            {
+                if (bytes[offset + index] != sequence[index])
+                {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (match)
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     private static List<IntPtr> SuspendProcessThreads(int processId)

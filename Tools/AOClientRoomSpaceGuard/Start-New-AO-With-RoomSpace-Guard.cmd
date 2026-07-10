@@ -6,5 +6,4 @@ if not exist "%GUARD%" (
   pause
   exit /b 1
 )
-start "AO RoomSpace Guard - New Client" /min "%GUARD%" --client-root "C:\Funcom\Anarchy Online" --wait-seconds 600
-start "" /D "C:\Funcom\Anarchy Online" "C:\Funcom\Anarchy Online\Anarchy.exe"
+start "AO RoomSpace Guard - New Client" /min "%GUARD%" --client-root "C:\Funcom\Anarchy Online" --wait-seconds 600 --launch-client

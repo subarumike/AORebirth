@@ -5,6 +5,8 @@ This runtime guard prevents the Subway `std::bad_cast` crash in both supported A
 The guard:
 
 - selects a patch profile only when `N3.dll` has an approved SHA-256 hash;
+- acquires the per-client guard lock before it launches `Anarchy.exe`, so a duplicate
+  shortcut invocation fails closed instead of starting an unguarded client;
 - waits for `anarchyonline.exe` from the requested client directory;
 - verifies that the loaded `N3.dll` came from the same directory;
 - patches only four audited surface-collision callsites (`CalculateClosestPoint`, `GetTileTriangles`, and the two `GetLineIntersection` lookups) with a checked `Space_i` to `n3RoomSpace_t` preflight;
@@ -16,10 +18,12 @@ The guard:
 - keeps a bounded telemetry monitor alive until the client exits;
 - records only the first guarded failure at each callsite plus one final counter summary;
 - atomically preserves the first playfield pointer, exact cast-input room-space pointer,
-  event-time vtable, failure reason, current field value, and field-match result before
-  later failures can overwrite that evidence.
+  event-time vtable, failure reason, signed cell result, exact query-vector pointer and
+  XYZ coordinates, current field value, and field-match result before later failures can
+  overwrite that evidence.
 
-Run the matching installed launcher shortcut. Logs are written to:
+Run the matching installed guarded-launch shortcut. Do not start AO separately from that
+shortcut. Logs are written to:
 
 `%LOCALAPPDATA%\AOClientRoomSpaceGuard\guard.log`
 
@@ -28,9 +32,10 @@ The patch exists only in process memory and must be applied on each client launc
 Telemetry messages:
 
 - `PATCH PASS`: all four calls and the telemetry wrapper were installed and verified.
+- `LAUNCH PASS`: the guard acquired its profile lock and launched the requested AO client.
 - `MONITOR START`: the minimized guard is watching the patched process.
 - `GUARD HIT first`: the first failed cast or invalid-cell result for that callsite,
-  including object identity evidence.
+  including object identity, signed cell result, and query-coordinate evidence.
 - `MONITOR END`: the client exited and the final per-callsite counts were recorded.
 
 The monitor does not log every event, so a long-running client cannot create unbounded
@@ -57,5 +62,8 @@ README to `C:\Funcom\AOClientRoomSpaceGuard`. It never launches AO.
   unguarded client crashed almost immediately. Crash return `N3+0x16149` is the instruction
   after guarded call `N3+0x16144`.
 
-This validates the current mitigation. It does not yet identify the earlier lifecycle
-operation that makes the room-space object incompatible.
+This validates the current mitigation. Current telemetry rules out the earlier
+wrong-class/stale-room-space theory for the captured new-client run: the exact room-space
+pointer remained current, the dynamic cast succeeded, and `GetInsideCell` repeatedly
+returned a negative cell result. The added query telemetry is the next evidence needed to
+map that invalid lookup to the responsible room geometry/resource.
