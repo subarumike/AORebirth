@@ -45,6 +45,8 @@ namespace ZoneEngine.Core.Packets
     using AORebirth.Enums;
     using AORebirth.Interfaces;
 
+    using AORebirth.Core.Playfields;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
@@ -481,6 +483,47 @@ namespace ZoneEngine.Core.Packets
             // End Meshs
             scfu.Flags2 = 0; // packetFlags2
             scfu.Unknown2 = 0;
+
+            CapturedSubwayOrdinaryRuntimeDefinition capturedOrdinary;
+            if (CapturedSubwayOrdinaryRuntimeRegistry.TryGet(character.Identity.Instance, out capturedOrdinary))
+            {
+                CapturedSubwayOrdinarySpawnDefinition spawn = capturedOrdinary.Spawn;
+                CapturedSubwayOrdinaryArchetypeDefinition archetype = capturedOrdinary.Archetype;
+                scfu.AdditionalFlags = spawn.CapturedFlags;
+                scfu.SuppressedFlags = ~spawn.CapturedFlags;
+                scfu.Flags2 = (byte)spawn.CapturedFlags2;
+                scfu.Unknown1 = spawn.Unknown1.ToArray();
+                scfu.Unknown2 = (byte)spawn.Unknown2;
+                scfu.VisibleTitle = (byte)archetype.VisibleTitle;
+                scfu.Textures =
+                    archetype.Textures.Select(
+                        texture =>
+                            new Texture
+                            {
+                                Place = texture.Place,
+                                Id = texture.Id,
+                                Unknown = texture.Unknown
+                            }).ToArray();
+                scfu.Meshes =
+                    archetype.Meshes.Select(
+                        mesh =>
+                            new Mesh
+                            {
+                                Position = (byte)mesh.Position,
+                                Id = mesh.Id,
+                                OverrideTextureId = mesh.OverrideTextureId,
+                                Layer = (byte)mesh.Layer
+                            }).ToArray();
+                scfu.Waypoints =
+                    spawn.Waypoints.Select(
+                        waypoint =>
+                            new Vector3
+                            {
+                                X = waypoint.X,
+                                Y = waypoint.Y,
+                                Z = waypoint.Z
+                            }).ToArray();
+            }
 
             return scfu;
         }

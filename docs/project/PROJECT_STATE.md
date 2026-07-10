@@ -19,6 +19,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - The Def-Agg investigation is closed: live AO confirmed the repeated hint as normal level 1 client behavior.
 - Previous capture-backed enemy, movement, combat, zoning, and appearance milestones remain completed project history.
 - Filth Flea appearance has been corrected from capture-backed Subway SCFU texture evidence.
+- Subway PF127 now has the preserved 95-spawn supported baseline plus a template-free ordinary framework containing 126 deduplicated Shadow, Stim Fiend, Workman/Architect Striker, Infected Attendant, Slum Runner, Looter, Infector, Lost Thought, and Neural Burnout spawns. The framework is generated from completed SCFU, movement, combat, corpse, and inventory evidence; named/boss content remains deferred rather than assigned ordinary or guessed database behavior.
 - Subway content work is the primary development track.
 
 ## Current Baseline

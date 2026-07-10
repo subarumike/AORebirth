@@ -452,6 +452,31 @@ namespace AORebirth.Core.Playfields
                        };
             }
 
+            CapturedSubwayOrdinaryRuntimeDefinition capturedOrdinary;
+            if (CapturedSubwayOrdinaryRuntimeRegistry.TryGet(
+                    attacker.Identity.Instance,
+                    out capturedOrdinary)
+                && capturedOrdinary.Archetype.Combat.Observed)
+            {
+                CapturedSubwayCombatEvidenceDefinition combat = capturedOrdinary.Archetype.Combat;
+                return new CombatAttackSource
+                       {
+                           MinDamage = combat.MinDamage,
+                           MaxDamage = combat.MaxDamage,
+                           DamageBonus = 0,
+                           Range = NpcCombatAttackRules.MaxMeleeCombatDistance,
+                           RechargeSeconds = combat.RechargeSeconds > 0
+                                                 ? combat.RechargeSeconds
+                                                 : NpcCombatAttackRules.DefaultCombatTickSeconds,
+                           UsesEquippedWeapon = false,
+                           AttackInfoAmmoCount = NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                           AttackInfoWeaponSlot = combat.WeaponSlot,
+                           AttackInfoUnk1 = combat.AttackInfoUnknown,
+                           AttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType,
+                           AttackInfoWeaponInstance = combat.WeaponInstance
+                       };
+            }
+
             EquippedCombatWeapon equippedWeapon = this.GetEquippedCombatWeapon(attacker);
             if (equippedWeapon == null)
             {

@@ -981,11 +981,20 @@ namespace AOSharpLiveCapture
                 {
                     string key = character.Identity.ToString();
                     currentCharacters.Add(key);
-                    if (this.knownCharacters.Add(key))
+                    bool firstSeen = this.knownCharacters.Add(key);
+                    if (firstSeen)
                     {
                         this.LogEvent("CHAR-SEEN", this.DescribeCharacter(character));
-                        this.TrackEnemyFromCharacter(character, "spawn", "CHAR-SEEN");
                     }
+
+                    // Dungeon playfields do not provide additional zone boundaries as the player
+                    // moves between rooms. Sample every currently visible character so one traversal
+                    // preserves later stat changes and a position history instead of only the first
+                    // in-range snapshot.
+                    this.TrackEnemyFromCharacter(
+                        character,
+                        firstSeen ? "spawn" : "survey",
+                        firstSeen ? "CHAR-SEEN" : "VISIBLE-SURVEY");
                 }
 
                 foreach (string removed in this.knownCharacters.Except(currentCharacters).ToArray())
@@ -3092,6 +3101,11 @@ namespace AOSharpLiveCapture
                 }
 
                 SimpleChar character = dynel.Cast<SimpleChar>();
+                if (this.IsLocalPlayerPet(character))
+                {
+                    return false;
+                }
+
                 return SafeBool(() => character.IsNpc) || SafeBool(() => character.IsPet);
             }
             catch
@@ -3148,12 +3162,27 @@ namespace AOSharpLiveCapture
 
         private bool IsEnemyCharacter(SimpleChar character)
         {
-            if (character == null || this.IsLocalPlayerIdentity(character.Identity))
+            if (character == null
+                || this.IsLocalPlayerIdentity(character.Identity)
+                || this.IsLocalPlayerPet(character))
             {
                 return false;
             }
 
             return SafeBool(() => character.IsNpc) || SafeBool(() => character.IsPet);
+        }
+
+        private bool IsLocalPlayerPet(SimpleChar character)
+        {
+            if (character == null || !SafeBool(() => character.IsPet) || DynelManager.LocalPlayer == null)
+            {
+                return false;
+            }
+
+            return Safe(() => character.PetOwnerId.ToString(CultureInfo.InvariantCulture))
+                   == Safe(
+                       () => DynelManager.LocalPlayer.Identity.Instance.ToString(
+                           CultureInfo.InvariantCulture));
         }
 
         private bool IsDungeonEnemyPopulationEvidence(SimpleChar character)
