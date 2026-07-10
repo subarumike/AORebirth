@@ -75,6 +75,11 @@ is live-confirmed level 1 client behavior, not an AORebirth combat regression.
 - Previous capture-backed enemy, movement, combat, zoning, and appearance work remains completed project history.
 - Subway entry/exit placement has been repaired for the current tested route.
 - Filth Flea appearance has been corrected from capture-backed SCFU texture evidence.
+- Captures `20260709-205921`, `20260709-210452`, `20260709-212115`, and `20260709-212336` now provide a reusable raw-packet and continuous-survey evidence set for the explored Subway sections.
+- The current supported-type population baseline contains 95 capture-backed Filth Flea, Discarded Pet, Disobedient Bot, Mugger, Thief, and Violent Vagabond spawns, replacing the earlier 32-spawn subset without stacking duplicate populations. Captures `20260709-220439` and `20260709-222339` added eighteen spatially distinct deeper supported-type positions; later same-position respawn identities were not added as duplicate spawns.
+- Packet-backed Mugger and Violent Vagabond visuals are applied from the recovered SCFU texture/mesh profiles.
+- The ordinary capture-backed framework now adds 126 deduplicated PF127 spawns for Shadow, Stim Fiend, Workman/Architect Striker, Infected Attendant, Slum Runner, Looter, Infector, Lost Thought, and Neural Burnout. It constructs attackable characters without guessed database templates and preserves captured SCFU identity/appearance/unknown fields, stats, movement paths, combat evidence, and observed loot. `Healer`, boss-owned Infectors, and all named/boss archetypes are excluded.
+- Mike reports `20260709-222339` completes the remaining live Subway traversal. The capture includes Abmouth Supremus, Eumenides, Vergil Aeneid, Bitaxel, Bloodcreeper, Empty Shell, Fragmented Soul, Incomplete Rebuild, Melded Patterns, Molested Molecules, Premature Pattern, and Redundant Scan evidence; these remain evidence-only until their bounded boss/archetype contracts are implemented.
 - Def-Agg level 1 combat hint has been closed as live-confirmed behavior, not a regression.
 
 ## Regression Risks Only

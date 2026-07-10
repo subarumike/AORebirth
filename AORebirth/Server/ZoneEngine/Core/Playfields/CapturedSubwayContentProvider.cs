@@ -13,47 +13,101 @@ namespace ZoneEngine.Core.Playfields
 
         private static readonly CapturedSubwaySpawnDefinition[] SpawnDefinitions =
         {
-            FilthFlea(0x794ADC01, 5, 115, 145.625015f, 107.61483f, 199.491653f),
-            FilthFlea(0x794ADC04, 5, 115, 150.841934f, 107.61483f, 200.950867f),
-            FilthFlea(0x794ADC0E, 6, 138, 146.663925f, 107.61483f, 201.587692f),
-            FilthFlea(0x794D7AAF, 6, 138, 152.891312f, 107.61483f, 203.949051f),
-            DiscardedPet(0x794DF1E3, 7, 160, 185.44902f, 107.61483f, 241.865524f),
-            DiscardedPet(0x794DF1E5, 5, 115, 184.843964f, 107.61483f, 240.569778f),
-            ViolentVagabond(0x794DF1F4, 7, 128, 169.0753f, 107.61483f, 246.01f),
-            FilthFlea(0x794DF2C6, 5, 115, 156.022324f, 107.61483f, 247.582184f),
-            DiscardedPet(0x794DF2CC, 7, 160, 159.4724f, 107.61483f, 233.273438f),
-            DiscardedPet(0x794DF2D8, 5, 115, 158.730713f, 107.61483f, 235.305878f),
-            FilthFlea(0x794DF2E9, 6, 138, 148.609024f, 107.61483f, 199.3537f),
-            DiscardedPet(0x794DF2F1, 6, 138, 159.2063f, 107.61483f, 240.190948f),
-            FirstLowerSectionSpawn(FilthFlea(0x794DF703, 4, 93, 93.11594f, 107.61483f, 248.1135f, 18)),
-            DiscardedPet(0x794DF70C, 6, 138, 158.913147f, 107.61483f, 245.805054f),
-            FirstLowerSectionSpawn(FilthFlea(0x794DF719, 6, 138, 92.96334f, 107.61483f, 257.187653f, 25)),
-            FirstLowerSectionSpawn(FilthFlea(0x794DF71A, 5, 115, 96.69107f, 107.61483f, 257.262329f)),
-            FirstLowerSectionSpawn(FilthFlea(0x794DF71D, 4, 93, 86.61528f, 107.61483f, 250.256943f)),
-            DiscardedPet(0x794DF729, 9, 205, 149.134018f, 107.61483f, 199.856888f),
-            FirstLowerSectionSpawn(FilthFlea(0x794DF72A, 5, 115, 120.578316f, 107.61483f, 234.1854f)),
-            FirstLowerSectionSpawn(FilthFlea(0x794DF72E, 6, 138, 120.630936f, 107.61483f, 241.199829f)),
-            FirstLowerSectionSpawn(FilthFlea(0x794DF730, 6, 138, 122.1621f, 107.61483f, 236.5588f)),
-            FirstLowerSectionSpawn(DisobedientBot(0x794DF749, 8, 183, 114.395836f, 107.61483f, 231.561676f)),
-            DisobedientBot(0x794DF7F1, 7, 160, 173.6774f, 107.61483f, 232.1588f),
-            DisobedientBot(0x794E807A, 5, 115, 179.707809f, 107.61483f, 231.963226f),
-            Thief(
-                0x794E80A1,
-                5,
-                115,
-                80.79672f,
-                115.765f,
-                323.7208f,
-                86.76542f,
-                115.9823f,
-                322.6304f),
-            FirstLowerSectionSpawn(FilthFlea(0x794E815F, 4, 93, 100.812515f, 107.61483f, 239.3656f)),
-            FilthFlea(0x794E8162, 4, 93, 88.36062f, 115.615f, 300.164978f),
-            FilthFlea(0x794E8163, 4, 93, 86.083015f, 111.615f, 270.3774f),
-            FirstLowerSectionSpawn(FilthFlea(0x794E8167, 6, 138, 101.651108f, 107.61483f, 237.365173f)),
-            FilthFlea(0x794E816B, 6, 138, 144.579971f, 107.61483f, 217.487f),
-            Mugger(0x794E8174, 5, 92, 136.2028f, 107.61483f, 239.212845f),
-            FirstLowerSectionSpawn(FilthFlea(0x794E8179, 6, 138, 84.66971f, 107.61483f, 258.626678f))
+            CapturedSurveySpawn(DiscardedPet(0x794DF1E5, 5, 115, 184.843964f, 107.61483f, 240.569778f, 93, 24)),
+            CapturedSurveySpawn(DiscardedPet(0x794E83C1, 7, 160, 195.351364f, 107.611687f, 290.974426f, 94, 32)),
+            CapturedSurveySpawn(DiscardedPet(0x79528F6A, 9, 205, 171.851227f, 107.611687f, 304.098846f, 95, 40)),
+            CapturedSurveySpawn(DiscardedPet(0x79528FDA, 8, 183, 188.99f, 107.611687f, 309.9072f, 94, 36)),
+            CapturedSurveySpawn(DiscardedPet(0x795317D6, 5, 115, 178.220322f, 107.61483f, 247.394058f, 93, 24)),
+            CapturedSurveySpawn(DiscardedPet(0x7953AA04, 10, 227, 346.527771f, 102.814827f, 161.956f, 95, 44)),
+            CapturedSurveySpawn(DiscardedPet(0x7953AA1B, 10, 227, 346.468719f, 102.814827f, 165.56929f, 95, 44)),
+            CapturedSurveySpawn(DiscardedPet(0x7953AA82, 10, 227, 349.01f, 102.814827f, 168.297592f, 95, 44)),
+            CapturedSurveySpawn(DiscardedPet(0x7953AC01, 6, 138, 149.800781f, 107.61483f, 251.29686f, 93, 28)),
+            CapturedSurveySpawn(DiscardedPet(0x7953AD3C, 8, 183, 149.255112f, 107.61483f, 199.861237f, 94, 36)),
+            CapturedSurveySpawn(DiscardedPet(0x7953AD5F, 10, 227, 200.48233f, 107.6164f, 161.475555f, 95, 44)),
+            CapturedSurveySpawn(DiscardedPet(0x7953AD6D, 10, 227, 267.8472f, 102.8164f, 164.076736f, 95, 44)),
+            CapturedSurveySpawn(DiscardedPet(0x7953AD6F, 10, 227, 268.905518f, 102.8164f, 166.401535f, 95, 44)),
+            CapturedSurveySpawn(DiscardedPet(0x7953AD74, 10, 227, 277.9136f, 102.8164f, 165.517181f, 95, 44)),
+            CapturedSurveySpawn(DiscardedPet(0x7953AF53, 6, 138, 158.790054f, 107.61483f, 235.160751f, 93, 28)),
+            CapturedSurveySpawn(DiscardedPet(0x7953AF66, 5, 115, 158.817078f, 107.61483f, 246.372574f, 93, 24)),
+            CapturedSurveySpawn(DiscardedPet(0x7953AF74, 5, 115, 185.507675f, 107.61483f, 241.627518f, 93, 24)),
+            CapturedSurveySpawn(DiscardedPet(0x7953AF99, 6, 138, 181.53067f, 107.61483f, 249.831055f, 93, 28)),
+            CapturedSurveySpawn(DisobedientBot(0x7953AA1E, 10, 227, 333.486145f, 102.414825f, 161.493332f, 95, 34)),
+            CapturedSurveySpawn(DisobedientBot(0x7953AA81, 10, 227, 325.24176f, 102.814827f, 163.737274f, 95, 34)),
+            CapturedSurveySpawn(DisobedientBot(0x7953AA8F, 10, 227, 337.210541f, 102.414825f, 160.9172f, 95, 34)),
+            CapturedSurveySpawn(DisobedientBot(0x7953AB08, 10, 227, 334.099823f, 102.414825f, 166.305527f, 95, 34)),
+            CapturedSurveySpawn(DisobedientBot(0x7953AD4B, 9, 205, 208.746964f, 107.6164f, 165.358978f, 95, 31)),
+            CapturedSurveySpawn(DisobedientBot(0x7953AD61, 10, 227, 214.0725f, 107.6164f, 164.6418f, 95, 34)),
+            CapturedSurveySpawn(DisobedientBot(0x7953AD69, 9, 205, 216.01f, 107.6164f, 162.708969f, 95, 31)),
+            CapturedSurveySpawn(DisobedientBot(0x7953AF6F, 9, 205, 114.499268f, 107.61483f, 231.651047f, 95, 31)),
+            CapturedSurveySpawn(DisobedientBot(0x7953AF98, 7, 160, 173.610947f, 107.61483f, 232.288391f, 94, 25)),
+            CapturedSurveySpawn(DisobedientBot(0x7953AFA3, 6, 138, 179.514313f, 107.61483f, 232.11319f, 93, 22)),
+            CapturedSurveySpawn(FilthFlea(0x795313FC, 5, 115, 147.950089f, 107.61483f, 229.4221f, 21)),
+            CapturedSurveySpawn(FilthFlea(0x7953174B, 6, 138, 120.682472f, 107.61483f, 241.098831f, 24)),
+            CapturedSurveySpawn(FilthFlea(0x79531752, 5, 115, 120.437515f, 107.61483f, 238.616013f, 21)),
+            CapturedSurveySpawn(FilthFlea(0x79531754, 5, 115, 120.613022f, 107.61483f, 237.217636f, 21)),
+            CapturedSurveySpawn(FilthFlea(0x795317F5, 7, 160, 158.915558f, 107.6164f, 162.843613f, 27)),
+            CapturedSurveySpawn(FilthFlea(0x7953A9C2, 15, 393, 283.226f, 100.8164f, 212.817139f, 57)),
+            CapturedSurveySpawn(FilthFlea(0x7953A9C6, 14, 360, 278.982574f, 100.8164f, 212.5821f, 53)),
+            CapturedSurveySpawn(FilthFlea(0x7953AA0B, 15, 393, 316.3524f, 102.8164f, 218.6188f, 57)),
+            CapturedSurveySpawn(FilthFlea(0x7953AA0C, 13, 327, 315.676147f, 102.8164f, 220.470123f, 49)),
+            CapturedSurveySpawn(FilthFlea(0x7953AD2B, 6, 138, 152.821289f, 107.61483f, 203.99f, 24)),
+            CapturedSurveySpawn(FilthFlea(0x7953AD2C, 5, 115, 148.600433f, 107.61483f, 224.30545f, 21)),
+            CapturedSurveySpawn(FilthFlea(0x7953AD2F, 8, 183, 145.374847f, 107.61483f, 199.427826f, 31)),
+            CapturedSurveySpawn(FilthFlea(0x7953AD30, 7, 160, 149.195938f, 107.61483f, 213.897476f, 27)),
+            CapturedSurveySpawn(FilthFlea(0x7953AD36, 8, 183, 146.856918f, 107.61483f, 201.203613f, 31)),
+            CapturedSurveySpawn(FilthFlea(0x7953AD3E, 5, 115, 148.99f, 107.61483f, 196.137863f, 21)),
+            CapturedSurveySpawn(FilthFlea(0x7953AD70, 11, 261, 224.797775f, 107.6164f, 165.968567f, 41)),
+            CapturedSurveySpawn(FilthFlea(0x7953AD71, 11, 261, 226.115967f, 107.6164f, 162.99f, 41)),
+            CapturedSurveySpawn(FilthFlea(0x7953AD73, 10, 227, 224.226089f, 107.6164f, 163.8984f, 37)),
+            CapturedSurveySpawn(FilthFlea(0x7953AD75, 11, 261, 231.024567f, 107.6164f, 163.936813f, 41)),
+            CapturedSurveySpawn(FilthFlea(0x7953AD78, 10, 227, 248.081528f, 106.405754f, 164.442352f, 37)),
+            CapturedSurveySpawn(FilthFlea(0x7953AEEA, 4, 93, 88.50346f, 115.615f, 300.2512f, 17)),
+            CapturedSurveySpawn(FilthFlea(0x7953AEEE, 5, 115, 86.2133f, 111.615f, 270.391357f, 21)),
+            CapturedSurveySpawn(FilthFlea(0x7953AEFC, 4, 93, 100.99f, 107.61483f, 238.867691f, 17)),
+            CapturedSurveySpawn(FilthFlea(0x7953AF04, 5, 115, 97.40637f, 107.61483f, 257.277435f, 21)),
+            CapturedSurveySpawn(FilthFlea(0x7953AF10, 5, 115, 86.80035f, 107.61483f, 250.369431f, 21)),
+            CapturedSurveySpawn(FilthFlea(0x7953AF18, 4, 93, 91.5352859f, 107.61483f, 248.860519f, 17)),
+            CapturedSurveySpawn(FilthFlea(0x7953AF22, 6, 138, 101.782433f, 107.61483f, 236.890366f, 24)),
+            CapturedSurveySpawn(FilthFlea(0x7953AF4A, 6, 138, 85.88043f, 107.61483f, 258.95575f, 24)),
+            CapturedSurveySpawn(FilthFlea(0x7953AF57, 5, 115, 92.79191f, 107.61483f, 257.037323f, 21)),
+            CapturedSurveySpawn(FilthFlea(0x7953AFAA, 7, 160, 179.492691f, 107.61483f, 252.259949f, 27)),
+            CapturedSurveySpawn(FilthFlea(0x7953AFAE, 5, 115, 176.862076f, 107.61483f, 249.52832f, 21)),
+            CapturedSurveySpawn(FilthFlea(0x7953AFC4, 7, 160, 182.377f, 107.61483f, 222.0669f, 27)),
+            CapturedSurveySpawn(FilthFlea(0x7953AFC6, 5, 115, 190.181137f, 107.61483f, 224.268433f, 21)),
+            CapturedSurveySpawn(FilthFlea(0x7953AFCC, 5, 115, 177.573273f, 107.61483f, 224.148026f, 21)),
+            CapturedSurveySpawn(FilthFlea(0x7953A9E1, 13, 327, 330.578979f, 102.865f, 150.1263f, 49)),
+            CapturedSurveySpawn(FilthFlea(0x7953A9E7, 11, 261, 328.6433f, 102.965f, 143.931885f, 41)),
+            CapturedSurveySpawn(FilthFlea(0x7953A9EA, 11, 261, 325.99f, 102.8164f, 148.119644f, 41)),
+            CapturedSurveySpawn(FilthFlea(0x7953A9FC, 11, 261, 327.13147f, 102.865f, 142.704468f, 41)),
+            CapturedSurveySpawn(FilthFlea(0x79513A87, 12, 294, 351.975525f, 102.814827f, 141.408966f, 45)),
+            CapturedSurveySpawn(FilthFlea(0x79513A8F, 12, 294, 351.4564f, 102.814827f, 148.9678f, 45)),
+            CapturedSurveySpawn(FilthFlea(0x79513AAF, 13, 327, 348.571533f, 102.814827f, 138.478455f, 49)),
+            CapturedSurveySpawn(FilthFlea(0x79513AC2, 13, 327, 350.350433f, 102.814827f, 144.813583f, 49)),
+            CapturedSurveySpawn(FilthFlea(0x79545223, 13, 327, 325.3251f, 102.814827f, 183.530884f, 49)),
+            CapturedSurveySpawn(FilthFlea(0x79545227, 11, 261, 324.01f, 102.814827f, 178.83403f, 41)),
+            CapturedSurveySpawn(FilthFlea(0x79531120, 21, 592, 187.0416f, 73.3830261f, 88.03114f, 80)),
+            CapturedSurveySpawn(FilthFlea(0x79531122, 21, 592, 187.2152f, 73.24139f, 109.886124f, 80)),
+            CapturedSurveySpawn(FilthFlea(0x79545191, 19, 526, 160.99f, 81.21325f, 70.15537f, 72)),
+            CapturedSurveySpawn(FilthFlea(0x7953AF6D, 19, 526, 121.509415f, 77.01481f, 126.348518f, 72)),
+            CapturedSurveySpawn(FilthFlea(0x7953AF71, 21, 592, 125.111382f, 77.01481f, 128.979477f, 80)),
+            CapturedSurveySpawn(FilthFlea(0x7953AF76, 20, 559, 123.632492f, 77.01481f, 126.585861f, 76)),
+            CapturedSurveySpawn(FilthFlea(0x795451A4, 21, 592, 123.01f, 77.01481f, 127.967026f, 80)),
+            CapturedSurveySpawn(Mugger(0x7953AA11, 8, 146, 291.3161f, 102.8164f, 250.824387f, 94, 30)),
+            CapturedSurveySpawn(Mugger(0x7953AD6B, 10, 182, 264.127747f, 103.19651f, 163.2112f, 95, 36)),
+            CapturedSurveySpawn(Mugger(0x795450D4, 5, 92, 167.8636f, 109.104828f, 255.636658f, 93, 20)),
+            CapturedSurveySpawn(Mugger(0x795451FE, 10, 182, 228.215637f, 107.6164f, 163.445328f, 95, 36)),
+            CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20)),
+            CapturedSurveySpawn(ViolentVagabond(0x7953AA4A, 10, 182, 198.0572f, 108.416405f, 191.596924f, 95, 27)),
+            CapturedSurveySpawn(ViolentVagabond(0x7953AD40, 6, 110, 148.6321f, 107.6164f, 189.491272f, 93, 18)),
+            CapturedSurveySpawn(ViolentVagabond(0x7953AD48, 7, 128, 190.403168f, 107.6164f, 164.9011f, 94, 20)),
+            CapturedSurveySpawn(ViolentVagabond(0x7953AD49, 6, 110, 171.154053f, 107.6164f, 164.4986f, 93, 18)),
+            CapturedSurveySpawn(ViolentVagabond(0x7953AD4A, 7, 128, 160.536346f, 107.6164f, 165.190842f, 94, 20)),
+            CapturedSurveySpawn(ViolentVagabond(0x7953AD4C, 7, 128, 163.605255f, 107.6164f, 167.144913f, 94, 20)),
+            CapturedSurveySpawn(ViolentVagabond(0x7953AD54, 8, 146, 198.14859f, 107.6164f, 163.834351f, 94, 23)),
+            CapturedSurveySpawn(ViolentVagabond(0x7953AD58, 10, 182, 201.0314f, 107.6164f, 183.943253f, 95, 27)),
+            CapturedSurveySpawn(ViolentVagabond(0x7953AD76, 10, 182, 282.375244f, 102.8164f, 166.22612f, 95, 27)),
+            CapturedSurveySpawn(ViolentVagabond(0x7953AF49, 7, 128, 90.4653f, 107.61483f, 245.882523f, 94, 20)),
+            CapturedSurveySpawn(ViolentVagabond(0x7953AFA1, 7, 128, 184.873016f, 107.61483f, 245.969681f, 94, 20))
         };
 
         // Source: capture 20260709-164414 movement-packets.csv. These are complete
@@ -62,7 +116,7 @@ namespace ZoneEngine.Core.Playfields
             new Dictionary<int, CapturedSubwayPatrolReplaySegment[]>
             {
                 {
-                    0x794DF703,
+                    0x7953AF18,
                     new[]
                     {
                         new CapturedSubwayPatrolReplaySegment(0.665506, 90.9275284f, 107.61483f, 248.660339f, 93.7800903f, 107.61483f, 246.556122f, 25),
@@ -77,7 +131,7 @@ namespace ZoneEngine.Core.Playfields
                     }
                 },
                 {
-                    0x794DF719,
+                    0x7953AF57,
                     new[]
                     {
                         new CapturedSubwayPatrolReplaySegment(0.441025, 94.3362808f, 107.61483f, 257.132813f, 95.413147f, 108.601692f, 258.466431f, 24),
@@ -95,7 +149,7 @@ namespace ZoneEngine.Core.Playfields
                     }
                 },
                 {
-                    0x794DF72A,
+                    0x79531752,
                     new[]
                     {
                         new CapturedSubwayPatrolReplaySegment(0.250007, 120.377983f, 107.61483f, 238.187988f, 120.357513f, 107.61483f, 238.598038f, 24),
@@ -113,7 +167,7 @@ namespace ZoneEngine.Core.Playfields
                     }
                 },
                 {
-                    0x794DF730,
+                    0x79531754,
                     new[]
                     {
                         new CapturedSubwayPatrolReplaySegment(0.750019, 122.448677f, 107.61483f, 236.743958f, 120.128296f, 107.61483f, 236.93544f, 24),
@@ -159,6 +213,13 @@ namespace ZoneEngine.Core.Playfields
             return spawn;
         }
 
+        private static CapturedSubwaySpawnDefinition CapturedSurveySpawn(
+            CapturedSubwaySpawnDefinition spawn)
+        {
+            spawn.ContentSection = "Captured20260709Survey";
+            return spawn;
+        }
+
         private static CapturedSubwaySpawnDefinition FilthFlea(
             int sourceInstance,
             int level,
@@ -193,7 +254,9 @@ namespace ZoneEngine.Core.Playfields
             int health,
             float x,
             float y,
-            float z)
+            float z,
+            int monsterScale = 94,
+            int runSpeed = 33)
         {
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
@@ -202,9 +265,9 @@ namespace ZoneEngine.Core.Playfields
                 17720,
                 level,
                 health,
-                94,
+                monsterScale,
                 0,
-                33,
+                runSpeed,
                 138,
                 268980737,
                 7,
@@ -220,7 +283,9 @@ namespace ZoneEngine.Core.Playfields
             int health,
             float x,
             float y,
-            float z)
+            float z,
+            int monsterScale = 90,
+            int runSpeed = 33)
         {
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
@@ -229,9 +294,9 @@ namespace ZoneEngine.Core.Playfields
                 17649,
                 level,
                 health,
-                90,
+                monsterScale,
                 0,
-                33,
+                runSpeed,
                 95,
                 403182081,
                 7,
@@ -247,7 +312,9 @@ namespace ZoneEngine.Core.Playfields
             int health,
             float x,
             float y,
-            float z)
+            float z,
+            int monsterScale = 94,
+            int runSpeed = 21)
         {
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
@@ -256,9 +323,9 @@ namespace ZoneEngine.Core.Playfields
                 203734,
                 level,
                 health,
-                94,
+                monsterScale,
                 40705,
-                21,
+                runSpeed,
                 138,
                 268964353,
                 1,
@@ -275,9 +342,11 @@ namespace ZoneEngine.Core.Playfields
             float x,
             float y,
             float z,
-            float patrolX,
-            float patrolY,
-            float patrolZ)
+            int monsterScale = 93,
+            int runSpeed = 20,
+            float? patrolX = null,
+            float? patrolY = null,
+            float? patrolZ = null)
         {
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
@@ -286,9 +355,9 @@ namespace ZoneEngine.Core.Playfields
                 26092,
                 level,
                 health,
-                93,
+                monsterScale,
                 40694,
-                20,
+                runSpeed,
                 138,
                 268964353,
                 1,
@@ -307,7 +376,9 @@ namespace ZoneEngine.Core.Playfields
             int health,
             float x,
             float y,
-            float z)
+            float z,
+            int monsterScale = 93,
+            int runSpeed = 18)
         {
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
@@ -316,9 +387,9 @@ namespace ZoneEngine.Core.Playfields
                 203733,
                 level,
                 health,
-                93,
+                monsterScale,
                 40676,
-                18,
+                runSpeed,
                 3,
                 268964353,
                 1,

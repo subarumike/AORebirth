@@ -224,6 +224,9 @@ namespace AORebirth.Core.Playfields
 
         private static readonly CombatLootTableEntry[] DebugLootTable = CombatTestLootCatalog.BuildEntries();
 
+        private static readonly CombatLootTableEntry[] CapturedSubwayOrdinaryLootTable =
+            new CapturedSubwayOrdinaryContentProvider().BuildCapturedLootEntries();
+
         private static readonly object DatabaseLootTableLock = new object();
 
         private static CombatLootTableEntry[] databaseLootTable = new CombatLootTableEntry[0];
@@ -2813,9 +2816,16 @@ namespace AORebirth.Core.Playfields
             int monsterData = target.Stats[StatIds.monsterdata].Value;
             int npcFamily = target.Stats[StatIds.npcfamily].Value;
             int level = target.Stats[StatIds.level].Value;
-            List<CombatLootTableEntry> matchingEntries = DebugLootTable.Where(
+            List<CombatLootTableEntry> matchingEntries = CapturedSubwayOrdinaryLootTable.Where(
                 x => x.Matches(target.Name, monsterData, npcFamily)).ToList();
-            string lootSource = "debug";
+            string lootSource = "captured-subway-ordinary";
+
+            if (matchingEntries.Count == 0)
+            {
+                matchingEntries = DebugLootTable.Where(
+                    x => x.Matches(target.Name, monsterData, npcFamily)).ToList();
+                lootSource = "debug";
+            }
 
             if (matchingEntries.Count == 0)
             {

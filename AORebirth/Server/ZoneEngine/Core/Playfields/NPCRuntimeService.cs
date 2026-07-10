@@ -37,11 +37,15 @@ namespace AORebirth.Core.Playfields
 
         private readonly CapturedSubwayContentProvider capturedSubwayContent;
 
+        private readonly CapturedSubwayOrdinaryContentProvider capturedSubwayOrdinaryContent;
+
         private readonly NpcPatrolReplayCoordinator patrolReplay;
 
         private readonly CapturedAreteRobotSpawnOrchestrator capturedAreteRobotSpawns;
 
         private readonly CapturedSubwaySpawnOrchestrator capturedSubwaySpawns;
+
+        private readonly CapturedSubwayOrdinarySpawnOrchestrator capturedSubwayOrdinarySpawns;
 
         private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
 
@@ -59,6 +63,7 @@ namespace AORebirth.Core.Playfields
             this.combatTick = new NpcCombatTickCoordinator(playfield);
             this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
             this.capturedSubwayContent = new CapturedSubwayContentProvider();
+            this.capturedSubwayOrdinaryContent = new CapturedSubwayOrdinaryContentProvider();
             this.patrolReplay =
                 new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent, this.capturedSubwayContent);
             this.capturedAreteRobotSpawns =
@@ -70,6 +75,10 @@ namespace AORebirth.Core.Playfields
                 new CapturedSubwaySpawnOrchestrator(
                     this.capturedSubwayContent,
                     this.patrolReplay,
+                    this.ActivateNpc);
+            this.capturedSubwayOrdinarySpawns =
+                new CapturedSubwayOrdinarySpawnOrchestrator(
+                    this.capturedSubwayOrdinaryContent,
                     this.ActivateNpc);
         }
 
@@ -116,6 +125,7 @@ namespace AORebirth.Core.Playfields
         {
             this.capturedAreteRobotSpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
             this.capturedSubwaySpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
+            this.capturedSubwayOrdinarySpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
         }
 
         internal bool HasPendingDeadNpcDespawn(Identity identity)
@@ -198,6 +208,7 @@ namespace AORebirth.Core.Playfields
         {
             this.corpseLifecycle.FinalizeNpcDespawn(target);
             this.dynelRegistry.Unregister(target.Identity);
+            CapturedSubwayOrdinaryRuntimeRegistry.Remove(target.Identity.Instance);
         }
 
         internal void ResetCombatTick(ICharacter attacker)

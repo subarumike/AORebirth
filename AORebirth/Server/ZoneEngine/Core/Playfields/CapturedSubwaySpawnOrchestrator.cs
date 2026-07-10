@@ -25,8 +25,11 @@ namespace AORebirth.Core.Playfields
     internal sealed class CapturedSubwaySpawnOrchestrator
     {
         private const int CapturedSubwayThiefMonsterData = 26092;
+        private const int CapturedSubwayMuggerMonsterData = 203734;
+        private const int CapturedSubwayViolentVagabondMonsterData = 203733;
         private const int CapturedSubwayThiefBodyMesh = 160561;
         private const int CapturedSubwayThiefBackMesh = 7777;
+        private const int CapturedSubwayViolentVagabondBackMesh = 136583;
 
         private readonly CapturedSubwayContentProvider capturedSubwayContent;
 
@@ -181,9 +184,14 @@ namespace AORebirth.Core.Playfields
                 ClearTemplateHeadMesh(mobCharacter);
             }
 
-            if (spawn.MonsterData == CapturedSubwayThiefMonsterData)
+            if (spawn.MonsterData == CapturedSubwayThiefMonsterData
+                || spawn.MonsterData == CapturedSubwayMuggerMonsterData)
             {
                 ApplyCapturedSubwayThiefVisuals(mobCharacter, spawn.HeadMesh);
+            }
+            else if (spawn.MonsterData == CapturedSubwayViolentVagabondMonsterData)
+            {
+                ApplyCapturedSubwayViolentVagabondVisuals(mobCharacter, spawn.HeadMesh);
             }
         }
 
@@ -237,6 +245,23 @@ namespace AORebirth.Core.Playfields
             mobCharacter.SocialMeshLayer.AddMesh(0, CapturedSubwayThiefBodyMesh, 0, 2);
             mobCharacter.SocialMeshLayer.AddMesh(0, headMesh, 0, 4);
             mobCharacter.SocialMeshLayer.AddMesh(1, CapturedSubwayThiefBackMesh, 0, 2);
+        }
+
+        private static void ApplyCapturedSubwayViolentVagabondVisuals(
+            Character mobCharacter,
+            int headMesh)
+        {
+            mobCharacter.Textures.Clear();
+            mobCharacter.Textures.Add(new AOTextures(0, 0));
+            mobCharacter.Textures.Add(new AOTextures(1, 21824));
+            mobCharacter.Textures.Add(new AOTextures(2, 0));
+            mobCharacter.Textures.Add(new AOTextures(3, 21819));
+            mobCharacter.Textures.Add(new AOTextures(4, 21831));
+
+            mobCharacter.MeshLayer.AddMesh(0, headMesh, 0, 4);
+            mobCharacter.MeshLayer.AddMesh(1, CapturedSubwayViolentVagabondBackMesh, 0, 2);
+            mobCharacter.SocialMeshLayer.AddMesh(0, headMesh, 0, 4);
+            mobCharacter.SocialMeshLayer.AddMesh(1, CapturedSubwayViolentVagabondBackMesh, 0, 2);
         }
 
         private static void SetMobStat(ICharacter mobCharacter, StatIds stat, int value)
