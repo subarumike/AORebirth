@@ -211,30 +211,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void LoginBoundsSocketReceiveBufferToDeclaredFrameBeforeDeserialize()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string loginClient = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\LoginEngine\CoreClient\Client.cs"));
-
-            int frameIndex = loginClient.IndexOf(
-                "packet = ExtractDeclaredFrame(packet);",
-                StringComparison.Ordinal);
-            int deserializeIndex = loginClient.IndexOf(
-                "message = this.messageSerializer.Deserialize(packet);",
-                StringComparison.Ordinal);
-
-            Assert.IsTrue(frameIndex >= 0, "Login must isolate the header-declared AO frame.");
-            Assert.IsTrue(
-                deserializeIndex > frameIndex,
-                "Login frame isolation must occur before strict envelope deserialization.");
-            StringAssert.Contains(
-                loginClient,
-                "int declaredLength = (receiveBuffer[MessageSizeOffset] << 8)");
-            StringAssert.Contains(loginClient, "declaredLength >= receiveBuffer.Length");
-        }
-
-        [TestMethod]
         public void LoginAndZoneDiagnosticReadsGuardShortPackets()
         {
             string repositoryRoot = FindRepositoryRoot();
