@@ -1305,8 +1305,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 orchestratorText.Contains("Pool.Instance.GetFreeInstance<Character>")
                 && orchestratorText.Contains("ApplyCapturedStats(character, spawn, archetype)")
                 && orchestratorText.Contains("ApplyCapturedAppearance(character, archetype)")
-                && orchestratorText.Contains("CapturedSubwayOrdinaryRuntimeRegistry.Register"),
+                && orchestratorText.Contains("CapturedSubwayOrdinaryRuntimeRegistry.Register")
+                && orchestratorText.Contains("character.Stats.SetBaseValueWithoutTriggering("),
                 "Template-free ordinary NPC construction must still use the standard attackable Character runtime.");
+            Assert.IsFalse(
+                ExtractMethodBlock(orchestratorText, "private static void SetMobStat(").Contains(".Value = value"),
+                "Template-free captured NPC initialization must not trigger derived stats before all base values exist.");
             Assert.IsTrue(
                 scfuText.Contains("CapturedSubwayOrdinaryRuntimeRegistry.TryGet")
                 && scfuText.Contains("scfu.AdditionalFlags = spawn.CapturedFlags;")

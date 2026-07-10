@@ -1,0 +1,45 @@
+﻿{
+  "timestampUtc": "2026-06-22T16:54:07.1170882Z",
+  "captureStartUtc": "2026-06-22T16:24:42.8184746Z",
+  "captureEndUtc": "2026-06-22T16:54:07.1170882Z",
+  "sessionDurationSeconds": 1764.299,
+  "captureFolderPath": "C:\\Users\\kegzi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260622-182442",
+  "characterName": "Hiredhitman",
+  "playfieldId": "(Playfield2:10E83C)",
+  "packetCounts": {
+    "inboundRaw": 13830,
+    "outboundRaw": 4435,
+    "decodedInboundN3": 13301,
+    "decodedOutboundN3": 4377
+  },
+  "captureCounts": {
+    "vendorInteractionAttempts": 2,
+    "vendorFullUpdateMessages": 17,
+    "shopUpdateMessages": 1,
+    "shopUpdateRows": 7,
+    "systemMessages": 1281,
+    "chatDialogueMessages": 246,
+    "npcInteractions": 1659,
+    "inventoryUpdateMessages": 116,
+    "inventoryUpdateRows": 78,
+    "enemyTrackedEntities": 159,
+    "enemyStateRows": 3279,
+    "enemyCombatEvents": 375,
+    "enemyDamageEvents": 127,
+    "enemyDeathEvents": 0,
+    "enemySpawnEvents": 159,
+    "enemyDespawnEvents": 1088,
+    "enemyHealthUpdates": 1746,
+    "enemyPositionUpdates": 702
+  },
+  "lastPacketUtc": "2026-06-22T16:54:02.0510126Z",
+  "vendorInteractionIdentities": ["(VendingMachine:12EA61A0)"],
+  "shopUpdateIdentities": ["(VendingMachine:12EA61A0)"],
+  "vendorFullUpdateIdentities": ["(VendingMachine:12EA61A0)", "(VendingMachine:12EA61A1)"],
+  "validation": {
+    "status": "complete",
+    "processingAllowed": true,
+    "issues": [],
+    "notes": []
+  }
+}
