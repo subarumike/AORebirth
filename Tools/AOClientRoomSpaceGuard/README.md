@@ -63,7 +63,10 @@ README to `C:\Funcom\AOClientRoomSpaceGuard`. It never launches AO.
   after guarded call `N3+0x16144`.
 
 This validates the current mitigation. Current telemetry rules out the earlier
-wrong-class/stale-room-space theory for the captured new-client run: the exact room-space
-pointer remained current, the dynamic cast succeeded, and `GetInsideCell` repeatedly
-returned a negative cell result. The added query telemetry is the next evidence needed to
-map that invalid lookup to the responsible room geometry/resource.
+wrong-class/stale-room-space theory for the main invalid-cell path: the exact room-space
+pointer remains current and `GetInsideCell` returns `-1`. Multiple-room correlation shows
+that the client callers preserve valid captured actor X/Z but derive out-of-cell heights:
+Workman Striker samples are `0.75` and `1.50` units below the actor, while a separate
+Infector line query uses `Y=0` instead of its captured `Y=73.01795`. The permanent guarded
+behavior is therefore to return no room for those invalid queries; AORebirth server spawn
+coordinates and captured movement paths are not altered.
