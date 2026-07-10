@@ -53,10 +53,6 @@ namespace LoginEngine.CoreClient
     {
         #region Fields
 
-        private const int MessageHeaderLength = 16;
-
-        private const int MessageSizeOffset = 6;
-
         /// <summary>
         /// </summary>
         private readonly IBus bus;
@@ -254,7 +250,6 @@ namespace LoginEngine.CoreClient
             this._remainingLength = 0;
             try
             {
-                packet = ExtractDeclaredFrame(packet);
                 message = this.messageSerializer.Deserialize(packet);
             }
             catch (Exception)
@@ -283,25 +278,6 @@ namespace LoginEngine.CoreClient
             this.bus.Publish(new MessageReceivedEvent(this, message));
 
             return true;
-        }
-
-        private static byte[] ExtractDeclaredFrame(byte[] receiveBuffer)
-        {
-            if (receiveBuffer == null || receiveBuffer.Length < MessageHeaderLength)
-            {
-                return receiveBuffer;
-            }
-
-            int declaredLength = (receiveBuffer[MessageSizeOffset] << 8)
-                                 | receiveBuffer[MessageSizeOffset + 1];
-            if (declaredLength < MessageHeaderLength || declaredLength >= receiveBuffer.Length)
-            {
-                return receiveBuffer;
-            }
-
-            var frame = new byte[declaredLength];
-            Array.Copy(receiveBuffer, frame, declaredLength);
-            return frame;
         }
 
         #endregion
