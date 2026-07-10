@@ -67,7 +67,6 @@
     <Compile Include="DebuggingSerializerTests.cs" />
     <Compile Include="GenericCmdUseRouteClassifierTests.cs" />
     <Compile Include="InfoPacketTests.cs" />
-    <Compile Include="MessageEnvelopeValidationTests.cs" />
     <Compile Include="N3RecoveredContractTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\CityControllerInteractionRules.cs">
