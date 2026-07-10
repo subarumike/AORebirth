@@ -21,6 +21,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Filth Flea appearance has been corrected from capture-backed Subway SCFU texture evidence.
 - Subway PF127 now has the preserved 95-spawn supported baseline plus a template-free ordinary framework containing 126 deduplicated Shadow, Stim Fiend, Workman/Architect Striker, Infected Attendant, Slum Runner, Looter, Infector, Lost Thought, and Neural Burnout spawns. The framework is generated from completed SCFU, movement, combat, corpse, and inventory evidence; named/boss content remains deferred rather than assigned ordinary or guessed database behavior.
 - Subway content work is the primary development track.
+- AO client Subway room-space crash mitigation is A/B validated for both supported clients: the guarded old client remained stable on live while the unguarded control crashed immediately after guarded call `N3+0x148B6`, and the guarded new client remained stable on AORebirth while the unguarded control crashed immediately after guarded call `N3+0x16144`. `Tools/AOClientRoomSpaceGuard` is a client-only, per-launch mitigation and does not justify a server-content change. The deployed telemetry build now records the first failed cast/invalid-cell event per callsite plus final counts and object identity evidence needed to locate the earlier lifecycle violation.
 
 ## Current Baseline
 
