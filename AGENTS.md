@@ -1,5 +1,6 @@
 # Agent Rules
 
+- This agent works only on AORebirth. Never work on AO Rebuild or AO stripdown, and never switch to either workspace.
 - Read `AI_START_HERE.md` first.
 - Ground work in repository files.
 - Never rely on old chat history.
