@@ -360,6 +360,38 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void SubwayFilthFleaCombatUsesCapturedPoisonAndMeleeAttackContext()
+        {
+            Assert.AreEqual(17657, NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData);
+            Assert.AreEqual(15, NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonDamage);
+            Assert.AreEqual(3, NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeDamage);
+            Assert.AreEqual(1, NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonWeaponSlot);
+            Assert.AreEqual(0, NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeWeaponSlot);
+            Assert.AreEqual(0x45504148, NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag);
+            Assert.AreEqual(0x415A5553, NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag);
+            Assert.AreEqual(3650, (int)(NpcCombatAttackRules.CapturedSubwayFilthFleaInitialAttackSeconds * 1000));
+            Assert.AreEqual(1580, (int)(NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonRechargeSeconds * 1000));
+            Assert.AreEqual(2800, (int)(NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeRechargeSeconds * 1000));
+
+            string repositoryRoot = FindRepositoryRoot();
+            string coordinatorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            int contextIndex = coordinatorText.IndexOf(
+                "this.AnnounceCapturedSubwayFilthFleaAttackStartContext(attacker);",
+                StringComparison.Ordinal);
+            int poisonContextIndex = coordinatorText.IndexOf(
+                "CreateCapturedSubwayFilthFleaSpecialAttacks()",
+                StringComparison.Ordinal);
+            int attackInfoIndex = coordinatorText.IndexOf(
+                "this.AnnounceCombatDamage(",
+                StringComparison.Ordinal);
+
+            Assert.IsTrue(contextIndex >= 0, "Flea combat start must announce captured attack context.");
+            Assert.IsTrue(poisonContextIndex >= 0, "Flea combat must expose captured natural attack templates.");
+            Assert.IsTrue(attackInfoIndex > contextIndex, "Flea context must be established before AttackInfo damage.");
+        }
+
+        [TestMethod]
         public void PlayerCombatRuntimeServiceFinalBoundaryOwnsLifecycleOrchestrationOnly()
         {
             string repositoryRoot = FindRepositoryRoot();

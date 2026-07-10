@@ -36,6 +36,8 @@ namespace AORebirth.Core.Playfields
 
         private readonly Dictionary<int, int> lastNpcSpecialAttackWeaponTargets = new Dictionary<int, int>();
 
+        private readonly HashSet<int> capturedSubwayFilthFleaPoisonAttacks = new HashSet<int>();
+
         private readonly Playfield playfield;
 
         internal NpcCombatTickCoordinator(Playfield playfield)
@@ -45,13 +47,21 @@ namespace AORebirth.Core.Playfields
 
         internal void ResetCombatTick(ICharacter attacker)
         {
-            double initialDelaySeconds = Playfield.IsCapturedCleaningRobot(attacker)
-                                             ? NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds
-                                             : NpcCombatAttackRules.DefaultCombatTickSeconds;
+            bool isCapturedSubwayFilthFlea = IsCapturedSubwayFilthFlea(attacker);
+            double initialDelaySeconds = isCapturedSubwayFilthFlea
+                                             ? NpcCombatAttackRules.CapturedSubwayFilthFleaInitialAttackSeconds
+                                             : Playfield.IsCapturedCleaningRobot(attacker)
+                                                   ? NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds
+                                                   : NpcCombatAttackRules.DefaultCombatTickSeconds;
             this.nextCombatTicks[attacker.Identity.Instance] =
                 DateTime.UtcNow + TimeSpan.FromSeconds(initialDelaySeconds);
 
             this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
+            this.capturedSubwayFilthFleaPoisonAttacks.Remove(attacker.Identity.Instance);
+            if (isCapturedSubwayFilthFlea)
+            {
+                this.AnnounceCapturedSubwayFilthFleaAttackStartContext(attacker);
+            }
         }
 
         internal void ClearTracking(Identity identity)
@@ -60,6 +70,7 @@ namespace AORebirth.Core.Playfields
             this.lastNpcCombatWeaponSlots.Remove(identity.Instance);
             this.lastNpcUnarmedAttackInfoSlots.Remove(identity.Instance);
             this.lastNpcSpecialAttackWeaponTargets.Remove(identity.Instance);
+            this.capturedSubwayFilthFleaPoisonAttacks.Remove(identity.Instance);
         }
 
         internal void ProcessCombatTick(ICharacter attacker)
@@ -140,6 +151,10 @@ namespace AORebirth.Core.Playfields
                 attackSource.UsesEquippedWeapon
                     ? CombatDamageSource.WeaponAutoAttack
                     : CombatDamageSource.UnarmedAutoAttack);
+            if (attackSource.IsCapturedSubwayFilthFleaPoisonAttack)
+            {
+                this.capturedSubwayFilthFleaPoisonAttacks.Add(attacker.Identity.Instance);
+            }
             target.SendChangedStats();
             LogUtil.Debug(
                 DebugInfoDetail.Network,
@@ -238,6 +253,34 @@ namespace AORebirth.Core.Playfields
                     attacker.Stats[StatIds.monsterdata].Value));
         }
 
+        private void AnnounceCapturedSubwayFilthFleaAttackStartContext(ICharacter attacker)
+        {
+            if (attacker.FightingTarget.Instance == 0)
+            {
+                return;
+            }
+
+            this.lastNpcSpecialAttackWeaponTargets[attacker.Identity.Instance] = attacker.FightingTarget.Instance;
+            this.playfield.Announce(
+                new SpecialAttackWeaponMessage
+                {
+                    Identity = attacker.Identity,
+                    Specials = CreateCapturedSubwayFilthFleaSpecialAttacks(),
+                    Unknown1 = NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                    Unknown2 = NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                    Unknown3 = NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                    Unknown4 = NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                    Unknown5 = NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue
+                });
+            this.playfield.Announce(
+                new AttackMessage
+                {
+                    Identity = attacker.Identity,
+                    Target = attacker.FightingTarget,
+                    Action = 0
+                });
+        }
+
         private static SpecialAttack[] CreateCapturedCleaningRobotSpecialAttacks()
         {
             return new[]
@@ -255,6 +298,27 @@ namespace AORebirth.Core.Playfields
                            Unknown2 = NpcCombatAttackRules.CapturedCleaningRobotRightWeaponTemplate,
                            Unknown3 = NpcCombatAttackRules.CapturedCleaningRobotRightWeaponTag,
                            Unknown4 = "LIW1"
+                       }
+                   };
+        }
+
+        private static SpecialAttack[] CreateCapturedSubwayFilthFleaSpecialAttacks()
+        {
+            return new[]
+                   {
+                       new SpecialAttack
+                       {
+                           Unknown1 = NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadLowTemplate,
+                           Unknown2 = NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadHighTemplate,
+                           Unknown3 = NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
+                           Unknown4 = NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadName
+                       },
+                       new SpecialAttack
+                       {
+                           Unknown1 = NpcCombatAttackRules.CapturedSubwayFilthFleaArmsLowTemplate,
+                           Unknown2 = NpcCombatAttackRules.CapturedSubwayFilthFleaArmsHighTemplate,
+                           Unknown3 = NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag,
+                           Unknown4 = NpcCombatAttackRules.CapturedSubwayFilthFleaArmsName
                        }
                    };
         }
@@ -357,6 +421,37 @@ namespace AORebirth.Core.Playfields
 
         private CombatAttackSource GetCombatAttackSource(ICharacter attacker)
         {
+            if (IsCapturedSubwayFilthFlea(attacker))
+            {
+                bool poisonAttackCompleted =
+                    this.capturedSubwayFilthFleaPoisonAttacks.Contains(attacker.Identity.Instance);
+                return new CombatAttackSource
+                       {
+                           MinDamage = poisonAttackCompleted
+                                           ? NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeDamage
+                                           : NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonDamage,
+                           MaxDamage = poisonAttackCompleted
+                                           ? NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeDamage
+                                           : NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonDamage,
+                           DamageBonus = 0,
+                           Range = NpcCombatAttackRules.MaxMeleeCombatDistance,
+                           RechargeSeconds = poisonAttackCompleted
+                                                 ? NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeRechargeSeconds
+                                                 : NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonRechargeSeconds,
+                           UsesEquippedWeapon = false,
+                           AttackInfoAmmoCount = NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                           AttackInfoWeaponSlot = poisonAttackCompleted
+                                                      ? NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeWeaponSlot
+                                                      : NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonWeaponSlot,
+                           AttackInfoUnk1 = 0,
+                           AttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType,
+                           AttackInfoWeaponInstance = poisonAttackCompleted
+                                                          ? NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag
+                                                          : NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
+                           IsCapturedSubwayFilthFleaPoisonAttack = !poisonAttackCompleted
+                       };
+            }
+
             EquippedCombatWeapon equippedWeapon = this.GetEquippedCombatWeapon(attacker);
             if (equippedWeapon == null)
             {
@@ -539,6 +634,16 @@ namespace AORebirth.Core.Playfields
                    || NormalizeCombatItemStat(item.GetAttribute((int)StatIds.rechargedelay), 0) > 0;
         }
 
+        private static bool IsCapturedSubwayFilthFlea(ICharacter character)
+        {
+            return character != null
+                   && character.Playfield != null
+                   && character.Playfield.Identity.Instance == NpcCombatAttackRules.CapturedSubwayPlayfield
+                   && character.Stats[StatIds.monsterdata].Value
+                      == NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData
+                   && string.Equals(character.Name, "Filth Flea", StringComparison.Ordinal);
+        }
+
         private static double NormalizeCombatRange(int range)
         {
             int normalizedRange = NormalizeCombatItemStat(range, 0);
@@ -587,6 +692,8 @@ namespace AORebirth.Core.Playfields
             public int AttackInfoHitType { get; set; }
 
             public int AttackInfoWeaponInstance { get; set; }
+
+            public bool IsCapturedSubwayFilthFleaPoisonAttack { get; set; }
         }
 
         private enum CombatDamageSource

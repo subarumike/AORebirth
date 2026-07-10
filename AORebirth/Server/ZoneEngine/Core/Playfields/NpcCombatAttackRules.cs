@@ -38,6 +38,44 @@ namespace ZoneEngine.Core.Playfields
 
         public const int NormalAttackInfoHitType = 3;
 
+        public const int CapturedSubwayFilthFleaMonsterData = 17657;
+
+        public const int CapturedSubwayPlayfield = 127;
+
+        public const double CapturedSubwayFilthFleaInitialAttackSeconds = 3.65;
+
+        public const double CapturedSubwayFilthFleaPoisonRechargeSeconds = 1.58;
+
+        public const double CapturedSubwayFilthFleaMeleeRechargeSeconds = 2.8;
+
+        public const int CapturedSubwayFilthFleaPoisonDamage = 15;
+
+        public const int CapturedSubwayFilthFleaMeleeDamage = 3;
+
+        public const int CapturedSubwayFilthFleaPoisonWeaponSlot = 1;
+
+        public const int CapturedSubwayFilthFleaMeleeWeaponSlot = 0;
+
+        public const int CapturedSubwayFilthFleaStickToHeadLowTemplate = 201059;
+
+        public const int CapturedSubwayFilthFleaStickToHeadHighTemplate = 201060;
+
+        public const int CapturedSubwayFilthFleaStickToHeadTag = 0x45504148;
+
+        public const string CapturedSubwayFilthFleaStickToHeadName = "EPAH";
+
+        public const int CapturedSubwayFilthFleaArmsLowTemplate = 201056;
+
+        public const int CapturedSubwayFilthFleaArmsHighTemplate = 201057;
+
+        public const int CapturedSubwayFilthFleaArmsTag = 0x415A5553;
+
+        public const string CapturedSubwayFilthFleaArmsName = "AZUS";
+
+        public const int CapturedSubwayFilthFleaSpecialAttackWeaponValue = 33;
+
+        public const int CapturedSubwayFilthFleaSpecialAttackWeaponLastValue = 0;
+
         public static bool ShouldSendCapturedCleaningRobotAttackStartContext(
             bool isCapturedCleaningRobot,
             bool usesEquippedWeapon,
