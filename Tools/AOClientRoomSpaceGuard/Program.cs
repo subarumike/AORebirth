@@ -15,6 +15,7 @@ internal static class Program
     private const uint ProcessVmOperation = 0x0008;
     private const uint ProcessVmRead = 0x0010;
     private const uint ProcessVmWrite = 0x0020;
+    private const uint ProcessSynchronize = 0x00100000;
     private const uint ThreadSuspendResume = 0x0002;
     private const uint SnapshotThread = 0x00000004;
     private const uint SnapshotModule = 0x00000008;
@@ -25,6 +26,11 @@ internal static class Program
     private const uint PageReadWrite = 0x04;
     private const uint PageExecuteRead = 0x20;
     private const uint PageExecuteReadWrite = 0x40;
+    private const uint WaitObject0 = 0x00000000;
+    private const uint WaitTimeout = 0x00000102;
+    private const int TelemetrySlotSize = 24;
+    private const int TelemetryPageOffset = 0x1000;
+    private const int GuardAllocationSize = 0x2000;
     private static readonly IntPtr InvalidHandleValue = new IntPtr(-1);
 
     private static readonly PatchProfile[] Profiles =
@@ -114,10 +120,15 @@ internal static class Program
     {
         const uint sampleModuleBase = 0x60000000;
         const uint sampleWrapperBase = 0x30000000;
+        const uint sampleTelemetryBase = sampleWrapperBase + TelemetryPageOffset;
 
         foreach (PatchProfile profile in Profiles)
         {
-            byte[] wrapper = BuildWrapper(profile, sampleModuleBase, sampleWrapperBase);
+            byte[] wrapper = BuildWrapper(
+                profile,
+                sampleModuleBase,
+                sampleWrapperBase,
+                sampleTelemetryBase);
 
             foreach (int callRva in profile.CollisionCallRvas)
             {
@@ -137,21 +148,40 @@ internal static class Program
                     profile.Name + " patched call target at 0x" + callRva.ToString("X"));
             }
 
-            Require(wrapper.Length == 83, profile.Name + " wrapper length");
-            Require(wrapper[33] == 0x74 && wrapper[34] == 0x25,
+            Require(wrapper.Length > 88 && wrapper.Length < TelemetryPageOffset,
+                profile.Name + " wrapper length");
+            Require(wrapper[6] == 0xFF && wrapper[7] == 0x71 && wrapper[8] == 0x58,
+                profile.Name + " exact room-space capture");
+            Require(wrapper[23] == 0xFF && wrapper[24] == 0x75 && wrapper[25] == 0xF8,
+                profile.Name + " captured room-space cast input");
+            Require(wrapper[36] == 0x74 && wrapper[37] == 0x25,
                 profile.Name + " null branch");
-            Require(wrapper[47] == 0x78 && wrapper[48] == 0x17,
+            Require(wrapper[50] == 0x78 && wrapper[51] == 0x17,
                 profile.Name + " invalid-cell branch");
-            Require(DecodeRelativeTarget(sampleWrapperBase, wrapper, 23) ==
+            Require(DecodeRelativeTarget(sampleWrapperBase, wrapper, 26) ==
                 sampleModuleBase + (uint)profile.DynamicCastRva, profile.Name + " dynamic-cast target");
-            Require(DecodeRelativeTarget(sampleWrapperBase, wrapper, 40) ==
+            Require(DecodeRelativeTarget(sampleWrapperBase, wrapper, 43) ==
                 sampleModuleBase + (uint)profile.GetInsideCellRva, profile.Name + " inside-cell target");
-            Require(DecodeRelativeTarget(sampleWrapperBase, wrapper, 52) ==
+            Require(DecodeRelativeTarget(sampleWrapperBase, wrapper, 55) ==
                 sampleModuleBase + (uint)profile.GetZonesRva, profile.Name + " room-list target");
-            Require(BitConverter.ToUInt32(wrapper, 9) == sampleModuleBase + (uint)profile.TargetTypeRva,
+            Require(DecodeRelativeTarget(sampleWrapperBase, wrapper, 75) == sampleWrapperBase + 91,
+                profile.Name + " telemetry recorder target");
+            Require(BitConverter.ToUInt32(wrapper, 12) == sampleModuleBase + (uint)profile.TargetTypeRva,
                 profile.Name + " target RTTI");
-            Require(BitConverter.ToUInt32(wrapper, 14) == sampleModuleBase + (uint)profile.SourceTypeRva,
+            Require(BitConverter.ToUInt32(wrapper, 17) == sampleModuleBase + (uint)profile.SourceTypeRva,
                 profile.Name + " source RTTI");
+            for (int index = 0; index < profile.CollisionCallRvas.Length; index++)
+            {
+                uint sampleSlot = sampleTelemetryBase + (uint)(index * TelemetrySlotSize);
+                foreach (uint fieldOffset in new uint[] { 0u, 4u, 8u, 12u, 16u, 20u })
+                {
+                    Require(ContainsUInt32(wrapper, sampleSlot + fieldOffset),
+                        profile.Name + " telemetry field address " + index + "+" + fieldOffset);
+                }
+                Require(ContainsUInt32(wrapper,
+                    sampleModuleBase + (uint)profile.CollisionCallRvas[index] + 5u),
+                    profile.Name + " telemetry return address " + index);
+            }
         }
 
         Log("SELF-TEST PASS targetedProfiles=" + Profiles.Length);
@@ -216,7 +246,8 @@ internal static class Program
     private static void ApplyTargetedGuard(TargetProcess target, PatchProfile profile)
     {
         IntPtr process = OpenProcess(
-            ProcessQueryInformation | ProcessVmOperation | ProcessVmRead | ProcessVmWrite,
+            ProcessQueryInformation | ProcessVmOperation | ProcessVmRead | ProcessVmWrite |
+            ProcessSynchronize,
             false,
             target.ProcessId);
 
@@ -243,7 +274,7 @@ internal static class Program
                     profile.CollisionCallRvas[index].ToString("X") + ".");
             }
 
-            wrapperAddress = VirtualAllocEx(process, IntPtr.Zero, new UIntPtr(0x1000),
+            wrapperAddress = VirtualAllocEx(process, IntPtr.Zero, new UIntPtr(GuardAllocationSize),
                 MemCommit | MemReserve, PageReadWrite);
             if (wrapperAddress == IntPtr.Zero)
             {
@@ -251,8 +282,11 @@ internal static class Program
             }
 
             uint wrapperBase = ToUInt32(wrapperAddress, "targeted wrapper address");
-            byte[] wrapper = BuildWrapper(profile, moduleBase, wrapperBase);
+            uint telemetryBase = wrapperBase + TelemetryPageOffset;
+            byte[] wrapper = BuildWrapper(profile, moduleBase, wrapperBase, telemetryBase);
             WriteExact(process, wrapperAddress, wrapper);
+            WriteExact(process, new IntPtr(telemetryBase),
+                new byte[profile.CollisionCallRvas.Length * TelemetrySlotSize]);
 
             uint oldWrapperProtection;
             if (!VirtualProtectEx(process, wrapperAddress, new UIntPtr(0x1000),
@@ -310,6 +344,9 @@ internal static class Program
 
                     Require(ReadExact(process, wrapperAddress, wrapper.Length).SequenceEqual(wrapper),
                         "Targeted wrapper verification failed.");
+                    Require(ReadExact(process, new IntPtr(telemetryBase),
+                        profile.CollisionCallRvas.Length * TelemetrySlotSize)
+                        .All(value => value == 0), "Targeted telemetry initialization failed.");
                 }
                 catch
                 {
@@ -336,8 +373,10 @@ internal static class Program
             Log("PATCH PASS targeted pid=" + target.ProcessId + " profile=" + profile.Name +
                 " callRvas=" + string.Join(",", profile.CollisionCallRvas
                     .Select(rva => "0x" + rva.ToString("X"))) +
-                " wrapper=0x" + wrapperBase.ToString("X8"));
+                " wrapper=0x" + wrapperBase.ToString("X8") +
+                " telemetry=0x" + telemetryBase.ToString("X8"));
             wrapperAddress = IntPtr.Zero;
+            MonitorTelemetry(process, target.ProcessId, profile, telemetryBase);
         }
         finally
         {
@@ -350,7 +389,8 @@ internal static class Program
         }
     }
 
-    private static byte[] BuildWrapper(PatchProfile profile, uint moduleBase, uint wrapperBase)
+    private static byte[] BuildWrapper(PatchProfile profile, uint moduleBase, uint wrapperBase,
+        uint telemetryBase)
     {
         var bytes = new List<byte>
         {
@@ -358,6 +398,7 @@ internal static class Program
             0x8B, 0xEC,
             0x56,
             0x8B, 0xF1,
+            0xFF, 0x71, 0x58,
             0x6A, 0x00,
             0x68
         };
@@ -367,11 +408,11 @@ internal static class Program
         bytes.AddRange(new byte[]
         {
             0x6A, 0x00,
-            0xFF, 0x71, 0x58,
+            0xFF, 0x75, 0xF8,
             0xE8
         });
         bytes.AddRange(RelativeDisplacement(
-            wrapperBase + 28,
+            wrapperBase + 31,
             moduleBase + (uint)profile.DynamicCastRva));
         bytes.AddRange(new byte[]
         {
@@ -383,7 +424,7 @@ internal static class Program
             0xE8
         });
         bytes.AddRange(RelativeDisplacement(
-            wrapperBase + 45,
+            wrapperBase + 48,
             moduleBase + (uint)profile.GetInsideCellRva));
         bytes.AddRange(new byte[]
         {
@@ -394,7 +435,7 @@ internal static class Program
             0xE8
         });
         bytes.AddRange(RelativeDisplacement(
-            wrapperBase + 57,
+            wrapperBase + 60,
             moduleBase + (uint)profile.GetZonesRva));
         bytes.AddRange(new byte[]
         {
@@ -404,14 +445,199 @@ internal static class Program
             0x8B, 0x75, 0xFC,
             0x8B, 0xE5,
             0x5D,
-            0xC2, 0x08, 0x00,
+            0xC2, 0x08, 0x00
+        });
+
+        int telemetryCallOffset = bytes.Count;
+        bytes.Add(0xE8);
+        bytes.AddRange(new byte[4]);
+        bytes.AddRange(new byte[]
+        {
             0x33, 0xC0,
             0x8B, 0x75, 0xFC,
             0x8B, 0xE5,
             0x5D,
             0xC2, 0x08, 0x00
         });
+
+        int recorderOffset = bytes.Count;
+        PatchInt32(bytes, telemetryCallOffset + 1, unchecked((int)(
+            wrapperBase + (uint)recorderOffset -
+            (wrapperBase + (uint)telemetryCallOffset + 5u))));
+        AppendTelemetryRecorder(bytes, profile, moduleBase, wrapperBase, telemetryBase);
         return bytes.ToArray();
+    }
+
+    private static void AppendTelemetryRecorder(List<byte> bytes, PatchProfile profile,
+        uint moduleBase, uint wrapperBase, uint telemetryBase)
+    {
+        bytes.AddRange(new byte[]
+        {
+            0xBA, 0x01, 0x00, 0x00, 0x00,
+            0x85, 0xC0,
+            0x79, 0x05,
+            0xBA, 0x02, 0x00, 0x00, 0x00,
+            0x8B, 0x4D, 0x04
+        });
+
+        var jumpDisplacements = new List<int>();
+        for (int index = 0; index < profile.CollisionCallRvas.Length; index++)
+        {
+            bytes.AddRange(new byte[] { 0x81, 0xF9 });
+            AppendUInt32(bytes,
+                moduleBase + (uint)profile.CollisionCallRvas[index] + 5u);
+            bytes.AddRange(new byte[] { 0x0F, 0x84 });
+            jumpDisplacements.Add(bytes.Count);
+            bytes.AddRange(new byte[4]);
+        }
+
+        bytes.Add(0xC3);
+
+        for (int index = 0; index < profile.CollisionCallRvas.Length; index++)
+        {
+            int slotOffset = bytes.Count;
+            int displacementOffset = jumpDisplacements[index];
+            PatchInt32(bytes, displacementOffset, unchecked((int)(
+                wrapperBase + (uint)slotOffset -
+                (wrapperBase + (uint)displacementOffset + 4u))));
+
+            uint slotAddress = telemetryBase + (uint)(index * TelemetrySlotSize);
+            bytes.AddRange(new byte[]
+            {
+                0x33, 0xC0,
+                0xB9, 0x01, 0x00, 0x00, 0x00,
+                0xF0, 0x0F, 0xB1, 0x0D
+            });
+            AppendUInt32(bytes, slotAddress + 4u);
+            bytes.AddRange(new byte[] { 0x0F, 0x85 });
+            int waitJumpDisplacement = bytes.Count;
+            bytes.AddRange(new byte[4]);
+
+            bytes.AddRange(new byte[] { 0x89, 0x35 });
+            AppendUInt32(bytes, slotAddress + 8u);
+            bytes.AddRange(new byte[] { 0x8B, 0x45, 0xF8, 0xA3 });
+            AppendUInt32(bytes, slotAddress + 12u);
+            bytes.AddRange(new byte[] { 0x85, 0xC0, 0x74, 0x02, 0x8B, 0x00, 0xA3 });
+            AppendUInt32(bytes, slotAddress + 16u);
+            bytes.AddRange(new byte[] { 0x89, 0x15 });
+            AppendUInt32(bytes, slotAddress + 20u);
+            bytes.AddRange(new byte[] { 0xC7, 0x05 });
+            AppendUInt32(bytes, slotAddress + 4u);
+            AppendUInt32(bytes, 2u);
+            bytes.Add(0xE9);
+            int countJumpDisplacement = bytes.Count;
+            bytes.AddRange(new byte[4]);
+
+            int waitOffset = bytes.Count;
+            PatchInt32(bytes, waitJumpDisplacement, unchecked((int)(
+                wrapperBase + (uint)waitOffset -
+                (wrapperBase + (uint)waitJumpDisplacement + 4u))));
+            bytes.AddRange(new byte[] { 0x83, 0x3D });
+            AppendUInt32(bytes, slotAddress + 4u);
+            bytes.Add(0x02);
+            bytes.AddRange(new byte[] { 0x0F, 0x85 });
+            int waitLoopDisplacement = bytes.Count;
+            bytes.AddRange(new byte[4]);
+            PatchInt32(bytes, waitLoopDisplacement, unchecked((int)(
+                wrapperBase + (uint)waitOffset -
+                (wrapperBase + (uint)waitLoopDisplacement + 4u))));
+
+            int countOffset = bytes.Count;
+            PatchInt32(bytes, countJumpDisplacement, unchecked((int)(
+                wrapperBase + (uint)countOffset -
+                (wrapperBase + (uint)countJumpDisplacement + 4u))));
+            bytes.AddRange(new byte[] { 0xF0, 0xFF, 0x05 });
+            AppendUInt32(bytes, slotAddress);
+            bytes.Add(0xC3);
+        }
+    }
+
+    private static void MonitorTelemetry(IntPtr process, int processId, PatchProfile profile,
+        uint telemetryBase)
+    {
+        var lastCounts = new uint[profile.CollisionCallRvas.Length];
+        bool telemetryReadWarningLogged = false;
+        Log("MONITOR START pid=" + processId + " profile=" + profile.Name);
+
+        while (true)
+        {
+            uint waitResult = WaitForSingleObject(process, 250);
+            if (waitResult == WaitObject0)
+            {
+                break;
+            }
+
+            if (waitResult != WaitTimeout)
+            {
+                ThrowLastWin32("WaitForSingleObject failed while monitoring guard telemetry");
+            }
+
+            byte[] snapshot;
+            if (!TryReadExact(process, new IntPtr(telemetryBase),
+                profile.CollisionCallRvas.Length * TelemetrySlotSize, out snapshot))
+            {
+                if (!telemetryReadWarningLogged)
+                {
+                    Log("MONITOR READ RETRY pid=" + processId + " profile=" + profile.Name);
+                    telemetryReadWarningLogged = true;
+                }
+
+                continue;
+            }
+
+            telemetryReadWarningLogged = false;
+
+            for (int index = 0; index < profile.CollisionCallRvas.Length; index++)
+            {
+                int offset = index * TelemetrySlotSize;
+                uint count = BitConverter.ToUInt32(snapshot, offset);
+                if (count == lastCounts[index])
+                {
+                    continue;
+                }
+
+                uint captureState = BitConverter.ToUInt32(snapshot, offset + 4);
+                uint playfield = BitConverter.ToUInt32(snapshot, offset + 8);
+                uint roomSpace = BitConverter.ToUInt32(snapshot, offset + 12);
+                uint vtable = BitConverter.ToUInt32(snapshot, offset + 16);
+                uint reason = BitConverter.ToUInt32(snapshot, offset + 20);
+                if (lastCounts[index] == 0)
+                {
+                    LogFirstTelemetryHit(process, processId, profile, index, count,
+                        captureState, playfield, roomSpace, vtable, reason);
+                }
+
+                lastCounts[index] = count;
+            }
+        }
+
+        Log("MONITOR END pid=" + processId + " profile=" + profile.Name +
+            " counts=" + string.Join(",", profile.CollisionCallRvas
+                .Select((rva, index) => "0x" + rva.ToString("X") + "=" + lastCounts[index])));
+    }
+
+    private static void LogFirstTelemetryHit(IntPtr process, int processId,
+        PatchProfile profile, int callsiteIndex, uint count, uint captureState,
+        uint playfield, uint roomSpace, uint vtable, uint reason)
+    {
+        uint currentRoomSpace = 0;
+        bool currentReadable = playfield != 0 && TryReadUInt32(
+            process, new IntPtr((long)playfield + 0x58), out currentRoomSpace);
+        Log("GUARD HIT first pid=" + processId + " profile=" + profile.Name +
+            " callRva=0x" + profile.CollisionCallRvas[callsiteIndex].ToString("X") +
+            " count=" + count +
+            " captureState=" + captureState +
+            " reason=" + (reason == 2 ? "invalid-cell" : "dynamic-cast") +
+            " playfield=" + FormatAddress(playfield) +
+            " roomSpace=" + FormatAddress(roomSpace) +
+            " currentRoomSpace=" + (currentReadable ? FormatAddress(currentRoomSpace) : "unreadable") +
+            " fieldMatch=" + (currentReadable && currentRoomSpace == roomSpace) +
+            " eventVtable=" + FormatAddress(vtable));
+    }
+
+    private static string FormatAddress(uint address)
+    {
+        return "0x" + address.ToString("X8");
     }
 
     private static byte[] BuildRelativeCall(uint callAddress, uint destination)
@@ -443,6 +669,39 @@ internal static class Program
     private static void AppendUInt32(List<byte> bytes, uint value)
     {
         bytes.AddRange(BitConverter.GetBytes(value));
+    }
+
+    private static void PatchInt32(List<byte> bytes, int offset, int value)
+    {
+        byte[] encoded = BitConverter.GetBytes(value);
+        for (int index = 0; index < encoded.Length; index++)
+        {
+            bytes[offset + index] = encoded[index];
+        }
+    }
+
+    private static bool ContainsUInt32(byte[] bytes, uint value)
+    {
+        byte[] encoded = BitConverter.GetBytes(value);
+        for (int offset = 0; offset <= bytes.Length - encoded.Length; offset++)
+        {
+            bool match = true;
+            for (int index = 0; index < encoded.Length; index++)
+            {
+                if (bytes[offset + index] != encoded[index])
+                {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (match)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static List<IntPtr> SuspendProcessThreads(int processId)
@@ -567,6 +826,28 @@ internal static class Program
         }
 
         return buffer;
+    }
+
+    private static bool TryReadExact(IntPtr process, IntPtr address, int count,
+        out byte[] buffer)
+    {
+        buffer = new byte[count];
+        IntPtr read;
+        return ReadProcessMemory(process, address, buffer, count, out read) &&
+            read.ToInt64() == count;
+    }
+
+    private static bool TryReadUInt32(IntPtr process, IntPtr address, out uint value)
+    {
+        byte[] buffer;
+        if (TryReadExact(process, address, 4, out buffer))
+        {
+            value = BitConverter.ToUInt32(buffer, 0);
+            return true;
+        }
+
+        value = 0;
+        return false;
     }
 
     private static void WriteExact(IntPtr process, IntPtr address, byte[] data)
@@ -790,4 +1071,7 @@ internal static class Program
 
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool FlushInstructionCache(IntPtr process, IntPtr address, UIntPtr size);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern uint WaitForSingleObject(IntPtr handle, uint milliseconds);
 }
