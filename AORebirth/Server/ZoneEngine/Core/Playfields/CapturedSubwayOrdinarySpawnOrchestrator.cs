@@ -175,8 +175,9 @@ namespace AORebirth.Core.Playfields
 
         private static void SetMobStat(ICharacter character, StatIds stat, int value)
         {
-            character.Stats[stat].Value = value;
-            character.Stats[stat].BaseValue = (uint)Math.Max(0, value);
+            character.Stats.SetBaseValueWithoutTriggering(
+                (int)stat,
+                (uint)Math.Max(0, value));
         }
     }
 
