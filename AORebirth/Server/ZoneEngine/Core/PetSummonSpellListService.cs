@@ -82,6 +82,13 @@ namespace ZoneEngine.Core
 
             "004D000A000100C600000DBC35FE28684D4501140000C35035FE286800000007E20000CFAF0001EB32000000040000000200000000000002D00000005D00000000000000000000002A000000010000000000000001000000094D543039000000C0FFFFFFFF00000000000000030000000000000000000000000001ADB1000000010000008300000080000000000000035100000351000000000000C35035FE28680000C35035FE286800001443616C6C696E67206F662042656C616D6F727465000000000000");
 
+        private const int OwnerHealCaptureHeaderLength = 31;
+
+        private static readonly byte[] OwnerHealCaptureHeader = CopyHeader(OwnerHealCaptureWire, OwnerHealCaptureHeaderLength);
+
+        private static readonly byte[] OwnerHealTierCaptureHeader = HexToBytes(
+            "004D000A000100C600000DBD35FE28684D4501140000C35035FE2868000000");
+
 
 
         private static readonly byte[] OwnerAttackCaptureWire = HexToBytes(
@@ -134,11 +141,24 @@ namespace ZoneEngine.Core
 
 
 
-            byte[] captureWire = petSlotStrain == PetSlotClassifier.HealingPetStrain
-
-                ? OwnerHealCaptureWire
-
-                : OwnerAttackCaptureWire;
+            byte[] captureWire;
+            if (petSlotStrain == PetSlotClassifier.HealingPetStrain && nanoId != 125746)
+            {
+                byte[] body = PetSummonSpellListBuilder.BuildOwnerPayload(
+                    ownerCharacter.Identity,
+                    nanoId,
+                    petHash,
+                    petTypeId,
+                    PetSlotClassifier.HealingSpellListSlot,
+                    PetSummonNanoCatalog.GetSummonNanoDisplayName(nanoId));
+                captureWire = CombineHeaderAndBody(OwnerHealTierCaptureHeader, body);
+            }
+            else
+            {
+                captureWire = petSlotStrain == PetSlotClassifier.HealingPetStrain
+                    ? OwnerHealCaptureWire
+                    : OwnerAttackCaptureWire;
+            }
 
 
 
@@ -158,62 +178,65 @@ namespace ZoneEngine.Core
 
 
 
-        public static void SendPetSummonSpellLists(ICharacter owner, Identity petIdentity, int petSlotStrain)
-
+        public static void SendPetSummonSpellLists(
+            ICharacter owner,
+            Identity petIdentity,
+            int petSlotStrain,
+            string petHash = null)
         {
-
             Character ownerCharacter = owner as Character;
-
             if (ownerCharacter == null
-
                 || ownerCharacter.Controller == null
-
                 || ownerCharacter.Controller.Client == null
-
                 || petIdentity.Type == IdentityType.None)
-
             {
-
                 return;
-
             }
-
-
 
             if (petSlotStrain != PetSlotClassifier.HealingPetStrain)
-
             {
-
                 return;
-
             }
 
+            byte[] wireA;
+            byte[] wireB;
+            if (PetHealingPetScfuCatalog.TryGetPetSpellListWires(petHash, out wireA, out wireB))
+            {
+                if (wireA != null)
+                {
+                    SendPatchedCaptureWire(
+                        ownerCharacter,
+                        wireA,
+                        petIdentity,
+                        ownerCharacter.Identity.Instance,
+                        false);
+                }
 
+                if (wireB != null)
+                {
+                    SendPatchedCaptureWire(
+                        ownerCharacter,
+                        wireB,
+                        petIdentity,
+                        ownerCharacter.Identity.Instance,
+                        false);
+                }
+
+                return;
+            }
 
             SendPatchedCaptureWire(
-
                 ownerCharacter,
-
                 PetHealCaptureWireA,
-
                 petIdentity,
-
                 ownerCharacter.Identity.Instance,
-
                 false);
-
             SendPatchedCaptureWire(
-
                 ownerCharacter,
-
                 PetHealCaptureWireB,
-
                 petIdentity,
-
                 ownerCharacter.Identity.Instance,
-
                 false);
-
         }
 
 
@@ -337,6 +360,24 @@ namespace ZoneEngine.Core
         }
 
 
+
+        private static byte[] CopyHeader(byte[] captureWire, int headerLength)
+        {
+            var header = new byte[headerLength];
+            Buffer.BlockCopy(captureWire, 0, header, 0, headerLength);
+            return header;
+        }
+
+        private static byte[] CombineHeaderAndBody(byte[] header, byte[] body)
+        {
+            var packet = new byte[header.Length + body.Length];
+            Buffer.BlockCopy(header, 0, packet, 0, header.Length);
+            Buffer.BlockCopy(body, 0, packet, header.Length, body.Length);
+            ushort totalLength = (ushort)packet.Length;
+            packet[6] = (byte)(totalLength >> 8);
+            packet[7] = (byte)totalLength;
+            return packet;
+        }
 
         private static byte[] HexToBytes(string hex)
 

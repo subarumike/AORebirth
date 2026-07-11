@@ -103,6 +103,21 @@ namespace ZoneEngine.Core
                 return false;
             }
 
+            int shellPetStrain = PetSlotClassifier.ResolveStrain(definition.PetHash);
+            if (shellPetStrain == PetSlotClassifier.RegularPetStrain
+                && PetRuntimeService.Default.HasLivingAttackPet(character))
+            {
+                ChatTextMessageHandler.Default.Send(character, "You can have just 1 Attack Pet.");
+                return false;
+            }
+
+            if (shellPetStrain == PetSlotClassifier.HealingPetStrain
+                && PetRuntimeService.Default.HasLivingHealingPet(character))
+            {
+                ChatTextMessageHandler.Default.Send(character, "You can have just 1 Heal Pet.");
+                return false;
+            }
+
             bool summoned = PetRuntimeService.Default.SummonPet(
                 character,
                 definition.PetHash,
@@ -112,12 +127,10 @@ namespace ZoneEngine.Core
 
             if (!summoned)
             {
-                ChatTextMessageHandler.Default.Send(character, "Pet shell failed to summon a pet.");
+                return false;
             }
-            else
-            {
-                this.ConsumeShell(character, itemPosition);
-            }
+
+            this.ConsumeShell(character, itemPosition);
 
             LogUtil.Debug(
                 DebugInfoDetail.GameFunctions,

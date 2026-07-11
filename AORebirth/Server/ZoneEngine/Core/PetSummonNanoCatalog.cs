@@ -40,15 +40,35 @@ namespace ZoneEngine.Core
         private static readonly Dictionary<int, string> PreferredPetHashByNano =
             new Dictionary<int, string>
             {
+                { 125738, "MT01" },
+                { 125743, "MT04" },
+                { 125744, "MT03" },
+                { 125745, "MT02" },
                 { 125746, "BSLX" },
+                { 43324, "PT50" },
+                { 43733, "PT51" },
+                { 43723, "PT52" },
+                { 43734, "PT52" },
+                { 43735, "PT53" },
+                { 43732, "PT54" },
                 { 43737, "PT56" },
             };
 
         private static readonly Dictionary<int, int> PreferredPetTypeByNano =
             new Dictionary<int, int>
             {
-                { 125746, 2 },
-                { 43737, 52 },
+                { 125738, 14 },
+                { 125743, 77 },
+                { 125744, 55 },
+                { 125745, 33 },
+                { 125746, 192 },
+                { 43324, 10 },
+                { 43733, 32 },
+                { 43723, 52 },
+                { 43734, 62 },
+                { 43735, 95 },
+                { 43732, 137 },
+                { 43737, 200 },
             };
 
         public static bool IsCatalogSummonNano(int nanoId)
@@ -116,6 +136,24 @@ namespace ZoneEngine.Core
                 ? preferredHash
                 : null;
         }
+
+        public static string GetSummonNanoDisplayName(int nanoId)
+        {
+            string displayName;
+            return SummonNanoDisplayName.TryGetValue(nanoId, out displayName)
+                ? displayName
+                : "Calling";
+        }
+
+        private static readonly Dictionary<int, string> SummonNanoDisplayName =
+            new Dictionary<int, string>
+            {
+                { 125738, "Calling of Medinos" },
+                { 125743, "Calling of Sanoo" },
+                { 125744, "Calling of Valentyia" },
+                { 125745, "Calling of Salvinous" },
+                { 125746, "Calling of Belamorte" },
+            };
 
         private static int ResolvePreferredPetType(int nanoId)
         {

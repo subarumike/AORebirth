@@ -287,6 +287,28 @@ namespace ZoneEngine.Core.Controllers
                 return false;
             }
 
+            if (NanoEventRuntimeService.Default.HasSummonPetOnUse(nanoId))
+            {
+                PetSummonParams summonParams;
+                if (PetSummonNanoCatalog.TryResolve(this.Character, nanoId, out summonParams))
+                {
+                    int summonPetStrain = PetSlotClassifier.ResolveStrain(summonParams.PetHash);
+                    if (summonPetStrain == PetSlotClassifier.RegularPetStrain
+                        && PetRuntimeService.Default.HasLivingAttackPet(this.Character))
+                    {
+                        ChatTextMessageHandler.Default.Send(this.Character, "You can have just 1 Attack Pet.");
+                        return false;
+                    }
+
+                    if (summonPetStrain == PetSlotClassifier.HealingPetStrain
+                        && PetRuntimeService.Default.HasLivingHealingPet(this.Character))
+                    {
+                        ChatTextMessageHandler.Default.Send(this.Character, "You can have just 1 Heal Pet.");
+                        return false;
+                    }
+                }
+            }
+
             NanoFormula nano = NanoLoader.NanoList[nanoId];
             int strain = NanoEventRuntimeService.Default.HasSummonPetOnUse(nanoId)
                 ? ActiveNanoRuntimeService.Default.ResolveNanoStrain(this.Character, nanoId)
@@ -338,17 +360,12 @@ namespace ZoneEngine.Core.Controllers
                 PetSummonParams summonParams;
                 if (PetSummonNanoCatalog.TryResolve(this.Character, nanoId, out summonParams))
                 {
-                    if (!PetRuntimeService.Default.SummonPet(
+                    PetRuntimeService.Default.SummonPet(
                         this.Character,
                         summonParams.PetHash,
                         summonParams.PetTypeId,
                         strain,
-                        nanoId))
-                    {
-                        ChatTextMessageHandler.Default.Send(
-                            this.Character,
-                            "Pet spawn failed. Check mob template " + summonParams.PetHash + " in database.");
-                    }
+                        nanoId);
                 }
                 else
                 {

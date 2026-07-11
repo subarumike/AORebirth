@@ -8,6 +8,8 @@ namespace ZoneEngine.Core
 
         public const int NpcFallbackDamage = 1;
 
+        private static readonly Random DamageRandom = new Random();
+
         public static int Calculate(
             int minDamage,
             int maxDamage,
@@ -22,7 +24,11 @@ namespace ZoneEngine.Core
 
             if (normalizedMaxDamage > 0)
             {
-                return Math.Max(fallbackDamage, normalizedMaxDamage + normalizedDamageBonus);
+                int rolledDamage = normalizedMinDamage == normalizedMaxDamage
+                    ? normalizedMaxDamage
+                    : normalizedMinDamage + DamageRandom.Next(normalizedMaxDamage - normalizedMinDamage + 1);
+
+                return Math.Max(fallbackDamage, rolledDamage + normalizedDamageBonus);
             }
 
             return Math.Max(fallbackDamage, level + normalizedDamageBonus);

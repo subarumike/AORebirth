@@ -143,7 +143,6 @@ namespace AORebirth.Core.Playfields
             bool killingHit = newHealth == 0;
 
             this.AnnounceNpcSpecialAttackWeaponContextIfNeeded(attacker, target, attackSource);
-            target.Stats[StatIds.health].Value = newHealth;
             this.AnnounceCombatDamage(
                 attacker,
                 target,
@@ -152,11 +151,13 @@ namespace AORebirth.Core.Playfields
                 attackSource.UsesEquippedWeapon
                     ? CombatDamageSource.WeaponAutoAttack
                     : CombatDamageSource.UnarmedAutoAttack);
+            target.Stats[StatIds.health].Value = newHealth;
             if (attackSource.IsCapturedSubwayFilthFleaPoisonAttack)
             {
                 this.capturedSubwayFilthFleaPoisonAttacks.Add(attacker.Identity.Instance);
             }
             target.SendChangedStats();
+            this.playfield.NotifyNpcCombatDamage(target);
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
@@ -531,7 +532,8 @@ namespace AORebirth.Core.Playfields
                            AttackInfoWeaponSlot = PetCombatRules.AttackPetAttackInfoWeaponSlot,
                            AttackInfoUnk1 = PetCombatRules.AttackPetAttackInfoUnk1,
                            AttackInfoHitType = PetCombatRules.AttackPetAttackInfoHitType,
-                           AttackInfoWeaponInstance = attackInfoWeaponInstance
+                           AttackInfoWeaponInstance = attackInfoWeaponInstance,
+                           SendAttackInfo = true
                        };
             }
 

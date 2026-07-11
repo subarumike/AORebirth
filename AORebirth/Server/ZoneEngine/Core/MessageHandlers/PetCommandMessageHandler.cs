@@ -38,17 +38,22 @@ namespace ZoneEngine.Core.MessageHandlers
             int commandId = message.Unknown2;
             bool applyToAllPets = message.Unknown1 == 1;
             Identity petIdentity = this.ResolvePetIdentity(message);
-            Identity commandTarget = this.ResolveCommandTarget(message);
-            if (commandTarget.Instance == 0)
+            Identity rawCommandTarget = this.ResolveCommandTarget(message);
+            PetCommandService.CommitHealTargetFromPacket(owner, petIdentity, rawCommandTarget);
+
+            Identity commandTarget = rawCommandTarget;
+            if (commandTarget.Instance == 0 && commandId != PetCommandService.CommandHeal)
             {
                 commandTarget = owner.SelectedTarget;
             }
 
-            if (commandId == PetCommandService.CommandHeal
-                || PetCommandService.HasActiveHealCommand(owner)
-                || (message.Identities != null
-                    && message.Identities.Length > 1
-                    && message.Identities[1].Instance != 0))
+            if (commandId == PetCommandService.CommandHeal)
+            {
+                commandTarget = PetCommandService.ResolveHealCommandTarget(owner, petIdentity, rawCommandTarget);
+                PetCommandService.SyncOwnerHealSelectedTarget(owner, commandTarget);
+            }
+            else if (PetCommandService.HasActiveHealCommand(owner)
+                && commandTarget.Instance != 0)
             {
                 PetCommandService.SyncOwnerHealSelectedTarget(owner, commandTarget);
             }

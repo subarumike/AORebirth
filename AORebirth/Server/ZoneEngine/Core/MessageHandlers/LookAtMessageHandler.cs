@@ -77,10 +77,9 @@ namespace ZoneEngine.Core.MessageHandlers
 
             if (client.Controller.LookAt(message.Target))
             {
-                if (!PetCommandService.HasActiveHealCommand(client.Controller.Character))
-                {
-                    PetCommandService.OnOwnerSelectedTargetChanged(client.Controller.Character);
-                }
+                PetCommandService.ResolveFriendlyHealTargetForSelection(
+                    client.Controller.Character,
+                    message.Target);
 
                 if (message.ReturnInfo != 1)
                 {

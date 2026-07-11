@@ -39,6 +39,9 @@ namespace ZoneEngine.Core
         private static readonly Dictionary<int, PetHealCommandState> ActiveHealCommands =
             new Dictionary<int, PetHealCommandState>();
 
+        private static readonly Dictionary<int, Identity> OwnerHealFocusSelection =
+            new Dictionary<int, Identity>();
+
         public const int CommandFollow = 1;
 
         public const int CommandBehind = 2;
@@ -110,8 +113,8 @@ namespace ZoneEngine.Core
                 return;
             }
 
-            ICharacter pet = owner.Playfield.FindByIdentity<ICharacter>(petIdentity);
-            if (pet == null || pet.Stats[StatIds.petmaster].Value != owner.Identity.Instance)
+            ICharacter pet = ResolveOwnedPet(owner, petIdentity);
+            if (pet == null)
             {
                 return;
             }
@@ -253,6 +256,7 @@ namespace ZoneEngine.Core
             petController.StopFollow();
             pet.SetTarget(attackTarget);
             pet.SetFightingTarget(attackTarget);
+            playfield.SuspendNpcRegen(attackTargetCharacter);
             playfield.ResetCombatTick(pet.Identity);
             playfield.AcquireNpcAggro(pet, attackTargetCharacter);
         }
@@ -303,7 +307,7 @@ namespace ZoneEngine.Core
 
         internal static bool OnOwnerLookAtTarget(ICharacter owner, Identity lookTarget)
         {
-            if (owner == null || lookTarget.Instance == 0 || !HasActiveHealCommand(owner))
+            if (owner == null || lookTarget.Instance == 0)
             {
                 return false;
             }
@@ -314,15 +318,209 @@ namespace ZoneEngine.Core
                 return false;
             }
 
-            Identity friendly = NormalizeFriendlyHealIdentity(owner, lookTarget, playfield);
+            Identity friendly = ResolveFriendlyHealTargetByInstance(owner, lookTarget, playfield);
             if (friendly.Instance == 0)
             {
                 return false;
             }
 
+            SetOwnerHealFocusSelection(owner, friendly);
             owner.SetTarget(friendly);
-            ApplyHealFocusToActivePets(owner, playfield, friendly, true);
+
+            if (HasActiveHealCommand(owner))
+            {
+                ApplyHealFocusToActivePets(owner, playfield, friendly, true);
+            }
+
             return true;
+        }
+
+        internal static ICharacter ResolveOwnedPet(ICharacter owner, Identity petIdentity)
+        {
+            if (owner == null || petIdentity.Instance == 0)
+            {
+                return null;
+            }
+
+            foreach (int strain in PetRuntimeService.Default.GetActivePetStrains(owner))
+            {
+                ICharacter ownedPet = PetRuntimeService.Default.GetActivePetInStrain(owner, strain);
+                if (ownedPet != null && ownedPet.Identity.Instance == petIdentity.Instance)
+                {
+                    return ownedPet;
+                }
+            }
+
+            if (owner.Playfield == null)
+            {
+                return null;
+            }
+
+            ICharacter byIdentity = owner.Playfield.FindByIdentity<ICharacter>(petIdentity);
+            if (byIdentity != null && byIdentity.Stats[StatIds.petmaster].Value == owner.Identity.Instance)
+            {
+                return byIdentity;
+            }
+
+            Playfield playfield = owner.Playfield as Playfield;
+            if (playfield == null)
+            {
+                return null;
+            }
+
+            return FindCharacterByInstance(playfield, petIdentity.Instance, petIdentity);
+        }
+
+        internal static Identity ResolveHealCommandTarget(
+            ICharacter owner,
+            Identity healPetIdentity,
+            Identity packetTarget)
+        {
+            if (owner == null || owner.Playfield == null)
+            {
+                return Identity.None;
+            }
+
+            Playfield playfield = owner.Playfield as Playfield;
+            if (playfield == null)
+            {
+                return Identity.None;
+            }
+
+            // Capture 20260711-022256: heal owner sends Identities[1]=heal pet, not owner.
+            bool healPetSentinel = packetTarget.Instance != 0
+                && healPetIdentity.Instance != 0
+                && packetTarget.Instance == healPetIdentity.Instance;
+            if (healPetSentinel)
+            {
+                packetTarget = Identity.None;
+            }
+
+            if (packetTarget.Instance != 0)
+            {
+                Identity normalizedPacketTarget = ResolveFriendlyHealTargetByInstance(owner, packetTarget, playfield);
+                if (normalizedPacketTarget.Instance != 0)
+                {
+                    SetOwnerHealFocusSelection(owner, normalizedPacketTarget);
+                    return normalizedPacketTarget;
+                }
+            }
+
+            if (healPetSentinel)
+            {
+                Identity storedSentinelSelection = GetOwnerHealFocusSelection(owner, playfield);
+                if (storedSentinelSelection.Instance != 0)
+                {
+                    return storedSentinelSelection;
+                }
+            }
+            else
+            {
+                Identity storedSelection = GetOwnerHealFocusSelection(owner, playfield);
+                if (storedSelection.Instance != 0)
+                {
+                    return storedSelection;
+                }
+            }
+
+            SetOwnerHealFocusSelection(owner, owner.Identity);
+            return owner.Identity;
+        }
+
+        private static Identity GetOwnerHealFocusSelection(ICharacter owner, Playfield playfield)
+        {
+            if (owner == null || playfield == null)
+            {
+                return Identity.None;
+            }
+
+            Identity storedSelection;
+            if (!OwnerHealFocusSelection.TryGetValue(owner.Identity.Instance, out storedSelection)
+                || storedSelection.Instance == 0)
+            {
+                return Identity.None;
+            }
+
+            return ResolveFriendlyHealTargetByInstance(owner, storedSelection, playfield);
+        }
+
+        private static Identity ResolveFriendlyHealTargetByInstance(
+            ICharacter owner,
+            Identity target,
+            Playfield playfield)
+        {
+            if (owner == null || playfield == null || target.Instance == 0)
+            {
+                return Identity.None;
+            }
+
+            if (target.Instance == owner.Identity.Instance)
+            {
+                return owner.Identity;
+            }
+
+            foreach (int strain in PetRuntimeService.Default.GetActivePetStrains(owner))
+            {
+                ICharacter ownedPet = PetRuntimeService.Default.GetActivePetInStrain(owner, strain);
+                if (ownedPet == null
+                    || ownedPet.Identity.Instance != target.Instance
+                    || ownedPet.Stats[StatIds.health].Value <= 0)
+                {
+                    continue;
+                }
+
+                return ownedPet.Identity;
+            }
+
+            return NormalizeFriendlyHealIdentity(owner, target, playfield);
+        }
+
+        internal static void CommitHealTargetFromPacket(
+            ICharacter owner,
+            Identity healPetIdentity,
+            Identity packetTarget)
+        {
+            if (owner == null
+                || owner.Playfield == null
+                || packetTarget.Instance == 0
+                || (healPetIdentity.Instance != 0 && packetTarget.Instance == healPetIdentity.Instance))
+            {
+                return;
+            }
+
+            ResolveFriendlyHealTargetForSelection(owner, packetTarget);
+        }
+
+        internal static Identity ResolveFriendlyHealTargetForSelection(ICharacter owner, Identity target)
+        {
+            if (owner == null || owner.Playfield == null || target.Instance == 0)
+            {
+                return Identity.None;
+            }
+
+            Playfield playfield = owner.Playfield as Playfield;
+            if (playfield == null)
+            {
+                return Identity.None;
+            }
+
+            Identity friendly = ResolveFriendlyHealTargetByInstance(owner, target, playfield);
+            if (friendly.Instance != 0)
+            {
+                SetOwnerHealFocusSelection(owner, friendly);
+            }
+
+            return friendly;
+        }
+
+        private static void SetOwnerHealFocusSelection(ICharacter owner, Identity focus)
+        {
+            if (owner == null || focus.Instance == 0)
+            {
+                return;
+            }
+
+            OwnerHealFocusSelection[owner.Identity.Instance] = focus;
         }
 
         internal static bool HasActiveHealCommand(ICharacter owner)
@@ -387,11 +585,10 @@ namespace ZoneEngine.Core
                 return;
             }
 
-            Identity liveFocus = ResolveLiveHealFocus(owner, playfield, Identity.None);
-            if (liveFocus.Instance != 0 && liveFocus.Instance != healState.FocusTarget.Instance)
+            Identity markedTarget = GetOwnerHealFocusSelection(owner, playfield);
+            if (markedTarget.Instance != 0 && markedTarget.Instance != healState.FocusTarget.Instance)
             {
-                healState.FocusTarget = liveFocus;
-                healState.RotateIndex = 0;
+                healState.FocusTarget = markedTarget;
                 healState.NextCastUtc = DateTime.UtcNow;
             }
 
@@ -418,12 +615,38 @@ namespace ZoneEngine.Core
                 return;
             }
 
-            Identity focus = ResolveLiveHealFocus(owner, playfield, commandTarget);
+            Identity focus = ResolveHealCommandTarget(owner, playfield, commandTarget);
             if (focus.Instance != 0)
             {
                 owner.SetTarget(focus);
                 ApplyHealFocusToActivePets(owner, playfield, focus, false);
             }
+        }
+
+        private static Identity ResolveHealCommandTarget(
+            ICharacter owner,
+            Playfield playfield,
+            Identity commandTarget)
+        {
+            ICharacter healPet = null;
+            foreach (int petInstance in ActiveHealCommands.Keys)
+            {
+                ICharacter candidate = FindCharacterByInstance(playfield, petInstance, Identity.None);
+                if (candidate == null || !PetCombatRules.IsPlayerOwnedHealingPet(candidate))
+                {
+                    continue;
+                }
+
+                ICharacter healOwner = PetCombatRules.ResolvePetOwner(candidate);
+                if (healOwner != null && healOwner.Identity.Instance == owner.Identity.Instance)
+                {
+                    healPet = candidate;
+                    break;
+                }
+            }
+
+            Identity healPetIdentity = healPet != null ? healPet.Identity : Identity.None;
+            return ResolveHealCommandTarget(owner, healPetIdentity, commandTarget);
         }
 
         private static void ApplyHealFocusToActivePets(
@@ -454,7 +677,6 @@ namespace ZoneEngine.Core
                 }
 
                 healState.FocusTarget = focus;
-                healState.RotateIndex = 0;
                 healState.NextCastUtc = DateTime.UtcNow;
                 ActiveHealCommands[petInstance] = healState;
 
@@ -495,57 +717,13 @@ namespace ZoneEngine.Core
                 return;
             }
 
-            Identity normalizedTarget = NormalizeFriendlyHealIdentity(owner, owner.SelectedTarget, playfield);
+            Identity normalizedTarget = ResolveFriendlyHealTargetByInstance(owner, owner.SelectedTarget, playfield);
             if (normalizedTarget.Instance != 0)
             {
+                SetOwnerHealFocusSelection(owner, normalizedTarget);
                 owner.SetTarget(normalizedTarget);
                 ApplyHealFocusToActivePets(owner, playfield, normalizedTarget, true);
-                return;
             }
-
-            var activePetInstances = new List<int>(ActiveHealCommands.Keys);
-            foreach (int petInstance in activePetInstances)
-            {
-                PetHealCommandState healState;
-                if (!ActiveHealCommands.TryGetValue(petInstance, out healState))
-                {
-                    continue;
-                }
-
-                ICharacter pet = FindCharacterByInstance(playfield, petInstance, Identity.None);
-                if (pet == null || !PetCombatRules.IsPlayerOwnedHealingPet(pet))
-                {
-                    continue;
-                }
-
-                ICharacter healOwner = PetCombatRules.ResolvePetOwner(pet);
-                if (healOwner == null || healOwner.Identity.Instance != owner.Identity.Instance)
-                {
-                    continue;
-                }
-
-                healState.RotateIndex = 0;
-                healState.NextCastUtc = DateTime.UtcNow;
-                ProcessHealCycle(owner, pet, playfield, ref healState);
-                ActiveHealCommands[petInstance] = healState;
-            }
-        }
-
-        private static Identity ResolveLiveHealFocus(
-            ICharacter owner,
-            Playfield playfield,
-            Identity commandTarget)
-        {
-            if (commandTarget.Instance != 0)
-            {
-                Identity normalizedCommandTarget = NormalizeFriendlyHealIdentity(owner, commandTarget, playfield);
-                if (normalizedCommandTarget.Instance != 0)
-                {
-                    return normalizedCommandTarget;
-                }
-            }
-
-            return NormalizeFriendlyHealIdentity(owner, owner.SelectedTarget, playfield);
         }
 
         private static Identity NormalizeFriendlyHealIdentity(
@@ -591,30 +769,56 @@ namespace ZoneEngine.Core
                 }
             }
 
-            return playfield.FindByIdentity<ICharacter>(
+            ICharacter byCanBeAffected = playfield.FindByIdentity<ICharacter>(
                 new Identity
                 {
                     Type = IdentityType.CanbeAffected,
                     Instance = instance
-                })
-                ?? ResolveCharacterFromPool(playfield, instance);
+                });
+            if (byCanBeAffected != null)
+            {
+                return byCanBeAffected;
+            }
+
+            return ResolveCharacterFromPool(playfield, instance, hint);
         }
 
-        private static ICharacter ResolveCharacterFromPool(Playfield playfield, int instance)
+        private static ICharacter ResolveCharacterFromPool(Playfield playfield, int instance, Identity hint)
         {
             if (playfield == null || instance == 0)
             {
                 return null;
             }
 
-            ICharacter fromPool = Pool.Instance.GetObject<ICharacter>(
-                playfield.Identity,
+            Identity parent = playfield.Identity;
+
+            if (hint.Instance == instance && hint.Type != IdentityType.None)
+            {
+                ICharacter byHint = Pool.Instance.GetObject(parent, hint) as ICharacter;
+                if (byHint != null)
+                {
+                    return byHint;
+                }
+            }
+
+            ICharacter byCanBeAffected = Pool.Instance.GetObject(
+                parent,
+                new Identity
+                {
+                    Type = IdentityType.CanbeAffected,
+                    Instance = instance
+                }) as ICharacter;
+            if (byCanBeAffected != null)
+            {
+                return byCanBeAffected;
+            }
+
+            return Pool.Instance.GetObject<ICharacter>(
                 new Identity
                 {
                     Type = IdentityType.CanbeAffected,
                     Instance = instance
                 });
-            return fromPool;
         }
 
         private static ICharacter ResolveHealTargetCharacter(
@@ -622,7 +826,7 @@ namespace ZoneEngine.Core
             Playfield playfield,
             Identity target)
         {
-            Identity normalized = NormalizeFriendlyHealIdentity(owner, target, playfield);
+            Identity normalized = ResolveFriendlyHealTargetByInstance(owner, target, playfield);
             if (normalized.Instance == 0)
             {
                 return null;
@@ -661,7 +865,7 @@ namespace ZoneEngine.Core
 
             SyncOwnerHealSelectedTarget(owner, commandTarget);
 
-            Identity healFocus = ResolveLiveHealFocus(owner, playfield, commandTarget);
+            Identity healFocus = ResolveHealCommandTarget(owner, pet.Identity, commandTarget);
             if (healFocus.Instance != 0)
             {
                 SyncHealPetFollow(pet, petController, healFocus);
@@ -677,15 +881,15 @@ namespace ZoneEngine.Core
                 healState = new PetHealCommandState();
             }
 
-            healState.RotateIndex = 0;
             healState.NextCastUtc = DateTime.UtcNow;
+            healState.FocusTarget = healFocus;
+
+            ActiveHealCommands[pet.Identity.Instance] = healState;
 
             if (healFocus.Instance != 0)
             {
-                healState.FocusTarget = healFocus;
+                ApplyHealFocusToActivePets(owner, playfield, healFocus, true);
             }
-
-            ActiveHealCommands[pet.Identity.Instance] = healState;
 
             if (!healState.AnnouncedStart)
             {
@@ -725,99 +929,43 @@ namespace ZoneEngine.Core
             Identity focus = healState.FocusTarget;
             if (focus.Instance == 0)
             {
-                focus = ResolveLiveHealFocus(owner, playfield, Identity.None);
+                focus = GetOwnerHealFocusSelection(owner, playfield);
                 if (focus.Instance != 0)
                 {
                     healState.FocusTarget = focus;
                 }
             }
 
-            if (focus.Instance != 0)
-            {
-                ICharacter focusTarget = ResolveHealTargetCharacter(owner, playfield, focus);
-                if (focusTarget == null || focusTarget.Stats[StatIds.health].Value <= 0)
-                {
-                    healState.FocusTarget = Identity.None;
-                    ReturnPetToOwner(pet);
-                    healState.NextCastUtc = DateTime.UtcNow.AddSeconds(PetCombatRules.HealCastRetrySeconds);
-                    return;
-                }
-
-                var petController = pet.Controller as NPCController;
-                if (petController != null)
-                {
-                    SyncHealPetFollow(pet, petController, focus);
-                }
-
-                if (IsHealCandidateReady(pet, focusTarget)
-                    && TryCastPetHeal(owner, pet, focusTarget, playfield))
-                {
-                    healState.NextCastUtc = DateTime.UtcNow.AddSeconds(PetCombatRules.HealCastRetrySeconds);
-                    return;
-                }
-
-                healState.NextCastUtc = DateTime.UtcNow.AddSeconds(PetCombatRules.HealCastRetrySeconds);
-                return;
-            }
-
-            List<ICharacter> friendlyTargets = CollectFriendlyHealTargets(owner, pet, playfield);
-            List<ICharacter> needyTargets = new List<ICharacter>();
-            foreach (ICharacter candidate in friendlyTargets)
-            {
-                if (IsHealCandidateReady(pet, candidate))
-                {
-                    needyTargets.Add(candidate);
-                }
-            }
-
-            if (needyTargets.Count == 0)
+            if (focus.Instance == 0)
             {
                 healState.NextCastUtc = DateTime.UtcNow.AddSeconds(PetCombatRules.HealCastRetrySeconds);
                 return;
             }
 
-            int startIndex = healState.RotateIndex % needyTargets.Count;
-            for (int offset = 0; offset < needyTargets.Count; offset++)
+            ICharacter focusTarget = ResolveHealTargetCharacter(owner, playfield, focus);
+            if (focusTarget == null || focusTarget.Stats[StatIds.health].Value <= 0)
             {
-                int index = (startIndex + offset) % needyTargets.Count;
-                if (TryCastPetHeal(owner, pet, needyTargets[index], playfield))
+                healState.FocusTarget = Identity.None;
+                ReturnPetToOwner(pet);
+                healState.NextCastUtc = DateTime.UtcNow.AddSeconds(PetCombatRules.HealCastRetrySeconds);
+                return;
+            }
+
+            var petController = pet.Controller as NPCController;
+            if (petController != null)
+            {
+                SyncHealPetFollow(pet, petController, focus);
+            }
+
+            if (IsHealCandidateReady(pet, focusTarget))
+            {
+                if (TryCastPetHeal(owner, pet, focusTarget, playfield, ref healState))
                 {
-                    healState.RotateIndex = (index + 1) % needyTargets.Count;
-                    healState.NextCastUtc = DateTime.UtcNow.AddSeconds(PetCombatRules.HealCastRetrySeconds);
                     return;
                 }
             }
 
             healState.NextCastUtc = DateTime.UtcNow.AddSeconds(PetCombatRules.HealCastRetrySeconds);
-        }
-
-        private static List<ICharacter> CollectFriendlyHealTargets(
-            ICharacter owner,
-            ICharacter healPet,
-            Playfield playfield)
-        {
-            var targets = new List<ICharacter>();
-            if (owner != null
-                && owner.InPlayfield(playfield.Identity)
-                && owner.Stats[StatIds.health].Value > 0)
-            {
-                targets.Add(owner);
-            }
-
-            foreach (int strain in PetRuntimeService.Default.GetActivePetStrains(owner))
-            {
-                ICharacter ownedPet = PetRuntimeService.Default.GetActivePetInStrain(owner, strain);
-                if (ownedPet == null
-                    || !ownedPet.InPlayfield(playfield.Identity)
-                    || ownedPet.Stats[StatIds.health].Value <= 0)
-                {
-                    continue;
-                }
-
-                targets.Add(ownedPet);
-            }
-
-            return targets;
         }
 
         private static bool IsHealCandidateReady(ICharacter healPet, ICharacter candidate)
@@ -842,7 +990,8 @@ namespace ZoneEngine.Core
             ICharacter owner,
             ICharacter pet,
             ICharacter healTarget,
-            Playfield playfield)
+            Playfield playfield,
+            ref PetHealCommandState healState)
         {
             int healNanoId;
             if (!PetRuntimeService.Default.TryGetHealNanoId(owner, pet, out healNanoId))
@@ -902,9 +1051,9 @@ namespace ZoneEngine.Core
                 new HealthDamageMessage
                 {
                     Identity = healTarget.Identity,
-                    Unknown1 = actualHeal,
-                    Unknown2 = 0,
-                    Unknown3 = 0,
+                    Unknown1 = healthAfter,
+                    Unknown2 = actualHeal,
+                    Unknown3 = (int)StatIds.flags,
                     Unknown4 = 0,
                     Target = pet.Identity,
                     Unknown5 = 0
@@ -944,6 +1093,9 @@ namespace ZoneEngine.Core
                     healRoll,
                     actualHeal,
                     nanoCost));
+
+            healState.NextCastUtc = DateTime.UtcNow.AddSeconds(
+                PetHealNanoCatalog.GetHealRechargeSeconds(healNanoId));
             return true;
         }
 
@@ -1024,8 +1176,6 @@ namespace ZoneEngine.Core
         private sealed class PetHealCommandState
         {
             public Identity FocusTarget { get; set; }
-
-            public int RotateIndex { get; set; }
 
             public DateTime NextCastUtc { get; set; }
 

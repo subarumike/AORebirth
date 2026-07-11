@@ -177,6 +177,10 @@ Filter will be applied to mob name"));
                 npcController);
             mobCharacter.Playfield = character.Playfield;
             (mobCharacter.Playfield as Playfield)?.RegisterNpcHome(mobCharacter);
+            int spawnHealth = Math.Max(1, mobCharacter.Stats[StatIds.life].Value);
+            mobCharacter.Stats[StatIds.health].Value = spawnHealth;
+            mobCharacter.Stats[StatIds.health].BaseValue = (uint)spawnHealth;
+            mobCharacter.DoNotDoTimers = false;
             SimpleCharFullUpdateMessage mess = SimpleCharFullUpdate.ConstructMessage(mobCharacter);
             character.Playfield.Announce(mess);
             AppearanceUpdateMessageHandler.Default.Send(mobCharacter);
@@ -193,8 +197,6 @@ Filter will be applied to mob name"));
             v.x += 10 - rnd.Next(20);
             v.z -= 10 - rnd.Next(20);
             mobCharacter.AddWaypoint(v, false);
-            mobCharacter.Stats[StatIds.health].Value = 10000;
-            mobCharacter.DoNotDoTimers = false;
         }
 
         /// <summary>

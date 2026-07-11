@@ -30,12 +30,18 @@ namespace ZoneEngine.Core
 
         private const int OwnerNameLengthOffset = 140;
 
+        private const int OwnerPetHashLengthOffset = 57;
+
+        private const int OwnerPetHashStringOffset = 58;
+
+        private const int OwnerPetTypeIdOffset = 62;
+
         private const int PetIdentityOffset = 56;
 
         private static readonly byte[] OwnerHealBodyTemplate = HexToBytes(
-            "07E20000CFAF0001EB32000000040000000200000000000002D00000005D00000000000000000000002A000000010000000000000001000000"
-            + "094D543039000000C0FFFFFFFF00000000000000030000000000000000000000000001ADB1000000010000008300000080000000000000035100000351000000000000"
-            + "C35035FE28680000C35035FE286800001443616C6C696E67206F662042656C616D6F727465000000000000");
+            "07E20000CFAF0001EB31000000040000000200000000000002D00000005D00000000000000000000002A000000010000000000000001000000"
+            + "094D54303200000021FFFFFFFF00000000000000030000000000000000000000000001ADB100000001000000830000008000000000000000AE000000AE000000000000"
+            + "C35035FE28680000C35035FE286800001443616C6C696E67206F662053616C76696E6F7573000000000000");
 
         private static readonly byte[] OwnerAttackBodyTemplate = HexToBytes(
             "07E20000CFAF0000AAD90000000400000005000000830000034E00000002000000820000034E00000002000000000000000000000004000000FB000000010000004200000000000000000000"
@@ -64,6 +70,8 @@ namespace ZoneEngine.Core
             PatchSpellListSlot(body, spellListSlot);
             PatchIdentity(body, OwnerIdentityOffset1, owner);
             PatchIdentity(body, OwnerIdentityOffset2, owner);
+            PatchPetHash(body, petHash);
+            PatchPetTypeId(body, petTypeId);
             PatchName(body, OwnerNameLengthOffset, nanoName ?? string.Empty);
             return body;
         }
@@ -122,6 +130,29 @@ namespace ZoneEngine.Core
             int stringOffset = lengthOffset + 1;
             Array.Clear(body, stringOffset, body.Length - stringOffset);
             Buffer.BlockCopy(bytes, 0, body, stringOffset, bytes.Length);
+        }
+
+        private static void PatchPetHash(byte[] body, string petHash)
+        {
+            if (string.IsNullOrWhiteSpace(petHash))
+            {
+                return;
+            }
+
+            byte[] bytes = Encoding.ASCII.GetBytes(petHash);
+            if (bytes.Length > 4)
+            {
+                throw new InvalidOperationException("Pet summon SpellList pet hash is too long.");
+            }
+
+            body[OwnerPetHashLengthOffset] = 9;
+            Array.Clear(body, OwnerPetHashStringOffset, 4);
+            Buffer.BlockCopy(bytes, 0, body, OwnerPetHashStringOffset, bytes.Length);
+        }
+
+        private static void PatchPetTypeId(byte[] body, int petTypeId)
+        {
+            WriteInt32BigEndian(body, OwnerPetTypeIdOffset, petTypeId);
         }
 
         private static void WriteUInt16BigEndian(byte[] buffer, int offset, ushort value)

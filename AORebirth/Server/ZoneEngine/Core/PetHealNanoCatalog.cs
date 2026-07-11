@@ -22,11 +22,19 @@ namespace ZoneEngine.Core
     #endregion
 
     /// <summary>
-    /// Capture-backed MP heal-pet nanos from 20260711-022256 (Belamorte's Blessing).
+    /// Capture-backed MP heal-pet nanos from 20260711-022256 (Belamorte) and 20260711-195926 (MT01-MT04).
     /// </summary>
     internal static class PetHealNanoCatalog
     {
         public const int BelamorteBlessingNanoId = 125720;
+
+        public const int ValentyiaHeatNanoId = 125721;
+
+        public const int SalvinousTouchNanoId = 125722;
+
+        public const int SanooPulseNanoId = 125723;
+
+        public const int MedinosWhisperNanoId = 125728;
 
         public const int PetNanoExecutedWithinOwnerNcuAction = 0x00000081;
 
@@ -37,12 +45,20 @@ namespace ZoneEngine.Core
         private static readonly Dictionary<int, int> HealNanoBySummonNano =
             new Dictionary<int, int>
             {
+                { 125738, MedinosWhisperNanoId },
+                { 125743, SanooPulseNanoId },
+                { 125744, ValentyiaHeatNanoId },
+                { 125745, SalvinousTouchNanoId },
                 { 125746, BelamorteBlessingNanoId },
             };
 
         private static readonly Dictionary<string, int> HealNanoByPetHash =
             new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
             {
+                { "MT01", MedinosWhisperNanoId },
+                { "MT02", SalvinousTouchNanoId },
+                { "MT03", ValentyiaHeatNanoId },
+                { "MT04", SanooPulseNanoId },
                 { "BSLX", BelamorteBlessingNanoId },
             };
 
@@ -50,6 +66,30 @@ namespace ZoneEngine.Core
             new Dictionary<int, string>
             {
                 { BelamorteBlessingNanoId, "Belamorte's Blessing" },
+                { ValentyiaHeatNanoId, "Valentyia's Heat" },
+                { SalvinousTouchNanoId, "Touch of Salvinous" },
+                { SanooPulseNanoId, "Pulse of Sanoo" },
+                { MedinosWhisperNanoId, "Whisper of Medinos" },
+            };
+
+        private static readonly Dictionary<string, int> HealingPetNanoPoolByHash =
+            new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "MT01", 379 },
+                { "MT02", 1207 },
+                { "MT03", 2370 },
+                { "MT04", 3767 },
+                { "BSLX", 13184 },
+            };
+
+        private static readonly Dictionary<int, double> HealRechargeSecondsByNano =
+            new Dictionary<int, double>
+            {
+                { MedinosWhisperNanoId, 8.0 },
+                { SalvinousTouchNanoId, 8.9 },
+                { ValentyiaHeatNanoId, 12.0 },
+                { SanooPulseNanoId, 8.7 },
+                { BelamorteBlessingNanoId, 6.0 },
             };
 
         public static bool TryResolveHealNano(int summonNanoId, string petHash, out int healNanoId)
@@ -74,6 +114,32 @@ namespace ZoneEngine.Core
             return HealNanoDisplayName.TryGetValue(healNanoId, out displayName)
                 ? displayName
                 : "Heal";
+        }
+
+        public static bool TryGetHealingPetNanoPool(string petHash, out int currentNano, out int maxNano)
+        {
+            currentNano = 0;
+            maxNano = 0;
+            if (string.IsNullOrWhiteSpace(petHash))
+            {
+                return false;
+            }
+
+            if (!HealingPetNanoPoolByHash.TryGetValue(petHash, out currentNano))
+            {
+                return false;
+            }
+
+            maxNano = currentNano;
+            return true;
+        }
+
+        public static double GetHealRechargeSeconds(int healNanoId)
+        {
+            double rechargeSeconds;
+            return HealRechargeSecondsByNano.TryGetValue(healNanoId, out rechargeSeconds)
+                ? rechargeSeconds
+                : 9.0;
         }
 
         public static int GetNanoCastCost(NanoFormula nano)

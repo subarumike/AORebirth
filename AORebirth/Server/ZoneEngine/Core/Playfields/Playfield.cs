@@ -490,6 +490,21 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.AcquireNpcAggro(attacker, target);
         }
 
+        internal IEnumerable<ICharacter> EnumerateActiveCharacters()
+        {
+            return this.runtimeSystems.Characters();
+        }
+
+        internal void NotifyNpcCombatDamage(ICharacter npc)
+        {
+            this.runtimeSystems.NotifyNpcCombatDamage(npc);
+        }
+
+        internal void SuspendNpcRegen(ICharacter npc)
+        {
+            this.runtimeSystems.SuspendNpcRegen(npc);
+        }
+
         internal void ClearInvalidNpcCombatTarget(ICharacter attacker)
         {
             this.runtimeSystems.ClearInvalidNpcCombatTarget(attacker);
@@ -1460,7 +1475,6 @@ namespace AORebirth.Core.Playfields
             int newHealth = Math.Max(0, currentHealth - damage);
             bool killingHit = newHealth == 0;
 
-            target.Stats[StatIds.health].Value = newHealth;
             this.AnnounceCombatDamage(
                 attacker,
                 target,
@@ -1469,6 +1483,7 @@ namespace AORebirth.Core.Playfields
                 attackSource.UsesEquippedWeapon
                     ? CombatDamageSource.WeaponAutoAttack
                     : CombatDamageSource.UnarmedAutoAttack);
+            target.Stats[StatIds.health].Value = newHealth;
             this.runtimeSystems.SendChangedStats(target, SendChangedStats);
             LogUtil.Debug(
                 DebugInfoDetail.Network,
