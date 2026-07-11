@@ -40,6 +40,8 @@ namespace LoginEngine.Packets
     using AORebirth.Database.Dao;
     using AORebirth.Database.Entities;
 
+    using LoginEngine.CharacterCreation;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     #endregion
@@ -201,11 +203,17 @@ namespace LoginEngine.Packets
             }
             else
             {
-                playfield = 4582;
-                x = 939;
-                y = 20;
-                z = 732;
+                playfield = 6553;
+                x = 3607;
+                y = 52;
+                z = 786;
             }
+           // {
+           //     playfield = 4582;
+          //      x = 939;
+           //     y = 20;
+          //      z = 732;
+          //  }
 
             DBCharacter character = CharacterDao.Instance.Get(charid);
             if (character != null)
@@ -345,6 +353,63 @@ namespace LoginEngine.Packets
             StatDao.Instance.BulkReplace(stats);
 
             #endregion
+
+            if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Metaphysicist)
+            {
+                MetaphysicistStarterLoadout.Apply(charID);
+            }
+            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.MartialArtist)
+            {
+                MartialArtistStarterLoadout.Apply(charID);
+            }
+            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Adventurer)
+            {
+                AdventurerStarterLoadout.Apply(charID);
+            }
+            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Engineer)
+            {
+                EngineerStarterLoadout.Apply(charID);
+            }
+            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Soldier)
+            {
+                SoldierStarterLoadout.Apply(charID);
+            }
+            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Fixer)
+            {
+                FixerStarterLoadout.Apply(charID);
+            }
+            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Keeper)
+            {
+                KeeperStarterLoadout.Apply(charID);
+            }
+            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Agent)
+            {
+                AgentStarterLoadout.Apply(charID);
+            }
+            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Enforcer)
+            {
+                EnforcerStarterLoadout.Apply(charID);
+            }
+            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Trader)
+            {
+                TraderStarterLoadout.Apply(charID);
+            }
+            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Doctor)
+            {
+                DoctorStarterLoadout.Apply(charID);
+            }
+            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Bureaucrat)
+            {
+                BureaucratStarterLoadout.Apply(charID);
+            }
+            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Nanotechnician)
+            {
+                NanotechnicianStarterLoadout.Apply(charID);
+            }
+            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Shade)
+            {
+                ShadeStarterLoadout.Apply(charID);
+            }
 
             return charID;
         }
