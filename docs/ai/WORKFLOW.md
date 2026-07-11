@@ -167,6 +167,20 @@ cmd /d /c tools-temp\start-aosharp-live-capture.cmd --pid <ao-client-pid>
 
 This wrapper is the only approved Codex startup command for AOSharp live capture. It starts the existing AOSharp injector against an already-running AO client and reports only the exact injector command, success or failure, capture output path, and failure log path. It does not launch the AO game/client.
 
+Build the capture plugin after capture-tool source changes with:
+
+```cmd
+cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.csproj /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
+```
+
+One-pass NPC captures preserve raw packets in `packets.hex.log` and promote reusable evidence into `enemy-full-updates.csv`, `enemy-state.csv`, `enemy-dossier.json`, `enemy-movement.csv`, `movement-packets.csv`, `enemy-combat.csv`, `enemy-stat-updates.csv`, `npc-lifecycle.csv`, `corpse-full-updates.csv`, and `inventory-updates.csv`. Final capture validation must report incomplete when corpse presence or inventory was observed without a successfully decoded identity-linked `CorpseFullUpdate`.
+
+Existing capture folders can be retro-decoded without repeating gameplay:
+
+```cmd
+cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py <capture-folder>
+```
+
 Before running the wrapper, do not run `rg`, `dir`, `tasklist`, recursive searches, process sweeps, source inspection, build-folder enumeration, or old-log scraping to rediscover how capture startup works. Use the wrapper directly.
 
 Do not inspect AOSharp capture source code, search for command names, enumerate build folders, or read old capture logs unless the wrapper fails or Mike explicitly asks for investigation.
