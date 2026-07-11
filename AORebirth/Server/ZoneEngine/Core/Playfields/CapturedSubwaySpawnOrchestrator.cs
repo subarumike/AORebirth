@@ -3,9 +3,7 @@ namespace AORebirth.Core.Playfields
     #region Usings ...
 
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
-    using System.Linq;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.NPCHandler;
@@ -39,12 +37,6 @@ namespace AORebirth.Core.Playfields
 
         private readonly Action<ICharacter> activateNpc;
 
-        private readonly Dictionary<int, CapturedSubwaySpawnDefinition> activeSpawnDefinitions =
-            new Dictionary<int, CapturedSubwaySpawnDefinition>();
-
-        private readonly Dictionary<int, CapturedSubwayRespawnState> pendingRespawns =
-            new Dictionary<int, CapturedSubwayRespawnState>();
-
         internal CapturedSubwaySpawnOrchestrator(
             CapturedSubwayContentProvider capturedSubwayContent,
             NpcPatrolReplayCoordinator patrolReplay,
@@ -65,82 +57,14 @@ namespace AORebirth.Core.Playfields
             CapturedSubwaySpawnDefinition[] spawns = this.capturedSubwayContent.GetSpawnDefinitions();
             foreach (CapturedSubwaySpawnDefinition spawn in spawns)
             {
-                this.SpawnCapturedSubwayMob(playfield, playfieldIdentity, spawn, false);
+                this.SpawnCapturedSubwayMob(playfield, playfieldIdentity, spawn);
             }
         }
 
-        internal void ScheduleRespawnAfterDespawn(ICharacter target, DateTime despawnedAtUtc)
-        {
-            if (target == null)
-            {
-                return;
-            }
-
-            CapturedSubwaySpawnDefinition spawn;
-            if (!this.activeSpawnDefinitions.TryGetValue(target.Identity.Instance, out spawn))
-            {
-                return;
-            }
-
-            this.activeSpawnDefinitions.Remove(target.Identity.Instance);
-            if (!spawn.HasRespawnDelay)
-            {
-                return;
-            }
-
-            DateTime respawnsAtUtc =
-                despawnedAtUtc + TimeSpan.FromSeconds(spawn.RespawnDelaySeconds.Value);
-            this.pendingRespawns[spawn.SourceInstance] =
-                new CapturedSubwayRespawnState(spawn, respawnsAtUtc);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Captured Subway respawn scheduled sourceIdentity=SimpleChar:{0:X8} name={1} respawnsAtUtc={2:o}",
-                    spawn.SourceInstance,
-                    spawn.Name,
-                    respawnsAtUtc));
-        }
-
-        internal void ForgetDespawned(ICharacter target)
-        {
-            if (target != null)
-            {
-                this.activeSpawnDefinitions.Remove(target.Identity.Instance);
-            }
-        }
-
-        internal void ProcessDueRespawns(
+        private void SpawnCapturedSubwayMob(
             Playfield playfield,
             Identity playfieldIdentity,
-            DateTime utcNow)
-        {
-            if (playfieldIdentity.Instance != CapturedSubwayContentProvider.SubwayPlayfieldInstance)
-            {
-                return;
-            }
-
-            CapturedSubwayRespawnState[] dueRespawns = this.pendingRespawns.Values
-                .Where(value => value.RespawnsAtUtc <= utcNow)
-                .ToArray();
-            foreach (CapturedSubwayRespawnState dueRespawn in dueRespawns)
-            {
-                if (this.SpawnCapturedSubwayMob(playfield, playfieldIdentity, dueRespawn.Spawn, true))
-                {
-                    this.pendingRespawns.Remove(dueRespawn.Spawn.SourceInstance);
-                    continue;
-                }
-
-                dueRespawn.RespawnsAtUtc = utcNow + TimeSpan.FromSeconds(5.0);
-            }
-        }
-
-        private bool SpawnCapturedSubwayMob(
-            Playfield playfield,
-            Identity playfieldIdentity,
-            CapturedSubwaySpawnDefinition spawn,
-            bool beginPatrolAfterFullUpdate)
+            CapturedSubwaySpawnDefinition spawn)
         {
             var npcController = new NPCController();
             Character mobCharacter = NonPlayerCharacterHandler.SpawnMobFromTemplate(
@@ -160,7 +84,7 @@ namespace AORebirth.Core.Playfields
                         "Captured Subway spawn failed sourceIdentity=SimpleChar:{0:X8} name={1}",
                         spawn.SourceInstance,
                         spawn.Name));
-                return false;
+                return;
             }
 
             mobCharacter.Name = spawn.Name;
@@ -168,20 +92,11 @@ namespace AORebirth.Core.Playfields
             mobCharacter.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
             PrepareCapturedSubwayMob(mobCharacter, spawn);
             AssignCapturedPatrolWaypoint(mobCharacter, spawn);
-            if (!beginPatrolAfterFullUpdate)
-            {
-                this.AssignCapturedPatrolReplay(mobCharacter, npcController, spawn);
-            }
-
+            this.AssignCapturedPatrolReplay(mobCharacter, npcController, spawn);
             mobCharacter.DoNotDoTimers = false;
             var fullUpdate = SimpleCharFullUpdate.ConstructMessage(mobCharacter);
             this.activateNpc(mobCharacter);
-            this.activeSpawnDefinitions[mobCharacter.Identity.Instance] = spawn;
             playfield.Announce(fullUpdate);
-            if (beginPatrolAfterFullUpdate)
-            {
-                this.AssignCapturedPatrolReplay(mobCharacter, npcController, spawn);
-            }
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
@@ -199,8 +114,6 @@ namespace AORebirth.Core.Playfields
                     spawn.Level,
                     spawn.RunSpeed,
                     spawn.ContentSection));
-
-            return true;
         }
 
         private void AssignCapturedPatrolReplay(
@@ -219,12 +132,10 @@ namespace AORebirth.Core.Playfields
                         return;
                     }
 
-                    var start = spawn.UseSpawnAsPatrolStart
-                                    ? new AORebirth.Core.Vector.Vector3(spawn.X, spawn.Y, spawn.Z)
-                                    : new AORebirth.Core.Vector.Vector3(
-                                        segments[0].StartX,
-                                        segments[0].StartY,
-                                        segments[0].StartZ);
+                    var start = new AORebirth.Core.Vector.Vector3(
+                        segments[0].StartX,
+                        segments[0].StartY,
+                        segments[0].StartZ);
                     var end = new AORebirth.Core.Vector.Vector3(
                         segments[0].EndX,
                         segments[0].EndY,
@@ -233,11 +144,7 @@ namespace AORebirth.Core.Playfields
                     mobCharacter.Waypoints.Clear();
                     mobCharacter.AddWaypoint(start, false);
                     mobCharacter.AddWaypoint(end, false);
-                    npcController.SetCapturedPatrolReplaySegments(
-                        segments,
-                        false,
-                        true,
-                        spawn.UseSpawnAsPatrolStart);
+                    npcController.SetCapturedPatrolReplaySegments(segments, false, true);
                 });
 
             if (replaySegmentCount > 0)
@@ -361,21 +268,6 @@ namespace AORebirth.Core.Playfields
         {
             mobCharacter.Stats[stat].Value = value;
             mobCharacter.Stats[stat].BaseValue = (uint)value;
-        }
-
-        private sealed class CapturedSubwayRespawnState
-        {
-            public CapturedSubwayRespawnState(
-                CapturedSubwaySpawnDefinition spawn,
-                DateTime respawnsAtUtc)
-            {
-                this.Spawn = spawn;
-                this.RespawnsAtUtc = respawnsAtUtc;
-            }
-
-            public CapturedSubwaySpawnDefinition Spawn { get; private set; }
-
-            public DateTime RespawnsAtUtc { get; set; }
         }
     }
 }

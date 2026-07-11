@@ -149,14 +149,6 @@ namespace AORebirth.Core.Playfields
             }
         }
 
-        internal void ProcessDueCapturedSubwayRespawns(DateTime utcNow)
-        {
-            this.capturedSubwaySpawns.ProcessDueRespawns(
-                this.playfield,
-                this.playfield.Identity,
-                utcNow);
-        }
-
         internal void ClearNpcCorpseDespawn(int corpseInstance)
         {
             this.corpseDespawnTicks.Remove(corpseInstance);
@@ -208,14 +200,12 @@ namespace AORebirth.Core.Playfields
                 return true;
             }
 
-            this.capturedSubwaySpawns.ScheduleRespawnAfterDespawn(character, DateTime.UtcNow);
             this.FinalizeNpcDespawn(character);
             return true;
         }
 
         internal void FinalizeNpcDespawn(ICharacter target)
         {
-            this.capturedSubwaySpawns.ForgetDespawned(target);
             this.corpseLifecycle.FinalizeNpcDespawn(target);
             this.dynelRegistry.Unregister(target.Identity);
             CapturedSubwayOrdinaryRuntimeRegistry.Remove(target.Identity.Instance);
