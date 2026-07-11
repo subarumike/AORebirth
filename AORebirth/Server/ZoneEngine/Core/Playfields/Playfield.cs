@@ -162,6 +162,8 @@ namespace AORebirth.Core.Playfields
 
         private const int CapturedSubwayThiefNpcFamily = 138;
 
+        private const int CapturedSubwayThiefCorpseCatMesh = 5907;
+
         private const int CapturedCleaningRobotCorpseCatMesh = 297018;
 
         private const int CapturedCleaningRobotCorpseCredits = 5;
@@ -2468,22 +2470,6 @@ namespace AORebirth.Core.Playfields
 
         private void SendCorpseFullUpdate(ICharacter target, Identity corpseIdentity)
         {
-            if (IsCapturedSubwayThief(target))
-            {
-                // Capture 20260710-205400 proves the Thief corpse inventory but does not
-                // contain an identity-linked CorpseFullUpdate visual. Sending MonsterData
-                // 26092 as CATMesh crashes the current client renderer in randy31.dll.
-                // Keep the registered logical corpse/loot route and suppress only the
-                // unresolved visual packet until an exact corpse visual is captured.
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format(
-                        "CorpseFullUpdate visual suppressed target={0} corpse={1}; captured Subway Thief CATMesh unresolved.",
-                        target.Identity,
-                        corpseIdentity));
-                return;
-            }
-
             int corpseCatMesh = CorpseCatMeshFor(target);
             int corpseMonsterData = CorpseMonsterDataFor(target);
             int recipientCount = 0;
@@ -2787,9 +2773,6 @@ namespace AORebirth.Core.Playfields
 
         internal bool CanBuildKnownCorpseVisual(ICharacter target)
         {
-            // The captured Subway Thief remains eligible so its logical corpse and
-            // captured handbag loot are registered. Its unresolved visual packet is
-            // suppressed in SendCorpseFullUpdate instead of using MonsterData as CATMesh.
             return IsCapturedCleaningRobot(target)
                    || IsCapturedSubwayThief(target)
                    || CombatCorpseVisuals.IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
@@ -2801,6 +2784,11 @@ namespace AORebirth.Core.Playfields
             if (IsCapturedCleaningRobot(target))
             {
                 return CapturedCleaningRobotCorpseCatMesh;
+            }
+
+            if (IsCapturedSubwayThief(target))
+            {
+                return CapturedSubwayThiefCorpseCatMesh;
             }
 
             return CombatCorpseVisuals.CorpseCatMeshFor(
