@@ -397,10 +397,27 @@ namespace Utility
             {
                 zs.CopyTo(ms);
                 ms.Position = 0;
-                byte[] normalizedData = NormalizeNegativeFixIntEncoding(ms.ToArray());
-                using (MemoryStream normalizedStream = new MemoryStream(normalizedData))
+                try
                 {
-                    this.DataSlice = messagePackSerializer.Unpack(normalizedStream);
+                    byte[] normalizedData = NormalizeNegativeFixIntEncoding(ms.ToArray());
+                    using (MemoryStream normalizedStream = new MemoryStream(normalizedData))
+                    {
+                        this.DataSlice = messagePackSerializer.Unpack(normalizedStream);
+                    }
+                }
+                catch (Exception normalizationException)
+                {
+                    try
+                    {
+                        ms.Position = 0;
+                        this.DataSlice = messagePackSerializer.Unpack(ms);
+                    }
+                    catch (Exception rawException)
+                    {
+                        throw new InvalidDataException(
+                            "MessagePackZip slice could not be read with normalized or raw MessagePack data.",
+                            new AggregateException(normalizationException, rawException));
+                    }
                 }
             }
         }
