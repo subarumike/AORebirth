@@ -293,7 +293,7 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            this.StartCombatWithAcquiredTarget(attacker, target);
+            this.StartCombatWithAcquiredTarget(attacker, target, capturedContract);
         }
 
         internal void ProcessPatrolTick(ICharacter character)
@@ -304,6 +304,16 @@ namespace AORebirth.Core.Playfields
             }
 
             PetCommandService.ProcessPetHealTick(character);
+
+            if (character.FightingTarget.Instance != 0)
+            {
+                if (character.Controller.IsFollowing())
+                {
+                    character.Controller.DoFollow();
+                }
+
+                return;
+            }
 
             if (character.Controller.IsFollowing())
             {
@@ -322,11 +332,30 @@ namespace AORebirth.Core.Playfields
             this.combatTick.ClearTracking(identity);
         }
 
-        private void StartCombatWithAcquiredTarget(ICharacter attacker, ICharacter target)
+        private void StartCombatWithAcquiredTarget(
+            ICharacter attacker,
+            ICharacter target,
+            CapturedEnemyCombatContract capturedContract)
         {
             target.SetTarget(attacker.Identity);
             target.SetFightingTarget(attacker.Identity);
-            this.ResetCombatTick(target);
+
+            NPCController npcController = target.Controller as NPCController;
+            if (npcController != null
+                && capturedContract != null
+                && capturedContract.HasCapturedCombatStopSequence)
+            {
+                this.ResetCombatTick(target);
+            }
+            else
+            {
+                if (npcController != null)
+                {
+                    npcController.StopFollowForCombatRange(attacker.Coordinates().coordinate);
+                }
+
+                this.ResetCombatTick(target);
+            }
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,

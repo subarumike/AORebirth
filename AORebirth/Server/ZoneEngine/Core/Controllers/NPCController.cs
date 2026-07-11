@@ -47,6 +47,7 @@ namespace ZoneEngine.Core.Controllers
     using AORebirth.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using Utility;
@@ -923,6 +924,105 @@ namespace ZoneEngine.Core.Controllers
             }
 
             this.ResetFollowPosition();
+        }
+
+        public void StopFollowForCapturedCombatRange(Vector3 targetPosition)
+        {
+            Vector3 current = this.UpdateMotionSegmentPosition(DateTime.UtcNow);
+
+            this.Character.Coordinates(current);
+            this.FaceToward(current, targetPosition);
+            this.LogChase("captured-combat-stop", current, targetPosition);
+
+            this.AnnounceCapturedCombatMessage(
+                new FollowTargetMessage
+                {
+                    Identity = this.Character.Identity,
+                    Unknown = 0,
+                    Info =
+                        new FollowTargetInfo
+                        {
+                            MoveType = 25,
+                            Target = Identity.None,
+                            Dummy = 0,
+                            Dummy1 = 0x40000000,
+                            X = current.xf,
+                            Y = current.yf,
+                            Z = current.zf
+                        }
+                });
+            this.AnnounceCapturedCombatMessage(
+                new StopMovingCmdMessage
+                {
+                    Identity = this.Character.Identity,
+                    Unknown = 0,
+                    Unknown1 = 1,
+                    Unknown2 = 514,
+                    Unknown3 = 1
+                });
+            this.AnnounceCapturedCombatMessage(
+                new SetPosMessage
+                {
+                    Identity = this.Character.Identity,
+                    Unknown = 0,
+                    Coordinates =
+                        new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                        {
+                            X = current.xf,
+                            Y = current.yf,
+                            Z = current.zf
+                        },
+                    Unknown1 = 1,
+                    Unknown2 = 0,
+                    Unknown3 = 0
+                });
+            this.followIdentity = Identity.None;
+            lock (this.followCoordinates)
+            {
+                this.followCoordinates = new Vector3(
+                    targetPosition.xf,
+                    targetPosition.yf + 0.5f,
+                    targetPosition.zf);
+            }
+
+            this.ResetFollowPosition();
+            this.Run();
+            this.AnnounceCapturedCombatMessage(
+                new FollowTargetMessage
+                {
+                    Identity = this.Character.Identity,
+                    Unknown = EnemyBehaviorContract.OfficialFollowTargetUnknown,
+                    Info =
+                        new FollowCoordinateInfo
+                        {
+                            CurrentCoordinates = current,
+                            EndCoordinates = this.followCoordinates,
+                            CoordinateCount = EnemyBehaviorContract.CoordinateFollowPointCount,
+                            MoveMode = EnemyBehaviorContract.RunMoveMode,
+                            FollowInfoType = EnemyBehaviorContract.CoordinateFollowInfoType
+                        }
+                });
+            DateTime now = DateTime.UtcNow;
+            this.SetMotionSegment(current, this.followCoordinates, now);
+            this.lastMotionPacketUtc = now;
+            this.lastMotionPacketDestination = this.followCoordinates;
+            this.hasMotionPacket = true;
+        }
+
+        private void AnnounceCapturedCombatMessage(MessageBody body)
+        {
+            var playfield = this.Character.Playfield as AORebirth.Core.Playfields.Playfield;
+            if (playfield != null)
+            {
+                playfield.Announce(body);
+                return;
+            }
+
+            this.Character.Playfield.Publish(
+                new IMSendAOtomationMessageToPlayfield
+                {
+                    Body = body
+                });
         }
 
         public void Run()

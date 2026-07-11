@@ -28,6 +28,30 @@ namespace ZoneEngine.Core.Playfields
 
         public const int UnarmedAttackInfoAmmoCount = -1;
 
+        public const int CapturedSubwayThiefAttackInfoAmmoCount = -1;
+
+        public const int CapturedSubwayThiefAttackInfoUnknown = 0;
+
+        public const int CapturedSubwayThiefSpecialAttackWeaponUnknown1 = 32;
+
+        public const int CapturedSubwayThiefSpecialAttackWeaponUnknown2 = 32;
+
+        public const int CapturedSubwayThiefSpecialAttackWeaponUnknown3 = 32;
+
+        public const int CapturedSubwayThiefSpecialAttackWeaponUnknown4 = 32;
+
+        public const int CapturedSubwayThiefSpecialAttackWeaponUnknown5 = 0;
+
+        public const double CapturedSubwayThiefAttackStartDelaySeconds = 1.409765;
+
+        public const double CapturedSubwayThiefMovementTransitionDelaySeconds = 0.219999;
+
+        public const double CapturedSubwayThiefFirstHitDelaySeconds = 11.409643;
+
+        public const double CapturedSubwayThiefRechargeSeconds = 6.0;
+
+        public const int CapturedSubwayThiefDamage = 9;
+
         public const int NpcUnarmedRightAttackInfoWeaponSlot = 0;
 
         public const int NpcUnarmedLeftAttackInfoWeaponSlot = 1;

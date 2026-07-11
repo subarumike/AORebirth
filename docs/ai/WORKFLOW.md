@@ -134,6 +134,22 @@ cmd /d /c restart-engines.cmd
 
 `restart-engines.cmd` is the repo-owned Codex restart entrypoint. It calls the existing approved `stop-engines.cmd` and `start-engines.cmd` wrappers and does not add extra polling, diagnostics, or manual lifecycle commands.
 
+## AOtomation Messaging Tests
+
+Build and run the legacy MSTest assembly through the repo-owned wrapper:
+
+```cmd
+cmd /d /c tools\run_aotomation_messaging_tests.cmd
+```
+
+Pass a Visual Studio Test Platform filter directly to run a focused test first:
+
+```cmd
+cmd /d /c tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifiedName=SmokeLounge.AOtomation.Messaging.Tests.PlayfieldLifecycleTraceTests.SubwayThiefCombatContractPreservesLiveEnvelopeMovementAndDeathOrder"
+```
+
+The wrapper builds the test project with the repository's single-node MSBuild settings, locates `vstest.console.exe` through Visual Studio Installer's `vswhere.exe`, and then runs the generated .NET Framework 4.8 test assembly. Do not substitute `dotnet test` for this legacy project.
+
 ## Database
 
 - Use only `cellao_codex_clean`; this is the active legacy database name retained for local compatibility.

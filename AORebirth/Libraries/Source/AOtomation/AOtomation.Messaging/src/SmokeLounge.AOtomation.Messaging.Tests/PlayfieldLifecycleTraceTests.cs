@@ -303,7 +303,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Player and NPC AttackInfo packets must use the live-captured base Unknown=0 shape.");
             Assert.IsTrue(
                 npcCombatTickText.Contains("NpcCombatAttackRules.DefaultCombatTickSeconds")
-                && npcCombatTickText.Contains("DateTime.UtcNow + TimeSpan.FromSeconds(initialDelaySeconds)")
+                && npcCombatTickText.Contains("now + TimeSpan.FromSeconds(initialDelaySeconds)")
+                && npcCombatTickText.Contains(
+                    "capturedContract.AttackStartDelaySeconds + capturedContract.FirstHitDelaySeconds")
                 && !npcCombatTickText.Contains("this.nextCombatTicks.Remove(attacker.Identity.Instance);"),
                 "NPC combat start must not emit immediate first-hit AttackInfo before the live-compatible combat-start window.");
             Assert.IsFalse(
@@ -336,6 +338,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             Assert.AreEqual(10, NpcCombatAttackRules.CapturedCleaningRobotRightHandDamage);
             Assert.AreEqual(8, NpcCombatAttackRules.CapturedCleaningRobotLeftHandDamage);
+            Assert.AreEqual(-1, NpcCombatAttackRules.CapturedSubwayThiefAttackInfoAmmoCount);
+            Assert.AreEqual(0, NpcCombatAttackRules.CapturedSubwayThiefAttackInfoUnknown);
+            Assert.AreEqual(32, NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown1);
+            Assert.AreEqual(32, NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown2);
+            Assert.AreEqual(32, NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown3);
+            Assert.AreEqual(32, NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown4);
+            Assert.AreEqual(0, NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown5);
+            Assert.AreEqual(1409, (int)(NpcCombatAttackRules.CapturedSubwayThiefAttackStartDelaySeconds * 1000));
+            Assert.AreEqual(
+                219,
+                (int)(NpcCombatAttackRules.CapturedSubwayThiefMovementTransitionDelaySeconds * 1000));
+            Assert.AreEqual(11409, (int)(NpcCombatAttackRules.CapturedSubwayThiefFirstHitDelaySeconds * 1000));
+            Assert.AreEqual(6000, (int)(NpcCombatAttackRules.CapturedSubwayThiefRechargeSeconds * 1000));
+            Assert.AreEqual(9, NpcCombatAttackRules.CapturedSubwayThiefDamage);
             Assert.AreEqual(
                 2700,
                 (int)(NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds * 1000));
@@ -360,6 +376,63 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void SubwayThiefCombatContractPreservesLiveEnvelopeMovementAndDeathOrder()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string contractText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
+            string coordinatorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            string controllerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Controllers\NPCController.cs"));
+            string npcRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+
+            Assert.IsTrue(
+                contractText.Contains("case 26092:")
+                && contractText.Contains("HasCapturedAttackStartContext = true")
+                && contractText.Contains("HasCapturedEquippedAttackInfo = true")
+                && contractText.Contains("HasCapturedCombatStopSequence = true")
+                && contractText.Contains("SendStopFightOnDeath = sendStopFightOnDeath")
+                && contractText.Contains("CapturedSubwayThiefMovementTransitionDelaySeconds")
+                && contractText.Contains("CapturedSubwayThiefAttackInfoAmmoCount")
+                && contractText.Contains("CapturedSubwayThiefAttackInfoUnknown"),
+                "MonsterData 26092 must retain the live-derived Thief attack contract.");
+
+            Assert.IsTrue(
+                coordinatorText.Contains("pendingCapturedAttackStarts")
+                && coordinatorText.Contains("pendingCapturedMovementTransitions")
+                && coordinatorText.Contains(
+                    "capturedContract.AttackStartDelaySeconds + capturedContract.FirstHitDelaySeconds")
+                && coordinatorText.Contains("+ capturedContract.MovementTransitionDelaySeconds")
+                && coordinatorText.Contains("capturedContract.HasCapturedAttackStartContext")
+                && coordinatorText.Contains("capturedContract.HasCapturedEquippedAttackInfo")
+                && coordinatorText.Contains("? capturedContract.AttackInfoAmmoCount")
+                && coordinatorText.Contains("? capturedContract.AttackInfoUnknown")
+                && coordinatorText.Contains(": 40,")
+                && coordinatorText.Contains(": 4,"),
+                "Thief timing and AttackInfo overrides must stay contract-gated while legacy equipped NPC fields remain unchanged.");
+
+            string capturedStopBlock = ExtractMethodBlock(
+                controllerText,
+                "public void StopFollowForCapturedCombatRange(");
+            AssertTextBefore(capturedStopBlock, "new FollowTargetInfo", "new StopMovingCmdMessage");
+            AssertTextBefore(capturedStopBlock, "new StopMovingCmdMessage", "new SetPosMessage");
+            AssertTextBefore(capturedStopBlock, "new SetPosMessage", "new FollowCoordinateInfo");
+
+            AssertTextBefore(
+                ExtractMethodBlock(npcRuntimeText, "internal void BeginNpcDeath("),
+                "this.playfield.StopDyingNpcCombatState(target);",
+                "this.playfield.SendNpcDeathAnimation(target);");
+            Assert.IsTrue(
+                ExtractMethodBlock(playfieldText, "internal void StopDyingNpcCombatState(")
+                    .Contains("capturedContract.SendStopFightOnDeath"),
+                "The live-captured Thief StopFight must be emitted before its Death action.");
+        }
+
+        [TestMethod]
         public void SubwayFilthFleaCombatUsesCapturedPoisonAndMeleeAttackContext()
         {
             Assert.AreEqual(17657, NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData);
@@ -376,6 +449,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string repositoryRoot = FindRepositoryRoot();
             string coordinatorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            Assert.IsTrue(
+                coordinatorText.Contains("this.AnnounceCapturedEnemyAttackStartContext(attacker, capturedContract);")
+                && coordinatorText.Contains("private void AnnounceCapturedEnemyAttackStartContext(")
+                && coordinatorText.Contains("CapturedEnemyCombatContract capturedContract)")
+                && coordinatorText.Contains("Specials = new SpecialAttack[0]")
+                && coordinatorText.Contains("Unknown = 0,")
+                && coordinatorText.Contains("pendingCapturedMovementTransitions")
+                && coordinatorText.Contains("capturedContract.MovementTransitionDelaySeconds")
+                && coordinatorText.Contains("hasCapturedEquippedAttackInfo")
+                && coordinatorText.Contains("AttackInfoAmmoCount = hasCapturedEquippedAttackInfo")
+                && coordinatorText.Contains("AttackInfoUnk1 = hasCapturedEquippedAttackInfo")
+                && coordinatorText.Contains("DamageBonus = damageBonus,"),
+                "Thief must use its captured attack context, delayed movement transition, and fixed normal-hit envelope without changing legacy equipped NPCs.");
             int contextIndex = coordinatorText.IndexOf(
                 "this.AnnounceCapturedSubwayFilthFleaAttackStartContext(attacker);",
                 StringComparison.Ordinal);
@@ -2423,7 +2509,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Playfield must delegate NPC combat stop/clear orchestration through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 npcCombatTickText.Contains("this.playfield.ClearNpcCombatTracking(attacker.Identity);")
-                && npcCombatTickText.Contains("this.playfield.ClearInvalidNpcCombatTarget(attacker);"),
+                && npcCombatTickText.Contains("this.playfield.ClearInvalidNpcCombatTarget(attacker);")
+                && npcCombatTickText.Contains("if (attacker == null || this.playfield == null)"),
                 "NpcCombatTickCoordinator must route NPC combat clear decisions through the runtime ownership boundary.");
             Assert.IsTrue(
                 playfieldText.Contains("internal bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)")
@@ -2535,19 +2622,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 npcRuntimeText.Contains("internal void AcquireAggro(ICharacter attacker, ICharacter target)")
                 && npcRuntimeText.Contains("NpcAiProfiles.CanRetaliate(npcController.AiProfile)")
-                && npcRuntimeText.Contains("this.StartCombatWithAcquiredTarget(attacker, target);")
-                && npcRuntimeText.Contains("private void StartCombatWithAcquiredTarget(ICharacter attacker, ICharacter target)")
+                && npcRuntimeText.Contains("this.StartCombatWithAcquiredTarget(attacker, target, capturedContract);")
+                && npcRuntimeText.Contains("private void StartCombatWithAcquiredTarget(")
                 && npcRuntimeText.Contains("target.SetFightingTarget(attacker.Identity);")
+                && npcRuntimeText.Contains("npcController.StopFollowForCombatRange(attacker.Coordinates().coordinate);")
                 && npcRuntimeText.Contains("this.ResetCombatTick(target);"),
-                "NPCRuntimeService must own NPC aggro acquisition and combat-start orchestration.");
+                "NPCRuntimeService must own NPC aggro acquisition, patrol cancellation, and combat-start orchestration.");
             Assert.IsTrue(
                 timedLifecycleText.Contains("processNpcPatrolTick(dynel);"),
                 "Timed lifecycle scheduling must delegate NPC patrol ticks through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 npcRuntimeText.Contains("internal void ProcessPatrolTick(ICharacter character)")
+                && npcRuntimeText.Contains("if (character.FightingTarget.Instance != 0)")
                 && npcRuntimeText.Contains("character.Controller.DoFollow();")
                 && npcRuntimeText.Contains("character.Controller.StartPatrolling();"),
-                "NPCRuntimeService must own NPC patrol/follow tick orchestration while controllers keep behavior.");
+                "NPCRuntimeService must keep combat follow active while preventing patrol replay during combat.");
+            Assert.IsTrue(
+                npcCombatTickText.Contains("maintainMovementDuringRecharge")
+                && npcCombatTickText.Contains("!this.playfield.IsInCombatRange(attacker, target, attackSource.Range)")
+                && npcCombatTickText.Contains("this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);")
+                && npcCombatTickText.Contains("this.playfield.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);")
+                && npcCombatTickText.Contains(
+                    "npcController.StopFollowForCapturedCombatRange(target.Coordinates().coordinate);"),
+                "Captured and existing known combat paths must maintain chase and melee hold while Thief preserves its delayed transition.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.SpawnCapturedNpcContent(playfieldIdentity);"),
                 "Playfield must delegate captured NPC spawn orchestration through PlayfieldRuntimeSystems.");
