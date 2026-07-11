@@ -928,11 +928,6 @@ namespace ZoneEngine.Core.Playfields
             this.npcRuntime.ProcessDueNpcCorpseDespawns(utcNow, despawnCorpse);
         }
 
-        internal void ProcessDueCapturedSubwayRespawns(DateTime utcNow)
-        {
-            this.npcRuntime.ProcessDueCapturedSubwayRespawns(utcNow);
-        }
-
         internal void BeginNpcDeath(ICharacter attacker, ICharacter target)
         {
             this.npcRuntime.BeginNpcDeath(attacker, target);

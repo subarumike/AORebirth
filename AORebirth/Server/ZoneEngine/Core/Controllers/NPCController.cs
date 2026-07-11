@@ -89,8 +89,6 @@ namespace ZoneEngine.Core.Controllers
 
         private bool capturedPatrolReplayBatchesZeroDelaySegments;
 
-        private bool capturedPatrolReplayUsesRuntimeStartOnce;
-
         private DateTime nextCapturedPatrolReplayUtc = DateTime.MinValue;
 
         private bool hasMotionPacket;
@@ -292,24 +290,10 @@ namespace ZoneEngine.Core.Controllers
             bool useRuntimeStart,
             bool batchZeroDelaySegments)
         {
-            this.SetCapturedPatrolReplaySegments(
-                segments,
-                useRuntimeStart,
-                batchZeroDelaySegments,
-                false);
-        }
-
-        public void SetCapturedPatrolReplaySegments(
-            NpcPatrolReplaySegment[] segments,
-            bool useRuntimeStart,
-            bool batchZeroDelaySegments,
-            bool useRuntimeStartOnce)
-        {
             this.capturedPatrolReplaySegments = segments ?? new NpcPatrolReplaySegment[0];
             this.capturedPatrolReplayIndex = 0;
             this.capturedPatrolReplayUsesRuntimeStart = useRuntimeStart;
             this.capturedPatrolReplayBatchesZeroDelaySegments = batchZeroDelaySegments;
-            this.capturedPatrolReplayUsesRuntimeStartOnce = useRuntimeStartOnce;
             this.nextCapturedPatrolReplayUtc = DateTime.MinValue;
         }
 
@@ -350,10 +334,7 @@ namespace ZoneEngine.Core.Controllers
                 }
 
                 var capturedStart = new Vector3(segment.StartX, segment.StartY, segment.StartZ);
-                bool useRuntimeStart =
-                    this.capturedPatrolReplayUsesRuntimeStart
-                    || this.capturedPatrolReplayUsesRuntimeStartOnce;
-                Vector3 start = useRuntimeStart
+                Vector3 start = this.capturedPatrolReplayUsesRuntimeStart
                                     ? this.UpdateMotionSegmentPosition(now)
                                     : capturedStart;
                 var end = new Vector3(segment.EndX, segment.EndY, segment.EndZ);
@@ -366,7 +347,6 @@ namespace ZoneEngine.Core.Controllers
                 this.lastMotionPacketUtc = now;
                 this.lastMotionPacketDestination = end;
                 this.hasMotionPacket = true;
-                this.capturedPatrolReplayUsesRuntimeStartOnce = false;
 
                 this.capturedPatrolReplayIndex =
                     (this.capturedPatrolReplayIndex + 1) % this.capturedPatrolReplaySegments.Length;
