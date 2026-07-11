@@ -114,7 +114,17 @@ namespace ZoneEngine.Core.Playfields
             CapturedSurveySpawn(Mugger(0x7957E5C7, 8, 146, 153.4413f, 107.613258f, 297.974335f, 94, 30)),
             CapturedSurveySpawn(Mugger(0x7957E5C8, 8, 146, 145.386154f, 107.613258f, 289.6806f, 94, 30)),
             CapturedSurveySpawn(Mugger(0x7957E5CA, 10, 182, 267.640045f, 107.611687f, 287.824371f, 95, 36)),
-            CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20)),
+            CapturedSurveySpawn(Thief(
+                0x7953AEA5,
+                5,
+                115,
+                72.7292557f,
+                115.61483f,
+                313.1308f,
+                93,
+                20,
+                useSpawnAsPatrolStart: true,
+                respawnDelaySeconds: 60.0)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AA4A, 10, 182, 198.0572f, 108.416405f, 191.596924f, 95, 27)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AD40, 6, 110, 148.6321f, 107.6164f, 189.491272f, 93, 18)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AD48, 7, 128, 190.403168f, 107.6164f, 164.9011f, 94, 20)),
@@ -144,6 +154,22 @@ namespace ZoneEngine.Core.Playfields
         private static readonly Dictionary<int, CapturedSubwayPatrolReplaySegment[]> PatrolReplaySegments =
             new Dictionary<int, CapturedSubwayPatrolReplaySegment[]>
             {
+                {
+                    // Source: completed Thief capture 20260710-205400,
+                    // movement-packets.csv rows 602-964 plus the next-cycle boundary.
+                    0x7953AEA5,
+                    new[]
+                    {
+                        new CapturedSubwayPatrolReplaySegment(4.548876, 79.989151f, 115.764999f, 315.675354f, 71.796402f, 115.61483f, 313.129456f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.366818, 72.9594345f, 115.61483f, 313.497711f, 70.0936584f, 115.61483f, 314.961914f, 24),
+                        new CapturedSubwayPatrolReplaySegment(3.349639, 71.1996384f, 115.61483f, 314.249268f, 69.7715149f, 115.61483f, 320.24707f, 24),
+                        new CapturedSubwayPatrolReplaySegment(3.334295, 70.0100021f, 115.61483f, 319.04303f, 71.3595734f, 115.61483f, 325.121643f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.331337, 71.0473251f, 115.61483f, 323.888733f, 73.746109f, 115.61483f, 325.728882f, 24),
+                        new CapturedSubwayPatrolReplaySegment(8.916981, 72.5469437f, 115.61483f, 325.066711f, 86.765419f, 115.982338f, 322.630432f, 24),
+                        new CapturedSubwayPatrolReplaySegment(7.115712, 85.6077423f, 115.614998f, 322.841034f, 95.6155396f, 115.42672f, 316.017395f, 24),
+                        new CapturedSubwayPatrolReplaySegment(10.417090, 94.4051971f, 115.885956f, 316.858337f, 78.6982346f, 115.614662f, 315.49176f, 24)
+                    }
+                },
                 {
                     0x7953AF18,
                     new[]
@@ -233,6 +259,24 @@ namespace ZoneEngine.Core.Playfields
             var result = new CapturedSubwayPatrolReplaySegment[segments.Length];
             Array.Copy(segments, result, segments.Length);
             return result;
+        }
+
+        public CapturedSubwayLootDefinition[] GetLootDefinitions()
+        {
+            // Source: completed Thief capture 20260710-205400, inventory-updates.csv.
+            // The one-of-one observed corpse contained one QL1 Stolen Handbag
+            // (297055/297055). Mission-state gating remains unknown.
+            return new[]
+                       {
+                           new CapturedSubwayLootDefinition(
+                               "Thief",
+                               26092,
+                               138,
+                               297055,
+                               297055,
+                               1,
+                               10000)
+                       };
         }
 
         private static CapturedSubwaySpawnDefinition FirstLowerSectionSpawn(
@@ -375,7 +419,9 @@ namespace ZoneEngine.Core.Playfields
             int runSpeed = 20,
             float? patrolX = null,
             float? patrolY = null,
-            float? patrolZ = null)
+            float? patrolZ = null,
+            bool useSpawnAsPatrolStart = false,
+            double? respawnDelaySeconds = null)
         {
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
@@ -396,7 +442,9 @@ namespace ZoneEngine.Core.Playfields
                 z,
                 patrolX,
                 patrolY,
-                patrolZ);
+                patrolZ,
+                useSpawnAsPatrolStart,
+                respawnDelaySeconds);
         }
 
         private static CapturedSubwaySpawnDefinition ViolentVagabond(
@@ -450,7 +498,9 @@ namespace ZoneEngine.Core.Playfields
             float z,
             float? patrolX = null,
             float? patrolY = null,
-            float? patrolZ = null)
+            float? patrolZ = null,
+            bool useSpawnAsPatrolStart = false,
+            double? respawnDelaySeconds = null)
         {
             this.SourceInstance = sourceInstance;
             this.ContentSection = "CapturedPopulation";
@@ -472,6 +522,8 @@ namespace ZoneEngine.Core.Playfields
             this.PatrolX = patrolX;
             this.PatrolY = patrolY;
             this.PatrolZ = patrolZ;
+            this.UseSpawnAsPatrolStart = useSpawnAsPatrolStart;
+            this.RespawnDelaySeconds = respawnDelaySeconds;
         }
 
         public int SourceInstance { get; private set; }
@@ -514,11 +566,23 @@ namespace ZoneEngine.Core.Playfields
 
         public float? PatrolZ { get; private set; }
 
+        public bool UseSpawnAsPatrolStart { get; private set; }
+
+        public double? RespawnDelaySeconds { get; private set; }
+
         public bool HasPatrolWaypoint
         {
             get
             {
                 return this.PatrolX.HasValue && this.PatrolY.HasValue && this.PatrolZ.HasValue;
+            }
+        }
+
+        public bool HasRespawnDelay
+        {
+            get
+            {
+                return this.RespawnDelaySeconds.HasValue && this.RespawnDelaySeconds.Value >= 0.0;
             }
         }
     }
@@ -560,5 +624,40 @@ namespace ZoneEngine.Core.Playfields
         public float EndZ { get; private set; }
 
         public byte MoveMode { get; private set; }
+    }
+
+    internal sealed class CapturedSubwayLootDefinition
+    {
+        public CapturedSubwayLootDefinition(
+            string exactName,
+            int monsterData,
+            int npcFamily,
+            int lowId,
+            int highId,
+            int quality,
+            int observedBasisPoints)
+        {
+            this.ExactName = exactName;
+            this.MonsterData = monsterData;
+            this.NpcFamily = npcFamily;
+            this.LowId = lowId;
+            this.HighId = highId;
+            this.Quality = quality;
+            this.ObservedBasisPoints = observedBasisPoints;
+        }
+
+        public string ExactName { get; private set; }
+
+        public int MonsterData { get; private set; }
+
+        public int NpcFamily { get; private set; }
+
+        public int LowId { get; private set; }
+
+        public int HighId { get; private set; }
+
+        public int Quality { get; private set; }
+
+        public int ObservedBasisPoints { get; private set; }
     }
 }

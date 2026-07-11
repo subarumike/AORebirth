@@ -66,7 +66,7 @@ namespace ZoneEngine.Core.Packets
         private const string SubwayFilthFleaName = "Filth Flea";
         private const int SubwayThiefMonsterData = 26092;
         private const string SubwayThiefName = "Thief";
-        private const uint CapturedSubwayThiefAppearanceValue = 0x00122002;
+        private const uint CapturedSubwayThiefAppearanceValue = 1576;
 
         private static readonly byte[] CapturedSubwayFilthFleaExtendedTextureOverrideData =
             new byte[]
@@ -84,6 +84,15 @@ namespace ZoneEngine.Core.Packets
                 {
                     0x3F, 0xBC, 0xC2, 0x27, 0x3D, 0x55, 0xBB, 0xA1,
                     0xBE, 0x89, 0xF0, 0x4E, 0x02, 0x02, 0x01, 0x01,
+                    0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
+                    0x00, 0x02, 0x00, 0x00
+                };
+
+        private static readonly byte[] CapturedSubwayStationaryThiefUnknown1 =
+            new byte[]
+                {
+                    0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0x03, 0x01, 0x00, 0x01,
                     0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
                     0x00, 0x02, 0x00, 0x00
                 };
@@ -386,7 +395,9 @@ namespace ZoneEngine.Core.Packets
 
             if (IsCapturedSubwayThief(charPlayfield, monsterData, charName))
             {
-                scfu.Unknown1 = CapturedSubwayThiefUnknown1;
+                scfu.Unknown1 = character.Waypoints != null && character.Waypoints.Count > 1
+                                    ? CapturedSubwayThiefUnknown1
+                                    : CapturedSubwayStationaryThiefUnknown1;
                 scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6 | SimpleCharFullUpdateFlags.IsPet;
                 scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
             }

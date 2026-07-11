@@ -992,6 +992,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
             string orchestratorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwaySpawnOrchestrator.cs"));
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string scfuPacketText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
             string scfuMessageText = File.ReadAllText(
@@ -1128,8 +1130,46 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && thiefFactory.Contains("26092")
                 && thiefFactory.Contains("40694")
                 && thiefFactory.Contains("138")
-                && providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20))"),
+                && providerText.Contains("0x7953AEA5")
+                && providerText.Contains("72.7292557f")
+                && providerText.Contains("useSpawnAsPatrolStart: true")
+                && providerText.Contains("respawnDelaySeconds: 60.0"),
                 "Captured Subway Thief must preserve live monsterData, scale, head mesh, run speed, NPC family, and current surveyed position.");
+            Assert.IsTrue(
+                providerText.Contains("new CapturedSubwayLootDefinition(")
+                && providerText.Contains("297055")
+                && providerText.Contains("10000")
+                && playfieldText.Contains("CapturedSubwayLootTable")
+                && playfieldText.Contains("LowId = loot.LowId")
+                && playfieldText.Contains("HighId = loot.HighId")
+                && playfieldText.Contains("MinQuality = loot.Quality")
+                && playfieldText.Contains("MaxQuality = loot.Quality")
+                && playfieldText.Contains("this.Identity.Instance == CapturedSubwayContentProvider.SubwayPlayfieldInstance")
+                && playfieldText.IndexOf("CapturedSubwayLootTable.Where(", StringComparison.Ordinal)
+                   < playfieldText.IndexOf("CapturedSubwayOrdinaryLootTable.Where(", StringComparison.Ordinal),
+                "Captured Subway Thief must use the captured QL1 Stolen Handbag corpse drop before fallback loot tables.");
+            Assert.IsTrue(
+                orchestratorText.Contains("ScheduleRespawnAfterDespawn(ICharacter target, DateTime despawnedAtUtc)")
+                && orchestratorText.Contains("TimeSpan.FromSeconds(spawn.RespawnDelaySeconds.Value)")
+                && orchestratorText.Contains("ProcessDueRespawns(")
+                && npcRuntimeText.Contains("this.capturedSubwaySpawns.ScheduleRespawnAfterDespawn(character, DateTime.UtcNow);")
+                && npcRuntimeText.Contains("ProcessDueCapturedSubwayRespawns(DateTime utcNow)"),
+                "Captured Subway Thief must respawn 60 seconds after its dead NPC identity despawns.");
+            string processDeadNpcDespawn =
+                ExtractMethodBlock(npcRuntimeText, "internal bool ProcessDeadNpcDespawn(ICharacter character)");
+            string finalizeNpcDespawn =
+                ExtractMethodBlock(npcRuntimeText, "internal void FinalizeNpcDespawn(ICharacter target)");
+            AssertTextBefore(
+                processDeadNpcDespawn,
+                "this.capturedSubwaySpawns.ScheduleRespawnAfterDespawn(character, DateTime.UtcNow);",
+                "this.FinalizeNpcDespawn(character);");
+            Assert.IsFalse(
+                finalizeNpcDespawn.Contains("ScheduleRespawnAfterDespawn"),
+                "Immediate or administrative NPC despawns must not schedule captured Subway respawns.");
+            Assert.IsTrue(
+                finalizeNpcDespawn.Contains("this.capturedSubwaySpawns.ForgetDespawned(target);")
+                && orchestratorText.Contains("internal void ForgetDespawned(ICharacter target)"),
+                "Every finalized captured spawn must release its active runtime identity without creating a respawn.");
             Assert.IsTrue(
                 orchestratorText.Contains("CapturedSubwayThiefMonsterData = 26092")
                 && orchestratorText.Contains("CapturedSubwayThiefBodyMesh = 160561")
@@ -1154,8 +1194,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 scfuPacketText.Contains("private const int SubwayThiefMonsterData = 26092")
                 && scfuPacketText.Contains("private const string SubwayThiefName = \"Thief\"")
-                && scfuPacketText.Contains("CapturedSubwayThiefAppearanceValue = 0x00122002")
+                && scfuPacketText.Contains("CapturedSubwayThiefAppearanceValue = 1576")
                 && scfuPacketText.Contains("CapturedSubwayThiefUnknown1")
+                && scfuPacketText.Contains("CapturedSubwayStationaryThiefUnknown1")
+                && scfuPacketText.Contains("character.Waypoints != null && character.Waypoints.Count > 1")
                 && scfuPacketText.Contains("scfu.Version = 58;")
                 && scfuPacketText.Contains("scfu.Appearance.Value = CapturedSubwayThiefAppearanceValue;")
                 && scfuPacketText.Contains("SimpleCharFullUpdateFlags.UnknownFlag6 | SimpleCharFullUpdateFlags.IsPet")
@@ -1178,16 +1220,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Controllers\NPCController.cs"));
 
             Assert.AreEqual(
-                95,
+                124,
                 CountOccurrences(providerText, "            CapturedSurveySpawn("),
-                "The expanded ordinary-archetype slice must not disturb the 95 previously supported spawns.");
+                "The Thief capture slice must not disturb the 124 supported-family spawns.");
 
             string[] patrolSourceIdentities =
                 {
                     "0x7953AF18",
                     "0x7953AF57",
                     "0x79531752",
-                    "0x79531754"
+                    "0x79531754",
+                    "0x7953AEA5"
                 };
             for (int i = 0; i < patrolSourceIdentities.Length; i++)
             {
@@ -1199,11 +1242,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.AreEqual(
-                45,
+                53,
                 CountOccurrences(providerText, "new CapturedSubwayPatrolReplaySegment("),
-                "The four moving mobs must load complete periodic NpcPath cycles from capture 20260709-164414.");
+                "The five moving mobs must load complete periodic NpcPath cycles from their completed captures.");
             Assert.IsTrue(
                 providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.665506, 90.9275284f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(4.548876, 79.989151f")
                 && providerText.Contains("0x7953AF18")
                 && providerText.Contains("0x7953AF57")
                 && providerText.Contains("0x79531752")
@@ -1214,7 +1258,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 orchestratorText.Contains("this.patrolReplay.AssignCapturedSubwayReplay(")
                 && orchestratorText.Contains("mobCharacter.AddWaypoint(start, false);")
                 && orchestratorText.Contains("mobCharacter.AddWaypoint(end, false);")
-                && orchestratorText.Contains("npcController.SetCapturedPatrolReplaySegments(segments, false, true);")
+                && orchestratorText.Contains("spawn.UseSpawnAsPatrolStart")
+                && orchestratorText.Contains("npcController.SetCapturedPatrolReplaySegments(")
                 && orchestratorText.Contains("npcController.State = CharacterState.Patrolling;"),
                 "Subway spawn orchestration must announce live SCFU waypoints and retain exact captured segment starts.");
             Assert.IsTrue(
@@ -1227,6 +1272,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && npcControllerText.Contains("&& this.HasCapturedPatrolReplay();")
                 && npcControllerText.Contains("&& this.Character.FightingTarget.Equals(Identity.None)")
                 && npcControllerText.Contains("segment.MoveMode == EnemyBehaviorContract.RunMoveMode")
+                && npcControllerText.Contains("capturedPatrolReplayUsesRuntimeStartOnce = useRuntimeStartOnce")
+                && npcControllerText.Contains("|| this.capturedPatrolReplayUsesRuntimeStartOnce")
+                && npcControllerText.Contains("this.capturedPatrolReplayUsesRuntimeStartOnce = false;")
                 && npcControllerText.Contains(": capturedStart")
                 && npcControllerText.Contains("capturedPatrolReplayBatchesZeroDelaySegments")
                 && npcControllerText.Contains("segment.DelayAfterSeconds > 0.0")
@@ -1234,11 +1282,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Subway replay must preserve captured starts/movement modes, batch same-time corrections, and stop when combat begins.");
 
             AssertTextBefore(
-                ExtractMethodBlock(orchestratorText, "private void SpawnCapturedSubwayMob("),
+                ExtractMethodBlock(orchestratorText, "private bool SpawnCapturedSubwayMob("),
                 "var fullUpdate = SimpleCharFullUpdate.ConstructMessage(mobCharacter);",
                 "this.activateNpc(mobCharacter);");
             AssertTextBefore(
-                ExtractMethodBlock(orchestratorText, "private void SpawnCapturedSubwayMob("),
+                ExtractMethodBlock(orchestratorText, "private bool SpawnCapturedSubwayMob("),
                 "this.activateNpc(mobCharacter);",
                 "playfield.Announce(fullUpdate);");
 
