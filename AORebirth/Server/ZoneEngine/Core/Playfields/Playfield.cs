@@ -2856,6 +2856,12 @@ namespace AORebirth.Core.Playfields
                     ? CapturedSubwayLootTable.Where(
                         x => x.Matches(target.Name, monsterData, npcFamily)).ToList()
                     : new List<CombatLootTableEntry>();
+
+            if (string.Equals(target.Name, "Thief", StringComparison.Ordinal)
+                && !CapturedSubwayHandbagMissionRuntime.HasActiveMissionPlayerInPlayfield(target))
+            {
+                matchingEntries.Clear();
+            }
             string lootSource = "captured-subway-supported";
 
             if (matchingEntries.Count == 0)

@@ -621,6 +621,11 @@ namespace ZoneEngine.Core.Controllers
 
         public bool Trade(Identity target)
         {
+            if (CapturedSubwayHandbagMissionRuntime.TryStartDialogue(this.Character, target))
+            {
+                return true;
+            }
+
             if (ContentDrivenNpcDialogueRouter.TryStartDialogue(this.Character, target))
             {
                 return true;

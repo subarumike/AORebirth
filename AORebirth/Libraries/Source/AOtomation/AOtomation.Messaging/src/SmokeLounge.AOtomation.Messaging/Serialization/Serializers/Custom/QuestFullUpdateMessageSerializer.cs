@@ -331,7 +331,15 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
 
         private static void WriteFixedString(StreamWriter writer, string value, int length)
         {
-            writer.WriteString(value ?? string.Empty, length);
+            string source = value ?? string.Empty;
+            var bytes = new byte[length];
+            int count = Math.Min(source.Length, length);
+            for (int i = 0; i < count; i++)
+            {
+                bytes[i] = (byte)source[i];
+            }
+
+            writer.WriteBytes(bytes);
         }
 
         private static int ReadX3F1Count(StreamReader reader)
