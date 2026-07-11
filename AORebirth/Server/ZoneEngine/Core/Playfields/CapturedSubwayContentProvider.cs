@@ -5,6 +5,8 @@ namespace ZoneEngine.Core.Playfields
     using System;
     using System.Collections.Generic;
 
+    using AORebirth.Core.Playfields;
+
     #endregion
 
     internal sealed class CapturedSubwayContentProvider
@@ -485,6 +487,7 @@ namespace ZoneEngine.Core.Playfields
             this.PatrolZ = patrolZ;
             this.UseSpawnAsPatrolStart = useSpawnAsPatrolStart;
             this.RespawnDelaySeconds = respawnDelaySeconds;
+            this.Combat = CapturedSubwayCombatCatalog.For(name, monsterData);
         }
 
         public int SourceInstance { get; private set; }
@@ -530,6 +533,8 @@ namespace ZoneEngine.Core.Playfields
         public bool UseSpawnAsPatrolStart { get; private set; }
 
         public double? RespawnDelaySeconds { get; private set; }
+
+        public CapturedEnemyCombatContract Combat { get; private set; }
 
         public bool HasPatrolWaypoint
         {

@@ -166,6 +166,25 @@ namespace AORebirth.Core.Playfields
             mobCharacter.Playfield = playfield;
             mobCharacter.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
             PrepareCapturedSubwayMob(mobCharacter, spawn);
+            string combatFailure;
+            bool combatReady = CapturedEnemyCombatRuntime.Prepare(
+                mobCharacter,
+                npcController,
+                spawn.Combat,
+                out combatFailure);
+            if (!combatReady)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Captured Subway combat contract incomplete sourceIdentity=SimpleChar:{0:X8} name={1} monsterData={2} reason={3}",
+                        spawn.SourceInstance,
+                        spawn.Name,
+                        spawn.MonsterData,
+                        combatFailure));
+            }
+
             AssignCapturedPatrolWaypoint(mobCharacter, spawn);
             this.AssignCapturedPatrolReplay(mobCharacter, npcController, spawn);
             mobCharacter.DoNotDoTimers = false;
@@ -173,12 +192,16 @@ namespace AORebirth.Core.Playfields
             this.activateNpc(mobCharacter);
             this.activeSpawnDefinitions[mobCharacter.Identity.Instance] = spawn;
             playfield.Announce(fullUpdate);
+            if (combatReady && spawn.Combat.AttackModel == CapturedEnemyAttackModel.EquippedWeapon)
+            {
+                WeaponItemFullUpdate.SendWeaponDefinitions(mobCharacter);
+            }
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Captured Subway mob spawned sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} name={2} monsterData={3} pos=({4},{5},{6}) health={7} level={8} runSpeed={9} section={10}",
+                    "Captured Subway mob spawned sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} name={2} monsterData={3} pos=({4},{5},{6}) health={7} level={8} runSpeed={9} section={10} combatModel={11} combatReady={12}",
                     spawn.SourceInstance,
                     mobCharacter.Identity,
                     spawn.Name,
@@ -189,7 +212,9 @@ namespace AORebirth.Core.Playfields
                     spawn.Health,
                     spawn.Level,
                     spawn.RunSpeed,
-                    spawn.ContentSection));
+                    spawn.ContentSection,
+                    spawn.Combat.AttackModel,
+                    combatReady));
 
             return true;
         }

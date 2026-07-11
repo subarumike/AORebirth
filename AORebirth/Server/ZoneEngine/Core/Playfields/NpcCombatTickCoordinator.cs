@@ -467,28 +467,28 @@ namespace AORebirth.Core.Playfields
                        };
             }
 
-            CapturedSubwayOrdinaryRuntimeDefinition capturedOrdinary;
-            if (CapturedSubwayOrdinaryRuntimeRegistry.TryGet(
+            CapturedEnemyCombatContract capturedContract;
+            if (CapturedEnemyCombatRuntimeRegistry.TryGet(
                     attacker.Identity.Instance,
-                    out capturedOrdinary)
-                && capturedOrdinary.Archetype.Combat.Observed)
+                    out capturedContract)
+                && capturedContract.IsCombatReady
+                && capturedContract.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo)
             {
-                CapturedSubwayCombatEvidenceDefinition combat = capturedOrdinary.Archetype.Combat;
                 return new CombatAttackSource
                        {
-                           MinDamage = combat.MinDamage,
-                           MaxDamage = combat.MaxDamage,
+                           MinDamage = capturedContract.MinDamage,
+                           MaxDamage = capturedContract.MaxDamage,
                            DamageBonus = 0,
                            Range = NpcCombatAttackRules.MaxMeleeCombatDistance,
-                           RechargeSeconds = combat.RechargeSeconds > 0
-                                                 ? combat.RechargeSeconds
+                           RechargeSeconds = capturedContract.RechargeSeconds > 0
+                                                 ? capturedContract.RechargeSeconds
                                                  : NpcCombatAttackRules.DefaultCombatTickSeconds,
                            UsesEquippedWeapon = false,
                            AttackInfoAmmoCount = NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
-                           AttackInfoWeaponSlot = combat.WeaponSlot,
-                           AttackInfoUnk1 = combat.AttackInfoUnknown,
+                           AttackInfoWeaponSlot = capturedContract.AttackInfoWeaponSlot,
+                           AttackInfoUnk1 = capturedContract.AttackInfoUnknown,
                            AttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType,
-                           AttackInfoWeaponInstance = combat.WeaponInstance,
+                           AttackInfoWeaponInstance = capturedContract.AttackInfoWeaponInstance,
                            SendAttackInfo = true
                        };
             }

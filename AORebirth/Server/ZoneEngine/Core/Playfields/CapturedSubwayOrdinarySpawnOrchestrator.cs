@@ -80,6 +80,26 @@ namespace AORebirth.Core.Playfields
             ApplyCapturedStats(character, spawn, archetype);
             ApplyCapturedAppearance(character, archetype);
             ApplyCapturedPath(character, controller, spawn);
+            CapturedEnemyCombatContract combatContract = CapturedSubwayCombatCatalog.ForOrdinary(archetype);
+            string combatFailure;
+            bool combatReady = CapturedEnemyCombatRuntime.Prepare(
+                character,
+                controller,
+                combatContract,
+                out combatFailure);
+            if (!combatReady)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Captured Subway ordinary combat contract incomplete sourceIdentity=SimpleChar:{0:X8} name={1} monsterData={2} reason={3}",
+                        spawn.SourceInstance,
+                        archetype.Name,
+                        archetype.MonsterData,
+                        combatFailure));
+            }
+
             character.DoNotDoTimers = false;
 
             CapturedSubwayOrdinaryRuntimeRegistry.Register(character.Identity.Instance, spawn, archetype);
@@ -91,7 +111,7 @@ namespace AORebirth.Core.Playfields
                 DebugInfoDetail.Engine,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Captured Subway ordinary spawn sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} name={2} monsterData={3} level={4} position=({5},{6},{7}) evidence={8}",
+                    "Captured Subway ordinary spawn sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} name={2} monsterData={3} level={4} position=({5},{6},{7}) evidence={8} combatModel={9} combatReady={10}",
                     spawn.SourceInstance,
                     character.Identity,
                     archetype.Name,
@@ -100,7 +120,9 @@ namespace AORebirth.Core.Playfields
                     spawn.X,
                     spawn.Y,
                     spawn.Z,
-                    spawn.EvidenceCapture));
+                    spawn.EvidenceCapture,
+                    combatContract.AttackModel,
+                    combatReady));
         }
 
         private static void ApplyCapturedStats(
