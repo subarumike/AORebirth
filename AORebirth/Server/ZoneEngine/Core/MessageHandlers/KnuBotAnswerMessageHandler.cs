@@ -41,6 +41,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Playfields;
 
     #endregion
 
@@ -62,7 +63,11 @@ namespace ZoneEngine.Core.MessageHandlers
                 messageWrapper.MessageBody.Answer,
                 messageWrapper.MessageBody.Unknown1);
 
-            if (ContentDrivenNpcDialogueRouter.TryHandleAnswer(
+            if (CapturedSubwayHandbagMissionRuntime.TryHandleAnswer(
+                    messageWrapper.Client.Controller.Character,
+                    messageWrapper.MessageBody.Target,
+                    messageWrapper.MessageBody.Answer)
+                || ContentDrivenNpcDialogueRouter.TryHandleAnswer(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody.Target,
                 messageWrapper.MessageBody.Answer))

@@ -49,6 +49,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Packets;
+    using ZoneEngine.Core.Playfields;
 
     #endregion
 
@@ -77,6 +78,7 @@ namespace ZoneEngine.Core.MessageHandlers
         public void Send(ICharacter dataProvider, ICharacter receiver)
         {
             this.Send(receiver, Filler(dataProvider));
+            CapturedSubwayHandbagMissionRuntime.TryResendActiveMission(receiver);
         }
 
         /// <summary>

@@ -47,6 +47,8 @@ namespace AORebirth.Core.Playfields
 
         private readonly CapturedSubwayOrdinarySpawnOrchestrator capturedSubwayOrdinarySpawns;
 
+        private readonly CapturedSubwayEntranceMissionSpawnOrchestrator capturedSubwayEntranceMissionSpawns;
+
         private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
 
         private readonly Dictionary<int, DateTime> corpseDespawnTicks = new Dictionary<int, DateTime>();
@@ -80,6 +82,8 @@ namespace AORebirth.Core.Playfields
                 new CapturedSubwayOrdinarySpawnOrchestrator(
                     this.capturedSubwayOrdinaryContent,
                     this.ActivateNpc);
+            this.capturedSubwayEntranceMissionSpawns =
+                new CapturedSubwayEntranceMissionSpawnOrchestrator(this.ActivateNpc);
         }
 
         internal void ActivateNpc(ICharacter character)
@@ -126,6 +130,7 @@ namespace AORebirth.Core.Playfields
             this.capturedAreteRobotSpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
             this.capturedSubwaySpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
             this.capturedSubwayOrdinarySpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
+            this.capturedSubwayEntranceMissionSpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
         }
 
         internal bool HasPendingDeadNpcDespawn(Identity identity)

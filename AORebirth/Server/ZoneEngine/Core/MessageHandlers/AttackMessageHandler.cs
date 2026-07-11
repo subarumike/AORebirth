@@ -47,6 +47,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Playfields;
 
     #endregion
 
@@ -84,7 +85,9 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            if (ContentDrivenNpcDialogueRouter.ShouldSuppressCombat(target) || IsImmuneTarget(target))
+            if (CapturedSubwayHandbagMissionRuntime.ShouldSuppressCombat(target)
+                || ContentDrivenNpcDialogueRouter.ShouldSuppressCombat(target)
+                || IsImmuneTarget(target))
             {
                 this.CancelPlayerAttack(character);
                 this.SendAttackState(character, Identity.None, 0);

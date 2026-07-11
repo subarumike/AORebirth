@@ -38,6 +38,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Playfields;
+
     #endregion
 
     /// <summary>
@@ -53,6 +55,11 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         protected override void Read(KnuBotTradeMessage message, IZoneClient client)
         {
+            if (CapturedSubwayHandbagMissionRuntime.TryHandleTradeOffer(client.Controller.Character, message))
+            {
+                return;
+            }
+
             InventoryContainerRuntimeService.Default.HandleKnuBotTradeItemRemove(client, message);
 
             // client.Character.Knubot.

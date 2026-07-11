@@ -67,6 +67,19 @@ namespace ZoneEngine.Core.Packets
         private const int SubwayThiefMonsterData = 26092;
         private const string SubwayThiefName = "Thief";
         private const uint CapturedSubwayThiefAppearanceValue = 1576;
+        private const int MontroyalPlayfieldResource = 655;
+        private const int NataliaMonsterData = 26076;
+        private const string NataliaName = "Natalia Akcora";
+        private const uint CapturedNataliaAppearanceValue = 1832;
+
+        private static readonly byte[] CapturedNataliaUnknown1 =
+            new byte[]
+                {
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x01,
+                    0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
+                    0x00, 0x02, 0x00, 0x00
+                };
 
         private static readonly byte[] CapturedSubwayFilthFleaExtendedTextureOverrideData =
             new byte[]
@@ -256,6 +269,7 @@ namespace ZoneEngine.Core.Packets
 
             scfu.Version = 57; // SCFU packet version (57/0x39)
             if (IsCapturedSubwayThief(charPlayfield, monsterData, charName)
+                || IsCapturedNatalia(charPlayfield, monsterData, charName)
                 || (charPlayfield == SubwayPlayfieldResource
                     && character.Waypoints != null
                     && character.Waypoints.Count > 1))
@@ -299,6 +313,11 @@ namespace ZoneEngine.Core.Packets
             if (IsCapturedSubwayThief(charPlayfield, monsterData, charName))
             {
                 scfu.Appearance.Value = CapturedSubwayThiefAppearanceValue;
+            }
+
+            if (IsCapturedNatalia(charPlayfield, monsterData, charName))
+            {
+                scfu.Appearance.Value = CapturedNataliaAppearanceValue;
             }
 
             // Name
@@ -398,6 +417,13 @@ namespace ZoneEngine.Core.Packets
                 scfu.Unknown1 = character.Waypoints != null && character.Waypoints.Count > 1
                                     ? CapturedSubwayThiefUnknown1
                                     : CapturedSubwayStationaryThiefUnknown1;
+                scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6 | SimpleCharFullUpdateFlags.IsPet;
+                scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
+            }
+
+            if (IsCapturedNatalia(charPlayfield, monsterData, charName))
+            {
+                scfu.Unknown1 = CapturedNataliaUnknown1;
                 scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6 | SimpleCharFullUpdateFlags.IsPet;
                 scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
             }
@@ -551,6 +577,13 @@ namespace ZoneEngine.Core.Packets
             return playfieldInstance == SubwayPlayfieldResource
                 && monsterData == SubwayThiefMonsterData
                 && string.Equals(name, SubwayThiefName, StringComparison.Ordinal);
+        }
+
+        private static bool IsCapturedNatalia(int playfieldInstance, int monsterData, string name)
+        {
+            return playfieldInstance == MontroyalPlayfieldResource
+                && monsterData == NataliaMonsterData
+                && string.Equals(name, NataliaName, StringComparison.Ordinal);
         }
 
         /// <summary>
