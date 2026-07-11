@@ -10,6 +10,6 @@ int main()
         return 1;
     }
 
-    std::printf("AORoomSpaceFix self-test passed: profiles=2 callsites=1 wrapper=86.\n");
+    std::printf("AORoomSpaceFix self-test passed: profiles=2 callsites=4 wrapper=86.\n");
     return 0;
 }

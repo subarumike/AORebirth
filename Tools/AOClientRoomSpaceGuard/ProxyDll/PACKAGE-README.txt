@@ -5,8 +5,6 @@ This package prevents the repeatable Anarchy Online E06D7363 RoomSpace crash.
 It does not replace or modify AnarchyOnline.exe, N3.dll, XML, resources, or
 shortcuts. The installed version.dll is loaded by AO's normal dependency chain
 and applies the repair only in process memory.
-This build patches only the observed crashing RoomSpace callsite for the
-approved client hash instead of touching the other audited collision callsites.
 
 INSTALL
 -------
