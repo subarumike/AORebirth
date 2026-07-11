@@ -12,6 +12,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   4. Add vendors, quest interactions, remaining polish, and capture parity validation.
 - Subway content binding uses resource/playfield `127`; live runtime instance ids such as `R=1187842` and capture/runtime output such as `Playfield2:122002` must not be used as the server content binding key.
 - Subway content work should use completed AOSharpLiveCapture folders supplied by Mike. Codex does not launch the AO client or capture tooling unless Mike explicitly instructs it in the current task.
+- AOSharpLiveCapture one-pass quest coverage now preserves every decoded N3 message recursively without truncating nested fields or arrays, captures all readable player stats at start/stop/zoning and five-second intervals, and emits a quest coverage manifest. This is the required path for one-off quest lines that cannot be replayed without creating another character.
 - Prefer visible Subway gameplay improvements over architectural refactoring, implement incrementally within playfield `127`, and do not resume Playfield decomposition unless Mike explicitly requests it.
 - Live AO captures are authoritative. Avoid speculative fixes and require capture-backed evidence for Subway behavior.
 - Playfield runtime decomposition has completed through the latest extracted runtime services and is now maintenance work, not the active development focus.

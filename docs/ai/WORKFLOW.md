@@ -177,6 +177,17 @@ If the wrapper fails, run at most one targeted failure-log inspection command, s
 cmd /d /c findstr /C:"ERROR:" tools-temp\AOSharpLiveInjector\bin\Debug\AOSharpLiveInjector-start.log
 ```
 
+### One-Pass Quest Capture
+
+One-off missions must be captured as a complete quest line because replaying them can require a new character.
+
+- Start the capture before the first conversation or mission interaction.
+- Continue through acceptance, every objective, combat/loot, every zone transition, return dialogue, item turn-in, completion, and reward delivery.
+- Stop only after the final reward/stat messages have arrived. No extra manual snapshot or marker commands are required.
+- The capture automatically writes every raw packet to `packets.hex.log`, every decoded N3 message with complete nested fields and arrays to `decoded-messages.jsonl`, and full player-stat baselines/boundaries/five-second samples to `player-stat-snapshots.csv`.
+- `quest-capture-coverage.json` reports message-family counts and warns which common quest families were not observed. Missing families are review warnings because not every quest uses trade, combat, or zoning.
+- Dialogue, NPC interactions, inventory changes, enemy full updates, combat attribution, movement, and zoning evidence remain in their specialized outputs. Analyze the supplied completed folder immediately; do not ask Mike to repeat post-capture collection steps.
+
 ## Live Client Behavior Bugs
 
 For AORebirth bugs involving current AO client behavior, packet flow, UI actions, item movement, inventory, bank, backpacks, shops, trade, missions, NPC interactions, pets, combat actions, or other client/server behavior:
