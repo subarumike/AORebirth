@@ -210,10 +210,12 @@ namespace AORebirth.Core.Playfields
                         return;
                     }
 
-                    var start = new AORebirth.Core.Vector.Vector3(
-                        segments[0].StartX,
-                        segments[0].StartY,
-                        segments[0].StartZ);
+                    var start = spawn.UseSpawnAsPatrolStart
+                                    ? new AORebirth.Core.Vector.Vector3(spawn.X, spawn.Y, spawn.Z)
+                                    : new AORebirth.Core.Vector.Vector3(
+                                        segments[0].StartX,
+                                        segments[0].StartY,
+                                        segments[0].StartZ);
                     var end = new AORebirth.Core.Vector.Vector3(
                         segments[0].EndX,
                         segments[0].EndY,
@@ -222,7 +224,11 @@ namespace AORebirth.Core.Playfields
                     mobCharacter.Waypoints.Clear();
                     mobCharacter.AddWaypoint(start, false);
                     mobCharacter.AddWaypoint(end, false);
-                    npcController.SetCapturedPatrolReplaySegments(segments, false, true);
+                    npcController.SetCapturedPatrolReplaySegments(
+                        segments,
+                        false,
+                        true,
+                        spawn.UseSpawnAsPatrolStart);
                 });
 
             if (replaySegmentCount > 0)
