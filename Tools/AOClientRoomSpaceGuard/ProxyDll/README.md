@@ -11,12 +11,13 @@ real DLL under the 32-bit Windows system directory. A deferred worker then:
 1. waits for `N3.dll` outside loader lock;
 2. hashes the exact file backing the loaded module;
 3. selects only the approved new-client or old-client profile;
-4. verifies all four original calls still target the expected `PosToRoom` RVA;
-5. emits the same proven x86 checked-cast/negative-cell wrapper as the external
-   `AOClientRoomSpaceGuard`;
+4. verifies the observed crashing callsite still targets the expected
+   `PosToRoom` RVA;
+5. emits the proven x86 checked-cast/negative-cell wrapper from the external
+   `AOClientRoomSpaceGuard` for that callsite only;
 6. requires repeated stable thread snapshots and aborts if any client thread
    cannot be opened, suspended, or completely enumerated;
-7. applies and verifies all four calls as one transaction, requires every
+7. applies and verifies that call as one transaction, requires every
    instruction-cache flush, and verifies page-protection restoration and thread
    resumption before reporting readiness;
 8. verifies rollback before freeing the wrapper and retains that allocation if
@@ -46,9 +47,8 @@ The build never launches AO and never installs into a client directory.
 
 The packaged install/uninstall path has been smoke-tested against isolated copies of both
 approved clients, including exact-name activation, ownership/hash verification, idempotent
-install, and same-handle uninstall. The old live client at `D:\Funcom\Anarchy Online` has
-the verified package installed without changing its EXE or `N3.dll`. AO was not launched;
-normal-shortcut in-game stability and the runtime `PATCH PASS` log remain the next smoke.
+install, and same-handle uninstall. Runtime smoke remains required after every proxy
+repair because the installed DLL runs inside the AO client process.
 
 ## Installation
 

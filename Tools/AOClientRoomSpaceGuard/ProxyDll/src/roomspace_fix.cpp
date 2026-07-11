@@ -17,7 +17,7 @@ namespace aorf
 {
     namespace
     {
-        constexpr size_t CallsiteCount = 4;
+        constexpr size_t CallsiteCount = 1;
         constexpr size_t WrapperSize = 86;
 
         struct PatchProfile
@@ -38,7 +38,7 @@ namespace aorf
             {
                 "new-client",
                 "E242F4855DE93094161B619047CD838B6A3261BB53A5EB17065F60EDA5239168",
-                { 0x157BC, 0x16144, 0x168E2, 0x168F6 },
+                { 0x16144 },
                 0xE095,
                 0x3AAEA,
                 0x5F894,
@@ -49,7 +49,7 @@ namespace aorf
             {
                 "old-client",
                 "8C019EFD72D547879A06585B69147AB1546B9617A2FCE090E5863791AEC8B0BB",
-                { 0x13F2E, 0x148B6, 0x15054, 0x15068 },
+                { 0x148B6 },
                 0xC8AA,
                 0x3894A,
                 0x5B80C,
@@ -765,15 +765,11 @@ namespace aorf
         if (protectionsRestored && threadsResumed)
         {
             Log(
-                "PATCH PASS profile=%s sha256=%s wrapper=0x%08lX "
-                "callRvas=0x%X,0x%X,0x%X,0x%X",
+                "PATCH PASS profile=%s sha256=%s wrapper=0x%08lX callRva=0x%X",
                 profile->name,
                 hash.c_str(),
                 static_cast<unsigned long>(wrapperAddress),
-                profile->collisionCallRvas[0],
-                profile->collisionCallRvas[1],
-                profile->collisionCallRvas[2],
-                profile->collisionCallRvas[3]);
+                profile->collisionCallRvas[0]);
         }
         else
         {
