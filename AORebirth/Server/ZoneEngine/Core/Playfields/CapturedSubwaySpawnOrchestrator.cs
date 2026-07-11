@@ -3,7 +3,9 @@ namespace AORebirth.Core.Playfields
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.NPCHandler;
@@ -37,6 +39,12 @@ namespace AORebirth.Core.Playfields
 
         private readonly Action<ICharacter> activateNpc;
 
+        private readonly Dictionary<int, CapturedSubwaySpawnDefinition> activeSpawnDefinitions =
+            new Dictionary<int, CapturedSubwaySpawnDefinition>();
+
+        private readonly Dictionary<int, CapturedSubwayRespawnState> pendingRespawns =
+            new Dictionary<int, CapturedSubwayRespawnState>();
+
         internal CapturedSubwaySpawnOrchestrator(
             CapturedSubwayContentProvider capturedSubwayContent,
             NpcPatrolReplayCoordinator patrolReplay,
@@ -61,7 +69,74 @@ namespace AORebirth.Core.Playfields
             }
         }
 
-        private void SpawnCapturedSubwayMob(
+        internal void ScheduleRespawnAfterDespawn(ICharacter target, DateTime despawnedAtUtc)
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            CapturedSubwaySpawnDefinition spawn;
+            if (!this.activeSpawnDefinitions.TryGetValue(target.Identity.Instance, out spawn))
+            {
+                return;
+            }
+
+            this.activeSpawnDefinitions.Remove(target.Identity.Instance);
+            if (!spawn.HasRespawnDelay)
+            {
+                return;
+            }
+
+            DateTime dueAtUtc = despawnedAtUtc.AddSeconds(spawn.RespawnDelaySeconds.Value);
+            this.pendingRespawns[spawn.SourceInstance] =
+                new CapturedSubwayRespawnState(spawn, dueAtUtc);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Captured Subway respawn scheduled sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} name={2} dueAtUtc={3:o}",
+                    spawn.SourceInstance,
+                    target.Identity,
+                    spawn.Name,
+                    dueAtUtc));
+        }
+
+        internal void ProcessDueRespawns(Playfield playfield, Identity playfieldIdentity, DateTime utcNow)
+        {
+            if (playfieldIdentity.Instance != CapturedSubwayContentProvider.SubwayPlayfieldInstance)
+            {
+                return;
+            }
+
+            foreach (CapturedSubwayRespawnState state in this.pendingRespawns
+                .Where(x => x.Value.DueAtUtc <= utcNow)
+                .Select(x => x.Value)
+                .ToArray())
+            {
+                this.pendingRespawns.Remove(state.Spawn.SourceInstance);
+                if (this.SpawnCapturedSubwayMob(playfield, playfieldIdentity, state.Spawn))
+                {
+                    continue;
+                }
+
+                DateTime retryAtUtc = utcNow.AddSeconds(5.0);
+                this.pendingRespawns[state.Spawn.SourceInstance] =
+                    new CapturedSubwayRespawnState(state.Spawn, retryAtUtc);
+
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Captured Subway respawn retry scheduled sourceIdentity=SimpleChar:{0:X8} name={1} retryAtUtc={2:o}",
+                        state.Spawn.SourceInstance,
+                        state.Spawn.Name,
+                        retryAtUtc));
+            }
+        }
+
+        private bool SpawnCapturedSubwayMob(
             Playfield playfield,
             Identity playfieldIdentity,
             CapturedSubwaySpawnDefinition spawn)
@@ -84,7 +159,7 @@ namespace AORebirth.Core.Playfields
                         "Captured Subway spawn failed sourceIdentity=SimpleChar:{0:X8} name={1}",
                         spawn.SourceInstance,
                         spawn.Name));
-                return;
+                return false;
             }
 
             mobCharacter.Name = spawn.Name;
@@ -96,6 +171,7 @@ namespace AORebirth.Core.Playfields
             mobCharacter.DoNotDoTimers = false;
             var fullUpdate = SimpleCharFullUpdate.ConstructMessage(mobCharacter);
             this.activateNpc(mobCharacter);
+            this.activeSpawnDefinitions[mobCharacter.Identity.Instance] = spawn;
             playfield.Announce(fullUpdate);
 
             LogUtil.Debug(
@@ -114,6 +190,8 @@ namespace AORebirth.Core.Playfields
                     spawn.Level,
                     spawn.RunSpeed,
                     spawn.ContentSection));
+
+            return true;
         }
 
         private void AssignCapturedPatrolReplay(
@@ -268,6 +346,19 @@ namespace AORebirth.Core.Playfields
         {
             mobCharacter.Stats[stat].Value = value;
             mobCharacter.Stats[stat].BaseValue = (uint)value;
+        }
+
+        private sealed class CapturedSubwayRespawnState
+        {
+            public CapturedSubwayRespawnState(CapturedSubwaySpawnDefinition spawn, DateTime dueAtUtc)
+            {
+                this.Spawn = spawn;
+                this.DueAtUtc = dueAtUtc;
+            }
+
+            public CapturedSubwaySpawnDefinition Spawn { get; private set; }
+
+            public DateTime DueAtUtc { get; private set; }
         }
     }
 }

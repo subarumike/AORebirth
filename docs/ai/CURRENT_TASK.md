@@ -84,6 +84,7 @@ is live-confirmed level 1 client behavior, not an AORebirth combat regression.
 - Mike reports `20260709-222339` completes the remaining live Subway traversal. The capture includes Abmouth Supremus, Eumenides, Vergil Aeneid, Bitaxel, Bloodcreeper, Empty Shell, Fragmented Soul, Incomplete Rebuild, Melded Patterns, Molested Molecules, Premature Pattern, and Redundant Scan evidence; these remain evidence-only until their bounded boss/archetype contracts are implemented.
 - Def-Agg level 1 combat hint has been closed as live-confirmed behavior, not a regression.
 - Generic unarmed NPC attacks without captured or equipped weapon context no longer emit `AttackInfo`. This removes the client-generated `nanobots / unknown damage` combat text while preserving health changes and capture-backed/equipped attack packets.
+- First-room Thief behavior is restored as an isolated capture-backed slice: the existing Thief spawn/visual now has a 60-second respawn after despawn and drops QL1 Stolen Handbag (`297055/297055`) from corpse loot. Thief patrol replay/movement and the handbag mission chain remain deferred.
 
 ## Regression Risks Only
 

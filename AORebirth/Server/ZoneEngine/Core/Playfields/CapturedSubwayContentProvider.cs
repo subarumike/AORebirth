@@ -96,7 +96,7 @@ namespace ZoneEngine.Core.Playfields
             CapturedSurveySpawn(Mugger(0x7953AD6B, 10, 182, 264.127747f, 103.19651f, 163.2112f, 95, 36)),
             CapturedSurveySpawn(Mugger(0x795450D4, 5, 92, 167.8636f, 109.104828f, 255.636658f, 93, 20)),
             CapturedSurveySpawn(Mugger(0x795451FE, 10, 182, 228.215637f, 107.6164f, 163.445328f, 95, 36)),
-            CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20)),
+            CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20, respawnDelaySeconds: 60.0)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AA4A, 10, 182, 198.0572f, 108.416405f, 191.596924f, 95, 27)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AD40, 6, 110, 148.6321f, 107.6164f, 189.491272f, 93, 18)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AD48, 7, 128, 190.403168f, 107.6164f, 164.9011f, 94, 20)),
@@ -204,6 +204,21 @@ namespace ZoneEngine.Core.Playfields
             var result = new CapturedSubwayPatrolReplaySegment[segments.Length];
             Array.Copy(segments, result, segments.Length);
             return result;
+        }
+
+        public CapturedSubwayLootDefinition[] GetLootDefinitions()
+        {
+            return new[]
+            {
+                new CapturedSubwayLootDefinition(
+                    "Thief",
+                    26092,
+                    138,
+                    297055,
+                    297055,
+                    1,
+                    10000)
+            };
         }
 
         private static CapturedSubwaySpawnDefinition FirstLowerSectionSpawn(
@@ -346,7 +361,8 @@ namespace ZoneEngine.Core.Playfields
             int runSpeed = 20,
             float? patrolX = null,
             float? patrolY = null,
-            float? patrolZ = null)
+            float? patrolZ = null,
+            double? respawnDelaySeconds = null)
         {
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
@@ -367,7 +383,8 @@ namespace ZoneEngine.Core.Playfields
                 z,
                 patrolX,
                 patrolY,
-                patrolZ);
+                patrolZ,
+                respawnDelaySeconds);
         }
 
         private static CapturedSubwaySpawnDefinition ViolentVagabond(
@@ -421,7 +438,8 @@ namespace ZoneEngine.Core.Playfields
             float z,
             float? patrolX = null,
             float? patrolY = null,
-            float? patrolZ = null)
+            float? patrolZ = null,
+            double? respawnDelaySeconds = null)
         {
             this.SourceInstance = sourceInstance;
             this.ContentSection = "CapturedPopulation";
@@ -443,6 +461,7 @@ namespace ZoneEngine.Core.Playfields
             this.PatrolX = patrolX;
             this.PatrolY = patrolY;
             this.PatrolZ = patrolZ;
+            this.RespawnDelaySeconds = respawnDelaySeconds;
         }
 
         public int SourceInstance { get; private set; }
@@ -485,6 +504,8 @@ namespace ZoneEngine.Core.Playfields
 
         public float? PatrolZ { get; private set; }
 
+        public double? RespawnDelaySeconds { get; private set; }
+
         public bool HasPatrolWaypoint
         {
             get
@@ -492,6 +513,49 @@ namespace ZoneEngine.Core.Playfields
                 return this.PatrolX.HasValue && this.PatrolY.HasValue && this.PatrolZ.HasValue;
             }
         }
+
+        public bool HasRespawnDelay
+        {
+            get
+            {
+                return this.RespawnDelaySeconds.HasValue && this.RespawnDelaySeconds.Value > 0.0;
+            }
+        }
+    }
+
+    internal sealed class CapturedSubwayLootDefinition
+    {
+        public CapturedSubwayLootDefinition(
+            string exactName,
+            int monsterData,
+            int npcFamily,
+            int lowId,
+            int highId,
+            int quality,
+            int observedBasisPoints)
+        {
+            this.ExactName = exactName;
+            this.MonsterData = monsterData;
+            this.NpcFamily = npcFamily;
+            this.LowId = lowId;
+            this.HighId = highId;
+            this.Quality = quality;
+            this.ObservedBasisPoints = observedBasisPoints;
+        }
+
+        public string ExactName { get; private set; }
+
+        public int MonsterData { get; private set; }
+
+        public int NpcFamily { get; private set; }
+
+        public int LowId { get; private set; }
+
+        public int HighId { get; private set; }
+
+        public int Quality { get; private set; }
+
+        public int ObservedBasisPoints { get; private set; }
     }
 
     internal sealed class CapturedSubwayPatrolReplaySegment
