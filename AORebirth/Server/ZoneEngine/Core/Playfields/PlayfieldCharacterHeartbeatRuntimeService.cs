@@ -37,9 +37,17 @@ namespace ZoneEngine.Core.Playfields
                 && nanoDelta != 0
                 && nanoInterval.LastTick < DateTime.UtcNow)
             {
-                dynel.Stats[StatIds.currentnano].Value += nanoDelta;
+                int maxNanoEnergy;
+                if (TryReadMaxNanoEnergy(dynel, out maxNanoEnergy))
+                {
+                    dynel.Stats[StatIds.currentnano].Value =
+                        Math.Min(
+                            maxNanoEnergy,
+                            dynel.Stats[StatIds.currentnano].Value + nanoDelta);
+                    changed = true;
+                }
+
                 nanoInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(nanoIntervalSeconds);
-                changed = true;
             }
 
             if (changed)
@@ -73,6 +81,22 @@ namespace ZoneEngine.Core.Playfields
             if (callback == null)
             {
                 throw new ArgumentNullException(name);
+            }
+        }
+
+        private static bool TryReadMaxNanoEnergy(ICharacter dynel, out int maxNanoEnergy)
+        {
+            try
+            {
+                maxNanoEnergy = dynel.Stats[StatIds.maxnanoenergy].Value;
+                return true;
+            }
+            catch (IndexOutOfRangeException)
+            {
+                // Template-free captured NPCs can lack the profession/breed inputs
+                // required by the derived max-nano stat. They do not regenerate nano.
+                maxNanoEnergy = 0;
+                return false;
             }
         }
     }
