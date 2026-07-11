@@ -1,0 +1,65 @@
+import struct
+import io
+
+cap = bytes.fromhex(
+    open(
+        r"c:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260710-185528\packets.hex.log",
+        encoding="utf-8",
+    )
+    .readlines()[9]
+    .split("hex=")[1]
+    .strip()
+)[31:]
+
+s = io.BytesIO()
+p = lambda f, v: s.write(struct.pack(f, v))
+s.write(bytes([0x07, 0xE2, 0, 0]))
+p(">H", 53167)
+p(">i", 125746)
+p(">i", 4)
+p(">i", 2)
+mid = bytes(
+    [
+        0x00, 0x00, 0x00, 0x00, 0x02, 0xD0, 0x00, 0x00, 0x05, 0xD0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x02, 0xA0, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+        0x00, 0x00, 0x00,
+    ]
+)
+s.write(mid)
+p("<i", 9)
+s.write(b"MT09\x00\x00\x00\x00\x00")
+p("<i", -1073741824)
+tail = bytes(
+    [
+        0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xB1, 0xAD, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00,
+        0x83, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x51, 0x03, 0x00, 0x00,
+        0x51, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    ]
+)
+s.write(tail)
+p("<H", 0xC350)
+p("<i", 0x6828FE35)
+p("<H", 0)
+p("<H", 0xC350)
+p("<i", 0x6828FE35)
+p("<H", 0)
+name = b"Calling of Belamorte"
+p("<i", len(name))
+s.write(name)
+s.write(b"\x00" * ((4 - len(name) % 4) % 4))
+b = s.getvalue()
+
+out = open(r"c:\Users\nermi\source\repos\AORebirth\tools-temp\compare_out.txt", "w")
+out.write(f"built {len(b)} cap {len(cap)}\n")
+for i in range(max(len(b), len(cap))):
+    cb = cap[i] if i < len(cap) else -1
+    bb = b[i] if i < len(b) else -1
+    if cb != bb:
+        out.write(f"diff {i} {bb} {cb}\n")
+        out.write(f"b {b[max(0,i-4):i+12].hex()}\n")
+        out.write(f"c {cap[max(0,i-4):i+12].hex()}\n")
+        break
+else:
+    out.write("MATCH\n")
+out.close()

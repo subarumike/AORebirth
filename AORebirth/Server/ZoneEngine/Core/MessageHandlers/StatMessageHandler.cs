@@ -214,6 +214,16 @@ namespace ZoneEngine.Core.MessageHandlers
             this.Send(character, this.Filler(character, statId, statValue));
         }
 
+        public void AnnounceSingle(ICharacter character, int statId, uint statValue)
+        {
+            if (statId == (int)StatIds.cash)
+            {
+                statValue = CashStatRules.Normalize(character);
+            }
+
+            this.Send(character, this.Filler(character, statId, statValue), true);
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="character">
