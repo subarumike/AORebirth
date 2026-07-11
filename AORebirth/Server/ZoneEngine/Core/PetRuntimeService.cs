@@ -48,6 +48,12 @@ namespace ZoneEngine.Core
         private readonly ConcurrentDictionary<PetSlotKey, PendingPetRestore> pendingRestoreBySlot =
             new ConcurrentDictionary<PetSlotKey, PendingPetRestore>();
 
+        private readonly ConcurrentDictionary<int, DateTime> nextPetHealthRegenUtc =
+            new ConcurrentDictionary<int, DateTime>();
+
+        private readonly ConcurrentDictionary<int, DateTime> nextPetNanoRegenUtc =
+            new ConcurrentDictionary<int, DateTime>();
+
         private PetRuntimeService()
         {
         }
@@ -55,6 +61,18 @@ namespace ZoneEngine.Core
         public static PetRuntimeService Default
         {
             get { return DefaultInstance; }
+        }
+
+        public bool HasLivingAttackPet(ICharacter owner)
+        {
+            ICharacter attackPet = this.GetActivePetInStrain(owner, PetSlotClassifier.RegularPetStrain);
+            return attackPet != null && attackPet.Stats[StatIds.health].Value > 0;
+        }
+
+        public bool HasLivingHealingPet(ICharacter owner)
+        {
+            ICharacter healPet = this.GetActivePetInStrain(owner, PetSlotClassifier.HealingPetStrain);
+            return healPet != null && healPet.Stats[StatIds.health].Value > 0;
         }
 
         public bool SummonPet(
@@ -105,8 +123,23 @@ namespace ZoneEngine.Core
                     mobTemplate.MonsterData,
                     mobTemplate.NPCFamily));
 
+            if (petSlotStrain == PetSlotClassifier.RegularPetStrain && this.HasLivingAttackPet(owner))
+            {
+                ChatTextMessageHandler.Default.Send(owner, "You can have just 1 Attack Pet.");
+                return false;
+            }
+
+            if (petSlotStrain == PetSlotClassifier.HealingPetStrain && this.HasLivingHealingPet(owner))
+            {
+                ChatTextMessageHandler.Default.Send(owner, "You can have just 1 Heal Pet.");
+                return false;
+            }
+
             this.PurgeOrphanPetMobsForOwner(owner);
-            this.DismissPetByStrain(owner, petSlotStrain, true);
+            bool preservePendingRestore = this.HasPendingRestoreForStrain(
+                owner.Identity.Instance,
+                petSlotStrain);
+            this.DismissPetByStrain(owner, petSlotStrain, !preservePendingRestore);
 
             Coordinate ownerCoord = owner.Coordinates();
             var spawnCoord = new Coordinate(
@@ -115,7 +148,10 @@ namespace ZoneEngine.Core
                 ownerCoord.z + 1.5f);
 
             var controller = new NPCController();
-            int spawnLevel = owner.Stats[StatIds.level].Value;
+            int resolvedPetTypeId = petTypeId > 0 ? petTypeId : 1;
+            int spawnLevel = petSlotStrain == PetSlotClassifier.RegularPetStrain && resolvedPetTypeId > 0
+                ? resolvedPetTypeId
+                : owner.Stats[StatIds.level].Value;
             Character petCharacter = NonPlayerCharacterHandler.SpawnMobFromTemplate(
                 mobHash,
                 owner.Playfield.Identity,
@@ -130,11 +166,11 @@ namespace ZoneEngine.Core
                 return false;
             }
 
-            int resolvedPetTypeId = petTypeId > 0 ? petTypeId : 1;
-
             petCharacter.Playfield = owner.Playfield;
             this.FinalizePetCharacter(petCharacter);
-            this.ApplyHealingPetNanoPool(petCharacter, petSlotStrain);
+            this.ApplyAttackPetCombatProfile(petCharacter, petHash, resolvedPetTypeId, mobTemplate);
+            this.ApplyHealingPetNanoPool(petCharacter, petSlotStrain, petHash);
+            this.ApplyRestoredPetCombatStats(owner, petCharacter, petSlotStrain);
             petCharacter.Stats[StatIds.petmaster].Value = owner.Identity.Instance;
             petCharacter.Stats[StatIds.pettype].Value = resolvedPetTypeId;
             petCharacter.Stats[StatIds.petstate].Value = PetSlotClassifier.CapturedPetStateValue;
@@ -165,10 +201,11 @@ namespace ZoneEngine.Core
 
             if (summonNanoId > 0 && petSlotStrain == PetSlotClassifier.HealingPetStrain)
             {
-                PetSummonCaptureWireReplayer.SendBelamorteScfuToOwner(
+                PetSummonCaptureWireReplayer.SendHealingPetScfuToOwner(
                     ownerClient,
                     owner,
-                    petCharacter);
+                    petCharacter,
+                    petHash);
                 this.SendPetStatToOwner(
                     ownerClient,
                     petCharacter.Identity,
@@ -187,6 +224,7 @@ namespace ZoneEngine.Core
                     summonNanoId,
                     petHash,
                     petTypeId);
+                this.SendPetCombatStatSyncToOwner(ownerClient, petCharacter, petSlotStrain);
             }
             else
             {
@@ -218,6 +256,8 @@ namespace ZoneEngine.Core
                         petCharacter.Identity,
                         petSlotStrain);
                 }
+
+                this.SendPetCombatStatSyncToOwner(ownerClient, petCharacter, petSlotStrain);
 
                 Coordinate petCoord = petCharacter.Coordinates();
                 ownerClient.SendCompressed(
@@ -319,16 +359,27 @@ namespace ZoneEngine.Core
                 }
 
                 pendingRestore.ShouldRestore = true;
+
+                ICharacter activePet = this.GetActivePetInStrain(owner, entry.Key.Strain);
+                if (activePet != null && activePet.Stats[StatIds.health].Value > 0)
+                {
+                    pendingRestore.SavedHealth = activePet.Stats[StatIds.health].Value;
+                    pendingRestore.SavedCurrentNano = activePet.Stats[StatIds.currentnano].Value;
+                    pendingRestore.HasSavedCombatStats = true;
+                }
+
                 this.pendingRestoreBySlot[entry.Key] = pendingRestore;
 
                 LogUtil.Debug(
                     DebugInfoDetail.GameFunctions,
                     string.Format(
-                        "StashPet owner={0} hash={1} type={2} strain={3}",
+                        "StashPet owner={0} hash={1} type={2} strain={3} hp={4} np={5}",
                         owner.Identity,
                         pendingRestore.PetHash,
                         pendingRestore.PetTypeId,
-                        pendingRestore.PetSlotStrain));
+                        pendingRestore.PetSlotStrain,
+                        pendingRestore.HasSavedCombatStats ? pendingRestore.SavedHealth : -1,
+                        pendingRestore.HasSavedCombatStats ? pendingRestore.SavedCurrentNano : -1));
             }
 
             this.PurgeOrphanPetMobsForOwner(owner);
@@ -775,19 +826,123 @@ namespace ZoneEngine.Core
             petCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.health, maxLife);
         }
 
-        private void ApplyHealingPetNanoPool(Character petCharacter, int petSlotStrain)
+        private void ApplyHealingPetNanoPool(Character petCharacter, int petSlotStrain, string petHash)
         {
             if (petSlotStrain != PetSlotClassifier.HealingPetStrain)
             {
                 return;
             }
 
+            int currentNano;
+            int maxNano;
+            if (!PetHealNanoCatalog.TryGetHealingPetNanoPool(petHash, out currentNano, out maxNano))
+            {
+                currentNano = PetCombatRules.HealingPetCapturedCurrentNano;
+                maxNano = PetCombatRules.HealingPetCapturedMaxNano;
+            }
+
             petCharacter.Stats.SetBaseValueWithoutTriggering(
                 (int)StatIds.currentnano,
-                (uint)PetCombatRules.HealingPetCapturedCurrentNano);
+                (uint)currentNano);
+            petCharacter.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.maxnanoenergy,
+                (uint)maxNano);
         }
 
-        private void SendPetStatToOwner(
+        private void ApplyAttackPetCombatProfile(
+            Character petCharacter,
+            string petHash,
+            int petTypeId,
+            DBMobTemplate mobTemplate)
+        {
+            if (petCharacter == null || mobTemplate == null)
+            {
+                return;
+            }
+
+            PetAttackPetCombatCatalog.Profile combatProfile;
+            if (!PetAttackPetCombatCatalog.TryGet(petHash, out combatProfile))
+            {
+                return;
+            }
+
+            petCharacter.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.mindamage,
+                (uint)combatProfile.MinDamage);
+            petCharacter.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.maxdamage,
+                (uint)combatProfile.MaxDamage);
+
+            if (petTypeId > 0)
+            {
+                int petLevel = Math.Max(
+                    mobTemplate.MinLvl,
+                    Math.Min(petTypeId, mobTemplate.MaxLvl));
+                petCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.level, (uint)petLevel);
+            }
+
+            uint maxLife = (uint)Math.Max(1, mobTemplate.Health);
+            petCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.life, maxLife);
+            petCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.health, maxLife);
+        }
+
+        private void ApplyRestoredPetCombatStats(ICharacter owner, Character petCharacter, int petSlotStrain)
+        {
+            if (owner == null || petCharacter == null)
+            {
+                return;
+            }
+
+            PendingPetRestore pendingRestore;
+            if (!this.pendingRestoreBySlot.TryGetValue(
+                new PetSlotKey(owner.Identity.Instance, petSlotStrain),
+                out pendingRestore)
+                || !pendingRestore.HasSavedCombatStats)
+            {
+                return;
+            }
+
+            int maxLife = Math.Max(1, petCharacter.Stats[StatIds.life].Value);
+            int restoredHealth = Math.Max(0, Math.Min(pendingRestore.SavedHealth, maxLife));
+            petCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.health, (uint)restoredHealth);
+
+            if (petSlotStrain == PetSlotClassifier.HealingPetStrain)
+            {
+                int restoredNano = Math.Max(0, pendingRestore.SavedCurrentNano);
+                petCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.currentnano, (uint)restoredNano);
+            }
+
+            pendingRestore.HasSavedCombatStats = false;
+            this.pendingRestoreBySlot[new PetSlotKey(owner.Identity.Instance, petSlotStrain)] = pendingRestore;
+        }
+
+        private void SendPetCombatStatSyncToOwner(
+            ZoneClient ownerClient,
+            Character petCharacter,
+            int petSlotStrain)
+        {
+            if (ownerClient == null || petCharacter == null)
+            {
+                return;
+            }
+
+            this.SendPetStatToOwner(
+                ownerClient,
+                petCharacter.Identity,
+                StatIds.health,
+                (uint)Math.Max(0, petCharacter.Stats[StatIds.health].Value));
+
+            if (petSlotStrain == PetSlotClassifier.HealingPetStrain)
+            {
+                this.SendPetStatToOwner(
+                    ownerClient,
+                    petCharacter.Identity,
+                    StatIds.currentnano,
+                    (uint)Math.Max(0, petCharacter.Stats[StatIds.currentnano].Value));
+            }
+        }
+
+        internal void SendPetStatToOwner(
             ZoneClient ownerClient,
             Identity petIdentity,
             StatIds statId,
@@ -813,6 +968,106 @@ namespace ZoneEngine.Core
                 });
         }
 
+        internal void ProcessPetPassiveRegen(ICharacter pet)
+        {
+            if (pet == null || !PetCombatRules.IsPlayerOwnedPet(pet))
+            {
+                return;
+            }
+
+            int petInstance = pet.Identity.Instance;
+            if (petInstance == 0)
+            {
+                return;
+            }
+
+            int currentHealth = pet.Stats[StatIds.health].Value;
+            if (currentHealth <= 0)
+            {
+                this.nextPetHealthRegenUtc.TryRemove(petInstance, out _);
+                this.nextPetNanoRegenUtc.TryRemove(petInstance, out _);
+                return;
+            }
+
+            DateTime now = DateTime.UtcNow;
+            bool healthChanged = false;
+            bool nanoChanged = false;
+
+            DateTime nextHealth = this.nextPetHealthRegenUtc.GetOrAdd(petInstance, now);
+            if (now >= nextHealth)
+            {
+                int maxHealth = pet.Stats[StatIds.life].Value;
+                if (currentHealth < maxHealth)
+                {
+                    int healDelta = PetCombatRules.ResolvePetHealthRegenDelta(maxHealth);
+                    pet.Stats[StatIds.health].Value =
+                        Math.Min(maxHealth, currentHealth + healDelta);
+                    healthChanged = true;
+                }
+
+                this.nextPetHealthRegenUtc[petInstance] =
+                    now.AddSeconds(PetCombatRules.PetHealthRegenIntervalSeconds);
+            }
+
+            if (PetCombatRules.IsPlayerOwnedHealingPet(pet))
+            {
+                DateTime nextNano = this.nextPetNanoRegenUtc.GetOrAdd(petInstance, now);
+                if (now >= nextNano)
+                {
+                    int currentNano = pet.Stats[StatIds.currentnano].Value;
+                    int maxNano = pet.Stats[StatIds.maxnanoenergy].Value;
+                    if (maxNano > 0 && currentNano < maxNano)
+                    {
+                        int nanoDelta = PetCombatRules.ResolvePetNanoRegenDelta(maxNano);
+                        if (nanoDelta > 0)
+                        {
+                            int updatedNano = Math.Min(maxNano, currentNano + nanoDelta);
+                            if (updatedNano != currentNano)
+                            {
+                                pet.Stats[StatIds.currentnano].Value = updatedNano;
+                                nanoChanged = true;
+                            }
+                        }
+                    }
+
+                    this.nextPetNanoRegenUtc[petInstance] =
+                        now.AddSeconds(PetCombatRules.PetNanoRegenIntervalSeconds);
+                }
+            }
+
+            if (!healthChanged && !nanoChanged)
+            {
+                return;
+            }
+
+            ICharacter owner = PetCombatRules.ResolvePetOwner(pet);
+            ZoneClient ownerClient = owner != null && owner.Controller != null
+                ? owner.Controller.Client as ZoneClient
+                : null;
+            if (ownerClient == null)
+            {
+                return;
+            }
+
+            if (healthChanged)
+            {
+                this.SendPetStatToOwner(
+                    ownerClient,
+                    pet.Identity,
+                    StatIds.health,
+                    (uint)Math.Max(0, pet.Stats[StatIds.health].Value));
+            }
+
+            if (nanoChanged)
+            {
+                this.SendPetStatToOwner(
+                    ownerClient,
+                    pet.Identity,
+                    StatIds.currentnano,
+                    (uint)Math.Max(0, pet.Stats[StatIds.currentnano].Value));
+            }
+        }
+
         private const int SummonCaptureStatIdA = 0x4A5;
 
         private const int SummonCaptureStatIdB = 0x4A0;
@@ -836,7 +1091,8 @@ namespace ZoneEngine.Core
             PetSummonSpellListService.SendPetSummonSpellLists(
                 owner,
                 petCharacter.Identity,
-                PetSlotClassifier.HealingPetStrain);
+                PetSlotClassifier.HealingPetStrain,
+                petHash);
         }
 
         private void SendPostSummonPetStatsToOwner(ZoneClient ownerClient, Character petCharacter)
@@ -964,6 +1220,12 @@ namespace ZoneEngine.Core
             public int SummonNanoId { get; set; }
 
             public bool ShouldRestore { get; set; }
+
+            public bool HasSavedCombatStats { get; set; }
+
+            public int SavedHealth { get; set; }
+
+            public int SavedCurrentNano { get; set; }
         }
     }
 }

@@ -573,6 +573,16 @@ namespace ZoneEngine.Core.Playfields
             this.characterHeartbeat.ProcessRegeneration(dynel, sendChangedStats);
         }
 
+        internal void NotifyNpcCombatDamage(ICharacter npc)
+        {
+            this.characterHeartbeat.NotifyNpcDamaged(npc);
+        }
+
+        internal void SuspendNpcRegen(ICharacter npc)
+        {
+            this.characterHeartbeat.SuspendNpcRegen(npc);
+        }
+
         internal void ProcessCharacterFollow(ICharacter dynel)
         {
             this.characterHeartbeat.ProcessFollow(dynel);

@@ -74,8 +74,8 @@ namespace ZoneEngine.Core.Playfields
                         continue;
                     }
 
-                    processRegeneration(dynel);
                     processCombatTick(dynel);
+                    processRegeneration(dynel);
 
                     if (dynel.Controller is NPCController)
                     {

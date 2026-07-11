@@ -198,10 +198,56 @@ namespace ZoneEngine.Core
 
 
 
+        public static void EnqueueHealingPetSummonLink(
+            ZoneClient ownerClient,
+            ICharacter owner,
+            Character petCharacter,
+            uint mobFlags)
+        {
+            if (ownerClient == null || owner == null || petCharacter == null)
+            {
+                return;
+            }
+
+            int ownerInstance = owner.Identity.Instance;
+            int petInstance = petCharacter.Identity.Instance;
+
+            EnqueueStatPetmaster(ownerClient, ownerInstance, petInstance);
+            EnqueueAddPet(ownerClient, ownerInstance, petInstance);
+            EnqueueStatFlags(ownerClient, petInstance, mobFlags);
+        }
+
+        public static void EnqueueHealingPetSummonPostStats(ZoneClient ownerClient, Character petCharacter)
+        {
+            if (ownerClient == null || petCharacter == null)
+            {
+                return;
+            }
+
+            int petInstance = petCharacter.Identity.Instance;
+
+            EnqueueStatPetState(ownerClient, petInstance);
+            EnqueueStatSide(ownerClient, petInstance);
+            EnqueueStatTemplate(ownerClient, StatBattleStationSide, petInstance, "battlestationside");
+            EnqueueStatTemplate(ownerClient, StatRunSpeed, petInstance, "runspeed");
+            EnqueueStatTemplate(ownerClient, StatExpansion, petInstance, "expansion");
+            EnqueueStatTemplate(ownerClient, StatUnknownA, petInstance, "statA");
+            EnqueueStatTemplate(ownerClient, StatUnknownB, petInstance, "statB");
+        }
+
         public static void SendBelamorteScfuToOwner(
             ZoneClient ownerClient,
             ICharacter owner,
             Character petCharacter)
+        {
+            SendHealingPetScfuToOwner(ownerClient, owner, petCharacter, "BSLX");
+        }
+
+        public static void SendHealingPetScfuToOwner(
+            ZoneClient ownerClient,
+            ICharacter owner,
+            Character petCharacter,
+            string petHash)
         {
             if (ownerClient == null || owner == null || petCharacter == null)
             {
@@ -218,7 +264,8 @@ namespace ZoneEngine.Core
                 ownerInstance,
                 petInstance,
                 playfieldId,
-                petCoord);
+                petCoord,
+                petHash);
         }
 
         public static void ReplayBelamorteSummonPostScfu(
@@ -377,9 +424,16 @@ namespace ZoneEngine.Core
             int ownerInstance,
             int petInstance,
             int playfieldId,
-            Coordinate petCoord)
+            Coordinate petCoord,
+            string petHash)
         {
-            byte[] packet = (byte[])ScfuBelamorte.Clone();
+            byte[] template;
+            if (!PetHealingPetScfuCatalog.TryGetScfuWire(petHash, out template))
+            {
+                template = (byte[])ScfuBelamorte.Clone();
+            }
+
+            byte[] packet = (byte[])template.Clone();
             PatchHeader(packet, ownerInstance);
             WriteInt32BigEndian(packet, N3IdentityInstanceOffset, petInstance);
             WriteInt32BigEndian(packet, ScfuPlayfieldOffset, playfieldId);
@@ -566,7 +620,7 @@ namespace ZoneEngine.Core
 
 
 
-        private static void EnqueueSetWantedDirection(ZoneClient ownerClient, int ownerInstance, int petInstance)
+        public static void EnqueueSetWantedDirection(ZoneClient ownerClient, int ownerInstance, int petInstance)
 
         {
 

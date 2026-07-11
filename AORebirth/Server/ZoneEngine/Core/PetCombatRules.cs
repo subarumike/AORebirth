@@ -10,6 +10,8 @@ namespace ZoneEngine.Core
 {
     #region Usings ...
 
+    using System;
+
     using AORebirth.Core.Entities;
     using AORebirth.Enums;
 
@@ -30,6 +32,8 @@ namespace ZoneEngine.Core
 
         public const int AttackPetRightWeaponHighTemplate = 0x0001D73E;
 
+        private const int UnsetTemplateStatValue = 1234567890;
+
         public const int AttackPetLeftWeaponTag = 0x4D455732;
 
         public const int AttackPetRightWeaponTag = 0x4D455731;
@@ -46,6 +50,7 @@ namespace ZoneEngine.Core
 
         public const int AttackPetAttackInfoHitType = 1;
 
+        // Used only when an attack pet has no capture-backed combat profile and no mob damage stats.
         public const int AttackPetFallbackDamage = 930;
 
         public const double AttackPetRechargeSeconds = 2.0;
@@ -54,11 +59,54 @@ namespace ZoneEngine.Core
 
         public const double HealCastRetrySeconds = 2.5;
 
-        public const int HealingPetCapturedCurrentNano = 13227;
+        public const int HealingPetCapturedCurrentNano = 13184;
+
+        public const int HealingPetCapturedMaxNano = 13184;
+
+        // Capture 20260711-172653: Metaphysical Demon regens +162 HP about every 1.0s
+        // (19481 max life -> life/120). Live AO also sends Stat(Health) each tick.
+        public const int PetHealthRegenMaxLifeDivisor = 120;
+
+        public const double PetHealthRegenIntervalSeconds = 1.0;
+
+        public const int PetNanoRegenMaxNanoDivisor = 120;
+
+        public const double PetNanoRegenIntervalSeconds = 1.0;
+
+        public static int ResolvePetHealthRegenDelta(int maxHealth)
+        {
+            return Math.Max(1, maxHealth / PetHealthRegenMaxLifeDivisor);
+        }
+
+        public static int ResolvePetNanoRegenDelta(int maxNano)
+        {
+            if (maxNano <= 0)
+            {
+                return 0;
+            }
+
+            return Math.Max(1, maxNano / PetNanoRegenMaxNanoDivisor);
+        }
+
+        // NPC regen: much lower than pets, every 5s, paused while under attack.
+        public const int NpcHealthRegenMaxLifeDivisor = 2400;
+
+        public const double NpcHealthRegenIntervalSeconds = 5.0;
+
+        public static int ResolveNpcHealthRegenDelta(int maxHealth)
+        {
+            return Math.Max(1, maxHealth / NpcHealthRegenMaxLifeDivisor);
+        }
 
         public static bool IsPlayerOwnedPet(ICharacter character)
         {
-            return character != null && character.Stats[StatIds.petmaster].Value > 0;
+            if (character == null)
+            {
+                return false;
+            }
+
+            int petMaster = character.Stats[StatIds.petmaster].Value;
+            return petMaster > 0 && petMaster != UnsetTemplateStatValue;
         }
 
         public static bool IsPlayerOwnedAttackPet(ICharacter pet)

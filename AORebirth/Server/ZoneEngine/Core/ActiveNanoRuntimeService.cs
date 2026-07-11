@@ -42,6 +42,16 @@ namespace ZoneEngine.Core
         private static readonly Dictionary<int, List<DBCharacterActiveNano>> ZoneTransferStashByCharacter =
             new Dictionary<int, List<DBCharacterActiveNano>>();
 
+        private static readonly Dictionary<int, ZoneTransferStatSnapshot> ZoneTransferStatStashByCharacter =
+            new Dictionary<int, ZoneTransferStatSnapshot>();
+
+        private sealed class ZoneTransferStatSnapshot
+        {
+            public int Health { get; set; }
+
+            public int CurrentNano { get; set; }
+        }
+
         private ActiveNanoRuntimeService()
         {
         }
@@ -447,6 +457,7 @@ namespace ZoneEngine.Core
             }
 
             this.StashZoneTransferNanos(character);
+            this.StashZoneTransferStats(character);
             PetRuntimeService.Default.StashPetForZoneTransfer(character);
             this.ClearPlayfieldBoundActiveNanos(character);
             this.RevokeImplantAccessOnPlayfieldLeave(character);
@@ -936,6 +947,12 @@ namespace ZoneEngine.Core
 
         public bool HasZoneTransferStash(int characterId)
         {
+            return this.HasZoneTransferNanoStash(characterId)
+                || this.HasZoneTransferStatStash(characterId);
+        }
+
+        public bool HasZoneTransferNanoStash(int characterId)
+        {
             lock (Sync)
             {
                 List<DBCharacterActiveNano> stash;
@@ -943,6 +960,138 @@ namespace ZoneEngine.Core
                     && stash != null
                     && stash.Count > 0;
             }
+        }
+
+        public bool HasZoneTransferStatStash(int characterId)
+        {
+            lock (Sync)
+            {
+                return ZoneTransferStatStashByCharacter.ContainsKey(characterId);
+            }
+        }
+
+        public void TryRestoreZoneTransferStats(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            int characterId = character.Identity.Instance;
+            ZoneTransferStatSnapshot snapshot;
+            lock (Sync)
+            {
+                if (!ZoneTransferStatStashByCharacter.TryGetValue(characterId, out snapshot)
+                    || snapshot == null)
+                {
+                    return;
+                }
+
+                ZoneTransferStatStashByCharacter.Remove(characterId);
+            }
+
+            int maxLife = Math.Max(1, character.Stats[StatIds.life].Value);
+            int restoredHealth = Math.Max(0, Math.Min(snapshot.Health, maxLife));
+            int restoredNano = Math.Max(0, snapshot.CurrentNano);
+
+            character.Stats[StatIds.health].Value = restoredHealth;
+            character.Stats[StatIds.health].BaseValue = (uint)restoredHealth;
+            character.Stats[StatIds.currentnano].Value = restoredNano;
+            character.Stats[StatIds.currentnano].BaseValue = (uint)restoredNano;
+
+            this.SendRestoredCombatStatsToClient(character, restoredHealth, restoredNano);
+
+            LogUtil.Debug(
+                DebugInfoDetail.GameFunctions,
+                string.Format(
+                    "RestoreZoneTransferStats char={0} hp={1}/{2} np={3}",
+                    character.Identity,
+                    restoredHealth,
+                    maxLife,
+                    restoredNano));
+        }
+
+        private void StashZoneTransferStats(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            int characterId = character.Identity.Instance;
+            lock (Sync)
+            {
+                ZoneTransferStatStashByCharacter[characterId] = new ZoneTransferStatSnapshot
+                {
+                    Health = character.Stats[StatIds.health].Value,
+                    CurrentNano = character.Stats[StatIds.currentnano].Value
+                };
+            }
+
+            this.PersistCharacterCombatStats(character);
+
+            LogUtil.Debug(
+                DebugInfoDetail.GameFunctions,
+                string.Format(
+                    "StashZoneTransferStats char={0} hp={1}/{2} np={3}",
+                    character.Identity,
+                    character.Stats[StatIds.health].Value,
+                    character.Stats[StatIds.life].Value,
+                    character.Stats[StatIds.currentnano].Value));
+        }
+
+        private void PersistCharacterCombatStats(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            this.UpsertCharacterStat(
+                character.Identity.Instance,
+                StatIds.health,
+                character.Stats[StatIds.health].Value);
+            this.UpsertCharacterStat(
+                character.Identity.Instance,
+                StatIds.currentnano,
+                character.Stats[StatIds.currentnano].Value);
+        }
+
+        private void UpsertCharacterStat(int characterId, StatIds statId, int value)
+        {
+            DBStats stat = StatDao.Instance
+                .GetAll(new { Type = 50000, Instance = characterId, StatId = (int)statId })
+                .FirstOrDefault();
+
+            if (stat == null)
+            {
+                StatDao.Instance.Add(
+                    new DBStats
+                    {
+                        Type = 50000,
+                        Instance = characterId,
+                        StatId = (int)statId,
+                        StatValue = value
+                    });
+                return;
+            }
+
+            stat.StatValue = value;
+            StatDao.Instance.Save(stat);
+        }
+
+        private void SendRestoredCombatStatsToClient(ICharacter character, int health, int currentNano)
+        {
+            if (character == null || character.Controller == null || character.Controller.Client == null)
+            {
+                return;
+            }
+
+            StatMessageHandler.Default.SendSingle(character, (int)StatIds.health, (uint)Math.Max(0, health));
+            StatMessageHandler.Default.SendSingle(
+                character,
+                (int)StatIds.currentnano,
+                (uint)Math.Max(0, currentNano));
         }
 
         private List<DBCharacterActiveNano> TakeZoneTransferStash(int characterId)

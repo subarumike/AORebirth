@@ -291,6 +291,7 @@ namespace ZoneEngine.Core
             this.Controller.Character.Playfield = pf;
             this.Playfield = pf;
             this.Controller.Character.Stats.Read();
+            ActiveNanoRuntimeService.Default.TryRestoreZoneTransferStats(this.Controller.Character);
             this.controller.Character.Stats[StatIds.visualprofession].BaseValue = (uint)this.controller.Character.Stats[StatIds.profession].Value;
         }
 
