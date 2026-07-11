@@ -43,7 +43,6 @@ namespace ZoneEngine.Core.MessageHandlers
     using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.KnuBot;
-    using ZoneEngine.Core.Playfields;
 
     #endregion
 
@@ -67,10 +66,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 messageWrapper.MessageBody.Seconds,
                 messageWrapper.MessageBody.Unknown3);
 
-            if (CapturedSubwayHandbagMissionRuntime.TryHandleClose(
-                    messageWrapper.Client.Controller.Character,
-                    messageWrapper.MessageBody.Target)
-                || ContentDrivenNpcDialogueRouter.TryHandleClose(
+            if (ContentDrivenNpcDialogueRouter.TryHandleClose(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody.Target))
             {
