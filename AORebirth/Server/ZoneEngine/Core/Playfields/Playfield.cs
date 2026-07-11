@@ -158,6 +158,10 @@ namespace AORebirth.Core.Playfields
 
         private const int CapturedCleaningRobotMonsterData = 297023;
 
+        private const int CapturedSubwayThiefMonsterData = 26092;
+
+        private const int CapturedSubwayThiefNpcFamily = 138;
+
         private const int CapturedCleaningRobotCorpseCatMesh = 297018;
 
         private const int CapturedCleaningRobotCorpseCredits = 5;
@@ -2768,6 +2772,7 @@ namespace AORebirth.Core.Playfields
         internal bool CanBuildKnownCorpseVisual(ICharacter target)
         {
             return IsCapturedCleaningRobot(target)
+                   || IsCapturedSubwayThief(target)
                    || CombatCorpseVisuals.IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
                    || MonsterDataToCorpseCatMesh.ContainsKey(target.Stats[StatIds.monsterdata].Value);
         }
@@ -2783,6 +2788,14 @@ namespace AORebirth.Core.Playfields
                 target.Stats[StatIds.catmesh].Value,
                 target.Stats[StatIds.monsterdata].Value,
                 MonsterDataToCorpseCatMesh);
+        }
+
+        private static bool IsCapturedSubwayThief(ICharacter target)
+        {
+            return target != null
+                   && string.Equals(target.Name, "Thief", StringComparison.OrdinalIgnoreCase)
+                   && target.Stats[StatIds.monsterdata].Value == CapturedSubwayThiefMonsterData
+                   && target.Stats[StatIds.npcfamily].Value == CapturedSubwayThiefNpcFamily;
         }
 
         private static int DeathAnimationKeyFor(ICharacter target)
