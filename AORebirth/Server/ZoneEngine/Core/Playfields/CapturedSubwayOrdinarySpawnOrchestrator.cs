@@ -20,6 +20,8 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class CapturedSubwayOrdinarySpawnOrchestrator
     {
+        private static readonly bool EnableCapturedSubwayNpcMovement = false;
+
         private readonly CapturedSubwayOrdinaryContentProvider content;
         private readonly Action<ICharacter> activateNpc;
 
@@ -160,6 +162,11 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayOrdinarySpawnDefinition spawn)
         {
             character.Waypoints.Clear();
+            if (!EnableCapturedSubwayNpcMovement)
+            {
+                return;
+            }
+
             foreach (CapturedSubwayWaypointDefinition waypoint in spawn.Waypoints)
             {
                 character.AddWaypoint(
