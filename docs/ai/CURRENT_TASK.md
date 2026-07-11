@@ -90,6 +90,7 @@ is live-confirmed level 1 client behavior, not an AORebirth combat regression.
 - Live capture `20260711-170337` proves the bounded Thief retaliation contract: QL1 Solar-Powered Pistol `121567`, `SpecialAttackWeapon` header `Unknown=0` with body values `32/32/32/32/0`, `Attack` header `Unknown=0`, attack start `1.409765s` after the echoed player attack, movement transition `0.219999s` after the Thief attack, first landed hit `11.409643s` after the Thief attack (`12.819408s` after the player echo), fixed normal damage `9`, `AmmoCount=-1`, slot `6`, `Unk1=0`, weapon instance `0`, and approximately six-second repeats. Its captured movement transition is emitted as Target -> `StopMovingCmd` -> `SetPos` -> `NpcPath`, and its captured `StopFight` precedes Death. Private capture `20260711-172309` supplied the pre-repair comparison: header `Unknown=1`, body `32/2/2/2/0`, reordered/duplicate movement, and no dying-NPC `StopFight`.
 - The implementation now keeps those values behind explicit Thief contract fields and separate attack-start/movement/first-hit deadlines. Other equipped NPCs retain the legacy item damage bonus, timing, `AmmoCount=40`, and `Unk1=4`; only capture-ready/known combat paths maintain movement during recharge. Focused combat, packet-envelope, death, corpse, and loot tests pass `9/9`, and the approved AORebirth build passes. A post-repair live capture is still required before claiming live parity.
 - The centralized generalized damage-calculation system is a separate future task and was not started in this checkpoint.
+- The heartbeat health-state audit classified the pending `InvalidOperationException` swallow as `MASKS_UPSTREAM_DEFECT`. `ZoneEngineLog.txt` proves the observed failure was a duplicate health stat (`Sequence contains more than one matching element`) during the NPC attacker scan; normal construction supplies exactly one positive-default health and life stat, but the runtime producer of the duplicate remains unresolved. The swallow was removed. Only positive current health below maximum health can pass NPC regeneration, zero/negative current health is treated as dead, zero/negative maximum health and current health at/above maximum are skipped without mutation, and only characters targeting the NPC have health read during the attacker scan. Missing or duplicate health on a relevant attacker remains observable as upstream corruption. Player regeneration, combat timing, death/corpse ordering, and regeneration values are unchanged.
 
 ## Regression Risks Only
 
@@ -118,3 +119,12 @@ Mike performs live AO client playtesting. Do not claim live validation unless Mi
 - `cmd /d /c tools\build_aorebirth_debug.cmd`: PASS.
 - `cmd /d /c tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifiedName~SmokeLounge.AOtomation.Messaging.Tests.PlayfieldLifecycleTraceTests"`: `39/44` pass. The five failures are older source/data guardrails outside this Thief slice.
 - `cmd /d /c tools\run_aotomation_messaging_tests.cmd`: `128/134` pass. The same five lifecycle failures plus the pre-existing inventory ownership guardrail fail; all six are baseline guardrail failures unrelated to the new Thief expectations.
+
+## Latest Heartbeat Checkpoint Validation
+
+- `cmd /d /c tools\run_aotomation_messaging_tests.cmd /Tests:PlayfieldCharacterHeartbeatHealthRulesCoverRuntimeModelStates,PlayfieldCharacterHeartbeatStatsContractSurfacesMissingOrDuplicateHealth`: PASS, `2/2`.
+- Focused heartbeat, combat, death, corpse, and loot selection: PASS, `7/7`.
+- Previous focused combat/lifecycle selection: PASS, `9/9`.
+- `cmd /d /c tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:FullyQualifiedName~PlayfieldLifecycleTraceTests`: `39/44` pass; the same five baseline lifecycle guardrails fail.
+- `cmd /d /c tools\run_aotomation_messaging_tests.cmd`: `130/136` pass, improving only by the two new heartbeat tests; the same six pre-existing guardrail failures remain unchanged from the `128/134` pre-edit baseline.
+- `cmd /d /c tools\build_aorebirth_debug.cmd`: PASS. The approved engine restart completed with ChatEngine, LoginEngine, and ZoneEngine listening on their expected ports.

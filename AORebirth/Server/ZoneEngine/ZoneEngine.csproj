@@ -332,6 +332,7 @@
     <Compile Include="Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldPacketSequencingRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldAnnouncementRuntimeService.cs" />
+    <Compile Include="Core\Playfields\PlayfieldCharacterHeartbeatHealthRules.cs" />
     <Compile Include="Core\Playfields\PlayfieldCharacterHeartbeatRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldPublishFanoutRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldAOtomationDeliveryRuntimeService.cs" />

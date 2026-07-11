@@ -69,6 +69,7 @@
     <Compile Include="GenericCmdUseRouteClassifierTests.cs" />
     <Compile Include="InfoPacketTests.cs" />
     <Compile Include="N3RecoveredContractTests.cs" />
+    <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\CityControllerInteractionRules.cs">
       <Link>CityControllerInteractionRules.cs</Link>
@@ -120,6 +121,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcPatrolReplayCoordinator.cs">
       <Link>NpcPatrolReplayCoordinator.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldCharacterHeartbeatHealthRules.cs">
+      <Link>PlayfieldCharacterHeartbeatHealthRules.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleTrace.cs">
       <Link>PlayfieldLifecycleTrace.cs</Link>
