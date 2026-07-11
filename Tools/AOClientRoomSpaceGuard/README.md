@@ -29,6 +29,25 @@ shortcut. Logs are written to:
 
 The patch exists only in process memory and must be applied on each client launch. Unknown or updated DLL hashes fail closed.
 
+## Distribution lanes
+
+`ProxyDll` is the normal-shortcut distribution lane. It packages the proven RoomSpace
+repair as an x86 `version.dll` proxy that forwards the Windows version APIs and applies
+the same four audited callsite changes in process memory. It supports only the exact
+approved old- and new-client `N3.dll` SHA-256 hashes. Its installer refuses a client
+directory that already contains `version.dll`, and the package includes matching install
+and uninstall commands plus the required AOReloaded MIT attribution.
+
+The proxy leaves `AnarchyOnline.exe`, `N3.dll`, graphics/resources, and existing shortcuts
+unchanged. It does not include AOReloaded's LAA executable patch, settings changes, or any
+other AOReloaded modification. See `ProxyDll\README.md` for build and package details.
+
+The external guarded launcher remains the diagnostic and telemetry lane. Use it when the
+bounded `GUARD HIT` evidence and per-callsite counters are needed; use the proxy package
+for normal-shortcut player distribution. Exact isolated install/uninstall smoke tests pass
+for both approved clients; the installed live-client proxy still needs the in-game runtime
+smoke described in `ProxyDll\README.md`.
+
 Telemetry messages:
 
 - `PATCH PASS`: all four calls and the telemetry wrapper were installed and verified.
