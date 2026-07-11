@@ -224,6 +224,33 @@ namespace AORebirth.Core.Playfields
 
         private static readonly CombatLootTableEntry[] DebugLootTable = CombatTestLootCatalog.BuildEntries();
 
+        private static readonly CombatLootTableEntry[] CapturedSubwayLootTable =
+            new CapturedSubwayContentProvider().GetLootDefinitions()
+                .Select(
+                    loot =>
+                        new CombatLootTableEntry
+                            {
+                                ExactName = loot.ExactName,
+                                MonsterData = loot.MonsterData,
+                                NpcFamily = loot.NpcFamily,
+                                Slot = 0,
+                                DropChanceBasisPoints = loot.ObservedBasisPoints,
+                                ItemTemplates =
+                                    new[]
+                                        {
+                                            new CombatLootItemTemplate
+                                                {
+                                                    LowId = loot.LowId,
+                                                    HighId = loot.HighId,
+                                                    MinQuality = loot.Quality,
+                                                    MaxQuality = loot.Quality,
+                                                    RangeCheck = 0,
+                                                    DropGroupHash = "captured-subway-supported"
+                                                }
+                                        }
+                            })
+                .ToArray();
+
         private static readonly CombatLootTableEntry[] CapturedSubwayOrdinaryLootTable =
             new CapturedSubwayOrdinaryContentProvider().BuildCapturedLootEntries();
 
@@ -2504,7 +2531,9 @@ namespace AORebirth.Core.Playfields
 
         private void ProcessCorpseDespawns()
         {
-            this.runtimeSystems.ProcessDueNpcCorpseDespawns(DateTime.UtcNow, this.DespawnCorpse);
+            DateTime utcNow = DateTime.UtcNow;
+            this.runtimeSystems.ProcessDueNpcCorpseDespawns(utcNow, this.DespawnCorpse);
+            this.runtimeSystems.ProcessDueCapturedSubwayRespawns(utcNow);
         }
 
         private void ProcessPendingCorpseSpawns()
@@ -2822,9 +2851,19 @@ namespace AORebirth.Core.Playfields
             int monsterData = target.Stats[StatIds.monsterdata].Value;
             int npcFamily = target.Stats[StatIds.npcfamily].Value;
             int level = target.Stats[StatIds.level].Value;
-            List<CombatLootTableEntry> matchingEntries = CapturedSubwayOrdinaryLootTable.Where(
-                x => x.Matches(target.Name, monsterData, npcFamily)).ToList();
-            string lootSource = "captured-subway-ordinary";
+            List<CombatLootTableEntry> matchingEntries =
+                this.Identity.Instance == CapturedSubwayContentProvider.SubwayPlayfieldInstance
+                    ? CapturedSubwayLootTable.Where(
+                        x => x.Matches(target.Name, monsterData, npcFamily)).ToList()
+                    : new List<CombatLootTableEntry>();
+            string lootSource = "captured-subway-supported";
+
+            if (matchingEntries.Count == 0)
+            {
+                matchingEntries = CapturedSubwayOrdinaryLootTable.Where(
+                    x => x.Matches(target.Name, monsterData, npcFamily)).ToList();
+                lootSource = "captured-subway-ordinary";
+            }
 
             if (matchingEntries.Count == 0)
             {
