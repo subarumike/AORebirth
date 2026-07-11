@@ -133,7 +133,8 @@ namespace AORebirth.Core.Playfields
                     "20260709-212115",
                     "20260709-212336",
                     "20260709-220439",
-                    "20260709-222339"
+                    "20260709-222339",
+                    "20260710-202132"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "workman_striker",
@@ -383,7 +384,8 @@ namespace AORebirth.Core.Playfields
                 {
                     "20260709-210452",
                     "20260709-212115",
-                    "20260709-212336"
+                    "20260709-212336",
+                    "20260710-202132"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "infector",
@@ -512,6 +514,49 @@ namespace AORebirth.Core.Playfields
                 {
                     "20260709-220439",
                     "20260709-222339"
+                }),
+            new CapturedSubwayOrdinaryArchetypeDefinition(
+                "deranged_shopper",
+                "deranged_shopper",
+                "Deranged Shopper",
+                203736,
+                138,
+                0,
+                268964353,
+                0,
+                0,
+                31,
+                0,
+                1835u,
+                40630,
+                new CapturedSubwayTextureDefinition[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 0, 0),
+                    new CapturedSubwayTextureDefinition(1, 30859, 0),
+                    new CapturedSubwayTextureDefinition(2, 30869, 0),
+                    new CapturedSubwayTextureDefinition(3, 40896, 0),
+                    new CapturedSubwayTextureDefinition(4, 15815, 0)
+                },
+                new CapturedSubwayMeshDefinition[]
+                {
+                    new CapturedSubwayMeshDefinition(0, 40630u, 0, 4),
+                    new CapturedSubwayMeshDefinition(1, 95784u, 0, 2)
+                },
+                new CapturedSubwayCombatEvidenceDefinition(
+                    true,
+                    9,
+                    9,
+                    0.000000,
+                    6,
+                    0,
+                    0,
+                    1),
+                new CapturedSubwayLootEvidenceDefinition[]
+                {
+                },
+                new string[]
+                {
+                    "20260710-202132"
                 }),
         };
 
@@ -661,6 +706,28 @@ namespace AORebirth.Core.Playfields
                 "",
                 "20260709-212336",
                 "2026-07-10T02:33:47.2707446Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79574527,
+                "deranged_shopper",
+                8,
+                256,
+                0,
+                94,
+                31,
+                255.7054f, 107.611687f, 285.020325f,
+                0.0f, -0.209199682f, 0.0f, 0.977872968f,
+                (SimpleCharFullUpdateFlags)0x020B4ACB,
+                0,
+                "BF1CFF49BB8D859C3FAF117D02020101000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(255.7054f, 107.611687f, 285.020325f),
+                    new CapturedSubwayWaypointDefinition(254.4f, 107.601685f, 287.899963f)
+                },
+                "",
+                "20260710-202132",
+                "2026-07-11T01:23:01.1556318Z"),
             new CapturedSubwayOrdinarySpawnDefinition(
                 0x7953AA1A,
                 "infected_attendant",
@@ -1137,6 +1204,47 @@ namespace AORebirth.Core.Playfields
                 "",
                 "20260709-212336",
                 "2026-07-10T02:24:37.0524810Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79557CB8,
+                "looter",
+                10,
+                318,
+                0,
+                95,
+                34,
+                284.850769f, 107.611687f, 294.085632f,
+                0.0f, -0.9593532f, 0.0f, 0.2822098f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260710-202132",
+                "2026-07-11T01:23:43.2019952Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7957E5CD,
+                "looter",
+                9,
+                287,
+                0,
+                95,
+                31,
+                230.674591f, 107.611687f, 290.99f,
+                0.0f, 0.9820799f, 0.0f, 0.188465044f,
+                (SimpleCharFullUpdateFlags)0x020B4ACB,
+                0,
+                "00000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(230.674591f, 107.611687f, 290.99f)
+                },
+                "",
+                "20260710-202132",
+                "2026-07-11T01:23:01.1556318Z"),
             new CapturedSubwayOrdinarySpawnDefinition(
                 0x7953AECD,
                 "lost_thought",
@@ -2674,6 +2782,130 @@ namespace AORebirth.Core.Playfields
                 "",
                 "20260709-222339",
                 "2026-07-10T03:24:04.2322101Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79557F12,
+                "stim_fiend",
+                11,
+                261,
+                0,
+                96,
+                49,
+                287.733978f, 107.611687f, 299.437225f,
+                0.0f, -0.9918657f, 0.0f, 0.127288952f,
+                (SimpleCharFullUpdateFlags)0x022B4ACB,
+                0,
+                "BEC1EC1A33FA5853BFB9C67202020101000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(287.733978f, 107.611687f, 299.437225f),
+                    new CapturedSubwayWaypointDefinition(287.3037f, 107.611687f, 297.787262f)
+                },
+                "",
+                "20260710-202132",
+                "2026-07-11T01:23:43.2019952Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7957E128,
+                "stim_fiend",
+                12,
+                294,
+                0,
+                96,
+                54,
+                287.055054f, 107.611687f, 310.951843f,
+                0.0f, -0.998169065f, 0.0f, 0.06048951f,
+                (SimpleCharFullUpdateFlags)0x022A4ACB,
+                0,
+                "80000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260710-202132",
+                "2026-07-11T01:23:43.2019952Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7957E415,
+                "stim_fiend",
+                9,
+                205,
+                0,
+                95,
+                40,
+                197.723587f, 107.6164f, 168.280075f,
+                0.0f, 0.9979032f, 0.0f, 0.0647237748f,
+                (SimpleCharFullUpdateFlags)0x022B4ACB,
+                0,
+                "3D5BED123F0A3BE6BED3088102020101000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(197.723587f, 107.6164f, 168.280075f),
+                    new CapturedSubwayWaypointDefinition(196.790176f, 107.6164f, 172.632324f)
+                },
+                "",
+                "20260710-202132",
+                "2026-07-11T01:22:15.2253676Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7957E5CF,
+                "stim_fiend",
+                10,
+                227,
+                0,
+                95,
+                44,
+                277.575073f, 107.611687f, 275.633026f,
+                0.0f, 0.480897844f, 0.0f, 0.8767766f,
+                (SimpleCharFullUpdateFlags)0x022A4ACB,
+                0,
+                "00000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260710-202132",
+                "2026-07-11T01:23:43.2019952Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7957E5D0,
+                "stim_fiend",
+                10,
+                227,
+                0,
+                95,
+                44,
+                290.75827f, 107.611687f, 283.753021f,
+                0.0f, 0.0707829148f, 0.0f, 0.9974919f,
+                (SimpleCharFullUpdateFlags)0x022A4ACB,
+                0,
+                "00000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260710-202132",
+                "2026-07-11T01:23:43.2339955Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7957E5D1,
+                "stim_fiend",
+                10,
+                227,
+                0,
+                95,
+                44,
+                292.3236f, 107.611687f, 294.727081f,
+                0.0f, -0.994126141f, 0.0f, 0.108227827f,
+                (SimpleCharFullUpdateFlags)0x022A4ACB,
+                0,
+                "80000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260710-202132",
+                "2026-07-11T01:23:43.2339955Z"),
             new CapturedSubwayOrdinarySpawnDefinition(
                 0x7953A84F,
                 "workman_striker",

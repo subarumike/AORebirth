@@ -17,8 +17,15 @@ CAPTURES = (
     "20260709-212336",
     "20260709-220439",
     "20260709-222339",
+    "20260710-202132",
 )
-SPAWN_CAPTURES = ("20260709-212336", "20260709-222339")
+SPAWN_CAPTURES = ("20260709-212336", "20260709-222339", "20260710-202132")
+CAPTURE_ARCHETYPE_FILTERS = {
+    "20260710-202132": frozenset(("Looter", "Stim Fiend", "Deranged Shopper")),
+}
+ARCHETYPE_CAPTURE_FILTERS = {
+    "Deranged Shopper": frozenset(("20260710-202132",)),
+}
 OUTPUT = (
     REPO
     / "AORebirth"
@@ -40,6 +47,7 @@ ARCHETYPES = {
     "Infector": ("infector", "infector"),
     "Lost Thought": ("lost_thought", "lost_thought"),
     "Neural Burnout": ("neural_burnout", "neural_burnout"),
+    "Deranged Shopper": ("deranged_shopper", "deranged_shopper"),
 }
 
 FLAG_VALUES = {
@@ -122,11 +130,21 @@ def canonical_position(row: dict[str, str]) -> tuple[float, float, float]:
     return (float(row["PositionX"]), float(row["PositionY"]), float(row["PositionZ"]))
 
 
+def capture_allows_archetype(capture: str, name: str) -> bool:
+    allowed_names = CAPTURE_ARCHETYPE_FILTERS.get(capture)
+    if allowed_names is not None and name not in allowed_names:
+        return False
+    allowed_captures = ARCHETYPE_CAPTURE_FILTERS.get(name)
+    return allowed_captures is None or capture in allowed_captures
+
+
 def load_scfu_rows(captures: tuple[str, ...]) -> list[dict[str, str]]:
     rows = []
     for capture in captures:
         for row in read_csv(CAPTURE_ROOT / capture / "scfu-appearance.csv"):
             if row["Name"] not in ARCHETYPES:
+                continue
+            if not capture_allows_archetype(capture, row["Name"]):
                 continue
             row = dict(row)
             row["EvidenceCapture"] = capture
@@ -264,7 +282,11 @@ def loot_profiles() -> dict[str, list[dict[str, int]]]:
         with (CAPTURE_ROOT / capture / "events.log").open(encoding="utf-8-sig") as handle:
             for line in handle:
                 match = corpse_pattern.search(line)
-                if match and match.group("name") in ARCHETYPES:
+                if (
+                    match
+                    and match.group("name") in ARCHETYPES
+                    and capture_allows_archetype(capture, match.group("name"))
+                ):
                     corpses.append(
                         {
                             "time": parse_time(match.group("time")),
