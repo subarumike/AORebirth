@@ -64,7 +64,13 @@ namespace AORebirth.Database.Dao
         /// </returns>
         public DBMobTemplate GetMobTemplateByHash(string hash)
         {
-            return this.GetWhere(new { hash }).FirstOrDefault();
+            DBMobTemplate mob = this.GetWhere(new { Hash = hash }).FirstOrDefault();
+            if (mob != null)
+            {
+                return mob;
+            }
+
+            return PetSummonMobTemplateCatalog.TryGet(hash);
         }
 
         /// <summary>

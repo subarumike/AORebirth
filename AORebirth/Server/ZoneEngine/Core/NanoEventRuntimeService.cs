@@ -51,6 +51,11 @@ namespace ZoneEngine.Core
 
         public bool HasSummonPetOnUse(int nanoId)
         {
+            if (PetSummonNanoCatalog.IsCatalogSummonNano(nanoId))
+            {
+                return true;
+            }
+
             NanoFormula nano;
             if (!NanoLoader.NanoList.TryGetValue(nanoId, out nano))
             {

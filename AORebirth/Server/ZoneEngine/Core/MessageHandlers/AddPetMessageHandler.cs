@@ -27,7 +27,7 @@ namespace ZoneEngine.Core.MessageHandlers
             return x =>
             {
                 x.Identity = owner.Identity;
-                x.Unknown = 0;
+                x.Unknown = 1;
                 x.PetIdentity = petIdentity;
             };
         }

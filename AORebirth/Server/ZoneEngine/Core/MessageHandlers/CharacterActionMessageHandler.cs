@@ -436,6 +436,28 @@ namespace ZoneEngine.Core.MessageHandlers
         }
 
         /// <summary>
+        /// Owner CharacterAction 129 — "executes within your NCU" (20260711-022256).
+        /// Parameter2 is the heal roll from the nano hit function.
+        /// </summary>
+        public void SendPetNanoExecutedWithinOwnerNcu(ICharacter owner, ICharacter pet, int healRoll)
+        {
+            this.Send(
+                owner,
+                x =>
+                {
+                    x.Identity = owner.Identity;
+                    x.Unknown = 0x00;
+                    x.Action = (CharacterActionType)PetHealNanoCatalog.PetNanoExecutedWithinOwnerNcuAction;
+                    x.Unknown1 = 0x00000000;
+                    x.Target = pet.Identity;
+                    x.Parameter1 = 0;
+                    x.Parameter2 = healRoll;
+                    x.Unknown2 = 0x0000;
+                },
+                true);
+        }
+
+        /// <summary>
         /// </summary>
         /// <param name="character">
         /// </param>
@@ -509,9 +531,20 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public void SetNanoDuration(ICharacter character, Identity target, int unknown1, int duration = 0x249F0)
         {
-            if (duration > 0)
+            int strain = ActiveNanoRuntimeService.Default.ResolveNanoStrain(character, unknown1);
+            if (duration > 0
+                && !ActiveNanoRuntimeService.Default.HasActiveNanoInStrain(character, unknown1, strain))
             {
-                ActiveNanoRuntimeService.Default.ApplyActiveNano(character, unknown1, duration, target);
+                if (!ActiveNanoRuntimeService.Default.ApplyActiveNano(
+                    character,
+                    unknown1,
+                    duration,
+                    target,
+                    strain))
+                {
+                    return;
+                }
+
                 if (character.Controller != null && character.Controller.Client != null)
                 {
                     SimpleCharFullUpdate.SendToOne(character, character.Controller.Client);
@@ -521,9 +554,14 @@ namespace ZoneEngine.Core.MessageHandlers
             this.Send(character, this.ConstructSetNanoDuration(character, target, unknown1, duration));
         }
 
+        public void NotifyActiveNanoDuration(ICharacter character, Identity target, int nanoId, int duration)
+        {
+            this.Send(character, this.ConstructSetNanoDuration(character, target, nanoId, duration));
+        }
+
         public void SendActiveNanoDuration(ICharacter character, Identity target, int nanoId, int duration)
         {
-            this.SetNanoDuration(character, target, nanoId, duration);
+            this.NotifyActiveNanoDuration(character, target, nanoId, duration);
         }
 
         public void AcknowledgeRemoveFriendlyNano(ICharacter character, CharacterActionMessage message, int nanoId)

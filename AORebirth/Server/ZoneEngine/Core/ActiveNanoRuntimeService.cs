@@ -21,6 +21,8 @@ namespace ZoneEngine.Core
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
 
+    using Utility;
+
     #endregion
 
     public sealed class ActiveNanoRuntimeService
@@ -44,30 +46,58 @@ namespace ZoneEngine.Core
         {
         }
 
-        public void ApplyActiveNano(
+        public bool ApplyActiveNano(
             ICharacter character,
             int nanoId,
             int durationCentiseconds,
-            Identity durationPacketIdentity = default(Identity))
+            Identity durationPacketIdentity = default(Identity),
+            int activeStrain = 0)
         {
             if (character == null || !NanoLoader.NanoList.ContainsKey(nanoId))
             {
-                return;
+                return false;
             }
 
             bool isSurgeryClinicNano = nanoId == SurgeryClinicInteractionRules.SurgeryClinicNanoId;
             if (!isSurgeryClinicNano && !this.CanActivateNano(character, nanoId))
             {
-                return;
+                return false;
             }
 
             NanoFormula nano = NanoLoader.NanoList[nanoId];
-            int strain = nano.NanoStrain();
-            this.RemoveActiveNanoByStrain(character, strain, true);
-
+            int strain = activeStrain > 0 ? activeStrain : this.ResolveNanoStrain(character, nanoId);
             DateTime expiresAtUtc = durationCentiseconds > 0
                 ? DateTime.UtcNow.AddMilliseconds((long)durationCentiseconds * 10L)
                 : DateTime.MaxValue;
+
+            IActiveNano existing;
+            if (character.ActiveNanos.TryGetValue(strain, out existing) && existing != null && existing.ID == nanoId)
+            {
+                var existingState = existing as ActiveNanoState;
+                if (existingState != null)
+                {
+                    existingState.TickCounter = durationCentiseconds;
+                    existingState.TickInterval = durationCentiseconds;
+                    existingState.ExpiresAtUtc = expiresAtUtc;
+                    existingState.NcuCost = nano.NCUCost();
+                    if (!durationPacketIdentity.Equals(default(Identity)))
+                    {
+                        existingState.DurationPacketIdentity = durationPacketIdentity;
+                    }
+
+                    this.CancelExpiryTimer(character.Identity.Instance, strain);
+                    if (durationCentiseconds > 0)
+                    {
+                        this.ScheduleExpiry(character, strain, nanoId, durationCentiseconds);
+                    }
+
+                    this.SyncPersistedStore(character);
+                    this.SyncCurrentNcuStat(character);
+                    return true;
+                }
+            }
+
+            this.RemoveActiveNanoByStrain(character, strain, true);
 
             var state = new ActiveNanoState
             {
@@ -91,6 +121,8 @@ namespace ZoneEngine.Core
             {
                 this.ScheduleExpiry(character, strain, nanoId, durationCentiseconds);
             }
+
+            return true;
         }
 
         public bool CanActivateNano(ICharacter character, int nanoId)
@@ -106,7 +138,7 @@ namespace ZoneEngine.Core
             }
 
             NanoFormula nano = NanoLoader.NanoList[nanoId];
-            int strain = nano.NanoStrain();
+            int strain = this.ResolveNanoStrain(character, nanoId);
             int newCost = nano.NCUCost();
             int projectedUsed = this.GetUsedNcu(character);
 
@@ -117,6 +149,34 @@ namespace ZoneEngine.Core
             }
 
             return projectedUsed + newCost <= this.GetMaxNcu(character);
+        }
+
+        public int ResolveNanoStrain(ICharacter character, int nanoId)
+        {
+            if (NanoEventRuntimeService.Default.HasSummonPetOnUse(nanoId))
+            {
+                string petHash = PetSummonNanoCatalog.GetPreferredPetHash(nanoId);
+                int petStrain = PetSlotClassifier.ResolveStrain(petHash);
+                if (petStrain > 0)
+                {
+                    return petStrain;
+                }
+            }
+
+            return NanoLoader.NanoList[nanoId].NanoStrain();
+        }
+
+        public bool HasActiveNanoInStrain(ICharacter character, int nanoId, int strain)
+        {
+            if (character == null || strain <= 0)
+            {
+                return false;
+            }
+
+            IActiveNano activeNano;
+            return character.ActiveNanos.TryGetValue(strain, out activeNano)
+                && activeNano != null
+                && activeNano.ID == nanoId;
         }
 
         public int GetUsedNcu(ICharacter character)
@@ -374,6 +434,11 @@ namespace ZoneEngine.Core
             }
         }
 
+        public void RemoveActiveNanoInStrain(ICharacter character, int strain, bool notifyClient)
+        {
+            this.RemoveActiveNanoByStrain(character, strain, notifyClient);
+        }
+
         public void HandlePlayfieldLeave(ICharacter character)
         {
             if (character == null)
@@ -407,8 +472,9 @@ namespace ZoneEngine.Core
             int characterId = character.Identity.Instance;
             DateTime nowUtc = DateTime.UtcNow;
             List<DBCharacterActiveNano> persistedNanos = this.TakeZoneTransferStash(characterId);
+            bool isZoneTransferRestore = persistedNanos != null && persistedNanos.Count > 0;
 
-            if (persistedNanos == null || persistedNanos.Count == 0)
+            if (!isZoneTransferRestore)
             {
                 CharacterActiveNanosDao.Instance.DeleteExpiredActiveNanos(characterId, nowUtc);
                 persistedNanos = CharacterActiveNanosDao.Instance.ReadActiveNanos(characterId);
@@ -437,14 +503,24 @@ namespace ZoneEngine.Core
                     expiresAtUtc,
                     nowUtc,
                     persisted.DurationCentiseconds);
-                if (remainingCentiseconds <= 0)
+                bool isPermanentSummonPetNano = expiresAtUtc == DateTime.MaxValue
+                    && NanoEventRuntimeService.Default.HasSummonPetOnUse(persisted.NanoId);
+                if (remainingCentiseconds <= 0 && !isPermanentSummonPetNano)
                 {
                     continue;
                 }
 
-                if (!this.CanActivateNano(character, persisted.NanoId))
+                if (remainingCentiseconds <= 0 && isPermanentSummonPetNano)
                 {
-                    continue;
+                    if (!isZoneTransferRestore
+                        && !PetRuntimeService.Default.HasPendingRestoreForStrain(
+                            characterId,
+                            persisted.Strain))
+                    {
+                        continue;
+                    }
+
+                    remainingCentiseconds = 0;
                 }
 
                 stillActive.Add(persisted);
@@ -452,9 +528,11 @@ namespace ZoneEngine.Core
                 restoredAny = true;
             }
 
-            if (stillActive.Count > 0)
+            CharacterActiveNanosDao.Instance.ReplaceActiveNanos(characterId, stillActive);
+
+            if (!PetRuntimeService.Default.HasPendingRestore(characterId))
             {
-                CharacterActiveNanosDao.Instance.ReplaceActiveNanos(characterId, stillActive);
+                this.CleanupOrphanSummonPetNanos(character, notifyClient);
             }
 
             if (notifyClient && restoredAny)
@@ -464,10 +542,81 @@ namespace ZoneEngine.Core
 
             foreach (KeyValuePair<int, IActiveNano> entry in character.ActiveNanos.ToList())
             {
-                PetShellItemService.Default.GiveShellAfterNanoRestore(character, entry.Value.ID);
+                if (!NanoEventRuntimeService.Default.HasSummonPetOnUse(entry.Value.ID))
+                {
+                    PetShellItemService.Default.GiveShellAfterNanoRestore(character, entry.Value.ID);
+                }
             }
 
             this.SyncCurrentNcuStat(character);
+        }
+
+        public void CleanupOrphanSummonPetNanosAfterPetRestore(ICharacter character)
+        {
+            this.CleanupOrphanSummonPetNanos(character, true);
+        }
+
+        public void PurgeOrphanSummonNanoInStrain(ICharacter character, int strain, bool notifyClient)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            IActiveNano activeNano;
+            if (!character.ActiveNanos.TryGetValue(strain, out activeNano) || activeNano == null)
+            {
+                return;
+            }
+
+            if (!NanoEventRuntimeService.Default.HasSummonPetOnUse(activeNano.ID))
+            {
+                return;
+            }
+
+            if (PetRuntimeService.Default.HasActivePetInStrain(character, strain))
+            {
+                return;
+            }
+
+            if (PetRuntimeService.Default.HasPendingRestoreForStrain(
+                character.Identity.Instance,
+                strain))
+            {
+                return;
+            }
+
+            this.RemoveActiveNanoByStrain(character, strain, notifyClient);
+        }
+
+        private void CleanupOrphanSummonPetNanos(ICharacter character, bool notifyClient)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            foreach (KeyValuePair<int, IActiveNano> entry in character.ActiveNanos.ToList())
+            {
+                if (!NanoEventRuntimeService.Default.HasSummonPetOnUse(entry.Value.ID))
+                {
+                    continue;
+                }
+
+                if (PetRuntimeService.Default.HasActivePetInStrain(character, entry.Key))
+                {
+                    continue;
+                }
+
+                if (PetRuntimeService.Default.HasPendingRestoreForStrain(
+                    character.Identity.Instance,
+                    entry.Key))
+                {
+                    continue;
+                }
+
+                this.RemoveActiveNanoByStrain(character, entry.Key, notifyClient);
+            }
         }
 
         public void SchedulePostLoginNanoRestore(IZoneClient client)
@@ -479,11 +628,18 @@ namespace ZoneEngine.Core
 
             int characterId = client.Controller.Character.Identity.Instance;
             bool hasZoneTransferStash = this.HasZoneTransferStash(characterId);
+            bool hasDbActiveNanos = CharacterActiveNanosDao.Instance.HasActiveNanos(characterId);
             bool hasPendingPetRestore = PetRuntimeService.Default.HasPendingRestore(characterId);
-            if (!hasZoneTransferStash
-                && !CharacterActiveNanosDao.Instance.HasActiveNanos(characterId)
-                && !hasPendingPetRestore)
+            if (!hasZoneTransferStash && !hasDbActiveNanos)
             {
+                if (hasPendingPetRestore)
+                {
+                    PetRuntimeService.Default.ClearPendingRestoreForOwner(characterId);
+                    LogUtil.Debug(
+                        DebugInfoDetail.GameFunctions,
+                        "Cleared stale pet pending restore on login char=" + characterId);
+                }
+
                 return;
             }
 
@@ -503,7 +659,7 @@ namespace ZoneEngine.Core
                     this.RestoreCharacterActiveNanos(character, true);
                 });
 
-            if (hasPendingPetRestore)
+            if (hasZoneTransferStash && hasPendingPetRestore)
             {
                 ThreadPool.QueueUserWorkItem(
                     _ =>
@@ -531,7 +687,7 @@ namespace ZoneEngine.Core
             foreach (KeyValuePair<int, IActiveNano> entry in character.ActiveNanos.ToList())
             {
                 IActiveNano activeNano = entry.Value;
-                CharacterActionMessageHandler.Default.SendActiveNanoDuration(
+                CharacterActionMessageHandler.Default.NotifyActiveNanoDuration(
                     character,
                     character.Identity,
                     activeNano.ID,
@@ -606,7 +762,7 @@ namespace ZoneEngine.Core
 
             if (NanoEventRuntimeService.Default.HasSummonPetOnUse(nanoId))
             {
-                PetRuntimeService.Default.DismissPet(character);
+                PetRuntimeService.Default.DismissPetByStrain(character, strain);
             }
 
             if (notifyClient)
@@ -778,7 +934,7 @@ namespace ZoneEngine.Core
             }
         }
 
-        private bool HasZoneTransferStash(int characterId)
+        public bool HasZoneTransferStash(int characterId)
         {
             lock (Sync)
             {

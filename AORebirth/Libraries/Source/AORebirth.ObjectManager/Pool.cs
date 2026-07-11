@@ -541,6 +541,7 @@ namespace AORebirth.ObjectManager
                             if (temp is T)
                             {
                                 list[(int)obj.Identity.Type].Remove(obj.Identity.Long());
+                                this.PurgeResidualChildren(obj.Identity);
                             }
                             else
                             {
@@ -645,20 +646,54 @@ namespace AORebirth.ObjectManager
 
         #endregion
 
-        public int GetFreeInstance<T>(int minId, IdentityType type)
+        public void PurgeResidualChildren(Identity identity)
         {
-            Identity temp = new Identity() { Type = type, Instance = minId };
+            ulong parentId = identity.Long();
+            lock (this.pool)
+            {
+                this.pool.Remove(parentId);
+            }
+        }
 
+        public bool HasResidualChildren(Identity identity)
+        {
+            ulong parentId = identity.Long();
+            lock (this.pool)
+            {
+                return this.pool.ContainsKey(parentId);
+            }
+        }
+
+        public int GetFreeInstance<T>(int minId, IdentityType type) where T : class, IEntity
+        {
             lock (this.reservedIds)
             {
-                if (maxIds.ContainsKey((int)type))
+                int candidate = minId;
+                while (true)
                 {
-                    minId = minId < maxIds[(int)type] + 1 ? maxIds[(int)type] + 1 : minId;
+                    var probe = new Identity { Type = type, Instance = candidate };
+                    ulong probeLong = probe.Long();
+                    if (this.reservedIds.Contains(probeLong) || this.GetObject<T>(probe) != null)
+                    {
+                        candidate++;
+                        continue;
+                    }
+
+                    if (this.HasResidualChildren(probe))
+                    {
+                        this.PurgeResidualChildren(probe);
+                    }
+
+                    break;
                 }
-                maxIds[(int)type] = minId;
+
+                if (!this.maxIds.ContainsKey((int)type) || candidate > this.maxIds[(int)type])
+                {
+                    this.maxIds[(int)type] = candidate;
+                }
+
+                return candidate;
             }
-            temp.Instance = minId;
-            return temp.Instance;
         }
     }
 }

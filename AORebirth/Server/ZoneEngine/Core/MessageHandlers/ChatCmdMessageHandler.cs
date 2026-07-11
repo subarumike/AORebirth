@@ -38,6 +38,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.ChatCommands;
     using ZoneEngine.Script;
@@ -94,6 +95,12 @@ namespace ZoneEngine.Core.MessageHandlers
             if (commandName == "team")
             {
                 TeamRuntime.TryHandleChatCommand(client.Controller.Character, cmdArgs);
+                return;
+            }
+
+            if (commandName == "pet")
+            {
+                PetCommandService.HandleChatPetCommand(client, cmdArgs);
                 return;
             }
 

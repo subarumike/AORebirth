@@ -65,6 +65,14 @@ namespace ZoneEngine.Core.MessageHandlers
         }
 
         /// <summary>
+        /// Pet heal casts use Identity=pet and Caster=None (20260711-022256).
+        /// </summary>
+        public void SendPetCast(ICharacter pet, int nanoId, Identity target, bool announceToPlayfield = true)
+        {
+            this.Send(pet, this.PetCastFiller(pet, nanoId, target), announceToPlayfield);
+        }
+
+        /// <summary>
         /// </summary>
         /// <param name="character">
         /// </param>
@@ -80,6 +88,19 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 x.Identity = character.Identity;
                 x.Caster = character.Identity;
+                x.Target = target;
+                x.NanoId = nanoId;
+                x.Unknown = 0;
+                x.Unknown1 = 0;
+            };
+        }
+
+        private MessageDataFiller PetCastFiller(ICharacter pet, int nanoId, Identity target)
+        {
+            return x =>
+            {
+                x.Identity = pet.Identity;
+                x.Caster = Identity.None;
                 x.Target = target;
                 x.NanoId = nanoId;
                 x.Unknown = 0;

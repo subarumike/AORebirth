@@ -157,7 +157,7 @@ namespace AORebirth.Core.Playfields
         {
             SetMobStat(mobCharacter, StatIds.side, 3);
             SetMobStat(mobCharacter, StatIds.fatness, 1);
-            SetMobStat(mobCharacter, StatIds.breed, spawn.Breed);
+            SetMobStat(mobCharacter, StatIds.breed, Math.Max(1, Math.Min(7, spawn.Breed)));
             SetMobStat(mobCharacter, StatIds.sex, spawn.Sex);
             SetMobStat(mobCharacter, StatIds.race, 1);
             SetMobStat(mobCharacter, StatIds.flags, spawn.CharacterFlags);
@@ -171,6 +171,8 @@ namespace AORebirth.Core.Playfields
             SetMobStat(mobCharacter, StatIds.currentmovementmode, (int)MoveModes.Run);
             SetMobStat(mobCharacter, StatIds.prevmovementmode, (int)MoveModes.Run);
             SetMobStat(mobCharacter, StatIds.runspeed, spawn.RunSpeed);
+            SetMobStat(mobCharacter, StatIds.profession, 1);
+            SetMobStat(mobCharacter, StatIds.titlelevel, 1);
             SetMobStat(mobCharacter, StatIds.level, spawn.Level);
             SetMobStat(mobCharacter, StatIds.life, spawn.Health);
             SetMobStat(mobCharacter, StatIds.health, spawn.Health);

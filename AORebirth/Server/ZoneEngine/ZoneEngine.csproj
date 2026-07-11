@@ -90,6 +90,7 @@
     <Compile Include="ChatCommands\ChatCommandCreateOrg.cs" />
     <Compile Include="ChatCommands\ChatCommandGiveCredits.cs" />
     <Compile Include="ChatCommands\ChatCommandGiveItem.cs" />
+    <Compile Include="ChatCommands\ChatCommandGivePetShell.cs" />
     <Compile Include="ChatCommands\ChatCommandSet.cs" />
     <Compile Include="ChatCommands\DebugItem.cs" />
     <Compile Include="ChatCommands\FindWeaponVisual.cs" />
@@ -181,6 +182,8 @@
     <Compile Include="Core\Functions\GameFunctions\teleport.cs" />
     <Compile Include="Core\Functions\GameFunctions\teleportproxy2.cs" />
     <Compile Include="Core\Functions\GameFunctions\uploadnano.cs" />
+    <Compile Include="Core\Functions\GameFunctions\summonpet.cs" />
+    <Compile Include="Core\Functions\GameFunctions\summonpets.cs" />
     <Compile Include="Core\IntermalMessageEvents\PlayfieldMessageReceivedEvent.cs" />
     <Compile Include="Core\InternalMessages\IMExecuteFunction.cs" />
     <Compile Include="Core\InternalMessages\IMSendAOtomatinMessageToPlayfieldOthers.cs" />
@@ -197,7 +200,15 @@
     <Compile Include="Core\ActiveNanoRuntimeService.cs" />
     <Compile Include="Core\NanoEventRuntimeService.cs" />
     <Compile Include="Core\PetRuntimeService.cs" />
+    <Compile Include="Core\PetCommandService.cs" />
+    <Compile Include="Core\PetHealNanoCatalog.cs" />
+    <Compile Include="Core\PetCombatRules.cs" />
     <Compile Include="Core\PetMobTemplateResolver.cs" />
+    <Compile Include="Core\PetSlotClassifier.cs" />
+    <Compile Include="Core\PetSummonScfuExtensions.cs" />
+    <Compile Include="Core\PetSummonCaptureWireReplayer.cs" />
+    <Compile Include="Core\PetSummonSpellListBuilder.cs" />
+    <Compile Include="Core\PetSummonSpellListService.cs" />
     <Compile Include="Core\PetShellItemService.cs" />
     <Compile Include="Core\PetSummonNanoCatalog.cs" />
     <Compile Include="Core\MessageHandlers\AddTemplateMessageHandler.cs" />
@@ -207,6 +218,7 @@
     <Compile Include="Core\MessageHandlers\BuffMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\AddPetMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\RemovePetMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\PetCommandMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\BackpackContainerActionMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\CastNanoMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\CharacterActionMessageHandler.cs" />

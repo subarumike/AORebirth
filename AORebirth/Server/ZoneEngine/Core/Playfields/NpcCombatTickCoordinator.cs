@@ -108,7 +108,8 @@ namespace AORebirth.Core.Playfields
             if (this.nextCombatTicks.TryGetValue(attacker.Identity.Instance, out nextTick)
                 && nextTick > now)
             {
-                if (Playfield.IsCapturedCleaningRobot(attacker))
+                if (Playfield.IsCapturedCleaningRobot(attacker)
+                    || PetCombatRules.IsPlayerOwnedAttackPet(attacker))
                 {
                     if (!this.playfield.IsInCombatRange(attacker, target, attackSource.Range))
                     {
@@ -170,6 +171,16 @@ namespace AORebirth.Core.Playfields
 
             if (killingHit)
             {
+                if (PetCombatRules.IsPlayerOwnedAttackPet(attacker))
+                {
+                    this.playfield.Announce(
+                        new StopFightMessage
+                        {
+                            Identity = attacker.Identity,
+                            Unknown1 = 1
+                        });
+                }
+
                 this.playfield.HandleCombatKillingHit(attacker, target);
                 return;
             }
@@ -205,12 +216,22 @@ namespace AORebirth.Core.Playfields
                     Playfield.IsCapturedCleaningRobot(attacker),
                     attackSource.UsesEquippedWeapon,
                     previousTarget,
+                    targetInstance)
+                && !NpcCombatAttackRules.ShouldSendPlayerOwnedAttackPetAttackStartContext(
+                    PetCombatRules.IsPlayerOwnedAttackPet(attacker),
+                    previousTarget,
                     targetInstance))
             {
                 return;
             }
 
             this.lastNpcSpecialAttackWeaponTargets[attackerInstance] = targetInstance;
+            if (PetCombatRules.IsPlayerOwnedAttackPet(attacker))
+            {
+                this.AnnouncePlayerOwnedAttackPetAttackStartContext(attacker, target);
+                return;
+            }
+
             this.playfield.Announce(
                 new SpecialAttackWeaponMessage
                 {
@@ -253,6 +274,36 @@ namespace AORebirth.Core.Playfields
                     attacker.Stats[StatIds.monsterdata].Value));
         }
 
+        private void AnnouncePlayerOwnedAttackPetAttackStartContext(ICharacter attacker, ICharacter target)
+        {
+            this.playfield.Announce(
+                new SpecialAttackWeaponMessage
+                {
+                    Identity = attacker.Identity,
+                    Specials = CreatePlayerOwnedAttackPetSpecialAttacks(),
+                    Unknown1 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    Unknown2 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    Unknown3 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    Unknown4 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    Unknown5 = 0
+                });
+            this.playfield.Announce(
+                new AttackMessage
+                {
+                    Identity = attacker.Identity,
+                    Target = target.Identity,
+                    Action = 0
+                });
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "CombatPetAttackStartContextSend attacker={0} target={1}",
+                    attacker.Identity,
+                    target.Identity));
+        }
+
         private void AnnounceCapturedSubwayFilthFleaAttackStartContext(ICharacter attacker)
         {
             if (attacker.FightingTarget.Instance == 0)
@@ -279,6 +330,27 @@ namespace AORebirth.Core.Playfields
                     Target = attacker.FightingTarget,
                     Action = 0
                 });
+        }
+
+        private static SpecialAttack[] CreatePlayerOwnedAttackPetSpecialAttacks()
+        {
+            return new[]
+                   {
+                       new SpecialAttack
+                       {
+                           Unknown1 = PetCombatRules.AttackPetLeftWeaponTemplate,
+                           Unknown2 = PetCombatRules.AttackPetRightWeaponTemplate,
+                           Unknown3 = PetCombatRules.AttackPetLeftWeaponTag,
+                           Unknown4 = PetCombatRules.AttackPetLeftWeaponName
+                       },
+                       new SpecialAttack
+                       {
+                           Unknown1 = PetCombatRules.AttackPetLeftWeaponHighTemplate,
+                           Unknown2 = PetCombatRules.AttackPetRightWeaponHighTemplate,
+                           Unknown3 = PetCombatRules.AttackPetRightWeaponTag,
+                           Unknown4 = PetCombatRules.AttackPetRightWeaponName
+                       }
+                   };
         }
 
         private static SpecialAttack[] CreateCapturedCleaningRobotSpecialAttacks()
@@ -421,6 +493,34 @@ namespace AORebirth.Core.Playfields
 
         private CombatAttackSource GetCombatAttackSource(ICharacter attacker)
         {
+            if (PetCombatRules.IsPlayerOwnedAttackPet(attacker))
+            {
+                int rawMinDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.mindamage].Value, 0);
+                int rawMaxDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.maxdamage].Value, 0);
+                int petMinDamage = rawMinDamage > 0
+                                       ? rawMinDamage
+                                       : (rawMaxDamage > 0 ? rawMaxDamage : PetCombatRules.AttackPetFallbackDamage);
+                int petMaxDamage = rawMaxDamage > 0
+                                       ? rawMaxDamage
+                                       : (rawMinDamage > 0 ? rawMinDamage : PetCombatRules.AttackPetFallbackDamage);
+                int attackInfoWeaponInstance = this.GetAttackPetAttackInfoWeaponInstance(attacker);
+
+                return new CombatAttackSource
+                       {
+                           MinDamage = petMinDamage,
+                           MaxDamage = petMaxDamage,
+                           DamageBonus = NormalizeCombatItemStat(attacker.Stats[StatIds.damagebonus].Value, 0),
+                           Range = NpcCombatAttackRules.MaxMeleeCombatDistance,
+                           RechargeSeconds = PetCombatRules.AttackPetRechargeSeconds,
+                           UsesEquippedWeapon = true,
+                           AttackInfoAmmoCount = NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                           AttackInfoWeaponSlot = PetCombatRules.AttackPetAttackInfoWeaponSlot,
+                           AttackInfoUnk1 = PetCombatRules.AttackPetAttackInfoUnk1,
+                           AttackInfoHitType = PetCombatRules.AttackPetAttackInfoHitType,
+                           AttackInfoWeaponInstance = attackInfoWeaponInstance
+                       };
+            }
+
             if (IsCapturedSubwayFilthFlea(attacker))
             {
                 bool poisonAttackCompleted =
@@ -545,6 +645,22 @@ namespace AORebirth.Core.Playfields
                        AttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType,
                        AttackInfoWeaponInstance = 0
                     };
+        }
+
+        private int GetAttackPetAttackInfoWeaponInstance(ICharacter attacker)
+        {
+            int attackerInstance = attacker.Identity.Instance;
+            int lastSlot;
+            if (this.lastNpcUnarmedAttackInfoSlots.TryGetValue(attackerInstance, out lastSlot)
+                && lastSlot == PetCombatRules.AttackPetAttackInfoWeaponSlot)
+            {
+                this.lastNpcUnarmedAttackInfoSlots[attackerInstance] =
+                    NpcCombatAttackRules.NpcUnarmedRightAttackInfoWeaponSlot;
+                return PetCombatRules.AttackPetRightWeaponTag;
+            }
+
+            this.lastNpcUnarmedAttackInfoSlots[attackerInstance] = PetCombatRules.AttackPetAttackInfoWeaponSlot;
+            return PetCombatRules.AttackPetLeftWeaponTag;
         }
 
         private int GetUnarmedAttackInfoWeaponSlot(ICharacter attacker)

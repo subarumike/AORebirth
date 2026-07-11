@@ -111,7 +111,10 @@ namespace AORebirth.Core.Playfields
             uint appearance = archetype.AppearanceValue;
             SetMobStat(character, StatIds.side, (int)(appearance & 7));
             SetMobStat(character, StatIds.fatness, (int)((appearance & 31) >> 3));
-            SetMobStat(character, StatIds.breed, (int)((appearance & 255) >> 5));
+            SetMobStat(
+                character,
+                StatIds.breed,
+                Math.Max(1, Math.Min(7, (int)((appearance & 255) >> 5))));
             SetMobStat(character, StatIds.sex, (int)((appearance & 1023) >> 8));
             SetMobStat(character, StatIds.race, (int)(appearance >> 10));
             SetMobStat(character, StatIds.flags, archetype.CharacterFlags);
@@ -125,6 +128,8 @@ namespace AORebirth.Core.Playfields
             SetMobStat(character, StatIds.currentmovementmode, (int)MoveModes.Run);
             SetMobStat(character, StatIds.prevmovementmode, (int)MoveModes.Run);
             SetMobStat(character, StatIds.runspeed, spawn.RunSpeed);
+            SetMobStat(character, StatIds.profession, 1);
+            SetMobStat(character, StatIds.titlelevel, 1);
             SetMobStat(character, StatIds.level, spawn.Level);
             SetMobStat(character, StatIds.life, spawn.Health);
             SetMobStat(character, StatIds.health, Math.Max(0, spawn.Health - spawn.HealthDamage));

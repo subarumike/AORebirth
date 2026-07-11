@@ -294,6 +294,22 @@ namespace ZoneEngine.Core
             this.controller.Character.Stats[StatIds.visualprofession].BaseValue = (uint)this.controller.Character.Stats[StatIds.profession].Value;
         }
 
+        public void EnqueueOutboundCompressedBuffer(byte[] buffer)
+        {
+            if (buffer == null || buffer.Length == 0)
+            {
+                return;
+            }
+
+            var queuedBuffer = new byte[buffer.Length];
+            Buffer.BlockCopy(buffer, 0, queuedBuffer, 0, buffer.Length);
+
+            lock (this.sendQueue)
+            {
+                this.sendQueue.Enqueue(queuedBuffer);
+            }
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="buffer">
@@ -449,11 +465,19 @@ namespace ZoneEngine.Core
                     // Remove reference of character
                     if ((this.Controller != null) && (this.Controller.Character != null))
                     {
-                        if (!this.Controller.Character.InLogoutTimerPeriod())
+                        ICharacter disconnectCharacter = this.Controller.Character;
+                        int characterId = disconnectCharacter.Identity.Instance;
+                        bool preservePetRestore =
+                            ActiveNanoRuntimeService.Default.HasZoneTransferStash(characterId);
+                        PetRuntimeService.Default.OnCharacterDisconnected(
+                            disconnectCharacter,
+                            preservePetRestore);
+
+                        if (!disconnectCharacter.InLogoutTimerPeriod())
                         {
-                            this.Controller.Character.EnterLogoutSitPosture();
+                            disconnectCharacter.EnterLogoutSitPosture();
                             this.Controller.State = CharacterState.Idle;
-                            this.Controller.Character.StartLogoutTimer();
+                            disconnectCharacter.StartLogoutTimer();
                         }
 
                         //if (this == this.character.Client)
