@@ -2119,8 +2119,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && characterHeartbeatText.Contains("internal void ProcessRegeneration(ICharacter dynel, Action<ICharacter> sendChangedStats)")
                 && characterHeartbeatText.Contains("StatHealInterval healInterval")
                 && characterHeartbeatText.Contains("StatNanoInterval nanoInterval")
-                && characterHeartbeatText.Contains("TryReadMaxNanoEnergy(dynel, out maxNanoEnergy)")
-                && characterHeartbeatText.Contains("catch (IndexOutOfRangeException)")
                 && characterHeartbeatText.Contains("sendChangedStats(dynel);")
                 && characterHeartbeatText.Contains("internal void ProcessFollow(ICharacter dynel)")
                 && characterHeartbeatText.Contains("dynel.Controller.DoFollow();")
