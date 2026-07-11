@@ -1,0 +1,91 @@
+# AO Client RoomSpace Guard
+
+This runtime guard prevents the Subway `std::bad_cast` crash in both supported AO client builds without modifying launcher-managed files.
+
+The guard:
+
+- selects a patch profile only when `N3.dll` has an approved SHA-256 hash;
+- acquires the per-client guard lock before it launches `Anarchy.exe`, so a duplicate
+  shortcut invocation fails closed instead of starting an unguarded client;
+- waits for `anarchyonline.exe` from the requested client directory;
+- verifies that the loaded `N3.dll` came from the same directory;
+- patches only four audited surface-collision callsites (`CalculateClosestPoint`, `GetTileTriangles`, and the two `GetLineIntersection` lookups) with a checked `Space_i` to `n3RoomSpace_t` preflight;
+- uses the checked `n3RoomSpace_t*` directly for `GetInsideCell` and the original room lookup, avoiding a second throwing cast;
+- returns `nullptr` only to that collision caller when the checked cast or cell lookup fails; that caller already handles the no-room result;
+- leaves every other `PosToRoom` call unchanged;
+- suspends the client briefly while replacing the single call instruction;
+- verifies the in-memory bytes and flushes the instruction cache;
+- keeps a bounded telemetry monitor alive until the client exits;
+- records only the first guarded failure at each callsite plus one final counter summary;
+- atomically preserves the first playfield pointer, exact cast-input room-space pointer,
+  event-time vtable, failure reason, signed cell result, exact query-vector pointer and
+  XYZ coordinates, current field value, and field-match result before later failures can
+  overwrite that evidence.
+
+Run the matching installed guarded-launch shortcut. Do not start AO separately from that
+shortcut. Logs are written to:
+
+`%LOCALAPPDATA%\AOClientRoomSpaceGuard\guard.log`
+
+The patch exists only in process memory and must be applied on each client launch. Unknown or updated DLL hashes fail closed.
+
+## Distribution lanes
+
+`ProxyDll` is the normal-shortcut distribution lane. It packages the proven RoomSpace
+repair as an x86 `version.dll` proxy that forwards the Windows version APIs and applies
+the same four audited callsite changes in process memory. It supports only the exact
+approved old- and new-client `N3.dll` SHA-256 hashes. Its installer refuses a client
+directory that already contains `version.dll`, and the package includes matching install
+and uninstall commands plus the required AOReloaded MIT attribution.
+
+The proxy leaves `AnarchyOnline.exe`, `N3.dll`, graphics/resources, and existing shortcuts
+unchanged. It does not include AOReloaded's LAA executable patch, settings changes, or any
+other AOReloaded modification. See `ProxyDll\README.md` for build and package details.
+
+The external guarded launcher remains the diagnostic and telemetry lane. Use it when the
+bounded `GUARD HIT` evidence and per-callsite counters are needed; use the proxy package
+for normal-shortcut player distribution. Exact isolated install/uninstall smoke tests pass
+for both approved clients; the installed live-client proxy still needs the in-game runtime
+smoke described in `ProxyDll\README.md`.
+
+Telemetry messages:
+
+- `PATCH PASS`: all four calls and the telemetry wrapper were installed and verified.
+- `LAUNCH PASS`: the guard acquired its profile lock and launched the requested AO client.
+- `MONITOR START`: the minimized guard is watching the patched process.
+- `GUARD HIT first`: the first failed cast or invalid-cell result for that callsite,
+  including object identity, signed cell result, and query-coordinate evidence.
+- `MONITOR END`: the client exited and the final per-callsite counts were recorded.
+
+The monitor does not log every event, so a long-running client cannot create unbounded
+per-hit output.
+
+## Build and deploy
+
+Close guarded AO clients, then run from the AORebirth repository root:
+
+```cmd
+cmd /d /c Tools\AOClientRoomSpaceGuard\Build-And-Deploy.cmd
+```
+
+The wrapper compiles an optimized x86 executable to a temporary path, runs the wrapper
+self-test, validates both installed N3 hashes, and deploys the executable, launchers, and
+README to `C:\Funcom\AOClientRoomSpaceGuard`. It never launches AO.
+
+## Confirmed A/B validation
+
+- Old client on live: guarded for more than 20 minutes in the failing room; the unguarded
+  client crashed almost immediately. Crash return `N3+0x148BB` is the instruction after
+  guarded call `N3+0x148B6`.
+- New client on AORebirth: guarded in the same failing condition without a crash; the
+  unguarded client crashed almost immediately. Crash return `N3+0x16149` is the instruction
+  after guarded call `N3+0x16144`.
+
+This validates the current mitigation. Current telemetry rules out the earlier
+wrong-class/stale-room-space theory for the main invalid-cell path: the exact room-space
+pointer remains current and `GetInsideCell` returns `-1`. Multiple-room correlation shows
+that the client callers preserve valid captured actor X/Z but derive out-of-cell heights:
+Workman Striker samples are `0.75` and `1.50` units below the actor, while a separate
+Infector line query uses `Y=0` instead of its captured `Y=73.01795`. The permanent guarded
+behavior is therefore to return no room for those invalid queries; AORebirth server spawn
+coordinates and captured movement paths are not altered.

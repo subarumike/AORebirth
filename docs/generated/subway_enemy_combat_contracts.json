@@ -1,0 +1,1043 @@
+{
+  "Abmouth Supremus": {
+    "monsterData": [
+      155962
+    ],
+    "captures": [
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:79545116)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 1,
+    "attackInfoObserved": false,
+    "attackInfoRows": 0,
+    "minDamage": 0,
+    "maxDamage": 0,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Architect Striker": {
+    "monsterData": [
+      203743
+    ],
+    "captures": [
+      "20260709-212115",
+      "20260709-212336",
+      "20260709-220439"
+    ],
+    "identities": [
+      "(SimpleChar:7953A9B3)",
+      "(SimpleChar:7953A9BD)",
+      "(SimpleChar:7953AAEB)",
+      "(SimpleChar:7953AFDA)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 22,
+    "attackInfoObserved": true,
+    "attackInfoRows": 33,
+    "minDamage": 13,
+    "maxDamage": 38,
+    "medianRechargeSeconds": 5.350104,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1397315377,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Basic Quality Armorer": {
+    "monsterData": [
+      26097
+    ],
+    "captures": [
+      "20260709-212115"
+    ],
+    "identities": [
+      "(SimpleChar:79135F53)"
+    ],
+    "retaliationObserved": false,
+    "retaliationRows": 0,
+    "attackInfoObserved": false,
+    "attackInfoRows": 0,
+    "minDamage": 0,
+    "maxDamage": 0,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 121567,
+    "equippedWeaponQuality": 1
+  },
+  "Basic Quality Pharmacist": {
+    "monsterData": [
+      26151
+    ],
+    "captures": [
+      "20260709-212115"
+    ],
+    "identities": [
+      "(SimpleChar:79135F54)"
+    ],
+    "retaliationObserved": false,
+    "retaliationRows": 0,
+    "attackInfoObserved": false,
+    "attackInfoRows": 0,
+    "minDamage": 0,
+    "maxDamage": 0,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 121567,
+    "equippedWeaponQuality": 1
+  },
+  "Basic Quality Weaponsdealer": {
+    "monsterData": [
+      26092
+    ],
+    "captures": [
+      "20260709-212115"
+    ],
+    "identities": [
+      "(SimpleChar:79135F52)"
+    ],
+    "retaliationObserved": false,
+    "retaliationRows": 0,
+    "attackInfoObserved": false,
+    "attackInfoRows": 0,
+    "minDamage": 0,
+    "maxDamage": 0,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 121567,
+    "equippedWeaponQuality": 1
+  },
+  "Basic Tools Merchant": {
+    "monsterData": [
+      26137
+    ],
+    "captures": [
+      "20260709-212115"
+    ],
+    "identities": [
+      "(SimpleChar:79135F55)"
+    ],
+    "retaliationObserved": false,
+    "retaliationRows": 0,
+    "attackInfoObserved": false,
+    "attackInfoRows": 0,
+    "minDamage": 0,
+    "maxDamage": 0,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 121567,
+    "equippedWeaponQuality": 1
+  },
+  "Bloodcreeper": {
+    "monsterData": [
+      30379
+    ],
+    "captures": [
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:795450A1)",
+      "(SimpleChar:795451C5)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 2,
+    "attackInfoObserved": true,
+    "attackInfoRows": 6,
+    "minDamage": 21,
+    "maxDamage": 41,
+    "medianRechargeSeconds": 6.49924,
+    "weaponSlot": 1,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1397446450,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Deranged Shopper": {
+    "monsterData": [
+      203736
+    ],
+    "captures": [
+      "20260709-210452"
+    ],
+    "identities": [
+      "(SimpleChar:7953AD91)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 5,
+    "attackInfoObserved": true,
+    "attackInfoRows": 3,
+    "minDamage": 10,
+    "maxDamage": 11,
+    "medianRechargeSeconds": 5.200886,
+    "weaponSlot": 6,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 125455,
+    "equippedWeaponQuality": 9
+  },
+  "Discarded Pet": {
+    "monsterData": [
+      17720
+    ],
+    "captures": [
+      "20260709-210452",
+      "20260709-220439"
+    ],
+    "identities": [
+      "(SimpleChar:794F626A)",
+      "(SimpleChar:795317D6)",
+      "(SimpleChar:7953AA04)",
+      "(SimpleChar:7953AA1B)",
+      "(SimpleChar:7953AA82)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 4,
+    "attackInfoObserved": true,
+    "attackInfoRows": 1,
+    "minDamage": 9,
+    "maxDamage": 9,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1397315377,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Disobedient Bot": {
+    "monsterData": [
+      17649
+    ],
+    "captures": [
+      "20260709-220439"
+    ],
+    "identities": [
+      "(SimpleChar:7953AA81)",
+      "(SimpleChar:7953AB08)",
+      "(SimpleChar:7953AD69)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 3,
+    "attackInfoObserved": false,
+    "attackInfoRows": 0,
+    "minDamage": 0,
+    "maxDamage": 0,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Empty Shell": {
+    "monsterData": [
+      203731
+    ],
+    "captures": [
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:79545175)",
+      "(SimpleChar:79545178)",
+      "(SimpleChar:79545179)",
+      "(SimpleChar:79545182)",
+      "(SimpleChar:79545183)",
+      "(SimpleChar:7954519B)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 6,
+    "attackInfoObserved": true,
+    "attackInfoRows": 1,
+    "minDamage": 15,
+    "maxDamage": 15,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1397315377,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Eumenides": {
+    "monsterData": [
+      203726
+    ],
+    "captures": [
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:79545042)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 1,
+    "attackInfoObserved": true,
+    "attackInfoRows": 2,
+    "minDamage": 39,
+    "maxDamage": 45,
+    "medianRechargeSeconds": 9.749082,
+    "weaponSlot": 6,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 123267,
+    "equippedWeaponQuality": 20
+  },
+  "Filth Flea": {
+    "monsterData": [
+      17657
+    ],
+    "captures": [
+      "20260709-193914",
+      "20260709-210452",
+      "20260709-220439",
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:79513A87)",
+      "(SimpleChar:79513A8F)",
+      "(SimpleChar:79513AAF)",
+      "(SimpleChar:79513AC2)",
+      "(SimpleChar:795313FC)",
+      "(SimpleChar:79531761)",
+      "(SimpleChar:7953A884)",
+      "(SimpleChar:7953A9E7)",
+      "(SimpleChar:7953A9EA)",
+      "(SimpleChar:7953A9FC)",
+      "(SimpleChar:795451FC)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 11,
+    "attackInfoObserved": true,
+    "attackInfoRows": 30,
+    "minDamage": 3,
+    "maxDamage": 37,
+    "medianRechargeSeconds": 2.568367,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1096439123,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Fragmented Soul": {
+    "monsterData": [
+      203729
+    ],
+    "captures": [
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:7954516A)",
+      "(SimpleChar:7954516F)",
+      "(SimpleChar:7954517A)",
+      "(SimpleChar:7954518A)",
+      "(SimpleChar:7954518B)",
+      "(SimpleChar:7954518E)",
+      "(SimpleChar:795451AA)",
+      "(SimpleChar:795451AE)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 9,
+    "attackInfoObserved": true,
+    "attackInfoRows": 2,
+    "minDamage": 18,
+    "maxDamage": 23,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 6,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 123685,
+    "equippedWeaponQuality": 17
+  },
+  "Fury Externalization": {
+    "monsterData": [
+      96195
+    ],
+    "captures": [
+      "20260709-205921"
+    ],
+    "identities": [
+      "(SimpleChar:7953AE99)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 17,
+    "attackInfoObserved": true,
+    "attackInfoRows": 26,
+    "minDamage": 25,
+    "maxDamage": 57,
+    "medianRechargeSeconds": 3.365748,
+    "weaponSlot": 1,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1296389938,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Healer": {
+    "monsterData": [
+      96193
+    ],
+    "captures": [
+      "20260709-220439",
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:7954523B)",
+      "(SimpleChar:795481C0)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 6,
+    "attackInfoObserved": false,
+    "attackInfoRows": 0,
+    "minDamage": 0,
+    "maxDamage": 0,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Incomplete Rebuild": {
+    "monsterData": [
+      203728
+    ],
+    "captures": [
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:79545170)",
+      "(SimpleChar:79545172)",
+      "(SimpleChar:79545177)",
+      "(SimpleChar:79545181)",
+      "(SimpleChar:79545188)",
+      "(SimpleChar:795451BC)",
+      "(SimpleChar:795451C1)",
+      "(SimpleChar:795451CB)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 11,
+    "attackInfoObserved": true,
+    "attackInfoRows": 1,
+    "minDamage": 43,
+    "maxDamage": 43,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 6,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 122653,
+    "equippedWeaponQuality": 18
+  },
+  "Infected Attendant": {
+    "monsterData": [
+      96056
+    ],
+    "captures": [
+      "20260709-220439"
+    ],
+    "identities": [
+      "(SimpleChar:7953A9E6)",
+      "(SimpleChar:7953AA1A)",
+      "(SimpleChar:7953AA32)",
+      "(SimpleChar:7953AB2D)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 6,
+    "attackInfoObserved": true,
+    "attackInfoRows": 1,
+    "minDamage": 11,
+    "maxDamage": 11,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1397315377,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Infector": {
+    "monsterData": [
+      31909
+    ],
+    "captures": [
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:7953AD64)",
+      "(SimpleChar:7954514F)",
+      "(SimpleChar:79545150)",
+      "(SimpleChar:79545153)",
+      "(SimpleChar:79545154)",
+      "(SimpleChar:7954517D)",
+      "(SimpleChar:795451A1)",
+      "(SimpleChar:795451A6)",
+      "(SimpleChar:795451A9)",
+      "(SimpleChar:795451E8)",
+      "(SimpleChar:79545218)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 38,
+    "attackInfoObserved": true,
+    "attackInfoRows": 39,
+    "minDamage": 13,
+    "maxDamage": 75,
+    "medianRechargeSeconds": 5.065262,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1145919558,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Killer": {
+    "monsterData": [
+      96195
+    ],
+    "captures": [
+      "20260709-220439",
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:7953AE99)",
+      "(SimpleChar:7954523C)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 47,
+    "attackInfoObserved": true,
+    "attackInfoRows": 53,
+    "minDamage": 38,
+    "maxDamage": 114,
+    "medianRechargeSeconds": 5.649989,
+    "weaponSlot": 1,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1296389938,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Looter": {
+    "monsterData": [
+      203745
+    ],
+    "captures": [
+      "20260709-210452",
+      "20260709-212115"
+    ],
+    "identities": [
+      "(SimpleChar:79528F96)",
+      "(SimpleChar:79528FD6)",
+      "(SimpleChar:795312BC)",
+      "(SimpleChar:795313CB)",
+      "(SimpleChar:7953AD7C)",
+      "(SimpleChar:7953AD8D)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 15,
+    "attackInfoObserved": true,
+    "attackInfoRows": 16,
+    "minDamage": 11,
+    "maxDamage": 25,
+    "medianRechargeSeconds": 5.282358,
+    "weaponSlot": 6,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 123038,
+    "equippedWeaponQuality": 11
+  },
+  "Melded Patterns": {
+    "monsterData": [
+      203747
+    ],
+    "captures": [
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:7954517C)",
+      "(SimpleChar:79545185)",
+      "(SimpleChar:79545187)",
+      "(SimpleChar:79545190)",
+      "(SimpleChar:79545196)",
+      "(SimpleChar:79545198)",
+      "(SimpleChar:795451D8)",
+      "(SimpleChar:795451DD)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 10,
+    "attackInfoObserved": true,
+    "attackInfoRows": 5,
+    "minDamage": 22,
+    "maxDamage": 34,
+    "medianRechargeSeconds": 4.533262,
+    "weaponSlot": 6,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 121817,
+    "equippedWeaponQuality": 19
+  },
+  "Molested Molecules": {
+    "monsterData": [
+      203746
+    ],
+    "captures": [
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:79545174)",
+      "(SimpleChar:7954517B)",
+      "(SimpleChar:795451B5)",
+      "(SimpleChar:795451C2)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 7,
+    "attackInfoObserved": true,
+    "attackInfoRows": 4,
+    "minDamage": 17,
+    "maxDamage": 53,
+    "medianRechargeSeconds": 9.483859,
+    "weaponSlot": 6,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 122217,
+    "equippedWeaponQuality": 20
+  },
+  "Mugger": {
+    "monsterData": [
+      203734
+    ],
+    "captures": [
+      "20260709-210452",
+      "20260709-212115",
+      "20260709-212336",
+      "20260709-220439"
+    ],
+    "identities": [
+      "(SimpleChar:7953AA11)",
+      "(SimpleChar:7953AD53)",
+      "(SimpleChar:7953AD55)",
+      "(SimpleChar:7953AD5C)",
+      "(SimpleChar:7953AD6B)",
+      "(SimpleChar:7953ADC6)",
+      "(SimpleChar:7953ADC8)",
+      "(SimpleChar:7953AF3C)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 17,
+    "attackInfoObserved": true,
+    "attackInfoRows": 49,
+    "minDamage": 10,
+    "maxDamage": 21,
+    "medianRechargeSeconds": 5.900159,
+    "weaponSlot": 6,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 121567,
+    "equippedWeaponQuality": 1
+  },
+  "Neural Burnout": {
+    "monsterData": [
+      203730
+    ],
+    "captures": [
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:795451D5)",
+      "(SimpleChar:79545229)",
+      "(SimpleChar:79545231)",
+      "(SimpleChar:7954523D)",
+      "(SimpleChar:79545245)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 9,
+    "attackInfoObserved": true,
+    "attackInfoRows": 2,
+    "minDamage": 14,
+    "maxDamage": 33,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1397315377,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Premature Pattern": {
+    "monsterData": [
+      203727
+    ],
+    "captures": [
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:7954516B)",
+      "(SimpleChar:7954516C)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 2,
+    "attackInfoObserved": true,
+    "attackInfoRows": 2,
+    "minDamage": 22,
+    "maxDamage": 41,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1397315377,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Redundant Scan": {
+    "monsterData": [
+      204178
+    ],
+    "captures": [
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:795451BF)",
+      "(SimpleChar:795451C4)",
+      "(SimpleChar:795451D3)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 7,
+    "attackInfoObserved": false,
+    "attackInfoRows": 0,
+    "minDamage": 0,
+    "maxDamage": 0,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 122028,
+    "equippedWeaponQuality": 25
+  },
+  "Shadow": {
+    "monsterData": [
+      30464
+    ],
+    "captures": [
+      "20260709-212115",
+      "20260709-212336",
+      "20260709-220439"
+    ],
+    "identities": [
+      "(SimpleChar:7952880B)",
+      "(SimpleChar:79528817)",
+      "(SimpleChar:79528828)",
+      "(SimpleChar:79528829)",
+      "(SimpleChar:7952882A)",
+      "(SimpleChar:7953A96C)",
+      "(SimpleChar:7953A97A)",
+      "(SimpleChar:7953AA1C)",
+      "(SimpleChar:7953AA2A)",
+      "(SimpleChar:7953AA2B)",
+      "(SimpleChar:7953AA33)",
+      "(SimpleChar:7953AA53)",
+      "(SimpleChar:7953AA55)",
+      "(SimpleChar:7953AA56)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 76,
+    "attackInfoObserved": true,
+    "attackInfoRows": 119,
+    "minDamage": 11,
+    "maxDamage": 44,
+    "medianRechargeSeconds": 5.299939,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1145919558,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Slum Runner": {
+    "monsterData": [
+      55648
+    ],
+    "captures": [
+      "20260709-220439",
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:7953A993)",
+      "(SimpleChar:7953AA19)",
+      "(SimpleChar:7953ABC0)",
+      "(SimpleChar:7953ABC3)",
+      "(SimpleChar:7953AF7B)",
+      "(SimpleChar:7953AF7F)",
+      "(SimpleChar:79545058)",
+      "(SimpleChar:79545059)",
+      "(SimpleChar:79545060)",
+      "(SimpleChar:79545064)",
+      "(SimpleChar:7954506C)",
+      "(SimpleChar:7954506F)",
+      "(SimpleChar:79545073)",
+      "(SimpleChar:79545080)",
+      "(SimpleChar:79545081)",
+      "(SimpleChar:79545083)",
+      "(SimpleChar:79545086)",
+      "(SimpleChar:795450E9)",
+      "(SimpleChar:795450F6)",
+      "(SimpleChar:795450F8)",
+      "(SimpleChar:795450FA)",
+      "(SimpleChar:795450FD)",
+      "(SimpleChar:79545138)",
+      "(SimpleChar:79545142)",
+      "(SimpleChar:7954514E)",
+      "(SimpleChar:795451A2)",
+      "(SimpleChar:79545201)",
+      "(SimpleChar:7954520E)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 57,
+    "attackInfoObserved": true,
+    "attackInfoRows": 25,
+    "minDamage": 5,
+    "maxDamage": 11,
+    "medianRechargeSeconds": 4.033397,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1145196631,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Stim Fiend": {
+    "monsterData": [
+      203739
+    ],
+    "captures": [
+      "20260709-210452",
+      "20260709-212115",
+      "20260709-212336",
+      "20260709-220439"
+    ],
+    "identities": [
+      "(SimpleChar:795312BD)",
+      "(SimpleChar:795312C9)",
+      "(SimpleChar:7953AA4B)",
+      "(SimpleChar:7953ABAF)",
+      "(SimpleChar:7953AD66)",
+      "(SimpleChar:7953AD99)",
+      "(SimpleChar:7953ADAB)",
+      "(SimpleChar:7953ADB1)",
+      "(SimpleChar:7953ADBE)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 27,
+    "attackInfoObserved": true,
+    "attackInfoRows": 23,
+    "minDamage": 10,
+    "maxDamage": 47,
+    "medianRechargeSeconds": 5.399389,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1397315377,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Tailor": {
+    "monsterData": [
+      26076
+    ],
+    "captures": [
+      "20260709-212115"
+    ],
+    "identities": [
+      "(SimpleChar:79135F51)"
+    ],
+    "retaliationObserved": false,
+    "retaliationRows": 0,
+    "attackInfoObserved": false,
+    "attackInfoRows": 0,
+    "minDamage": 0,
+    "maxDamage": 0,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 121567,
+    "equippedWeaponQuality": 1
+  },
+  "Thief": {
+    "monsterData": [
+      26092
+    ],
+    "captures": [
+      "20260710-205400"
+    ],
+    "identities": [
+      "(SimpleChar:7957E61A)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 1,
+    "attackInfoObserved": false,
+    "attackInfoRows": 0,
+    "minDamage": 0,
+    "maxDamage": 0,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 121567,
+    "equippedWeaponQuality": 1
+  },
+  "Uncontrollable Anger": {
+    "monsterData": [
+      96195
+    ],
+    "captures": [
+      "20260709-220439",
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:7953AD65)",
+      "(SimpleChar:795451B9)",
+      "(SimpleChar:795451CD)",
+      "(SimpleChar:795451CE)",
+      "(SimpleChar:79545202)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 9,
+    "attackInfoObserved": true,
+    "attackInfoRows": 6,
+    "minDamage": 12,
+    "maxDamage": 42,
+    "medianRechargeSeconds": 5.167153,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 1397315377,
+    "equippedWeaponObserved": false,
+    "equippedWeaponTemplateId": 0,
+    "equippedWeaponQuality": 0
+  },
+  "Vergil Aeneid": {
+    "monsterData": [
+      203748
+    ],
+    "captures": [
+      "20260709-222339"
+    ],
+    "identities": [
+      "(SimpleChar:795451E3)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 1,
+    "attackInfoObserved": false,
+    "attackInfoRows": 0,
+    "minDamage": 0,
+    "maxDamage": 0,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 122123,
+    "equippedWeaponQuality": 23
+  },
+  "Violent Vagabond": {
+    "monsterData": [
+      203733
+    ],
+    "captures": [
+      "20260709-205921",
+      "20260709-210452",
+      "20260709-212115",
+      "20260709-212336"
+    ],
+    "identities": [
+      "(SimpleChar:79528F80)",
+      "(SimpleChar:7953AA4A)",
+      "(SimpleChar:7953ABC5)",
+      "(SimpleChar:7953AD49)",
+      "(SimpleChar:7953AD58)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 5,
+    "attackInfoObserved": false,
+    "attackInfoRows": 0,
+    "minDamage": 0,
+    "maxDamage": 0,
+    "medianRechargeSeconds": 0.0,
+    "weaponSlot": 0,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 130590,
+    "equippedWeaponQuality": 1
+  },
+  "Workman Striker": {
+    "monsterData": [
+      203854
+    ],
+    "captures": [
+      "20260709-212115",
+      "20260709-212336",
+      "20260709-220439"
+    ],
+    "identities": [
+      "(SimpleChar:7953A830)",
+      "(SimpleChar:7953A84F)",
+      "(SimpleChar:7953A9F7)",
+      "(SimpleChar:7953AA0D)",
+      "(SimpleChar:7953AA16)",
+      "(SimpleChar:7953AA77)",
+      "(SimpleChar:7953AABE)",
+      "(SimpleChar:7953AAE9)",
+      "(SimpleChar:7953AB03)",
+      "(SimpleChar:7953AE95)",
+      "(SimpleChar:7953AFB8)",
+      "(SimpleChar:7953AFBC)",
+      "(SimpleChar:7953AFDD)",
+      "(SimpleChar:79545000)",
+      "(SimpleChar:79545136)"
+    ],
+    "retaliationObserved": true,
+    "retaliationRows": 63,
+    "attackInfoObserved": true,
+    "attackInfoRows": 104,
+    "minDamage": 12,
+    "maxDamage": 42,
+    "medianRechargeSeconds": 5.029176,
+    "weaponSlot": 6,
+    "attackInfoUnknown": 0,
+    "attackInfoWeaponInstance": 0,
+    "equippedWeaponObserved": true,
+    "equippedWeaponTemplateId": 122905,
+    "equippedWeaponQuality": 14
+  }
+}
