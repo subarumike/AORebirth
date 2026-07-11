@@ -301,8 +301,6 @@
     <Compile Include="Core\Playfields\CapturedSubwayContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinarySpawnOrchestrator.cs" />
-    <Compile Include="Core\Playfields\CapturedSubwayEntranceMissionSpawnOrchestrator.cs" />
-    <Compile Include="Core\Playfields\CapturedSubwayHandbagMissionRuntime.cs" />
     <Compile Include="Core\Playfields\CapturedSubwaySpawnOrchestrator.cs" />
     <Compile Include="Core\Playfields\NpcCombatAttackRules.cs" />
     <Compile Include="Core\Playfields\NpcCombatTickCoordinator.cs" />

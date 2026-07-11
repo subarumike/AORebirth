@@ -1207,54 +1207,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void SubwayHandbagMissionCaptureRemainsWired()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string runtimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayHandbagMissionRuntime.cs"));
-            string spawnText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayEntranceMissionSpawnOrchestrator.cs"));
-            string scfuText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string questSerializerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\Serialization\Serializers\Custom\QuestFullUpdateMessageSerializer.cs"));
-
-            Assert.IsTrue(
-                spawnText.Contains("Natalia Akcora")
-                && spawnText.Contains("3287.04688f")
-                && spawnText.Contains("860.1282f")
-                && spawnText.Contains("StatIds.monsterdata, 26076")
-                && spawnText.Contains("StatIds.headmesh, 40635")
-                && spawnText.Contains("new AOTextures(0, 284555)")
-                && spawnText.Contains("new AOTextures(4, 284556)"),
-                "Natalia Akcora must preserve the captured PF655 identity-linked SCFU position and appearance fields.");
-            Assert.IsTrue(
-                scfuText.Contains("CapturedNataliaAppearanceValue = 1832")
-                && scfuText.Contains("CapturedNataliaUnknown1")
-                && scfuText.Contains("IsCapturedNatalia(charPlayfield, monsterData, charName)"),
-                "Natalia must emit the captured SCFU version, appearance value, flags, and unknown bytes.");
-            Assert.IsTrue(
-                runtimeText.Contains("MissionInstance = 1431120071")
-                && runtimeText.Contains("The stolen handbag")
-                && runtimeText.Contains("DailyMissionXpRewardItemId = 285612")
-                && runtimeText.Contains("HandbagItemId = 297055")
-                && runtimeText.Contains("new Vector3(3306, 0, 837)")
-                && runtimeText.Contains("CreateCompletionAction")
-                && runtimeText.Contains("CreateQuestDelete")
-                && runtimeText.Contains("page.Write();"),
-                "The handbag mission must preserve the captured mission DTO, trade consumption, reward item action, and completion packets.");
-            Assert.IsTrue(
-                runtimeText.Contains("UnknownHash1 = \"\\u006A\\u0051\\u00B7\\u00A3\"")
-                && questSerializerText.Contains("bytes[i] = (byte)source[i];"),
-                "QuestFullUpdate must preserve the captured four raw action-hash bytes instead of ASCII-replacing them.");
-            Assert.IsTrue(
-                playfieldText.Contains("CapturedSubwayHandbagMissionRuntime.HasActiveMissionPlayerInPlayfield(target)"),
-                "The Thief handbag drop must be gated by an active mission player in PF127, including helper kills.");
-        }
-
-        [TestMethod]
         public void SubwayExistingPopulationAndPatrolReplayRemainLoaded()
         {
             string repositoryRoot = FindRepositoryRoot();
