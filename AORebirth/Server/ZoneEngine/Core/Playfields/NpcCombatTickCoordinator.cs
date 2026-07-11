@@ -421,25 +421,39 @@ namespace AORebirth.Core.Playfields
                     attacker.Stats[StatIds.weapontype].Value,
                     attacker.Stats[StatIds.equippedweapons].Value));
 
-            this.playfield.Announce(
-                new AttackInfoMessage
-                {
-                    Identity = attacker.Identity,
-                    Unknown = 0,
-                    Target = target.Identity,
-                    Unknown1 = damage,
-                    Unknown2 = attackSource.AttackInfoAmmoCount,
-                    Unknown3 = attackSource.AttackInfoWeaponSlot,
-                    Unknown4 = attackSource.AttackInfoUnk1,
-                    Unknown5 = attackSource.AttackInfoHitType,
-                    Unknown6 = attackSource.AttackInfoWeaponInstance
-                });
-            PlayfieldLifecycleTrace.Record(
-                PlayfieldLifecycleTrace.FlowCleaningRobotNpcAttack,
-                PlayfieldLifecycleTrace.StageRobotAttackInfo,
-                PlayfieldLifecycleTrace.MessageAttackInfo,
-                attacker.Identity,
-                "target=" + target.Identity);
+            if (attackSource.SendAttackInfo)
+            {
+                this.playfield.Announce(
+                    new AttackInfoMessage
+                    {
+                        Identity = attacker.Identity,
+                        Unknown = 0,
+                        Target = target.Identity,
+                        Unknown1 = damage,
+                        Unknown2 = attackSource.AttackInfoAmmoCount,
+                        Unknown3 = attackSource.AttackInfoWeaponSlot,
+                        Unknown4 = attackSource.AttackInfoUnk1,
+                        Unknown5 = attackSource.AttackInfoHitType,
+                        Unknown6 = attackSource.AttackInfoWeaponInstance
+                    });
+                PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowCleaningRobotNpcAttack,
+                    PlayfieldLifecycleTrace.StageRobotAttackInfo,
+                    PlayfieldLifecycleTrace.MessageAttackInfo,
+                    attacker.Identity,
+                    "target=" + target.Identity);
+            }
+            else
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Network,
+                    string.Format(
+                        "CombatAttackInfoSkip source={0} attacker={1} target={2} dmg={3} reason=no_captured_or_equipped_context",
+                        source,
+                        attacker.Identity,
+                        target.Identity,
+                        damage));
+            }
 
             this.AnnounceHealthDamageIfNeeded(attacker, target, damage, source);
         }
@@ -548,32 +562,34 @@ namespace AORebirth.Core.Playfields
                            AttackInfoWeaponInstance = poisonAttackCompleted
                                                           ? NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag
                                                           : NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
+                           SendAttackInfo = true,
                            IsCapturedSubwayFilthFleaPoisonAttack = !poisonAttackCompleted
                        };
             }
 
-            CapturedSubwayOrdinaryRuntimeDefinition capturedOrdinary;
-            if (CapturedSubwayOrdinaryRuntimeRegistry.TryGet(
+            CapturedEnemyCombatContract capturedContract;
+            if (CapturedEnemyCombatRuntimeRegistry.TryGet(
                     attacker.Identity.Instance,
-                    out capturedOrdinary)
-                && capturedOrdinary.Archetype.Combat.Observed)
+                    out capturedContract)
+                && capturedContract.IsCombatReady
+                && capturedContract.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo)
             {
-                CapturedSubwayCombatEvidenceDefinition combat = capturedOrdinary.Archetype.Combat;
                 return new CombatAttackSource
                        {
-                           MinDamage = combat.MinDamage,
-                           MaxDamage = combat.MaxDamage,
+                           MinDamage = capturedContract.MinDamage,
+                           MaxDamage = capturedContract.MaxDamage,
                            DamageBonus = 0,
                            Range = NpcCombatAttackRules.MaxMeleeCombatDistance,
-                           RechargeSeconds = combat.RechargeSeconds > 0
-                                                 ? combat.RechargeSeconds
+                           RechargeSeconds = capturedContract.RechargeSeconds > 0
+                                                 ? capturedContract.RechargeSeconds
                                                  : NpcCombatAttackRules.DefaultCombatTickSeconds,
                            UsesEquippedWeapon = false,
                            AttackInfoAmmoCount = NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
-                           AttackInfoWeaponSlot = combat.WeaponSlot,
-                           AttackInfoUnk1 = combat.AttackInfoUnknown,
+                           AttackInfoWeaponSlot = capturedContract.AttackInfoWeaponSlot,
+                           AttackInfoUnk1 = capturedContract.AttackInfoUnknown,
                            AttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType,
-                           AttackInfoWeaponInstance = combat.WeaponInstance
+                           AttackInfoWeaponInstance = capturedContract.AttackInfoWeaponInstance,
+                           SendAttackInfo = true
                        };
             }
 
@@ -608,7 +624,8 @@ namespace AORebirth.Core.Playfields
                            AttackInfoWeaponSlot = attackInfoWeaponSlot,
                            AttackInfoUnk1 = 0,
                            AttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType,
-                           AttackInfoWeaponInstance = this.GetUnarmedAttackInfoWeaponInstance(attacker)
+                           AttackInfoWeaponInstance = this.GetUnarmedAttackInfoWeaponInstance(attacker),
+                           SendAttackInfo = Playfield.IsCapturedCleaningRobot(attacker)
                         };
             }
 
@@ -643,7 +660,8 @@ namespace AORebirth.Core.Playfields
                        AttackInfoWeaponSlot = equippedWeapon.Slot,
                        AttackInfoUnk1 = 4,
                        AttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType,
-                       AttackInfoWeaponInstance = 0
+                       AttackInfoWeaponInstance = 0,
+                       SendAttackInfo = true
                     };
         }
 
@@ -833,6 +851,8 @@ namespace AORebirth.Core.Playfields
             public int AttackInfoHitType { get; set; }
 
             public int AttackInfoWeaponInstance { get; set; }
+
+            public bool SendAttackInfo { get; set; }
 
             public bool IsCapturedSubwayFilthFleaPoisonAttack { get; set; }
         }

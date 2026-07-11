@@ -149,6 +149,11 @@ namespace AORebirth.Core.Playfields
             }
         }
 
+        internal void ProcessDueCapturedSubwayRespawns(Identity playfieldIdentity, DateTime utcNow)
+        {
+            this.capturedSubwaySpawns.ProcessDueRespawns(this.playfield, playfieldIdentity, utcNow);
+        }
+
         internal void ClearNpcCorpseDespawn(int corpseInstance)
         {
             this.corpseDespawnTicks.Remove(corpseInstance);
@@ -206,9 +211,11 @@ namespace AORebirth.Core.Playfields
 
         internal void FinalizeNpcDespawn(ICharacter target)
         {
+            this.capturedSubwaySpawns.ScheduleRespawnAfterDespawn(target, DateTime.UtcNow);
             this.corpseLifecycle.FinalizeNpcDespawn(target);
             this.dynelRegistry.Unregister(target.Identity);
             CapturedSubwayOrdinaryRuntimeRegistry.Remove(target.Identity.Instance);
+            CapturedEnemyCombatRuntimeRegistry.Remove(target.Identity.Instance);
         }
 
         internal void ResetCombatTick(ICharacter attacker)
@@ -249,12 +256,40 @@ namespace AORebirth.Core.Playfields
         internal void AcquireAggro(ICharacter attacker, ICharacter target)
         {
             NPCController npcController = target.Controller as NPCController;
-            if (npcController == null
-                || npcController.KnuBot != null
+            if (npcController == null)
+            {
+                return;
+            }
+
+            CapturedEnemyCombatContract capturedContract;
+            if (CapturedEnemyCombatRuntimeRegistry.TryGet(target.Identity.Instance, out capturedContract)
+                && !capturedContract.IsCombatReady)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Captured enemy combat refused npc={0} attacker={1} reason=contract-incomplete evidence={2}",
+                        target.Identity,
+                        attacker.Identity,
+                        capturedContract.Evidence));
+                return;
+            }
+
+            if (npcController.KnuBot != null
                 || !NpcAiProfiles.CanRetaliate(npcController.AiProfile)
                 || target.Stats[StatIds.health].Value <= 0
                 || target.FightingTarget.Instance != 0)
             {
+                LogUtil.Debug(
+                    DebugInfoDetail.Network,
+                    string.Format(
+                        "NPC combat refused npc={0} attacker={1} knubot={2} profile={3} health={4} fightingTarget={5}",
+                        target.Identity,
+                        attacker.Identity,
+                        npcController.KnuBot != null,
+                        npcController.AiProfile,
+                        target.Stats[StatIds.health].Value,
+                        target.FightingTarget));
                 return;
             }
 

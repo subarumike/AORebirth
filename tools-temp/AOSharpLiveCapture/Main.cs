@@ -37,6 +37,12 @@ namespace AOSharpLiveCapture
             new Dictionary<string, RecentEnemyFullUpdateEvidence>();
         private readonly Dictionary<string, EnemyEntityState> enemyStates = new Dictionary<string, EnemyEntityState>();
         private readonly Dictionary<string, List<EnemyStateEvent>> enemyStateTimeline = new Dictionary<string, List<EnemyStateEvent>>();
+
+        private const int CorpseFullUpdateDeadNpcTypeOffset = 183;
+        private const int CorpseFullUpdateDeadNpcInstanceOffset = 191;
+        private const int CorpseFullUpdateMonsterDataSuffixOffset = 72;
+        private const int CorpseFullUpdateTailDeadNpcTypeSuffixOffset = 80;
+        private const int CorpseFullUpdateTailDeadNpcInstanceSuffixOffset = 84;
         private readonly HashSet<string> interestingMessageNames = new HashSet<string>
         {
             "SimpleCharFullUpdate",
@@ -108,6 +114,8 @@ namespace AOSharpLiveCapture
         private StreamWriter movementPacketsLog;
         private StreamWriter enemyStatUpdatesLog;
         private StreamWriter enemyFightEventsLog;
+        private StreamWriter corpseFullUpdatesLog;
+        private StreamWriter npcLifecycleLog;
         private bool enabled;
         private bool captureFinalized;
         private int inboundPacketCount;
@@ -141,6 +149,13 @@ namespace AOSharpLiveCapture
         private int movementStopMovingCmdPacketCount;
         private int movementDecodeErrorCount;
         private int enemyStatUpdateRowCount;
+        private int corpseFullUpdatePacketCount;
+        private int corpseFullUpdateRowCount;
+        private int corpseFullUpdateDecodeErrorCount;
+        private int corpseInventoryUpdateCount;
+        private int corpseSeenEventCount;
+        private int corpseGoneEventCount;
+        private int npcLifecycleRowCount;
         private DateTime nextFlushUtc;
         private DateTime nextSnapshotUtc;
         private DateTime captureStartUtc;
@@ -985,6 +1000,15 @@ namespace AOSharpLiveCapture
                     if (firstSeen)
                     {
                         this.LogEvent("CHAR-SEEN", this.DescribeCharacter(character));
+                        this.LogNpcLifecycleRow(
+                            "LOCAL",
+                            0,
+                            "character-seen",
+                            "DynelSnapshot",
+                            character.Identity.ToString(),
+                            string.Empty,
+                            character.Name,
+                            this.DescribeCharacter(character));
                     }
 
                     // Dungeon playfields do not provide additional zone boundaries as the player
@@ -1000,6 +1024,15 @@ namespace AOSharpLiveCapture
                 foreach (string removed in this.knownCharacters.Except(currentCharacters).ToArray())
                 {
                     this.LogEvent("CHAR-GONE", removed);
+                    this.LogNpcLifecycleRow(
+                        "LOCAL",
+                        0,
+                        "character-gone",
+                        "DynelSnapshot",
+                        removed,
+                        string.Empty,
+                        string.Empty,
+                        string.Empty);
                     this.TrackEnemyGone(removed);
                     this.knownCharacters.Remove(removed);
                 }
@@ -1011,13 +1044,33 @@ namespace AOSharpLiveCapture
                     currentCorpses.Add(key);
                     if (this.knownCorpses.Add(key))
                     {
+                        this.corpseSeenEventCount++;
                         this.LogEvent("CORPSE-SEEN", this.DescribeCorpse(corpse));
+                        this.LogNpcLifecycleRow(
+                            "LOCAL",
+                            0,
+                            "corpse-seen",
+                            "DynelSnapshot",
+                            corpse.Identity.ToString(),
+                            string.Empty,
+                            corpse.Name,
+                            this.DescribeCorpse(corpse));
                     }
                 }
 
                 foreach (string removed in this.knownCorpses.Except(currentCorpses).ToArray())
                 {
+                    this.corpseGoneEventCount++;
                     this.LogEvent("CORPSE-GONE", removed);
+                    this.LogNpcLifecycleRow(
+                        "LOCAL",
+                        0,
+                        "corpse-gone",
+                        "DynelSnapshot",
+                        removed,
+                        string.Empty,
+                        string.Empty,
+                        string.Empty);
                     this.knownCorpses.Remove(removed);
                 }
             }
@@ -1076,6 +1129,190 @@ namespace AOSharpLiveCapture
             }
 
             this.ExportMovementPacket(direction, sequence, packet);
+            this.ExportNpcLifecyclePacket(direction, sequence, packet);
+        }
+
+        private void ExportNpcLifecyclePacket(string direction, int sequence, byte[] packet)
+        {
+            if (packet == null || packet.Length < 231)
+            {
+                return;
+            }
+
+            int messageType = ReadInt32BigEndian(packet, 16);
+            if (messageType != (int)N3MessageType.CorpseFullUpdate)
+            {
+                return;
+            }
+
+            this.corpseFullUpdatePacketCount++;
+
+            try
+            {
+                int nameOffset = FindAscii(packet, "Remains of ");
+                if (nameOffset < 4)
+                {
+                    throw new InvalidDataException("CorpseFullUpdate has no encoded Remains name marker.");
+                }
+
+                int encodedNameLength = ReadInt32BigEndian(packet, nameOffset - 4);
+                int suffixOffset = nameOffset + encodedNameLength;
+                int monsterDataOffset = suffixOffset + CorpseFullUpdateMonsterDataSuffixOffset;
+                int tailDeadNpcTypeOffset = suffixOffset + CorpseFullUpdateTailDeadNpcTypeSuffixOffset;
+                int tailDeadNpcInstanceOffset = suffixOffset + CorpseFullUpdateTailDeadNpcInstanceSuffixOffset;
+
+                if (encodedNameLength <= 0
+                    || suffixOffset > packet.Length
+                    || monsterDataOffset < suffixOffset
+                    || tailDeadNpcInstanceOffset + 4 > packet.Length)
+                {
+                    throw new InvalidDataException(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Invalid CorpseFullUpdate layout len={0} encodedNameLength={1} monsterDataOffset={2} tailOffset={3}.",
+                            packet.Length,
+                            encodedNameLength,
+                            monsterDataOffset,
+                            tailDeadNpcInstanceOffset));
+                }
+
+                uint corpseType = ReadUInt32BigEndian(packet, 20);
+                uint corpseInstance = ReadUInt32BigEndian(packet, 24);
+                uint deadNpcType = ReadUInt32BigEndian(packet, CorpseFullUpdateDeadNpcTypeOffset);
+                uint deadNpcInstance = ReadUInt32BigEndian(packet, CorpseFullUpdateDeadNpcInstanceOffset);
+                uint tailDeadNpcType = ReadUInt32BigEndian(packet, tailDeadNpcTypeOffset);
+                uint tailDeadNpcInstance = ReadUInt32BigEndian(packet, tailDeadNpcInstanceOffset);
+                string corpseName = Encoding.ASCII
+                    .GetString(packet, nameOffset, encodedNameLength)
+                    .TrimEnd('\0');
+                string corpseIdentity = FormatRawIdentity(corpseType, corpseInstance);
+                string deadNpcIdentity = FormatRawIdentity(deadNpcType, deadNpcInstance);
+                string deadNpcName = this.ResolveDynelName(deadNpcType, deadNpcInstance);
+
+                lock (this.syncRoot)
+                {
+                    this.corpseFullUpdateRowCount++;
+                    this.corpseFullUpdatesLog.WriteLine(
+                        string.Join(
+                            ",",
+                            Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                            Csv(direction),
+                            sequence.ToString(CultureInfo.InvariantCulture),
+                            ReadUInt32BigEndian(packet, 12).ToString(CultureInfo.InvariantCulture),
+                            Csv(FormatRawIdentityType(corpseType)),
+                            Csv(FormatRawInstance(corpseInstance)),
+                            Csv(corpseIdentity),
+                            Csv(corpseName),
+                            ReadInt32BigEndian(packet, 73).ToString(CultureInfo.InvariantCulture),
+                            Csv(FormatFloat(ReadSingleBigEndian(packet, 45))),
+                            Csv(FormatFloat(ReadSingleBigEndian(packet, 49))),
+                            Csv(FormatFloat(ReadSingleBigEndian(packet, 53))),
+                            ReadInt32BigEndian(packet, 143).ToString(CultureInfo.InvariantCulture),
+                            ReadInt32BigEndian(packet, 159).ToString(CultureInfo.InvariantCulture),
+                            ReadInt32BigEndian(packet, 167).ToString(CultureInfo.InvariantCulture),
+                            ReadInt32BigEndian(packet, 175).ToString(CultureInfo.InvariantCulture),
+                            Csv(FormatRawIdentityType(deadNpcType)),
+                            Csv(FormatRawInstance(deadNpcInstance)),
+                            Csv(deadNpcIdentity),
+                            Csv(deadNpcName),
+                            ReadInt32BigEndian(packet, 199).ToString(CultureInfo.InvariantCulture),
+                            ReadInt32BigEndian(packet, 207).ToString(CultureInfo.InvariantCulture),
+                            ReadInt32BigEndian(packet, monsterDataOffset).ToString(CultureInfo.InvariantCulture),
+                            Csv(FormatRawIdentityType(tailDeadNpcType)),
+                            Csv(FormatRawInstance(tailDeadNpcInstance)),
+                            Csv(FormatRawIdentity(tailDeadNpcType, tailDeadNpcInstance)),
+                            packet.Length.ToString(CultureInfo.InvariantCulture),
+                            Csv(ToHex(packet))));
+                    this.corpseFullUpdatesLog.Flush();
+                }
+
+                this.LogNpcLifecycleRow(
+                    direction,
+                    sequence,
+                    "corpse-full-update",
+                    N3MessageType.CorpseFullUpdate.ToString(),
+                    deadNpcIdentity,
+                    corpseIdentity,
+                    corpseName,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "catMesh={0} monsterData={1} deadNpc={2} tailDeadNpc={3}",
+                        ReadInt32BigEndian(packet, 199),
+                        ReadInt32BigEndian(packet, monsterDataOffset),
+                        deadNpcIdentity,
+                        FormatRawIdentity(tailDeadNpcType, tailDeadNpcInstance)));
+            }
+            catch (Exception ex)
+            {
+                this.corpseFullUpdateDecodeErrorCount++;
+                this.LogNpcLifecycleRow(
+                    direction,
+                    sequence,
+                    "corpse-full-update-decode-error",
+                    N3MessageType.CorpseFullUpdate.ToString(),
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    ex.Message + " raw=" + ToHex(packet));
+            }
+        }
+
+        private void LogNpcLifecycleRow(
+            string direction,
+            int sequence,
+            string phase,
+            string messageType,
+            string primaryIdentity,
+            string relatedIdentity,
+            string name,
+            string detail)
+        {
+            lock (this.syncRoot)
+            {
+                this.npcLifecycleRowCount++;
+                this.npcLifecycleLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv(direction),
+                        sequence.ToString(CultureInfo.InvariantCulture),
+                        Csv(phase),
+                        Csv(messageType),
+                        Csv(primaryIdentity),
+                        Csv(relatedIdentity),
+                        Csv(name),
+                        Csv(detail)));
+                this.npcLifecycleLog.Flush();
+            }
+        }
+
+        private static int FindAscii(byte[] bytes, string value)
+        {
+            if (bytes == null || string.IsNullOrEmpty(value))
+            {
+                return -1;
+            }
+
+            byte[] needle = Encoding.ASCII.GetBytes(value);
+            for (int offset = 0; offset <= bytes.Length - needle.Length; offset++)
+            {
+                bool match = true;
+                for (int index = 0; index < needle.Length; index++)
+                {
+                    if (bytes[offset + index] != needle[index])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (match)
+                {
+                    return offset;
+                }
+            }
+
+            return -1;
         }
 
         private void ExportMovementPacket(string direction, int sequence, byte[] packet)
@@ -1539,6 +1776,7 @@ namespace AOSharpLiveCapture
             bool interesting = this.interestingMessageNames.Contains(messageName);
             string detail = interesting ? this.DescribeN3Message(message) : string.Empty;
             this.ExportSpecializedMessage(direction, sequence, message);
+            this.ExportNpcLifecycleMessage(direction, sequence, message);
             this.CacheEnemyFullUpdate(direction, sequence, message);
             if (this.ShouldCaptureEnemyFightEvidence(direction, sequence, message))
             {
@@ -1573,6 +1811,72 @@ namespace AOSharpLiveCapture
                     message.N3MessageType,
                     message.Identity,
                     string.IsNullOrEmpty(detail) ? string.Empty : " " + detail));
+        }
+
+        private void ExportNpcLifecycleMessage(string direction, int sequence, N3Message message)
+        {
+            string messageName = message.N3MessageType.ToString();
+            string identity = message.Identity.ToString();
+            string detail = this.DescribeObject(message);
+            string phase = string.Empty;
+            string relatedIdentity = string.Empty;
+
+            if (string.Equals(messageName, "CharacterAction", StringComparison.OrdinalIgnoreCase))
+            {
+                string action = GetMemberString(message, "Action");
+                if (string.Equals(action, "99", StringComparison.OrdinalIgnoreCase)
+                    || action.IndexOf("death", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    phase = "death-action";
+                    relatedIdentity = GetMemberString(message, "Target");
+                }
+            }
+            else if (string.Equals(messageName, "GenericCmd", StringComparison.OrdinalIgnoreCase)
+                     && detail.IndexOf("(Corpse:", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                phase = "corpse-use";
+                relatedIdentity = GetMemberString(message, "Target");
+            }
+            else if (string.Equals(messageName, "InventoryUpdate", StringComparison.OrdinalIgnoreCase)
+                     && identity.IndexOf("(Corpse:", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                phase = "corpse-inventory";
+            }
+            else if (string.Equals(messageName, "ClientMoveItemToInventory", StringComparison.OrdinalIgnoreCase))
+            {
+                phase = "loot-move-request";
+                relatedIdentity = GetMemberString(message, "SourceContainer");
+            }
+            else if (string.Equals(messageName, "ContainerAddItem", StringComparison.OrdinalIgnoreCase))
+            {
+                phase = "loot-move-result";
+                relatedIdentity = GetMemberString(message, "Source");
+            }
+            else if (string.Equals(messageName, "Despawn", StringComparison.OrdinalIgnoreCase)
+                     && (identity.IndexOf("(Corpse:", StringComparison.OrdinalIgnoreCase) >= 0
+                         || this.focusedEnemyIdentities.Contains(identity)))
+            {
+                phase = identity.IndexOf("(Corpse:", StringComparison.OrdinalIgnoreCase) >= 0
+                    ? "corpse-despawn"
+                    : "enemy-despawn";
+            }
+
+            if (string.IsNullOrEmpty(phase))
+            {
+                return;
+            }
+
+            this.LogNpcLifecycleRow(
+                direction,
+                sequence,
+                phase,
+                messageName,
+                identity,
+                relatedIdentity,
+                this.ResolveDynelName(
+                    unchecked((uint)(int)message.Identity.Type),
+                    unchecked((uint)message.Identity.Instance)),
+                detail);
         }
 
         private string DescribeN3Message(N3Message message)
@@ -1874,6 +2178,11 @@ namespace AOSharpLiveCapture
                 this.inventoryUpdateMessageCount++;
                 string capturedUtc = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
                 string inventoryIdentity = message.InventoryIdentity.ToString();
+                if (inventoryIdentity.IndexOf("(Corpse:", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    this.corpseInventoryUpdateCount++;
+                }
+
                 for (int i = 0; i < items.Length; i++)
                 {
                     InventorySlot item = items[i];
@@ -3436,6 +3745,42 @@ namespace AOSharpLiveCapture
                         this.movementDecodeErrorCount));
             }
 
+            if (this.corpseFullUpdatePacketCount > 0 && this.corpseFullUpdateRowCount == 0)
+            {
+                issues.Add("CorpseFullUpdate packets were observed, but corpse-full-updates.csv has no decoded rows.");
+            }
+
+            if (this.corpseFullUpdateDecodeErrorCount > 0)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "CorpseFullUpdate decode errors: {0}.",
+                        this.corpseFullUpdateDecodeErrorCount));
+            }
+
+            if ((this.corpseSeenEventCount > 0 || this.corpseInventoryUpdateCount > 0)
+                && this.corpseFullUpdateRowCount == 0)
+            {
+                issues.Add("Corpse presence or inventory was observed, but no identity-linked CorpseFullUpdate was decoded.");
+            }
+            else if (this.corpseFullUpdateRowCount > 0)
+            {
+                notes.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Corpse lifecycle decode usable: {0}/{1} CorpseFullUpdate packets produced rows.",
+                        this.corpseFullUpdateRowCount,
+                        this.corpseFullUpdatePacketCount));
+            }
+
+            if (this.enemyDeathEventCount > 0
+                && this.corpseSeenEventCount == 0
+                && this.corpseFullUpdateRowCount == 0)
+            {
+                notes.Add("Enemy death was observed without a corpse spawn; this may be valid for the captured archetype.");
+            }
+
             string status = issues.Count == 0 ? "complete" : "incomplete";
             return new CaptureValidation(status, issues.Count == 0, issues, notes);
         }
@@ -3836,6 +4181,27 @@ namespace AOSharpLiveCapture
                 json.AppendLine(",");
                 json.Append("    \"enemyStatUpdateRows\": ");
                 json.Append(this.enemyStatUpdateRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"corpseFullUpdatePackets\": ");
+                json.Append(this.corpseFullUpdatePacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"corpseFullUpdateRows\": ");
+                json.Append(this.corpseFullUpdateRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"corpseFullUpdateDecodeErrors\": ");
+                json.Append(this.corpseFullUpdateDecodeErrorCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"corpseInventoryUpdates\": ");
+                json.Append(this.corpseInventoryUpdateCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"corpseSeenEvents\": ");
+                json.Append(this.corpseSeenEventCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"corpseGoneEvents\": ");
+                json.Append(this.corpseGoneEventCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"npcLifecycleRows\": ");
+                json.Append(this.npcLifecycleRowCount.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine(",");
                 json.Append("    \"enemyCombatEvents\": ");
                 json.Append(this.enemyCombatEventCount.ToString(CultureInfo.InvariantCulture));
@@ -4784,6 +5150,10 @@ namespace AOSharpLiveCapture
             this.enemyStatUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-stat-updates.csv"));
             this.enemyStatUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,Stat,StatId,Value,PositionX,PositionY,PositionZ,StatsCount,Detail");
             this.enemyFightEventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-fight-events.log"));
+            this.corpseFullUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "corpse-full-updates.csv"));
+            this.corpseFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,ReceiverInstance,CorpseType,CorpseInstance,CorpseIdentity,CorpseName,PlayfieldId,PositionX,PositionY,PositionZ,MonsterScale,Sex,Breed,Race,DeadNpcType,DeadNpcInstance,DeadNpcIdentity,DeadNpcName,CorpseCatMesh,CorpseCredits,CorpseMonsterData,TailDeadNpcType,TailDeadNpcInstance,TailDeadNpcIdentity,PacketLength,RawHex");
+            this.npcLifecycleLog = CreateWriter(Path.Combine(this.sessionDirectory, "npc-lifecycle.csv"));
+            this.npcLifecycleLog.WriteLine("CapturedUtc,Direction,Sequence,Phase,MessageType,PrimaryIdentity,RelatedIdentity,Name,Detail");
             this.WriteEnemyStateJson();
             this.WriteEnemyDossierJson();
             this.WriteMovementSummaryJson();
@@ -4839,6 +5209,13 @@ namespace AOSharpLiveCapture
             this.movementStopMovingCmdPacketCount = 0;
             this.movementDecodeErrorCount = 0;
             this.enemyStatUpdateRowCount = 0;
+            this.corpseFullUpdatePacketCount = 0;
+            this.corpseFullUpdateRowCount = 0;
+            this.corpseFullUpdateDecodeErrorCount = 0;
+            this.corpseInventoryUpdateCount = 0;
+            this.corpseSeenEventCount = 0;
+            this.corpseGoneEventCount = 0;
+            this.npcLifecycleRowCount = 0;
             this.localEnemyCombatContextUntilUtc = default(DateTime);
             this.lastPlayfieldId = string.Empty;
             this.lastCapturePlayfieldIdentity = string.Empty;
@@ -4865,6 +5242,8 @@ namespace AOSharpLiveCapture
                 this.movementPacketsLog.Flush();
                 this.enemyStatUpdatesLog.Flush();
                 this.enemyFightEventsLog.Flush();
+                this.corpseFullUpdatesLog.Flush();
+                this.npcLifecycleLog.Flush();
             }
         }
 
@@ -4887,6 +5266,8 @@ namespace AOSharpLiveCapture
                 this.movementPacketsLog?.Flush();
                 this.enemyStatUpdatesLog?.Flush();
                 this.enemyFightEventsLog?.Flush();
+                this.corpseFullUpdatesLog?.Flush();
+                this.npcLifecycleLog?.Flush();
                 this.eventsLog?.Dispose();
                 this.packetsLog?.Dispose();
                 this.shopUpdatesLog?.Dispose();
@@ -4902,6 +5283,8 @@ namespace AOSharpLiveCapture
                 this.movementPacketsLog?.Dispose();
                 this.enemyStatUpdatesLog?.Dispose();
                 this.enemyFightEventsLog?.Dispose();
+                this.corpseFullUpdatesLog?.Dispose();
+                this.npcLifecycleLog?.Dispose();
                 this.eventsLog = null;
                 this.packetsLog = null;
                 this.shopUpdatesLog = null;
@@ -4917,6 +5300,8 @@ namespace AOSharpLiveCapture
                 this.movementPacketsLog = null;
                 this.enemyStatUpdatesLog = null;
                 this.enemyFightEventsLog = null;
+                this.corpseFullUpdatesLog = null;
+                this.npcLifecycleLog = null;
             }
         }
 

@@ -44,6 +44,12 @@ namespace ZoneEngine.Core.Packets
         private const int CapturedSubwayFilthFleaMonsterDataOffset = 325;
         private const int CapturedSubwayFilthFleaTailDeadNpcInstanceOffset = 337;
 
+        private const int SubwayThiefMonsterData = 26092;
+        private const string SubwayThiefName = "Thief";
+        private const int CapturedSubwayThiefPacketLength = 412;
+        private const int CapturedSubwayThiefMonsterDataOffset = 324;
+        private const int CapturedSubwayThiefTailDeadNpcInstanceOffset = 336;
+
         private static readonly byte[] Template = HexToBytes(
             "0000000a0001019e000000003cac6f144f474e050000c76a00f0f00100000000080000000b00000000000000004504a4df41c5ea1244cb530d000000003e8fb30a000000003f75b5e0000002350000000000000000006f000046f200000000001818050000001700000000000002bd00000000000002be00000000000002bf000000000000019c000000010000016800000062000000df000000000000003b00000003000000040000000700000059000000010000019f0000c350000001a0776b95780000002a0000797e0000003d000000000000000800004650000000220000003c0000001b52656d61696e73206f66205268696e6f6d616e204d6f74686572000000000200000032000003f100000003000007e20000cf2738f46cbe0000000400000000000000010000000000000000000000000000000000000000000001f700000001000000040000798a000000000000c350776b9578000017a600000000000000000000000000000001000000000000000000000002000000000000000000000003000000000000000000000004000000000000000000000000");
 
@@ -60,6 +66,18 @@ namespace ZoneEngine.Core.Packets
             + "01000000000000000000000002000000000000000000000003000000000000000000000004000000000000000000000001000007E24D617465726961"
             + "6C20233900000000000000000000000000000000000000000000003B810000000000000001");
 
+        // Official live Subway capture 20260710-205400, CorpseFullUpdate packet #1580.
+        // This exact Thief corpse includes the captured CATMesh and material tail. The
+        // generic MonsterData-as-CATMesh fallback crashes the current client renderer.
+        private static readonly byte[] CapturedSubwayThiefTemplate = HexToBytes(
+            "0000000A0001019C00000DB47944C0654F474E050000C76A00F6C00400000000080000000B0000000000000000428C26A642E73ACB439F59EA00000000"
+            + "3F19FB87000000003F4C83360014D00E0000000000000000006F00004AE300000000001818050000001700000000000002BD00000000000002BE00000000"
+            + "000002BF000000000000019C00000001000001680000005D000000DF000000010000003B00000002000000040000000100000059000000010000019F0000"
+            + "C350000001A07957E61A0000002A000017130000003D0000001D0000000800004650000000220000003C00000040000273310000001152656D61696E73206F"
+            + "66205468696566000000000200000032000003F100000003000007E20000CF273978332B000000040000000000000001000000000000000000000000000000"
+            + "0000000000000001F70000000100000004000065EC000000000000C3507957E61A000017A600000000000024CA000000000000000100002219000000000000"
+            + "0002000024CC0000000000000003000024CB0000000000000004000024CD0000000000000000");
+
         public static byte[] Build(
             ICharacter deadNpc,
             Identity corpseIdentity,
@@ -69,6 +87,18 @@ namespace ZoneEngine.Core.Packets
             int corpseMonsterData,
             int corpseCredits)
         {
+            if (IsCapturedSubwayThief(deadNpc))
+            {
+                return BuildCapturedSubwayThief(
+                    deadNpc,
+                    corpseIdentity,
+                    receiver,
+                    serverId,
+                    corpseCatMesh,
+                    corpseMonsterData,
+                    corpseCredits);
+            }
+
             if (IsCapturedSubwayFilthFlea(deadNpc))
             {
                 return BuildCapturedSubwayFilthFlea(
@@ -130,6 +160,50 @@ namespace ZoneEngine.Core.Packets
                    && deadNpc.Playfield.Identity.Instance == SubwayPlayfieldResource
                    && deadNpc.Stats[StatIds.monsterdata].Value == SubwayFilthFleaMonsterData
                    && string.Equals(deadNpc.Name, SubwayFilthFleaName, StringComparison.Ordinal);
+        }
+
+        private static bool IsCapturedSubwayThief(ICharacter deadNpc)
+        {
+            return deadNpc != null
+                   && deadNpc.Playfield != null
+                   && deadNpc.Playfield.Identity.Instance == SubwayPlayfieldResource
+                   && deadNpc.Stats[StatIds.monsterdata].Value == SubwayThiefMonsterData
+                   && string.Equals(deadNpc.Name, SubwayThiefName, StringComparison.Ordinal);
+        }
+
+        private static byte[] BuildCapturedSubwayThief(
+            ICharacter deadNpc,
+            Identity corpseIdentity,
+            Identity receiver,
+            int serverId,
+            int corpseCatMesh,
+            int corpseMonsterData,
+            int corpseCredits)
+        {
+            byte[] buffer = (byte[])CapturedSubwayThiefTemplate.Clone();
+            if (buffer.Length != CapturedSubwayThiefPacketLength)
+            {
+                throw new InvalidOperationException("Captured Subway Thief corpse template length changed.");
+            }
+
+            WritePacketLength(buffer, buffer.Length);
+            WriteInt32(buffer, ServerIdOffset, serverId);
+            WriteInt32(buffer, ReceiverInstanceOffset, receiver.Instance);
+            WriteInt32(buffer, CorpseInstanceOffset, corpseIdentity.Instance);
+            WriteSingle(buffer, PositionXOffset, deadNpc.RawCoordinates.X);
+            WriteSingle(buffer, PositionYOffset, deadNpc.RawCoordinates.Y);
+            WriteSingle(buffer, PositionZOffset, deadNpc.RawCoordinates.Z);
+            WriteInt32(buffer, PlayfieldIdOffset, deadNpc.Playfield.Identity.Instance);
+            WriteInt32(buffer, DeadNpcInstanceOffset, deadNpc.Identity.Instance);
+            WriteInt32(buffer, CorpseCatMeshOffset, corpseCatMesh);
+            WriteInt32(buffer, CorpseCashValueOffset, Math.Max(0, corpseCredits));
+            WriteInt32(buffer, CapturedSubwayThiefMonsterDataOffset, corpseMonsterData);
+            WriteInt32(
+                buffer,
+                CapturedSubwayThiefTailDeadNpcInstanceOffset,
+                deadNpc.Identity.Instance);
+
+            return buffer;
         }
 
         private static byte[] BuildCapturedSubwayFilthFlea(

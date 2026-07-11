@@ -90,7 +90,6 @@
     <Compile Include="ChatCommands\ChatCommandCreateOrg.cs" />
     <Compile Include="ChatCommands\ChatCommandGiveCredits.cs" />
     <Compile Include="ChatCommands\ChatCommandGiveItem.cs" />
-    <Compile Include="ChatCommands\ChatCommandGivePetShell.cs" />
     <Compile Include="ChatCommands\ChatCommandSet.cs" />
     <Compile Include="ChatCommands\DebugItem.cs" />
     <Compile Include="ChatCommands\FindWeaponVisual.cs" />
@@ -164,6 +163,7 @@
     <Compile Include="Core\Functions\GameFunctions\changeactionrestriction.cs" />
     <Compile Include="Core\Functions\GameFunctions\lockskill.cs" />
     <Compile Include="Core\Functions\GameFunctions\shophash.cs" />
+    <Compile Include="Core\Functions\GameFunctions\shouldermesh.cs" />
     <Compile Include="Core\Functions\GameFunctions\exitproxyplayfield.cs" />
     <Compile Include="Core\Functions\GameFunctions\headmesh.cs" />
     <Compile Include="Core\Functions\GameFunctions\hit.cs" />
@@ -172,8 +172,6 @@
     <Compile Include="Core\Functions\GameFunctions\modify.cs" />
     <Compile Include="Core\Functions\GameFunctions\modifypercentage.cs" />
     <Compile Include="Core\Functions\GameFunctions\openbank.cs" />
-    <Compile Include="Core\Functions\GameFunctions\shouldermesh.cs" />
-    <Compile Include="Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs" />
     <Compile Include="Core\Functions\GameFunctions\teleportproxy.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -182,8 +180,6 @@
     <Compile Include="Core\Functions\GameFunctions\teleport.cs" />
     <Compile Include="Core\Functions\GameFunctions\teleportproxy2.cs" />
     <Compile Include="Core\Functions\GameFunctions\uploadnano.cs" />
-    <Compile Include="Core\Functions\GameFunctions\summonpet.cs" />
-    <Compile Include="Core\Functions\GameFunctions\summonpets.cs" />
     <Compile Include="Core\IntermalMessageEvents\PlayfieldMessageReceivedEvent.cs" />
     <Compile Include="Core\InternalMessages\IMExecuteFunction.cs" />
     <Compile Include="Core\InternalMessages\IMSendAOtomatinMessageToPlayfieldOthers.cs" />
@@ -196,29 +192,10 @@
     <Compile Include="Core\InternalMessages\InternalMessageBody.cs" />
     <Compile Include="Core\KnuBot\BaseKnuBot.cs" />
     <Compile Include="Core\KnuBot\KnuBotDialogTree.cs" />
-    <Compile Include="Core\CombatStartPacketDiagnostics.cs" />
-    <Compile Include="Core\ActiveNanoRuntimeService.cs" />
-    <Compile Include="Core\NanoEventRuntimeService.cs" />
-    <Compile Include="Core\PetRuntimeService.cs" />
-    <Compile Include="Core\PetCommandService.cs" />
-    <Compile Include="Core\PetHealNanoCatalog.cs" />
-    <Compile Include="Core\PetCombatRules.cs" />
-    <Compile Include="Core\PetMobTemplateResolver.cs" />
-    <Compile Include="Core\PetSlotClassifier.cs" />
-    <Compile Include="Core\PetSummonScfuExtensions.cs" />
-    <Compile Include="Core\PetSummonCaptureWireReplayer.cs" />
-    <Compile Include="Core\PetSummonSpellListBuilder.cs" />
-    <Compile Include="Core\PetSummonSpellListService.cs" />
-    <Compile Include="Core\PetShellItemService.cs" />
-    <Compile Include="Core\PetSummonNanoCatalog.cs" />
     <Compile Include="Core\MessageHandlers\AddTemplateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\AppearanceUpdateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\AttackMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\BankMessageHandler.cs" />
-    <Compile Include="Core\MessageHandlers\BuffMessageHandler.cs" />
-    <Compile Include="Core\MessageHandlers\AddPetMessageHandler.cs" />
-    <Compile Include="Core\MessageHandlers\RemovePetMessageHandler.cs" />
-    <Compile Include="Core\MessageHandlers\PetCommandMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\BackpackContainerActionMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\CastNanoMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\CharacterActionMessageHandler.cs" />
@@ -307,51 +284,19 @@
     <Compile Include="Core\Playfields\Content\PlayfieldContentCoordinator.cs" />
     <Compile Include="Core\Playfields\Content\PlayfieldContentRegistration.cs" />
     <Compile Include="Core\Playfields\Content\PrivateCityContentModule.cs" />
-    <Compile Include="Core\Playfields\Content\SubwayContentModule.cs" />
     <Compile Include="Core\Playfields\CapturedAreteRobotContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs" />
-    <Compile Include="Core\Playfields\CapturedSubwayContentProvider.cs" />
-    <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
-    <Compile Include="Core\Playfields\CapturedSubwayOrdinarySpawnOrchestrator.cs" />
-    <Compile Include="Core\Playfields\CapturedSubwaySpawnOrchestrator.cs" />
-    <Compile Include="Core\Playfields\CapturedEnemyCombatContract.cs" />
     <Compile Include="Core\Playfields\NpcCombatAttackRules.cs" />
     <Compile Include="Core\Playfields\NpcCombatTickCoordinator.cs" />
     <Compile Include="Core\Playfields\NpcCorpseLifecycleCoordinator.cs" />
     <Compile Include="Core\Playfields\NpcCorpseLifecycleRules.cs" />
-    <Compile Include="Core\Playfields\NPCRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs" />
     <Compile Include="Core\Playfields\NpcPatrolReplayCoordinator.cs" />
-    <Compile Include="Core\Playfields\PlayerCombatRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldEnvironmentFunctionRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldInteractionRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldPacketSequencingRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldAnnouncementRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldCharacterHeartbeatRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldPublishFanoutRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldAOtomationDeliveryRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldRewardRuntimeService.cs" />
     <Compile Include="Core\Playfields\PrivateCityReadyInitCoordinator.cs" />
     <Compile Include="Core\Playfields\Playfield.cs" />
     <Compile Include="Core\Playfields\PlayfieldContentDataProvider.cs" />
-    <Compile Include="Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldDynelRegistry.cs" />
-    <Compile Include="Core\Playfields\PlayfieldLifecycleRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldLifecycleTrace.cs" />
-    <Compile Include="Core\Playfields\PlayfieldPlayerDeathRespawnRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldRuntimeSystems.cs" />
-    <Compile Include="Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldStatUpdateRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldStaticDynelRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldTransferRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldVendorRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldWallCollisionRuntimeService.cs" />
     <Compile Include="Core\Playfields\Playfields.cs" />
     <Compile Include="Core\Playfields\WallCollision.cs" />
     <Compile Include="Core\Playfields\WallCollisionResult.cs" />
@@ -545,7 +490,7 @@
     <Folder Include="Core\InternalMessageHandler\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

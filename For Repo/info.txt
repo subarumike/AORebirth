@@ -1,0 +1,7 @@
+AORebirth/AORebirth/Server/ZoneEngine/Core/Functions/GameFunctions/shouldermesh.cs (New File)
+
+[Equip.cs](AORebirth/AORebirth/Server/ZoneEngine/Core/Packets/Equip.cs)
+[UnEquip.cs](AORebirth/AORebirth/Server/ZoneEngine/Core/Packets/UnEquip.cs)
+[SocialArmorInventoryPage.cs](AORebirth/AORebirth/Libraries/Source/AORebirth.Core/Inventory/SocialArmorInventoryPage.cs)
+[shouldermesh.cs](AORebirth/AORebirth/Server/ZoneEngine/Core/Functions/GameFunctions/shouldermesh.cs) novi fajl
+[ZoneEngine.csproj](AORebirth/AORebirth/Server/ZoneEngine/ZoneEngine.csproj)
