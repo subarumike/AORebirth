@@ -27,7 +27,6 @@ namespace ZoneEngine.Core.Playfields
         private const int MissionIdentityType = 56003;
         private const int MissionInstance = 1431120071;
         private const int DailyMissionXpRewardItemId = 285612;
-        private static readonly bool EmitCapturedQuestUiPackets = false;
         private const string MissionShortInfo = "The stolen handbag";
         private const string MissionLongInfo =
             "The stolen handbag<BR><BR>Natalia Akcora has her handbag stolen, the thief ran in to the Subway entrance. Find him and give Natalia back her purse.<BR>";
@@ -108,11 +107,8 @@ namespace ZoneEngine.Core.Playfields
                 case HandbagDialogueStage.AcceptChoice:
                     session.State = HandbagMissionState.Active;
                     session.Dialogue = HandbagDialogueStage.Goodbye;
-                    if (EmitCapturedQuestUiPackets)
-                    {
-                        source.Controller.Client.SendCompressed(
-                            CreateQuestFullUpdateMessage(source.Identity, target, MissionEmission.Accept));
-                    }
+                    source.Controller.Client.SendCompressed(
+                        CreateQuestFullUpdateMessage(source.Identity, target, MissionEmission.Accept));
                     KnuBotAnswerListMessageHandler.Default.Send(source, target, new[] { "Goodbye" });
                     return true;
 
@@ -201,11 +197,8 @@ namespace ZoneEngine.Core.Playfields
             KnuBotRejectedItemsMessageHandler.Default.Send(source, message.Target, new Item[0]);
 
             ApplyCapturedReward(source);
-            if (EmitCapturedQuestUiPackets)
-            {
-                source.Controller.Client.SendCompressed(CreateCompletionAction(source.Identity));
-                source.Controller.Client.SendCompressed(CreateQuestDelete(source.Identity));
-            }
+            source.Controller.Client.SendCompressed(CreateCompletionAction(source.Identity));
+            source.Controller.Client.SendCompressed(CreateQuestDelete(source.Identity));
 
             session.State = HandbagMissionState.Completed;
             session.Dialogue = HandbagDialogueStage.CompletionThanks;
@@ -249,11 +242,6 @@ namespace ZoneEngine.Core.Playfields
 
         internal static void TryResendActiveMission(ICharacter source)
         {
-            if (!EmitCapturedQuestUiPackets)
-            {
-                return;
-            }
-
             if (source == null || source.Playfield == null || source.Controller == null
                 || source.Controller.Client == null)
             {
