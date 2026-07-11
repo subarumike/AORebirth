@@ -17,6 +17,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Playfield runtime decomposition has completed through the latest extracted runtime services and is now maintenance work, not the active development focus.
 - Corpse open, item loot transfer, and corpse credit payout are capture-backed and live validated.
 - The Def-Agg investigation is closed: live AO confirmed the repeated hint as normal level 1 client behavior.
+- Generic unarmed NPC attacks without captured or equipped weapon context suppress `AttackInfo` so the client does not invent `nanobots / unknown damage` text. Capture-backed/equipped NPC attack packets remain enabled.
 - Previous capture-backed enemy, movement, combat, zoning, and appearance milestones remain completed project history.
 - Filth Flea appearance has been corrected from capture-backed Subway SCFU texture evidence.
 - Subway PF127 now has the preserved 95-spawn supported baseline plus a template-free ordinary framework containing 126 deduplicated Shadow, Stim Fiend, Workman/Architect Striker, Infected Attendant, Slum Runner, Looter, Infector, Lost Thought, and Neural Burnout spawns. The framework is generated from completed SCFU, movement, combat, corpse, and inventory evidence; named/boss content remains deferred rather than assigned ordinary or guessed database behavior.

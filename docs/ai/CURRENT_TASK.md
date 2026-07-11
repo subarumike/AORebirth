@@ -83,6 +83,7 @@ is live-confirmed level 1 client behavior, not an AORebirth combat regression.
 - `Tools/AOClientRoomSpaceGuard/ProxyDll` provides the completed RoomSpace-only `version.dll` repair for normal AO shortcuts. Exact install/uninstall validation passed, the verified package is installed in both supported clients (`C:\Funcom\Anarchy Online` for local testing and `D:\Funcom\Anarchy Online` for live testing), and pre/post hashes prove both client EXEs and `N3.dll` files remain unchanged. Mike confirmed the guarded clients no longer crash. Treat this repair as closed unless a new regression appears; active work has returned to capture-backed PF127 Subway content using completed capture `20260709-222339`, with named/boss/archetype behavior implemented only through bounded evidence-backed contracts.
 - Mike reports `20260709-222339` completes the remaining live Subway traversal. The capture includes Abmouth Supremus, Eumenides, Vergil Aeneid, Bitaxel, Bloodcreeper, Empty Shell, Fragmented Soul, Incomplete Rebuild, Melded Patterns, Molested Molecules, Premature Pattern, and Redundant Scan evidence; these remain evidence-only until their bounded boss/archetype contracts are implemented.
 - Def-Agg level 1 combat hint has been closed as live-confirmed behavior, not a regression.
+- Generic unarmed NPC attacks without captured or equipped weapon context no longer emit `AttackInfo`. This removes the client-generated `nanobots / unknown damage` combat text while preserving health changes and capture-backed/equipped attack packets.
 
 ## Regression Risks Only
 
