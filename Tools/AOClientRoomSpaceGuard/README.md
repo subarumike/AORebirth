@@ -33,8 +33,9 @@ The patch exists only in process memory and must be applied on each client launc
 
 `ProxyDll` is the normal-shortcut distribution lane. It packages the proven RoomSpace
 repair as an x86 `version.dll` proxy that forwards the Windows version APIs and applies
-the same four audited callsite changes in process memory. It supports only the exact
-approved old- and new-client `N3.dll` SHA-256 hashes. Its installer refuses a client
+only the observed crashing callsite change in process memory for each supported client
+build. It supports only the exact approved old- and new-client `N3.dll` SHA-256 hashes.
+Its installer refuses a client
 directory that already contains `version.dll`, and the package includes matching install
 and uninstall commands plus the required AOReloaded MIT attribution.
 
