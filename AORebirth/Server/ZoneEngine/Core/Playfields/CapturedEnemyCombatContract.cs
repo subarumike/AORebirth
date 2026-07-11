@@ -13,6 +13,7 @@ namespace AORebirth.Core.Playfields
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Playfields;
 
     internal enum CapturedEnemyAttackModel
     {
@@ -55,6 +56,34 @@ namespace AORebirth.Core.Playfields
         internal int WeaponQuality { get; private set; }
 
         internal int WeaponInventorySlot { get; private set; }
+
+        internal bool HasEmptySpecialAttackWeaponContext { get; private set; }
+
+        internal bool HasCapturedAttackStartContext { get; private set; }
+
+        internal bool HasCapturedEquippedAttackInfo { get; private set; }
+
+        internal bool HasCapturedCombatStopSequence { get; private set; }
+
+        internal int AttackInfoAmmoCount { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown1 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown2 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown3 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown4 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown5 { get; private set; }
+
+        internal double AttackStartDelaySeconds { get; private set; }
+
+        internal double MovementTransitionDelaySeconds { get; private set; }
+
+        internal double FirstHitDelaySeconds { get; private set; }
+
+        internal bool SendStopFightOnDeath { get; private set; }
 
         internal bool IsCombatReady
         {
@@ -124,6 +153,56 @@ namespace AORebirth.Core.Playfields
                 WeaponQuality = quality,
                 WeaponInventorySlot = inventorySlot
             };
+        }
+
+        internal static CapturedEnemyCombatContract EquippedWeaponWithEmptySpecialAttackContext(
+            string evidence,
+            int lowId,
+            int highId,
+            int quality,
+            int inventorySlot,
+            int minDamage,
+            int maxDamage,
+            double attackStartDelaySeconds,
+            double movementTransitionDelaySeconds,
+            double firstHitDelaySeconds,
+            double rechargeSeconds,
+            bool sendStopFightOnDeath,
+            int attackInfoAmmoCount,
+            int attackInfoUnknown,
+            int unknown1,
+            int unknown2,
+            int unknown3,
+            int unknown4,
+            int unknown5)
+        {
+            CapturedEnemyCombatContract contract = EquippedWeapon(
+                evidence,
+                lowId,
+                highId,
+                quality,
+                inventorySlot);
+            contract.HasEmptySpecialAttackWeaponContext = true;
+            contract.HasCapturedAttackStartContext = true;
+            contract.HasCapturedEquippedAttackInfo = true;
+            contract.HasCapturedCombatStopSequence = true;
+            contract.AttackInfoAmmoCount = attackInfoAmmoCount;
+            contract.AttackInfoWeaponSlot = inventorySlot;
+            contract.AttackInfoUnknown = attackInfoUnknown;
+            contract.AttackInfoWeaponInstance = 0;
+            contract.MinDamage = minDamage;
+            contract.MaxDamage = maxDamage;
+            contract.AttackStartDelaySeconds = attackStartDelaySeconds;
+            contract.MovementTransitionDelaySeconds = movementTransitionDelaySeconds;
+            contract.FirstHitDelaySeconds = firstHitDelaySeconds;
+            contract.RechargeSeconds = rechargeSeconds;
+            contract.SendStopFightOnDeath = sendStopFightOnDeath;
+            contract.SpecialAttackWeaponUnknown1 = unknown1;
+            contract.SpecialAttackWeaponUnknown2 = unknown2;
+            contract.SpecialAttackWeaponUnknown3 = unknown3;
+            contract.SpecialAttackWeaponUnknown4 = unknown4;
+            contract.SpecialAttackWeaponUnknown5 = unknown5;
+            return contract;
         }
 
         internal static CapturedEnemyCombatContract Specialized(string evidence)
@@ -310,12 +389,26 @@ namespace AORebirth.Core.Playfields
                         0,
                         0);
                 case 26092:
-                    return CapturedEnemyCombatContract.EquippedWeapon(
-                        "20260710-205400: Thief retaliation plus QL1 Solar-Powered Pistol 121567",
+                    return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
+                        "20260711-170337 packets 301-654: Thief attack start, movement transition, three 9-point landed hits, and six-second repeat cadence",
                         121567,
                         121567,
                         1,
-                        (int)WeaponSlots.Righthand);
+                        (int)WeaponSlots.Righthand,
+                        NpcCombatAttackRules.CapturedSubwayThiefDamage,
+                        NpcCombatAttackRules.CapturedSubwayThiefDamage,
+                        NpcCombatAttackRules.CapturedSubwayThiefAttackStartDelaySeconds,
+                        NpcCombatAttackRules.CapturedSubwayThiefMovementTransitionDelaySeconds,
+                        NpcCombatAttackRules.CapturedSubwayThiefFirstHitDelaySeconds,
+                        NpcCombatAttackRules.CapturedSubwayThiefRechargeSeconds,
+                        true,
+                        NpcCombatAttackRules.CapturedSubwayThiefAttackInfoAmmoCount,
+                        NpcCombatAttackRules.CapturedSubwayThiefAttackInfoUnknown,
+                        NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown1,
+                        NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown2,
+                        NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown3,
+                        NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown4,
+                        NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown5);
                 case 203733:
                     return CapturedEnemyCombatContract.EquippedWeapon(
                         "20260709-205921/210452/212115/212336: Violent Vagabond QL1 weapon 130590",

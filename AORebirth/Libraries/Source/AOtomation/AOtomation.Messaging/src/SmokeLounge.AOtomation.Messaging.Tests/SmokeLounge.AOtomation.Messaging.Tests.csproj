@@ -65,6 +65,7 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="DebuggingSerializerTests.cs" />
+    <Compile Include="CapturedEnemyCombatContractTestStub.cs" />
     <Compile Include="GenericCmdUseRouteClassifierTests.cs" />
     <Compile Include="InfoPacketTests.cs" />
     <Compile Include="N3RecoveredContractTests.cs" />

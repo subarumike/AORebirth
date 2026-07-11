@@ -1899,13 +1899,23 @@ namespace AORebirth.Core.Playfields
         {
             this.runtimeSystems.StopDyingNpcCombatState(target);
 
-            if (IsCapturedCleaningRobot(target))
+            bool isCapturedCleaningRobot = IsCapturedCleaningRobot(target);
+            CapturedEnemyCombatContract capturedContract;
+            bool sendCapturedStopFight = CapturedEnemyCombatRuntimeRegistry.TryGet(
+                                               target.Identity.Instance,
+                                               out capturedContract)
+                                           && capturedContract.SendStopFightOnDeath;
+            if (isCapturedCleaningRobot)
             {
                 PlayfieldLifecycleTrace.Record(
                     PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
                     PlayfieldLifecycleTrace.StageRobotStopFight,
                     PlayfieldLifecycleTrace.MessageStopFight,
                     target.Identity);
+            }
+
+            if (isCapturedCleaningRobot || sendCapturedStopFight)
+            {
                 this.SendCombatStopMessage(target);
             }
         }

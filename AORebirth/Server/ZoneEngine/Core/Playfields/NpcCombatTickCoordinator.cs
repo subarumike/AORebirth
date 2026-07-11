@@ -38,6 +38,12 @@ namespace AORebirth.Core.Playfields
 
         private readonly HashSet<int> capturedSubwayFilthFleaPoisonAttacks = new HashSet<int>();
 
+        private readonly Dictionary<int, DateTime> pendingCapturedAttackStarts =
+            new Dictionary<int, DateTime>();
+
+        private readonly Dictionary<int, DateTime> pendingCapturedMovementTransitions =
+            new Dictionary<int, DateTime>();
+
         private readonly Playfield playfield;
 
         internal NpcCombatTickCoordinator(Playfield playfield)
@@ -48,19 +54,55 @@ namespace AORebirth.Core.Playfields
         internal void ResetCombatTick(ICharacter attacker)
         {
             bool isCapturedSubwayFilthFlea = IsCapturedSubwayFilthFlea(attacker);
+            CapturedEnemyCombatContract capturedContract;
+            bool hasCapturedContract = CapturedEnemyCombatRuntimeRegistry.TryGet(
+                attacker.Identity.Instance,
+                out capturedContract)
+                                       && capturedContract.IsCombatReady;
+            bool hasCapturedAttackStart = hasCapturedContract
+                                          && capturedContract.HasCapturedAttackStartContext;
             double initialDelaySeconds = isCapturedSubwayFilthFlea
                                              ? NpcCombatAttackRules.CapturedSubwayFilthFleaInitialAttackSeconds
                                              : Playfield.IsCapturedCleaningRobot(attacker)
                                                    ? NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds
                                                    : NpcCombatAttackRules.DefaultCombatTickSeconds;
-            this.nextCombatTicks[attacker.Identity.Instance] =
-                DateTime.UtcNow + TimeSpan.FromSeconds(initialDelaySeconds);
+            DateTime now = DateTime.UtcNow;
+            if (hasCapturedAttackStart && capturedContract.AttackStartDelaySeconds > 0)
+            {
+                this.pendingCapturedAttackStarts[attacker.Identity.Instance] =
+                    now + TimeSpan.FromSeconds(capturedContract.AttackStartDelaySeconds);
+                if (capturedContract.HasCapturedCombatStopSequence)
+                {
+                    this.pendingCapturedMovementTransitions[attacker.Identity.Instance] =
+                        now + TimeSpan.FromSeconds(
+                            capturedContract.AttackStartDelaySeconds
+                            + capturedContract.MovementTransitionDelaySeconds);
+                }
+
+                this.nextCombatTicks[attacker.Identity.Instance] =
+                    now + TimeSpan.FromSeconds(
+                        capturedContract.AttackStartDelaySeconds + capturedContract.FirstHitDelaySeconds);
+            }
+            else
+            {
+                this.pendingCapturedAttackStarts.Remove(attacker.Identity.Instance);
+                this.pendingCapturedMovementTransitions.Remove(attacker.Identity.Instance);
+                this.nextCombatTicks[attacker.Identity.Instance] =
+                    now + TimeSpan.FromSeconds(initialDelaySeconds);
+            }
 
             this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
             this.capturedSubwayFilthFleaPoisonAttacks.Remove(attacker.Identity.Instance);
             if (isCapturedSubwayFilthFlea)
             {
                 this.AnnounceCapturedSubwayFilthFleaAttackStartContext(attacker);
+            }
+            else if (!Playfield.IsCapturedCleaningRobot(attacker))
+            {
+                if (hasCapturedAttackStart && capturedContract.AttackStartDelaySeconds <= 0)
+                {
+                    this.AnnounceCapturedEnemyAttackStartContext(attacker, capturedContract);
+                }
             }
         }
 
@@ -71,10 +113,17 @@ namespace AORebirth.Core.Playfields
             this.lastNpcUnarmedAttackInfoSlots.Remove(identity.Instance);
             this.lastNpcSpecialAttackWeaponTargets.Remove(identity.Instance);
             this.capturedSubwayFilthFleaPoisonAttacks.Remove(identity.Instance);
+            this.pendingCapturedAttackStarts.Remove(identity.Instance);
+            this.pendingCapturedMovementTransitions.Remove(identity.Instance);
         }
 
         internal void ProcessCombatTick(ICharacter attacker)
         {
+            if (attacker == null || this.playfield == null)
+            {
+                return;
+            }
+
             if (attacker.FightingTarget.Instance == 0)
             {
                 this.playfield.ClearNpcCombatTracking(attacker.Identity);
@@ -102,23 +151,78 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            DateTime pendingAttackStart;
+            if (this.pendingCapturedAttackStarts.TryGetValue(
+                    attacker.Identity.Instance,
+                    out pendingAttackStart))
+            {
+                if (pendingAttackStart > DateTime.UtcNow)
+                {
+                    return;
+                }
+
+                CapturedEnemyCombatContract pendingContract;
+                if (CapturedEnemyCombatRuntimeRegistry.TryGet(
+                        attacker.Identity.Instance,
+                        out pendingContract)
+                    && pendingContract.IsCombatReady)
+                {
+                    this.AnnounceCapturedEnemyAttackStartContext(attacker, pendingContract);
+                }
+
+                this.pendingCapturedAttackStarts.Remove(attacker.Identity.Instance);
+                return;
+            }
+
+            DateTime pendingMovementTransition;
+            if (this.pendingCapturedMovementTransitions.TryGetValue(
+                    attacker.Identity.Instance,
+                    out pendingMovementTransition))
+            {
+                if (pendingMovementTransition > DateTime.UtcNow)
+                {
+                    return;
+                }
+
+                CapturedEnemyCombatContract movementContract;
+                NPCController npcController = attacker.Controller as NPCController;
+                if (npcController != null
+                    && CapturedEnemyCombatRuntimeRegistry.TryGet(
+                        attacker.Identity.Instance,
+                        out movementContract)
+                    && movementContract.IsCombatReady
+                    && movementContract.HasCapturedCombatStopSequence)
+                {
+                    npcController.StopFollowForCapturedCombatRange(target.Coordinates().coordinate);
+                }
+
+                this.pendingCapturedMovementTransitions.Remove(attacker.Identity.Instance);
+                return;
+            }
+
             CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
+            CapturedEnemyCombatContract activeCapturedContract;
+            bool maintainMovementDuringRecharge =
+                Playfield.IsCapturedCleaningRobot(attacker)
+                || PetCombatRules.IsPlayerOwnedAttackPet(attacker)
+                || (CapturedEnemyCombatRuntimeRegistry.TryGet(
+                        attacker.Identity.Instance,
+                        out activeCapturedContract)
+                    && activeCapturedContract.IsCombatReady);
             DateTime nextTick;
             DateTime now = DateTime.UtcNow;
             if (this.nextCombatTicks.TryGetValue(attacker.Identity.Instance, out nextTick)
                 && nextTick > now)
             {
-                if (Playfield.IsCapturedCleaningRobot(attacker)
-                    || PetCombatRules.IsPlayerOwnedAttackPet(attacker))
+                if (maintainMovementDuringRecharge
+                    && !this.playfield.IsInCombatRange(attacker, target, attackSource.Range))
                 {
-                    if (!this.playfield.IsInCombatRange(attacker, target, attackSource.Range))
-                    {
-                        this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
-                    }
-                    else if (attackSource.Range <= NpcCombatAttackRules.MaxMeleeCombatDistance)
-                    {
-                        this.playfield.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);
-                    }
+                    this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
+                }
+                else if (maintainMovementDuringRecharge
+                         && attackSource.Range <= NpcCombatAttackRules.MaxMeleeCombatDistance)
+                {
+                    this.playfield.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);
                 }
 
                 return;
@@ -331,6 +435,51 @@ namespace AORebirth.Core.Playfields
                     Target = attacker.FightingTarget,
                     Action = 0
                 });
+        }
+
+        private void AnnounceCapturedEnemyAttackStartContext(
+            ICharacter attacker,
+            CapturedEnemyCombatContract capturedContract)
+        {
+            if (attacker == null || capturedContract == null || attacker.FightingTarget.Instance == 0)
+            {
+                return;
+            }
+
+            if (capturedContract.HasEmptySpecialAttackWeaponContext)
+            {
+                this.lastNpcSpecialAttackWeaponTargets[attacker.Identity.Instance] =
+                    attacker.FightingTarget.Instance;
+                this.playfield.Announce(
+                    new SpecialAttackWeaponMessage
+                    {
+                        Identity = attacker.Identity,
+                        Unknown = 0,
+                        Specials = new SpecialAttack[0],
+                        Unknown1 = capturedContract.SpecialAttackWeaponUnknown1,
+                        Unknown2 = capturedContract.SpecialAttackWeaponUnknown2,
+                        Unknown3 = capturedContract.SpecialAttackWeaponUnknown3,
+                        Unknown4 = capturedContract.SpecialAttackWeaponUnknown4,
+                        Unknown5 = capturedContract.SpecialAttackWeaponUnknown5
+                    });
+            }
+
+            this.playfield.Announce(
+                new AttackMessage
+                {
+                    Identity = attacker.Identity,
+                    Unknown = 0,
+                    Target = attacker.FightingTarget,
+                    Action = 0
+                });
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "CombatCapturedEnemyAttackStartContextSend attacker={0} target={1}",
+                    attacker.Identity,
+                    attacker.FightingTarget));
         }
 
         private static SpecialAttack[] CreatePlayerOwnedAttackPetSpecialAttacks()
@@ -632,20 +781,31 @@ namespace AORebirth.Core.Playfields
             }
 
             IItem weapon = equippedWeapon.Item;
-            int minDamage = NormalizeCombatItemStat(weapon.GetAttribute((int)StatIds.mindamage), 0);
-            int maxDamage = NormalizeCombatItemStat(weapon.GetAttribute((int)StatIds.maxdamage), 0);
-            int damageBonus = NormalizeCombatItemStat(weapon.GetAttribute((int)StatIds.damagebonus), 0);
+            bool hasCapturedEquippedAttackInfo = capturedContract != null
+                                                  && capturedContract.HasCapturedEquippedAttackInfo;
+            int minDamage = hasCapturedEquippedAttackInfo && capturedContract.MinDamage > 0
+                                ? capturedContract.MinDamage
+                                : NormalizeCombatItemStat(weapon.GetAttribute((int)StatIds.mindamage), 0);
+            int maxDamage = hasCapturedEquippedAttackInfo && capturedContract.MaxDamage > 0
+                                ? capturedContract.MaxDamage
+                                : NormalizeCombatItemStat(weapon.GetAttribute((int)StatIds.maxdamage), 0);
+            int damageBonus = hasCapturedEquippedAttackInfo
+                                  ? 0
+                                  : NormalizeCombatItemStat(
+                                      weapon.GetAttribute((int)StatIds.damagebonus),
+                                      0);
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
-                    "CombatAttackSource weapon attacker={0} item={1}/{2} slot={3} min={4} max={5} rangeRaw={6}",
+                    "CombatAttackSource weapon attacker={0} item={1}/{2} slot={3} min={4} max={5} damageBonus={6} rangeRaw={7}",
                     attacker.Identity,
                     weapon.LowID,
                     weapon.HighID,
                     equippedWeapon.Slot,
                     minDamage,
                     maxDamage,
+                    damageBonus,
                     weapon.GetAttribute((int)StatIds.attackrange)));
 
             return new CombatAttackSource
@@ -654,15 +814,26 @@ namespace AORebirth.Core.Playfields
                        MaxDamage = maxDamage,
                        DamageBonus = damageBonus,
                        Range = NormalizeCombatRange(weapon.GetAttribute((int)StatIds.attackrange)),
-                       RechargeSeconds = NormalizeCombatDelaySeconds(
-                           weapon.GetAttribute((int)StatIds.itemdelay),
-                           weapon.GetAttribute((int)StatIds.rechargedelay)),
+                       RechargeSeconds = hasCapturedEquippedAttackInfo
+                                             && capturedContract.RechargeSeconds > 0
+                                             ? capturedContract.RechargeSeconds
+                                             : NormalizeCombatDelaySeconds(
+                                                 weapon.GetAttribute((int)StatIds.itemdelay),
+                                                 weapon.GetAttribute((int)StatIds.rechargedelay)),
                        UsesEquippedWeapon = true,
-                       AttackInfoAmmoCount = 40,
-                       AttackInfoWeaponSlot = equippedWeapon.Slot,
-                       AttackInfoUnk1 = 4,
+                       AttackInfoAmmoCount = hasCapturedEquippedAttackInfo
+                                                 ? capturedContract.AttackInfoAmmoCount
+                                                 : 40,
+                       AttackInfoWeaponSlot = hasCapturedEquippedAttackInfo
+                                                  ? capturedContract.AttackInfoWeaponSlot
+                                                  : equippedWeapon.Slot,
+                       AttackInfoUnk1 = hasCapturedEquippedAttackInfo
+                                            ? capturedContract.AttackInfoUnknown
+                                            : 4,
                        AttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType,
-                       AttackInfoWeaponInstance = 0,
+                       AttackInfoWeaponInstance = hasCapturedEquippedAttackInfo
+                                                      ? capturedContract.AttackInfoWeaponInstance
+                                                      : 0,
                        SendAttackInfo = true
                     };
         }
