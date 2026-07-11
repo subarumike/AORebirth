@@ -86,5 +86,14 @@ namespace ZoneEngine.Core.Playfields
                    && !usesEquippedWeapon
                    && (!previousTargetInstance.HasValue || previousTargetInstance.Value != targetInstance);
         }
+
+        public static bool ShouldSendPlayerOwnedAttackPetAttackStartContext(
+            bool isPlayerOwnedAttackPet,
+            int? previousTargetInstance,
+            int targetInstance)
+        {
+            return isPlayerOwnedAttackPet
+                   && (!previousTargetInstance.HasValue || previousTargetInstance.Value != targetInstance);
+        }
     }
 }

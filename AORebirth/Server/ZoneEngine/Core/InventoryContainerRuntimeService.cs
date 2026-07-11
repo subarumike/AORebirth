@@ -811,6 +811,11 @@ namespace ZoneEngine.Core
                 return false;
             }
 
+            if (PetShellItemService.Default.TryUsePetShell(character, itemPosition, item))
+            {
+                return true;
+            }
+
             TemplateActionMessageHandler.Default.Send(
                 character,
                 item,

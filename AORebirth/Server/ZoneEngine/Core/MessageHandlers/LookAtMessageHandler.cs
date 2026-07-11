@@ -38,6 +38,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core;
+
     using Utility;
 
     #endregion
@@ -71,8 +73,15 @@ namespace ZoneEngine.Core.MessageHandlers
                     message.Target.ToString(true),
                     message.ReturnInfo));
 
+            PetCommandService.OnOwnerLookAtTarget(client.Controller.Character, message.Target);
+
             if (client.Controller.LookAt(message.Target))
             {
+                if (!PetCommandService.HasActiveHealCommand(client.Controller.Character))
+                {
+                    PetCommandService.OnOwnerSelectedTargetChanged(client.Controller.Character);
+                }
+
                 if (message.ReturnInfo != 1)
                 {
                     CharacterInfoPacketMessageHandler.Default.Send(client.Controller.Character, message.Target);

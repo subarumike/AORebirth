@@ -195,13 +195,41 @@ namespace ZoneEngine.Core.Controllers
         public bool LookAt(Identity target)
         {
             // TODO: add Team lookup here too (F1-F6 for example)
-            bool result = false;
+            if (target.Instance == 0)
+            {
+                return false;
+            }
+
+            if (target.Instance == this.Character.Identity.Instance)
+            {
+                this.Character.SetTarget(this.Character.Identity);
+                return true;
+            }
+
+            if (this.Character.Playfield != null)
+            {
+                ICharacter resolved = Pool.Instance.GetObject<ICharacter>(this.Character.Playfield.Identity, target)
+                    ?? Pool.Instance.GetObject<ICharacter>(
+                        this.Character.Playfield.Identity,
+                        new Identity
+                        {
+                            Type = IdentityType.CanbeAffected,
+                            Instance = target.Instance
+                        });
+                if (resolved != null)
+                {
+                    this.Character.SetTarget(resolved.Identity);
+                    return true;
+                }
+            }
+
             if (Pool.Instance.Contains(this.Character.Playfield.Identity, target))
             {
                 this.Character.SetTarget(target);
-                result = true;
+                return true;
             }
-            return result;
+
+            return false;
         }
 
         /// <summary>
@@ -225,8 +253,50 @@ namespace ZoneEngine.Core.Controllers
             // 6. Wait for nano recharge delay
             // 7. Unlock nano casting
 
+            if (!NanoLoader.NanoList.ContainsKey(nanoId))
+            {
+                ChatTextMessageHandler.Default.Send(this.Character, "Unknown nano program.");
+                return false;
+            }
+
+            if (!this.Character.UploadedNanos.Any(x => x.NanoId == nanoId))
+            {
+                PetShellItemService.Default.TryEnsureNanoUploaded(this.Character, nanoId);
+            }
+
+            if (!this.Character.UploadedNanos.Any(x => x.NanoId == nanoId))
+            {
+                ChatTextMessageHandler.Default.Send(
+                    this.Character,
+                    "Nano is not uploaded. Use the nano crystal first.");
+                return false;
+            }
+
+            if (NanoEventRuntimeService.Default.HasSummonPetOnUse(nanoId))
+            {
+                int petStrain = ActiveNanoRuntimeService.Default.ResolveNanoStrain(this.Character, nanoId);
+                ActiveNanoRuntimeService.Default.PurgeOrphanSummonNanoInStrain(
+                    this.Character,
+                    petStrain,
+                    true);
+            }
+
+            if (!ActiveNanoRuntimeService.Default.CanActivateNano(this.Character, nanoId))
+            {
+                ChatTextMessageHandler.Default.Send(this.Character, "Not enough NCU to activate this nano.");
+                return false;
+            }
+
             NanoFormula nano = NanoLoader.NanoList[nanoId];
-            int strain = nano.NanoStrain();
+            int strain = NanoEventRuntimeService.Default.HasSummonPetOnUse(nanoId)
+                ? ActiveNanoRuntimeService.Default.ResolveNanoStrain(this.Character, nanoId)
+                : nano.NanoStrain();
+
+            if (NanoEventRuntimeService.Default.HasSummonPetOnUse(nanoId)
+                && (target.Type == IdentityType.None || target.Instance == 0))
+            {
+                target = this.Character.Identity;
+            }
 
             CastNanoSpellMessageHandler.Default.Send(this.Character, nanoId, target);
 
@@ -249,12 +319,56 @@ namespace ZoneEngine.Core.Controllers
             // TODO: Calculate nanocost modifiers etc.
             this.Character.Stats[StatIds.currentnano].Value -= nano.getItemAttribute(407);
 
-            // CharacterAction 98 - Set nano duration
-            CharacterActionMessageHandler.Default.SetNanoDuration(
-                this.Character,
-                target,
-                nanoId,
-                nano.getItemAttribute(8));
+            int duration = nano.getItemAttribute(8);
+            bool isSummonPetNano = NanoEventRuntimeService.Default.HasSummonPetOnUse(nano);
+            bool usesShell = isSummonPetNano
+                && PetShellCatalog.UsesShellOnSummon(this.Character.Stats[StatIds.profession].Value);
+
+            if (usesShell)
+            {
+                CharacterActionMessageHandler.Default.SetNanoDuration(
+                    this.Character,
+                    target,
+                    nanoId,
+                    duration);
+                PetShellItemService.Default.TryGiveShellForNano(this.Character, nanoId);
+            }
+            else if (isSummonPetNano)
+            {
+                PetSummonParams summonParams;
+                if (PetSummonNanoCatalog.TryResolve(this.Character, nanoId, out summonParams))
+                {
+                    if (!PetRuntimeService.Default.SummonPet(
+                        this.Character,
+                        summonParams.PetHash,
+                        summonParams.PetTypeId,
+                        strain,
+                        nanoId))
+                    {
+                        ChatTextMessageHandler.Default.Send(
+                            this.Character,
+                            "Pet spawn failed. Check mob template " + summonParams.PetHash + " in database.");
+                    }
+                }
+                else
+                {
+                    string preferredHash = PetSummonNanoCatalog.GetPreferredPetHash(nanoId);
+                    string hint = string.IsNullOrWhiteSpace(preferredHash)
+                        ? "Could not resolve a pet for this nano."
+                        : "Could not resolve a pet for this nano. Import mob template "
+                            + preferredHash
+                            + " into the MySQL database.";
+                    ChatTextMessageHandler.Default.Send(this.Character, hint);
+                }
+            }
+            else
+            {
+                CharacterActionMessageHandler.Default.SetNanoDuration(
+                    this.Character,
+                    target,
+                    nanoId,
+                    duration);
+            }
 
             Thread.Sleep(nano.getItemAttribute(210) * 10); // Recharge Delay
             return false;

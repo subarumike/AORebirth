@@ -24,12 +24,9 @@ namespace ZoneEngine.Core.Playfields
 
             foreach (Character entity in characters)
             {
-                if (entity != null)
+                if (entity?.Controller?.Client != null)
                 {
-                    if (entity.Controller.Client != null)
-                    {
-                        sendMessageBodyToClient(entity.Controller.Client, messageBody);
-                    }
+                    sendMessageBodyToClient(entity.Controller.Client, messageBody);
                 }
             }
         }
@@ -44,12 +41,11 @@ namespace ZoneEngine.Core.Playfields
 
             foreach (Character entity in characters)
             {
-                if (entity != null)
+                if (entity != null
+                    && entity.Identity != excludedIdentity
+                    && entity.Controller?.Client != null)
                 {
-                    if (entity.Identity != excludedIdentity)
-                    {
-                        sendMessageBodyToClient(entity.Controller.Client, messageBody);
-                    }
+                    sendMessageBodyToClient(entity.Controller.Client, messageBody);
                 }
             }
         }

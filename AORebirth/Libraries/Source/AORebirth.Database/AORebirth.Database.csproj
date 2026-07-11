@@ -115,6 +115,7 @@
     <Compile Include="Dao\MobSpawnDao.cs" />
     <Compile Include="Dao\MobSpawnStatDao.cs" />
     <Compile Include="Dao\MobTemplateDao.cs" />
+    <Compile Include="Dao\PetSummonMobTemplateCatalog.cs" />
     <Compile Include="Dao\InstancedItemDao.cs" />
     <Compile Include="Dao\ItemDao.cs" />
     <Compile Include="Dao\ItemNamesDao.cs" />

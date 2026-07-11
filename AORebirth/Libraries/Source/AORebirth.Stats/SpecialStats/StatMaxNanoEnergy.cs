@@ -81,7 +81,13 @@ namespace AORebirth.Stats.SpecialStats
             get
             {
                 int[] breedBaseNanoPoints = { 10, 10, 15, 8, 10, 10, 10 };
-                return (uint)breedBaseNanoPoints[this.Stats[StatIds.breed].BaseValue - 1];
+                int breedIndex = (int)this.Stats[StatIds.breed].BaseValue;
+                if (breedIndex < 1 || breedIndex > breedBaseNanoPoints.Length)
+                {
+                    breedIndex = 1;
+                }
+
+                return (uint)breedBaseNanoPoints[breedIndex - 1];
             }
         }
 
@@ -104,8 +110,18 @@ namespace AORebirth.Stats.SpecialStats
 
                 int[] breedMultiplicatorNanoPoints = { 3, 3, 4, 2, 3, 3, 3 };
                 int[] breedModificatorNanoPoints = { 0, -1, 1, -2, 0, 0, 0 };
-                uint breed = this.Stats[StatIds.breed].BaseValue;
-                uint profession = this.Stats[StatIds.profession].BaseValue;
+                int breed = (int)this.Stats[StatIds.breed].BaseValue;
+                int profession = (int)this.Stats[StatIds.profession].BaseValue;
+
+                if (breed < 1 || breed > breedMultiplicatorNanoPoints.Length)
+                {
+                    breed = 1;
+                }
+
+                if (profession < 1)
+                {
+                    profession = 1;
+                }
 
                 // TODO: Change the tableProfessionNanoPoints array and add the 13th as dummy
                 if (profession > 13)
@@ -113,7 +129,17 @@ namespace AORebirth.Stats.SpecialStats
                     profession--;
                 }
 
-                uint titleLevel = this.Stats[StatIds.titlelevel].BaseValue;
+                if (profession < 1 || profession > tableProfessionNanoPoints.GetLength(1))
+                {
+                    profession = 1;
+                }
+
+                int titleLevel = (int)this.Stats[StatIds.titlelevel].BaseValue;
+                if (titleLevel < 1 || titleLevel > tableProfessionNanoPoints.GetLength(0))
+                {
+                    titleLevel = 1;
+                }
+
                 uint level = this.Stats[StatIds.level].BaseValue;
 
                 int beforeModifiers =

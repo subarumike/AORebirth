@@ -268,6 +268,8 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            PetCommandService.ProcessPetHealTick(character);
+
             if (character.Controller.IsFollowing())
             {
                 character.Controller.DoFollow();

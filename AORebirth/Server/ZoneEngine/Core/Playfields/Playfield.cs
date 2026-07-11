@@ -292,7 +292,6 @@ namespace AORebirth.Core.Playfields
                     this.runtimeSystems.DeliverAOtomationMessageBodiesToClient));
             this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<IMSendPlayerSCFUs>(this.SendSCFUsToClient));
             this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<IMExecuteFunction>(this.ExecuteFunction));
-            this.heartBeat = new Timer(this.HeartBeatTimer, null, 10, 0);
 
             this.statels = this.runtimeSystems.ResolveStatels(playfieldIdentity);
             this.runtimeSystems.RegisterStatels(this.statels);
@@ -300,6 +299,7 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.MaterializeStartupObjects(
                 playfieldIdentity,
                 this.statels);
+            this.heartBeat = new Timer(this.HeartBeatTimer, null, 10, 0);
         }
 
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
@@ -446,6 +446,11 @@ namespace AORebirth.Core.Playfields
         public void RegisterNpcHome(ICharacter character)
         {
             this.runtimeSystems.RegisterNpcHome(character);
+        }
+
+        public void ActivateNpc(ICharacter character)
+        {
+            this.runtimeSystems.ActivateNpc(character);
         }
 
         public void AcquireNpcAggro(ICharacter attacker, ICharacter target)
@@ -2786,6 +2791,10 @@ namespace AORebirth.Core.Playfields
                     if (character.Controller is NPCController)
                     {
                         this.ClearNpcFightingTarget(character);
+                        if (PetCombatRules.IsPlayerOwnedPet(character))
+                        {
+                            PetCommandService.ReturnPetToOwner(character);
+                        }
                     }
                     else
                     {

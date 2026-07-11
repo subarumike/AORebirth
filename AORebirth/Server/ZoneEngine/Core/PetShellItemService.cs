@@ -106,7 +106,9 @@ namespace ZoneEngine.Core
             bool summoned = PetRuntimeService.Default.SummonPet(
                 character,
                 definition.PetHash,
-                definition.PetTypeId);
+                definition.PetTypeId,
+                this.ResolveShellPetStrain(definition.NanoId),
+                definition.NanoId);
 
             if (!summoned)
             {
@@ -272,6 +274,24 @@ namespace ZoneEngine.Core
 
             definition = null;
             return false;
+        }
+
+        private int ResolveShellPetStrain(int nanoId)
+        {
+            NanoFormula nano;
+            if (NanoLoader.NanoList.TryGetValue(nanoId, out nano))
+            {
+                return nano.NanoStrain();
+            }
+
+            return 0;
+        }
+
+        public bool TryEnsureNanoUploaded(ICharacter character, int nanoId)
+        {
+            this.EnsureNanoUploaded(character, nanoId);
+            return character != null
+                && character.UploadedNanos.Any(x => x.NanoId == nanoId);
         }
 
         private void EnsureNanoUploaded(ICharacter character, int nanoId)

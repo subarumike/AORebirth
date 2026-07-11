@@ -166,6 +166,8 @@ namespace AORebirth.Core.NPCHandler
                 {
                     throw new Exception("Object " + mobId.ToString(true) + " already exists!!");
                 }
+
+                Pool.Instance.PurgeResidualChildren(mobId);
                 Character cmob = new Character(playfield.Identity, mobId, npccontroller);
                 cmob.Read();
                 cmob.Playfield = playfield;

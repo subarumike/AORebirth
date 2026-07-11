@@ -139,6 +139,8 @@ namespace ZoneEngine.Core.Packets
             int healthValue;
             int losHeight;
 
+            int petMasterInstance;
+
             int monsterData;
             int monsterScale;
             int visualFlags;
@@ -237,6 +239,7 @@ namespace ZoneEngine.Core.Packets
 
                 losHeight = character.Stats[StatIds.losheight].Value;
                 NPCFamily = character.Stats[StatIds.npcfamily].Value;
+                petMasterInstance = character.Stats[StatIds.petmaster].Value;
                 currentHealth = character.Stats[StatIds.health].Value;
             }
 
@@ -250,6 +253,10 @@ namespace ZoneEngine.Core.Packets
                 || (charPlayfield == SubwayPlayfieldResource
                     && character.Waypoints != null
                     && character.Waypoints.Count > 1))
+            {
+                scfu.Version = 58;
+            }
+            else if (petMasterInstance != 0)
             {
                 scfu.Version = 58;
             }
@@ -389,6 +396,12 @@ namespace ZoneEngine.Core.Packets
                 scfu.Unknown1 = CapturedSubwayThiefUnknown1;
                 scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6 | SimpleCharFullUpdateFlags.IsPet;
                 scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
+            }
+            else if (petMasterInstance != 0)
+            {
+                scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6
+                    | SimpleCharFullUpdateFlags.IsPet
+                    | SimpleCharFullUpdateFlags.UnknownDataFlag;
             }
 
             if (headMeshValue != 0)

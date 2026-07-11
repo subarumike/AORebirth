@@ -51,6 +51,7 @@ namespace ZoneEngine.Core.Controllers
 
     using Utility;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Functions;
     using ZoneEngine.Core.InternalMessages;
@@ -148,21 +149,6 @@ namespace ZoneEngine.Core.Controllers
 
         private void LogChase(string phase, Vector3 start, Vector3 destination)
         {
-            Vector3 raw = this.Character.RawCoordinates;
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "NPCCHASE phase={0} npc={1} target={2} raw={3} start={4} dest={5} dist={6:0.00} stop={7:0.00} mode={8}",
-                    phase,
-                    this.Character.Identity.ToString(true),
-                    this.followIdentity.ToString(true),
-                    FormatVector(raw),
-                    FormatVector(start),
-                    FormatVector(destination),
-                    start.Distance2D(destination),
-                    this.followStopDistance,
-                    this.Character.MoveMode));
         }
 
         private static Vector3 MoveToward(Vector3 start, Vector3 destination, double maxDistance)
@@ -341,7 +327,7 @@ namespace ZoneEngine.Core.Controllers
                 this.followCoordinates = end;
                 this.Character.Coordinates(start);
                 this.FaceToward(start, end);
-                this.LogChase("captured-patrol-replay", start, end);
+            //    this.LogChase("captured-patrol-replay", start, end);
                 FollowTargetMessageHandler.Default.Send(this.Character, start, end);
                 this.SetMotionSegment(start, end, now);
                 this.lastMotionPacketUtc = now;
@@ -812,7 +798,12 @@ namespace ZoneEngine.Core.Controllers
                 ICharacter targetChar = GetCharacterFromPool(this.Character.Playfield.Identity, this.followIdentity);
                 if (targetChar == null)
                 {
-                    // If target does not longer exist (death or zone or logoff) then stop following
+                    if (PetCombatRules.IsPlayerOwnedPet(this.Character))
+                    {
+                        PetCommandService.ReturnPetToOwner(this.Character);
+                        return;
+                    }
+
                     this.StopFollow();
                     return;
                 }
