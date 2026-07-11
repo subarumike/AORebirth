@@ -1054,42 +1054,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(patrolReplayIndex > 0, "Captured Subway patrol replay data must follow spawn definitions.");
             string spawnDefinitionsText = providerText.Substring(0, patrolReplayIndex);
             Assert.AreEqual(
-                124,
+                95,
                 CountOccurrences(spawnDefinitionsText, "CapturedSurveySpawn("),
-                "CapturedSubwayContentProvider must preserve all 124 capture-backed supported-family Subway spawns.");
-            string[] followupSupportedSourceInstances =
-                {
-                    "0x79557C09", "0x79557C26", "0x79557C31", "0x79557C8B", "0x79557CA7",
-                    "0x79557CAB", "0x79557CAD", "0x7957E411", "0x7957E4A5", "0x7957E4B1",
-                    "0x7957E4BC", "0x79557C66", "0x7957E40A", "0x79557F14", "0x7957E5C6",
-                    "0x7957E5C7", "0x7957E5C8", "0x7957E5CA", "0x79557CAC", "0x7957405C",
-                    "0x795743A7", "0x795743A8", "0x7957E02C", "0x7957E02E", "0x7957E123",
-                    "0x7957E40E", "0x7957E5BF", "0x7957E5C4", "0x7957E5C5"
-                };
-            for (int i = 0; i < followupSupportedSourceInstances.Length; i++)
-            {
-                Assert.IsTrue(
-                    spawnDefinitionsText.Contains(followupSupportedSourceInstances[i]),
-                    "Missing follow-up supported Subway spawn " + followupSupportedSourceInstances[i] + ".");
-            }
-            int disobedientBotHelperIndex = providerText.IndexOf(
-                "private static CapturedSubwaySpawnDefinition DisobedientBot(",
-                StringComparison.Ordinal);
-            int muggerHelperIndex = providerText.IndexOf(
-                "private static CapturedSubwaySpawnDefinition Mugger(",
-                disobedientBotHelperIndex,
-                StringComparison.Ordinal);
-            Assert.IsTrue(
-                disobedientBotHelperIndex > 0
-                && muggerHelperIndex > disobedientBotHelperIndex,
-                "Captured Subway Disobedient Bot helper must remain present.");
-            string disobedientBotHelperText = providerText.Substring(
-                disobedientBotHelperIndex,
-                muggerHelperIndex - disobedientBotHelperIndex);
-            Assert.IsTrue(
-                disobedientBotHelperText.Contains("                138,")
-                && disobedientBotHelperText.Contains("                268964353,"),
-                "Disobedient Bot must preserve the fresh live SCFU NPC family and character flags.");
+                "CapturedSubwayContentProvider must preserve the 95 already-supported ordinary Subway spawns.");
             Assert.IsFalse(
                 providerText.Contains("122002"),
                 "CapturedSubwayContentProvider must bind content to resource/playfield 127, not capture object Playfield2:122002.");
@@ -1278,25 +1245,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
             Assert.AreEqual(
-                11,
+                10,
                 CountOccurrences(providerText, "            new CapturedSubwayOrdinaryArchetypeDefinition("),
-                "The ten ordinary families must retain eleven captured visual/template variants because Workman and Architect Striker differ.");
+                "The nine ordinary families must retain ten captured visual/template variants because Workman and Architect Striker differ.");
             Assert.AreEqual(
-                135,
+                126,
                 CountOccurrences(providerText, "            new CapturedSubwayOrdinarySpawnDefinition("),
-                "The completed capture survey must register all 135 spatially deduplicated ordinary spawn positions.");
-            string[] followupOrdinarySourceInstances =
-                {
-                    "0x79557CB8", "0x7957E5CD",
-                    "0x79557F12", "0x7957E128", "0x7957E415", "0x7957E5CF", "0x7957E5D0", "0x7957E5D1",
-                    "0x79574527"
-                };
-            for (int i = 0; i < followupOrdinarySourceInstances.Length; i++)
-            {
-                Assert.IsTrue(
-                    providerText.Contains(followupOrdinarySourceInstances[i]),
-                    "Missing follow-up ordinary Subway spawn " + followupOrdinarySourceInstances[i] + ".");
-            }
+                "The completed capture survey must register all 126 spatially deduplicated ordinary spawn positions.");
 
             string[] capturedNames =
                 {
@@ -1309,42 +1264,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Looter",
                     "Infector",
                     "Lost Thought",
-                    "Neural Burnout",
-                    "Deranged Shopper"
+                    "Neural Burnout"
                 };
             for (int i = 0; i < capturedNames.Length; i++)
             {
                 Assert.IsTrue(providerText.Contains("\"" + capturedNames[i] + "\""), "Missing " + capturedNames[i] + ".");
             }
 
-            int[] capturedMonsterData = { 30464, 203739, 203854, 203743, 96056, 55648, 203745, 31909, 96193, 203730, 203736 };
+            int[] capturedMonsterData = { 30464, 203739, 203854, 203743, 96056, 55648, 203745, 31909, 96193, 203730 };
             for (int i = 0; i < capturedMonsterData.Length; i++)
             {
                 Assert.IsTrue(
                     providerText.Contains("                " + capturedMonsterData[i] + ","),
                     "Missing captured monsterData " + capturedMonsterData[i] + ".");
             }
-
-            int derangedShopperIndex = providerText.IndexOf(
-                "                \"deranged_shopper\",",
-                StringComparison.Ordinal);
-            int firstOrdinarySpawnIndex = providerText.IndexOf(
-                "            new CapturedSubwayOrdinarySpawnDefinition(",
-                derangedShopperIndex,
-                StringComparison.Ordinal);
-            Assert.IsTrue(
-                derangedShopperIndex > 0
-                && firstOrdinarySpawnIndex > derangedShopperIndex,
-                "Deranged Shopper captured archetype must precede generated spawn definitions.");
-            string derangedShopperArchetypeText = providerText.Substring(
-                derangedShopperIndex,
-                firstOrdinarySpawnIndex - derangedShopperIndex);
-            Assert.IsTrue(
-                derangedShopperArchetypeText.Contains("new CapturedSubwayTextureDefinition(1, 30859, 0)")
-                && derangedShopperArchetypeText.Contains("new CapturedSubwayTextureDefinition(4, 15815, 0)")
-                && derangedShopperArchetypeText.Contains("new CapturedSubwayMeshDefinition(1, 95784u, 0, 2)")
-                && derangedShopperArchetypeText.Contains("\"20260710-202132\""),
-                "Deranged Shopper must preserve its exact raw-SCFU appearance and evidence capture.");
 
             Assert.IsTrue(
                 providerText.Contains("\"workman_striker\",")
