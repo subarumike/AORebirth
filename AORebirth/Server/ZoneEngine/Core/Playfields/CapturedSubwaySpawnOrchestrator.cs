@@ -32,7 +32,6 @@ namespace AORebirth.Core.Playfields
         private const int CapturedSubwayThiefBodyMesh = 160561;
         private const int CapturedSubwayThiefBackMesh = 7777;
         private const int CapturedSubwayViolentVagabondBackMesh = 136583;
-        private static readonly bool EnableCapturedSubwayNpcMovement = false;
 
         private readonly CapturedSubwayContentProvider capturedSubwayContent;
 
@@ -168,13 +167,10 @@ namespace AORebirth.Core.Playfields
             mobCharacter.Playfield = playfield;
             mobCharacter.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
             PrepareCapturedSubwayMob(mobCharacter, spawn);
-            if (EnableCapturedSubwayNpcMovement)
+            AssignCapturedPatrolWaypoint(mobCharacter, spawn);
+            if (!beginPatrolAfterFullUpdate)
             {
-                AssignCapturedPatrolWaypoint(mobCharacter, spawn);
-                if (!beginPatrolAfterFullUpdate)
-                {
-                    this.AssignCapturedPatrolReplay(mobCharacter, npcController, spawn);
-                }
+                this.AssignCapturedPatrolReplay(mobCharacter, npcController, spawn);
             }
 
             mobCharacter.DoNotDoTimers = false;
@@ -182,7 +178,7 @@ namespace AORebirth.Core.Playfields
             this.activateNpc(mobCharacter);
             this.activeSpawnDefinitions[mobCharacter.Identity.Instance] = spawn;
             playfield.Announce(fullUpdate);
-            if (EnableCapturedSubwayNpcMovement && beginPatrolAfterFullUpdate)
+            if (beginPatrolAfterFullUpdate)
             {
                 this.AssignCapturedPatrolReplay(mobCharacter, npcController, spawn);
             }
