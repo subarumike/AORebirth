@@ -95,7 +95,8 @@ namespace ZoneEngine.Core.Playfields
             }
 
             int currentHealth = npc.Stats[StatIds.health].Value;
-            if (currentHealth <= 0)
+            if (!PlayfieldCharacterHeartbeatHealthRules.IsLivingHealth(
+                currentHealth))
             {
                 this.nextNpcHealthRegenUtc.TryRemove(npcInstance, out _);
                 this.npcRegenSuspendedForCombat.TryRemove(npcInstance, out _);
@@ -108,7 +109,9 @@ namespace ZoneEngine.Core.Playfields
             }
 
             int maxHealth = npc.Stats[StatIds.life].Value;
-            if (currentHealth >= maxHealth)
+            if (!PlayfieldCharacterHeartbeatHealthRules.CanRegenerateNpcHealth(
+                currentHealth,
+                maxHealth))
             {
                 return;
             }
@@ -160,16 +163,16 @@ namespace ZoneEngine.Core.Playfields
                     continue;
                 }
 
-                if (character.Stats[StatIds.health].Value <= 0)
-                {
-                    continue;
-                }
-
-                if (character.FightingTarget.Instance == targetInstance
-                    || character.SelectedTarget.Instance == targetInstance)
-                {
-                    return true;
-                }
+                bool targetsNpc = character.FightingTarget.Instance == targetInstance
+                    || character.SelectedTarget.Instance == targetInstance;
+                // Missing or duplicate health is upstream stat corruption and must remain observable.
+                if (PlayfieldCharacterHeartbeatHealthRules.IsLivingNpcAttackCandidate(
+                    character,
+                    targetsNpc,
+                    candidate => candidate.Stats[StatIds.health].Value))
+                {
+                    return true;
+                }
             }
 
             return false;
@@ -204,4 +207,3 @@ namespace ZoneEngine.Core.Playfields
         }
     }
 }
-
