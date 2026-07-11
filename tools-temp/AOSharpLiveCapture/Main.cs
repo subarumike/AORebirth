@@ -37,7 +37,6 @@ namespace AOSharpLiveCapture
             new Dictionary<string, RecentEnemyFullUpdateEvidence>();
         private readonly Dictionary<string, EnemyEntityState> enemyStates = new Dictionary<string, EnemyEntityState>();
         private readonly Dictionary<string, List<EnemyStateEvent>> enemyStateTimeline = new Dictionary<string, List<EnemyStateEvent>>();
-        private readonly Dictionary<string, int> decodedMessageTypeCounts = new Dictionary<string, int>();
         private readonly HashSet<string> interestingMessageNames = new HashSet<string>
         {
             "SimpleCharFullUpdate",
@@ -109,8 +108,6 @@ namespace AOSharpLiveCapture
         private StreamWriter movementPacketsLog;
         private StreamWriter enemyStatUpdatesLog;
         private StreamWriter enemyFightEventsLog;
-        private StreamWriter decodedMessagesLog;
-        private StreamWriter playerStatSnapshotsLog;
         private bool enabled;
         private bool captureFinalized;
         private int inboundPacketCount;
@@ -144,11 +141,8 @@ namespace AOSharpLiveCapture
         private int movementStopMovingCmdPacketCount;
         private int movementDecodeErrorCount;
         private int enemyStatUpdateRowCount;
-        private int decodedMessageEvidenceRowCount;
-        private int playerStatSnapshotCount;
         private DateTime nextFlushUtc;
         private DateTime nextSnapshotUtc;
-        private DateTime nextQuestSnapshotUtc;
         private DateTime captureStartUtc;
         private DateTime captureStartLocal;
         private DateTime lastPacketUtc;
@@ -216,9 +210,6 @@ namespace AOSharpLiveCapture
             this.LogEvent("PLUGIN", "Enemy state JSON: " + Path.Combine(this.sessionDirectory, "enemy-state.json"));
             this.LogEvent("PLUGIN", "Capture info: " + Path.Combine(this.sessionDirectory, "capture_info.json"));
             this.LogEvent("PLUGIN", "Capture session metadata: " + Path.Combine(this.sessionDirectory, "capture-session.json"));
-            this.LogEvent("PLUGIN", "Complete decoded N3 evidence: " + Path.Combine(this.sessionDirectory, "decoded-messages.jsonl"));
-            this.LogEvent("PLUGIN", "Complete player stat snapshots: " + Path.Combine(this.sessionDirectory, "player-stat-snapshots.csv"));
-            this.LogEvent("PLUGIN", "Quest capture coverage: " + Path.Combine(this.sessionDirectory, "quest-capture-coverage.json"));
             this.LogSnapshot("initial");
             Chat.WriteLine("AOSharpLiveCapture logging to " + this.sessionDirectory, ChatColor.Gold);
             }
@@ -293,13 +284,11 @@ namespace AOSharpLiveCapture
 
                 case "stop":
                     this.LogEvent("COMMAND", "capture stopped");
-                    this.WritePlayerStatSnapshot("capture-stop");
                     this.enabled = false;
                     this.Flush();
                     this.WriteEnemyStateJson();
                     this.WriteEnemyDossierJson();
                     this.WriteMovementSummaryJson();
-                    this.WriteQuestCaptureCoverage();
                     CaptureValidation stopValidation = this.ValidateCapture();
                     this.WriteCaptureHealth(stopValidation);
                     this.WriteCaptureInfo(DateTime.UtcNow, stopValidation);
@@ -319,7 +308,6 @@ namespace AOSharpLiveCapture
 
                 case "snapshot":
                     this.LogSnapshot("manual");
-                    this.WritePlayerStatSnapshot("manual");
                     chatWindow.WriteLine("AO capture snapshot written.", ChatColor.Gold);
                     break;
 
@@ -943,7 +931,6 @@ namespace AOSharpLiveCapture
             this.knownCharacters.Clear();
             this.knownCorpses.Clear();
             this.LogSnapshot("playfield-init");
-            this.WritePlayerStatSnapshot("playfield-init");
         }
 
         private void OnTeleportStarted(object sender, EventArgs e)
@@ -955,7 +942,6 @@ namespace AOSharpLiveCapture
         {
             this.LogEvent("TELEPORT", "ended");
             this.LogSnapshot("teleport-ended");
-            this.WritePlayerStatSnapshot("teleport-ended");
         }
 
         private void OnTeleportFailed(object sender, EventArgs e)
@@ -977,12 +963,6 @@ namespace AOSharpLiveCapture
             {
                 this.nextSnapshotUtc = now.AddSeconds(1);
                 this.TrackDynelChanges();
-            }
-
-            if (now >= this.nextQuestSnapshotUtc)
-            {
-                this.nextQuestSnapshotUtc = now.AddSeconds(5);
-                this.WritePlayerStatSnapshot("periodic");
             }
 
             if (now >= this.nextFlushUtc)
@@ -1556,14 +1536,6 @@ namespace AOSharpLiveCapture
         private void LogN3Message(string direction, int sequence, N3Message message)
         {
             string messageName = message.N3MessageType.ToString();
-            try
-            {
-                this.WriteDecodedMessageEvidence(direction, sequence, message);
-            }
-            catch (Exception ex)
-            {
-                this.TryLogEvent("DECODED-EVIDENCE-ERROR", messageName + " " + ex);
-            }
             bool interesting = this.interestingMessageNames.Contains(messageName);
             string detail = interesting ? this.DescribeN3Message(message) : string.Empty;
             this.ExportSpecializedMessage(direction, sequence, message);
@@ -3351,7 +3323,6 @@ namespace AOSharpLiveCapture
             }
 
             this.captureFinalized = true;
-            this.WritePlayerStatSnapshot("capture-finalize");
             this.enabled = false;
 
             this.LogEvent("PLUGIN", "Final capture flush delay starting: 5 seconds.");
@@ -3361,7 +3332,6 @@ namespace AOSharpLiveCapture
             this.WriteEnemyStateJson();
             this.WriteEnemyDossierJson();
             this.WriteMovementSummaryJson();
-            this.WriteQuestCaptureCoverage();
 
             CaptureValidation validation = this.ValidateCapture();
             this.WriteCaptureHealth(validation);
@@ -3391,22 +3361,6 @@ namespace AOSharpLiveCapture
             if (this.GetSessionFileLength("packets.hex.log") <= 0)
             {
                 notes.Add("packets.hex.log is empty; no raw packets were observed in this session.");
-            }
-
-            int decodedTotal = this.decodedInboundCount + this.decodedOutboundCount;
-            if (decodedTotal > 0 && this.decodedMessageEvidenceRowCount != decodedTotal)
-            {
-                issues.Add(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "decoded-messages.jsonl is incomplete: expected {0} decoded messages but wrote {1}.",
-                        decodedTotal,
-                        this.decodedMessageEvidenceRowCount));
-            }
-
-            if (this.playerStatSnapshotCount < 2)
-            {
-                issues.Add("player-stat-snapshots.csv is missing a complete start/final stat boundary pair.");
             }
 
             if (this.vendorInteractionAttemptCount > 0 && this.shopUpdateRowCount == 0)
@@ -3846,12 +3800,6 @@ namespace AOSharpLiveCapture
                 json.AppendLine(",");
                 json.Append("    \"enemyFightAutoCaptureEnabled\": ");
                 json.Append(this.enemyFightAutoCaptureEnabled ? "true" : "false");
-                json.AppendLine(",");
-                json.Append("    \"decodedMessageEvidenceRows\": ");
-                json.Append(this.decodedMessageEvidenceRowCount.ToString(CultureInfo.InvariantCulture));
-                json.AppendLine(",");
-                json.Append("    \"playerStatSnapshots\": ");
-                json.Append(this.playerStatSnapshotCount.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine(",");
                 json.Append("    \"enemyTrackedEntities\": ");
                 json.Append(this.enemyStates.Count.ToString(CultureInfo.InvariantCulture));
@@ -4535,287 +4483,6 @@ namespace AOSharpLiveCapture
                 Safe(() => corpse.IsOpen.ToString()));
         }
 
-        private void WriteDecodedMessageEvidence(string direction, int sequence, N3Message message)
-        {
-            if (message == null || this.decodedMessagesLog == null)
-            {
-                return;
-            }
-
-            var json = new StringBuilder(4096);
-            json.Append('{');
-            json.Append("\"capturedUtc\":");
-            json.Append(Json(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)));
-            json.Append(",\"direction\":");
-            json.Append(Json(direction));
-            json.Append(",\"sequence\":");
-            json.Append(sequence.ToString(CultureInfo.InvariantCulture));
-            json.Append(",\"messageType\":");
-            json.Append(Json(message.N3MessageType.ToString()));
-            json.Append(",\"messageTypeValue\":");
-            json.Append(((int)message.N3MessageType).ToString(CultureInfo.InvariantCulture));
-            json.Append(",\"identity\":");
-            json.Append(Json(message.Identity.ToString()));
-            json.Append(",\"payload\":");
-            AppendEvidenceValue(json, message, 0, new HashSet<object>());
-            json.Append('}');
-
-            lock (this.syncRoot)
-            {
-                this.decodedMessageEvidenceRowCount++;
-                int count;
-                this.decodedMessageTypeCounts.TryGetValue(message.N3MessageType.ToString(), out count);
-                this.decodedMessageTypeCounts[message.N3MessageType.ToString()] = count + 1;
-                this.decodedMessagesLog.WriteLine(json.ToString());
-            }
-        }
-
-        private void WritePlayerStatSnapshot(string reason)
-        {
-            LocalPlayer player = DynelManager.LocalPlayer;
-            if (player == null || this.playerStatSnapshotsLog == null)
-            {
-                return;
-            }
-
-            string capturedUtc = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
-            string playerIdentity = Safe(() => player.Identity.ToString());
-            string playerName = Safe(() => player.Name);
-            string playfieldIdentity = Safe(() => Playfield.Identity.ToString());
-            string position = Safe(() => player.Position.ToString());
-            Stat[] stats = Enum.GetValues(typeof(Stat)).Cast<Stat>()
-                .GroupBy(stat => Convert.ToInt32(stat, CultureInfo.InvariantCulture))
-                .Select(group => group.First())
-                .OrderBy(stat => Convert.ToInt32(stat, CultureInfo.InvariantCulture))
-                .ToArray();
-
-            lock (this.syncRoot)
-            {
-                this.playerStatSnapshotCount++;
-                foreach (Stat stat in stats)
-                {
-                    try
-                    {
-                        int statId = Convert.ToInt32(stat, CultureInfo.InvariantCulture);
-                        int value = player.GetStat(stat);
-                        this.playerStatSnapshotsLog.WriteLine(
-                            string.Join(
-                                ",",
-                                Csv(capturedUtc),
-                                Csv(reason),
-                                Csv(playerIdentity),
-                                Csv(playerName),
-                                Csv(playfieldIdentity),
-                                Csv(position),
-                                Csv(statId.ToString(CultureInfo.InvariantCulture)),
-                                Csv(stat.ToString()),
-                                Csv(value.ToString(CultureInfo.InvariantCulture))));
-                    }
-                    catch
-                    {
-                    }
-                }
-
-                this.playerStatSnapshotsLog.Flush();
-            }
-        }
-
-        private void WriteQuestCaptureCoverage()
-        {
-            try
-            {
-                Dictionary<string, int> counts;
-                int evidenceRows;
-                int statSnapshots;
-                lock (this.syncRoot)
-                {
-                    counts = new Dictionary<string, int>(this.decodedMessageTypeCounts);
-                    evidenceRows = this.decodedMessageEvidenceRowCount;
-                    statSnapshots = this.playerStatSnapshotCount;
-                }
-
-                string[] expectedFamilies =
-                    {
-                        "QuestFullUpdate", "Quest", "CharacterAction", "Stat", "InventoryUpdate",
-                        "KnubotOpenChatWindow", "KnubotAnswerList", "KnubotAnswer", "KnubotStartTrade",
-                        "KnubotTrade", "KnubotFinishTrade"
-                    };
-                string[] missing = expectedFamilies.Where(name => !counts.ContainsKey(name)).ToArray();
-                var json = new StringBuilder();
-                json.AppendLine("{");
-                json.Append("  \"generatedUtc\": ");
-                json.Append(Json(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)));
-                json.AppendLine(",");
-                json.Append("  \"decodedMessageEvidenceRows\": ");
-                json.Append(evidenceRows.ToString(CultureInfo.InvariantCulture));
-                json.AppendLine(",");
-                json.Append("  \"playerStatSnapshots\": ");
-                json.Append(statSnapshots.ToString(CultureInfo.InvariantCulture));
-                json.AppendLine(",");
-                json.AppendLine("  \"guaranteedOutputs\": [");
-                json.AppendLine("    \"packets.hex.log (all raw inbound and outbound packets)\",");
-                json.AppendLine("    \"decoded-messages.jsonl (all decoded N3 fields and full arrays)\",");
-                json.AppendLine("    \"player-stat-snapshots.csv (all readable player stats at boundaries and every five seconds)\",");
-                json.AppendLine("    \"chat-dialogue.log and npc-interactions.log\",");
-                json.AppendLine("    \"inventory-updates.csv, enemy-combat.csv, enemy-movement.csv, and enemy-full-updates.csv\"");
-                json.AppendLine("  ],");
-                json.AppendLine("  \"messageTypeCounts\": {");
-                KeyValuePair<string, int>[] orderedCounts = counts.OrderBy(pair => pair.Key).ToArray();
-                for (int i = 0; i < orderedCounts.Length; i++)
-                {
-                    json.Append("    ");
-                    json.Append(Json(orderedCounts[i].Key));
-                    json.Append(": ");
-                    json.Append(orderedCounts[i].Value.ToString(CultureInfo.InvariantCulture));
-                    json.AppendLine(i + 1 == orderedCounts.Length ? string.Empty : ",");
-                }
-
-                json.AppendLine("  },");
-                json.Append("  \"missingQuestMessageFamilies\": [");
-                json.Append(string.Join(",", missing.Select(Json).ToArray()));
-                json.AppendLine("],");
-                json.Append("  \"note\": ");
-                json.Append(Json("A missing family is a review warning, not proof of capture failure; some quest branches do not use every family."));
-                json.AppendLine();
-                json.AppendLine("}");
-                File.WriteAllText(
-                    Path.Combine(this.sessionDirectory, "quest-capture-coverage.json"),
-                    json.ToString(),
-                    Encoding.UTF8);
-            }
-            catch (Exception ex)
-            {
-                this.TryLogEvent("QUEST-COVERAGE-ERROR", ex.ToString());
-            }
-        }
-
-        private static void AppendEvidenceValue(
-            StringBuilder json,
-            object value,
-            int depth,
-            HashSet<object> activeObjects)
-        {
-            if (value == null)
-            {
-                json.Append("null");
-                return;
-            }
-
-            if (depth > 24)
-            {
-                json.Append(Json("<maximum-depth>"));
-                return;
-            }
-
-            Type type = value.GetType();
-            if (value is string || value is char || value is DateTime || value is Guid)
-            {
-                json.Append(Json(Convert.ToString(value, CultureInfo.InvariantCulture)));
-                return;
-            }
-
-            if (value is bool)
-            {
-                json.Append((bool)value ? "true" : "false");
-                return;
-            }
-
-            if (value is byte[])
-            {
-                byte[] bytes = (byte[])value;
-                json.Append("{\"length\":");
-                json.Append(bytes.Length.ToString(CultureInfo.InvariantCulture));
-                json.Append(",\"hex\":");
-                json.Append(Json(ToHex(bytes)));
-                json.Append('}');
-                return;
-            }
-
-            if (type.IsEnum)
-            {
-                json.Append("{\"name\":");
-                json.Append(Json(value.ToString()));
-                json.Append(",\"value\":");
-                json.Append(Convert.ToInt64(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture));
-                json.Append('}');
-                return;
-            }
-
-            if (type.IsPrimitive || value is decimal)
-            {
-                IFormattable numeric = value as IFormattable;
-                string formatted = numeric == null ? value.ToString() : numeric.ToString(null, CultureInfo.InvariantCulture);
-                if (string.Equals(formatted, "NaN", StringComparison.OrdinalIgnoreCase)
-                    || formatted.IndexOf("Infinity", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    json.Append(Json(formatted));
-                }
-                else
-                {
-                    json.Append(formatted);
-                }
-                return;
-            }
-
-            IEnumerable enumerable = value as IEnumerable;
-            if (enumerable != null)
-            {
-                json.Append('[');
-                bool first = true;
-                foreach (object item in enumerable)
-                {
-                    if (!first)
-                    {
-                        json.Append(',');
-                    }
-
-                    first = false;
-                    AppendEvidenceValue(json, item, depth + 1, activeObjects);
-                }
-
-                json.Append(']');
-                return;
-            }
-
-            if (!type.IsValueType && !activeObjects.Add(value))
-            {
-                json.Append(Json("<cycle:" + type.FullName + ">"));
-                return;
-            }
-
-            json.Append('{');
-            json.Append("\"$type\":");
-            json.Append(Json(type.FullName));
-            IEnumerable<MemberInfo> members = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                .Where(property => property.CanRead && property.GetIndexParameters().Length == 0)
-                .Cast<MemberInfo>()
-                .Concat(type.GetFields(BindingFlags.Instance | BindingFlags.Public).Cast<MemberInfo>())
-                .OrderBy(member => member.Name);
-            foreach (MemberInfo member in members)
-            {
-                json.Append(',');
-                json.Append(Json(member.Name));
-                json.Append(':');
-                try
-                {
-                    object memberValue = member is PropertyInfo
-                                             ? ((PropertyInfo)member).GetValue(value, null)
-                                             : ((FieldInfo)member).GetValue(value);
-                    AppendEvidenceValue(json, memberValue, depth + 1, activeObjects);
-                }
-                catch (Exception ex)
-                {
-                    json.Append(Json("<read-error:" + ex.GetType().Name + ">"));
-                }
-            }
-
-            json.Append('}');
-            if (!type.IsValueType)
-            {
-                activeObjects.Remove(value);
-            }
-        }
-
         private string DescribeObject(object value)
         {
             if (value == null)
@@ -5117,9 +4784,6 @@ namespace AOSharpLiveCapture
             this.enemyStatUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-stat-updates.csv"));
             this.enemyStatUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,Stat,StatId,Value,PositionX,PositionY,PositionZ,StatsCount,Detail");
             this.enemyFightEventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-fight-events.log"));
-            this.decodedMessagesLog = CreateWriter(Path.Combine(this.sessionDirectory, "decoded-messages.jsonl"));
-            this.playerStatSnapshotsLog = CreateWriter(Path.Combine(this.sessionDirectory, "player-stat-snapshots.csv"));
-            this.playerStatSnapshotsLog.WriteLine("CapturedUtc,Reason,PlayerIdentity,PlayerName,PlayfieldIdentity,Position,StatId,StatName,Value");
             this.WriteEnemyStateJson();
             this.WriteEnemyDossierJson();
             this.WriteMovementSummaryJson();
@@ -5128,8 +4792,6 @@ namespace AOSharpLiveCapture
             this.enabled = true;
             this.nextFlushUtc = DateTime.UtcNow.AddSeconds(2);
             this.nextSnapshotUtc = DateTime.UtcNow.AddSeconds(1);
-            this.nextQuestSnapshotUtc = DateTime.UtcNow.AddSeconds(5);
-            this.WritePlayerStatSnapshot("capture-start");
         }
 
         private void ResetCaptureState()
@@ -5144,7 +4806,6 @@ namespace AOSharpLiveCapture
             this.recentEnemyFullUpdates.Clear();
             this.enemyStates.Clear();
             this.enemyStateTimeline.Clear();
-            this.decodedMessageTypeCounts.Clear();
 
             this.captureFinalized = false;
             this.inboundPacketCount = 0;
@@ -5178,8 +4839,6 @@ namespace AOSharpLiveCapture
             this.movementStopMovingCmdPacketCount = 0;
             this.movementDecodeErrorCount = 0;
             this.enemyStatUpdateRowCount = 0;
-            this.decodedMessageEvidenceRowCount = 0;
-            this.playerStatSnapshotCount = 0;
             this.localEnemyCombatContextUntilUtc = default(DateTime);
             this.lastPlayfieldId = string.Empty;
             this.lastCapturePlayfieldIdentity = string.Empty;
@@ -5206,8 +4865,6 @@ namespace AOSharpLiveCapture
                 this.movementPacketsLog.Flush();
                 this.enemyStatUpdatesLog.Flush();
                 this.enemyFightEventsLog.Flush();
-                this.decodedMessagesLog.Flush();
-                this.playerStatSnapshotsLog.Flush();
             }
         }
 
@@ -5230,8 +4887,6 @@ namespace AOSharpLiveCapture
                 this.movementPacketsLog?.Flush();
                 this.enemyStatUpdatesLog?.Flush();
                 this.enemyFightEventsLog?.Flush();
-                this.decodedMessagesLog?.Flush();
-                this.playerStatSnapshotsLog?.Flush();
                 this.eventsLog?.Dispose();
                 this.packetsLog?.Dispose();
                 this.shopUpdatesLog?.Dispose();
@@ -5247,8 +4902,6 @@ namespace AOSharpLiveCapture
                 this.movementPacketsLog?.Dispose();
                 this.enemyStatUpdatesLog?.Dispose();
                 this.enemyFightEventsLog?.Dispose();
-                this.decodedMessagesLog?.Dispose();
-                this.playerStatSnapshotsLog?.Dispose();
                 this.eventsLog = null;
                 this.packetsLog = null;
                 this.shopUpdatesLog = null;
@@ -5264,8 +4917,6 @@ namespace AOSharpLiveCapture
                 this.movementPacketsLog = null;
                 this.enemyStatUpdatesLog = null;
                 this.enemyFightEventsLog = null;
-                this.decodedMessagesLog = null;
-                this.playerStatSnapshotsLog = null;
             }
         }
 
