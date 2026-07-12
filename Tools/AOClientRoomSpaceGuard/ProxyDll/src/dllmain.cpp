@@ -76,6 +76,26 @@ namespace
             return 1;
         }
 
+        aorf::ClientProfile profile = aorf::GetLoadedN3ClientProfile();
+        if (profile == aorf::ClientProfile::Unknown)
+        {
+            aorf::Log("ERROR client profile was not available after RoomSpace repair");
+            MessageBoxW(
+                nullptr,
+                L"AORoomSpaceFix could not verify this client profile. "
+                L"Close AO and review %LOCALAPPDATA%\\AORoomSpaceFix\\AORoomSpaceFix.log.",
+                L"AO RoomSpace Fix",
+                MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
+            return 1;
+        }
+
+        if (profile == aorf::ClientProfile::NewClient)
+        {
+            aorf::Log("SKIP old-client-only GUI rectangle and renderer repairs");
+            aorf::Log("READY RoomSpace repair active");
+            return 0;
+        }
+
         if (!aorf::InstallGuiRectFix())
         {
             aorf::Log("ERROR GUI rectangle repair was not installed");
