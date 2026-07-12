@@ -3236,18 +3236,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldUseCorpse.Contains("this.runtimeSystems.TryUseCorpse(")
                 && playfieldUseCorpse.Contains("this.SendCorpseInventoryUpdate")
+                && playfieldUseCorpse.Contains("this.SendCorpseLootAccessAction")
                 && playfieldUseCorpse.Contains("this.ScheduleCorpseCreditAward"),
                 "Playfield must delegate corpse access sequencing while retaining packet and credit callbacks.");
             Assert.IsTrue(
                 corpseUse.Contains("this.SendCorpseInventoryUpdateAndCredits(")
                 && corpseUse.Contains("if (hasUnlootedItems(corpse))")
+                && corpseUse.Contains("if (wasOpened)")
+                && corpseUse.Contains("sendCorpseLootAccessAction(looter, corpse);")
+                && corpseUse.Contains("sendUseActionFinished(looter);")
                 && corpseUse.Contains("else"),
-                "Corpse access service must use the captured InventoryUpdate open path for item-bearing and empty corpses.");
+                "Corpse access must always refresh the captured InventoryUpdate path and supplement already-opened loot corpses with the client reopen action.");
             Assert.IsFalse(
-                corpseUse.Contains("sendCorpseLootAccessAction")
-                || corpseUse.Contains("sendUseActionFinished")
-                || corpseUse.Contains("NextUseSendsAccessActionOnly"),
-                "Corpse Use must not take the old unproven action-only path instead of the captured InventoryUpdate open path.");
+                corpseUse.Contains("NextUseSendsAccessActionOnly"),
+                "Corpse reopen must not alternate into the old action-only path that skipped InventoryUpdate refreshes.");
             AssertTextBefore(
                 inventoryAndCredits,
                 "sendCorpseInventoryUpdate(looter, corpse);",

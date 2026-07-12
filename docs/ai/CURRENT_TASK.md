@@ -73,6 +73,7 @@ is live-confirmed level 1 client behavior, not an AORebirth combat regression.
 
 - Playfield runtime decomposition is completed through the latest extracted runtime services and is maintenance work only unless Mike explicitly selects it.
 - Corpse open, item loot transfer, and corpse credit payout are capture-backed and live validated.
+- Loot-bearing corpses now support close-and-reopen for their full remaining lifetime: every use refreshes the captured InventoryUpdate, and an already-opened corpse also receives the client access action required to reopen the cached loot window. This does not consume loot or shorten the five-minute regular-corpse lifetime.
 - Loot-bearing corpses no longer receive an initial timed despawn; empty or fully looted corpses use the 30-second empty cleanup window.
 - Previous capture-backed enemy, movement, combat, zoning, and appearance work remains completed project history.
 - Subway entry/exit placement has been repaired for the current tested route.
