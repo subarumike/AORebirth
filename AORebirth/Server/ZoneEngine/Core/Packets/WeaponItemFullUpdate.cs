@@ -33,6 +33,7 @@ namespace ZoneEngine.Core.Packets
 {
     #region Usings ...
 
+    using System.Collections.Generic;
     using System.Linq;
 
     using AORebirth.Core.Entities;
@@ -55,6 +56,8 @@ namespace ZoneEngine.Core.Packets
     /// </summary>
     public static class WeaponItemFullUpdate
     {
+        private const int MissingItemStatValue = 1234567890;
+
         public static void Send(IZoneClient client)
         {
             ICharacter character = client.Controller.Character;
@@ -69,29 +72,27 @@ namespace ZoneEngine.Core.Packets
                 return;
             }
 
-            SendForSlot(character, weaponPage, (int)WeaponSlots.Righthand);
-            SendForSlot(character, weaponPage, (int)WeaponSlots.LeftHand);
+            WeaponItemFullUpdateMessage rightHand = CreateForSlot(character, weaponPage, (int)WeaponSlots.Righthand);
+            if (rightHand != null)
+            {
+                character.Send(rightHand);
+                LogWeaponDefinition("sent-slot", character, null, rightHand, false);
+            }
+
+            WeaponItemFullUpdateMessage leftHand = CreateForSlot(character, weaponPage, (int)WeaponSlots.LeftHand);
+            if (leftHand != null)
+            {
+                character.Send(leftHand);
+                LogWeaponDefinition("sent-slot", character, null, leftHand, false);
+            }
         }
 
         public static void SendWeaponDefinitions(ICharacter character, bool announceToPlayfield = false)
         {
-            if (character == null)
+            foreach (WeaponItemFullUpdateMessage message in CreateWeaponDefinitionMessages(character))
             {
-                return;
-            }
-
-            foreach (IInventoryPage page in InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character))
-            {
-                for (int slot = page.FirstSlotNumber; slot < page.FirstSlotNumber + page.MaxSlots; slot++)
-                {
-                    IItem item = page[slot];
-                    if (item == null || !IsWeaponItem(page, item))
-                    {
-                        continue;
-                    }
-
-                    SendForSlot(character, page, slot, announceToPlayfield);
-                }
+                character.Send(message, announceToPlayfield);
+                LogWeaponDefinition("sent", character, null, message, announceToPlayfield);
             }
         }
 
@@ -108,23 +109,59 @@ namespace ZoneEngine.Core.Packets
                 {
                     if (object.ReferenceEquals(page[slot], item))
                     {
-                        SendForSlot(character, page, slot);
+                        WeaponItemFullUpdateMessage message = CreateForSlot(character, page, slot);
+                        if (message != null)
+                        {
+                            character.Send(message);
+                            LogWeaponDefinition("sent-single", character, null, message, false);
+                        }
+
                         return;
                     }
                 }
             }
         }
 
-        private static void SendForSlot(
+        public static WeaponItemFullUpdateMessage[] CreateWeaponDefinitionMessages(ICharacter character)
+        {
+            if (character == null)
+            {
+                return new WeaponItemFullUpdateMessage[0];
+            }
+
+            var messages = new List<WeaponItemFullUpdateMessage>();
+            foreach (IInventoryPage page in InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character))
+            {
+                for (int slot = page.FirstSlotNumber; slot < page.FirstSlotNumber + page.MaxSlots; slot++)
+                {
+                    WeaponItemFullUpdateMessage message = CreateForSlot(character, page, slot);
+                    if (message != null)
+                    {
+                        messages.Add(message);
+                    }
+                }
+            }
+
+            return messages.ToArray();
+        }
+
+        internal static void LogObserverWeaponDefinition(
+            ICharacter owner,
+            ICharacter recipient,
+            WeaponItemFullUpdateMessage message)
+        {
+            LogWeaponDefinition("visibility-sync", owner, recipient, message, false);
+        }
+
+        private static WeaponItemFullUpdateMessage CreateForSlot(
             ICharacter character,
             IInventoryPage page,
-            int slot,
-            bool announceToPlayfield = false)
+            int slot)
         {
             IItem item = page[slot];
             if (item == null || !IsWeaponItem(page, item))
             {
-                return;
+                return null;
             }
 
             int quality = NormalizeValue(item.Quality);
@@ -154,20 +191,7 @@ namespace ZoneEngine.Core.Packets
                 Unknown3 = 0
             };
 
-            character.Send(message, announceToPlayfield);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Error,
-                string.Format(
-                    "WeaponItemFullUpdate sent char={0} slot={1} hasItem={2} item={3}/{4} ql={5} itemId={6} announce={7}",
-                    character.Identity,
-                    slot,
-                    1,
-                    lowId,
-                    highId,
-                    quality,
-                    weaponIdentity.Instance,
-                    announceToPlayfield ? 1 : 0));
+            return message;
         }
 
         private static GameTuple<CharacterStat, uint>[] BuildStats(
@@ -177,7 +201,7 @@ namespace ZoneEngine.Core.Packets
             int highId,
             int multipleCount)
         {
-            return new[]
+            var stats = new List<GameTuple<CharacterStat, uint>>
             {
                 StatTuple(CharacterStat.Flags, (uint)NormalizeFlags(item.Flags)),
                 StatTuple(CharacterStat.StaticInstance, (uint)lowId),
@@ -185,8 +209,35 @@ namespace ZoneEngine.Core.Packets
                 StatTuple(CharacterStat.ACGItemTemplateID, (uint)lowId),
                 StatTuple(CharacterStat.ACGItemTemplateID2, (uint)highId),
                 StatTuple(CharacterStat.MultipleCount, (uint)multipleCount),
-                StatTuple(CharacterStat.Energy, 0)
+                StatTuple(CharacterStat.Energy, ResolveEnergy(item))
             };
+            AddStatIfPresent(stats, CharacterStat.AttackDelay, item.GetAttribute((int)StatIds.itemdelay));
+            AddStatIfPresent(stats, CharacterStat.RechargeDelay, item.GetAttribute((int)StatIds.rechargedelay));
+            return stats.ToArray();
+        }
+
+        private static void AddStatIfPresent(
+            ICollection<GameTuple<CharacterStat, uint>> stats,
+            CharacterStat stat,
+            int value)
+        {
+            if (value == MissingItemStatValue)
+            {
+                return;
+            }
+
+            stats.Add(StatTuple(stat, unchecked((uint)value)));
+        }
+
+        private static uint ResolveEnergy(IItem item)
+        {
+            int energy = item.GetAttribute((int)StatIds.energy);
+            if (energy == MissingItemStatValue)
+            {
+                return uint.MaxValue;
+            }
+
+            return unchecked((uint)energy);
         }
 
         private static GameTuple<CharacterStat, uint> StatTuple(CharacterStat stat, uint value)
@@ -213,17 +264,55 @@ namespace ZoneEngine.Core.Packets
 
         private static int NormalizeFlags(int flags)
         {
-            return flags > 0 && flags != 1234567890 ? flags : 0x403;
+            return flags > 0 && flags != MissingItemStatValue ? flags : 0x403;
         }
 
         private static int NormalizeValue(int value)
         {
-            if (value <= 0 || value == 1234567890)
+            if (value <= 0 || value == MissingItemStatValue)
             {
                 return 0;
             }
 
             return value;
+        }
+
+        private static void LogWeaponDefinition(
+            string phase,
+            ICharacter owner,
+            ICharacter recipient,
+            WeaponItemFullUpdateMessage message,
+            bool announceToPlayfield)
+        {
+            if (!ShouldLogWeaponDefinition(owner))
+            {
+                return;
+            }
+
+            int slot = message.Unknown2 & 0xff;
+            string recipientText = recipient == null ? "none" : recipient.Identity.ToString();
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "WeaponItemFullUpdate {0} owner={1} recipient={2} weapon={3} slot={4} ownerField={5} playfield={6} stats={7} announce={8}",
+                    phase,
+                    owner == null ? Identity.None : owner.Identity,
+                    recipientText,
+                    message.Identity,
+                    slot,
+                    message.Owner,
+                    message.PlayfieldId,
+                    message.Stats == null ? 0 : message.Stats.Length,
+                    announceToPlayfield ? 1 : 0));
+        }
+
+        private static bool ShouldLogWeaponDefinition(ICharacter owner)
+        {
+            return owner != null
+                   && owner.Playfield != null
+                   && owner.Playfield.Identity.Instance == 127
+                   && owner.Stats[StatIds.monsterdata].Value == 26092
+                   && string.Equals(owner.Name, "Thief", System.StringComparison.Ordinal);
         }
     }
 }

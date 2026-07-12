@@ -38,6 +38,8 @@ namespace AORebirth.Core.Playfields
 
         private readonly HashSet<int> capturedSubwayFilthFleaPoisonAttacks = new HashSet<int>();
 
+        private readonly HashSet<int> capturedSubwayThiefDiagnosticDamageSent = new HashSet<int>();
+
         private readonly Dictionary<int, DateTime> pendingCapturedAttackStarts =
             new Dictionary<int, DateTime>();
 
@@ -113,6 +115,7 @@ namespace AORebirth.Core.Playfields
             this.lastNpcUnarmedAttackInfoSlots.Remove(identity.Instance);
             this.lastNpcSpecialAttackWeaponTargets.Remove(identity.Instance);
             this.capturedSubwayFilthFleaPoisonAttacks.Remove(identity.Instance);
+            this.capturedSubwayThiefDiagnosticDamageSent.Remove(identity.Instance);
             this.pendingCapturedAttackStarts.Remove(identity.Instance);
             this.pendingCapturedMovementTransitions.Remove(identity.Instance);
         }
@@ -246,7 +249,8 @@ namespace AORebirth.Core.Playfields
             int newHealth = Math.Max(0, currentHealth - damage);
             bool killingHit = newHealth == 0;
 
-            if (IsCapturedSubwayThief(attacker))
+            if (IsCapturedSubwayThief(attacker)
+                && !this.AllowCapturedSubwayThiefDiagnosticDamage(attacker, target, damage))
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Network,
@@ -998,6 +1002,39 @@ namespace AORebirth.Core.Playfields
                    && character.Stats[StatIds.monsterdata].Value
                       == NpcCombatAttackRules.CapturedSubwayThiefMonsterData
                    && string.Equals(character.Name, "Thief", StringComparison.Ordinal);
+        }
+
+        private bool AllowCapturedSubwayThiefDiagnosticDamage(ICharacter attacker, ICharacter target, int damage)
+        {
+            if (!CapturedSubwayThiefDiagnosticDamageEnabled())
+            {
+                return false;
+            }
+
+            if (this.capturedSubwayThiefDiagnosticDamageSent.Contains(attacker.Identity.Instance))
+            {
+                return false;
+            }
+
+            this.capturedSubwayThiefDiagnosticDamageSent.Add(attacker.Identity.Instance);
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "CombatCapturedSubwayThiefDiagnosticDamageEnabled attacker={0} target={1} dmg={2} limit=one-hit",
+                    attacker.Identity,
+                    target.Identity,
+                    damage));
+            return true;
+        }
+
+        private static bool CapturedSubwayThiefDiagnosticDamageEnabled()
+        {
+            string value = Environment.GetEnvironmentVariable(
+                "AO_REBIRTH_ENABLE_SUBWAY_THIEF_DIAGNOSTIC_DAMAGE");
+            return string.Equals(value, "1", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(value, "on", StringComparison.OrdinalIgnoreCase);
         }
 
         private static double NormalizeCombatRange(int range)

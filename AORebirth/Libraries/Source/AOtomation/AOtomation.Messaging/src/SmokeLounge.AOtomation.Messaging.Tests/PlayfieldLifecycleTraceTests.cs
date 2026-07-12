@@ -393,6 +393,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwaySpawnOrchestrator.cs"));
             string weaponItemFullUpdateText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\WeaponItemFullUpdate.cs"));
+            string visibilityPacketText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs"));
 
             Assert.IsTrue(
                 contractText.Contains("case 26092:")
@@ -422,14 +424,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && coordinatorText.Contains(": 40,")
                 && coordinatorText.Contains(": 4,")
                 && coordinatorText.Contains("IsCapturedSubwayThief(attacker)")
-                && coordinatorText.Contains("CombatCapturedSubwayThiefDamageSuppressed"),
-                "Thief timing and AttackInfo overrides must stay contract-gated while legacy equipped NPC fields remain unchanged.");
+                && coordinatorText.Contains("CombatCapturedSubwayThiefDamageSuppressed")
+                && coordinatorText.Contains("AO_REBIRTH_ENABLE_SUBWAY_THIEF_DIAGNOSTIC_DAMAGE")
+                && coordinatorText.Contains("capturedSubwayThiefDiagnosticDamageSent")
+                && coordinatorText.Contains("limit=one-hit"),
+                "Thief timing and AttackInfo overrides must stay contract-gated while legacy equipped NPC fields remain unchanged; real Thief damage may only pass through a default-off one-hit diagnostic gate.");
             Assert.IsTrue(
                 orchestratorText.Contains("WeaponItemFullUpdate.SendWeaponDefinitions(mobCharacter, true)")
                 && weaponItemFullUpdateText.Contains("SendWeaponDefinitions(ICharacter character, bool announceToPlayfield = false)")
-                && weaponItemFullUpdateText.Contains("SendForSlot(character, page, slot, announceToPlayfield)")
-                && weaponItemFullUpdateText.Contains("character.Send(message, announceToPlayfield)"),
-                "Captured equipped Subway NPC weapons must be announced to observers after SCFU so the client has weapon context before AttackInfo.");
+                && weaponItemFullUpdateText.Contains("CreateWeaponDefinitionMessages(ICharacter character)")
+                && weaponItemFullUpdateText.Contains("CharacterStat.Energy, ResolveEnergy(item)")
+                && weaponItemFullUpdateText.Contains("return uint.MaxValue;")
+                && weaponItemFullUpdateText.Contains("CharacterStat.AttackDelay, item.GetAttribute((int)StatIds.itemdelay)")
+                && weaponItemFullUpdateText.Contains("CharacterStat.RechargeDelay, item.GetAttribute((int)StatIds.rechargedelay)")
+                && visibilityPacketText.Contains("sendVisibilityMessage(simpleCharFullUpdate);")
+                && visibilityPacketText.Contains("this.SendWeaponDefinitionsForVisibility(temp, recipient, sendVisibilityMessage);")
+                && visibilityPacketText.Contains("WeaponItemFullUpdate.CreateWeaponDefinitionMessages(owner)")
+                && visibilityPacketText.Contains("WeaponItemFullUpdate.LogObserverWeaponDefinition(owner, recipient, message)"),
+                "Captured equipped Subway NPC weapons must use the live-shaped item stats and be replayed to observers after SCFU but before CharInPlay.");
 
             string capturedStopBlock = ExtractMethodBlock(
                 controllerText,

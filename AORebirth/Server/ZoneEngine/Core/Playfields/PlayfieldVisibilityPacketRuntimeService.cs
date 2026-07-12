@@ -71,7 +71,11 @@ namespace ZoneEngine.Core.Playfields
                                 PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
                                 temp.Identity,
                                 "recipient=" + recipient.Identity),
-                            () => sendVisibilityMessage(simpleCharFullUpdate),
+                            () =>
+                            {
+                                sendVisibilityMessage(simpleCharFullUpdate);
+                                this.SendWeaponDefinitionsForVisibility(temp, recipient, sendVisibilityMessage);
+                            },
                             () => { charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 }; },
                             () => PlayfieldLifecycleTrace.Record(
                                 PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
@@ -119,7 +123,11 @@ namespace ZoneEngine.Core.Playfields
                     PlayfieldLifecycleTrace.StageJoiningCharacterSimpleCharFullUpdateBroadcast,
                     PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
                     temp.Identity),
-                () => announceVisibilityMessage(SimpleCharFullUpdate.ConstructMessage(temp)),
+                () =>
+                {
+                    announceVisibilityMessage(SimpleCharFullUpdate.ConstructMessage(temp));
+                    this.SendWeaponDefinitionsForVisibility(temp, null, announceVisibilityMessage);
+                },
                 () => { charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 }; },
                 () => PlayfieldLifecycleTrace.Record(
                     PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
@@ -127,6 +135,18 @@ namespace ZoneEngine.Core.Playfields
                     PlayfieldLifecycleTrace.MessageCharInPlay,
                     temp.Identity),
                 () => announceVisibilityMessage(charInPlay));
+        }
+
+        private void SendWeaponDefinitionsForVisibility(
+            ICharacter owner,
+            ICharacter recipient,
+            Action<MessageBody> sendVisibilityMessage)
+        {
+            foreach (WeaponItemFullUpdateMessage message in WeaponItemFullUpdate.CreateWeaponDefinitionMessages(owner))
+            {
+                sendVisibilityMessage(message);
+                WeaponItemFullUpdate.LogObserverWeaponDefinition(owner, recipient, message);
+            }
         }
 
         private static void Require(Delegate callback, string name)
