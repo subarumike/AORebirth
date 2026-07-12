@@ -6,6 +6,28 @@
   ],
   "ExtractionTimestampUtc": "2026-06-22T10:09:06.6228733Z",
   "ExtractorVersion": "1.0.0",
+  "InternetSources": [
+    {
+      "Reliability": "COMMUNITY_DOCUMENTED",
+      "Title": "Dyna Camps by level",
+      "Url": "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+    },
+    {
+      "Reliability": "COMMUNITY_DOCUMENTED",
+      "Title": "Unique Mobs",
+      "Url": "https://anarchyonline.fandom.com/wiki/Unique_Mobs"
+    },
+    {
+      "Reliability": "COMMUNITY_DOCUMENTED",
+      "Title": "Biomare",
+      "Url": "https://anarchyonline.fandom.com/wiki/Biomare"
+    },
+    {
+      "Reliability": "COMMUNITY_DOCUMENTED",
+      "Title": "Pandemonium",
+      "Url": "https://wiki.aodb.us/wiki/Pandemonium"
+    }
+  ],
   "Parser": "AODB.RdbController.GetRaw plus repository extractor normalization",
   "RdbSource": "C:\\Funcom\\Anarchy Online\\cd_image\\data\\db\\ResourceDatabase.idx",
   "RecordTypesRead": [
@@ -298,6 +320,6 @@
       "RecordType": 3086621
     }
   ],
-  "RepositoryCommit": "b7ad82cc49ce795b39fd9a9e41f7989b2b53800b",
+  "RepositoryCommit": "fc9c52a2403fdc3cd0c78d69273512c592c0f993",
   "TotalRecordsScanned": 649606
 }

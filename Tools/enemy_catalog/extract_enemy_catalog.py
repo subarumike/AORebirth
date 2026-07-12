@@ -86,6 +86,7 @@ def main(argv=None):
         first={n:(root/args.output/n).read_bytes() for n in names}; write_outputs(root/args.output,dump,catalog,dats,commit); second={n:(root/args.output/n).read_bytes() for n in names}
         assert first==second and len({x["CanonicalEnemyKey"] for x in catalog})==len(catalog)
         assert all(x["MinimumLevel"] is None or x["MaximumLevel"] is None or x["MinimumLevel"]<=x["MaximumLevel"] for x in catalog)
+    subprocess.run([sys.executable,str(root/"Tools/enemy_catalog/enrich_enemy_catalog.py"),str(root)],cwd=root,check=True)
     if args.build_workbook:
         node=os.environ.get("CODEX_BUNDLED_NODE","node")
         if not os.environ.get("CODEX_NODE_MODULES"):

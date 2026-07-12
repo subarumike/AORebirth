@@ -1,1 +1,193 @@
 CanonicalEnemyKey,EnemyName,Configuration,WeaponCategory,Source,Confidence,Notes
+external-commander-jocasta,Commander Jocasta,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-commander-kelly-frederickson,Commander Kelly Frederickson,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-diamondine-soldier,Diamondine Soldier,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-fiery-soldier,Fiery Soldier,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-guardian-of-tomorrow,Guardian of Tomorrow,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-high-commander-frederickson,High Commander Frederickson,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-mantis-queen,Mantis Queen,claws,CLAWS,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-notum-soldier,Notum Soldier,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-the-iron-reet,The Iron Reet,natural ranged,NATURAL_RANGED,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-116714,home guard,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-154698,ninjadroid boss,unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-155071,rhinoman albino,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-157180,leet2,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-157321,mantis boss,claws,CLAWS,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-158177,mantis baby,claws,CLAWS,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-159085,atrox thin male brute,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-159086,solitus thin female brute,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-17627,protodroid,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-17637,cyborg soldier - female bader,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-17639,cyborg soldier - male bader,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-17641,cyborg soldier - felmale bad,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-17643,cyborg soldier - male,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-17645,cyborg soldier - male bad,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-17647,cyborg soldier - female,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-17649,android,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-17655,leet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-17660,malle,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-17664,rhinoman,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-17687,rollerrat,bite,BITE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-17710,pit lizard,bite,BITE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-17712,sandworm,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-17716,enigma,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-201533,lctower_guard_small,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-201634,lctower_guard_big,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-203724,high commander hoover,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-203730,neural burnout,nano caster,NANO_CASTER,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-203734,mugger,unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-203739,stim fiend,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-203741,workman striker,unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-203743,architect striker(robe),unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-203745,looter(robe),unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-203854,workman striker(robe),unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-205940,crypt guardian,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-205943,awakened pit demon,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-206792,vanguard commander_female,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-206793,vanguard commander_male,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-206794,vanguard watcher,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-207475,turret,turret weapon,TURRET_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-209361,sl_weaver of spirits,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-209395,sl_mortiig predator,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-210238,security guard,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-210582,guardian_of_shadows,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-216990,sl_spirit_redeemed female,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-217006,sl_spirit_redeemed_female,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-217007,sl_spirits_unredeemed_male,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-217008,sl_spirit_unredeemed_female,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-217019,sl_spirits_redeemed_male,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-217022,sl_spirits_redeemed_female_,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-218695,sl_pet_predators,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-218783,sl_pet_slayers,unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-223561,sl_prime devorer_bileswarm colossus,natural ranged,NATURAL_RANGED,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-225815,sl_redeemed_guardtower,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-226880,shadowleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-227701,sl_corporate guardian,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-22790,ottous,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-22804,t-droid,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-22821,omni slayer droid,unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-229068,sl_bronto_mama,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-236598,guardian_of_shadows_loop,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-236599,guardian_of_shadows_idle2,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-246449,vanguard,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-246862,omni-trans commander_female,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-246982,alien battlesuit hover,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-247467,alien_battlesuit_hover_melee_ranged,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-247468,alien_battlesuit_hover_melee,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-247469,alien_battlesuit_hover_ranged,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-247477,alien_battlesuit_hover_caster,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-247728,alien_spider,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-247740,alien_mini_bug,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-247801,athleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-247829,leetzilla,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-247831,masculeet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-247832,cheerleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-247834,deleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-247835,bruce leet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-247836,invaleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-247837,bulleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-247838,violeet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-247839,calculeet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-247880,alien_mini_bug_melee_ranged,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-247881,alien_mini_bug_melee,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-247882,alien_mini_bug_ranged,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-247883,alien_mini_bug_caster,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-249667,icc shuttle guard,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-251772,alien_battlesuit_hover_melee_ranged_unrooted,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-251773,alien_battlesuit_hover_caster_unrooted,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-251774,alien_battlesuit_hover_melee_unrooted,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-251775,alien_battlesuit_hover_ranged_unrooted,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-251781,alien_mini_bug_melee_ranged_unrooted,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-251782,alien_mini_bug_melee_unrooted,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-251783,alien_mini_bug_ranged_unrooted,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-251784,alien_mini_bug_caster_unrooted,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-252342,leetor,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-253588,alien defense drone,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-253599,alien defense turret,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-254001,alien_battlesuit_hover_m_b,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-254002,alien_battlesuit_hover_m_b_u,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-254003,alien_battlesuit_hover_mr_b_u,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-254006,alien_battlesuit_hover_r_b_u,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-254008,alien_battlesuit_hover_c_b_u,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-254035,alien_battlesuit_centaur_c_cp,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-254118,icc shuttle guard-rooted,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-254293,alien_mini_bug_ranged_black,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-254294,alien_mini_bug_melee_black,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-254295,alien_mini_bug_melee_ranged_b,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-254296,alien_mini_bug_caster_black,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-254849,ai_mortiig predator_pet,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-256062,vanguard node 19,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-256459,alien_mini_bug_melee_ranged_b_u,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-256461,alien_mini_bug_ranged_black_u,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-256462,alien_mini_bug_melee_black_u,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-256464,alien_mini_bug_caster_black_u,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-256518,ai_cutecreature_draculeet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-256519,ai_cutecreature_frankenleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-257283,alien coccoon,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-258174,rookie alien hunter,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-259982,giant sandworm,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-260034,alien signal tower,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-260229,alien bomb,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-260280,alien_mini_bug_melee_striped_u,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-26048,medusa,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-260844,sl_spirits_redeemed_male_kungfu,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-262088,solitus_male_shade,energy attack,ENERGY_ATTACK,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-262397,alien tentacle,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-262975,alien antibody,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-263810,alien wrench,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-267084,bursting nano soldier,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-267170,atrox enforcer male - special anims,unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-269393,iceberg monster,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-269727,iceberg monster - rising,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-273406,plate monster,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-275575,alien scoutship,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-276976,sick alien,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-277995,ai_cutecreature_frankenleet_pet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-277996,ai_cutecreature_draculeet_pet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-278790,slimy alien plant,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-278843,alien fighter ship,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-279066,alien jamming tower,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-279518,gingerleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-280206,alien devourer,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-280495,sl_spirits_redeemed_female_saveanim,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-281961,barleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-282037,bob marleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-284637,reinleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-28513,primitive medusa,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-285148,enigma dog toy,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-285468,cyborg soldier - female - one eye,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-288500,dancing cyborg doll a,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-288558,devileet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-289492,gift-wrapped leet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-294111,elf leet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-294329,elf_leet_new,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-295565,atrox thin male brute - desmond,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-297228,henrys test leet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-301639,inf_mission_2_spirit_totem,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-30252,giant snake,bite,BITE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-30258,biofreak noskin,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-30346,bronto mama,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-30354,salamander,bite,BITE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-30360,minibull,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-30371,aquaan queen,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-30375,mutant mantis,claws,CLAWS,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-304767,alien bomb christmas,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-304794,alien christmas turret,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-304909,omni slayer droid tam,unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-305587,nano_freak_2020 - guardian of the three,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-305611,deathless legion,unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-31114,rhinoman female,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-31907,bileswarm colossus,natural ranged,NATURAL_RANGED,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-31909,bileswarm worker,natural ranged,NATURAL_RANGED,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-32419,sewer snake,bite,BITE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-38383,enigma floatpot,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-38389,anun,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-38394,nanofreak,nano caster,NANO_CASTER,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-40063,rollerrat queen,bite,BITE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-40071,enigma dog,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-40075,blubbag,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-45872,enigma tree,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-45874,buzzsaw,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-55648,alienpod spider,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-95384,rockmonster,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-96056,protocol droid,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
