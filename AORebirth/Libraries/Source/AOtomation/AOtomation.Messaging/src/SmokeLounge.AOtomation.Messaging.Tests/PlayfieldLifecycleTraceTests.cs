@@ -7,6 +7,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Runtime.CompilerServices;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -1201,9 +1202,25 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(patrolReplayIndex > 0, "Captured Subway patrol replay data must follow spawn definitions.");
             string spawnDefinitionsText = providerText.Substring(0, patrolReplayIndex);
             Assert.AreEqual(
-                95,
+                124,
                 CountOccurrences(spawnDefinitionsText, "CapturedSurveySpawn("),
-                "CapturedSubwayContentProvider must preserve the 95 already-supported ordinary Subway spawns.");
+                "CapturedSubwayContentProvider must preserve all 124 capture-backed supported-family Subway spawns.");
+            string[] restoredSupportedSourceInstances =
+                {
+                    "0x79557C09", "0x79557C26", "0x79557C31", "0x79557C8B", "0x79557CA7",
+                    "0x79557CAB", "0x79557CAD", "0x7957E411", "0x7957E4A5", "0x7957E4B1",
+                    "0x7957E4BC", "0x79557C66", "0x7957E40A", "0x79557F14", "0x7957E5C6",
+                    "0x7957E5C7", "0x7957E5C8", "0x7957E5CA", "0x79557CAC", "0x7957405C",
+                    "0x795743A7", "0x795743A8", "0x7957E02C", "0x7957E02E", "0x7957E123",
+                    "0x7957E40E", "0x7957E5BF", "0x7957E5C4", "0x7957E5C5"
+                };
+            for (int i = 0; i < restoredSupportedSourceInstances.Length; i++)
+            {
+                Assert.AreEqual(
+                    1,
+                    CountOccurrences(spawnDefinitionsText, restoredSupportedSourceInstances[i]),
+                    "Restored supported source identity must appear exactly once: " + restoredSupportedSourceInstances[i]);
+            }
             Assert.IsFalse(
                 providerText.Contains("122002"),
                 "CapturedSubwayContentProvider must bind content to resource/playfield 127, not capture object Playfield2:122002.");
@@ -1292,9 +1309,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Controllers\NPCController.cs"));
 
             Assert.AreEqual(
-                95,
+                124,
                 CountOccurrences(providerText, "            CapturedSurveySpawn("),
-                "The expanded ordinary-archetype slice must not disturb the 95 previously supported spawns.");
+                "The expanded ordinary-archetype slice must retain all 124 supported-family spawns.");
 
             string[] patrolSourceIdentities =
                 {
@@ -1313,9 +1330,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.AreEqual(
-                45,
+                53,
                 CountOccurrences(providerText, "new CapturedSubwayPatrolReplaySegment("),
-                "The four moving mobs must load complete periodic NpcPath cycles from capture 20260709-164414.");
+                "Existing periodic patrol cycles and the accepted Thief replay must remain loaded.");
             Assert.IsTrue(
                 providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.665506, 90.9275284f")
                 && providerText.Contains("0x7953AF18")
@@ -1328,7 +1345,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 orchestratorText.Contains("this.patrolReplay.AssignCapturedSubwayReplay(")
                 && orchestratorText.Contains("mobCharacter.AddWaypoint(start, false);")
                 && orchestratorText.Contains("mobCharacter.AddWaypoint(end, false);")
-                && orchestratorText.Contains("npcController.SetCapturedPatrolReplaySegments(segments, false, true);")
+                && orchestratorText.Contains("npcController.SetCapturedPatrolReplaySegments(")
+                && orchestratorText.Contains("spawn.UseSpawnAsPatrolStart)")
                 && orchestratorText.Contains("npcController.State = CharacterState.Patrolling;"),
                 "Subway spawn orchestration must announce live SCFU waypoints and retain exact captured segment starts.");
             Assert.IsTrue(
@@ -1348,11 +1366,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Subway replay must preserve captured starts/movement modes, batch same-time corrections, and stop when combat begins.");
 
             AssertTextBefore(
-                ExtractMethodBlock(orchestratorText, "private void SpawnCapturedSubwayMob("),
+                ExtractMethodBlock(orchestratorText, "private bool SpawnCapturedSubwayMob("),
                 "var fullUpdate = SimpleCharFullUpdate.ConstructMessage(mobCharacter);",
                 "this.activateNpc(mobCharacter);");
             AssertTextBefore(
-                ExtractMethodBlock(orchestratorText, "private void SpawnCapturedSubwayMob("),
+                ExtractMethodBlock(orchestratorText, "private bool SpawnCapturedSubwayMob("),
                 "this.activateNpc(mobCharacter);",
                 "playfield.Announce(fullUpdate);");
 
@@ -1382,8 +1400,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinarySpawnOrchestrator.cs"));
             string runtimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
-            string combatText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            string combatContractText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
             string playfieldText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string scfuText = File.ReadAllText(
@@ -1392,13 +1410,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
             Assert.AreEqual(
-                10,
+                11,
                 CountOccurrences(providerText, "            new CapturedSubwayOrdinaryArchetypeDefinition("),
-                "The nine ordinary families must retain ten captured visual/template variants because Workman and Architect Striker differ.");
+                "The ten ordinary families must retain eleven captured visual/template variants because Workman and Architect Striker differ.");
             Assert.AreEqual(
-                126,
+                135,
                 CountOccurrences(providerText, "            new CapturedSubwayOrdinarySpawnDefinition("),
-                "The completed capture survey must register all 126 spatially deduplicated ordinary spawn positions.");
+                "The completed capture survey must register all 135 spatially deduplicated ordinary spawn positions.");
+
+            string[] restoredOrdinarySourceInstances =
+                {
+                    "0x79557CB8", "0x7957E5CD", "0x79557F12", "0x7957E128", "0x7957E415",
+                    "0x7957E5CF", "0x7957E5D0", "0x7957E5D1", "0x79574527"
+                };
+            for (int i = 0; i < restoredOrdinarySourceInstances.Length; i++)
+            {
+                Assert.AreEqual(
+                    1,
+                    CountOccurrences(providerText, restoredOrdinarySourceInstances[i]),
+                    "Restored ordinary source identity must appear exactly once: " + restoredOrdinarySourceInstances[i]);
+            }
 
             string[] capturedNames =
                 {
@@ -1411,14 +1442,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Looter",
                     "Infector",
                     "Lost Thought",
-                    "Neural Burnout"
+                    "Neural Burnout",
+                    "Deranged Shopper"
                 };
             for (int i = 0; i < capturedNames.Length; i++)
             {
                 Assert.IsTrue(providerText.Contains("\"" + capturedNames[i] + "\""), "Missing " + capturedNames[i] + ".");
             }
 
-            int[] capturedMonsterData = { 30464, 203739, 203854, 203743, 96056, 55648, 203745, 31909, 96193, 203730 };
+            int[] capturedMonsterData = { 30464, 203739, 203854, 203743, 96056, 55648, 203745, 31909, 96193, 203730, 203736 };
             for (int i = 0; i < capturedMonsterData.Length; i++)
             {
                 Assert.IsTrue(
@@ -1431,6 +1463,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && providerText.Contains("\"architect_striker\",")
                 && CountOccurrences(providerText, "                \"striker\",") == 2,
                 "Workman and Architect Striker must share one ordinary family while preserving separate captured identities.");
+            Assert.IsTrue(
+                providerText.Contains("\"looter\",")
+                && providerText.Contains("\"stim_fiend\",")
+                && providerText.Contains("\"deranged_shopper\",")
+                && providerText.Contains("new CapturedSubwayTextureDefinition(1, 30859, 0)")
+                && providerText.Contains("new CapturedSubwayMeshDefinition(1, 95784u, 0, 2)")
+                && providerText.Contains("\"20260710-202132\""),
+                "Looter, Stim Fiend, and Deranged Shopper must use capture-generated reusable archetypes.");
             Assert.IsTrue(
                 providerText.Contains("CapturedSubwayTextureDefinition[]")
                 && providerText.Contains("CapturedSubwayMeshDefinition[]")
@@ -1467,10 +1507,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && scfuText.Contains("archetype.Meshes.Select("),
                 "SCFU construction must emit the captured ordinary appearance and exact optional-field shape.");
             Assert.IsTrue(
-                combatText.Contains("capturedOrdinary.Archetype.Combat.Observed")
-                && combatText.Contains("MinDamage = combat.MinDamage")
-                && combatText.Contains("RechargeSeconds = combat.RechargeSeconds > 0"),
-                "Ordinary combat must use observed damage and timing without changing unrelated global combat behavior.");
+                orchestratorText.Contains("CapturedSubwayCombatCatalog.ForOrdinary(archetype)")
+                && combatContractText.Contains("internal static CapturedEnemyCombatContract ForOrdinary(")
+                && combatContractText.Contains("if (combat == null || !combat.Observed)")
+                && combatContractText.Contains("return CapturedEnemyCombatContract.FixedAttack(")
+                && combatContractText.Contains("combat.MinDamage")
+                && combatContractText.Contains("combat.MaxDamage")
+                && combatContractText.Contains("combat.RechargeSeconds"),
+                "Ordinary combat must use the shared captured contract and fail closed when AttackInfo is unobserved.");
             Assert.IsTrue(
                 providerText.Contains("DropGroupHash = \"captured-subway-ordinary\"")
                 && playfieldText.Contains("CapturedSubwayOrdinaryLootTable")
@@ -1502,6 +1546,126 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Named, boss, personal-pet, and boss-owned summon evidence is outside this ordinary slice: "
                     + excludedNamedOrOwnedMobs[i]);
             }
+        }
+
+        [TestMethod]
+        public void Subway20260710PopulationRestoreManifestMatchesCaptureAndBoundaries()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string manifestPath = Path.Combine(
+                repositoryRoot,
+                @"docs\generated\subway_20260710_population_restore_manifest.csv");
+            string supportedProviderText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+            string ordinaryProviderText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
+            string ordinaryGeneratorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"tools-temp\AOSharpCaptureAnalyzer\generate_subway_ordinary_content.py"));
+            string ordinaryOrchestratorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinarySpawnOrchestrator.cs"));
+            string supportedOrchestratorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwaySpawnOrchestrator.cs"));
+            string npcRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+
+            string[] lines = File.ReadAllLines(manifestPath);
+            Assert.IsTrue(lines.Length > 1, "Population restore manifest must contain classified capture rows.");
+            string[] header = lines[0].Split(',');
+            int captureIndex = Array.IndexOf(header, "CaptureId");
+            int playfieldIndex = Array.IndexOf(header, "ResourcePlayfieldId");
+            int identityIndex = Array.IndexOf(header, "Identity");
+            int nameIndex = Array.IndexOf(header, "Name");
+            int xIndex = Array.IndexOf(header, "PositionX");
+            int yIndex = Array.IndexOf(header, "PositionY");
+            int zIndex = Array.IndexOf(header, "PositionZ");
+            int ownerIndex = Array.IndexOf(header, "Owner");
+            int classificationIndex = Array.IndexOf(header, "Classification");
+            Assert.IsTrue(
+                captureIndex >= 0 && playfieldIndex >= 0 && identityIndex >= 0 && nameIndex >= 0
+                && xIndex >= 0 && yIndex >= 0 && zIndex >= 0 && ownerIndex >= 0 && classificationIndex >= 0,
+                "Population restore manifest must expose the required evidence columns.");
+
+            string[][] rows = lines.Skip(1).Select(line => line.Split(',')).ToArray();
+            Assert.AreEqual(107, rows.Length, "Every unique SCFU identity in capture 20260710-202132 must have a disposition.");
+            Assert.AreEqual(29, rows.Count(row => row[classificationIndex] == "SUPPORTED_FAMILY_RESTORE"));
+            Assert.AreEqual(9, rows.Count(row => row[classificationIndex] == "ORDINARY_ENEMY_REGENERATE"));
+            Assert.AreEqual(18, rows.Count(row => row[classificationIndex] == "DUPLICATE_EXCLUDED"));
+            Assert.AreEqual(2, rows.Count(row => row[classificationIndex] == "OWNED_SUMMON_EXCLUDED"));
+            Assert.AreEqual(49, rows.Count(row => row[classificationIndex] == "UNSUPPORTED_FAMILY_EXCLUDED"));
+            Assert.AreEqual(0, rows.Count(row => row[classificationIndex] == "MALFORMED_OR_INCOMPLETE"));
+
+            string[][] included = rows
+                .Where(
+                    row => row[classificationIndex] == "SUPPORTED_FAMILY_RESTORE"
+                        || row[classificationIndex] == "ORDINARY_ENEMY_REGENERATE")
+                .ToArray();
+            Assert.AreEqual(38, included.Length);
+            Assert.AreEqual(38, included.Select(row => row[identityIndex]).Distinct().Count());
+            Assert.IsTrue(included.All(row => row[captureIndex] == "20260710-202132"));
+            Assert.IsTrue(included.All(row => row[playfieldIndex] == "127"));
+            Assert.IsTrue(included.All(row => string.IsNullOrEmpty(row[ownerIndex])));
+
+            foreach (string[] row in included)
+            {
+                string sourceIdentity = "0x" + row[identityIndex]
+                    .Replace("(SimpleChar:", string.Empty)
+                    .Replace(")", string.Empty);
+                string providerText = row[classificationIndex] == "SUPPORTED_FAMILY_RESTORE"
+                    ? supportedProviderText
+                    : ordinaryProviderText;
+                Assert.AreEqual(1, CountOccurrences(providerText, sourceIdentity), "Included source identity must be unique: " + sourceIdentity);
+                int identityOffset = providerText.IndexOf(sourceIdentity, StringComparison.Ordinal);
+                string evidenceBlock = providerText.Substring(identityOffset, Math.Min(1200, providerText.Length - identityOffset));
+                Assert.IsTrue(
+                    evidenceBlock.Contains(row[xIndex] + "f")
+                    && evidenceBlock.Contains(row[yIndex] + "f")
+                    && evidenceBlock.Contains(row[zIndex] + "f"),
+                    "Runtime position must exactly match captured position for " + sourceIdentity + ".");
+            }
+
+            string[] ordinaryNames = { "Looter", "Stim Fiend", "Deranged Shopper" };
+            Assert.IsTrue(
+                included.Where(row => row[classificationIndex] == "ORDINARY_ENEMY_REGENERATE")
+                    .All(row => ordinaryNames.Contains(row[nameIndex])),
+                "Only the three capture-approved ordinary archetypes may be regenerated.");
+            Assert.IsTrue(
+                ordinaryGeneratorText.Contains("return sorted(selected, key=lambda value: (value[\"Name\"], value[\"Identity\"]))")
+                && ordinaryGeneratorText.Contains("CAPTURE_ARCHETYPE_FILTERS")
+                && ordinaryGeneratorText.Contains("ARCHETYPE_CAPTURE_FILTERS"),
+                "Ordinary regeneration must remain deterministic and capture-filtered.");
+
+            string[] excludedNamedOrOwned =
+                {
+                    "Abmouth Supremus", "Eumenides", "Vergil Aeneid", "Strike Foreman", "Healer",
+                    "0x795451A1", "0x795451A9"
+                };
+            foreach (string excluded in excludedNamedOrOwned)
+            {
+                Assert.IsFalse(supportedProviderText.Contains(excluded) || ordinaryProviderText.Contains(excluded));
+            }
+            foreach (string[] row in rows.Where(row => row[classificationIndex].EndsWith("EXCLUDED", StringComparison.Ordinal)))
+            {
+                string sourceIdentity = "0x" + row[identityIndex]
+                    .Replace("(SimpleChar:", string.Empty)
+                    .Replace(")", string.Empty);
+                Assert.IsFalse(
+                    supportedProviderText.Contains(sourceIdentity) || ordinaryProviderText.Contains(sourceIdentity),
+                    "Excluded identity must not become a static spawn: " + sourceIdentity);
+            }
+
+            Assert.IsFalse(
+                supportedProviderText.Contains("RoomSpace")
+                || ordinaryProviderText.Contains("RoomSpace")
+                || ordinaryGeneratorText.Contains("RoomSpace"),
+                "Population restoration must not add a RoomSpace workaround or coordinate mutation.");
+            Assert.IsTrue(
+                supportedOrchestratorText.Contains("SpawnMobFromTemplate")
+                && supportedOrchestratorText.Contains("spawn.SourceInstance")
+                && ordinaryOrchestratorText.Contains("Pool.Instance.GetFreeInstance<Character>")
+                && ordinaryOrchestratorText.Contains("spawn.SourceInstance")
+                && ordinaryOrchestratorText.Contains("CapturedSubwayOrdinaryRuntimeRegistry.Register")
+                && npcRuntimeText.Contains("CapturedSubwayOrdinaryRuntimeRegistry.Remove"),
+                "Current identity allocation and NPC death/despawn lifecycle ownership must remain unchanged.");
         }
 
         [TestMethod]
