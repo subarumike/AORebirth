@@ -52,6 +52,8 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayThiefDamage = 9;
 
+        public const int CapturedSubwayThiefMonsterData = 26092;
+
         public const int NpcUnarmedRightAttackInfoWeaponSlot = 0;
 
         public const int NpcUnarmedLeftAttackInfoWeaponSlot = 1;

@@ -246,6 +246,20 @@ namespace AORebirth.Core.Playfields
             int newHealth = Math.Max(0, currentHealth - damage);
             bool killingHit = newHealth == 0;
 
+            if (IsCapturedSubwayThief(attacker))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Network,
+                    string.Format(
+                        "CombatCapturedSubwayThiefDamageSuppressed attacker={0} target={1} dmg={2} reason=client_weapon_context_unproven",
+                        attacker.Identity,
+                        target.Identity,
+                        damage));
+                this.nextCombatTicks[attacker.Identity.Instance] =
+                    DateTime.UtcNow + TimeSpan.FromSeconds(attackSource.RechargeSeconds);
+                return;
+            }
+
             this.AnnounceNpcSpecialAttackWeaponContextIfNeeded(attacker, target, attackSource);
             this.AnnounceCombatDamage(
                 attacker,
@@ -974,6 +988,16 @@ namespace AORebirth.Core.Playfields
                    && character.Stats[StatIds.monsterdata].Value
                       == NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData
                    && string.Equals(character.Name, "Filth Flea", StringComparison.Ordinal);
+        }
+
+        private static bool IsCapturedSubwayThief(ICharacter character)
+        {
+            return character != null
+                   && character.Playfield != null
+                   && character.Playfield.Identity.Instance == NpcCombatAttackRules.CapturedSubwayPlayfield
+                   && character.Stats[StatIds.monsterdata].Value
+                      == NpcCombatAttackRules.CapturedSubwayThiefMonsterData
+                   && string.Equals(character.Name, "Thief", StringComparison.Ordinal);
         }
 
         private static double NormalizeCombatRange(int range)
