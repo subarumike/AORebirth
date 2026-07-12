@@ -130,4 +130,5 @@ tools-temp/*.png
 tools-temp/screen-captures/
 tools-temp/worktree-snapshots/
 tools-temp/db-backups/
+.local/
 .aider*

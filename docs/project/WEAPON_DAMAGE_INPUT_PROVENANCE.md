@@ -93,6 +93,8 @@ No universal weapon add-damage stat is proven. `DamageBonus` remains legacy dama
 
 `WeaponDamageDiagnosticSnapshotBuilder` is a separate opt-in diagnostic seam. It is disabled by default, does not call production formula selection, and evaluates candidate formulas only against supplied observation records.
 
+The first ordinary-hit campaign adds an opt-in runtime JSONL evidence seam for player equipped-weapon auto-attacks. It is enabled only through `AO_REBIRTH_WEAPON_DAMAGE_EVIDENCE_SESSION` and writes under `.local\weapon-damage-evidence\<SESSION_ID>\raw\`. It records already-computed production result data plus weapon/template/stat evidence needed for import. The seam does not select a formula and is not active in normal engine startup.
+
 Classifications:
 
 - `FormulaInputComplete`: all supplied diagnostic inputs are complete.

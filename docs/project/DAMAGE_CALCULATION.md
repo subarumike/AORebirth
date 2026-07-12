@@ -74,6 +74,8 @@ Formula-backed ordinary weapon requests require weapon min/max, damage type, eff
 
 `WeaponDamageDiagnosticSnapshotBuilder` is also diagnostic-only. It returns `null` unless explicitly enabled, records the supplied production result instead of recalculating it, and evaluates candidate formulas only against supplied observation records. It does not consume random numbers or mutate combat state.
 
+Player equipped-weapon auto-attacks now also have an opt-in evidence JSONL logger for the first controlled ordinary-hit campaign. It is disabled unless the engine process has `AO_REBIRTH_WEAPON_DAMAGE_EVIDENCE_SESSION`; when enabled it records the already-computed `DamageCalculationResult`, base roll, target health before/after, weapon template fields, attack-skill values, target matching AC, and normal-hit marker. It does not activate `EvidenceBackedWeaponDamage` and does not replace legacy/fixed production damage.
+
 Build classifications:
 
 - `FormulaInputComplete`: all diagnostic inputs were supplied explicitly.
