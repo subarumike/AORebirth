@@ -26,8 +26,10 @@ real DLL under the 32-bit Windows system directory. A deferred worker then:
 For the approved old live client, the proxy also verifies the exact GUI callsite
 and `Utils!Rect::operator+(Point)` implementation associated with the recurring
 `Utils.dll +0x72F1` crash, then replaces that one GUI import with a guard that
-returns an empty rectangle when GUI supplies a null or unreadable rectangle
-address. Valid readable rectangles continue through the original function
+returns an empty rectangle when GUI supplies a null, unreadable, or nonsensical
+rectangle or point address. A process exception fallback also contains access
+violations from the exact verified `Utils!Rect::operator+(Point)` body. Valid
+readable rectangle and point data continue through the original function
 unchanged.
 
 The old live renderer repair verifies the exact `randy31.dll +0x6C3A1` byte-
