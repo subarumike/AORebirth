@@ -10,6 +10,8 @@ Primary artifacts:
 - Captured fixed Thief record: `docs/project/damage-evidence/observations/fixed-captured-thief.json`
 - Live template: `docs/project/damage-evidence/observations/live-observation-template.json`
 - Initial report: `docs/project/damage-evidence/reports/initial-parity-report.md`
+- First campaign: `docs/project/WEAPON_DAMAGE_FIRST_CAPTURE.md`
+- Session wrapper: `tools\weapon_damage_evidence.cmd`
 
 Validation rules:
 
@@ -22,5 +24,16 @@ Validation rules:
 Candidate evaluation is report-only. `WeaponDamageCandidateEvaluator` and `WeaponDamageParityReporter` compare complete observations against candidate formula orderings and report exact matches, multiple matches, no matches, rounding boundaries, and possible hidden modifiers. They do not call production damage paths and do not consume random numbers.
 
 The diagnostic seam is opt-in through `WeaponDamageDiagnosticSnapshotBuilder`. It returns `null` when disabled and only records request-builder, production-result, and candidate-evaluation data when explicitly enabled by test or future diagnostic tooling.
+
+The first private-server campaign also has an opt-in runtime evidence log. It is disabled unless `AO_REBIRTH_WEAPON_DAMAGE_EVIDENCE_SESSION` is present in the engine process environment. The approved wrapper creates session folders under `.local\weapon-damage-evidence\<SESSION_ID>\`, writes generated engine-start commands, imports diagnostic JSONL rows, rejects ambiguous rows, emits schema-shaped observations, and creates a report-only parity report.
+
+Core commands:
+
+```cmd
+tools\weapon_damage_evidence.cmd prepare --session-id <ID>
+tools\weapon_damage_evidence.cmd status --session-id <ID>
+tools\weapon_damage_evidence.cmd finish --session-id <ID>
+tools\weapon_damage_evidence.cmd analyze --session-id <ID>
+```
 
 Promotion requires exactly one candidate matching every complete observation, no contradictory observations, no unresolved required matrix rows, and an explicit implementation task authorizing production formula activation.

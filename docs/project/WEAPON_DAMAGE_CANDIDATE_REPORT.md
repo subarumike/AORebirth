@@ -2,6 +2,8 @@
 
 Current result: no candidate formula is proven.
 
+First controlled campaign status: prepared/operator-pending. The selected primary fixture is QL1 Solar-Powered Pistol `121567`; the optional confirmation fixture is QL1 Worn Oak Bo `121565`; the first target fixture is an isolated private-server `Malfunctioning Cleaning Robot` accepted only when diagnostics prove normal-hit status, target AC, health continuity, and no overlap.
+
 The framework now represents candidate families needed for ordinary weapon-hit parity:
 
 | Area | Represented candidates | Production status |
@@ -25,3 +27,4 @@ Known unresolved blockers:
 - Add All Off ordering relative to weighted skills is unproven;
 - universal add-damage source is not proven;
 - no complete live ordinary weapon-hit observation matrix exists yet.
+- first campaign has not collected observations yet; candidate matching remains pending.

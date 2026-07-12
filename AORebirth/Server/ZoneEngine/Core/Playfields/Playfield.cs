@@ -56,6 +56,7 @@ namespace AORebirth.Core.Playfields
     using AORebirth.Enums;
     using AORebirth.Interfaces;
     using AORebirth.ObjectManager;
+    using AORebirth.Stats;
 
     using MemBus;
     using MemBus.Configurators;
@@ -1471,7 +1472,8 @@ namespace AORebirth.Core.Playfields
             }
 
             int currentHealth = target.Stats[StatIds.health].Value;
-            int damage = this.CalculateCombatDamage(attacker, attackSource);
+            DamageCalculationResult damageResult = this.CalculateCombatDamageDetailed(attacker, attackSource);
+            int damage = damageResult.FinalTargetDamage;
             int newHealth = Math.Max(0, currentHealth - damage);
             bool killingHit = newHealth == 0;
 
@@ -1496,6 +1498,7 @@ namespace AORebirth.Core.Playfields
                     target.Stats[StatIds.life].Value,
                     attackSource.UsesEquippedWeapon ? 1 : 0,
                     attackSource.AttackInfoWeaponSlot));
+            this.TryWriteWeaponDamageEvidence(attacker, target, attackSource, damageResult, currentHealth, newHealth);
 
             if (killingHit)
             {
@@ -1509,12 +1512,18 @@ namespace AORebirth.Core.Playfields
 
         private int CalculateCombatDamage(ICharacter attacker, CombatAttackSource attackSource)
         {
-            return CombatDamageRules.Calculate(
+            return this.CalculateCombatDamageDetailed(attacker, attackSource).FinalTargetDamage;
+        }
+
+        private DamageCalculationResult CalculateCombatDamageDetailed(ICharacter attacker, CombatAttackSource attackSource)
+        {
+            return CombatDamageRules.CalculateDetailed(
                 attackSource.MinDamage,
                 attackSource.MaxDamage,
                 attackSource.DamageBonus,
                 attacker.Stats[StatIds.level].Value,
-                attacker.Controller is PlayerController);
+                attacker.Controller is PlayerController,
+                null);
         }
 
         internal bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)
@@ -1697,6 +1706,14 @@ namespace AORebirth.Core.Playfields
                        MinDamage = minDamage,
                        MaxDamage = maxDamage,
                        DamageBonus = damageBonus,
+                       WeaponLowId = weapon.LowID,
+                       WeaponHighId = weapon.HighID,
+                       WeaponQualityLevel = weapon.Quality,
+                       RawDamageType = weapon.GetAttribute((int)StatIds.damagetype),
+                       AttackSkillDefinitions = GetAttackSkillDefinitions(weapon),
+                       AttackSkillValues = GetAttackSkillValues(attacker, weapon),
+                       EffectiveAttackRating = GetEffectiveAttackRating(attacker, weapon),
+                       AddAllOff = TryGetStatValue(attacker, 276),
                        Range = NormalizeCombatRange(weapon.GetAttribute((int)StatIds.attackrange)),
                        RechargeSeconds = NormalizeCombatDelaySeconds(
                            weapon.GetAttribute((int)StatIds.itemdelay),
@@ -1708,6 +1725,198 @@ namespace AORebirth.Core.Playfields
                        AttackInfoHitType = NormalAttackInfoHitType,
                        AttackInfoWeaponInstance = 0
                     };
+        }
+
+        private void TryWriteWeaponDamageEvidence(
+            ICharacter attacker,
+            ICharacter target,
+            CombatAttackSource attackSource,
+            DamageCalculationResult damageResult,
+            int targetHealthBefore,
+            int targetHealthAfter)
+        {
+            string sessionId = Environment.GetEnvironmentVariable("AO_REBIRTH_WEAPON_DAMAGE_EVIDENCE_SESSION");
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return;
+            }
+
+            if (attacker == null || target == null || attackSource == null)
+            {
+                return;
+            }
+
+            if (!attackSource.UsesEquippedWeapon)
+            {
+                return;
+            }
+
+            string evidenceDirectory = Environment.GetEnvironmentVariable("AO_REBIRTH_WEAPON_DAMAGE_EVIDENCE_DIR");
+            if (string.IsNullOrEmpty(evidenceDirectory))
+            {
+                evidenceDirectory = Path.Combine(".local", "weapon-damage-evidence", sessionId);
+            }
+
+            try
+            {
+                string rawDirectory = Path.Combine(evidenceDirectory, "raw");
+                Directory.CreateDirectory(rawDirectory);
+                string targetArmorField = "null";
+                DamageType mappedDamageType;
+                if (TryMapRawDamageType(attackSource.RawDamageType, out mappedDamageType))
+                {
+                    int armorStatId;
+                    if (DamageCalculator.TryGetArmorStatForDamageType(mappedDamageType, out armorStatId))
+                    {
+                        int? targetArmor = TryGetStatValue(target, armorStatId);
+                        targetArmorField = targetArmor.HasValue ? targetArmor.Value.ToString(CultureInfo.InvariantCulture) : "null";
+                    }
+                }
+
+                string line = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{{\"schemaVersion\":\"1.0\",\"sessionId\":\"{0}\",\"timestampUtc\":\"{1:O}\",\"sourceKind\":\"PrivateServerControlled\",\"eventKind\":\"ordinary-weapon-hit\",\"attackerIdentity\":\"{2}\",\"targetIdentity\":\"{3}\",\"weaponTemplateIdentity\":\"{4}\",\"weaponHighId\":{5},\"weaponQualityLevel\":{6},\"weaponMinimum\":{7},\"weaponMaximum\":{8},\"legacyDamageBonus\":{9},\"rawDamageType\":{10},\"mappedDamageType\":\"{11}\",\"attackSkillDefinitions\":\"{12}\",\"attackSkillValues\":\"{13}\",\"effectiveAttackRating\":{14},\"addAllOff\":{15},\"targetMatchingArmor\":{16},\"hitKind\":\"{17}\",\"attackInfoHitType\":{18},\"baseRoll\":{19},\"selectedProductionStrategy\":\"{20}\",\"observedDamage\":{21},\"targetHealthBefore\":{22},\"targetHealthAfter\":{23},\"multipleDamageSourcesPossible\":false,\"externalDamagePossible\":false,\"packetOrderComplete\":true,\"criticalStateEvidencePresent\":true,\"evidenceReference\":\"ZoneEngine weapon-damage evidence log\"}}",
+                    JsonEscape(sessionId),
+                    DateTime.UtcNow,
+                    JsonEscape(attacker.Identity.ToString(true)),
+                    JsonEscape(target.Identity.ToString(true)),
+                    JsonEscape(attackSource.WeaponLowId.ToString(CultureInfo.InvariantCulture)),
+                    attackSource.WeaponHighId,
+                    attackSource.WeaponQualityLevel,
+                    attackSource.MinDamage,
+                    attackSource.MaxDamage,
+                    attackSource.DamageBonus,
+                    attackSource.RawDamageType,
+                    JsonEscape(mappedDamageType.ToString()),
+                    JsonEscape(attackSource.AttackSkillDefinitions),
+                    JsonEscape(attackSource.AttackSkillValues),
+                    NullableIntJson(attackSource.EffectiveAttackRating),
+                    NullableIntJson(attackSource.AddAllOff),
+                    targetArmorField,
+                    attackSource.AttackInfoHitType == NormalAttackInfoHitType ? "KnownNormal" : "UnknownHitKind",
+                    attackSource.AttackInfoHitType,
+                    damageResult.BaseRoll,
+                    JsonEscape(damageResult.Strategy.ToString()),
+                    damageResult.FinalTargetDamage,
+                    targetHealthBefore,
+                    targetHealthAfter);
+
+                File.AppendAllText(Path.Combine(rawDirectory, "server-weapon-damage-events.jsonl"), line + Environment.NewLine);
+            }
+            catch (Exception exception)
+            {
+                LogUtil.Debug(DebugInfoDetail.Error, "WeaponDamageEvidenceLog failed: " + exception.Message);
+            }
+        }
+
+        private static string GetAttackSkillDefinitions(IItem weapon)
+        {
+            ItemTemplate template;
+            if (weapon == null || !ItemLoader.ItemList.TryGetValue(weapon.LowID, out template) || template.Attack == null)
+            {
+                return string.Empty;
+            }
+
+            return string.Join(",", template.Attack.OrderBy(x => x.Key).Select(x => x.Key + ":" + x.Value));
+        }
+
+        private static string GetAttackSkillValues(ICharacter attacker, IItem weapon)
+        {
+            ItemTemplate template;
+            if (attacker == null || weapon == null || !ItemLoader.ItemList.TryGetValue(weapon.LowID, out template) || template.Attack == null)
+            {
+                return string.Empty;
+            }
+
+            return string.Join(
+                ",",
+                template.Attack.OrderBy(x => x.Key).Select(
+                    x =>
+                    {
+                        int? value = TryGetStatValue(attacker, x.Key);
+                        return x.Key + ":" + (value.HasValue ? value.Value.ToString(CultureInfo.InvariantCulture) : "missing");
+                    }));
+        }
+
+        private static int? GetEffectiveAttackRating(ICharacter attacker, IItem weapon)
+        {
+            ItemTemplate template;
+            if (attacker == null || weapon == null || !ItemLoader.ItemList.TryGetValue(weapon.LowID, out template) || template.Attack == null || template.Attack.Count == 0)
+            {
+                return null;
+            }
+
+            int total = 0;
+            foreach (KeyValuePair<int, int> contribution in template.Attack)
+            {
+                int? value = TryGetStatValue(attacker, contribution.Key);
+                if (!value.HasValue)
+                {
+                    return null;
+                }
+
+                total += (value.Value * contribution.Value) / 100;
+            }
+
+            return total;
+        }
+
+        private static int? TryGetStatValue(ICharacter character, int statId)
+        {
+            if (character == null || character.Stats == null || character.Stats.All == null)
+            {
+                return null;
+            }
+
+            IStat stat = character.Stats.All.SingleOrDefault(x => x.StatId == statId);
+            return stat == null ? (int?)null : stat.Value;
+        }
+
+        private static bool TryMapRawDamageType(int rawDamageType, out DamageType damageType)
+        {
+            switch (rawDamageType)
+            {
+                case 90:
+                    damageType = DamageType.Projectile;
+                    return true;
+                case 91:
+                    damageType = DamageType.Melee;
+                    return true;
+                case 92:
+                    damageType = DamageType.Energy;
+                    return true;
+                case 93:
+                    damageType = DamageType.Chemical;
+                    return true;
+                case 94:
+                    damageType = DamageType.Radiation;
+                    return true;
+                case 95:
+                    damageType = DamageType.Cold;
+                    return true;
+                case 96:
+                    damageType = DamageType.Poison;
+                    return true;
+                case 97:
+                    damageType = DamageType.Fire;
+                    return true;
+                case 168:
+                    damageType = DamageType.Nano;
+                    return true;
+                default:
+                    damageType = DamageType.Unknown;
+                    return false;
+            }
+        }
+
+        private static string NullableIntJson(int? value)
+        {
+            return value.HasValue ? value.Value.ToString(CultureInfo.InvariantCulture) : "null";
+        }
+
+        private static string JsonEscape(string value)
+        {
+            return (value ?? string.Empty).Replace("\\", "\\\\").Replace("\"", "\\\"");
         }
 
         private int GetUnarmedAttackInfoWeaponSlot(ICharacter attacker)
@@ -3555,6 +3764,22 @@ namespace AORebirth.Core.Playfields
             public int AttackInfoHitType { get; set; }
 
             public int AttackInfoWeaponInstance { get; set; }
+
+            public int WeaponLowId { get; set; }
+
+            public int WeaponHighId { get; set; }
+
+            public int WeaponQualityLevel { get; set; }
+
+            public int RawDamageType { get; set; }
+
+            public string AttackSkillDefinitions { get; set; }
+
+            public string AttackSkillValues { get; set; }
+
+            public int? EffectiveAttackRating { get; set; }
+
+            public int? AddAllOff { get; set; }
         }
 
         private enum CombatDamageSource
