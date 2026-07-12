@@ -1,0 +1,303 @@
+{
+  "DatFilesRead": [
+    "AORebirth/Datafiles/items.dat",
+    "AORebirth/Datafiles/nanos.dat",
+    "AORebirth/Datafiles/playfields.dat"
+  ],
+  "ExtractionTimestampUtc": "2026-06-22T10:09:06.6228733Z",
+  "ExtractorVersion": "1.0.0",
+  "Parser": "AODB.RdbController.GetRaw plus repository extractor normalization",
+  "RdbSource": "C:\\Funcom\\Anarchy Online\\cd_image\\data\\db\\ResourceDatabase.idx",
+  "RecordTypesRead": [
+    {
+      "Count": 630,
+      "RecordType": 1000001
+    },
+    {
+      "Count": 39,
+      "RecordType": 1000008
+    },
+    {
+      "Count": 461,
+      "RecordType": 1000009
+    },
+    {
+      "Count": 1,
+      "RecordType": 1000010
+    },
+    {
+      "Count": 237877,
+      "RecordType": 1000013
+    },
+    {
+      "Count": 630,
+      "RecordType": 1000014
+    },
+    {
+      "Count": 5,
+      "RecordType": 1000015
+    },
+    {
+      "Count": 120842,
+      "RecordType": 1000020
+    },
+    {
+      "Count": 309,
+      "RecordType": 1000021
+    },
+    {
+      "Count": 1,
+      "RecordType": 1000024
+    },
+    {
+      "Count": 630,
+      "RecordType": 1000026
+    },
+    {
+      "Count": 5,
+      "RecordType": 1000027
+    },
+    {
+      "Count": 630,
+      "RecordType": 1000029
+    },
+    {
+      "Count": 31,
+      "RecordType": 1000030
+    },
+    {
+      "Count": 14,
+      "RecordType": 1000031
+    },
+    {
+      "Count": 2063,
+      "RecordType": 1000036
+    },
+    {
+      "Count": 12,
+      "RecordType": 1000037
+    },
+    {
+      "Count": 20,
+      "RecordType": 1000039
+    },
+    {
+      "Count": 85,
+      "RecordType": 1000040
+    },
+    {
+      "Count": 1,
+      "RecordType": 1000045
+    },
+    {
+      "Count": 14311,
+      "RecordType": 1000046
+    },
+    {
+      "Count": 946,
+      "RecordType": 1000047
+    },
+    {
+      "Count": 15,
+      "RecordType": 1000200
+    },
+    {
+      "Count": 5,
+      "RecordType": 1000203
+    },
+    {
+      "Count": 77,
+      "RecordType": 1000204
+    },
+    {
+      "Count": 15,
+      "RecordType": 1000206
+    },
+    {
+      "Count": 5,
+      "RecordType": 1000209
+    },
+    {
+      "Count": 5,
+      "RecordType": 1000210
+    },
+    {
+      "Count": 11228,
+      "RecordType": 1010001
+    },
+    {
+      "Count": 861,
+      "RecordType": 1010002
+    },
+    {
+      "Count": 3318,
+      "RecordType": 1010003
+    },
+    {
+      "Count": 13035,
+      "RecordType": 1010004
+    },
+    {
+      "Count": 845,
+      "RecordType": 1010006
+    },
+    {
+      "Count": 9309,
+      "RecordType": 1010008
+    },
+    {
+      "Count": 608,
+      "RecordType": 1010009
+    },
+    {
+      "Count": 265,
+      "RecordType": 1010011
+    },
+    {
+      "Count": 363,
+      "RecordType": 1010013
+    },
+    {
+      "Count": 12163,
+      "RecordType": 1010016
+    },
+    {
+      "Count": 12401,
+      "RecordType": 1010017
+    },
+    {
+      "Count": 60,
+      "RecordType": 1010019
+    },
+    {
+      "Count": 60,
+      "RecordType": 1010020
+    },
+    {
+      "Count": 845,
+      "RecordType": 1010021
+    },
+    {
+      "Count": 845,
+      "RecordType": 1010022
+    },
+    {
+      "Count": 605,
+      "RecordType": 1010023
+    },
+    {
+      "Count": 605,
+      "RecordType": 1010024
+    },
+    {
+      "Count": 1,
+      "RecordType": 1010025
+    },
+    {
+      "Count": 668,
+      "RecordType": 1010026
+    },
+    {
+      "Count": 8,
+      "RecordType": 1010027
+    },
+    {
+      "Count": 10965,
+      "RecordType": 1040005
+    },
+    {
+      "Count": 1470,
+      "RecordType": 1040023
+    },
+    {
+      "Count": 3010,
+      "RecordType": 3020069
+    },
+    {
+      "Count": 3012,
+      "RecordType": 3020096
+    },
+    {
+      "Count": 11953,
+      "RecordType": 3030001
+    },
+    {
+      "Count": 1901,
+      "RecordType": 3030002
+    },
+    {
+      "Count": 15471,
+      "RecordType": 3030004
+    },
+    {
+      "Count": 3012,
+      "RecordType": 3030006
+    },
+    {
+      "Count": 606,
+      "RecordType": 3030009
+    },
+    {
+      "Count": 265,
+      "RecordType": 3030011
+    },
+    {
+      "Count": 12078,
+      "RecordType": 3030030
+    },
+    {
+      "Count": 626,
+      "RecordType": 3030210
+    },
+    {
+      "Count": 626,
+      "RecordType": 3030211
+    },
+    {
+      "Count": 222,
+      "RecordType": 3030218
+    },
+    {
+      "Count": 333,
+      "RecordType": 3030220
+    },
+    {
+      "Count": 10,
+      "RecordType": 3030221
+    },
+    {
+      "Count": 335,
+      "RecordType": 3086601
+    },
+    {
+      "Count": 45475,
+      "RecordType": 3086602
+    },
+    {
+      "Count": 34240,
+      "RecordType": 3086603
+    },
+    {
+      "Count": 335,
+      "RecordType": 3086604
+    },
+    {
+      "Count": 2476,
+      "RecordType": 3086606
+    },
+    {
+      "Count": 332,
+      "RecordType": 3086611
+    },
+    {
+      "Count": 335,
+      "RecordType": 3086620
+    },
+    {
+      "Count": 52760,
+      "RecordType": 3086621
+    }
+  ],
+  "RepositoryCommit": "a25dde9dd6c469a004cc5732d8d09d41ea7e2b83",
+  "TotalRecordsScanned": 649606
+}
