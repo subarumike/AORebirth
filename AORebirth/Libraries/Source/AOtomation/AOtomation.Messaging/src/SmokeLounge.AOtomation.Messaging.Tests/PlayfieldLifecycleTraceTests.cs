@@ -480,6 +480,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string repositoryRoot = FindRepositoryRoot();
             string coordinatorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            string providerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
             Assert.IsTrue(
                 coordinatorText.Contains("this.AnnounceCapturedEnemyAttackStartContext(attacker, capturedContract);")
                 && coordinatorText.Contains("private void AnnounceCapturedEnemyAttackStartContext(")
@@ -506,6 +508,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(contextIndex >= 0, "Flea combat start must announce captured attack context.");
             Assert.IsTrue(poisonContextIndex >= 0, "Flea combat must expose captured natural attack templates.");
             Assert.IsTrue(attackInfoIndex > contextIndex, "Flea context must be established before AttackInfo damage.");
+            Assert.IsTrue(
+                providerText.Contains("20260709-210452 and 20260709-220439, inventory-updates.csv")
+                && providerText.Contains("\"Filth Flea\"")
+                && providerText.Contains("17657")
+                && providerText.Contains("234874")
+                && providerText.Contains("103110")
+                && providerText.Contains("101581")
+                && providerText.Contains("110874")
+                && providerText.Contains("101507")
+                && providerText.Contains("202719")
+                && providerText.Contains("234876")
+                && providerText.Contains("101761")
+                && providerText.Contains("110192"),
+                "Filth Flea must retain captured Subway corpse loot evidence from completed inventory captures.");
         }
 
         [TestMethod]
