@@ -1203,7 +1203,7 @@ namespace AOSharpLiveCapture
 
                 lock (this.syncRoot)
                 {
-                    this.corpseEvidenceByDeadNpc[deadNpcIdentity] = new CorpseLifecycleEvidence
+                    this.corpseEvidenceByDeadNpc[NormalizeIdentityKey(deadNpcIdentity)] = new CorpseLifecycleEvidence
                     {
                         DeadNpcIdentity = deadNpcIdentity,
                         CorpseIdentity = corpseIdentity,
@@ -3975,7 +3975,7 @@ namespace AOSharpLiveCapture
                 }
 
                 CorpseLifecycleEvidence corpse;
-                this.corpseEvidenceByDeadNpc.TryGetValue(death.EntityId, out corpse);
+                this.corpseEvidenceByDeadNpc.TryGetValue(NormalizeIdentityKey(death.EntityId), out corpse);
 
                 EnemyRespawnObservation observation = new EnemyRespawnObservation
                 {
@@ -4056,6 +4056,16 @@ namespace AOSharpLiveCapture
             return stateEvent.EventType == "spawn"
                    || stateEvent.EventType == "population"
                    || stateEvent.EventType == "respawn";
+        }
+
+        private static string NormalizeIdentityKey(string identity)
+        {
+            if (string.IsNullOrWhiteSpace(identity))
+            {
+                return string.Empty;
+            }
+
+            return identity.Trim().TrimStart('(').TrimEnd(')');
         }
 
         private double? PositionDelta(EnemyStateEvent first, EnemyStateEvent second)
