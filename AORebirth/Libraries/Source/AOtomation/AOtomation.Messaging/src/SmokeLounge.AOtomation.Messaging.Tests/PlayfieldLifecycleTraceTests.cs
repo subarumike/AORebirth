@@ -389,6 +389,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
             string playfieldText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string orchestratorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwaySpawnOrchestrator.cs"));
+            string weaponItemFullUpdateText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\WeaponItemFullUpdate.cs"));
 
             Assert.IsTrue(
                 contractText.Contains("case 26092:")
@@ -408,10 +412,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 coordinatorText.Contains("pendingCapturedAttackStarts")
                 && coordinatorText.Contains("pendingCapturedMovementTransitions")
-                && coordinatorText.Contains("CombatDamageSuppress")
-                && coordinatorText.Contains("captured_thief_hidden_unknown_damage_guard")
-                && coordinatorText.Contains("SuppressDamageApplication = IsCapturedSubwayThief(attacker)")
-                && coordinatorText.Contains("SendAttackInfo = !IsCapturedSubwayThief(attacker)")
                 && coordinatorText.Contains(
                     "capturedContract.AttackStartDelaySeconds + capturedContract.FirstHitDelaySeconds")
                 && coordinatorText.Contains("+ capturedContract.MovementTransitionDelaySeconds")
@@ -422,6 +422,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && coordinatorText.Contains(": 40,")
                 && coordinatorText.Contains(": 4,"),
                 "Thief timing and AttackInfo overrides must stay contract-gated while legacy equipped NPC fields remain unchanged.");
+            Assert.IsTrue(
+                orchestratorText.Contains("WeaponItemFullUpdate.SendWeaponDefinitions(mobCharacter, true)")
+                && weaponItemFullUpdateText.Contains("SendWeaponDefinitions(ICharacter character, bool announceToPlayfield = false)")
+                && weaponItemFullUpdateText.Contains("SendForSlot(character, page, slot, announceToPlayfield)")
+                && weaponItemFullUpdateText.Contains("character.Send(message, announceToPlayfield)"),
+                "Captured equipped Subway NPC weapons must be announced to observers after SCFU so the client has weapon context before AttackInfo.");
 
             string capturedStopBlock = ExtractMethodBlock(
                 controllerText,

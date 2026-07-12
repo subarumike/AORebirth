@@ -73,7 +73,7 @@ namespace ZoneEngine.Core.Packets
             SendForSlot(character, weaponPage, (int)WeaponSlots.LeftHand);
         }
 
-        public static void SendWeaponDefinitions(ICharacter character)
+        public static void SendWeaponDefinitions(ICharacter character, bool announceToPlayfield = false)
         {
             if (character == null)
             {
@@ -90,7 +90,7 @@ namespace ZoneEngine.Core.Packets
                         continue;
                     }
 
-                    SendForSlot(character, page, slot);
+                    SendForSlot(character, page, slot, announceToPlayfield);
                 }
             }
         }
@@ -115,7 +115,11 @@ namespace ZoneEngine.Core.Packets
             }
         }
 
-        private static void SendForSlot(ICharacter character, IInventoryPage page, int slot)
+        private static void SendForSlot(
+            ICharacter character,
+            IInventoryPage page,
+            int slot,
+            bool announceToPlayfield = false)
         {
             IItem item = page[slot];
             if (item == null || !IsWeaponItem(page, item))
@@ -150,19 +154,20 @@ namespace ZoneEngine.Core.Packets
                 Unknown3 = 0
             };
 
-            character.Send(message);
+            character.Send(message, announceToPlayfield);
 
             LogUtil.Debug(
                 DebugInfoDetail.Error,
                 string.Format(
-                    "WeaponItemFullUpdate sent char={0} slot={1} hasItem={2} item={3}/{4} ql={5} itemId={6}",
+                    "WeaponItemFullUpdate sent char={0} slot={1} hasItem={2} item={3}/{4} ql={5} itemId={6} announce={7}",
                     character.Identity,
                     slot,
                     1,
                     lowId,
                     highId,
                     quality,
-                    weaponIdentity.Instance));
+                    weaponIdentity.Instance,
+                    announceToPlayfield ? 1 : 0));
         }
 
         private static GameTuple<CharacterStat, uint>[] BuildStats(
