@@ -29,11 +29,11 @@ and `Utils!Rect::operator+(Point)` implementation associated with the recurring
 returns an empty rectangle when GUI supplies a null rectangle. Valid rectangles
 continue through the original function unchanged.
 
-The old live renderer repair verifies the exact `randy31.dll +0x6C3A1` color
-read. If that instruction receives an invalid low pointer, the process-level
-guard substitutes black color components and resumes immediately after the
-three unsafe byte reads. All other renderer exceptions continue through the
-normal client exception path unchanged.
+The old live renderer repair verifies the exact `randy31.dll +0x6C3A1` byte-
+color and `randy31.dll +0x6C51D` packed-color reads. If either instruction
+receives an invalid low pointer, the process-level guard substitutes black
+color components and resumes after the unsafe read. All other renderer
+exceptions continue through the normal client exception path unchanged.
 
 The proxy never modifies AO files after installation. It contains no
 LargeAddressAware patch, XML/settings changes, DValues, camera/input hooks,
