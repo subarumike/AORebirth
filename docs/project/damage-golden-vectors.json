@@ -349,6 +349,110 @@
     "productionStatus": "evidence-blocked"
   },
   {
+    "name": "provenance-solar-pistol-incomplete",
+    "vectorType": "weapon-input-provenance",
+    "weaponSource": {
+      "templateId": 121567,
+      "qualityLevel": 1,
+      "source": "items.dat plus starter loadout and captured Thief contract"
+    },
+    "attackerSource": {
+      "category": "PlayerOrNpc",
+      "status": "partial"
+    },
+    "targetSource": {
+      "category": "Any",
+      "status": "matching armor not supplied by active callers"
+    },
+    "resolvedInputs": {
+      "minimum": 2,
+      "maximum": 18,
+      "legacyDamageBonus": 18,
+      "rawDamageType": 90,
+      "attackSkills": [
+        { "statId": 112, "percentage": 100 }
+      ],
+      "attackTime": 100,
+      "rechargeTime": 100
+    },
+    "unresolvedInputs": [
+      "critical bonus",
+      "critical state",
+      "AMS cap absence semantics",
+      "matching armor",
+      "universal add damage"
+    ],
+    "evidenceClasses": {
+      "templateFields": "PROVEN_REPOSITORY_BEHAVIOR",
+      "formulaSemantics": "UNKNOWN"
+    },
+    "buildClassification": "FORMULA_INPUT_INCOMPLETE",
+    "expectedActiveStrategy": "LegacyFallback",
+    "unchangedFinalProductionBehavior": "legacy or fixed captured behavior only"
+  },
+  {
+    "name": "provenance-triple-blade-multi-skill-report-only",
+    "vectorType": "weapon-input-provenance",
+    "weaponSource": {
+      "templateId": 121572,
+      "qualityLevel": 1,
+      "source": "items.dat"
+    },
+    "resolvedInputs": {
+      "minimum": 1,
+      "maximum": 10,
+      "legacyDamageBonus": 10,
+      "rawDamageType": 91,
+      "attackSkills": [
+        { "statId": 103, "percentage": 67 },
+        { "statId": 106, "percentage": 33 }
+      ],
+      "AMSCap": 30,
+      "attackTime": 100,
+      "rechargeTime": 129
+    },
+    "unresolvedInputs": [
+      "weight semantics beyond representation",
+      "Add All Off ordering",
+      "critical state",
+      "critical bonus",
+      "armor formula",
+      "universal add damage"
+    ],
+    "evidenceClasses": {
+      "templateFields": "PROVEN_DATABASE_CONTRACT",
+      "requestBuilder": "CONTROLLED_TEST_CONFIRMED",
+      "formulaSemantics": "UNKNOWN"
+    },
+    "buildClassification": "FORMULA_INPUT_INCOMPLETE",
+    "expectedActiveStrategy": "LegacyFallback",
+    "unchangedFinalProductionBehavior": "no production formula activation"
+  },
+  {
+    "name": "provenance-fixed-captured-thief",
+    "vectorType": "weapon-input-provenance",
+    "weaponSource": {
+      "templateId": 121567,
+      "qualityLevel": 1,
+      "source": "captured Subway Thief contract"
+    },
+    "resolvedInputs": {
+      "fixedDamage": 9,
+      "attackTiming": "captured",
+      "movementAndDeathOrder": "captured"
+    },
+    "unresolvedInputs": [
+      "formula inputs intentionally unused"
+    ],
+    "evidenceClasses": {
+      "fixedDamage": "PROVEN_CAPTURED_BEHAVIOR",
+      "requestBuilder": "CONTROLLED_TEST_CONFIRMED"
+    },
+    "buildClassification": "FIXED_CAPTURED",
+    "expectedActiveStrategy": "FixedCapturedDamage",
+    "unchangedFinalProductionBehavior": "Subway Thief remains fixed 9"
+  },
+  {
     "name": "pet-active-legacy-damage",
     "mode": "PvM",
     "attackCategory": "RegularAttack",

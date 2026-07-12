@@ -12,6 +12,8 @@ Outcome B: architecture and evidence only.
 
 The repository exposes some weapon input contracts, but it does not prove the AO ordinary weapon formula ordering or caller completeness needed to activate AR, AC, critical, or add-damage math in production. The calculator therefore keeps production on legacy/fixed strategies and records evidence-blocked formula readiness when the candidate weapon formula policy is requested.
 
+The follow-up provenance audit also selected Outcome B. `WeaponDamageRequestBuilder` now provides side-effect-free diagnostics for ordinary weapon input readiness and records missing/malformed data without changing active damage. The full provenance report is in [WEAPON_DAMAGE_INPUT_PROVENANCE.md](WEAPON_DAMAGE_INPUT_PROVENANCE.md).
+
 ## Current Production Formula
 
 Evidence class: `PROVEN_REPOSITORY_BEHAVIOR`.
@@ -63,6 +65,20 @@ The calculator now records a strategy for every result:
 - `EvidenceBackedWeaponDamage`: reserved for a future activation when the complete formula and caller inputs are proven.
 
 Formula-backed ordinary weapon requests require weapon min/max, damage type, effective AR or weighted attack-skill contributions, explicit target matching AC, resolved critical state, and critical bonus when critical. Missing values must not be silently treated as zero.
+
+## Request Construction Diagnostics
+
+`WeaponDamageRequestBuilder` is diagnostic-only. It can assemble a candidate `DamageCalculationRequest`, provenance records, and input issues for ordinary weapon damage, but it is not called by production combat damage selection.
+
+Build classifications:
+
+- `FormulaInputComplete`: all diagnostic inputs were supplied explicitly.
+- `FormulaInputIncomplete`: required inputs or semantics are missing.
+- `LegacyRequired`: the weapon template identity is not trustworthy enough for formula construction.
+- `FixedCaptured`: captured fixed damage such as Subway Thief.
+- `MalformedData`: invalid or duplicate data such as minimum greater than maximum, negative AMS cap, or duplicate supplied attacker stats.
+
+The builder never silently treats missing values as zero. Known zero must be explicit. Universal add-damage and critical state remain the largest formula-readiness gaps.
 
 ## Fixed Captured Damage
 
