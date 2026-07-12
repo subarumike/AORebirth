@@ -8,7 +8,7 @@ namespace ZoneEngine.Core
 
         public const int NpcFallbackDamage = 1;
 
-        private static readonly Random DamageRandom = new Random();
+        private static readonly IDamageRandomSource DamageRandom = new SystemDamageRandomSource();
 
         public static int Calculate(
             int minDamage,
@@ -17,21 +17,58 @@ namespace ZoneEngine.Core
             int level,
             bool isPlayer)
         {
+            return CalculateDetailed(
+                minDamage,
+                maxDamage,
+                damageBonus,
+                level,
+                isPlayer,
+                DamageRandom).FinalTargetDamage;
+        }
+
+        public static DamageCalculationResult CalculateDetailed(
+            int minDamage,
+            int maxDamage,
+            int damageBonus,
+            int level,
+            bool isPlayer,
+            IDamageRandomSource randomSource)
+        {
             int normalizedMinDamage = Math.Max(0, minDamage);
             int normalizedMaxDamage = Math.Max(normalizedMinDamage, maxDamage);
-            int normalizedDamageBonus = Math.Max(0, damageBonus);
-            int fallbackDamage = isPlayer ? PlayerFallbackDamage : NpcFallbackDamage;
 
-            if (normalizedMaxDamage > 0)
-            {
-                int rolledDamage = normalizedMinDamage == normalizedMaxDamage
-                    ? normalizedMaxDamage
-                    : normalizedMinDamage + DamageRandom.Next(normalizedMaxDamage - normalizedMinDamage + 1);
-
-                return Math.Max(fallbackDamage, rolledDamage + normalizedDamageBonus);
-            }
-
-            return Math.Max(fallbackDamage, level + normalizedDamageBonus);
+            return DamageCalculator.Calculate(
+                new DamageCalculationRequest
+                {
+                    Context = new DamageCalculationContext
+                    {
+                        Mode = DamageCalculationMode.PvM,
+                        AttackCategory = DamageAttackCategory.RegularAttack,
+                        SpecialAttackCategory = SpecialAttackCategory.None,
+                        CompatibilityPolicy = isPlayer ? "repository-player-legacy-normal-hit" : "repository-npc-legacy-normal-hit",
+                        EvidenceSource = "CombatDamageRules.Calculate pre-centralization behavior"
+                    },
+                    Source = new DamageSourceSnapshot
+                    {
+                        Category = isPlayer ? DamageSourceCategory.Player : DamageSourceCategory.Npc,
+                        Level = level
+                    },
+                    Definition = new DamageDefinition
+                    {
+                        BaseMinimum = normalizedMinDamage,
+                        BaseMaximum = normalizedMaxDamage,
+                        DamageType = DamageType.Unknown,
+                        EvidenceClassification = DamageEvidenceClassification.ProvenRepositoryBehavior
+                    },
+                    Modifiers = new DamageModifierSet
+                    {
+                        FlatAddDamage = damageBonus
+                    },
+                    Policy = DamageCalculationPolicy.RepositoryLegacyNormalHit(isPlayer),
+                    EvidenceClassification = DamageEvidenceClassification.ProvenRepositoryBehavior,
+                    HitOutcome = DamageHitOutcome.Hit
+                },
+                randomSource ?? DamageRandom);
         }
     }
 }

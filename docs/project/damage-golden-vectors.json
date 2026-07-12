@@ -1,0 +1,315 @@
+[
+  {
+    "name": "captured-subway-thief-fixed-9",
+    "mode": "PvM",
+    "attackCategory": "FixedDamage",
+    "sourceCategory": "Npc",
+    "targetCategory": "Player",
+    "attackDefinition": {
+      "fixedDamage": 9,
+      "baseMinimum": 9,
+      "baseMaximum": 9,
+      "damageType": "Projectile"
+    },
+    "targetMitigation": {
+      "matchingArmor": 999999
+    },
+    "controlledRandomInputs": [],
+    "expectedStageTrace": [
+      "ValidateRequest",
+      "ResolveModeAndPolicy",
+      "ResolveDamageType",
+      "ResolveHitOutcome",
+      "RollOrSelectBaseDamage",
+      "ApplyArmorMitigation",
+      "ReturnTrace"
+    ],
+    "expectedFinalDamage": 9,
+    "evidenceClass": "PROVEN_CAPTURED_BEHAVIOR",
+    "evidenceSource": "live capture 20260711-170337; Subway Thief lifecycle tests",
+    "productionStatus": "active-fixed-captured-contract"
+  },
+  {
+    "name": "repository-npc-low-level-weapon-roll",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "sourceCategory": "Npc",
+    "targetCategory": "Player",
+    "attackDefinition": {
+      "baseMinimum": 1,
+      "baseMaximum": 3,
+      "damageType": "Unknown"
+    },
+    "targetMitigation": {},
+    "controlledRandomInputs": [2],
+    "expectedStageTrace": [
+      "RollOrSelectBaseDamage",
+      "ApplyFlatDamageModifiers",
+      "ApplyMinimumDamageFloor",
+      "ReturnTrace"
+    ],
+    "expectedFinalDamage": 2,
+    "evidenceClass": "PROVEN_REPOSITORY_BEHAVIOR",
+    "evidenceSource": "CombatDamageRules.cs legacy behavior",
+    "productionStatus": "active"
+  },
+  {
+    "name": "repository-player-fallback-floor",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "sourceCategory": "Player",
+    "targetCategory": "Npc",
+    "attackDefinition": {
+      "baseMinimum": 0,
+      "baseMaximum": 0,
+      "damageType": "Unknown"
+    },
+    "targetMitigation": {},
+    "controlledRandomInputs": [],
+    "expectedFinalDamage": 15,
+    "evidenceClass": "PROVEN_REPOSITORY_BEHAVIOR",
+    "evidenceSource": "CombatDamageRules.cs legacy behavior",
+    "productionStatus": "active"
+  },
+  {
+    "name": "minimum-damage-weapon-evidence-blocked",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "attackDefinition": {
+      "baseMinimum": 5,
+      "baseMaximum": 20
+    },
+    "targetMitigation": {
+      "matchingArmor": 999999
+    },
+    "controlledRandomInputs": [5],
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "AO minimum-damage floor versus repository fallback floor not proven",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "critical-heavy-weapon-evidence-blocked",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "attackDefinition": {
+      "baseMinimum": 1,
+      "baseMaximum": 10,
+      "criticalBonus": 100,
+      "isCritical": true
+    },
+    "controlledRandomInputs": [10],
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "critical bonus scaling, AC interaction, and floor ordering not proven",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "zero-ac-repository-legacy",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "attackDefinition": {
+      "baseMinimum": 4,
+      "baseMaximum": 4
+    },
+    "targetMitigation": {
+      "matchingArmor": 0
+    },
+    "controlledRandomInputs": [],
+    "expectedFinalDamage": 4,
+    "evidenceClass": "PROVEN_REPOSITORY_BEHAVIOR",
+    "evidenceSource": "current repository formula has no AC stage when no armor is supplied by callers",
+    "productionStatus": "active"
+  },
+  {
+    "name": "ar-capped-weapon-report-only",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "sourceStats": {
+      "attackRating": 1200
+    },
+    "attackDefinition": {
+      "baseMinimum": 1,
+      "baseMaximum": 1,
+      "attackRatingCap": 1000
+    },
+    "controlledRandomInputs": [],
+    "expectedStageTrace": [
+      "ApplyAttackRatingCap",
+      "ApplyPre1000AttackRatingScaling",
+      "ApplyPost1000AttackRatingScaling"
+    ],
+    "expectedAttackRatingCapResult": 1000,
+    "evidenceClass": "CONTROLLED_TEST_CONFIRMED",
+    "evidenceSource": "isolated calculator policy test",
+    "productionStatus": "report-only"
+  },
+  {
+    "name": "ar-below-1000-report-only",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "sourceStats": {
+      "attackRating": 999
+    },
+    "attackDefinition": {
+      "baseMinimum": 1,
+      "baseMaximum": 1
+    },
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "pre-1000 AR multiplier is not proven for production callers",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "ar-at-1000-report-only",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "sourceStats": {
+      "attackRating": 1000
+    },
+    "attackDefinition": {
+      "baseMinimum": 1,
+      "baseMaximum": 1
+    },
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "1000 AR boundary multiplier is not proven for production callers",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "high-ac-weapon-evidence-blocked",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "attackDefinition": {
+      "baseMinimum": 10,
+      "baseMaximum": 10
+    },
+    "targetMitigation": {
+      "matchingArmor": 10000
+    },
+    "controlledRandomInputs": [],
+    "expectedStageTrace": [
+      "ApplyArmorMitigation"
+    ],
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "AC stat contracts exist; formula and ordering not proven",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "reflect-evidence-blocked",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "targetMitigation": {
+      "reflectPercentage": 30,
+      "reflectCap": 40
+    },
+    "controlledRandomInputs": [],
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "reflect stat contracts exist; prevention and return ordering not proven",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "absorb-evidence-blocked",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "targetMitigation": {
+      "typedAbsorbPool": 50,
+      "universalAbsorbPool": 60
+    },
+    "controlledRandomInputs": [],
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "absorb stat contracts exist; layer ordering not proven",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "pvp-evidence-blocked",
+    "mode": "PvP",
+    "attackCategory": "RegularAttack",
+    "controlledRandomInputs": [],
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "PvP conversion and health-cap rules not proven",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "burst-evidence-blocked",
+    "mode": "PvM",
+    "attackCategory": "SpecialAttack",
+    "specialAttackCategory": "Burst",
+    "attackDefinition": {
+      "bulletCount": 3
+    },
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "no repository or capture formula for burst bullet handling",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "full-auto-evidence-blocked",
+    "mode": "PvM",
+    "attackCategory": "SpecialAttack",
+    "specialAttackCategory": "FullAuto",
+    "attackDefinition": {
+      "bulletCount": 10
+    },
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "no repository or capture formula for full-auto hit count or compression",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "aimed-shot-evidence-blocked",
+    "mode": "PvM",
+    "attackCategory": "SpecialAttack",
+    "specialAttackCategory": "AimedShot",
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "multiplier and cap rules not proven",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "nano-direct-evidence-blocked",
+    "mode": "PvM",
+    "attackCategory": "NanoDirect",
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "nano damage formula not present in migrated runtime",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "perk-evidence-blocked",
+    "mode": "PvM",
+    "attackCategory": "Perk",
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "perk metadata exists; damage formula not present",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "proc-evidence-blocked",
+    "mode": "PvM",
+    "attackCategory": "Proc",
+    "expectedFinalDamage": null,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "proc damage and recursion rules not proven",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "pet-active-legacy-damage",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "sourceCategory": "Pet",
+    "attackDefinition": {
+      "baseMinimum": 850,
+      "baseMaximum": 930
+    },
+    "controlledRandomInputs": [900],
+    "expectedFinalDamage": 900,
+    "evidenceClass": "PROVEN_REPOSITORY_BEHAVIOR",
+    "evidenceSource": "NpcCombatTickCoordinator routes attack pets through CombatDamageRules",
+    "productionStatus": "active"
+  }
+]
