@@ -13,6 +13,21 @@ namespace ZoneEngine.Core.Playfields
     {
         public const int SubwayPlayfieldInstance = 127;
 
+        // Emergency runtime quarantine: restoring this capture as one batch repeatedly
+        // crashes the AO client during the PF127 existing-character visibility snapshot.
+        // Keep the evidence rows checked in, but do not announce them until the failing
+        // packet shape or visibility-volume boundary has been isolated in smaller slices.
+        private static readonly HashSet<int> RuntimeQuarantinedSourceInstances =
+            new HashSet<int>
+            {
+                2035645449, 2035645478, 2035645489, 2035645579, 2035645607,
+                2035645611, 2035645613, 2035803153, 2035803301, 2035803313,
+                2035803324, 2035645542, 2035803146, 2035646228, 2035803590,
+                2035803591, 2035803592, 2035803594, 2035645612, 2035761244,
+                2035762087, 2035762088, 2035802156, 2035802158, 2035802403,
+                2035803150, 2035803583, 2035803588, 2035803589
+            };
+
         private static readonly CapturedSubwaySpawnDefinition[] SpawnDefinitions =
         {
             CapturedSurveySpawn(DiscardedPet(0x794DF1E5, 5, 115, 184.843964f, 107.61483f, 240.569778f, 93, 24)),
@@ -235,9 +250,16 @@ namespace ZoneEngine.Core.Playfields
 
         public CapturedSubwaySpawnDefinition[] GetSpawnDefinitions()
         {
-            var result = new CapturedSubwaySpawnDefinition[SpawnDefinitions.Length];
-            Array.Copy(SpawnDefinitions, result, SpawnDefinitions.Length);
-            return result;
+            var result = new List<CapturedSubwaySpawnDefinition>();
+            foreach (CapturedSubwaySpawnDefinition spawn in SpawnDefinitions)
+            {
+                if (!RuntimeQuarantinedSourceInstances.Contains(spawn.SourceInstance))
+                {
+                    result.Add(spawn);
+                }
+            }
+
+            return result.ToArray();
         }
 
         public CapturedSubwayPatrolReplaySegment[] GetPatrolReplaySegments(int sourceInstance)
@@ -424,7 +446,7 @@ namespace ZoneEngine.Core.Playfields
             float x,
             float y,
             float z,
-            int monsterScale = 94,
+            int monsterScale = 90,
             int runSpeed = 33)
         {
             return new CapturedSubwaySpawnDefinition(
@@ -437,8 +459,8 @@ namespace ZoneEngine.Core.Playfields
                 monsterScale,
                 0,
                 runSpeed,
-                138,
-                268964353,
+                95,
+                403182081,
                 7,
                 5,
                 x,

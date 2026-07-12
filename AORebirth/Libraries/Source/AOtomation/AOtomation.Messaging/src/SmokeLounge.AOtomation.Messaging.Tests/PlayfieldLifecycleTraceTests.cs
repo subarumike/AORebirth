@@ -1221,6 +1221,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     CountOccurrences(spawnDefinitionsText, restoredSupportedSourceInstances[i]),
                     "Restored supported source identity must appear exactly once: " + restoredSupportedSourceInstances[i]);
             }
+            Assert.IsTrue(
+                providerText.Contains("RuntimeQuarantinedSourceInstances.Contains(spawn.SourceInstance)"),
+                "The client-crashing 20260710 population batch must remain evidence-only until its visibility snapshot is isolated safely.");
             Assert.IsFalse(
                 providerText.Contains("122002"),
                 "CapturedSubwayContentProvider must bind content to resource/playfield 127, not capture object Playfield2:122002.");
@@ -1430,6 +1433,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     CountOccurrences(providerText, restoredOrdinarySourceInstances[i]),
                     "Restored ordinary source identity must appear exactly once: " + restoredOrdinarySourceInstances[i]);
             }
+            Assert.IsTrue(
+                providerText.Contains("!string.Equals(spawn.EvidenceCapture, \"20260710-202132\", StringComparison.Ordinal)"),
+                "The client-crashing 20260710 ordinary batch must remain evidence-only until its visibility snapshot is isolated safely.");
 
             string[] capturedNames =
                 {
