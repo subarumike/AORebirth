@@ -351,7 +351,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 (int)(NpcCombatAttackRules.CapturedSubwayThiefMovementTransitionDelaySeconds * 1000));
             Assert.AreEqual(11409, (int)(NpcCombatAttackRules.CapturedSubwayThiefFirstHitDelaySeconds * 1000));
             Assert.AreEqual(6000, (int)(NpcCombatAttackRules.CapturedSubwayThiefRechargeSeconds * 1000));
-            Assert.AreEqual(9, NpcCombatAttackRules.CapturedSubwayThiefDamage);
+            Assert.AreEqual(0, NpcCombatAttackRules.CapturedSubwayThiefWeaponDamageMinimumOverride);
+            Assert.AreEqual(0, NpcCombatAttackRules.CapturedSubwayThiefWeaponDamageMaximumOverride);
             Assert.AreEqual(
                 2700,
                 (int)(NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds * 1000));
@@ -408,8 +409,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && contractText.Contains("ApplyWeaponStatIfPresent(character, weapon, StatIds.weapontype)")
                 && contractText.Contains("CapturedSubwayThiefMovementTransitionDelaySeconds")
                 && contractText.Contains("CapturedSubwayThiefAttackInfoAmmoCount")
-                && contractText.Contains("CapturedSubwayThiefAttackInfoUnknown"),
-                "MonsterData 26092 must retain the live-derived Thief attack contract and captured weapon display stats.");
+                && contractText.Contains("CapturedSubwayThiefAttackInfoUnknown")
+                && contractText.Contains("CapturedSubwayThiefWeaponDamageMinimumOverride")
+                && contractText.Contains("CapturedSubwayThiefWeaponDamageMaximumOverride"),
+                "MonsterData 26092 must retain the live-derived Thief attack contract and captured weapon display stats while using the equipped weapon roll for damage.");
 
             Assert.IsTrue(
                 coordinatorText.Contains("pendingCapturedAttackStarts")
@@ -422,13 +425,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && coordinatorText.Contains("? capturedContract.AttackInfoAmmoCount")
                 && coordinatorText.Contains("? capturedContract.AttackInfoUnknown")
                 && coordinatorText.Contains(": 40,")
-                && coordinatorText.Contains(": 4,")
-                && coordinatorText.Contains("IsCapturedSubwayThief(attacker)")
-                && coordinatorText.Contains("CombatCapturedSubwayThiefDamageSuppressed")
-                && coordinatorText.Contains("AO_REBIRTH_ENABLE_SUBWAY_THIEF_DIAGNOSTIC_DAMAGE")
-                && coordinatorText.Contains("capturedSubwayThiefDiagnosticDamageSent")
-                && coordinatorText.Contains("limit=one-hit"),
-                "Thief timing and AttackInfo overrides must stay contract-gated while legacy equipped NPC fields remain unchanged; real Thief damage may only pass through a default-off one-hit diagnostic gate.");
+                && coordinatorText.Contains(": 4,"),
+                "Thief timing and AttackInfo overrides must stay contract-gated while legacy equipped NPC fields remain unchanged; damage must flow through the equipped weapon roll.");
+            Assert.IsFalse(
+                coordinatorText.Contains("CombatCapturedSubwayThiefDamageSuppressed")
+                || coordinatorText.Contains("AO_REBIRTH_ENABLE_SUBWAY_THIEF_DIAGNOSTIC_DAMAGE")
+                || coordinatorText.Contains("capturedSubwayThiefDiagnosticDamageSent"),
+                "The temporary one-hit Thief diagnostic damage gate must be removed after live proof that the client renders projectile damage.");
             Assert.IsTrue(
                 orchestratorText.Contains("WeaponItemFullUpdate.SendWeaponDefinitions(mobCharacter, true)")
                 && weaponItemFullUpdateText.Contains("SendWeaponDefinitions(ICharacter character, bool announceToPlayfield = false)")

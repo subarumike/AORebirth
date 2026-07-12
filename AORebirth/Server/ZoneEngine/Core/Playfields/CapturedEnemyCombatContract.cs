@@ -415,13 +415,13 @@ namespace AORebirth.Core.Playfields
                         0);
                 case 26092:
                     return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
-                        "20260711-170337 packets 301-654: Thief attack start, movement transition, three 9-point landed hits, and six-second repeat cadence",
+                        "20260711-170337 packets 301-654: Thief attack start, movement transition, three landed projectile hits, and six-second repeat cadence; 2026-07-12 private validation proved the weapon context renders projectile damage",
                         121567,
                         121567,
                         1,
                         (int)WeaponSlots.Righthand,
-                        NpcCombatAttackRules.CapturedSubwayThiefDamage,
-                        NpcCombatAttackRules.CapturedSubwayThiefDamage,
+                        NpcCombatAttackRules.CapturedSubwayThiefWeaponDamageMinimumOverride,
+                        NpcCombatAttackRules.CapturedSubwayThiefWeaponDamageMaximumOverride,
                         NpcCombatAttackRules.CapturedSubwayThiefAttackStartDelaySeconds,
                         NpcCombatAttackRules.CapturedSubwayThiefMovementTransitionDelaySeconds,
                         NpcCombatAttackRules.CapturedSubwayThiefFirstHitDelaySeconds,

@@ -50,7 +50,9 @@ namespace ZoneEngine.Core.Playfields
 
         public const double CapturedSubwayThiefRechargeSeconds = 6.0;
 
-        public const int CapturedSubwayThiefDamage = 9;
+        public const int CapturedSubwayThiefWeaponDamageMinimumOverride = 0;
+
+        public const int CapturedSubwayThiefWeaponDamageMaximumOverride = 0;
 
         public const int CapturedSubwayThiefMonsterData = 26092;
 
