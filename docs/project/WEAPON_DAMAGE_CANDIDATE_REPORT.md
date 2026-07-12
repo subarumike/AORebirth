@@ -2,7 +2,7 @@
 
 Current result: no candidate formula is proven.
 
-First controlled campaign status: prepared/operator-pending. The selected primary fixture is QL1 Solar-Powered Pistol `121567`; the optional confirmation fixture is QL1 Worn Oak Bo `121565`; the first target fixture is an isolated private-server `Malfunctioning Cleaning Robot` accepted only when diagnostics prove normal-hit status, target AC, health continuity, and no overlap.
+First controlled campaign status: post-fix corrected legacy sample validated. Session `starter-pistol-postfix-001` captured 13 valid QL1 Solar-Powered Pistol `121567` hits against Arete `Malfunctioning Cleaning Robot` targets. Emitted damage stayed within `2-18`, active `legacyDamageBonus` was `0`, the player fallback floor was bypassed for the valid equipped-weapon range, and no duplicate/overlapping damage was observed. The optional confirmation fixture remains QL1 Worn Oak Bo `121565`.
 
 The framework now represents candidate families needed for ordinary weapon-hit parity:
 
@@ -18,6 +18,8 @@ The framework now represents candidate families needed for ordinary weapon-hit p
 The synthetic fixture set covers evaluator behavior for templates `121567`, `121565`, `100240`, and `121572`, but those rows are `CONTROLLED_TEST_CONFIRMED` controls only. They are not live observations and do not prove AO formula behavior.
 
 The captured Subway Thief row is `PROVEN_CAPTURED_BEHAVIOR` for fixed `9` damage only. It remains a bounded fixed-damage contract and must not be generalized into ordinary weapon formula math.
+
+The `starter-pistol-postfix-001` sample proves only corrected AORebirth legacy behavior for the primary starter pistol fixture. It does not distinguish the inactive AR/AC candidate families, and it must not be used as original-AO formula proof.
 
 Known unresolved blockers:
 

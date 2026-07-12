@@ -1,8 +1,8 @@
 # First Ordinary Weapon-Hit Evidence Campaign
 
-Outcome: **B — capture prepared, operator action required**.
+Outcome: **A — first post-fix corrected legacy sample validated**.
 
-No live observations have been collected in this repository state. No production formula is activated, and production damage remains legacy/fixed.
+Post-fix session `starter-pistol-postfix-001` collected 13 ordinary QL1 Solar-Powered Pistol `121567` hits against Arete `Malfunctioning Cleaning Robot` targets. All 13 rows are valid after lethal-overkill-aware health validation, emitted damage stayed within the corrected legacy `2-18` range, active `legacyDamageBonus` was `0`, and the player fallback floor did not clamp valid weapon rolls upward. No production formula is activated, and original AO AR/AC/critical/add-damage parity remains unproven.
 
 ## Scope
 
@@ -53,13 +53,19 @@ The row records attacker identity, target identity, weapon template, min/max, ra
 ## Session commands
 
 ```cmd
-cmd /d /c tools\weapon_damage_evidence.cmd prepare --session-id first-normal-hit-001
-cmd /d /c .local\weapon-damage-evidence\first-normal-hit-001\commands\start-session-engines.cmd
-cmd /d /c tools\weapon_damage_evidence.cmd status --session-id first-normal-hit-001
-cmd /d /c tools\weapon_damage_evidence.cmd finish --session-id first-normal-hit-001
-cmd /d /c .local\weapon-damage-evidence\first-normal-hit-001\commands\disable-session-engines.cmd
-cmd /d /c tools\weapon_damage_evidence.cmd analyze --session-id first-normal-hit-001
+cmd /d /c tools\weapon_damage_evidence.cmd prepare --session-id starter-pistol-postfix-001
+cmd /d /c .local\weapon-damage-evidence\starter-pistol-postfix-001\commands\start-session-engines.cmd
+cmd /d /c tools\weapon_damage_evidence.cmd status --session-id starter-pistol-postfix-001
+cmd /d /c tools\weapon_damage_evidence.cmd finish --session-id starter-pistol-postfix-001
+cmd /d /c .local\weapon-damage-evidence\starter-pistol-postfix-001\commands\disable-session-engines.cmd
+cmd /d /c tools\weapon_damage_evidence.cmd analyze --session-id starter-pistol-postfix-001
 ```
+
+## Post-fix session result
+
+Sanitized report: [damage-evidence/reports/starter-pistol-postfix-001.md](damage-evidence/reports/starter-pistol-postfix-001.md).
+
+Session `starter-pistol-postfix-001` on commit `d4b152f98f303578567fd8ccf106901f9d65958f` captured 13 raw events and produced 13 valid observations, 0 incomplete observations, and 0 rejected observations after validator support for lethal overkill clamping. The emitted damage values were `9, 18, 6, 18, 5, 17, 15, 8, 7, 8, 11, 2, 11`, so the observed range was exactly `2-18`. Every row used weapon template `121567`, resolved min/max `2/18`, `legacyDamageBonus=0`, `selectedProductionStrategy=LegacyFallback`, and matching health deltas after clamped lethal hits were accepted.
 
 ## Operator procedure
 
