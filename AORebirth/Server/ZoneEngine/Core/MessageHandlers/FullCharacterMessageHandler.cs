@@ -65,6 +65,10 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public void Send(ICharacter character)
         {
+            CombatXpRuntimeService.LogXpWireSnapshot(
+                character,
+                "FullCharacterMessageHandler",
+                "fullcharacter-send-begin");
             this.Send(character, character);
         }
 
@@ -941,13 +945,40 @@ namespace ZoneEngine.Core.MessageHandlers
             return value;
         }
 
+        // FullCharacter bulk: client adds LastSaveXP/SavedXP + UnsavedXP when all three
+        // are present (e.g. 1450+110=1560). XP(52) is cumulative and poisons the bar.
+        // Omit these from FullCharacter; login bar sync sends floor via standalone StatMessage.
+        private static readonly int[] WireManagedXpStatIds =
+        {
+            (int)StatIds.xp,
+            (int)StatIds.lastxp,
+            (int)StatIds.savedxp,
+            (int)StatIds.lastsavexp
+        };
+
         private static void AddStat3232(IZoneClient client, IList<GameTuple<int, uint>> list, int statId)
         {
+            for (int i = 0; i < WireManagedXpStatIds.Length; i++)
+            {
+                if (WireManagedXpStatIds[i] == statId)
+                {
+                    return;
+                }
+            }
+
             var tuple = new GameTuple<int, uint>
                         {
                             Value1 = statId,
                             Value2 = client.Controller.Character.Stats[statId].BaseValue
                         };
+
+            CombatXpRuntimeService.LogXpWireOutbound(
+                "FullCharacterMessageHandler",
+                "fullcharacter-add-stat",
+                client.Controller.Character,
+                statId,
+                tuple.Value2,
+                "FullCharacter");
 
             list.Add(tuple);
         }

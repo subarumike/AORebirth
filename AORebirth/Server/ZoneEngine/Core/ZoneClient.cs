@@ -317,6 +317,17 @@ namespace ZoneEngine.Core
         /// </param>
         public void SendCompressed(byte[] buffer)
         {
+            if (buffer == null || buffer.Length < 2)
+            {
+                return;
+            }
+
+            // During zone reconnect the dispatcher can outlive a disposed stream.
+            if (this.netStream == null || this.zStream == null)
+            {
+                return;
+            }
+
             // We can not be multithreaded here. packet numbers would be jumbled
             lock (this.locker)
             {
