@@ -194,7 +194,7 @@ namespace AORebirth.Core.Playfields
             playfield.Announce(fullUpdate);
             if (combatReady && spawn.Combat.AttackModel == CapturedEnemyAttackModel.EquippedWeapon)
             {
-                WeaponItemFullUpdate.SendWeaponDefinitions(mobCharacter);
+                WeaponItemFullUpdate.SendWeaponDefinitions(mobCharacter, true);
             }
 
             LogUtil.Debug(
