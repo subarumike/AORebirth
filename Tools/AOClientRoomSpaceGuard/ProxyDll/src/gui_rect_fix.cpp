@@ -11,12 +11,43 @@ namespace
 {
     void* OriginalRectAdd = nullptr;
 
+    bool __stdcall IsReadableRect(const void* pointer)
+    {
+        MEMORY_BASIC_INFORMATION memory = {};
+        if (!pointer || VirtualQuery(pointer, &memory, sizeof(memory)) != sizeof(memory) ||
+            memory.State != MEM_COMMIT ||
+            (memory.Protect & (PAGE_GUARD | PAGE_NOACCESS)) != 0)
+        {
+            return false;
+        }
+
+        DWORD readable = memory.Protect & 0xFF;
+        if (readable != PAGE_READONLY && readable != PAGE_READWRITE &&
+            readable != PAGE_WRITECOPY && readable != PAGE_EXECUTE_READ &&
+            readable != PAGE_EXECUTE_READWRITE && readable != PAGE_EXECUTE_WRITECOPY)
+        {
+            return false;
+        }
+
+        uintptr_t address = reinterpret_cast<uintptr_t>(pointer);
+        uintptr_t regionEnd = reinterpret_cast<uintptr_t>(memory.BaseAddress) +
+            memory.RegionSize;
+        return regionEnd >= address && regionEnd - address >= 16;
+    }
+
     __declspec(naked) void GuiRectAddGuard()
     {
         __asm
         {
             test ecx, ecx
+            jz invalid_rect
+            push ecx
+            push ecx
+            call IsReadableRect
+            test eax, eax
+            pop ecx
             jnz valid_rect
+        invalid_rect:
             mov eax, dword ptr [esp + 4]
             xor edx, edx
             mov dword ptr [eax], edx
@@ -89,7 +120,7 @@ namespace aorf
             return false;
         }
 
-        Log("PATCH PASS GUI rectangle null guard callsite=GUI+0x14C4A9 target=Utils+0x82E6");
+        Log("PATCH PASS GUI rectangle pointer guard callsite=GUI+0x14C4A9 target=Utils+0x82E6");
         return true;
     }
 }
