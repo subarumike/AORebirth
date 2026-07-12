@@ -123,6 +123,7 @@
   },
   {
     "name": "ar-capped-weapon-report-only",
+    "strategy": "EvidenceBlocked",
     "mode": "PvM",
     "attackCategory": "RegularAttack",
     "sourceStats": {
@@ -142,6 +143,56 @@
     "expectedAttackRatingCapResult": 1000,
     "evidenceClass": "CONTROLLED_TEST_CONFIRMED",
     "evidenceSource": "isolated calculator policy test",
+    "productionStatus": "report-only"
+  },
+  {
+    "name": "candidate-weapon-formula-missing-armor-blocked",
+    "strategy": "EvidenceBlocked",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "sourceStats": {
+      "attackRating": 100,
+      "addAllOff": 5
+    },
+    "attackDefinition": {
+      "baseMinimum": 2,
+      "baseMaximum": 4,
+      "damageType": "Projectile",
+      "criticalState": false
+    },
+    "targetMitigation": {
+      "matchingArmor": null
+    },
+    "controlledRandomInputs": [3],
+    "expectedStageTrace": [
+      "SelectDamageStrategy"
+    ],
+    "expectedFinalDamage": 15,
+    "evidenceClass": "UNKNOWN",
+    "evidenceSource": "formula policy validation test; matching AC must be known zero or known value",
+    "productionStatus": "evidence-blocked"
+  },
+  {
+    "name": "weighted-attack-skill-report-only",
+    "strategy": "LegacyFallback",
+    "mode": "PvM",
+    "attackCategory": "RegularAttack",
+    "sourceStats": {
+      "attackSkillContributions": [
+        { "statId": 105, "percentage": 67, "value": 123, "contribution": 82 },
+        { "statId": 106, "percentage": 33, "value": 456, "contribution": 150 }
+      ],
+      "addAllOff": 10,
+      "effectiveAttackRating": 242
+    },
+    "attackDefinition": {
+      "baseMinimum": 1,
+      "baseMaximum": 1
+    },
+    "controlledRandomInputs": [],
+    "expectedFinalDamage": 15,
+    "evidenceClass": "CONTROLLED_TEST_CONFIRMED",
+    "evidenceSource": "calculator model test only; no active caller supplies weapon skill weights",
     "productionStatus": "report-only"
   },
   {
