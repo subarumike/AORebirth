@@ -421,6 +421,168 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(DamageCalculationStrategyKind.FixedCapturedDamage, damage.Strategy);
         }
 
+        [TestMethod]
+        public void WeaponDamageObservationValidatorClassifiesCompleteIncompleteRejectedAndAmbiguousInputs()
+        {
+            WeaponDamageObservation complete = WeaponDamageObservationValidator.Validate(BuildCompleteObservationDraft("complete", 23));
+
+            WeaponDamageObservationDraft incompleteDraft = BuildCompleteObservationDraft("incomplete", 23);
+            incompleteDraft.Input.TargetArmor = null;
+            incompleteDraft.Input.AddAllOff = null;
+            incompleteDraft.Input.AmsCap = 0;
+            incompleteDraft.Result.HitKind = WeaponDamageHitKind.KnownCritical;
+            incompleteDraft.Input.CriticalStateEvidencePresent = false;
+            incompleteDraft.Input.MultipleDamageSourcesPossible = true;
+            incompleteDraft.Input.ReflectAbsorbShieldProcNanoDotOrEnvironmentalPossible = true;
+            WeaponDamageObservation incomplete = WeaponDamageObservationValidator.Validate(incompleteDraft);
+
+            WeaponDamageObservationDraft rejectedDraft = BuildCompleteObservationDraft("rejected", 23);
+            rejectedDraft.Result.TargetHealthAfter = 80;
+            WeaponDamageObservation rejected = WeaponDamageObservationValidator.Validate(rejectedDraft);
+
+            Assert.AreEqual(WeaponDamageObservationValidationStatus.Complete, complete.ValidationStatus);
+            Assert.AreEqual(WeaponDamageObservationValidationStatus.Incomplete, incomplete.ValidationStatus);
+            AssertIssue(incomplete, WeaponDamageObservationIssueKind.MissingArmor);
+            AssertIssue(incomplete, WeaponDamageObservationIssueKind.MissingAddAllOff);
+            AssertIssue(incomplete, WeaponDamageObservationIssueKind.MissingAmsCapSemantics);
+            AssertIssue(incomplete, WeaponDamageObservationIssueKind.CriticalStateClaimedWithoutEvidence);
+            AssertIssue(incomplete, WeaponDamageObservationIssueKind.MultipleDamageSourcesPossible);
+            AssertIssue(incomplete, WeaponDamageObservationIssueKind.ExternalDamagePossible);
+            Assert.AreEqual(WeaponDamageObservationValidationStatus.Rejected, rejected.ValidationStatus);
+            AssertIssue(rejected, WeaponDamageObservationIssueKind.HealthDeltaMismatch);
+        }
+
+        [TestMethod]
+        public void WeaponDamageCandidateEvaluatorRepresentsArAcFloorCriticalAndAddDamageVariants()
+        {
+            WeaponDamageObservation normal = WeaponDamageObservationValidator.Validate(BuildCompleteObservationDraft("normal", 23));
+            WeaponDamageCandidateFormula defaultFormula = new WeaponDamageCandidateFormula { Name = "default-report-only" };
+            WeaponDamageCandidateFormula noAc = new WeaponDamageCandidateFormula
+            {
+                Name = "no-ac",
+                AcOrdering = WeaponDamageCandidateAcOrdering.None
+            };
+            WeaponDamageCandidateFormula addDamageArScaled = new WeaponDamageCandidateFormula
+            {
+                Name = "add-damage-ar-scaled",
+                AddDamageOrdering = WeaponDamageCandidateAddDamageOrdering.ArScaled
+            };
+            WeaponDamageCandidateFormula noFloor = new WeaponDamageCandidateFormula
+            {
+                Name = "minimum-floor-disabled",
+                MinimumFloorAfterAc = false
+            };
+
+            AssertCandidate(defaultFormula, normal, 23, true);
+            AssertCandidate(noAc, normal, 25, false);
+            AssertCandidate(addDamageArScaled, normal, 28, false);
+
+            WeaponDamageObservationDraft floorDraft = BuildCompleteObservationDraft("floor", 1);
+            floorDraft.Input.BaseRoll = 1;
+            floorDraft.Input.AttackRating = 0;
+            floorDraft.Input.TargetArmor = 100;
+            floorDraft.Input.TypeSpecificAddDamage = 0;
+            floorDraft.Input.UniversalAddDamage = 0;
+            floorDraft.Result.TargetHealthBefore = 100;
+            floorDraft.Result.TargetHealthAfter = 99;
+            WeaponDamageObservation floor = WeaponDamageObservationValidator.Validate(floorDraft);
+            AssertCandidate(defaultFormula, floor, 1, true);
+            AssertCandidate(noFloor, floor, 0, false);
+
+            WeaponDamageObservationDraft criticalDraft = BuildCompleteObservationDraft("critical", 37);
+            criticalDraft.Result.HitKind = WeaponDamageHitKind.KnownCritical;
+            criticalDraft.Input.CriticalStateEvidencePresent = true;
+            criticalDraft.Input.WeaponMaximum = 30;
+            criticalDraft.Input.CriticalBonus = 7;
+            criticalDraft.Input.AttackRating = 0;
+            criticalDraft.Input.TargetArmor = 0;
+            criticalDraft.Input.TypeSpecificAddDamage = 0;
+            criticalDraft.Input.UniversalAddDamage = 0;
+            criticalDraft.Result.TargetHealthBefore = 100;
+            criticalDraft.Result.TargetHealthAfter = 63;
+            WeaponDamageObservation critical = WeaponDamageObservationValidator.Validate(criticalDraft);
+            WeaponDamageCandidateFormula maxPlusBonus = new WeaponDamageCandidateFormula
+            {
+                Name = "critical-max-plus-bonus",
+                CriticalOrdering = WeaponDamageCandidateCriticalOrdering.MaximumPlusCriticalBonus
+            };
+            AssertCandidate(maxPlusBonus, critical, 37, true);
+        }
+
+        [TestMethod]
+        public void WeaponDamageParityReporterClassifiesMultipleUniqueNoMatchAndRoundingBoundarySets()
+        {
+            WeaponDamageObservation observation = WeaponDamageObservationValidator.Validate(BuildCompleteObservationDraft("parity", 23));
+            WeaponDamageCandidateFormula matchingA = new WeaponDamageCandidateFormula { Name = "matching-a" };
+            WeaponDamageCandidateFormula matchingB = new WeaponDamageCandidateFormula { Name = "matching-b" };
+            WeaponDamageCandidateFormula nonMatching = new WeaponDamageCandidateFormula
+            {
+                Name = "non-matching",
+                AcOrdering = WeaponDamageCandidateAcOrdering.None
+            };
+
+            WeaponDamageEvidenceSet multipleSet = new WeaponDamageEvidenceSet();
+            multipleSet.Observations.Add(observation);
+            multipleSet.CandidateFormulas.Add(matchingA);
+            multipleSet.CandidateFormulas.Add(matchingB);
+            WeaponDamageParityReport multiple = WeaponDamageParityReporter.Generate(multipleSet);
+
+            WeaponDamageEvidenceSet uniqueSet = new WeaponDamageEvidenceSet();
+            uniqueSet.Observations.Add(observation);
+            uniqueSet.CandidateFormulas.Add(matchingA);
+            uniqueSet.CandidateFormulas.Add(nonMatching);
+            WeaponDamageParityReport unique = WeaponDamageParityReporter.Generate(uniqueSet);
+
+            WeaponDamageEvidenceSet noMatchSet = new WeaponDamageEvidenceSet();
+            noMatchSet.Observations.Add(observation);
+            noMatchSet.CandidateFormulas.Add(nonMatching);
+            WeaponDamageParityReport noMatch = WeaponDamageParityReporter.Generate(noMatchSet);
+
+            Assert.AreEqual(2, multiple.CandidatesMatchingEveryObservation.Count);
+            Assert.IsTrue(multiple.UnderdeterminedObservations.Contains("parity"));
+            Assert.AreEqual(1, unique.CandidatesMatchingEveryObservation.Count);
+            Assert.IsFalse(unique.FormulaProven);
+            Assert.IsTrue(unique.PossibleRoundingBoundaries.Contains("parity"));
+            Assert.IsTrue(noMatch.ContradictoryObservations.Contains("parity"));
+            Assert.IsTrue(noMatch.PossibleHiddenModifiers.Contains("parity"));
+        }
+
+        [TestMethod]
+        public void WeaponDamageObservationJsonImporterParsesAndRejectsSchemaInputs()
+        {
+            string validJson = "{\"schemaVersion\":\"1.0\",\"observationId\":\"json-1\",\"captureDate\":\"2026-07-11\",\"environment\":\"repository-test\",\"packetReference\":\"packet.csv#1\",\"logReference\":\"ZoneEngineLog.txt#1\",\"weaponTemplateIdentity\":\"121567\",\"weaponMinimum\":1,\"weaponMaximum\":10,\"baseRoll\":10,\"attackRating\":400,\"addAllOff\":0,\"targetArmor\":20,\"amsCap\":1000,\"mappedDamageType\":\"Projectile\",\"packetOrderComplete\":true,\"criticalStateEvidencePresent\":false,\"hitKind\":\"KnownNormal\",\"observedDamage\":23,\"targetHealthBefore\":100,\"targetHealthAfter\":77}";
+            WeaponDamageObservationImportResult valid = WeaponDamageObservationJsonImporter.Import(validJson);
+            WeaponDamageObservationImportResult missingSchema = WeaponDamageObservationJsonImporter.Import("{\"observationId\":\"missing-schema\"}");
+            WeaponDamageObservationImportResult unsupportedSchema = WeaponDamageObservationJsonImporter.Import("{\"schemaVersion\":\"2.0\",\"observationId\":\"unsupported\"}");
+
+            Assert.IsTrue(valid.Success);
+            Assert.AreEqual("json-1", valid.Observation.Source.ObservationId);
+            Assert.AreEqual(WeaponDamageObservationValidationStatus.Complete, valid.Observation.ValidationStatus);
+            Assert.IsFalse(missingSchema.Success);
+            Assert.IsTrue(missingSchema.Diagnostics.Any(x => x.Contains("unsupported schemaVersion")));
+            Assert.IsFalse(unsupportedSchema.Success);
+            Assert.IsTrue(unsupportedSchema.Diagnostics.Any(x => x.Contains("unsupported schemaVersion")));
+        }
+
+        [TestMethod]
+        public void WeaponDamageDiagnosticSnapshotIsOptInAndDoesNotChangeProductionDamageOrRandomness()
+        {
+            QueuedDamageRandomSource randomSource = new QueuedDamageRandomSource(4, 5);
+            DamageCalculationResult production = CombatDamageRules.CalculateDetailed(1, 6, 0, 1, false, randomSource);
+            int remainingAfterProduction = randomSource.RemainingCount;
+            WeaponDamageObservation observation = WeaponDamageObservationValidator.Validate(BuildCompleteObservationDraft("diagnostic", 23));
+
+            WeaponDamageDiagnosticSnapshot disabled = WeaponDamageDiagnosticSnapshotBuilder.Build(false, null, production, observation, new[] { new WeaponDamageCandidateFormula { Name = "candidate" } });
+            WeaponDamageDiagnosticSnapshot enabled = WeaponDamageDiagnosticSnapshotBuilder.Build(true, null, production, observation, new[] { new WeaponDamageCandidateFormula { Name = "candidate" } });
+
+            Assert.IsNull(disabled);
+            Assert.AreEqual(production.FinalTargetDamage, enabled.ActualLegacyResult);
+            Assert.AreEqual(DamageCalculationStrategyKind.LegacyFallback, enabled.SelectedStrategy);
+            Assert.AreEqual(1, enabled.CandidateEvaluations.Count);
+            Assert.AreEqual(remainingAfterProduction, randomSource.RemainingCount);
+            Assert.AreEqual(5, randomSource.NextInclusive(1, 6));
+        }
+
         private static void AssertArmorStat(DamageType damageType, int expectedStatId)
         {
             int statId;
@@ -580,6 +742,59 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(result.Issues.Any(x => x.Kind == expected), expected.ToString());
         }
 
+        private static void AssertIssue(WeaponDamageObservation observation, WeaponDamageObservationIssueKind expected)
+        {
+            Assert.IsTrue(observation.Issues.Any(x => x.Kind == expected), expected.ToString());
+        }
+
+        private static void AssertCandidate(WeaponDamageCandidateFormula formula, WeaponDamageObservation observation, int expectedDamage, bool expectedExactMatch)
+        {
+            WeaponDamageCandidateEvaluation evaluation = WeaponDamageCandidateEvaluator.Evaluate(observation, formula);
+            Assert.IsTrue(evaluation.Evaluable, formula.Name);
+            Assert.AreEqual(expectedDamage, evaluation.PredictedDamage, formula.Name);
+            Assert.AreEqual(expectedExactMatch, evaluation.ExactMatch, formula.Name);
+        }
+
+        private static WeaponDamageObservationDraft BuildCompleteObservationDraft(string observationId, int observedDamage)
+        {
+            WeaponDamageObservationDraft draft = new WeaponDamageObservationDraft();
+            draft.Source.ObservationId = observationId;
+            draft.Source.SourceKind = WeaponDamageObservationSourceKind.RepositorySynthetic;
+            draft.Source.Classification = DamageEvidenceClassification.ControlledTestConfirmed;
+            draft.Source.PacketEvidenceReference = "repository-test-packet";
+            draft.Source.LogEvidenceReference = "repository-test-log";
+            draft.Input.AttackerIdentity = "attacker";
+            draft.Input.AttackerCategory = DamageSourceCategory.Player;
+            draft.Input.TargetIdentity = "target";
+            draft.Input.WeaponTemplateIdentity = "test-template";
+            draft.Input.WeaponInstanceIdentity = "test-instance";
+            draft.Input.WeaponQualityLevel = 1;
+            draft.Input.WeaponMinimum = 1;
+            draft.Input.WeaponMaximum = 10;
+            draft.Input.BaseRoll = 10;
+            draft.Input.CriticalBonus = 5;
+            draft.Input.RawDamageType = 2;
+            draft.Input.MappedDamageType = DamageType.Projectile;
+            draft.Input.AttackRating = 400;
+            draft.Input.AddAllOff = 0;
+            draft.Input.TemporaryOffensiveModifiers = 0;
+            draft.Input.AmsCap = 1000;
+            draft.Input.AmsCapPresent = true;
+            draft.Input.TargetArmor = 20;
+            draft.Input.TypeSpecificAddDamage = 3;
+            draft.Input.UniversalAddDamage = 2;
+            draft.Input.MultipleDamageSourcesPossible = false;
+            draft.Input.ReflectAbsorbShieldProcNanoDotOrEnvironmentalPossible = false;
+            draft.Input.PacketOrderComplete = true;
+            draft.Input.CriticalStateEvidencePresent = false;
+            draft.Input.AttackSkillDefinitions.Add(new AttackSkillContribution { StatId = 112, Percentage = 100, Value = 400 });
+            draft.Result.HitKind = WeaponDamageHitKind.KnownNormal;
+            draft.Result.ObservedDamage = observedDamage;
+            draft.Result.TargetHealthBefore = 100;
+            draft.Result.TargetHealthAfter = 100 - observedDamage;
+            return draft;
+        }
+
         private static void AssertStage(
             DamageCalculationResult result,
             string stage,
@@ -618,6 +833,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 }
 
                 return this.values.Dequeue() < chanceBasisPoints;
+            }
+
+            public int RemainingCount
+            {
+                get
+                {
+                    return this.values.Count;
+                }
             }
         }
     }

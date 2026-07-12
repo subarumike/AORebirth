@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "weapon-damage-observation.schema.json",
+  "title": "AORebirth weapon damage observation",
+  "description": "Evidence-only observation contract for ordinary weapon-hit parity analysis. This schema does not authorize production formula activation.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "source",
+    "attacker",
+    "weapon",
+    "target",
+    "hit",
+    "result",
+    "evidence"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "observationId",
+        "sourceKind",
+        "classification"
+      ],
+      "properties": {
+        "observationId": { "type": "string", "minLength": 1 },
+        "sourceKind": {
+          "enum": [
+            "RepositorySynthetic",
+            "PrivateServerControlled",
+            "ExternalLiveClient"
+          ]
+        },
+        "captureDate": { "type": "string" },
+        "environment": { "type": "string" },
+        "classification": {
+          "enum": [
+            "UNKNOWN",
+            "PROVEN_REPOSITORY_BEHAVIOR",
+            "PROVEN_CAPTURED_BEHAVIOR",
+            "PROVEN_DATABASE_CONTRACT",
+            "CONTROLLED_TEST_CONFIRMED"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "attacker": {
+      "type": "object",
+      "required": [
+        "identity",
+        "category",
+        "attackRating",
+        "addAllOff"
+      ],
+      "properties": {
+        "identity": { "type": "string" },
+        "category": { "enum": [ "Player", "Npc", "Pet" ] },
+        "attackRating": { "type": [ "integer", "null" ] },
+        "addAllOff": { "type": [ "integer", "null" ] },
+        "temporaryOffensiveModifiers": { "type": [ "integer", "null" ] },
+        "typeSpecificAddDamage": { "type": [ "integer", "null" ] },
+        "universalAddDamage": { "type": [ "integer", "null" ] },
+        "attackSkills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [ "statId", "percentage", "value" ],
+            "properties": {
+              "statId": { "type": "integer" },
+              "percentage": { "type": "integer" },
+              "value": { "type": "integer" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "weapon": {
+      "type": "object",
+      "required": [
+        "templateIdentity",
+        "qualityLevel",
+        "minimum",
+        "maximum",
+        "damageType"
+      ],
+      "properties": {
+        "templateIdentity": { "type": "string", "minLength": 1 },
+        "instanceIdentity": { "type": "string" },
+        "qualityLevel": { "type": [ "integer", "null" ] },
+        "minimum": { "type": [ "integer", "null" ] },
+        "maximum": { "type": [ "integer", "null" ] },
+        "legacyDamageBonus": { "type": [ "integer", "null" ] },
+        "criticalBonus": { "type": [ "integer", "null" ] },
+        "rawDamageType": { "type": [ "integer", "null" ] },
+        "damageType": { "type": "string" },
+        "amsCapPresent": { "type": [ "boolean", "null" ] },
+        "amsCap": { "type": [ "integer", "null" ] },
+        "attackTime": { "type": [ "integer", "null" ] },
+        "rechargeTime": { "type": [ "integer", "null" ] }
+      },
+      "additionalProperties": false
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "identity",
+        "category",
+        "matchingArmor"
+      ],
+      "properties": {
+        "identity": { "type": "string" },
+        "category": { "enum": [ "Player", "Npc", "Pet" ] },
+        "matchingArmor": { "type": [ "integer", "null" ] }
+      },
+      "additionalProperties": false
+    },
+    "hit": {
+      "type": "object",
+      "required": [
+        "hitKind",
+        "packetOrderComplete",
+        "criticalStateEvidencePresent",
+        "multipleDamageSourcesPossible",
+        "externalDamagePossible"
+      ],
+      "properties": {
+        "hitKind": {
+          "enum": [
+            "KnownNormal",
+            "KnownCritical",
+            "UnknownHitKind",
+            "Miss",
+            "Evade",
+            "Block",
+            "Parry",
+            "Riposte"
+          ]
+        },
+        "baseRoll": { "type": [ "integer", "null" ] },
+        "packetOrderComplete": { "type": "boolean" },
+        "criticalStateEvidencePresent": { "type": "boolean" },
+        "multipleDamageSourcesPossible": { "type": "boolean" },
+        "externalDamagePossible": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "observedDamage",
+        "targetHealthBefore",
+        "targetHealthAfter"
+      ],
+      "properties": {
+        "observedDamage": { "type": [ "integer", "null" ], "minimum": 0 },
+        "targetHealthBefore": { "type": [ "integer", "null" ] },
+        "targetHealthAfter": { "type": [ "integer", "null" ] }
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "packetReferences",
+        "logReferences",
+        "uncertainties"
+      ],
+      "properties": {
+        "packetReferences": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "logReferences": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "timingReference": { "type": "string" },
+        "uncertainties": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

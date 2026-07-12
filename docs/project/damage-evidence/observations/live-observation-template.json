@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "1.0",
+  "description": "Template for a future live or controlled ordinary weapon-hit observation. Do not fill fields with guesses.",
+  "source": {
+    "observationId": "",
+    "sourceKind": "ExternalLiveClient",
+    "captureDate": "",
+    "environment": "",
+    "classification": "UNKNOWN"
+  },
+  "attacker": {
+    "identity": "",
+    "category": "Player",
+    "attackRating": null,
+    "addAllOff": null,
+    "temporaryOffensiveModifiers": null,
+    "typeSpecificAddDamage": null,
+    "universalAddDamage": null,
+    "attackSkills": []
+  },
+  "weapon": {
+    "templateIdentity": "",
+    "instanceIdentity": "",
+    "qualityLevel": null,
+    "minimum": null,
+    "maximum": null,
+    "legacyDamageBonus": null,
+    "criticalBonus": null,
+    "rawDamageType": null,
+    "damageType": "",
+    "amsCapPresent": null,
+    "amsCap": null,
+    "attackTime": null,
+    "rechargeTime": null
+  },
+  "target": {
+    "identity": "",
+    "category": "Npc",
+    "matchingArmor": null
+  },
+  "hit": {
+    "hitKind": "UnknownHitKind",
+    "baseRoll": null,
+    "packetOrderComplete": false,
+    "criticalStateEvidencePresent": false,
+    "multipleDamageSourcesPossible": true,
+    "externalDamagePossible": true
+  },
+  "result": {
+    "observedDamage": null,
+    "targetHealthBefore": null,
+    "targetHealthAfter": null
+  },
+  "evidence": {
+    "packetReferences": [],
+    "logReferences": [],
+    "timingReference": "",
+    "uncertainties": []
+  }
+}

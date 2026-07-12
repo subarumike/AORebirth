@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0",
+  "description": "Captured Subway Thief fixed-damage observation. This proves the bounded captured contract only; it does not infer a general ordinary weapon formula.",
+  "source": {
+    "observationId": "subway-thief-20260711-170337-fixed-9",
+    "sourceKind": "PrivateServerControlled",
+    "captureDate": "2026-07-11",
+    "environment": "AORebirth private capture",
+    "classification": "PROVEN_CAPTURED_BEHAVIOR"
+  },
+  "attacker": {
+    "identity": "Subway Thief",
+    "category": "Npc",
+    "attackRating": null,
+    "addAllOff": null,
+    "attackSkills": []
+  },
+  "weapon": {
+    "templateIdentity": "121567",
+    "instanceIdentity": "0",
+    "qualityLevel": 1,
+    "minimum": null,
+    "maximum": null,
+    "legacyDamageBonus": null,
+    "criticalBonus": null,
+    "rawDamageType": 90,
+    "damageType": "Projectile",
+    "amsCapPresent": false
+  },
+  "target": {
+    "identity": "captured player target",
+    "category": "Player",
+    "matchingArmor": null
+  },
+  "hit": {
+    "hitKind": "KnownNormal",
+    "baseRoll": null,
+    "packetOrderComplete": true,
+    "criticalStateEvidencePresent": true,
+    "multipleDamageSourcesPossible": false,
+    "externalDamagePossible": false
+  },
+  "result": {
+    "observedDamage": 9,
+    "targetHealthBefore": null,
+    "targetHealthAfter": null
+  },
+  "evidence": {
+    "packetReferences": [
+      "capture 20260711-170337 AttackInfo fixed normal damage 9"
+    ],
+    "logReferences": [
+      "DAMAGE_EVIDENCE_MATRIX.md captured Subway Thief hit row"
+    ],
+    "timingReference": "first landed hit 11.409643s after Thief attack in capture notes",
+    "uncertainties": [
+      "ordinary formula not inferred",
+      "attacker AR not supplied",
+      "target matching AC not supplied",
+      "base roll not supplied"
+    ]
+  }
+}
