@@ -274,7 +274,7 @@ namespace ZoneEngine.Core
 
         public static readonly TimeSpan CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30);
 
-        public static readonly TimeSpan ItemLootCorpseLifetime = TimeSpan.FromSeconds(60);
+        public static readonly TimeSpan ItemLootCorpseLifetime = TimeSpan.FromMinutes(5);
 
         public static readonly TimeSpan MajorBossCorpseLifetime = TimeSpan.FromMinutes(30);
 

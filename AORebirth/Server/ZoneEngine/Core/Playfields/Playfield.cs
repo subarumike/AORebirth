@@ -2789,10 +2789,7 @@ namespace AORebirth.Core.Playfields
             };
 
             this.corpses[corpseIdentity.Instance] = state;
-            if (!state.HasUnlootedItems)
-            {
-                this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);
-            }
+            this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,

@@ -1660,10 +1660,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("CapturedSubwayThiefCorpseCatMesh = 5907")
                 && playfieldText.Contains("private static bool IsCapturedSubwayThief(ICharacter target)")
-                && registerCorpse.Contains("if (!state.HasUnlootedItems)")
+                && !registerCorpse.Contains("if (!state.HasUnlootedItems)")
+                && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30)"),
-                "Accepted Subway Thief must keep captured corpse visual selection and the loot-bearing corpse despawn guard.");
+                && corpseRulesText.Contains("CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30)")
+                && corpseRulesText.Contains("ItemLootCorpseLifetime = TimeSpan.FromMinutes(5)"),
+                "Accepted Subway Thief must keep captured corpse visual selection and the generic five-minute loot-bearing corpse lifetime.");
         }
 
         [TestMethod]
@@ -3085,15 +3087,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseInteractionRulesText.Contains("public const int CorpseUseAcknowledgeDelayMilliseconds = 550;"),
                 "Capture-backed corpse credit payout must stay after InventoryUpdate and before the delayed GenericCmd success ack.");
             Assert.IsTrue(
-                registerCorpse.Contains("if (!state.HasUnlootedItems)")
+                !registerCorpse.Contains("if (!state.HasUnlootedItems)")
                 && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
                 && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30);")
-                && corpseRulesText.Contains("public static readonly TimeSpan CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30);"),
-                "Loot-bearing corpses must not receive an initial despawn timer; empty corpses must use the 30-second cleanup window.");
+                && corpseRulesText.Contains("public static readonly TimeSpan CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30);")
+                && corpseRulesText.Contains("public static readonly TimeSpan ItemLootCorpseLifetime = TimeSpan.FromMinutes(5);"),
+                "Regular loot-bearing corpses must receive a five-minute initial lifetime; empty corpses must use the 30-second cleanup window.");
             AssertTextBefore(
                 registerCorpse,
                 "this.corpses[corpseIdentity.Instance] = state;",
-                "if (!state.HasUnlootedItems)");
+                "this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);");
 
             Assert.IsTrue(
                 playfieldLootCorpseItem.Contains("this.runtimeSystems.TryLootCorpseItem(")
