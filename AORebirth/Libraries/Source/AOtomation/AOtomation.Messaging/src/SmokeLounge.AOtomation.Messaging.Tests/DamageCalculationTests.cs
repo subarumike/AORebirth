@@ -310,6 +310,117 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(4, second.BaseRoll);
         }
 
+        [TestMethod]
+        public void WeaponDamageRequestBuilderClassifiesCompleteSingleSkillProvenanceWithoutActivatingFormula()
+        {
+            WeaponDamageRequestBuildResult result = WeaponDamageRequestBuilder.Build(BuildCompleteProjectileInput());
+
+            Assert.AreEqual(WeaponDamageRequestBuildClassification.FormulaInputComplete, result.Classification);
+            Assert.AreEqual(DamageCalculationStrategyKind.LegacyFallback, result.ExpectedActiveStrategy);
+            Assert.AreEqual(0, result.Issues.Count);
+            Assert.AreEqual(1, result.Request.Definition.BaseMinimum);
+            Assert.AreEqual(10, result.Request.Definition.BaseMaximum);
+            Assert.AreEqual(DamageType.Projectile, result.Request.Definition.DamageType);
+            Assert.AreEqual(25, result.Request.Source.AddAllOff);
+            Assert.AreEqual(125, result.Request.Source.AttackSkillContributions[0].Value);
+            Assert.AreEqual(100, result.Request.Source.AttackSkillContributions[0].Percentage);
+            Assert.AreEqual(1, CombatDamageRules.Calculate(1, 1, 0, 1, false));
+        }
+
+        [TestMethod]
+        public void WeaponDamageRequestBuilderRepresentsMultipleWeightedSkillsAndRejectsInvalidTotals()
+        {
+            WeaponDamageRequestBuildInput input = BuildCompleteProjectileInput();
+            input.Weapon.AttackSkillContributions.Clear();
+            input.Weapon.AttackSkillContributions.Add(new AttackSkillContribution { StatId = 103, Percentage = 67 });
+            input.Weapon.AttackSkillContributions.Add(new AttackSkillContribution { StatId = 106, Percentage = 33 });
+            input.Attacker.Stats.Add(new WeaponDamageStatSnapshot { StatId = 103, Value = 90 });
+            input.Attacker.Stats.Add(new WeaponDamageStatSnapshot { StatId = 106, Value = 30 });
+
+            WeaponDamageRequestBuildResult complete = WeaponDamageRequestBuilder.Build(input);
+
+            Assert.AreEqual(WeaponDamageRequestBuildClassification.FormulaInputComplete, complete.Classification);
+            Assert.AreEqual(2, complete.Request.Source.AttackSkillContributions.Count);
+
+            input.Weapon.AttackSkillContributions[1].Percentage = 20;
+            WeaponDamageRequestBuildResult invalid = WeaponDamageRequestBuilder.Build(input);
+
+            Assert.AreEqual(WeaponDamageRequestBuildClassification.FormulaInputIncomplete, invalid.Classification);
+            AssertIssue(invalid, WeaponDamageInputIssueKind.InvalidSkillWeight);
+        }
+
+        [TestMethod]
+        public void WeaponDamageRequestBuilderReportsMissingAndUnknownWeaponTemplateInputs()
+        {
+            WeaponDamageRequestBuildResult missingSkill = WeaponDamageRequestBuilder.Build(BuildInputWithoutAttackSkills());
+            WeaponDamageRequestBuildResult missingMinimum = WeaponDamageRequestBuilder.Build(BuildInputWithWeaponChange(x => x.HasMinimumDamage = false));
+            WeaponDamageRequestBuildResult missingMaximum = WeaponDamageRequestBuilder.Build(BuildInputWithWeaponChange(x => x.HasMaximumDamage = false));
+            WeaponDamageRequestBuildResult invertedRange = WeaponDamageRequestBuilder.Build(BuildInputWithWeaponChange(x => x.MinimumDamage = 30));
+            WeaponDamageRequestBuildResult missingCriticalBonus = WeaponDamageRequestBuilder.Build(BuildInputWithCriticalHitWithoutBonus());
+            WeaponDamageRequestBuildResult missingDamageType = WeaponDamageRequestBuilder.Build(BuildInputWithWeaponChange(x => x.HasDamageType = false));
+            WeaponDamageRequestBuildResult unknownDamageType = WeaponDamageRequestBuilder.Build(BuildInputWithWeaponChange(x => x.DamageType = DamageType.Unknown));
+
+            AssertIssue(missingSkill, WeaponDamageInputIssueKind.MissingAttackSkill);
+            AssertIssue(missingMinimum, WeaponDamageInputIssueKind.MissingMinimum);
+            AssertIssue(missingMaximum, WeaponDamageInputIssueKind.MissingMaximum);
+            Assert.AreEqual(WeaponDamageRequestBuildClassification.MalformedData, invertedRange.Classification);
+            AssertIssue(invertedRange, WeaponDamageInputIssueKind.MinimumGreaterThanMaximum);
+            AssertIssue(missingCriticalBonus, WeaponDamageInputIssueKind.MissingCriticalBonus);
+            AssertIssue(missingDamageType, WeaponDamageInputIssueKind.MissingDamageType);
+            AssertIssue(unknownDamageType, WeaponDamageInputIssueKind.UnknownDamageType);
+        }
+
+        [TestMethod]
+        public void WeaponDamageRequestBuilderReportsAmsCapAndStatCardinalityIssues()
+        {
+            WeaponDamageRequestBuildResult zeroCap = WeaponDamageRequestBuilder.Build(BuildInputWithWeaponChange(x => x.AmsCap = 0));
+            WeaponDamageRequestBuildResult negativeCap = WeaponDamageRequestBuilder.Build(BuildInputWithWeaponChange(x => x.AmsCap = -1));
+            WeaponDamageRequestBuildResult missingAttackerStat = WeaponDamageRequestBuilder.Build(BuildInputWithoutAttackSkillStat());
+            WeaponDamageRequestBuildResult duplicateAttackerStat = WeaponDamageRequestBuilder.Build(BuildInputWithDuplicateAttackSkillStat());
+
+            AssertIssue(zeroCap, WeaponDamageInputIssueKind.MissingAmsCapSemantics);
+            Assert.AreEqual(WeaponDamageRequestBuildClassification.MalformedData, negativeCap.Classification);
+            AssertIssue(negativeCap, WeaponDamageInputIssueKind.NegativeAmsCap);
+            AssertIssue(missingAttackerStat, WeaponDamageInputIssueKind.MissingAttackerStat);
+            Assert.AreEqual(WeaponDamageRequestBuildClassification.MalformedData, duplicateAttackerStat.Classification);
+            AssertIssue(duplicateAttackerStat, WeaponDamageInputIssueKind.DuplicateAttackerStat);
+        }
+
+        [TestMethod]
+        public void WeaponDamageRequestBuilderReportsArmorAddDamageAndCriticalStateGaps()
+        {
+            WeaponDamageRequestBuildResult missingArmor = WeaponDamageRequestBuilder.Build(BuildInputWithoutTargetArmor());
+            WeaponDamageRequestBuildResult unknownArmor = WeaponDamageRequestBuilder.Build(BuildInputWithWeaponChange(x => x.DamageType = DamageType.Disease));
+            WeaponDamageRequestBuildResult missingTypeAdd = WeaponDamageRequestBuilder.Build(BuildInputWithoutTypeAddDamage());
+            WeaponDamageRequestBuildResult missingCriticalState = WeaponDamageRequestBuilder.Build(BuildInputWithMissingCriticalState());
+
+            AssertIssue(missingArmor, WeaponDamageInputIssueKind.MissingArmorStat);
+            AssertIssue(unknownArmor, WeaponDamageInputIssueKind.UnknownArmorMapping);
+            AssertIssue(missingTypeAdd, WeaponDamageInputIssueKind.MissingAttackerStat);
+            AssertIssue(missingTypeAdd, WeaponDamageInputIssueKind.MissingAddDamageSource);
+            AssertIssue(missingCriticalState, WeaponDamageInputIssueKind.MissingCriticalState);
+        }
+
+        [TestMethod]
+        public void WeaponDamageRequestBuilderClassifiesFixedCapturedAndLeavesSubwayThiefDamageUnchanged()
+        {
+            WeaponDamageRequestBuildInput input = BuildCompleteProjectileInput();
+            input.IsFixedCapturedDamage = true;
+            input.FixedCapturedDamage = 9;
+            input.Attacker.Category = DamageSourceCategory.Npc;
+            input.Weapon.TemplateIdentity = "121567";
+            input.Weapon.MinimumDamage = 9;
+            input.Weapon.MaximumDamage = 9;
+
+            WeaponDamageRequestBuildResult build = WeaponDamageRequestBuilder.Build(input);
+            DamageCalculationResult damage = DamageCalculator.Calculate(build.Request, new QueuedDamageRandomSource());
+
+            Assert.AreEqual(WeaponDamageRequestBuildClassification.FixedCaptured, build.Classification);
+            Assert.AreEqual(DamageCalculationStrategyKind.FixedCapturedDamage, build.ExpectedActiveStrategy);
+            Assert.AreEqual(9, damage.FinalTargetDamage);
+            Assert.AreEqual(DamageCalculationStrategyKind.FixedCapturedDamage, damage.Strategy);
+        }
+
         private static void AssertArmorStat(DamageType damageType, int expectedStatId)
         {
             int statId;
@@ -356,6 +467,117 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Policy = DamageCalculationPolicy.RepositoryLegacyNormalHit(true),
                 EvidenceClassification = DamageEvidenceClassification.ControlledTestConfirmed
             };
+        }
+
+        private static WeaponDamageRequestBuildInput BuildCompleteProjectileInput()
+        {
+            WeaponDamageRequestBuildInput input = new WeaponDamageRequestBuildInput
+            {
+                CallerName = "test-player-projectile-weapon",
+                HasCriticalState = true,
+                IsCritical = false,
+                HasUniversalAddDamageSource = true,
+                UniversalAddDamage = 0
+            };
+
+            input.Weapon.TemplateIdentity = "test-template";
+            input.Weapon.TemplateSource = "items.dat";
+            input.Weapon.QualityLevel = 1;
+            input.Weapon.HasMinimumDamage = true;
+            input.Weapon.MinimumDamage = 1;
+            input.Weapon.HasMaximumDamage = true;
+            input.Weapon.MaximumDamage = 10;
+            input.Weapon.HasCriticalBonus = true;
+            input.Weapon.CriticalBonus = 5;
+            input.Weapon.HasDamageType = true;
+            input.Weapon.DamageType = DamageType.Projectile;
+            input.Weapon.RawDamageTypeStat = 90;
+            input.Weapon.HasAmsCap = true;
+            input.Weapon.AmsCap = 500;
+            input.Weapon.HasAttackTime = true;
+            input.Weapon.AttackTime = 100;
+            input.Weapon.HasRechargeTime = true;
+            input.Weapon.RechargeTime = 150;
+            input.Weapon.WeaponCategory = 3;
+            input.Weapon.WeaponSlot = 6;
+            input.Weapon.AttackSkillContributions.Add(new AttackSkillContribution { StatId = 112, Percentage = 100 });
+
+            input.Attacker.Category = DamageSourceCategory.Player;
+            input.Attacker.Identity = "player";
+            input.Attacker.Readiness = WeaponDamageAttackerReadiness.CompleteStatProvenance;
+            input.Attacker.Stats.Add(new WeaponDamageStatSnapshot { StatId = 112, Value = 125, Source = "Stat.Value" });
+            input.Attacker.Stats.Add(new WeaponDamageStatSnapshot { StatId = 276, Value = 25, Source = "Stat.Value" });
+            input.Attacker.Stats.Add(new WeaponDamageStatSnapshot { StatId = 278, Value = 3, Source = "Stat.Value" });
+
+            input.Target.Category = DamageSourceCategory.Npc;
+            input.Target.Identity = "target";
+            input.Target.Stats.Add(new WeaponDamageStatSnapshot { StatId = 90, Value = 40, Source = "Stat.Value" });
+            return input;
+        }
+
+        private static WeaponDamageRequestBuildInput BuildInputWithWeaponChange(System.Action<WeaponDamageWeaponSnapshot> change)
+        {
+            WeaponDamageRequestBuildInput input = BuildCompleteProjectileInput();
+            change(input.Weapon);
+            return input;
+        }
+
+        private static WeaponDamageRequestBuildInput BuildInputWithoutAttackSkills()
+        {
+            WeaponDamageRequestBuildInput input = BuildCompleteProjectileInput();
+            input.Weapon.AttackSkillContributions.Clear();
+            return input;
+        }
+
+        private static WeaponDamageRequestBuildInput BuildInputWithCriticalHitWithoutBonus()
+        {
+            WeaponDamageRequestBuildInput input = BuildCompleteProjectileInput();
+            input.IsCritical = true;
+            input.Weapon.HasCriticalBonus = false;
+            return input;
+        }
+
+        private static WeaponDamageRequestBuildInput BuildInputWithoutAttackSkillStat()
+        {
+            WeaponDamageRequestBuildInput input = BuildCompleteProjectileInput();
+            input.Attacker.Stats.Clear();
+            input.Attacker.Stats.Add(new WeaponDamageStatSnapshot { StatId = 276, Value = 25 });
+            input.Attacker.Stats.Add(new WeaponDamageStatSnapshot { StatId = 278, Value = 3 });
+            return input;
+        }
+
+        private static WeaponDamageRequestBuildInput BuildInputWithDuplicateAttackSkillStat()
+        {
+            WeaponDamageRequestBuildInput input = BuildCompleteProjectileInput();
+            input.Attacker.Stats.Add(new WeaponDamageStatSnapshot { StatId = 112, Value = 130 });
+            return input;
+        }
+
+        private static WeaponDamageRequestBuildInput BuildInputWithoutTargetArmor()
+        {
+            WeaponDamageRequestBuildInput input = BuildCompleteProjectileInput();
+            input.Target.Stats.Clear();
+            return input;
+        }
+
+        private static WeaponDamageRequestBuildInput BuildInputWithoutTypeAddDamage()
+        {
+            WeaponDamageRequestBuildInput input = BuildCompleteProjectileInput();
+            input.Attacker.Stats.Remove(input.Attacker.Stats.Single(x => x.StatId == 278));
+            input.HasUniversalAddDamageSource = false;
+            return input;
+        }
+
+        private static WeaponDamageRequestBuildInput BuildInputWithMissingCriticalState()
+        {
+            WeaponDamageRequestBuildInput input = BuildCompleteProjectileInput();
+            input.HasCriticalState = false;
+            return input;
+        }
+
+        private static void AssertIssue(WeaponDamageRequestBuildResult result, WeaponDamageInputIssueKind expected)
+        {
+            Assert.IsTrue(result.Issues.Any(x => x.Kind == expected), expected.ToString());
         }
 
         private static void AssertStage(
