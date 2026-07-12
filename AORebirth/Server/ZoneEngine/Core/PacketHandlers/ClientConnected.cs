@@ -217,9 +217,25 @@ client.Controller.Character.Playfield.Identity,
                 client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,
                 () =>
                 {
+                    CombatXpRuntimeService.LogXpWireSnapshot(
+                        client.Controller.Character,
+                        "ClientConnected",
+                        "zone-login-before-prepare");
                     CombatXpRuntimeService.PrepareXpStatsForLogin(client.Controller.Character);
+                    CombatXpRuntimeService.LogXpWireSnapshot(
+                        client.Controller.Character,
+                        "ClientConnected",
+                        "zone-login-after-prepare-before-fullchar");
                     FullCharacterMessageHandler.Default.Send(client.Controller.Character);
-                    CombatXpRuntimeService.SendLoginXpBarSync(client.Controller.Character);
+                    // Client only honors the XP-bar floor (LastSaveXP 372) from a standalone
+                    // StatMessage, not from the FullCharacter bulk. Re-send floor stats
+                    // (Unknown=1, no cumulative XP, no feedback) so the bar shows progress
+                    // instead of the raw cumulative XP after zone/relog.
+                    CombatXpRuntimeService.SyncXpBarStatsOnLogin(client.Controller.Character);
+                    CombatXpRuntimeService.LogXpWireSnapshot(
+                        client.Controller.Character,
+                        "ClientConnected",
+                        "zone-login-after-fullchar");
                 },
                 () =>
                 {

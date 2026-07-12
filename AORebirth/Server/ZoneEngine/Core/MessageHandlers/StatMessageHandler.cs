@@ -44,6 +44,8 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
     using Utility;
 
+    using ZoneEngine.Core;
+
     #endregion
 
     /// <summary>
@@ -126,6 +128,18 @@ namespace ZoneEngine.Core.MessageHandlers
 
             if (statsToClient.Count > 0)
             {
+                foreach (KeyValuePair<int, uint> kv in statsToClient)
+                {
+                    CombatXpRuntimeService.LogXpWireOutbound(
+                        "StatMessageHandler",
+                        "bulk-client",
+                        character,
+                        kv.Key,
+                        kv.Value,
+                        "StatMessage",
+                        "unknown=default");
+                }
+
                 CombatStartPacketDiagnostics.LogStatBulk(
                     "StatMessageHandler.SendBulk.client",
                     character,
@@ -152,6 +166,18 @@ namespace ZoneEngine.Core.MessageHandlers
 
             if (statsToPlayfield.Count > 0)
             {
+                foreach (KeyValuePair<int, uint> kv in statsToPlayfield)
+                {
+                    CombatXpRuntimeService.LogXpWireOutbound(
+                        "StatMessageHandler",
+                        "bulk-playfield",
+                        character,
+                        kv.Key,
+                        kv.Value,
+                        "StatMessage",
+                        "unknown=default playfield=true");
+                }
+
                 CombatStartPacketDiagnostics.LogStatBulk(
                     "StatMessageHandler.SendBulk.playfield",
                     character,
@@ -211,6 +237,17 @@ namespace ZoneEngine.Core.MessageHandlers
                         "Cash stat single send char={0} cash={1}",
                         character.Identity,
                         statValue));
+            }
+            else
+            {
+                CombatXpRuntimeService.LogXpWireOutbound(
+                    "StatMessageHandler",
+                    "single-client",
+                    character,
+                    statId,
+                    statValue,
+                    "StatMessage",
+                    "unknown=default");
             }
 
             this.Send(character, this.Filler(character, statId, statValue));

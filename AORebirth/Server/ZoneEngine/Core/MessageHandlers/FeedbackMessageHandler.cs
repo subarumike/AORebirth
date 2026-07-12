@@ -38,6 +38,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core;
+
     #endregion
 
     /// <summary>
@@ -57,6 +59,12 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public void Send(ICharacter character, int categoryId, int messageId)
         {
+            CombatXpRuntimeService.LogXpWireFeedbackOutbound(
+                "FeedbackMessageHandler",
+                "feedback-send",
+                character,
+                categoryId,
+                messageId);
             this.Send(character, Filler(character, categoryId, messageId));
         }
 

@@ -40,6 +40,7 @@ namespace ZoneEngine.Core
         private const int XpFeedbackMessageId = 249817907;
         private const int CapturedNewLevelUnknown2 = 4;
         private const string XpTracePrefix = "COMBAT_XP_TRACE";
+        internal const string XpWireTracePrefix = "XP_WIRE_TRACE";
 
         private static readonly int[] WireManagedXpStatIds =
         {
@@ -159,8 +160,27 @@ namespace ZoneEngine.Core
                 return;
             }
 
+            LogXpWireSnapshot(character, "CombatXpRuntimeService", "login-prepare-before");
+
+            int levelBefore = GetCurrentLevel(character);
             NormalizeXpStatsFromPersistedLevel(character);
+
+            int levelAfter = GetCurrentLevel(character);
+            IZoneClient client = character.Controller?.Client;
+            if (levelAfter > levelBefore && client != null)
+            {
+                LogXpWireSnapshot(
+                    character,
+                    "CombatXpRuntimeService",
+                    "login-prepare-levelup-wire",
+                    "levelBefore=" + levelBefore.ToString(CultureInfo.InvariantCulture)
+                    + " levelAfter=" + levelAfter.ToString(CultureInfo.InvariantCulture));
+                SendLevelUpPreFeedbackPackets(client, character, levelBefore);
+                PersistLevelStat(character);
+            }
+
             WriteXpStatsToDb(character, "login-complete");
+            LogXpWireSnapshot(character, "CombatXpRuntimeService", "login-prepare-after");
         }
 
         internal static void SendLoginXpBarSync(ICharacter character)
@@ -177,23 +197,62 @@ namespace ZoneEngine.Core
             uint cumulative = floorXp + progress;
             uint nextXp = (uint)GetNextXpRequiredForLevel(level);
 
-            SendClientStatWithUnknown(client, character, CharacterStat.LastSaveXP, floorXp, CapturedLevelUpStatUnknown);
-            SendClientStatWithUnknown(client, character, CharacterStat.SavedXP, floorXp, CapturedLevelUpStatUnknown);
-            SendClientStatWithUnknown(client, character, CharacterStat.NextXP, nextXp, CapturedLevelUpStatUnknown);
-            if (progress > 0)
-            {
-                SendClientStatWithUnknown(client, character, CharacterStat.UnsavedXP, progress, CapturedLevelUpStatUnknown);
-            }
+            LogXpWireSnapshot(
+                character,
+                "CombatXpRuntimeService",
+                "login-bar-sync-before",
+                "cumulative=" + cumulative.ToString(CultureInfo.InvariantCulture));
 
-            StatMessageHandler.Default.SendSingle(character, (int)StatIds.xp, cumulative);
+            // After FullCharacter (unsaved/next/level only): replay the capture-backed level-up
+            // XP wire for the *current* level. Logs show XP(52) alone makes the bar show
+            // cumulative (7280/4000); NewLevel + LastSaveXP + XP matches in-zone level-up
+            // (130/4000). No FeedbackMessage on login — that triggers bogus reward chat.
+            uint nextLevelCumulative = level >= MaxLevel
+                ? 0
+                : GetCumulativeXpForLevelStart(level + 1);
+            var loginNewLevelMessage = new NewLevelMessage
+                                       {
+                                           Identity = character.Identity,
+                                           Unknown = 0,
+                                           Level = level,
+                                           Ip = Math.Max(0, character.Stats[StatIds.ip].Value),
+                                           Xp = (int)cumulative,
+                                           LastSaveXp = (int)floorXp,
+                                           NextLevelXp = (int)nextLevelCumulative,
+                                           Unknown1 = 0,
+                                           Unknown2 = CapturedNewLevelUnknown2,
+                                           LastXp = Math.Max(0, character.Stats[StatIds.lastxp].Value)
+                                       };
+            LogXpWireNewLevel(
+                "CombatXpRuntimeService",
+                "login-bar-sync-newlevel",
+                character,
+                loginNewLevelMessage);
+            client.SendCompressed(loginNewLevelMessage);
+            SendClientStatWithUnknown(
+                client,
+                character,
+                CharacterStat.LastSaveXP,
+                floorXp,
+                CapturedLevelUpStatUnknown,
+                "login-bar-sync");
+            SendSocialStatusReset(client, character);
+            SendClientStatWithUnknown(
+                client,
+                character,
+                CharacterStat.XP,
+                cumulative,
+                0,
+                "login-bar-sync-xp-baseline");
             LogXpTrace(
                 character,
                 "login-bar-sync",
-                "cumulative=" + cumulative.ToString(CultureInfo.InvariantCulture)
+                "wire=after-fullchar cumulative=" + cumulative.ToString(CultureInfo.InvariantCulture)
                 + " floor=" + floorXp.ToString(CultureInfo.InvariantCulture)
                 + " progress=" + progress.ToString(CultureInfo.InvariantCulture)
                 + " next=" + nextXp.ToString(CultureInfo.InvariantCulture)
-                + " level=" + level.ToString(CultureInfo.InvariantCulture));
+                + " level=" + level.ToString(CultureInfo.InvariantCulture)
+                + " newLevelReplay=true feedback=none");
         }
 
         internal static void SyncXpBarStatsOnLogin(ICharacter character)
@@ -282,8 +341,7 @@ namespace ZoneEngine.Core
                     + " newFloor=" + newFloor.ToString(CultureInfo.InvariantCulture));
 
                 SetXpStat(character, StatIds.level, (uint)newLevel, "levelup-apply-level");
-                SetXpStat(character, StatIds.lastsavexp, newFloor, "levelup-apply-lastsave");
-                SetXpStat(character, StatIds.savedxp, newFloor, "levelup-apply-saved");
+                ClearDbManagedFloorStats(character, "levelup-apply");
                 SetXpStat(character, StatIds.nextxp, (uint)GetNextXpRequiredForLevel(newLevel), "levelup-apply-next");
                 SetXpStat(character, StatIds.unsavedxp, remainder, "levelup-apply-unsaved");
                 SetXpStat(character, StatIds.xp, newFloor + remainder, "levelup-apply-cumulative");
@@ -318,7 +376,12 @@ namespace ZoneEngine.Core
                 "login-normalize-before",
                 "dbXp=" + xp.ToString(CultureInfo.InvariantCulture)
                 + " dbUnsaved=" + unsavedXp.ToString(CultureInfo.InvariantCulture)
+                + " dbLastsave=" + NormalizeStatValue(character.Stats[StatIds.lastsavexp].BaseValue).ToString(CultureInfo.InvariantCulture)
+                + " dbSaved=" + NormalizeStatValue(character.Stats[StatIds.savedxp].BaseValue).ToString(CultureInfo.InvariantCulture)
                 + " floor=" + floor.ToString(CultureInfo.InvariantCulture));
+
+            // Stats 334/372 are not used for manual save XP yet; discard any legacy DB floor values.
+            ClearDbManagedFloorStats(character, "login-normalize-clear-db-floor");
 
             uint progress = ResolveStoredProgress(level, floor, xp, unsavedXp);
 
@@ -411,17 +474,39 @@ namespace ZoneEngine.Core
         private static void EnsureLevelXpThresholds(ICharacter character, string source)
         {
             int level = GetCurrentLevel(character);
-            uint floor = GetCumulativeXpForLevelStart(level);
-            SetXpStat(character, StatIds.lastsavexp, floor, source + ":lastsave");
-            SetXpStat(character, StatIds.savedxp, floor, source + ":saved");
+            ClearDbManagedFloorStats(character, source);
             SetXpStat(character, StatIds.nextxp, (uint)GetNextXpRequiredForLevel(level), source + ":next");
+        }
+
+        /// <summary>
+        /// SavedXP (334) and LastSaveXP (372) are not persisted until manual save XP exists.
+        /// Level floor for bar/kill wire is computed from the RK table at send time.
+        /// </summary>
+        private static void ClearDbManagedFloorStats(ICharacter character, string source)
+        {
+            SetXpStat(character, StatIds.lastsavexp, 0, source + ":lastsave");
+            SetXpStat(character, StatIds.savedxp, 0, source + ":saved");
         }
 
         private static void SendNormalKillXpPacket(IZoneClient client, ICharacter character)
         {
             uint cumulativeXp = character.Stats[StatIds.xp].BaseValue;
             LogXpTrace(character, "wire-normal-kill", "stat=52 value=" + cumulativeXp.ToString(CultureInfo.InvariantCulture));
+            LogXpWireOutbound(
+                "CombatXpRuntimeService",
+                "kill-xp-stat",
+                character,
+                (int)StatIds.xp,
+                cumulativeXp,
+                "StatMessage",
+                "unknown=0");
             StatMessageHandler.Default.SendSingle(character, (int)StatIds.xp, cumulativeXp);
+            LogXpWireFeedbackOutbound(
+                "CombatXpRuntimeService",
+                "kill-xp-feedback",
+                character,
+                LevelUpFeedbackCategoryId,
+                XpFeedbackMessageId);
             FeedbackMessageHandler.Default.Send(
                 character,
                 LevelUpFeedbackCategoryId,
@@ -479,20 +564,21 @@ namespace ZoneEngine.Core
                     ? 0
                     : GetCumulativeXpForLevelStart(level + 1);
 
-                client.SendCompressed(
-                    new NewLevelMessage
-                    {
-                        Identity = character.Identity,
-                        Unknown = 0,
-                        Level = level,
-                        Ip = Math.Max(0, character.Stats[StatIds.ip].Value),
-                        Xp = (int)cumulativeXp,
-                        LastSaveXp = (int)lastSaveXp,
-                        NextLevelXp = (int)nextLevelXp,
-                        Unknown1 = 0,
-                        Unknown2 = CapturedNewLevelUnknown2,
-                        LastXp = Math.Max(0, character.Stats[StatIds.lastxp].Value)
-                    });
+                var newLevelMessage = new NewLevelMessage
+                                      {
+                                          Identity = character.Identity,
+                                          Unknown = 0,
+                                          Level = level,
+                                          Ip = Math.Max(0, character.Stats[StatIds.ip].Value),
+                                          Xp = (int)cumulativeXp,
+                                          LastSaveXp = (int)lastSaveXp,
+                                          NextLevelXp = (int)nextLevelXp,
+                                          Unknown1 = 0,
+                                          Unknown2 = CapturedNewLevelUnknown2,
+                                          LastXp = Math.Max(0, character.Stats[StatIds.lastxp].Value)
+                                      };
+                LogXpWireNewLevel("CombatXpRuntimeService", "levelup-newlevel", character, newLevelMessage);
+                client.SendCompressed(newLevelMessage);
 
                 LogXpTrace(
                     character,
@@ -560,9 +646,29 @@ namespace ZoneEngine.Core
                 + " nextCumulative=" + nextLevelXp.ToString(CultureInfo.InvariantCulture)
                 + " xp52db=" + character.Stats[StatIds.xp].BaseValue.ToString(CultureInfo.InvariantCulture));
 
-            SendClientStatWithUnknown(client, character, CharacterStat.LastSaveXP, floorXp, CapturedLevelUpStatUnknown);
+            SendClientStatWithUnknown(
+                client,
+                character,
+                CharacterStat.LastSaveXP,
+                floorXp,
+                CapturedLevelUpStatUnknown,
+                "levelup-wire-sync");
             SendSocialStatusReset(client, character);
+            LogXpWireOutbound(
+                "CombatXpRuntimeService",
+                "levelup-xp-stat",
+                character,
+                (int)StatIds.xp,
+                cumulativeXp,
+                "StatMessage",
+                "unknown=0");
             StatMessageHandler.Default.SendSingle(character, (int)StatIds.xp, cumulativeXp);
+            LogXpWireFeedbackOutbound(
+                "CombatXpRuntimeService",
+                "levelup-xp-feedback",
+                character,
+                LevelUpFeedbackCategoryId,
+                XpFeedbackMessageId);
             FeedbackMessageHandler.Default.Send(
                 character,
                 LevelUpFeedbackCategoryId,
@@ -574,8 +680,17 @@ namespace ZoneEngine.Core
             ICharacter character,
             CharacterStat stat,
             uint value,
-            byte unknown)
+            byte unknown,
+            string stage = "stat-unknown")
         {
+            LogXpWireOutbound(
+                "CombatXpRuntimeService",
+                stage,
+                character,
+                (int)stat,
+                value,
+                "StatMessage",
+                "unknown=" + unknown.ToString(CultureInfo.InvariantCulture));
             client.SendCompressed(
                 new StatMessage
                 {
@@ -728,6 +843,8 @@ namespace ZoneEngine.Core
             {
                 case StatIds.xp:
                     return "XP";
+                case StatIds.ip:
+                    return "IP";
                 case StatIds.level:
                     return "Level";
                 case StatIds.lastxp:
@@ -770,6 +887,154 @@ namespace ZoneEngine.Core
                     "{0} stage={1} char={2} level54={3} levelRaw={4} xp52={5} unsaved592={6} lastsave372={7} saved334={8} next350={9} lastxp57={10} progress={11} nextRequired={12} bar={13}/{14} {15}",
                     XpTracePrefix,
                     stage,
+                    character.Identity,
+                    level,
+                    levelRaw,
+                    xp,
+                    unsaved,
+                    lastsave,
+                    saved,
+                    next,
+                    lastxp,
+                    progress,
+                    nextRequired,
+                    progress,
+                    nextRequired,
+                    details ?? string.Empty));
+        }
+
+        internal static bool IsXpWireStatId(int statId)
+        {
+            return statId == (int)StatIds.xp
+                   || statId == (int)StatIds.ip
+                   || statId == (int)StatIds.level
+                   || statId == (int)StatIds.lastxp
+                   || statId == (int)StatIds.savedxp
+                   || statId == (int)StatIds.nextxp
+                   || statId == (int)StatIds.lastsavexp
+                   || statId == (int)StatIds.unsavedxp;
+        }
+
+        internal static bool IsXpFeedbackMessage(int categoryId, int messageId)
+        {
+            return categoryId == LevelUpFeedbackCategoryId && messageId == XpFeedbackMessageId;
+        }
+
+        internal static void LogXpWireOutbound(
+            string source,
+            string stage,
+            ICharacter character,
+            int statId,
+            uint value,
+            string wireKind,
+            string details = "")
+        {
+            if (character == null || !IsXpWireStatId(statId))
+            {
+                return;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0} source={1} stage={2} char={3} wire={4} statId={5} stat={6} value={7} {8}",
+                    XpWireTracePrefix,
+                    source ?? string.Empty,
+                    stage ?? string.Empty,
+                    character.Identity,
+                    wireKind ?? string.Empty,
+                    statId,
+                    GetXpStatName((StatIds)statId),
+                    value,
+                    details ?? string.Empty));
+        }
+
+        internal static void LogXpWireFeedbackOutbound(
+            string source,
+            string stage,
+            ICharacter character,
+            int categoryId,
+            int messageId,
+            string details = "")
+        {
+            if (character == null || !IsXpFeedbackMessage(categoryId, messageId))
+            {
+                return;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0} source={1} stage={2} char={3} wire=FeedbackMessage category={4} messageId={5} {6}",
+                    XpWireTracePrefix,
+                    source ?? string.Empty,
+                    stage ?? string.Empty,
+                    character.Identity,
+                    categoryId,
+                    messageId,
+                    details ?? string.Empty));
+        }
+
+        internal static void LogXpWireNewLevel(
+            string source,
+            string stage,
+            ICharacter character,
+            NewLevelMessage message)
+        {
+            if (character == null || message == null)
+            {
+                return;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0} source={1} stage={2} char={3} wire=NewLevel level={4} ip={5} xp={6} lastSaveXp={7} nextLevelXp={8} lastXp={9}",
+                    XpWireTracePrefix,
+                    source ?? string.Empty,
+                    stage ?? string.Empty,
+                    character.Identity,
+                    message.Level,
+                    message.Ip,
+                    message.Xp,
+                    message.LastSaveXp,
+                    message.NextLevelXp,
+                    message.LastXp));
+        }
+
+        internal static void LogXpWireSnapshot(
+            ICharacter character,
+            string source,
+            string stage,
+            string details = "")
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            int level = GetCurrentLevel(character);
+            uint levelRaw = character.Stats[StatIds.level].BaseValue;
+            uint xp = character.Stats[StatIds.xp].BaseValue;
+            uint unsaved = character.Stats[StatIds.unsavedxp].BaseValue;
+            uint lastsave = character.Stats[StatIds.lastsavexp].BaseValue;
+            uint saved = character.Stats[StatIds.savedxp].BaseValue;
+            uint next = character.Stats[StatIds.nextxp].BaseValue;
+            uint lastxp = character.Stats[StatIds.lastxp].BaseValue;
+            uint progress = GetBarProgress(character);
+            int nextRequired = GetNextXpRequiredForLevel(level);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0} source={1} stage={2} char={3} level54={4} levelRaw={5} xp52={6} unsaved592={7} lastsave372={8} saved334={9} next350={10} lastxp57={11} progress={12} nextRequired={13} bar={14}/{15} {16}",
+                    XpWireTracePrefix,
+                    source ?? string.Empty,
+                    stage ?? string.Empty,
                     character.Identity,
                     level,
                     levelRaw,
