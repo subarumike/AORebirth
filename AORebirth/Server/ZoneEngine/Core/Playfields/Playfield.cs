@@ -1705,7 +1705,7 @@ namespace AORebirth.Core.Playfields
                    {
                        MinDamage = minDamage,
                        MaxDamage = maxDamage,
-                       DamageBonus = damageBonus,
+                       DamageBonus = 0,
                        WeaponLowId = weapon.LowID,
                        WeaponHighId = weapon.HighID,
                        WeaponQualityLevel = weapon.Quality,

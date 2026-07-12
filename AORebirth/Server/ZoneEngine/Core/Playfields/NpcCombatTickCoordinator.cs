@@ -812,7 +812,7 @@ namespace AORebirth.Core.Playfields
                    {
                        MinDamage = minDamage,
                        MaxDamage = maxDamage,
-                       DamageBonus = damageBonus,
+                       DamageBonus = 0,
                        Range = NormalizeCombatRange(weapon.GetAttribute((int)StatIds.attackrange)),
                        RechargeSeconds = hasCapturedEquippedAttackInfo
                                              && capturedContract.RechargeSeconds > 0

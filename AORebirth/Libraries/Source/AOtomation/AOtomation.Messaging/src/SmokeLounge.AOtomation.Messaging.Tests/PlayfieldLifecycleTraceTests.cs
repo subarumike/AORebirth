@@ -460,8 +460,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && coordinatorText.Contains("hasCapturedEquippedAttackInfo")
                 && coordinatorText.Contains("AttackInfoAmmoCount = hasCapturedEquippedAttackInfo")
                 && coordinatorText.Contains("AttackInfoUnk1 = hasCapturedEquippedAttackInfo")
-                && coordinatorText.Contains("DamageBonus = damageBonus,"),
-                "Thief must use its captured attack context, delayed movement transition, and fixed normal-hit envelope without changing legacy equipped NPCs.");
+                && coordinatorText.Contains("DamageBonus = 0,"),
+                "Thief must use its captured attack context, delayed movement transition, and fixed normal-hit envelope without reusing weapon max-damage as flat add damage.");
             int contextIndex = coordinatorText.IndexOf(
                 "this.AnnounceCapturedSubwayFilthFleaAttackStartContext(attacker);",
                 StringComparison.Ordinal);
