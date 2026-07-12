@@ -482,6 +482,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
             string providerText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+            string corpseRulesText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
             Assert.IsTrue(
                 coordinatorText.Contains("this.AnnounceCapturedEnemyAttackStartContext(attacker, capturedContract);")
                 && coordinatorText.Contains("private void AnnounceCapturedEnemyAttackStartContext(")
@@ -522,6 +524,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && providerText.Contains("101761")
                 && providerText.Contains("110192"),
                 "Filth Flea must retain captured Subway corpse loot evidence from completed inventory captures.");
+            Assert.IsTrue(
+                corpseRulesText.Contains("20260709-210452 and 20260709-220439")
+                && corpseRulesText.Contains("CorpseFullUpdate packets for monsterData 17657")
+                && corpseRulesText.Contains("Observed nonzero spawn credits: 29, 35, 41, 66, 72, 79")
+                && corpseRulesText.Contains("new ObservedCorpseCreditRule(\"Filth Flea\", 17657, 29, 79)"),
+                "Filth Flea must retain captured Subway corpse credit evidence from completed corpse full-update captures.");
         }
 
         [TestMethod]
