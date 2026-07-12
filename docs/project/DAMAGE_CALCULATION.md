@@ -14,6 +14,8 @@ The repository exposes some weapon input contracts, but it does not prove the AO
 
 The follow-up provenance audit also selected Outcome B. `WeaponDamageRequestBuilder` now provides side-effect-free diagnostics for ordinary weapon input readiness and records missing/malformed data without changing active damage. The full provenance report is in [WEAPON_DAMAGE_INPUT_PROVENANCE.md](WEAPON_DAMAGE_INPUT_PROVENANCE.md).
 
+The parity-framework follow-up remains Outcome B: evidence and reporting only. `WeaponDamageObservationValidator`, `WeaponDamageCandidateEvaluator`, `WeaponDamageParityReporter`, and `WeaponDamageDiagnosticSnapshotBuilder` can validate ordinary weapon-hit observations, compare report-only candidate formula orderings, and build opt-in diagnostic snapshots. They are not wired into production combat selection and they do not activate AR, AC, critical, add-damage, AMSCap, or minimum-floor formula changes.
+
 ## Current Production Formula
 
 Evidence class: `PROVEN_REPOSITORY_BEHAVIOR`.
@@ -70,6 +72,8 @@ Formula-backed ordinary weapon requests require weapon min/max, damage type, eff
 
 `WeaponDamageRequestBuilder` is diagnostic-only. It can assemble a candidate `DamageCalculationRequest`, provenance records, and input issues for ordinary weapon damage, but it is not called by production combat damage selection.
 
+`WeaponDamageDiagnosticSnapshotBuilder` is also diagnostic-only. It returns `null` unless explicitly enabled, records the supplied production result instead of recalculating it, and evaluates candidate formulas only against supplied observation records. It does not consume random numbers or mutate combat state.
+
 Build classifications:
 
 - `FormulaInputComplete`: all diagnostic inputs were supplied explicitly.
@@ -79,6 +83,20 @@ Build classifications:
 - `MalformedData`: invalid or duplicate data such as minimum greater than maximum, negative AMS cap, or duplicate supplied attacker stats.
 
 The builder never silently treats missing values as zero. Known zero must be explicit. Universal add-damage and critical state remain the largest formula-readiness gaps.
+
+Observation validation applies the same policy: health delta mismatches are rejected; missing armor, missing Add All Off, missing or ambiguous AMSCap semantics, unknown critical state, incomplete packet ordering, possible external damage, and possible multiple damage sources keep observations incomplete rather than making zero assumptions.
+
+## Parity Evidence Framework
+
+Evidence artifacts live under `docs/project/damage-evidence/`:
+
+- `schema/weapon-damage-observation.schema.json` defines schema version `1.0`.
+- `observations/repository-synthetic-fixtures.json` provides deterministic evaluator controls for templates `121567`, `121565`, `100240`, and `121572`; these are `CONTROLLED_TEST_CONFIRMED` controls only.
+- `observations/fixed-captured-thief.json` preserves the captured Subway Thief fixed `9` hit as `PROVEN_CAPTURED_BEHAVIOR`.
+- `procedures/operator-observation-matrix.md` defines the required live/control observation categories before formula promotion.
+- `reports/initial-parity-report.md` records that no ordinary weapon formula is proven.
+
+Candidate formula evaluation is deliberately separate from `DamageCalculator.Calculate(...)`. Reports can distinguish multiple matching candidates, unique candidate matches, contradictions, rounding boundaries, and possible hidden modifiers, but only an explicit future implementation task can promote a formula into production.
 
 ## Fixed Captured Damage
 

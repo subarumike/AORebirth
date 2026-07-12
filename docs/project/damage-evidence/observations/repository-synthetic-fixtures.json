@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0",
+  "description": "Repository-synthetic control observations used only to exercise parity evaluator variants. These are not live AO observations and do not prove an ordinary weapon formula.",
+  "classification": "CONTROLLED_TEST_CONFIRMED",
+  "observations": [
+    {
+      "observationId": "repository-synthetic-121567-normal",
+      "templateIdentity": "121567",
+      "name": "Solar-Powered Pistol",
+      "purpose": "single-skill projectile normal-hit candidate evaluator control",
+      "weapon": { "minimum": 2, "maximum": 18, "legacyDamageBonus": 18, "rawDamageType": 90, "damageType": "Projectile", "amsCapPresent": false },
+      "attackSkills": [ { "statId": 112, "percentage": 100, "value": 400 } ],
+      "controlledResult": { "baseRoll": 10, "matchingArmor": 20, "addAllOff": 0, "typeSpecificAddDamage": 3, "universalAddDamage": 2, "observedDamage": 23 },
+      "nonAuthority": "Repository-synthetic value for test determinism only."
+    },
+    {
+      "observationId": "repository-synthetic-121565-melee",
+      "templateIdentity": "121565",
+      "name": "Worn Oak Bo",
+      "purpose": "single-skill melee template fixture",
+      "weapon": { "minimum": 6, "maximum": 24, "legacyDamageBonus": 18, "rawDamageType": 91, "damageType": "Melee", "amsCapPresent": false },
+      "attackSkills": [ { "statId": 100, "percentage": 100, "value": 350 } ],
+      "controlledResult": { "baseRoll": 8, "matchingArmor": 10, "addAllOff": 0, "typeSpecificAddDamage": 0, "universalAddDamage": 0, "observedDamage": 14 },
+      "nonAuthority": "Repository-synthetic value for evaluator coverage only."
+    },
+    {
+      "observationId": "repository-synthetic-100240-energy",
+      "templateIdentity": "100240",
+      "name": "DefaultDistance_001",
+      "purpose": "energy damage-type fixture",
+      "weapon": { "minimum": 6, "maximum": 12, "legacyDamageBonus": 6, "rawDamageType": 92, "damageType": "Energy", "amsCapPresent": false },
+      "attackSkills": [ { "statId": 100, "percentage": 100, "value": 1000 } ],
+      "controlledResult": { "baseRoll": 6, "matchingArmor": 30, "addAllOff": 0, "typeSpecificAddDamage": 0, "universalAddDamage": 0, "observedDamage": 18 },
+      "nonAuthority": "Repository-synthetic value for candidate AR boundary reports only."
+    },
+    {
+      "observationId": "repository-synthetic-121572-multiskill",
+      "templateIdentity": "121572",
+      "name": "Useless Triple-Blade",
+      "purpose": "multi-skill and AMSCap-positive fixture",
+      "weapon": { "minimum": 1, "maximum": 10, "legacyDamageBonus": 10, "rawDamageType": 91, "damageType": "Melee", "amsCapPresent": true, "amsCap": 30 },
+      "attackSkills": [
+        { "statId": 103, "percentage": 67, "value": 60 },
+        { "statId": 106, "percentage": 33, "value": 60 }
+      ],
+      "controlledResult": { "baseRoll": 4, "matchingArmor": 0, "addAllOff": 0, "typeSpecificAddDamage": 0, "universalAddDamage": 0, "observedDamage": 4 },
+      "nonAuthority": "Repository-synthetic value for weighting and cap diagnostics only."
+    }
+  ]
+}

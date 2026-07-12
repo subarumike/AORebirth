@@ -4,6 +4,8 @@ Outcome: **B — partial input provenance**.
 
 This audit is evidence-only. It does not activate an AO weapon-damage formula and does not change production damage selection. Current production remains `LegacyFallback` or `FixedCapturedDamage`.
 
+Follow-up parity work adds a schema and report-only evaluator, not formula activation. Observation schema version `1.0` records source metadata, weapon inputs, attacker stats, target stats, resolved hit type, health before/after, observed damage, packet/log references, and uncertainty annotations. The live observation template must not be populated with inferred values.
+
 ## Source model
 
 | Input | Storage source | Database/resource source | Field/stat | Load path | Runtime owner | Lookup path | Type | Missing/default behavior | Evidence | Active caller availability |
@@ -40,6 +42,8 @@ Read-only sources used: `cellao_codex_clean.itemnames`, `cellao_codex_clean.item
 | Violent Vagabond contract weapon `130590` | captured NPC contract plus `itemnames` | 1 | 1 | 1 | 1 | absent in explicit template stats | none | absent | `10/250` | contract proves equipped identity only; template is named `Red Wine`, so weapon semantics are ambiguous |
 
 The sampled local `items` table had no current rows for these template IDs. A currently equipped player weapon is represented by starter loadout code using `121567`, not by a live inventory row in the audited database snapshot.
+
+Read-only `items.dat` AMSCap audit for templates with both min/max weapon stats found `17,574` candidate weapon templates: `7,388` without stat `538`, `0` with zero, `10,186` positive, and `0` negative. This proves field presence distribution only; it does not prove formula semantics or active caller use.
 
 ## Attack-skill representation
 
@@ -87,6 +91,8 @@ No universal weapon add-damage stat is proven. `DamageBonus` remains legacy dama
 
 `WeaponDamageRequestBuilder` is side-effect-free. It builds a diagnostic `DamageCalculationRequest` plus input provenance and issues, but it is not wired into active production damage selection.
 
+`WeaponDamageDiagnosticSnapshotBuilder` is a separate opt-in diagnostic seam. It is disabled by default, does not call production formula selection, and evaluates candidate formulas only against supplied observation records.
+
 Classifications:
 
 - `FormulaInputComplete`: all supplied diagnostic inputs are complete.
@@ -108,6 +114,8 @@ The builder never silently defaults missing data to zero. Known zero must be sup
 | Other pet | `LEGACY_ONLY` | no ordinary weapon formula input path proven |
 | Captured fixed-damage NPC | `FIXED_CAPTURED` | fixed contracts bypass AR, AC, criticals, and add damage |
 
+Target armor availability remains `AVAILABLE_BUT_SEMANTICS_PARTIAL` for player, NPC, and pet targets: matching AC stat mappings are known, but capture-level proof is still required for timing, formula ordering, and whether the active caller can provide the value at the exact hit boundary. Missing matching armor remains incomplete and is not zero.
+
 ## Remaining blockers before formula activation
 
 - prove critical bonus source and semantics
@@ -119,3 +127,4 @@ The builder never silently defaults missing data to zero. Known zero must be sup
 - prove add-damage ordering, eligibility, and universal stat source
 - prove target armor availability for player, NPC, and pet targets
 - prove caller integration can supply every input without changing packet order, timing, health mutation, death, corpse, loot, XP, or heartbeat behavior
+- complete the parity observation matrix in `docs/project/damage-evidence/procedures/operator-observation-matrix.md`
