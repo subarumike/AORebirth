@@ -408,6 +408,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 coordinatorText.Contains("pendingCapturedAttackStarts")
                 && coordinatorText.Contains("pendingCapturedMovementTransitions")
+                && coordinatorText.Contains("CombatDamageSuppress")
+                && coordinatorText.Contains("captured_thief_hidden_unknown_damage_guard")
+                && coordinatorText.Contains("SuppressDamageApplication = IsCapturedSubwayThief(attacker)")
+                && coordinatorText.Contains("SendAttackInfo = !IsCapturedSubwayThief(attacker)")
                 && coordinatorText.Contains(
                     "capturedContract.AttackStartDelaySeconds + capturedContract.FirstHitDelaySeconds")
                 && coordinatorText.Contains("+ capturedContract.MovementTransitionDelaySeconds")

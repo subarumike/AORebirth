@@ -42,6 +42,8 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayThiefSpecialAttackWeaponUnknown5 = 0;
 
+        public const int CapturedSubwayThiefMonsterData = 26092;
+
         public const double CapturedSubwayThiefAttackStartDelaySeconds = 1.409765;
 
         public const double CapturedSubwayThiefMovementTransitionDelaySeconds = 0.219999;

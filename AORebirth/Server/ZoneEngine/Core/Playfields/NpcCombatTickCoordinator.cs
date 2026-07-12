@@ -241,6 +241,19 @@ namespace AORebirth.Core.Playfields
                 this.playfield.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);
             }
 
+            if (attackSource.SuppressDamageApplication)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Network,
+                    string.Format(
+                        "CombatDamageSuppress attacker={0} target={1} reason=captured_thief_hidden_unknown_damage_guard",
+                        attacker.Identity,
+                        target.Identity));
+                this.nextCombatTicks[attacker.Identity.Instance] =
+                    DateTime.UtcNow + TimeSpan.FromSeconds(attackSource.RechargeSeconds);
+                return;
+            }
+
             int currentHealth = target.Stats[StatIds.health].Value;
             int damage = this.CalculateCombatDamage(attacker, attackSource);
             int newHealth = Math.Max(0, currentHealth - damage);
@@ -834,7 +847,8 @@ namespace AORebirth.Core.Playfields
                        AttackInfoWeaponInstance = hasCapturedEquippedAttackInfo
                                                       ? capturedContract.AttackInfoWeaponInstance
                                                       : 0,
-                       SendAttackInfo = true
+                       SendAttackInfo = !IsCapturedSubwayThief(attacker),
+                       SuppressDamageApplication = IsCapturedSubwayThief(attacker)
                     };
         }
 
@@ -976,6 +990,16 @@ namespace AORebirth.Core.Playfields
                    && string.Equals(character.Name, "Filth Flea", StringComparison.Ordinal);
         }
 
+        private static bool IsCapturedSubwayThief(ICharacter character)
+        {
+            return character != null
+                   && character.Playfield != null
+                   && character.Playfield.Identity.Instance == NpcCombatAttackRules.CapturedSubwayPlayfield
+                   && character.Stats[StatIds.monsterdata].Value
+                      == NpcCombatAttackRules.CapturedSubwayThiefMonsterData
+                   && string.Equals(character.Name, "Thief", StringComparison.Ordinal);
+        }
+
         private static double NormalizeCombatRange(int range)
         {
             int normalizedRange = NormalizeCombatItemStat(range, 0);
@@ -1026,6 +1050,8 @@ namespace AORebirth.Core.Playfields
             public int AttackInfoWeaponInstance { get; set; }
 
             public bool SendAttackInfo { get; set; }
+
+            public bool SuppressDamageApplication { get; set; }
 
             public bool IsCapturedSubwayFilthFleaPoisonAttack { get; set; }
         }
