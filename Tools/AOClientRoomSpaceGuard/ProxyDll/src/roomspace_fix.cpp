@@ -326,6 +326,43 @@ namespace aorf
             return nullptr;
         }
 
+        const PatchProfile* GetLoadedProfile()
+        {
+            HMODULE n3 = GetModuleHandleW(L"N3.dll");
+            if (!n3)
+            {
+                Log("ERROR N3.dll is not loaded");
+                return nullptr;
+            }
+
+            wchar_t n3Path[MAX_PATH] = {};
+            DWORD pathLength = GetModuleFileNameW(
+                n3,
+                n3Path,
+                static_cast<DWORD>(sizeof(n3Path) / sizeof(n3Path[0])));
+            if (pathLength == 0 || pathLength >= sizeof(n3Path) / sizeof(n3Path[0]))
+            {
+                Log("ERROR unable to resolve loaded N3.dll path");
+                return nullptr;
+            }
+
+            std::string hash;
+            if (!Sha256File(n3Path, hash))
+            {
+                Log("ERROR unable to hash loaded N3.dll");
+                return nullptr;
+            }
+
+            const PatchProfile* profile = SelectProfile(hash);
+            if (!profile)
+            {
+                Log("ERROR unsupported N3.dll sha256=%s", hash.c_str());
+                return nullptr;
+            }
+
+            return profile;
+        }
+
         bool ContainsThreadId(const SuspendedThreads& suspended, DWORD threadId)
         {
             for (size_t index = 0; index < suspended.count; ++index)
@@ -528,37 +565,32 @@ namespace aorf
         }
     }
 
+    ClientProfile GetLoadedN3ClientProfile()
+    {
+        const PatchProfile* profile = GetLoadedProfile();
+        if (!profile)
+        {
+            return ClientProfile::Unknown;
+        }
+
+        if (std::strcmp(profile->name, "old-client") == 0)
+        {
+            return ClientProfile::OldClient;
+        }
+        if (std::strcmp(profile->name, "new-client") == 0)
+        {
+            return ClientProfile::NewClient;
+        }
+
+        return ClientProfile::Unknown;
+    }
+
     bool InstallRoomSpaceFix()
     {
         HMODULE n3 = GetModuleHandleW(L"N3.dll");
-        if (!n3)
-        {
-            Log("ERROR N3.dll is not loaded");
-            return false;
-        }
-
-        wchar_t n3Path[MAX_PATH] = {};
-        DWORD pathLength = GetModuleFileNameW(
-            n3,
-            n3Path,
-            static_cast<DWORD>(sizeof(n3Path) / sizeof(n3Path[0])));
-        if (pathLength == 0 || pathLength >= sizeof(n3Path) / sizeof(n3Path[0]))
-        {
-            Log("ERROR unable to resolve loaded N3.dll path");
-            return false;
-        }
-
-        std::string hash;
-        if (!Sha256File(n3Path, hash))
-        {
-            Log("ERROR unable to hash loaded N3.dll");
-            return false;
-        }
-
-        const PatchProfile* profile = SelectProfile(hash);
+        const PatchProfile* profile = GetLoadedProfile();
         if (!profile)
         {
-            Log("ERROR unsupported N3.dll sha256=%s", hash.c_str());
             return false;
         }
 
@@ -768,7 +800,7 @@ namespace aorf
                 "PATCH PASS profile=%s sha256=%s wrapper=0x%08lX "
                 "callRvas=0x%X,0x%X,0x%X,0x%X",
                 profile->name,
-                hash.c_str(),
+                profile->sha256,
                 static_cast<unsigned long>(wrapperAddress),
                 profile->collisionCallRvas[0],
                 profile->collisionCallRvas[1],
@@ -782,7 +814,7 @@ namespace aorf
                 "sha256=%s wrapper=0x%08lX "
                 "protectionsRestored=%s threadsResumed=%s",
                 profile->name,
-                hash.c_str(),
+                profile->sha256,
                 static_cast<unsigned long>(wrapperAddress),
                 protectionsRestored ? "true" : "false",
                 threadsResumed ? "true" : "false");
