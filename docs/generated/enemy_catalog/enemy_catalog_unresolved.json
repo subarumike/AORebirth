@@ -1104,6 +1104,342 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "family-android",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-anun",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-aquaan",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-biledrinker",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-bileswarm",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-biofreak",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-blubbag",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-bronto",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-buzzsaw",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-clawfinger",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-cyborg",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-enigma",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-eyemutant",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-flea",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-hammerbeast",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-hound",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-igruana",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-leet",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-lizard",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-malle",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-manteze",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-mantis",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-mechdog",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-minibull",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-nanofreak",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-nighthowler",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-ninja-droid",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-ottou",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-pit-lizard",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-quake-lizard",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-reet",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-rhinoman",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-rollerrat",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-salamander",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-sand-demon",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-sandworm",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-scorpiod",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-shadowmutant",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-snake",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-spider",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-tentacle-mutant",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "family-unfinished-breed",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "attack category"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "rdb-1040023-100419",
     "SourceRecordIds": [
       {

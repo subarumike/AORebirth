@@ -799,17 +799,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "rhinoman"
+      "rhinoman",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: rhinoman albino"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -826,7 +829,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -928,17 +933,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: leet2"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -955,7 +963,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -964,17 +974,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "mantis"
+      "mantis",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: mantis boss"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -991,7 +1004,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -1065,17 +1080,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "mantis"
+      "mantis",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: mantis baby"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -1092,7 +1110,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -1949,17 +1969,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "cyborg"
+      "cyborg",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: cyborg soldier - female bader"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -1976,7 +1999,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -1985,17 +2010,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "cyborg"
+      "cyborg",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: cyborg soldier - male bader"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -2012,7 +2040,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -2021,17 +2051,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "cyborg"
+      "cyborg",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: cyborg soldier - felmale bad"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -2048,7 +2081,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -2057,17 +2092,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "cyborg"
+      "cyborg",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: cyborg soldier - male"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -2084,7 +2122,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -2093,17 +2133,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "cyborg"
+      "cyborg",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: cyborg soldier - male bad"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -2120,7 +2163,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -2129,17 +2174,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "cyborg"
+      "cyborg",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: cyborg soldier - female"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -2156,7 +2204,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -2165,15 +2215,18 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "INFERRED_CORRELATION",
     "dataset_matches": [
-      "droid"
+      "droid",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: android"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "PlayfieldNames",
-      "AttackTypes"
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "MinimumLevel",
@@ -2190,7 +2243,10 @@
       "bulk exact-name match against Unique Mobs",
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
-    "web_sources_found": []
+    "web_sources_found": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ]
   },
   {
     "candidate_id": 17651,
@@ -2260,17 +2316,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: leet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -2287,7 +2346,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -2327,17 +2388,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "malle"
+      "malle",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: malle"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -2354,7 +2418,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -2394,17 +2460,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "rhinoman"
+      "rhinoman",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: rhinoman"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -2421,7 +2490,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -2430,17 +2501,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "rollerrat"
+      "rollerrat",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: rollerrat"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -2457,7 +2531,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -2714,17 +2790,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "pit lizard"
+      "pit lizard",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: pit lizard"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -2741,7 +2820,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -2750,17 +2831,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "worm"
+      "worm",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: sandworm"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -2777,7 +2861,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -2822,17 +2908,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "enigma"
+      "enigma",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: enigma"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -2849,7 +2938,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -10244,17 +10335,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "bileswarm"
+      "bileswarm",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: sl_prime devorer_bileswarm colossus"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -10271,7 +10365,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -10600,17 +10696,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "shadow"
+      "shadow",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: shadowleet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -10627,7 +10726,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway"
+      "https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -10700,17 +10801,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "ottous"
+      "ottous",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: ottous"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -10727,7 +10831,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -10735,11 +10841,15 @@
     "candidate_name": "green lizard",
     "classification": "INSUFFICIENT_EVIDENCE",
     "classification_basis": "RDB_TEMPLATE_NAME",
-    "dataset_matches": [],
+    "dataset_matches": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ],
     "exact_queries_attempted": [
       "RDB exact name: green lizard"
     ],
     "fields_resolved": [
+      "DynaCampEvidence",
       "EnemyFamily",
       "PlayfieldNames"
     ],
@@ -10759,7 +10869,10 @@
       "bulk exact-name match against Unique Mobs",
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
-    "web_sources_found": []
+    "web_sources_found": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ]
   },
   {
     "candidate_id": 22798,
@@ -10895,17 +11008,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "bronto"
+      "bronto",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: sl_bronto_mama"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -10922,7 +11038,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -12076,15 +12194,18 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "INFERRED_CORRELATION",
     "dataset_matches": [
-      "alien"
+      "alien",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: alien_spider"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "PlayfieldNames",
-      "AttackTypes"
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "MinimumLevel",
@@ -12101,7 +12222,10 @@
       "bulk exact-name match against Unique Mobs",
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
-    "web_sources_found": []
+    "web_sources_found": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ]
   },
   {
     "candidate_id": 247740,
@@ -12173,17 +12297,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: athleet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -12200,7 +12327,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -12209,17 +12338,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: leetzilla"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -12236,7 +12368,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -12245,17 +12379,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: masculeet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -12272,7 +12409,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -12281,17 +12420,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: cheerleet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -12308,7 +12450,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -12317,17 +12461,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: deleet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -12344,7 +12491,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -12353,17 +12502,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: bruce leet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -12380,7 +12532,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -12389,17 +12543,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: invaleet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -12416,7 +12573,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -12425,17 +12584,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: bulleet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -12452,7 +12614,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -12461,17 +12625,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: violeet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -12488,7 +12655,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -12497,17 +12666,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: calculeet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -12524,7 +12696,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -14171,17 +14345,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: leetor"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -14198,7 +14375,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -16790,17 +16969,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: ai_cutecreature_draculeet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -16817,7 +16999,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -16826,17 +17010,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: ai_cutecreature_frankenleet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -16853,7 +17040,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -19191,17 +19380,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "worm"
+      "worm",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: giant sandworm"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -19218,7 +19410,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -21388,11 +21582,15 @@
     "candidate_name": "grey lizard backpack",
     "classification": "INSUFFICIENT_EVIDENCE",
     "classification_basis": "RDB_TEMPLATE_NAME",
-    "dataset_matches": [],
+    "dataset_matches": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ],
     "exact_queries_attempted": [
       "RDB exact name: grey lizard backpack"
     ],
     "fields_resolved": [
+      "DynaCampEvidence",
       "EnemyFamily"
     ],
     "fields_unresolved": [
@@ -21412,18 +21610,25 @@
       "bulk exact-name match against Unique Mobs",
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
-    "web_sources_found": []
+    "web_sources_found": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ]
   },
   {
     "candidate_id": 262894,
     "candidate_name": "grey lizard backpack 2",
     "classification": "INSUFFICIENT_EVIDENCE",
     "classification_basis": "RDB_TEMPLATE_NAME",
-    "dataset_matches": [],
+    "dataset_matches": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ],
     "exact_queries_attempted": [
       "RDB exact name: grey lizard backpack 2"
     ],
     "fields_resolved": [
+      "DynaCampEvidence",
       "EnemyFamily"
     ],
     "fields_unresolved": [
@@ -21443,7 +21648,10 @@
       "bulk exact-name match against Unique Mobs",
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
-    "web_sources_found": []
+    "web_sources_found": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ]
   },
   {
     "candidate_id": 262895,
@@ -34804,17 +35012,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: ai_cutecreature_frankenleet_pet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -34831,7 +35042,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -34840,17 +35053,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: ai_cutecreature_draculeet_pet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -34867,7 +35083,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -35130,17 +35348,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: gingerleet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -35157,7 +35378,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -36630,17 +36853,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: barleet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -36657,7 +36883,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -36666,17 +36894,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: bob marleet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -36693,7 +36924,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -38240,17 +38473,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: reinleet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -38267,7 +38503,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -38777,17 +39015,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "enigma"
+      "enigma",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: enigma dog toy"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -38804,7 +39045,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -38906,17 +39149,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "cyborg"
+      "cyborg",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: cyborg soldier - female - one eye"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -38933,7 +39179,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -39717,17 +39965,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "cyborg"
+      "cyborg",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: dancing cyborg doll a"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -39744,7 +39995,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -40063,17 +40316,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: devileet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -40090,7 +40346,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -40316,17 +40574,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: gift-wrapped leet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -40343,7 +40604,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -40796,17 +41059,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: elf leet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -40823,7 +41089,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -40894,17 +41162,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: elf_leet_new"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -40921,7 +41192,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -42730,17 +43003,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "leet"
+      "leet",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: henrys test leet"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -42757,7 +43033,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -43050,17 +43328,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "snake"
+      "snake",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: giant snake"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -43077,7 +43358,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -43086,17 +43369,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "biofreak"
+      "biofreak",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: biofreak noskin"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -43113,7 +43399,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -43308,17 +43596,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "bronto"
+      "bronto",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: bronto mama"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -43335,7 +43626,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -43406,17 +43699,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "salamander"
+      "salamander",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: salamander"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -43433,7 +43729,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -43504,17 +43802,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "minibull"
+      "minibull",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: minibull"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -43531,7 +43832,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -43633,17 +43936,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "aquaan"
+      "aquaan",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: aquaan queen"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -43660,7 +43966,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -43735,11 +44043,15 @@
     "candidate_name": "skin spider",
     "classification": "INSUFFICIENT_EVIDENCE",
     "classification_basis": "RDB_TEMPLATE_NAME",
-    "dataset_matches": [],
+    "dataset_matches": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ],
     "exact_queries_attempted": [
       "RDB exact name: skin spider"
     ],
     "fields_resolved": [
+      "DynaCampEvidence",
       "EnemyFamily",
       "PlayfieldNames"
     ],
@@ -43759,18 +44071,25 @@
       "bulk exact-name match against Unique Mobs",
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
-    "web_sources_found": []
+    "web_sources_found": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ]
   },
   {
     "candidate_id": 30383,
     "candidate_name": "hammerbeast",
     "classification": "INSUFFICIENT_EVIDENCE",
     "classification_basis": "RDB_TEMPLATE_NAME",
-    "dataset_matches": [],
+    "dataset_matches": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ],
     "exact_queries_attempted": [
       "RDB exact name: hammerbeast"
     ],
     "fields_resolved": [
+      "DynaCampEvidence",
       "EnemyFamily",
       "PlayfieldNames"
     ],
@@ -43790,7 +44109,10 @@
       "bulk exact-name match against Unique Mobs",
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
-    "web_sources_found": []
+    "web_sources_found": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ]
   },
   {
     "candidate_id": 304402,
@@ -44273,17 +44595,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "rhinoman"
+      "rhinoman",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: rhinoman female"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -44300,7 +44625,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -44345,17 +44672,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "bileswarm"
+      "bileswarm",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: bileswarm colossus"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -44372,7 +44702,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -44381,17 +44713,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "bileswarm"
+      "bileswarm",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: bileswarm worker"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -44408,7 +44743,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -44417,17 +44754,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "snake"
+      "snake",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: sewer snake"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -44444,7 +44784,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -44453,17 +44795,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "enigma"
+      "enigma",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: enigma floatpot"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -44480,7 +44825,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -44519,11 +44866,15 @@
     "candidate_name": "clawfinger",
     "classification": "INSUFFICIENT_EVIDENCE",
     "classification_basis": "RDB_TEMPLATE_NAME",
-    "dataset_matches": [],
+    "dataset_matches": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ],
     "exact_queries_attempted": [
       "RDB exact name: clawfinger"
     ],
     "fields_resolved": [
+      "DynaCampEvidence",
       "EnemyFamily",
       "PlayfieldNames"
     ],
@@ -44543,7 +44894,10 @@
       "bulk exact-name match against Unique Mobs",
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
-    "web_sources_found": []
+    "web_sources_found": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ]
   },
   {
     "candidate_id": 38389,
@@ -44551,17 +44905,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "anun"
+      "anun",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: anun"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -44578,7 +44935,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -44587,17 +44946,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "nanofreak"
+      "nanofreak",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: nanofreak"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -44614,7 +44976,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -44716,17 +45080,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "rollerrat"
+      "rollerrat",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: rollerrat queen"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -44743,7 +45110,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -44845,17 +45214,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "enigma"
+      "enigma",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: enigma dog"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -44872,7 +45244,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -44912,17 +45286,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "blubbag"
+      "blubbag",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: blubbag"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -44939,7 +45316,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -45567,11 +45946,15 @@
     "candidate_name": "unfinished breed failed",
     "classification": "CONFIRMED_PLACEHOLDER_OR_INTERNAL",
     "classification_basis": "INFERRED_CORRELATION",
-    "dataset_matches": [],
+    "dataset_matches": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ],
     "exact_queries_attempted": [
       "RDB exact name: unfinished breed failed"
     ],
     "fields_resolved": [
+      "DynaCampEvidence",
       "EnemyFamily",
       "PlayfieldNames"
     ],
@@ -45591,18 +45974,25 @@
       "bulk exact-name match against Unique Mobs",
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
-    "web_sources_found": []
+    "web_sources_found": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ]
   },
   {
     "candidate_id": 45603,
     "candidate_name": "unfinished breed",
     "classification": "INSUFFICIENT_EVIDENCE",
     "classification_basis": "RDB_TEMPLATE_NAME",
-    "dataset_matches": [],
+    "dataset_matches": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ],
     "exact_queries_attempted": [
       "RDB exact name: unfinished breed"
     ],
     "fields_resolved": [
+      "DynaCampEvidence",
       "EnemyFamily",
       "PlayfieldNames"
     ],
@@ -45622,7 +46012,10 @@
       "bulk exact-name match against Unique Mobs",
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
-    "web_sources_found": []
+    "web_sources_found": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ]
   },
   {
     "candidate_id": 45871,
@@ -45661,17 +46054,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "enigma"
+      "enigma",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: enigma tree"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -45688,7 +46084,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -45728,17 +46126,20 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
     "dataset_matches": [
-      "buzzsaw"
+      "buzzsaw",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: buzzsaw"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "MinimumLevel",
       "MaximumLevel",
-      "PlayfieldNames",
-      "AttackTypes"
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "Exact internal weapon/attack reference"
@@ -45755,7 +46156,9 @@
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
     "web_sources_found": [
-      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level"
+      "https://wiki.aodb.us/wiki/Dyna_Camps_by_level",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -45826,15 +46229,18 @@
     "classification": "LIKELY_ENEMY_TYPE",
     "classification_basis": "INFERRED_CORRELATION",
     "dataset_matches": [
-      "alien"
+      "alien",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ],
     "exact_queries_attempted": [
       "RDB exact name: alienpod spider"
     ],
     "fields_resolved": [
+      "AttackTypes",
+      "DynaCampEvidence",
       "EnemyFamily",
-      "PlayfieldNames",
-      "AttackTypes"
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "MinimumLevel",
@@ -45851,7 +46257,10 @@
       "bulk exact-name match against Unique Mobs",
       "bulk area/family match against AO-Universe and AOWiki extracts"
     ],
-    "web_sources_found": []
+    "web_sources_found": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ]
   },
   {
     "candidate_id": 85351,
@@ -46889,16 +47298,20 @@
     "candidate_name": "Buzzsaw Techno Scavenger",
     "classification": "CONFIRMED_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
-    "dataset_matches": [],
+    "dataset_matches": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ],
     "exact_queries_attempted": [],
     "external_canonical_key": "external-buzzsaw-techno-scavenger",
     "fields_resolved": [
-      "EnemyFamily",
-      "MinimumLevel",
-      "MaximumLevel",
-      "PlayfieldNames",
       "AttackTypes",
-      "IsBoss"
+      "DynaCampEvidence",
+      "EnemyFamily",
+      "IsBoss",
+      "MaximumLevel",
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "RDB mapping",
@@ -46914,7 +47327,9 @@
       "https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests"
     ],
     "web_sources_found": [
-      "https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests"
+      "https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -47036,10 +47451,14 @@
     "candidate_name": "Clawfinger Forefather",
     "classification": "CONFIRMED_BOSS",
     "classification_basis": "COMMUNITY_DOCUMENTED",
-    "dataset_matches": [],
+    "dataset_matches": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ],
     "exact_queries_attempted": [],
     "external_canonical_key": "external-clawfinger-forefather",
     "fields_resolved": [
+      "DynaCampEvidence",
       "IsBoss"
     ],
     "fields_unresolved": [
@@ -47056,7 +47475,9 @@
       "https://anarchyonline.fandom.com/wiki/Unique_Mobs"
     ],
     "web_sources_found": [
-      "https://anarchyonline.fandom.com/wiki/Unique_Mobs"
+      "https://anarchyonline.fandom.com/wiki/Unique_Mobs",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -47276,16 +47697,20 @@
     "candidate_name": "Den Mantis Breeder",
     "classification": "CONFIRMED_ENEMY_TYPE",
     "classification_basis": "COMMUNITY_DOCUMENTED",
-    "dataset_matches": [],
+    "dataset_matches": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ],
     "exact_queries_attempted": [],
     "external_canonical_key": "external-den-mantis-breeder",
     "fields_resolved": [
-      "EnemyFamily",
-      "MinimumLevel",
-      "MaximumLevel",
-      "PlayfieldNames",
       "AttackTypes",
-      "IsBoss"
+      "DynaCampEvidence",
+      "EnemyFamily",
+      "IsBoss",
+      "MaximumLevel",
+      "MinimumLevel",
+      "PlayfieldNames"
     ],
     "fields_unresolved": [
       "RDB mapping",
@@ -47301,7 +47726,9 @@
       "https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den"
     ],
     "web_sources_found": [
-      "https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den"
+      "https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -48616,10 +49043,14 @@
     "candidate_name": "Mantis Queen",
     "classification": "CONFIRMED_BOSS",
     "classification_basis": "COMMUNITY_DOCUMENTED",
-    "dataset_matches": [],
+    "dataset_matches": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ],
     "exact_queries_attempted": [],
     "external_canonical_key": "external-mantis-queen",
     "fields_resolved": [
+      "DynaCampEvidence",
       "IsBoss"
     ],
     "fields_unresolved": [
@@ -48636,7 +49067,9 @@
       "https://anarchyonline.fandom.com/wiki/Unique_Mobs"
     ],
     "web_sources_found": [
-      "https://anarchyonline.fandom.com/wiki/Unique_Mobs"
+      "https://anarchyonline.fandom.com/wiki/Unique_Mobs",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {
@@ -50074,10 +50507,14 @@
     "candidate_name": "The Iron Reet",
     "classification": "CONFIRMED_BOSS",
     "classification_basis": "COMMUNITY_DOCUMENTED",
-    "dataset_matches": [],
+    "dataset_matches": [
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
+    ],
     "exact_queries_attempted": [],
     "external_canonical_key": "external-the-iron-reet",
     "fields_resolved": [
+      "DynaCampEvidence",
       "IsBoss"
     ],
     "fields_unresolved": [
@@ -50094,7 +50531,9 @@
       "https://anarchyonline.fandom.com/wiki/Unique_Mobs"
     ],
     "web_sources_found": [
-      "https://anarchyonline.fandom.com/wiki/Unique_Mobs"
+      "https://anarchyonline.fandom.com/wiki/Unique_Mobs",
+      "SRC-DYNA-ODT-001",
+      "SRC-DYNA-ODT-001"
     ]
   },
   {

@@ -565,3 +565,15 @@
 - Client RDB type 1040023 exposes template identifiers and names but the available AODB reader exposes unknown layouts only as raw bytes.
 - Levels, hostility, boss/mission flags, spawn definitions, and weapon/attack links are therefore preserved as unresolved rather than inferred.
 - Zone links are evidence-ranked name-token matches against RDB district/area/statel text and are not exact spawn proof.
+
+## ODT Dyna Camp Import
+
+- Rows imported: 174
+- Exact source family labels: 46
+- Normalized families: 42
+- Zones: 9
+- Coordinates: 174
+- Approximate boss levels: 174
+- Minion-level rows: 170
+- Boss-only camps: 4
+- Confidence: COMMUNITY_DOCUMENTED

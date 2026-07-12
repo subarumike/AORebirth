@@ -72,7 +72,7 @@ def write_outputs(out, dump, catalog, sources, commit):
     return scanned,len(unresolved)
 
 def main(argv=None):
-    ap=argparse.ArgumentParser(); ap.add_argument("--validate",action="store_true"); ap.add_argument("--build-workbook",action="store_true"); ap.add_argument("--dump"); ap.add_argument("--output",default="docs/generated/enemy_catalog")
+    ap=argparse.ArgumentParser(); ap.add_argument("--validate",action="store_true"); ap.add_argument("--build-workbook",action="store_true"); ap.add_argument("--import-dyna-odt"); ap.add_argument("--dump"); ap.add_argument("--output",default="docs/generated/enemy_catalog")
     args=ap.parse_args(argv); root=Path(__file__).resolve().parents[2]; dump_path=Path(args.dump) if args.dump else root/"tools-temp/enemy-catalog-rdb-inventory.json"
     if not args.dump:
         script=root/"tools/enemy_catalog/export_rdb_inventory.ps1"
@@ -87,6 +87,9 @@ def main(argv=None):
         assert first==second and len({x["CanonicalEnemyKey"] for x in catalog})==len(catalog)
         assert all(x["MinimumLevel"] is None or x["MaximumLevel"] is None or x["MinimumLevel"]<=x["MaximumLevel"] for x in catalog)
     subprocess.run([sys.executable,str(root/"Tools/enemy_catalog/enrich_enemy_catalog.py"),str(root)],cwd=root,check=True)
+    dyna=[sys.executable,str(root/"Tools/enemy_catalog/import_dyna_odt.py"),"--output",str(root/args.output)]
+    if args.import_dyna_odt: dyna += ["--source",args.import_dyna_odt]
+    if args.import_dyna_odt or (root/args.output/"sources/dyna_boss_list_1.normalized.json").exists(): subprocess.run(dyna,cwd=root,check=True)
     if args.build_workbook:
         node=os.environ.get("CODEX_BUNDLED_NODE","node")
         if not os.environ.get("CODEX_NODE_MODULES"):
