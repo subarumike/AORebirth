@@ -46,10 +46,9 @@ namespace aorf
         auto utilsBase = reinterpret_cast<uint8_t*>(utils);
         void** importSlot = reinterpret_cast<void**>(guiBase + 0x1A83D0);
         void* expectedTarget = utilsBase + 0x82E6;
-        constexpr uint8_t ExpectedCaller[] =
+        constexpr uint8_t ExpectedCallerPrefix[] =
         {
-            0x8B, 0x4D, 0x0C, 0x50, 0x8D, 0x45, 0xB8, 0x50,
-            0xFF, 0x15, 0xD0, 0x83, 0x1A, 0x10
+            0x8B, 0x4D, 0x0C, 0x50, 0x8D, 0x45, 0xB8, 0x50, 0xFF, 0x15
         };
         constexpr uint8_t ExpectedTarget[] =
         {
@@ -57,7 +56,13 @@ namespace aorf
             0x8B, 0x45, 0x08, 0xD8, 0x01
         };
 
-        if (std::memcmp(guiBase + 0x14C4A1, ExpectedCaller, sizeof(ExpectedCaller)) != 0 ||
+        uint32_t importedSlotOperand = 0;
+        std::memcpy(&importedSlotOperand, guiBase + 0x14C4AB, sizeof(importedSlotOperand));
+        if (std::memcmp(
+                guiBase + 0x14C4A1,
+                ExpectedCallerPrefix,
+                sizeof(ExpectedCallerPrefix)) != 0 ||
+            importedSlotOperand != reinterpret_cast<uint32_t>(importSlot) ||
             std::memcmp(expectedTarget, ExpectedTarget, sizeof(ExpectedTarget)) != 0 ||
             *importSlot != expectedTarget)
         {
