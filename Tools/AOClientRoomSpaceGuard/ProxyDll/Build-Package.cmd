@@ -53,6 +53,7 @@ cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
   "%SRC%\dllmain.cpp" ^
   "%SRC%\logging.cpp" ^
   "%SRC%\gui_rect_fix.cpp" ^
+  "%SRC%\randy_color_fix.cpp" ^
   "%SRC%\roomspace_fix.cpp" ^
   "%SRC%\version_proxy.cpp" ^
   /link /DLL /MACHINE:X86 /LTCG /OPT:REF /OPT:ICF /DYNAMICBASE /NXCOMPAT ^
