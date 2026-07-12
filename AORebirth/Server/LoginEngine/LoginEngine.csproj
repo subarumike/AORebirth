@@ -92,6 +92,8 @@
     <Compile Include="CharacterCreation\NanotechnicianStarterLoadout.cs" />
     <Compile Include="CharacterCreation\ShadeStarterLoadout.cs" />
     <Compile Include="CharacterCreation\SoldierStarterLoadout.cs" />
+    <Compile Include="CharacterCreation\StarterVitalStats.cs" />
+    <Compile Include="CharacterCreation\StarterXpStats.cs" />
     <Compile Include="CharacterCreation\TraderStarterLoadout.cs" />
     <Compile Include="Component\ClientFactory.cs" />
     <Compile Include="CoreServer\LoginServer.cs" />

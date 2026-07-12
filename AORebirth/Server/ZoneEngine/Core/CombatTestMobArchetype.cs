@@ -52,7 +52,8 @@ namespace ZoneEngine.Core
             new[] { 1044525 },
             0x1F,
             6,
-            500,
+            LiveObservedDeathActionKey,
+            260,
             NpcAiProfile.Passive);
 
         public static readonly Entry IslandReet = new Entry(
@@ -386,6 +387,10 @@ namespace ZoneEngine.Core
             SetMobStat(mobCharacter, StatIds.damagetype, (int)StatIds.meleeac);
             SetMobStat(mobCharacter, StatIds.weapontype, 0);
             SetMobStat(mobCharacter, StatIds.equippedweapons, 0);
+            if (entry.XpReward > 0)
+            {
+                SetMobStat(mobCharacter, StatIds.xp, entry.XpReward);
+            }
 
             NPCController npcController = mobCharacter.Controller as NPCController;
             if (npcController != null)
@@ -434,6 +439,7 @@ namespace ZoneEngine.Core
                     0x1F,
                     EnemyBehaviorContract.NpcRunSpeedForMaxFollowSpeed,
                     LiveObservedDeathActionKey,
+                    0,
                     aiProfile)
             {
             }
@@ -455,6 +461,7 @@ namespace ZoneEngine.Core
                 int visualFlags,
                 int runSpeedBase,
                 int deathAnimationKey,
+                int xpReward,
                 NpcAiProfile aiProfile)
             {
                 this.Key = key;
@@ -473,6 +480,7 @@ namespace ZoneEngine.Core
                 this.VisualFlags = visualFlags;
                 this.RunSpeedBase = runSpeedBase;
                 this.DeathAnimationKey = deathAnimationKey;
+                this.XpReward = xpReward;
                 this.AiProfile = aiProfile;
             }
 
@@ -521,6 +529,8 @@ namespace ZoneEngine.Core
             public int RunSpeedBase { get; private set; }
 
             public int DeathAnimationKey { get; private set; }
+
+            public int XpReward { get; private set; }
 
             public NpcAiProfile AiProfile { get; private set; }
 

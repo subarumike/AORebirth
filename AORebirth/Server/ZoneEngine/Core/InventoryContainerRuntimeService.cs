@@ -816,6 +816,11 @@ namespace ZoneEngine.Core
                 return true;
             }
 
+            if (this.TryUseStarterVitalConsumable(character, itemPosition, item))
+            {
+                return true;
+            }
+
             TemplateActionMessageHandler.Default.Send(
                 character,
                 item,
@@ -839,6 +844,60 @@ namespace ZoneEngine.Core
 
             item.PerformAction(character, EventType.OnUse, itemPosition.Instance);
             return true;
+        }
+
+        private bool TryUseStarterVitalConsumable(ICharacter character, Identity itemPosition, Item item)
+        {
+            if (!this.IsStarterVitalConsumable(item))
+            {
+                return false;
+            }
+
+            int maxHealth = Math.Max(1, character.Stats[StatIds.life].Value);
+            int maxNano = Math.Max(0, character.Stats[StatIds.maxnanoenergy].Value);
+            character.Stats[StatIds.health].Value = maxHealth;
+            character.Stats[StatIds.health].BaseValue = (uint)maxHealth;
+            character.Stats[StatIds.currentnano].Value = maxNano;
+            character.Stats[StatIds.currentnano].BaseValue = (uint)maxNano;
+
+            StatMessageHandler.Default.SendSingle(character, (int)StatIds.health, (uint)maxHealth);
+            StatMessageHandler.Default.SendSingle(character, (int)StatIds.currentnano, (uint)maxNano);
+
+            this.ConsumeInventoryStackItem(character, itemPosition, item);
+            return true;
+        }
+
+        private bool IsStarterVitalConsumable(Item item)
+        {
+            const int healthAndNanoStim = 291043;
+            const int healthAndNanoRecharger = 291082;
+
+            return item.LowID == healthAndNanoStim
+                   || item.HighID == healthAndNanoStim
+                   || item.LowID == healthAndNanoRecharger
+                   || item.HighID == healthAndNanoRecharger;
+        }
+
+        private void ConsumeInventoryStackItem(ICharacter character, Identity itemPosition, Item item)
+        {
+            item.MultipleCount--;
+            if (item.MultipleCount <= 0)
+            {
+                character.BaseInventory.RemoveItem(
+                    (int)itemPosition.Type,
+                    itemPosition.Instance);
+                CharacterActionMessageHandler.Default.SendDeleteItem(
+                    character,
+                    (int)itemPosition.Type,
+                    itemPosition.Instance);
+                return;
+            }
+
+            IInventoryPage page;
+            if (character.BaseInventory.Pages.TryGetValue((int)itemPosition.Type, out page))
+            {
+                page.Write();
+            }
         }
 
         public void DeleteInventoryItemAction(ICharacter character, CharacterActionMessage message)

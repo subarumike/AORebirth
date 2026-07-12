@@ -989,6 +989,9 @@ namespace ZoneEngine.Core.Controllers
 
             this.Character.Stats.GetChangedStats(toPlayer, toPlayfield);
 
+            CombatXpRuntimeService.RemoveWireManagedStatsFromBulk(toPlayer);
+            CombatXpRuntimeService.RemoveWireManagedStatsFromBulk(toPlayfield);
+
             StatMessageHandler.Default.SendBulk(this.Character, toPlayer, toPlayfield);
         }
 

@@ -476,9 +476,14 @@ namespace ZoneEngine.Core
 
                         if (!disconnectCharacter.InLogoutTimerPeriod())
                         {
-                            disconnectCharacter.EnterLogoutSitPosture();
-                            this.Controller.State = CharacterState.Idle;
-                            disconnectCharacter.StartLogoutTimer();
+                            bool isZoneTransfer =
+                                ActiveNanoRuntimeService.Default.HasZoneTransferStash(characterId);
+                            if (!isZoneTransfer)
+                            {
+                                disconnectCharacter.EnterLogoutSitPosture();
+                                this.Controller.State = CharacterState.Idle;
+                                disconnectCharacter.StartLogoutTimer();
+                            }
                         }
 
                         //if (this == this.character.Client)

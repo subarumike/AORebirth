@@ -86,6 +86,7 @@
     <Compile Include="..\..\SolutionAssemblyInfo.cs">
       <Link>Properties\SolutionAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="ChatCommands\Backflip.cs" />
     <Compile Include="ChatCommands\ChatCommandGet.cs" />
     <Compile Include="ChatCommands\ChatCommandCreateOrg.cs" />
     <Compile Include="ChatCommands\ChatCommandGiveCredits.cs" />
@@ -151,6 +152,8 @@
     <Compile Include="Core\CombatCorpseRules.cs" />
     <Compile Include="Core\CombatDamageRules.cs" />
     <Compile Include="Core\DamageCalculation.cs" />
+    <Compile Include="Core\CombatXpRuntimeService.cs" />
+    <Compile Include="Core\SocialActionRuntimeService.cs" />
     <Compile Include="Core\CombatTestMobArchetype.cs" />
     <Compile Include="Core\ChatCommandText.cs" />
     <Compile Include="Core\GridZoneInDiagnostics.cs" />

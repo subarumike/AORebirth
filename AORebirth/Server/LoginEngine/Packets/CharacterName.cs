@@ -334,9 +334,12 @@ namespace LoginEngine.Packets
             // Agility / 17
             stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 17, StatValue = this.Abis[5] });
 
-            // Set HP and NP auf 1
-            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 1, StatValue = 1 });
-            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 214, StatValue = 1 });
+            // Title level
+            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 37, StatValue = 1 });
+
+            // Starter skill bases used by HP/NP formulas
+            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 152, StatValue = 5 });
+            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 132, StatValue = 5 });
 
             // NPCFamily / 455
             stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 455, StatValue = 0 });
@@ -410,6 +413,9 @@ namespace LoginEngine.Packets
             {
                 ShadeStarterLoadout.Apply(charID);
             }
+
+            StarterVitalStats.Apply(charID, this.Breed, this.Profession, this.Abis);
+            StarterXpStats.Apply(charID);
 
             return charID;
         }

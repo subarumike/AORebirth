@@ -197,7 +197,11 @@ namespace ZoneEngine.Core.Packets
                 lastName = character.LastName;
                 orgNameLength = character.OrganizationName.Length;
                 orgName = character.OrganizationName;
-                levelValue = character.Stats[StatIds.level].Value;
+                levelValue = (int)character.Stats[StatIds.level].BaseValue;
+                if (levelValue <= 0 || levelValue > 200)
+                {
+                    levelValue = 1;
+                }
                 healthValue = character.Stats[StatIds.life].Value;
 
                 monsterData = character.Stats[StatIds.monsterdata].Value;

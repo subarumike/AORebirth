@@ -132,6 +132,11 @@ namespace ZoneEngine.Core.Arete.Quests
             return true;
         }
 
+        public static bool HasActiveProgress(ICharacter source)
+        {
+            return GetProgressForCharacter(source) != null;
+        }
+
         public static RexB18CProgressUpdateResult TryObserveNpcDeath(
             ICharacter attacker,
             ICharacter target)
@@ -376,60 +381,8 @@ namespace ZoneEngine.Core.Arete.Quests
 
             public static bool TrySend(ICharacter character, ObjectiveProgressRecord progress)
             {
-                if (character == null || character.Controller == null || character.Controller.Client == null)
-                {
-                    Log(
-                        "feedback skipped mission={0} reason=missing-client progress={1}/{2} noQuestDelete=true noCompletion=true",
-                        MissionId,
-                        ProgressCount(progress),
-                        RequiredCount);
-                    return false;
-                }
-
-                if (progress == null)
-                {
-                    Log(
-                        "feedback skipped mission={0} reason=missing-progress noQuestDelete=true noCompletion=true",
-                        MissionId);
-                    return false;
-                }
-
-                string formatFeedback = GetCapturedRemainingCountFeedback(progress.CurrentCount);
-                if (!string.IsNullOrEmpty(formatFeedback))
-                {
-                    character.Controller.Client.SendCompressed(
-                        new FormatFeedbackMessage
-                        {
-                            Identity = character.Identity,
-                            Unknown = 1,
-                            Unknown1 = 0,
-                            FormattedMessage = formatFeedback,
-                            Unknown2 = 0
-                        });
-                }
-
-                character.Controller.Client.SendCompressed(
-                    new FeedbackMessage
-                    {
-                        Identity = character.Identity,
-                        Unknown = 1,
-                        Unknown1 = 0,
-                        CategoryId = FeedbackCategoryId,
-                        MessageId = FeedbackMessageId
-                    });
-
-                Log(
-                    "feedback sent mission={0} character={1} progress={2}/{3} formatFeedback={4} feedbackCategory={5} feedbackMessage={6} sender=server capturedSource=20260614-194454/system-messages.log completionHandoffCandidate={7} noRewards=true noDbWrites=true",
-                    MissionId,
-                    IdentityText(character),
-                    progress.CurrentCount,
-                    progress.RequiredCount,
-                    !string.IsNullOrEmpty(formatFeedback),
-                    FeedbackCategoryId,
-                    FeedbackMessageId,
-                    progress.Completed);
-
-                return true;
+                // B18C kill feedback disabled until mission work resumes.
+                return false;
             }
 
             private static string GetCapturedRemainingCountFeedback(int currentCount)

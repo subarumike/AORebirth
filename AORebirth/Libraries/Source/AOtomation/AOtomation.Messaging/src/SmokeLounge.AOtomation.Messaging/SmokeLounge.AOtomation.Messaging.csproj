@@ -236,6 +236,7 @@
     <Compile Include="Messages\N3Messages\KnuBotFinishTradeMessage.cs" />
     <Compile Include="Messages\N3Messages\CharDCMoveMessage.cs" />
     <Compile Include="Messages\N3Messages\CharInPlayMessage.cs" />
+    <Compile Include="Messages\N3Messages\NewLevelMessage.cs" />
     <Compile Include="Messages\N3Messages\ContainerAddItemMessage.cs" />
     <Compile Include="Messages\N3Messages\FollowTargetMessage.cs" />
     <Compile Include="Messages\N3Messages\GenericCmdAction.cs" />

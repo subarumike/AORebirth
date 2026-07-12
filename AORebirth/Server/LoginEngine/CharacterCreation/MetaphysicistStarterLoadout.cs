@@ -57,12 +57,6 @@ namespace LoginEngine.CharacterCreation
             public int Count;
         }
 
-        private const int StarterLife = 25;
-        private const int StarterHealth = 25;
-        private const int StarterNano = 25;
-        private const int StarterMaxNano = 25;
-        private const int CharacterStatType = 50000;
-
         private static readonly StarterItemDefinition[] Items =
         {
             new StarterItemDefinition { Placement = 64, LowId = 291082, HighId = 291082, Quality = 1, Count = 50 },
@@ -78,61 +72,7 @@ namespace LoginEngine.CharacterCreation
 
         public static void Apply(int characterId)
         {
-            ApplyStarterStats(characterId);
             ApplyStarterItems(characterId);
-        }
-
-        private static void ApplyStarterStats(int characterId)
-        {
-            var stats = new List<DBStats>
-                        {
-                            new DBStats
-                            {
-                                Type = CharacterStatType,
-                                Instance = characterId,
-                                StatId = 1,
-                                StatValue = StarterLife
-                            },
-                            new DBStats
-                            {
-                                Type = CharacterStatType,
-                                Instance = characterId,
-                                StatId = 27,
-                                StatValue = StarterHealth
-                            },
-                            new DBStats
-                            {
-                                Type = CharacterStatType,
-                                Instance = characterId,
-                                StatId = 214,
-                                StatValue = StarterNano
-                            },
-                            new DBStats
-                            {
-                                Type = CharacterStatType,
-                                Instance = characterId,
-                                StatId = 221,
-                                StatValue = StarterMaxNano
-                            },
-                        };
-
-            foreach (DBStats stat in stats)
-            {
-                DBStats existing = StatDao.Instance.GetById(stat.Type, stat.Instance, stat.StatId);
-                if (existing.Id != 0)
-                {
-                    if (existing.StatValue == stat.StatValue)
-                    {
-                        continue;
-                    }
-
-                    existing.StatValue = stat.StatValue;
-                    StatDao.Instance.Save(existing);
-                    continue;
-                }
-
-                StatDao.Instance.Add(stat);
-            }
         }
 
         private static void ApplyStarterItems(int characterId)

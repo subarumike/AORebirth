@@ -3190,7 +3190,7 @@ namespace AORebirth.Stats
             this.lastPerkResetTime = new Stat(this, 577, 0, false, false, false);
             this.lastRnd = new Stat(this, 522, 1234567890, false, false, false);
             this.lastSK = new Stat(this, 574, 0, false, false, false);
-            this.lastSaveXP = new Stat(this, 372, 0, false, false, false);
+            this.lastSaveXP = new Stat(this, 372, 0, true, false, false);
             this.lastSaved = new Stat(this, 249, 1234567890, false, false, false);
             this.lastXP = new Stat(this, 57, 0, false, false, false);
             this.leaderLockDownTime = new Stat(this, 614, 1234567890, false, false, false);
@@ -3468,7 +3468,7 @@ namespace AORebirth.Stats
             this.rotation = new Stat(this, 400, 1234567890, false, false, false);
             this.rp = new Stat(this, 199, 0, false, false, false);
             this.runSpeed = new StatSkill(this, 156, 5, true, false, false);
-            this.savedXP = new Stat(this, 334, 0, false, false, false);
+            this.savedXP = new Stat(this, 334, 0, true, false, false);
             this.school = new Stat(this, 405, 1234567890, false, false, false);
             this.secondaryItemInstance = new Stat(this, 83, 1234567890, false, false, false);
             this.secondaryItemTemplate = new Stat(this, 273, 1234567890, false, false, false);
@@ -3581,7 +3581,7 @@ namespace AORebirth.Stats
             this.twohEdgedWeapons = new StatSkill(this, 105, 5, true, false, false);
             this.unarmedTemplateInstance = new Stat(this, 418, 0, false, false, false);
             this.unreadMailCount = new Stat(this, 649, 0, false, false, false);
-            this.unsavedXP = new Stat(this, 592, 0, false, false, false);
+            this.unsavedXP = new Stat(this, 592, 0, true, false, false);
             this.userInstance = new Stat(this, 85, 1234567890, false, false, false);
             this.userType = new Stat(this, 84, 1234567890, false, false, false);
             this.vehicleAC = new Stat(this, 664, 1234567890, false, false, false);
@@ -3608,7 +3608,7 @@ namespace AORebirth.Stats
             this.weaponStyleLeft = new Stat(this, 1015, 0, false, false, false);
             this.weaponStyleRight = new Stat(this, 1016, 0, false, false, false);
             this.weaponsStyle = new Stat(this, 1003, 1234567890, false, false, false);
-            this.xp = new Stat(this, 52, 0, false, false, false);
+            this.xp = new Stat(this, 52, 0, true, false, false);
             this.xpBonus = new Stat(this, 341, 1234567890, false, false, false);
             this.xpKillRange = new Stat(this, 275, 5, false, false, false);
             this.xpModifier = new Stat(this, 319, 0, false, false, false);
@@ -12088,13 +12088,9 @@ namespace AORebirth.Stats
                 }
             }
 
-            if (temp.Count == 0)
+            if (temp.Count > 0)
             {
-                StatDao.Instance.Delete(new { type = typ, Id = inst });
-            }
-            else
-            {
-                StatDao.Instance.BulkReplace(temp);
+                StatDao.Instance.BulkUpsert(temp);
             }
 
             return true;
