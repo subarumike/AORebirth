@@ -355,7 +355,8 @@ namespace ZoneEngine.Core.Playfields
                 5,
                 x,
                 y,
-                z);
+                z,
+                respawnDelaySeconds: 240.0);
         }
 
         private static CapturedSubwaySpawnDefinition DiscardedPet(

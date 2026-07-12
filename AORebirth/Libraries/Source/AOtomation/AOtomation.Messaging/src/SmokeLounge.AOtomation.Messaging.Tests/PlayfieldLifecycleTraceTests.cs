@@ -524,6 +524,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && providerText.Contains("101761")
                 && providerText.Contains("110192"),
                 "Filth Flea must retain captured Subway corpse loot evidence from completed inventory captures.");
+            string filthFleaFactory = ExtractMethodBlock(
+                providerText,
+                "private static CapturedSubwaySpawnDefinition FilthFlea");
+            Assert.IsTrue(
+                filthFleaFactory.Contains("respawnDelaySeconds: 240.0"),
+                "Filth Flea must retain the captured four-minute post-despawn respawn schedule.");
             Assert.IsTrue(
                 corpseRulesText.Contains("20260709-210452 and 20260709-220439")
                 && corpseRulesText.Contains("CorpseFullUpdate packets for monsterData 17657")
@@ -1564,13 +1570,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string[] acceptedEnemyKeys =
                 {
-                    "Thief|26092|138"
+                    "Thief|26092|138",
+                    "Filth Flea|17657|138"
                 };
 
             Assert.AreEqual(
-                1,
+                2,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
+
+            Assert.IsTrue(
+                providerText.Contains("private static CapturedSubwaySpawnDefinition FilthFlea(")
+                && providerText.Contains("respawnDelaySeconds: 240.0")
+                && providerText.Contains("20260709-210452 and 20260709-220439, inventory-updates.csv")
+                && combatContractText.Contains("case 17657:")
+                && attackRulesText.Contains("CapturedSubwayFilthFleaMonsterData = 17657")
+                && movementCoordinatorText.Contains("CreateCapturedSubwayFilthFleaSpecialAttacks()")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue")
+                && scfuPacketText.Contains("SubwayFilthFleaMonsterData = 17657")
+                && scfuPacketText.Contains("CapturedSubwayFilthFleaExtendedTextureOverrideData")
+                && corpsePacketText.Contains("CapturedSubwayFilthFleaPacketLength = 457")
+                && corpsePacketText.Contains("BuildCapturedSubwayFilthFlea(")
+                && corpseRulesText.Contains("new ObservedCorpseCreditRule(\"Filth Flea\", 17657, 29, 79)"),
+                "Accepted Subway Filth Flea must keep spawn, movement/chase, combat, appearance, corpse visual, loot, credits, and four-minute respawn coverage together.");
 
             Assert.IsTrue(
                 providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0))")

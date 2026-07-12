@@ -33,8 +33,8 @@ CSV_HEADER = [
 RESPAWN_CSV_HEADER = [
     "GeneratedUtc", "Status", "DeathIdentity", "Name", "MonsterData",
     "NpcFamily", "DeathUtc", "DeathX", "DeathY", "DeathZ",
-    "CorpseIdentity", "CorpseSeenUtc", "RespawnIdentity", "RespawnUtc",
-    "RespawnDelaySeconds", "RespawnX", "RespawnY", "RespawnZ",
+    "CorpseIdentity", "CorpseSeenUtc", "CorpseGoneUtc", "RespawnIdentity", "RespawnUtc",
+    "RespawnDelaySeconds", "RespawnAfterCorpseGoneSeconds", "RespawnX", "RespawnY", "RespawnZ",
     "PositionDelta", "ElapsedAfterDeathSeconds", "CandidateCount", "Detail",
 ]
 
@@ -233,6 +233,51 @@ def load_enemy_profiles(path):
     return profiles
 
 
+def load_enemy_dossier_profiles(path):
+    profiles = {}
+    if not path.exists():
+        return profiles
+
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    for enemy in data.get("enemies", []):
+        identity_value = enemy.get("identity", "")
+        if not identity_value:
+            continue
+        profiles[identity_value] = {
+            "Name": str(enemy.get("name", "")),
+            "MonsterData": str(enemy.get("monsterData", "")),
+            "NpcFamily": str(enemy.get("npcFamily", "")),
+        }
+    return profiles
+
+
+def identity_key(value):
+    value = (value or "").strip().strip("()")
+    if ":" not in value:
+        return value.upper()
+    identity_type, instance = value.split(":", 1)
+    try:
+        instance = f"{int(instance, 16):08X}"
+    except ValueError:
+        instance = instance.upper()
+    return f"{identity_type.upper()}:{instance}"
+
+
+def load_corpse_gone_times(path):
+    gone_times = {}
+    if not path.exists():
+        return gone_times
+
+    with path.open("r", encoding="utf-8-sig", newline="") as handle:
+        for row in csv.DictReader(handle):
+            if row.get("Phase") != "corpse-gone":
+                continue
+            corpse_identity = identity_key(row.get("PrimaryIdentity", ""))
+            if corpse_identity:
+                gone_times[corpse_identity] = row.get("CapturedUtc", "")
+    return gone_times
+
+
 def load_corpse_by_dead_npc(path):
     corpses = {}
     if not path.exists():
@@ -251,19 +296,27 @@ def load_corpse_by_dead_npc(path):
 
 
 def same_profile(dead_profile, candidate_profile):
-    required_fields = ("Name", "MonsterData", "NpcFamily")
-    return all(
+    required_fields = ("Name", "MonsterData")
+    if not all(
         dead_profile.get(field)
         and candidate_profile.get(field)
         and dead_profile.get(field) == candidate_profile.get(field)
         for field in required_fields
-    )
+    ):
+        return False
+    dead_family = dead_profile.get("NpcFamily", "")
+    candidate_family = candidate_profile.get("NpcFamily", "")
+    return not dead_family or not candidate_family or dead_family == candidate_family
 
 
 def build_enemy_respawns(capture, corpse_csv):
     state_rows, skipped_state_rows = load_enemy_state_rows(capture / "enemy-state.csv")
-    profiles = load_enemy_profiles(capture / "enemy-full-updates.csv")
+    profiles = load_enemy_dossier_profiles(capture / "enemy-dossier.json")
+    for identity_value, profile in load_enemy_profiles(capture / "enemy-full-updates.csv").items():
+        existing = profiles.setdefault(identity_value, {})
+        existing.update({key: value for key, value in profile.items() if value})
     corpses = load_corpse_by_dead_npc(corpse_csv)
+    corpse_gone_times = load_corpse_gone_times(capture / "npc-lifecycle.csv")
     capture_end = parse_timestamp(state_rows[-1]["timestamp"]) if state_rows else None
     generated_utc = dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z")
     observations = []
@@ -299,6 +352,8 @@ def build_enemy_respawns(capture, corpse_csv):
             status = "ambiguous"
 
         corpse = corpses.get(dead_identity, {})
+        corpse_gone_utc = corpse_gone_times.get(identity_key(corpse.get("CorpseIdentity", "")), "")
+        corpse_gone_time = parse_timestamp(corpse_gone_utc)
         selected_time = selected[0] if selected else None
         selected_delta = selected[1] if selected else None
         selected_row = selected[2] if selected else {}
@@ -316,11 +371,17 @@ def build_enemy_respawns(capture, corpse_csv):
             "DeathZ": death.get("z", ""),
             "CorpseIdentity": corpse.get("CorpseIdentity", ""),
             "CorpseSeenUtc": corpse.get("CorpseSeenUtc", ""),
+            "CorpseGoneUtc": corpse_gone_utc,
             "RespawnIdentity": selected_row.get("entityId", "") if selected else "",
             "RespawnUtc": selected_row.get("timestamp", "") if selected else "",
             "RespawnDelaySeconds": (
                 f"{max(0, (selected_time - death_time).total_seconds()):.3f}"
                 if selected_time
+                else ""
+            ),
+            "RespawnAfterCorpseGoneSeconds": (
+                f"{max(0, (selected_time - corpse_gone_time).total_seconds()):.3f}"
+                if selected_time and corpse_gone_time
                 else ""
             ),
             "RespawnX": selected_row.get("x", "") if selected else "",

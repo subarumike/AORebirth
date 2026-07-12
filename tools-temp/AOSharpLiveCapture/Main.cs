@@ -1070,6 +1070,7 @@ namespace AOSharpLiveCapture
 
                 foreach (string removed in this.knownCorpses.Except(currentCorpses).ToArray())
                 {
+                    DateTime goneUtc = DateTime.UtcNow;
                     this.corpseGoneEventCount++;
                     this.LogEvent("CORPSE-GONE", removed);
                     this.LogNpcLifecycleRow(
@@ -1081,6 +1082,14 @@ namespace AOSharpLiveCapture
                         string.Empty,
                         string.Empty,
                         string.Empty);
+                    foreach (CorpseLifecycleEvidence evidence in this.corpseEvidenceByDeadNpc.Values)
+                    {
+                        if (!evidence.CorpseGoneUtc.HasValue
+                            && NormalizeIdentityKey(evidence.CorpseIdentity) == NormalizeIdentityKey(removed))
+                        {
+                            evidence.CorpseGoneUtc = goneUtc;
+                        }
+                    }
                     this.knownCorpses.Remove(removed);
                 }
             }
@@ -2358,7 +2367,11 @@ namespace AOSharpLiveCapture
             }
 
             bool registered = this.TryRegisterFocusedEnemyFromMessage(direction, sequence, message);
-            return registered || this.MessageTouchesFocusedEnemy(message);
+            SimpleCharFullUpdateMessage simpleCharFullUpdate = message as SimpleCharFullUpdateMessage;
+            return registered
+                || this.MessageTouchesFocusedEnemy(message)
+                || (simpleCharFullUpdate != null && this.IsEnemySimpleCharUpdate(simpleCharFullUpdate))
+                || this.IsTrackableEnemyIdentity(message.Identity);
         }
 
         private bool TryRegisterFocusedEnemyFromMessage(string direction, int sequence, N3Message message)
@@ -3898,7 +3911,7 @@ namespace AOSharpLiveCapture
                 List<EnemyRespawnObservation> observations = this.BuildEnemyRespawnObservations(captureEndUtc);
                 using (StreamWriter writer = CreateWriter(path))
                 {
-                    writer.WriteLine("GeneratedUtc,Status,DeathIdentity,Name,MonsterData,NpcFamily,DeathUtc,DeathX,DeathY,DeathZ,CorpseIdentity,CorpseSeenUtc,RespawnIdentity,RespawnUtc,RespawnDelaySeconds,RespawnX,RespawnY,RespawnZ,PositionDelta,ElapsedAfterDeathSeconds,CandidateCount,Detail");
+                    writer.WriteLine("GeneratedUtc,Status,DeathIdentity,Name,MonsterData,NpcFamily,DeathUtc,DeathX,DeathY,DeathZ,CorpseIdentity,CorpseSeenUtc,CorpseGoneUtc,RespawnIdentity,RespawnUtc,RespawnDelaySeconds,RespawnAfterCorpseGoneSeconds,RespawnX,RespawnY,RespawnZ,PositionDelta,ElapsedAfterDeathSeconds,CandidateCount,Detail");
                     string generatedUtc = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
                     foreach (EnemyRespawnObservation observation in observations)
                     {
@@ -3919,12 +3932,18 @@ namespace AOSharpLiveCapture
                                 observation.CorpseSeenUtc.HasValue
                                     ? Csv(observation.CorpseSeenUtc.Value.ToString("o", CultureInfo.InvariantCulture))
                                     : string.Empty,
+                                observation.CorpseGoneUtc.HasValue
+                                    ? Csv(observation.CorpseGoneUtc.Value.ToString("o", CultureInfo.InvariantCulture))
+                                    : string.Empty,
                                 Csv(observation.RespawnIdentity),
                                 observation.RespawnUtc.HasValue
                                     ? Csv(observation.RespawnUtc.Value.ToString("o", CultureInfo.InvariantCulture))
                                     : string.Empty,
                                 observation.RespawnDelaySeconds.HasValue
                                     ? observation.RespawnDelaySeconds.Value.ToString("0.###", CultureInfo.InvariantCulture)
+                                    : string.Empty,
+                                observation.RespawnAfterCorpseGoneSeconds.HasValue
+                                    ? observation.RespawnAfterCorpseGoneSeconds.Value.ToString("0.###", CultureInfo.InvariantCulture)
                                     : string.Empty,
                                 NullableFloat(observation.RespawnX),
                                 NullableFloat(observation.RespawnY),
@@ -3998,11 +4017,15 @@ namespace AOSharpLiveCapture
                     DeathZ = death.Z,
                     CorpseIdentity = corpse == null ? string.Empty : corpse.CorpseIdentity,
                     CorpseSeenUtc = corpse == null ? (DateTime?)null : corpse.CorpseSeenUtc,
+                    CorpseGoneUtc = corpse == null ? (DateTime?)null : corpse.CorpseGoneUtc,
                     RespawnIdentity = selected == null ? string.Empty : selected.EntityId,
                     RespawnUtc = selected == null ? (DateTime?)null : selected.TimestampUtc,
                     RespawnDelaySeconds = selected == null
                         ? (double?)null
                         : Math.Max(0, (selected.TimestampUtc - death.TimestampUtc).TotalSeconds),
+                    RespawnAfterCorpseGoneSeconds = selected == null || corpse == null || !corpse.CorpseGoneUtc.HasValue
+                        ? (double?)null
+                        : Math.Max(0, (selected.TimestampUtc - corpse.CorpseGoneUtc.Value).TotalSeconds),
                     RespawnX = selected == null ? null : selected.X,
                     RespawnY = selected == null ? null : selected.Y,
                     RespawnZ = selected == null ? null : selected.Z,
@@ -4969,11 +4992,15 @@ namespace AOSharpLiveCapture
 
             public DateTime? CorpseSeenUtc { get; set; }
 
+            public DateTime? CorpseGoneUtc { get; set; }
+
             public string RespawnIdentity { get; set; }
 
             public DateTime? RespawnUtc { get; set; }
 
             public double? RespawnDelaySeconds { get; set; }
+
+            public double? RespawnAfterCorpseGoneSeconds { get; set; }
 
             public float? RespawnX { get; set; }
 
@@ -4997,6 +5024,8 @@ namespace AOSharpLiveCapture
             public string CorpseIdentity { get; set; }
 
             public DateTime CorpseSeenUtc { get; set; }
+
+            public DateTime? CorpseGoneUtc { get; set; }
 
             public int CorpseCredits { get; set; }
 
