@@ -3091,11 +3091,6 @@ namespace AOSharpLiveCapture
                 return;
             }
 
-            if (!this.enemyFightCaptureEnabled && !this.IsFocusedEnemyIdentity(dynel.Identity))
-            {
-                return;
-            }
-
             try
             {
                 this.TrackEnemyFromCharacter(dynel.Cast<SimpleChar>(), requestedEventType, "DYNEL-SPAWNED");
@@ -3114,7 +3109,7 @@ namespace AOSharpLiveCapture
             }
 
             bool isCombatOrFocused = this.enemyFightCaptureEnabled || this.IsFocusedEnemyIdentity(character.Identity);
-            bool isPopulationEvidence = !isCombatOrFocused && this.IsDungeonEnemyPopulationEvidence(character);
+            bool isPopulationEvidence = !isCombatOrFocused && this.IsBroadVisibleEnemyEvidence(character);
             if (!isCombatOrFocused && !isPopulationEvidence)
             {
                 return;
@@ -3330,7 +3325,7 @@ namespace AOSharpLiveCapture
 
         private bool IsEnemySimpleCharUpdate(SimpleCharFullUpdateMessage message)
         {
-            if (!this.IsTrackableEnemyIdentity(message.Identity))
+            if (!this.IsSimpleNonLocalCharacterIdentity(message.Identity))
             {
                 return false;
             }
@@ -3350,7 +3345,9 @@ namespace AOSharpLiveCapture
                 return false;
             }
 
-            return this.enemyFightCaptureEnabled || this.IsFocusedEnemyIdentity(identity);
+            return this.IsFocusedEnemyIdentity(identity)
+                || this.IsTrackedEnemyState(identity.ToString())
+                || this.IsVisibleEnemyIdentity(identity);
         }
 
         private bool IsSimpleNonLocalCharacterIdentity(Identity identity)
@@ -3400,6 +3397,24 @@ namespace AOSharpLiveCapture
             lock (this.syncRoot)
             {
                 return this.enemyStates.ContainsKey(identityText);
+            }
+        }
+
+        private bool IsVisibleEnemyIdentity(Identity identity)
+        {
+            try
+            {
+                Dynel dynel = DynelManager.GetDynel(identity);
+                if (dynel == null)
+                {
+                    return false;
+                }
+
+                return this.IsEnemyCharacter(dynel.Cast<SimpleChar>());
+            }
+            catch
+            {
+                return false;
             }
         }
 
@@ -3560,21 +3575,14 @@ namespace AOSharpLiveCapture
                            CultureInfo.InvariantCulture));
         }
 
-        private bool IsDungeonEnemyPopulationEvidence(SimpleChar character)
+        private bool IsBroadVisibleEnemyEvidence(SimpleChar character)
         {
-            if (!this.IsDungeonPopulationCaptureContext())
+            if (!this.IsEnemyCharacter(character) || SafeBool(() => character.IsPlayer))
             {
                 return false;
             }
 
-            if (!SafeBool(() => character.IsNpc) || SafeBool(() => character.IsPet) || SafeBool(() => character.IsPlayer))
-            {
-                return false;
-            }
-
-            int monsterData;
-            return int.TryParse(SafeStat(character, Stat.MonsterData), NumberStyles.Integer, CultureInfo.InvariantCulture, out monsterData)
-                && monsterData > 0;
+            return true;
         }
 
         private bool IsDungeonPopulationCaptureContext()
