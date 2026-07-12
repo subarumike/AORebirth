@@ -14,6 +14,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Subway content work should use completed AOSharpLiveCapture folders supplied by Mike. Codex does not launch the AO client or capture tooling unless Mike explicitly instructs it in the current task.
 - Prefer visible Subway gameplay improvements over architectural refactoring, implement incrementally within playfield `127`, and do not resume Playfield decomposition unless Mike explicitly requests it.
 - Live AO captures are authoritative. Avoid speculative fixes and require capture-backed evidence for Subway behavior.
+- Subway enemies are not accepted one subsystem at a time. The source-level accepted-enemy gate must cover spawn, movement/chase, combat contract, weapon context, corpse visual, loot, respawn, and loot/despawn behavior together before an enemy can be treated as finished.
 - Playfield runtime decomposition has completed through the latest extracted runtime services and is now maintenance work, not the active development focus.
 - Corpse open, item loot transfer, and corpse credit payout are capture-backed and live validated.
 - Loot-bearing corpses now keep their corpse state instead of receiving an initial timed despawn. Empty corpses and fully looted corpses use the 30-second empty cleanup window; this protects the first-room Subway Thief's guaranteed QL1 Stolen Handbag corpse loot from disappearing before it is looted.

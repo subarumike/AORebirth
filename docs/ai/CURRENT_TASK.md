@@ -43,6 +43,7 @@ Make the Subway dungeon, resource/playfield `127`, fully playable from capture-b
 - Implement Subway incrementally within the single resource/playfield `127`.
 - Do not resume Playfield decomposition unless Mike explicitly requests it.
 - Avoid speculative fixes; implement behavior only from capture-backed evidence.
+- Do not mark a Subway enemy accepted until `AcceptedSubwayEnemyGateRequiresWholeEnemyCoverage` covers spawn, movement/chase, combat contract, weapon context, corpse visual, loot, respawn, and loot/despawn behavior together.
 
 ## Resolved Def-Agg Finding
 

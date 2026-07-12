@@ -1212,7 +1212,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && thiefFactory.Contains("26092")
                 && thiefFactory.Contains("40694")
                 && thiefFactory.Contains("138")
-                && providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20))"),
+                && providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0))"),
                 "Captured Subway Thief must preserve live monsterData, scale, head mesh, run speed, NPC family, and current surveyed position.");
             Assert.IsTrue(
                 orchestratorText.Contains("CapturedSubwayThiefMonsterData = 26092")
@@ -1511,6 +1511,112 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && capturedBuildMethod.Contains("WriteInt32(buffer, DeadNpcInstanceOffset, deadNpc.Identity.Instance);")
                 && capturedBuildMethod.Contains("CapturedSubwayFilthFleaTailDeadNpcInstanceOffset"),
                 "Captured flea corpse construction must retain the live visual payload while patching runtime identities.");
+        }
+
+        [TestMethod]
+        public void AcceptedSubwayEnemyGateRequiresWholeEnemyCoverage()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string providerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+            string combatContractText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
+            string attackRulesText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs"));
+            string movementCoordinatorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            string movementRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs"));
+            string weaponPacketText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\WeaponItemFullUpdate.cs"));
+            string scfuPacketText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
+            string corpsePacketText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\CorpseFullUpdate.cs"));
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string corpseRulesText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
+
+            string[] acceptedEnemyKeys =
+                {
+                    "Thief|26092|138"
+                };
+
+            Assert.AreEqual(
+                1,
+                acceptedEnemyKeys.Length,
+                "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
+
+            Assert.IsTrue(
+                providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0))")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(4.548876")
+                && providerText.Contains("new CapturedSubwayLootDefinition(")
+                && providerText.Contains("\"Thief\"")
+                && providerText.Contains("26092")
+                && providerText.Contains("138")
+                && providerText.Contains("297055")
+                && providerText.Contains("10000"),
+                "Accepted Subway Thief must have spawn, patrol start, respawn, guaranteed handbag loot, and identity-specific loot evidence together.");
+
+            Assert.IsTrue(
+                combatContractText.Contains("case 26092:")
+                && combatContractText.Contains("CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(")
+                && combatContractText.Contains("121567")
+                && combatContractText.Contains("CapturedSubwayThiefAttackStartDelaySeconds")
+                && combatContractText.Contains("CapturedSubwayThiefMovementTransitionDelaySeconds")
+                && combatContractText.Contains("CapturedSubwayThiefFirstHitDelaySeconds")
+                && combatContractText.Contains("CapturedSubwayThiefRechargeSeconds")
+                && combatContractText.Contains("CapturedSubwayThiefAttackInfoAmmoCount")
+                && combatContractText.Contains("CapturedSubwayThiefAttackInfoUnknown")
+                && combatContractText.Contains("CapturedSubwayThiefSpecialAttackWeaponUnknown1"),
+                "Accepted Subway Thief must keep one combat contract containing weapon, attack context, movement transition, timing, and AttackInfo context.");
+            Assert.IsTrue(
+                attackRulesText.Contains("CapturedSubwayThiefMonsterData = 26092")
+                && attackRulesText.Contains("CapturedSubwayThiefAttackInfoAmmoCount = -1")
+                && attackRulesText.Contains("CapturedSubwayThiefAttackInfoUnknown = 0")
+                && attackRulesText.Contains("CapturedSubwayThiefRechargeSeconds = 6.0")
+                && attackRulesText.Contains("CapturedSubwayThiefWeaponDamageMinimumOverride = 0")
+                && attackRulesText.Contains("CapturedSubwayThiefWeaponDamageMaximumOverride = 0"),
+                "Accepted Subway Thief must not silently fall back to fixed fake damage or stale AttackInfo constants.");
+
+            Assert.IsTrue(
+                movementCoordinatorText.Contains("capturedContract.HasCapturedAttackStartContext")
+                && movementCoordinatorText.Contains("capturedContract.MovementTransitionDelaySeconds")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue"),
+                "Accepted Subway Thief must be covered by captured attack-start transition and generic combat follow/chase movement.");
+
+            Assert.IsTrue(
+                weaponPacketText.Contains("owner.Playfield.Identity.Instance == 127")
+                && weaponPacketText.Contains("owner.Stats[StatIds.monsterdata].Value == 26092")
+                && weaponPacketText.Contains("string.Equals(owner.Name, \"Thief\"")
+                && weaponPacketText.Contains("CharacterStat.Energy")
+                && weaponPacketText.Contains("CharacterStat.AttackDelay")
+                && weaponPacketText.Contains("CharacterStat.RechargeDelay"),
+                "Accepted Subway Thief must announce a live-shaped equipped weapon definition so the client renders projectile damage.");
+
+            Assert.IsTrue(
+                scfuPacketText.Contains("private const int SubwayThiefMonsterData = 26092")
+                && scfuPacketText.Contains("private const string SubwayThiefName = \"Thief\"")
+                && scfuPacketText.Contains("CapturedSubwayThiefAppearanceValue")
+                && scfuPacketText.Contains("CapturedSubwayThiefUnknown1"),
+                "Accepted Subway Thief must retain its identity-specific SCFU appearance and movement bytes.");
+            Assert.IsTrue(
+                corpsePacketText.Contains("SubwayThiefMonsterData = 26092")
+                && corpsePacketText.Contains("CapturedSubwayThiefPacketLength = 412")
+                && corpsePacketText.Contains("CapturedSubwayThiefTemplate")
+                && corpsePacketText.Contains("BuildCapturedSubwayThief("),
+                "Accepted Subway Thief must retain the exact captured corpse visual packet path.");
+
+            string registerCorpse = ExtractMethodBlock(playfieldText, "private void RegisterCorpse");
+            Assert.IsTrue(
+                playfieldText.Contains("CapturedSubwayThiefCorpseCatMesh = 5907")
+                && playfieldText.Contains("private static bool IsCapturedSubwayThief(ICharacter target)")
+                && registerCorpse.Contains("if (!state.HasUnlootedItems)")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
+                && corpseRulesText.Contains("CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30)"),
+                "Accepted Subway Thief must keep captured corpse visual selection and the loot-bearing corpse despawn guard.");
         }
 
         [TestMethod]
