@@ -669,6 +669,55 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1, info.Flag);
         }
 
+        [TestMethod]
+        public void OfficialSubwayThiefCombatPacketsMatchCapturedBytes()
+        {
+            Identity thief = new Identity { Type = IdentityType.CanbeAffected, Instance = unchecked((int)0x795B5DB2) };
+            Identity player = new Identity { Type = IdentityType.CanbeAffected, Instance = unchecked((int)0x7944C065) };
+
+            var specialAttackWeapon = new SpecialAttackWeaponMessage
+                                      {
+                                          Identity = thief,
+                                          Unknown = 0,
+                                          Specials = new SpecialAttack[0],
+                                          Unknown1 = 32,
+                                          Unknown2 = 32,
+                                          Unknown3 = 32,
+                                          Unknown4 = 32,
+                                          Unknown5 = 0
+                                      };
+            CollectionAssert.AreEqual(
+                HexToBytes("1D3C0F1C0000C350795B5DB200000003F10000002000000020000000200000002000000000"),
+                Serialize(specialAttackWeapon));
+
+            var attack = new AttackMessage
+                         {
+                             Identity = thief,
+                             Unknown = 0,
+                             Target = player,
+                             Action = 0
+                         };
+            CollectionAssert.AreEqual(
+                HexToBytes("284940700000C350795B5DB2000000C3507944C06500"),
+                Serialize(attack));
+
+            var attackInfo = new AttackInfoMessage
+                             {
+                                 Identity = thief,
+                                 Unknown = 0,
+                                 Unknown1 = 9,
+                                 Unknown2 = -1,
+                                 Unknown3 = 6,
+                                 Target = player,
+                                 Unknown4 = 0,
+                                 Unknown5 = 3,
+                                 Unknown6 = 0
+                             };
+            CollectionAssert.AreEqual(
+                HexToBytes("46002F160000C350795B5DB20000000009FFFFFFFF000000060000C3507944C065000000000000000300000000"),
+                Serialize(attackInfo));
+        }
+
         private static void AssertSerializedSize(MessageBody body, int expectedSize)
         {
             byte[] bytes = Serialize(body);
