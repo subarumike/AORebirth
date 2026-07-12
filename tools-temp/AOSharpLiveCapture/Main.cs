@@ -37,6 +37,8 @@ namespace AOSharpLiveCapture
             new Dictionary<string, RecentEnemyFullUpdateEvidence>();
         private readonly Dictionary<string, EnemyEntityState> enemyStates = new Dictionary<string, EnemyEntityState>();
         private readonly Dictionary<string, List<EnemyStateEvent>> enemyStateTimeline = new Dictionary<string, List<EnemyStateEvent>>();
+        private readonly Dictionary<string, CorpseLifecycleEvidence> corpseEvidenceByDeadNpc =
+            new Dictionary<string, CorpseLifecycleEvidence>();
 
         private const int CorpseFullUpdateDeadNpcTypeOffset = 183;
         private const int CorpseFullUpdateDeadNpcInstanceOffset = 191;
@@ -169,6 +171,7 @@ namespace AOSharpLiveCapture
         private bool enemyFightCaptureEnabled;
         private bool enemyFightAutoCaptureEnabled = true;
         private bool enemyFightCaptureStarted;
+        private bool respawnCaptureRequested;
 
         public override void Run(string pluginDir)
         {
@@ -298,20 +301,27 @@ namespace AOSharpLiveCapture
                     break;
 
                 case "stop":
+                    DateTime stopUtc = DateTime.UtcNow;
                     this.LogEvent("COMMAND", "capture stopped");
                     this.enabled = false;
                     this.Flush();
                     this.WriteEnemyStateJson();
                     this.WriteEnemyDossierJson();
                     this.WriteMovementSummaryJson();
+                    this.WriteEnemyRespawnCsv(stopUtc);
                     CaptureValidation stopValidation = this.ValidateCapture();
                     this.WriteCaptureHealth(stopValidation);
-                    this.WriteCaptureInfo(DateTime.UtcNow, stopValidation);
+                    this.WriteCaptureInfo(stopUtc, stopValidation);
                     chatWindow.WriteLine("AO capture stopped.", ChatColor.Gold);
                     break;
 
                 case "mark":
                     string marker = args.Length > 1 ? string.Join(" ", args.Skip(1).ToArray()) : "(no text)";
+                    if (marker.IndexOf("respawn", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        this.respawnCaptureRequested = true;
+                    }
+
                     this.LogEvent("MARK", marker);
                     chatWindow.WriteLine("AO capture marker written.", ChatColor.Gold);
                     break;
@@ -1185,17 +1195,27 @@ namespace AOSharpLiveCapture
                 string corpseName = Encoding.ASCII
                     .GetString(packet, nameOffset, encodedNameLength)
                     .TrimEnd('\0');
+                DateTime capturedUtc = DateTime.UtcNow;
+                string capturedUtcText = capturedUtc.ToString("o", CultureInfo.InvariantCulture);
                 string corpseIdentity = FormatRawIdentity(corpseType, corpseInstance);
                 string deadNpcIdentity = FormatRawIdentity(deadNpcType, deadNpcInstance);
                 string deadNpcName = this.ResolveDynelName(deadNpcType, deadNpcInstance);
 
                 lock (this.syncRoot)
                 {
+                    this.corpseEvidenceByDeadNpc[deadNpcIdentity] = new CorpseLifecycleEvidence
+                    {
+                        DeadNpcIdentity = deadNpcIdentity,
+                        CorpseIdentity = corpseIdentity,
+                        CorpseSeenUtc = capturedUtc,
+                        CorpseCredits = ReadInt32BigEndian(packet, 207),
+                        CorpseMonsterData = ReadInt32BigEndian(packet, monsterDataOffset)
+                    };
                     this.corpseFullUpdateRowCount++;
                     this.corpseFullUpdatesLog.WriteLine(
                         string.Join(
                             ",",
-                            Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                            Csv(capturedUtcText),
                             Csv(direction),
                             sequence.ToString(CultureInfo.InvariantCulture),
                             ReadUInt32BigEndian(packet, 12).ToString(CultureInfo.InvariantCulture),
@@ -2388,9 +2408,10 @@ namespace AOSharpLiveCapture
                 this.localEnemyCombatContextUntilUtc = DateTime.UtcNow.AddSeconds(LocalEnemyCombatContextSeconds);
                 if (added)
                 {
+                    DateTime timestamp = DateTime.UtcNow;
                     bool created;
-                    EnemyEntityState state = this.GetOrCreateEnemyState(identity, DateTime.UtcNow, out created);
-                    this.RecordEnemyStateEvent(state, DateTime.UtcNow, "focus");
+                    EnemyEntityState state = this.GetOrCreateEnemyState(identity, timestamp, out created);
+                    this.RecordEnemyStateEvent(state, timestamp, "focus", direction, sequence, "Focus", reason);
                 }
             }
 
@@ -2814,10 +2835,10 @@ namespace AOSharpLiveCapture
                 this.enemyCombatEventCount++;
                 if (created)
                 {
-                    this.RecordEnemyStateEvent(state, timestamp, "spawn");
+                    this.RecordEnemyStateEvent(state, timestamp, "spawn", direction, sequence, message.N3MessageType.ToString(), "CharacterAction");
                 }
 
-                this.RecordEnemyDeath(state, timestamp);
+                this.RecordEnemyDeath(state, timestamp, direction, sequence, message.N3MessageType.ToString(), "CharacterAction");
             }
         }
 
@@ -2850,8 +2871,20 @@ namespace AOSharpLiveCapture
                     this.enemyPositionUpdateCount++;
                 }
 
-                this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : "update");
-                this.RecordEnemyDeathIfNeeded(state, timestamp);
+                this.RecordEnemyStateEvent(
+                    state,
+                    timestamp,
+                    state.DeathLogged && state.CurrentHealth.HasValue && state.CurrentHealth.Value > 0 ? "respawn" : created ? "spawn" : "update",
+                    direction,
+                    sequence,
+                    message.N3MessageType.ToString(),
+                    "SimpleCharFullUpdate");
+                if (state.CurrentHealth.HasValue && state.CurrentHealth.Value > 0)
+                {
+                    state.DeathLogged = false;
+                }
+
+                this.RecordEnemyDeathIfNeeded(state, timestamp, direction, sequence, message.N3MessageType.ToString(), "SimpleCharFullUpdate");
             }
         }
 
@@ -2913,8 +2946,8 @@ namespace AOSharpLiveCapture
 
                 if (changed)
                 {
-                    this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : "update");
-                    this.RecordEnemyDeathIfNeeded(state, timestamp);
+                    this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : "update", direction, sequence, message.N3MessageType.ToString(), "Stat");
+                    this.RecordEnemyDeathIfNeeded(state, timestamp, direction, sequence, message.N3MessageType.ToString(), "Stat");
                 }
             }
         }
@@ -2951,8 +2984,8 @@ namespace AOSharpLiveCapture
 
                 if (changed)
                 {
-                    this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : "update");
-                    this.RecordEnemyDeathIfNeeded(state, timestamp);
+                    this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : "update", direction, sequence, message.N3MessageType.ToString(), "SimpleItemFullUpdate");
+                    this.RecordEnemyDeathIfNeeded(state, timestamp, direction, sequence, message.N3MessageType.ToString(), "SimpleItemFullUpdate");
                 }
             }
         }
@@ -2975,11 +3008,11 @@ namespace AOSharpLiveCapture
                 this.enemyHealthUpdateCount++;
                 if (created)
                 {
-                    this.RecordEnemyStateEvent(state, timestamp, "spawn");
+                    this.RecordEnemyStateEvent(state, timestamp, "spawn", direction, sequence, message.N3MessageType.ToString(), "HealthDamage");
                 }
 
-                this.RecordEnemyStateEvent(state, timestamp, "damage");
-                this.RecordEnemyDeathIfNeeded(state, timestamp);
+                this.RecordEnemyStateEvent(state, timestamp, "damage", direction, sequence, message.N3MessageType.ToString(), "HealthDamage");
+                this.RecordEnemyDeathIfNeeded(state, timestamp, direction, sequence, message.N3MessageType.ToString(), "HealthDamage");
             }
         }
 
@@ -3003,10 +3036,10 @@ namespace AOSharpLiveCapture
 
                 if (created)
                 {
-                    this.RecordEnemyStateEvent(state, timestamp, "spawn");
+                    this.RecordEnemyStateEvent(state, timestamp, "spawn", direction, sequence, "CombatTarget", "CombatTarget");
                 }
 
-                this.RecordEnemyStateEvent(state, timestamp, eventType);
+                this.RecordEnemyStateEvent(state, timestamp, eventType, direction, sequence, "CombatTarget", "CombatTarget");
             }
         }
 
@@ -3025,7 +3058,7 @@ namespace AOSharpLiveCapture
                 if (this.UpdateEnemyPosition(state, position))
                 {
                     this.enemyPositionUpdateCount++;
-                    this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : eventType);
+                    this.RecordEnemyStateEvent(state, timestamp, created ? "spawn" : eventType, direction, sequence, "Movement", "Position");
                 }
             }
         }
@@ -3044,10 +3077,10 @@ namespace AOSharpLiveCapture
                 EnemyEntityState state = this.GetOrCreateEnemyState(identity, timestamp, out created);
                 if (created)
                 {
-                    this.RecordEnemyStateEvent(state, timestamp, "spawn");
+                    this.RecordEnemyStateEvent(state, timestamp, "spawn", direction, sequence, "Despawn", "Despawn");
                 }
 
-                this.RecordEnemyStateEvent(state, timestamp, "despawn");
+                this.RecordEnemyStateEvent(state, timestamp, "despawn", direction, sequence, "Despawn", "Despawn");
             }
         }
 
@@ -3110,8 +3143,14 @@ namespace AOSharpLiveCapture
                 string eventType = created
                     ? (isPopulationEvidence ? "population" : "spawn")
                     : (requestedEventType == "spawn" ? (isPopulationEvidence ? "population-update" : "update") : requestedEventType);
-                this.RecordEnemyStateEvent(state, timestamp, eventType);
-                this.RecordEnemyDeathIfNeeded(state, timestamp);
+                if (state.DeathLogged && state.CurrentHealth.HasValue && state.CurrentHealth.Value > 0)
+                {
+                    eventType = "respawn";
+                    state.DeathLogged = false;
+                }
+
+                this.RecordEnemyStateEvent(state, timestamp, eventType, "LOCAL", 0, "DynelSnapshot", evidenceSource);
+                this.RecordEnemyDeathIfNeeded(state, timestamp, "LOCAL", 0, "DynelSnapshot", evidenceSource);
             }
         }
 
@@ -3131,7 +3170,7 @@ namespace AOSharpLiveCapture
                     return;
                 }
 
-                this.RecordEnemyStateEvent(state, timestamp, "despawn");
+                this.RecordEnemyStateEvent(state, timestamp, "despawn", "LOCAL", 0, "DynelSnapshot", "CHAR-GONE");
             }
         }
 
@@ -3189,17 +3228,29 @@ namespace AOSharpLiveCapture
             return changed;
         }
 
-        private void RecordEnemyDeathIfNeeded(EnemyEntityState state, DateTime timestamp)
+        private void RecordEnemyDeathIfNeeded(
+            EnemyEntityState state,
+            DateTime timestamp,
+            string direction,
+            int sequence,
+            string messageType,
+            string evidenceSource)
         {
             if (!state.CurrentHealth.HasValue || state.CurrentHealth.Value > 0 || state.DeathLogged)
             {
                 return;
             }
 
-            this.RecordEnemyDeath(state, timestamp);
+            this.RecordEnemyDeath(state, timestamp, direction, sequence, messageType, evidenceSource);
         }
 
-        private void RecordEnemyDeath(EnemyEntityState state, DateTime timestamp)
+        private void RecordEnemyDeath(
+            EnemyEntityState state,
+            DateTime timestamp,
+            string direction,
+            int sequence,
+            string messageType,
+            string evidenceSource)
         {
             if (state.DeathLogged)
             {
@@ -3207,15 +3258,26 @@ namespace AOSharpLiveCapture
             }
 
             state.DeathLogged = true;
-            this.RecordEnemyStateEvent(state, timestamp, "death");
+            this.RecordEnemyStateEvent(state, timestamp, "death", direction, sequence, messageType, evidenceSource);
         }
 
-        private void RecordEnemyStateEvent(EnemyEntityState state, DateTime timestamp, string eventType)
+        private void RecordEnemyStateEvent(
+            EnemyEntityState state,
+            DateTime timestamp,
+            string eventType,
+            string direction,
+            int sequence,
+            string messageType,
+            string evidenceSource)
         {
             state.LastUpdateUtc = timestamp;
             EnemyStateEvent stateEvent = new EnemyStateEvent
             {
                 TimestampUtc = timestamp,
+                Direction = direction ?? string.Empty,
+                Sequence = sequence,
+                MessageType = messageType ?? string.Empty,
+                EvidenceSource = evidenceSource ?? string.Empty,
                 EntityId = state.EntityId,
                 Level = state.Level,
                 CurrentHealth = state.CurrentHealth,
@@ -3235,7 +3297,7 @@ namespace AOSharpLiveCapture
 
             timeline.Add(stateEvent);
             this.enemyStateRowCount++;
-            if (eventType == "spawn")
+            if (eventType == "spawn" || eventType == "respawn")
             {
                 this.enemySpawnEventCount++;
             }
@@ -3251,9 +3313,13 @@ namespace AOSharpLiveCapture
             this.enemyStateLog.WriteLine(
                 string.Join(
                     ",",
-                    Csv(timestamp.ToString("o", CultureInfo.InvariantCulture)),
-                    Csv(state.EntityId),
-                    NullableInt(state.Level),
+                        Csv(timestamp.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv(direction ?? string.Empty),
+                        sequence.ToString(CultureInfo.InvariantCulture),
+                        Csv(messageType ?? string.Empty),
+                        Csv(evidenceSource ?? string.Empty),
+                        Csv(state.EntityId),
+                        NullableInt(state.Level),
                     NullableInt(state.CurrentHealth),
                     NullableInt(state.MaxHealth),
                     NullableFloat(state.X),
@@ -3641,6 +3707,7 @@ namespace AOSharpLiveCapture
             this.WriteEnemyStateJson();
             this.WriteEnemyDossierJson();
             this.WriteMovementSummaryJson();
+            this.WriteEnemyRespawnCsv(DateTime.UtcNow);
 
             CaptureValidation validation = this.ValidateCapture();
             this.WriteCaptureHealth(validation);
@@ -3661,6 +3728,10 @@ namespace AOSharpLiveCapture
         {
             List<string> issues = new List<string>();
             List<string> notes = new List<string>();
+            List<EnemyRespawnObservation> respawns = this.BuildEnemyRespawnObservations(DateTime.UtcNow);
+            int completeRespawns = respawns.Count(x => x.Status == "complete");
+            int ambiguousRespawns = respawns.Count(x => x.Status == "ambiguous");
+            int incompleteRespawns = respawns.Count(x => x.Status == "incomplete");
 
             if (this.GetSessionFileLength("events.log") <= 0)
             {
@@ -3781,8 +3852,224 @@ namespace AOSharpLiveCapture
                 notes.Add("Enemy death was observed without a corpse spawn; this may be valid for the captured archetype.");
             }
 
+            if (respawns.Count > 0)
+            {
+                notes.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Enemy respawn correlation rows: complete={0} ambiguous={1} incomplete={2}.",
+                        completeRespawns,
+                        ambiguousRespawns,
+                        incompleteRespawns));
+            }
+
+            if (this.respawnCaptureRequested && this.enemyDeathEventCount == 0)
+            {
+                issues.Add("Respawn capture was requested by marker, but no enemy death was observed.");
+            }
+
+            if (this.respawnCaptureRequested && completeRespawns == 0)
+            {
+                issues.Add("Respawn capture was requested by marker, but no same-archetype same-position respawn was correlated.");
+            }
+
+            if (this.respawnCaptureRequested && ambiguousRespawns > 0)
+            {
+                issues.Add("Respawn capture produced ambiguous same-position candidates; inspect enemy-respawns.csv before accepting timing.");
+            }
+
             string status = issues.Count == 0 ? "complete" : "incomplete";
             return new CaptureValidation(status, issues.Count == 0, issues, notes);
+        }
+
+        private void WriteEnemyRespawnCsv(DateTime captureEndUtc)
+        {
+            try
+            {
+                string path = Path.Combine(this.sessionDirectory, "enemy-respawns.csv");
+                List<EnemyRespawnObservation> observations = this.BuildEnemyRespawnObservations(captureEndUtc);
+                using (StreamWriter writer = CreateWriter(path))
+                {
+                    writer.WriteLine("GeneratedUtc,Status,DeathIdentity,Name,MonsterData,NpcFamily,DeathUtc,DeathX,DeathY,DeathZ,CorpseIdentity,CorpseSeenUtc,RespawnIdentity,RespawnUtc,RespawnDelaySeconds,RespawnX,RespawnY,RespawnZ,PositionDelta,ElapsedAfterDeathSeconds,CandidateCount,Detail");
+                    string generatedUtc = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
+                    foreach (EnemyRespawnObservation observation in observations)
+                    {
+                        writer.WriteLine(
+                            string.Join(
+                                ",",
+                                Csv(generatedUtc),
+                                Csv(observation.Status),
+                                Csv(observation.DeathIdentity),
+                                Csv(observation.Name),
+                                Csv(observation.MonsterData),
+                                Csv(observation.NpcFamily),
+                                Csv(observation.DeathUtc.ToString("o", CultureInfo.InvariantCulture)),
+                                NullableFloat(observation.DeathX),
+                                NullableFloat(observation.DeathY),
+                                NullableFloat(observation.DeathZ),
+                                Csv(observation.CorpseIdentity),
+                                observation.CorpseSeenUtc.HasValue
+                                    ? Csv(observation.CorpseSeenUtc.Value.ToString("o", CultureInfo.InvariantCulture))
+                                    : string.Empty,
+                                Csv(observation.RespawnIdentity),
+                                observation.RespawnUtc.HasValue
+                                    ? Csv(observation.RespawnUtc.Value.ToString("o", CultureInfo.InvariantCulture))
+                                    : string.Empty,
+                                observation.RespawnDelaySeconds.HasValue
+                                    ? observation.RespawnDelaySeconds.Value.ToString("0.###", CultureInfo.InvariantCulture)
+                                    : string.Empty,
+                                NullableFloat(observation.RespawnX),
+                                NullableFloat(observation.RespawnY),
+                                NullableFloat(observation.RespawnZ),
+                                observation.PositionDelta.HasValue
+                                    ? observation.PositionDelta.Value.ToString("0.###", CultureInfo.InvariantCulture)
+                                    : string.Empty,
+                                observation.ElapsedAfterDeathSeconds.ToString("0.###", CultureInfo.InvariantCulture),
+                                observation.CandidateCount.ToString(CultureInfo.InvariantCulture),
+                                Csv(observation.Detail)));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.LogEvent("ENEMY-RESPAWN-CSV-ERROR", ex.ToString());
+            }
+        }
+
+        private List<EnemyRespawnObservation> BuildEnemyRespawnObservations(DateTime captureEndUtc)
+        {
+            const double SamePositionThreshold = 2.0;
+            List<EnemyRespawnObservation> observations = new List<EnemyRespawnObservation>();
+            List<EnemyStateEvent> events = new List<EnemyStateEvent>();
+            lock (this.syncRoot)
+            {
+                foreach (List<EnemyStateEvent> timeline in this.enemyStateTimeline.Values)
+                {
+                    events.AddRange(timeline);
+                }
+            }
+
+            events = events.OrderBy(x => x.TimestampUtc).ToList();
+            foreach (EnemyStateEvent death in events.Where(x => x.EventType == "death"))
+            {
+                EnemyEntityState deadState = this.GetEnemyStateSnapshot(death.EntityId);
+                if (deadState == null)
+                {
+                    continue;
+                }
+
+                List<EnemyStateEvent> candidates = events
+                    .Where(
+                        x => x.TimestampUtc > death.TimestampUtc
+                             && IsRespawnCandidateEvent(x)
+                             && this.IsSameEnemyRespawnCandidate(deadState, death, x, SamePositionThreshold))
+                    .OrderBy(x => x.TimestampUtc)
+                    .ToList();
+
+                EnemyStateEvent selected = candidates.FirstOrDefault();
+                string status = selected == null ? "incomplete" : "complete";
+                if (candidates.Count > 1
+                    && Math.Abs((candidates[1].TimestampUtc - selected.TimestampUtc).TotalSeconds) <= 2.0)
+                {
+                    status = "ambiguous";
+                }
+
+                CorpseLifecycleEvidence corpse;
+                this.corpseEvidenceByDeadNpc.TryGetValue(death.EntityId, out corpse);
+
+                EnemyRespawnObservation observation = new EnemyRespawnObservation
+                {
+                    Status = status,
+                    DeathIdentity = death.EntityId,
+                    Name = deadState.Name,
+                    MonsterData = deadState.MonsterData,
+                    NpcFamily = deadState.NpcFamily,
+                    DeathUtc = death.TimestampUtc,
+                    DeathX = death.X,
+                    DeathY = death.Y,
+                    DeathZ = death.Z,
+                    CorpseIdentity = corpse == null ? string.Empty : corpse.CorpseIdentity,
+                    CorpseSeenUtc = corpse == null ? (DateTime?)null : corpse.CorpseSeenUtc,
+                    RespawnIdentity = selected == null ? string.Empty : selected.EntityId,
+                    RespawnUtc = selected == null ? (DateTime?)null : selected.TimestampUtc,
+                    RespawnDelaySeconds = selected == null
+                        ? (double?)null
+                        : Math.Max(0, (selected.TimestampUtc - death.TimestampUtc).TotalSeconds),
+                    RespawnX = selected == null ? null : selected.X,
+                    RespawnY = selected == null ? null : selected.Y,
+                    RespawnZ = selected == null ? null : selected.Z,
+                    PositionDelta = selected == null ? null : this.PositionDelta(death, selected),
+                    ElapsedAfterDeathSeconds = Math.Max(0, (captureEndUtc - death.TimestampUtc).TotalSeconds),
+                    CandidateCount = candidates.Count,
+                    Detail = selected == null
+                        ? "No later same-name/same-monsterData/same-position spawn was observed before capture stop."
+                        : "Matched later same-name/same-monsterData/same-position spawn."
+                };
+                observations.Add(observation);
+            }
+
+            return observations;
+        }
+
+        private EnemyEntityState GetEnemyStateSnapshot(string entityId)
+        {
+            lock (this.syncRoot)
+            {
+                EnemyEntityState state;
+                return this.enemyStates.TryGetValue(entityId, out state) ? state : null;
+            }
+        }
+
+        private bool IsSameEnemyRespawnCandidate(
+            EnemyEntityState deadState,
+            EnemyStateEvent death,
+            EnemyStateEvent candidate,
+            double samePositionThreshold)
+        {
+            EnemyEntityState candidateState = this.GetEnemyStateSnapshot(candidate.EntityId);
+            if (candidateState == null)
+            {
+                return false;
+            }
+
+            if (!string.Equals(deadState.Name ?? string.Empty, candidateState.Name ?? string.Empty, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            if (!string.Equals(deadState.MonsterData ?? string.Empty, candidateState.MonsterData ?? string.Empty, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            if (!string.Equals(deadState.NpcFamily ?? string.Empty, candidateState.NpcFamily ?? string.Empty, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            double? delta = this.PositionDelta(death, candidate);
+            return delta.HasValue && delta.Value <= samePositionThreshold;
+        }
+
+        private static bool IsRespawnCandidateEvent(EnemyStateEvent stateEvent)
+        {
+            return stateEvent.EventType == "spawn"
+                   || stateEvent.EventType == "population"
+                   || stateEvent.EventType == "respawn";
+        }
+
+        private double? PositionDelta(EnemyStateEvent first, EnemyStateEvent second)
+        {
+            if (!first.X.HasValue || !first.Y.HasValue || !first.Z.HasValue
+                || !second.X.HasValue || !second.Y.HasValue || !second.Z.HasValue)
+            {
+                return null;
+            }
+
+            double dx = first.X.Value - second.X.Value;
+            double dy = first.Y.Value - second.Y.Value;
+            double dz = first.Z.Value - second.Z.Value;
+            return Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
         }
 
         private void WriteEnemyStateJson()
@@ -3982,6 +4269,14 @@ namespace AOSharpLiveCapture
             json.Append(Json(stateEvent.TimestampUtc.ToString("o", CultureInfo.InvariantCulture)));
             json.Append(", \"entityId\": ");
             json.Append(Json(stateEvent.EntityId));
+            json.Append(", \"direction\": ");
+            json.Append(Json(stateEvent.Direction));
+            json.Append(", \"sequence\": ");
+            json.Append(stateEvent.Sequence.ToString(CultureInfo.InvariantCulture));
+            json.Append(", \"messageType\": ");
+            json.Append(Json(stateEvent.MessageType));
+            json.Append(", \"evidenceSource\": ");
+            json.Append(Json(stateEvent.EvidenceSource));
             json.Append(", \"level\": ");
             AppendJsonNullableInt(json, stateEvent.Level);
             json.Append(", \"currentHealth\": ");
@@ -4217,6 +4512,16 @@ namespace AOSharpLiveCapture
                 json.AppendLine(",");
                 json.Append("    \"enemyDespawnEvents\": ");
                 json.Append(this.enemyDespawnEventCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                List<EnemyRespawnObservation> respawns = this.BuildEnemyRespawnObservations(durationEndUtc);
+                json.Append("    \"enemyRespawnRows\": ");
+                json.Append(respawns.Count.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"enemyRespawnCompleteRows\": ");
+                json.Append(respawns.Count(x => x.Status == "complete").ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"respawnCaptureRequested\": ");
+                json.Append(this.respawnCaptureRequested ? "true" : "false");
                 json.AppendLine(",");
                 json.Append("    \"enemyHealthUpdates\": ");
                 json.Append(this.enemyHealthUpdateCount.ToString(CultureInfo.InvariantCulture));
@@ -4597,6 +4902,14 @@ namespace AOSharpLiveCapture
         {
             public DateTime TimestampUtc { get; set; }
 
+            public string Direction { get; set; }
+
+            public int Sequence { get; set; }
+
+            public string MessageType { get; set; }
+
+            public string EvidenceSource { get; set; }
+
             public string EntityId { get; set; }
 
             public int? Level { get; set; }
@@ -4612,6 +4925,64 @@ namespace AOSharpLiveCapture
             public float? Z { get; set; }
 
             public string EventType { get; set; }
+        }
+
+        private sealed class EnemyRespawnObservation
+        {
+            public string Status { get; set; }
+
+            public string DeathIdentity { get; set; }
+
+            public string Name { get; set; }
+
+            public string MonsterData { get; set; }
+
+            public string NpcFamily { get; set; }
+
+            public DateTime DeathUtc { get; set; }
+
+            public float? DeathX { get; set; }
+
+            public float? DeathY { get; set; }
+
+            public float? DeathZ { get; set; }
+
+            public string CorpseIdentity { get; set; }
+
+            public DateTime? CorpseSeenUtc { get; set; }
+
+            public string RespawnIdentity { get; set; }
+
+            public DateTime? RespawnUtc { get; set; }
+
+            public double? RespawnDelaySeconds { get; set; }
+
+            public float? RespawnX { get; set; }
+
+            public float? RespawnY { get; set; }
+
+            public float? RespawnZ { get; set; }
+
+            public double? PositionDelta { get; set; }
+
+            public double ElapsedAfterDeathSeconds { get; set; }
+
+            public int CandidateCount { get; set; }
+
+            public string Detail { get; set; }
+        }
+
+        private sealed class CorpseLifecycleEvidence
+        {
+            public string DeadNpcIdentity { get; set; }
+
+            public string CorpseIdentity { get; set; }
+
+            public DateTime CorpseSeenUtc { get; set; }
+
+            public int CorpseCredits { get; set; }
+
+            public int CorpseMonsterData { get; set; }
         }
 
         private sealed class RecentEnemyFullUpdateEvidence
@@ -5138,7 +5509,7 @@ namespace AOSharpLiveCapture
             this.inventoryUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "inventory-updates.csv"));
             this.inventoryUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,InventoryIdentity,Handle,Slot,Placement,Flags,Count,ItemIdentity,LowId,HighId,Quality,Unknown");
             this.enemyStateLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-state.csv"));
-            this.enemyStateLog.WriteLine("timestamp,entityId,level,currentHealth,maxHealth,x,y,z,eventType");
+            this.enemyStateLog.WriteLine("timestamp,direction,sequence,messageType,evidenceSource,entityId,level,currentHealth,maxHealth,x,y,z,eventType");
             this.enemyFullUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-full-updates.csv"));
             this.enemyFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,Identity,Name,PlayfieldId,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,FightingTargetRole,FightingTargetIdentity,Version,Flags,CharacterFlags,AccountFlags,Expansions,CharacterInfoType,NPCFamily,LosHeight,Level,Health,HealthDamage,MonsterData,MonsterScale,VisualFlags,VisibleTitle,Unknown1Length,HeadMesh,RunSpeedBase,ActiveNanoCount,TextureCount,Textures,MeshCount,Meshes,Flags2,Unknown2,Detail");
             this.enemyCombatLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-combat.csv"));
@@ -5176,6 +5547,7 @@ namespace AOSharpLiveCapture
             this.recentEnemyFullUpdates.Clear();
             this.enemyStates.Clear();
             this.enemyStateTimeline.Clear();
+            this.corpseEvidenceByDeadNpc.Clear();
 
             this.captureFinalized = false;
             this.inboundPacketCount = 0;
@@ -5221,6 +5593,7 @@ namespace AOSharpLiveCapture
             this.lastCapturePlayfieldIdentity = string.Empty;
             this.enemyFightCaptureEnabled = false;
             this.enemyFightCaptureStarted = false;
+            this.respawnCaptureRequested = false;
         }
 
         private void Flush()
