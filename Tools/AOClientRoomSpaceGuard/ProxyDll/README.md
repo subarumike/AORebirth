@@ -1,6 +1,6 @@
-# AO RoomSpace Fix proxy DLL
+# AO client crash-fix proxy DLL
 
-This is a RoomSpace-only `version.dll` proxy for the two approved Anarchy Online
+This is a narrowly scoped `version.dll` proxy for the approved Anarchy Online
 client builds. Windows loads it through the existing dependency chain:
 
 `AnarchyOnline.exe -> GUI.dll -> Awesomium.dll -> VERSION.dll`
@@ -23,9 +23,15 @@ real DLL under the 32-bit Windows system directory. A deferred worker then:
    rollback or cache state cannot be proven safe;
 9. retains the installed wrapper allocation until process exit.
 
+For the approved old live client, the proxy also verifies the exact GUI callsite
+and `Utils!Rect::operator+(Point)` implementation associated with the recurring
+`Utils.dll +0x72F1` crash, then replaces that one GUI import with a guard that
+returns an empty rectangle when GUI supplies a null rectangle. Valid rectangles
+continue through the original function unchanged.
+
 The proxy never modifies AO files after installation. It contains no
-LargeAddressAware patch, XML/settings changes, DValues, camera/input/UI hooks,
-or Project Rubi-Ka-specific behavior.
+LargeAddressAware patch, XML/settings changes, DValues, camera/input hooks,
+other UI modifications, or Project Rubi-Ka-specific behavior.
 
 ## Build
 

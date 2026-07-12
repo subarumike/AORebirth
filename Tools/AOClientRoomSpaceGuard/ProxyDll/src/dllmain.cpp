@@ -3,6 +3,7 @@
 // settings, camera, input, and UI modifications.
 
 #include "logging.h"
+#include "gui_rect_fix.h"
 #include "roomspace_fix.h"
 
 #include <windows.h>
@@ -74,7 +75,19 @@ namespace
             return 1;
         }
 
-        aorf::Log("READY RoomSpace repair active");
+        if (!aorf::InstallGuiRectFix())
+        {
+            aorf::Log("ERROR GUI rectangle repair was not installed");
+            MessageBoxW(
+                nullptr,
+                L"AORoomSpaceFix could not install the GUI crash repair. "
+                L"Close AO and review %LOCALAPPDATA%\\AORoomSpaceFix\\AORoomSpaceFix.log.",
+                L"AO RoomSpace Fix",
+                MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
+            return 1;
+        }
+
+        aorf::Log("READY RoomSpace and GUI rectangle repairs active");
         return 0;
     }
 
