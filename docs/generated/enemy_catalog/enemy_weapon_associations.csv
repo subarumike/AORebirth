@@ -1,13 +1,61 @@
 CanonicalEnemyKey,EnemyName,Configuration,WeaponCategory,Source,Confidence,Notes
-external-commander-jocasta,Commander Jocasta,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
-external-commander-kelly-frederickson,Commander Kelly Frederickson,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
-external-diamondine-soldier,Diamondine Soldier,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
-external-fiery-soldier,Fiery Soldier,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
-external-guardian-of-tomorrow,Guardian of Tomorrow,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
-external-high-commander-frederickson,High Commander Frederickson,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
-external-mantis-queen,Mantis Queen,claws,CLAWS,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
-external-notum-soldier,Notum Soldier,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
-external-the-iron-reet,The Iron Reet,natural ranged,NATURAL_RANGED,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-34-ii-handyman,34-II Handyman,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-34-v-worker,34-V Worker,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-alien-communication-officer,Alien Communication Officer,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-alien-immature-vector,Alien Immature Vector,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-alien-larva,Alien Larva,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-alien-leader,Alien Leader,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-alien-medic,Alien Medic,nano caster,NANO_CASTER,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-architect-striker,Architect Striker,unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-betrayer-of-memory,Betrayer of Memory,mixed melee and nano,MIXED_MELEE_AND_NANO,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/steps-of-madness,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-bloodcreeper,Bloodcreeper,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-buckethead-techno-scavenger,Buckethead Techno Scavenger,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-buzzsaw-techno-scavenger,Buzzsaw Techno Scavenger,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-cultist,Cultist,unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/temple-of-three-winds,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-defender-of-the-three,Defender of the Three,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-den-hive-guardian,Den Hive Guardian,claws,CLAWS,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-den-mantis,Den Mantis,claws,CLAWS,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-den-mantis-breeder,Den Mantis Breeder,claws,CLAWS,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-den-smuggler,Den Smuggler,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-den-smuggler-pilot,Den Smuggler Pilot,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-emotional-sponge,Emotional Sponge,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-eternal-guardian,Eternal Guardian,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-eternal-sentinel,Eternal Sentinel,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-exarch,Exarch,unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/temple-of-three-winds,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-exarch-truan,Exarch Truan,unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/temple-of-three-winds,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-heckler-of-elements,Heckler of Elements,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-infector,Infector,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-jealousy,Jealousy,mixed melee and nano,MIXED_MELEE_AND_NANO,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/steps-of-madness,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-junkbot-tech-scavenger,Junkbot Tech Scavenger,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-legionnaire,Legionnaire,unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/temple-of-three-winds,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-melded-pattern,Melded Pattern,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-mind-shard,Mind Shard,nano caster,NANO_CASTER,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/steps-of-madness,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-notum-habit,Notum Habit,nano caster,NANO_CASTER,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/steps-of-madness,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-patrol-mech-dog,Patrol Mech Dog,bite,BITE,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-preceptor-brell,Preceptor Brell,mixed melee and nano,MIXED_MELEE_AND_NANO,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/high-level-encounter-2/the-inner-sanctum,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-preceptor-coshi,Preceptor Coshi,mixed melee and nano,MIXED_MELEE_AND_NANO,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/high-level-encounter-2/the-inner-sanctum,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-pulsing-hatred,Pulsing Hatred,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/steps-of-madness,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-redeemed-custodian,Redeemed Custodian,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-regeneration-conduit,Regeneration Conduit,nano caster,NANO_CASTER,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-reverend-gulard,Reverend Gulard,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-reverend-hyuan,Reverend Hyuan,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-shadow,Shadow,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-sizzling-synaptid,Sizzling Synaptid,energy attack,ENERGY_ATTACK,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-slum-runner,Slum Runner,unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-smuggler-droid,Smuggler Droid,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-smuggler-frother,Smuggler Frother,unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-smuggler-outcast,Smuggler Outcast,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-smuggler-turret,Smuggler Turret,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-stinger,Stinger,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-suppressed-emotion,Suppressed Emotion,mixed melee and nano,MIXED_MELEE_AND_NANO,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/steps-of-madness,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-the-re-animator,The Re-Animator,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-uncontrollable-anger,Uncontrollable Anger,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-unhallowed-soul,Unhallowed Soul,energy attack,ENERGY_ATTACK,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/high-level-encounter-2/the-inner-sanctum,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-unredeemed-custodian,Unredeemed Custodian,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-waste-collector,Waste Collector,unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-waste-disposer,Waste Disposer,unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-windcaller-rendal,Windcaller Rendal,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+external-windcaller-yatila,Windcaller Yatila,unknown,UNKNOWN,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-116714,home guard,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-154698,ninjadroid boss,unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-155071,rhinoman albino,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
@@ -16,6 +64,7 @@ rdb-1040023-157321,mantis boss,claws,CLAWS,https://wiki.aodb.us/wiki/Dyna_Camps_
 rdb-1040023-158177,mantis baby,claws,CLAWS,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-159085,atrox thin male brute,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-159086,solitus thin female brute,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-165193,nanofemale_ah_curiouscolonist,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-17627,protodroid,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-17637,cyborg soldier - female bader,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-17639,cyborg soldier - male bader,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
@@ -30,45 +79,63 @@ rdb-1040023-17664,rhinoman,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki
 rdb-1040023-17687,rollerrat,bite,BITE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-17710,pit lizard,bite,BITE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-17712,sandworm,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-17714,organic waste collector,unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-17716,enigma,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-201533,lctower_guard_small,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-201634,lctower_guard_big,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-203724,high commander hoover,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-203730,neural burnout,nano caster,NANO_CASTER,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-203730,neural burnout,nano caster,NANO_CASTER,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-203734,mugger,unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-203739,stim fiend,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-203741,workman striker,unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-203743,architect striker(robe),unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-203739,stim fiend,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-203741,workman striker,unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-203743,architect striker(robe),unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-203745,looter(robe),unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-203854,workman striker(robe),unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-203854,workman striker(robe),unknown melee weapon,UNKNOWN_MELEE_WEAPON,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-205940,crypt guardian,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-205943,awakened pit demon,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-206792,vanguard commander_female,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-206793,vanguard commander_male,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-206794,vanguard watcher,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-207475,turret,turret weapon,TURRET_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-209361,sl_weaver of spirits,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-209395,sl_mortiig predator,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-210238,security guard,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-210582,guardian_of_shadows,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-216990,sl_spirit_redeemed female,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-217006,sl_spirit_redeemed_female,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-217007,sl_spirits_unredeemed_male,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-217008,sl_spirit_unredeemed_female,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-217019,sl_spirits_redeemed_male,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-217022,sl_spirits_redeemed_female_,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-209143,sl_essence eremite,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-209150,sl_rotting eremite,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-209158,sl_rippled eremite,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-209165,sl_sparkling eremite,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-209319,sl_croaker of night,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-209326,sl_croaker of light,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-209347,sl_weaver of shadow,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-209361,sl_weaver of spirits,energy attack,ENERGY_ATTACK,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-209368,sl_mortiig,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-209395,sl_mortiig predator,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-210237,security camera,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-210238,security guard,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-210582,guardian_of_shadows,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-214119,sl_redeemed2_fire_suir,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-214121,sl_redeemed2_water_suir,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-214122,sl_redeemed2_earth_suir,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-214123,sl_redeemed2_air_suir,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-214978,sl_twisted horror,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-215847,psionic_eremite_nomove,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-216990,sl_spirit_redeemed female,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-217006,sl_spirit_redeemed_female,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-217007,sl_spirits_unredeemed_male,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-217008,sl_spirit_unredeemed_female,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-217019,sl_spirits_redeemed_male,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-217022,sl_spirits_redeemed_female_,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-218695,sl_pet_predators,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-218783,sl_pet_slayers,unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-223561,sl_prime devorer_bileswarm colossus,natural ranged,NATURAL_RANGED,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
-rdb-1040023-225815,sl_redeemed_guardtower,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-226880,shadowleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-225815,sl_redeemed_guardtower,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-225818,sl_redeemed_controltower,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-226880,shadowleet,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-227701,sl_corporate guardian,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-22790,ottous,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-22804,t-droid,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-22821,omni slayer droid,unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-229068,sl_bronto_mama,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
-rdb-1040023-236598,guardian_of_shadows_loop,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-236599,guardian_of_shadows_idle2,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-236598,guardian_of_shadows_loop,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-236599,guardian_of_shadows_idle2,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-236640,sl_redeemed_grunt,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-246449,vanguard,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-246862,omni-trans commander_female,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-246982,alien battlesuit hover,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
@@ -115,7 +182,7 @@ rdb-1040023-254293,alien_mini_bug_ranged_black,alien natural attack,ALIEN_NATURA
 rdb-1040023-254294,alien_mini_bug_melee_black,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-254295,alien_mini_bug_melee_ranged_b,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-254296,alien_mini_bug_caster_black,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-254849,ai_mortiig predator_pet,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-254849,ai_mortiig predator_pet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-256062,vanguard node 19,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-256459,alien_mini_bug_melee_ranged_b_u,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-256461,alien_mini_bug_ranged_black_u,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
@@ -130,13 +197,14 @@ rdb-1040023-260034,alien signal tower,alien natural attack,ALIEN_NATURAL_ATTACK,
 rdb-1040023-260229,alien bomb,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-260280,alien_mini_bug_melee_striped_u,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-26048,medusa,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
-rdb-1040023-260844,sl_spirits_redeemed_male_kungfu,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-260844,sl_spirits_redeemed_male_kungfu,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-262088,solitus_male_shade,energy attack,ENERGY_ATTACK,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-262397,alien tentacle,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-262975,alien antibody,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-263810,alien wrench,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-267084,bursting nano soldier,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-267170,atrox enforcer male - special anims,unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-267322,paolo turin,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-269393,iceberg monster,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-269727,iceberg monster - rising,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-273406,plate monster,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
@@ -149,9 +217,19 @@ rdb-1040023-278843,alien fighter ship,alien natural attack,ALIEN_NATURAL_ATTACK,
 rdb-1040023-279066,alien jamming tower,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-279518,gingerleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-280206,alien devourer,alien natural attack,ALIEN_NATURAL_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
-rdb-1040023-280495,sl_spirits_redeemed_female_saveanim,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-280495,sl_spirits_redeemed_female_saveanim,mixed melee and nano,MIXED_MELEE_AND_NANO,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-281961,barleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-282037,bob marleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-283873,hoverboard_b_chimera_solitus_male - 3 tricks,bite,BITE,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-283900,hoverboard_b_chimera_solitus_female - 3 tricks,bite,BITE,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-283901,hoverboard_b_chimera_atrox - 3 tricks,bite,BITE,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-283907,hoverboard_b_chimera_opifex_male - 3 tricks,bite,BITE,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-283908,hoverboard_b_chimera_opifex_female - 3 tricks,bite,BITE,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-283909,hoverboard_b_chimera_solitus_male_robe - 3 tricks,bite,BITE,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-283910,hoverboard_b_chimera_solitus_female_robe - 3 tricks,bite,BITE,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-283911,hoverboard_b_chimera_atrox_robe - 3 tricks,bite,BITE,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-283912,hoverboard_b_chimera_opifex_male_robe - 3 tricks,bite,BITE,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-283913,hoverboard_b_chimera_opifex_female_robe - 3 tricks,bite,BITE,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-284637,reinleet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-28513,primitive medusa,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-285148,enigma dog toy,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
@@ -159,11 +237,13 @@ rdb-1040023-285468,cyborg soldier - female - one eye,unknown ranged weapon,UNKNO
 rdb-1040023-288500,dancing cyborg doll a,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-288558,devileet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-289492,gift-wrapped leet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-290647,heckler_of_celebration,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-294110,zix-in-a-box,natural melee,NATURAL_MELEE,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-294111,elf leet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-294329,elf_leet_new,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-295565,atrox thin male brute - desmond,natural melee,NATURAL_MELEE,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-297228,henrys test leet,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
-rdb-1040023-301639,inf_mission_2_spirit_totem,energy attack,ENERGY_ATTACK,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
+rdb-1040023-301639,inf_mission_2_spirit_totem,energy attack,ENERGY_ATTACK,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-30252,giant snake,bite,BITE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-30258,biofreak noskin,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-30346,bronto mama,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
@@ -177,6 +257,7 @@ rdb-1040023-304909,omni slayer droid tam,unknown melee weapon,UNKNOWN_MELEE_WEAP
 rdb-1040023-305587,nano_freak_2020 - guardian of the three,unknown ranged weapon,UNKNOWN_RANGED_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-305611,deathless legion,unknown melee weapon,UNKNOWN_MELEE_WEAPON,RDB name correlation,INFERRED_CORRELATION,Category-level evidence; no exact item-template mapping
 rdb-1040023-31114,rhinoman female,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
+rdb-1040023-31762,desert eremite,natural melee,NATURAL_MELEE,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-31907,bileswarm colossus,natural ranged,NATURAL_RANGED,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-31909,bileswarm worker,natural ranged,NATURAL_RANGED,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping
 rdb-1040023-32419,sewer snake,bite,BITE,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Category-level evidence; no exact item-template mapping

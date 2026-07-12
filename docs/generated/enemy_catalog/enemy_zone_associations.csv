@@ -1,23 +1,64 @@
 CanonicalEnemyKey,EnemyName,Zone,PlayfieldId,Source,Confidence,Notes
+external-alien-communication-officer,Alien Communication Officer,Sector 10,,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Documented family association
+external-alien-immature-vector,Alien Immature Vector,Sector 10,,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Documented family association
+external-alien-larva,Alien Larva,Sector 10,,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Documented family association
+external-alien-leader,Alien Leader,Sector 10,,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Documented family association
+external-alien-medic,Alien Medic,Sector 10,,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Documented family association
 external-aquarius,Aquarius,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
+external-architect-striker,Architect Striker,Condemned Subway,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
 external-aries,Aries,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
+external-betrayer-of-memory,Betrayer of Memory,Steps of Madness,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/steps-of-madness,COMMUNITY_DOCUMENTED,Documented family association
+external-bloodcreeper,Bloodcreeper,Condemned Subway,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
+external-buckethead-techno-scavenger,Buckethead Techno Scavenger,Athen Shire,,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Documented family association
+external-buckethead-techno-scavenger,Buckethead Techno Scavenger,Newland,,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Documented family association
+external-buckethead-techno-scavenger,Buckethead Techno Scavenger,Wartorn Valley,,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Documented family association
+external-buzzsaw-techno-scavenger,Buzzsaw Techno Scavenger,Athen Shire,,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Documented family association
+external-buzzsaw-techno-scavenger,Buzzsaw Techno Scavenger,Newland,,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Documented family association
+external-buzzsaw-techno-scavenger,Buzzsaw Techno Scavenger,Wartorn Valley,,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Documented family association
 external-cancer,Cancer,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
 external-capricorn,Capricorn,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
+external-cultist,Cultist,Temple of Three Winds,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/temple-of-three-winds,COMMUNITY_DOCUMENTED,Documented family association
+external-den-hive-guardian,Den Hive Guardian,Smuggler's Den,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Documented family association
+external-den-mantis,Den Mantis,Smuggler's Den,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Documented family association
+external-den-mantis-breeder,Den Mantis Breeder,Smuggler's Den,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Documented family association
+external-den-smuggler,Den Smuggler,Smuggler's Den,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Documented family association
+external-den-smuggler-pilot,Den Smuggler Pilot,Smuggler's Den,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Documented family association
+external-exarch,Exarch,Temple of Three Winds,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/temple-of-three-winds,COMMUNITY_DOCUMENTED,Documented family association
+external-exarch-truan,Exarch Truan,Temple of Three Winds,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/temple-of-three-winds,COMMUNITY_DOCUMENTED,Documented family association
 external-gemini,Gemini,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
+external-heckler-of-elements,Heckler of Elements,Shadowlands,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+external-infector,Infector,Condemned Subway,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
+external-jealousy,Jealousy,Steps of Madness,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/steps-of-madness,COMMUNITY_DOCUMENTED,Documented family association
+external-legionnaire,Legionnaire,Temple of Three Winds,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/temple-of-three-winds,COMMUNITY_DOCUMENTED,Documented family association
 external-leo,Leo,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
 external-libra,Libra,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
-external-mantis-queen,Mantis Queen,Aegean,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
-external-mantis-queen,Mantis Queen,Varmint Woods,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
-external-mantis-queen,Mantis Queen,Perpetual Wastelands,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
+external-mind-shard,Mind Shard,Steps of Madness,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/steps-of-madness,COMMUNITY_DOCUMENTED,Documented family association
+external-notum-habit,Notum Habit,Steps of Madness,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/steps-of-madness,COMMUNITY_DOCUMENTED,Documented family association
+external-patrol-mech-dog,Patrol Mech Dog,Athen Shire,,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Documented family association
 external-pisces,Pisces,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
+external-preceptor-brell,Preceptor Brell,Inner Sanctum,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/high-level-encounter-2/the-inner-sanctum,COMMUNITY_DOCUMENTED,Documented family association
+external-preceptor-coshi,Preceptor Coshi,Inner Sanctum,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/high-level-encounter-2/the-inner-sanctum,COMMUNITY_DOCUMENTED,Documented family association
+external-pulsing-hatred,Pulsing Hatred,Steps of Madness,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/steps-of-madness,COMMUNITY_DOCUMENTED,Documented family association
+external-redeemed-custodian,Redeemed Custodian,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+external-regeneration-conduit,Regeneration Conduit,Sector 10,,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Documented family association
 external-sagittarius,Sagittarius,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
 external-scorpio,Scorpio,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
+external-shadow,Shadow,Condemned Subway,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
+external-sizzling-synaptid,Sizzling Synaptid,Adonis,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+external-slum-runner,Slum Runner,Condemned Subway,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
+external-smuggler-frother,Smuggler Frother,Smuggler's Den,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Documented family association
+external-smuggler-outcast,Smuggler Outcast,Smuggler's Den,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den,COMMUNITY_DOCUMENTED,Documented family association
+external-stinger,Stinger,Adonis,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+external-suppressed-emotion,Suppressed Emotion,Steps of Madness,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/steps-of-madness,COMMUNITY_DOCUMENTED,Documented family association
 external-t-i-m,T.I.M,Biomare,,https://anarchyonline.fandom.com/wiki/Biomare,COMMUNITY_DOCUMENTED,Documented family association
 external-taurus,Taurus,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
 external-the-beast,The Beast,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
-external-the-iron-reet,The Iron Reet,Omni Forest,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 external-the-night-heart,The Night Heart,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
+external-unhallowed-soul,Unhallowed Soul,Inner Sanctum,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/high-level-encounter-2/the-inner-sanctum,COMMUNITY_DOCUMENTED,Documented family association
+external-unredeemed-custodian,Unredeemed Custodian,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
 external-virgo,Virgo,Pandemonium,,https://anarchyonline.fandom.com/wiki/Unique_Mobs,COMMUNITY_DOCUMENTED,Name-token correlation
+external-waste-collector,Waste Collector,Athen Shire,,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Documented family association
+external-waste-disposer,Waste Disposer,Wartorn Valley,,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-116714,home guard,Galway County,685,RDB text,INFERRED_CORRELATION,Name-token correlation
 rdb-1040023-116714,home guard,Galway Shire,687,RDB text,INFERRED_CORRELATION,Name-token correlation
 rdb-1040023-116714,home guard,Upper Scheol,4880,RDB text,INFERRED_CORRELATION,Name-token correlation
@@ -45,6 +86,7 @@ rdb-1040023-163003,unicorn boss,Stret West Bank,790,RDB text,RDB_TEMPLATE_NAME,N
 rdb-1040023-163003,unicorn boss,Omni Training,950,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-163003,unicorn boss,Clan Training,952,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-165186,solitusmale_ah_merchant,Varmint Woods,600,RDB text,INFERRED_CORRELATION,Name-token correlation
+rdb-1040023-165193,nanofemale_ah_curiouscolonist,Alien raids,,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-17637,cyborg soldier - female bader,Perpetual Wastelands,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-17637,cyborg soldier - female bader,Central Artery Valley,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-17639,cyborg soldier - male bader,Perpetual Wastelands,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
@@ -90,7 +132,7 @@ rdb-1040023-17691,gofle,Southern Fouls Hills,615,RDB text,RDB_TEMPLATE_NAME,Name
 rdb-1040023-17708,stalker,Deep Artery Valley,595,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-17710,pit lizard,Belial Forest,565,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-17712,sandworm,Perpetual Wastelands,570,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
-rdb-1040023-17714,organic waste collector,Pandemonium Caina,4328,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
+rdb-1040023-17714,organic waste collector,Athen Shire,4328,https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-17716,enigma,Central Artery Valley,590,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-17716,enigma,Belial Forest,595,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-17720,mech dog - skin,Wailing Wastes,551,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
@@ -183,9 +225,12 @@ rdb-1040023-201899,lctower_service_small,Broken Shores AI Demo,4899,RDB text,RDB
 rdb-1040023-203161,yalmaha regular,Athen Shire,550,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-203406,yalmaha sleek yellow,Southern Fouls Hills,615,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-203729,fragmented soul,Inferno,4605,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
+rdb-1040023-203730,neural burnout,Condemned Subway,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-203731,empty shell,North of Elysium,4544,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-203739,stim fiend,The Perpetual Wastelands,570,RDB text,INFERRED_CORRELATION,Name-token correlation
-rdb-1040023-203739,stim fiend,Omni1 Entertainment,705,RDB text,INFERRED_CORRELATION,Name-token correlation
+rdb-1040023-203739,stim fiend,Condemned Subway,570,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-203741,workman striker,Condemned Subway,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-203743,architect striker(robe),Condemned Subway,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-203854,workman striker(robe),Condemned Subway,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-205481,lctower_supplymasters_control_tower,Old Athen,540,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-205481,lctower_supplymasters_control_tower,Pleasant Meadows,630,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-205481,lctower_supplymasters_control_tower,Rome Blue,735,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
@@ -211,31 +256,18 @@ rdb-1040023-205627,lctower_supplymeels_control_tower,Xan Tower,6021,RDB text,RDB
 rdb-1040023-205943,awakened pit demon,Perpetual Wastelands,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-206213,cerubins tentacle,Omni Forest,716,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-206794,vanguard watcher,Adonis City,4872,RDB text,INFERRED_CORRELATION,Name-token correlation
-rdb-1040023-209143,sl_essence eremite,East of Elysium,4543,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209150,sl_rotting eremite,East of Elysium,4543,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209158,sl_rippled eremite,East of Elysium,4543,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209165,sl_sparkling eremite,East of Elysium,4543,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209326,sl_croaker of light,Central Artery Valley,590,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209326,sl_croaker of light,Andromeda,655,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209326,sl_croaker of light,Omni1 Entertainment,705,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209326,sl_croaker of light,The Longest Road,795,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209326,sl_croaker of light,Penumbra Hollows,4322,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209326,sl_croaker of light,Penumbra Transit (dng),4324,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209326,sl_croaker of light,Adonis Hallway,4877,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209326,sl_croaker of light,Lower Scheol,4881,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209326,sl_croaker of light,Broken Shores AI Demo,4899,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209326,sl_croaker of light,Space Apartment,6001,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209326,sl_croaker of light,Arid Rift,6011,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209326,sl_croaker of light,Antiques n' Stuff,7013,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209326,sl_croaker of light,Unicorn Dungeon,7092,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
+rdb-1040023-209143,sl_essence eremite,Shadowlands,4543,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-209150,sl_rotting eremite,Shadowlands,4543,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-209158,sl_rippled eremite,Shadowlands,4543,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-209165,sl_sparkling eremite,Shadowlands,4543,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-209319,sl_croaker of night,Shadowlands,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-209326,sl_croaker of light,Shadowlands,590,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-209340,sl_crippler of life,The Longest Road,795,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209347,sl_weaver of shadow,Burning Marshes,4005,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
+rdb-1040023-209347,sl_weaver of shadow,Condemned Subway,4005,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-209354,sl_weaver of decay,Milky Way,625,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209368,sl_mortiig,South Buggy (DONT DELETE),4505,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209368,sl_mortiig,South of Elysium,4540,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-209395,sl_mortiig predator,Milky Way,625,RDB text,INFERRED_CORRELATION,Name-token correlation
-rdb-1040023-209395,sl_mortiig predator,Omni Forest,716,RDB text,INFERRED_CORRELATION,Name-token correlation
-rdb-1040023-209395,sl_mortiig predator,Greater Omni Forest,717,RDB text,INFERRED_CORRELATION,Name-token correlation
+rdb-1040023-209361,sl_weaver of spirits,Shadowlands,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-209368,sl_mortiig,Shadowlands,4505,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-209395,sl_mortiig predator,Shadowlands,625,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-209409,sl_devourer of life,The Longest Road,795,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-209415,sl_devourer of light,Central Artery Valley,590,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-209415,sl_devourer of light,Andromeda,655,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
@@ -250,16 +282,29 @@ rdb-1040023-209415,sl_devourer of light,Space Apartment,6001,RDB text,RDB_TEMPLA
 rdb-1040023-209415,sl_devourer of light,Arid Rift,6011,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-209415,sl_devourer of light,Antiques n' Stuff,7013,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-209415,sl_devourer of light,Unicorn Dungeon,7092,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-210238,security guard,Galway County,685,RDB text,INFERRED_CORRELATION,Name-token correlation
-rdb-1040023-210238,security guard,Galway Shire,687,RDB text,INFERRED_CORRELATION,Name-token correlation
-rdb-1040023-210238,security guard,Upper Scheol,4880,RDB text,INFERRED_CORRELATION,Name-token correlation
-rdb-1040023-214978,sl_twisted horror,Deep Artery Valley,595,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
+rdb-1040023-210237,security camera,Alien raids,,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-210238,security guard,Alien raids,685,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-210582,guardian_of_shadows,Condemned Subway,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-214119,sl_redeemed2_fire_suir,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-214121,sl_redeemed2_water_suir,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-214122,sl_redeemed2_earth_suir,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-214123,sl_redeemed2_air_suir,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-214978,sl_twisted horror,Shadowlands,595,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-215024,jobe_magnus_galway,Southern Artery Valley,610,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-215024,jobe_magnus_galway,Galway County,685,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-215024,jobe_magnus_galway,Galway Shire,687,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-215024,jobe_magnus_galway,Omni-1 Trade,710,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-215024,jobe_magnus_galway,Rome Park,730,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-215035,jobe_chang_dong,Inferno,4605,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
+rdb-1040023-215847,psionic_eremite_nomove,Shadowlands,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-216990,sl_spirit_redeemed female,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-217006,sl_spirit_redeemed_female,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-217007,sl_spirits_unredeemed_male,Shadowlands temples,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-217007,sl_spirits_unredeemed_male,Pandemonium,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-217008,sl_spirit_unredeemed_female,Shadowlands temples,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-217008,sl_spirit_unredeemed_female,Pandemonium,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-217019,sl_spirits_redeemed_male,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-217022,sl_spirits_redeemed_female_,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-218695,sl_pet_predators,Milky Way,625,RDB text,INFERRED_CORRELATION,Name-token correlation
 rdb-1040023-218695,sl_pet_predators,Omni Forest,716,RDB text,INFERRED_CORRELATION,Name-token correlation
 rdb-1040023-218695,sl_pet_predators,Greater Omni Forest,717,RDB text,INFERRED_CORRELATION,Name-token correlation
@@ -279,10 +324,9 @@ rdb-1040023-224217,sl_harhead_test,The Perpetual Wastelands,570,RDB text,RDB_TEM
 rdb-1040023-224217,sl_harhead_test,Neutral Training,954,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-224425,sl_spermy the whale_test,The Perpetual Wastelands,570,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-224425,sl_spermy the whale_test,Neutral Training,954,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
-rdb-1040023-226880,shadowleet,Andromeda,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
-rdb-1040023-226880,shadowleet,Newland Desert,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
-rdb-1040023-226880,shadowleet,Varmint Woods,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
-rdb-1040023-226880,shadowleet,Aegean,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-225815,sl_redeemed_guardtower,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-225818,sl_redeemed_controltower,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-226880,shadowleet,Condemned Subway,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-22790,ottous,Belial Forest,605,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-22794,green lizard,Newland Desert,565,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-22794,green lizard,Varmint Woods,600,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
@@ -292,6 +336,9 @@ rdb-1040023-233173,tarasque_can move,Athen Shire,550,RDB text,RDB_TEMPLATE_NAME,
 rdb-1040023-233173,tarasque_can move,Character Creation Lab Dng,896,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-233173,tarasque_can move,Arrival Hall,4604,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-233478,sl_shark,Southern Fouls Hills,615,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
+rdb-1040023-236598,guardian_of_shadows_loop,Condemned Subway,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-236599,guardian_of_shadows_idle2,Condemned Subway,,https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-236640,sl_redeemed_grunt,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-247468,alien_battlesuit_hover_melee,Tir,640,RDB text,INFERRED_CORRELATION,Name-token correlation
 rdb-1040023-247728,alien_spider,Wailing Wastes,551,RDB text,INFERRED_CORRELATION,Name-token correlation
 rdb-1040023-247728,alien_spider,Central Artery Valley,590,RDB text,INFERRED_CORRELATION,Name-token correlation
@@ -367,6 +414,7 @@ rdb-1040023-254296,alien_mini_bug_caster_black,South Buggy (DONT DELETE),4505,RD
 rdb-1040023-254296,alien_mini_bug_caster_black,South of Elysium,4540,RDB text,INFERRED_CORRELATION,Name-token correlation
 rdb-1040023-254296,alien_mini_bug_caster_black,West of Elysium,4541,RDB text,INFERRED_CORRELATION,Name-token correlation
 rdb-1040023-254296,alien_mini_bug_caster_black,North of Elysium,4544,RDB text,INFERRED_CORRELATION,Name-token correlation
+rdb-1040023-254849,ai_mortiig predator_pet,Shadowlands,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-254917,yalm - sunrise,Andromeda,655,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-254917,yalm - sunrise,Sunrise Station,6002,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-254922,yalm - obsidian,The Longest Road,795,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
@@ -416,6 +464,7 @@ rdb-1040023-260034,alien signal tower,Pandemonium Tower Gigantomachy,4900,RDB te
 rdb-1040023-260034,alien signal tower,Xan Hub Tower Room 1,6020,RDB text,INFERRED_CORRELATION,Name-token correlation
 rdb-1040023-260034,alien signal tower,Xan Tower,6021,RDB text,INFERRED_CORRELATION,Name-token correlation
 rdb-1040023-26048,medusa,The Reck,595,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-260844,sl_spirits_redeemed_male_kungfu,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-262088,solitus_male_shade,Andromeda,500,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-262316,antipersonel gun - atrox,Stret East Bank,635,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-262316,antipersonel gun - atrox,Omni Forest,716,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
@@ -441,6 +490,7 @@ rdb-1040023-265802,antivehicular battery - atrox,Omni Forest,716,RDB text,RDB_TE
 rdb-1040023-267084,bursting nano soldier,Parnassos,500,RDB text,INFERRED_CORRELATION,Name-token correlation
 rdb-1040023-267131,atrox keeper special attacks,Aegean,585,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-267131,atrox keeper special attacks,Milky Way,625,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
+rdb-1040023-267322,paolo turin,Alien raids,,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-267324,penley meer,Inferno,4605,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-268203,tentacle -swimming only,The Perpetual Wastelands,570,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-268203,tentacle -swimming only,Andromeda,655,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
@@ -683,6 +733,7 @@ rdb-1040023-279518,gingerleet,Andromeda,,https://wiki.aodb.us/wiki/Dyna_Camps_by
 rdb-1040023-279518,gingerleet,Newland Desert,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-279518,gingerleet,Varmint Woods,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-279518,gingerleet,Aegean,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-280495,sl_spirits_redeemed_female_saveanim,Shadowlands temples,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-280539,hoverchair_atrox,Stret East Bank,635,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-280539,hoverchair_atrox,Omni Forest,716,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-281033,mysterious xan tower - red spawn,Varmint Woods,600,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
@@ -714,6 +765,26 @@ rdb-1040023-282037,bob marleet,Andromeda,,https://wiki.aodb.us/wiki/Dyna_Camps_b
 rdb-1040023-282037,bob marleet,Newland Desert,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-282037,bob marleet,Varmint Woods,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-282037,bob marleet,Aegean,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283873,hoverboard_b_chimera_solitus_male - 3 tricks,Shadowlands,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283873,hoverboard_b_chimera_solitus_male - 3 tricks,Pandemonium,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283900,hoverboard_b_chimera_solitus_female - 3 tricks,Shadowlands,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283900,hoverboard_b_chimera_solitus_female - 3 tricks,Pandemonium,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283901,hoverboard_b_chimera_atrox - 3 tricks,Shadowlands,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283901,hoverboard_b_chimera_atrox - 3 tricks,Pandemonium,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283907,hoverboard_b_chimera_opifex_male - 3 tricks,Shadowlands,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283907,hoverboard_b_chimera_opifex_male - 3 tricks,Pandemonium,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283908,hoverboard_b_chimera_opifex_female - 3 tricks,Shadowlands,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283908,hoverboard_b_chimera_opifex_female - 3 tricks,Pandemonium,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283909,hoverboard_b_chimera_solitus_male_robe - 3 tricks,Shadowlands,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283909,hoverboard_b_chimera_solitus_male_robe - 3 tricks,Pandemonium,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283910,hoverboard_b_chimera_solitus_female_robe - 3 tricks,Shadowlands,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283910,hoverboard_b_chimera_solitus_female_robe - 3 tricks,Pandemonium,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283911,hoverboard_b_chimera_atrox_robe - 3 tricks,Shadowlands,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283911,hoverboard_b_chimera_atrox_robe - 3 tricks,Pandemonium,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283912,hoverboard_b_chimera_opifex_male_robe - 3 tricks,Shadowlands,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283912,hoverboard_b_chimera_opifex_male_robe - 3 tricks,Pandemonium,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283913,hoverboard_b_chimera_opifex_female_robe - 3 tricks,Shadowlands,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-283913,hoverboard_b_chimera_opifex_female_robe - 3 tricks,Pandemonium,,https://wiki.aodb.us/wiki/Pandemonium,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-283954,hoverbike_b_t8_atrox,Stret East Bank,635,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-283954,hoverbike_b_t8_atrox,Omni Forest,716,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-284155,solitus_female_catgirl_three,Avalon,505,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
@@ -787,8 +858,10 @@ rdb-1040023-289492,gift-wrapped leet,Andromeda,565,https://wiki.aodb.us/wiki/Dyn
 rdb-1040023-289492,gift-wrapped leet,Newland Desert,585,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-289492,gift-wrapped leet,Varmint Woods,600,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-289492,gift-wrapped leet,Aegean,655,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-290647,heckler_of_celebration,Shadowlands,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-293552,halloween_hoverbroom_atrox,Stret East Bank,635,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-293552,halloween_hoverbroom_atrox,Omni Forest,716,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
+rdb-1040023-294110,zix-in-a-box,Alien raids,,https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-294111,elf leet,Andromeda,565,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-294111,elf leet,Newland Desert,585,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-294111,elf leet,Varmint Woods,600,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
@@ -976,6 +1049,7 @@ rdb-1040023-297228,henrys test leet,Andromeda,565,https://wiki.aodb.us/wiki/Dyna
 rdb-1040023-297228,henrys test leet,Newland Desert,585,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-297228,henrys test leet,Varmint Woods,600,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-297228,henrys test leet,Aegean,655,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
+rdb-1040023-301639,inf_mission_2_spirit_totem,Shadowlands,,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-301827,hoverchair_nanomage_male_christmas_green,Old Athen,540,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-301827,hoverchair_nanomage_male_christmas_green,Mort,560,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-301827,hoverchair_nanomage_male_christmas_green,Aegean,585,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
@@ -1048,7 +1122,7 @@ rdb-1040023-31114,rhinoman female,Newland Desert,,https://wiki.aodb.us/wiki/Dyna
 rdb-1040023-31114,rhinoman female,Omni Forest,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-31114,rhinoman female,Varmint Woods,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-31114,rhinoman female,Aegean,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
-rdb-1040023-31762,desert eremite,East of Elysium,4543,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
+rdb-1040023-31762,desert eremite,Shadowlands,4543,https://wiki.aodb.us/wiki/Shadowlands_Missions,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-31907,bileswarm colossus,Varmint Woods,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-31907,bileswarm colossus,Belial Forest,,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
 rdb-1040023-31909,bileswarm worker,Varmint Woods,655,https://wiki.aodb.us/wiki/Dyna_Camps_by_level,COMMUNITY_DOCUMENTED,Documented family association
