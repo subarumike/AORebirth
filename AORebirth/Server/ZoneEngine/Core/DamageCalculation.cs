@@ -2,6 +2,7 @@ namespace ZoneEngine.Core
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     public enum DamageEvidenceClassification
     {
@@ -101,6 +102,14 @@ namespace ZoneEngine.Core
         EvidenceBlocked
     }
 
+    public enum DamageCalculationStrategyKind
+    {
+        LegacyFallback,
+        FixedCapturedDamage,
+        EvidenceBackedWeaponDamage,
+        EvidenceBlocked
+    }
+
     public interface IDamageRandomSource
     {
         int NextInclusive(int minimumInclusive, int maximumInclusive);
@@ -184,6 +193,7 @@ namespace ZoneEngine.Core
         {
             this.Identity = string.Empty;
             this.Category = DamageSourceCategory.Unknown;
+            this.AttackSkillContributions = new List<AttackSkillContribution>();
         }
 
         public string Identity { get; set; }
@@ -195,6 +205,25 @@ namespace ZoneEngine.Core
         public int AttackRating { get; set; }
 
         public int AddAllOff { get; set; }
+
+        public IList<AttackSkillContribution> AttackSkillContributions { get; private set; }
+    }
+
+    public sealed class AttackSkillContribution
+    {
+        public int StatId { get; set; }
+
+        public int Percentage { get; set; }
+
+        public int Value { get; set; }
+
+        public int Contribution
+        {
+            get
+            {
+                return (this.Value * this.Percentage) / 100;
+            }
+        }
     }
 
     public sealed class DamageTargetSnapshot
@@ -230,6 +259,10 @@ namespace ZoneEngine.Core
         public int BaseMaximum { get; set; }
 
         public int CriticalBonus { get; set; }
+
+        public bool HasCriticalState { get; set; }
+
+        public bool HasCriticalBonus { get; set; }
 
         public int FixedDamage { get; set; }
 
@@ -272,6 +305,8 @@ namespace ZoneEngine.Core
     {
         public int FlatAddDamage { get; set; }
 
+        public int LegacyDamageBonus { get; set; }
+
         public int TypeSpecificAddDamage { get; set; }
 
         public int UniversalAddDamage { get; set; }
@@ -284,6 +319,8 @@ namespace ZoneEngine.Core
     public sealed class DamageMitigationSet
     {
         public int MatchingArmor { get; set; }
+
+        public bool HasMatchingArmor { get; set; }
 
         public int ReflectPercentage { get; set; }
 
@@ -318,6 +355,7 @@ namespace ZoneEngine.Core
             this.EnablePercentageHealthDamage = false;
             this.EnableReturnedDamage = false;
             this.IsFixedCapturedDamage = false;
+            this.EnableEvidenceBackedWeaponFormula = false;
             this.PlayerFallbackDamage = CombatDamageRules.PlayerFallbackDamage;
             this.NpcFallbackDamage = CombatDamageRules.NpcFallbackDamage;
         }
@@ -350,6 +388,8 @@ namespace ZoneEngine.Core
 
         public bool IsFixedCapturedDamage { get; set; }
 
+        public bool EnableEvidenceBackedWeaponFormula { get; set; }
+
         public int PlayerFallbackDamage { get; set; }
 
         public int NpcFallbackDamage { get; set; }
@@ -376,6 +416,21 @@ namespace ZoneEngine.Core
                 IsFixedCapturedDamage = true
             };
         }
+
+        public static DamageCalculationPolicy EvidenceBackedWeaponFormula(string name)
+        {
+            return new DamageCalculationPolicy
+            {
+                Name = name,
+                EvidenceClassification = DamageEvidenceClassification.Unknown,
+                UseRepositoryLegacyNormalHit = false,
+                PreserveLegacyFallbackFloor = false,
+                EnableEvidenceBackedWeaponFormula = true,
+                EnableArmorMitigation = true,
+                EnableCriticalDamage = true,
+                EnableAttackRatingScaling = true
+            };
+        }
     }
 
     public sealed class DamageCalculationResult
@@ -388,7 +443,13 @@ namespace ZoneEngine.Core
             this.Trace = new DamageCalculationTrace();
             this.SubHitResults = new List<DamageCalculationResult>();
             this.Clamps = new List<string>();
+            this.Strategy = DamageCalculationStrategyKind.LegacyFallback;
+            this.StrategyReason = string.Empty;
         }
+
+        public DamageCalculationStrategyKind Strategy { get; set; }
+
+        public string StrategyReason { get; set; }
 
         public DamageHitOutcome HitOutcome { get; set; }
 
@@ -417,6 +478,12 @@ namespace ZoneEngine.Core
         public int MinimumDamageFloor { get; set; }
 
         public int FlatAddDamageContribution { get; set; }
+
+        public int LegacyDamageBonusContribution { get; set; }
+
+        public int TypeSpecificAddDamageContribution { get; set; }
+
+        public int UniversalAddDamageContribution { get; set; }
 
         public IList<DamageCalculationResult> SubHitResults { get; private set; }
 
@@ -567,6 +634,80 @@ namespace ZoneEngine.Core
 
     public static class DamageCalculator
     {
+        public static bool TryGetArmorStatForDamageType(DamageType damageType, out int statId)
+        {
+            switch (damageType)
+            {
+                case DamageType.Projectile:
+                    statId = 90;
+                    return true;
+                case DamageType.Melee:
+                    statId = 91;
+                    return true;
+                case DamageType.Energy:
+                    statId = 92;
+                    return true;
+                case DamageType.Chemical:
+                    statId = 93;
+                    return true;
+                case DamageType.Radiation:
+                    statId = 94;
+                    return true;
+                case DamageType.Cold:
+                    statId = 95;
+                    return true;
+                case DamageType.Poison:
+                    statId = 96;
+                    return true;
+                case DamageType.Fire:
+                    statId = 97;
+                    return true;
+                case DamageType.Nano:
+                    statId = 168;
+                    return true;
+                default:
+                    statId = 0;
+                    return false;
+            }
+        }
+
+        public static bool TryGetAddDamageStatForDamageType(DamageType damageType, out int statId)
+        {
+            switch (damageType)
+            {
+                case DamageType.Projectile:
+                    statId = 278;
+                    return true;
+                case DamageType.Melee:
+                    statId = 279;
+                    return true;
+                case DamageType.Energy:
+                    statId = 280;
+                    return true;
+                case DamageType.Chemical:
+                    statId = 281;
+                    return true;
+                case DamageType.Radiation:
+                    statId = 282;
+                    return true;
+                case DamageType.Cold:
+                    statId = 311;
+                    return true;
+                case DamageType.Nano:
+                    statId = 315;
+                    return true;
+                case DamageType.Fire:
+                    statId = 316;
+                    return true;
+                case DamageType.Poison:
+                    statId = 317;
+                    return true;
+                default:
+                    statId = 0;
+                    return false;
+            }
+        }
+
         public static DamageCalculationResult Calculate(
             DamageCalculationRequest request,
             IDamageRandomSource randomSource)
@@ -588,8 +729,12 @@ namespace ZoneEngine.Core
             result.HitOutcome = request.HitOutcome;
 
             DamageEvidenceClassification evidence = ResolveEvidence(request);
+            string strategyReason;
+            result.Strategy = SelectStrategy(request, out strategyReason);
+            result.StrategyReason = strategyReason;
             result.Trace.Add("ValidateRequest", DamageCalculationStageStatus.Applied, 0, 0, evidence, "request and deterministic random source present");
             result.Trace.Add("ResolveModeAndPolicy", DamageCalculationStageStatus.Applied, (int)request.Context.Mode, (int)request.Context.Mode, request.Policy.EvidenceClassification, request.Policy.Name);
+            result.Trace.Add("SelectDamageStrategy", result.Strategy == DamageCalculationStrategyKind.EvidenceBlocked ? DamageCalculationStageStatus.EvidenceBlocked : DamageCalculationStageStatus.Applied, 0, (int)result.Strategy, evidence, result.StrategyReason);
 
             DamageType selectedDamageType = request.DamageTypeOverride == DamageType.Unknown
                                                 ? request.Definition.DamageType
@@ -615,8 +760,13 @@ namespace ZoneEngine.Core
             result.Trace.Add("ResolveCritical", request.Definition.IsCritical && !request.Policy.EnableCriticalDamage ? DamageCalculationStageStatus.EvidenceBlocked : DamageCalculationStageStatus.Skipped, 0, 0, request.Definition.IsCritical ? DamageEvidenceClassification.Unknown : evidence, request.Definition.IsCritical ? "critical formula not proven for migrated callers" : "not critical");
 
             int effectiveAttackRating = request.Source.AttackRating + request.Source.AddAllOff;
+            if (request.Source.AttackSkillContributions.Count > 0)
+            {
+                effectiveAttackRating = request.Source.AttackSkillContributions.Sum(x => x.Contribution) + request.Source.AddAllOff;
+            }
+
             result.EffectiveAttackRating = effectiveAttackRating;
-            result.Trace.Add("ResolveEffectiveAttackRating", DamageCalculationStageStatus.Preserved, request.Source.AttackRating, effectiveAttackRating, evidence, "current migrated callers do not scale by attack rating");
+            result.Trace.Add("ResolveEffectiveAttackRating", DamageCalculationStageStatus.Preserved, request.Source.AttackRating, effectiveAttackRating, evidence, request.Source.AttackSkillContributions.Count > 0 ? "weighted attack-skill contributions are represented but not active for migrated callers" : "current migrated callers do not scale by attack rating");
 
             if (request.Definition.HasAttackRatingCap)
             {
@@ -654,6 +804,11 @@ namespace ZoneEngine.Core
             if (request.Mitigation.MatchingArmor != 0)
             {
                 result.Trace.Add("ApplyArmorMitigation", request.Policy.EnableArmorMitigation ? DamageCalculationStageStatus.EvidenceBlocked : DamageCalculationStageStatus.EvidenceBlocked, afterMitigation, afterMitigation, DamageEvidenceClassification.Unknown, "AC ordering and division are unresolved for migrated production damage");
+                int armorStatId;
+                if (TryGetArmorStatForDamageType(selectedDamageType, out armorStatId))
+                {
+                    result.Trace.Add("ResolveArmorStat", DamageCalculationStageStatus.Applied, (int)selectedDamageType, armorStatId, DamageEvidenceClassification.ProvenDatabaseContract, "damage-type to AC stat mapping only; no AC formula activated");
+                }
             }
             else
             {
@@ -661,10 +816,27 @@ namespace ZoneEngine.Core
             }
 
             result.MinimumDamageFloor = fallbackFloor;
-            int normalizedFlatAdd = Math.Max(0, request.Modifiers.FlatAddDamage);
-            result.FlatAddDamageContribution = normalizedFlatAdd;
-            int afterFlatAdd = afterMitigation + normalizedFlatAdd;
-            result.Trace.Add("ApplyFlatDamageModifiers", DamageCalculationStageStatus.Preserved, afterMitigation, afterFlatAdd, evidence, "negative damage bonus is clamped to zero by existing behavior");
+            int normalizedLegacyDamageBonus = Math.Max(0, request.Modifiers.LegacyDamageBonus);
+            if (normalizedLegacyDamageBonus == 0 && request.Modifiers.FlatAddDamage != 0)
+            {
+                normalizedLegacyDamageBonus = Math.Max(0, request.Modifiers.FlatAddDamage);
+            }
+
+            result.LegacyDamageBonusContribution = normalizedLegacyDamageBonus;
+            result.TypeSpecificAddDamageContribution = request.Modifiers.TypeSpecificAddDamage;
+            result.UniversalAddDamageContribution = request.Modifiers.UniversalAddDamage;
+            result.FlatAddDamageContribution = normalizedLegacyDamageBonus;
+            int afterFlatAdd = afterMitigation + normalizedLegacyDamageBonus;
+            result.Trace.Add("ApplyFlatDamageModifiers", DamageCalculationStageStatus.Preserved, afterMitigation, afterFlatAdd, evidence, "legacy damagebonus is kept separate from type-specific and universal add damage");
+            if (request.Modifiers.TypeSpecificAddDamage != 0 || request.Modifiers.UniversalAddDamage != 0)
+            {
+                int addDamageStatId;
+                if (TryGetAddDamageStatForDamageType(selectedDamageType, out addDamageStatId))
+                {
+                    result.Trace.Add("ResolveAddDamageStat", DamageCalculationStageStatus.Applied, (int)selectedDamageType, addDamageStatId, DamageEvidenceClassification.ProvenDatabaseContract, "type-specific add-damage stat mapping only; add-damage formula remains inactive");
+                }
+            }
+
             result.Trace.Add("ApplyMinimumDamageFloor", DamageCalculationStageStatus.Preserved, afterFlatAdd, Math.Max(fallbackFloor, afterFlatAdd), evidence, "repository legacy fallback floor");
 
             int currentDamage = Math.Max(fallbackFloor, afterFlatAdd);
@@ -686,6 +858,75 @@ namespace ZoneEngine.Core
             result.Trace.Add("ReturnTrace", DamageCalculationStageStatus.Applied, result.FinalTargetDamage, result.FinalTargetDamage, evidence, "side-effect-free result only");
 
             return result;
+        }
+
+        private static DamageCalculationStrategyKind SelectStrategy(
+            DamageCalculationRequest request,
+            out string reason)
+        {
+            if (request.Policy.IsFixedCapturedDamage || request.Definition.FixedDamage > 0)
+            {
+                reason = "fixed captured damage selected; AR, AC, criticals, and add-damage are not applied";
+                return DamageCalculationStrategyKind.FixedCapturedDamage;
+            }
+
+            if (request.Policy.EnableEvidenceBackedWeaponFormula)
+            {
+                if (!IsFormulaBackedWeaponRequestComplete(request, out reason))
+                {
+                    return DamageCalculationStrategyKind.EvidenceBlocked;
+                }
+
+                reason = "formula-ready request shape is present, but production AO weapon ordering is not proven in this repository";
+                return DamageCalculationStrategyKind.EvidenceBlocked;
+            }
+
+            reason = "legacy repository damage selected because AO weapon formula evidence is incomplete";
+            return DamageCalculationStrategyKind.LegacyFallback;
+        }
+
+        private static bool IsFormulaBackedWeaponRequestComplete(
+            DamageCalculationRequest request,
+            out string reason)
+        {
+            if (request.Definition.BaseMinimum < 0 || request.Definition.BaseMaximum <= 0)
+            {
+                reason = "missing or invalid weapon min/max damage";
+                return false;
+            }
+
+            if (request.Definition.DamageType == DamageType.Unknown)
+            {
+                reason = "missing proven weapon damage type";
+                return false;
+            }
+
+            if (request.Source.AttackRating == 0 && request.Source.AttackSkillContributions.Count == 0)
+            {
+                reason = "missing proven effective attack rating or weighted skill contributions";
+                return false;
+            }
+
+            if (!request.Mitigation.HasMatchingArmor)
+            {
+                reason = "missing explicit target matching AC input; zero AC must be supplied as known zero";
+                return false;
+            }
+
+            if (!request.Definition.HasCriticalState)
+            {
+                reason = "missing resolved critical state";
+                return false;
+            }
+
+            if (request.Definition.IsCritical && !request.Definition.HasCriticalBonus)
+            {
+                reason = "critical hit is requested without a proven critical bonus input";
+                return false;
+            }
+
+            reason = string.Empty;
+            return true;
         }
 
         private static void NormalizeRequest(DamageCalculationRequest request)

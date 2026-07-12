@@ -53,7 +53,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(5, maximumRoll.FinalTargetDamage);
             Assert.AreEqual(CombatDamageRules.PlayerFallbackDamage, playerFallback.FinalTargetDamage);
             Assert.AreEqual(CombatDamageRules.NpcFallbackDamage, npcFallback.FinalTargetDamage);
+            Assert.AreEqual(DamageCalculationStrategyKind.LegacyFallback, maximumRoll.Strategy);
+            Assert.AreEqual(2, maximumRoll.LegacyDamageBonusContribution);
             Assert.AreEqual(DamageEvidenceClassification.ProvenRepositoryBehavior, maximumRoll.EvidenceClassification);
+            AssertStage(maximumRoll, "SelectDamageStrategy", DamageCalculationStageStatus.Applied);
             AssertStage(maximumRoll, "RollOrSelectBaseDamage", DamageCalculationStageStatus.Preserved);
             AssertStage(maximumRoll, "ApplyFlatDamageModifiers", DamageCalculationStageStatus.Preserved);
             AssertStage(maximumRoll, "ReturnTrace", DamageCalculationStageStatus.Applied);
@@ -102,6 +105,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new QueuedDamageRandomSource());
 
             Assert.AreEqual(9, result.FinalTargetDamage);
+            Assert.AreEqual(DamageCalculationStrategyKind.FixedCapturedDamage, result.Strategy);
             Assert.AreEqual(DamageType.Projectile, result.SelectedDamageType);
             AssertStage(result, "RollOrSelectBaseDamage", DamageCalculationStageStatus.Applied);
             AssertStage(result, "ApplyArmorMitigation", DamageCalculationStageStatus.EvidenceBlocked);
@@ -195,6 +199,94 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void DamageTypeStatMappingsExposeOnlyRepositoryProvenContracts()
+        {
+            AssertArmorStat(DamageType.Projectile, 90);
+            AssertArmorStat(DamageType.Melee, 91);
+            AssertArmorStat(DamageType.Energy, 92);
+            AssertArmorStat(DamageType.Chemical, 93);
+            AssertArmorStat(DamageType.Radiation, 94);
+            AssertArmorStat(DamageType.Cold, 95);
+            AssertArmorStat(DamageType.Poison, 96);
+            AssertArmorStat(DamageType.Fire, 97);
+            AssertArmorStat(DamageType.Nano, 168);
+
+            AssertAddDamageStat(DamageType.Projectile, 278);
+            AssertAddDamageStat(DamageType.Melee, 279);
+            AssertAddDamageStat(DamageType.Energy, 280);
+            AssertAddDamageStat(DamageType.Chemical, 281);
+            AssertAddDamageStat(DamageType.Radiation, 282);
+            AssertAddDamageStat(DamageType.Cold, 311);
+            AssertAddDamageStat(DamageType.Nano, 315);
+            AssertAddDamageStat(DamageType.Fire, 316);
+            AssertAddDamageStat(DamageType.Poison, 317);
+
+            int statId;
+            Assert.IsFalse(DamageCalculator.TryGetArmorStatForDamageType(DamageType.Disease, out statId));
+            Assert.IsFalse(DamageCalculator.TryGetAddDamageStatForDamageType(DamageType.Disease, out statId));
+        }
+
+        [TestMethod]
+        public void FormulaPolicyRemainsEvidenceBlockedUntilAllRequiredInputsAreKnown()
+        {
+            DamageCalculationResult missingArmor = DamageCalculator.Calculate(
+                new DamageCalculationRequest
+                {
+                    Source = new DamageSourceSnapshot
+                    {
+                        Category = DamageSourceCategory.Player,
+                        AttackRating = 100,
+                        AddAllOff = 5
+                    },
+                    Definition = new DamageDefinition
+                    {
+                        BaseMinimum = 2,
+                        BaseMaximum = 4,
+                        DamageType = DamageType.Projectile,
+                        HasCriticalState = true,
+                        IsCritical = false
+                    },
+                    Policy = DamageCalculationPolicy.EvidenceBackedWeaponFormula("candidate-ordinary-weapon")
+                },
+                new QueuedDamageRandomSource(3));
+
+            Assert.AreEqual(DamageCalculationStrategyKind.EvidenceBlocked, missingArmor.Strategy);
+            StringAssert.Contains(missingArmor.StrategyReason, "matching AC");
+            AssertStage(missingArmor, "SelectDamageStrategy", DamageCalculationStageStatus.EvidenceBlocked);
+            Assert.AreEqual(15, missingArmor.FinalTargetDamage);
+        }
+
+        [TestMethod]
+        public void WeightedAttackSkillInputsAreRepresentedButDoNotActivateScaling()
+        {
+            DamageSourceSnapshot source = new DamageSourceSnapshot
+            {
+                Category = DamageSourceCategory.Player,
+                AddAllOff = 10
+            };
+            source.AttackSkillContributions.Add(new AttackSkillContribution { StatId = 105, Percentage = 67, Value = 123 });
+            source.AttackSkillContributions.Add(new AttackSkillContribution { StatId = 106, Percentage = 33, Value = 456 });
+
+            DamageCalculationResult result = DamageCalculator.Calculate(
+                new DamageCalculationRequest
+                {
+                    Source = source,
+                    Definition = new DamageDefinition
+                    {
+                        BaseMinimum = 1,
+                        BaseMaximum = 1
+                    },
+                    Policy = DamageCalculationPolicy.RepositoryLegacyNormalHit(true)
+                },
+                new QueuedDamageRandomSource());
+
+            Assert.AreEqual(242, result.EffectiveAttackRating);
+            Assert.AreEqual(15, result.FinalTargetDamage);
+            AssertStage(result, "ApplyPre1000AttackRatingScaling", DamageCalculationStageStatus.Skipped);
+            AssertStage(result, "ApplyPost1000AttackRatingScaling", DamageCalculationStageStatus.Skipped);
+        }
+
+        [TestMethod]
         public void DeterministicRandomSourceReplaysBaseDamageRolls()
         {
             DamageCalculationResult first = CombatDamageRules.CalculateDetailed(
@@ -216,6 +308,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(first.FinalTargetDamage, second.FinalTargetDamage);
             Assert.AreEqual(4, first.BaseRoll);
             Assert.AreEqual(4, second.BaseRoll);
+        }
+
+        private static void AssertArmorStat(DamageType damageType, int expectedStatId)
+        {
+            int statId;
+            Assert.IsTrue(DamageCalculator.TryGetArmorStatForDamageType(damageType, out statId), damageType.ToString());
+            Assert.AreEqual(expectedStatId, statId, damageType.ToString());
+        }
+
+        private static void AssertAddDamageStat(DamageType damageType, int expectedStatId)
+        {
+            int statId;
+            Assert.IsTrue(DamageCalculator.TryGetAddDamageStatForDamageType(damageType, out statId), damageType.ToString());
+            Assert.AreEqual(expectedStatId, statId, damageType.ToString());
         }
 
         private static DamageCalculationResult CalculateWithAttackRatingCap(int attackRating, int cap)

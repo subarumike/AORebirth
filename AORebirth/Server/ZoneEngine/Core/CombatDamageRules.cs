@@ -62,7 +62,7 @@ namespace ZoneEngine.Core
                     },
                     Modifiers = new DamageModifierSet
                     {
-                        FlatAddDamage = damageBonus
+                        LegacyDamageBonus = damageBonus
                     },
                     Policy = DamageCalculationPolicy.RepositoryLegacyNormalHit(isPlayer),
                     EvidenceClassification = DamageEvidenceClassification.ProvenRepositoryBehavior,
