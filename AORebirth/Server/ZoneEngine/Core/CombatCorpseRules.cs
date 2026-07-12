@@ -9,8 +9,8 @@ namespace ZoneEngine.Core
 
     public enum CombatCorpseLootClass
     {
-        CreditsOnly,
-        ItemLoot,
+        Empty,
+        RegularLoot,
         MajorBoss
     }
 
@@ -259,7 +259,11 @@ namespace ZoneEngine.Core
             new ObservedCorpseCreditRule("Shore Snake", 30252, 5, 5),
             new ObservedCorpseCreditRule("Surf Lizard", 22794, 1, 1),
             new ObservedCorpseCreditRule("Cliff Malle", 17660, 3, 3),
-            new ObservedCorpseCreditRule("Reef Salamander", 30354, 23, 29)
+            new ObservedCorpseCreditRule("Reef Salamander", 30354, 23, 29),
+            // Source: completed Subway captures 20260709-210452 and 20260709-220439,
+            // CorpseFullUpdate packets for monsterData 17657 at corpse cash offset 207.
+            // Observed nonzero spawn credits: 29, 35, 41, 66, 72, 79.
+            new ObservedCorpseCreditRule("Filth Flea", 17657, 29, 79)
         };
 
         public const int CorpseInventorySlots = 21;
@@ -268,22 +272,22 @@ namespace ZoneEngine.Core
 
         public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30);
 
-        public static readonly TimeSpan CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30);
+        public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(30);
 
-        public static readonly TimeSpan ItemLootCorpseLifetime = TimeSpan.FromSeconds(60);
+        public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(5);
 
         public static readonly TimeSpan MajorBossCorpseLifetime = TimeSpan.FromMinutes(30);
 
-        public static CombatCorpseLootClass LootClassFor(int unlootedItemCount, bool isMajorBoss)
+        public static CombatCorpseLootClass LootClassFor(int unlootedItemCount, int unlootedCredits, bool isMajorBoss)
         {
             if (isMajorBoss)
             {
                 return CombatCorpseLootClass.MajorBoss;
             }
 
-            return unlootedItemCount > 0
-                       ? CombatCorpseLootClass.ItemLoot
-                       : CombatCorpseLootClass.CreditsOnly;
+            return unlootedItemCount > 0 || unlootedCredits > 0
+                       ? CombatCorpseLootClass.RegularLoot
+                       : CombatCorpseLootClass.Empty;
         }
 
         public static TimeSpan LifetimeFor(CombatCorpseLootClass lootClass)
@@ -293,11 +297,11 @@ namespace ZoneEngine.Core
                 case CombatCorpseLootClass.MajorBoss:
                     return MajorBossCorpseLifetime;
 
-                case CombatCorpseLootClass.ItemLoot:
-                    return ItemLootCorpseLifetime;
+                case CombatCorpseLootClass.RegularLoot:
+                    return RegularLootCorpseLifetime;
 
                 default:
-                    return CreditsOnlyCorpseLifetime;
+                    return EmptyCorpseLifetime;
             }
         }
 

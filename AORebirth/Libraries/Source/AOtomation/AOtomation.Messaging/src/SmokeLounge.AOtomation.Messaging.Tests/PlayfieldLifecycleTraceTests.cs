@@ -480,6 +480,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string repositoryRoot = FindRepositoryRoot();
             string coordinatorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            string providerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+            string corpseRulesText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
             Assert.IsTrue(
                 coordinatorText.Contains("this.AnnounceCapturedEnemyAttackStartContext(attacker, capturedContract);")
                 && coordinatorText.Contains("private void AnnounceCapturedEnemyAttackStartContext(")
@@ -506,6 +510,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(contextIndex >= 0, "Flea combat start must announce captured attack context.");
             Assert.IsTrue(poisonContextIndex >= 0, "Flea combat must expose captured natural attack templates.");
             Assert.IsTrue(attackInfoIndex > contextIndex, "Flea context must be established before AttackInfo damage.");
+            Assert.IsTrue(
+                providerText.Contains("20260709-210452 and 20260709-220439, inventory-updates.csv")
+                && providerText.Contains("\"Filth Flea\"")
+                && providerText.Contains("17657")
+                && providerText.Contains("234874")
+                && providerText.Contains("103110")
+                && providerText.Contains("101581")
+                && providerText.Contains("110874")
+                && providerText.Contains("101507")
+                && providerText.Contains("202719")
+                && providerText.Contains("234876")
+                && providerText.Contains("101761")
+                && providerText.Contains("110192"),
+                "Filth Flea must retain captured Subway corpse loot evidence from completed inventory captures.");
+            string filthFleaFactory = ExtractMethodBlock(
+                providerText,
+                "private static CapturedSubwaySpawnDefinition FilthFlea");
+            Assert.IsTrue(
+                filthFleaFactory.Contains("respawnDelaySeconds: 240.0"),
+                "Filth Flea must retain the captured four-minute post-despawn respawn schedule.");
+            Assert.IsTrue(
+                corpseRulesText.Contains("20260709-210452 and 20260709-220439")
+                && corpseRulesText.Contains("CorpseFullUpdate packets for monsterData 17657")
+                && corpseRulesText.Contains("Observed nonzero spawn credits: 29, 35, 41, 66, 72, 79")
+                && corpseRulesText.Contains("new ObservedCorpseCreditRule(\"Filth Flea\", 17657, 29, 79)"),
+                "Filth Flea must retain captured Subway corpse credit evidence from completed corpse full-update captures.");
         }
 
         [TestMethod]
@@ -1540,13 +1570,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string[] acceptedEnemyKeys =
                 {
-                    "Thief|26092|138"
+                    "Thief|26092|138",
+                    "Filth Flea|17657|138"
                 };
 
             Assert.AreEqual(
-                1,
+                2,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
+
+            Assert.IsTrue(
+                providerText.Contains("private static CapturedSubwaySpawnDefinition FilthFlea(")
+                && providerText.Contains("respawnDelaySeconds: 240.0")
+                && providerText.Contains("20260709-210452 and 20260709-220439, inventory-updates.csv")
+                && combatContractText.Contains("case 17657:")
+                && attackRulesText.Contains("CapturedSubwayFilthFleaMonsterData = 17657")
+                && movementCoordinatorText.Contains("CreateCapturedSubwayFilthFleaSpecialAttacks()")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue")
+                && scfuPacketText.Contains("SubwayFilthFleaMonsterData = 17657")
+                && scfuPacketText.Contains("CapturedSubwayFilthFleaExtendedTextureOverrideData")
+                && corpsePacketText.Contains("CapturedSubwayFilthFleaPacketLength = 457")
+                && corpsePacketText.Contains("BuildCapturedSubwayFilthFlea(")
+                && corpseRulesText.Contains("new ObservedCorpseCreditRule(\"Filth Flea\", 17657, 29, 79)"),
+                "Accepted Subway Filth Flea must keep spawn, movement/chase, combat, appearance, corpse visual, loot, credits, and four-minute respawn coverage together.");
 
             Assert.IsTrue(
                 providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0))")
@@ -1613,10 +1660,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("CapturedSubwayThiefCorpseCatMesh = 5907")
                 && playfieldText.Contains("private static bool IsCapturedSubwayThief(ICharacter target)")
-                && registerCorpse.Contains("if (!state.HasUnlootedItems)")
+                && !registerCorpse.Contains("if (!state.HasUnlootedItems)")
+                && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30)"),
-                "Accepted Subway Thief must keep captured corpse visual selection and the loot-bearing corpse despawn guard.");
+                && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.FromSeconds(30)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(5)"),
+                "Accepted Subway Thief must keep captured corpse visual selection and the generic five-minute loot-bearing corpse lifetime.");
         }
 
         [TestMethod]
@@ -3038,15 +3087,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseInteractionRulesText.Contains("public const int CorpseUseAcknowledgeDelayMilliseconds = 550;"),
                 "Capture-backed corpse credit payout must stay after InventoryUpdate and before the delayed GenericCmd success ack.");
             Assert.IsTrue(
-                registerCorpse.Contains("if (!state.HasUnlootedItems)")
+                !registerCorpse.Contains("if (!state.HasUnlootedItems)")
                 && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
                 && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30);")
-                && corpseRulesText.Contains("public static readonly TimeSpan CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30);"),
-                "Loot-bearing corpses must not receive an initial despawn timer; empty corpses must use the 30-second cleanup window.");
+                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(30);")
+                && corpseRulesText.Contains("public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(5);")
+                && registerCorpse.Contains("CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);")
+                && corpseRulesText.Contains("unlootedItemCount > 0 || unlootedCredits > 0"),
+                "Regular loot-bearing corpses must receive a five-minute initial lifetime; empty corpses must use the 30-second cleanup window.");
             AssertTextBefore(
                 registerCorpse,
                 "this.corpses[corpseIdentity.Instance] = state;",
-                "if (!state.HasUnlootedItems)");
+                "this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);");
 
             Assert.IsTrue(
                 playfieldLootCorpseItem.Contains("this.runtimeSystems.TryLootCorpseItem(")

@@ -189,7 +189,7 @@ Build the capture plugin after capture-tool source changes with:
 cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.csproj /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 ```
 
-One-pass NPC captures preserve raw packets in `packets.hex.log` and promote reusable evidence into `enemy-full-updates.csv`, `enemy-state.csv`, `enemy-dossier.json`, `enemy-movement.csv`, `movement-packets.csv`, `enemy-combat.csv`, `enemy-stat-updates.csv`, `npc-lifecycle.csv`, `corpse-full-updates.csv`, and `inventory-updates.csv`. Final capture validation must report incomplete when corpse presence or inventory was observed without a successfully decoded identity-linked `CorpseFullUpdate`.
+One-pass NPC captures preserve raw packets in `packets.hex.log` and promote reusable evidence into `enemy-full-updates.csv`, `enemy-state.csv`, `enemy-dossier.json`, `enemy-movement.csv`, `movement-packets.csv`, `enemy-combat.csv`, `enemy-stat-updates.csv`, `npc-lifecycle.csv`, `corpse-full-updates.csv`, `enemy-respawns.csv`, and `inventory-updates.csv`. `enemy-state.csv` rows include source direction, packet sequence, message type, and evidence source. For respawn timing captures, Mike should write a respawn marker such as `/aocap mark respawn-start` before the kill/wait loop; marked respawn captures validate incomplete unless a same-archetype same-position respawn is correlated. Final capture validation must report incomplete when corpse presence or inventory was observed without a successfully decoded identity-linked `CorpseFullUpdate`.
 
 Existing capture folders can be retro-decoded without repeating gameplay:
 
