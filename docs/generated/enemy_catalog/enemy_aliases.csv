@@ -1,0 +1,47 @@
+SourceName,NormalizedName,CanonicalFamily,RelationshipType,EvidenceSource,Confidence,Notes
+Androids,android,family-android,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Anuns,anun,family-anun,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Aquaans,aquaan,family-aquaan,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Biledrinkers,biledrinker,family-biledrinker,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Bileswarms,bileswarm,family-bileswarm,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Biofreak,biofreak,family-biofreak,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Biofreaks,biofreak,family-biofreak,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Blubbags,blubbag,family-blubbag,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Brontos,bronto,family-bronto,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Buzzsaws,buzzsaw,family-buzzsaw,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Clawfingers,clawfinger,family-clawfinger,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Cyborgs,cyborg,family-cyborg,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Enigmas,enigma,family-enigma,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Eyemutants,eyemutant,family-eyemutant,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Fleas,flea,family-flea,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Hammerbeasts,hammerbeast,family-hammerbeast,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Hounds,hound,family-hound,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Igruana,igruana,family-igruana,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Leets,leet,family-leet,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Lizards,lizard,family-lizard,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Malle,malle,family-malle,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Manteze,manteze,family-manteze,DISTINCT_VARIANT_RETAINED,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Mantezes,manteze,family-manteze,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Mantis,mantis,family-mantis,DISTINCT_VARIANT_RETAINED,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Mechdogs,mechdog,family-mechdog,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Minibulls,minibull,family-minibull,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Nanofreaks,nanofreak,family-nanofreak,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Nighthowler,nighthowler,family-nighthowler,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Ninjadroids,ninja droid,family-ninja-droid,SPELLING_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Ottous,ottou,family-ottou,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Pareets,reet,family-reet,DOCUMENTED_ALIAS,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Pit Lizards,pit lizard,family-pit-lizard,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Quake Lizards,quake lizard,family-quake-lizard,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Reets,reet,family-reet,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Rhinomen,rhinoman,family-rhinoman,SPELLING_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Rollerrats,rollerrat,family-rollerrat,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Salamanders,salamander,family-salamander,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Sand Demon,sand demon,family-sand-demon,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Sandworms,sandworm,family-sandworm,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Scorpiods,scorpiod,family-scorpiod,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Shadowmutants,shadowmutant,family-shadowmutant,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Snakes,snake,family-snake,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Spiders,spider,family-spider,SINGULAR_PLURAL_VARIANT,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Tentacle Mutant,tentacle mutant,family-tentacle-mutant,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Tentacle Mutants,tentacle mutant,family-tentacle-mutant,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.
+Unfinished Breed,unfinished breed,family-unfinished-breed,EXACT_NORMALIZATION,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,Hammerbeast and Manteze relationships intentionally retained as ambiguous/distinct where applicable.

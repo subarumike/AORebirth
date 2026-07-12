@@ -4,6 +4,18 @@
     "AORebirth/Datafiles/nanos.dat",
     "AORebirth/Datafiles/playfields.dat"
   ],
+  "DynaOdtSource": {
+    "FileSize": 61268,
+    "ImportDate": "2026-07-12",
+    "OriginalFilename": "dyna boss list 1.odt",
+    "OriginalPathAtImport": "C:\\Users\\Mike\\Downloads\\dyna boss list 1.odt",
+    "ParserVersion": "1.0.0",
+    "RowCount": 174,
+    "Sha256": "9c7e6ae8f9fa7207a57174a5bccc9d115217f2ce882b5aeedb1e27b0e3dfd257",
+    "SourceId": "SRC-DYNA-ODT-001",
+    "SourceTitle": "Dyna Boss List 1",
+    "SourceType": "COMMUNITY_MAINTAINED_ODT"
+  },
   "ExtractionTimestampUtc": "2026-06-22T10:09:06.6228733Z",
   "ExtractorVersion": "1.0.0",
   "InternetSources": [
@@ -365,6 +377,6 @@
       "RecordType": 3086621
     }
   ],
-  "RepositoryCommit": "612c6318a60b120bdf79fc0eb21728b87bdb05a4",
+  "RepositoryCommit": "a5aef19fbc308f98bd24848ec599c0befcf9a091",
   "TotalRecordsScanned": 649606
 }

@@ -1228,3 +1228,177 @@ rdb-1040023-99456,hover boat ferry,Coast of Harmony,4894,RDB text,RDB_TEMPLATE_N
 rdb-1040023-99902,grid default character,Andromeda,655,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-99902,grid default character,Borealis,800,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
 rdb-1040023-99902,grid default character,Character Creation Lab Dng,896,RDB text,RDB_TEMPLATE_NAME,Name-token correlation
+family-blubbag,blubbag,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1740x1940 approximate boss 20; minions 15-20
+family-blubbag,blubbag,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1710x1720 approximate boss 30; minions 25-30
+family-blubbag,blubbag,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1680x1730 approximate boss 30; minions 25-30
+family-flea,flea,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1420x2620 approximate boss 35; minions 25-30
+family-flea,flea,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1580x2780 approximate boss 35; minions 25-30
+family-flea,flea,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2100x2340 approximate boss 35; minions 25-30
+family-leet,leet,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1340x1900 approximate boss 40; minions 30-35
+family-android,android,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 980x380 approximate boss 50; minions 40-45
+family-hound,hound,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1620x2060 approximate boss 50; minions 40-45
+family-rollerrat,rollerrat,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1860x2780 approximate boss 50; minions 40-45
+family-hound,hound,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2140x980 approximate boss 60; minions 45-50
+family-manteze,manteze,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1420x700 approximate boss 60; minions 45-50
+family-manteze,manteze,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1180x940 approximate boss 60; minions 45-50
+family-mechdog,mechdog,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1100x1700 approximate boss 60; minions 45-50
+family-android,android,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 860x2340 approximate boss 65; minions 50-55
+family-tentacle-mutant,tentacle mutant,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 660x820 approximate boss 70; minions (no mobs)
+family-android,android,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 380x2300 approximate boss 70; minions 55-60
+family-hound,hound,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 820x980 approximate boss 70; minions 55-60
+family-anun,anun,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1300x1530 approximate boss 75; minions 60-65
+family-manteze,manteze,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2060x740 approximate boss 75; minions 60-65
+family-rhinoman,rhinoman,Aegean,585,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 460x340 approximate boss 75; minions 60-65
+family-leet,leet,Andromeda,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1380x2700 approximate boss 40; minions 30-35
+family-hammerbeast,hammerbeast,Andromeda,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1700x2740 approximate boss 45; minions 35-40
+family-scorpiod,scorpiod,Andromeda,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1220x2100 approximate boss 50; minions 40-45
+family-shadowmutant,shadowmutant,Andromeda,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3020x2220 approximate boss 70; minions 50-55
+family-hound,hound,Andromeda,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 460x580 approximate boss 70; minions 55-60
+family-snake,snake,Andromeda,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1180x1420 approximate boss 80; minions 60-65
+family-hammerbeast,hammerbeast,Andromeda,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 4180x420 approximate boss 85; minions 70-75
+family-spider,spider,Andromeda,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2940x2020 approximate boss 95; minions 75-80
+family-spider,spider,Andromeda,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2220x1500 approximate boss 95; minions 75-80
+family-shadowmutant,shadowmutant,Andromeda,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 4520x1150 approximate boss 100; minions 80-85
+family-snake,snake,Andromeda,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3020x300 approximate boss 105; minions 85-90
+family-pit-lizard,pit lizard,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1450x665 approximate boss 175; minions 160-165
+family-enigma,enigma,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1660x3100 approximate boss 135; minions 110-115
+family-ottou,ottou,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2120x2980 approximate boss 135; minions 110-115
+family-ninja-droid,ninja droid,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 380x2260 approximate boss 150; minions 125-130
+family-bileswarm,bileswarm,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1700x2580 approximate boss 160; minions (no mobs)
+family-ninja-droid,ninja droid,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2500x2140 approximate boss 160; minions 135-140
+family-enigma,enigma,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 580x1820 approximate boss 165; minions 135-140
+family-ninja-droid,ninja droid,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2200x2510 approximate boss 165; minions 135-140
+family-snake,snake,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 460x780 approximate boss 170; minions 140-145
+family-quake-lizard,quake lizard,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 820x1940 approximate boss 175; minions 135-140
+family-quake-lizard,quake lizard,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 900x740 approximate boss 175; minions 135-140
+family-snake,snake,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1700x1380 approximate boss 180; minions 150-155
+family-nanofreak,nanofreak,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1660x1780 approximate boss 185; minions 151-155
+family-snake,snake,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1500x2100 approximate boss 190; minions 155-160
+family-snake,snake,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1780x1140 approximate boss 190; minions 155-160
+family-pit-lizard,pit lizard,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 820x1340 approximate boss 195; minions 155-160
+family-pit-lizard,pit lizard,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1480x640 approximate boss 195; minions 160-165
+family-snake,snake,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2380x1460 approximate boss 200; minions 160-165
+family-nanofreak,nanofreak,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2380x740 approximate boss 205; minions 165-170
+family-biledrinker,biledrinker,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2300x1260 approximate boss 205; minions 170-175
+family-biledrinker,biledrinker,Belial Forest,605,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1700x540 approximate boss 210; minions 170-175
+family-cyborg,cyborg,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1380x2740 approximate boss 120; minions 95-100
+family-enigma,enigma,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1700x2500 approximate boss 120; minions 100-105
+family-spider,spider,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 860x2380 approximate boss 130; minions 105-110
+family-spider,spider,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 460x2380 approximate boss 135; minions 110-115
+family-anun,anun,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 420x1060 approximate boss 145; minions 115-120
+family-spider,spider,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 940x1860 approximate boss 145; minions 115-120
+family-spider,spider,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3380x1380 approximate boss 145; minions 120-125
+family-spider,spider,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 500x1700 approximate boss 150; minions 120-125
+family-spider,spider,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2340x340 approximate boss 150; minions 120-125
+family-snake,snake,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3220x1620 approximate boss 150; minions 125-130
+family-enigma,enigma,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2380x2340 approximate boss 155; minions 130-135
+family-enigma,enigma,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2620x2820 approximate boss 160; minions 130-135
+family-snake,snake,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 380x420 approximate boss 160; minions 130-135
+family-anun,anun,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3580x2940 approximate boss 165; minions 130-135
+family-enigma,enigma,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1340x860 approximate boss 170; minions 135-140
+family-enigma,enigma,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 940x1540 approximate boss 170; minions 140-145
+family-nanofreak,nanofreak,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2660x300 approximate boss 205; minions 165-170
+family-snake,snake,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3540x1420 approximate boss 215; minions 175-180
+family-snake,snake,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2500x1900 approximate boss 245; minions 200-205
+family-snake,snake,Central Artery Valley,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2500x1900 approximate boss 275; minions 200-205
+family-rhinoman,rhinoman,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1260x2540 approximate boss 15; minions 10-15
+family-rhinoman,rhinoman,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1340x2340 approximate boss 15; minions 10-15
+family-eyemutant,eyemutant,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2180x2740 approximate boss 20; minions 15-20
+family-rhinoman,rhinoman,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 740x2390 approximate boss 30; minions (no mobs)
+family-buzzsaw,buzzsaw,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2820x700 approximate boss 30; minions 20-25
+family-bronto,bronto,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2340x1060 approximate boss 30; minions 20-25
+family-lizard,lizard,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 340x1740 approximate boss 30; minions 20-25
+family-flea,flea,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3260x2900 approximate boss 35; minions 25-30
+family-rhinoman,rhinoman,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1460x2140 approximate boss 40; minions 30-35
+family-salamander,salamander,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2740x2460 approximate boss 40; minions 30-35
+family-scorpiod,scorpiod,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2620x300 approximate boss 40; minions 30-35
+family-snake,snake,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2100x2220 approximate boss 40; minions 30-35
+family-leet,leet,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1220x2900 approximate boss 40; minions 30-35
+family-leet,leet,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 740x2900 approximate boss 40; minions 30-35
+family-leet,leet,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 460x2380 approximate boss 40; minions 30-35
+family-scorpiod,scorpiod,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2340x660 approximate boss 40; minions 30-35
+family-rhinoman,rhinoman,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1700x1580 approximate boss 40; minions 30-35
+family-minibull,minibull,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3420x2100 approximate boss 50; minions 40-45
+family-rhinoman,rhinoman,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3490x1300 approximate boss 55; minions 40-45
+family-rhinoman,rhinoman,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2820x1220 approximate boss 60; minions 45-50
+family-rhinoman,rhinoman,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2660x1460 approximate boss 65; minions 50-55
+family-rhinoman,rhinoman,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2810x1640 approximate boss 65; minions 50-55
+family-rhinoman,rhinoman,Newland Desert,565,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2820x1620 approximate boss 65; minions 50-55
+family-reet,reet,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 660x2540 approximate boss 5; minions 3-4
+family-blubbag,blubbag,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 540x2190 approximate boss 5; minions 3-4
+family-malle,malle,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 380x1500 approximate boss 10; minions 3-5
+family-igruana,igruana,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 380x3180 approximate boss 10; minions 5-6
+family-biofreak,biofreak,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 380x1300 approximate boss 10; minions 5-7
+family-blubbag,blubbag,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 540x2860 approximate boss 10; minions 6-8
+family-leet,leet,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 380x820 approximate boss 10; minions 7-8
+family-shadowmutant,shadowmutant,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 300x1060 approximate boss 10; minions 8-10
+family-tentacle-mutant,tentacle mutant,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 850x3260 approximate boss 15; minions 11-13
+family-reet,reet,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 300x620 approximate boss 15; minions 11-13
+family-aquaan,aquaan,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 540x660 approximate boss 15; minions 12-14
+family-nighthowler,nighthowler,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 660x1340 approximate boss 15; minions 12-14
+family-rhinoman,rhinoman,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 620x340 approximate boss 20; minions 15-17
+family-flea,flea,Omni Forest,716,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 540x1020 approximate boss 25; minions 17-19
+family-mantis,mantis,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1160x1145 approximate boss 105; minions 76-90
+family-cyborg,cyborg,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1935x1380 approximate boss 105; minions 85-90
+family-cyborg,cyborg,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1950x1390 approximate boss 110; minions 85-90
+family-anun,anun,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3060x920 approximate boss 130; minions 105-110
+family-mantis,mantis,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1460x860 approximate boss 165; minions 135-140
+family-mantis,mantis,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2660x2300 approximate boss 165; minions 135-140
+family-anun,anun,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 380x500 approximate boss 175; minions 145-150
+family-anun,anun,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 380x900 approximate boss 175; minions 145-150
+family-anun,anun,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 460x3140 approximate boss 185; minions 150-155
+family-anun,anun,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 700x2460 approximate boss 185; minions 150-155
+family-anun,anun,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1260x2860 approximate boss 185; minions 150-155
+family-anun,anun,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1340x3060 approximate boss 185; minions 150-155
+family-sandworm,sandworm,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 420x1500 approximate boss 190; minions 145-150
+family-mantis,mantis,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2080x2770 approximate boss 195; minions 75-180
+family-mantis,mantis,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2460x2660 approximate boss 200; minions 165-170
+family-mantis,mantis,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2740x2460 approximate boss 200; minions 165-170
+family-mantis,mantis,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2980x2940 approximate boss 200; minions 165-170
+family-mantis,mantis,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3100x3260 approximate boss 200; minions 165-170
+family-anun,anun,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3520x2020 approximate boss 200; minions 165-170
+family-mantis,mantis,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2220x3340 approximate boss 205; minions 165-170
+family-sand-demon,sand demon,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3940x1780 approximate boss 210; minions (no mobs)
+family-cyborg,cyborg,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3460x2940 approximate boss 235; minions 171-190
+family-cyborg,cyborg,Perpetual Wastelands,,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3475x2980 approximate boss 245; minions 171-190
+family-lizard,lizard,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1740x2660 approximate boss 20; minions 15-20
+family-lizard,lizard,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1020x2740 approximate boss 30; minions 20-25
+family-leet,leet,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3340x2860 approximate boss 40; minions 30-35
+family-rhinoman,rhinoman,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1020x300 approximate boss 60; minions 45-50
+family-blubbag,blubbag,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1300x2340 approximate boss 60; minions 51-56
+family-blubbag,blubbag,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 3060x2220 approximate boss 65; minions 50-55
+family-rhinoman,rhinoman,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1220x340 approximate boss 65; minions 50-55
+family-spider,spider,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1420x1540 approximate boss 65; minions 50-55
+family-manteze,manteze,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 4020x1780 approximate boss 65; minions 55-60
+family-rhinoman,rhinoman,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1140x980 approximate boss 70; minions 55-60
+family-manteze,manteze,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 700x2180 approximate boss 75; minions 60-65
+family-manteze,manteze,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 580x2540 approximate boss 75; minions 60-65
+family-manteze,manteze,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 4060x1340 approximate boss 75; minions 60-65
+family-rhinoman,rhinoman,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1340x900 approximate boss 75; minions 60-65
+family-rhinoman,rhinoman,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1940x1860 approximate boss 75; minions 60-65
+family-unfinished-breed,unfinished breed,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2040x420 approximate boss 75; minions 60-65
+family-unfinished-breed,unfinished breed,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2040x400 approximate boss 75; minions 60-65
+family-manteze,manteze,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 4220x380 approximate boss 80; minions 65-70
+family-rhinoman,rhinoman,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1380x540 approximate boss 80; minions 65-70
+family-rhinoman,rhinoman,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1860x1100 approximate boss 100; minions 80-85
+family-bileswarm,bileswarm,Varmint Woods,600,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1700x820 approximate boss 130; minions 105-110
+family-biofreak,biofreak,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 340x1060 approximate boss 45; minions 35-40
+family-blubbag,blubbag,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1100x2020 approximate boss 50; minions 35-40
+family-rollerrat,rollerrat,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1740x1220 approximate boss 50; minions 35-40
+family-clawfinger,clawfinger,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1140x1700 approximate boss 50; minions 40-45
+family-hound,hound,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1580x1140 approximate boss 50; minions 40-45
+family-hound,hound,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1420x1140 approximate boss 50; minions 40-45
+family-hound,hound,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1380x1380 approximate boss 50; minions 40-45
+family-blubbag,blubbag,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1700x1740 approximate boss 55; minions 40-45
+family-blubbag,blubbag,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2300x1340 approximate boss 55; minions 40-45
+family-blubbag,blubbag,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2420x1340 approximate boss 60; minions 45-50
+family-scorpiod,scorpiod,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 540x1460 approximate boss 60; minions 45-50
+family-spider,spider,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1980x2580 approximate boss 60; minions 45-50
+family-spider,spider,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 620x3060 approximate boss 65; minions 50-55
+family-blubbag,blubbag,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2340x1420 approximate boss 65; minions 55-60
+family-spider,spider,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1260x2540 approximate boss 70; minions 55-60
+family-spider,spider,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1340x2500 approximate boss 70; minions 55-60
+family-blubbag,blubbag,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 2340x1500 approximate boss 75; minions 50-55
+family-hammerbeast,hammerbeast,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 980x3300 approximate boss 90; minions 70-75
+family-hammerbeast,hammerbeast,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1540x3340 approximate boss 90; minions 70-75
+family-hammerbeast,hammerbeast,Wailing Wastes,551,SRC-DYNA-ODT-001,COMMUNITY_DOCUMENTED,DOCUMENTED_STATIC_SPAWN 1700x3380 approximate boss 90; minions 70-75
