@@ -26,6 +26,51 @@
       "Reliability": "COMMUNITY_DOCUMENTED",
       "Title": "Pandemonium",
       "Url": "https://wiki.aodb.us/wiki/Pandemonium"
+    },
+    {
+      "Reliability": "COMMUNITY_DOCUMENTED",
+      "Title": "Sector 10",
+      "Url": "https://www.ao-universe.com/guides/alien-invasion/quests-guides/sector-10-alien-playfield"
+    },
+    {
+      "Reliability": "COMMUNITY_DOCUMENTED",
+      "Title": "Encounter Guides",
+      "Url": "https://www.ao-universe.com/guides/classic-ao/encounter-guides-3"
+    },
+    {
+      "Reliability": "COMMUNITY_DOCUMENTED",
+      "Title": "Inner Sanctum",
+      "Url": "https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/high-level-encounter-2/the-inner-sanctum"
+    },
+    {
+      "Reliability": "COMMUNITY_DOCUMENTED",
+      "Title": "Shoulderpads Quests",
+      "Url": "https://www.ao-universe.com/guides/classic-ao/quests-guides-3/shoulderpads-quests"
+    },
+    {
+      "Reliability": "COMMUNITY_DOCUMENTED",
+      "Title": "Shadowlands Missions",
+      "Url": "https://wiki.aodb.us/wiki/Shadowlands_Missions"
+    },
+    {
+      "Reliability": "COMMUNITY_DOCUMENTED",
+      "Title": "Condemned Subway",
+      "Url": "https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/condemned-subway"
+    },
+    {
+      "Reliability": "COMMUNITY_DOCUMENTED",
+      "Title": "Temple of Three Winds",
+      "Url": "https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/temple-of-three-winds"
+    },
+    {
+      "Reliability": "COMMUNITY_DOCUMENTED",
+      "Title": "Steps of Madness",
+      "Url": "https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/low-level-encounter/steps-of-madness"
+    },
+    {
+      "Reliability": "COMMUNITY_DOCUMENTED",
+      "Title": "Smuggler's Den",
+      "Url": "https://www.ao-universe.com/guides/classic-ao/encounter-guides-3/mid-level-encounter/the-mantis-and-smugglers-den"
     }
   ],
   "Parser": "AODB.RdbController.GetRaw plus repository extractor normalization",
@@ -320,6 +365,6 @@
       "RecordType": 3086621
     }
   ],
-  "RepositoryCommit": "fc9c52a2403fdc3cd0c78d69273512c592c0f993",
+  "RepositoryCommit": "612c6318a60b120bdf79fc0eb21728b87bdb05a4",
   "TotalRecordsScanned": 649606
 }

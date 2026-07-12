@@ -1,5 +1,21 @@
 [
   {
+    "CanonicalEnemyKey": "external-34-ii-handyman",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-34-v-worker",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-abmouth-supremus",
     "SourceRecordIds": [],
     "UnresolvedFields": [
@@ -8,11 +24,59 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "external-alien-communication-officer",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-alien-immature-vector",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-alien-larva",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-alien-leader",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-alien-medic",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-aquarius",
     "SourceRecordIds": [],
     "UnresolvedFields": [
       "RDB mapping",
       "weapon or natural attack"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-architect-striker",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
     ]
   },
   {
@@ -29,6 +93,38 @@
     "UnresolvedFields": [
       "RDB mapping",
       "weapon or natural attack"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-betrayer-of-memory",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-bloodcreeper",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-buckethead-techno-scavenger",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-buzzsaw-techno-scavenger",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
     ]
   },
   {
@@ -76,10 +172,7 @@
     "SourceRecordIds": [],
     "UnresolvedFields": [
       "RDB mapping",
-      "weapon or natural attack",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference"
+      "weapon or natural attack"
     ]
   },
   {
@@ -87,10 +180,15 @@
     "SourceRecordIds": [],
     "UnresolvedFields": [
       "RDB mapping",
-      "weapon or natural attack",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference"
+      "weapon or natural attack"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-cultist",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
     ]
   },
   {
@@ -102,14 +200,59 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "external-defender-of-the-three",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-den-hive-guardian",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-den-mantis",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-den-mantis-breeder",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-den-smuggler",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-den-smuggler-pilot",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-diamondine-soldier",
     "SourceRecordIds": [],
     "UnresolvedFields": [
       "RDB mapping",
-      "weapon or natural attack",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference"
+      "weapon or natural attack"
     ]
   },
   {
@@ -161,6 +304,14 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "external-emotional-sponge",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-eradicator-deimos",
     "SourceRecordIds": [],
     "UnresolvedFields": [
@@ -177,14 +328,43 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "external-eternal-guardian",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-eternal-sentinel",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-exarch",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-exarch-truan",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-fiery-soldier",
     "SourceRecordIds": [],
     "UnresolvedFields": [
       "RDB mapping",
-      "weapon or natural attack",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference"
+      "weapon or natural attack"
     ]
   },
   {
@@ -256,10 +436,15 @@
     "SourceRecordIds": [],
     "UnresolvedFields": [
       "RDB mapping",
-      "weapon or natural attack",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference"
+      "weapon or natural attack"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-heckler-of-elements",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
     ]
   },
   {
@@ -275,10 +460,7 @@
     "SourceRecordIds": [],
     "UnresolvedFields": [
       "RDB mapping",
-      "weapon or natural attack",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference"
+      "weapon or natural attack"
     ]
   },
   {
@@ -287,6 +469,14 @@
     "UnresolvedFields": [
       "RDB mapping",
       "weapon or natural attack"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-infector",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
     ]
   },
   {
@@ -306,6 +496,14 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "external-jealousy",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-jeru-the-defiler",
     "SourceRecordIds": [],
     "UnresolvedFields": [
@@ -322,6 +520,14 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "external-junkbot-tech-scavenger",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-khalum",
     "SourceRecordIds": [],
     "UnresolvedFields": [
@@ -335,6 +541,14 @@
     "UnresolvedFields": [
       "RDB mapping",
       "weapon or natural attack"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-legionnaire",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
     ]
   },
   {
@@ -382,10 +596,23 @@
     "SourceRecordIds": [],
     "UnresolvedFields": [
       "RDB mapping",
-      "weapon or natural attack",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference"
+      "weapon or natural attack"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-melded-pattern",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-mind-shard",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
     ]
   },
   {
@@ -429,14 +656,19 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "external-notum-habit",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-notum-soldier",
     "SourceRecordIds": [],
     "UnresolvedFields": [
       "RDB mapping",
-      "weapon or natural attack",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference"
+      "weapon or natural attack"
     ]
   },
   {
@@ -480,6 +712,14 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "external-patrol-mech-dog",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-peter-lee",
     "SourceRecordIds": [],
     "UnresolvedFields": [
@@ -512,6 +752,22 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "external-preceptor-brell",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-preceptor-coshi",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-professor-van-horn",
     "SourceRecordIds": [],
     "UnresolvedFields": [
@@ -520,11 +776,51 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "external-pulsing-hatred",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-r-2000-vermin-disposal-unit",
     "SourceRecordIds": [],
     "UnresolvedFields": [
       "RDB mapping",
       "weapon or natural attack"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-redeemed-custodian",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-regeneration-conduit",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-reverend-gulard",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-reverend-hyuan",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
     ]
   },
   {
@@ -552,11 +848,75 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "external-shadow",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-sizzling-synaptid",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-slum-runner",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-smuggler-droid",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-smuggler-frother",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-smuggler-outcast",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-smuggler-turret",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-special-agent-lamb",
     "SourceRecordIds": [],
     "UnresolvedFields": [
       "RDB mapping",
       "weapon or natural attack"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-stinger",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
     ]
   },
   {
@@ -581,6 +941,14 @@
     "UnresolvedFields": [
       "RDB mapping",
       "weapon or natural attack"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-suppressed-emotion",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
     ]
   },
   {
@@ -620,10 +988,7 @@
     "SourceRecordIds": [],
     "UnresolvedFields": [
       "RDB mapping",
-      "weapon or natural attack",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference"
+      "weapon or natural attack"
     ]
   },
   {
@@ -651,6 +1016,14 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "external-the-re-animator",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-the-reanimator",
     "SourceRecordIds": [],
     "UnresolvedFields": [
@@ -667,11 +1040,67 @@
     ]
   },
   {
+    "CanonicalEnemyKey": "external-uncontrollable-anger",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-unhallowed-soul",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-unredeemed-custodian",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
     "CanonicalEnemyKey": "external-virgo",
     "SourceRecordIds": [],
     "UnresolvedFields": [
       "RDB mapping",
       "weapon or natural attack"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-waste-collector",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-waste-disposer",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-windcaller-rendal",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
+    ]
+  },
+  {
+    "CanonicalEnemyKey": "external-windcaller-yatila",
+    "SourceRecordIds": [],
+    "UnresolvedFields": [
+      "RDB mapping",
+      "exact weapon or attack template"
     ]
   },
   {
@@ -714,8 +1143,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1042,9 +1469,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1057,9 +1481,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1117,9 +1538,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1132,9 +1550,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1177,9 +1592,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1209,8 +1621,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1225,8 +1635,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1476,10 +1884,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -1583,8 +1988,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1597,9 +2000,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1612,9 +2012,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1627,9 +2024,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1642,9 +2036,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1657,9 +2048,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1672,9 +2060,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1688,8 +2073,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1731,9 +2114,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1761,9 +2141,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1791,9 +2168,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1806,9 +2180,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1939,9 +2310,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1954,9 +2322,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -1969,9 +2334,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -1983,9 +2346,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -2043,8 +2403,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -2073,8 +2431,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -2279,8 +2635,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -2352,10 +2706,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -2399,8 +2749,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -2428,9 +2776,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -2458,10 +2803,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -2474,10 +2815,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -2507,8 +2844,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -2566,10 +2901,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -2867,8 +3198,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -2911,9 +3240,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -3017,8 +3343,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -3033,8 +3357,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -3048,8 +3370,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -3064,8 +3384,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -3948,9 +4266,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -3962,9 +4278,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -3976,9 +4290,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -3990,9 +4302,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -4184,10 +4494,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -4199,9 +4506,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -4242,9 +4547,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -4270,10 +4573,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -4286,9 +4585,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -4300,9 +4597,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -4418,10 +4712,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -4433,9 +4724,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -4448,10 +4736,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -4614,10 +4898,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -4629,10 +4910,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -4644,10 +4922,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -4659,10 +4934,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -4734,9 +5006,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -5241,10 +5511,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -5301,10 +5568,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5317,10 +5580,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5333,10 +5592,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5349,10 +5604,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5365,10 +5616,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5381,10 +5628,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5398,8 +5641,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5414,8 +5655,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5472,9 +5711,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5560,10 +5796,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5576,10 +5808,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -5636,9 +5865,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5668,8 +5894,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5682,9 +5906,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5743,8 +5964,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5759,8 +5978,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5773,9 +5990,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5846,10 +6060,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5862,10 +6072,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -5878,10 +6084,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -6030,8 +6233,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6046,8 +6247,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6077,8 +6276,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6258,8 +6455,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6273,8 +6468,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6289,8 +6482,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6305,8 +6496,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6335,8 +6524,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6351,8 +6538,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6380,9 +6565,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6395,9 +6577,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6410,9 +6589,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6425,9 +6601,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6440,9 +6613,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6455,9 +6625,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6470,9 +6637,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6485,9 +6649,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6500,9 +6661,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6515,9 +6673,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6652,8 +6807,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6667,8 +6820,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6683,8 +6834,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6699,8 +6848,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6909,8 +7056,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6970,8 +7115,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -6986,8 +7129,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7002,8 +7143,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7018,8 +7157,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7094,8 +7231,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7110,8 +7245,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7126,8 +7259,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7142,8 +7273,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7320,9 +7449,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7352,8 +7478,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7368,8 +7492,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7624,8 +7746,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7640,8 +7760,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7656,8 +7774,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7672,8 +7788,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7688,8 +7802,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -7824,8 +7936,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8035,8 +8145,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8050,8 +8158,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8065,8 +8171,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8081,8 +8185,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8096,8 +8198,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8185,10 +8285,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8320,8 +8416,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8366,8 +8460,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8397,8 +8489,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8413,8 +8503,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8444,8 +8532,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8578,9 +8664,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8593,9 +8676,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8668,8 +8748,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -8742,8 +8820,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -9730,9 +9806,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -9746,8 +9819,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -9777,8 +9848,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -9793,8 +9862,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -9807,9 +9874,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -9957,10 +10021,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -10423,9 +10483,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -10723,8 +10780,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -10934,8 +10989,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -11498,8 +11551,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -12141,8 +12192,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -12171,8 +12220,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -12290,10 +12337,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -12783,8 +12827,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -12828,8 +12870,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -16184,8 +16224,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -16866,8 +16904,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -16955,8 +16991,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -17223,9 +17257,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -17238,9 +17269,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -17284,8 +17312,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -17299,8 +17325,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -17314,8 +17338,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -17372,9 +17394,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -17449,8 +17468,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -17463,10 +17480,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -18090,9 +18103,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -18105,9 +18115,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -18165,10 +18172,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -18180,10 +18184,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -18195,10 +18196,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -18210,10 +18208,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -18225,10 +18220,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -18240,10 +18232,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -18255,10 +18244,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -18270,10 +18256,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -18285,10 +18268,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -18300,10 +18280,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -18835,9 +18812,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -19075,9 +19049,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -19090,9 +19061,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -19149,9 +19117,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -19537,9 +19502,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -19701,9 +19663,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -19815,9 +19774,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -19905,10 +19861,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -20024,10 +19977,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -20039,9 +19989,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -20084,9 +20031,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -20333,8 +20277,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -20949,9 +20891,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -20979,10 +20918,6 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21098,9 +21033,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21113,9 +21045,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21216,9 +21145,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21261,9 +21187,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21306,9 +21229,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21366,9 +21286,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21381,9 +21298,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21484,8 +21398,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21500,8 +21412,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21516,8 +21426,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21605,8 +21513,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21621,8 +21527,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21665,9 +21569,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21680,9 +21581,7 @@
       }
     ],
     "UnresolvedFields": [
-      "MinimumLevel",
-      "WeaponTemplateIds",
-      "AttackTemplateIds"
+      "Exact internal weapon/attack reference"
     ]
   },
   {
@@ -21694,9 +21593,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21709,9 +21605,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21724,9 +21617,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21739,9 +21629,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21782,9 +21669,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21797,9 +21681,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21857,9 +21738,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21916,9 +21794,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -21945,9 +21820,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -22299,9 +22171,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -22329,9 +22198,6 @@
       }
     ],
     "UnresolvedFields": [
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -22374,8 +22240,6 @@
     ],
     "UnresolvedFields": [
       "MinimumLevel",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -22480,8 +22344,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
@@ -22525,8 +22387,6 @@
     "UnresolvedFields": [
       "MinimumLevel",
       "PlayfieldIds",
-      "Exact internal weapon/attack reference",
-      "Exact internal weapon/attack reference",
       "Exact internal weapon/attack reference"
     ]
   },
