@@ -262,6 +262,8 @@ namespace AORebirth.Core.Playfields
 
     internal static class CapturedEnemyCombatRuntime
     {
+        private const int MissingItemStatValue = 1234567890;
+
         internal static bool Prepare(
             Character character,
             NPCController controller,
@@ -348,7 +350,30 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            if (contract.HasCapturedEquippedAttackInfo)
+            {
+                ApplyCapturedEquippedAttackDisplayStats(character, weapon);
+            }
+
             return true;
+        }
+
+        private static void ApplyCapturedEquippedAttackDisplayStats(ICharacter character, IItem weapon)
+        {
+            ApplyWeaponStatIfPresent(character, weapon, StatIds.defaultattacktype);
+            ApplyWeaponStatIfPresent(character, weapon, StatIds.damagetype);
+            ApplyWeaponStatIfPresent(character, weapon, StatIds.weapontype);
+        }
+
+        private static void ApplyWeaponStatIfPresent(ICharacter character, IItem weapon, StatIds stat)
+        {
+            int value = weapon.GetAttribute((int)stat);
+            if (value == MissingItemStatValue)
+            {
+                return;
+            }
+
+            SetMobStat(character, stat, value);
         }
 
         private static void SetMobStat(ICharacter character, StatIds stat, int value)
