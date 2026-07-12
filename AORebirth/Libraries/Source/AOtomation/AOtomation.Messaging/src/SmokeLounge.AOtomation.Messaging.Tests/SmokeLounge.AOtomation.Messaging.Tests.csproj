@@ -65,6 +65,7 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="DebuggingSerializerTests.cs" />
+    <Compile Include="DamageCalculationTests.cs" />
     <Compile Include="CapturedEnemyCombatContractTestStub.cs" />
     <Compile Include="GenericCmdUseRouteClassifierTests.cs" />
     <Compile Include="InfoPacketTests.cs" />
@@ -79,6 +80,12 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\GenericCmdUseRouteClassifier.cs">
       <Link>GenericCmdUseRouteClassifier.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\CombatDamageRules.cs">
+      <Link>CombatDamageRules.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\DamageCalculation.cs">
+      <Link>DamageCalculation.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\GridTerminalInteractionRules.cs">
       <Link>GridTerminalInteractionRules.cs</Link>
