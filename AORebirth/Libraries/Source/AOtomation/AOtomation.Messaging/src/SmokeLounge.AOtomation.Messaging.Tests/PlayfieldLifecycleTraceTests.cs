@@ -396,10 +396,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && contractText.Contains("HasCapturedEquippedAttackInfo = true")
                 && contractText.Contains("HasCapturedCombatStopSequence = true")
                 && contractText.Contains("SendStopFightOnDeath = sendStopFightOnDeath")
+                && contractText.Contains("ApplyCapturedEquippedAttackDisplayStats(character, weapon)")
+                && contractText.Contains("ApplyWeaponStatIfPresent(character, weapon, StatIds.defaultattacktype)")
+                && contractText.Contains("ApplyWeaponStatIfPresent(character, weapon, StatIds.damagetype)")
+                && contractText.Contains("ApplyWeaponStatIfPresent(character, weapon, StatIds.weapontype)")
                 && contractText.Contains("CapturedSubwayThiefMovementTransitionDelaySeconds")
                 && contractText.Contains("CapturedSubwayThiefAttackInfoAmmoCount")
                 && contractText.Contains("CapturedSubwayThiefAttackInfoUnknown"),
-                "MonsterData 26092 must retain the live-derived Thief attack contract.");
+                "MonsterData 26092 must retain the live-derived Thief attack contract and captured weapon display stats.");
 
             Assert.IsTrue(
                 coordinatorText.Contains("pendingCapturedAttackStarts")
