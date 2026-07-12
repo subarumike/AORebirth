@@ -817,7 +817,11 @@ namespace ZoneEngine.Core
                 result.Trace.Add("ApplyArmorMitigation", DamageCalculationStageStatus.Skipped, afterMitigation, afterMitigation, evidence, "no matching armor supplied by migrated callers");
             }
 
-            result.MinimumDamageFloor = fallbackFloor;
+            bool hasRealDamageRange = normalizedMaximum > 0
+                                      && !request.Policy.IsFixedCapturedDamage
+                                      && request.Definition.FixedDamage <= 0;
+            int activeMinimumDamageFloor = hasRealDamageRange ? 0 : fallbackFloor;
+            result.MinimumDamageFloor = activeMinimumDamageFloor;
             int normalizedLegacyDamageBonus = Math.Max(0, request.Modifiers.LegacyDamageBonus);
             if (normalizedLegacyDamageBonus == 0 && request.Modifiers.FlatAddDamage != 0)
             {
@@ -839,9 +843,9 @@ namespace ZoneEngine.Core
                 }
             }
 
-            result.Trace.Add("ApplyMinimumDamageFloor", DamageCalculationStageStatus.Preserved, afterFlatAdd, Math.Max(fallbackFloor, afterFlatAdd), evidence, "repository legacy fallback floor");
+            result.Trace.Add("ApplyMinimumDamageFloor", DamageCalculationStageStatus.Preserved, afterFlatAdd, Math.Max(activeMinimumDamageFloor, afterFlatAdd), evidence, hasRealDamageRange ? "real min/max damage range preserves rolled weapon damage" : "repository legacy fallback floor");
 
-            int currentDamage = Math.Max(fallbackFloor, afterFlatAdd);
+            int currentDamage = Math.Max(activeMinimumDamageFloor, afterFlatAdd);
 
             TraceBlockedIfNeeded(result, request.Definition.BulletCount > 1 || request.Context.SpecialAttackCategory != SpecialAttackCategory.None, "ResolveSpecialSubHits", currentDamage, "special attack formulas are represented but not active without evidence");
             TraceBlockedIfNeeded(result, request.Definition.BulletCount > 1, "AggregateSubHits", currentDamage, "multi-hit aggregation ordering is unresolved");
