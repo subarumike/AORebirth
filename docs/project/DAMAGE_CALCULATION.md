@@ -20,17 +20,20 @@ The parity-framework follow-up remains Outcome B: evidence and reporting only. `
 
 Evidence class: `PROVEN_REPOSITORY_BEHAVIOR`.
 
-Current migrated normal-hit behavior is exactly the legacy `CombatDamageRules` behavior:
+Current migrated normal-hit behavior remains a corrected AORebirth legacy path, not an original-AO formula:
 
 1. `normalizedMinDamage = max(0, minDamage)`
 2. `normalizedMaxDamage = max(normalizedMinDamage, maxDamage)`
-3. `normalizedDamageBonus = max(0, damageBonus)`
+3. equipped weapon callers pass active flat `damageBonus=0`; legacy/non-equipped callers may still pass an explicit legacy damage bonus
 4. `fallbackDamage = 15` for players, `1` for NPCs and pets
 5. if `normalizedMaxDamage > 0`, roll inclusive integer damage from `normalizedMinDamage..normalizedMaxDamage`
 6. otherwise use attacker level
-7. final damage is `max(fallbackDamage, baseDamage + normalizedDamageBonus)`
+7. a valid real damage range uses no fallback floor, so low rolls are preserved
+8. missing or invalid damage ranges keep the legacy fallback floor
 
-Rounding is integer-only. The current migrated formula has no floating point. Negative minimum, maximum, and damage bonus values are clamped before calculation. The random roll is inclusive at both ends.
+Rounding is integer-only. The current migrated formula has no floating point. Negative minimum, maximum, and explicit legacy damage bonus values are clamped before calculation. The random roll is inclusive at both ends.
+
+Post-fix evidence session `starter-pistol-postfix-001` validated the corrected legacy QL1 Solar-Powered Pistol `121567` range: 13 ordinary hits stayed within `2-18`, with active `legacyDamageBonus=0` and no fallback-floor clamp. This is not original AO formula proof.
 
 ## Weapon Formula Readiness
 

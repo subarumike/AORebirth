@@ -449,6 +449,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             rejectedDraft.Result.TargetHealthAfter = 80;
             WeaponDamageObservation rejected = WeaponDamageObservationValidator.Validate(rejectedDraft);
 
+            WeaponDamageObservationDraft lethalOverkillDraft = BuildCompleteObservationDraft("lethal-overkill", 23);
+            lethalOverkillDraft.Result.TargetHealthBefore = 12;
+            lethalOverkillDraft.Result.TargetHealthAfter = 0;
+            WeaponDamageObservation lethalOverkill = WeaponDamageObservationValidator.Validate(lethalOverkillDraft);
+
             Assert.AreEqual(WeaponDamageObservationValidationStatus.Complete, complete.ValidationStatus);
             Assert.AreEqual(WeaponDamageObservationValidationStatus.Incomplete, incomplete.ValidationStatus);
             AssertIssue(incomplete, WeaponDamageObservationIssueKind.MissingArmor);
@@ -459,6 +464,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertIssue(incomplete, WeaponDamageObservationIssueKind.ExternalDamagePossible);
             Assert.AreEqual(WeaponDamageObservationValidationStatus.Rejected, rejected.ValidationStatus);
             AssertIssue(rejected, WeaponDamageObservationIssueKind.HealthDeltaMismatch);
+            Assert.AreEqual(WeaponDamageObservationValidationStatus.Complete, lethalOverkill.ValidationStatus);
         }
 
         [TestMethod]

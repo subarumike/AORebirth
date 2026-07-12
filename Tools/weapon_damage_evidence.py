@@ -352,7 +352,9 @@ def validate_event(event, previous_by_target):
     if event.get("externalDamagePossible") is True:
         issues.append("external damage possible")
     if isinstance(event.get("targetHealthBefore"), int) and isinstance(event.get("targetHealthAfter"), int) and isinstance(event.get("observedDamage"), int):
-        if event["targetHealthBefore"] - event["targetHealthAfter"] != event["observedDamage"]:
+        health_delta = event["targetHealthBefore"] - event["targetHealthAfter"]
+        expected_delta = min(event["observedDamage"], event["targetHealthBefore"])
+        if health_delta != expected_delta:
             rejected.append("health delta mismatch")
     target = event.get("targetIdentity", "")
     if target in previous_by_target and previous_by_target[target] != event.get("targetHealthBefore"):
@@ -602,6 +604,7 @@ def self_test():
         dict(valid_event, targetIdentity="NPC:5", targetMatchingArmor=None, targetHealthBefore=100, targetHealthAfter=62),
         dict(valid_event, targetIdentity="NPC:6", observedDamage=99, targetHealthBefore=100, targetHealthAfter=62),
         dict(valid_event, targetIdentity="NPC:1", targetHealthBefore=70, targetHealthAfter=32),
+        dict(valid_event, targetIdentity="NPC:7", observedDamage=38, targetHealthBefore=12, targetHealthAfter=0),
     ]
     raw_path = os.path.join(path, "raw", "server-weapon-damage-events.jsonl")
     with open(raw_path, "w") as f:
@@ -609,7 +612,7 @@ def self_test():
             f.write(json.dumps(case, sort_keys=True) + "\n")
     analyze(session_id)
     analysis = read_json(os.path.join(path, "reports", "analysis.json"))
-    assert analysis["validObservationCount"] == 1
+    assert analysis["validObservationCount"] == 2
     assert analysis["incompleteObservationCount"] == 5
     assert analysis["rejectedObservationCount"] == 1
     assert "AR-A_AC-A" in analysis["candidateResults"]

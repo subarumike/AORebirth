@@ -2034,7 +2034,10 @@ namespace ZoneEngine.Core
             if (draft.Result.TargetHealthBefore.HasValue
                 && draft.Result.TargetHealthAfter.HasValue
                 && draft.Result.ObservedDamage.HasValue
-                && draft.Result.TargetHealthBefore.Value - draft.Result.TargetHealthAfter.Value != draft.Result.ObservedDamage.Value)
+                && !ObservedDamageMatchesHealthDelta(
+                    draft.Result.TargetHealthBefore.Value,
+                    draft.Result.TargetHealthAfter.Value,
+                    draft.Result.ObservedDamage.Value))
             {
                 issues.Add(new WeaponDamageObservationIssue(WeaponDamageObservationIssueKind.HealthDeltaMismatch, "health delta does not match observed damage"));
             }
@@ -2098,6 +2101,16 @@ namespace ZoneEngine.Core
                                                                  ? WeaponDamageObservationValidationStatus.Rejected
                                                                  : (issues.Count == 0 ? WeaponDamageObservationValidationStatus.Complete : WeaponDamageObservationValidationStatus.Incomplete);
             return new WeaponDamageObservation(CloneSource(draft.Source), CloneInput(draft.Input), CloneResult(draft.Result), issues, status);
+        }
+
+        private static bool ObservedDamageMatchesHealthDelta(
+            int targetHealthBefore,
+            int targetHealthAfter,
+            int observedDamage)
+        {
+            int healthDelta = targetHealthBefore - targetHealthAfter;
+            int expectedHealthDelta = Math.Min(observedDamage, targetHealthBefore);
+            return healthDelta == expectedHealthDelta;
         }
 
         private static WeaponDamageObservationSource CloneSource(WeaponDamageObservationSource source)
