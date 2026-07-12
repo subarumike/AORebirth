@@ -10,8 +10,10 @@
 namespace
 {
     void* OriginalRectAdd = nullptr;
+    uintptr_t RectAddStartAddress = 0;
+    uintptr_t RectAddEndAddress = 0;
 
-    bool __stdcall IsReadableRect(const void* pointer)
+    bool IsReadableRange(const void* pointer, size_t size)
     {
         MEMORY_BASIC_INFORMATION memory = {};
         if (!pointer || VirtualQuery(pointer, &memory, sizeof(memory)) != sizeof(memory) ||
@@ -32,7 +34,97 @@ namespace
         uintptr_t address = reinterpret_cast<uintptr_t>(pointer);
         uintptr_t regionEnd = reinterpret_cast<uintptr_t>(memory.BaseAddress) +
             memory.RegionSize;
-        return regionEnd >= address && regionEnd - address >= 16;
+        return regionEnd >= address && regionEnd - address >= size;
+    }
+
+    bool IsSaneFloat(float value)
+    {
+        uint32_t bits = 0;
+        std::memcpy(&bits, &value, sizeof(bits));
+        if ((bits & 0x7F800000u) == 0x7F800000u)
+        {
+            return false;
+        }
+
+        return value > -1000000.0f && value < 1000000.0f;
+    }
+
+    bool __stdcall IsReadablePoint(const void* pointer)
+    {
+        if (!IsReadableRange(pointer, 8))
+        {
+            return false;
+        }
+
+        const float* values = reinterpret_cast<const float*>(pointer);
+        return IsSaneFloat(values[0]) && IsSaneFloat(values[1]);
+    }
+
+    bool __stdcall IsReadableRect(const void* pointer)
+    {
+        if (!IsReadableRange(pointer, 16))
+        {
+            return false;
+        }
+
+        const float* values = reinterpret_cast<const float*>(pointer);
+        return IsSaneFloat(values[0]) && IsSaneFloat(values[1]) &&
+            IsSaneFloat(values[2]) && IsSaneFloat(values[3]);
+    }
+
+    void WriteEmptyRect(void* pointer)
+    {
+        if (!pointer)
+        {
+            return;
+        }
+
+        uint32_t zero = 0;
+        std::memcpy(pointer, &zero, sizeof(zero));
+        std::memcpy(static_cast<uint8_t*>(pointer) + 4, &zero, sizeof(zero));
+        std::memcpy(static_cast<uint8_t*>(pointer) + 8, &zero, sizeof(zero));
+        std::memcpy(static_cast<uint8_t*>(pointer) + 12, &zero, sizeof(zero));
+    }
+
+    LONG CALLBACK RectAddExceptionGuard(EXCEPTION_POINTERS* exception)
+    {
+        if (!exception || !exception->ExceptionRecord || !exception->ContextRecord ||
+            exception->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION ||
+            exception->ExceptionRecord->NumberParameters < 2)
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        uintptr_t fault = reinterpret_cast<uintptr_t>(
+            exception->ExceptionRecord->ExceptionAddress);
+        if (fault < RectAddStartAddress || fault >= RectAddEndAddress)
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        DWORD frame = exception->ContextRecord->Ebp;
+        if (!IsReadableRange(reinterpret_cast<const void*>(frame), 16))
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        DWORD previousFrame = 0;
+        DWORD returnAddress = 0;
+        DWORD resultPointer = 0;
+        std::memcpy(&previousFrame, reinterpret_cast<const void*>(frame), sizeof(previousFrame));
+        std::memcpy(&returnAddress, reinterpret_cast<const void*>(frame + 4), sizeof(returnAddress));
+        std::memcpy(&resultPointer, reinterpret_cast<const void*>(frame + 8), sizeof(resultPointer));
+        if (!IsReadableRange(reinterpret_cast<const void*>(resultPointer), 16))
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        WriteEmptyRect(reinterpret_cast<void*>(resultPointer));
+        exception->ContextRecord->Eax = resultPointer;
+        exception->ContextRecord->Eip = returnAddress;
+        exception->ContextRecord->Esp = frame + 16;
+        exception->ContextRecord->Ebp = previousFrame;
+        return EXCEPTION_CONTINUE_EXECUTION;
     }
 
     __declspec(naked) void GuiRectAddGuard()
@@ -44,6 +136,13 @@ namespace
             push ecx
             push ecx
             call IsReadableRect
+            test eax, eax
+            pop ecx
+            jz invalid_rect
+            mov eax, dword ptr [esp + 8]
+            push ecx
+            push eax
+            call IsReadablePoint
             test eax, eax
             pop ecx
             jnz valid_rect
@@ -102,6 +201,18 @@ namespace aorf
         }
 
         OriginalRectAdd = expectedTarget;
+        RectAddStartAddress = reinterpret_cast<uintptr_t>(expectedTarget);
+        RectAddEndAddress = RectAddStartAddress + sizeof(ExpectedTarget);
+        if (!AddVectoredExceptionHandler(1, RectAddExceptionGuard))
+        {
+            Log("ERROR GUI rectangle exception guard installation failed code=%lu",
+                GetLastError());
+            OriginalRectAdd = nullptr;
+            RectAddStartAddress = 0;
+            RectAddEndAddress = 0;
+            return false;
+        }
+
         DWORD oldProtection = 0;
         if (!VirtualProtect(importSlot, sizeof(*importSlot), PAGE_READWRITE, &oldProtection))
         {
@@ -120,7 +231,7 @@ namespace aorf
             return false;
         }
 
-        Log("PATCH PASS GUI rectangle pointer guard callsite=GUI+0x14C4A9 target=Utils+0x82E6");
+        Log("PATCH PASS GUI rectangle data guard callsite=GUI+0x14C4A9 target=Utils+0x82E6");
         return true;
     }
 }
