@@ -2893,9 +2893,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CorpseInteractionRules.cs"));
             string inventoryRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs"));
+            string corpseRulesText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
 
             string playfieldUseCorpse = ExtractMethodBlock(playfieldText, "public bool TryUseCorpse");
             string playfieldLootCorpseItem = ExtractMethodBlock(playfieldText, "public bool TryLootCorpseItem");
+            string registerCorpse = ExtractMethodBlock(playfieldText, "private void RegisterCorpse");
             string playfieldPendingCredits = ExtractMethodBlock(playfieldText, "private void ProcessPendingCorpseCreditAwards");
             string corpseUse = ExtractMethodBlock(corpseAccessText, "internal bool TryUseCorpse<TCorpseState>(");
             string corpseLoot = ExtractMethodBlock(corpseAccessText, "internal bool TryLootCorpseItem<TCorpseState, TCorpseLootItem>(");
@@ -2933,6 +2936,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldText.Contains("private static readonly TimeSpan CorpseCreditAwardDelay = TimeSpan.FromMilliseconds(500);")
                 && corpseInteractionRulesText.Contains("public const int CorpseUseAcknowledgeDelayMilliseconds = 550;"),
                 "Capture-backed corpse credit payout must stay after InventoryUpdate and before the delayed GenericCmd success ack.");
+            Assert.IsTrue(
+                registerCorpse.Contains("if (!state.HasUnlootedItems)")
+                && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
+                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30);")
+                && corpseRulesText.Contains("public static readonly TimeSpan CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30);"),
+                "Loot-bearing corpses must not receive an initial despawn timer; empty corpses must use the 30-second cleanup window.");
+            AssertTextBefore(
+                registerCorpse,
+                "this.corpses[corpseIdentity.Instance] = state;",
+                "if (!state.HasUnlootedItems)");
 
             Assert.IsTrue(
                 playfieldLootCorpseItem.Contains("this.runtimeSystems.TryLootCorpseItem(")
