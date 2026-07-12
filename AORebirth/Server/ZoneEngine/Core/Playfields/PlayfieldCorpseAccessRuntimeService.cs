@@ -4,10 +4,13 @@ namespace AORebirth.Core.Playfields
 
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.Items;
+    using AORebirth.Database.Dao;
+    using AORebirth.Database.Entities;
     using AORebirth.Enums;
     using AORebirth.Interfaces;
 
@@ -312,6 +315,12 @@ namespace AORebirth.Core.Playfields
             setLooted(corpseLootItem, true);
             setOpened(corpse, true);
             sendCorpseContainerAddItem(looter, sourceContainer, transferResult.TargetSlot);
+            sendChatText(
+                looter,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "You looted {0}.",
+                    ResolveLootItemDisplayName(item)));
 
             if (!hasUnlootedItems(corpse))
             {
@@ -336,6 +345,28 @@ namespace AORebirth.Core.Playfields
                     remainingUnlootedItems(corpse)));
 
             return true;
+        }
+
+        private static string ResolveLootItemDisplayName(Item item)
+        {
+            if (item == null)
+            {
+                return "an item";
+            }
+
+            DBItemName itemName = ItemNamesDao.Instance.Get(item.LowID);
+            if (itemName != null && !string.IsNullOrWhiteSpace(itemName.Name))
+            {
+                return itemName.Name;
+            }
+
+            itemName = ItemNamesDao.Instance.Get(item.HighID);
+            if (itemName != null && !string.IsNullOrWhiteSpace(itemName.Name))
+            {
+                return itemName.Name;
+            }
+
+            return string.Format(CultureInfo.InvariantCulture, "item {0}", item.LowID);
         }
 
         internal void ProcessPendingCorpseCreditAwards<TAward, TCorpseState>(

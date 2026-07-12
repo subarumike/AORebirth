@@ -176,7 +176,7 @@ namespace ZoneEngine.Core.MessageHandlers
                                  Unknown1=1,
                                  Unknown2=0,
                                  CurrentHealth = tPlayer.Stats[StatIds.health].Value,
-                                 Level = (byte)tPlayer.Stats[StatIds.level].Value,
+                                 Level = ResolveInfoLevel(tPlayer),
                                  MaxHealth = tPlayer.Stats[StatIds.life].Value,
                                  OrganizationId = 0,
                                  Profession = (byte)tPlayer.Stats[StatIds.profession].Value,
@@ -195,7 +195,7 @@ namespace ZoneEngine.Core.MessageHandlers
                              {
                                  Unknown1 = 0x01,
                                  Profession = (Profession)tPlayer.Stats[StatIds.profession].Value,
-                                 Level = (byte)tPlayer.Stats[StatIds.level].Value,
+                                 Level = ResolveInfoLevel(tPlayer),
                                  TitleLevel = (byte)tPlayer.Stats[StatIds.titlelevel].Value,
                                  VisualProfession =
                                      (Profession)tPlayer.Stats[StatIds.visualprofession].Value,
@@ -249,6 +249,17 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 return 0;
             }
+        }
+
+        private static byte ResolveInfoLevel(ICharacter character)
+        {
+            uint raw = character.Stats[StatIds.level].BaseValue;
+            if (raw == 0 || raw == 1234567890U || raw > 200)
+            {
+                return 1;
+            }
+
+            return (byte)raw;
         }
 
         #endregion

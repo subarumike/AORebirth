@@ -90,6 +90,8 @@ namespace ZoneEngine.Core.MessageHandlers
             Dictionary<int, uint> toPlayer = new Dictionary<int, uint>();
             Dictionary<int, uint> toPlayfield = new Dictionary<int, uint>();
             character.Stats.GetChangedStats(toPlayer, toPlayfield);
+            CombatXpRuntimeService.RemoveWireManagedStatsFromBulk(toPlayer);
+            CombatXpRuntimeService.RemoveWireManagedStatsFromBulk(toPlayfield);
             this.SendBulk(character, toPlayer, toPlayfield);
         }
 

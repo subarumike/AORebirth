@@ -181,6 +181,8 @@ client.Controller.Character.Playfield.Identity,
 
             /* visual */
             Playfield currentPlayfield = null;
+            client.Controller.Character.CalculateSkills();
+            SyncVitalStats(client.Controller.Character);
             client.PacketSequencing.RunSessionReadyFullCharacterSequence(
                 () => PlayfieldLifecycleTrace.Record(
                     PlayfieldLifecycleTrace.FlowPrivateCityReadyInit,
@@ -213,7 +215,12 @@ client.Controller.Character.Playfield.Identity,
                     PlayfieldLifecycleTrace.MessageFullCharacter,
                     identity),
                 client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,
-                () => FullCharacterMessageHandler.Default.Send(client.Controller.Character),
+                () =>
+                {
+                    CombatXpRuntimeService.PrepareXpStatsForLogin(client.Controller.Character);
+                    FullCharacterMessageHandler.Default.Send(client.Controller.Character);
+                    CombatXpRuntimeService.SendLoginXpBarSync(client.Controller.Character);
+                },
                 () =>
                 {
                     if (currentPlayfield != null)
@@ -277,6 +284,7 @@ client.Controller.Character.Playfield.Identity,
             // TODO: create a better alternative to ProcessTimers
             // client.Character.ProcessTimers(DateTime.Now + TimeSpan.FromMilliseconds(200));
             client.Controller.Character.CalculateSkills();
+            SyncVitalStats(client.Controller.Character);
             InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(client.Controller.Character, false);
 
             if (currentPlayfield != null)
@@ -328,8 +336,9 @@ client.Controller.Character.Playfield.Identity,
 
         private static void InitializeActionableState(ZoneClient client)
         {
-            bool restoreSeatedPosture = client.PreserveLogoutSitOnConnect
-                                        || client.Controller.Character.MoveMode == MoveModes.Sit;
+            // Only restore sit for intentional logout-timer reconnects.
+            // MoveMode==Sit after grid zoning is a disconnect artifact and must not be restored.
+            bool restoreSeatedPosture = client.PreserveLogoutSitOnConnect;
 
             // Match the captured live alive/actionable baseline.
             SetStat(client, StatIds.state, 0);
@@ -341,8 +350,22 @@ client.Controller.Character.Playfield.Identity,
             }
             else
             {
+                Character concrete = client.Controller.Character as Character;
+                if (concrete != null)
+                {
+                    concrete.UpdateMoveType(25);
+                }
+
                 SetStat(client, StatIds.currentmovementmode, (int)MoveModes.Run);
                 SetStat(client, StatIds.prevmovementmode, (int)MoveModes.Run);
+                UpsertCharacterStat(
+                    client.Controller.Character.Identity.Instance,
+                    StatIds.currentmovementmode,
+                    (int)MoveModes.Run);
+                UpsertCharacterStat(
+                    client.Controller.Character.Identity.Instance,
+                    StatIds.prevmovementmode,
+                    (int)MoveModes.Run);
             }
 
 
@@ -393,6 +416,37 @@ client.Controller.Character.Playfield.Identity,
             SetStat(client, StatIds.specialcondition, 3);
             SetStat(client, StatIds.actioncategory, 0);
          
+        }
+
+        private static void SyncVitalStats(ICharacter character)
+        {
+            int maxLife = Math.Max(1, character.Stats[StatIds.life].Value);
+            int maxNano = Math.Max(0, character.Stats[StatIds.maxnanoenergy].Value);
+
+            if (character.Starting)
+            {
+                character.Stats[StatIds.health].Value = maxLife;
+                character.Stats[StatIds.health].BaseValue = (uint)maxLife;
+                character.Stats[StatIds.currentnano].Value = maxNano;
+                character.Stats[StatIds.currentnano].BaseValue = (uint)maxNano;
+                UpsertCharacterStat(character.Identity.Instance, StatIds.health, maxLife);
+                UpsertCharacterStat(character.Identity.Instance, StatIds.currentnano, maxNano);
+                return;
+            }
+
+            if (character.Stats[StatIds.health].Value > maxLife)
+            {
+                character.Stats[StatIds.health].Value = maxLife;
+                character.Stats[StatIds.health].BaseValue = (uint)maxLife;
+                UpsertCharacterStat(character.Identity.Instance, StatIds.health, maxLife);
+            }
+
+            if (character.Stats[StatIds.currentnano].Value > maxNano)
+            {
+                character.Stats[StatIds.currentnano].Value = maxNano;
+                character.Stats[StatIds.currentnano].BaseValue = (uint)maxNano;
+                UpsertCharacterStat(character.Identity.Instance, StatIds.currentnano, maxNano);
+            }
         }
 
         private static void SetStat(ZoneClient client, StatIds stat, int value)

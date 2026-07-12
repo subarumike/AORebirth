@@ -2131,65 +2131,10 @@ namespace AORebirth.Core.Playfields
 
         internal void AwardCombatXp(ICharacter attacker, ICharacter target)
         {
-            if (attacker == null || target == null || !(attacker.Controller is PlayerController))
-            {
-                return;
-            }
-
-            int xpReward = CalculateCombatXpReward(attacker, target);
-            if (xpReward <= 0)
-            {
-                return;
-            }
-
-            uint xpBeforeBase = attacker.Stats[StatIds.xp].BaseValue;
-            int xpBefore = xpBeforeBase > int.MaxValue ? int.MaxValue : (int)xpBeforeBase;
-            long xpAfterLong = (long)xpBefore + xpReward;
-            int xpAfter = xpAfterLong > int.MaxValue ? int.MaxValue : (int)xpAfterLong;
-
-            ulong unsavedXpAfter = (ulong)attacker.Stats[StatIds.unsavedxp].BaseValue + (uint)xpReward;
-            attacker.Stats[StatIds.xp].Set((uint)xpAfter);
-            attacker.Stats[StatIds.lastxp].Set((uint)xpReward);
-            attacker.Stats[StatIds.unsavedxp].Set((uint)Math.Min((ulong)int.MaxValue, unsavedXpAfter));
-
-            if (attacker.Controller != null && attacker.Controller.Client != null)
-            {
-                StatMessageHandler.Default.SendChanged(attacker);
-                this.SendRewardFeedback(
-                    attacker,
-                    string.Format(CultureInfo.InvariantCulture, "You received {0} xp.", xpReward));
-            }
-
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Combat XP awarded attacker={0} target={1} xp={2} xpBeforeBase={3} xpAfter={4}",
-                    attacker.Identity,
-                    target.Identity,
-                    xpReward,
-                    xpBeforeBase,
-                    xpAfter));
-
-            attacker.Stats.Write();
-        }
-
-        private static int CalculateCombatXpReward(ICharacter attacker, ICharacter target)
-        {
-            int targetXp = target.Stats[StatIds.xp].Value;
-            if (targetXp > 0)
-            {
-                return targetXp;
-            }
-
-            int targetLevel = Math.Max(1, target.Stats[StatIds.level].Value);
-            int attackerLevel = Math.Max(1, attacker.Stats[StatIds.level].Value);
-            if (targetLevel < Math.Max(1, attackerLevel - 10))
-            {
-                return 1;
-            }
-
-            return Math.Max(1, targetLevel);
+            CombatXpRuntimeService.AwardCombatXp(
+                attacker,
+                target,
+                (character, text) => this.SendRewardFeedback(character, text));
         }
 
         private void KillPlayerTarget(ICharacter target)

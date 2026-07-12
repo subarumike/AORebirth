@@ -121,6 +121,84 @@ namespace AORebirth.Database.Dao
         }
 
         /// <summary>
+        /// Insert or update stats without deleting other rows for the same owner.
+        /// </summary>
+        public void BulkUpsert(List<DBStats> stats, IDbConnection connection = null, IDbTransaction transaction = null)
+        {
+            if (stats == null || stats.Count == 0)
+            {
+                return;
+            }
+
+            IDbConnection conn = connection;
+            try
+            {
+                conn = conn ?? Connector.GetConnection();
+                IDbTransaction trans = transaction;
+                bool ownsTransaction = transaction == null;
+                try
+                {
+                    trans = trans ?? conn.BeginTransaction();
+
+                    foreach (DBStats stat in stats)
+                    {
+                        DBStats existing = this.GetById(stat.Type, stat.Instance, stat.StatId);
+                        if (existing.Id != 0)
+                        {
+                            if (existing.StatValue == stat.StatValue)
+                            {
+                                continue;
+                            }
+
+                            existing.StatValue = stat.StatValue;
+                            this.Save(existing, null, conn, trans);
+                            continue;
+                        }
+
+                        this.Add(stat, conn, trans);
+                    }
+
+                    if (ownsTransaction)
+                    {
+                        trans.Commit();
+                    }
+                }
+                catch
+                {
+                    if (ownsTransaction)
+                    {
+                        if (trans != null)
+                        {
+                            trans.Rollback();
+                        }
+                    }
+
+                    throw;
+                }
+                finally
+                {
+                    if (ownsTransaction)
+                    {
+                        if (trans != null)
+                        {
+                            trans.Dispose();
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (connection == null)
+                {
+                    if (conn != null)
+                    {
+                        conn.Dispose();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Disband an organization
         /// </summary>
         /// <param name="orgId">

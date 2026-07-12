@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="TypeMetaBuilderTest.cs" company="SmokeLounge">
 //   Copyright © 2013 SmokeLounge.
 //   This program is free software. It comes without any warranty, to
@@ -279,6 +279,40 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Assert.AreEqual(expectedChar.Value1, actualChar.Value1);
                 Assert.AreEqual(expectedChar.Value2, actualChar.Value2);
             }
+        }
+
+        [TestMethod]
+        public void NewLevelMessageTest()
+        {
+            var expected = new NewLevelMessage
+                               {
+                                   Identity =
+                                       new Identity
+                                           {
+                                               Type = IdentityType.CanbeAffected,
+                                               Instance = 12345
+                                           },
+                                   Level = 2,
+                                   Ip = 5500,
+                                   Xp = 1560,
+                                   LastSaveXp = 1450,
+                                   NextLevelXp = 4050,
+                                   Unknown1 = 0,
+                                   Unknown2 = 4,
+                                   LastXp = 260
+                               };
+
+            var actual = (NewLevelMessage)this.SerializeDeserialize(expected);
+
+            this.AssertN3Message(expected, actual);
+            Assert.AreEqual(expected.Level, actual.Level);
+            Assert.AreEqual(expected.Ip, actual.Ip);
+            Assert.AreEqual(expected.Xp, actual.Xp);
+            Assert.AreEqual(expected.LastSaveXp, actual.LastSaveXp);
+            Assert.AreEqual(expected.NextLevelXp, actual.NextLevelXp);
+            Assert.AreEqual(expected.Unknown1, actual.Unknown1);
+            Assert.AreEqual(expected.Unknown2, actual.Unknown2);
+            Assert.AreEqual(expected.LastXp, actual.LastXp);
         }
 
         [TestMethod]

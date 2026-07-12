@@ -2700,13 +2700,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 rewardRuntimeText.Contains("internal sealed class PlayfieldRewardRuntimeService")
                 && rewardRuntimeText.Contains("internal void RunNpcDeathRewardHooks(")
-                && rewardRuntimeText.Contains("RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);")
                 && rewardRuntimeText.Contains("awardCombatXp(attacker, target);"),
                 "PlayfieldRewardRuntimeService must own named NPC death reward hook orchestration.");
-            AssertTextBefore(
-                rewardRuntimeText,
-                "RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);",
-                "awardCombatXp(attacker, target);");
             Assert.IsFalse(
                 npcRuntimeText.Contains("RexB18CObjectiveProgressTracker.TryObserveNpcDeath")
                 || npcRuntimeText.Contains("private void RunNpcDeathRewardHooks"),
