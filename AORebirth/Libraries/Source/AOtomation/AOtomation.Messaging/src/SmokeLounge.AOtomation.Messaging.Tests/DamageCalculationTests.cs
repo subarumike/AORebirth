@@ -41,6 +41,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 true,
                 randomSource);
 
+            DamageCalculationResult playerWeaponMinimumRoll = CombatDamageRules.CalculateDetailed(
+                2,
+                18,
+                0,
+                1,
+                true,
+                new QueuedDamageRandomSource(2));
+
             DamageCalculationResult npcFallback = CombatDamageRules.CalculateDetailed(
                 -5,
                 -2,
@@ -52,6 +60,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(2, minimumRoll.FinalTargetDamage);
             Assert.AreEqual(5, maximumRoll.FinalTargetDamage);
             Assert.AreEqual(CombatDamageRules.PlayerFallbackDamage, playerFallback.FinalTargetDamage);
+            Assert.AreEqual(2, playerWeaponMinimumRoll.FinalTargetDamage);
             Assert.AreEqual(CombatDamageRules.NpcFallbackDamage, npcFallback.FinalTargetDamage);
             Assert.AreEqual(DamageCalculationStrategyKind.LegacyFallback, maximumRoll.Strategy);
             Assert.AreEqual(2, maximumRoll.LegacyDamageBonusContribution);
