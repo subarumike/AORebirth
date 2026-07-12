@@ -3349,7 +3349,9 @@ namespace AORebirth.Core.Playfields
 
         public CapturedSubwayOrdinarySpawnDefinition[] GetSpawns()
         {
-            return Spawns.ToArray();
+            return Spawns
+                .Where(spawn => !string.Equals(spawn.EvidenceCapture, "20260710-202132", StringComparison.Ordinal))
+                .ToArray();
         }
 
         public bool TryGetArchetype(string key, out CapturedSubwayOrdinaryArchetypeDefinition archetype)
