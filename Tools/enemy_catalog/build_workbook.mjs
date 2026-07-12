@@ -1,0 +1,68 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+import { createRequire } from "node:module";
+
+if (!process.env.CODEX_NODE_MODULES) throw new Error("CODEX_NODE_MODULES must point to the bundled Codex node_modules directory");
+const require = createRequire(path.join(process.env.CODEX_NODE_MODULES, "package.json"));
+const { SpreadsheetFile, Workbook } = require("@oai/artifact-tool");
+
+const root = process.argv[2];
+const outDir = path.join(root, "docs", "generated", "enemy_catalog");
+const catalog = JSON.parse(await fs.readFile(path.join(outDir, "enemy_catalog.json"), "utf8"));
+const sourceDoc = JSON.parse(await fs.readFile(path.join(outDir, "enemy_catalog_sources.json"), "utf8"));
+const wb = Workbook.create();
+const confidence = "UNRESOLVED";
+const accessed = "2026-07-12";
+const sources = [
+  ["SRC-RDB", "LOCAL_RDB", "AO Resource Database", sourceDoc.RdbSource, "local", accessed, "Primary", "PROVEN_RDB", catalog.length, "Raw identifiers and printable strings via AODB.RdbController"],
+  ["SRC-REPO", "REPOSITORY", "AORebirth repository", root, "local", accessed, "Secondary", "PROVEN_REPOSITORY", catalog.length, "Server content and documentation are corroborating evidence only"],
+  ["SRC-AOU", "INTERNET", "AO-Universe Search Database", "https://www.ao-universe.com/guides?link=search", "ao-universe.com", accessed, "Secondary", "COMMUNITY_DOCUMENTED", 0, "Encounter and zone guide index; not bulk-linked to candidates"],
+  ["SRC-AOWIKI-DYNA", "INTERNET", "Dyna Camps by level", "https://wiki.aodb.us/wiki/Dyna_Camps_by_level", "wiki.aodb.us", accessed, "Secondary", "COMMUNITY_DOCUMENTED", 0, "Community level and zone table; retained for future structured import"],
+  ["SRC-AOWIKI-PANDE", "INTERNET", "Pandemonium", "https://wiki.aodb.us/wiki/Pandemonium", "wiki.aodb.us", accessed, "Secondary", "COMMUNITY_DOCUMENTED", 0, "Community encounter overview"],
+  ["SRC-FUNCOM", "INTERNET", "Funcom AO Knowledge Database", "https://forums.funcom.com/c/anarchy-online/ao-knowledge/43", "forums.funcom.com", accessed, "Secondary", "COMMUNITY_DOCUMENTED", 0, "Official-hosted community knowledge index"]
+];
+
+const enemyHeaders = ["Canonical Enemy Key","Enemy Name","Normalized Name","Aliases","Variant Name","Enemy Family","Enemy Archetype","Record Classification","MonsterData ID","Template ID","Other Internal IDs","RDB Record Type","Faction","Side","Expansion","Boss","Unique","Named Enemy","Mission Only","Pet or Summon","Turret","Attackable","Hostile by Default","Minimum Level","Maximum Level","Exact Level","Level Description","Level Confidence","Level Sources","Primary Zones","All Zones","Playfield IDs","Playfield Names","Dungeons","Instances","Mission Locations","Spawn Coordinates","Spawn Evidence","Primary Weapon","All Weapons","Weapon Template IDs","Weapon Categories","Visible Weapon","Natural Attack","Attack Types","Damage Types","Attack Range","Attack Time","Recharge Time","Special Attacks","Nano Programs","Combat Notes","Appearance or Model","Loot Notes","Source Count","Primary Evidence Source","Repository Evidence","RDB Evidence","Internet Evidence","Evidence Confidence","Conflicting Evidence","Unresolved Fields","Research Status","Last Verified"];
+const text = v => Array.isArray(v) ? v.join("; ") : (v ?? "");
+const enemyRows = catalog.map(r => [r.CanonicalEnemyKey,r.DisplayName,(r.DisplayName||"").toLowerCase(),"","",r.EnemyFamily,r.EnemyArchetype,r.RecordClassification,r.MonsterDataId,r.TemplateId,"",1040023,r.Faction,r.Side,r.ExpansionOrDataset,r.IsBoss,r.IsUnique,"",r.IsMissionOnly,r.IsPetLike,r.IsTurret,r.IsAttackable,r.IsHostileByDefault,r.MinimumLevel,r.MaximumLevel,r.ExactLevel,"",confidence,"",text(r.PlayfieldNames),text(r.ZoneNames),text(r.PlayfieldIds),text(r.PlayfieldNames),text(r.DungeonNames),"","",text(r.SpawnCoordinatesWhenAvailable),"RDB name-token correlation only","",text(r.WeaponNames),text(r.WeaponTemplateIds),text(r.WeaponCategories),r.VisibleWeapon,"",text(r.AttackTypes),text(r.DamageTypes),r.AttackRange,r.AttackTime,r.RechargeTime,text(r.SpecialAttacks),text(r.NanoProgramNames),"",r.MonsterDataId?`MonsterData ${r.MonsterDataId}`:"","",1,"SRC-RDB","","RDB type 1040023 identifier/name record","",confidence,"",text(r.UnresolvedFields),"NEEDS_RESEARCH",accessed]);
+
+const zoneHeaders=["Canonical Enemy Key","Enemy Name","Zone","Subzone","Playfield ID","Dungeon or Instance","Minimum Level in Zone","Maximum Level in Zone","Spawn Coordinates","Spawn Type","Static or Dynamic","Mission Generated","Source","Confidence","Notes"];
+const zoneRows=[]; for (const r of catalog) for (let i=0;i<r.PlayfieldIds.length;i++) zoneRows.push([r.CanonicalEnemyKey,r.DisplayName,r.PlayfieldNames[i]||"","",r.PlayfieldIds[i],"","","","","UNKNOWN","UNKNOWN","","SRC-RDB","INFERRED_CORRELATION","Name-token correlation against RDB district/area/statel text"]);
+const weaponHeaders=["Canonical Enemy Key","Enemy Name","Configuration","Hand or Slot","Weapon Name","Weapon Template ID","Weapon Category","Visible","Natural Attack","Melee or Ranged","Damage Type","Attack Range","Attack Time","Recharge Time","Specials","Nano or Proc","Source","Confidence","Notes"];
+const weaponRows=[];
+const dispositionHeaders=["RDB Candidate ID","Display Name","Raw Record Type","Payload Size","Payload Hash","Disposition","Canonical Enemy Key","Reason","Repository Matches","Internet Matches","Unresolved Reason"];
+const dispositionRows=catalog.map(r=>[String(r.TemplateId),r.DisplayName,"1040023",r.RdbPayloadSize,r.RdbPayloadHash,r.RecordClassification,r.CanonicalEnemyKey,"No authoritative hostility/combat classification decoded","","","Level, hostility, identity role, and combat references unresolved"]);
+const familyHeaders=["Enemy Family","Known Members","Level Range","Common Zones","Common Weapon or Attack","Combat Archetype","Boss Variants","Evidence","Notes"];
+const famMap=new Map(); for(const r of catalog){const f=r.EnemyFamily||"<unclassified>"; if(!famMap.has(f))famMap.set(f,[]); famMap.get(f).push(r)}
+const familyRows=[...famMap].sort((a,b)=>a[0].localeCompare(b[0])).map(([f,rows])=>[f,rows.length,"",[...new Set(rows.flatMap(x=>x.PlayfieldNames))].join("; "),"","","","SRC-RDB","Mechanical family token only; review required"]);
+const zoneSummary=new Map(); for(const z of zoneRows){const key=`${z[2]}|${z[4]}`; if(!zoneSummary.has(key),false){} if(!zoneSummary.has(key))zoneSummary.set(key,[]); zoneSummary.get(key).push(z)}
+const zonesHeaders=["Zone","Playfield ID","Expansion","Outdoor or Dungeon","Enemy Type Count","Minimum Known Enemy Level","Maximum Known Enemy Level","Named Enemies","Bosses","Source Coverage","Notes"];
+const zonesRows=[...zoneSummary].sort((a,b)=>a[0].localeCompare(b[0])).map(([k,rows])=>[rows[0][2],rows[0][4],"","UNKNOWN",new Set(rows.map(x=>x[0])).size,"","","","","INFERRED_CORRELATION","RDB name-token associations"]);
+const sourcesHeaders=["Source ID","Source Type","Title","Repository Path or URL","Domain","Accessed Date","Primary or Secondary","Reliability","Records Supported","Notes"];
+const conflictsHeaders=["Canonical Enemy Key","Enemy Name","Field","Value A","Source A","Value B","Source B","Preferred Value","Resolution Basis","Status"];
+const unresolvedHeaders=["Canonical Enemy Key or Candidate ID","Enemy Name","Unresolved Field","Reason","Attempts Made","Repository Searches","RDB Searches","Internet Searches","Possible Next Step","Blocking or Nonblocking"];
+const unresolvedRows=[]; for(const r of catalog) for(const field of r.UnresolvedFields) unresolvedRows.push([r.CanonicalEnemyKey,r.DisplayName,field,"No proven field in decoded RDB payload","Repository/RDB inventory; public source discovery","Repository-wide evidence inventory pending row-level correlation","Raw record inventoried and fingerprinted","AO-Universe/AOWiki/Funcom source indexes discovered; candidate-level research pending","Decode schema or link a source-backed record","NONBLOCKING"]);
+
+function colName(n){let s=""; while(n){n--;s=String.fromCharCode(65+n%26)+s;n=Math.floor(n/26)}return s}
+function addDataSheet(name,headers,rows,tableName){const sh=wb.worksheets.add(name); sh.showGridLines=false; const matrix=[headers,...rows]; const end=colName(headers.length); sh.getRange(`A1:${end}${matrix.length}`).values=matrix; sh.getRange(`A1:${end}1`).format={fill:"#17365D",font:{bold:true,color:"#FFFFFF"},wrapText:true,verticalAlignment:"center"}; sh.getRange(`A1:${end}${matrix.length}`).format.font={name:"Aptos",size:9}; sh.getRange(`A1:${end}${matrix.length}`).format.verticalAlignment="top"; sh.getRange(`A1:${end}${matrix.length}`).format.wrapText=true; sh.getRange(`A1:${end}${matrix.length}`).format.autofitColumns(); sh.getRange(`A1:${end}1`).format.rowHeight=42; for(let c=0;c<headers.length;c++){const h=headers[c]; const cell=sh.getRange(`${colName(c+1)}:${colName(c+1)}`); if(/URL|Path|Payload Hash/.test(h))cell.format.columnWidth=40; else if(/Evidence|Notes|Sources|Unresolved|Reason|Matches|Combat|Loot|All Zones|Weapons/.test(h))cell.format.columnWidth=32; else if(/Key|Name|Classification|Disposition|Status/.test(h))cell.format.columnWidth=22; else cell.format.columnWidth=14;} sh.freezePanes.freezeRows(1); sh.freezePanes.freezeColumns(Math.min(2,headers.length)); if(rows.length) {const t=sh.tables.add(`A1:${end}${matrix.length}`,true,tableName); t.style="TableStyleMedium2";} return sh}
+
+const enemySheet=addDataSheet("Enemy Catalog",enemyHeaders,enemyRows,"EnemyCatalogTable");
+addDataSheet("Zone Associations",zoneHeaders,zoneRows,"ZoneAssociationsTable");
+addDataSheet("Weapon Associations",weaponHeaders,weaponRows,"WeaponAssociationsTable");
+const dispositionSheet=addDataSheet("RDB Candidate Disposition",dispositionHeaders,dispositionRows,"CandidateDispositionTable");
+addDataSheet("Enemy Families",familyHeaders,familyRows,"EnemyFamiliesTable");
+addDataSheet("Zones",zonesHeaders,zonesRows,"ZonesTable");
+const srcSheet=addDataSheet("Sources",sourcesHeaders,sources,"SourcesTable");
+addDataSheet("Conflicts",conflictsHeaders,[],"ConflictsTable");
+addDataSheet("Unresolved",unresolvedHeaders,unresolvedRows,"UnresolvedTable");
+const summary=wb.worksheets.add("Summary"); summary.showGridLines=false;
+summary.getRange("A1:D1").merge(); summary.getRange("A1").values=[["Anarchy Online Enemy Catalog"]]; summary.getRange("A1:D1").format={fill:"#17365D",font:{bold:true,color:"#FFFFFF",size:16},rowHeight:30};
+const summaryRows=[["Metric","Value","Coverage","Notes"],["Original RDB candidates",catalog.length,"100%","All candidates have dispositions"],["Candidates dispositioned",dispositionRows.length,"100%","Currently insufficient evidence pending row-level enrichment"],["Confirmed enemy types",0,"0%","No candidate promoted without evidence"],["Confirmed variants",0,"0%",""],["Named enemies",0,"0%",""],["Bosses",0,"0%",""],["Non-hostile NPCs excluded",0,"0%",""],["Pets and summons",0,"0%",""],["Placeholders",0,"0%",""],["Unresolved candidates",catalog.length,"100%","Explicitly retained"],["Enemies with resolved levels",0,"0%",""],["Enemies with resolved zones",catalog.filter(x=>x.PlayfieldIds.length).length,`${(100*catalog.filter(x=>x.PlayfieldIds.length).length/catalog.length).toFixed(1)}%`,"Inferred RDB text correlations"],["Enemies with resolved weapons/attacks",0,"0%",""],["Repository sources",2,"",""],["Internet sources",4,"","Source indexes only; not candidate-level assertions"],["Conflicts",0,"",""],["Research date",accessed,"",""],["Repository commit",sourceDoc.RepositoryCommit,"",""]];
+summary.getRange(`A3:D${summaryRows.length+2}`).values=summaryRows; summary.getRange("A3:D3").format={fill:"#5B9BD5",font:{bold:true,color:"#FFFFFF"}}; summary.getRange(`A3:D${summaryRows.length+2}`).format.wrapText=true; summary.getRange("A:A").format.columnWidth=31; summary.getRange("B:B").format.columnWidth=44; summary.getRange("C:C").format.columnWidth=14; summary.getRange("D:D").format.columnWidth=48; summary.freezePanes.freezeRows(3);
+enemySheet.getRange(`BH2:BH${enemyRows.length+1}`).conditionalFormats.add("containsText",{text:"UNRESOLVED",format:{fill:"#F4CCCC",font:{color:"#9C0006"}}});
+dispositionSheet.getRange(`F2:F${dispositionRows.length+1}`).dataValidation={rule:{type:"list",values:["CONFIRMED_ENEMY_TYPE","CONFIRMED_ENEMY_VARIANT","CONFIRMED_NAMED_ENEMY","CONFIRMED_BOSS","CONFIRMED_NON_HOSTILE_NPC","CONFIRMED_PET_OR_SUMMON","CONFIRMED_PLACEHOLDER_OR_INTERNAL","DUPLICATE_OR_ALIAS","INSUFFICIENT_EVIDENCE","MALFORMED_OR_UNREADABLE"]}};
+for(let i=2;i<=sources.length+1;i++){const v=sources[i-2][3]; if(/^https?:/.test(v)) srcSheet.getRange(`D${i}`).hyperlink={address:v,textToDisplay:v};}
+await fs.mkdir(path.join(outDir,"qa"),{recursive:true});
+for(const name of ["Enemy Catalog","Zone Associations","Weapon Associations","RDB Candidate Disposition","Enemy Families","Zones","Sources","Conflicts","Unresolved","Summary"]){const blob=await wb.render({sheetName:name,range:name==="Summary"?"A1:D21":"A1:J8",scale:1,format:"png"}); await fs.writeFile(path.join(outDir,"qa",`${name.replaceAll(" ","_")}.png`),new Uint8Array(await blob.arrayBuffer()));}
+const xlsx=await SpreadsheetFile.exportXlsx(wb); await xlsx.save(path.join(outDir,"anarchy_online_enemy_catalog.xlsx"));
+const inspection=await wb.inspect({kind:"sheet",include:"id,name",maxChars:3000}); console.log(inspection.ndjson);

@@ -11,6 +11,7 @@ foreach ($required in @($common, $aodb, $idx)) { if (-not (Test-Path -LiteralPat
 Add-Type -Path $common
 Add-Type -Path $aodb
 $encoding = [Text.Encoding]::GetEncoding(1252)
+$sha256 = [Security.Cryptography.SHA256]::Create()
 $controller = New-Object AODB.RdbController($AoClientPath)
 try {
     $types = New-Object Collections.Generic.List[object]
@@ -24,7 +25,8 @@ try {
                 $text = $encoding.GetString($raw)
                 $strings = @([regex]::Matches($text, '[ -~]{3,}') | ForEach-Object { $_.Value.Trim() } | Where-Object { $_ } | Select-Object -Unique)
             }
-            $records.Add([ordered]@{ id=[int]$recordId; size=if ($null -eq $raw) { 0 } else { $raw.Length }; strings=$strings })
+            $hash = if ($null -eq $raw) { $null } else { ([BitConverter]::ToString($sha256.ComputeHash($raw))).Replace('-', '').ToLowerInvariant() }
+            $records.Add([ordered]@{ id=[int]$recordId; size=if ($null -eq $raw) { 0 } else { $raw.Length }; sha256=$hash; strings=$strings })
         } }
         $types.Add([ordered]@{ type=[int]$typeId; count=$controller.RecordTypeToId[$typeId].Count; records=$records })
     }
@@ -33,4 +35,4 @@ try {
     if ($parent) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
     $payload | ConvertTo-Json -Depth 7 -Compress | Set-Content -LiteralPath $OutputPath -Encoding UTF8
 }
-finally { $controller.Dispose() }
+finally { $sha256.Dispose(); $controller.Dispose() }
