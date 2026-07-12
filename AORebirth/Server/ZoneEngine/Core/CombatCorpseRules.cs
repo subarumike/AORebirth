@@ -9,8 +9,8 @@ namespace ZoneEngine.Core
 
     public enum CombatCorpseLootClass
     {
-        CreditsOnly,
-        ItemLoot,
+        Empty,
+        RegularLoot,
         MajorBoss
     }
 
@@ -272,22 +272,22 @@ namespace ZoneEngine.Core
 
         public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30);
 
-        public static readonly TimeSpan CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30);
+        public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(30);
 
-        public static readonly TimeSpan ItemLootCorpseLifetime = TimeSpan.FromMinutes(5);
+        public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(5);
 
         public static readonly TimeSpan MajorBossCorpseLifetime = TimeSpan.FromMinutes(30);
 
-        public static CombatCorpseLootClass LootClassFor(int unlootedItemCount, bool isMajorBoss)
+        public static CombatCorpseLootClass LootClassFor(int unlootedItemCount, int unlootedCredits, bool isMajorBoss)
         {
             if (isMajorBoss)
             {
                 return CombatCorpseLootClass.MajorBoss;
             }
 
-            return unlootedItemCount > 0
-                       ? CombatCorpseLootClass.ItemLoot
-                       : CombatCorpseLootClass.CreditsOnly;
+            return unlootedItemCount > 0 || unlootedCredits > 0
+                       ? CombatCorpseLootClass.RegularLoot
+                       : CombatCorpseLootClass.Empty;
         }
 
         public static TimeSpan LifetimeFor(CombatCorpseLootClass lootClass)
@@ -297,11 +297,11 @@ namespace ZoneEngine.Core
                 case CombatCorpseLootClass.MajorBoss:
                     return MajorBossCorpseLifetime;
 
-                case CombatCorpseLootClass.ItemLoot:
-                    return ItemLootCorpseLifetime;
+                case CombatCorpseLootClass.RegularLoot:
+                    return RegularLootCorpseLifetime;
 
                 default:
-                    return CreditsOnlyCorpseLifetime;
+                    return EmptyCorpseLifetime;
             }
         }
 

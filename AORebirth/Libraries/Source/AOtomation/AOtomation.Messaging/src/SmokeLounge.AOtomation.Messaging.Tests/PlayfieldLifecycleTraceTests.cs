@@ -1663,8 +1663,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && !registerCorpse.Contains("if (!state.HasUnlootedItems)")
                 && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("ItemLootCorpseLifetime = TimeSpan.FromMinutes(5)"),
+                && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.FromSeconds(30)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(5)"),
                 "Accepted Subway Thief must keep captured corpse visual selection and the generic five-minute loot-bearing corpse lifetime.");
         }
 
@@ -3090,8 +3090,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 !registerCorpse.Contains("if (!state.HasUnlootedItems)")
                 && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
                 && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30);")
-                && corpseRulesText.Contains("public static readonly TimeSpan CreditsOnlyCorpseLifetime = TimeSpan.FromSeconds(30);")
-                && corpseRulesText.Contains("public static readonly TimeSpan ItemLootCorpseLifetime = TimeSpan.FromMinutes(5);"),
+                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(30);")
+                && corpseRulesText.Contains("public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(5);")
+                && registerCorpse.Contains("CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);")
+                && corpseRulesText.Contains("unlootedItemCount > 0 || unlootedCredits > 0"),
                 "Regular loot-bearing corpses must receive a five-minute initial lifetime; empty corpses must use the 30-second cleanup window.");
             AssertTextBefore(
                 registerCorpse,

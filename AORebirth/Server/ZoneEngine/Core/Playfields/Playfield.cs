@@ -2164,7 +2164,7 @@ namespace AORebirth.Core.Playfields
                 looter,
                 corpseIdentity,
                 this.corpses,
-                CombatCorpseRules.ItemLootCorpseLifetime,
+                CombatCorpseRules.RegularLootCorpseLifetime,
                 CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay,
                 corpse => corpse.DeadNpcIdentity,
                 corpse => corpse.ExpiresAtUtc,
@@ -2218,7 +2218,7 @@ namespace AORebirth.Core.Playfields
                 this.ScheduleCorpseDespawn,
                 this.ExtendCorpseLifetime,
                 this.DespawnCorpse,
-                CombatCorpseRules.ItemLootCorpseLifetime,
+                CombatCorpseRules.RegularLootCorpseLifetime,
                 CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay);
         }
 
@@ -2711,11 +2711,14 @@ namespace AORebirth.Core.Playfields
             return CombatCorpseRules.LifetimeFor(lootClass);
         }
 
-        private static CombatCorpseLootClass CorpseLootClassFor(ICharacter target, IList<CorpseLootItem> lootItems)
+        private static CombatCorpseLootClass CorpseLootClassFor(
+            ICharacter target,
+            IList<CorpseLootItem> lootItems,
+            int credits)
         {
             // Boss classification is intentionally conservative until we have capture-backed
             // identification rules for major encounter tiers.
-            return CombatCorpseRules.LootClassFor(lootItems.Count, false);
+            return CombatCorpseRules.LootClassFor(lootItems.Count, credits, false);
         }
 
         private void ProcessCorpseDespawns()
@@ -2747,7 +2750,7 @@ namespace AORebirth.Core.Playfields
                     CorpseIdentity = corpseIdentity,
                     DeadNpcIdentity = target.Identity,
                     Name = "Remains of " + target.Name,
-                    LootClass = CombatCorpseLootClass.CreditsOnly,
+                    LootClass = CombatCorpseLootClass.Empty,
                     CreatedAtUtc = DateTime.UtcNow,
                     SpawnsAtUtc = spawnsAtUtc
                 };
@@ -2771,8 +2774,8 @@ namespace AORebirth.Core.Playfields
         private void RegisterCorpse(ICharacter target, Identity corpseIdentity)
         {
             List<CorpseLootItem> lootItems = this.RollCorpseLootItems(target);
-            CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems);
             int credits = RollCorpseCredits(target);
+            CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);
             TimeSpan lifetime = CorpseLifetimeFor(lootClass);
             DateTime expiresAtUtc = DateTime.UtcNow + lifetime;
             var state = new CorpseState
