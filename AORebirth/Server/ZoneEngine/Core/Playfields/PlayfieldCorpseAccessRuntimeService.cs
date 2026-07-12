@@ -32,11 +32,14 @@ namespace AORebirth.Core.Playfields
             Func<TCorpseState, Identity> deadNpcIdentity,
             Func<TCorpseState, DateTime> expiresAtUtc,
             Func<TCorpseState, bool> hasUnlootedItems,
+            Func<TCorpseState, bool> opened,
             Action<TCorpseState, bool> setOpened,
             Func<TCorpseState, object> lootClass,
             Action<int> despawnCorpse,
             Action<TCorpseState, TimeSpan, string> extendCorpseLifetime,
             Action<ICharacter, TCorpseState> sendCorpseInventoryUpdate,
+            Action<ICharacter, TCorpseState> sendCorpseLootAccessAction,
+            Action<ICharacter> sendUseActionFinished,
             Action<ICharacter, TCorpseState> scheduleCorpseCreditAward,
             Action<TCorpseState, TimeSpan, string> scheduleCorpseDespawn)
             where TCorpseState : class
@@ -74,6 +77,7 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            bool wasOpened = opened(corpse);
             setOpened(corpse, true);
 
             if (hasUnlootedItems(corpse))
@@ -84,6 +88,12 @@ namespace AORebirth.Core.Playfields
                     corpse,
                     sendCorpseInventoryUpdate,
                     scheduleCorpseCreditAward);
+
+                if (wasOpened)
+                {
+                    sendCorpseLootAccessAction(looter, corpse);
+                    sendUseActionFinished(looter);
+                }
             }
             else
             {

@@ -787,11 +787,14 @@ namespace ZoneEngine.Core.Playfields
             Func<TCorpseState, Identity> deadNpcIdentity,
             Func<TCorpseState, DateTime> expiresAtUtc,
             Func<TCorpseState, bool> hasUnlootedItems,
+            Func<TCorpseState, bool> opened,
             Action<TCorpseState, bool> setOpened,
             Func<TCorpseState, object> lootClass,
             Action<int> despawnCorpse,
             Action<TCorpseState, TimeSpan, string> extendCorpseLifetime,
             Action<ICharacter, TCorpseState> sendCorpseInventoryUpdate,
+            Action<ICharacter, TCorpseState> sendCorpseLootAccessAction,
+            Action<ICharacter> sendUseActionFinished,
             Action<ICharacter, TCorpseState> scheduleCorpseCreditAward,
             Action<TCorpseState, TimeSpan, string> scheduleCorpseDespawn)
             where TCorpseState : class
@@ -805,11 +808,14 @@ namespace ZoneEngine.Core.Playfields
                 deadNpcIdentity,
                 expiresAtUtc,
                 hasUnlootedItems,
+                opened,
                 setOpened,
                 lootClass,
                 despawnCorpse,
                 extendCorpseLifetime,
                 sendCorpseInventoryUpdate,
+                sendCorpseLootAccessAction,
+                sendUseActionFinished,
                 scheduleCorpseCreditAward,
                 scheduleCorpseDespawn);
         }
