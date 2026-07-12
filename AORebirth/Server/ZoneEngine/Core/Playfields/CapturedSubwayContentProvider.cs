@@ -226,9 +226,11 @@ namespace ZoneEngine.Core.Playfields
 
         public CapturedSubwayLootDefinition[] GetLootDefinitions()
         {
-            // Source: completed Thief capture 20260710-205400, inventory-updates.csv.
-            // The one-of-one observed corpse contained one QL1 Stolen Handbag
-            // (297055/297055). Mission-state gating remains unknown.
+            // Sources: completed Subway corpse inventory captures.
+            // Thief: 20260710-205400, inventory-updates.csv; the one-of-one observed corpse
+            // contained one QL1 Stolen Handbag (297055/297055). Mission-state gating remains unknown.
+            // Filth Flea: 20260709-210452 and 20260709-220439, inventory-updates.csv
+            // correlated by enemy-combat.csv death sequence and enemy-dossier.json monsterData 17657.
             return new[]
             {
                 new CapturedSubwayLootDefinition(
@@ -238,7 +240,79 @@ namespace ZoneEngine.Core.Playfields
                     297055,
                     297055,
                     1,
-                    10000)
+                    10000),
+                new CapturedSubwayLootDefinition(
+                    "Filth Flea",
+                    17657,
+                    138,
+                    234874,
+                    234874,
+                    1,
+                    1250),
+                new CapturedSubwayLootDefinition(
+                    "Filth Flea",
+                    17657,
+                    138,
+                    103110,
+                    103111,
+                    6,
+                    1250),
+                new CapturedSubwayLootDefinition(
+                    "Filth Flea",
+                    17657,
+                    138,
+                    101581,
+                    101582,
+                    6,
+                    1250),
+                new CapturedSubwayLootDefinition(
+                    "Filth Flea",
+                    17657,
+                    138,
+                    110874,
+                    110875,
+                    6,
+                    1250),
+                new CapturedSubwayLootDefinition(
+                    "Filth Flea",
+                    17657,
+                    138,
+                    101507,
+                    101508,
+                    6,
+                    1250),
+                new CapturedSubwayLootDefinition(
+                    "Filth Flea",
+                    17657,
+                    138,
+                    202719,
+                    202720,
+                    14,
+                    1250),
+                new CapturedSubwayLootDefinition(
+                    "Filth Flea",
+                    17657,
+                    138,
+                    234876,
+                    234876,
+                    1,
+                    1250),
+                new CapturedSubwayLootDefinition(
+                    "Filth Flea",
+                    17657,
+                    138,
+                    101761,
+                    101762,
+                    9,
+                    1250),
+                new CapturedSubwayLootDefinition(
+                    "Filth Flea",
+                    17657,
+                    138,
+                    110192,
+                    110193,
+                    15,
+                    1250)
             };
         }
 
@@ -281,7 +355,8 @@ namespace ZoneEngine.Core.Playfields
                 5,
                 x,
                 y,
-                z);
+                z,
+                respawnDelaySeconds: 240.0);
         }
 
         private static CapturedSubwaySpawnDefinition DiscardedPet(
