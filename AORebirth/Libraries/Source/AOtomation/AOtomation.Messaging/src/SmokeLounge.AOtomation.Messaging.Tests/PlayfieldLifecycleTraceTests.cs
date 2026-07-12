@@ -420,7 +420,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && coordinatorText.Contains("? capturedContract.AttackInfoAmmoCount")
                 && coordinatorText.Contains("? capturedContract.AttackInfoUnknown")
                 && coordinatorText.Contains(": 40,")
-                && coordinatorText.Contains(": 4,"),
+                && coordinatorText.Contains(": 4,")
+                && coordinatorText.Contains("IsCapturedSubwayThief(attacker)")
+                && coordinatorText.Contains("CombatCapturedSubwayThiefDamageSuppressed"),
                 "Thief timing and AttackInfo overrides must stay contract-gated while legacy equipped NPC fields remain unchanged.");
             Assert.IsTrue(
                 orchestratorText.Contains("WeaponItemFullUpdate.SendWeaponDefinitions(mobCharacter, true)")
