@@ -35,11 +35,14 @@ violations from the exact verified `Utils!Rect::operator+(Point)` body. Valid
 readable rectangle and point data continue through the original function
 unchanged.
 
-The old live renderer repair verifies the exact `randy31.dll +0x6C3A1` byte-
-color and `randy31.dll +0x6C51D` packed-color reads. If either instruction
-receives an invalid low pointer, the process-level guard substitutes black
-color components and resumes after the unsafe read. All other renderer
-exceptions continue through the normal client exception path unchanged.
+The old live renderer repair verifies the exact `randy31.dll +0x21A94`
+draw-resource pointer read, `randy31.dll +0x6C3A1` byte-color read, and
+`randy31.dll +0x6C51D` packed-color read. If the draw wrapper receives an
+invalid low resource pointer, the process-level guard returns from that one
+draw call without submitting it. If either color instruction receives an
+invalid low pointer, the guard substitutes black color components and resumes
+after the unsafe read. All other renderer exceptions continue through the
+normal client exception path unchanged.
 
 The crash dump handler does not suppress arbitrary access violations, C++
 exceptions, driver faults, stack corruption, or unknown callsite failures.

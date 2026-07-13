@@ -38,6 +38,10 @@ For the old graphics client, look for:
 PATCH PASS
 READY RoomSpace, GUI rectangle, and renderer repairs active
 
+The old-client renderer repair skips one bad randy31 draw-resource call when
+the client passes a low integer instead of a resource pointer. Existing color
+pointer guards remain limited to the verified randy31 color-read callsites.
+
 The dump handler does not suppress arbitrary access violations, C++
 exceptions, driver faults, stack corruption, or unknown callsite failures.
 Only targeted, byte-verified repairs resume execution.
