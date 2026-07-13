@@ -729,7 +729,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string playerCombatTick = ExtractMethodBlock(playfieldText, "private void ProcessValidatedPlayerCombatTick");
             Assert.IsTrue(
                 playfieldText.Contains("private ICharacter FindPlayerCombatTarget(Identity target)")
-                && playfieldText.Contains("private bool IsValidPlayerCombatTarget(ICharacter target)")
+                && playfieldText.Contains("private bool IsValidPlayerCombatTarget(ICharacter attacker, ICharacter target)")
                 && playfieldText.Contains("private void LogInvalidPlayerCombatTickTarget(ICharacter attacker, ICharacter target)")
                 && playerCombatTick.Contains("CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);")
                 && playerCombatTick.Contains("this.HandleCombatKillingHit(attacker, target);"),

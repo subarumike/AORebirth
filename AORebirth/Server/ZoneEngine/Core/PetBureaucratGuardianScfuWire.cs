@@ -15,7 +15,10 @@ namespace ZoneEngine.Core
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.Network;
+    using AORebirth.Core.Playfields;
     using AORebirth.Core.Vector;
+
+    using ZoneEngine.Core.Controllers;
 
     #endregion
 
@@ -50,9 +53,86 @@ namespace ZoneEngine.Core
             Character petCharacter,
             int summonNanoId)
         {
-            if (ownerClient == null || owner == null || petCharacter == null)
+            if (ownerClient == null)
             {
                 return;
+            }
+
+            SendToRecipient(ownerClient, owner, petCharacter, summonNanoId);
+        }
+
+        public static void SendToOtherPlayers(
+            ICharacter owner,
+            Character petCharacter,
+            int summonNanoId)
+        {
+            if (owner == null || petCharacter == null || owner.Playfield == null)
+            {
+                return;
+            }
+
+            Playfield playfield = owner.Playfield as Playfield;
+            if (playfield == null)
+            {
+                return;
+            }
+
+            foreach (ICharacter character in playfield.EnumerateActiveCharacters())
+            {
+                if (character == null
+                    || character.Identity == owner.Identity
+                    || !(character.Controller is PlayerController))
+                {
+                    continue;
+                }
+
+                ZoneClient recipientClient = character.Controller.Client as ZoneClient;
+                if (recipientClient == null)
+                {
+                    continue;
+                }
+
+                SendToRecipient(recipientClient, owner, petCharacter, summonNanoId);
+            }
+        }
+
+        public static void SendToRecipient(
+            ZoneClient recipientClient,
+            ICharacter owner,
+            Character petCharacter,
+            int summonNanoId)
+        {
+            if (recipientClient?.Controller?.Character == null)
+            {
+                return;
+            }
+
+            int recipientInstance = recipientClient.Controller.Character.Identity.Instance;
+            byte[] packet = BuildPacket(owner, petCharacter, summonNanoId, recipientInstance);
+            if (packet == null)
+            {
+                return;
+            }
+
+            recipientClient.Server.Info(
+                recipientClient,
+                "SummonWireSend GuardianSCFU recipient={0} pet={1} len={2} nano={3}",
+                recipientInstance,
+                petCharacter.Identity,
+                packet.Length,
+                summonNanoId);
+            recipientClient.EnqueueOutboundCompressedBuffer(packet);
+        }
+
+        internal static byte[] BuildPacket(
+            ICharacter owner,
+            Character petCharacter,
+            int summonNanoId,
+            int recipientInstance)
+        {
+            if (owner == null || petCharacter == null || owner.Playfield == null)
+            {
+                return null;
             }
 
             byte[] template = summonNanoId == CeoGuardianNanoId
@@ -62,34 +142,28 @@ namespace ZoneEngine.Core
                     : null;
             if (template == null)
             {
-                return;
+                return null;
             }
 
             byte[] packet = (byte[])template.Clone();
-            int ownerInstance = owner.Identity.Instance;
             int petInstance = petCharacter.Identity.Instance;
             int playfieldId = owner.Playfield.Identity.Instance;
             Coordinate petCoord = petCharacter.Coordinates();
 
-            PatchHeader(packet, ownerInstance);
+            PatchHeader(packet, recipientInstance);
             WriteInt32BigEndian(packet, N3IdentityInstanceOffset, petInstance);
             WriteInt32BigEndian(packet, ScfuPlayfieldOffset, playfieldId);
             WriteFloat(packet, ScfuCoordOffset, petCoord.x);
             WriteFloat(packet, ScfuCoordOffset + 4, petCoord.y);
             WriteFloat(packet, ScfuCoordOffset + 8, petCoord.z);
 
-            ownerClient.Server.Info(
-                ownerClient,
-                "SummonWireSend GuardianSCFU len={0} nano={1}",
-                packet.Length,
-                summonNanoId);
-            ownerClient.EnqueueOutboundCompressedBuffer(packet);
+            return packet;
         }
 
-        private static void PatchHeader(byte[] packet, int ownerInstance)
+        private static void PatchHeader(byte[] packet, int recipientInstance)
         {
             WriteInt32BigEndian(packet, HeaderSenderOffset, ZoneServerSenderId);
-            WriteInt32BigEndian(packet, HeaderReceiverOffset, ownerInstance);
+            WriteInt32BigEndian(packet, HeaderReceiverOffset, recipientInstance);
             ushort totalLength = (ushort)packet.Length;
             packet[6] = (byte)(totalLength >> 8);
             packet[7] = (byte)totalLength;

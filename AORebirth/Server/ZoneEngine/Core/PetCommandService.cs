@@ -253,6 +253,11 @@ namespace ZoneEngine.Core
                 return;
             }
 
+            if (!PlayerVersusPlayerCombatRules.CanEngagePlayerVersusPlayerCombat(pet, attackTargetCharacter))
+            {
+                return;
+            }
+
             petController.StopFollow();
             pet.SetTarget(attackTarget);
             pet.SetFightingTarget(attackTarget);

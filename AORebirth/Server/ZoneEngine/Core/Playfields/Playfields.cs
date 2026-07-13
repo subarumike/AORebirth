@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2014, CellAO Team
 // 
@@ -382,6 +382,51 @@ namespace ZoneEngine.Core.Playfields
             }
 
             return 0;
+        }
+
+        /// <summary>
+        /// Resolves the playfield suppression-gas percent for PvP authorization.
+        /// Multi-district playfields without polygon lookup default to 75% until district geometry exists.
+        /// </summary>
+        public static int ResolveSuppressionGasPercent(int playfieldId)
+        {
+            const int defaultSuppressionGasPercent = 75;
+            List<DistrictInfo> districts = GetDistricts(playfieldId);
+            if (districts == null || districts.Count == 0)
+            {
+                return defaultSuppressionGasPercent;
+            }
+
+            if (districts.Count == 1)
+            {
+                return districts[0].suppressionGas;
+            }
+
+            int firstGas = districts[0].suppressionGas;
+            for (int index = 1; index < districts.Count; index++)
+            {
+                if (districts[index].suppressionGas != firstGas)
+                {
+                    return defaultSuppressionGasPercent;
+                }
+            }
+
+            return firstGas;
+        }
+
+        /// <summary>
+        /// </summary>
+        public static List<DistrictInfo> GetDistricts(int playfieldId)
+        {
+            foreach (PlayfieldInfo pfInfo in Instance.playfields)
+            {
+                if (pfInfo.id == playfieldId)
+                {
+                    return pfInfo.districts ?? new List<DistrictInfo>();
+                }
+            }
+
+            return DistrictInfo.LoadDistricts(playfieldId);
         }
 
         /// <summary>

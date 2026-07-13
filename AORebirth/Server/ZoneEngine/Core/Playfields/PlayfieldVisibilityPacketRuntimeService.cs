@@ -16,6 +16,7 @@ namespace ZoneEngine.Core.Playfields
 
     using Utility;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Packets;
 
     #endregion
@@ -188,6 +189,16 @@ namespace ZoneEngine.Core.Playfields
                 return false;
             }
 
+            if (this.TrySendGuardianVisibilityScfu(
+                    temp,
+                    recipient,
+                    sendVisibilityMessage,
+                    diagnosticSnapshot,
+                    joiningCharacter))
+            {
+                return true;
+            }
+
             SubwayVisibilityDiagnosticEnemy diagnosticEnemy =
                 diagnosticSnapshot == null ? null : diagnosticSnapshot.BeginEnemy(temp);
             try
@@ -255,6 +266,113 @@ namespace ZoneEngine.Core.Playfields
                 if (diagnosticSnapshot != null)
                 {
                     diagnosticSnapshot.RecordFailure(diagnosticEnemy, "enemy_visibility_sequence", exception);
+                }
+
+                throw;
+            }
+        }
+
+        private bool TrySendGuardianVisibilityScfu(
+            Character pet,
+            ICharacter recipient,
+            Action<MessageBody> sendVisibilityMessage,
+            SubwayVisibilityDiagnosticSnapshot diagnosticSnapshot,
+            bool joiningCharacter)
+        {
+            if (!PetBureaucratGuardianAppearance.IsGuardianPet(pet))
+            {
+                return false;
+            }
+
+            int summonNanoId = PetBureaucratGuardianAppearance.ResolveSummonNanoId(pet);
+            ICharacter owner = PetCombatRules.ResolvePetOwner(pet);
+            ZoneClient recipientClient = recipient.Controller != null
+                ? recipient.Controller.Client as ZoneClient
+                : null;
+            if (summonNanoId <= 0 || owner == null || recipientClient == null)
+            {
+                return false;
+            }
+
+            SubwayVisibilityDiagnosticEnemy diagnosticEnemy =
+                diagnosticSnapshot == null ? null : diagnosticSnapshot.BeginEnemy(pet);
+            try
+            {
+                CharInPlayMessage charInPlay = null;
+                this.packetSequences.RunVisibilityPacketPairSequence(
+                    () => PlayfieldLifecycleTrace.Record(
+                        PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                        joiningCharacter
+                            ? PlayfieldLifecycleTrace.StageJoiningCharacterSimpleCharFullUpdateBroadcast
+                            : PlayfieldLifecycleTrace.StageExistingCharacterSimpleCharFullUpdate,
+                        PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
+                        pet.Identity,
+                        "recipient=" + recipient.Identity + " guardianWire=true"),
+                    () =>
+                    {
+                        using (SubwayVisibilitySnapshotDiagnostics.BeginPacket(
+                            diagnosticSnapshot,
+                            diagnosticEnemy,
+                            SubwayVisibilityDiagnosticPacketKind.SimpleCharFullUpdate,
+                            0))
+                        {
+                            PetBureaucratGuardianScfuWire.SendToRecipient(
+                                recipientClient,
+                                owner,
+                                pet,
+                                summonNanoId);
+                        }
+
+                        WeaponItemFullUpdateMessage weaponMessage =
+                            WeaponItemFullUpdate.CreateRightHandWeaponDefinitionMessage(pet);
+                        if (weaponMessage != null)
+                        {
+                            using (SubwayVisibilitySnapshotDiagnostics.BeginPacket(
+                                diagnosticSnapshot,
+                                diagnosticEnemy,
+                                SubwayVisibilityDiagnosticPacketKind.WeaponDefinition,
+                                1))
+                            {
+                                sendVisibilityMessage(weaponMessage);
+                            }
+
+                            WeaponItemFullUpdate.LogObserverWeaponDefinition(pet, recipient, weaponMessage);
+                        }
+                    },
+                    () => { charInPlay = new CharInPlayMessage { Identity = pet.Identity, Unknown = 0x00 }; },
+                    () => PlayfieldLifecycleTrace.Record(
+                        PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                        joiningCharacter
+                            ? PlayfieldLifecycleTrace.StageJoiningCharacterCharInPlayBroadcast
+                            : PlayfieldLifecycleTrace.StageExistingCharacterCharInPlay,
+                        PlayfieldLifecycleTrace.MessageCharInPlay,
+                        pet.Identity,
+                        "recipient=" + recipient.Identity),
+                    () =>
+                    {
+                        using (SubwayVisibilitySnapshotDiagnostics.BeginPacket(
+                            diagnosticSnapshot,
+                            diagnosticEnemy,
+                            SubwayVisibilityDiagnosticPacketKind.CharInPlay,
+                            0))
+                        {
+                            sendVisibilityMessage(charInPlay);
+                        }
+                    });
+
+                this.visibilityInterest.MarkVisibleEntry(recipient, pet);
+                if (diagnosticSnapshot != null)
+                {
+                    diagnosticSnapshot.MarkEnemyQueued(diagnosticEnemy);
+                }
+
+                return true;
+            }
+            catch (Exception exception)
+            {
+                if (diagnosticSnapshot != null)
+                {
+                    diagnosticSnapshot.RecordFailure(diagnosticEnemy, "guardian_visibility_sequence", exception);
                 }
 
                 throw;
