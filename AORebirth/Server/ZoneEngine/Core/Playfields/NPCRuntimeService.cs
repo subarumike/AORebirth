@@ -215,6 +215,7 @@ namespace AORebirth.Core.Playfields
             this.corpseLifecycle.FinalizeNpcDespawn(target);
             this.dynelRegistry.Unregister(target.Identity);
             CapturedSubwayOrdinaryRuntimeRegistry.Remove(target.Identity.Instance);
+            SubwayVisibilityDiagnosticSelection.RemoveRuntimeIdentity(target.Identity.Instance);
             CapturedEnemyCombatRuntimeRegistry.Remove(target.Identity.Instance);
         }
 

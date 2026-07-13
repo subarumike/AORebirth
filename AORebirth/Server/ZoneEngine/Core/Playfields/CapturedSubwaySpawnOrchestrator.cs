@@ -83,6 +83,7 @@ namespace AORebirth.Core.Playfields
             }
 
             this.activeSpawnDefinitions.Remove(target.Identity.Instance);
+            SubwayVisibilityDiagnosticSelection.RemoveRuntimeIdentity(target.Identity.Instance);
             if (!spawn.HasRespawnDelay)
             {
                 return;
@@ -191,6 +192,9 @@ namespace AORebirth.Core.Playfields
             var fullUpdate = SimpleCharFullUpdate.ConstructMessage(mobCharacter);
             this.activateNpc(mobCharacter);
             this.activeSpawnDefinitions[mobCharacter.Identity.Instance] = spawn;
+            SubwayVisibilityDiagnosticSelection.RegisterRuntimeIdentity(
+                mobCharacter.Identity.Instance,
+                spawn.SourceInstance);
             playfield.Announce(fullUpdate);
             if (combatReady && spawn.Combat.AttackModel == CapturedEnemyAttackModel.EquippedWeapon)
             {

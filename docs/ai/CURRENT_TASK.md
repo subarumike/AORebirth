@@ -4,6 +4,8 @@
 
 Make the Subway dungeon, resource/playfield `127`, fully playable from capture-backed evidence.
 
+Active diagnostic checkpoint: the 38 rows from capture `20260710-202132` remain quarantined by default. Opt-in PF127 visibility-isolation tooling now provides stable ordinals, controlled slices, exact serialized-size and transport-completion ledgers, operator outcome recording, and cross-session analysis. The first manual sequence is `NONE`, `SUPPORTED_29`, then `ORDINARY_9`; no production visibility cutoff or packet change is authorized from this diagnostic pass.
+
 ## Implementation Roadmap
 
 ### Phase 1 - NPC Population And Combat

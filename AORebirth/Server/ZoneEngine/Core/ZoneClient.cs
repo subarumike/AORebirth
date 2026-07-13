@@ -59,6 +59,7 @@ namespace ZoneEngine.Core
 
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Playfields;
 
     using IBus = MemBus.IBus;
 
@@ -218,7 +219,18 @@ namespace ZoneEngine.Core
                                   }
                           };
 
-            byte[] buffer = this.messageSerializer.Serialize(message);
+            byte[] buffer;
+            SubwayVisibilitySnapshotDiagnostics.OnSerializationStarted(messageBody);
+            try
+            {
+                buffer = this.messageSerializer.Serialize(message);
+                SubwayVisibilitySnapshotDiagnostics.OnSerializationCompleted(messageBody, buffer);
+            }
+            catch (Exception exception)
+            {
+                SubwayVisibilitySnapshotDiagnostics.OnSerializationFailed(messageBody, exception);
+                throw;
+            }
             CombatStartPacketDiagnostics.LogSerializedOutbound(
                 "ZoneClient.SendCompressed",
                 messageBody,
@@ -325,6 +337,7 @@ namespace ZoneEngine.Core
             // During zone reconnect the dispatcher can outlive a disposed stream.
             if (this.netStream == null || this.zStream == null)
             {
+                SubwayVisibilitySnapshotDiagnostics.OnTransportUnavailable(buffer, "network or compression stream unavailable");
                 return;
             }
 
@@ -340,8 +353,10 @@ namespace ZoneEngine.Core
 
                     try
                     {
+                        SubwayVisibilitySnapshotDiagnostics.OnTransportStarted(buffer);
                         this.zStream.Write(buffer, 0, buffer.Length);
                         this.zStream.Flush();
+                        SubwayVisibilitySnapshotDiagnostics.OnTransportCompleted(buffer);
                         if (ContainsTradeOpcode(buffer))
                         {
                             LogUtil.Debug(
@@ -352,10 +367,15 @@ namespace ZoneEngine.Core
                     }
                     catch (Exception e)
                     {
+                        SubwayVisibilitySnapshotDiagnostics.OnTransportFailed(buffer, e);
                         LogUtil.Debug(DebugInfoDetail.Error, "Error writing to zStream");
                         LogUtil.ErrorException(e);
                         this.server.DisconnectClient(this);
                     }
+                }
+                else
+                {
+                    SubwayVisibilitySnapshotDiagnostics.OnTransportUnavailable(buffer, "network stream is not writable");
                 }
             }
 
