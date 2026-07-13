@@ -270,7 +270,7 @@ namespace ZoneEngine.Core
 
         public const int MoveToInventoryPlacement = 0x6f;
 
-        public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30);
+        public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(1);
 
         public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(30);
 
