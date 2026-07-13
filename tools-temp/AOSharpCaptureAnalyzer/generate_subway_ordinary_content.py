@@ -846,6 +846,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="validate and atomically replace the checked-in provider",
     )
+    mode.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="validate normalized profile/spawn input and content equivalence without writing",
+    )
     return parser.parse_args()
 
 

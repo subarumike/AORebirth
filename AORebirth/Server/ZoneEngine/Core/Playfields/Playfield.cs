@@ -3038,6 +3038,12 @@ namespace AORebirth.Core.Playfields
 
         private void DespawnCorpse(int corpseInstance)
         {
+            CorpseState corpse;
+            if (this.corpses.TryGetValue(corpseInstance, out corpse))
+            {
+                this.runtimeSystems.NotifyPopulationCorpseRemoved(corpse.CorpseIdentity);
+            }
+
             this.runtimeSystems.DespawnCorpse(
                 corpseInstance,
                 this.SendCorpseDespawn,

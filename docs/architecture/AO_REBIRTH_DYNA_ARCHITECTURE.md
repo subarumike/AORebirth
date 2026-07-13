@@ -1,5 +1,7 @@
 # AORebirth Dyna Architecture
 
+Foundation status: normalized spawn/group definitions, camp keys, shared respawn policy shapes, deterministic scheduling, and fail-closed scripted activation are available to a future `DynaCampController`. No dyna camp or boss is active.
+
 ## Evidence boundary
 
 The repository imports 174 community-documented camp rows in `docs/generated/enemy_catalog/sources/dyna_boss_list_1.normalized.*`. These establish documented locations/names/approximate levels only. They are not proof of RDB stats, exact spawn coordinates, minion composition, timers, mechanics, or loot probabilities. Imported rows remain proposals until reviewed evidence activates them.
