@@ -38,13 +38,6 @@ receives an invalid low pointer, the process-level guard substitutes black
 color components and resumes after the unsafe read. All other renderer
 exceptions continue through the normal client exception path unchanged.
 
-The old live Vehicle repair verifies the exact collision-query callsites
-associated with the recurring `Vehicle.dll -> N3.dll -> MSVCR100.dll`
-`E06D7363` C++ exception path. It wraps only those three verified virtual calls
-and converts that exception into the original caller's normal `false` result so
-the client uses its existing fallback vectors. Other exceptions continue
-through the normal client exception path unchanged.
-
 The proxy never modifies AO files after installation. It contains no
 LargeAddressAware patch, XML/settings changes, DValues, camera/input hooks,
 other UI modifications, or Project Rubi-Ka-specific behavior.
