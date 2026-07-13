@@ -116,6 +116,15 @@ class SubwayVisibilityDiagnosticTests(unittest.TestCase):
             self.assertNotIn("FAILURE_FOLLOWS_SPECIFIC_IDENTITY", report["findings"])
             self.assertIn("not a PROVEN_CAUSAL_ENEMY", report["causality_warning"])
 
+    def test_runtime_summary_accepts_dotnet_utf8_bom(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            summary = {"snapshot_completed": True, "total_npcs_sent": 221}
+            (target / "snapshot-summary.jsonl").write_text(
+                json.dumps(summary) + "\n", encoding="utf-8-sig"
+            )
+            self.assertEqual(summary, diagnostic.load_last_summary(target))
+
 
 if __name__ == "__main__":
     unittest.main()
