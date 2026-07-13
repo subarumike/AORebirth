@@ -792,8 +792,8 @@ namespace ZoneEngine.Core.Playfields
             Func<TCorpseState, object> lootClass,
             Action<int> despawnCorpse,
             Action<TCorpseState, TimeSpan, string> extendCorpseLifetime,
+            Action<TCorpseState> refreshCorpseInventoryHandle,
             Action<ICharacter, TCorpseState> sendCorpseInventoryUpdate,
-            Action<ICharacter, TCorpseState> sendCorpseLootAccessAction,
             Action<ICharacter> sendUseActionFinished,
             Action<ICharacter, TCorpseState> scheduleCorpseCreditAward,
             Action<TCorpseState, TimeSpan, string> scheduleCorpseDespawn)
@@ -813,8 +813,8 @@ namespace ZoneEngine.Core.Playfields
                 lootClass,
                 despawnCorpse,
                 extendCorpseLifetime,
+                refreshCorpseInventoryHandle,
                 sendCorpseInventoryUpdate,
-                sendCorpseLootAccessAction,
                 sendUseActionFinished,
                 scheduleCorpseCreditAward,
                 scheduleCorpseDespawn);

@@ -37,8 +37,8 @@ namespace AORebirth.Core.Playfields
             Func<TCorpseState, object> lootClass,
             Action<int> despawnCorpse,
             Action<TCorpseState, TimeSpan, string> extendCorpseLifetime,
+            Action<TCorpseState> refreshCorpseInventoryHandle,
             Action<ICharacter, TCorpseState> sendCorpseInventoryUpdate,
-            Action<ICharacter, TCorpseState> sendCorpseLootAccessAction,
             Action<ICharacter> sendUseActionFinished,
             Action<ICharacter, TCorpseState> scheduleCorpseCreditAward,
             Action<TCorpseState, TimeSpan, string> scheduleCorpseDespawn)
@@ -77,7 +77,26 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            bool wasOpened = opened(corpse);
+            if (opened(corpse))
+            {
+                // Official live capture F6C004: close returns CharacterAction 110 without
+                // InventoryUpdate; the next Use reopens with a refreshed inventory handle.
+                setOpened(corpse, false);
+                refreshCorpseInventoryHandle(corpse);
+                sendUseActionFinished(looter);
+
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        "CorpseUse accepted close corpse={0} deadNpc={1} looter={2} opened=False lootClass={3}",
+                        corpseIdentity,
+                        deadNpcIdentity(corpse),
+                        looter.Identity,
+                        lootClass(corpse)));
+
+                return true;
+            }
+
             setOpened(corpse, true);
 
             if (hasUnlootedItems(corpse))
@@ -89,11 +108,6 @@ namespace AORebirth.Core.Playfields
                     sendCorpseInventoryUpdate,
                     scheduleCorpseCreditAward);
 
-                if (wasOpened)
-                {
-                    sendCorpseLootAccessAction(looter, corpse);
-                    sendUseActionFinished(looter);
-                }
             }
             else
             {
