@@ -131,4 +131,5 @@ tools-temp/screen-captures/
 tools-temp/worktree-snapshots/
 tools-temp/db-backups/
 .local/
+__pycache__/
 .aider*

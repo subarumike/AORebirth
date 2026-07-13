@@ -17,6 +17,7 @@ namespace AORebirth.Core.Playfields
 
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.Packets;
+    using ZoneEngine.Core.Playfields;
 
     internal sealed class CapturedSubwayOrdinarySpawnOrchestrator
     {
@@ -105,6 +106,9 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayOrdinaryRuntimeRegistry.Register(character.Identity.Instance, spawn, archetype);
             var fullUpdate = SimpleCharFullUpdate.ConstructMessage(character);
             this.activateNpc(character);
+            SubwayVisibilityDiagnosticSelection.RegisterRuntimeIdentity(
+                character.Identity.Instance,
+                spawn.SourceInstance);
             playfield.Announce(fullUpdate);
 
             LogUtil.Debug(

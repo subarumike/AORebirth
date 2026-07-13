@@ -11,6 +11,7 @@ namespace AORebirth.Core.Playfields
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core;
+    using ZoneEngine.Core.Playfields;
 
     internal sealed class CapturedSubwayOrdinaryContentProvider
     {
@@ -3350,7 +3351,9 @@ namespace AORebirth.Core.Playfields
         public CapturedSubwayOrdinarySpawnDefinition[] GetSpawns()
         {
             return Spawns
-                .Where(spawn => !string.Equals(spawn.EvidenceCapture, "20260710-202132", StringComparison.Ordinal))
+                .Where(
+                    spawn => !string.Equals(spawn.EvidenceCapture, "20260710-202132", StringComparison.Ordinal)
+                             || SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(spawn.SourceInstance))
                 .ToArray();
         }
 

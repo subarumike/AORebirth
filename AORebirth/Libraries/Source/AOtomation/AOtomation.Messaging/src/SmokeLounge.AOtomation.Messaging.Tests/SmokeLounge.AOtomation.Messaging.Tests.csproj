@@ -72,6 +72,8 @@
     <Compile Include="N3RecoveredContractTests.cs" />
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
+    <Compile Include="SubwayVisibilityPacketMeasurementTests.cs" />
+    <Compile Include="SubwayVisibilityDiagnosticSelectionTestStub.cs" />
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\CityControllerInteractionRules.cs">
       <Link>CityControllerInteractionRules.cs</Link>
     </Compile>
@@ -134,6 +136,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleTrace.cs">
       <Link>PlayfieldLifecycleTrace.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\SubwayVisibilityPacketMeasurement.cs">
+      <Link>SubwayVisibilityPacketMeasurement.cs</Link>
     </Compile>
     <Compile Include="TypeMetaBuilderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

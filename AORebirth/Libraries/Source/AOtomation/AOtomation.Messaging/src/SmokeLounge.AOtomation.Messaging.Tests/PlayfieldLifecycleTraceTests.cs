@@ -1394,6 +1394,94 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void SubwayVisibilityIsolationDiagnosticsRemainOptInAndManifestOrdered()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string manifestPath = Path.Combine(
+                repositoryRoot,
+                @"docs\generated\subway_pf127_visibility_diagnostic_manifest.csv");
+            string[] manifestLines = File.ReadAllLines(manifestPath);
+            string selectionText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\SubwayVisibilityDiagnosticSelection.cs"));
+            string diagnosticText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\SubwayVisibilitySnapshotDiagnostics.cs"));
+            string visibilityText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs"));
+            string zoneClientText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
+            string supportedProviderText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+            string ordinaryProviderText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
+            string ordinaryGeneratorText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"tools-temp\AOSharpCaptureAnalyzer\generate_subway_ordinary_content.py"));
+
+            Assert.AreEqual(39, manifestLines.Length, "Manifest must contain one header plus 38 stable rows.");
+            for (int ordinal = 1; ordinal <= 38; ordinal++)
+            {
+                Assert.IsTrue(
+                    manifestLines[ordinal].StartsWith(ordinal + ",", StringComparison.Ordinal),
+                    "Manifest ordinal must be stable and contiguous: " + ordinal);
+            }
+
+            Assert.AreEqual(
+                29,
+                manifestLines.Count(line => line.Contains(",SUPPORTED_FAMILY_RESTORE,")),
+                "Supported diagnostic group must contain exactly 29 rows.");
+            Assert.AreEqual(
+                9,
+                manifestLines.Count(line => line.Contains(",ORDINARY_ENEMY_REGENERATE,")),
+                "Ordinary diagnostic group must contain exactly nine rows.");
+            Assert.IsTrue(
+                selectionText.Contains("SubwayVisibilityDiagnosticConfiguration.Disabled")
+                && selectionText.Contains("return current.Enabled && current.SelectedSourceInstances.Contains(sourceInstance);")
+                && selectionText.Contains("ALL_38 requires all 38 explicit manifest identities"),
+                "Diagnostic selection must fail closed and require explicit identities.");
+            Assert.IsTrue(
+                supportedProviderText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(spawn.SourceInstance)")
+                && ordinaryProviderText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(spawn.SourceInstance)")
+                && ordinaryGeneratorText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(spawn.SourceInstance)"),
+                "Both quarantined population providers must use the same opt-in selector.");
+
+            AssertTextBefore(
+                visibilityText,
+                "sendVisibilityMessage(simpleCharFullUpdate);",
+                "this.SendWeaponDefinitionsForVisibility(");
+            AssertTextBefore(
+                visibilityText,
+                "this.SendWeaponDefinitionsForVisibility(",
+                "sendVisibilityMessage(charInPlay);");
+            AssertTextBefore(
+                zoneClientText,
+                "SubwayVisibilitySnapshotDiagnostics.OnSerializationStarted(messageBody);",
+                "buffer = this.messageSerializer.Serialize(message);");
+            AssertTextBefore(
+                zoneClientText,
+                "buffer = this.messageSerializer.Serialize(message);",
+                "SubwayVisibilitySnapshotDiagnostics.OnSerializationCompleted(messageBody, buffer);");
+            Assert.IsTrue(
+                diagnosticText.Contains("SCFU_SERIALIZATION_COMPLETED")
+                || diagnosticText.Contains("PacketPrefix(record.Kind) + \"_SERIALIZATION_COMPLETED\"")
+                && diagnosticText.Contains("ENEMY_SEQUENCE_COMPLETED")
+                && diagnosticText.Contains("SNAPSHOT_COMPLETED")
+                && diagnosticText.Contains("total_serialized_bytes")
+                && diagnosticText.Contains("last_completed_enemy_identity"),
+                "Diagnostic ledger must preserve serialization, enemy, and snapshot completion markers.");
+        }
+
+        [TestMethod]
         public void SubwayOrdinaryArchetypesUseCaptureBackedTemplateFreeFramework()
         {
             string repositoryRoot = FindRepositoryRoot();

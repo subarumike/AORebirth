@@ -253,7 +253,8 @@ namespace ZoneEngine.Core.Playfields
             var result = new List<CapturedSubwaySpawnDefinition>();
             foreach (CapturedSubwaySpawnDefinition spawn in SpawnDefinitions)
             {
-                if (!RuntimeQuarantinedSourceInstances.Contains(spawn.SourceInstance))
+                if (!RuntimeQuarantinedSourceInstances.Contains(spawn.SourceInstance)
+                    || SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(spawn.SourceInstance))
                 {
                     result.Add(spawn);
                 }
