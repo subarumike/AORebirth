@@ -20,6 +20,8 @@ namespace ZoneEngine.Core
 
         public const int HealingPetStrain = 1016;
 
+        public const int BureaucratCompanionStrain = 1017;
+
         public const int HealingSpellListSlot = 2;
 
         public const int RegularSpellListSlot = 5;
@@ -39,6 +41,17 @@ namespace ZoneEngine.Core
                 return RegularPetStrain;
             }
 
+            switch (petHash.ToUpperInvariant())
+            {
+                case "A020":
+                case "A141":
+                case "BCBG":
+                    return RegularPetStrain;
+                case "A142":
+                case "CRLT":
+                    return BureaucratCompanionStrain;
+            }
+
             return HealingPetStrain;
         }
 
@@ -48,5 +61,11 @@ namespace ZoneEngine.Core
                 ? HealingSpellListSlot
                 : RegularSpellListSlot;
         }
+
+        public static bool IsBureaucratCompanionStrain(int petSlotStrain)
+        {
+            return petSlotStrain == BureaucratCompanionStrain;
+        }
+
     }
 }

@@ -211,8 +211,11 @@
     <Compile Include="Core\PetHealingPetScfuCatalog.cs" />
     <Compile Include="Core\PetMobTemplateResolver.cs" />
     <Compile Include="Core\PetSlotClassifier.cs" />
+    <Compile Include="Core\PetBureaucratCompanionAppearance.cs" />
+    <Compile Include="Core\PetBureaucratGuardianAppearance.cs" />
     <Compile Include="Core\PetSummonScfuExtensions.cs" />
     <Compile Include="Core\PetSummonCaptureWireReplayer.cs" />
+    <Compile Include="Core\PetBureaucratGuardianScfuWire.cs" />
     <Compile Include="Core\PetSummonSpellListBuilder.cs" />
     <Compile Include="Core\PetSummonSpellListService.cs" />
     <Compile Include="Core\PetShellItemService.cs" />

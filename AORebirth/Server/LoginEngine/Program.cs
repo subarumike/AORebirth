@@ -549,6 +549,7 @@ namespace LoginEngine
             consoleCommands.AddEntry("adduser", AddUser);
             consoleCommands.AddEntry("hash", SetHash);
             consoleCommands.AddEntry("setgm", SetGMLevel);
+            consoleCommands.AddEntry("setexp", SetExpansions);
             consoleCommands.AddEntry("logoffchars", LogoffCharacters);
             consoleCommands.AddEntry("setpass", SetPassword);
             return true;
@@ -736,6 +737,25 @@ namespace LoginEngine
                 LoginDataDao.SetGM(obj[1], gmlevel);
                 Colouring.Push(ConsoleColor.Green);
                 Console.WriteLine("Successfully set GM Level " + gmlevel + " to account " + obj[1]);
+                Colouring.Pop();
+            }
+        }
+
+        private static void SetExpansions(string[] obj)
+        {
+            int expansions = 0;
+            if ((obj.Length != 3) || (!int.TryParse(obj[2], out expansions)))
+            {
+                Colouring.Push(ConsoleColor.Red);
+                Console.WriteLine("Syntax: setexp <username> <expansions>");
+                Console.WriteLine("Use 2047 for all known expansions.");
+                Colouring.Pop();
+            }
+            else
+            {
+                LoginDataDao.SetExpansions(obj[1], expansions);
+                Colouring.Push(ConsoleColor.Green);
+                Console.WriteLine("Successfully set expansions " + expansions + " to account " + obj[1]);
                 Colouring.Pop();
             }
         }

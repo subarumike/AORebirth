@@ -204,7 +204,7 @@ namespace AORebirth.Core.Playfields
             CapturedEnemyCombatContract activeCapturedContract;
             bool maintainMovementDuringRecharge =
                 Playfield.IsCapturedCleaningRobot(attacker)
-                || PetCombatRules.IsPlayerOwnedAttackPet(attacker)
+                || PetCombatRules.IsPlayerOwnedMeleeCombatPet(attacker)
                 || (CapturedEnemyCombatRuntimeRegistry.TryGet(
                         attacker.Identity.Instance,
                         out activeCapturedContract)
@@ -276,7 +276,7 @@ namespace AORebirth.Core.Playfields
 
             if (killingHit)
             {
-                if (PetCombatRules.IsPlayerOwnedAttackPet(attacker))
+                if (PetCombatRules.IsPlayerOwnedMeleeCombatPet(attacker))
                 {
                     this.playfield.Announce(
                         new StopFightMessage
@@ -323,7 +323,8 @@ namespace AORebirth.Core.Playfields
                     previousTarget,
                     targetInstance)
                 && !NpcCombatAttackRules.ShouldSendPlayerOwnedAttackPetAttackStartContext(
-                    PetCombatRules.IsPlayerOwnedAttackPet(attacker),
+                    PetCombatRules.IsPlayerOwnedMewAttackPet(attacker)
+                    || PetCombatRules.IsPlayerOwnedBureaucratCompanionPet(attacker),
                     previousTarget,
                     targetInstance))
             {
@@ -331,7 +332,20 @@ namespace AORebirth.Core.Playfields
             }
 
             this.lastNpcSpecialAttackWeaponTargets[attackerInstance] = targetInstance;
-            if (PetCombatRules.IsPlayerOwnedAttackPet(attacker))
+            if (PetBureaucratGuardianAppearance.IsGuardianPet(attacker))
+            {
+                this.playfield.Announce(
+                    new AttackMessage
+                    {
+                        Identity = attacker.Identity,
+                        Target = target.Identity,
+                        Action = 0
+                    });
+                return;
+            }
+
+            if (PetCombatRules.IsPlayerOwnedMewAttackPet(attacker)
+                || PetCombatRules.IsPlayerOwnedBureaucratCompanionPet(attacker))
             {
                 this.AnnouncePlayerOwnedAttackPetAttackStartContext(attacker, target);
                 return;
@@ -657,16 +671,53 @@ namespace AORebirth.Core.Playfields
 
         private CombatAttackSource GetCombatAttackSource(ICharacter attacker)
         {
-            if (PetCombatRules.IsPlayerOwnedAttackPet(attacker))
+            if (PetBureaucratGuardianAppearance.IsGuardianPet(attacker))
             {
                 int rawMinDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.mindamage].Value, 0);
                 int rawMaxDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.maxdamage].Value, 0);
+                int fallbackMinDamage = PetCombatRules.ResolveLevelEquivalentAttackPetMinDamage(
+                    attacker.Stats[StatIds.level].Value);
+                int fallbackMaxDamage = PetCombatRules.ResolveLevelEquivalentAttackPetMaxDamage(
+                    attacker.Stats[StatIds.level].Value);
                 int petMinDamage = rawMinDamage > 0
                                        ? rawMinDamage
-                                       : (rawMaxDamage > 0 ? rawMaxDamage : PetCombatRules.AttackPetFallbackDamage);
+                                       : (rawMaxDamage > 0 ? rawMaxDamage : fallbackMinDamage);
                 int petMaxDamage = rawMaxDamage > 0
                                        ? rawMaxDamage
-                                       : (rawMinDamage > 0 ? rawMinDamage : PetCombatRules.AttackPetFallbackDamage);
+                                       : (rawMinDamage > 0 ? rawMinDamage : fallbackMaxDamage);
+
+                return new CombatAttackSource
+                       {
+                           MinDamage = petMinDamage,
+                           MaxDamage = petMaxDamage,
+                           DamageBonus = NormalizeCombatItemStat(attacker.Stats[StatIds.damagebonus].Value, 0),
+                           Range = NpcCombatAttackRules.MaxMeleeCombatDistance,
+                           RechargeSeconds = PetCombatRules.AttackPetRechargeSeconds,
+                           UsesEquippedWeapon = true,
+                           AttackInfoAmmoCount = NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                           AttackInfoWeaponSlot = (int)WeaponSlots.Righthand,
+                           AttackInfoUnk1 = 4,
+                           AttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType,
+                           AttackInfoWeaponInstance = 0,
+                           SendAttackInfo = true
+                       };
+            }
+
+            if (PetCombatRules.IsPlayerOwnedMewAttackPet(attacker)
+                || PetCombatRules.IsPlayerOwnedBureaucratCompanionPet(attacker))
+            {
+                int rawMinDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.mindamage].Value, 0);
+                int rawMaxDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.maxdamage].Value, 0);
+                int fallbackMinDamage = PetCombatRules.ResolveLevelEquivalentAttackPetMinDamage(
+                    attacker.Stats[StatIds.level].Value);
+                int fallbackMaxDamage = PetCombatRules.ResolveLevelEquivalentAttackPetMaxDamage(
+                    attacker.Stats[StatIds.level].Value);
+                int petMinDamage = rawMinDamage > 0
+                                       ? rawMinDamage
+                                       : (rawMaxDamage > 0 ? rawMaxDamage : fallbackMinDamage);
+                int petMaxDamage = rawMaxDamage > 0
+                                       ? rawMaxDamage
+                                       : (rawMinDamage > 0 ? rawMinDamage : fallbackMaxDamage);
                 int attackInfoWeaponInstance = this.GetAttackPetAttackInfoWeaponInstance(attacker);
 
                 return new CombatAttackSource

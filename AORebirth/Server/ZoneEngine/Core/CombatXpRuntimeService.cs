@@ -31,7 +31,8 @@ namespace ZoneEngine.Core
     /// </summary>
     internal static class CombatXpRuntimeService
     {
-        private const int MaxLevel = 200;
+        private const int MaxLevel = 220;
+        private const int MaxRubikaLevel = 200;
         private const int UnsetStatSentinel = 1234567890;
         private const int CapturedMalfunctioningCleaningRobotXp = 260;
         private const byte CapturedLevelUpStatUnknown = 1;
@@ -71,84 +72,91 @@ namespace ZoneEngine.Core
             ICharacter target,
             Action<ICharacter, string> sendFeedback)
         {
-            if (attacker == null || target == null || !(attacker.Controller is Controllers.PlayerController))
+            if (attacker == null || target == null)
             {
                 return;
             }
 
-            IZoneClient client = attacker.Controller.Client;
+            ICharacter xpRecipient = ResolveXpRecipient(attacker);
+            if (xpRecipient == null || !(xpRecipient.Controller is Controllers.PlayerController))
+            {
+                return;
+            }
+
+            IZoneClient client = xpRecipient.Controller.Client;
             if (client == null)
             {
                 return;
             }
 
-            int xpReward = CalculateCombatXpReward(attacker, target);
+            int xpReward = CalculateCombatXpReward(xpRecipient, target);
             if (xpReward <= 0)
             {
-                LogXpTrace(attacker, "kill-skip", "reason=zero-reward");
+                LogXpTrace(xpRecipient, "kill-skip", "reason=zero-reward");
                 return;
             }
 
-            LogXpRewardSource(attacker, target, xpReward);
+            LogXpRewardSource(xpRecipient, target, xpReward);
 
-            int levelBefore = GetCurrentLevel(attacker);
+            int levelBefore = GetCurrentLevel(xpRecipient);
 
             LogXpTrace(
-                attacker,
+                xpRecipient,
                 "kill-start",
-                "reward=" + xpReward.ToString(CultureInfo.InvariantCulture));
+                "reward=" + xpReward.ToString(CultureInfo.InvariantCulture)
+                + " sourceAttacker=" + attacker.Identity);
 
             uint floorXp = GetCumulativeXpForLevelStart(levelBefore);
-            uint progressBefore = GetBarProgress(attacker);
+            uint progressBefore = GetBarProgress(xpRecipient);
             uint newProgress = AddClamped(progressBefore, xpReward);
 
-            SetXpStat(attacker, StatIds.unsavedxp, newProgress, "kill-add-unsaved");
-            SetXpStat(attacker, StatIds.xp, floorXp + newProgress, "kill-add-cumulative");
-            SetXpStat(attacker, StatIds.lastxp, (uint)xpReward, "kill-add-lastxp");
-            EnsureLevelXpThresholds(attacker, "kill-add-thresholds");
+            SetXpStat(xpRecipient, StatIds.unsavedxp, newProgress, "kill-add-unsaved");
+            SetXpStat(xpRecipient, StatIds.xp, floorXp + newProgress, "kill-add-cumulative");
+            SetXpStat(xpRecipient, StatIds.lastxp, (uint)xpReward, "kill-add-lastxp");
+            EnsureLevelXpThresholds(xpRecipient, "kill-add-thresholds");
 
             LogXpTrace(
-                attacker,
+                xpRecipient,
                 "kill-after-add",
                 "progressBefore=" + progressBefore.ToString(CultureInfo.InvariantCulture)
                 + " progressAfter=" + newProgress.ToString(CultureInfo.InvariantCulture)
-                + " cumulative=" + attacker.Stats[StatIds.xp].BaseValue.ToString(CultureInfo.InvariantCulture));
+                + " cumulative=" + xpRecipient.Stats[StatIds.xp].BaseValue.ToString(CultureInfo.InvariantCulture));
 
-            bool leveledUp = ApplyPendingLevelUps(attacker, levelBefore);
+            bool leveledUp = ApplyPendingLevelUps(xpRecipient, levelBefore);
 
             if (sendFeedback != null)
             {
-                LogXpTrace(attacker, "xp-chat-deferred", "source=captured-feedback-message");
+                LogXpTrace(xpRecipient, "xp-chat-deferred", "source=captured-feedback-message");
             }
 
             if (leveledUp)
             {
-                SendLevelUpPreFeedbackPackets(client, attacker, levelBefore);
-                PersistLevelStat(attacker);
+                SendLevelUpPreFeedbackPackets(client, xpRecipient, levelBefore);
+                PersistLevelStat(xpRecipient);
             }
             else
             {
-                if (GetBarProgress(attacker) >= (uint)GetNextXpRequiredForLevel(levelBefore))
+                if (GetBarProgress(xpRecipient) >= (uint)GetNextXpRequiredForLevel(levelBefore))
                 {
                     LogXpTrace(
-                        attacker,
+                        xpRecipient,
                         "levelup-missed",
                         "reason=progress-met-but-ApplyPendingLevelUps-returned-false"
-                        + " progress=" + GetBarProgress(attacker).ToString(CultureInfo.InvariantCulture)
+                        + " progress=" + GetBarProgress(xpRecipient).ToString(CultureInfo.InvariantCulture)
                         + " required=" + GetNextXpRequiredForLevel(levelBefore).ToString(CultureInfo.InvariantCulture));
                 }
 
-                SendNormalKillXpPacket(client, attacker);
+                SendNormalKillXpPacket(client, xpRecipient);
             }
 
-            ClearManualXpWireStatChangedFlags(attacker, leveledUp);
-            WriteXpStatsToDb(attacker, leveledUp ? "kill-complete-levelup" : "kill-complete");
+            ClearManualXpWireStatChangedFlags(xpRecipient, leveledUp);
+            WriteXpStatsToDb(xpRecipient, leveledUp ? "kill-complete-levelup" : "kill-complete");
 
             LogXpTrace(
-                attacker,
+                xpRecipient,
                 leveledUp ? "kill-complete-levelup" : "kill-complete",
                 "levelBefore=" + levelBefore.ToString(CultureInfo.InvariantCulture)
-                + " levelAfter=" + GetCurrentLevel(attacker).ToString(CultureInfo.InvariantCulture)
+                + " levelAfter=" + GetCurrentLevel(xpRecipient).ToString(CultureInfo.InvariantCulture)
                 + " leveledUp=" + leveledUp.ToString(CultureInfo.InvariantCulture)
                 + " wire=" + (leveledUp ? "levelup-packets" : "xp-only"));
         }
@@ -207,7 +215,7 @@ namespace ZoneEngine.Core
             // XP wire for the *current* level. Logs show XP(52) alone makes the bar show
             // cumulative (7280/4000); NewLevel + LastSaveXP + XP matches in-zone level-up
             // (130/4000). No FeedbackMessage on login — that triggers bogus reward chat.
-            uint nextLevelCumulative = level >= MaxLevel
+            uint nextLevelCumulative = level >= MaxRubikaLevel
                 ? 0
                 : GetCumulativeXpForLevelStart(level + 1);
             var loginNewLevelMessage = new NewLevelMessage
@@ -264,6 +272,26 @@ namespace ZoneEngine.Core
         {
             int xpReward = ResolveBaseCombatXpReward(target);
             return ApplyGreyMobXpCap(attacker, target, xpReward);
+        }
+
+        private static ICharacter ResolveXpRecipient(ICharacter attacker)
+        {
+            if (attacker == null)
+            {
+                return null;
+            }
+
+            if (attacker.Controller is Controllers.PlayerController)
+            {
+                return attacker;
+            }
+
+            if (PetCombatRules.IsPlayerOwnedPet(attacker))
+            {
+                return PetCombatRules.ResolvePetOwner(attacker);
+            }
+
+            return null;
         }
 
         private static int ResolveBaseCombatXpReward(ICharacter target)
@@ -525,9 +553,9 @@ namespace ZoneEngine.Core
                 return 0;
             }
 
-            if (level > MaxLevel)
+            if (level > MaxRubikaLevel)
             {
-                return (uint)XPTable.TableRKXP[MaxLevel - 1, 1];
+                return (uint)XPTable.TableRKXP[MaxRubikaLevel - 1, 1];
             }
 
             return (uint)XPTable.TableRKXP[level - 1, 1];
@@ -535,7 +563,7 @@ namespace ZoneEngine.Core
 
         private static int GetNextXpRequiredForLevel(int level)
         {
-            if (level < 1 || level >= MaxLevel)
+            if (level < 1 || level >= MaxRubikaLevel)
             {
                 return 0;
             }
@@ -560,7 +588,7 @@ namespace ZoneEngine.Core
             {
                 uint cumulativeXp = character.Stats[StatIds.xp].BaseValue;
                 uint lastSaveXp = GetCumulativeXpForLevelStart(level);
-                uint nextLevelXp = level >= MaxLevel
+                uint nextLevelXp = level >= MaxRubikaLevel
                     ? 0
                     : GetCumulativeXpForLevelStart(level + 1);
 
@@ -632,7 +660,7 @@ namespace ZoneEngine.Core
             uint floorXp = GetCumulativeXpForLevelStart(level);
             uint progress = GetBarProgress(character);
             uint cumulativeXp = character.Stats[StatIds.xp].BaseValue;
-            uint nextLevelXp = level >= MaxLevel ? 0 : GetCumulativeXpForLevelStart(level + 1);
+            uint nextLevelXp = level >= MaxRubikaLevel ? 0 : GetCumulativeXpForLevelStart(level + 1);
 
             // Capture 20260712-131331:
             // NewLevel payload, LastSaveXP Unknown=1, SocialStatus=0 Unknown=1,

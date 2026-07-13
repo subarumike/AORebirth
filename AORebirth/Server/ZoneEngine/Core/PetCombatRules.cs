@@ -50,9 +50,6 @@ namespace ZoneEngine.Core
 
         public const int AttackPetAttackInfoHitType = 1;
 
-        // Used only when an attack pet has no capture-backed combat profile and no mob damage stats.
-        public const int AttackPetFallbackDamage = 930;
-
         public const double AttackPetRechargeSeconds = 2.0;
 
         public const double HealCastRange = 20.0;
@@ -98,6 +95,20 @@ namespace ZoneEngine.Core
             return Math.Max(1, maxHealth / NpcHealthRegenMaxLifeDivisor);
         }
 
+        public static int ResolveLevelEquivalentAttackPetMinDamage(int level)
+        {
+            int normalizedLevel = Math.Max(1, level);
+            return Math.Max(3, (normalizedLevel * 9) / 5 + 2);
+        }
+
+        public static int ResolveLevelEquivalentAttackPetMaxDamage(int level)
+        {
+            int normalizedLevel = Math.Max(1, level);
+            int minDamage = ResolveLevelEquivalentAttackPetMinDamage(normalizedLevel);
+            int maxDamage = (normalizedLevel * 13) / 5 + 6;
+            return Math.Max(minDamage, maxDamage);
+        }
+
         public static bool IsPlayerOwnedPet(ICharacter character)
         {
             if (character == null)
@@ -126,6 +137,40 @@ namespace ZoneEngine.Core
                 owner,
                 PetSlotClassifier.RegularPetStrain);
             return attackPet != null && attackPet.Identity == pet.Identity;
+        }
+
+        public static bool IsPlayerOwnedBureaucratCompanionPet(ICharacter pet)
+        {
+            if (!IsPlayerOwnedPet(pet) || pet.Playfield == null)
+            {
+                return false;
+            }
+
+            ICharacter owner = ResolvePetOwner(pet);
+            if (owner == null)
+            {
+                return false;
+            }
+
+            ICharacter companionPet = PetRuntimeService.Default.GetActivePetInStrain(
+                owner,
+                PetSlotClassifier.BureaucratCompanionStrain);
+            return companionPet != null && companionPet.Identity == pet.Identity;
+        }
+
+        public static bool IsPlayerOwnedBureaucratGuardianPet(ICharacter pet)
+        {
+            return PetBureaucratGuardianAppearance.IsGuardianPet(pet);
+        }
+
+        public static bool IsPlayerOwnedMewAttackPet(ICharacter pet)
+        {
+            return IsPlayerOwnedAttackPet(pet) && !IsPlayerOwnedBureaucratGuardianPet(pet);
+        }
+
+        public static bool IsPlayerOwnedMeleeCombatPet(ICharacter pet)
+        {
+            return IsPlayerOwnedAttackPet(pet) || IsPlayerOwnedBureaucratCompanionPet(pet);
         }
 
         public static bool IsPlayerOwnedHealingPet(ICharacter pet)

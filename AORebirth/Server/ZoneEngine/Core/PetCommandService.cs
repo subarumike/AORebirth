@@ -195,7 +195,7 @@ namespace ZoneEngine.Core
 
                 case CommandAttack:
                     ActiveHealCommands.Remove(pet.Identity.Instance);
-                    if (!PetCombatRules.IsPlayerOwnedAttackPet(pet))
+                    if (!PetCombatRules.IsPlayerOwnedMeleeCombatPet(pet))
                     {
                         return;
                     }

@@ -75,6 +75,12 @@ namespace ZoneEngine.Core
             return healPet != null && healPet.Stats[StatIds.health].Value > 0;
         }
 
+        public bool HasLivingBureaucratCompanionPet(ICharacter owner)
+        {
+            ICharacter companionPet = this.GetActivePetInStrain(owner, PetSlotClassifier.BureaucratCompanionStrain);
+            return companionPet != null && companionPet.Stats[StatIds.health].Value > 0;
+        }
+
         public bool SummonPet(
             ICharacter owner,
             string petHash,
@@ -100,8 +106,7 @@ namespace ZoneEngine.Core
                 LogUtil.Debug(DebugInfoDetail.GameFunctions, "SummonPet unknown pet hash " + petHash);
                 ChatTextMessageHandler.Default.Send(
                     owner,
-                    "Pet spawn failed: missing mob template for " + petHash
-                        + ". Import hash BSLX into MySQL mobtemplate (see SqlTables/mobtemplate.sql).");
+                    "Pet spawn failed: missing mob template for " + petHash + ".");
                 return false;
             }
 
@@ -135,23 +140,41 @@ namespace ZoneEngine.Core
                 return false;
             }
 
+            if (PetSlotClassifier.IsBureaucratCompanionStrain(petSlotStrain)
+                && this.HasLivingBureaucratCompanionPet(owner))
+            {
+                ChatTextMessageHandler.Default.Send(owner, "You can have just 1 Bureaucrat Companion Pet.");
+                return false;
+            }
+
             this.PurgeOrphanPetMobsForOwner(owner);
             bool preservePendingRestore = this.HasPendingRestoreForStrain(
                 owner.Identity.Instance,
                 petSlotStrain);
             this.DismissPetByStrain(owner, petSlotStrain, !preservePendingRestore);
 
-            Coordinate ownerCoord = owner.Coordinates();
-            var spawnCoord = new Coordinate(
-                ownerCoord.x + 1.5f,
-                ownerCoord.y,
-                ownerCoord.z + 1.5f);
+            Coordinate spawnCoord = this.ResolvePetSpawnCoordinate(owner, petSlotStrain);
 
             var controller = new NPCController();
             int resolvedPetTypeId = petTypeId > 0 ? petTypeId : 1;
-            int spawnLevel = petSlotStrain == PetSlotClassifier.RegularPetStrain && resolvedPetTypeId > 0
-                ? resolvedPetTypeId
-                : owner.Stats[StatIds.level].Value;
+            int ownerLevel = owner.Stats[StatIds.level].Value;
+            int spawnLevel;
+            if (PetSlotClassifier.IsBureaucratCompanionStrain(petSlotStrain))
+            {
+                spawnLevel = PetSummonNanoCatalog.ResolveBureaucratCompanionLevel(
+                    summonNanoId,
+                    ownerLevel,
+                    resolvedPetTypeId);
+                resolvedPetTypeId = spawnLevel;
+            }
+            else if (petSlotStrain == PetSlotClassifier.RegularPetStrain && resolvedPetTypeId > 0)
+            {
+                spawnLevel = resolvedPetTypeId;
+            }
+            else
+            {
+                spawnLevel = ownerLevel;
+            }
             Character petCharacter = NonPlayerCharacterHandler.SpawnMobFromTemplate(
                 mobHash,
                 owner.Playfield.Identity,
@@ -169,6 +192,19 @@ namespace ZoneEngine.Core
             petCharacter.Playfield = owner.Playfield;
             this.FinalizePetCharacter(petCharacter);
             this.ApplyAttackPetCombatProfile(petCharacter, petHash, resolvedPetTypeId, mobTemplate);
+            this.ApplyCapturedBureaucratPetProfile(
+                petCharacter,
+                summonNanoId,
+                owner,
+                resolvedPetTypeId);
+            if (PetSlotClassifier.IsBureaucratCompanionStrain(petSlotStrain))
+            {
+                PetBureaucratCompanionAppearance.Apply(petCharacter, mobTemplate);
+            }
+            else if (PetBureaucratGuardianAppearance.IsGuardianNano(summonNanoId))
+            {
+                PetBureaucratGuardianAppearance.Apply(petCharacter, summonNanoId);
+            }
             this.ApplyHealingPetNanoPool(petCharacter, petSlotStrain, petHash);
             this.ApplyRestoredPetCombatStats(owner, petCharacter, petSlotStrain);
             petCharacter.Stats[StatIds.petmaster].Value = owner.Identity.Instance;
@@ -188,7 +224,7 @@ namespace ZoneEngine.Core
             }
 
             SimpleCharFullUpdateMessage petSpawnUpdate =
-                this.ConstructPetSpawnFullUpdate(petCharacter, petSlotStrain);
+                this.ConstructPetSpawnFullUpdate(petCharacter, petSlotStrain, summonNanoId);
 
             ownerClient.Server.Info(
                 ownerClient,
@@ -228,7 +264,42 @@ namespace ZoneEngine.Core
             }
             else
             {
-                ownerClient.SendCompressed(petSpawnUpdate);
+                if (PetBureaucratGuardianAppearance.IsGuardianNano(summonNanoId))
+                {
+                    PetBureaucratGuardianScfuWire.SendToOwner(
+                        ownerClient,
+                        owner,
+                        petCharacter,
+                        summonNanoId);
+                }
+                else
+                {
+                    ownerClient.SendCompressed(petSpawnUpdate);
+                }
+
+                if (PetSlotClassifier.IsBureaucratCompanionStrain(petSlotStrain)
+                    || PetBureaucratGuardianAppearance.IsGuardianNano(summonNanoId))
+                {
+                    // Capture order: SCFU -> WeaponItemFullUpdate (companion briefcase / guardian sword).
+                    if (PetBureaucratGuardianAppearance.IsGuardianNano(summonNanoId))
+                    {
+                        WeaponItemFullUpdateMessage guardianWeaponUpdate =
+                            WeaponItemFullUpdate.CreateRightHandWeaponDefinitionMessage(petCharacter);
+                        if (guardianWeaponUpdate != null)
+                        {
+                            ownerClient.SendCompressed(guardianWeaponUpdate);
+                        }
+                    }
+                    else
+                    {
+                        foreach (WeaponItemFullUpdateMessage weaponUpdate in
+                                 WeaponItemFullUpdate.CreateWeaponDefinitionMessages(petCharacter))
+                        {
+                            ownerClient.SendCompressed(weaponUpdate);
+                        }
+                    }
+                }
+
                 this.SendPetStatToOwner(
                     ownerClient,
                     petCharacter.Identity,
@@ -254,7 +325,8 @@ namespace ZoneEngine.Core
                     PetSummonSpellListService.SendPetSummonSpellLists(
                         owner,
                         petCharacter.Identity,
-                        petSlotStrain);
+                        petSlotStrain,
+                        petHash);
                 }
 
                 this.SendPetCombatStatSyncToOwner(ownerClient, petCharacter, petSlotStrain);
@@ -282,14 +354,39 @@ namespace ZoneEngine.Core
                 concretePlayfield.RegisterNpcHome(petCharacter);
             }
 
-            owner.Playfield.AnnounceOthers(petSpawnUpdate, owner.Identity);
+            if (PetBureaucratGuardianAppearance.IsGuardianNano(summonNanoId))
+            {
+                owner.Playfield.AnnounceOthers(
+                    PetBureaucratGuardianAppearance.BuildAnnounceVisualUpdate(petCharacter, summonNanoId),
+                    owner.Identity);
+            }
+            else
+            {
+                owner.Playfield.AnnounceOthers(petSpawnUpdate, owner.Identity);
+            }
 
-            if (summonNanoId > 0 && !this.HasActiveSummonPetNanoInStrain(owner, petSlotStrain))
+            if (PetSlotClassifier.IsBureaucratCompanionStrain(petSlotStrain)
+                || PetBureaucratGuardianAppearance.IsGuardianNano(summonNanoId))
+            {
+                if (PetBureaucratGuardianAppearance.IsGuardianNano(summonNanoId))
+                {
+                    WeaponItemFullUpdate.SendRightHandWeaponDefinition(petCharacter, true);
+                }
+                else
+                {
+                    WeaponItemFullUpdate.SendWeaponDefinitions(petCharacter, true);
+                }
+            }
+
+            if (summonNanoId > 0
+                && !this.HasActiveSummonPetNanoInStrain(owner, petSlotStrain))
             {
                 this.RegisterOwnerSummonNano(owner, summonNanoId, petSlotStrain);
             }
 
-            controller.Follow(owner.Identity, 2.0);
+            controller.Follow(
+                owner.Identity,
+                PetSlotClassifier.IsBureaucratCompanionStrain(petSlotStrain) ? 4.0 : 2.0);
 
             var slotKey = new PetSlotKey(owner.Identity.Instance, petSlotStrain);
             this.activePetBySlot[slotKey] = petCharacter.Identity;
@@ -392,6 +489,8 @@ namespace ZoneEngine.Core
             {
                 return;
             }
+
+            PetShellItemService.Default.RegisterInventoryShells(owner);
 
             this.PurgeOrphanPetMobsForOwner(owner);
 
@@ -801,7 +900,8 @@ namespace ZoneEngine.Core
 
         private SimpleCharFullUpdateMessage ConstructPetSpawnFullUpdate(
             Character petCharacter,
-            int petSlotStrain)
+            int petSlotStrain,
+            int summonNanoId)
         {
             SimpleCharFullUpdateMessage message = SimpleCharFullUpdate.ConstructMessage(petCharacter);
             if (petSlotStrain == PetSlotClassifier.HealingPetStrain)
@@ -824,6 +924,98 @@ namespace ZoneEngine.Core
 
             uint maxLife = (uint)petCharacter.Stats[StatIds.life].Value;
             petCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.health, maxLife);
+        }
+
+        private Coordinate ResolvePetSpawnCoordinate(ICharacter owner, int petSlotStrain)
+        {
+            Coordinate ownerCoord = owner.Coordinates();
+            if (PetSlotClassifier.IsBureaucratCompanionStrain(petSlotStrain))
+            {
+                return new Coordinate(
+                    ownerCoord.x - 1.75f,
+                    ownerCoord.y,
+                    ownerCoord.z + 2.25f);
+            }
+
+            if (this.HasLivingBureaucratCompanionPet(owner))
+            {
+                return new Coordinate(
+                    ownerCoord.x + 1.75f,
+                    ownerCoord.y,
+                    ownerCoord.z + 1.25f);
+            }
+
+            return new Coordinate(
+                ownerCoord.x + 1.5f,
+                ownerCoord.y,
+                ownerCoord.z + 1.5f);
+        }
+
+        private void ApplyCapturedBureaucratPetProfile(
+            Character petCharacter,
+            int summonNanoId,
+            ICharacter owner,
+            int petTypeId)
+        {
+            if (petCharacter == null || summonNanoId <= 0)
+            {
+                return;
+            }
+
+            CapturedBureaucratPetProfile profile;
+            if (!PetSummonNanoCatalog.TryGetBureaucratProfile(summonNanoId, out profile))
+            {
+                return;
+            }
+
+            int ownerLevel = owner != null ? owner.Stats[StatIds.level].Value : profile.Level;
+            int resolvedLevel = PetSummonNanoCatalog.ResolveBureaucratCompanionLevel(
+                summonNanoId,
+                ownerLevel,
+                petTypeId);
+            int resolvedHealth = profile.Health;
+            if (profile.Level > 0 && resolvedLevel != profile.Level)
+            {
+                resolvedHealth = (int)((long)profile.Health * resolvedLevel / profile.Level);
+            }
+
+            petCharacter.Name = profile.Name;
+            petCharacter.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.level,
+                (uint)resolvedLevel);
+            petCharacter.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.life,
+                (uint)resolvedHealth);
+            petCharacter.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.health,
+                (uint)resolvedHealth);
+            petCharacter.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.monsterdata,
+                (uint)profile.MonsterData);
+            petCharacter.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.monsterscale,
+                (uint)profile.MonsterScale);
+            petCharacter.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.runspeed,
+                (uint)profile.RunSpeed);
+            petCharacter.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.npcfamily,
+                (uint)profile.NpcFamily);
+            petCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.side, 2);
+            petCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.battlestationside, 2);
+            petCharacter.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.mindamage,
+                (uint)PetCombatRules.ResolveLevelEquivalentAttackPetMinDamage(resolvedLevel));
+            petCharacter.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.maxdamage,
+                (uint)PetCombatRules.ResolveLevelEquivalentAttackPetMaxDamage(resolvedLevel));
+
+            if (profile.HeadMesh > 0)
+            {
+                petCharacter.Stats.SetBaseValueWithoutTriggering(
+                    (int)StatIds.headmesh,
+                    (uint)profile.HeadMesh);
+            }
         }
 
         private void ApplyHealingPetNanoPool(Character petCharacter, int petSlotStrain, string petHash)

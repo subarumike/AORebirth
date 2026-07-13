@@ -198,7 +198,7 @@ namespace ZoneEngine.Core.Packets
                 orgNameLength = character.OrganizationName.Length;
                 orgName = character.OrganizationName;
                 levelValue = (int)character.Stats[StatIds.level].BaseValue;
-                if (levelValue <= 0 || levelValue > 200)
+                if (levelValue <= 0)
                 {
                     levelValue = 1;
                 }

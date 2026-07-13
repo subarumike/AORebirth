@@ -11,9 +11,12 @@ namespace ZoneEngine.Core
     #region Usings ...
 
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Events;
+    using AORebirth.Core.Functions;
     using AORebirth.Core.Inventory;
     using AORebirth.Core.Items;
     using AORebirth.Core.Nanos;
@@ -47,34 +50,55 @@ namespace ZoneEngine.Core
 
         public bool TryGiveShellForNano(ICharacter character, int nanoId)
         {
-            if (!PetShellCatalog.UsesShellOnSummon(character.Stats[StatIds.profession].Value))
+            if (!PetShellCatalog.UsesShellOnSummon(
+                character.Stats[StatIds.profession].Value,
+                nanoId))
             {
                 return false;
             }
 
             PetSummonParams summonParams;
-            if (!PetSummonNanoCatalog.TryResolve(character, nanoId, out summonParams))
+            if (!PetSummonNanoCatalog.TryResolveShellSummonParams(nanoId, out summonParams)
+                && !PetSummonNanoCatalog.TryResolve(character, nanoId, out summonParams))
             {
                 return false;
             }
 
-            int shellItemId;
-            int shellQuality;
-            if (!PetShellCatalog.TryGetShellItemForProfession(
-                character.Stats[StatIds.profession].Value,
-                out shellItemId,
-                out shellQuality))
+            PetShellDefinition shellTemplate;
+            if (!PetShellCatalog.TryGet(
+                PetShellCatalog.ResolveKind(character.Stats[StatIds.profession].Value),
+                out shellTemplate))
             {
                 return false;
+            }
+
+            int shellLowId = shellTemplate.DisplayItemLowId;
+            int shellHighId = shellTemplate.DisplayItemHighId;
+            int shellQuality = shellTemplate.DisplayQuality;
+            CapturedBureaucratShellDisplay shellDisplay;
+            if (PetSummonNanoCatalog.TryGetBureaucratShellDisplay(nanoId, out shellDisplay))
+            {
+                shellLowId = shellDisplay.DisplayItemLowId;
+                shellHighId = shellDisplay.DisplayItemHighId;
+                shellQuality = shellDisplay.DisplayQuality;
+            }
+            else
+            {
+                CapturedBureaucratPetProfile profile;
+                if (PetSummonNanoCatalog.TryGetBureaucratProfile(nanoId, out profile))
+                {
+                    shellQuality = profile.Level;
+                }
             }
 
             var definition = new PetShellDefinition(
-                PetShellCatalog.ResolveKind(character.Stats[StatIds.profession].Value),
-                shellItemId,
+                shellTemplate.Kind,
+                shellLowId,
                 shellQuality,
                 nanoId,
                 summonParams.PetHash,
-                summonParams.PetTypeId);
+                summonParams.PetTypeId,
+                shellHighId);
 
             return this.TryGiveShell(character, definition);
         }
@@ -92,7 +116,7 @@ namespace ZoneEngine.Core
 
         public bool TryUsePetShell(ICharacter character, Identity itemPosition, Item item)
         {
-            if (character == null || item == null)
+            if (character == null || item == null || IsNanoCrystalItem(item))
             {
                 return false;
             }
@@ -108,26 +132,35 @@ namespace ZoneEngine.Core
                 && PetRuntimeService.Default.HasLivingAttackPet(character))
             {
                 ChatTextMessageHandler.Default.Send(character, "You can have just 1 Attack Pet.");
-                return false;
+                return true;
             }
 
             if (shellPetStrain == PetSlotClassifier.HealingPetStrain
                 && PetRuntimeService.Default.HasLivingHealingPet(character))
             {
                 ChatTextMessageHandler.Default.Send(character, "You can have just 1 Heal Pet.");
-                return false;
+                return true;
+            }
+
+            if (PetSlotClassifier.IsBureaucratCompanionStrain(shellPetStrain)
+                && PetRuntimeService.Default.HasLivingBureaucratCompanionPet(character))
+            {
+                ChatTextMessageHandler.Default.Send(
+                    character,
+                    "You can have just 1 Bureaucrat Companion Pet.");
+                return true;
             }
 
             bool summoned = PetRuntimeService.Default.SummonPet(
                 character,
                 definition.PetHash,
                 definition.PetTypeId,
-                this.ResolveShellPetStrain(definition.NanoId),
+                PetSlotClassifier.ResolveStrain(definition.PetHash),
                 definition.NanoId);
 
             if (!summoned)
             {
-                return false;
+                return true;
             }
 
             this.ConsumeShell(character, itemPosition);
@@ -178,17 +211,55 @@ namespace ZoneEngine.Core
                 return;
             }
 
-            if (!PetShellCatalog.UsesShellOnSummon(character.Stats[StatIds.profession].Value))
+            if (!PetShellCatalog.UsesShellOnSummon(
+                character.Stats[StatIds.profession].Value,
+                nanoId))
             {
                 return;
             }
 
-            if (this.CharacterAlreadyHasRegisteredShell(character))
+            if (this.CharacterAlreadyHasShell(character, nanoId))
             {
                 return;
             }
 
             this.TryGiveShellForNano(character, nanoId);
+        }
+
+        public void RegisterInventoryShells(ICharacter character)
+        {
+            if (character == null || character.BaseInventory == null || character.BaseInventory.Pages == null)
+            {
+                return;
+            }
+
+            int ownerInstance = character.Identity.Instance;
+            foreach (KeyValuePair<int, IInventoryPage> pageEntry in character.BaseInventory.Pages)
+            {
+                IInventoryPage page = pageEntry.Value;
+                if (page == null)
+                {
+                    continue;
+                }
+
+                foreach (KeyValuePair<int, IItem> slotEntry in page.List())
+                {
+                    Item inventoryItem = slotEntry.Value as Item;
+                    if (inventoryItem == null || !IsPetShellItem(inventoryItem))
+                    {
+                        continue;
+                    }
+
+                    int slot = slotEntry.Key;
+                    PetShellDefinition definition;
+                    if (!this.TryBuildDefinitionFromShellItem(character, inventoryItem, out definition))
+                    {
+                        continue;
+                    }
+
+                    this.shellsBySlot[new PetShellKey(ownerInstance, pageEntry.Key, slot)] = definition;
+                }
+            }
         }
 
         private bool TryGiveShell(ICharacter character, PetShellDefinition definition)
@@ -198,11 +269,28 @@ namespace ZoneEngine.Core
                 return false;
             }
 
-            if (!ItemLoader.ItemList.ContainsKey(definition.DisplayItemLowId))
+            if (this.CharacterAlreadyHasShell(character, definition.NanoId))
+            {
+                ChatTextMessageHandler.Default.Send(
+                    character,
+                    "You already have a pet shell.");
+                return false;
+            }
+
+            PetShellDisplayItemCatalog.EnsureRegistered(
+                definition.DisplayItemLowId,
+                definition.DisplayItemHighId,
+                definition.NanoId);
+
+            if (!ItemLoader.ItemList.ContainsKey(definition.DisplayItemLowId)
+                || !ItemLoader.ItemList.ContainsKey(definition.DisplayItemHighId))
             {
                 LogUtil.Debug(
                     DebugInfoDetail.GameFunctions,
-                    "GivePetShell missing item template " + definition.DisplayItemLowId);
+                    string.Format(
+                        "GivePetShell missing item template low={0} high={1}",
+                        definition.DisplayItemLowId,
+                        definition.DisplayItemHighId));
                 return false;
             }
 
@@ -219,7 +307,7 @@ namespace ZoneEngine.Core
             Item item = new Item(
                 definition.DisplayQuality,
                 definition.DisplayItemLowId,
-                definition.DisplayItemLowId);
+                definition.DisplayItemHighId);
 
             InventoryError err = character.BaseInventory.AddToPage(pageId, slot, item);
             if (err != InventoryError.OK)
@@ -249,10 +337,63 @@ namespace ZoneEngine.Core
             return true;
         }
 
-        private bool CharacterAlreadyHasRegisteredShell(ICharacter character)
+        private bool CharacterAlreadyHasShell(ICharacter character, int nanoId = 0)
         {
+            if (character == null)
+            {
+                return false;
+            }
+
             int ownerInstance = character.Identity.Instance;
-            return this.shellsBySlot.Keys.Any(x => x.OwnerInstance == ownerInstance);
+            foreach (KeyValuePair<PetShellKey, PetShellDefinition> shellEntry in this.shellsBySlot)
+            {
+                if (shellEntry.Key.OwnerInstance != ownerInstance)
+                {
+                    continue;
+                }
+
+                if (nanoId <= 0 || shellEntry.Value.NanoId == nanoId)
+                {
+                    return true;
+                }
+            }
+
+            if (character.BaseInventory == null || character.BaseInventory.Pages == null)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<int, IInventoryPage> pageEntry in character.BaseInventory.Pages)
+            {
+                IInventoryPage page = pageEntry.Value;
+                if (page == null)
+                {
+                    continue;
+                }
+
+                foreach (KeyValuePair<int, IItem> slotEntry in page.List())
+                {
+                    Item inventoryItem = slotEntry.Value as Item;
+                    if (inventoryItem == null || !IsPetShellItem(inventoryItem))
+                    {
+                        continue;
+                    }
+
+                    if (nanoId <= 0)
+                    {
+                        return true;
+                    }
+
+                    PetShellDefinition existingDefinition;
+                    if (this.TryBuildDefinitionFromShellItem(character, inventoryItem, out existingDefinition)
+                        && existingDefinition.NanoId == nanoId)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private bool TryResolveDefinition(
@@ -271,33 +412,95 @@ namespace ZoneEngine.Core
                 return true;
             }
 
-            PetSummonParams summonParams;
-            if (PetShellCatalog.TryGetByDisplayLowId(item.LowID, out definition)
-                && PetSummonNanoCatalog.TryResolve(character, definition.NanoId, out summonParams))
+            if (!this.TryBuildDefinitionFromShellItem(character, item, out definition))
             {
-                definition = new PetShellDefinition(
-                    definition.Kind,
-                    definition.DisplayItemLowId,
-                    definition.DisplayQuality,
-                    definition.NanoId,
-                    summonParams.PetHash,
-                    summonParams.PetTypeId);
+                definition = null;
+                return false;
+            }
+
+            this.shellsBySlot[shellKey] = definition;
+            return true;
+        }
+
+        private bool TryBuildDefinitionFromShellItem(
+            ICharacter character,
+            Item item,
+            out PetShellDefinition definition)
+        {
+            definition = null;
+            if (character == null || item == null)
+            {
+                return false;
+            }
+
+            PetSummonParams summonParams;
+            PetShellDefinition shellTemplate;
+            if (!PetSummonNanoCatalog.TryResolveShellSummonForItem(
+                    character,
+                    item.LowID,
+                    item.HighID,
+                    item.Quality,
+                    character.Stats[StatIds.profession].Value,
+                    out summonParams))
+            {
+                return false;
+            }
+
+            if (!PetShellCatalog.TryGetByDisplayLowId(item.LowID, out shellTemplate)
+                && !PetShellCatalog.TryGetBureaucratFallback(out shellTemplate))
+            {
+                return false;
+            }
+
+            definition = new PetShellDefinition(
+                shellTemplate.Kind,
+                item.LowID,
+                item.Quality,
+                summonParams.NanoId,
+                summonParams.PetHash,
+                summonParams.PetTypeId,
+                item.HighID);
+            return true;
+        }
+
+        public static bool IsPetShellItem(Item item)
+        {
+            return item != null
+                && !IsNanoCrystalItem(item)
+                && IsDisplayShellItem(item.LowID);
+        }
+
+        public static bool IsDisplayShellItem(int lowId)
+        {
+            if (PetSummonNanoCatalog.IsBureaucratShellItemLowId(lowId))
+            {
                 return true;
             }
 
-            definition = null;
-            return false;
+            PetShellDefinition ignored;
+            return PetShellCatalog.TryGetByDisplayLowId(lowId, out ignored);
         }
 
-        private int ResolveShellPetStrain(int nanoId)
+        private static bool IsNanoCrystalItem(Item item)
         {
-            NanoFormula nano;
-            if (NanoLoader.NanoList.TryGetValue(nanoId, out nano))
+            if (item == null || item.Events == null)
             {
-                return nano.NanoStrain();
+                return false;
             }
 
-            return 0;
+            const int uploadNanoFunctionId = (int)FunctionType.UploadNano;
+            foreach (Event itemEvent in item.Events.Where(x => x.EventType == EventType.OnUse))
+            {
+                foreach (Function function in itemEvent.Functions)
+                {
+                    if (function.FunctionType == uploadNanoFunctionId)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public bool TryEnsureNanoUploaded(ICharacter character, int nanoId)
@@ -373,10 +576,12 @@ namespace ZoneEngine.Core
             int displayQuality,
             int nanoId,
             string petHash,
-            int petTypeId)
+            int petTypeId,
+            int displayItemHighId = 0)
         {
             this.Kind = kind;
             this.DisplayItemLowId = displayItemLowId;
+            this.DisplayItemHighId = displayItemHighId > 0 ? displayItemHighId : displayItemLowId;
             this.DisplayQuality = displayQuality;
             this.NanoId = nanoId;
             this.PetHash = petHash;
@@ -386,6 +591,8 @@ namespace ZoneEngine.Core
         public PetShellKind Kind { get; private set; }
 
         public int DisplayItemLowId { get; private set; }
+
+        public int DisplayItemHighId { get; private set; }
 
         public int DisplayQuality { get; private set; }
 
@@ -410,9 +617,10 @@ namespace ZoneEngine.Core
             PetShellKind.Bureaucrat,
             displayItemLowId: 96235,
             displayQuality: 1,
-            nanoId: 43718,
-            petHash: "PT51",
-            petTypeId: 19);
+            nanoId: 46397,
+            petHash: "A020",
+            petTypeId: 2,
+            displayItemHighId: 150722);
 
         private static readonly PetShellDefinition MetaPhysicistShell = new PetShellDefinition(
             PetShellKind.MetaPhysicist,
@@ -458,6 +666,16 @@ namespace ZoneEngine.Core
 
         public static bool UsesShellOnSummon(int profession)
         {
+            return UsesShellOnSummon(profession, 0);
+        }
+
+        public static bool UsesShellOnSummon(int profession, int nanoId)
+        {
+            if (PetSummonNanoCatalog.IsDirectSummonNano(nanoId))
+            {
+                return false;
+            }
+
             switch ((Profession)profession)
             {
                 case Profession.Engineer:
@@ -493,7 +711,8 @@ namespace ZoneEngine.Core
                 return true;
             }
 
-            if (lowId == BureaucratShell.DisplayItemLowId)
+            if (lowId == BureaucratShell.DisplayItemLowId
+                || PetSummonNanoCatalog.IsBureaucratShellItemLowId(lowId))
             {
                 definition = BureaucratShell;
                 return true;
@@ -507,6 +726,57 @@ namespace ZoneEngine.Core
 
             definition = null;
             return false;
+        }
+
+        public static bool TryGetBureaucratFallback(out PetShellDefinition definition)
+        {
+            definition = BureaucratShell;
+            return true;
+        }
+    }
+
+    internal static class PetShellDisplayItemCatalog
+    {
+        public static void EnsureRegistered(int lowId, int highId, int nanoId = 0)
+        {
+            EnsureItem(lowId);
+            if (highId != lowId)
+            {
+                EnsureItem(highId);
+            }
+
+            string shellName = nanoId > 0
+                ? PetSummonNanoCatalog.GetBureaucratShellItemName(nanoId)
+                : null;
+            if (string.IsNullOrWhiteSpace(shellName))
+            {
+                return;
+            }
+
+            TradeSkill.Instance.ItemNames[lowId] = shellName;
+            if (highId != lowId)
+            {
+                TradeSkill.Instance.ItemNames[highId] = shellName;
+            }
+        }
+
+        private static void EnsureItem(int itemId)
+        {
+            if (ItemLoader.ItemList.ContainsKey(itemId))
+            {
+                return;
+            }
+
+            ItemLoader.ItemList[itemId] = new ItemTemplate
+            {
+                ID = itemId,
+                Quality = 1,
+                Flags = 0,
+                ItemType = 0,
+                Stats = new Dictionary<int, int>(),
+                Attack = new Dictionary<int, int>(),
+                Defend = new Dictionary<int, int>(),
+            };
         }
     }
 }
