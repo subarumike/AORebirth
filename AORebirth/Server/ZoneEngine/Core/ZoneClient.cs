@@ -499,6 +499,12 @@ namespace ZoneEngine.Core
                     {
                         ICharacter disconnectCharacter = this.Controller.Character;
                         int characterId = disconnectCharacter.Identity.Instance;
+                        Playfield disconnectPlayfield = disconnectCharacter.Playfield as Playfield;
+                        if (disconnectPlayfield != null)
+                        {
+                            disconnectPlayfield.ForgetVisibilityRecipient(disconnectCharacter.Identity);
+                        }
+
                         bool preservePetRestore =
                             ActiveNanoRuntimeService.Default.HasZoneTransferStash(characterId);
                         PetRuntimeService.Default.OnCharacterDisconnected(

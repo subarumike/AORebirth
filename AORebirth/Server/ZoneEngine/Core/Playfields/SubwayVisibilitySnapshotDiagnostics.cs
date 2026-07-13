@@ -257,6 +257,7 @@ namespace ZoneEngine.Core.Playfields
 
         private int sendOrdinal;
         private int totalCandidateNpcs;
+        private SubwayVisibilitySpatialInterestMetrics spatialInterestMetrics;
         private int totalNpcsSent;
         private int totalPackets;
         private long totalBytes;
@@ -409,6 +410,37 @@ namespace ZoneEngine.Core.Playfields
                 string.Empty,
                 0,
                 "total_candidate_npcs=" + this.totalCandidateNpcs.ToString(CultureInfo.InvariantCulture));
+        }
+
+        internal void RecordSpatialInterestSelection(
+            SubwayVisibilitySpatialInterestMetrics metrics)
+        {
+            if (metrics == null)
+            {
+                throw new ArgumentNullException("metrics");
+            }
+
+            lock (this.sync)
+            {
+                this.spatialInterestMetrics = metrics;
+            }
+
+            this.SetTotalCandidateNpcs(metrics.TotalPlayfieldNpcs);
+            this.WriteEvent(
+                "SNAPSHOT_SPATIAL_INTEREST_SELECTED",
+                null,
+                string.Empty,
+                0,
+                string.Join(
+                    " ",
+                    "total_playfield_characters=" + metrics.TotalPlayfieldCharacters.ToString(CultureInfo.InvariantCulture),
+                    "total_playfield_npcs=" + metrics.TotalPlayfieldNpcs.ToString(CultureInfo.InvariantCulture),
+                    "spatial_query_inspected_candidates=" + metrics.SpatialQueryInspectedCandidates.ToString(CultureInfo.InvariantCulture),
+                    "within_enter_radius_count=" + metrics.WithinEnterRadiusCount.ToString(CultureInfo.InvariantCulture),
+                    "already_visible_count=" + metrics.AlreadyVisibleCount.ToString(CultureInfo.InvariantCulture),
+                    "newly_visible_count=" + metrics.NewlyVisibleCount.ToString(CultureInfo.InvariantCulture),
+                    "leaving_visible_count=" + metrics.LeavingVisibleCount.ToString(CultureInfo.InvariantCulture),
+                    "filtered_out_count=" + metrics.FilteredOutCount.ToString(CultureInfo.InvariantCulture)));
         }
 
         internal void RecordPacketEvent(
@@ -671,6 +703,9 @@ namespace ZoneEngine.Core.Playfields
                 AppendJson(builder, "player_identity", this.playerIdentity.ToString(), false);
                 AppendJson(builder, "playfield_id", this.playfieldId, false);
                 AppendJson(builder, "total_candidate_npcs", this.totalCandidateNpcs, false);
+                (this.spatialInterestMetrics
+                 ?? SubwayVisibilitySpatialInterestMetrics.ForInitialSnapshot(0, 0, 0, 0, 0))
+                    .AppendJsonFields(builder, false);
                 AppendJson(builder, "total_npcs_sent", this.totalNpcsSent, false);
                 AppendJson(builder, "total_packet_count", this.totalPackets, false);
                 AppendJson(builder, "total_serialized_bytes", this.totalBytes, false);

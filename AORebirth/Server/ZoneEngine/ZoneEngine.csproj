@@ -358,9 +358,15 @@
     <Compile Include="Core\Playfields\PlayfieldTransferRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVendorRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs" />
+    <Compile Include="Core\Playfields\PlayfieldVisibilityInterestPolicy.cs" />
+    <Compile Include="Core\Playfields\PlayfieldVisibilityInterestState.cs" />
+    <Compile Include="Core\Playfields\PlayfieldVisibilityInterestRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs" />
+    <Compile Include="Core\Playfields\PlayfieldSpatialCharacterIndex.cs" />
+    <Compile Include="Core\Playfields\UniformSpatialIndex.cs" />
     <Compile Include="Core\Playfields\SubwayVisibilityDiagnosticSelection.cs" />
     <Compile Include="Core\Playfields\SubwayVisibilityPacketMeasurement.cs" />
+    <Compile Include="Core\Playfields\SubwayVisibilitySpatialInterestMetrics.cs" />
     <Compile Include="Core\Playfields\SubwayVisibilitySnapshotDiagnostics.cs" />
     <Compile Include="Core\Playfields\PlayfieldWallCollisionRuntimeService.cs" />
     <Compile Include="Core\Playfields\Playfields.cs" />

@@ -72,7 +72,11 @@
     <Compile Include="N3RecoveredContractTests.cs" />
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
+    <Compile Include="PlayfieldVisibilityInterestTests.cs" />
+    <Compile Include="PlayfieldVisibilityInterestStateTests.cs" />
+    <Compile Include="PlayfieldVisibilityLifecycleIntegrationTests.cs" />
     <Compile Include="SubwayVisibilityPacketMeasurementTests.cs" />
+    <Compile Include="SubwayVisibilitySpatialInterestMetricsTests.cs" />
     <Compile Include="SubwayVisibilityDiagnosticSelectionTestStub.cs" />
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\CityControllerInteractionRules.cs">
       <Link>CityControllerInteractionRules.cs</Link>
@@ -122,6 +126,12 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs">
       <Link>CapturedSubwayContentProvider.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs">
+      <Link>CapturedSubwayOrdinaryContentProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs">
+      <Link>OrdinaryEnemyCatalog.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyProfile.cs">
       <Link>OrdinaryEnemyProfile.cs</Link>
     </Compile>
@@ -140,8 +150,20 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleTrace.cs">
       <Link>PlayfieldLifecycleTrace.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityInterestPolicy.cs">
+      <Link>PlayfieldVisibilityInterestPolicy.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityInterestState.cs">
+      <Link>PlayfieldVisibilityInterestState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\UniformSpatialIndex.cs">
+      <Link>UniformSpatialIndex.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\SubwayVisibilityPacketMeasurement.cs">
       <Link>SubwayVisibilityPacketMeasurement.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\SubwayVisibilitySpatialInterestMetrics.cs">
+      <Link>SubwayVisibilitySpatialInterestMetrics.cs</Link>
     </Compile>
     <Compile Include="TypeMetaBuilderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

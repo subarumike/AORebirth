@@ -17,7 +17,6 @@ namespace AORebirth.Core.Playfields
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
-    using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
 
     #endregion
@@ -141,7 +140,7 @@ namespace AORebirth.Core.Playfields
                 PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
                 mobCharacter.Identity,
                 PlayfieldLifecycleTrace.FormatCapturedAreteRobotSimpleCharFullUpdateDetail(spawn.SourceInstance));
-            playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));
+            playfield.AnnounceSpawnedCharacterVisibility(mobCharacter, Identity.None);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,

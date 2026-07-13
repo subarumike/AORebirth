@@ -280,9 +280,8 @@ namespace ZoneEngine.Core
             {
                 concretePlayfield.ActivateNpc(petCharacter);
                 concretePlayfield.RegisterNpcHome(petCharacter);
+                concretePlayfield.AnnounceSpawnedCharacterVisibility(petCharacter, owner.Identity);
             }
-
-            owner.Playfield.AnnounceOthers(petSpawnUpdate, owner.Identity);
 
             if (summonNanoId > 0 && !this.HasActiveSummonPetNanoInStrain(owner, petSlotStrain))
             {
