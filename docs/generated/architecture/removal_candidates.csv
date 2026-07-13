@@ -1,0 +1,11 @@
+Candidate ID,File or symbol,Disposition,Replacement owner,Migration dependency,Risk,Test required before removal,Reason
+AR-RM001,Playfield.RollCapturedCleaningRobotLootItems,REMOVE,LootGenerationService,AR-B009,HIGH,Seeded captured-outcome and corpse parity,Special-case loot logic
+AR-RM002,Playfield.DebugLootTable,REMOVE,Versioned test loot repository,AR-B009,MEDIUM,Debug smoke fixture parity,Duplicate production loot source
+AR-RM003,CapturedSubwayOrdinaryContentProvider.BuildCapturedLootEntries,DEPRECATE,Loot definition importer,AR-B009,HIGH,All active PF127 assignment parity,Generated provider owns runtime loot conversion
+AR-RM004,Playfield.GetDatabaseLootTable,REPLACE,LootDefinitionRepository,AR-B009,MEDIUM,DB load failure cache and precedence tests,Static cache and policy in Playfield
+AR-RM005,CapturedAreteRobotSpawnOrchestrator,CONSOLIDATE,SpawnController,AR-B008,HIGH,Arete spawn movement combat corpse packet parity,Family-specific spawn runtime
+AR-RM006,PlayfieldDbMobSpawnRuntimeService direct policy,CONSOLIDATE,Legacy DB spawn adapter,AR-B008,HIGH,Startup population parity,Source format owns materialization lifecycle
+AR-RM007,AORebirth/Server/ZoneEngine/Core/MessageHandlers/TradeMessageHandler.cs.orig,REMOVE,Git history,None,LOW,Source reference check and build,Stale duplicate file
+AR-RM008,AORebirth/Libraries/Source/AORebirth.Database/SqlTables/*.sql.obsolete,DEPRECATE,Migration archive,Explicit schema approval,MEDIUM,Schema inventory and Mike approval,Obsolete schema artifacts
+AR-RM009,Deprecated PowerShell workflow wrappers,DEPRECATE,Approved cmd wrappers,Wrapper coverage,LOW,Workflow smoke validation,Conflicting operational entrypoints
+AR-RM010,Large generated C# population arrays,REPLACE,Validated indexed content loader,AR-B016,HIGH,Deterministic load and runtime parity,Does not scale as primary content storage
