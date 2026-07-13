@@ -45,6 +45,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using Utility;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Controllers;
 
@@ -89,6 +90,14 @@ namespace ZoneEngine.Core.MessageHandlers
                 this.CancelPlayerAttack(character);
                 this.SendAttackState(character, Identity.None, 0);
                 client.Server.Info(client, "Attack ignored for non-attackable target.");
+                return;
+            }
+
+            if (!PlayerVersusPlayerCombatRules.CanEngagePlayerVersusPlayerCombat(character, target))
+            {
+                this.CancelPlayerAttack(character);
+                this.SendAttackState(character, Identity.None, 0);
+                client.Server.Info(client, "Attack ignored: suppression gas / PvP flag rules.");
                 return;
             }
 

@@ -132,7 +132,10 @@ namespace AORebirth.Core.Playfields
             }
 
             ICharacter target = this.playfield.FindByIdentity<ICharacter>(attacker.FightingTarget);
-            if (target == null || !target.InPlayfield(this.playfield.Identity) || target.Stats[StatIds.health].Value <= 0)
+            if (target == null
+                || !target.InPlayfield(this.playfield.Identity)
+                || target.Stats[StatIds.health].Value <= 0
+                || !PlayerVersusPlayerCombatRules.CanEngagePlayerVersusPlayerCombat(attacker, target))
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Error,

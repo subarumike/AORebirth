@@ -56,13 +56,27 @@ namespace ZoneEngine.Core
 
         public static bool IsGuardianPet(ICharacter pet)
         {
-            if (pet == null || !PetCombatRules.IsPlayerOwnedAttackPet(pet))
+            return ResolveSummonNanoId(pet) > 0;
+        }
+
+        public static int ResolveSummonNanoId(ICharacter pet)
+        {
+            if (pet == null || !PetCombatRules.IsPlayerOwnedPet(pet))
             {
-                return false;
+                return 0;
             }
 
-            return string.Equals(pet.Name, "Corporate Guardian", StringComparison.Ordinal)
-                   || string.Equals(pet.Name, "CEO Guardian", StringComparison.Ordinal);
+            if (string.Equals(pet.Name, "CEO Guardian", StringComparison.Ordinal))
+            {
+                return CeoGuardianNanoId;
+            }
+
+            if (string.Equals(pet.Name, "Corporate Guardian", StringComparison.Ordinal))
+            {
+                return CorporateGuardianNanoId;
+            }
+
+            return 0;
         }
 
         public static void Apply(Character petCharacter, int summonNanoId)

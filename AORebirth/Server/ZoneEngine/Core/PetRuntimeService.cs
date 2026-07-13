@@ -355,13 +355,7 @@ namespace ZoneEngine.Core
                 concretePlayfield.AnnounceSpawnedCharacterVisibility(petCharacter, owner.Identity);
             }
 
-            if (PetBureaucratGuardianAppearance.IsGuardianNano(summonNanoId))
-            {
-                owner.Playfield.AnnounceOthers(
-                    PetBureaucratGuardianAppearance.BuildAnnounceVisualUpdate(petCharacter, summonNanoId),
-                    owner.Identity);
-            }
-            else
+            if (!PetBureaucratGuardianAppearance.IsGuardianNano(summonNanoId))
             {
                 owner.Playfield.AnnounceOthers(petSpawnUpdate, owner.Identity);
             }

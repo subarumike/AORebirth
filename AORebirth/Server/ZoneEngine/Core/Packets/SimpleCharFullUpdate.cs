@@ -426,6 +426,15 @@ namespace ZoneEngine.Core.Packets
             {
                 scfu.ExtendedTextureOverrideData = CapturedSubwayFilthFleaExtendedTextureOverrideData;
             }
+            else if (petMasterInstance != 0
+                && ZoneEngine.Core.PetBureaucratGuardianAppearance.IsGuardianPet(character))
+            {
+                // Owner receives the capture-exact guardian wire; other players receive this
+                // serializer-built visibility SCFU. Attach the guardian body textures so both match.
+                scfu.ExtendedTextureOverrideData =
+                    ZoneEngine.Core.PetSummonScfuExtensions.CloneGuardianExtendedTextureOverrideData();
+                scfu.VisualFlags = 31;
+            }
 
             scfu.ActiveNanos = (from nano in nanos
                 select

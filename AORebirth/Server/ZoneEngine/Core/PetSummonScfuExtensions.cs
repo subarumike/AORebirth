@@ -79,6 +79,15 @@ namespace ZoneEngine.Core
             message.VisualFlags = 31;
             message.Expansions = 0;
         }
+
+        /// <summary>
+        /// Guardian body/face texture override (hellface2/hell1/hell2) shared by CEO and Corporate guardians.
+        /// Used to make the visibility SCFU other players receive match the owner's capture-wire appearance.
+        /// </summary>
+        public static byte[] CloneGuardianExtendedTextureOverrideData()
+        {
+            return (byte[])CapturedGuardianExtendedTextureOverrideData.Clone();
+        }
     }
 }
 

@@ -1505,7 +1505,7 @@ namespace AORebirth.Core.Playfields
                 attacker,
                 this.ClearCombatTracking,
                 this.FindPlayerCombatTarget,
-                this.IsValidPlayerCombatTarget,
+                target => this.IsValidPlayerCombatTarget(attacker, target),
                 this.LogInvalidPlayerCombatTickTarget,
                 this.ProcessValidatedPlayerCombatTick);
         }
@@ -1515,9 +1515,12 @@ namespace AORebirth.Core.Playfields
             return this.FindByIdentity<ICharacter>(target);
         }
 
-        private bool IsValidPlayerCombatTarget(ICharacter target)
+        private bool IsValidPlayerCombatTarget(ICharacter attacker, ICharacter target)
         {
-            return target != null && target.InPlayfield(this.Identity) && target.Stats[StatIds.health].Value > 0;
+            return target != null
+                   && target.InPlayfield(this.Identity)
+                   && target.Stats[StatIds.health].Value > 0
+                   && PlayerVersusPlayerCombatRules.CanEngagePlayerVersusPlayerCombat(attacker, target);
         }
 
         private void LogInvalidPlayerCombatTickTarget(ICharacter attacker, ICharacter target)
