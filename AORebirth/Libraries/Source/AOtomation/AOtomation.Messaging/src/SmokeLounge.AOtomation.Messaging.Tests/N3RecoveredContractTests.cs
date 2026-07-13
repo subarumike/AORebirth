@@ -379,6 +379,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void CorpseCloseActionMatchesCapture20260712195019Body()
+        {
+            var close = new ActionMessage
+                        {
+                            Identity = new Identity { Type = IdentityType.Corpse, Instance = 0x00F6C002 },
+                            Unknown = 1,
+                            ActionCode = 1,
+                            ActionIdentity = 0x66,
+                            Target = new Identity { Type = IdentityType.CanbeAffected, Instance = 0x7944C065 }
+                        };
+
+            byte[] capturedBody =
+                HexToBytes("2049527C0000C76A00F6C0020100000001000000660000C3507944C065");
+            CollectionAssert.AreEqual(capturedBody, Serialize(close));
+        }
+
+        [TestMethod]
         public void ToClientQuitDespawnAndDropDynelUseDistinctWireShapes()
         {
             CollectionAssert.AreEqual(HexToBytes("36510078"), Serialize(new ToClientQuitMessage()));

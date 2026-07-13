@@ -794,6 +794,7 @@ namespace ZoneEngine.Core.Playfields
             Action<TCorpseState, TimeSpan, string> extendCorpseLifetime,
             Action<TCorpseState> refreshCorpseInventoryHandle,
             Action<ICharacter, TCorpseState> sendCorpseInventoryUpdate,
+            Action<ICharacter, TCorpseState> sendCorpseCloseAction,
             Action<ICharacter> sendUseActionFinished,
             Action<ICharacter, TCorpseState> scheduleCorpseCreditAward,
             Action<TCorpseState, TimeSpan, string> scheduleCorpseDespawn)
@@ -815,6 +816,7 @@ namespace ZoneEngine.Core.Playfields
                 extendCorpseLifetime,
                 refreshCorpseInventoryHandle,
                 sendCorpseInventoryUpdate,
+                sendCorpseCloseAction,
                 sendUseActionFinished,
                 scheduleCorpseCreditAward,
                 scheduleCorpseDespawn);
