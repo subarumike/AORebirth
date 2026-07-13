@@ -22,6 +22,7 @@ namespace ZoneEngine.Core.Playfields
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.InternalMessages;
+    using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Playfields.Content;
 
     #endregion
@@ -86,6 +87,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout;
 
+        private readonly PlayfieldVisibilityInterestRuntimeService visibilityInterest;
+
         private readonly PlayfieldVisibilityPacketRuntimeService visibilityPackets;
 
         private readonly PlayfieldWallCollisionRuntimeService wallCollision;
@@ -142,7 +145,17 @@ namespace ZoneEngine.Core.Playfields
             this.transfers = new PlayfieldTransferRuntimeService(this.lifecycle, this.packetSequences);
             this.vendors = new PlayfieldVendorRuntimeService();
             this.visibilityFanout = new PlayfieldVisibilityFanoutRuntimeService();
-            this.visibilityPackets = new PlayfieldVisibilityPacketRuntimeService(this.visibilityFanout, this.packetSequences);
+            PlayfieldVisibilityInterestPolicy visibilityPolicy =
+                PlayfieldVisibilityInterestPolicy.FromEnvironment();
+            this.visibilityInterest =
+                new PlayfieldVisibilityInterestRuntimeService(
+                    visibilityPolicy,
+                    new PlayfieldSpatialCharacterIndex(visibilityPolicy));
+            this.visibilityPackets =
+                new PlayfieldVisibilityPacketRuntimeService(
+                    this.visibilityFanout,
+                    this.packetSequences,
+                    this.visibilityInterest);
             this.wallCollision = new PlayfieldWallCollisionRuntimeService();
             this.privateCityReadyInit =
                 new PrivateCityReadyInitCoordinator(
@@ -186,6 +199,12 @@ namespace ZoneEngine.Core.Playfields
             this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);
         }
 
+        internal void ClearNpcRuntimeState()
+        {
+            this.npcRuntime.ClearRuntimeState();
+            this.visibilityInterest.Clear();
+        }
+
         internal List<StatelData> ResolveStatels(Identity playfieldIdentity)
         {
             return this.contentData.ResolveStatels(playfieldIdentity);
@@ -227,10 +246,16 @@ namespace ZoneEngine.Core.Playfields
         internal void RegisterDynel(IEntity entity)
         {
             this.dynelRegistry.Register(entity);
+            ICharacter character = entity as ICharacter;
+            if (character != null)
+            {
+                this.visibilityInterest.Register(character);
+            }
         }
 
         internal void UnregisterDynel(Identity identity)
         {
+            this.visibilityInterest.Unregister(identity);
             this.dynelRegistry.Unregister(identity);
         }
 
@@ -295,6 +320,7 @@ namespace ZoneEngine.Core.Playfields
         internal void ActivateNpc(ICharacter character)
         {
             this.npcRuntime.ActivateNpc(character);
+            this.visibilityInterest.Register(character);
         }
 
         internal void RegisterNpcHome(ICharacter character)
@@ -392,9 +418,123 @@ namespace ZoneEngine.Core.Playfields
 
         internal void AnnounceJoiningCharacterVisibility(
             ICharacter character,
-            Action<MessageBody> announceVisibilityMessage)
+            Action<ICharacter, MessageBody> sendVisibilityMessage,
+            Action<ICharacter, Identity> sendLeaveVisibility)
         {
-            this.visibilityPackets.AnnounceJoiningCharacterVisibility(character, announceVisibilityMessage);
+            this.visibilityPackets.AnnounceJoiningCharacterVisibility(
+                character,
+                sendVisibilityMessage,
+                sendLeaveVisibility);
+        }
+
+        internal void AnnounceSpawnedCharacterVisibility(
+            ICharacter character,
+            Identity alreadyVisibleRecipient,
+            Action<ICharacter, MessageBody> sendVisibilityMessage,
+            Action<ICharacter, Identity> sendLeaveVisibility)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            this.visibilityInterest.Register(character);
+            if (alreadyVisibleRecipient != Identity.None)
+            {
+                ICharacter recipient = this.dynelRegistry.FindByIdentity<ICharacter>(alreadyVisibleRecipient);
+                if (recipient != null)
+                {
+                    this.visibilityInterest.MarkVisibleEntry(recipient, character);
+                }
+            }
+
+            this.visibilityPackets.AnnounceJoiningCharacterVisibility(
+                character,
+                sendVisibilityMessage,
+                sendLeaveVisibility);
+        }
+
+        internal void RefreshCharacterVisibility(
+            ICharacter character,
+            Action<ICharacter, MessageBody> sendVisibilityMessage,
+            Action<ICharacter, Identity> sendLeaveVisibility)
+        {
+            this.visibilityPackets.AnnounceJoiningCharacterVisibility(
+                character,
+                sendVisibilityMessage,
+                sendLeaveVisibility);
+        }
+
+        internal bool TryAnnounceCharacterScopedMessage(
+            Identity sourceIdentity,
+            Identity excludedRecipient,
+            MessageBody messageBody,
+            Action<IZoneClient, MessageBody> sendMessageBodyToClient)
+        {
+            ICharacter source = this.dynelRegistry.FindByIdentity<ICharacter>(sourceIdentity);
+            if (source == null)
+            {
+                return false;
+            }
+
+            foreach (ICharacter recipient in this.visibilityInterest.VisibleRecipientsForSource(sourceIdentity))
+            {
+                if (recipient.Identity != excludedRecipient
+                    && recipient.Controller != null
+                    && recipient.Controller.Client != null)
+                {
+                    sendMessageBodyToClient(recipient.Controller.Client, messageBody);
+                }
+            }
+
+            if (source.Identity != excludedRecipient
+                && source.Controller != null
+                && source.Controller.Client != null)
+            {
+                sendMessageBodyToClient(source.Controller.Client, messageBody);
+            }
+
+            return true;
+        }
+
+        internal bool TryDespawnVisibleCharacter(
+            Identity sourceIdentity,
+            Action<ICharacter, MessageBody> sendVisibilityMessage)
+        {
+            ICharacter source = this.dynelRegistry.FindByIdentity<ICharacter>(sourceIdentity);
+            if (source == null)
+            {
+                return false;
+            }
+
+            DespawnMessage despawn = DespawnMessageHandler.Default.Create(sourceIdentity);
+            foreach (ICharacter recipient in this.visibilityInterest.VisibleRecipientsForSource(sourceIdentity))
+            {
+                sendVisibilityMessage(recipient, despawn);
+            }
+
+            this.visibilityInterest.Unregister(sourceIdentity);
+            return true;
+        }
+
+        internal void ForgetVisibilityRecipient(Identity recipientIdentity)
+        {
+            this.visibilityInterest.ForgetRecipient(recipientIdentity);
+        }
+
+        internal ReadOnlyCollection<ICharacter> VisibleRecipientsForSource(Identity sourceIdentity)
+        {
+            return this.visibilityInterest.VisibleRecipientsForSource(sourceIdentity);
+        }
+
+        internal float VisibilityEnterRadius
+        {
+            get { return this.visibilityInterest.Policy.EnterRadius; }
+        }
+
+        internal float VisibilityLeaveRadius
+        {
+            get { return this.visibilityInterest.Policy.LeaveRadius; }
         }
 
         internal void PublishMessageBodyToClient(IZoneClient client, MessageBody body, Action<object> publish)
@@ -787,11 +927,15 @@ namespace ZoneEngine.Core.Playfields
             Func<TCorpseState, Identity> deadNpcIdentity,
             Func<TCorpseState, DateTime> expiresAtUtc,
             Func<TCorpseState, bool> hasUnlootedItems,
+            Func<TCorpseState, bool> opened,
             Action<TCorpseState, bool> setOpened,
             Func<TCorpseState, object> lootClass,
             Action<int> despawnCorpse,
             Action<TCorpseState, TimeSpan, string> extendCorpseLifetime,
+            Action<TCorpseState> refreshCorpseInventoryHandle,
             Action<ICharacter, TCorpseState> sendCorpseInventoryUpdate,
+            Action<ICharacter, TCorpseState> sendCorpseCloseAction,
+            Action<ICharacter> sendUseActionFinished,
             Action<ICharacter, TCorpseState> scheduleCorpseCreditAward,
             Action<TCorpseState, TimeSpan, string> scheduleCorpseDespawn)
             where TCorpseState : class
@@ -805,11 +949,15 @@ namespace ZoneEngine.Core.Playfields
                 deadNpcIdentity,
                 expiresAtUtc,
                 hasUnlootedItems,
+                opened,
                 setOpened,
                 lootClass,
                 despawnCorpse,
                 extendCorpseLifetime,
+                refreshCorpseInventoryHandle,
                 sendCorpseInventoryUpdate,
+                sendCorpseCloseAction,
+                sendUseActionFinished,
                 scheduleCorpseCreditAward,
                 scheduleCorpseDespawn);
         }

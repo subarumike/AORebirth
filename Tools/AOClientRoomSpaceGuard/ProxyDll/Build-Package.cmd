@@ -50,6 +50,7 @@ pushd "%BUILD_ROOT%"
 cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
   /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DNOMINMAX ^
   /I"%SRC%" /LD ^
+  "%SRC%\crash_dump.cpp" ^
   "%SRC%\dllmain.cpp" ^
   "%SRC%\logging.cpp" ^
   "%SRC%\gui_rect_fix.cpp" ^
@@ -235,7 +236,41 @@ if errorlevel 1 (
   exit /b 1
 )
 
+set "PUBLISHED_DIR=%ARTIFACT_ROOT%\AORoomSpaceFix-v1"
+set "PUBLISHED_TMP=%ARTIFACT_ROOT%\AORoomSpaceFix-v1.tmp"
+if exist "%PUBLISHED_TMP%" rmdir /S /Q "%PUBLISHED_TMP%"
+if exist "%PUBLISHED_TMP%" (
+  echo [AORoomSpaceFix] ERROR could not clear stale extracted package staging.
+  exit /b 1
+)
+mkdir "%PUBLISHED_TMP%"
+if errorlevel 1 (
+  echo [AORoomSpaceFix] ERROR could not create extracted package staging.
+  exit /b 1
+)
+tar.exe -x -f "%ZIP%" -C "%PUBLISHED_TMP%"
+if errorlevel 1 (
+  echo [AORoomSpaceFix] ERROR extracted package publication failed.
+  exit /b 1
+)
+"%BUILD_ROOT%\AORoomSpaceFixDeploy.exe" verify-package "%PUBLISHED_TMP%"
+if errorlevel 1 (
+  echo [AORoomSpaceFix] ERROR extracted package publication verification failed.
+  exit /b 1
+)
+if exist "%PUBLISHED_DIR%" rmdir /S /Q "%PUBLISHED_DIR%"
+if exist "%PUBLISHED_DIR%" (
+  echo [AORoomSpaceFix] ERROR could not replace stale extracted package.
+  exit /b 1
+)
+move /Y "%PUBLISHED_TMP%" "%PUBLISHED_DIR%" >nul
+if errorlevel 1 (
+  echo [AORoomSpaceFix] ERROR could not publish extracted package.
+  exit /b 1
+)
+
 echo [AORoomSpaceFix] PASS package="%ZIP%"
+echo [AORoomSpaceFix] PASS extracted package="%PUBLISHED_DIR%"
 echo [AORoomSpaceFix] AO was not launched and no client directory was changed.
 exit /b 0
 

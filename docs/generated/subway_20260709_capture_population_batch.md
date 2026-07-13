@@ -72,6 +72,12 @@ The runtime constructs ordinary `Character` instances directly rather than calli
 
 The captures also contain Strike Foreman, Abmouth Supremus, Eumenides, Vergil Aeneid, Bitaxel, Bloodcreeper, Empty Shell, Fragmented Soul, Incomplete Rebuild, Melded Patterns, Molested Molecules, Premature Pattern, Redundant Scan, and other named/deep content. Those entities remain outside this slice and were not assigned guessed templates or ordinary behavior. `Healer` is Mike's personal pet, not a Subway enemy, and is excluded from population planning.
 
+## Follow-up population restoration
+
+Completed capture `20260710-202132` supplies a separate 38-row restoration: 29 supported-family rows and nine ordinary rows consisting of two Looters, six Stim Fiends, and one Deranged Shopper. The complete 107-identity disposition is recorded in `subway_20260710_population_restore_manifest.csv`, with the readable reconstruction report in `subway_20260710_population_restore.md`.
+
+The follow-up uses exact captured source identities and coordinates without relocation. Historical commit `c2ebdb07` was inspected as evidence for the prior intent, but no historical commit was cherry-picked and the overbroad rollback `e9405ab8` was not reverted. Named bosses, owned summons, unsupported families, and duplicates remain excluded. The later RoomSpace investigation established that the previous instability was client-side; this population restoration adds no RoomSpace workaround or coordinate suppression.
+
 ## Validation
 
 - `AOSharpCaptureAnalyzer` Debug/x86 build: PASS.

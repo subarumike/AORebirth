@@ -35,6 +35,7 @@
 
 For capture-backed tasks:
 
+- When Mike provides an AOSharpLiveCapture capture directory or path, treat that as confirmation that the capture is complete and closed. Analyze it immediately; do not ask whether it is closed or finalized unless Mike explicitly says the capture is still running.
 - When a workflow document explicitly identifies the approved command, wrapper, launcher, or script, use that command directly. Do not perform any repository search to verify, locate, confirm, inspect, or rediscover it.
 - Launch the approved AOSharp capture workflow immediately.
 - Reproduce the gameplay action.

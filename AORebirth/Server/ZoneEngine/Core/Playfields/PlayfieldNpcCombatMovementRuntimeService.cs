@@ -5,6 +5,7 @@ namespace ZoneEngine.Core.Playfields
     using System;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Playfields;
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -47,6 +48,12 @@ namespace ZoneEngine.Core.Playfields
                 return;
             }
 
+            if (!CanChase(attacker))
+            {
+                npcController.StopFollow();
+                return;
+            }
+
             double distance = GetCombatDistance(attacker, target);
             if (distance <= MaxMeleeFollowHoldDistance)
             {
@@ -79,6 +86,12 @@ namespace ZoneEngine.Core.Playfields
                 return;
             }
 
+            if (!CanChase(attacker))
+            {
+                npcController.StopFollow();
+                return;
+            }
+
             this.MoveNpcTowardCombatTarget(
                 attacker,
                 target,
@@ -91,6 +104,13 @@ namespace ZoneEngine.Core.Playfields
         internal static double GetCombatDistance(ICharacter attacker, ICharacter target)
         {
             return GetCombatPosition(attacker).Distance2D(GetCombatPosition(target));
+        }
+
+        private static bool CanChase(ICharacter attacker)
+        {
+            OrdinaryEnemyRuntimeDefinition definition;
+            return !OrdinaryEnemyRuntimeRegistry.TryGet(attacker.Identity.Instance, out definition)
+                   || definition.Profile.Aggression.Chase;
         }
 
         internal static bool IsCapturedCleaningRobot(ICharacter character)

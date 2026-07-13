@@ -32,11 +32,15 @@ namespace AORebirth.Core.Playfields
             Func<TCorpseState, Identity> deadNpcIdentity,
             Func<TCorpseState, DateTime> expiresAtUtc,
             Func<TCorpseState, bool> hasUnlootedItems,
+            Func<TCorpseState, bool> opened,
             Action<TCorpseState, bool> setOpened,
             Func<TCorpseState, object> lootClass,
             Action<int> despawnCorpse,
             Action<TCorpseState, TimeSpan, string> extendCorpseLifetime,
+            Action<TCorpseState> refreshCorpseInventoryHandle,
             Action<ICharacter, TCorpseState> sendCorpseInventoryUpdate,
+            Action<ICharacter, TCorpseState> sendCorpseCloseAction,
+            Action<ICharacter> sendUseActionFinished,
             Action<ICharacter, TCorpseState> scheduleCorpseCreditAward,
             Action<TCorpseState, TimeSpan, string> scheduleCorpseDespawn)
             where TCorpseState : class
@@ -74,6 +78,27 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            if (opened(corpse))
+            {
+                // Official live capture 20260712-195019: close returns Action 0x66,
+                // CharacterAction 110, and the Use acknowledgement without InventoryUpdate.
+                setOpened(corpse, false);
+                refreshCorpseInventoryHandle(corpse);
+                sendCorpseCloseAction(looter, corpse);
+                sendUseActionFinished(looter);
+
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        "CorpseUse accepted close corpse={0} deadNpc={1} looter={2} opened=False lootClass={3}",
+                        corpseIdentity,
+                        deadNpcIdentity(corpse),
+                        looter.Identity,
+                        lootClass(corpse)));
+
+                return true;
+            }
+
             setOpened(corpse, true);
 
             if (hasUnlootedItems(corpse))
@@ -84,6 +109,7 @@ namespace AORebirth.Core.Playfields
                     corpse,
                     sendCorpseInventoryUpdate,
                     scheduleCorpseCreditAward);
+
             }
             else
             {

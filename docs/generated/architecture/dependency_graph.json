@@ -1,0 +1,7 @@
+{
+  "schemaVersion":"1.0",
+  "nodes":["guardrails","visibility","loot_definition","loot_generation","corpse_inventory","loot_rights","population_model","respawn_scheduler","static_manifests","dyna","mission_dungeon","encounters","population_persistence","bulk_content"],
+  "edges":[
+    {"from":"guardrails","to":"loot_definition"},{"from":"loot_definition","to":"loot_generation"},{"from":"loot_generation","to":"corpse_inventory"},{"from":"corpse_inventory","to":"loot_rights"},{"from":"guardrails","to":"population_model"},{"from":"population_model","to":"respawn_scheduler"},{"from":"population_model","to":"static_manifests"},{"from":"respawn_scheduler","to":"static_manifests"},{"from":"static_manifests","to":"dyna"},{"from":"loot_generation","to":"dyna"},{"from":"static_manifests","to":"mission_dungeon"},{"from":"loot_generation","to":"mission_dungeon"},{"from":"dyna","to":"encounters"},{"from":"mission_dungeon","to":"encounters"},{"from":"respawn_scheduler","to":"population_persistence"},{"from":"encounters","to":"population_persistence"},{"from":"population_persistence","to":"bulk_content"},{"from":"visibility","to":"bulk_content"}
+  ]
+}
