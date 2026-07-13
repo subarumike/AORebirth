@@ -2,10 +2,10 @@
 
 | Candidate | Disposition | Replacement owner | Dependency | Risk and required test |
 | --- | --- | --- | --- | --- |
-| `Playfield.RollCapturedCleaningRobotLootItems` | REMOVE | global loot service | captured-outcome parity adapter | High; deterministic outcome fixture and corpse parity |
-| `Playfield.DebugLootTable` path | REMOVE | versioned test content repository | loot resolver | Medium; debug/smoke fixture parity |
-| `CapturedSubwayOrdinaryContentProvider.BuildCapturedLootEntries` runtime conversion | DEPRECATE | evidence importer + loot tables | normalized schema | High; all active PF127 tables compare equal |
-| `Playfield.GetDatabaseLootTable` static cache | REPLACE | indexed loot repository | DB adapter | Medium; load/error/precedence tests |
+| `Playfield.RollCapturedCleaningRobotLootItems` | REMOVED | global loot service | captured-outcome parity adapter | Deterministic parity covered |
+| `Playfield.DebugLootTable` path | REMOVED | explicit debug assignment | loot resolver | Isolated from ordinary production selection |
+| Captured ordinary runtime loot conversion | REPLACED | global registry adapter | normalized definitions | Thief and Filth Flea use shared generation |
+| `Playfield.GetDatabaseLootTable` static cache | REMOVED | indexed registry DB adapter | DB adapter | Missing/invalid data fails closed |
 | `CapturedAreteRobotSpawnOrchestrator` | CONSOLIDATE | generic spawn controller | population adapter and packet fixtures | High; Arete spawn/movement/combat/corpse parity |
 | `PlayfieldDbMobSpawnRuntimeService` direct materialization policy | CONSOLIDATE | generic spawn controller | legacy DB definition adapter | High; startup population parity |
 | `TradeMessageHandler.cs.orig` | REMOVE | active handler/history | confirm no tooling reference | Low; build and source-reference guard |

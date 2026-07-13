@@ -2,22 +2,23 @@
 
 ## Current Focus
 
-Live-validate the global visibility-interest runtime, then perform a bounded rollout of the 38 quarantined PF127 Subway rows from capture `20260710-202132`.
+Live-validate the new global loot foundation for Subway playfield `127`, beginning with the next clean Disobedient Bot sample.
 
 ## Remaining Step
 
-1. Confirm the current safe 221-row population through login/relog, traversal across visibility boundaries, player and NPC movement, combat/death, corpse appearance/re-entry/loot/despawn, respawn, zoning, and unchanged static/vendor visibility.
-2. Run the existing controlled sequence `NONE`, `SUPPORTED_29`, then `ORDINARY_9`, recording the spatial and packet transport diagnostics for each session.
-3. Keep every failing slice quarantined. Activate the full 259-row population only after Mike reports repeatable client success for both bounded slices and the combined population.
+1. Capture ten kills and initial corpse opens for one enemy type in one session.
+2. Use `corpse-loot-observations.csv` to retain empty outcomes, credits, enemy level, player level, item rows, and identity correlation.
+3. Add only newly proven membership and weights to the global registry without treating the sample as complete or guaranteed.
+4. Live-validate item variety, empty outcomes, credit conditioning, corpse lifetime, reopen, final-loot cleanup, and respawn.
 
 ## Constraints
 
-- Do not claim live validation from builds or automated tests.
-- Do not unquarantine any row before the controlled client rollout succeeds.
-- Do not change packet fields, enemy profiles/spawns, RoomSpace handling, or add pacing, batching, throttling, or pagination during this validation.
-- Keep the ordinary-enemy runtime and the client-side RoomSpace guard separate from visibility-interest diagnosis.
-- Use `docs/project/VISIBILITY_INTEREST.md` as the implemented architecture reference.
+- Ordinary enemies resolve the Subway dungeon-wide pool plus their enemy-type pool.
+- Named enemies and bosses use dedicated tables rather than the ordinary enemy-type fallback.
+- Capture counts are evidence and candidate weights, never proof of guaranteed loot or a complete pool.
+- Do not infer player-level, enemy-level, quality, or drop-rate formulas beyond captured evidence.
+- Do not change database schemas or write runtime loot data to the database.
 
 ## Completion Evidence
 
-The task is complete only when Mike confirms stable repeated login and traversal with all 259 captured rows active and the recorded diagnostics show bounded selection with complete SCFU, weapon-definition, CharInPlay, corpse, and Despawn delivery.
+The global registry, deterministic resolver/generator, corpse inventory owner, compatibility adapters, and focused tests are active. The task is complete when a healthy one-enemy ten-kill capture is correlated and Mike confirms private-server loot/corpse behavior in gameplay.
