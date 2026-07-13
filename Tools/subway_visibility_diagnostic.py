@@ -258,7 +258,7 @@ def load_last_summary(target: Path) -> dict | None:
     path = target / "snapshot-summary.jsonl"
     if not path.exists():
         return None
-    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8-sig").splitlines() if line.strip()]
     return rows[-1] if rows else None
 
 
