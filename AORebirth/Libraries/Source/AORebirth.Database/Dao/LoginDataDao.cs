@@ -130,6 +130,23 @@ namespace AORebirth.Database.Dao
             }
         }
 
+        public static void SetExpansions(string user, int expansions)
+        {
+            try
+            {
+                using (IDbConnection conn = Connector.GetConnection())
+                {
+                    conn.Execute(
+                        "UPDATE login SET Expansions=@expansions WHERE Username=@user",
+                        new { expansions, user });
+                }
+            }
+            catch (Exception e)
+            {
+                LogUtil.ErrorException(e);
+            }
+        }
+
         /// <summary>
         /// Write login data to table
         /// </summary>

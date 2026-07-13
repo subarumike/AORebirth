@@ -66,6 +66,11 @@ namespace ZoneEngine.Core
 
         public void EnsureWeaponVisualMeshes(ICharacter character, bool announceAppearanceUpdate)
         {
+            if (PetBureaucratGuardianAppearance.IsGuardianPet(character))
+            {
+                return;
+            }
+
             IInventoryPage weaponPage;
             if (!character.BaseInventory.Pages.TryGetValue((int)IdentityType.WeaponPage, out weaponPage))
             {
@@ -812,6 +817,11 @@ namespace ZoneEngine.Core
             }
 
             if (PetShellItemService.Default.TryUsePetShell(character, itemPosition, item))
+            {
+                return true;
+            }
+
+            if (PetShellItemService.IsPetShellItem(item))
             {
                 return true;
             }

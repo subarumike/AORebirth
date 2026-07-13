@@ -18,10 +18,12 @@ namespace AORebirth.Database.Dao
     #endregion
 
     /// <summary>
-    /// Capture-backed MP pet mob templates used when MySQL mobtemplate rows are missing.
-    /// Source: SqlTables/mobtemplate.sql (BSLX, PT50-PT56, MT01-MT04) and live captures
+    /// Capture-backed pet mob templates used when MySQL mobtemplate rows are missing.
+    /// Source: SqlTables/mobtemplate.sql (BSLX, PT50-PT56, MT01-MT04, A020, A141-A142)
+    /// and live captures
     /// 20260710-185528 (Belamorte), 20260711-181536 (attack pets PT50-PT54),
-    /// 20260711-195926 (Soothing Spirits heal pets MT01-MT04).
+    /// 20260711-195926 (Soothing Spirits heal pets MT01-MT04),
+    /// 20260713-103510 and 20260713-110254 (Bureaucrat shell/direct-summon SCFUs).
     /// </summary>
     internal static class PetSummonMobTemplateCatalog
     {
@@ -227,6 +229,122 @@ namespace AORebirth.Database.Dao
                         Health = 2274,
                         MonsterData = 96193,
                         MonsterScale = 109,
+                    }
+                },
+                {
+                    "A020",
+                    new DBMobTemplate
+                    {
+                        Hash = "A020",
+                        MinLvl = 5,
+                        MaxLvl = 6,
+                        Side = 1,
+                        Fatness = 1,
+                        Breed = 7,
+                        Sex = 5,
+                        Race = 1,
+                        Name = "Bureaucrat Worker",
+                        Flags = 403182081,
+                        NPCFamily = 95,
+                        Health = 110,
+                        MonsterData = 96056,
+                        MonsterScale = 93,
+                    }
+                },
+                {
+                    "A141",
+                    new DBMobTemplate
+                    {
+                        Hash = "A141",
+                        MinLvl = 193,
+                        MaxLvl = 236,
+                        Side = 0,
+                        Fatness = 1,
+                        Breed = 7,
+                        Sex = 5,
+                        Race = 1,
+                        Name = "CEO Guardian",
+                        Flags = 403182081,
+                        NPCFamily = 95,
+                        Health = 34513,
+                        MonsterData = 227701,
+                        MonsterScale = 125,
+                        TextureHands = 909,
+                        TextureBody = 224853,
+                        TextureFeet = 224854,
+                        TextureArms = 224854,
+                        TextureLegs = 224854,
+                    }
+                },
+                {
+                    "BCBG",
+                    new DBMobTemplate
+                    {
+                        Hash = "BCBG",
+                        MinLvl = 200,
+                        MaxLvl = 200,
+                        Side = 2,
+                        Fatness = 1,
+                        Breed = 7,
+                        Sex = 5,
+                        Race = 1,
+                        Name = "Bureaucrat Bodyguard",
+                        Flags = 403182081,
+                        NPCFamily = 95,
+                        Health = 29148,
+                        MonsterData = 17627,
+                        MonsterScale = 121,
+                    }
+                },
+                {
+                    "CRLT",
+                    new DBMobTemplate
+                    {
+                        Hash = "CRLT",
+                        MinLvl = 200,
+                        MaxLvl = 215,
+                        Side = 2,
+                        Fatness = 1,
+                        Breed = 4,
+                        Sex = 5,
+                        Race = 1,
+                        Name = "Carlita Desposito",
+                        Flags = 403182081,
+                        NPCFamily = 97,
+                        Health = 51768,
+                        MonsterData = 293901,
+                        MonsterScale = 100,
+                        TextureHands = 284555,
+                        TextureBody = 247933,
+                        TextureFeet = 284553,
+                        TextureArms = 247887,
+                        TextureLegs = 284556,
+                        HeadMesh = 223867,
+                    }
+                },
+                {
+                    "A142",
+                    new DBMobTemplate
+                    {
+                        Hash = "A142",
+                        MinLvl = 220,
+                        MaxLvl = 220,
+                        Side = 2,
+                        Fatness = 1,
+                        Breed = 4,
+                        Sex = 5,
+                        Race = 1,
+                        Name = "Carlo Pinnetti",
+                        Flags = 403182081,
+                        NPCFamily = 97,
+                        Health = 55687,
+                        MonsterData = 258209,
+                        MonsterScale = 130,
+                        TextureBody = 284557,
+                        TextureFeet = 247977,
+                        TextureArms = 247887,
+                        TextureLegs = 248016,
+                        HeadMesh = 40121,
                     }
                 },
                 {

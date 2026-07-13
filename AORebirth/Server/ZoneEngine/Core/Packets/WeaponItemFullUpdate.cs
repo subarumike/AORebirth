@@ -145,6 +145,34 @@ namespace ZoneEngine.Core.Packets
             return messages.ToArray();
         }
 
+        public static WeaponItemFullUpdateMessage CreateRightHandWeaponDefinitionMessage(ICharacter character)
+        {
+            if (character == null || character.BaseInventory == null)
+            {
+                return null;
+            }
+
+            IInventoryPage weaponPage;
+            if (!character.BaseInventory.Pages.TryGetValue((int)IdentityType.WeaponPage, out weaponPage))
+            {
+                return null;
+            }
+
+            return CreateForSlot(character, weaponPage, (int)WeaponSlots.Righthand);
+        }
+
+        public static void SendRightHandWeaponDefinition(ICharacter character, bool announceToPlayfield = false)
+        {
+            WeaponItemFullUpdateMessage message = CreateRightHandWeaponDefinitionMessage(character);
+            if (message == null)
+            {
+                return;
+            }
+
+            character.Send(message, announceToPlayfield);
+            LogWeaponDefinition("sent-right-hand", character, null, message, announceToPlayfield);
+        }
+
         internal static void LogObserverWeaponDefinition(
             ICharacter owner,
             ICharacter recipient,

@@ -26,6 +26,8 @@ namespace ZoneEngine.Core
 
     using System.Net;
 
+    using System.Threading;
+
 
 
     using AORebirth.Core.Entities;
@@ -107,6 +109,16 @@ namespace ZoneEngine.Core
 
             "005B000A0001006600000DBC35FE28684D4501140000C350795625EA00000007E20000CF2218620D8600000004000000000000000100000000000000000000000000000000000002170000007D00000000000000000000C350795625EA000000000000000000");
 
+        // Capture 20260713-142159 (Corporate Guardian shell summon pet SpellList).
+        private static readonly byte[] BureaucratAttackPetSpellListWire = HexToBytes(
+            "00C6000A0001006600000DB3762ABC214D4501140000C3507962366700000007E20000CF221864840D00000004000000000000000100000000000000000000000000000000000002B10000009600000000000000000000C35079623667000000000000000000");
+
+        private const int BureaucratSpellListSubIdOffset = 40;
+
+        private static int bureaucratWorkerSpellListSeq = 0x81C0;
+
+        private static int bureaucratGuardianSpellListSeq = 0x840C;
+
 
 
         public static void SendOwnerPetSummon(
@@ -138,8 +150,6 @@ namespace ZoneEngine.Core
                 return;
 
             }
-
-
 
             byte[] captureWire;
             if (petSlotStrain == PetSlotClassifier.HealingPetStrain && nanoId != 125746)
@@ -315,6 +325,22 @@ namespace ZoneEngine.Core
         }
 
 
+
+        private static int AllocateBureaucratSpellListSubId(string petHash)
+        {
+            ushort lowId;
+            if (string.Equals(petHash, "A141", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(petHash, "BCBG", StringComparison.OrdinalIgnoreCase))
+            {
+                lowId = (ushort)Interlocked.Increment(ref bureaucratGuardianSpellListSeq);
+            }
+            else
+            {
+                lowId = (ushort)Interlocked.Increment(ref bureaucratWorkerSpellListSeq);
+            }
+
+            return unchecked((int)(0x18640000u | lowId));
+        }
 
         private static void PatchBodyIdentity(byte[] packet, int offset, Identity identity)
         {

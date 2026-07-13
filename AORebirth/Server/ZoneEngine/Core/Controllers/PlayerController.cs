@@ -287,8 +287,13 @@ namespace ZoneEngine.Core.Controllers
                 return false;
             }
 
-            if (NanoEventRuntimeService.Default.HasSummonPetOnUse(nanoId))
+            if (NanoEventRuntimeService.Default.HasSummonPetOnUse(nanoId)
+                && !PetShellCatalog.UsesShellOnSummon(
+                    this.Character.Stats[StatIds.profession].Value,
+                    nanoId))
             {
+                // Shell-based casts create/refresh a shell item, not a living pet.
+                // Living-pet uniqueness is enforced when the shell is used.
                 PetSummonParams summonParams;
                 if (PetSummonNanoCatalog.TryResolve(this.Character, nanoId, out summonParams))
                 {
@@ -304,6 +309,15 @@ namespace ZoneEngine.Core.Controllers
                         && PetRuntimeService.Default.HasLivingHealingPet(this.Character))
                     {
                         ChatTextMessageHandler.Default.Send(this.Character, "You can have just 1 Heal Pet.");
+                        return false;
+                    }
+
+                    if (PetSlotClassifier.IsBureaucratCompanionStrain(summonPetStrain)
+                        && PetRuntimeService.Default.HasLivingBureaucratCompanionPet(this.Character))
+                    {
+                        ChatTextMessageHandler.Default.Send(
+                            this.Character,
+                            "You can have just 1 Bureaucrat Companion Pet.");
                         return false;
                     }
                 }
@@ -342,17 +356,16 @@ namespace ZoneEngine.Core.Controllers
             this.Character.Stats[StatIds.currentnano].Value -= nano.getItemAttribute(407);
 
             int duration = nano.getItemAttribute(8);
-            bool isSummonPetNano = NanoEventRuntimeService.Default.HasSummonPetOnUse(nano);
+            bool isSummonPetNano = NanoEventRuntimeService.Default.HasSummonPetOnUse(nanoId);
             bool usesShell = isSummonPetNano
-                && PetShellCatalog.UsesShellOnSummon(this.Character.Stats[StatIds.profession].Value);
+                && PetShellCatalog.UsesShellOnSummon(
+                    this.Character.Stats[StatIds.profession].Value,
+                    nanoId);
 
             if (usesShell)
             {
-                CharacterActionMessageHandler.Default.SetNanoDuration(
-                    this.Character,
-                    target,
-                    nanoId,
-                    duration);
+                // Live AO shell nanos (20260713-142159): FinishNanoCasting + shell item only.
+                // SetNanoDuration creates a ghost NoName pet slot without a linked world pet.
                 PetShellItemService.Default.TryGiveShellForNano(this.Character, nanoId);
             }
             else if (isSummonPetNano)
