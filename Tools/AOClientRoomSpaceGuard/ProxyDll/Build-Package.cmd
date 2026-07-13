@@ -50,6 +50,7 @@ pushd "%BUILD_ROOT%"
 cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
   /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DNOMINMAX ^
   /I"%SRC%" /LD ^
+  "%SRC%\crash_dump.cpp" ^
   "%SRC%\dllmain.cpp" ^
   "%SRC%\logging.cpp" ^
   "%SRC%\gui_rect_fix.cpp" ^

@@ -1,10 +1,12 @@
 AO RoomSpace Fix - version.dll proxy
 ====================================
 
-This package prevents the repeatable Anarchy Online E06D7363 RoomSpace crash.
-It does not replace or modify AnarchyOnline.exe, N3.dll, XML, resources, or
-shortcuts. The installed version.dll is loaded by AO's normal dependency chain
-and applies the repair only in process memory.
+This package prevents several repeatable Anarchy Online client crashes through
+byte-verified in-memory guards. It also writes an unhandled crash minidump for
+new crash signatures before chaining back to AO's normal crash path. It does
+not replace or modify AnarchyOnline.exe, N3.dll, XML, resources, or shortcuts.
+The installed version.dll is loaded by AO's normal dependency chain and applies
+the repair only in process memory.
 
 INSTALL
 -------
@@ -24,11 +26,21 @@ LOG
 ---
 
 %LOCALAPPDATA%\AORoomSpaceFix\AORoomSpaceFix.log
+%LOCALAPPDATA%\AORoomSpaceFix\Dumps
 
-Look for both:
+For the new graphics client, look for:
 
 PATCH PASS
 READY RoomSpace repair active
+
+For the old graphics client, look for:
+
+PATCH PASS
+READY RoomSpace, GUI rectangle, and renderer repairs active
+
+The dump handler does not suppress arbitrary access violations, C++
+exceptions, driver faults, stack corruption, or unknown callsite failures.
+Only targeted, byte-verified repairs resume execution.
 
 UNINSTALL
 ---------
