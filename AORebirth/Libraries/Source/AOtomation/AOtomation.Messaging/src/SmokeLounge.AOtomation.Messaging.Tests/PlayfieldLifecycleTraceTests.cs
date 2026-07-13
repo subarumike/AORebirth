@@ -3236,20 +3236,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldUseCorpse.Contains("this.runtimeSystems.TryUseCorpse(")
                 && playfieldUseCorpse.Contains("this.SendCorpseInventoryUpdate")
-                && playfieldUseCorpse.Contains("this.SendCorpseLootAccessAction")
+                && playfieldUseCorpse.Contains("corpse.InventoryHandle = this.AllocateCorpseInventoryHandle();")
                 && playfieldUseCorpse.Contains("this.ScheduleCorpseCreditAward"),
                 "Playfield must delegate corpse access sequencing while retaining packet and credit callbacks.");
             Assert.IsTrue(
                 corpseUse.Contains("this.SendCorpseInventoryUpdateAndCredits(")
                 && corpseUse.Contains("if (hasUnlootedItems(corpse))")
-                && corpseUse.Contains("if (wasOpened)")
-                && corpseUse.Contains("sendCorpseLootAccessAction(looter, corpse);")
+                && corpseUse.Contains("if (opened(corpse))")
+                && corpseUse.Contains("setOpened(corpse, false);")
+                && corpseUse.Contains("refreshCorpseInventoryHandle(corpse);")
                 && corpseUse.Contains("sendUseActionFinished(looter);")
+                && corpseUse.Contains("return true;")
                 && corpseUse.Contains("else"),
-                "Corpse access must always refresh the captured InventoryUpdate path and supplement already-opened loot corpses with the client reopen action.");
+                "Corpse access must preserve the captured open, close, and reopen alternation.");
             Assert.IsFalse(
-                corpseUse.Contains("NextUseSendsAccessActionOnly"),
-                "Corpse reopen must not alternate into the old action-only path that skipped InventoryUpdate refreshes.");
+                corpseUse.Contains("NextUseSendsAccessActionOnly")
+                || corpseUse.Contains("sendCorpseLootAccessAction")
+                || playfieldText.Contains("ActionIdentity = 0x66"),
+                "Corpse reopen must not retain either rejected action-only hypothesis.");
+            AssertTextBefore(corpseUse, "if (opened(corpse))", "setOpened(corpse, false);");
+            AssertTextBefore(corpseUse, "setOpened(corpse, false);", "refreshCorpseInventoryHandle(corpse);");
+            AssertTextBefore(corpseUse, "refreshCorpseInventoryHandle(corpse);", "sendUseActionFinished(looter);");
+            AssertTextBefore(corpseUse, "sendUseActionFinished(looter);", "setOpened(corpse, true);");
             AssertTextBefore(
                 inventoryAndCredits,
                 "sendCorpseInventoryUpdate(looter, corpse);",
