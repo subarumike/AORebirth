@@ -18,7 +18,6 @@ namespace AORebirth.Core.Playfields
     using Utility;
 
     using ZoneEngine.Core.Controllers;
-    using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
 
     internal sealed class OrdinaryEnemyRuntimeService
@@ -253,18 +252,13 @@ namespace AORebirth.Core.Playfields
             character.DoNotDoTimers = false;
             var runtimeDefinition = new OrdinaryEnemyRuntimeDefinition(spawn, profile);
             OrdinaryEnemyRuntimeRegistry.Register(character.Identity.Instance, runtimeDefinition);
-            var fullUpdate = SimpleCharFullUpdate.ConstructMessage(character);
             this.activateNpc(character);
             this.activeByRuntimeIdentity[character.Identity.Instance] = runtimeDefinition;
             this.activeRuntimeIdentityBySource[spawn.SourceIdentity] = character.Identity.Instance;
             SubwayVisibilityDiagnosticSelection.RegisterRuntimeIdentity(
                 character.Identity.Instance,
                 spawn.SourceIdentity);
-            playfield.Announce(fullUpdate);
-            if (combatReady && profile.Combat.VisibleWeapon)
-            {
-                WeaponItemFullUpdate.SendWeaponDefinitions(character, true);
-            }
+            playfield.AnnounceSpawnedCharacterVisibility(character, Identity.None);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,

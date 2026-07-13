@@ -118,6 +118,8 @@ namespace AORebirth.Core.Playfields
 
         private readonly Dictionary<int, CorpseState> corpses = new Dictionary<int, CorpseState>();
 
+        private readonly object corpseVisibilitySync = new object();
+
         private readonly Dictionary<int, CorpseState> pendingCorpseSpawns = new Dictionary<int, CorpseState>();
 
         private readonly Dictionary<int, PendingCorpseCreditAward> pendingCorpseCreditAwards =
@@ -393,6 +395,26 @@ namespace AORebirth.Core.Playfields
         public void Announce(MessageBody messageBody)
         {
             CombatStartPacketDiagnostics.LogOutbound("Playfield.Announce", messageBody, Identity.None);
+
+            N3Message n3Message = messageBody as N3Message;
+            if (n3Message != null)
+            {
+                ICharacter source = this.FindByIdentity<ICharacter>(n3Message.Identity);
+                if (source != null && IsVisibilityMovementMessage(messageBody))
+                {
+                    this.RefreshCharacterVisibility(source);
+                }
+
+                if (this.runtimeSystems.TryAnnounceCharacterScopedMessage(
+                    n3Message.Identity,
+                    Identity.None,
+                    messageBody,
+                    this.Send))
+                {
+                    return;
+                }
+            }
+
             this.runtimeSystems.AnnounceMessageToCharacterClients(messageBody, this.Send);
         }
 
@@ -418,6 +440,17 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void AnnounceOthers(MessageBody messageBody, Identity dontSend)
         {
+            N3Message n3Message = messageBody as N3Message;
+            if (n3Message != null
+                && this.runtimeSystems.TryAnnounceCharacterScopedMessage(
+                    n3Message.Identity,
+                    dontSend,
+                    messageBody,
+                    this.Send))
+            {
+                return;
+            }
+
             this.runtimeSystems.AnnounceMessageToOtherCharacterClients(messageBody, dontSend, this.Send);
         }
 
@@ -427,7 +460,69 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void Despawn(Identity identity)
         {
+            if (this.runtimeSystems.TryDespawnVisibleCharacter(identity, this.SendVisibilityMessage))
+            {
+                return;
+            }
+
             this.Announce(DespawnMessageHandler.Default.Create(identity));
+        }
+
+        public void AnnounceSpawnedCharacterVisibility(
+            ICharacter character,
+            Identity alreadyVisibleRecipient)
+        {
+            this.runtimeSystems.AnnounceSpawnedCharacterVisibility(
+                character,
+                alreadyVisibleRecipient,
+                this.SendVisibilityMessage,
+                this.SendVisibilityLeave);
+        }
+
+        public void RefreshCharacterVisibility(ICharacter character)
+        {
+            this.runtimeSystems.RefreshCharacterVisibility(
+                character,
+                this.SendVisibilityMessage,
+                this.SendVisibilityLeave);
+            this.RefreshCorpseVisibilityForRecipient(character);
+        }
+
+        public void ForgetVisibilityRecipient(Identity recipientIdentity)
+        {
+            this.runtimeSystems.ForgetVisibilityRecipient(recipientIdentity);
+            lock (this.corpseVisibilitySync)
+            {
+                foreach (CorpseState corpse in this.corpses.Values)
+                {
+                    if (corpse.VisibleRecipients != null)
+                    {
+                        corpse.VisibleRecipients.Remove(recipientIdentity);
+                    }
+                }
+            }
+        }
+
+        private void SendVisibilityMessage(ICharacter recipient, MessageBody messageBody)
+        {
+            if (recipient != null
+                && recipient.Controller != null
+                && recipient.Controller.Client != null)
+            {
+                this.Send(recipient.Controller.Client, messageBody);
+            }
+        }
+
+        private void SendVisibilityLeave(ICharacter recipient, Identity identity)
+        {
+            this.SendVisibilityMessage(recipient, DespawnMessageHandler.Default.Create(identity));
+        }
+
+        private static bool IsVisibilityMovementMessage(MessageBody messageBody)
+        {
+            return messageBody is CharDCMoveMessage
+                   || messageBody is FollowTargetMessage
+                   || messageBody is SetPosMessage;
         }
 
         private Coordinate DynelDropPosition(Identity identity)
@@ -722,8 +817,7 @@ namespace AORebirth.Core.Playfields
 
         private void AnnouncePlayfieldTransferDespawn(Dynel dynel)
         {
-            DespawnMessage despawnMessage = DespawnMessageHandler.Default.Create(dynel.Identity);
-            this.AnnounceOthers(despawnMessage, dynel.Identity);
+            this.Despawn(dynel.Identity);
         }
 
         private static void ApplyPlayfieldTransferState(Dynel dynel, Coordinate destination, IQuaternion heading)
@@ -844,6 +938,7 @@ namespace AORebirth.Core.Playfields
                                        z = destination.z
                                    };
             dynel.RawHeading = new AORebirth.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
+            this.RefreshCharacterVisibility(character);
             this.PrimeStatelCollisionContacts(character);
 
             LogUtil.Debug(
@@ -869,6 +964,14 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void DisconnectClient(IInstancedEntity entity)
         {
+            ICharacter character = entity as ICharacter;
+            if (character != null)
+            {
+                this.Despawn(character.Identity);
+                this.ForgetVisibilityRecipient(character.Identity);
+                this.runtimeSystems.UnregisterDynel(character.Identity);
+            }
+
             this.runtimeSystems.RemoveInstancedEntity(entity);
         }
 
@@ -927,11 +1030,15 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.SendExistingCharacterVisibilityToClient(
                 sendSCFUs.toClient.Controller.Character,
                 body => sendSCFUs.toClient.SendCompressed(body));
+            this.SendExistingCorpseVisibilityToClient(sendSCFUs.toClient.Controller.Character);
         }
 
         public void AnnouncePlayerVisibility(ICharacter character)
         {
-            this.runtimeSystems.AnnounceJoiningCharacterVisibility(character, body => this.Announce(body));
+            this.runtimeSystems.AnnounceJoiningCharacterVisibility(
+                character,
+                this.SendVisibilityMessage,
+                this.SendVisibilityLeave);
         }
 
         #endregion
@@ -1335,6 +1442,7 @@ namespace AORebirth.Core.Playfields
 
             var sendSCFUs = new IMSendPlayerSCFUs { toClient = client };
             this.SendSCFUsToClient(sendSCFUs);
+            this.RefreshCharacterVisibility(character);
 
             foreach (StaticDynel staticDynel in this.runtimeSystems.StaticDynels())
             {
@@ -2653,24 +2761,33 @@ namespace AORebirth.Core.Playfields
             int corpseMonsterData = CorpseMonsterDataFor(target);
             int recipientCount = 0;
 
-            foreach (ICharacter character in this.runtimeSystems.Characters())
+            CorpseState corpse;
+            if (!this.corpses.TryGetValue(corpseIdentity.Instance, out corpse))
             {
-                ZoneClient client = character.Controller.Client as ZoneClient;
-                if (client == null)
-                {
-                    continue;
-                }
+                return;
+            }
 
-                client.SendCompressed(
-                    CorpseFullUpdate.Build(
-                        target,
-                        corpseIdentity,
-                        character.Identity,
-                        this.server.Id,
-                        corpseCatMesh,
-                        corpseMonsterData,
-                        this.CorpseCreditsFor(corpseIdentity)));
-                recipientCount++;
+            corpse.VisualSource = target;
+            var recipients = this.runtimeSystems.VisibleRecipientsForSource(target.Identity).ToList();
+            if (target.Controller != null
+                && target.Controller.Client != null
+                && recipients.All(x => x.Identity != target.Identity))
+            {
+                recipients.Add(target);
+            }
+
+            foreach (ICharacter character in recipients
+                .OrderBy(x => (int)x.Identity.Type)
+                .ThenBy(x => x.Identity.Instance))
+            {
+                if (this.SendCorpseFullUpdateToRecipient(
+                    corpse,
+                    character,
+                    corpseCatMesh,
+                    corpseMonsterData))
+                {
+                    recipientCount++;
+                }
             }
 
             LogUtil.Debug(
@@ -2691,6 +2808,150 @@ namespace AORebirth.Core.Playfields
                     target.RawCoordinates.X,
                     target.RawCoordinates.Y,
                     target.RawCoordinates.Z));
+        }
+
+        private bool SendCorpseFullUpdateToRecipient(
+            CorpseState corpse,
+            ICharacter recipient,
+            int corpseCatMesh,
+            int corpseMonsterData)
+        {
+            ZoneClient client = recipient == null || recipient.Controller == null
+                ? null
+                : recipient.Controller.Client as ZoneClient;
+            if (corpse == null
+                || corpse.VisualSource == null
+                || recipient == null
+                || client == null)
+            {
+                return false;
+            }
+
+            lock (this.corpseVisibilitySync)
+            {
+                if (!corpse.VisibleRecipients.Add(recipient.Identity))
+                {
+                    return false;
+                }
+            }
+
+            try
+            {
+                client.SendCompressed(
+                    CorpseFullUpdate.Build(
+                        corpse.VisualSource,
+                        corpse.CorpseIdentity,
+                        recipient.Identity,
+                        this.server.Id,
+                        corpseCatMesh,
+                        corpseMonsterData,
+                        corpse.Credits));
+            }
+            catch
+            {
+                lock (this.corpseVisibilitySync)
+                {
+                    corpse.VisibleRecipients.Remove(recipient.Identity);
+                }
+
+                throw;
+            }
+
+            return true;
+        }
+
+        private void SendExistingCorpseVisibilityToClient(ICharacter recipient)
+        {
+            if (recipient == null)
+            {
+                return;
+            }
+
+            foreach (CorpseState corpse in this.corpses.Values.OrderBy(x => x.CorpseIdentity.Instance))
+            {
+                if (corpse.VisualSource == null
+                    || corpse.VisualSource.Coordinates().Distance2D(recipient.Coordinates())
+                       > this.runtimeSystems.VisibilityEnterRadius)
+                {
+                    continue;
+                }
+
+                this.SendCorpseFullUpdateToRecipient(
+                    corpse,
+                    recipient,
+                    CorpseCatMeshFor(corpse.VisualSource),
+                    CorpseMonsterDataFor(corpse.VisualSource));
+            }
+        }
+
+        private void RefreshCorpseVisibilityForRecipient(ICharacter recipient)
+        {
+            if (recipient == null
+                || recipient.Controller == null
+                || recipient.Controller.Client == null)
+            {
+                return;
+            }
+
+            foreach (CorpseState corpse in this.corpses.Values.OrderBy(x => x.CorpseIdentity.Instance))
+            {
+                if (corpse.VisualSource == null)
+                {
+                    continue;
+                }
+
+                double distance = corpse.VisualSource.Coordinates().Distance2D(recipient.Coordinates());
+                bool visible;
+                lock (this.corpseVisibilitySync)
+                {
+                    visible = corpse.VisibleRecipients.Contains(recipient.Identity);
+                }
+                if (!visible && distance <= this.runtimeSystems.VisibilityEnterRadius)
+                {
+                    this.SendCorpseFullUpdateToRecipient(
+                        corpse,
+                        recipient,
+                        CorpseCatMeshFor(corpse.VisualSource),
+                        CorpseMonsterDataFor(corpse.VisualSource));
+                }
+                else if (visible && distance > this.runtimeSystems.VisibilityLeaveRadius)
+                {
+                    this.SendVisibilityLeave(recipient, corpse.CorpseIdentity);
+                    lock (this.corpseVisibilitySync)
+                    {
+                        corpse.VisibleRecipients.Remove(recipient.Identity);
+                    }
+                }
+            }
+        }
+
+        private void SendCorpseDespawn(Identity corpseIdentity)
+        {
+            CorpseState corpse;
+            if (!this.corpses.TryGetValue(corpseIdentity.Instance, out corpse))
+            {
+                return;
+            }
+
+            Identity[] recipientIdentities;
+            lock (this.corpseVisibilitySync)
+            {
+                recipientIdentities = corpse.VisibleRecipients
+                    .OrderBy(x => (int)x.Type)
+                    .ThenBy(x => x.Instance)
+                    .ToArray();
+                corpse.VisibleRecipients.Clear();
+            }
+
+            foreach (Identity recipientIdentity in recipientIdentities)
+            {
+                ICharacter recipient = this.FindByIdentity<ICharacter>(recipientIdentity);
+                if (recipient != null)
+                {
+                    this.SendVisibilityLeave(recipient, corpseIdentity);
+                }
+            }
+
         }
 
         private int CorpseCreditsFor(Identity corpseIdentity)
@@ -2799,6 +3060,8 @@ namespace AORebirth.Core.Playfields
             {
                 CorpseIdentity = corpseIdentity,
                 DeadNpcIdentity = target.Identity,
+                VisualSource = target,
+                VisibleRecipients = new HashSet<Identity>(),
                 Name = "Remains of " + target.Name,
                 LootClass = lootClass,
                 CreatedAtUtc = DateTime.UtcNow,
@@ -2838,7 +3101,7 @@ namespace AORebirth.Core.Playfields
         {
             this.runtimeSystems.DespawnCorpse(
                 corpseInstance,
-                this.Despawn,
+                this.SendCorpseDespawn,
                 this.runtimeSystems.ClearNpcCorpseDespawn,
                 x => this.corpses.Remove(x),
                 x => this.pendingCorpseCreditAwards.Remove(x));
@@ -2886,6 +3149,10 @@ namespace AORebirth.Core.Playfields
             public Identity CorpseIdentity { get; set; }
 
             public Identity DeadNpcIdentity { get; set; }
+
+            public ICharacter VisualSource { get; set; }
+
+            public HashSet<Identity> VisibleRecipients { get; set; }
 
             public string Name { get; set; }
 
