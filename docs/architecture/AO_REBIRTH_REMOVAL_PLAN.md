@@ -8,6 +8,8 @@
 | `Playfield.GetDatabaseLootTable` static cache | REMOVED | indexed registry DB adapter | DB adapter | Missing/invalid data fails closed |
 | `CapturedAreteRobotSpawnOrchestrator` | CONSOLIDATE | generic spawn controller | population adapter and packet fixtures | High; Arete spawn/movement/combat/corpse parity |
 | `PlayfieldDbMobSpawnRuntimeService` direct materialization policy | CONSOLIDATE | generic spawn controller | legacy DB definition adapter | High; startup population parity |
+| `OrdinaryEnemyRuntimeService.ScheduleRespawnAfterDespawn` and `pendingRespawns` | REMOVED | `WorldPopulationController` + `WorldRespawnScheduler` | ordinary adapter | Deterministic scheduler/lifecycle guards |
+| `OrdinaryEnemyRuntimeService.SpawnForPlayfield` | REMOVED | `WorldPopulationController.ActivatePlayfield` | ordinary catalog adapter | Population/quarantine parity guards |
 | `TradeMessageHandler.cs.orig` | REMOVE | active handler/history | confirm no tooling reference | Low; build and source-reference guard |
 | `*.sql.obsolete` schema files | DEPRECATE then archive/remove | migrations/reference history | schema inventory approval | Medium; explicit Mike approval required |
 | PowerShell workflow scripts marked deprecated | DEPRECATE | approved cmd wrappers | wrapper coverage | Low; workflow docs/tests |

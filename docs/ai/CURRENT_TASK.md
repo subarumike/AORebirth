@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Live-validate the new global loot foundation for Subway playfield `127`, beginning with the next clean Disobedient Bot sample.
+Live-validate the global loot and ordinary-population foundations for Subway playfield `127`.
 
 ## Remaining Step
 
@@ -21,4 +21,4 @@ Live-validate the new global loot foundation for Subway playfield `127`, beginni
 
 ## Completion Evidence
 
-The global registry, deterministic resolver/generator, corpse inventory owner, compatibility adapters, and focused tests are active. The task is complete when a healthy one-enemy ten-kill capture is correlated and Mike confirms private-server loot/corpse behavior in gameplay.
+The global loot registry, corpse inventory owner, normalized spawn/group/respawn definitions, population controller, and shared scheduler are active. Automated parity is complete; live Thief, Filth Flea, and loot validation remains outstanding.

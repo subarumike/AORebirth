@@ -14,7 +14,7 @@ Status: PARTIAL. Corpse item/credit/open state and lookup ownership moved to `Co
 
 ## Phase 3 — Population and respawn
 
-Objective: introduce spawn definitions/groups/controllers, population state, and keyed scheduling. Dependencies: Phase 0. Adapt ordinary runtime first, then DB mobs and Arete robots. Tests: independent/shared timers, cancellation, reset, duplicate identity, cleanup, deterministic selection. Removal enabled: family orchestrators and timer duplication.
+Status: COMPLETE for profile-backed ordinary Subway population. Normalized definitions/groups/policies, population state, deterministic keyed scheduling, lifecycle notifications, and cleanup are active. DB materialization and captured Arete robots remain tracked legacy owners pending parity adapters.
 
 ## Phase 4 — Static world manifests
 

@@ -1,48 +1,59 @@
 # AORebirth World Population Architecture
 
-## Core records
+Status: global ordinary static-world foundation implemented.
 
-- `EnemyTypeProfile`: reusable appearance, stats, movement, aggression, combat, corpse, loot references, and evidence.
-- `SpawnDefinition`: `SpawnKey`, profile key, playfield, position/orientation, optional level/scale/path/group overrides, respawn policy, enabled/quarantine, evidence.
-- `SpawnGroup`: group key, playfield/zone/camp, min/max alive, activation policy, respawn policy, optional shared timer, population rules.
-- `SpawnController`: activation, registration, alive/dead state, scheduling, reset, cleanup, and recovery.
-- `EncounterController`: scripted mechanics only.
-- `RespawnPolicy`: fixed/range/shared/boss/minion/instance/quest/event/none plus restart behavior.
-- `PopulationState`: selected variant, live identities, death/due times, controller generation, durable version.
+```text
+OrdinaryEnemyProfile -> WorldSpawnDefinition -> SpawnGroupDefinition
+        |                         |
+        +-> OrdinaryEnemyRuntimeService <- WorldPopulationController
+                                             |
+                                      WorldRespawnScheduler
+```
 
-## Categories and owners
+## Ownership
 
-| Category | Owner |
-| --- | --- |
-| STATIC_WORLD | world manifest + spawn controller |
-| DYNAMIC_WORLD | rule/selection provider + spawn controller |
-| MISSION_GENERATED | mission population adapter |
-| DUNGEON_STATIC | dungeon manifest + instance controller |
-| DUNGEON_INSTANCE | instance population controller |
-| QUEST_CONTROLLED | quest controller referencing spawn groups |
-| EVENT_CONTROLLED | event controller referencing spawn groups |
-| RAID_CONTROLLED | raid encounter controller and lockout store |
-| DYNA_CAMP | dyna camp controller |
-| DYNA_BOSS | boss profile selected by dyna camp controller |
-| PET_OR_SUMMON | owner-scoped pet runtime, never static population |
-| SCRIPTED_ENCOUNTER | encounter controller |
+- Profiles own reusable appearance, stats, movement, aggression, combat, corpse, and loot evidence; never coordinates or timers.
+- `WorldSpawnDefinition` owns placement, stable source identity, profile/group/policy references, activation, quarantine, and provenance; never lifecycle code or loot generation.
+- `SpawnGroupDefinition` owns membership, activation, and min/max-alive policy.
+- `WorldPopulationController` owns activation, state transitions, lifecycle notifications, reset, cleanup, and diagnostics; never packets.
+- `WorldRespawnScheduler` owns one keyed due-time collection ordered by due time, playfield, and spawn key. There is no timer per spawn.
+- `OrdinaryEnemyRuntimeService` is the generic materializer. Combat, movement, visibility, loot-at-death, corpse protocol, and packets remain with established owners.
 
-## Lifecycle
+## State and respawn
 
-Definitions are immutable. On activation, the controller validates references and desired counts, asks the generic runtime to materialize characters, and records runtime identities separately. Death emits a population event. Final despawn schedules the referenced policy. Reset/disposal cancels by scope and removes identities through shared lifecycle/visibility hooks. Static providers never own timers.
+`PopulationRuntimeState` separates configured identity from current runtime identity and records lifecycle state, timestamps, corpse identity, generation, and explicit failure.
 
-The scheduler uses keyed due-time records rather than a timer per spawn. It supports independent/shared timers, random ranges from deterministic random sources, manual reset, cancellation, and restart recovery. Only durable camps/events/lockouts/instances persist; ordinary static population normally repopulates from manifests after restart.
+```text
+READY -> SPAWNING -> ALIVE -> DEAD_CORPSE_ACTIVE -> DESPAWNED
+                                                      |
+                                             WAITING_FOR_RESPAWN
+                                                      |
+                                                RESPAWNING -> ALIVE
+```
 
-## Requirements
+Policies support none, fixed, bounded deterministic random, group-shared, scripted, and unresolved modes. Scripted and unresolved fail closed. Current Subway ordinary delay starts at final dead-NPC despawn, preserving the removed local scheduler semantics. Respawn uses the original spawn row and position. Runtime identity allocation remains unchanged; whether the client requires identity reuse is unresolved.
 
-Support fixed and multiple spawns, weighted/random profile pools, min/max alive, shared/independent timers, day/night/event/quest/faction conditions, scaling, activation, instance creation, restart restoration, disabled/quarantined rows, and diagnostic slices. All selections and precedence must be deterministic for a supplied seed.
+## Subway migration
 
-## Migration
+`OrdinaryEnemyCatalog.GetSpawns()` adapts deterministically into normalized definitions. All 259 captured rows remain represented: 221 active at `PLAYFIELD_START` and 38 stored as `Quarantined=true`, `Enabled=false`. Thief and Filth Flea use the same controller and unchanged materializer. Quarantined rows cannot activate normally.
 
-1. Adapt `OrdinaryEnemyCatalog` without changing active PF127 rows.
-2. Adapt `PlayfieldDbMobSpawnRuntimeService` into legacy definitions.
-3. Replace `CapturedAreteRobotSpawnOrchestrator` after parity fixtures.
-4. Add static manifest loader and validators.
-5. Add dyna/mission/dungeon adapters.
+## Migration matrix
 
-Visibility registration, combat, movement, corpse, and loot remain shared downstream services.
+| Current path | Category | Owner/source | Replacement/status | Evidence |
+| --- | --- | --- | --- | --- |
+| Profile-backed Subway ordinary rows | STATIC_WORLD | catalog/captures | global controller; MIGRATED | Capture-backed |
+| Ordinary respawn dictionary | STATIC_WORLD | ordinary runtime | shared scheduler; REMOVED_AFTER_PARITY | Existing despawn timing |
+| DB `mobspawns` | STATIC_WORLD legacy | DB runtime | disabled normalized adapter; legacy owner retained | Legacy partial |
+| Captured Arete robots | STATIC_WORLD candidate | robot orchestrator | ADAPTER_REQUIRED pending parity | Capture-backed |
+| Vendors, terminals, static dynels | STATIC_OBJECT | specialized owners | STATIC_OBJECT_RETAIN | Existing contracts |
+| Pets and summons | PET_OR_SUMMON | pet runtime | retained and validator-rejected | Owner-scoped |
+| Scripted bosses/quests | SCRIPTED_ENCOUNTER | content handlers | CUSTOM_ENCOUNTER_RETAIN | Mechanic-specific |
+| Dyna proposals | DYNA_CAMP | generated evidence | EVIDENCE_BLOCKED; no activation | Community documented |
+
+## Lifecycle and persistence
+
+Playfield startup activates once. Disposal/reset cancels schedules and clears runtime mappings while definitions remain reusable. Corpse removal is an explicit notification; population never examines loot or removes corpses. Ordinary state is ephemeral and repopulates after restart. `IPopulationStateStore` reserves a future durable boundary for camps, bosses, events, lockouts, and recoverable instances; no schema or persistence was added.
+
+## Adding content
+
+Profiles contain reusable enemy-type facts. Spawn rows contain exact identity and location evidence and reference a validated group and respawn policy. Use `PLAYFIELD_START` only for ordinary static enemies. Use an encounter controller for phases, waves, adds, hazards, special targeting, invulnerability, doors, quest transitions, or synchronization.

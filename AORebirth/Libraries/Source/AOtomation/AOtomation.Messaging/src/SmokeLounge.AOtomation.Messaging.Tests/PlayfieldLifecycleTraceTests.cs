@@ -1315,8 +1315,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 npcRuntimeText.Contains("new CapturedSubwayContentProvider()")
                 && npcRuntimeText.Contains("new OrdinaryEnemyCatalog(")
                 && npcRuntimeText.Contains("new OrdinaryEnemyRuntimeService(")
-                && npcRuntimeText.Contains("this.ordinaryEnemies.SpawnForPlayfield(this.playfield, playfieldIdentity);"),
-                "NPCRuntimeService must own the unified ordinary-enemy spawn path.");
+                && npcRuntimeText.Contains("new WorldPopulationController(")
+                && npcRuntimeText.Contains("this.worldPopulation.ActivatePlayfield(playfieldIdentity);"),
+                "NPCRuntimeService must route ordinary activation through the global population controller.");
 
             Assert.IsTrue(
                 providerText.Contains("\"Filth Flea\"")
@@ -1753,10 +1754,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 runtimeText.Contains("new CapturedSubwayOrdinaryContentProvider()")
                 && runtimeText.Contains("new OrdinaryEnemyCatalog(")
                 && runtimeText.Contains("new OrdinaryEnemyRuntimeService(")
-                && runtimeText.Contains("this.ordinaryEnemies.SpawnForPlayfield(this.playfield, playfieldIdentity);")
+                && runtimeText.Contains("new WorldPopulationController(")
+                && runtimeText.Contains("this.worldPopulation.ActivatePlayfield(playfieldIdentity);")
                 && projectText.Contains(@"Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs")
                 && projectText.Contains(@"Core\Playfields\OrdinaryEnemyCatalog.cs")
-                && projectText.Contains(@"Core\Playfields\OrdinaryEnemyRuntimeService.cs"),
+                && projectText.Contains(@"Core\Playfields\OrdinaryEnemyRuntimeService.cs")
+                && projectText.Contains(@"Core\Playfields\WorldPopulationController.cs"),
                 "PF127 runtime and project wiring must include the ordinary capture-backed slice.");
 
             string[] excludedNamedOrOwnedMobs =
@@ -2105,9 +2108,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsTrue(
                 runtimeText.Contains("this.activeRuntimeIdentityBySource.ContainsKey(spawn.SourceIdentity)")
-                && runtimeText.Contains("this.pendingRespawns.ContainsKey(spawn.SourceIdentity)")
                 && runtimeText.Contains("internal void ClearRuntimeState(int playfieldInstance)")
                 && runtimeText.Contains("OrdinaryEnemyRuntimeRegistry.RemoveForPlayfield(playfieldInstance)")
+                && npcRuntimeText.Contains("this.worldPopulation.ClearPlayfield(this.playfield.Identity.Instance)")
                 && npcRuntimeText.Contains("this.ordinaryEnemies.ClearRuntimeState(this.playfield.Identity.Instance)")
                 && runtimeSystemsText.Contains("internal void ClearNpcRuntimeState()")
                 && playfieldText.Contains("this.runtimeSystems.ClearNpcRuntimeState();"),

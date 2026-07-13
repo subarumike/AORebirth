@@ -47,6 +47,8 @@ namespace AORebirth.Core.Playfields
 
         private readonly OrdinaryEnemyRuntimeService ordinaryEnemies;
 
+        private readonly WorldPopulationController worldPopulation;
+
         private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
 
         private readonly Dictionary<int, DateTime> corpseDespawnTicks = new Dictionary<int, DateTime>();
@@ -81,6 +83,8 @@ namespace AORebirth.Core.Playfields
                     this.patrolReplay,
                     this.dynelRegistry,
                     this.ActivateNpc);
+            this.worldPopulation =
+                new WorldPopulationController(this.playfield, this.ordinaryEnemyCatalog, this.ordinaryEnemies);
         }
 
         internal void ActivateNpc(ICharacter character)
@@ -98,6 +102,7 @@ namespace AORebirth.Core.Playfields
                 }
             }
 
+            this.worldPopulation.ClearPlayfield(this.playfield.Identity.Instance);
             this.ordinaryEnemies.ClearRuntimeState(this.playfield.Identity.Instance);
             this.npcHomeStates.Clear();
             this.corpseDespawnTicks.Clear();
@@ -140,7 +145,7 @@ namespace AORebirth.Core.Playfields
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
         {
             this.capturedAreteRobotSpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
-            this.ordinaryEnemies.SpawnForPlayfield(this.playfield, playfieldIdentity);
+            this.worldPopulation.ActivatePlayfield(playfieldIdentity);
         }
 
         internal bool HasPendingDeadNpcDespawn(Identity identity)
@@ -166,12 +171,17 @@ namespace AORebirth.Core.Playfields
 
         internal void ProcessDueCapturedSubwayRespawns(Identity playfieldIdentity, DateTime utcNow)
         {
-            this.ordinaryEnemies.ProcessDueRespawns(this.playfield, playfieldIdentity, utcNow);
+            this.worldPopulation.ProcessDue(utcNow);
         }
 
         internal void ClearNpcCorpseDespawn(int corpseInstance)
         {
             this.corpseDespawnTicks.Remove(corpseInstance);
+        }
+
+        internal void NotifyCorpseRemoved(Identity corpseIdentity)
+        {
+            this.worldPopulation.NotifyCorpseRemoved(corpseIdentity, DateTime.UtcNow);
         }
 
         internal void BeginNpcDeath(ICharacter attacker, ICharacter target)
@@ -194,6 +204,7 @@ namespace AORebirth.Core.Playfields
             this.playfield.SendNpcDeathAnimation(target);
             this.rewards.RunNpcDeathRewardHooks(attacker, target, this.playfield.AwardCombatXp);
             this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);
+            this.worldPopulation.NotifyDeath(target, corpseIdentity, DateTime.UtcNow);
 
             this.ScheduleDeadNpcDespawn(target);
 
@@ -226,7 +237,7 @@ namespace AORebirth.Core.Playfields
 
         internal void FinalizeNpcDespawn(ICharacter target)
         {
-            this.ordinaryEnemies.ScheduleRespawnAfterDespawn(target, DateTime.UtcNow);
+            this.worldPopulation.NotifyNpcDespawn(target, DateTime.UtcNow);
             this.corpseLifecycle.FinalizeNpcDespawn(target);
             this.dynelRegistry.Unregister(target.Identity);
             OrdinaryEnemyRuntimeRegistry.Remove(target.Identity.Instance);

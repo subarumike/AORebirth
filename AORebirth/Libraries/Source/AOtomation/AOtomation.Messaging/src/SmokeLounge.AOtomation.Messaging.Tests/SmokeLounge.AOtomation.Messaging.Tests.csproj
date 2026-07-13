@@ -73,6 +73,7 @@
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
     <Compile Include="GlobalLootFoundationTests.cs" />
+    <Compile Include="WorldPopulationFoundationTests.cs" />
     <Compile Include="SubwayLootPoolRulesTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestStateTests.cs" />
@@ -139,6 +140,8 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\LootDefinitions.cs"><Link>LootDefinitions.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\LootGenerationService.cs"><Link>LootGenerationService.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\WorldPopulationDefinitions.cs"><Link>WorldPopulationDefinitions.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\WorldRespawnScheduler.cs"><Link>WorldRespawnScheduler.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\SubwayLootPoolRules.cs">
       <Link>SubwayLootPoolRules.cs</Link>
     </Compile>
