@@ -93,8 +93,20 @@ namespace
 
         if (profile == aorf::ClientProfile::NewClient)
         {
+            if (!aorf::InstallNewClientGuiDrawFix())
+            {
+                aorf::Log("ERROR new-client GUI draw repair was not installed");
+                MessageBoxW(
+                    nullptr,
+                    L"AORoomSpaceFix could not install the new-client GUI crash repair. "
+                    L"Close AO and review %LOCALAPPDATA%\\AORoomSpaceFix\\AORoomSpaceFix.log.",
+                    L"AO RoomSpace Fix",
+                    MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
+                return 1;
+            }
+
             aorf::Log("SKIP old-client-only GUI rectangle and renderer repairs");
-            aorf::Log("READY RoomSpace repair active");
+            aorf::Log("READY RoomSpace and new-client GUI draw repairs active");
             return 0;
         }
 

@@ -26,6 +26,13 @@ real DLL under the 32-bit Windows system directory. A deferred worker then:
    rollback or cache state cannot be proven safe;
 10. retains the installed wrapper allocation until process exit.
 
+For the approved new graphics client, the proxy also verifies the exact two
+callers of `GUI.dll +0x14CA77`, a GUI draw helper associated with crashes where
+the client jumps into coordinate data such as `0x41C80000`. Those two calls are
+redirected through a guard that lets valid draw calls continue unchanged, but
+skips that one draw helper call if it raises an access violation at a
+non-executable address.
+
 For the approved old live client, the proxy also verifies the exact GUI callsite
 and `Utils!Rect::operator+(Point)` implementation associated with the recurring
 `Utils.dll +0x72F1` crash, then replaces that one GUI import with a guard that
@@ -36,13 +43,15 @@ readable rectangle and point data continue through the original function
 unchanged.
 
 The old live renderer repair verifies the exact `randy31.dll +0x21A94`
-draw-resource pointer read, `randy31.dll +0x6C3A1` byte-color read, and
-`randy31.dll +0x6C51D` packed-color read. If the draw wrapper receives an
-invalid low resource pointer, the process-level guard returns from that one
-draw call without submitting it. If either color instruction receives an
-invalid low pointer, the guard substitutes black color components and resumes
-after the unsafe read. All other renderer exceptions continue through the
-normal client exception path unchanged.
+draw-resource pointer read, `randy31.dll +0x2511A` render-state lookup,
+`randy31.dll +0x6C3A1` byte-color read, and `randy31.dll +0x6C51D`
+packed-color read. If the draw wrapper receives an invalid low resource
+pointer, the process-level guard returns from that one draw call without
+submitting it. If a render-state entry contains an impossible state id, the
+guard skips that one state entry and continues the state-application loop. If
+either color instruction receives an invalid low pointer, the guard substitutes
+black color components and resumes after the unsafe read. All other renderer
+exceptions continue through the normal client exception path unchanged.
 
 The crash dump handler does not suppress arbitrary access violations, C++
 exceptions, driver faults, stack corruption, or unknown callsite failures.
