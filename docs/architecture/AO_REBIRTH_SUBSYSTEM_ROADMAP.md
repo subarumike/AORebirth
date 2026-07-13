@@ -6,11 +6,11 @@ Objective: make ownership enforceable. Add static/source guards, deterministic c
 
 ## Phase 1 — Global loot domain
 
-Objective: define tables/groups/entries/assignments and deterministic resolution. Dependencies: Phase 0. Migrate adapters for DB, captured ordinary evidence, and narrow captured special outcomes without switching production first. Tests: inheritance, weighted/independent/exclusive rolls, guaranteed evidence, QL/quantity, unique constraints. Removal enabled: debug and special-case loot branches after parity.
+Status: COMPLETE for the foundation and current production adapters. Tables, groups, entries, assignments, deterministic resolution, validation, evidence semantics, credits, DB compatibility, captured ordinary profiles, and Cleaning Robot parity are active. Dyna/boss/encounter population remains future work.
 
 ## Phase 2 — Corpse inventory and rights
 
-Objective: move remaining-items, credits, ownership, access, transfer, close/reopen, and despawn policy out of `Playfield`. Dependencies: Phase 1 and packet fixtures. Preserve captured packets exactly. Completion: `Playfield` delegates all corpse state transitions and multi-access rules are explicit; unknown team/personal behavior remains blocked.
+Status: PARTIAL. Corpse item/credit/open state and lookup ownership moved to `CorpseInventoryService`; existing packet order, transfer callbacks, handles, and lifetimes remain unchanged. Unknown team/personal behavior remains evidence-blocked.
 
 ## Phase 3 — Population and respawn
 

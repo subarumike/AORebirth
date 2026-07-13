@@ -807,6 +807,134 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void AOSharpLiveCaptureIsolatesDecodedExportFailuresAndFailsClosedOnMissingCombatRows()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string captureText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"tools-temp\AOSharpLiveCapture\Main.cs"));
+            string captureLauncherText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"tools-temp\start-aosharp-live-capture.cmd"));
+            string inboundHandler = ExtractMethodBlock(
+                captureText,
+                "private void OnN3MessageReceived(object sender, N3Message message)");
+            string decodedPipeline = ExtractMethodBlock(
+                captureText,
+                "private void LogN3Message(string direction, int sequence, N3Message message)");
+            string fightSelector = ExtractMethodBlock(
+                captureText,
+                "private bool ShouldCaptureEnemyFightEvidence(string direction, int sequence, N3Message message)");
+            string captureValidation = ExtractMethodBlock(
+                captureText,
+                "private CaptureValidation ValidateCapture()");
+
+            Assert.IsTrue(
+                inboundHandler.Contains("\"combat-loot-smoke\"")
+                && inboundHandler.Contains("\"decoded-message-pipeline\"")
+                && inboundHandler.Contains("this.RunN3CaptureStage("),
+                "One failing decoded-message consumer must not abort the capture callback.");
+            AssertTextBefore(
+                decodedPipeline,
+                "this.LogEvent(",
+                "\"specialized-export\"");
+            Assert.IsTrue(
+                decodedPipeline.Contains("this.decodedN3EventRowCount++;")
+                && decodedPipeline.Contains("\"npc-lifecycle-export\"")
+                && decodedPipeline.Contains("\"enemy-fight-export\"")
+                && captureText.Contains("N3-STAGE-ERROR"),
+                "Decoded metadata must be logged first and every evidence exporter must be failure-isolated.");
+            Assert.IsTrue(
+                fightSelector.Contains("if (IsEnemyCombatEvidenceMessage(message))")
+                && fightSelector.Contains("this.enemyFightCaptureStarted = true;")
+                && captureText.Contains("\"SpecialAttackWeapon\"")
+                && captureText.Contains("IsRawCombatEvidencePacket(packet)"),
+                "Combat packets must be captured even when focused-enemy registration is unavailable.");
+            Assert.IsFalse(
+                captureText.Contains("SimpleItemFullUpdateMessage")
+                || captureText.Contains("VendingMachineFullUpdateMessage"),
+                "The live AOSharp runtime does not provide these compile-time message types; capture must use reflection-safe message-name handling.");
+            Assert.IsTrue(
+                captureText.Contains("\"SimpleItemFullUpdate\"")
+                && captureText.Contains("\"VendingMachineFullUpdate\"")
+                && captureText.Contains("GetMemberValue(message, \"Stats\")"),
+                "Unavailable optional AOSharp message types must remain captureable without triggering TypeLoadException.");
+            Assert.IsTrue(
+                captureValidation.Contains("this.decodedN3EventRowCount == 0")
+                && captureValidation.Contains("this.n3CaptureStageErrorCount > 0")
+                && captureValidation.Contains("this.rawCombatPacketCount > 0 && this.enemyCombatRowCount == 0"),
+                "Capture health must fail closed instead of reporting a combat capture complete with missing decoded evidence.");
+            Assert.IsTrue(
+                captureText.Contains("corpse-loot-observations.csv")
+                && captureText.Contains("InitialSnapshot")
+                && captureText.Contains("CorpseCredits")
+                && captureText.Contains("PlayerLevel")
+                && captureText.Contains("this.corpseLootInitialSnapshotCount < 10")
+                && captureText.Contains("this.corpseLootInitialEnemyKeys.Count != 1"),
+                "A marked ten-kill loot capture must preserve empty outcomes, credits, enemy/player context, and one-enemy completeness in one pass.");
+            Assert.IsTrue(
+                captureLauncherText.Contains("--loot-10")
+                && captureLauncherText.Contains("LOOT_CAPTURE_REQUEST")
+                && captureText.Contains("LootCaptureRequestFileName")
+                && captureText.Contains("loot-10 armed by approved launcher"),
+                "Codex must be able to arm ten-kill loot validation through the approved external launcher without asking Mike to type an in-game command.");
+        }
+
+        [TestMethod]
+        public void SubwayDisobedientBotCorpseUsesCapturedCreditsWithoutConstantItemDrop()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string providerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+            string catalogText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
+            string corpseRulesText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string capturedLootDefinitions = ExtractMethodBlock(
+                providerText,
+                "public CapturedSubwayLootDefinition[] GetLootDefinitions()");
+            string lootProfile = ExtractMethodBlock(
+                catalogText,
+                "private static OrdinaryEnemyLootProfile BuildLootProfile(");
+            string corpseRegistration = ExtractMethodBlock(
+                playfieldText,
+                "private void RegisterCorpse(ICharacter target, Identity corpseIdentity)");
+            string corpseVisualMap = ExtractMethodBlock(
+                corpseRulesText,
+                "public static Dictionary<int, int> BuildMonsterDataToCorpseCatMeshMap()");
+
+            Assert.IsTrue(
+                corpseVisualMap.Contains("{ 17649, 15215 }"),
+                "Disobedient Bot must use the corpse CATMesh captured in both official-live fights.");
+
+            Assert.IsTrue(
+                lootProfile.Contains("if (monsterData == 17649)")
+                && lootProfile.Contains("new OrdinaryEnemyLevelCreditRule(5, 6, 6, 2")
+                && lootProfile.Contains("new OrdinaryEnemyLevelCreditRule(6, 8, 8, 2")
+                && lootProfile.Contains("new OrdinaryEnemyLevelCreditRule(8, 10, 10, 4")
+                && lootProfile.Contains("new OrdinaryEnemyLevelCreditRule(9, 11, 11, 3")
+                && lootProfile.Contains("new OrdinaryEnemyLevelCreditRule(10, 12, 12, 2")
+                && lootProfile.Contains("OrdinaryEnemyEvidenceState.Observed")
+                && lootProfile.Contains("Keep unobserved levels unresolved"),
+                "Disobedient Bot credits must stay conditioned by identity-correlated enemy level instead of using a global range or guessed formula.");
+            Assert.IsFalse(
+                capturedLootDefinitions.Contains("\"Disobedient Bot\""),
+                "One observed Disobedient Bot outcome must not become a constant item drop instead of a pool roll.");
+            string globalLootText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
+            Assert.IsTrue(
+                globalLootText.Contains("profile.Loot.LevelCreditRules")
+                && globalLootText.Contains("x.EnemyLevel == targetLevel"),
+                "Runtime corpse credits must adapt the observed rule for the enemy's level into the global registry.");
+            Assert.IsTrue(
+                corpseRegistration.Contains("GlobalLootRuntimeService.Generate(target, this.Identity.Instance)")
+                && corpseRegistration.Contains("int credits = generatedLoot.Credits;")
+                && corpseRegistration.Contains("CorpseLootClassFor(target, lootItems, credits)")
+                && corpseRegistration.Contains("Credits = credits"),
+                "Captured Bot credits must create a regular loot-bearing corpse through the shared runtime.");
+        }
+
+        [TestMethod]
         public void CapturedAreteRobotContentProviderPreservesSpawnDefinitions()
         {
             var provider = new CapturedAreteRobotContentProvider();
@@ -1503,6 +1631,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
             string playfieldText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string globalLootText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
             string scfuText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
             string projectText = File.ReadAllText(
@@ -1616,9 +1746,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Ordinary combat must use the shared captured contract and fail closed when AttackInfo is unobserved.");
             Assert.IsTrue(
                 catalogText.Contains("DropGroupHash = \"ordinary-enemy-profile\"")
-                && playfieldText.Contains("BuildCombatLootTableEntries()")
-                && playfieldText.Contains("lootSource = \"ordinary-enemy-profile\""),
-                "Corpse loot must prefer only captured ordinary evidence before debug/database fallbacks.");
+                && globalLootText.Contains("EnsureOrdinary"),
+                "Captured ordinary loot evidence must be adapted into the global registry.");
 
             Assert.IsTrue(
                 runtimeText.Contains("new CapturedSubwayOrdinaryContentProvider()")
@@ -1960,24 +2089,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string runtimeSystemsText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
 
-            string lootMethod = ExtractMethodBlock(
-                playfieldText,
-                "private List<CorpseLootItem> RollCorpseLootItems(");
-            int failClosedIndex = lootMethod.IndexOf(
-                "if (profileBackedEnemy && matchingEntries.Count == 0)",
-                StringComparison.Ordinal);
-            int debugFallbackIndex = lootMethod.IndexOf(
-                "matchingEntries = DebugLootTable.Where(",
-                StringComparison.Ordinal);
-            int databaseFallbackIndex = lootMethod.IndexOf(
-                "matchingEntries = GetDatabaseLootTable().Where(",
-                StringComparison.Ordinal);
             Assert.IsTrue(
-                failClosedIndex >= 0
-                && debugFallbackIndex > failClosedIndex
-                && databaseFallbackIndex > failClosedIndex
-                && lootMethod.Contains("return lootItems;"),
-                "Profile-backed ordinary enemies with unresolved/empty loot must fail closed before debug or database loot fallback.");
+                playfieldText.Contains("GlobalLootRuntimeService.Generate(target, this.Identity.Instance)")
+                && !playfieldText.Contains("RollCorpseLootItems")
+                && !playfieldText.Contains("GetDatabaseLootTable")
+                && !playfieldText.Contains("DebugLootTable"),
+                "All corpse loot must resolve through the global service, with unresolved ordinary loot failing closed there.");
 
             Assert.IsTrue(
                 playfieldText.Contains("ordinaryDefinition.Profile.Corpse.UnlootedLifetimeSeconds")
@@ -3553,16 +3670,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("private void RegisterCorpse(ICharacter target, Identity corpseIdentity)")
                 && playfieldText.Contains("private void DespawnCorpse(int corpseInstance)")
-                && playfieldText.Contains("this.corpses[corpseIdentity.Instance] = state;")
-                && playfieldText.Contains("x => this.corpses.Remove(x)")
+                && playfieldText.Contains("this.corpseInventoryService.Create(state);")
+                && playfieldText.Contains("x => this.corpseInventoryService.Remove(x)")
                 && playfieldText.Contains("x => this.pendingCorpseCreditAwards.Remove(x)"),
-                "Playfield intentionally keeps corpse state storage while object lifecycle owns despawn cleanup order.");
+                "The corpse inventory service must own state while object lifecycle preserves despawn cleanup order.");
             Assert.IsTrue(
-                playfieldText.Contains("private List<CorpseLootItem> RollCorpseLootItems(ICharacter target)")
-                && playfieldText.Contains("private static int RollCorpseCredits(ICharacter target)")
+                playfieldText.Contains("GlobalLootRuntimeService.Generate(target, this.Identity.Instance)")
+                && playfieldText.Contains("private static readonly GlobalLootRuntimeService GlobalLootRuntimeService")
                 && playfieldText.Contains("private void SendCorpseInventoryUpdate(ICharacter looter, CorpseState corpse)")
                 && playfieldText.Contains("private void AwardCorpseCredits(ICharacter looter, CorpseState corpse)"),
-                "Playfield intentionally keeps loot, credit, and corpse container construction outside NPCRuntimeService.");
+                "Global services must own loot and corpse state while Playfield retains packet and character-credit application callbacks.");
             Assert.IsTrue(
                 corpseAccessText.Contains("internal sealed class PlayfieldCorpseAccessRuntimeService")
                 && corpseAccessText.Contains("internal bool TryUseCorpse<TCorpseState>(")
@@ -3742,7 +3859,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Regular loot-bearing corpses must receive a five-minute initial lifetime; empty corpses must use the captured near-immediate cleanup window.");
             AssertTextBefore(
                 registerCorpse,
-                "this.corpses[corpseIdentity.Instance] = state;",
+                "this.corpseInventoryService.Create(state);",
                 "this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);");
 
             Assert.IsTrue(
@@ -3795,7 +3912,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && scheduleCorpseCreditAward.Contains("this.pendingCorpseCreditAwards[corpse.CorpseIdentity.Instance]"),
                 "Playfield must keep pending corpse credit storage ownership and must not schedule duplicate or zero-credit payouts.");
             Assert.IsTrue(
-                awardCorpseCredits.Contains("corpse.CreditsLooted = true;")
+                awardCorpseCredits.Contains("this.corpseInventoryService.RemoveCredits(corpse.CorpseIdentity, DateTime.UtcNow)")
                 && awardCorpseCredits.Contains("CashStatRules.Clamp")
                 && awardCorpseCredits.Contains("looter.Stats[StatIds.cash].Set((uint)cashAfter);")
                 && awardCorpseCredits.Contains("this.runtimeSystems.SendChangedStatsIfClient(")
@@ -3816,9 +3933,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Item loot transfer must not independently award corpse credits.");
 
             Assert.IsTrue(
-                playfieldText.Contains("private readonly Dictionary<int, CorpseState> corpses")
+                playfieldText.Contains("private readonly CorpseInventoryService corpseInventoryService")
                 && playfieldText.Contains("private readonly Dictionary<int, PendingCorpseCreditAward> pendingCorpseCreditAwards"),
-                "Playfield must keep corpse and pending credit state storage for now.");
+                "The global corpse service must own corpse state while Playfield retains delayed credit scheduling.");
             Assert.IsTrue(
                 sendCorpseInventoryUpdate.Contains("new InventoryUpdateMessage")
                 && sendCorpseContainerAddItem.Contains("new ContainerAddItemMessage")

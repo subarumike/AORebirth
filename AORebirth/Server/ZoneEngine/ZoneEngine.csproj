@@ -325,6 +325,11 @@
     <Compile Include="Core\Playfields\CapturedEnemyCombatContract.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyCatalog.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyProfile.cs" />
+    <Compile Include="Core\Playfields\LootDefinitions.cs" />
+    <Compile Include="Core\Playfields\LootGenerationService.cs" />
+    <Compile Include="Core\Playfields\GlobalLootRuntimeService.cs" />
+    <Compile Include="Core\Playfields\CorpseInventoryService.cs" />
+    <Compile Include="Core\Playfields\SubwayLootPoolRules.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyRuntimeService.cs" />
     <Compile Include="Core\Playfields\NpcCombatAttackRules.cs" />
     <Compile Include="Core\Playfields\NpcCombatTickCoordinator.cs" />

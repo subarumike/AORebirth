@@ -116,7 +116,14 @@ namespace AORebirth.Core.Playfields
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
         private readonly Dictionary<int, int> lastCombatWeaponSlots = new Dictionary<int, int>();
 
-        private readonly Dictionary<int, CorpseState> corpses = new Dictionary<int, CorpseState>();
+        private readonly CorpseInventoryService corpseInventoryService = new CorpseInventoryService();
+
+        private static readonly GlobalLootRuntimeService GlobalLootRuntimeService = new GlobalLootRuntimeService();
+
+        private IDictionary<int, CorpseState> corpses
+        {
+            get { return this.corpseInventoryService.States; }
+        }
 
         private readonly object corpseVisibilitySync = new object();
 
@@ -165,31 +172,7 @@ namespace AORebirth.Core.Playfields
 
         private const int CapturedCleaningRobotCorpseCatMesh = 297018;
 
-        private const int CapturedCleaningRobotCorpseCredits = 5;
-
         private const double CapturedCleaningRobotFollowStopDistance = 0.0;
-
-        private static readonly int[][] CapturedCleaningRobotLootOutcomes =
-        {
-            new[] { 42620 },
-            new int[0],
-            new[] { 36779, 84142 },
-            new int[0],
-            new[] { 297289 },
-            new int[0],
-            new int[0],
-            new[] { 70558, 155685 },
-            new[] { 297289, 150306 },
-            new int[0],
-            new[] { 155666 },
-            new int[0],
-            new[] { 70564 },
-            new[] { 155666 },
-            new[] { 155687 },
-            new[] { 70565 },
-            new[] { 155684 },
-            new int[0]
-        };
 
         private const int UnarmedAttackInfoAmmoCount = -1;
 
@@ -222,24 +205,6 @@ namespace AORebirth.Core.Playfields
         private const int ShadowlandsStartY = 43;
 
         private const int ShadowlandsStartZ = 565;
-
-        private static readonly Random LootRandom = new Random();
-
-        private static readonly object LootRandomLock = new object();
-
-        private static readonly CombatLootTableEntry[] DebugLootTable = CombatTestLootCatalog.BuildEntries();
-
-        private static readonly CombatLootTableEntry[] OrdinaryEnemyLootTable =
-            new OrdinaryEnemyCatalog(
-                new CapturedSubwayContentProvider(),
-                new CapturedSubwayOrdinaryContentProvider())
-                .BuildCombatLootTableEntries();
-
-        private static readonly object DatabaseLootTableLock = new object();
-
-        private static CombatLootTableEntry[] databaseLootTable = new CombatLootTableEntry[0];
-
-        private static bool databaseLootTableLoaded;
 
         private static readonly Dictionary<int, int> MonsterDataToCorpseCatMesh =
             CombatCorpseVisuals.BuildMonsterDataToCorpseCatMeshMap();
@@ -1057,65 +1022,9 @@ namespace AORebirth.Core.Playfields
                 this.collisionStatels,
                 ResolveCapturedMontroyalPrivateCityInstance,
                 ResolveCharacterOrganizationInstance,
-                ResolveProxyExitDestination,
                 x => x.StopMovement(),
                 this.SendCapturedPrivateCityEntrySocialStatus,
                 this.TeleportToPlayfield);
-        }
-
-        private static ProxyPlayfieldExitDestination ResolveProxyExitDestination(ICharacter character)
-        {
-            if (character == null)
-            {
-                return null;
-            }
-
-            uint externalDoorInstance = character.Stats[StatIds.externaldoorinstance].BaseValue;
-            int externalPlayfieldId = character.Stats[StatIds.externalplayfieldinstance].Value;
-            PlayfieldData externalPlayfield;
-            if (externalPlayfieldId <= 0
-                || externalDoorInstance == 0
-                || !PlayfieldLoader.PFData.TryGetValue(externalPlayfieldId, out externalPlayfield))
-            {
-                return null;
-            }
-
-            StatelData door =
-                externalPlayfield.Statels.FirstOrDefault(
-                    x =>
-                        (uint)x.Identity.Instance == externalDoorInstance
-                        && x.Identity.Type == IdentityType.Door);
-            if (door == null)
-            {
-                return null;
-            }
-
-            var position = new AORebirth.Core.Vector.Vector3(door.X, door.Y, door.Z);
-            var heading = new AORebirth.Core.Vector.Quaternion(
-                door.HeadingX,
-                door.HeadingY,
-                door.HeadingZ,
-                door.HeadingW);
-
-            AORebirth.Core.Vector.Quaternion.Normalize(heading);
-            AORebirth.Core.Vector.Vector3 normal =
-                (AORebirth.Core.Vector.Vector3)heading.RotateVector3(AORebirth.Core.Vector.Vector3.AxisZ);
-
-            position.x += normal.x * 2.5;
-            position.z += normal.z * 2.5;
-
-            if (externalPlayfieldId == 655 && externalDoorInstance == 0xC01A028F)
-            {
-                position.x = 3294.2f;
-                position.y = 35.1f;
-                position.z = 843.7f;
-            }
-
-            return new ProxyPlayfieldExitDestination(
-                externalPlayfieldId,
-                externalDoorInstance,
-                new Coordinate(position),
-                heading);
         }
 
         private void PrimeStatelCollisionContacts(ICharacter dynel)
@@ -2263,7 +2172,8 @@ namespace AORebirth.Core.Playfields
                 corpse => corpse.ExpiresAtUtc,
                 corpse => corpse.HasUnlootedItems,
                 corpse => corpse.Opened,
-                (corpse, opened) => { corpse.Opened = opened; },
+                (corpse, opened) => this.corpseInventoryService.MarkOpened(
+                    corpse.CorpseIdentity, opened, DateTime.UtcNow),
                 corpse => corpse.LootClass,
                 this.DespawnCorpse,
                 this.ExtendCorpseLifetime,
@@ -2314,8 +2224,16 @@ namespace AORebirth.Core.Playfields
                 corpse => FindCorpseLootItem(corpse, requestedLootSlot),
                 lootItem => lootItem.Item,
                 lootItem => lootItem.Slot,
-                (lootItem, looted) => { lootItem.Looted = looted; },
-                (corpse, opened) => { corpse.Opened = opened; },
+                (lootItem, looted) =>
+                {
+                    if (looted && selectedCorpse != null)
+                    {
+                        this.corpseInventoryService.RemoveItem(
+                            selectedCorpse.CorpseIdentity, lootItem.Slot, DateTime.UtcNow);
+                    }
+                },
+                (corpse, opened) => this.corpseInventoryService.MarkOpened(
+                    corpse.CorpseIdentity, opened, DateTime.UtcNow),
                 this.runtimeSystems.CharacterHasUniqueItemAlready,
                 (character, text) => ChatTextMessageHandler.Default.Send(character, text),
                 this.SendUseActionFinished,
@@ -3043,8 +2961,22 @@ namespace AORebirth.Core.Playfields
 
         private void RegisterCorpse(ICharacter target, Identity corpseIdentity)
         {
-            List<CorpseLootItem> lootItems = this.RollCorpseLootItems(target);
-            int credits = RollCorpseCredits(target);
+            LootGenerationResult generatedLoot = GlobalLootRuntimeService.Generate(target, this.Identity.Instance);
+            List<CorpseLootItem> lootItems = generatedLoot.Items
+                .Select((value, index) => new CorpseLootItem
+                {
+                    Slot = index,
+                    Item = new Item(
+                        value.Quality,
+                        value.ItemTemplateId,
+                        value.HighItemTemplateId > 0 ? value.HighItemTemplateId : value.ItemTemplateId)
+                    {
+                        MultipleCount = value.Quantity
+                    },
+                    LootIdentity = this.AllocateCorpseLootItemIdentity()
+                })
+                .ToList();
+            int credits = generatedLoot.Credits;
             CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);
             TimeSpan lifetime = CorpseLifetimeFor(target, lootClass);
             TimeSpan itemLootLifetime = CombatCorpseRules.RegularLootCorpseLifetime;
@@ -3063,6 +2995,7 @@ namespace AORebirth.Core.Playfields
             {
                 CorpseIdentity = corpseIdentity,
                 DeadNpcIdentity = target.Identity,
+                PlayfieldId = this.Identity.Instance,
                 VisualSource = target,
                 VisibleRecipients = new HashSet<Identity>(),
                 Name = "Remains of " + target.Name,
@@ -3070,13 +3003,16 @@ namespace AORebirth.Core.Playfields
                 CreatedAtUtc = DateTime.UtcNow,
                 LootItems = lootItems,
                 Credits = credits,
+                GenerationResult = generatedLoot,
+                LootUnresolved = generatedLoot.LootUnresolved || generatedLoot.CreditsUnresolved,
+                RightsPolicy = CorpseLootRightsPolicy.Public,
                 InventoryHandle = this.AllocateCorpseInventoryHandle(),
                 ItemLootLifetime = itemLootLifetime,
                 EmptyCleanupDelay = emptyCleanupDelay,
                 ExpiresAtUtc = expiresAtUtc
             };
 
-            this.corpses[corpseIdentity.Instance] = state;
+            this.corpseInventoryService.Create(state);
             this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);
 
             LogUtil.Debug(
@@ -3106,7 +3042,7 @@ namespace AORebirth.Core.Playfields
                 corpseInstance,
                 this.SendCorpseDespawn,
                 this.runtimeSystems.ClearNpcCorpseDespawn,
-                x => this.corpses.Remove(x),
+                x => this.corpseInventoryService.Remove(x),
                 x => this.pendingCorpseCreditAwards.Remove(x));
         }
 
@@ -3145,60 +3081,6 @@ namespace AORebirth.Core.Playfields
                     minimumRemaining.TotalSeconds,
                     reason,
                     corpse.LootItems == null ? 0 : corpse.LootItems.Count(x => !x.Looted)));
-        }
-
-        private class CorpseState
-        {
-            public Identity CorpseIdentity { get; set; }
-
-            public Identity DeadNpcIdentity { get; set; }
-
-            public ICharacter VisualSource { get; set; }
-
-            public HashSet<Identity> VisibleRecipients { get; set; }
-
-            public string Name { get; set; }
-
-            public CombatCorpseLootClass LootClass { get; set; }
-
-            public DateTime CreatedAtUtc { get; set; }
-
-            public DateTime SpawnsAtUtc { get; set; }
-
-            public DateTime ExpiresAtUtc { get; set; }
-
-            public TimeSpan ItemLootLifetime { get; set; }
-
-            public TimeSpan EmptyCleanupDelay { get; set; }
-
-            public int InventoryHandle { get; set; }
-
-            public List<CorpseLootItem> LootItems { get; set; }
-
-            public int Credits { get; set; }
-
-            public bool CreditsLooted { get; set; }
-
-            public bool Opened { get; set; }
-
-            public bool HasUnlootedItems
-            {
-                get
-                {
-                    return this.LootItems != null && this.LootItems.Any(x => !x.Looted);
-                }
-            }
-        }
-
-        private class CorpseLootItem
-        {
-            public int Slot { get; set; }
-
-            public Item Item { get; set; }
-
-            public Identity LootIdentity { get; set; }
-
-            public bool Looted { get; set; }
         }
 
         private class PendingCorpseCreditAward
@@ -3341,413 +3223,6 @@ namespace AORebirth.Core.Playfields
             var stopFight = new StopFightMessage { Identity = character.Identity, Unknown1 = 1 };
 
             this.Announce(stopFight);
-        }
-
-        private List<CorpseLootItem> RollCorpseLootItems(ICharacter target)
-        {
-            var lootItems = new List<CorpseLootItem>();
-
-            if (IsCapturedCleaningRobot(target))
-            {
-                return this.RollCapturedCleaningRobotLootItems();
-            }
-
-            int monsterData = target.Stats[StatIds.monsterdata].Value;
-            int npcFamily = target.Stats[StatIds.npcfamily].Value;
-            int level = target.Stats[StatIds.level].Value;
-            var matchingEntries = new List<CombatLootTableEntry>();
-            string lootSource = "none";
-            OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
-            bool profileBackedEnemy = OrdinaryEnemyRuntimeRegistry.TryGet(
-                target.Identity.Instance,
-                out ordinaryDefinition);
-
-            if (profileBackedEnemy
-                && this.Identity.Instance == CapturedSubwayContentProvider.SubwayPlayfieldInstance)
-            {
-                matchingEntries = OrdinaryEnemyLootTable.Where(
-                    x => x.Matches(target.Name, monsterData, npcFamily)).ToList();
-                lootSource = "ordinary-enemy-profile";
-            }
-
-            if (profileBackedEnemy && matchingEntries.Count == 0)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format(
-                        "Ordinary enemy loot remains empty because profile evidence has no matching entries target={0} profile={1} evidence={2}",
-                        target.Identity,
-                        ordinaryDefinition.Profile.ProfileKey,
-                        ordinaryDefinition.Profile.Loot.Evidence));
-                return lootItems;
-            }
-
-            if (matchingEntries.Count == 0)
-            {
-                matchingEntries = DebugLootTable.Where(
-                    x => x.Matches(target.Name, monsterData, npcFamily)).ToList();
-                lootSource = "debug";
-            }
-
-            if (matchingEntries.Count == 0)
-            {
-                matchingEntries = GetDatabaseLootTable().Where(
-                    x => x.Matches(target.Name, monsterData, npcFamily)).ToList();
-                lootSource = "database";
-            }
-
-            if (matchingEntries.Count == 0)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    string.Format(
-                        "Loot roll found no configured table entries target={0} name={1} monsterData={2} npcFamily={3}",
-                        target.Identity,
-                        target.Name,
-                        monsterData,
-                        npcFamily));
-            }
-
-            foreach (CombatLootTableEntry entry in matchingEntries)
-            {
-                if (!RollLootChance(entry))
-                {
-                    continue;
-                }
-
-                Item item = CreateLootItem(entry, level);
-                if (item == null)
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Error,
-                        string.Format(
-                            "Loot roll skipped invalid item target={0} name={1}",
-                            target.Identity,
-                            target.Name));
-                    continue;
-                }
-
-                lootItems.Add(
-                    new CorpseLootItem
-                    {
-                        Slot = lootItems.Count,
-                        Item = item,
-                        LootIdentity = this.AllocateCorpseLootItemIdentity()
-                    });
-            }
-
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                string.Format(
-                    "Loot rolled target={0} name={1} monsterData={2} npcFamily={3} items={4} source={5}",
-                    target.Identity,
-                    target.Name,
-                    monsterData,
-                    npcFamily,
-                    lootItems.Count,
-                    lootSource));
-
-            return lootItems;
-        }
-
-        private List<CorpseLootItem> RollCapturedCleaningRobotLootItems()
-        {
-            var lootItems = new List<CorpseLootItem>();
-            int[] outcome = CapturedCleaningRobotLootOutcomes[NextLootRandom(CapturedCleaningRobotLootOutcomes.Length)];
-
-            foreach (int templateId in outcome)
-            {
-                Item item = CreateLootItem(new[] { templateId }, 1);
-                if (item == null)
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Error,
-                        string.Format(
-                            "Captured cleaning robot loot skipped missing item template templateId={0}",
-                            templateId));
-                    continue;
-                }
-
-                lootItems.Add(
-                    new CorpseLootItem
-                    {
-                        Slot = lootItems.Count,
-                        Item = item,
-                        LootIdentity = this.AllocateCorpseLootItemIdentity()
-                    });
-            }
-
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                string.Format(
-                    "Captured cleaning robot loot rolled items={0} source=live-capture-20260629-142800",
-                    lootItems.Count));
-
-            return lootItems;
-        }
-
-        private static int RollCorpseCredits(ICharacter target)
-        {
-            if (target == null)
-            {
-                return 0;
-            }
-
-            if (IsCapturedCleaningRobot(target))
-            {
-                return CapturedCleaningRobotCorpseCredits;
-            }
-
-            OrdinaryEnemyRuntimeDefinition definition;
-            bool profileBackedEnemy = OrdinaryEnemyRuntimeRegistry.TryGet(
-                target.Identity.Instance,
-                out definition);
-            if (profileBackedEnemy
-                && definition.Profile.Loot.CreditEvidence == OrdinaryEnemyEvidenceState.Observed
-                && definition.Profile.Loot.MinimumCredits.HasValue
-                && definition.Profile.Loot.MaximumCredits.HasValue)
-            {
-                int minimum = definition.Profile.Loot.MinimumCredits.Value;
-                int maximum = definition.Profile.Loot.MaximumCredits.Value;
-                lock (LootRandomLock)
-                {
-                    return maximum <= minimum
-                        ? minimum
-                        : minimum + LootRandom.Next(maximum - minimum + 1);
-                }
-            }
-
-            if (profileBackedEnemy)
-            {
-                return 0;
-            }
-
-            int monsterData = target.Stats[StatIds.monsterdata].Value;
-            lock (LootRandomLock)
-            {
-                return CombatCorpseRules.RollObservedCredits(
-                    target.Name,
-                    monsterData,
-                    max => LootRandom.Next(max));
-            }
-        }
-
-        private static CombatLootTableEntry[] GetDatabaseLootTable()
-        {
-            if (databaseLootTableLoaded)
-            {
-                return databaseLootTable;
-            }
-
-            lock (DatabaseLootTableLock)
-            {
-                if (databaseLootTableLoaded)
-                {
-                    return databaseLootTable;
-                }
-
-                try
-                {
-                    DBMobTemplate[] mobTemplates = MobTemplateDao.Instance.GetAll().ToArray();
-                    DBMobDroptable[] dropTable = MobDroptableDao.Instance.GetAll().ToArray();
-                    databaseLootTable = CombatMobLootCatalog.BuildEntries(mobTemplates, dropTable);
-                    LogUtil.Debug(
-                        DebugInfoDetail.Engine,
-                        string.Format(
-                            "Loaded database mob loot entries={0} templates={1} drops={2}",
-                            databaseLootTable.Length,
-                            mobTemplates.Length,
-                            dropTable.Length));
-                }
-                catch (Exception e)
-                {
-                    databaseLootTable = new CombatLootTableEntry[0];
-                    LogUtil.Debug(DebugInfoDetail.Error, "Database mob loot load failed: " + e.Message);
-                }
-
-                databaseLootTableLoaded = true;
-                return databaseLootTable;
-            }
-        }
-
-        private static bool RollLootChance(CombatLootTableEntry entry)
-        {
-            if (entry == null)
-            {
-                return false;
-            }
-
-            int chance = entry.EffectiveDropChanceBasisPoints;
-            if (chance <= 0)
-            {
-                return false;
-            }
-
-            if (chance >= 10000)
-            {
-                return true;
-            }
-
-            lock (LootRandomLock)
-            {
-                return CombatCorpseRules.ShouldDropBasisPoints(chance, max => LootRandom.Next(max));
-            }
-        }
-
-        private static bool RollLootChance(int dropChancePercent)
-        {
-            if (dropChancePercent <= 0)
-            {
-                return false;
-            }
-
-            if (dropChancePercent >= 100)
-            {
-                return true;
-            }
-
-            lock (LootRandomLock)
-            {
-                return CombatCorpseRules.ShouldDrop(dropChancePercent, max => LootRandom.Next(max));
-            }
-        }
-
-        private static Item CreateLootItem(CombatLootTableEntry entry, int targetLevel)
-        {
-            if (entry == null)
-            {
-                return null;
-            }
-
-            if (entry.ItemTemplates != null && entry.ItemTemplates.Length > 0)
-            {
-                return CreateLootItem(entry.ItemTemplates, targetLevel);
-            }
-
-            return CreateLootItem(entry.ItemTemplateIds, entry.Quality);
-        }
-
-        private static Item CreateLootItem(IEnumerable<CombatLootItemTemplate> itemTemplates, int targetLevel)
-        {
-            if (itemTemplates == null)
-            {
-                return null;
-            }
-
-            List<CombatLootItemTemplate> candidates =
-                itemTemplates.Where(x => CanDropLootTemplate(x, targetLevel)).ToList();
-
-            while (candidates.Count > 0)
-            {
-                int index = NextLootRandom(candidates.Count);
-                CombatLootItemTemplate candidate = candidates[index];
-                candidates.RemoveAt(index);
-
-                Item item = CreateLootItem(candidate, targetLevel);
-                if (item != null)
-                {
-                    return item;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool CanDropLootTemplate(CombatLootItemTemplate itemTemplate, int targetLevel)
-        {
-            if (itemTemplate == null || itemTemplate.LowId <= 0)
-            {
-                return false;
-            }
-
-            if (itemTemplate.RangeCheck == 0 || targetLevel <= 0)
-            {
-                return true;
-            }
-
-            int minQuality = Math.Max(1, itemTemplate.MinQuality);
-            int maxQuality = Math.Max(minQuality, itemTemplate.MaxQuality);
-            return targetLevel >= minQuality && targetLevel <= maxQuality;
-        }
-
-        private static Item CreateLootItem(CombatLootItemTemplate itemTemplate, int targetLevel)
-        {
-            int lowId = itemTemplate.LowId;
-            int highId = itemTemplate.HighId <= 0 ? lowId : itemTemplate.HighId;
-
-            if (!ItemLoader.ItemList.ContainsKey(lowId))
-            {
-                return null;
-            }
-
-            if (!ItemLoader.ItemList.ContainsKey(highId))
-            {
-                highId = lowId;
-            }
-
-            int quality = QualityForLootTemplate(itemTemplate, targetLevel);
-            return new Item(quality, lowId, highId) { MultipleCount = 1 };
-        }
-
-        private static int QualityForLootTemplate(CombatLootItemTemplate itemTemplate, int targetLevel)
-        {
-            int minQuality = Math.Max(1, itemTemplate.MinQuality);
-            int maxQuality = Math.Max(minQuality, itemTemplate.MaxQuality);
-
-            if (itemTemplate.RangeCheck != 0 && targetLevel > 0)
-            {
-                return Math.Min(maxQuality, Math.Max(minQuality, targetLevel));
-            }
-
-            return minQuality;
-        }
-
-        private static int NextLootRandom(int max)
-        {
-            lock (LootRandomLock)
-            {
-                return LootRandom.Next(max);
-            }
-        }
-
-        private static Item CreateLootItem(IEnumerable<int> templateIds, int requestedQuality)
-        {
-            if (templateIds == null)
-            {
-                return null;
-            }
-
-            int quality = Math.Max(1, requestedQuality);
-            foreach (int templateId in templateIds)
-            {
-                ItemTemplate template;
-                if (!ItemLoader.ItemList.TryGetValue(templateId, out template))
-                {
-                    continue;
-                }
-
-                int lowId = template.GetLowId(quality);
-                if (lowId == -1)
-                {
-                    lowId = templateId;
-                }
-
-                int highId = template.GetHighId(quality);
-                if (highId == 1234567890)
-                {
-                    highId = lowId;
-                }
-
-                if (!ItemLoader.ItemList.ContainsKey(lowId) || !ItemLoader.ItemList.ContainsKey(highId))
-                {
-                    continue;
-                }
-
-                var item = new Item(quality, lowId, highId) { MultipleCount = 1 };
-                return item;
-            }
-
-            return null;
         }
 
         private static CorpseLootItem FindCorpseLootItem(CorpseState corpse, int requestedLootSlot)
@@ -3895,7 +3370,10 @@ namespace AORebirth.Core.Playfields
 
             uint cashBeforeBase = looter.Stats[StatIds.cash].BaseValue;
             int cashBefore = CashStatRules.Clamp(cashBeforeBase);
-            corpse.CreditsLooted = true;
+            if (!this.corpseInventoryService.RemoveCredits(corpse.CorpseIdentity, DateTime.UtcNow))
+            {
+                return;
+            }
             int cashAfter = CashStatRules.Clamp((long)cashBefore + corpse.Credits);
 
             looter.Stats[StatIds.cash].Set((uint)cashAfter);
@@ -4027,6 +3505,7 @@ namespace AORebirth.Core.Playfields
                 {
                     // We wont save any NPCs to character table/character's stats table
                     this.runtimeSystems.ClearNpcRuntimeState();
+                    this.corpseInventoryService.ClearPlayfield(this.Identity.Instance);
                     this.DisconnectAllClients();
                     if (this.memBusDisposeContainer != null)
                     {
