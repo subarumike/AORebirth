@@ -3,6 +3,7 @@
 // settings, camera, input, and UI modifications.
 
 #include "logging.h"
+#include "crash_dump.h"
 #include "gui_rect_fix.h"
 #include "randy_color_fix.h"
 #include "roomspace_fix.h"
@@ -41,6 +42,7 @@ namespace
     {
         aorf::LogInit();
         aorf::Log("START version=1 pid=%lu", GetCurrentProcessId());
+        aorf::InstallCrashDumpHandler();
 
         HMODULE n3 = nullptr;
         for (int attempt = 0; attempt < 300; ++attempt)
