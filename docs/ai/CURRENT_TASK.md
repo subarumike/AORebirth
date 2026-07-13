@@ -74,7 +74,7 @@ is live-confirmed level 1 client behavior, not an AORebirth combat regression.
 - Playfield runtime decomposition is completed through the latest extracted runtime services and is maintenance work only unless Mike explicitly selects it.
 - Corpse open, item loot transfer, and corpse credit payout are capture-backed and live validated.
 - Loot-bearing corpse close/reopen now follows official-live capture `20260712-195019` for the same `(Corpse:F6C002)`: open sends `InventoryUpdate`; close sends `Action 0x66`, `CharacterAction 110`, and the normal Use acknowledgement without an inventory refresh; reopen sends a new `InventoryUpdate` with a refreshed handle. Capture 51 proves handles `113 -> 114 -> 115 -> 116` across successive reopens and one remaining item after the captured loot transfer. The rejected refresh-plus-`0x66` path is removed. Manual client validation remains required.
-- Loot-bearing corpses no longer receive an initial timed despawn; empty or fully looted corpses use the 30-second empty cleanup window.
+- Loot-bearing corpses retain their five-minute lifetime while loot remains; empty or fully looted corpses use a one-second cleanup delay, matching the near-immediate live disappearance observed after the final transfer.
 - Previous capture-backed enemy, movement, combat, zoning, and appearance work remains completed project history.
 - Subway entry/exit placement has been repaired for the current tested route.
 - Filth Flea appearance has been corrected from capture-backed SCFU texture evidence.
