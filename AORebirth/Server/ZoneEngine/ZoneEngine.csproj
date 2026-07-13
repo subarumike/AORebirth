@@ -318,9 +318,10 @@
     <Compile Include="Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
-    <Compile Include="Core\Playfields\CapturedSubwayOrdinarySpawnOrchestrator.cs" />
-    <Compile Include="Core\Playfields\CapturedSubwaySpawnOrchestrator.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatContract.cs" />
+    <Compile Include="Core\Playfields\OrdinaryEnemyCatalog.cs" />
+    <Compile Include="Core\Playfields\OrdinaryEnemyProfile.cs" />
+    <Compile Include="Core\Playfields\OrdinaryEnemyRuntimeService.cs" />
     <Compile Include="Core\Playfields\NpcCombatAttackRules.cs" />
     <Compile Include="Core\Playfields\NpcCombatTickCoordinator.cs" />
     <Compile Include="Core\Playfields\NpcCorpseLifecycleCoordinator.cs" />

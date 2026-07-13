@@ -122,6 +122,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs">
       <Link>CapturedSubwayContentProvider.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyProfile.cs">
+      <Link>OrdinaryEnemyProfile.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs">
       <Link>NpcCombatAttackRules.cs</Link>
     </Compile>

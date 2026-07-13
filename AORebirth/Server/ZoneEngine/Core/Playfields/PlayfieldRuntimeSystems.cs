@@ -186,6 +186,11 @@ namespace ZoneEngine.Core.Playfields
             this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);
         }
 
+        internal void ClearNpcRuntimeState()
+        {
+            this.npcRuntime.ClearRuntimeState();
+        }
+
         internal List<StatelData> ResolveStatels(Identity playfieldIdentity)
         {
             return this.contentData.ResolveStatels(playfieldIdentity);

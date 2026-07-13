@@ -159,10 +159,6 @@ namespace AORebirth.Core.Playfields
 
         private const int CapturedCleaningRobotMonsterData = 297023;
 
-        private const int CapturedSubwayThiefMonsterData = 26092;
-
-        private const int CapturedSubwayThiefNpcFamily = 138;
-
         private const int CapturedSubwayThiefCorpseCatMesh = 5907;
 
         private const int CapturedCleaningRobotCorpseCatMesh = 297018;
@@ -231,34 +227,11 @@ namespace AORebirth.Core.Playfields
 
         private static readonly CombatLootTableEntry[] DebugLootTable = CombatTestLootCatalog.BuildEntries();
 
-        private static readonly CombatLootTableEntry[] CapturedSubwayOrdinaryLootTable =
-            new CapturedSubwayOrdinaryContentProvider().BuildCapturedLootEntries();
-
-        private static readonly CombatLootTableEntry[] CapturedSubwayLootTable =
-            new CapturedSubwayContentProvider().GetLootDefinitions()
-                .Select(
-                    (loot, index) => new CombatLootTableEntry
-                    {
-                        ExactName = loot.ExactName,
-                        MonsterData = loot.MonsterData,
-                        NpcFamily = loot.NpcFamily,
-                        Slot = index,
-                        DropChanceBasisPoints = loot.ObservedBasisPoints,
-                        ItemTemplates =
-                            new[]
-                            {
-                                new CombatLootItemTemplate
-                                {
-                                    LowId = loot.LowId,
-                                    HighId = loot.HighId,
-                                    MinQuality = loot.Quality,
-                                    MaxQuality = loot.Quality,
-                                    RangeCheck = 0,
-                                    DropGroupHash = "captured-subway-supported"
-                                }
-                            }
-                    })
-                .ToArray();
+        private static readonly CombatLootTableEntry[] OrdinaryEnemyLootTable =
+            new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider())
+                .BuildCombatLootTableEntries();
 
         private static readonly object DatabaseLootTableLock = new object();
 
@@ -2160,12 +2133,21 @@ namespace AORebirth.Core.Playfields
 
         public bool TryUseCorpse(ICharacter looter, Identity corpseIdentity)
         {
+            CorpseState selectedCorpse;
+            TimeSpan itemLootLifetime = CombatCorpseRules.RegularLootCorpseLifetime;
+            TimeSpan emptyCleanupDelay = CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay;
+            if (this.corpses.TryGetValue(corpseIdentity.Instance, out selectedCorpse))
+            {
+                itemLootLifetime = selectedCorpse.ItemLootLifetime;
+                emptyCleanupDelay = selectedCorpse.EmptyCleanupDelay;
+            }
+
             return this.runtimeSystems.TryUseCorpse(
                 looter,
                 corpseIdentity,
                 this.corpses,
-                CombatCorpseRules.RegularLootCorpseLifetime,
-                CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay,
+                itemLootLifetime,
+                emptyCleanupDelay,
                 corpse => corpse.DeadNpcIdentity,
                 corpse => corpse.ExpiresAtUtc,
                 corpse => corpse.HasUnlootedItems,
@@ -2198,6 +2180,15 @@ namespace AORebirth.Core.Playfields
         public bool TryLootCorpseItem(ICharacter looter, Identity sourceContainer, Identity target, int targetPlacement)
         {
             int requestedLootSlot = sourceContainer.Instance & 0xffff;
+            int corpseInventoryHandle = (sourceContainer.Instance >> 16) & 0xffff;
+            CorpseState selectedCorpse = this.corpses.Values.FirstOrDefault(
+                corpse => corpse.InventoryHandle == corpseInventoryHandle);
+            TimeSpan itemLootLifetime = selectedCorpse == null
+                ? CombatCorpseRules.RegularLootCorpseLifetime
+                : selectedCorpse.ItemLootLifetime;
+            TimeSpan emptyCleanupDelay = selectedCorpse == null
+                ? CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay
+                : selectedCorpse.EmptyCleanupDelay;
             return this.runtimeSystems.TryLootCorpseItem(
                 looter,
                 sourceContainer,
@@ -2222,8 +2213,8 @@ namespace AORebirth.Core.Playfields
                 this.ScheduleCorpseDespawn,
                 this.ExtendCorpseLifetime,
                 this.DespawnCorpse,
-                CombatCorpseRules.RegularLootCorpseLifetime,
-                CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay);
+                itemLootLifetime,
+                emptyCleanupDelay);
         }
 
         private void SendCorpseContainerAddItem(ICharacter looter, Identity sourceContainer, int targetPlacement)
@@ -2710,8 +2701,19 @@ namespace AORebirth.Core.Playfields
                        : 0;
         }
 
-        private static TimeSpan CorpseLifetimeFor(CombatCorpseLootClass lootClass)
+        private static TimeSpan CorpseLifetimeFor(
+            ICharacter target,
+            CombatCorpseLootClass lootClass)
         {
+            OrdinaryEnemyRuntimeDefinition definition;
+            if (target != null
+                && OrdinaryEnemyRuntimeRegistry.TryGet(target.Identity.Instance, out definition))
+            {
+                return lootClass == CombatCorpseLootClass.Empty
+                    ? TimeSpan.FromSeconds(definition.Profile.Corpse.EmptyLifetimeSeconds)
+                    : TimeSpan.FromSeconds(definition.Profile.Corpse.UnlootedLifetimeSeconds);
+            }
+
             return CombatCorpseRules.LifetimeFor(lootClass);
         }
 
@@ -2780,7 +2782,18 @@ namespace AORebirth.Core.Playfields
             List<CorpseLootItem> lootItems = this.RollCorpseLootItems(target);
             int credits = RollCorpseCredits(target);
             CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);
-            TimeSpan lifetime = CorpseLifetimeFor(lootClass);
+            TimeSpan lifetime = CorpseLifetimeFor(target, lootClass);
+            TimeSpan itemLootLifetime = CombatCorpseRules.RegularLootCorpseLifetime;
+            TimeSpan emptyCleanupDelay = CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay;
+            OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
+            if (OrdinaryEnemyRuntimeRegistry.TryGet(target.Identity.Instance, out ordinaryDefinition))
+            {
+                itemLootLifetime = TimeSpan.FromSeconds(
+                    ordinaryDefinition.Profile.Corpse.UnlootedLifetimeSeconds);
+                emptyCleanupDelay = TimeSpan.FromSeconds(
+                    ordinaryDefinition.Profile.Corpse.LootedCleanupSeconds);
+            }
+
             DateTime expiresAtUtc = DateTime.UtcNow + lifetime;
             var state = new CorpseState
             {
@@ -2792,6 +2805,8 @@ namespace AORebirth.Core.Playfields
                 LootItems = lootItems,
                 Credits = credits,
                 InventoryHandle = this.AllocateCorpseInventoryHandle(),
+                ItemLootLifetime = itemLootLifetime,
+                EmptyCleanupDelay = emptyCleanupDelay,
                 ExpiresAtUtc = expiresAtUtc
             };
 
@@ -2882,6 +2897,10 @@ namespace AORebirth.Core.Playfields
 
             public DateTime ExpiresAtUtc { get; set; }
 
+            public TimeSpan ItemLootLifetime { get; set; }
+
+            public TimeSpan EmptyCleanupDelay { get; set; }
+
             public int InventoryHandle { get; set; }
 
             public List<CorpseLootItem> LootItems { get; set; }
@@ -2965,7 +2984,7 @@ namespace AORebirth.Core.Playfields
         internal bool CanBuildKnownCorpseVisual(ICharacter target)
         {
             return IsCapturedCleaningRobot(target)
-                   || IsCapturedSubwayThief(target)
+                   || UsesCapturedThiefCorpseProfile(target)
                    || CombatCorpseVisuals.IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
                    || MonsterDataToCorpseCatMesh.ContainsKey(target.Stats[StatIds.monsterdata].Value);
         }
@@ -2977,7 +2996,7 @@ namespace AORebirth.Core.Playfields
                 return CapturedCleaningRobotCorpseCatMesh;
             }
 
-            if (IsCapturedSubwayThief(target))
+            if (UsesCapturedThiefCorpseProfile(target))
             {
                 return CapturedSubwayThiefCorpseCatMesh;
             }
@@ -2988,12 +3007,13 @@ namespace AORebirth.Core.Playfields
                 MonsterDataToCorpseCatMesh);
         }
 
-        private static bool IsCapturedSubwayThief(ICharacter target)
+        private static bool UsesCapturedThiefCorpseProfile(ICharacter target)
         {
+            OrdinaryEnemyRuntimeDefinition definition;
             return target != null
-                   && string.Equals(target.Name, "Thief", StringComparison.OrdinalIgnoreCase)
-                   && target.Stats[StatIds.monsterdata].Value == CapturedSubwayThiefMonsterData
-                   && target.Stats[StatIds.npcfamily].Value == CapturedSubwayThiefNpcFamily;
+                   && OrdinaryEnemyRuntimeRegistry.TryGet(target.Identity.Instance, out definition)
+                   && definition.Profile.Corpse.PacketProfile
+                   == OrdinaryEnemyCorpsePacketProfile.CapturedThief;
         }
 
         private static int DeathAnimationKeyFor(ICharacter target)
@@ -3067,19 +3087,29 @@ namespace AORebirth.Core.Playfields
             int level = target.Stats[StatIds.level].Value;
             var matchingEntries = new List<CombatLootTableEntry>();
             string lootSource = "none";
+            OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
+            bool profileBackedEnemy = OrdinaryEnemyRuntimeRegistry.TryGet(
+                target.Identity.Instance,
+                out ordinaryDefinition);
 
-            if (this.Identity.Instance == CapturedSubwayContentProvider.SubwayPlayfieldInstance)
+            if (profileBackedEnemy
+                && this.Identity.Instance == CapturedSubwayContentProvider.SubwayPlayfieldInstance)
             {
-                matchingEntries = CapturedSubwayLootTable.Where(
+                matchingEntries = OrdinaryEnemyLootTable.Where(
                     x => x.Matches(target.Name, monsterData, npcFamily)).ToList();
-                lootSource = "captured-subway-supported";
+                lootSource = "ordinary-enemy-profile";
             }
 
-            if (matchingEntries.Count == 0)
+            if (profileBackedEnemy && matchingEntries.Count == 0)
             {
-                matchingEntries = CapturedSubwayOrdinaryLootTable.Where(
-                    x => x.Matches(target.Name, monsterData, npcFamily)).ToList();
-                lootSource = "captured-subway-ordinary";
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        "Ordinary enemy loot remains empty because profile evidence has no matching entries target={0} profile={1} evidence={2}",
+                        target.Identity,
+                        ordinaryDefinition.Profile.ProfileKey,
+                        ordinaryDefinition.Profile.Loot.Evidence));
+                return lootItems;
             }
 
             if (matchingEntries.Count == 0)
@@ -3196,6 +3226,30 @@ namespace AORebirth.Core.Playfields
             if (IsCapturedCleaningRobot(target))
             {
                 return CapturedCleaningRobotCorpseCredits;
+            }
+
+            OrdinaryEnemyRuntimeDefinition definition;
+            bool profileBackedEnemy = OrdinaryEnemyRuntimeRegistry.TryGet(
+                target.Identity.Instance,
+                out definition);
+            if (profileBackedEnemy
+                && definition.Profile.Loot.CreditEvidence == OrdinaryEnemyEvidenceState.Observed
+                && definition.Profile.Loot.MinimumCredits.HasValue
+                && definition.Profile.Loot.MaximumCredits.HasValue)
+            {
+                int minimum = definition.Profile.Loot.MinimumCredits.Value;
+                int maximum = definition.Profile.Loot.MaximumCredits.Value;
+                lock (LootRandomLock)
+                {
+                    return maximum <= minimum
+                        ? minimum
+                        : minimum + LootRandom.Next(maximum - minimum + 1);
+                }
+            }
+
+            if (profileBackedEnemy)
+            {
+                return 0;
             }
 
             int monsterData = target.Stats[StatIds.monsterdata].Value;
@@ -3702,6 +3756,7 @@ namespace AORebirth.Core.Playfields
                 if (!this.disposed)
                 {
                     // We wont save any NPCs to character table/character's stats table
+                    this.runtimeSystems.ClearNpcRuntimeState();
                     this.DisconnectAllClients();
                     if (this.memBusDisposeContainer != null)
                     {

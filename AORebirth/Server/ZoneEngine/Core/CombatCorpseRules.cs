@@ -259,11 +259,7 @@ namespace ZoneEngine.Core
             new ObservedCorpseCreditRule("Shore Snake", 30252, 5, 5),
             new ObservedCorpseCreditRule("Surf Lizard", 22794, 1, 1),
             new ObservedCorpseCreditRule("Cliff Malle", 17660, 3, 3),
-            new ObservedCorpseCreditRule("Reef Salamander", 30354, 23, 29),
-            // Source: completed Subway captures 20260709-210452 and 20260709-220439,
-            // CorpseFullUpdate packets for monsterData 17657 at corpse cash offset 207.
-            // Observed nonzero spawn credits: 29, 35, 41, 66, 72, 79.
-            new ObservedCorpseCreditRule("Filth Flea", 17657, 29, 79)
+            new ObservedCorpseCreditRule("Reef Salamander", 30354, 23, 29)
         };
 
         public const int CorpseInventorySlots = 21;

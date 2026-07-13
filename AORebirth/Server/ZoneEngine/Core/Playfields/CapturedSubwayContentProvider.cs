@@ -263,6 +263,16 @@ namespace ZoneEngine.Core.Playfields
             return result.ToArray();
         }
 
+        internal CapturedSubwaySpawnDefinition[] GetAllSpawnDefinitions()
+        {
+            return (CapturedSubwaySpawnDefinition[])SpawnDefinitions.Clone();
+        }
+
+        internal static bool IsRuntimeQuarantined(int sourceInstance)
+        {
+            return RuntimeQuarantinedSourceInstances.Contains(sourceInstance);
+        }
+
         public CapturedSubwayPatrolReplaySegment[] GetPatrolReplaySegments(int sourceInstance)
         {
             CapturedSubwayPatrolReplaySegment[] segments;
