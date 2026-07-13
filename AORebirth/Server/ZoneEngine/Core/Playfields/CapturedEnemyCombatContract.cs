@@ -23,6 +23,149 @@ namespace AORebirth.Core.Playfields
         Specialized
     }
 
+    internal sealed class CapturedEnemyCombatAttackDefinition
+    {
+        internal CapturedEnemyCombatAttackDefinition(
+            int minDamage,
+            int maxDamage,
+            int damageBonus,
+            double range,
+            double rechargeSeconds,
+            bool usesEquippedWeapon,
+            int attackInfoAmmoCount,
+            int attackInfoWeaponSlot,
+            int attackInfoUnknown,
+            int attackInfoHitType,
+            int attackInfoWeaponInstance,
+            bool sendAttackInfo)
+        {
+            this.MinDamage = minDamage;
+            this.MaxDamage = maxDamage;
+            this.DamageBonus = damageBonus;
+            this.Range = range;
+            this.RechargeSeconds = rechargeSeconds;
+            this.UsesEquippedWeapon = usesEquippedWeapon;
+            this.AttackInfoAmmoCount = attackInfoAmmoCount;
+            this.AttackInfoWeaponSlot = attackInfoWeaponSlot;
+            this.AttackInfoUnknown = attackInfoUnknown;
+            this.AttackInfoHitType = attackInfoHitType;
+            this.AttackInfoWeaponInstance = attackInfoWeaponInstance;
+            this.SendAttackInfo = sendAttackInfo;
+        }
+
+        internal int MinDamage { get; private set; }
+
+        internal int MaxDamage { get; private set; }
+
+        internal int DamageBonus { get; private set; }
+
+        internal double Range { get; private set; }
+
+        internal double RechargeSeconds { get; private set; }
+
+        internal bool UsesEquippedWeapon { get; private set; }
+
+        internal int AttackInfoAmmoCount { get; private set; }
+
+        internal int AttackInfoWeaponSlot { get; private set; }
+
+        internal int AttackInfoUnknown { get; private set; }
+
+        internal int AttackInfoHitType { get; private set; }
+
+        internal int AttackInfoWeaponInstance { get; private set; }
+
+        internal bool SendAttackInfo { get; private set; }
+
+        internal bool IsValid
+        {
+            get
+            {
+                return this.MinDamage > 0
+                       && this.MaxDamage >= this.MinDamage
+                       && this.Range > 0
+                       && this.RechargeSeconds > 0;
+            }
+        }
+    }
+
+    internal sealed class CapturedEnemySpecialAttackDefinition
+    {
+        internal CapturedEnemySpecialAttackDefinition(
+            int lowTemplate,
+            int highTemplate,
+            int tag,
+            string name)
+        {
+            this.LowTemplate = lowTemplate;
+            this.HighTemplate = highTemplate;
+            this.Tag = tag;
+            this.Name = name;
+        }
+
+        internal int LowTemplate { get; private set; }
+
+        internal int HighTemplate { get; private set; }
+
+        internal int Tag { get; private set; }
+
+        internal string Name { get; private set; }
+    }
+
+    internal sealed class CapturedEnemySpecialAttackSequenceDefinition
+    {
+        internal CapturedEnemySpecialAttackSequenceDefinition(
+            double initialAttackDelaySeconds,
+            CapturedEnemyCombatAttackDefinition openingAttack,
+            CapturedEnemyCombatAttackDefinition repeatingAttack,
+            CapturedEnemySpecialAttackDefinition[] specialAttacks,
+            int specialAttackWeaponUnknown1,
+            int specialAttackWeaponUnknown2,
+            int specialAttackWeaponUnknown3,
+            int specialAttackWeaponUnknown4,
+            int specialAttackWeaponUnknown5)
+        {
+            this.InitialAttackDelaySeconds = initialAttackDelaySeconds;
+            this.OpeningAttack = openingAttack;
+            this.RepeatingAttack = repeatingAttack;
+            this.SpecialAttacks = specialAttacks ?? new CapturedEnemySpecialAttackDefinition[0];
+            this.SpecialAttackWeaponUnknown1 = specialAttackWeaponUnknown1;
+            this.SpecialAttackWeaponUnknown2 = specialAttackWeaponUnknown2;
+            this.SpecialAttackWeaponUnknown3 = specialAttackWeaponUnknown3;
+            this.SpecialAttackWeaponUnknown4 = specialAttackWeaponUnknown4;
+            this.SpecialAttackWeaponUnknown5 = specialAttackWeaponUnknown5;
+        }
+
+        internal double InitialAttackDelaySeconds { get; private set; }
+
+        internal CapturedEnemyCombatAttackDefinition OpeningAttack { get; private set; }
+
+        internal CapturedEnemyCombatAttackDefinition RepeatingAttack { get; private set; }
+
+        internal CapturedEnemySpecialAttackDefinition[] SpecialAttacks { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown1 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown2 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown3 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown4 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown5 { get; private set; }
+
+        internal bool IsValid
+        {
+            get
+            {
+                return this.InitialAttackDelaySeconds >= 0
+                       && (this.OpeningAttack == null || this.OpeningAttack.IsValid)
+                       && this.RepeatingAttack != null
+                       && this.RepeatingAttack.IsValid;
+            }
+        }
+    }
+
     internal sealed class CapturedEnemyCombatContract
     {
         private CapturedEnemyCombatContract()
@@ -85,6 +228,8 @@ namespace AORebirth.Core.Playfields
 
         internal bool SendStopFightOnDeath { get; private set; }
 
+        internal CapturedEnemySpecialAttackSequenceDefinition SpecialAttackSequence { get; private set; }
+
         internal bool IsCombatReady
         {
             get
@@ -104,7 +249,8 @@ namespace AORebirth.Core.Playfields
                                && this.WeaponQuality > 0
                                && this.WeaponInventorySlot > 0;
                     case CapturedEnemyAttackModel.Specialized:
-                        return true;
+                        return this.SpecialAttackSequence != null
+                               && this.SpecialAttackSequence.IsValid;
                     default:
                         return false;
                 }
@@ -205,14 +351,17 @@ namespace AORebirth.Core.Playfields
             return contract;
         }
 
-        internal static CapturedEnemyCombatContract Specialized(string evidence)
+        internal static CapturedEnemyCombatContract CapturedSpecialSequence(
+            string evidence,
+            CapturedEnemySpecialAttackSequenceDefinition specialAttackSequence)
         {
             return new CapturedEnemyCombatContract
             {
                 Evidence = evidence,
                 Retaliates = true,
                 AiProfile = NpcAiProfile.Passive,
-                AttackModel = CapturedEnemyAttackModel.Specialized
+                AttackModel = CapturedEnemyAttackModel.Specialized,
+                SpecialAttackSequence = specialAttackSequence
             };
         }
 
@@ -389,8 +538,54 @@ namespace AORebirth.Core.Playfields
             switch (monsterData)
             {
                 case 17657:
-                    return CapturedEnemyCombatContract.Specialized(
-                        "20260709-193914: Filth Flea poison opener and melee cycle");
+                    return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                        "20260709-193914: Filth Flea poison opener and melee cycle",
+                        new CapturedEnemySpecialAttackSequenceDefinition(
+                            NpcCombatAttackRules.CapturedSubwayFilthFleaInitialAttackSeconds,
+                            new CapturedEnemyCombatAttackDefinition(
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonDamage,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonDamage,
+                                0,
+                                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonRechargeSeconds,
+                                false,
+                                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonWeaponSlot,
+                                0,
+                                NpcCombatAttackRules.NormalAttackInfoHitType,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
+                                true),
+                            new CapturedEnemyCombatAttackDefinition(
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeDamage,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeDamage,
+                                0,
+                                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeRechargeSeconds,
+                                false,
+                                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeWeaponSlot,
+                                0,
+                                NpcCombatAttackRules.NormalAttackInfoHitType,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag,
+                                true),
+                            new[]
+                            {
+                                new CapturedEnemySpecialAttackDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadLowTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadHighTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadName),
+                                new CapturedEnemySpecialAttackDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaArmsLowTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaArmsHighTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag,
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaArmsName)
+                            },
+                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue));
                 case 17720:
                     return CapturedEnemyCombatContract.FixedAttack(
                         "20260709-210452/220439: Discarded Pet AttackInfo",

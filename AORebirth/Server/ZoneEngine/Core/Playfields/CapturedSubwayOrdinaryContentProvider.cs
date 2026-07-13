@@ -3357,6 +3357,11 @@ namespace AORebirth.Core.Playfields
                 .ToArray();
         }
 
+        internal CapturedSubwayOrdinarySpawnDefinition[] GetAllSpawns()
+        {
+            return Spawns.ToArray();
+        }
+
         public bool TryGetArchetype(string key, out CapturedSubwayOrdinaryArchetypeDefinition archetype)
         {
             return ArchetypesByKey.TryGetValue(key, out archetype);

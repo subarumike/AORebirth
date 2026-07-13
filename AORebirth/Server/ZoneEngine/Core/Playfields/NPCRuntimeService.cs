@@ -39,13 +39,13 @@ namespace AORebirth.Core.Playfields
 
         private readonly CapturedSubwayOrdinaryContentProvider capturedSubwayOrdinaryContent;
 
+        private readonly OrdinaryEnemyCatalog ordinaryEnemyCatalog;
+
         private readonly NpcPatrolReplayCoordinator patrolReplay;
 
         private readonly CapturedAreteRobotSpawnOrchestrator capturedAreteRobotSpawns;
 
-        private readonly CapturedSubwaySpawnOrchestrator capturedSubwaySpawns;
-
-        private readonly CapturedSubwayOrdinarySpawnOrchestrator capturedSubwayOrdinarySpawns;
+        private readonly OrdinaryEnemyRuntimeService ordinaryEnemies;
 
         private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
 
@@ -64,6 +64,10 @@ namespace AORebirth.Core.Playfields
             this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
             this.capturedSubwayContent = new CapturedSubwayContentProvider();
             this.capturedSubwayOrdinaryContent = new CapturedSubwayOrdinaryContentProvider();
+            this.ordinaryEnemyCatalog =
+                new OrdinaryEnemyCatalog(
+                    this.capturedSubwayContent,
+                    this.capturedSubwayOrdinaryContent);
             this.patrolReplay =
                 new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent, this.capturedSubwayContent);
             this.capturedAreteRobotSpawns =
@@ -71,20 +75,32 @@ namespace AORebirth.Core.Playfields
                     this.capturedAreteRobotContent,
                     this.patrolReplay,
                     this.ActivateNpc);
-            this.capturedSubwaySpawns =
-                new CapturedSubwaySpawnOrchestrator(
-                    this.capturedSubwayContent,
+            this.ordinaryEnemies =
+                new OrdinaryEnemyRuntimeService(
+                    this.ordinaryEnemyCatalog,
                     this.patrolReplay,
-                    this.ActivateNpc);
-            this.capturedSubwayOrdinarySpawns =
-                new CapturedSubwayOrdinarySpawnOrchestrator(
-                    this.capturedSubwayOrdinaryContent,
+                    this.dynelRegistry,
                     this.ActivateNpc);
         }
 
         internal void ActivateNpc(ICharacter character)
         {
             this.dynelRegistry.Register(character);
+        }
+
+        internal void ClearRuntimeState()
+        {
+            foreach (ICharacter character in this.dynelRegistry.Characters())
+            {
+                if (character.Controller is NPCController)
+                {
+                    this.combatTick.ClearTracking(character.Identity);
+                }
+            }
+
+            this.ordinaryEnemies.ClearRuntimeState(this.playfield.Identity.Instance);
+            this.npcHomeStates.Clear();
+            this.corpseDespawnTicks.Clear();
         }
 
         internal void RegisterNpcHome(ICharacter character)
@@ -124,8 +140,7 @@ namespace AORebirth.Core.Playfields
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
         {
             this.capturedAreteRobotSpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
-            this.capturedSubwaySpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
-            this.capturedSubwayOrdinarySpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
+            this.ordinaryEnemies.SpawnForPlayfield(this.playfield, playfieldIdentity);
         }
 
         internal bool HasPendingDeadNpcDespawn(Identity identity)
@@ -151,7 +166,7 @@ namespace AORebirth.Core.Playfields
 
         internal void ProcessDueCapturedSubwayRespawns(Identity playfieldIdentity, DateTime utcNow)
         {
-            this.capturedSubwaySpawns.ProcessDueRespawns(this.playfield, playfieldIdentity, utcNow);
+            this.ordinaryEnemies.ProcessDueRespawns(this.playfield, playfieldIdentity, utcNow);
         }
 
         internal void ClearNpcCorpseDespawn(int corpseInstance)
@@ -211,10 +226,10 @@ namespace AORebirth.Core.Playfields
 
         internal void FinalizeNpcDespawn(ICharacter target)
         {
-            this.capturedSubwaySpawns.ScheduleRespawnAfterDespawn(target, DateTime.UtcNow);
+            this.ordinaryEnemies.ScheduleRespawnAfterDespawn(target, DateTime.UtcNow);
             this.corpseLifecycle.FinalizeNpcDespawn(target);
             this.dynelRegistry.Unregister(target.Identity);
-            CapturedSubwayOrdinaryRuntimeRegistry.Remove(target.Identity.Instance);
+            OrdinaryEnemyRuntimeRegistry.Remove(target.Identity.Instance);
             SubwayVisibilityDiagnosticSelection.RemoveRuntimeIdentity(target.Identity.Instance);
             CapturedEnemyCombatRuntimeRegistry.Remove(target.Identity.Instance);
         }
@@ -276,6 +291,13 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
+            if (OrdinaryEnemyRuntimeRegistry.TryGet(target.Identity.Instance, out ordinaryDefinition)
+                && ordinaryDefinition.Profile.Aggression.Mode == OrdinaryEnemyAggressionMode.Passive)
+            {
+                return;
+            }
+
             if (npcController.KnuBot != null
                 || !NpcAiProfiles.CanRetaliate(npcController.AiProfile)
                 || target.Stats[StatIds.health].Value <= 0
@@ -306,6 +328,12 @@ namespace AORebirth.Core.Playfields
 
             PetCommandService.ProcessPetHealTick(character);
 
+            ICharacter automaticTarget = this.ordinaryEnemies.FindAutomaticAggroTarget(character);
+            if (automaticTarget != null)
+            {
+                this.AcquireAggro(automaticTarget, character);
+            }
+
             if (character.FightingTarget.Instance != 0)
             {
                 if (character.Controller.IsFollowing())
@@ -315,6 +343,8 @@ namespace AORebirth.Core.Playfields
 
                 return;
             }
+
+            this.ordinaryEnemies.TryReturnToSpawn(character);
 
             if (character.Controller.IsFollowing())
             {

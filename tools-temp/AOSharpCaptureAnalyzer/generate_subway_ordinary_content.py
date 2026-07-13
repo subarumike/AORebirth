@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import argparse
 import csv
 import math
+import os
 import re
+import tempfile
 from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
@@ -50,6 +53,31 @@ ARCHETYPES = {
     "Deranged Shopper": ("deranged_shopper", "deranged_shopper"),
 }
 
+NAMED_BOSSES = frozenset(
+    (
+        "Abmouth Supremus",
+        "Bitaxel",
+        "Bloodcreeper",
+        "Empty Shell",
+        "Eumenides",
+        "Fragmented Soul",
+        "Incomplete Rebuild",
+        "Melded Patterns",
+        "Molested Molecules",
+        "Premature Pattern",
+        "Redundant Scan",
+        "Strike Foreman",
+        "Vergil Aeneid",
+    )
+)
+OWNED_SUMMON_NAMES = frozenset(("Healer",))
+
+CANDIDATE_ACCEPTED = "ACCEPTED_ORDINARY"
+CANDIDATE_NAMED_BOSS = "NAMED_BOSS_EXCLUDED"
+CANDIDATE_OWNED_SUMMON = "OWNED_SUMMON_EXCLUDED"
+CANDIDATE_UNSUPPORTED = "UNSUPPORTED_EXCLUDED"
+CANDIDATE_MALFORMED = "MALFORMED_EXCLUDED"
+
 FLAG_VALUES = {
     "IsNpc": 0x00000001,
     "UnknownFlag": 0x00000002,
@@ -87,6 +115,15 @@ def read_csv(path: Path) -> list[dict[str, str]]:
 
 def parse_time(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def stable_row_key(row: dict[str, str]) -> tuple:
+    return (
+        parse_time(row["CapturedUtc"]),
+        row.get("EvidenceCapture", ""),
+        int(row.get("EvidenceRowIndex", "0")),
+        row.get("Identity", ""),
+    )
 
 
 def identity_hex(identity: str) -> str:
@@ -138,32 +175,59 @@ def capture_allows_archetype(capture: str, name: str) -> bool:
     return allowed_captures is None or capture in allowed_captures
 
 
-def load_scfu_rows(captures: tuple[str, ...]) -> list[dict[str, str]]:
+def load_raw_scfu_rows(captures: tuple[str, ...]) -> list[dict[str, str]]:
     rows = []
     for capture in captures:
-        for row in read_csv(CAPTURE_ROOT / capture / "scfu-appearance.csv"):
-            if row["Name"] not in ARCHETYPES:
-                continue
-            if not capture_allows_archetype(capture, row["Name"]):
-                continue
+        for row_index, row in enumerate(
+            read_csv(CAPTURE_ROOT / capture / "scfu-appearance.csv")
+        ):
             row = dict(row)
             row["EvidenceCapture"] = capture
+            row["EvidenceRowIndex"] = str(row_index)
             rows.append(row)
     return rows
 
 
+def classify_spawn_candidate(row: dict[str, str]) -> str:
+    if not row.get("Identity") or not row.get("Name"):
+        return CANDIDATE_MALFORMED
+    if row.get("Owner") or row["Name"] in OWNED_SUMMON_NAMES:
+        return CANDIDATE_OWNED_SUMMON
+    if row["Name"] in NAMED_BOSSES:
+        return CANDIDATE_NAMED_BOSS
+    if row["Name"] not in ARCHETYPES:
+        return CANDIDATE_UNSUPPORTED
+    if not capture_allows_archetype(row["EvidenceCapture"], row["Name"]):
+        return CANDIDATE_UNSUPPORTED
+    return CANDIDATE_ACCEPTED
+
+
+def load_scfu_rows(captures: tuple[str, ...]) -> list[dict[str, str]]:
+    return [
+        row
+        for row in load_raw_scfu_rows(captures)
+        if row.get("Name") in ARCHETYPES
+        and capture_allows_archetype(row["EvidenceCapture"], row["Name"])
+    ]
+
+
 def first_rows_by_identity(rows: list[dict[str, str]]) -> list[dict[str, str]]:
     result = {}
-    for row in sorted(rows, key=lambda value: parse_time(value["CapturedUtc"])):
+    for row in sorted(rows, key=stable_row_key):
         result.setdefault(row["Identity"], row)
     return list(result.values())
 
 
 def select_spawns() -> list[dict[str, str]]:
-    rows = first_rows_by_identity(load_scfu_rows(SPAWN_CAPTURES))
-    rows = [row for row in rows if not row.get("Owner")]
+    rows = first_rows_by_identity(
+        [
+            row
+            for row in load_scfu_rows(SPAWN_CAPTURES)
+            if classify_spawn_candidate(row) == CANDIDATE_ACCEPTED
+        ]
+    )
     selected: list[dict[str, str]] = []
-    for row in sorted(rows, key=lambda value: parse_time(value["CapturedUtc"])):
+    for row in sorted(rows, key=stable_row_key):
         position = canonical_position(row)
         duplicate = False
         for prior in selected:
@@ -206,9 +270,25 @@ def select_archetype_profiles(spawns: list[dict[str, str]]) -> dict[str, dict[st
     profiles = {}
     for name in ARCHETYPES:
         candidates = [row for row in spawns if row["Name"] == name]
+        if not candidates:
+            raise ValueError("ordinary archetype has no captured profile: " + name)
         counts = Counter(visual_profile(row) for row in candidates)
-        selected_profile, _ = counts.most_common(1)[0]
-        profiles[name] = next(row for row in candidates if visual_profile(row) == selected_profile)
+        selected_profile = min(
+            counts,
+            key=lambda profile: (
+                -counts[profile],
+                min(
+                    stable_row_key(row)
+                    for row in candidates
+                    if visual_profile(row) == profile
+                ),
+                tuple(str(value) for value in profile),
+            ),
+        )
+        profiles[name] = min(
+            (row for row in candidates if visual_profile(row) == selected_profile),
+            key=stable_row_key,
+        )
     return profiles
 
 
@@ -221,8 +301,10 @@ def combat_profiles() -> dict[str, dict[str, object]]:
     detail_pattern = re.compile(
         r"WeaponSlot=(?P<slot>-?\d+).*Unk1=(?P<unknown>-?\d+).*WeaponInstance=(?P<instance>-?\d+)"
     )
-    for capture in CAPTURES:
-        for row in read_csv(CAPTURE_ROOT / capture / "enemy-combat.csv"):
+    for capture_index, capture in enumerate(CAPTURES):
+        for row_index, row in enumerate(
+            read_csv(CAPTURE_ROOT / capture / "enemy-combat.csv")
+        ):
             if row["MessageType"] != "AttackInfo" or row["SourceIdentity"] not in name_by_identity:
                 continue
             if not row["Amount"].isdigit() or int(row["Amount"]) <= 0:
@@ -238,6 +320,7 @@ def combat_profiles() -> dict[str, dict[str, object]]:
                     "slot": int(match.group("slot")),
                     "unknown": int(match.group("unknown")),
                     "instance": int(match.group("instance")),
+                    "order": (capture_index, row_index),
                 }
             )
 
@@ -255,13 +338,27 @@ def combat_profiles() -> dict[str, dict[str, object]]:
                 if 0.5 <= seconds <= 10.0:
                     intervals.append(seconds)
         intervals.sort()
-        profile = Counter((row["slot"], row["unknown"], row["instance"]) for row in rows)
-        slot, unknown, instance = profile.most_common(1)[0][0] if profile else (0, 0, 0)
+        attack_contexts = Counter(
+            (row["slot"], row["unknown"], row["instance"]) for row in rows
+        )
+        if attack_contexts:
+            slot, unknown, instance = min(
+                attack_contexts,
+                key=lambda context: (
+                    -attack_contexts[context],
+                    min(row["order"] for row in rows if (
+                        row["slot"], row["unknown"], row["instance"]
+                    ) == context),
+                    context,
+                ),
+            )
+        else:
+            slot, unknown, instance = (None, None, None)
         result[name] = {
             "observed": bool(rows),
-            "min": min((row["amount"] for row in rows), default=0),
-            "max": max((row["amount"] for row in rows), default=0),
-            "recharge": intervals[(len(intervals) - 1) // 2] if intervals else 0.0,
+            "min": min((row["amount"] for row in rows), default=None),
+            "max": max((row["amount"] for row in rows), default=None),
+            "recharge": intervals[(len(intervals) - 1) // 2] if intervals else None,
             "slot": slot,
             "unknown": unknown,
             "instance": instance,
@@ -347,11 +444,97 @@ def emit_array(items: list[str], indent: str) -> str:
     return "\n".join(items)
 
 
+def compatibility_int(value: int | None) -> int:
+    # The checked-in provider's legacy constructor has non-nullable value fields.
+    # Keep unresolved evidence as None in the generator model and translate only
+    # at this compatibility serialization boundary.
+    return 0 if value is None else value
+
+
+def compatibility_float(value: float | None) -> float:
+    return 0.0 if value is None else value
+
+
+def validate_content(
+    spawns: list[dict[str, str]],
+    profiles: dict[str, dict[str, str]],
+    combat: dict[str, dict[str, object]],
+) -> None:
+    profile_keys = [key for key, _ in ARCHETYPES.values()]
+    duplicate_profile_keys = sorted(
+        key for key, count in Counter(profile_keys).items() if count > 1
+    )
+    if duplicate_profile_keys:
+        raise ValueError(
+            "duplicate ordinary profile keys: " + ", ".join(duplicate_profile_keys)
+        )
+
+    expected_names = set(ARCHETYPES)
+    if set(profiles) != expected_names:
+        missing = sorted(expected_names - set(profiles))
+        unexpected = sorted(set(profiles) - expected_names)
+        raise ValueError(
+            "ordinary profile set mismatch missing="
+            + ",".join(missing)
+            + " unexpected="
+            + ",".join(unexpected)
+        )
+    generated_profile_keys = {ARCHETYPES[name][0] for name in profiles}
+
+    identities = [row["Identity"] for row in spawns]
+    duplicate_identities = sorted(
+        identity for identity, count in Counter(identities).items() if count > 1
+    )
+    if duplicate_identities:
+        raise ValueError(
+            "duplicate ordinary spawn identities: " + ", ".join(duplicate_identities)
+        )
+
+    selected_identities = set(identities)
+    for row in spawns:
+        disposition = classify_spawn_candidate(row)
+        if disposition != CANDIDATE_ACCEPTED:
+            raise ValueError(
+                "rejected ordinary spawn reached output identity={0} name={1} disposition={2}".format(
+                    row.get("Identity", ""), row.get("Name", ""), disposition
+                )
+            )
+        profile_key = ARCHETYPES[row["Name"]][0]
+        if row["Name"] not in profiles or profile_key not in generated_profile_keys:
+            raise ValueError(
+                "ordinary spawn has missing profile identity={0} profile={1}".format(
+                    row["Identity"], profile_key
+                )
+            )
+
+    for row in first_rows_by_identity(load_raw_scfu_rows(SPAWN_CAPTURES)):
+        disposition = classify_spawn_candidate(row)
+        if disposition != CANDIDATE_ACCEPTED and row.get("Identity") in selected_identities:
+            raise ValueError(
+                "excluded capture identity reached ordinary output identity={0} name={1} disposition={2}".format(
+                    row.get("Identity", ""), row.get("Name", ""), disposition
+                )
+            )
+
+    for name, evidence in combat.items():
+        if evidence["observed"]:
+            if evidence["min"] is None or evidence["max"] is None:
+                raise ValueError("observed combat is missing damage evidence: " + name)
+            if evidence["slot"] is None or evidence["unknown"] is None or evidence["instance"] is None:
+                raise ValueError("observed combat is missing attack context: " + name)
+        elif any(
+            evidence[field] is not None
+            for field in ("min", "max", "recharge", "slot", "unknown", "instance")
+        ):
+            raise ValueError("unobserved combat contains invented values: " + name)
+
+
 def generate() -> str:
     spawns = select_spawns()
     profiles = select_archetype_profiles(spawns)
     combat = combat_profiles()
     loot = loot_profiles()
+    validate_content(spawns, profiles, combat)
     evidence_captures = defaultdict(set)
     for evidence_row in load_scfu_rows(CAPTURES):
         evidence_captures[evidence_row["Name"]].add(evidence_row["EvidenceCapture"])
@@ -425,12 +608,12 @@ def generate() -> str:
                 "                },",
                 "                new CapturedSubwayCombatEvidenceDefinition(",
                 f"                    {str(combat_row['observed']).lower()},",
-                f"                    {combat_row['min']},",
-                f"                    {combat_row['max']},",
-                f"                    {combat_row['recharge']:.6f},",
-                f"                    {combat_row['slot']},",
-                f"                    {combat_row['unknown']},",
-                f"                    {combat_row['instance']},",
+                f"                    {compatibility_int(combat_row['min'])},",
+                f"                    {compatibility_int(combat_row['max'])},",
+                f"                    {compatibility_float(combat_row['recharge']):.6f},",
+                f"                    {compatibility_int(combat_row['slot'])},",
+                f"                    {compatibility_int(combat_row['unknown'])},",
+                f"                    {compatibility_int(combat_row['instance'])},",
                 f"                    {combat_row['rows']}),",
                 "                new CapturedSubwayLootEvidenceDefinition[]",
                 "                {",
@@ -513,6 +696,11 @@ def generate() -> str:
             "                .ToArray();",
             "        }",
             "",
+            "        internal CapturedSubwayOrdinarySpawnDefinition[] GetAllSpawns()",
+            "        {",
+            "            return Spawns.ToArray();",
+            "        }",
+            "",
             "        public bool TryGetArchetype(string key, out CapturedSubwayOrdinaryArchetypeDefinition archetype)",
             "        {",
             "            return ArchetypesByKey.TryGetValue(key, out archetype);",
@@ -586,6 +774,91 @@ def generate() -> str:
     return "\n".join(lines)
 
 
+def canonicalize_checked_content(value: bytes) -> str:
+    text = value.decode("utf-8-sig").replace("\r\n", "\n").replace("\r", "\n")
+    return text[:-1] if text.endswith("\n") else text
+
+
+def check_output(generated: bytes) -> None:
+    if not OUTPUT.exists():
+        raise SystemExit("generated provider is missing: " + str(OUTPUT))
+    checked_in = OUTPUT.read_bytes()
+    checked_content = canonicalize_checked_content(checked_in)
+    generated_content = canonicalize_checked_content(generated)
+    if checked_content != generated_content:
+        checked_lines = checked_content.splitlines()
+        generated_lines = generated_content.splitlines()
+        first_difference = next(
+            (
+                index
+                for index in range(max(len(checked_lines), len(generated_lines)))
+                if index >= len(checked_lines)
+                or index >= len(generated_lines)
+                or checked_lines[index] != generated_lines[index]
+            ),
+            0,
+        )
+        raise SystemExit(
+            "generated provider is stale at line {0}; checked-in={1!r} generated={2!r}; run with --write: {3}".format(
+                first_difference + 1,
+                checked_lines[first_difference][:160]
+                if first_difference < len(checked_lines)
+                else "<missing>",
+                generated_lines[first_difference][:160]
+                if first_difference < len(generated_lines)
+                else "<missing>",
+                OUTPUT,
+            )
+        )
+
+
+def write_output_atomically(generated: bytes) -> None:
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=OUTPUT.name + ".",
+        suffix=".tmp",
+        dir=str(OUTPUT.parent),
+    )
+    temporary_path = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(generated)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(str(temporary_path), str(OUTPUT))
+    finally:
+        if temporary_path.exists():
+            temporary_path.unlink()
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Generate capture-backed ordinary Subway content."
+    )
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
+        "--check",
+        action="store_true",
+        help="validate and content-compare the checked-in provider without writing",
+    )
+    mode.add_argument(
+        "--write",
+        action="store_true",
+        help="validate and atomically replace the checked-in provider",
+    )
+    return parser.parse_args()
+
+
+def main() -> None:
+    arguments = parse_args()
+    generated = generate().replace("\n", "\r\n").encode("utf-8")
+    if arguments.write:
+        write_output_atomically(generated)
+        print(f"generated {OUTPUT}")
+        return
+    check_output(generated)
+    print(f"PASS content-equivalent {OUTPUT}")
+
+
 if __name__ == "__main__":
-    OUTPUT.write_text(generate(), encoding="utf-8")
-    print(f"generated {OUTPUT}")
+    main()

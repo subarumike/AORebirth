@@ -66,6 +66,7 @@ is live-confirmed level 1 client behavior, not an AORebirth combat regression.
 ## Current Subway State
 
 - Subway content binding uses resource/playfield `127`.
+- Ordinary PF127 enemies now use one normalized profile/spawn catalog and one shared runtime. The catalog contains 17 profiles and 259 captured spawn rows; 221 retain the safe active disposition and the same 38 rows remain quarantined by default. Thief and Filth Flea are migrated parity anchors. See `docs/project/ORDINARY_ENEMY_RUNTIME.md`.
 - Runtime instance ids from live captures, such as `R=1187842`, are not server content binding ids.
 - `Playfield2:122002` is capture/runtime output and must not be used as the Subway content binding key.
 - Subway content work must stay capture-backed and should use completed AOSharpLiveCapture folders supplied by Mike.
@@ -80,7 +81,7 @@ is live-confirmed level 1 client behavior, not an AORebirth combat regression.
 - Previous capture-backed enemy, movement, combat, zoning, and appearance work remains completed project history.
 - Subway entry/exit placement has been repaired for the current tested route.
 - Filth Flea appearance has been corrected from capture-backed SCFU texture evidence.
-- Mike live-validated the next hallway Filth Flea on `2026-07-12` as working as intended for the tested gameplay path. Filth Flea also has captured corpse loot evidence in completed Subway captures `20260709-210452` and `20260709-220439`; item rows are represented in the supported Subway loot table, and observed nonzero corpse credits `29..79` are represented in `CombatCorpseRules`. Keep it as a passed hallway smoke result, but do not promote Filth Flea into `AcceptedSubwayEnemyGateRequiresWholeEnemyCoverage` until respawn/no-respawn expectations are explicitly covered by the accepted-enemy gate.
+- Mike live-validated the hallway Filth Flea on `2026-07-12`, including combat, loot, credits, corpse cleanup, and repeat respawn. Captures `20260709-210452` and `20260709-220439` prove its item rows and observed nonzero corpse credits `29..79`; capture `20260712-161506` plus repeated live observation establishes the four-minute post-despawn respawn. Those values now live in the generic ordinary-enemy profile and accepted-enemy coverage.
 - Captures `20260709-205921`, `20260709-210452`, `20260709-212115`, and `20260709-212336` now provide a reusable raw-packet and continuous-survey evidence set for the explored Subway sections.
 - The supported-family provider retains 124 capture-backed Filth Flea, Discarded Pet, Disobedient Bot, Mugger, Thief, and Violent Vagabond evidence rows. The 29 rows sourced from capture `20260710-202132` are runtime-quarantined because enabling that restored batch reproduced a PF127 login crash during the existing-character visibility snapshot. The prior 95-row supported-family runtime baseline remains active while the failing slice is isolated.
 - Packet-backed Mugger and Violent Vagabond visuals are applied from the recovered SCFU texture/mesh profiles.

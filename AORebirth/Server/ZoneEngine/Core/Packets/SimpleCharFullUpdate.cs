@@ -62,11 +62,6 @@ namespace ZoneEngine.Core.Packets
     public static class SimpleCharFullUpdate
     {
         private const int SubwayPlayfieldResource = 127;
-        private const int SubwayFilthFleaMonsterData = 17657;
-        private const string SubwayFilthFleaName = "Filth Flea";
-        private const int SubwayThiefMonsterData = 26092;
-        private const string SubwayThiefName = "Thief";
-        private const uint CapturedSubwayThiefAppearanceValue = 0x00122002;
 
         private static readonly byte[] CapturedSubwayFilthFleaExtendedTextureOverrideData =
             new byte[]
@@ -248,12 +243,17 @@ namespace ZoneEngine.Core.Packets
             }
 
             var scfu = new SimpleCharFullUpdateMessage();
+            OrdinaryEnemyRuntimeDefinition ordinaryRuntime;
+            bool hasOrdinaryRuntime =
+                OrdinaryEnemyRuntimeRegistry.TryGet(character.Identity.Instance, out ordinaryRuntime);
 
             // affected identity
             scfu.Identity = charId;
 
             scfu.Version = 57; // SCFU packet version (57/0x39)
-            if (IsCapturedSubwayThief(charPlayfield, monsterData, charName)
+            if ((hasOrdinaryRuntime
+                 && ordinaryRuntime.Profile.Appearance.ScfuProfile
+                 == OrdinaryEnemyScfuProfile.CapturedThief)
                 || (charPlayfield == SubwayPlayfieldResource
                     && character.Waypoints != null
                     && character.Waypoints.Count > 1))
@@ -298,9 +298,11 @@ namespace ZoneEngine.Core.Packets
                                   Race = raceValue
                               }; // appearance
 
-            if (IsCapturedSubwayThief(charPlayfield, monsterData, charName))
+            if (hasOrdinaryRuntime
+                && ordinaryRuntime.Profile.Appearance.ScfuProfile
+                == OrdinaryEnemyScfuProfile.CapturedThief)
             {
-                scfu.Appearance.Value = CapturedSubwayThiefAppearanceValue;
+                scfu.Appearance.Value = ordinaryRuntime.Profile.Appearance.AppearanceValue;
             }
 
             // Name
@@ -395,7 +397,9 @@ namespace ZoneEngine.Core.Packets
                                 };
             }
 
-            if (IsCapturedSubwayThief(charPlayfield, monsterData, charName))
+            if (hasOrdinaryRuntime
+                && ordinaryRuntime.Profile.Appearance.ScfuProfile
+                == OrdinaryEnemyScfuProfile.CapturedThief)
             {
                 scfu.Unknown1 = CapturedSubwayThiefUnknown1;
                 scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6 | SimpleCharFullUpdateFlags.IsPet;
@@ -416,7 +420,9 @@ namespace ZoneEngine.Core.Packets
             // Runspeed
             scfu.RunSpeedBase = (short)runSpeedBaseValue;
 
-            if (IsCapturedSubwayFilthFlea(charPlayfield, monsterData, charName))
+            if (hasOrdinaryRuntime
+                && ordinaryRuntime.Profile.Appearance.ScfuProfile
+                == OrdinaryEnemyScfuProfile.CapturedFilthFlea)
             {
                 scfu.ExtendedTextureOverrideData = CapturedSubwayFilthFleaExtendedTextureOverrideData;
             }
@@ -501,19 +507,19 @@ namespace ZoneEngine.Core.Packets
             scfu.Flags2 = 0; // packetFlags2
             scfu.Unknown2 = 0;
 
-            CapturedSubwayOrdinaryRuntimeDefinition capturedOrdinary;
-            if (CapturedSubwayOrdinaryRuntimeRegistry.TryGet(character.Identity.Instance, out capturedOrdinary))
+            if (hasOrdinaryRuntime && ordinaryRuntime.Spawn.HasCapturedScfuOverride)
             {
-                CapturedSubwayOrdinarySpawnDefinition spawn = capturedOrdinary.Spawn;
-                CapturedSubwayOrdinaryArchetypeDefinition archetype = capturedOrdinary.Archetype;
-                scfu.AdditionalFlags = spawn.CapturedFlags;
-                scfu.SuppressedFlags = ~spawn.CapturedFlags;
-                scfu.Flags2 = (byte)spawn.CapturedFlags2;
-                scfu.Unknown1 = spawn.Unknown1.ToArray();
-                scfu.Unknown2 = (byte)spawn.Unknown2;
-                scfu.VisibleTitle = (byte)archetype.VisibleTitle;
+                OrdinaryEnemySpawnDefinition spawn = ordinaryRuntime.Spawn;
+                OrdinaryEnemyAppearanceProfile appearance = ordinaryRuntime.Profile.Appearance;
+                var capturedFlags = (SimpleCharFullUpdateFlags)spawn.CapturedScfuFlags;
+                scfu.AdditionalFlags = capturedFlags;
+                scfu.SuppressedFlags = ~capturedFlags;
+                scfu.Flags2 = (byte)spawn.CapturedScfuFlags2;
+                scfu.Unknown1 = spawn.CapturedScfuUnknown1.ToArray();
+                scfu.Unknown2 = (byte)spawn.CapturedScfuUnknown2;
+                scfu.VisibleTitle = (byte)appearance.VisibleTitle;
                 scfu.Textures =
-                    archetype.Textures.Select(
+                    appearance.Textures.Select(
                         texture =>
                             new Texture
                             {
@@ -522,7 +528,7 @@ namespace ZoneEngine.Core.Packets
                                 Unknown = texture.Unknown
                             }).ToArray();
                 scfu.Meshes =
-                    archetype.Meshes.Select(
+                    appearance.Meshes.Select(
                         mesh =>
                             new Mesh
                             {
@@ -543,20 +549,6 @@ namespace ZoneEngine.Core.Packets
             }
 
             return scfu;
-        }
-
-        private static bool IsCapturedSubwayFilthFlea(int playfieldInstance, int monsterData, string name)
-        {
-            return playfieldInstance == SubwayPlayfieldResource
-                && monsterData == SubwayFilthFleaMonsterData
-                && string.Equals(name, SubwayFilthFleaName, StringComparison.Ordinal);
-        }
-
-        private static bool IsCapturedSubwayThief(int playfieldInstance, int monsterData, string name)
-        {
-            return playfieldInstance == SubwayPlayfieldResource
-                && monsterData == SubwayThiefMonsterData
-                && string.Equals(name, SubwayThiefName, StringComparison.Ordinal);
         }
 
         /// <summary>

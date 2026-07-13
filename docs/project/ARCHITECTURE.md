@@ -77,6 +77,7 @@ Important files and directories:
 - `AORebirth/Libraries/Source/AORebirth.Core/Inventory`: inventory pages and item movement models.
 - `AORebirth/Server/ZoneEngine/Core/Controllers/PlayerController.cs`: player runtime controller.
 - `AORebirth/Server/ZoneEngine/Core/Controllers/NPCController.cs`: NPC runtime controller and movement/combat behavior.
+- `AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyProfile.cs`, `OrdinaryEnemyCatalog.cs`, and `OrdinaryEnemyRuntimeService.cs`: validated ordinary-enemy type/spawn data and the single shared runtime path. See `docs/project/ORDINARY_ENEMY_RUNTIME.md`.
 - `AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs`: playfield entity registry, combat, death, corpse, loot, despawn, and broad gameplay flow.
 - `AORebirth/Server/ZoneEngine/Core/MessageHandlers`: N3 message handlers for zone gameplay.
 - `AORebirth/Server/ZoneEngine/Core/Packets`: custom packet builders.
