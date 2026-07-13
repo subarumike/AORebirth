@@ -10,10 +10,13 @@
 namespace
 {
     uintptr_t DrawResourceFaultAddress = 0;
+    uintptr_t RenderStateFaultAddress = 0;
+    uintptr_t RenderStateResumeAddress = 0;
     uintptr_t ByteColorFaultAddress = 0;
     uintptr_t ByteColorResumeAddress = 0;
     uintptr_t DwordColorFaultAddress = 0;
     uintptr_t DwordColorResumeAddress = 0;
+    LONG RenderStateSkipCount = 0;
 
     bool IsReadableRange(const void* pointer, size_t size)
     {
@@ -84,6 +87,43 @@ namespace
         }
 
         if (exception->ExceptionRecord->ExceptionAddress ==
+                reinterpret_cast<void*>(RenderStateFaultAddress) &&
+            exception->ContextRecord->Eax > 0x400 &&
+            IsReadableRange(
+                reinterpret_cast<const void*>(exception->ContextRecord->Esp),
+                sizeof(uint32_t)))
+        {
+            uint32_t pushedStateClass = 0;
+            std::memcpy(
+                &pushedStateClass,
+                reinterpret_cast<const void*>(exception->ContextRecord->Esp),
+                sizeof(pushedStateClass));
+            if (pushedStateClass != 0x0A)
+            {
+                return EXCEPTION_CONTINUE_SEARCH;
+            }
+
+            LONG count = InterlockedIncrement(&RenderStateSkipCount);
+            if (count <= 16 || count % 100 == 0)
+            {
+                aorf::Log(
+                    "PATCH HIT randy31 invalid render-state skipped state=0x%08lX "
+                    "device=0x%08lX entry=0x%08lX accessAddress=0x%08lX count=%ld",
+                    static_cast<unsigned long>(exception->ContextRecord->Eax),
+                    static_cast<unsigned long>(exception->ContextRecord->Ebx),
+                    static_cast<unsigned long>(exception->ContextRecord->Edi),
+                    static_cast<unsigned long>(
+                        exception->ExceptionRecord->ExceptionInformation[1]),
+                    static_cast<long>(count));
+            }
+
+            exception->ContextRecord->Esp += sizeof(uint32_t);
+            exception->ContextRecord->Eax = 0;
+            exception->ContextRecord->Eip = static_cast<DWORD>(RenderStateResumeAddress);
+            return EXCEPTION_CONTINUE_EXECUTION;
+        }
+
+        if (exception->ExceptionRecord->ExceptionAddress ==
                 reinterpret_cast<void*>(ByteColorFaultAddress) &&
             exception->ContextRecord->Eax < 0x10000)
         {
@@ -140,6 +180,22 @@ namespace aorf
             0x5D,
             0xC2, 0x18, 0x00
         };
+        constexpr uint8_t ExpectedRenderStateFaultSequence[] =
+        {
+            0x8B, 0x7E, 0x14,
+            0x03, 0x7D, 0xF8,
+            0x6A, 0x0A,
+            0x8B, 0x07,
+            0x8B, 0x8C, 0x83, 0xC8, 0x04, 0x00, 0x00,
+            0xFF, 0x77, 0x04,
+            0x89, 0x4F, 0x08,
+            0x50,
+            0x8B, 0xCB,
+            0xE8, 0x92, 0x6A, 0xFF, 0xFF,
+            0xFF, 0x45, 0xFC,
+            0x83, 0x45, 0xF8, 0x10,
+            0x88, 0x47, 0x0C
+        };
         constexpr uint8_t ExpectedDwordFaultSequence[] =
         {
             0x8B, 0x36,
@@ -155,6 +211,10 @@ namespace aorf
                 ExpectedDrawResourceFaultSequence,
                 sizeof(ExpectedDrawResourceFaultSequence)) != 0 ||
             std::memcmp(
+                base + 0x25110,
+                ExpectedRenderStateFaultSequence,
+                sizeof(ExpectedRenderStateFaultSequence)) != 0 ||
+            std::memcmp(
                 base + 0x6C51B,
                 ExpectedDwordFaultSequence,
                 sizeof(ExpectedDwordFaultSequence)) != 0)
@@ -164,6 +224,8 @@ namespace aorf
         }
 
         DrawResourceFaultAddress = reinterpret_cast<uintptr_t>(base + 0x21A94);
+        RenderStateFaultAddress = reinterpret_cast<uintptr_t>(base + 0x2511A);
+        RenderStateResumeAddress = reinterpret_cast<uintptr_t>(base + 0x2512F);
         ByteColorFaultAddress = reinterpret_cast<uintptr_t>(base + 0x6C3A1);
         ByteColorResumeAddress = reinterpret_cast<uintptr_t>(base + 0x6C3AC);
         DwordColorFaultAddress = reinterpret_cast<uintptr_t>(base + 0x6C51D);
@@ -173,6 +235,8 @@ namespace aorf
             Log("ERROR randy31 color-read exception guard installation failed code=%lu",
                 GetLastError());
             DrawResourceFaultAddress = 0;
+            RenderStateFaultAddress = 0;
+            RenderStateResumeAddress = 0;
             ByteColorFaultAddress = 0;
             ByteColorResumeAddress = 0;
             DwordColorFaultAddress = 0;
@@ -180,7 +244,7 @@ namespace aorf
             return false;
         }
 
-        Log("PATCH PASS randy31 invalid renderer/color-pointer guard faultRvas=0x21A94,0x6C3A1,0x6C51D");
+        Log("PATCH PASS randy31 invalid renderer/color-pointer guard faultRvas=0x21A94,0x2511A,0x6C3A1,0x6C51D");
         return true;
     }
 }
