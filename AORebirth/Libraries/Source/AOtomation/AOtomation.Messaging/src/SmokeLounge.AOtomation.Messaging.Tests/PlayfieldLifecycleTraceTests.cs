@@ -3245,18 +3245,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseUse.Contains("if (opened(corpse))")
                 && corpseUse.Contains("setOpened(corpse, false);")
                 && corpseUse.Contains("refreshCorpseInventoryHandle(corpse);")
+                && corpseUse.Contains("sendCorpseCloseAction(looter, corpse);")
                 && corpseUse.Contains("sendUseActionFinished(looter);")
                 && corpseUse.Contains("return true;")
                 && corpseUse.Contains("else"),
                 "Corpse access must preserve the captured open, close, and reopen alternation.");
             Assert.IsFalse(
                 corpseUse.Contains("NextUseSendsAccessActionOnly")
-                || corpseUse.Contains("sendCorpseLootAccessAction")
-                || playfieldText.Contains("ActionIdentity = 0x66"),
-                "Corpse reopen must not retain either rejected action-only hypothesis.");
+                || corpseUse.Contains("sendCorpseLootAccessAction"),
+                "Corpse reopen must not retain the rejected refresh-plus-action hypothesis.");
+            Assert.IsTrue(
+                playfieldText.Contains("private void SendCorpseCloseAction")
+                && playfieldText.Contains("ActionIdentity = 0x66"),
+                "Captured corpse close must emit Action 0x66 only through the close branch.");
             AssertTextBefore(corpseUse, "if (opened(corpse))", "setOpened(corpse, false);");
             AssertTextBefore(corpseUse, "setOpened(corpse, false);", "refreshCorpseInventoryHandle(corpse);");
-            AssertTextBefore(corpseUse, "refreshCorpseInventoryHandle(corpse);", "sendUseActionFinished(looter);");
+            AssertTextBefore(corpseUse, "refreshCorpseInventoryHandle(corpse);", "sendCorpseCloseAction(looter, corpse);");
+            AssertTextBefore(corpseUse, "sendCorpseCloseAction(looter, corpse);", "sendUseActionFinished(looter);");
             AssertTextBefore(corpseUse, "sendUseActionFinished(looter);", "setOpened(corpse, true);");
             AssertTextBefore(
                 inventoryAndCredits,

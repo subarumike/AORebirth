@@ -2176,6 +2176,7 @@ namespace AORebirth.Core.Playfields
                 this.ExtendCorpseLifetime,
                 corpse => { corpse.InventoryHandle = this.AllocateCorpseInventoryHandle(); },
                 this.SendCorpseInventoryUpdate,
+                this.SendCorpseCloseAction,
                 this.SendUseActionFinished,
                 this.ScheduleCorpseCreditAward,
                 this.ScheduleCorpseDespawn);
@@ -3488,6 +3489,31 @@ namespace AORebirth.Core.Playfields
                     CombatCorpseRules.CorpseInventorySlots,
                     corpse.InventoryHandle,
                     entries.Length));
+        }
+
+        private void SendCorpseCloseAction(ICharacter looter, CorpseState corpse)
+        {
+            if (looter.Controller.Client == null)
+            {
+                return;
+            }
+
+            looter.Controller.Client.SendCompressed(
+                new ActionMessage
+                {
+                    Identity = corpse.CorpseIdentity,
+                    Unknown = 1,
+                    ActionCode = 1,
+                    ActionIdentity = 0x66,
+                    Target = looter.Identity
+                });
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    "Corpse close Action sent looter={0} corpse={1} action=0x66",
+                    looter.Identity,
+                    corpse.CorpseIdentity));
         }
 
         private void ScheduleCorpseCreditAward(ICharacter looter, CorpseState corpse)

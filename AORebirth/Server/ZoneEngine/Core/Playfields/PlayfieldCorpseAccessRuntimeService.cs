@@ -39,6 +39,7 @@ namespace AORebirth.Core.Playfields
             Action<TCorpseState, TimeSpan, string> extendCorpseLifetime,
             Action<TCorpseState> refreshCorpseInventoryHandle,
             Action<ICharacter, TCorpseState> sendCorpseInventoryUpdate,
+            Action<ICharacter, TCorpseState> sendCorpseCloseAction,
             Action<ICharacter> sendUseActionFinished,
             Action<ICharacter, TCorpseState> scheduleCorpseCreditAward,
             Action<TCorpseState, TimeSpan, string> scheduleCorpseDespawn)
@@ -79,10 +80,11 @@ namespace AORebirth.Core.Playfields
 
             if (opened(corpse))
             {
-                // Official live capture F6C004: close returns CharacterAction 110 without
-                // InventoryUpdate; the next Use reopens with a refreshed inventory handle.
+                // Official live capture 20260712-195019: close returns Action 0x66,
+                // CharacterAction 110, and the Use acknowledgement without InventoryUpdate.
                 setOpened(corpse, false);
                 refreshCorpseInventoryHandle(corpse);
+                sendCorpseCloseAction(looter, corpse);
                 sendUseActionFinished(looter);
 
                 LogUtil.Debug(
