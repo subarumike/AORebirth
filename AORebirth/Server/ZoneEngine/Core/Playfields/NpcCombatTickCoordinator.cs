@@ -36,7 +36,7 @@ namespace AORebirth.Core.Playfields
 
         private readonly Dictionary<int, int> lastNpcSpecialAttackWeaponTargets = new Dictionary<int, int>();
 
-        private readonly HashSet<int> capturedSubwayFilthFleaPoisonAttacks = new HashSet<int>();
+        private readonly HashSet<int> completedCapturedOpeningAttacks = new HashSet<int>();
 
         private readonly Dictionary<int, DateTime> pendingCapturedAttackStarts =
             new Dictionary<int, DateTime>();
@@ -53,16 +53,17 @@ namespace AORebirth.Core.Playfields
 
         internal void ResetCombatTick(ICharacter attacker)
         {
-            bool isCapturedSubwayFilthFlea = IsCapturedSubwayFilthFlea(attacker);
             CapturedEnemyCombatContract capturedContract;
             bool hasCapturedContract = CapturedEnemyCombatRuntimeRegistry.TryGet(
                 attacker.Identity.Instance,
                 out capturedContract)
                                        && capturedContract.IsCombatReady;
+            CapturedEnemySpecialAttackSequenceDefinition specialAttackSequence =
+                hasCapturedContract ? capturedContract.SpecialAttackSequence : null;
             bool hasCapturedAttackStart = hasCapturedContract
                                           && capturedContract.HasCapturedAttackStartContext;
-            double initialDelaySeconds = isCapturedSubwayFilthFlea
-                                             ? NpcCombatAttackRules.CapturedSubwayFilthFleaInitialAttackSeconds
+            double initialDelaySeconds = specialAttackSequence != null
+                                             ? specialAttackSequence.InitialAttackDelaySeconds
                                              : Playfield.IsCapturedCleaningRobot(attacker)
                                                    ? NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds
                                                    : NpcCombatAttackRules.DefaultCombatTickSeconds;
@@ -92,10 +93,10 @@ namespace AORebirth.Core.Playfields
             }
 
             this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
-            this.capturedSubwayFilthFleaPoisonAttacks.Remove(attacker.Identity.Instance);
-            if (isCapturedSubwayFilthFlea)
+            this.completedCapturedOpeningAttacks.Remove(attacker.Identity.Instance);
+            if (specialAttackSequence != null)
             {
-                this.AnnounceCapturedSubwayFilthFleaAttackStartContext(attacker);
+                this.AnnounceCapturedSpecialAttackSequenceContext(attacker, specialAttackSequence);
             }
             else if (!Playfield.IsCapturedCleaningRobot(attacker))
             {
@@ -112,7 +113,7 @@ namespace AORebirth.Core.Playfields
             this.lastNpcCombatWeaponSlots.Remove(identity.Instance);
             this.lastNpcUnarmedAttackInfoSlots.Remove(identity.Instance);
             this.lastNpcSpecialAttackWeaponTargets.Remove(identity.Instance);
-            this.capturedSubwayFilthFleaPoisonAttacks.Remove(identity.Instance);
+            this.completedCapturedOpeningAttacks.Remove(identity.Instance);
             this.pendingCapturedAttackStarts.Remove(identity.Instance);
             this.pendingCapturedMovementTransitions.Remove(identity.Instance);
         }
@@ -256,9 +257,9 @@ namespace AORebirth.Core.Playfields
                     ? CombatDamageSource.WeaponAutoAttack
                     : CombatDamageSource.UnarmedAutoAttack);
             target.Stats[StatIds.health].Value = newHealth;
-            if (attackSource.IsCapturedSubwayFilthFleaPoisonAttack)
+            if (attackSource.CompletesCapturedOpeningAttack)
             {
-                this.capturedSubwayFilthFleaPoisonAttacks.Add(attacker.Identity.Instance);
+                this.completedCapturedOpeningAttacks.Add(attacker.Identity.Instance);
             }
             target.SendChangedStats();
             this.playfield.NotifyNpcCombatDamage(target);
@@ -423,9 +424,11 @@ namespace AORebirth.Core.Playfields
                     target.Identity));
         }
 
-        private void AnnounceCapturedSubwayFilthFleaAttackStartContext(ICharacter attacker)
+        private void AnnounceCapturedSpecialAttackSequenceContext(
+            ICharacter attacker,
+            CapturedEnemySpecialAttackSequenceDefinition specialAttackSequence)
         {
-            if (attacker.FightingTarget.Instance == 0)
+            if (attacker.FightingTarget.Instance == 0 || specialAttackSequence == null)
             {
                 return;
             }
@@ -435,12 +438,12 @@ namespace AORebirth.Core.Playfields
                 new SpecialAttackWeaponMessage
                 {
                     Identity = attacker.Identity,
-                    Specials = CreateCapturedSubwayFilthFleaSpecialAttacks(),
-                    Unknown1 = NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
-                    Unknown2 = NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
-                    Unknown3 = NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
-                    Unknown4 = NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
-                    Unknown5 = NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue
+                    Specials = CreateCapturedSpecialAttacks(specialAttackSequence.SpecialAttacks),
+                    Unknown1 = specialAttackSequence.SpecialAttackWeaponUnknown1,
+                    Unknown2 = specialAttackSequence.SpecialAttackWeaponUnknown2,
+                    Unknown3 = specialAttackSequence.SpecialAttackWeaponUnknown3,
+                    Unknown4 = specialAttackSequence.SpecialAttackWeaponUnknown4,
+                    Unknown5 = specialAttackSequence.SpecialAttackWeaponUnknown5
                 });
             this.playfield.Announce(
                 new AttackMessage
@@ -538,25 +541,23 @@ namespace AORebirth.Core.Playfields
                    };
         }
 
-        private static SpecialAttack[] CreateCapturedSubwayFilthFleaSpecialAttacks()
+        private static SpecialAttack[] CreateCapturedSpecialAttacks(
+            CapturedEnemySpecialAttackDefinition[] definitions)
         {
-            return new[]
-                   {
-                       new SpecialAttack
-                       {
-                           Unknown1 = NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadLowTemplate,
-                           Unknown2 = NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadHighTemplate,
-                           Unknown3 = NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
-                           Unknown4 = NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadName
-                       },
-                       new SpecialAttack
-                       {
-                           Unknown1 = NpcCombatAttackRules.CapturedSubwayFilthFleaArmsLowTemplate,
-                           Unknown2 = NpcCombatAttackRules.CapturedSubwayFilthFleaArmsHighTemplate,
-                           Unknown3 = NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag,
-                           Unknown4 = NpcCombatAttackRules.CapturedSubwayFilthFleaArmsName
-                       }
-                   };
+            if (definitions == null || definitions.Length == 0)
+            {
+                return new SpecialAttack[0];
+            }
+
+            return definitions.Select(
+                definition =>
+                    new SpecialAttack
+                    {
+                        Unknown1 = definition.LowTemplate,
+                        Unknown2 = definition.HighTemplate,
+                        Unknown3 = definition.Tag,
+                        Unknown4 = definition.Name
+                    }).ToArray();
         }
 
         private void AnnounceCombatDamage(
@@ -737,43 +738,42 @@ namespace AORebirth.Core.Playfields
                        };
             }
 
-            if (IsCapturedSubwayFilthFlea(attacker))
+            CapturedEnemyCombatContract capturedContract;
+            bool hasCapturedContract = CapturedEnemyCombatRuntimeRegistry.TryGet(
+                                           attacker.Identity.Instance,
+                                           out capturedContract)
+                                       && capturedContract.IsCombatReady;
+            if (hasCapturedContract
+                && capturedContract.AttackModel == CapturedEnemyAttackModel.Specialized
+                && capturedContract.SpecialAttackSequence != null)
             {
-                bool poisonAttackCompleted =
-                    this.capturedSubwayFilthFleaPoisonAttacks.Contains(attacker.Identity.Instance);
+                CapturedEnemySpecialAttackSequenceDefinition sequence =
+                    capturedContract.SpecialAttackSequence;
+                bool openingAttackCompleted = sequence.OpeningAttack == null
+                                              || this.completedCapturedOpeningAttacks.Contains(
+                                                  attacker.Identity.Instance);
+                CapturedEnemyCombatAttackDefinition attack = openingAttackCompleted
+                                                                  ? sequence.RepeatingAttack
+                                                                  : sequence.OpeningAttack;
                 return new CombatAttackSource
                        {
-                           MinDamage = poisonAttackCompleted
-                                           ? NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeDamage
-                                           : NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonDamage,
-                           MaxDamage = poisonAttackCompleted
-                                           ? NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeDamage
-                                           : NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonDamage,
-                           DamageBonus = 0,
-                           Range = NpcCombatAttackRules.MaxMeleeCombatDistance,
-                           RechargeSeconds = poisonAttackCompleted
-                                                 ? NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeRechargeSeconds
-                                                 : NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonRechargeSeconds,
-                           UsesEquippedWeapon = false,
-                           AttackInfoAmmoCount = NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
-                           AttackInfoWeaponSlot = poisonAttackCompleted
-                                                      ? NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeWeaponSlot
-                                                      : NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonWeaponSlot,
-                           AttackInfoUnk1 = 0,
-                           AttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType,
-                           AttackInfoWeaponInstance = poisonAttackCompleted
-                                                          ? NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag
-                                                          : NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
-                           SendAttackInfo = true,
-                           IsCapturedSubwayFilthFleaPoisonAttack = !poisonAttackCompleted
+                           MinDamage = attack.MinDamage,
+                           MaxDamage = attack.MaxDamage,
+                           DamageBonus = attack.DamageBonus,
+                           Range = attack.Range,
+                           RechargeSeconds = attack.RechargeSeconds,
+                           UsesEquippedWeapon = attack.UsesEquippedWeapon,
+                           AttackInfoAmmoCount = attack.AttackInfoAmmoCount,
+                           AttackInfoWeaponSlot = attack.AttackInfoWeaponSlot,
+                           AttackInfoUnk1 = attack.AttackInfoUnknown,
+                           AttackInfoHitType = attack.AttackInfoHitType,
+                           AttackInfoWeaponInstance = attack.AttackInfoWeaponInstance,
+                           SendAttackInfo = attack.SendAttackInfo,
+                           CompletesCapturedOpeningAttack = !openingAttackCompleted
                        };
             }
 
-            CapturedEnemyCombatContract capturedContract;
-            if (CapturedEnemyCombatRuntimeRegistry.TryGet(
-                    attacker.Identity.Instance,
-                    out capturedContract)
-                && capturedContract.IsCombatReady
+            if (hasCapturedContract
                 && capturedContract.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo)
             {
                 return new CombatAttackSource
@@ -1017,16 +1017,6 @@ namespace AORebirth.Core.Playfields
                    || NormalizeCombatItemStat(item.GetAttribute((int)StatIds.rechargedelay), 0) > 0;
         }
 
-        private static bool IsCapturedSubwayFilthFlea(ICharacter character)
-        {
-            return character != null
-                   && character.Playfield != null
-                   && character.Playfield.Identity.Instance == NpcCombatAttackRules.CapturedSubwayPlayfield
-                   && character.Stats[StatIds.monsterdata].Value
-                      == NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData
-                   && string.Equals(character.Name, "Filth Flea", StringComparison.Ordinal);
-        }
-
         private static double NormalizeCombatRange(int range)
         {
             int normalizedRange = NormalizeCombatItemStat(range, 0);
@@ -1078,7 +1068,7 @@ namespace AORebirth.Core.Playfields
 
             public bool SendAttackInfo { get; set; }
 
-            public bool IsCapturedSubwayFilthFleaPoisonAttack { get; set; }
+            public bool CompletesCapturedOpeningAttack { get; set; }
         }
 
         private enum CombatDamageSource

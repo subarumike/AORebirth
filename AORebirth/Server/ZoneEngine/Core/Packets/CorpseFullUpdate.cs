@@ -5,6 +5,7 @@ namespace ZoneEngine.Core.Packets
     using System.Text;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Playfields;
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -37,15 +38,10 @@ namespace ZoneEngine.Core.Packets
         private const int CorpseMonsterDataOffset = 330;
         private const int TailDeadNpcInstanceOffset = 342;
 
-        private const int SubwayPlayfieldResource = 127;
-        private const int SubwayFilthFleaMonsterData = 17657;
-        private const string SubwayFilthFleaName = "Filth Flea";
         private const int CapturedSubwayFilthFleaPacketLength = 457;
         private const int CapturedSubwayFilthFleaMonsterDataOffset = 325;
         private const int CapturedSubwayFilthFleaTailDeadNpcInstanceOffset = 337;
 
-        private const int SubwayThiefMonsterData = 26092;
-        private const string SubwayThiefName = "Thief";
         private const int CapturedSubwayThiefPacketLength = 412;
         private const int CapturedSubwayThiefMonsterDataOffset = 324;
         private const int CapturedSubwayThiefTailDeadNpcInstanceOffset = 336;
@@ -87,7 +83,14 @@ namespace ZoneEngine.Core.Packets
             int corpseMonsterData,
             int corpseCredits)
         {
-            if (IsCapturedSubwayThief(deadNpc))
+            OrdinaryEnemyRuntimeDefinition ordinaryRuntime = null;
+            bool hasOrdinaryRuntime = deadNpc != null
+                && OrdinaryEnemyRuntimeRegistry.TryGet(
+                    deadNpc.Identity.Instance,
+                    out ordinaryRuntime);
+            if (hasOrdinaryRuntime
+                && ordinaryRuntime.Profile.Corpse.PacketProfile
+                == OrdinaryEnemyCorpsePacketProfile.CapturedThief)
             {
                 return BuildCapturedSubwayThief(
                     deadNpc,
@@ -99,7 +102,9 @@ namespace ZoneEngine.Core.Packets
                     corpseCredits);
             }
 
-            if (IsCapturedSubwayFilthFlea(deadNpc))
+            if (hasOrdinaryRuntime
+                && ordinaryRuntime.Profile.Corpse.PacketProfile
+                == OrdinaryEnemyCorpsePacketProfile.CapturedFilthFlea)
             {
                 return BuildCapturedSubwayFilthFlea(
                     deadNpc,
@@ -151,24 +156,6 @@ namespace ZoneEngine.Core.Packets
             WriteInt32(buffer, TailDeadNpcInstanceOffset + afterNameDelta, deadNpc.Identity.Instance);
 
             return buffer;
-        }
-
-        private static bool IsCapturedSubwayFilthFlea(ICharacter deadNpc)
-        {
-            return deadNpc != null
-                   && deadNpc.Playfield != null
-                   && deadNpc.Playfield.Identity.Instance == SubwayPlayfieldResource
-                   && deadNpc.Stats[StatIds.monsterdata].Value == SubwayFilthFleaMonsterData
-                   && string.Equals(deadNpc.Name, SubwayFilthFleaName, StringComparison.Ordinal);
-        }
-
-        private static bool IsCapturedSubwayThief(ICharacter deadNpc)
-        {
-            return deadNpc != null
-                   && deadNpc.Playfield != null
-                   && deadNpc.Playfield.Identity.Instance == SubwayPlayfieldResource
-                   && deadNpc.Stats[StatIds.monsterdata].Value == SubwayThiefMonsterData
-                   && string.Equals(deadNpc.Name, SubwayThiefName, StringComparison.Ordinal);
         }
 
         private static byte[] BuildCapturedSubwayThief(

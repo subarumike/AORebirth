@@ -8,20 +8,30 @@ client builds. Windows loads it through the existing dependency chain:
 The proxy forwards the complete 17-export Windows `version.dll` surface to the
 real DLL under the 32-bit Windows system directory. A deferred worker then:
 
-1. waits for `N3.dll` outside loader lock;
-2. hashes the exact file backing the loaded module;
-3. selects only the approved new-client or old-client profile;
-4. verifies all four original calls still target the expected `PosToRoom` RVA;
-5. emits the same proven x86 checked-cast/negative-cell wrapper as the external
+1. installs an unhandled-crash dump handler that writes minidumps under
+   `%LOCALAPPDATA%\AORoomSpaceFix\Dumps` and chains back to the client's normal
+   crash path;
+2. waits for `N3.dll` outside loader lock;
+3. hashes the exact file backing the loaded module;
+4. selects only the approved new-client or old-client profile;
+5. verifies all four original calls still target the expected `PosToRoom` RVA;
+6. emits the same proven x86 checked-cast/negative-cell wrapper as the external
    `AOClientRoomSpaceGuard`;
-6. requires repeated stable thread snapshots and aborts if any client thread
+7. requires repeated stable thread snapshots and aborts if any client thread
    cannot be opened, suspended, or completely enumerated;
-7. applies and verifies all four calls as one transaction, requires every
+8. applies and verifies all four calls as one transaction, requires every
    instruction-cache flush, and verifies page-protection restoration and thread
    resumption before reporting readiness;
-8. verifies rollback before freeing the wrapper and retains that allocation if
+9. verifies rollback before freeing the wrapper and retains that allocation if
    rollback or cache state cannot be proven safe;
-9. retains the installed wrapper allocation until process exit.
+10. retains the installed wrapper allocation until process exit.
+
+For the approved new graphics client, the proxy also verifies the exact two
+callers of `GUI.dll +0x14CA77`, a GUI draw helper associated with crashes where
+the client jumps into coordinate data such as `0x41C80000`. Those two calls are
+redirected through a guard that lets valid draw calls continue unchanged, but
+skips that one draw helper call if it raises an access violation at a
+non-executable address.
 
 For the approved old live client, the proxy also verifies the exact GUI callsite
 and `Utils!Rect::operator+(Point)` implementation associated with the recurring
@@ -32,13 +42,21 @@ violations from the exact verified `Utils!Rect::operator+(Point)` body. Valid
 readable rectangle and point data continue through the original function
 unchanged.
 
-The old live renderer repair verifies the exact `randy31.dll +0x6C3A1` byte-
-color and `randy31.dll +0x6C51D` packed-color reads. If either instruction
-receives an invalid low pointer, the process-level guard substitutes black
-color components and resumes after the unsafe read. All other renderer
+The old live renderer repair verifies the exact `randy31.dll +0x21A94`
+draw-resource pointer read, `randy31.dll +0x2511A` render-state lookup,
+`randy31.dll +0x6C3A1` byte-color read, and `randy31.dll +0x6C51D`
+packed-color read. If the draw wrapper receives an invalid low resource
+pointer, the process-level guard returns from that one draw call without
+submitting it. If a render-state entry contains an impossible state id, the
+guard skips that one state entry and continues the state-application loop. If
+either color instruction receives an invalid low pointer, the guard substitutes
+black color components and resumes after the unsafe read. All other renderer
 exceptions continue through the normal client exception path unchanged.
 
-The proxy never modifies AO files after installation. It contains no
+The crash dump handler does not suppress arbitrary access violations, C++
+exceptions, driver faults, stack corruption, or unknown callsite failures.
+Only the targeted, byte-verified repairs listed above resume execution. The
+proxy never modifies AO files after installation. It contains no
 LargeAddressAware patch, XML/settings changes, DValues, camera/input hooks,
 other UI modifications, or Project Rubi-Ka-specific behavior.
 

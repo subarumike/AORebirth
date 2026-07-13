@@ -352,6 +352,7 @@ namespace ZoneEngine.Core
             {
                 concretePlayfield.ActivateNpc(petCharacter);
                 concretePlayfield.RegisterNpcHome(petCharacter);
+                concretePlayfield.AnnounceSpawnedCharacterVisibility(petCharacter, owner.Identity);
             }
 
             if (PetBureaucratGuardianAppearance.IsGuardianNano(summonNanoId))

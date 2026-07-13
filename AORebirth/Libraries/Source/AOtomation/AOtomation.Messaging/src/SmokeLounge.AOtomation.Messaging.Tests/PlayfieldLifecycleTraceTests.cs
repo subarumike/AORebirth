@@ -7,9 +7,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Runtime.CompilerServices;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using AORebirth.Core.Playfields;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -390,8 +393,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
             string playfieldText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string orchestratorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwaySpawnOrchestrator.cs"));
+            string ordinaryRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
             string weaponItemFullUpdateText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\WeaponItemFullUpdate.cs"));
             string visibilityPacketText = File.ReadAllText(
@@ -433,18 +436,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || coordinatorText.Contains("capturedSubwayThiefDiagnosticDamageSent"),
                 "The temporary one-hit Thief diagnostic damage gate must be removed after live proof that the client renders projectile damage.");
             Assert.IsTrue(
-                orchestratorText.Contains("WeaponItemFullUpdate.SendWeaponDefinitions(mobCharacter, true)")
+                ordinaryRuntimeText.Contains("playfield.AnnounceSpawnedCharacterVisibility(character, Identity.None);")
                 && weaponItemFullUpdateText.Contains("SendWeaponDefinitions(ICharacter character, bool announceToPlayfield = false)")
                 && weaponItemFullUpdateText.Contains("CreateWeaponDefinitionMessages(ICharacter character)")
                 && weaponItemFullUpdateText.Contains("CharacterStat.Energy, ResolveEnergy(item)")
                 && weaponItemFullUpdateText.Contains("return uint.MaxValue;")
-                && weaponItemFullUpdateText.Contains("CharacterStat.AttackDelay, item.GetAttribute((int)StatIds.itemdelay)")
-                && weaponItemFullUpdateText.Contains("CharacterStat.RechargeDelay, item.GetAttribute((int)StatIds.rechargedelay)")
+                && weaponItemFullUpdateText.Contains("AddStatIfPresent(stats, CharacterStat.AttackDelay, item.GetAttribute((int)StatIds.itemdelay))")
+                && weaponItemFullUpdateText.Contains("AddStatIfPresent(stats, CharacterStat.RechargeDelay, item.GetAttribute((int)StatIds.rechargedelay))")
                 && visibilityPacketText.Contains("sendVisibilityMessage(simpleCharFullUpdate);")
-                && visibilityPacketText.Contains("this.SendWeaponDefinitionsForVisibility(temp, recipient, sendVisibilityMessage);")
+                && visibilityPacketText.Contains("this.SendWeaponDefinitionsForVisibility(")
                 && visibilityPacketText.Contains("WeaponItemFullUpdate.CreateWeaponDefinitionMessages(owner)")
-                && visibilityPacketText.Contains("WeaponItemFullUpdate.LogObserverWeaponDefinition(owner, recipient, message)"),
-                "Captured equipped Subway NPC weapons must use the live-shaped item stats and be replayed to observers after SCFU but before CharInPlay.");
+                && visibilityPacketText.Contains("WeaponItemFullUpdate.LogObserverWeaponDefinition(owner, recipient, message)")
+                && visibilityPacketText.Contains("this.visibilityInterest.MarkVisibleEntry(recipient, source);"),
+                "Captured equipped Subway NPC weapons must enter through global interest, retain live-shaped item stats, and be replayed after SCFU but before CharInPlay.");
 
             string capturedStopBlock = ExtractMethodBlock(
                 controllerText,
@@ -482,12 +486,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
             string providerText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+            string catalogText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
             string corpseRulesText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
             Assert.IsTrue(
-                coordinatorText.Contains("this.AnnounceCapturedEnemyAttackStartContext(attacker, capturedContract);")
-                && coordinatorText.Contains("private void AnnounceCapturedEnemyAttackStartContext(")
-                && coordinatorText.Contains("CapturedEnemyCombatContract capturedContract)")
+                coordinatorText.Contains("this.AnnounceCapturedSpecialAttackSequenceContext(attacker, specialAttackSequence);")
+                && coordinatorText.Contains("private void AnnounceCapturedSpecialAttackSequenceContext(")
+                && coordinatorText.Contains("CapturedEnemySpecialAttackSequenceDefinition specialAttackSequence)")
                 && coordinatorText.Contains("Specials = new SpecialAttack[0]")
                 && coordinatorText.Contains("Unknown = 0,")
                 && coordinatorText.Contains("pendingCapturedMovementTransitions")
@@ -498,10 +504,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && coordinatorText.Contains("DamageBonus = 0,"),
                 "Thief must use its captured attack context, delayed movement transition, and fixed normal-hit envelope without reusing weapon max-damage as flat add damage.");
             int contextIndex = coordinatorText.IndexOf(
-                "this.AnnounceCapturedSubwayFilthFleaAttackStartContext(attacker);",
+                "this.AnnounceCapturedSpecialAttackSequenceContext(attacker, specialAttackSequence);",
                 StringComparison.Ordinal);
             int poisonContextIndex = coordinatorText.IndexOf(
-                "CreateCapturedSubwayFilthFleaSpecialAttacks()",
+                "CreateCapturedSpecialAttacks(specialAttackSequence.SpecialAttacks)",
                 StringComparison.Ordinal);
             int attackInfoIndex = coordinatorText.IndexOf(
                 "this.AnnounceCombatDamage(",
@@ -531,10 +537,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 filthFleaFactory.Contains("respawnDelaySeconds: 240.0"),
                 "Filth Flea must retain the captured four-minute post-despawn respawn schedule.");
             Assert.IsTrue(
-                corpseRulesText.Contains("20260709-210452 and 20260709-220439")
-                && corpseRulesText.Contains("CorpseFullUpdate packets for monsterData 17657")
-                && corpseRulesText.Contains("Observed nonzero spawn credits: 29, 35, 41, 66, 72, 79")
-                && corpseRulesText.Contains("new ObservedCorpseCreditRule(\"Filth Flea\", 17657, 29, 79)"),
+                catalogText.Contains("if (monsterData == 17657)")
+                && catalogText.Contains("OrdinaryEnemyEvidenceState.Observed")
+                && catalogText.Contains("29,")
+                && catalogText.Contains("79)"),
                 "Filth Flea must retain captured Subway corpse credit evidence from completed corpse full-update captures.");
         }
 
@@ -1137,8 +1143,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
             string providerText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+            string catalogText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
             string orchestratorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwaySpawnOrchestrator.cs"));
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
             string scfuPacketText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
             string scfuMessageText = File.ReadAllText(
@@ -1160,7 +1168,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 moduleText.Contains("return false;"),
                 "Subway content module must not suppress unrelated DB mob spawns in this first slice.");
             Assert.IsFalse(
-                moduleText.Contains("CapturedSubwaySpawnOrchestrator")
+                moduleText.Contains("OrdinaryEnemyRuntimeService")
                 || moduleText.Contains("NonPlayerCharacterHandler"),
                 "Subway content module must stay content-only and not own NPC runtime orchestration.");
 
@@ -1170,14 +1178,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\Content\SubwayContentModule.cs")
                 && projectText.Contains(@"Core\Playfields\CapturedSubwayContentProvider.cs")
-                && projectText.Contains(@"Core\Playfields\CapturedSubwaySpawnOrchestrator.cs"),
+                && projectText.Contains(@"Core\Playfields\OrdinaryEnemyProfile.cs")
+                && projectText.Contains(@"Core\Playfields\OrdinaryEnemyCatalog.cs")
+                && projectText.Contains(@"Core\Playfields\OrdinaryEnemyRuntimeService.cs"),
                 "ZoneEngine project must compile the Subway content files.");
 
             Assert.IsTrue(
                 npcRuntimeText.Contains("new CapturedSubwayContentProvider()")
-                && npcRuntimeText.Contains("new CapturedSubwaySpawnOrchestrator(")
-                && npcRuntimeText.Contains("this.capturedSubwaySpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);"),
-                "NPCRuntimeService must own the Subway captured spawn path.");
+                && npcRuntimeText.Contains("new OrdinaryEnemyCatalog(")
+                && npcRuntimeText.Contains("new OrdinaryEnemyRuntimeService(")
+                && npcRuntimeText.Contains("this.ordinaryEnemies.SpawnForPlayfield(this.playfield, playfieldIdentity);"),
+                "NPCRuntimeService must own the unified ordinary-enemy spawn path.");
 
             Assert.IsTrue(
                 providerText.Contains("\"Filth Flea\"")
@@ -1201,24 +1212,43 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(patrolReplayIndex > 0, "Captured Subway patrol replay data must follow spawn definitions.");
             string spawnDefinitionsText = providerText.Substring(0, patrolReplayIndex);
             Assert.AreEqual(
-                95,
+                124,
                 CountOccurrences(spawnDefinitionsText, "CapturedSurveySpawn("),
-                "CapturedSubwayContentProvider must preserve the 95 already-supported ordinary Subway spawns.");
+                "CapturedSubwayContentProvider must preserve all 124 capture-backed supported-family Subway spawns.");
+            string[] restoredSupportedSourceInstances =
+                {
+                    "0x79557C09", "0x79557C26", "0x79557C31", "0x79557C8B", "0x79557CA7",
+                    "0x79557CAB", "0x79557CAD", "0x7957E411", "0x7957E4A5", "0x7957E4B1",
+                    "0x7957E4BC", "0x79557C66", "0x7957E40A", "0x79557F14", "0x7957E5C6",
+                    "0x7957E5C7", "0x7957E5C8", "0x7957E5CA", "0x79557CAC", "0x7957405C",
+                    "0x795743A7", "0x795743A8", "0x7957E02C", "0x7957E02E", "0x7957E123",
+                    "0x7957E40E", "0x7957E5BF", "0x7957E5C4", "0x7957E5C5"
+                };
+            for (int i = 0; i < restoredSupportedSourceInstances.Length; i++)
+            {
+                Assert.AreEqual(
+                    1,
+                    CountOccurrences(spawnDefinitionsText, restoredSupportedSourceInstances[i]),
+                    "Restored supported source identity must appear exactly once: " + restoredSupportedSourceInstances[i]);
+            }
+            Assert.IsTrue(
+                providerText.Contains("RuntimeQuarantinedSourceInstances.Contains(spawn.SourceInstance)"),
+                "The client-crashing 20260710 population batch must remain evidence-only until its visibility snapshot is isolated safely.");
             Assert.IsFalse(
                 providerText.Contains("122002"),
                 "CapturedSubwayContentProvider must bind content to resource/playfield 127, not capture object Playfield2:122002.");
             Assert.IsTrue(
-                orchestratorText.Contains("SetMobStat(mobCharacter, StatIds.monsterdata, spawn.MonsterData);")
-                && orchestratorText.Contains("var fullUpdate = SimpleCharFullUpdate.ConstructMessage(mobCharacter);")
-                && orchestratorText.Contains("playfield.Announce(fullUpdate);"),
-                "Captured Subway spawns must remain visible, attackable NPCs using existing runtime/corpse paths.");
+                orchestratorText.Contains("SetMobStat(character, StatIds.monsterdata, profile.MonsterData, profile.ConstructionMode);")
+                && orchestratorText.Contains("this.activateNpc(character);")
+                && orchestratorText.Contains("playfield.AnnounceSpawnedCharacterVisibility(character, Identity.None);"),
+                "Captured Subway spawns must register through the global visibility-interest spawn hook while retaining existing runtime/corpse paths.");
             Assert.IsFalse(
-                orchestratorText.Contains("SetMobStat(mobCharacter, StatIds.catmesh, spawn.MonsterData);")
-                || orchestratorText.Contains("SetMobStat(mobCharacter, StatIds.displaycatmesh, spawn.MonsterData);"),
+                orchestratorText.Contains("SetMobStat(character, StatIds.catmesh")
+                || orchestratorText.Contains("SetMobStat(character, StatIds.displaycatmesh"),
                 "Captured Subway spawns must not overwrite template mesh stats with MonsterData ids.");
             Assert.IsTrue(
-                orchestratorText.Contains("ClearTemplateHeadMesh(mobCharacter);")
-                && orchestratorText.Contains("mobCharacter.MeshLayer.RemoveMesh(0, 0, 0, 4);"),
+                catalogText.Contains("source.HeadMesh == 0")
+                && orchestratorText.Contains("character.MeshLayer.RemoveMesh(0, 0, 0, 4);"),
                 "Captured Subway no-headmesh mobs must clear template zero mesh layers to preserve live Meshes=count=0 SCFU shape.");
             Assert.IsTrue(
                 scfuMessageText.Contains("public byte[] ExtendedTextureOverrideData { get; set; }")
@@ -1227,12 +1257,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "SimpleCharFullUpdate must be able to emit captured extended texture override data.");
             Assert.IsTrue(
                 scfuPacketText.Contains("private const int SubwayPlayfieldResource = 127;")
-                && scfuPacketText.Contains("private const int SubwayFilthFleaMonsterData = 17657;")
-                && scfuPacketText.Contains("private const string SubwayFilthFleaName = \"Filth Flea\"")
+                && catalogText.Contains("source.MonsterData == 17657")
+                && catalogText.Contains("OrdinaryEnemyScfuProfile.CapturedFilthFlea")
                 && scfuPacketText.Contains("CapturedSubwayFilthFleaExtendedTextureOverrideData")
                 && scfuPacketText.Contains("0x4D, 0x61, 0x74, 0x65,")
                 && scfuPacketText.Contains("0x72, 0x69, 0x61, 0x6C, 0x20, 0x23, 0x39")
-                && scfuPacketText.Contains("IsCapturedSubwayFilthFlea(charPlayfield, monsterData, charName)"),
+                && scfuPacketText.Contains("OrdinaryEnemyScfuProfile.CapturedFilthFlea"),
                 "Captured Subway Filth Flea must emit the live Material #9 extended texture override block only for PF127 monsterData 17657.");
             string thiefFactory = ExtractMethodBlock(
                 providerText,
@@ -1245,16 +1275,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0))"),
                 "Captured Subway Thief must preserve live monsterData, scale, head mesh, run speed, NPC family, and current surveyed position.");
             Assert.IsTrue(
-                orchestratorText.Contains("CapturedSubwayThiefMonsterData = 26092")
-                && orchestratorText.Contains("CapturedSubwayThiefBodyMesh = 160561")
-                && orchestratorText.Contains("CapturedSubwayThiefBackMesh = 7777")
-                && orchestratorText.Contains("mobCharacter.Textures.Add(new AOTextures(0, 0x24CA));")
-                && orchestratorText.Contains("mobCharacter.Textures.Add(new AOTextures(1, 0x2219));")
-                && orchestratorText.Contains("mobCharacter.Textures.Add(new AOTextures(2, 0x24CC));")
-                && orchestratorText.Contains("mobCharacter.Textures.Add(new AOTextures(3, 0x24CB));")
-                && orchestratorText.Contains("mobCharacter.Textures.Add(new AOTextures(4, 0x24CD));")
-                && orchestratorText.Contains("mobCharacter.MeshLayer.AddMesh(0, CapturedSubwayThiefBodyMesh, 0, 2);")
-                && orchestratorText.Contains("mobCharacter.MeshLayer.AddMesh(1, CapturedSubwayThiefBackMesh, 0, 2);"),
+                catalogText.Contains("source.MonsterData == 26092")
+                && catalogText.Contains("new OrdinaryEnemyTextureProfile(0, 0x24CA, 0)")
+                && catalogText.Contains("new OrdinaryEnemyTextureProfile(1, 0x2219, 0)")
+                && catalogText.Contains("new OrdinaryEnemyTextureProfile(2, 0x24CC, 0)")
+                && catalogText.Contains("new OrdinaryEnemyTextureProfile(3, 0x24CB, 0)")
+                && catalogText.Contains("new OrdinaryEnemyTextureProfile(4, 0x24CD, 0)")
+                && catalogText.Contains("new OrdinaryEnemyMeshProfile(0, 160561u, 0, 2)")
+                && catalogText.Contains("new OrdinaryEnemyMeshProfile(1, 7777u, 0, 2)")
+                && orchestratorText.Contains("foreach (OrdinaryEnemyTextureProfile texture in appearance.Textures)")
+                && orchestratorText.Contains("foreach (OrdinaryEnemyMeshProfile mesh in appearance.Meshes)"),
                 "Captured Subway Thief must apply the live texture IDs and three-mesh humanoid appearance shape.");
             Assert.IsTrue(
                 scfuMessageText.Contains("public SimpleCharFullUpdateFlags AdditionalFlags { get; set; }")
@@ -1266,15 +1296,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && scfuSerializerText.Contains("flags &= ~scfu.SuppressedFlags;"),
                 "SimpleCharFullUpdate must be able to emit captured waypoint data and capture-only flag deltas.");
             Assert.IsTrue(
-                scfuPacketText.Contains("private const int SubwayThiefMonsterData = 26092")
-                && scfuPacketText.Contains("private const string SubwayThiefName = \"Thief\"")
-                && scfuPacketText.Contains("CapturedSubwayThiefAppearanceValue = 0x00122002")
+                catalogText.Contains("source.MonsterData == 26092")
+                && catalogText.Contains("0x00122002u")
+                && catalogText.Contains("OrdinaryEnemyScfuProfile.CapturedThief")
                 && scfuPacketText.Contains("CapturedSubwayThiefUnknown1")
                 && scfuPacketText.Contains("scfu.Version = 58;")
-                && scfuPacketText.Contains("scfu.Appearance.Value = CapturedSubwayThiefAppearanceValue;")
+                && scfuPacketText.Contains("scfu.Appearance.Value = ordinaryRuntime.Profile.Appearance.AppearanceValue;")
                 && scfuPacketText.Contains("SimpleCharFullUpdateFlags.UnknownFlag6 | SimpleCharFullUpdateFlags.IsPet")
                 && scfuPacketText.Contains("scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;")
-                && scfuPacketText.Contains("IsCapturedSubwayThief(charPlayfield, monsterData, charName)"),
+                && scfuPacketText.Contains("ordinaryRuntime.Profile.Appearance.ScfuProfile"),
                 "Captured Subway Thief must emit the live version, appearance value, unknown movement bytes, and flag mask only for PF127 monsterData 26092.");
         }
 
@@ -1285,16 +1315,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string providerText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
             string orchestratorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwaySpawnOrchestrator.cs"));
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
             string coordinatorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcPatrolReplayCoordinator.cs"));
             string npcControllerText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Controllers\NPCController.cs"));
 
             Assert.AreEqual(
-                95,
+                124,
                 CountOccurrences(providerText, "            CapturedSurveySpawn("),
-                "The expanded ordinary-archetype slice must not disturb the 95 previously supported spawns.");
+                "The expanded ordinary-archetype slice must retain all 124 supported-family spawns.");
 
             string[] patrolSourceIdentities =
                 {
@@ -1313,9 +1343,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.AreEqual(
-                45,
+                53,
                 CountOccurrences(providerText, "new CapturedSubwayPatrolReplaySegment("),
-                "The four moving mobs must load complete periodic NpcPath cycles from capture 20260709-164414.");
+                "Existing periodic patrol cycles and the accepted Thief replay must remain loaded.");
             Assert.IsTrue(
                 providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.665506, 90.9275284f")
                 && providerText.Contains("0x7953AF18")
@@ -1326,10 +1356,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Captured patrol replay must preserve complete cycle timing, movement modes, and captured route speeds.");
             Assert.IsTrue(
                 orchestratorText.Contains("this.patrolReplay.AssignCapturedSubwayReplay(")
-                && orchestratorText.Contains("mobCharacter.AddWaypoint(start, false);")
-                && orchestratorText.Contains("mobCharacter.AddWaypoint(end, false);")
-                && orchestratorText.Contains("npcController.SetCapturedPatrolReplaySegments(segments, false, true);")
-                && orchestratorText.Contains("npcController.State = CharacterState.Patrolling;"),
+                && orchestratorText.Contains("character.AddWaypoint(start, false);")
+                && orchestratorText.Contains("character.AddWaypoint(end, false);")
+                && orchestratorText.Contains("controller.SetCapturedPatrolReplaySegments(")
+                && orchestratorText.Contains("spawn.UseSpawnAsPatrolStart)")
+                && orchestratorText.Contains("controller.State = CharacterState.Patrolling;"),
                 "Subway spawn orchestration must announce live SCFU waypoints and retain exact captured segment starts.");
             Assert.IsTrue(
                 coordinatorText.Contains("BuildCapturedSubwaySegments(int sourceInstance)")
@@ -1348,13 +1379,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Subway replay must preserve captured starts/movement modes, batch same-time corrections, and stop when combat begins.");
 
             AssertTextBefore(
-                ExtractMethodBlock(orchestratorText, "private void SpawnCapturedSubwayMob("),
-                "var fullUpdate = SimpleCharFullUpdate.ConstructMessage(mobCharacter);",
-                "this.activateNpc(mobCharacter);");
+                ExtractMethodBlock(orchestratorText, "private bool Spawn("),
+                "OrdinaryEnemyRuntimeRegistry.Register(character.Identity.Instance, runtimeDefinition);",
+                "this.activateNpc(character);");
             AssertTextBefore(
-                ExtractMethodBlock(orchestratorText, "private void SpawnCapturedSubwayMob("),
-                "this.activateNpc(mobCharacter);",
-                "playfield.Announce(fullUpdate);");
+                ExtractMethodBlock(orchestratorText, "private bool Spawn("),
+                "this.activateNpc(character);",
+                "playfield.AnnounceSpawnedCharacterVisibility(character, Identity.None);");
 
             string scfuPacketText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
@@ -1373,17 +1404,103 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void SubwayVisibilityIsolationDiagnosticsRemainOptInAndManifestOrdered()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string manifestPath = Path.Combine(
+                repositoryRoot,
+                @"docs\generated\subway_pf127_visibility_diagnostic_manifest.csv");
+            string[] manifestLines = File.ReadAllLines(manifestPath);
+            string selectionText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\SubwayVisibilityDiagnosticSelection.cs"));
+            string diagnosticText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\SubwayVisibilitySnapshotDiagnostics.cs"));
+            string visibilityText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs"));
+            string zoneClientText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
+            string ordinaryCatalogText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
+            string ordinaryGeneratorText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"tools-temp\AOSharpCaptureAnalyzer\generate_subway_ordinary_content.py"));
+
+            Assert.AreEqual(39, manifestLines.Length, "Manifest must contain one header plus 38 stable rows.");
+            for (int ordinal = 1; ordinal <= 38; ordinal++)
+            {
+                Assert.IsTrue(
+                    manifestLines[ordinal].StartsWith(ordinal + ",", StringComparison.Ordinal),
+                    "Manifest ordinal must be stable and contiguous: " + ordinal);
+            }
+
+            Assert.AreEqual(
+                29,
+                manifestLines.Count(line => line.Contains(",SUPPORTED_FAMILY_RESTORE,")),
+                "Supported diagnostic group must contain exactly 29 rows.");
+            Assert.AreEqual(
+                9,
+                manifestLines.Count(line => line.Contains(",ORDINARY_ENEMY_REGENERATE,")),
+                "Ordinary diagnostic group must contain exactly nine rows.");
+            Assert.IsTrue(
+                selectionText.Contains("SubwayVisibilityDiagnosticConfiguration.Disabled")
+                && selectionText.Contains("return current.Enabled && current.SelectedSourceInstances.Contains(sourceInstance);")
+                && selectionText.Contains("ALL_38 requires all 38 explicit manifest identities"),
+                "Diagnostic selection must fail closed and require explicit identities.");
+            Assert.IsTrue(
+                ordinaryCatalogText.Contains("spawn.Disposition == OrdinaryEnemyRuntimeDisposition.Active")
+                && ordinaryCatalogText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(")
+                && ordinaryGeneratorText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(spawn.SourceInstance)"),
+                "The unified catalog must keep both quarantined population groups behind the same opt-in selector.");
+
+            AssertTextBefore(
+                visibilityText,
+                "sendVisibilityMessage(simpleCharFullUpdate);",
+                "this.SendWeaponDefinitionsForVisibility(");
+            AssertTextBefore(
+                visibilityText,
+                "this.SendWeaponDefinitionsForVisibility(",
+                "sendVisibilityMessage(charInPlay);");
+            AssertTextBefore(
+                zoneClientText,
+                "SubwayVisibilitySnapshotDiagnostics.OnSerializationStarted(messageBody);",
+                "buffer = this.messageSerializer.Serialize(message);");
+            AssertTextBefore(
+                zoneClientText,
+                "buffer = this.messageSerializer.Serialize(message);",
+                "SubwayVisibilitySnapshotDiagnostics.OnSerializationCompleted(messageBody, buffer);");
+            Assert.IsTrue(
+                (diagnosticText.Contains("SCFU_SERIALIZATION_COMPLETED")
+                 || diagnosticText.Contains("PacketPrefix(record.Kind) + \"_SERIALIZATION_COMPLETED\""))
+                && diagnosticText.Contains("ENEMY_SEQUENCE_COMPLETED")
+                && diagnosticText.Contains("SNAPSHOT_COMPLETED")
+                && diagnosticText.Contains("total_serialized_bytes")
+                && diagnosticText.Contains("last_completed_enemy_identity"),
+                "Diagnostic ledger must preserve serialization, enemy, and snapshot completion markers.");
+        }
+
+        [TestMethod]
         public void SubwayOrdinaryArchetypesUseCaptureBackedTemplateFreeFramework()
         {
             string repositoryRoot = FindRepositoryRoot();
             string providerText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
+            string catalogText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
             string orchestratorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinarySpawnOrchestrator.cs"));
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
             string runtimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
-            string combatText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            string combatContractText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
             string playfieldText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string scfuText = File.ReadAllText(
@@ -1392,13 +1509,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
             Assert.AreEqual(
-                10,
+                11,
                 CountOccurrences(providerText, "            new CapturedSubwayOrdinaryArchetypeDefinition("),
-                "The nine ordinary families must retain ten captured visual/template variants because Workman and Architect Striker differ.");
+                "The ten ordinary families must retain eleven captured visual/template variants because Workman and Architect Striker differ.");
             Assert.AreEqual(
-                126,
+                135,
                 CountOccurrences(providerText, "            new CapturedSubwayOrdinarySpawnDefinition("),
-                "The completed capture survey must register all 126 spatially deduplicated ordinary spawn positions.");
+                "The completed capture survey must register all 135 spatially deduplicated ordinary spawn positions.");
+
+            string[] restoredOrdinarySourceInstances =
+                {
+                    "0x79557CB8", "0x7957E5CD", "0x79557F12", "0x7957E128", "0x7957E415",
+                    "0x7957E5CF", "0x7957E5D0", "0x7957E5D1", "0x79574527"
+                };
+            for (int i = 0; i < restoredOrdinarySourceInstances.Length; i++)
+            {
+                Assert.AreEqual(
+                    1,
+                    CountOccurrences(providerText, restoredOrdinarySourceInstances[i]),
+                    "Restored ordinary source identity must appear exactly once: " + restoredOrdinarySourceInstances[i]);
+            }
+            Assert.IsTrue(
+                providerText.Contains("!string.Equals(spawn.EvidenceCapture, \"20260710-202132\", StringComparison.Ordinal)"),
+                "The client-crashing 20260710 ordinary batch must remain evidence-only until its visibility snapshot is isolated safely.");
 
             string[] capturedNames =
                 {
@@ -1411,14 +1544,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Looter",
                     "Infector",
                     "Lost Thought",
-                    "Neural Burnout"
+                    "Neural Burnout",
+                    "Deranged Shopper"
                 };
             for (int i = 0; i < capturedNames.Length; i++)
             {
                 Assert.IsTrue(providerText.Contains("\"" + capturedNames[i] + "\""), "Missing " + capturedNames[i] + ".");
             }
 
-            int[] capturedMonsterData = { 30464, 203739, 203854, 203743, 96056, 55648, 203745, 31909, 96193, 203730 };
+            int[] capturedMonsterData = { 30464, 203739, 203854, 203743, 96056, 55648, 203745, 31909, 96193, 203730, 203736 };
             for (int i = 0; i < capturedMonsterData.Length; i++)
             {
                 Assert.IsTrue(
@@ -1432,6 +1566,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && CountOccurrences(providerText, "                \"striker\",") == 2,
                 "Workman and Architect Striker must share one ordinary family while preserving separate captured identities.");
             Assert.IsTrue(
+                providerText.Contains("\"looter\",")
+                && providerText.Contains("\"stim_fiend\",")
+                && providerText.Contains("\"deranged_shopper\",")
+                && providerText.Contains("new CapturedSubwayTextureDefinition(1, 30859, 0)")
+                && providerText.Contains("new CapturedSubwayMeshDefinition(1, 95784u, 0, 2)")
+                && providerText.Contains("\"20260710-202132\""),
+                "Looter, Stim Fiend, and Deranged Shopper must use capture-generated reusable archetypes.");
+            Assert.IsTrue(
                 providerText.Contains("CapturedSubwayTextureDefinition[]")
                 && providerText.Contains("CapturedSubwayMeshDefinition[]")
                 && providerText.Contains("CapturedSubwayWaypointDefinition[]")
@@ -1441,48 +1583,51 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Captured SCFU visual, flag, unknown-field, and path data must remain first-class evidence.");
             Assert.IsTrue(
                 providerText.Contains("new CapturedSubwayWaypointDefinition(")
-                && orchestratorText.Contains("foreach (CapturedSubwayWaypointDefinition waypoint in spawn.Waypoints)")
+                && catalogText.Contains("source.Waypoints")
+                && orchestratorText.Contains("foreach (OrdinaryEnemyWaypoint waypoint in spawn.Waypoints)")
                 && orchestratorText.Contains("controller.State = CharacterState.Patrolling;"),
                 "Captured SCFU movement paths must load where the captures supplied them.");
 
-            Assert.IsFalse(
-                orchestratorText.Contains("SpawnMobFromTemplate") || orchestratorText.Contains("MobTemplateDao"),
-                "Ordinary Subway archetypes must never substitute guessed database templates for capture evidence.");
             Assert.IsTrue(
-                orchestratorText.Contains("Pool.Instance.GetFreeInstance<Character>")
-                && orchestratorText.Contains("ApplyCapturedStats(character, spawn, archetype)")
-                && orchestratorText.Contains("ApplyCapturedAppearance(character, archetype)")
-                && orchestratorText.Contains("CapturedSubwayOrdinaryRuntimeRegistry.Register")
+                catalogText.Contains("OrdinaryEnemyConstructionMode.CapturedDirect")
+                && orchestratorText.Contains("if (profile.ConstructionMode == OrdinaryEnemyConstructionMode.TemplateBacked)")
+                && orchestratorText.Contains("Pool.Instance.GetFreeInstance<Character>")
+                && orchestratorText.Contains("ApplyStats(character, spawn, profile)")
+                && orchestratorText.Contains("ApplyAppearance(character, profile)")
+                && orchestratorText.Contains("OrdinaryEnemyRuntimeRegistry.Register")
                 && orchestratorText.Contains("character.Stats.SetBaseValueWithoutTriggering("),
-                "Template-free ordinary NPC construction must still use the standard attackable Character runtime.");
-            Assert.IsFalse(
-                ExtractMethodBlock(orchestratorText, "private static void SetMobStat(").Contains(".Value = value"),
-                "Template-free captured NPC initialization must not trigger derived stats before all base values exist.");
+                "Captured-direct ordinary NPC construction must use the standard attackable Character runtime without guessing a template.");
             Assert.IsTrue(
-                scfuText.Contains("CapturedSubwayOrdinaryRuntimeRegistry.TryGet")
-                && scfuText.Contains("scfu.AdditionalFlags = spawn.CapturedFlags;")
-                && scfuText.Contains("scfu.SuppressedFlags = ~spawn.CapturedFlags;")
-                && scfuText.Contains("scfu.Unknown1 = spawn.Unknown1.ToArray();")
-                && scfuText.Contains("archetype.Textures.Select(")
-                && scfuText.Contains("archetype.Meshes.Select("),
+                scfuText.Contains("OrdinaryEnemyRuntimeRegistry.TryGet")
+                && scfuText.Contains("scfu.AdditionalFlags = capturedFlags;")
+                && scfuText.Contains("scfu.SuppressedFlags = ~capturedFlags;")
+                && scfuText.Contains("scfu.Unknown1 = spawn.CapturedScfuUnknown1.ToArray();")
+                && scfuText.Contains("appearance.Textures.Select(")
+                && scfuText.Contains("appearance.Meshes.Select("),
                 "SCFU construction must emit the captured ordinary appearance and exact optional-field shape.");
             Assert.IsTrue(
-                combatText.Contains("capturedOrdinary.Archetype.Combat.Observed")
-                && combatText.Contains("MinDamage = combat.MinDamage")
-                && combatText.Contains("RechargeSeconds = combat.RechargeSeconds > 0"),
-                "Ordinary combat must use observed damage and timing without changing unrelated global combat behavior.");
+                catalogText.Contains("CapturedSubwayCombatCatalog.ForOrdinary(archetype)")
+                && combatContractText.Contains("internal static CapturedEnemyCombatContract ForOrdinary(")
+                && combatContractText.Contains("if (combat == null || !combat.Observed)")
+                && combatContractText.Contains("return CapturedEnemyCombatContract.FixedAttack(")
+                && combatContractText.Contains("combat.MinDamage")
+                && combatContractText.Contains("combat.MaxDamage")
+                && combatContractText.Contains("combat.RechargeSeconds"),
+                "Ordinary combat must use the shared captured contract and fail closed when AttackInfo is unobserved.");
             Assert.IsTrue(
-                providerText.Contains("DropGroupHash = \"captured-subway-ordinary\"")
-                && playfieldText.Contains("CapturedSubwayOrdinaryLootTable")
-                && playfieldText.Contains("lootSource = \"captured-subway-ordinary\""),
+                catalogText.Contains("DropGroupHash = \"ordinary-enemy-profile\"")
+                && playfieldText.Contains("BuildCombatLootTableEntries()")
+                && playfieldText.Contains("lootSource = \"ordinary-enemy-profile\""),
                 "Corpse loot must prefer only captured ordinary evidence before debug/database fallbacks.");
 
             Assert.IsTrue(
                 runtimeText.Contains("new CapturedSubwayOrdinaryContentProvider()")
-                && runtimeText.Contains("new CapturedSubwayOrdinarySpawnOrchestrator(")
-                && runtimeText.Contains("this.capturedSubwayOrdinarySpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);")
+                && runtimeText.Contains("new OrdinaryEnemyCatalog(")
+                && runtimeText.Contains("new OrdinaryEnemyRuntimeService(")
+                && runtimeText.Contains("this.ordinaryEnemies.SpawnForPlayfield(this.playfield, playfieldIdentity);")
                 && projectText.Contains(@"Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs")
-                && projectText.Contains(@"Core\Playfields\CapturedSubwayOrdinarySpawnOrchestrator.cs"),
+                && projectText.Contains(@"Core\Playfields\OrdinaryEnemyCatalog.cs")
+                && projectText.Contains(@"Core\Playfields\OrdinaryEnemyRuntimeService.cs"),
                 "PF127 runtime and project wiring must include the ordinary capture-backed slice.");
 
             string[] excludedNamedOrOwnedMobs =
@@ -1505,16 +1650,139 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void Subway20260710PopulationRestoreManifestMatchesCaptureAndBoundaries()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string manifestPath = Path.Combine(
+                repositoryRoot,
+                @"docs\generated\subway_20260710_population_restore_manifest.csv");
+            string supportedProviderText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+            string ordinaryProviderText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
+            string ordinaryGeneratorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"tools-temp\AOSharpCaptureAnalyzer\generate_subway_ordinary_content.py"));
+            string ordinaryCatalogText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
+            string ordinaryRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
+            string npcRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+
+            string[] lines = File.ReadAllLines(manifestPath);
+            Assert.IsTrue(lines.Length > 1, "Population restore manifest must contain classified capture rows.");
+            string[] header = lines[0].Split(',');
+            int captureIndex = Array.IndexOf(header, "CaptureId");
+            int playfieldIndex = Array.IndexOf(header, "ResourcePlayfieldId");
+            int identityIndex = Array.IndexOf(header, "Identity");
+            int nameIndex = Array.IndexOf(header, "Name");
+            int xIndex = Array.IndexOf(header, "PositionX");
+            int yIndex = Array.IndexOf(header, "PositionY");
+            int zIndex = Array.IndexOf(header, "PositionZ");
+            int ownerIndex = Array.IndexOf(header, "Owner");
+            int classificationIndex = Array.IndexOf(header, "Classification");
+            Assert.IsTrue(
+                captureIndex >= 0 && playfieldIndex >= 0 && identityIndex >= 0 && nameIndex >= 0
+                && xIndex >= 0 && yIndex >= 0 && zIndex >= 0 && ownerIndex >= 0 && classificationIndex >= 0,
+                "Population restore manifest must expose the required evidence columns.");
+
+            string[][] rows = lines.Skip(1).Select(line => line.Split(',')).ToArray();
+            Assert.AreEqual(107, rows.Length, "Every unique SCFU identity in capture 20260710-202132 must have a disposition.");
+            Assert.AreEqual(29, rows.Count(row => row[classificationIndex] == "SUPPORTED_FAMILY_RESTORE"));
+            Assert.AreEqual(9, rows.Count(row => row[classificationIndex] == "ORDINARY_ENEMY_REGENERATE"));
+            Assert.AreEqual(18, rows.Count(row => row[classificationIndex] == "DUPLICATE_EXCLUDED"));
+            Assert.AreEqual(2, rows.Count(row => row[classificationIndex] == "OWNED_SUMMON_EXCLUDED"));
+            Assert.AreEqual(49, rows.Count(row => row[classificationIndex] == "UNSUPPORTED_FAMILY_EXCLUDED"));
+            Assert.AreEqual(0, rows.Count(row => row[classificationIndex] == "MALFORMED_OR_INCOMPLETE"));
+
+            string[][] included = rows
+                .Where(
+                    row => row[classificationIndex] == "SUPPORTED_FAMILY_RESTORE"
+                        || row[classificationIndex] == "ORDINARY_ENEMY_REGENERATE")
+                .ToArray();
+            Assert.AreEqual(38, included.Length);
+            Assert.AreEqual(38, included.Select(row => row[identityIndex]).Distinct().Count());
+            Assert.IsTrue(included.All(row => row[captureIndex] == "20260710-202132"));
+            Assert.IsTrue(included.All(row => row[playfieldIndex] == "127"));
+            Assert.IsTrue(included.All(row => string.IsNullOrEmpty(row[ownerIndex])));
+
+            foreach (string[] row in included)
+            {
+                string sourceIdentity = "0x" + row[identityIndex]
+                    .Replace("(SimpleChar:", string.Empty)
+                    .Replace(")", string.Empty);
+                string providerText = row[classificationIndex] == "SUPPORTED_FAMILY_RESTORE"
+                    ? supportedProviderText
+                    : ordinaryProviderText;
+                Assert.AreEqual(1, CountOccurrences(providerText, sourceIdentity), "Included source identity must be unique: " + sourceIdentity);
+                int identityOffset = providerText.IndexOf(sourceIdentity, StringComparison.Ordinal);
+                string evidenceBlock = providerText.Substring(identityOffset, Math.Min(1200, providerText.Length - identityOffset));
+                Assert.IsTrue(
+                    evidenceBlock.Contains(row[xIndex] + "f")
+                    && evidenceBlock.Contains(row[yIndex] + "f")
+                    && evidenceBlock.Contains(row[zIndex] + "f"),
+                    "Runtime position must exactly match captured position for " + sourceIdentity + ".");
+            }
+
+            string[] ordinaryNames = { "Looter", "Stim Fiend", "Deranged Shopper" };
+            Assert.IsTrue(
+                included.Where(row => row[classificationIndex] == "ORDINARY_ENEMY_REGENERATE")
+                    .All(row => ordinaryNames.Contains(row[nameIndex])),
+                "Only the three capture-approved ordinary archetypes may be regenerated.");
+            Assert.IsTrue(
+                ordinaryGeneratorText.Contains("return sorted(selected, key=lambda value: (value[\"Name\"], value[\"Identity\"]))")
+                && ordinaryGeneratorText.Contains("CAPTURE_ARCHETYPE_FILTERS")
+                && ordinaryGeneratorText.Contains("ARCHETYPE_CAPTURE_FILTERS"),
+                "Ordinary regeneration must remain deterministic and capture-filtered.");
+
+            string[] excludedNamedOrOwned =
+                {
+                    "Abmouth Supremus", "Eumenides", "Vergil Aeneid", "Strike Foreman", "Healer",
+                    "0x795451A1", "0x795451A9"
+                };
+            foreach (string excluded in excludedNamedOrOwned)
+            {
+                Assert.IsFalse(supportedProviderText.Contains(excluded) || ordinaryProviderText.Contains(excluded));
+            }
+            foreach (string[] row in rows.Where(row => row[classificationIndex].EndsWith("EXCLUDED", StringComparison.Ordinal)))
+            {
+                string sourceIdentity = "0x" + row[identityIndex]
+                    .Replace("(SimpleChar:", string.Empty)
+                    .Replace(")", string.Empty);
+                Assert.IsFalse(
+                    supportedProviderText.Contains(sourceIdentity) || ordinaryProviderText.Contains(sourceIdentity),
+                    "Excluded identity must not become a static spawn: " + sourceIdentity);
+            }
+
+            Assert.IsFalse(
+                supportedProviderText.Contains("RoomSpace")
+                || ordinaryProviderText.Contains("RoomSpace")
+                || ordinaryGeneratorText.Contains("RoomSpace"),
+                "Population restoration must not add a RoomSpace workaround or coordinate mutation.");
+            Assert.IsTrue(
+                ordinaryCatalogText.Contains("CapturedSubwayContentProvider.IsRuntimeQuarantined(source.SourceInstance)")
+                && ordinaryCatalogText.Contains("QuarantinedOrdinaryCapture")
+                && ordinaryRuntimeText.Contains("SpawnMobFromTemplate")
+                && ordinaryRuntimeText.Contains("Pool.Instance.GetFreeInstance<Character>")
+                && ordinaryRuntimeText.Contains("spawn.SourceIdentity")
+                && ordinaryRuntimeText.Contains("OrdinaryEnemyRuntimeRegistry.Register")
+                && npcRuntimeText.Contains("OrdinaryEnemyRuntimeRegistry.Remove"),
+                "Current identity allocation and NPC death/despawn lifecycle ownership must remain unchanged.");
+        }
+
+        [TestMethod]
         public void SubwayFilthFleaCorpseUsesCapturedLiveVisualTemplate()
         {
             string repositoryRoot = FindRepositoryRoot();
+            string catalogText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
             string corpsePacketText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\CorpseFullUpdate.cs"));
 
             Assert.IsTrue(
-                corpsePacketText.Contains("SubwayPlayfieldResource = 127")
-                && corpsePacketText.Contains("SubwayFilthFleaMonsterData = 17657")
-                && corpsePacketText.Contains("SubwayFilthFleaName = \"Filth Flea\"")
+                catalogText.Contains("source.MonsterData == 17657")
+                && catalogText.Contains("OrdinaryEnemyCorpsePacketProfile.CapturedFilthFlea")
+                && corpsePacketText.Contains("OrdinaryEnemyRuntimeRegistry.TryGet")
                 && corpsePacketText.Contains("CapturedSubwayFilthFleaPacketLength = 457"),
                 "Subway Filth Flea corpse selection must stay scoped to the captured PF127 identity and packet length.");
             Assert.IsTrue(
@@ -1527,7 +1795,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 corpsePacketText,
                 "public static byte[] Build(");
             Assert.IsTrue(
-                buildMethod.Contains("IsCapturedSubwayFilthFlea(deadNpc)")
+                buildMethod.Contains("OrdinaryEnemyRuntimeRegistry.TryGet(")
+                && buildMethod.Contains("OrdinaryEnemyCorpsePacketProfile.CapturedFilthFlea")
                 && buildMethod.Contains("return BuildCapturedSubwayFilthFlea("),
                 "PF127 Filth Flea corpses must select the capture-backed visual packet before generic corpse construction.");
 
@@ -1549,6 +1818,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string repositoryRoot = FindRepositoryRoot();
             string providerText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+            string catalogText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
             string combatContractText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
             string attackRulesText = File.ReadAllText(
@@ -1584,15 +1855,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && providerText.Contains("respawnDelaySeconds: 240.0")
                 && providerText.Contains("20260709-210452 and 20260709-220439, inventory-updates.csv")
                 && combatContractText.Contains("case 17657:")
+                && combatContractText.Contains("CapturedEnemyCombatContract.CapturedSpecialSequence(")
                 && attackRulesText.Contains("CapturedSubwayFilthFleaMonsterData = 17657")
-                && movementCoordinatorText.Contains("CreateCapturedSubwayFilthFleaSpecialAttacks()")
+                && movementCoordinatorText.Contains("AnnounceCapturedSpecialAttackSequenceContext(")
+                && movementCoordinatorText.Contains("CreateCapturedSpecialAttacks(")
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
-                && scfuPacketText.Contains("SubwayFilthFleaMonsterData = 17657")
+                && catalogText.Contains("source.MonsterData == 17657")
+                && catalogText.Contains("OrdinaryEnemyScfuProfile.CapturedFilthFlea")
                 && scfuPacketText.Contains("CapturedSubwayFilthFleaExtendedTextureOverrideData")
                 && corpsePacketText.Contains("CapturedSubwayFilthFleaPacketLength = 457")
                 && corpsePacketText.Contains("BuildCapturedSubwayFilthFlea(")
-                && corpseRulesText.Contains("new ObservedCorpseCreditRule(\"Filth Flea\", 17657, 29, 79)"),
+                && catalogText.Contains("if (monsterData == 17657)")
+                && catalogText.Contains("OrdinaryEnemyEvidenceState.Observed")
+                && catalogText.Contains("29,")
+                && catalogText.Contains("79)"),
                 "Accepted Subway Filth Flea must keep spawn, movement/chase, combat, appearance, corpse visual, loot, credits, and four-minute respawn coverage together.");
 
             Assert.IsTrue(
@@ -1635,8 +1912,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Accepted Subway Thief must be covered by captured attack-start transition and generic combat follow/chase movement.");
 
             Assert.IsTrue(
-                weaponPacketText.Contains("owner.Playfield.Identity.Instance == 127")
-                && weaponPacketText.Contains("owner.Stats[StatIds.monsterdata].Value == 26092")
+                weaponPacketText.Contains("owner.Stats[StatIds.monsterdata].Value == 26092")
                 && weaponPacketText.Contains("string.Equals(owner.Name, \"Thief\"")
                 && weaponPacketText.Contains("CharacterStat.Energy")
                 && weaponPacketText.Contains("CharacterStat.AttackDelay")
@@ -1644,13 +1920,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Accepted Subway Thief must announce a live-shaped equipped weapon definition so the client renders projectile damage.");
 
             Assert.IsTrue(
-                scfuPacketText.Contains("private const int SubwayThiefMonsterData = 26092")
-                && scfuPacketText.Contains("private const string SubwayThiefName = \"Thief\"")
-                && scfuPacketText.Contains("CapturedSubwayThiefAppearanceValue")
-                && scfuPacketText.Contains("CapturedSubwayThiefUnknown1"),
+                catalogText.Contains("source.MonsterData == 26092")
+                && catalogText.Contains("0x00122002u")
+                && catalogText.Contains("OrdinaryEnemyScfuProfile.CapturedThief")
+                && scfuPacketText.Contains("ordinaryRuntime.Profile.Appearance.ScfuProfile")
+                && scfuPacketText.Contains("OrdinaryEnemyScfuProfile.CapturedThief"),
                 "Accepted Subway Thief must retain its identity-specific SCFU appearance and movement bytes.");
             Assert.IsTrue(
-                corpsePacketText.Contains("SubwayThiefMonsterData = 26092")
+                catalogText.Contains("OrdinaryEnemyCorpsePacketProfile.CapturedThief")
+                && corpsePacketText.Contains("OrdinaryEnemyRuntimeRegistry.TryGet")
                 && corpsePacketText.Contains("CapturedSubwayThiefPacketLength = 412")
                 && corpsePacketText.Contains("CapturedSubwayThiefTemplate")
                 && corpsePacketText.Contains("BuildCapturedSubwayThief("),
@@ -1659,13 +1937,351 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string registerCorpse = ExtractMethodBlock(playfieldText, "private void RegisterCorpse");
             Assert.IsTrue(
                 playfieldText.Contains("CapturedSubwayThiefCorpseCatMesh = 5907")
-                && playfieldText.Contains("private static bool IsCapturedSubwayThief(ICharacter target)")
+                && playfieldText.Contains("private static bool UsesCapturedThiefCorpseProfile(ICharacter target)")
+                && playfieldText.Contains("OrdinaryEnemyRuntimeRegistry.TryGet")
                 && !registerCorpse.Contains("if (!state.HasUnlootedItems)")
                 && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(1)")
                 && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.FromSeconds(30)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(5)"),
                 "Accepted Subway Thief must keep captured corpse visual selection and the generic five-minute loot-bearing corpse lifetime.");
+        }
+
+        [TestMethod]
+        public void OrdinaryEnemyRuntimeFailsClosedAndCleansProfileLifecycleState()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string playfieldText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+            string runtimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
+            string npcRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+            string runtimeSystemsText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+
+            string lootMethod = ExtractMethodBlock(
+                playfieldText,
+                "private List<CorpseLootItem> RollCorpseLootItems(");
+            int failClosedIndex = lootMethod.IndexOf(
+                "if (profileBackedEnemy && matchingEntries.Count == 0)",
+                StringComparison.Ordinal);
+            int debugFallbackIndex = lootMethod.IndexOf(
+                "matchingEntries = DebugLootTable.Where(",
+                StringComparison.Ordinal);
+            int databaseFallbackIndex = lootMethod.IndexOf(
+                "matchingEntries = GetDatabaseLootTable().Where(",
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                failClosedIndex >= 0
+                && debugFallbackIndex > failClosedIndex
+                && databaseFallbackIndex > failClosedIndex
+                && lootMethod.Contains("return lootItems;"),
+                "Profile-backed ordinary enemies with unresolved/empty loot must fail closed before debug or database loot fallback.");
+
+            Assert.IsTrue(
+                playfieldText.Contains("ordinaryDefinition.Profile.Corpse.UnlootedLifetimeSeconds")
+                && playfieldText.Contains("ordinaryDefinition.Profile.Corpse.LootedCleanupSeconds")
+                && playfieldText.Contains("selectedCorpse.ItemLootLifetime")
+                && playfieldText.Contains("selectedCorpse.EmptyCleanupDelay"),
+                "Corpse access and final-loot cleanup must consume the ordinary profile lifetime values.");
+
+            Assert.IsTrue(
+                runtimeText.Contains("this.activeRuntimeIdentityBySource.ContainsKey(spawn.SourceIdentity)")
+                && runtimeText.Contains("this.pendingRespawns.ContainsKey(spawn.SourceIdentity)")
+                && runtimeText.Contains("internal void ClearRuntimeState(int playfieldInstance)")
+                && runtimeText.Contains("OrdinaryEnemyRuntimeRegistry.RemoveForPlayfield(playfieldInstance)")
+                && npcRuntimeText.Contains("this.ordinaryEnemies.ClearRuntimeState(this.playfield.Identity.Instance)")
+                && runtimeSystemsText.Contains("internal void ClearNpcRuntimeState()")
+                && playfieldText.Contains("this.runtimeSystems.ClearNpcRuntimeState();"),
+                "Spawn/reset/dispose paths must prevent duplicates and clear runtime, combat, diagnostic, and profile registry state.");
+        }
+
+        [TestMethod]
+        public void OrdinaryEnemyProfileValidatorAcceptsStableKeysAndExplicitUnresolvedEvidence()
+        {
+            OrdinaryEnemyProfile first = CreateOrdinaryEnemyProfile("profile.a");
+            OrdinaryEnemyProfile second = CreateOrdinaryEnemyProfile("profile.b");
+            OrdinaryEnemySpawnDefinition firstSpawn = CreateOrdinaryEnemySpawn(
+                "spawn.0000000A",
+                10,
+                first.ProfileKey);
+            OrdinaryEnemySpawnDefinition secondSpawn = CreateOrdinaryEnemySpawn(
+                "spawn.00000014",
+                20,
+                second.ProfileKey);
+
+            OrdinaryEnemyProfileValidator.Validate(
+                new[] { first, second },
+                new[] { firstSpawn, secondSpawn });
+
+            OrdinaryEnemyProfile unresolved = CreateOrdinaryEnemyProfile(
+                "profile.unresolved",
+                OrdinaryEnemyConstructionMode.TemplateBacked,
+                OrdinaryEnemyAggressionMode.Retaliate,
+                OrdinaryEnemyCombatMode.Unresolved,
+                OrdinaryEnemyDamageSource.Unresolved,
+                OrdinaryEnemyLootEvidence.Unresolved,
+                false,
+                false);
+            OrdinaryEnemySpawnDefinition unresolvedSpawn = CreateOrdinaryEnemySpawn(
+                "spawn.0000001E",
+                30,
+                unresolved.ProfileKey,
+                OrdinaryEnemyMovementMode.Static,
+                null,
+                false,
+                OrdinaryEnemyEvidenceState.Unresolved,
+                null);
+
+            OrdinaryEnemyProfileValidator.Validate(
+                new[] { unresolved },
+                new[] { unresolvedSpawn });
+            Assert.IsFalse(unresolvedSpawn.HasRespawnDelay);
+            Assert.AreEqual(OrdinaryEnemyCombatMode.Unresolved, unresolved.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.Unresolved, unresolved.Combat.DamageSource);
+            Assert.AreEqual(OrdinaryEnemyLootEvidence.Unresolved, unresolved.Loot.Evidence);
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Unresolved, unresolved.Loot.CreditEvidence);
+        }
+
+        [TestMethod]
+        public void OrdinaryEnemyProfileValidatorRejectsDuplicateAndNondeterministicKeys()
+        {
+            OrdinaryEnemyProfile profileA = CreateOrdinaryEnemyProfile("profile.a");
+            OrdinaryEnemyProfile profileB = CreateOrdinaryEnemyProfile("profile.b");
+
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profileB, profileA },
+                new OrdinaryEnemySpawnDefinition[0],
+                "Profile ordering must be deterministic.");
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profileA, CreateOrdinaryEnemyProfile("profile.a") },
+                new OrdinaryEnemySpawnDefinition[0],
+                "Duplicate profile keys must fail closed.");
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profileA },
+                new[]
+                    {
+                        CreateOrdinaryEnemySpawn("spawn.same", 10, profileA.ProfileKey),
+                        CreateOrdinaryEnemySpawn("spawn.same", 20, profileA.ProfileKey)
+                    },
+                "Duplicate spawn keys must fail closed.");
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profileA },
+                new[]
+                    {
+                        CreateOrdinaryEnemySpawn("spawn.0000000A", 10, profileA.ProfileKey),
+                        CreateOrdinaryEnemySpawn("spawn.00000014", 10, profileA.ProfileKey)
+                    },
+                "Duplicate source identities must fail closed.");
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profileA },
+                new[]
+                    {
+                        CreateOrdinaryEnemySpawn("spawn.00000014", 20, profileA.ProfileKey),
+                        CreateOrdinaryEnemySpawn("spawn.0000000A", 10, profileA.ProfileKey)
+                    },
+                "Spawn identity ordering must be deterministic.");
+        }
+
+        [TestMethod]
+        public void OrdinaryEnemyProfileValidatorRejectsMissingProfilesBossesSummonsAndScriptedBehavior()
+        {
+            OrdinaryEnemyProfile profile = CreateOrdinaryEnemyProfile("profile.valid");
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profile },
+                new[] { CreateOrdinaryEnemySpawn("spawn.missing", 10, "profile.missing") },
+                "A spawn referencing a missing profile must fail closed.");
+            AssertOrdinaryEnemyValidationFails(
+                new[]
+                    {
+                        CreateOrdinaryEnemyProfile(
+                            "profile.boss",
+                            OrdinaryEnemyConstructionMode.TemplateBacked,
+                            OrdinaryEnemyAggressionMode.Retaliate,
+                            OrdinaryEnemyCombatMode.UnarmedMelee,
+                            OrdinaryEnemyDamageSource.CapturedFixed,
+                            OrdinaryEnemyLootEvidence.NoneProven,
+                            true,
+                            false)
+                    },
+                new OrdinaryEnemySpawnDefinition[0],
+                "Boss profiles must use a custom encounter module.");
+            AssertOrdinaryEnemyValidationFails(
+                new[]
+                    {
+                        CreateOrdinaryEnemyProfile(
+                            "profile.summon",
+                            OrdinaryEnemyConstructionMode.TemplateBacked,
+                            OrdinaryEnemyAggressionMode.Retaliate,
+                            OrdinaryEnemyCombatMode.UnarmedMelee,
+                            OrdinaryEnemyDamageSource.CapturedFixed,
+                            OrdinaryEnemyLootEvidence.NoneProven,
+                            false,
+                            true)
+                    },
+                new OrdinaryEnemySpawnDefinition[0],
+                "Owned summons must not enter the ordinary enemy catalog.");
+            AssertOrdinaryEnemyValidationFails(
+                new[]
+                    {
+                        CreateOrdinaryEnemyProfile(
+                            "profile.unresolved-aggression",
+                            OrdinaryEnemyConstructionMode.TemplateBacked,
+                            OrdinaryEnemyAggressionMode.Unresolved,
+                            OrdinaryEnemyCombatMode.UnarmedMelee,
+                            OrdinaryEnemyDamageSource.CapturedFixed,
+                            OrdinaryEnemyLootEvidence.NoneProven,
+                            false,
+                            false)
+                    },
+                new OrdinaryEnemySpawnDefinition[0],
+                "Aggression must be an explicit runtime selection.");
+            AssertOrdinaryEnemyValidationFails(
+                new[]
+                    {
+                        CreateOrdinaryEnemyProfile(
+                            "profile.scripted-aggression",
+                            OrdinaryEnemyConstructionMode.TemplateBacked,
+                            OrdinaryEnemyAggressionMode.Scripted,
+                            OrdinaryEnemyCombatMode.UnarmedMelee,
+                            OrdinaryEnemyDamageSource.CapturedFixed,
+                            OrdinaryEnemyLootEvidence.NoneProven,
+                            false,
+                            false)
+                    },
+                new OrdinaryEnemySpawnDefinition[0],
+                "Scripted aggression must use a custom encounter module.");
+            AssertOrdinaryEnemyValidationFails(
+                new[]
+                    {
+                        CreateOrdinaryEnemyProfile(
+                            "profile.scripted-combat",
+                            OrdinaryEnemyConstructionMode.TemplateBacked,
+                            OrdinaryEnemyAggressionMode.Retaliate,
+                            OrdinaryEnemyCombatMode.Scripted,
+                            OrdinaryEnemyDamageSource.Scripted,
+                            OrdinaryEnemyLootEvidence.NoneProven,
+                            false,
+                            false)
+                    },
+                new OrdinaryEnemySpawnDefinition[0],
+                "Scripted combat must use a custom encounter module.");
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profile },
+                new[]
+                    {
+                        CreateOrdinaryEnemySpawn(
+                            "spawn.unresolved",
+                            10,
+                            profile.ProfileKey,
+                            OrdinaryEnemyMovementMode.Unresolved)
+                    },
+                "Movement must be an explicit runtime selection.");
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profile },
+                new[]
+                    {
+                        CreateOrdinaryEnemySpawn(
+                            "spawn.scripted",
+                            10,
+                            profile.ProfileKey,
+                            OrdinaryEnemyMovementMode.Scripted)
+                    },
+                "Scripted movement must use a custom encounter module.");
+        }
+
+        [TestMethod]
+        public void OrdinaryEnemyProfileValidatorEnforcesMovementAndRespawnEvidence()
+        {
+            OrdinaryEnemyProfile profile = CreateOrdinaryEnemyProfile("profile.valid");
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profile },
+                new[]
+                    {
+                        CreateOrdinaryEnemySpawn(
+                            "spawn.patrol-missing",
+                            10,
+                            profile.ProfileKey,
+                            OrdinaryEnemyMovementMode.Patrol,
+                            new[] { new OrdinaryEnemyWaypoint(1.0f, 2.0f, 3.0f) })
+                    },
+                "Patrol movement requires at least two points or captured replay.");
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profile },
+                new[]
+                    {
+                        CreateOrdinaryEnemySpawn(
+                            "spawn.roam-missing",
+                            10,
+                            profile.ProfileKey,
+                            OrdinaryEnemyMovementMode.Roam)
+                    },
+                "Roam movement requires captured movement data.");
+
+            OrdinaryEnemySpawnDefinition replayPatrol = CreateOrdinaryEnemySpawn(
+                "spawn.replay",
+                10,
+                profile.ProfileKey,
+                OrdinaryEnemyMovementMode.Patrol,
+                null,
+                true);
+            OrdinaryEnemySpawnDefinition waypointPatrol = CreateOrdinaryEnemySpawn(
+                "spawn.waypoints",
+                20,
+                profile.ProfileKey,
+                OrdinaryEnemyMovementMode.Patrol,
+                new[]
+                    {
+                        new OrdinaryEnemyWaypoint(1.0f, 2.0f, 3.0f),
+                        new OrdinaryEnemyWaypoint(4.0f, 5.0f, 6.0f)
+                    });
+            OrdinaryEnemyProfileValidator.Validate(
+                new[] { profile },
+                new[] { replayPatrol, waypointPatrol });
+
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profile },
+                new[]
+                    {
+                        CreateOrdinaryEnemySpawn(
+                            "spawn.respawn-null",
+                            10,
+                            profile.ProfileKey,
+                            OrdinaryEnemyMovementMode.Static,
+                            null,
+                            false,
+                            OrdinaryEnemyEvidenceState.Observed,
+                            null)
+                    },
+                "Observed respawn evidence requires a delay.");
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profile },
+                new[]
+                    {
+                        CreateOrdinaryEnemySpawn(
+                            "spawn.respawn-zero",
+                            10,
+                            profile.ProfileKey,
+                            OrdinaryEnemyMovementMode.Static,
+                            null,
+                            false,
+                            OrdinaryEnemyEvidenceState.Observed,
+                            0.0)
+                    },
+                "Observed respawn evidence requires a positive delay.");
+
+            OrdinaryEnemySpawnDefinition observedRespawn = CreateOrdinaryEnemySpawn(
+                "spawn.respawn-valid",
+                10,
+                profile.ProfileKey,
+                OrdinaryEnemyMovementMode.Static,
+                null,
+                false,
+                OrdinaryEnemyEvidenceState.Observed,
+                60.0);
+            OrdinaryEnemyProfileValidator.Validate(new[] { profile }, new[] { observedRespawn });
+            Assert.IsTrue(observedRespawn.HasRespawnDelay);
         }
 
         [TestMethod]
@@ -1876,7 +2492,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new PlayfieldTimedLifecycleRuntimeService()",
                     "new PlayfieldVendorRuntimeService()",
                     "new PlayfieldVisibilityFanoutRuntimeService()",
-                    "new PlayfieldVisibilityPacketRuntimeService(this.visibilityFanout, this.packetSequences)",
+                    "new PlayfieldVisibilityInterestRuntimeService(",
+                    "new PlayfieldSpatialCharacterIndex(visibilityPolicy)",
+                    "new PlayfieldVisibilityPacketRuntimeService(",
                     "new PlayfieldWallCollisionRuntimeService()",
                     "new PlayfieldAnnouncementRuntimeService()",
                     "new PlayfieldPublishFanoutRuntimeService()",
@@ -1894,6 +2512,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     CountOccurrences(playfieldText, runtimeCoordinatorConstructors[i]),
                     "Playfield must not directly construct " + runtimeCoordinatorConstructors[i] + ".");
             }
+
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("PlayfieldVisibilityInterestPolicy.FromEnvironment()")
+                && runtimeSystemsText.Contains("this.visibilityFanout,")
+                && runtimeSystemsText.Contains("this.packetSequences,")
+                && runtimeSystemsText.Contains("this.visibilityInterest);")
+                && visibilityPacketText.Contains("PlayfieldVisibilityInterestRuntimeService visibilityInterest)"),
+                "PlayfieldRuntimeSystems must construct one global interest service and inject it as the third visibility-packet dependency.");
 
             Assert.AreEqual(
                 0,
@@ -2292,9 +2918,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && visibilityPacketText.Contains("this.packetSequences.RunVisibilityPacketPairSequence(")
                 && visibilityPacketText.Contains("LogUtil.Debug(")
                 && visibilityPacketText.Contains("internal void AnnounceJoiningCharacterVisibility(")
-                && visibilityPacketText.Contains("announceVisibilityMessage(SimpleCharFullUpdate.ConstructMessage(temp))")
-                && visibilityPacketText.Contains("announceVisibilityMessage(charInPlay)"),
-                "PlayfieldVisibilityPacketRuntimeService must own visibility packet-pair construction, sequencing delegation, and debug logging.");
+                && visibilityPacketText.Contains("this.visibilityInterest.SelectInitialCharacters(recipient)")
+                && visibilityPacketText.Contains("this.visibilityInterest.ReconcileInitializedRecipients(")
+                && visibilityPacketText.Contains("sendVisibilityMessage(simpleCharFullUpdate);")
+                && visibilityPacketText.Contains("this.SendWeaponDefinitionsForVisibility(")
+                && visibilityPacketText.Contains("sendVisibilityMessage(charInPlay);"),
+                "PlayfieldVisibilityPacketRuntimeService must own bounded interest entry, shared packet-pair construction, sequencing delegation, and debug logging.");
             Assert.IsFalse(
                 visibilityPacketText.Contains("SendCompressed")
                 || visibilityPacketText.Contains("Publish(")
@@ -2307,10 +2936,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 announcementText.Contains("internal sealed class PlayfieldAnnouncementRuntimeService")
                 && announcementText.Contains("internal void AnnounceToCharacterClients(")
                 && announcementText.Contains("foreach (Character entity in characters)")
-                && announcementText.Contains("if (entity.Controller.Client != null)")
+                && announcementText.Contains("if (entity?.Controller?.Client != null)")
                 && announcementText.Contains("sendMessageBodyToClient(entity.Controller.Client, messageBody);")
                 && announcementText.Contains("internal void AnnounceToOtherCharacterClients(")
-                && announcementText.Contains("if (entity.Identity != excludedIdentity)"),
+                && announcementText.Contains("&& entity.Identity != excludedIdentity")
+                && announcementText.Contains("&& entity.Controller?.Client != null"),
                 "PlayfieldAnnouncementRuntimeService must own message announcement recipient fanout orchestration.");
             Assert.IsFalse(
                 announcementText.Contains("SimpleCharFullUpdate")
@@ -2855,7 +3485,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || playfieldText.Contains("this.runtimeSystems.RemoveNpcImmediately("),
                 "Immediate NPC despawn APIs must use despawn naming instead of generic removal naming.");
             Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.ProcessDueNpcCorpseDespawns(DateTime.UtcNow, this.DespawnCorpse);")
+                playfieldText.Contains("this.runtimeSystems.ProcessDueNpcCorpseDespawns(utcNow, this.DespawnCorpse);")
                 && playfieldText.Contains("this.runtimeSystems.ProcessPendingCorpseSpawns(")
                 && playfieldText.Contains("this.runtimeSystems.DespawnCorpses(")
                 && playfieldText.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
@@ -3066,18 +3696,33 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldUseCorpse.Contains("this.runtimeSystems.TryUseCorpse(")
                 && playfieldUseCorpse.Contains("this.SendCorpseInventoryUpdate")
+                && playfieldUseCorpse.Contains("corpse.InventoryHandle = this.AllocateCorpseInventoryHandle();")
                 && playfieldUseCorpse.Contains("this.ScheduleCorpseCreditAward"),
                 "Playfield must delegate corpse access sequencing while retaining packet and credit callbacks.");
             Assert.IsTrue(
                 corpseUse.Contains("this.SendCorpseInventoryUpdateAndCredits(")
                 && corpseUse.Contains("if (hasUnlootedItems(corpse))")
+                && corpseUse.Contains("if (opened(corpse))")
+                && corpseUse.Contains("setOpened(corpse, false);")
+                && corpseUse.Contains("refreshCorpseInventoryHandle(corpse);")
+                && corpseUse.Contains("sendCorpseCloseAction(looter, corpse);")
+                && corpseUse.Contains("sendUseActionFinished(looter);")
+                && corpseUse.Contains("return true;")
                 && corpseUse.Contains("else"),
-                "Corpse access service must use the captured InventoryUpdate open path for item-bearing and empty corpses.");
+                "Corpse access must preserve the captured open, close, and reopen alternation.");
             Assert.IsFalse(
-                corpseUse.Contains("sendCorpseLootAccessAction")
-                || corpseUse.Contains("sendUseActionFinished")
-                || corpseUse.Contains("NextUseSendsAccessActionOnly"),
-                "Corpse Use must not take the old unproven action-only path instead of the captured InventoryUpdate open path.");
+                corpseUse.Contains("NextUseSendsAccessActionOnly")
+                || corpseUse.Contains("sendCorpseLootAccessAction"),
+                "Corpse reopen must not retain the rejected refresh-plus-action hypothesis.");
+            Assert.IsTrue(
+                playfieldText.Contains("private void SendCorpseCloseAction")
+                && playfieldText.Contains("ActionIdentity = 0x66"),
+                "Captured corpse close must emit Action 0x66 only through the close branch.");
+            AssertTextBefore(corpseUse, "if (opened(corpse))", "setOpened(corpse, false);");
+            AssertTextBefore(corpseUse, "setOpened(corpse, false);", "refreshCorpseInventoryHandle(corpse);");
+            AssertTextBefore(corpseUse, "refreshCorpseInventoryHandle(corpse);", "sendCorpseCloseAction(looter, corpse);");
+            AssertTextBefore(corpseUse, "sendCorpseCloseAction(looter, corpse);", "sendUseActionFinished(looter);");
+            AssertTextBefore(corpseUse, "sendUseActionFinished(looter);", "setOpened(corpse, true);");
             AssertTextBefore(
                 inventoryAndCredits,
                 "sendCorpseInventoryUpdate(looter, corpse);",
@@ -3089,12 +3734,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 !registerCorpse.Contains("if (!state.HasUnlootedItems)")
                 && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
-                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30);")
+                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(1);")
                 && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(30);")
                 && corpseRulesText.Contains("public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(5);")
                 && registerCorpse.Contains("CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);")
                 && corpseRulesText.Contains("unlootedItemCount > 0 || unlootedCredits > 0"),
-                "Regular loot-bearing corpses must receive a five-minute initial lifetime; empty corpses must use the 30-second cleanup window.");
+                "Regular loot-bearing corpses must receive a five-minute initial lifetime; empty corpses must use the captured near-immediate cleanup window.");
             AssertTextBefore(
                 registerCorpse,
                 "this.corpses[corpseIdentity.Instance] = state;",
@@ -4246,9 +4891,33 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string visibilityPacketSequenceText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs"));
             Assert.AreEqual(
-                2,
+                1,
                 CountOccurrences(visibilityPacketSequenceText, "this.packetSequences.RunVisibilityPacketPairSequence("),
-                "Playfield visibility packet runtime must own both SCFU -> CharInPlay visibility pair sequence entry points.");
+                "Playfield visibility packet runtime must keep one shared SCFU -> weapons -> CharInPlay packet-pair implementation.");
+            string initialVisibility = ExtractMethodBlock(
+                visibilityPacketSequenceText,
+                "internal void SendExistingCharacterVisibilityToClient(");
+            string joiningVisibility = ExtractMethodBlock(
+                visibilityPacketSequenceText,
+                "internal void AnnounceJoiningCharacterVisibility(");
+            string sharedEntryVisibility = ExtractMethodBlock(
+                visibilityPacketSequenceText,
+                "private bool SendCharacterVisibilityEntry(");
+            Assert.IsTrue(
+                initialVisibility.Contains("this.SendCharacterVisibilityEntry(")
+                && joiningVisibility.Contains("this.SendCharacterVisibilityEntry(")
+                && sharedEntryVisibility.Contains("sendVisibilityMessage(simpleCharFullUpdate);")
+                && sharedEntryVisibility.Contains("this.SendWeaponDefinitionsForVisibility(")
+                && sharedEntryVisibility.Contains("sendVisibilityMessage(charInPlay);"),
+                "Initial and joining interest paths must invoke the same ordered SCFU -> weapons -> CharInPlay implementation.");
+            AssertTextBefore(
+                sharedEntryVisibility,
+                "sendVisibilityMessage(simpleCharFullUpdate);",
+                "this.SendWeaponDefinitionsForVisibility(");
+            AssertTextBefore(
+                sharedEntryVisibility,
+                "this.SendWeaponDefinitionsForVisibility(",
+                "sendVisibilityMessage(charInPlay);");
             Assert.IsTrue(
                 privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPreFullCharacterOrgInitSequence(")
                 && privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPlayfieldReadyBlockSequence("),
@@ -4541,6 +5210,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs"));
+            string visibilityInterestText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityInterestRuntimeService.cs"));
+            string visibilityStateText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityInterestState.cs"));
+            string visibilityPolicyText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityInterestPolicy.cs"));
+            string spatialIndexText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldSpatialCharacterIndex.cs"));
             string announcementText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -4582,10 +5267,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && !sendScfus.Contains("LogUtil.Debug("),
                 "SendSCFUsToClient must delegate existing-character visibility packet orchestration through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
-                announcePlayerVisibility.Contains("this.runtimeSystems.AnnounceJoiningCharacterVisibility(character, body => this.Announce(body));")
+                announcePlayerVisibility.Contains("this.runtimeSystems.AnnounceJoiningCharacterVisibility(")
+                && announcePlayerVisibility.Contains("this.SendVisibilityMessage,")
+                && announcePlayerVisibility.Contains("this.SendVisibilityLeave);")
                 && !announcePlayerVisibility.Contains("CharInPlayMessage")
                 && !announcePlayerVisibility.Contains("SimpleCharFullUpdate.ConstructMessage(temp)"),
-                "AnnouncePlayerVisibility must delegate joining-character visibility packet orchestration through PlayfieldRuntimeSystems.");
+                "AnnouncePlayerVisibility must delegate targeted joining-character entry and leave delivery through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToCharacterClients(this.CharacterEntities(), publishToCharacterClient);")
                 && runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToOtherCharacterClients(")
@@ -4593,8 +5280,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "PlayfieldRuntimeSystems must feed visibility fanout and visibility packet orchestration from registry-backed views.");
             Assert.IsTrue(
                 runtimeSystemsText.Contains("this.visibilityPackets.SendExistingCharacterVisibilityToClient(")
-                && runtimeSystemsText.Contains("this.visibilityPackets.AnnounceJoiningCharacterVisibility("),
-                "PlayfieldRuntimeSystems must route visibility packet orchestration through PlayfieldVisibilityPacketRuntimeService.");
+                && runtimeSystemsText.Contains("this.visibilityPackets.AnnounceJoiningCharacterVisibility(")
+                && runtimeSystemsText.Contains("this.visibilityInterest.VisibleRecipientsForSource(sourceIdentity)"),
+                "PlayfieldRuntimeSystems must route visibility entry, leave, and scoped recipient lookup through the global interest boundary.");
+            Assert.IsTrue(
+                visibilityPolicyText.Contains("internal float EnterRadius")
+                && visibilityPolicyText.Contains("internal float LeaveRadius")
+                && spatialIndexText.Contains("internal IReadOnlyList<ICharacter> Query(Coordinate center, float radius)")
+                && visibilityInterestText.Contains("PlayfieldVisibilityInterestState<ICharacter>")
+                && visibilityStateText.Contains("visibleSourcesByRecipient")
+                && visibilityStateText.Contains("visibleRecipientsBySource")
+                && visibilityStateText.Contains("ReconcileInitializedRecipients("),
+                "Global visibility interest must own bounded policy, spatial candidate queries, bidirectional state, and hysteresis reconciliation.");
             Assert.IsTrue(
                 visibilityFanoutText.Contains("foreach (Character entity in characters)")
                 && visibilityFanoutText.Contains("if (entity.Controller.Client != null)")
@@ -4604,7 +5301,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && visibilityFanoutText.Contains("bool senderInRecipientPlayfield = entity.InPlayfield(playfieldIdentity);")
                 && visibilityFanoutText.Contains("sent = sendExistingCharacter(entity);")
                 && visibilityFanoutText.Contains("logVisibilityCandidate(entity, senderEqualsRecipient, senderInRecipientPlayfield, sent);"),
-                "Visibility fanout service must own recipient selection and iteration order.");
+                "Visibility fanout service must retain packet-agnostic iteration over the spatially selected character set.");
             Assert.IsFalse(
                 visibilityFanoutText.Contains("SimpleCharFullUpdate")
                 || visibilityFanoutText.Contains("CharInPlayMessage")
@@ -4617,11 +5314,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Visibility fanout service must not own packet construction, sends, logging, sequencing, or Pool scans.");
             Assert.IsTrue(
                 visibilityPacketText.Contains("this.visibilityFanout.FanoutExistingCharactersForScfu(")
+                && visibilityPacketText.Contains("this.visibilityInterest.SelectInitialCharacters(recipient)")
+                && visibilityPacketText.Contains("this.visibilityInterest.ReconcileInitializedRecipients(")
                 && visibilityPacketText.Contains("this.packetSequences.RunVisibilityPacketPairSequence(")
                 && visibilityPacketText.Contains("sendVisibilityMessage(simpleCharFullUpdate)")
-                && visibilityPacketText.Contains("announceVisibilityMessage(charInPlay)")
+                && visibilityPacketText.Contains("sendVisibilityMessage(charInPlay)")
                 && visibilityPacketText.Contains("LogUtil.Debug("),
-                "Visibility packet service must own packet pair orchestration and debug logging.");
+                "Visibility packet service must use bounded interest selection while retaining shared packet-pair orchestration and debug logging.");
             Assert.IsFalse(
                 visibilityPacketText.Contains("SendCompressed")
                 || visibilityPacketText.Contains("Publish(")
@@ -4629,8 +5328,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Visibility packet service must not own direct transport, publish wrappers, or Pool scans.");
             Assert.IsTrue(
                 announcementText.Contains("foreach (Character entity in characters)")
-                && announcementText.Contains("if (entity.Controller.Client != null)")
-                && announcementText.Contains("if (entity.Identity != excludedIdentity)")
+                && announcementText.Contains("if (entity?.Controller?.Client != null)")
+                && announcementText.Contains("&& entity.Identity != excludedIdentity")
+                && announcementText.Contains("&& entity.Controller?.Client != null")
                 && announcementText.Contains("sendMessageBodyToClient(entity.Controller.Client, messageBody);"),
                 "Announcement service must own message-recipient fanout and client-send callback ordering.");
             Assert.IsFalse(
@@ -4666,6 +5366,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     announceOthers,
                     sendScfus,
                     visibilityFanoutText,
+                    visibilityInterestText,
+                    spatialIndexText,
                     dynelDropPosition,
                     findNamed
                 };
@@ -4713,9 +5415,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || timedLifecycleText.Contains("Pool.Instance.GetAll"),
                 "Timed lifecycle character loop must not scan Pool directly.");
 
+            Assert.IsTrue(
+                corpseFullUpdate.Contains("this.runtimeSystems.VisibleRecipientsForSource(target.Identity)")
+                && corpseFullUpdate.Contains("this.SendCorpseFullUpdateToRecipient(")
+                && !corpseFullUpdate.Contains("this.runtimeSystems.Characters()")
+                && !corpseFullUpdate.Contains("Pool.Instance.GetAll"),
+                "Corpse full updates must target only recipients that currently know the dead NPC source.");
+
             string[] movedLoopBlocks =
                 {
-                    corpseFullUpdate,
                     stopFightingDeadTarget
                 };
             for (int i = 0; i < movedLoopBlocks.Length; i++)
@@ -5246,6 +5954,141 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 PlayfieldLifecycleTrace.StagePrivateCityReadyBlockEnd,
                 PlayfieldLifecycleTrace.MessagePrivateCityReadyBlockEnd,
                 character);
+        }
+
+        private static OrdinaryEnemyProfile CreateOrdinaryEnemyProfile(
+            string profileKey,
+            OrdinaryEnemyConstructionMode constructionMode = OrdinaryEnemyConstructionMode.TemplateBacked,
+            OrdinaryEnemyAggressionMode aggressionMode = OrdinaryEnemyAggressionMode.Retaliate,
+            OrdinaryEnemyCombatMode combatMode = OrdinaryEnemyCombatMode.UnarmedMelee,
+            OrdinaryEnemyDamageSource damageSource = OrdinaryEnemyDamageSource.CapturedFixed,
+            OrdinaryEnemyLootEvidence lootEvidence = OrdinaryEnemyLootEvidence.NoneProven,
+            bool bossOrScripted = false,
+            bool ownedSummon = false)
+        {
+            OrdinaryEnemyEvidenceState aggressionEvidence =
+                aggressionMode == OrdinaryEnemyAggressionMode.Unresolved
+                    ? OrdinaryEnemyEvidenceState.Unresolved
+                    : OrdinaryEnemyEvidenceState.Observed;
+            OrdinaryEnemyEvidenceState combatEvidence =
+                combatMode == OrdinaryEnemyCombatMode.Unresolved
+                || damageSource == OrdinaryEnemyDamageSource.Unresolved
+                    ? OrdinaryEnemyEvidenceState.Unresolved
+                    : OrdinaryEnemyEvidenceState.Observed;
+            return new OrdinaryEnemyProfile(
+                profileKey,
+                "test.family",
+                "Test Enemy",
+                12345,
+                constructionMode,
+                constructionMode == OrdinaryEnemyConstructionMode.TemplateBacked ? "A000" : string.Empty,
+                new OrdinaryEnemyAppearanceProfile(
+                    3,
+                    1,
+                    1,
+                    1,
+                    1,
+                    0,
+                    0,
+                    0,
+                    138,
+                    0,
+                    31,
+                    0,
+                    0u,
+                    0,
+                    false,
+                    true,
+                    new OrdinaryEnemyTextureProfile[0],
+                    new OrdinaryEnemyMeshProfile[0],
+                    OrdinaryEnemyScfuProfile.Generic),
+                new OrdinaryEnemyAggressionProfile(
+                    aggressionMode,
+                    null,
+                    true,
+                    false,
+                    aggressionEvidence),
+                new OrdinaryEnemyCombatProfile(
+                    combatMode,
+                    damageSource,
+                    false,
+                    new CapturedEnemyCombatContract(),
+                    combatEvidence),
+                new OrdinaryEnemyLootProfile(
+                    lootEvidence,
+                    new OrdinaryEnemyLootEntry[0],
+                    OrdinaryEnemyEvidenceState.Unresolved,
+                    null,
+                    null),
+                new OrdinaryEnemyCorpseProfile(
+                    OrdinaryEnemyCorpsePacketProfile.Generic,
+                    30.0,
+                    300.0,
+                    1.0),
+                new[] { "test-evidence" },
+                bossOrScripted,
+                ownedSummon);
+        }
+
+        private static OrdinaryEnemySpawnDefinition CreateOrdinaryEnemySpawn(
+            string spawnKey,
+            int sourceIdentity,
+            string profileKey,
+            OrdinaryEnemyMovementMode movementMode = OrdinaryEnemyMovementMode.Static,
+            OrdinaryEnemyWaypoint[] waypoints = null,
+            bool useCapturedPatrolReplay = false,
+            OrdinaryEnemyEvidenceState respawnEvidence = OrdinaryEnemyEvidenceState.Unresolved,
+            double? respawnDelaySeconds = null)
+        {
+            return new OrdinaryEnemySpawnDefinition(
+                spawnKey,
+                sourceIdentity,
+                profileKey,
+                127,
+                5,
+                115,
+                0,
+                93,
+                20,
+                1.0f,
+                2.0f,
+                3.0f,
+                0.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                movementMode,
+                waypoints,
+                useCapturedPatrolReplay,
+                false,
+                false,
+                0u,
+                0,
+                new byte[0],
+                0,
+                respawnEvidence,
+                respawnDelaySeconds,
+                OrdinaryEnemyRuntimeDisposition.Active,
+                string.Empty,
+                "test-capture",
+                "test-timestamp");
+        }
+
+        private static void AssertOrdinaryEnemyValidationFails(
+            OrdinaryEnemyProfile[] profiles,
+            OrdinaryEnemySpawnDefinition[] spawns,
+            string message)
+        {
+            try
+            {
+                OrdinaryEnemyProfileValidator.Validate(profiles, spawns);
+            }
+            catch (InvalidOperationException)
+            {
+                return;
+            }
+
+            Assert.Fail(message);
         }
 
         private static readonly ForbiddenReference[] ForbiddenContentModuleReferences =

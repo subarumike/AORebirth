@@ -5,6 +5,7 @@ namespace ZoneEngine.Core.Playfields
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
 
     using AORebirth.Core.Entities;
     using AORebirth.Interfaces;
@@ -25,9 +26,12 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldPacketSequencingRuntimeService packetSequences;
 
+        private readonly PlayfieldVisibilityInterestRuntimeService visibilityInterest;
+
         internal PlayfieldVisibilityPacketRuntimeService(
             PlayfieldVisibilityFanoutRuntimeService visibilityFanout,
-            PlayfieldPacketSequencingRuntimeService packetSequences)
+            PlayfieldPacketSequencingRuntimeService packetSequences,
+            PlayfieldVisibilityInterestRuntimeService visibilityInterest)
         {
             if (visibilityFanout == null)
             {
@@ -39,8 +43,14 @@ namespace ZoneEngine.Core.Playfields
                 throw new ArgumentNullException("packetSequences");
             }
 
+            if (visibilityInterest == null)
+            {
+                throw new ArgumentNullException("visibilityInterest");
+            }
+
             this.visibilityFanout = visibilityFanout;
             this.packetSequences = packetSequences;
+            this.visibilityInterest = visibilityInterest;
         }
 
         internal void SendExistingCharacterVisibilityToClient(
@@ -50,10 +60,51 @@ namespace ZoneEngine.Core.Playfields
         {
             Require(sendVisibilityMessage, "sendVisibilityMessage");
 
+            List<ICharacter> characterSnapshot = characters.Where(x => x != null).ToList();
+            this.visibilityInterest.Synchronize(characterSnapshot);
+            this.visibilityInterest.ForgetRecipient(recipient.Identity);
+            IList<ICharacter> selectedCharacters = this.visibilityInterest.SelectInitialCharacters(recipient);
             Identity playfieldIdentity = recipient.Playfield.Identity;
+            SubwayVisibilityDiagnosticSnapshot diagnosticSnapshot =
+                SubwayVisibilitySnapshotDiagnostics.TryBeginSnapshot(recipient, 0);
+            if (diagnosticSnapshot != null)
+            {
+                int totalPlayfieldCharacters = 0;
+                int totalPlayfieldNpcs = 0;
+                int visibilityEligibleCharacters = 0;
+                foreach (ICharacter candidate in characterSnapshot)
+                {
+                    if (!candidate.InPlayfield(playfieldIdentity))
+                    {
+                        continue;
+                    }
+
+                    totalPlayfieldCharacters++;
+                    if (candidate.Identity != recipient.Identity)
+                    {
+                        visibilityEligibleCharacters++;
+                    }
+
+                    Character candidateCharacter = candidate as Character;
+                    if (candidateCharacter != null
+                        && (candidate.Controller == null || candidate.Controller.Client == null))
+                    {
+                        totalPlayfieldNpcs++;
+                    }
+                }
+
+                diagnosticSnapshot.RecordSpatialInterestSelection(
+                    SubwayVisibilitySpatialInterestMetrics.ForInitialSnapshot(
+                        totalPlayfieldCharacters,
+                        totalPlayfieldNpcs,
+                        visibilityEligibleCharacters,
+                        this.visibilityInterest.LastCandidateInspectionCount,
+                        selectedCharacters.Count));
+            }
+
             this.visibilityFanout.FanoutExistingCharactersForScfu(
                 recipient,
-                characters,
+                selectedCharacters,
                 entity =>
                     {
                         Character temp = entity as Character;
@@ -62,29 +113,12 @@ namespace ZoneEngine.Core.Playfields
                             return false;
                         }
 
-                        SimpleCharFullUpdateMessage simpleCharFullUpdate = SimpleCharFullUpdate.ConstructMessage(temp);
-                        CharInPlayMessage charInPlay = null;
-                        this.packetSequences.RunVisibilityPacketPairSequence(
-                            () => PlayfieldLifecycleTrace.Record(
-                                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
-                                PlayfieldLifecycleTrace.StageExistingCharacterSimpleCharFullUpdate,
-                                PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
-                                temp.Identity,
-                                "recipient=" + recipient.Identity),
-                            () =>
-                            {
-                                sendVisibilityMessage(simpleCharFullUpdate);
-                                this.SendWeaponDefinitionsForVisibility(temp, recipient, sendVisibilityMessage);
-                            },
-                            () => { charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 }; },
-                            () => PlayfieldLifecycleTrace.Record(
-                                PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
-                                PlayfieldLifecycleTrace.StageExistingCharacterCharInPlay,
-                                PlayfieldLifecycleTrace.MessageCharInPlay,
-                                temp.Identity,
-                                "recipient=" + recipient.Identity),
-                            () => sendVisibilityMessage(charInPlay));
-                        return true;
+                        return this.SendCharacterVisibilityEntry(
+                            temp,
+                            recipient,
+                            sendVisibilityMessage,
+                            diagnosticSnapshot,
+                            false);
                     },
                 (entity, senderEqualsRecipient, senderInRecipientPlayfield, sent) =>
                     {
@@ -104,48 +138,160 @@ namespace ZoneEngine.Core.Playfields
                                 senderInRecipientPlayfield,
                                 sent));
                     });
-        }
-
-        internal void AnnounceJoiningCharacterVisibility(ICharacter character, Action<MessageBody> announceVisibilityMessage)
-        {
-            Require(announceVisibilityMessage, "announceVisibilityMessage");
-
-            Character temp = character as Character;
-            if (temp == null)
+            if (diagnosticSnapshot != null)
             {
-                return;
+                diagnosticSnapshot.MarkSnapshotEnqueueCompleted();
             }
 
-            CharInPlayMessage charInPlay = null;
-            this.packetSequences.RunVisibilityPacketPairSequence(
-                () => PlayfieldLifecycleTrace.Record(
-                    PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
-                    PlayfieldLifecycleTrace.StageJoiningCharacterSimpleCharFullUpdateBroadcast,
-                    PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
-                    temp.Identity),
-                () =>
+            this.visibilityInterest.CompleteInitialRecipient(recipient);
+        }
+
+        internal void AnnounceJoiningCharacterVisibility(
+            ICharacter character,
+            Action<ICharacter, MessageBody> sendVisibilityMessage,
+            Action<ICharacter, Identity> sendLeaveVisibility)
+        {
+            Require(sendVisibilityMessage, "sendVisibilityMessage");
+            Require(sendLeaveVisibility, "sendLeaveVisibility");
+
+            this.visibilityInterest.ReconcileInitializedRecipients(
+                character,
+                (recipient, source) => this.SendCharacterVisibilityEntry(
+                    source,
+                    recipient,
+                    body => sendVisibilityMessage(recipient, body),
+                    null,
+                    true),
+                sendLeaveVisibility);
+        }
+
+        internal bool SendCharacterVisibilityEntry(
+            ICharacter source,
+            ICharacter recipient,
+            Action<MessageBody> sendVisibilityMessage)
+        {
+            return this.SendCharacterVisibilityEntry(source, recipient, sendVisibilityMessage, null, false);
+        }
+
+        private bool SendCharacterVisibilityEntry(
+            ICharacter source,
+            ICharacter recipient,
+            Action<MessageBody> sendVisibilityMessage,
+            SubwayVisibilityDiagnosticSnapshot diagnosticSnapshot,
+            bool joiningCharacter)
+        {
+            Require(sendVisibilityMessage, "sendVisibilityMessage");
+
+            Character temp = source as Character;
+            if (temp == null)
+            {
+                return false;
+            }
+
+            SubwayVisibilityDiagnosticEnemy diagnosticEnemy =
+                diagnosticSnapshot == null ? null : diagnosticSnapshot.BeginEnemy(temp);
+            try
+            {
+                SimpleCharFullUpdateMessage simpleCharFullUpdate = SimpleCharFullUpdate.ConstructMessage(temp);
+                CharInPlayMessage charInPlay = null;
+                this.packetSequences.RunVisibilityPacketPairSequence(
+                    () => PlayfieldLifecycleTrace.Record(
+                        PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                        joiningCharacter
+                            ? PlayfieldLifecycleTrace.StageJoiningCharacterSimpleCharFullUpdateBroadcast
+                            : PlayfieldLifecycleTrace.StageExistingCharacterSimpleCharFullUpdate,
+                        PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
+                        temp.Identity,
+                        "recipient=" + recipient.Identity),
+                    () =>
+                    {
+                        using (SubwayVisibilitySnapshotDiagnostics.BeginPacket(
+                            diagnosticSnapshot,
+                            diagnosticEnemy,
+                            SubwayVisibilityDiagnosticPacketKind.SimpleCharFullUpdate,
+                            0))
+                        {
+                            sendVisibilityMessage(simpleCharFullUpdate);
+                        }
+
+                        this.SendWeaponDefinitionsForVisibility(
+                            temp,
+                            recipient,
+                            sendVisibilityMessage,
+                            diagnosticSnapshot,
+                            diagnosticEnemy);
+                    },
+                    () => { charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 }; },
+                    () => PlayfieldLifecycleTrace.Record(
+                        PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                        joiningCharacter
+                            ? PlayfieldLifecycleTrace.StageJoiningCharacterCharInPlayBroadcast
+                            : PlayfieldLifecycleTrace.StageExistingCharacterCharInPlay,
+                        PlayfieldLifecycleTrace.MessageCharInPlay,
+                        temp.Identity,
+                        "recipient=" + recipient.Identity),
+                    () =>
+                    {
+                        using (SubwayVisibilitySnapshotDiagnostics.BeginPacket(
+                            diagnosticSnapshot,
+                            diagnosticEnemy,
+                            SubwayVisibilityDiagnosticPacketKind.CharInPlay,
+                            0))
+                        {
+                            sendVisibilityMessage(charInPlay);
+                        }
+                    });
+
+                this.visibilityInterest.MarkVisibleEntry(recipient, source);
+                if (diagnosticSnapshot != null)
                 {
-                    announceVisibilityMessage(SimpleCharFullUpdate.ConstructMessage(temp));
-                    this.SendWeaponDefinitionsForVisibility(temp, null, announceVisibilityMessage);
-                },
-                () => { charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 }; },
-                () => PlayfieldLifecycleTrace.Record(
-                    PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
-                    PlayfieldLifecycleTrace.StageJoiningCharacterCharInPlayBroadcast,
-                    PlayfieldLifecycleTrace.MessageCharInPlay,
-                    temp.Identity),
-                () => announceVisibilityMessage(charInPlay));
+                    diagnosticSnapshot.MarkEnemyQueued(diagnosticEnemy);
+                }
+
+                return true;
+            }
+            catch (Exception exception)
+            {
+                if (diagnosticSnapshot != null)
+                {
+                    diagnosticSnapshot.RecordFailure(diagnosticEnemy, "enemy_visibility_sequence", exception);
+                }
+
+                throw;
+            }
         }
 
         private void SendWeaponDefinitionsForVisibility(
             ICharacter owner,
             ICharacter recipient,
-            Action<MessageBody> sendVisibilityMessage)
+            Action<MessageBody> sendVisibilityMessage,
+            SubwayVisibilityDiagnosticSnapshot diagnosticSnapshot,
+            SubwayVisibilityDiagnosticEnemy diagnosticEnemy)
         {
+            if (diagnosticSnapshot != null)
+            {
+                diagnosticSnapshot.MarkWeaponPhaseStarted(diagnosticEnemy);
+            }
+
+            int weaponIndex = 0;
             foreach (WeaponItemFullUpdateMessage message in WeaponItemFullUpdate.CreateWeaponDefinitionMessages(owner))
             {
-                sendVisibilityMessage(message);
+                weaponIndex++;
+                using (SubwayVisibilitySnapshotDiagnostics.BeginPacket(
+                    diagnosticSnapshot,
+                    diagnosticEnemy,
+                    SubwayVisibilityDiagnosticPacketKind.WeaponDefinition,
+                    weaponIndex))
+                {
+                    sendVisibilityMessage(message);
+                }
+
                 WeaponItemFullUpdate.LogObserverWeaponDefinition(owner, recipient, message);
+            }
+
+            if (diagnosticSnapshot != null)
+            {
+                diagnosticSnapshot.MarkWeaponPhaseCompleted(diagnosticEnemy);
             }
         }
 
