@@ -6,6 +6,7 @@
 #include "gui_rect_fix.h"
 #include "randy_color_fix.h"
 #include "roomspace_fix.h"
+#include "vehicle_collision_fix.h"
 
 #include <windows.h>
 
@@ -120,7 +121,19 @@ namespace
             return 1;
         }
 
-        aorf::Log("READY RoomSpace, GUI rectangle, and renderer repairs active");
+        if (!aorf::InstallVehicleCollisionFix())
+        {
+            aorf::Log("ERROR Vehicle collision repair was not installed");
+            MessageBoxW(
+                nullptr,
+                L"AORoomSpaceFix could not install the Vehicle crash repair. "
+                L"Close AO and review %LOCALAPPDATA%\\AORoomSpaceFix\\AORoomSpaceFix.log.",
+                L"AO RoomSpace Fix",
+                MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
+            return 1;
+        }
+
+        aorf::Log("READY RoomSpace, GUI rectangle, renderer, and Vehicle repairs active");
         return 0;
     }
 
