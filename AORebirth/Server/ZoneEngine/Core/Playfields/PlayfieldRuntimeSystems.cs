@@ -296,6 +296,11 @@ namespace ZoneEngine.Core.Playfields
                 removePendingCorpseCreditAward);
         }
 
+        internal void NotifyPopulationCorpseRemoved(Identity corpseIdentity)
+        {
+            this.npcRuntime.NotifyCorpseRemoved(corpseIdentity);
+        }
+
         internal void ProcessPendingCorpseSpawns<TCorpseState>(
             IDictionary<int, TCorpseState> pendingCorpseSpawns,
             Func<TCorpseState, DateTime> spawnsAtUtc,

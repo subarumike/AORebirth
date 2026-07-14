@@ -1,5 +1,7 @@
 # Generic Ordinary-Enemy Runtime
 
+Population ownership: profile-backed Subway rows are activated and respawned by `WorldPopulationController`. `OrdinaryEnemyRuntimeService` materializes requested rows only and no longer enumerates population or owns respawn timers. The catalog remains the capture-backed adapter with 259 rows, 221 active and 38 quarantined.
+
 ## Decision
 
 An ordinary enemy is an `OrdinaryEnemyProfile` plus one or more

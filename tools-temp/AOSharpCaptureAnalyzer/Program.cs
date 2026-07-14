@@ -4,224 +4,837 @@ namespace AOSharpCaptureAnalyzer
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Text;
+    using System.Text.RegularExpressions;
 
-    using SmokeLounge.AOtomation.Messaging.GameData;
-    using SmokeLounge.AOtomation.Messaging.Messages;
-    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-    using SmokeLounge.AOtomation.Messaging.Serialization;
+    using AORebirth.CaptureProtocol;
 
     internal static class Program
     {
         private const string HexMarker = " hex=";
 
+        private const string AbmouthPacketHex =
+            "0879000A000100E000000DB47944C065271B3A6B0000C35079607A11003A022A4A430015300843B28B514298374542C63F4100000000BF3695FE000000003F337068000004CB1141626D6F7574682053757072656D757300100812010000000096000000001E2854000002613A00A2001F000000001C8000000000000000800000000301000100010001000100000002000072000003F1000017A6000000000000000000000000000000010000000000000000000000020000000000000000000000030000000000000000000000040000000000000000000003F10000000000";
+
+        private const string ReplacementInfectorPacketHex =
+            "099F000A000100D900000DB47944C065271B3A6B0000C35079607AD0003A022A4A430015300843A7038C42933C6442C617A4000000003F374729000000003F32BB6F000004C809496E666563746F7200100812010000000096000A00001803C80000007CA50046001F000000001C0000000000000000800000000301000100010001000100000002000069000003F1000017A6000000000000000000000000000000010000000000000000000000020000000000000000000000030000000000000000000000040000000000000000000003F1000000020000";
+
         private static int Main(string[] args)
         {
+            if (args.Length == 1 && string.Equals(args[0], "--self-test", StringComparison.Ordinal))
+            {
+                return RunSelfTest();
+            }
+
             if (args.Length == 0)
             {
                 Console.Error.WriteLine("Usage: AOSharpCaptureAnalyzer <capture-folder> [capture-folder ...]");
+                Console.Error.WriteLine("       AOSharpCaptureAnalyzer --self-test");
                 return 2;
             }
 
-            var resolver = new SerializerResolverBuilder<N3Message>().Build();
-            var serializer = resolver.GetSerializer(typeof(SimpleCharFullUpdateMessage));
             int failures = 0;
             foreach (string captureFolder in args)
             {
-                failures += ExportCapture(captureFolder, resolver, serializer);
+                failures += ExportCapture(captureFolder);
             }
 
             return failures == 0 ? 0 : 1;
         }
 
-        private static int ExportCapture(
-            string captureFolder,
-            SerializerResolver resolver,
-            ISerializer serializer)
+        private static int ExportCapture(string captureFolder)
         {
-            string packetPath = Path.Combine(captureFolder, "packets.hex.log");
-            if (!File.Exists(packetPath))
+            CapturePacketSet packetSet;
+            try
             {
-                Console.Error.WriteLine("Missing packet log: " + packetPath);
+                packetSet = LoadCapturePackets(captureFolder);
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine(Path.GetFileName(captureFolder) + ": " + exception.Message);
                 return 1;
             }
 
             string outputPath = Path.Combine(captureFolder, "scfu-appearance.csv");
+            string errorPath = Path.Combine(captureFolder, "scfu-decode-errors.csv");
+            string pendingOutputPath = Path.Combine(captureFolder, "scfu-appearance.pending.csv");
+            string pendingErrorPath = Path.Combine(captureFolder, "scfu-decode-errors.pending.csv");
+            DeleteIfExists(pendingOutputPath);
+            DeleteIfExists(pendingErrorPath);
             int rows = 0;
-            int failures = 0;
-            using (var output = new System.IO.StreamWriter(outputPath, false, new UTF8Encoding(false)))
+            int failures = packetSet.SourceFailures;
+            int incomplete = 0;
+            using (var output = new StreamWriter(pendingOutputPath, false, new UTF8Encoding(false)))
+            using (var errors = new StreamWriter(pendingErrorPath, false, new UTF8Encoding(false)))
             {
-                output.WriteLine("CapturedUtc,Direction,Sequence,Identity,Name,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,Level,Health,HealthDamage,RunSpeed,NpcFamily,NpcLosHeight,CharacterFlags,AccountFlags,Expansions,VisualFlags,VisibleTitle,ScfuFlags,ScfuFlags2,Owner,AppearanceValue,Side,Fatness,Breed,Gender,Race,MonsterData,MonsterScale,HeadMesh,ScfuUnknown1Hex,ScfuUnknown2,ScfuUnknown3,ScfuUnknown4,Textures,Meshes,Waypoints,TextureOverrides");
-                foreach (string line in ReadSharedLines(packetPath))
+                output.WriteLine(RawScfuAppearanceCsv.Header);
+                errors.WriteLine("CapturedUtc,Direction,Sequence,DecodeStatus,DecodeError,RawPacketHex,RawBodyHex");
+                foreach (CapturedPacket capturedPacket in packetSet.Packets)
                 {
-                    if (line.IndexOf("n3=SimpleCharFullUpdate", StringComparison.Ordinal) < 0)
-                    {
-                        continue;
-                    }
-
-                    int markerIndex = line.IndexOf(HexMarker, StringComparison.Ordinal);
-                    if (markerIndex < 0)
+                    RawSimpleCharFullUpdate message;
+                    string decodeError;
+                    bool decoded = RawSimpleCharFullUpdateDecoder.TryDecodePacket(
+                        capturedPacket.Packet,
+                        out message,
+                        out decodeError);
+                    if (!decoded)
                     {
                         failures++;
-                        continue;
+                    }
+                    else if (!message.DecodeFullyConsumed)
+                    {
+                        incomplete++;
                     }
 
-                    try
+                    output.WriteLine(
+                        RawScfuAppearanceCsv.FormatRow(
+                            capturedPacket.Metadata,
+                            capturedPacket.Packet,
+                            message,
+                            decodeError));
+                    rows++;
+
+                    if (!decoded)
                     {
-                        byte[] packet = FromHex(line.Substring(markerIndex + HexMarker.Length));
-                        if (packet.Length <= 16)
-                        {
-                            failures++;
-                            continue;
-                        }
-
-                        SimpleCharFullUpdateMessage message;
-                        using (var memory = new MemoryStream(packet, 16, packet.Length - 16, false))
-                        using (var reader = new SmokeLounge.AOtomation.Messaging.Serialization.StreamReader(memory))
-                        {
-                            message = (SimpleCharFullUpdateMessage)serializer.Deserialize(
-                                reader,
-                                new SerializationContext(resolver));
-                        }
-
-                        string[] prefix = line.Substring(0, markerIndex).Split(' ');
-                        output.WriteLine(
+                        errors.WriteLine(
                             string.Join(
                                 ",",
-                                Csv(prefix.Length > 0 ? prefix[0] : string.Empty),
-                                Csv(prefix.Length > 1 ? prefix[1] : string.Empty),
-                                Csv(prefix.Length > 2 ? prefix[2] : string.Empty),
-                                Csv(message.Identity.ToString()),
-                                Csv(message.Name),
-                                Csv(message.Position.X.ToString("R", CultureInfo.InvariantCulture)),
-                                Csv(message.Position.Y.ToString("R", CultureInfo.InvariantCulture)),
-                                Csv(message.Position.Z.ToString("R", CultureInfo.InvariantCulture)),
-                                Csv(message.Heading.X.ToString("R", CultureInfo.InvariantCulture)),
-                                Csv(message.Heading.Y.ToString("R", CultureInfo.InvariantCulture)),
-                                Csv(message.Heading.Z.ToString("R", CultureInfo.InvariantCulture)),
-                                Csv(message.Heading.W.ToString("R", CultureInfo.InvariantCulture)),
-                                Csv(message.Level.ToString(CultureInfo.InvariantCulture)),
-                                Csv(message.Health.ToString(CultureInfo.InvariantCulture)),
-                                Csv(message.HealthDamage.ToString(CultureInfo.InvariantCulture)),
-                                Csv(message.RunSpeedBase.ToString(CultureInfo.InvariantCulture)),
-                                Csv(FormatNpcFamily(message.CharacterInfo)),
-                                Csv(FormatNpcLosHeight(message.CharacterInfo)),
-                                Csv(((int)message.CharacterFlags).ToString(CultureInfo.InvariantCulture)),
-                                Csv(message.AccountFlags.ToString(CultureInfo.InvariantCulture)),
-                                Csv(message.Expansions.ToString(CultureInfo.InvariantCulture)),
-                                Csv(message.VisualFlags.ToString(CultureInfo.InvariantCulture)),
-                                Csv(message.VisibleTitle.ToString(CultureInfo.InvariantCulture)),
-                                Csv(message.Flags.ToString()),
-                                Csv(message.Flags2.ToString()),
-                                Csv(message.Owner.HasValue ? message.Owner.Value.ToString() : string.Empty),
-                                Csv(message.Appearance == null ? string.Empty : message.Appearance.Value.ToString(CultureInfo.InvariantCulture)),
-                                Csv(message.Appearance == null ? string.Empty : message.Appearance.Side.ToString()),
-                                Csv(message.Appearance == null ? string.Empty : message.Appearance.Fatness.ToString()),
-                                Csv(message.Appearance == null ? string.Empty : message.Appearance.Breed.ToString()),
-                                Csv(message.Appearance == null ? string.Empty : message.Appearance.Gender.ToString()),
-                                Csv(message.Appearance == null ? string.Empty : message.Appearance.Race.ToString(CultureInfo.InvariantCulture)),
-                                Csv(message.MonsterData.ToString(CultureInfo.InvariantCulture)),
-                                Csv(message.MonsterScale.ToString(CultureInfo.InvariantCulture)),
-                                Csv(message.HeadMesh.HasValue ? message.HeadMesh.Value.ToString(CultureInfo.InvariantCulture) : string.Empty),
-                                Csv(ToHex(message.ScfuUnk1)),
-                                Csv(message.ScfuUnk2.ToString(CultureInfo.InvariantCulture)),
-                                Csv(message.ScfuUnk3.ToString("R", CultureInfo.InvariantCulture)),
-                                Csv(message.ScfuUnk4.ToString(CultureInfo.InvariantCulture)),
-                                Csv(FormatTextures(message.Textures)),
-                                Csv(FormatMeshes(message.Meshes)),
-                                Csv(FormatWaypoints(message.Waypoints)),
-                                Csv(FormatTextureOverrides(message.TextureOverrides))));
-                        rows++;
+                                Csv(capturedPacket.Metadata.CapturedUtc),
+                                Csv(capturedPacket.Metadata.Direction),
+                                Csv(capturedPacket.Metadata.Sequence),
+                                Csv("decode_failed"),
+                                Csv(decodeError),
+                                Csv(RawScfuFormatting.ToHex(capturedPacket.Packet)),
+                                Csv(PacketBodyHex(capturedPacket.Packet))));
                     }
-                    catch (Exception exception)
-                    {
-                        failures++;
-                        Console.Error.WriteLine(Path.GetFileName(captureFolder) + ": " + exception.Message);
-                    }
+                }
+            }
+
+            int result = failures + incomplete;
+            if (result == 0)
+            {
+                PromoteFile(pendingOutputPath, outputPath);
+                PromoteFile(pendingErrorPath, errorPath);
+            }
+            else
+            {
+                foreach (string failureMessage in packetSet.FailureMessages)
+                {
+                    Console.Error.WriteLine(Path.GetFileName(captureFolder) + ": " + failureMessage);
                 }
             }
 
             Console.WriteLine(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "{0}: SCFU appearance rows={1} failures={2}",
+                    "{0}: SCFU rows={1} failures={2} incomplete={3} packetLog={4} rawFallback={5}",
                     Path.GetFileName(captureFolder),
                     rows,
-                    failures));
-            return failures;
+                    failures,
+                    incomplete,
+                    packetSet.PacketLogRows,
+                    packetSet.RawFallbackRows));
+            return result;
         }
 
-        private static string FormatTextures(IEnumerable<Texture> textures)
+        private static void DeleteIfExists(string path)
         {
-            return string.Join(
-                "|",
-                (textures ?? Enumerable.Empty<Texture>()).Select(
-                    value => string.Format(
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+
+        private static void PromoteFile(string pendingPath, string outputPath)
+        {
+            if (File.Exists(outputPath))
+            {
+                File.Replace(pendingPath, outputPath, null, true);
+            }
+            else
+            {
+                File.Move(pendingPath, outputPath);
+            }
+        }
+
+        private static CapturePacketSet LoadCapturePackets(string captureFolder)
+        {
+            string packetPath = Path.Combine(captureFolder, "packets.hex.log");
+            string rawPacketPath = Path.Combine(captureFolder, "raw-packets.csv");
+            if (!File.Exists(packetPath) && !File.Exists(rawPacketPath))
+            {
+                throw new FileNotFoundException(
+                    "Neither packets.hex.log nor raw-packets.csv exists in the capture folder.");
+            }
+
+            CaptureExpectations expectations = ReadCaptureExpectations(captureFolder);
+            PacketSourceReport packetLog = ReadPacketLog(packetPath);
+            PacketSourceReport rawIndex = ReadRawPacketIndex(rawPacketPath);
+            return ReconcileSources(packetLog, rawIndex, expectations);
+        }
+
+        private static PacketSourceReport ReadPacketLog(string path)
+        {
+            var report = new PacketSourceReport("packets.hex.log", File.Exists(path));
+            if (!report.Exists)
+            {
+                return report;
+            }
+
+            foreach (string line in ReadSharedLines(path))
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    continue;
+                }
+
+                report.RawRowCount++;
+                int markerIndex = line.IndexOf(HexMarker, StringComparison.Ordinal);
+                string[] prefix = markerIndex < 0
+                                      ? line.Split((char[])null, StringSplitOptions.RemoveEmptyEntries)
+                                      : line.Substring(0, markerIndex)
+                                            .Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+                var metadata = new RawScfuCaptureMetadata
+                {
+                    CapturedUtc = prefix.Length > 0 ? prefix[0] : string.Empty,
+                    Direction = prefix.Length > 1 ? prefix[1] : string.Empty,
+                    Sequence = prefix.Length > 2 ? prefix[2].TrimStart('#') : string.Empty
+                };
+
+                int declaredLength = 0;
+                string error = markerIndex < 0
+                                   ? "packet log row has no hex payload"
+                                   : !TryReadLengthToken(prefix, out declaredLength)
+                                         ? "packet log row has no valid len declaration"
+                                         : string.Empty;
+                byte[] packet = null;
+                if (string.IsNullOrEmpty(error))
+                {
+                    try
+                    {
+                        packet = FromHex(line.Substring(markerIndex + HexMarker.Length).Trim());
+                    }
+                    catch (Exception exception)
+                    {
+                        error = "invalid packet hex: " + exception.Message;
+                    }
+                }
+
+                AddSourcePacket(report, metadata, packet, declaredLength, "raw_complete", error);
+            }
+
+            return report;
+        }
+
+        private static PacketSourceReport ReadRawPacketIndex(string path)
+        {
+            var report = new PacketSourceReport("raw-packets.csv", File.Exists(path));
+            if (!report.Exists)
+            {
+                return report;
+            }
+
+            using (IEnumerator<string> lines = ReadSharedLines(path).GetEnumerator())
+            {
+                if (!lines.MoveNext())
+                {
+                    report.HeaderValid = false;
+                    report.Errors.Add("raw-packets.csv is empty");
+                    return report;
+                }
+
+                List<string> headers = ParseCsvLine(lines.Current);
+                var headerIndexes = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < headers.Count; i++)
+                {
+                    headerIndexes[headers[i].TrimStart('\uFEFF')] = i;
+                }
+
+                string[] requiredHeaders =
+                {
+                    "CapturedUtc",
+                    "Direction",
+                    "Sequence",
+                    "PacketLength",
+                    "PreservationStatus",
+                    "RawHex"
+                };
+                foreach (string requiredHeader in requiredHeaders)
+                {
+                    if (!headerIndexes.ContainsKey(requiredHeader))
+                    {
+                        report.HeaderValid = false;
+                        report.Errors.Add("raw-packets.csv is missing header " + requiredHeader);
+                    }
+                }
+
+                while (lines.MoveNext())
+                {
+                    if (string.IsNullOrWhiteSpace(lines.Current))
+                    {
+                        continue;
+                    }
+
+                    report.RawRowCount++;
+                    List<string> values = ParseCsvLine(lines.Current);
+                    var metadata = new RawScfuCaptureMetadata
+                    {
+                        CapturedUtc = CsvValue(values, headerIndexes, "CapturedUtc"),
+                        ElapsedMilliseconds = CsvValue(values, headerIndexes, "ElapsedMilliseconds"),
+                        Direction = CsvValue(values, headerIndexes, "Direction"),
+                        GlobalOrdinal = CsvValue(values, headerIndexes, "GlobalOrdinal"),
+                        Sequence = CsvValue(values, headerIndexes, "Sequence")
+                    };
+                    int declaredLength;
+                    string declaredLengthText = CsvValue(values, headerIndexes, "PacketLength");
+                    string rawPacketHex = CsvValue(values, headerIndexes, "RawHex");
+                    string error = !int.TryParse(
+                                       declaredLengthText,
+                                       NumberStyles.Integer,
+                                       CultureInfo.InvariantCulture,
+                                       out declaredLength)
+                                       ? "raw packet row has invalid PacketLength"
+                                       : string.IsNullOrWhiteSpace(rawPacketHex)
+                                             ? "raw packet row has no RawHex"
+                                             : string.Empty;
+                    byte[] packet = null;
+                    if (string.IsNullOrEmpty(error))
+                    {
+                        try
+                        {
+                            packet = FromHex(rawPacketHex);
+                        }
+                        catch (Exception exception)
+                        {
+                            error = "invalid packet hex: " + exception.Message;
+                        }
+                    }
+
+                    AddSourcePacket(
+                        report,
+                        metadata,
+                        packet,
+                        declaredLength,
+                        CsvValue(values, headerIndexes, "PreservationStatus"),
+                        error);
+                }
+            }
+
+            return report;
+        }
+
+        private static void AddSourcePacket(
+            PacketSourceReport report,
+            RawScfuCaptureMetadata metadata,
+            byte[] packet,
+            int declaredLength,
+            string preservationStatus,
+            string error)
+        {
+            string eventKey = BuildEventKey(metadata);
+            if (string.IsNullOrEmpty(error) && string.IsNullOrEmpty(eventKey))
+            {
+                error = "raw packet row has no direction/sequence event key";
+            }
+
+            if (string.IsNullOrEmpty(error)
+                && !string.Equals(preservationStatus, "raw_complete", StringComparison.OrdinalIgnoreCase))
+            {
+                error = "raw packet row preservation status is not raw_complete";
+            }
+
+            if (string.IsNullOrEmpty(error)
+                && (packet == null || packet.Length == 0 || packet.Length != declaredLength))
+            {
+                error = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "raw packet length mismatch: declared={0}, actual={1}",
+                    declaredLength,
+                    packet == null ? 0 : packet.Length);
+            }
+
+            if (string.IsNullOrEmpty(error) && IsSimpleCharFullUpdatePacket(packet))
+            {
+                int frameLength = (packet[6] << 8) | packet[7];
+                if (frameLength != packet.Length)
+                {
+                    error = string.Format(
                         CultureInfo.InvariantCulture,
-                        "{0}:{1}:{2}",
-                        value.Place,
-                        value.Id,
-                        value.Unknown)));
+                        "SCFU frame length mismatch: header={0}, actual={1}",
+                        frameLength,
+                        packet.Length);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(error))
+            {
+                report.InvalidRowCount++;
+                report.Errors.Add(
+                    string.IsNullOrEmpty(eventKey)
+                        ? error
+                        : eventKey + ": " + error);
+                return;
+            }
+
+            if (report.RecordByEvent.ContainsKey(eventKey))
+            {
+                report.InvalidRowCount++;
+                report.Errors.Add(eventKey + ": duplicate event row in " + report.Name);
+                return;
+            }
+
+            var record = new SourcePacketRecord
+            {
+                EventKey = eventKey,
+                Metadata = metadata,
+                Packet = packet,
+                DeclaredLength = declaredLength,
+                SourceName = report.Name
+            };
+            report.RecordByEvent[eventKey] = record;
+            report.Records.Add(record);
+            report.ValidRowCount++;
+            if (IsSimpleCharFullUpdatePacket(packet))
+            {
+                report.ValidScfuRowCount++;
+            }
         }
 
-        private static string FormatMeshes(IEnumerable<Mesh> meshes)
+        private static CapturePacketSet ReconcileSources(
+            PacketSourceReport packetLog,
+            PacketSourceReport rawIndex,
+            CaptureExpectations expectations)
         {
-            return string.Join(
-                "|",
-                (meshes ?? Enumerable.Empty<Mesh>()).Select(
-                    value => string.Format(
+            var result = new CapturePacketSet
+            {
+                PacketLogRows = packetLog.ValidScfuRowCount
+            };
+            bool packetLogComplete = IsSourceComplete(packetLog, expectations.ExpectedRawPackets);
+            bool rawIndexComplete = IsSourceComplete(rawIndex, expectations.ExpectedRawPackets);
+            PacketSourceReport authoritativeSource = packetLogComplete ^ rawIndexComplete
+                                                         ? packetLogComplete ? packetLog : rawIndex
+                                                         : null;
+            var eventOrder = new List<string>();
+            var evidenceByEvent = new Dictionary<string, ReconciledEvent>(StringComparer.Ordinal);
+            var selectedRecords = new List<SourcePacketRecord>();
+            AddSourceEvidence(packetLog, true, eventOrder, evidenceByEvent);
+            AddSourceEvidence(rawIndex, false, eventOrder, evidenceByEvent);
+
+            if (authoritativeSource != null)
+            {
+                PacketSourceReport otherSource = ReferenceEquals(authoritativeSource, packetLog)
+                                                     ? rawIndex
+                                                     : packetLog;
+                foreach (SourcePacketRecord selected in authoritativeSource.Records)
+                {
+                    SourcePacketRecord matching;
+                    if (otherSource.RecordByEvent.TryGetValue(selected.EventKey, out matching)
+                        && ByteArraysEqual(selected.Packet, matching.Packet))
+                    {
+                        FillBlankMetadata(selected.Metadata, matching.Metadata);
+                    }
+
+                    selected.SelectedFromRawFallback = ReferenceEquals(authoritativeSource, rawIndex);
+                    selected.ReconcileOrder = selectedRecords.Count;
+                    selectedRecords.Add(selected);
+                }
+            }
+            else
+            {
+                foreach (string eventKey in eventOrder)
+                {
+                    ReconciledEvent evidence = evidenceByEvent[eventKey];
+                    SourcePacketRecord selected;
+                    if (evidence.PacketLog != null && evidence.RawIndex != null)
+                    {
+                        if (!ByteArraysEqual(evidence.PacketLog.Packet, evidence.RawIndex.Packet))
+                        {
+                            result.AddFailure(eventKey + ": raw sink conflict");
+                            continue;
+                        }
+
+                        selected = evidence.PacketLog;
+                        selected.SelectedFromRawFallback = false;
+                        FillBlankMetadata(selected.Metadata, evidence.RawIndex.Metadata);
+                    }
+                    else
+                    {
+                        selected = evidence.PacketLog ?? evidence.RawIndex;
+                        selected.SelectedFromRawFallback = evidence.PacketLog == null;
+                    }
+
+                    selected.ReconcileOrder = selectedRecords.Count;
+                    selectedRecords.Add(selected);
+                }
+            }
+
+            selectedRecords.Sort(CompareSourcePacketRecords);
+            foreach (SourcePacketRecord selected in selectedRecords)
+            {
+                result.ResolvedRawPacketCount++;
+                if (IsSimpleCharFullUpdatePacket(selected.Packet))
+                {
+                    if (selected.SelectedFromRawFallback)
+                    {
+                        result.RawFallbackRows++;
+                    }
+
+                    result.Packets.Add(
+                        new CapturedPacket
+                        {
+                            Metadata = selected.Metadata,
+                            Packet = selected.Packet
+                        });
+                }
+            }
+
+            if (packetLog.RawRowCount == 0 && rawIndex.RawRowCount == 0)
+            {
+                result.AddFailure("both raw packet sources are empty");
+            }
+
+            if (expectations.RecaptureRequired.HasValue && expectations.RecaptureRequired.Value)
+            {
+                result.AddFailure("capture_info.json reports recaptureRequired=true");
+            }
+
+            if (expectations.ExpectedRawPackets.HasValue)
+            {
+                if (result.ResolvedRawPacketCount != expectations.ExpectedRawPackets.Value)
+                {
+                    result.AddFailure(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "resolved raw packet count mismatch: expected={0}, actual={1}",
+                            expectations.ExpectedRawPackets.Value,
+                            result.ResolvedRawPacketCount));
+                }
+            }
+            else if (!packetLogComplete && !rawIndexComplete)
+            {
+                result.AddFailure("no structurally complete non-empty raw packet source is available");
+            }
+
+            if (expectations.ExpectedScfuPackets.HasValue
+                && result.Packets.Count != expectations.ExpectedScfuPackets.Value)
+            {
+                result.AddFailure(
+                    string.Format(
                         CultureInfo.InvariantCulture,
-                        "{0}:{1}:{2}:{3}",
-                        value.Position,
-                        value.Id,
-                        value.OverrideTextureId,
-                        value.Layer)));
+                        "resolved SCFU packet count mismatch: expected={0}, actual={1}",
+                        expectations.ExpectedScfuPackets.Value,
+                        result.Packets.Count));
+            }
+
+            if (!packetLogComplete
+                && !rawIndexComplete
+                && !expectations.ExpectedRawPackets.HasValue)
+            {
+                AppendSourceErrors(result, packetLog);
+                AppendSourceErrors(result, rawIndex);
+            }
+
+            return result;
         }
 
-        private static string FormatTextureOverrides(
-            IEnumerable<SimpleCharInfo.TextureOverride> overrides)
+        private static int CompareSourcePacketRecords(SourcePacketRecord left, SourcePacketRecord right)
         {
-            return string.Join(
-                "|",
-                (overrides ?? Enumerable.Empty<SimpleCharInfo.TextureOverride>()).Select(
-                    value => string.Format(
+            DateTime leftTimestamp;
+            DateTime rightTimestamp;
+            bool hasLeftTimestamp = DateTime.TryParse(
+                left.Metadata == null ? string.Empty : left.Metadata.CapturedUtc,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.RoundtripKind,
+                out leftTimestamp);
+            bool hasRightTimestamp = DateTime.TryParse(
+                right.Metadata == null ? string.Empty : right.Metadata.CapturedUtc,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.RoundtripKind,
+                out rightTimestamp);
+            if (hasLeftTimestamp && hasRightTimestamp)
+            {
+                int timestampComparison = leftTimestamp.CompareTo(rightTimestamp);
+                if (timestampComparison != 0)
+                {
+                    return timestampComparison;
+                }
+            }
+
+            long leftOrdinal;
+            long rightOrdinal;
+            bool hasLeftOrdinal = long.TryParse(
+                left.Metadata == null ? string.Empty : left.Metadata.GlobalOrdinal,
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out leftOrdinal);
+            bool hasRightOrdinal = long.TryParse(
+                right.Metadata == null ? string.Empty : right.Metadata.GlobalOrdinal,
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out rightOrdinal);
+            if (hasLeftOrdinal && hasRightOrdinal)
+            {
+                int ordinalComparison = leftOrdinal.CompareTo(rightOrdinal);
+                if (ordinalComparison != 0)
+                {
+                    return ordinalComparison;
+                }
+            }
+
+            return left.ReconcileOrder.CompareTo(right.ReconcileOrder);
+        }
+
+        private static void AddSourceEvidence(
+            PacketSourceReport source,
+            bool packetLog,
+            ICollection<string> eventOrder,
+            IDictionary<string, ReconciledEvent> evidenceByEvent)
+        {
+            foreach (SourcePacketRecord record in source.Records)
+            {
+                ReconciledEvent evidence;
+                if (!evidenceByEvent.TryGetValue(record.EventKey, out evidence))
+                {
+                    evidence = new ReconciledEvent();
+                    evidenceByEvent[record.EventKey] = evidence;
+                    eventOrder.Add(record.EventKey);
+                }
+
+                if (packetLog)
+                {
+                    evidence.PacketLog = record;
+                }
+                else
+                {
+                    evidence.RawIndex = record;
+                }
+            }
+        }
+
+        private static bool IsSourceComplete(PacketSourceReport source, int? expectedRawPackets)
+        {
+            return source.Exists
+                   && source.HeaderValid
+                   && source.RawRowCount > 0
+                   && source.InvalidRowCount == 0
+                   && source.ValidRowCount == source.RawRowCount
+                   && (!expectedRawPackets.HasValue
+                       || source.ValidRowCount == expectedRawPackets.Value);
+        }
+
+        private static void AppendSourceErrors(CapturePacketSet result, PacketSourceReport source)
+        {
+            foreach (string error in source.Errors)
+            {
+                result.AddFailure(source.Name + ": " + error);
+            }
+        }
+
+        private static CaptureExpectations ReadCaptureExpectations(string captureFolder)
+        {
+            string path = Path.Combine(captureFolder, "capture_info.json");
+            var result = new CaptureExpectations();
+            if (!File.Exists(path))
+            {
+                return result;
+            }
+
+            string json = File.ReadAllText(path);
+            int inbound;
+            int outbound;
+            if (TryReadJsonInt(json, "inboundRaw", out inbound)
+                && TryReadJsonInt(json, "outboundRaw", out outbound))
+            {
+                result.ExpectedRawPackets = checked(inbound + outbound);
+            }
+
+            int scfu;
+            if (TryReadJsonInt(json, "rawSimpleCharFullUpdatePackets", out scfu))
+            {
+                result.ExpectedScfuPackets = scfu;
+            }
+
+            bool recaptureRequired;
+            if (TryReadJsonBool(json, "recaptureRequired", out recaptureRequired))
+            {
+                result.RecaptureRequired = recaptureRequired;
+            }
+
+            return result;
+        }
+
+        private static bool TryReadJsonInt(string json, string propertyName, out int value)
+        {
+            value = 0;
+            Match match = Regex.Match(
+                json ?? string.Empty,
+                "\\\"" + Regex.Escape(propertyName) + "\\\"\\s*:\\s*(?<value>[0-9]+)",
+                RegexOptions.CultureInvariant);
+            return match.Success
+                   && int.TryParse(
+                       match.Groups["value"].Value,
+                       NumberStyles.None,
+                       CultureInfo.InvariantCulture,
+                       out value);
+        }
+
+        private static bool TryReadJsonBool(string json, string propertyName, out bool value)
+        {
+            value = false;
+            Match match = Regex.Match(
+                json ?? string.Empty,
+                "\\\"" + Regex.Escape(propertyName) + "\\\"\\s*:\\s*(?<value>true|false)",
+                RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+            return match.Success && bool.TryParse(match.Groups["value"].Value, out value);
+        }
+
+        private static bool TryReadLengthToken(string[] prefix, out int value)
+        {
+            foreach (string token in prefix ?? new string[0])
+            {
+                if (token.StartsWith("len=", StringComparison.Ordinal)
+                    && int.TryParse(
+                        token.Substring(4),
+                        NumberStyles.Integer,
                         CultureInfo.InvariantCulture,
-                        "{0}:{1}:{2}:{3}",
-                        value.Name,
-                        value.TextureId,
-                        value.Unknown1,
-                        value.Unknown2)));
+                        out value))
+                {
+                    return true;
+                }
+            }
+
+            value = 0;
+            return false;
         }
 
-        private static string FormatWaypoints(IEnumerable<AOSharp.Common.GameData.Vector3> waypoints)
+        private static string BuildEventKey(RawScfuCaptureMetadata metadata)
         {
-            return string.Join(
-                "|",
-                (waypoints ?? Enumerable.Empty<AOSharp.Common.GameData.Vector3>()).Select(
-                    value => string.Format(
-                        CultureInfo.InvariantCulture,
-                        "{0:R}:{1:R}:{2:R}",
-                        value.X,
-                        value.Y,
-                        value.Z)));
+            if (metadata == null
+                || string.IsNullOrWhiteSpace(metadata.Direction)
+                || string.IsNullOrWhiteSpace(metadata.Sequence))
+            {
+                return string.Empty;
+            }
+
+            string direction = metadata.Direction.Trim().ToUpperInvariant();
+            int sequence;
+            if ((!string.Equals(direction, "IN", StringComparison.Ordinal)
+                 && !string.Equals(direction, "OUT", StringComparison.Ordinal))
+                || !int.TryParse(
+                    metadata.Sequence.Trim(),
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out sequence)
+                || sequence <= 0)
+            {
+                return string.Empty;
+            }
+
+            return direction + "|" + sequence.ToString(CultureInfo.InvariantCulture);
         }
 
-        private static string FormatNpcFamily(SimpleCharInfo characterInfo)
+        private static void FillBlankMetadata(RawScfuCaptureMetadata target, RawScfuCaptureMetadata source)
         {
-            var npc = characterInfo as SimpleCharInfo.NPCInfo;
-            return npc == null ? string.Empty : npc.Family.ToString(CultureInfo.InvariantCulture);
+            target.CapturedUtc = Prefer(target.CapturedUtc, source.CapturedUtc);
+            target.ElapsedMilliseconds = Prefer(target.ElapsedMilliseconds, source.ElapsedMilliseconds);
+            target.Direction = Prefer(target.Direction, source.Direction);
+            target.GlobalOrdinal = Prefer(target.GlobalOrdinal, source.GlobalOrdinal);
+            target.Sequence = Prefer(target.Sequence, source.Sequence);
         }
 
-        private static string FormatNpcLosHeight(SimpleCharInfo characterInfo)
+        private static string Prefer(string current, string candidate)
         {
-            var npc = characterInfo as SimpleCharInfo.NPCInfo;
-            return npc == null ? string.Empty : npc.LosHeight.ToString(CultureInfo.InvariantCulture);
+            return string.IsNullOrEmpty(current) ? candidate : current;
+        }
+
+        private static bool ByteArraysEqual(byte[] left, byte[] right)
+        {
+            if (ReferenceEquals(left, right))
+            {
+                return true;
+            }
+
+            if (left == null || right == null || left.Length != right.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < left.Length; i++)
+            {
+                if (left[i] != right[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool IsSimpleCharFullUpdatePacket(byte[] packet)
+        {
+            return packet != null
+                   && packet.Length >= RawSimpleCharFullUpdateDecoder.N3BodyOffset + 4
+                   && ReadInt32BigEndian(packet, RawSimpleCharFullUpdateDecoder.N3BodyOffset)
+                   == RawSimpleCharFullUpdateDecoder.SimpleCharFullUpdateType;
+        }
+
+        private static int ReadInt32BigEndian(byte[] bytes, int offset)
+        {
+            return (bytes[offset] << 24)
+                   | (bytes[offset + 1] << 16)
+                   | (bytes[offset + 2] << 8)
+                   | bytes[offset + 3];
+        }
+
+        private static string CsvValue(
+            IList<string> values,
+            IDictionary<string, int> indexes,
+            string name)
+        {
+            int index;
+            return indexes.TryGetValue(name, out index) && index >= 0 && index < values.Count
+                       ? values[index]
+                       : string.Empty;
+        }
+
+        private static List<string> ParseCsvLine(string line)
+        {
+            var values = new List<string>();
+            var value = new StringBuilder();
+            bool quoted = false;
+            for (int i = 0; i < (line ?? string.Empty).Length; i++)
+            {
+                char current = line[i];
+                if (current == '"')
+                {
+                    if (quoted && i + 1 < line.Length && line[i + 1] == '"')
+                    {
+                        value.Append('"');
+                        i++;
+                    }
+                    else
+                    {
+                        quoted = !quoted;
+                    }
+                }
+                else if (current == ',' && !quoted)
+                {
+                    values.Add(value.ToString());
+                    value.Clear();
+                }
+                else
+                {
+                    value.Append(current);
+                }
+            }
+
+            values.Add(value.ToString());
+            return values;
         }
 
         private static byte[] FromHex(string hex)
         {
-            string value = hex.Trim();
+            string value = (hex ?? string.Empty).Trim();
             if ((value.Length & 1) != 0)
             {
                 throw new FormatException("Packet hex length is odd.");
@@ -230,30 +843,31 @@ namespace AOSharpCaptureAnalyzer
             var result = new byte[value.Length / 2];
             for (int i = 0; i < result.Length; i++)
             {
-                result[i] = byte.Parse(value.Substring(i * 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                result[i] = byte.Parse(
+                    value.Substring(i * 2, 2),
+                    NumberStyles.HexNumber,
+                    CultureInfo.InvariantCulture);
             }
 
             return result;
         }
 
-        private static string ToHex(IEnumerable<byte> bytes)
+        private static string PacketBodyHex(byte[] packet)
         {
-            if (bytes == null)
+            if (packet == null || packet.Length <= RawSimpleCharFullUpdateDecoder.N3BodyOffset)
             {
                 return string.Empty;
             }
 
-            return string.Concat(bytes.Select(value => value.ToString("X2", CultureInfo.InvariantCulture)));
+            var body = new byte[packet.Length - RawSimpleCharFullUpdateDecoder.N3BodyOffset];
+            Buffer.BlockCopy(packet, RawSimpleCharFullUpdateDecoder.N3BodyOffset, body, 0, body.Length);
+            return RawScfuFormatting.ToHex(body);
         }
 
         private static IEnumerable<string> ReadSharedLines(string path)
         {
-            using (var stream = new FileStream(
-                path,
-                FileMode.Open,
-                FileAccess.Read,
-                FileShare.ReadWrite))
-            using (var reader = new System.IO.StreamReader(stream, Encoding.UTF8, true))
+            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var reader = new StreamReader(stream, Encoding.UTF8, true))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
@@ -263,9 +877,391 @@ namespace AOSharpCaptureAnalyzer
             }
         }
 
+        private static int RunSelfTest()
+        {
+            try
+            {
+                byte[] abmouthPacket = FromHex(AbmouthPacketHex);
+                RawSimpleCharFullUpdate abmouth = RawSimpleCharFullUpdateDecoder.DecodePacket(abmouthPacket);
+                AssertEqual(224, abmouthPacket.Length, "Abmouth packet length");
+                AssertEqual(208, abmouth.RawBody.Length, "Abmouth body length");
+                AssertEqual(208, abmouth.BytesConsumed, "Abmouth bytes consumed");
+                Assert(abmouth.DecodeFullyConsumed, "Abmouth complete decode");
+                AssertEqual(0, abmouth.UndecodedTail.Length, "Abmouth tail length");
+                AssertEqual(0xC350, abmouth.Identity.Type, "Abmouth identity type");
+                AssertEqual(0x79607A11, abmouth.Identity.Instance, "Abmouth identity instance");
+                AssertEqual(58, abmouth.Version, "Abmouth version");
+                AssertEqual(0x022A4A43, abmouth.Flags, "Abmouth flags");
+                AssertEqual(0x00153008, abmouth.PlayfieldId.GetValueOrDefault(), "Abmouth playfield");
+                AssertEqual(0x43B28B51, FloatBits(abmouth.Position.X), "Abmouth position X bits");
+                AssertEqual(0x42983745, FloatBits(abmouth.Position.Y), "Abmouth position Y bits");
+                AssertEqual(0x42C63F41, FloatBits(abmouth.Position.Z), "Abmouth position Z bits");
+                AssertEqual(unchecked((int)0xBF3695FE), FloatBits(abmouth.Heading.Y), "Abmouth heading Y bits");
+                AssertEqual(0x3F337068, FloatBits(abmouth.Heading.W), "Abmouth heading W bits");
+                AssertEqual(0x04CB, (int)abmouth.AppearanceValue, "Abmouth appearance");
+                AssertEqual(0x10081201, abmouth.CharacterFlags, "Abmouth character flags");
+                AssertEqual(150, abmouth.Npc.Family, "Abmouth NPC family");
+                AssertEqual(0, abmouth.Npc.UnknownData, "Abmouth NPC unknown data");
+                AssertEqual(0, abmouth.Npc.UnknownData2, "Abmouth NPC unknown data 2");
+                Assert(!abmouth.Npc.UnknownData3.HasValue, "Abmouth NPC unknown data 3 absent");
+                AssertEqual(30, abmouth.Level, "Abmouth level");
+                AssertEqual(10324, abmouth.Health, "Abmouth health");
+                AssertEqual(155962, (int)abmouth.MonsterData, "Abmouth monster data");
+                AssertEqual(162, abmouth.MonsterScale, "Abmouth monster scale");
+                AssertEqual("80000000000000008000000003010001000100010001000000020000", RawScfuFormatting.ToHex(abmouth.Unknown1), "Abmouth unknown1");
+                AssertEqual(114, abmouth.RunSpeedBase, "Abmouth run speed");
+                AssertEqual(0, abmouth.ActiveNanos.Length, "Abmouth active nanos");
+                AssertEqual(5, abmouth.Textures.Length, "Abmouth textures");
+                AssertEqual(0, abmouth.Meshes.Length, "Abmouth meshes");
+                AssertEqual(0, abmouth.Flags2, "Abmouth flags2");
+                AssertEqual(0, abmouth.Unknown2, "Abmouth unknown2");
+
+                byte[] infectorPacket = FromHex(ReplacementInfectorPacketHex);
+                RawSimpleCharFullUpdate infector = RawSimpleCharFullUpdateDecoder.DecodePacket(infectorPacket);
+                AssertEqual(217, infectorPacket.Length, "Infector packet length");
+                AssertEqual(201, infector.RawBody.Length, "Infector body length");
+                AssertEqual(201, infector.BytesConsumed, "Infector bytes consumed");
+                Assert(infector.DecodeFullyConsumed, "Infector complete decode");
+                AssertEqual(0x79607AD0, infector.Identity.Instance, "Infector identity instance");
+                AssertEqual(0x43A7038C, FloatBits(infector.Position.X), "Infector position X bits");
+                AssertEqual(0x42933C64, FloatBits(infector.Position.Y), "Infector position Y bits");
+                AssertEqual(0x42C617A4, FloatBits(infector.Position.Z), "Infector position Z bits");
+                AssertEqual(0x3F374729, FloatBits(infector.Heading.Y), "Infector heading Y bits");
+                AssertEqual(0x3F32BB6F, FloatBits(infector.Heading.W), "Infector heading W bits");
+                AssertEqual(10, infector.Npc.UnknownData, "Infector NPC unknown data");
+                AssertEqual("00000000000000008000000003010001000100010001000000020000", RawScfuFormatting.ToHex(infector.Unknown1), "Infector unknown1");
+                AssertEqual(2, infector.Flags2, "Infector flags2");
+                AssertEqual(0, infector.Unknown2, "Infector unknown2");
+                Assert(infector.Unknown4.HasValue, "Infector unknown4 present");
+                AssertEqual(0, infector.Unknown4.GetValueOrDefault(), "Infector unknown4");
+
+                var truncated = new byte[infectorPacket.Length - 1];
+                Buffer.BlockCopy(infectorPacket, 0, truncated, 0, truncated.Length);
+                RawSimpleCharFullUpdate frameMismatchMessage;
+                string frameMismatchError;
+                Assert(
+                    !RawSimpleCharFullUpdateDecoder.TryDecodePacket(
+                        truncated,
+                        out frameMismatchMessage,
+                        out frameMismatchError),
+                    "Frame length mismatch rejected");
+                Assert(
+                    frameMismatchError.IndexOf("frame length mismatch", StringComparison.OrdinalIgnoreCase) >= 0,
+                    "Frame length mismatch error");
+
+                SetFrameLength(truncated);
+                RawSimpleCharFullUpdate truncatedMessage;
+                string truncatedError;
+                Assert(
+                    !RawSimpleCharFullUpdateDecoder.TryDecodePacket(truncated, out truncatedMessage, out truncatedError),
+                    "Truncated packet rejected without escaping callback");
+                Assert(truncatedMessage == null, "Truncated packet has no partial projection");
+                Assert(truncatedError.IndexOf("ScfuUnknown4", StringComparison.Ordinal) >= 0, "Truncated packet field error");
+                string failedRow = RawScfuAppearanceCsv.FormatRow(
+                    new RawScfuCaptureMetadata(),
+                    truncated,
+                    null,
+                    truncatedError);
+                Assert(
+                    failedRow.IndexOf(RawScfuFormatting.ToHex(truncated), StringComparison.Ordinal) >= 0,
+                    "Truncated packet raw bytes preserved");
+
+                byte[] badMarker = (byte[])abmouthPacket.Clone();
+                int markerOffset = FindBytes(badMarker, new byte[] { 0x00, 0x00, 0x03, 0xF1 }, RawSimpleCharFullUpdateDecoder.N3BodyOffset);
+                Assert(markerOffset >= 0, "Abmouth ActiveNanos marker found");
+                badMarker[markerOffset + 3] = 0xF0;
+                RawSimpleCharFullUpdate badMarkerMessage;
+                string badMarkerError;
+                Assert(
+                    !RawSimpleCharFullUpdateDecoder.TryDecodePacket(badMarker, out badMarkerMessage, out badMarkerError),
+                    "Bad X3F1 marker rejected");
+                Assert(badMarkerError.IndexOf("ActiveNanos marker", StringComparison.Ordinal) >= 0, "Bad X3F1 field error");
+
+                var extraTailPacket = new byte[abmouthPacket.Length + 1];
+                Buffer.BlockCopy(abmouthPacket, 0, extraTailPacket, 0, abmouthPacket.Length);
+                extraTailPacket[extraTailPacket.Length - 1] = 0xA5;
+                SetFrameLength(extraTailPacket);
+                RawSimpleCharFullUpdate extraTail = RawSimpleCharFullUpdateDecoder.DecodePacket(extraTailPacket);
+                Assert(!extraTail.DecodeFullyConsumed, "Extra byte requires offline decode");
+                AssertEqual(208, extraTail.BytesConsumed, "Extra-tail bytes consumed");
+                AssertEqual(1, extraTail.UndecodedTail.Length, "Extra-tail length");
+                AssertEqual(0xA5, extraTail.UndecodedTail[0], "Extra-tail byte");
+
+                string completeRow = RawScfuAppearanceCsv.FormatRow(
+                    new RawScfuCaptureMetadata(),
+                    abmouthPacket,
+                    abmouth,
+                    string.Empty);
+                AssertEqual(
+                    ParseCsvLine(RawScfuAppearanceCsv.Header).Count,
+                    ParseCsvLine(completeRow).Count,
+                    "Shared SCFU CSV schema width");
+
+                PacketSourceReport missingPacketLog = new PacketSourceReport("packets.hex.log", false);
+                PacketSourceReport rawOnly = CreateSelfTestSource(
+                    "raw-packets.csv",
+                    abmouthPacket,
+                    abmouthPacket.Length,
+                    "raw_complete");
+                CapturePacketSet rawOnlyResult = ReconcileSources(
+                    missingPacketLog,
+                    rawOnly,
+                    SelfTestExpectations(1, 1));
+                AssertEqual(0, rawOnlyResult.SourceFailures, "Raw-index-only fallback accepted");
+                AssertEqual(1, rawOnlyResult.Packets.Count, "Raw-index-only SCFU count");
+                AssertEqual(1, rawOnlyResult.RawFallbackRows, "Raw-index-only fallback count");
+
+                PacketSourceReport badLengthOnly = CreateSelfTestSource(
+                    "packets.hex.log",
+                    abmouthPacket,
+                    abmouthPacket.Length - 1,
+                    "raw_complete");
+                CapturePacketSet badLengthResult = ReconcileSources(
+                    badLengthOnly,
+                    new PacketSourceReport("raw-packets.csv", false),
+                    SelfTestExpectations(1, 1));
+                Assert(badLengthResult.SourceFailures > 0, "Sink-declared length mismatch rejected");
+
+                byte[] badFramePacket = (byte[])abmouthPacket.Clone();
+                int incorrectFrameLength = badFramePacket.Length - 1;
+                badFramePacket[6] = (byte)(incorrectFrameLength >> 8);
+                badFramePacket[7] = (byte)incorrectFrameLength;
+                PacketSourceReport badFrameOnly = CreateSelfTestSource(
+                    "packets.hex.log",
+                    badFramePacket,
+                    badFramePacket.Length,
+                    "raw_complete");
+                CapturePacketSet badFrameResult = ReconcileSources(
+                    badFrameOnly,
+                    new PacketSourceReport("raw-packets.csv", false),
+                    SelfTestExpectations(1, 1));
+                Assert(badFrameResult.SourceFailures > 0, "SCFU frame length mismatch rejected by source reconciliation");
+
+                PacketSourceReport goodRawIndex = CreateSelfTestSource(
+                    "raw-packets.csv",
+                    abmouthPacket,
+                    abmouthPacket.Length,
+                    "raw_complete");
+                CapturePacketSet recoveredResult = ReconcileSources(
+                    badLengthOnly,
+                    goodRawIndex,
+                    SelfTestExpectations(1, 1));
+                AssertEqual(0, recoveredResult.SourceFailures, "One good sink recovers one bad sink");
+                AssertEqual(1, recoveredResult.Packets.Count, "Recovered SCFU count");
+
+                CapturePacketSet recoveredFrameResult = ReconcileSources(
+                    badFrameOnly,
+                    goodRawIndex,
+                    SelfTestExpectations(1, 1));
+                AssertEqual(0, recoveredFrameResult.SourceFailures, "One good sink recovers a bad SCFU frame");
+
+                PacketSourceReport conflictingPacketLog = CreateSelfTestSource(
+                    "packets.hex.log",
+                    abmouthPacket,
+                    abmouthPacket.Length,
+                    "raw_complete");
+                PacketSourceReport conflictingRawIndex = CreateSelfTestSource(
+                    "raw-packets.csv",
+                    infectorPacket,
+                    infectorPacket.Length,
+                    "raw_complete");
+                CapturePacketSet conflictResult = ReconcileSources(
+                    conflictingPacketLog,
+                    conflictingRawIndex,
+                    SelfTestExpectations(1, 1));
+                Assert(conflictResult.SourceFailures > 0, "Conflicting raw sinks rejected");
+
+                CapturePacketSet emptyResult = ReconcileSources(
+                    new PacketSourceReport("packets.hex.log", true),
+                    new PacketSourceReport("raw-packets.csv", true),
+                    SelfTestExpectations(1, 1));
+                Assert(emptyResult.SourceFailures > 0, "Incomplete empty sources rejected");
+                Console.WriteLine("SCFU decoder self-test PASS");
+                return 0;
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine("SCFU decoder self-test FAIL: " + exception.Message);
+                return 1;
+            }
+        }
+
+        private static int FloatBits(float value)
+        {
+            return BitConverter.ToInt32(BitConverter.GetBytes(value), 0);
+        }
+
+        private static void SetFrameLength(byte[] packet)
+        {
+            if (packet == null || packet.Length < 8 || packet.Length > ushort.MaxValue)
+            {
+                throw new InvalidDataException("Self-test packet cannot encode its frame length.");
+            }
+
+            packet[6] = (byte)(packet.Length >> 8);
+            packet[7] = (byte)packet.Length;
+        }
+
+        private static PacketSourceReport CreateSelfTestSource(
+            string name,
+            byte[] packet,
+            int declaredLength,
+            string preservationStatus)
+        {
+            var report = new PacketSourceReport(name, true)
+            {
+                RawRowCount = 1
+            };
+            AddSourcePacket(
+                report,
+                new RawScfuCaptureMetadata
+                {
+                    CapturedUtc = "2026-07-13T00:00:00.0000000Z",
+                    Direction = "IN",
+                    GlobalOrdinal = "1",
+                    Sequence = "1"
+                },
+                packet,
+                declaredLength,
+                preservationStatus,
+                string.Empty);
+            return report;
+        }
+
+        private static CaptureExpectations SelfTestExpectations(int rawPackets, int scfuPackets)
+        {
+            return new CaptureExpectations
+            {
+                ExpectedRawPackets = rawPackets,
+                ExpectedScfuPackets = scfuPackets,
+                RecaptureRequired = false
+            };
+        }
+
+        private static int FindBytes(byte[] haystack, byte[] needle, int start)
+        {
+            for (int i = start; i <= haystack.Length - needle.Length; i++)
+            {
+                bool match = true;
+                for (int j = 0; j < needle.Length; j++)
+                {
+                    if (haystack[i + j] != needle[j])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (match)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private static void Assert(bool condition, string name)
+        {
+            if (!condition)
+            {
+                throw new InvalidDataException(name);
+            }
+        }
+
+        private static void AssertEqual<T>(T expected, T actual, string name)
+        {
+            if (!EqualityComparer<T>.Default.Equals(expected, actual))
+            {
+                throw new InvalidDataException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0}: expected {1}, actual {2}",
+                        name,
+                        expected,
+                        actual));
+            }
+        }
+
         private static string Csv(string value)
         {
             return "\"" + (value ?? string.Empty).Replace("\"", "\"\"") + "\"";
+        }
+
+        private sealed class CapturedPacket
+        {
+            internal RawScfuCaptureMetadata Metadata { get; set; }
+            internal byte[] Packet { get; set; }
+        }
+
+        private sealed class CapturePacketSet
+        {
+            internal CapturePacketSet()
+            {
+                this.Packets = new List<CapturedPacket>();
+                this.FailureMessages = new List<string>();
+            }
+
+            internal List<CapturedPacket> Packets { get; private set; }
+            internal List<string> FailureMessages { get; private set; }
+            internal int PacketLogRows { get; set; }
+            internal int RawFallbackRows { get; set; }
+            internal int SourceFailures { get; set; }
+            internal int ResolvedRawPacketCount { get; set; }
+
+            internal void AddFailure(string message)
+            {
+                this.SourceFailures++;
+                this.FailureMessages.Add(message);
+            }
+        }
+
+        private sealed class CaptureExpectations
+        {
+            internal int? ExpectedRawPackets { get; set; }
+            internal int? ExpectedScfuPackets { get; set; }
+            internal bool? RecaptureRequired { get; set; }
+        }
+
+        private sealed class PacketSourceReport
+        {
+            internal PacketSourceReport(string name, bool exists)
+            {
+                this.Name = name;
+                this.Exists = exists;
+                this.HeaderValid = true;
+                this.Records = new List<SourcePacketRecord>();
+                this.RecordByEvent = new Dictionary<string, SourcePacketRecord>(StringComparer.Ordinal);
+                this.Errors = new List<string>();
+            }
+
+            internal string Name { get; private set; }
+            internal bool Exists { get; private set; }
+            internal bool HeaderValid { get; set; }
+            internal int RawRowCount { get; set; }
+            internal int ValidRowCount { get; set; }
+            internal int InvalidRowCount { get; set; }
+            internal int ValidScfuRowCount { get; set; }
+            internal List<SourcePacketRecord> Records { get; private set; }
+            internal Dictionary<string, SourcePacketRecord> RecordByEvent { get; private set; }
+            internal List<string> Errors { get; private set; }
+        }
+
+        private sealed class SourcePacketRecord
+        {
+            internal string EventKey { get; set; }
+            internal string SourceName { get; set; }
+            internal int DeclaredLength { get; set; }
+            internal int ReconcileOrder { get; set; }
+            internal bool SelectedFromRawFallback { get; set; }
+            internal RawScfuCaptureMetadata Metadata { get; set; }
+            internal byte[] Packet { get; set; }
+        }
+
+        private sealed class ReconciledEvent
+        {
+            internal SourcePacketRecord PacketLog { get; set; }
+            internal SourcePacketRecord RawIndex { get; set; }
         }
     }
 }

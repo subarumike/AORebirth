@@ -7,9 +7,11 @@ for %%I in ("%SCRIPT_DIR%..") do set "REPO_ROOT=%%~fI"
 set "INJECTOR_EXE=%REPO_ROOT%\tools-temp\AOSharpLiveInjector\bin\Debug\AOSharpLiveInjector.exe"
 set "PLUGIN_DLL=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\AOSharpLiveCapture.dll"
 set "CAPTURE_ROOT=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\captures"
+set "LOOT_CAPTURE_REQUEST=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\loot-10.request"
 set "LOG_PATH=%REPO_ROOT%\tools-temp\AOSharpLiveInjector\bin\Debug\AOSharpLiveInjector-start.log"
 set "TARGET_SWITCH="
 set "TARGET_VALUE="
+set "LOOT_CAPTURE_MODE="
 set "LAUNCHER_VBS=%TEMP%\start-aosharp-live-capture-%RANDOM%%RANDOM%.vbs"
 
 if "%~1"=="" goto usage
@@ -18,6 +20,11 @@ if "%~1"=="" goto usage
 if "%~1"=="" goto parsed
 if /I "%~1"=="--help" goto help
 if /I "%~1"=="-h" goto help
+if /I "%~1"=="--loot-10" (
+    set "LOOT_CAPTURE_MODE=1"
+    shift
+    goto parse
+)
 if /I "%~1"=="--pid" (
     if defined TARGET_SWITCH goto one_target
     if "%~2"=="" goto usage
@@ -81,17 +88,33 @@ if defined PREVIOUS_CAPTURE (
     )
     if defined PRE_PACKET_SIZE if defined PRE_EVENT_SIZE if defined POST_PACKET_SIZE if defined POST_EVENT_SIZE (
         if !POST_PACKET_SIZE! GTR !PRE_PACKET_SIZE! if !POST_EVENT_SIZE! GEQ !PRE_EVENT_SIZE! (
+            if defined LOOT_CAPTURE_MODE (
+                echo FAILED: --loot-10 requires a fresh capture injection; an existing capture is active.
+                exit /b 1
+            )
             echo SUCCESS: AOSharp live capture already active.
             echo CaptureOutputPath: "!ACTIVE_CAPTURE_PATH!"
             echo FailureLog: "%LOG_PATH%"
             exit /b 0
         )
         if !POST_EVENT_SIZE! GTR !PRE_EVENT_SIZE! if !POST_PACKET_SIZE! GEQ !PRE_PACKET_SIZE! (
+            if defined LOOT_CAPTURE_MODE (
+                echo FAILED: --loot-10 requires a fresh capture injection; an existing capture is active.
+                exit /b 1
+            )
             echo SUCCESS: AOSharp live capture already active.
             echo CaptureOutputPath: "!ACTIVE_CAPTURE_PATH!"
             echo FailureLog: "%LOG_PATH%"
             exit /b 0
         )
+    )
+)
+
+if defined LOOT_CAPTURE_MODE (
+    > "%LOOT_CAPTURE_REQUEST%" echo loot-10
+    if not exist "%LOOT_CAPTURE_REQUEST%" (
+        echo FAILED: could not arm the ten-kill loot capture request: "%LOOT_CAPTURE_REQUEST%"
+        exit /b 1
     )
 )
 
@@ -164,11 +187,13 @@ exit /b 1
 :usage
 echo Usage: cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "Anarchy Online"
 echo    or: cmd /d /c tools-temp\start-aosharp-live-capture.cmd --pid 1234
+echo Add --loot-10 to arm one-enemy ten-corpse loot validation without an in-game command.
 echo This wrapper attaches to an already-running AO client. It does not launch the game/client.
 exit /b 2
 
 :help
 echo Usage: cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "Anarchy Online"
 echo    or: cmd /d /c tools-temp\start-aosharp-live-capture.cmd --pid 1234
+echo Add --loot-10 to arm one-enemy ten-corpse loot validation without an in-game command.
 echo This wrapper attaches to an already-running AO client. It does not launch the game/client.
 exit /b 0

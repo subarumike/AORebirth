@@ -1,5 +1,7 @@
 # AORebirth Global Loot Architecture
 
+Status: implemented foundation and production integration.
+
 ## Domain model
 
 `LootTable` contains `LootTableKey`, `DisplayName`, `TableType`, ordered `RollGroups`, `CreditsPolicy`, `QualityPolicy`, `Evidence`, and `Confidence`.
@@ -15,7 +17,7 @@
 1. `LootAssignmentResolver` resolves applicable tables using immutable kill context.
 2. `LootGenerationService` rolls with an injected deterministic random source and returns `GeneratedLoot`.
 3. `CorpseInventoryService` owns remaining items, credits, inventory handle, open/close state, and empty status.
-4. `LootRightsService` decides who may inspect/transfer and when rights expire.
+4. `CorpseLootRightsPolicy` records the explicit rights policy. Team/personal rights behavior remains fail-closed pending evidence.
 5. Item transfer owns unique/stack/inventory validation and persistence.
 6. Corpse lifecycle owns despawn, not loot definitions.
 
@@ -39,13 +41,18 @@ Merge from least to most specific: global defaults -> zone/dungeon/mission polic
 
 Every definition records source id, observation count where relevant, provenance, and confidence. One observed drop never becomes guaranteed.
 
-## Current migration
+## Migration matrix
 
-- Retain DB `mobdroptable` as a legacy input adapter.
-- Migrate captured ordinary `BuildCapturedLootEntries` output into evidence-bearing tables.
-- Migrate cleaning-robot outcomes into one capture-backed table preserving exact distribution semantics.
-- Remove `DebugLootTable` from production after fixture parity.
-- Extract `Playfield.cs:3293-3856` into the services above without changing packets.
+| Legacy source | Current owner | Status |
+| --- | --- | --- |
+| DB `mobdroptable` | `GlobalLootRuntimeService` legacy adapter | Active; invalid references fail closed |
+| Captured ordinary profiles, including Thief and Filth Flea | versioned tables and assignments | Active with evidence semantics preserved |
+| Cleaning Robot 18-outcome roll | one weighted table with explicit empty weight | Active with exact outcome semantics |
+| Debug combat loot | explicit debug assignment | Isolated from ordinary production selection |
+| `Playfield` loot rolling and corpse dictionary | `LootGenerationService` and `CorpseInventoryService` | Removed |
+| Pets and owned summons | no assignment | Explicitly fail closed |
+
+Boss, dyna, spawn, playfield, and encounter assignment keys are modeled and precedence-tested. No dyna population or encounter gameplay was added.
 
 ## Corpse lifecycle contract
 

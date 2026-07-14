@@ -44,6 +44,11 @@ namespace AORebirth.Core.Playfields
         private readonly Dictionary<int, DateTime> pendingCapturedMovementTransitions =
             new Dictionary<int, DateTime>();
 
+        private readonly Dictionary<int, DateTime[]> nextCapturedParallelAttackTicks =
+            new Dictionary<int, DateTime[]>();
+
+        private readonly HashSet<int> startedCapturedParallelAttackClocks = new HashSet<int>();
+
         private readonly Playfield playfield;
 
         internal NpcCombatTickCoordinator(Playfield playfield)
@@ -60,6 +65,8 @@ namespace AORebirth.Core.Playfields
                                        && capturedContract.IsCombatReady;
             CapturedEnemySpecialAttackSequenceDefinition specialAttackSequence =
                 hasCapturedContract ? capturedContract.SpecialAttackSequence : null;
+            CapturedEnemyParallelAttackSequenceDefinition parallelAttackSequence =
+                hasCapturedContract ? capturedContract.ParallelAttackSequence : null;
             bool hasCapturedAttackStart = hasCapturedContract
                                           && capturedContract.HasCapturedAttackStartContext;
             double initialDelaySeconds = specialAttackSequence != null
@@ -68,6 +75,19 @@ namespace AORebirth.Core.Playfields
                                                    ? NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds
                                                    : NpcCombatAttackRules.DefaultCombatTickSeconds;
             DateTime now = DateTime.UtcNow;
+            if (parallelAttackSequence != null)
+            {
+                // The captured XOPZ and DENW clocks are independent of target
+                // selection. Preserve them when Abmouth retargets mid-fight;
+                // ClearTracking owns the true combat-end reset.
+                this.pendingCapturedAttackStarts.Remove(attacker.Identity.Instance);
+                this.pendingCapturedMovementTransitions.Remove(attacker.Identity.Instance);
+                this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
+                this.completedCapturedOpeningAttacks.Remove(attacker.Identity.Instance);
+                this.AnnounceCapturedParallelAttackSequenceContext(attacker, parallelAttackSequence);
+                return;
+            }
+
             if (hasCapturedAttackStart && capturedContract.AttackStartDelaySeconds > 0)
             {
                 this.pendingCapturedAttackStarts[attacker.Identity.Instance] =
@@ -116,6 +136,8 @@ namespace AORebirth.Core.Playfields
             this.completedCapturedOpeningAttacks.Remove(identity.Instance);
             this.pendingCapturedAttackStarts.Remove(identity.Instance);
             this.pendingCapturedMovementTransitions.Remove(identity.Instance);
+            this.nextCapturedParallelAttackTicks.Remove(identity.Instance);
+            this.startedCapturedParallelAttackClocks.Remove(identity.Instance);
         }
 
         internal void ProcessCombatTick(ICharacter attacker)
@@ -201,6 +223,20 @@ namespace AORebirth.Core.Playfields
                 }
 
                 this.pendingCapturedMovementTransitions.Remove(attacker.Identity.Instance);
+                return;
+            }
+
+            CapturedEnemyCombatContract parallelContract;
+            if (CapturedEnemyCombatRuntimeRegistry.TryGet(
+                    attacker.Identity.Instance,
+                    out parallelContract)
+                && parallelContract.IsCombatReady
+                && parallelContract.ParallelAttackSequence != null)
+            {
+                this.ProcessCapturedParallelAttackTicks(
+                    attacker,
+                    target,
+                    parallelContract.ParallelAttackSequence);
                 return;
             }
 
@@ -468,6 +504,130 @@ namespace AORebirth.Core.Playfields
                     Target = attacker.FightingTarget,
                     Action = 0
                 });
+        }
+
+        private void AnnounceCapturedParallelAttackSequenceContext(
+            ICharacter attacker,
+            CapturedEnemyParallelAttackSequenceDefinition parallelAttackSequence)
+        {
+            if (attacker.FightingTarget.Instance == 0 || parallelAttackSequence == null)
+            {
+                return;
+            }
+
+            this.lastNpcSpecialAttackWeaponTargets[attacker.Identity.Instance] = attacker.FightingTarget.Instance;
+            this.playfield.Announce(
+                new SpecialAttackWeaponMessage
+                {
+                    Identity = attacker.Identity,
+                    Specials = CreateCapturedSpecialAttacks(parallelAttackSequence.SpecialAttacks),
+                    Unknown1 = parallelAttackSequence.SpecialAttackWeaponUnknown1,
+                    Unknown2 = parallelAttackSequence.SpecialAttackWeaponUnknown2,
+                    Unknown3 = parallelAttackSequence.SpecialAttackWeaponUnknown3,
+                    Unknown4 = parallelAttackSequence.SpecialAttackWeaponUnknown4,
+                    Unknown5 = parallelAttackSequence.SpecialAttackWeaponUnknown5
+                });
+            this.playfield.Announce(
+                new AttackMessage
+                {
+                    Identity = attacker.Identity,
+                    Target = attacker.FightingTarget,
+                    Action = 0
+                });
+        }
+
+        private void ProcessCapturedParallelAttackTicks(
+            ICharacter attacker,
+            ICharacter target,
+            CapturedEnemyParallelAttackSequenceDefinition sequence)
+        {
+            CapturedEnemyParallelAttackStreamDefinition[] streams = sequence.Streams;
+            double maximumRange = streams.Max(value => value.Attack.Range);
+            if (!this.playfield.IsInCombatRange(attacker, target, maximumRange))
+            {
+                this.playfield.TryMoveNpcIntoCombatRange(attacker, target, maximumRange);
+                return;
+            }
+
+            this.playfield.UpdateNpcMeleeFollowHold(attacker, target, maximumRange);
+            DateTime now = DateTime.UtcNow;
+            DateTime[] nextTicks;
+            if (!this.startedCapturedParallelAttackClocks.Contains(attacker.Identity.Instance)
+                || !this.nextCapturedParallelAttackTicks.TryGetValue(
+                    attacker.Identity.Instance,
+                    out nextTicks)
+                || nextTicks.Length != streams.Length)
+            {
+                nextTicks = streams
+                    .Select(value => now + TimeSpan.FromSeconds(value.InitialDelaySeconds))
+                    .ToArray();
+                this.nextCapturedParallelAttackTicks[attacker.Identity.Instance] = nextTicks;
+                this.startedCapturedParallelAttackClocks.Add(attacker.Identity.Instance);
+            }
+
+            int dueIndex = -1;
+            DateTime dueAt = DateTime.MaxValue;
+            for (int index = 0; index < nextTicks.Length; index++)
+            {
+                if (nextTicks[index] <= now && nextTicks[index] < dueAt)
+                {
+                    dueIndex = index;
+                    dueAt = nextTicks[index];
+                }
+            }
+
+            if (dueIndex < 0)
+            {
+                return;
+            }
+
+            CapturedEnemyCombatAttackDefinition attack = streams[dueIndex].Attack;
+            var attackSource = new CombatAttackSource
+            {
+                MinDamage = attack.MinDamage,
+                MaxDamage = attack.MaxDamage,
+                DamageBonus = attack.DamageBonus,
+                Range = attack.Range,
+                RechargeSeconds = attack.RechargeSeconds,
+                UsesEquippedWeapon = attack.UsesEquippedWeapon,
+                AttackInfoAmmoCount = attack.AttackInfoAmmoCount,
+                AttackInfoWeaponSlot = attack.AttackInfoWeaponSlot,
+                AttackInfoUnk1 = attack.AttackInfoUnknown,
+                AttackInfoHitType = attack.AttackInfoHitType,
+                AttackInfoWeaponInstance = attack.AttackInfoWeaponInstance,
+                SendAttackInfo = attack.SendAttackInfo
+            };
+
+            int currentHealth = target.Stats[StatIds.health].Value;
+            int damage = this.CalculateCombatDamage(attacker, attackSource);
+            int newHealth = Math.Max(0, currentHealth - damage);
+            this.AnnounceCombatDamage(
+                attacker,
+                target,
+                damage,
+                attackSource,
+                CombatDamageSource.UnarmedAutoAttack);
+            target.Stats[StatIds.health].Value = newHealth;
+            target.SendChangedStats();
+            this.playfield.NotifyNpcCombatDamage(target);
+            nextTicks[dueIndex] = now + TimeSpan.FromSeconds(attack.RechargeSeconds);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Combat parallel hit attacker={0} target={1} stream={2} damage={3} health={4}/{5}",
+                    attacker.Identity,
+                    target.Identity,
+                    dueIndex,
+                    damage,
+                    newHealth,
+                    target.Stats[StatIds.life].Value));
+
+            if (newHealth == 0)
+            {
+                this.playfield.HandleCombatKillingHit(attacker, target);
+            }
         }
 
         private void AnnounceCapturedEnemyAttackStartContext(

@@ -105,6 +105,14 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         public byte[] ExtendedTextureOverrideData { get; set; }
 
+        // Exact inbound body and any tail that could not be structurally decoded.
+        // These are capture/evidence fields and are intentionally not serialized.
+        public byte[] RawBody { get; set; }
+
+        public bool TailFullyDecoded { get; set; }
+
+        public byte[] UndecodedTail { get; set; }
+
         public Vector3[] Waypoints { get; set; }
 
         [AoMember(22, SerializeSize = ArraySizeType.X3F1)]
@@ -121,6 +129,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         [AoMember(26)]
         public byte Unknown2 { get; set; }
+
+        public byte Unknown4 { get; set; }
 
         #endregion
     }
