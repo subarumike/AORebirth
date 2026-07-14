@@ -48,12 +48,10 @@ namespace ZoneEngine.ChatCommands
     using AORebirth.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
-    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
-    using ZoneEngine.Core.Packets;
 
     using Utility;
 
@@ -176,14 +174,13 @@ Filter will be applied to mob name"));
                 character.RawHeading,
                 npcController);
             mobCharacter.Playfield = character.Playfield;
-            (mobCharacter.Playfield as Playfield)?.RegisterNpcHome(mobCharacter);
+            Playfield spawnPlayfield = mobCharacter.Playfield as Playfield;
+            spawnPlayfield?.RegisterNpcHome(mobCharacter);
             int spawnHealth = Math.Max(1, mobCharacter.Stats[StatIds.life].Value);
             mobCharacter.Stats[StatIds.health].Value = spawnHealth;
             mobCharacter.Stats[StatIds.health].BaseValue = (uint)spawnHealth;
             mobCharacter.DoNotDoTimers = false;
-            SimpleCharFullUpdateMessage mess = SimpleCharFullUpdate.ConstructMessage(mobCharacter);
-            character.Playfield.Announce(mess);
-            AppearanceUpdateMessageHandler.Default.Send(mobCharacter);
+            spawnPlayfield?.AnnounceSpawnedCharacterVisibility(mobCharacter, Identity.None);
 
             Vector3 v = new Vector3(coord.x, coord.y, coord.z + 5);
             mobCharacter.AddWaypoint(v, false);
@@ -310,15 +307,12 @@ Filter will be applied to mob name"));
                 if (mobCharacter != null)
                 {
                     mobCharacter.Playfield = character.Playfield;
-                    (mobCharacter.Playfield as Playfield)?.RegisterNpcHome(mobCharacter);
+                    Playfield spawnPlayfield = mobCharacter.Playfield as Playfield;
+                    spawnPlayfield?.RegisterNpcHome(mobCharacter);
                     mobCharacter.Stats[StatIds.health].Value = mobCharacter.Stats[StatIds.life].Value;
                     mobCharacter.Stats[StatIds.health].BaseValue = (uint)mobCharacter.Stats[StatIds.life].Value;
                     mobCharacter.DoNotDoTimers = false;
-
-                    SimpleCharFullUpdateMessage mess = SimpleCharFullUpdate.ConstructMessage(mobCharacter);
-                    character.Playfield.Announce(mess);
-                    character.Playfield.Announce(new CharInPlayMessage { Identity = mobCharacter.Identity, Unknown = 0x00 });
-                    AppearanceUpdateMessageHandler.Default.Send(mobCharacter);
+                    spawnPlayfield?.AnnounceSpawnedCharacterVisibility(mobCharacter, Identity.None);
 
                     character.Playfield.Publish(
                         ChatTextMessageHandler.Default.CreateIM(
@@ -685,13 +679,11 @@ Filter will be applied to mob name"));
             }
 
             mobCharacter.Playfield = character.Playfield;
-            (mobCharacter.Playfield as Playfield)?.RegisterNpcHome(mobCharacter);
+            Playfield spawnPlayfield = mobCharacter.Playfield as Playfield;
+            spawnPlayfield?.RegisterNpcHome(mobCharacter);
             CombatTestMobArchetype.Prepare(mobCharacter, entry);
             mobCharacter.DoNotDoTimers = false;
-
-            character.Playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));
-            character.Playfield.Announce(new CharInPlayMessage { Identity = mobCharacter.Identity, Unknown = 0x00 });
-            AppearanceUpdateMessageHandler.Default.Send(mobCharacter);
+            spawnPlayfield?.AnnounceSpawnedCharacterVisibility(mobCharacter, Identity.None);
 
             LogUtil.Debug(
                 DebugInfoDetail.Error,
@@ -730,10 +722,9 @@ Filter will be applied to mob name"));
                 return null;
             }
 
-            (mobCharacter.Playfield as Playfield)?.RegisterNpcHome(mobCharacter);
-            character.Playfield.Announce(SimpleCharFullUpdate.ConstructMessage(mobCharacter));
-            character.Playfield.Announce(new CharInPlayMessage { Identity = mobCharacter.Identity, Unknown = 0x00 });
-            AppearanceUpdateMessageHandler.Default.Send(mobCharacter);
+            Playfield spawnPlayfield = mobCharacter.Playfield as Playfield;
+            spawnPlayfield?.RegisterNpcHome(mobCharacter);
+            spawnPlayfield?.AnnounceSpawnedCharacterVisibility(mobCharacter, Identity.None);
 
             character.Playfield.Publish(
                 ChatTextMessageHandler.Default.CreateIM(

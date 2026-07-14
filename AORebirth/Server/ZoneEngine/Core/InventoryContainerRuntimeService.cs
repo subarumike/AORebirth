@@ -29,7 +29,10 @@ namespace ZoneEngine.Core
 
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
+    using ZoneEngine.Core.Functions;
     using ZoneEngine.Core.Functions.GameFunctions;
+
+    using MsgPack;
 
     #endregion
 
@@ -826,7 +829,12 @@ namespace ZoneEngine.Core
                 return true;
             }
 
-            if (this.TryUseStarterVitalConsumable(character, itemPosition, item))
+            if (this.TryUseHealthAndNanoRecharger(character, itemPosition, item))
+            {
+                return true;
+            }
+
+            if (this.TryUseHealthAndNanoStim(character, itemPosition, item))
             {
                 return true;
             }
@@ -837,7 +845,8 @@ namespace ZoneEngine.Core
                 (int)itemPosition.Type,
                 itemPosition.Instance);
 
-            if (ItemLoader.ItemList[item.HighID].IsConsumable())
+            if (ItemLoader.ItemList[item.HighID].IsConsumable()
+                && !this.IsHealthAndNanoRecharger(item))
             {
                 item.MultipleCount--;
                 if (item.MultipleCount <= 0)
@@ -856,36 +865,271 @@ namespace ZoneEngine.Core
             return true;
         }
 
-        private bool TryUseStarterVitalConsumable(ICharacter character, Identity itemPosition, Item item)
+        private bool TryUseHealthAndNanoStim(ICharacter character, Identity itemPosition, Item item)
         {
-            if (!this.IsStarterVitalConsumable(item))
+            if (!this.IsHealthAndNanoStim(item))
             {
                 return false;
             }
 
-            int maxHealth = Math.Max(1, character.Stats[StatIds.life].Value);
-            int maxNano = Math.Max(0, character.Stats[StatIds.maxnanoenergy].Value);
-            character.Stats[StatIds.health].Value = maxHealth;
-            character.Stats[StatIds.health].BaseValue = (uint)maxHealth;
-            character.Stats[StatIds.currentnano].Value = maxNano;
-            character.Stats[StatIds.currentnano].BaseValue = (uint)maxNano;
+            Character concrete = character as Character;
+            if (concrete == null)
+            {
+                return false;
+            }
 
-            StatMessageHandler.Default.SendSingle(character, (int)StatIds.health, (uint)maxHealth);
-            StatMessageHandler.Default.SendSingle(character, (int)StatIds.currentnano, (uint)maxNano);
+            TemplateActionMessageHandler.Default.Send(
+                character,
+                item,
+                (int)itemPosition.Type,
+                itemPosition.Instance);
 
+            int healthAmount;
+            int nanoAmount;
+            int lockStatId = (int)StatIds.firstaid;
+            int lockDurationSeconds = 40;
+            this.ResolveVitalItemEffects(
+                item,
+                (int)StatIds.firstaid,
+                40,
+                ResolveHealthAndNanoStimAmount(item.Quality),
+                out healthAmount,
+                out nanoAmount,
+                out lockStatId,
+                out lockDurationSeconds);
+
+            this.ApplyVitalRestore(concrete, healthAmount, nanoAmount);
+
+            FunctionCollection.Instance.CallFunction(
+                (int)FunctionType.LockSkill,
+                concrete,
+                concrete,
+                concrete,
+                new MessagePackObject[] { lockStatId, lockDurationSeconds });
+
+            // Stims are consumed; rechargers are not.
             this.ConsumeInventoryStackItem(character, itemPosition, item);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "HealthAndNanoStim used char={0} item={1}/{2} ql={3} heal={4} nano={5} lockStat={6} lockSecs={7}",
+                    character.Identity.ToString(true),
+                    item.LowID,
+                    item.HighID,
+                    item.Quality,
+                    healthAmount,
+                    nanoAmount,
+                    lockStatId,
+                    lockDurationSeconds));
+
             return true;
         }
 
-        private bool IsStarterVitalConsumable(Item item)
+        private bool TryUseHealthAndNanoRecharger(ICharacter character, Identity itemPosition, Item item)
         {
-            const int healthAndNanoStim = 291043;
-            const int healthAndNanoRecharger = 291082;
+            if (!this.IsHealthAndNanoRecharger(item))
+            {
+                return false;
+            }
 
-            return item.LowID == healthAndNanoStim
-                   || item.HighID == healthAndNanoStim
-                   || item.LowID == healthAndNanoRecharger
-                   || item.HighID == healthAndNanoRecharger;
+            Character concrete = character as Character;
+            if (concrete == null)
+            {
+                return false;
+            }
+
+            // Item OnUse Hit/LockSkill functions carry Sitting/InDuel requirements that our
+            // requirement runtime often fails even when sitting. Apply QL-interpolated Hits and
+            // Treatment lock directly. Never consume — rechargers are reusable.
+            TemplateActionMessageHandler.Default.Send(
+                character,
+                item,
+                (int)itemPosition.Type,
+                itemPosition.Instance);
+
+            int healthAmount;
+            int nanoAmount;
+            int lockStatId = (int)StatIds.treatment;
+            int lockDurationSeconds = 15;
+            this.ResolveVitalItemEffects(
+                item,
+                (int)StatIds.treatment,
+                15,
+                ResolveHealthAndNanoRechargerAmount(item.Quality),
+                out healthAmount,
+                out nanoAmount,
+                out lockStatId,
+                out lockDurationSeconds);
+
+            this.ApplyVitalRestore(concrete, healthAmount, nanoAmount);
+
+            FunctionCollection.Instance.CallFunction(
+                (int)FunctionType.LockSkill,
+                concrete,
+                concrete,
+                concrete,
+                new MessagePackObject[] { lockStatId, lockDurationSeconds });
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "HealthAndNanoRecharger used char={0} item={1}/{2} ql={3} heal={4} nano={5} lockStat={6} lockSecs={7}",
+                    character.Identity.ToString(true),
+                    item.LowID,
+                    item.HighID,
+                    item.Quality,
+                    healthAmount,
+                    nanoAmount,
+                    lockStatId,
+                    lockDurationSeconds));
+
+            return true;
+        }
+
+        private void ResolveVitalItemEffects(
+            Item item,
+            int defaultLockStatId,
+            int defaultLockDurationSeconds,
+            int fallbackAmount,
+            out int healthAmount,
+            out int nanoAmount,
+            out int lockStatId,
+            out int lockDurationSeconds)
+        {
+            healthAmount = 0;
+            nanoAmount = 0;
+            lockStatId = defaultLockStatId;
+            lockDurationSeconds = defaultLockDurationSeconds;
+
+            foreach (Event itemEvent in item.Events.Where(x => x.EventType == EventType.OnUse))
+            {
+                foreach (Function itemFunction in itemEvent.Functions)
+                {
+                    MessagePackObject[] arguments = itemFunction.Arguments.Values.ToArray();
+                    if (itemFunction.FunctionType == (int)FunctionType.Hit && arguments.Length >= 2)
+                    {
+                        int statNumber = arguments[0].AsInt32();
+                        int delta = Math.Abs(hit.ResolveHitDelta(arguments));
+                        if (statNumber == (int)StatIds.health || statNumber == (int)StatIds.life)
+                        {
+                            healthAmount = Math.Max(healthAmount, delta);
+                        }
+                        else if (statNumber == (int)StatIds.currentnano
+                                 || statNumber == (int)StatIds.nanoenergypool
+                                 || statNumber == (int)StatIds.maxnanoenergy)
+                        {
+                            nanoAmount = Math.Max(nanoAmount, delta);
+                        }
+
+                        continue;
+                    }
+
+                    if (itemFunction.FunctionType == (int)FunctionType.LockSkill)
+                    {
+                        int parsedStat;
+                        int parsedDuration;
+                        if (lockskill.TryReadArguments(arguments, out parsedStat, out parsedDuration))
+                        {
+                            lockStatId = parsedStat;
+                            lockDurationSeconds = parsedDuration;
+                        }
+                    }
+                }
+            }
+
+            if (healthAmount <= 0)
+            {
+                healthAmount = fallbackAmount;
+            }
+
+            if (nanoAmount <= 0)
+            {
+                nanoAmount = fallbackAmount;
+            }
+        }
+
+        private void ApplyVitalRestore(Character character, int healthAmount, int nanoAmount)
+        {
+            int maxLife = Math.Max(1, character.Stats[StatIds.life].Value);
+            int currentHealth = character.Stats[StatIds.health].Value;
+            int healthApplied = Math.Min(Math.Max(0, healthAmount), Math.Max(0, maxLife - currentHealth));
+            if (healthApplied > 0)
+            {
+                int newHealth = currentHealth + healthApplied;
+                character.Stats[StatIds.health].Value = newHealth;
+                character.Stats[StatIds.health].BaseValue = (uint)newHealth;
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.health, (uint)newHealth);
+                ChatTextMessageHandler.Default.Send(
+                    character,
+                    string.Format("You healed yourself for {0} points.", healthApplied));
+            }
+
+            int maxNano = Math.Max(0, character.Stats[StatIds.maxnanoenergy].Value);
+            int currentNano = character.Stats[StatIds.currentnano].Value;
+            int nanoApplied = Math.Min(Math.Max(0, nanoAmount), Math.Max(0, maxNano - currentNano));
+            if (nanoApplied > 0)
+            {
+                int newNano = currentNano + nanoApplied;
+                character.Stats[StatIds.currentnano].Value = newNano;
+                character.Stats[StatIds.currentnano].BaseValue = (uint)newNano;
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.currentnano, (uint)newNano);
+            }
+
+            if (character.Controller != null)
+            {
+                character.Controller.SendChangedStats();
+            }
+        }
+
+        private static int ResolveHealthAndNanoRechargerAmount(int quality)
+        {
+            // Live AO: QL1 = 200, QL100 = 5000 (linear between templates 291082/291083).
+            const int amountQl1 = 200;
+            const int amountQl100 = 5000;
+            int ql = Math.Max(1, Math.Min(100, quality));
+            if (ql <= 1)
+            {
+                return amountQl1;
+            }
+
+            return amountQl1 + ((amountQl100 - amountQl1) * (ql - 1) / 99);
+        }
+
+        private static int ResolveHealthAndNanoStimAmount(int quality)
+        {
+            // Live AO: QL1 = 30, QL200 = 2400 (linear between templates 291043/291044).
+            const int amountQl1 = 30;
+            const int amountQl200 = 2400;
+            int ql = Math.Max(1, Math.Min(200, quality));
+            if (ql <= 1)
+            {
+                return amountQl1;
+            }
+
+            return amountQl1 + ((amountQl200 - amountQl1) * (ql - 1) / 199);
+        }
+
+        private bool IsHealthAndNanoRecharger(Item item)
+        {
+            const int rechargerLow = 291082;
+            const int rechargerHigh = 291083;
+
+            return item.LowID == rechargerLow
+                   || item.HighID == rechargerLow
+                   || item.LowID == rechargerHigh
+                   || item.HighID == rechargerHigh;
+        }
+
+        private bool IsHealthAndNanoStim(Item item)
+        {
+            const int stimLow = 291043;
+            const int stimHigh = 291044;
+
+            return item.LowID == stimLow
+                   || item.HighID == stimLow
+                   || item.LowID == stimHigh
+                   || item.HighID == stimHigh;
         }
 
         private void ConsumeInventoryStackItem(ICharacter character, Identity itemPosition, Item item)
@@ -1143,8 +1387,17 @@ namespace ZoneEngine.Core
             switch (InventoryContainerInteractionRules.ResolveRouteMode(target))
             {
                 case InventoryContainerInteractionRouteMode.InventoryItem:
-                    this.UseInventoryItem(client.Controller.Character, target);
-                    GenericCmdMessageHandler.Default.Acknowledge(client.Controller.Character, message);
+                    if (this.UseInventoryItem(client.Controller.Character, target))
+                    {
+                        GenericCmdMessageHandler.Default.Acknowledge(client.Controller.Character, message);
+                    }
+                    else
+                    {
+                        // Prefer Denied so client does not consume Stack/Empty charges on failed uses
+                        // (e.g. Treatment skill locked).
+                        GenericCmdMessageHandler.Default.AcknowledgeDenied(client.Controller.Character, message);
+                    }
+
                     return true;
 
                 case InventoryContainerInteractionRouteMode.WearOrSocialBackpack:
@@ -2006,11 +2259,6 @@ namespace ZoneEngine.Core
                 foreach (Function itemFunction in itemEvent.Functions.Where(
                     x => x.FunctionType == (int)FunctionType.LockSkill))
                 {
-                    if (!ItemFunctionRequirementsPass(characterEntity, itemFunction))
-                    {
-                        continue;
-                    }
-
                     int statId;
                     int durationSeconds;
                     if (!lockskill.TryReadArguments(itemFunction.Arguments.Values.ToArray(), out statId, out durationSeconds))

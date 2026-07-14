@@ -93,6 +93,7 @@ namespace ZoneEngine.Core
             if (xpReward <= 0)
             {
                 LogXpTrace(xpRecipient, "kill-skip", "reason=zero-reward");
+                AlienXpRuntimeService.AwardAlienXpOnKill(attacker, target);
                 return;
             }
 
@@ -152,6 +153,13 @@ namespace ZoneEngine.Core
             ClearManualXpWireStatChangedFlags(xpRecipient, leveledUp);
             WriteXpStatsToDb(xpRecipient, leveledUp ? "kill-complete-levelup" : "kill-complete");
 
+            AlienXpRuntimeService.AwardAlienXpOnKill(attacker, target);
+            if (leveledUp)
+            {
+                // Banked AIXP may unlock when Rubi-Ka level crosses an AI gate.
+                AlienXpRuntimeService.TryApplyBankedAlienLevelUps(xpRecipient);
+            }
+
             LogXpTrace(
                 xpRecipient,
                 leveledUp ? "kill-complete-levelup" : "kill-complete",
@@ -188,6 +196,7 @@ namespace ZoneEngine.Core
             }
 
             WriteXpStatsToDb(character, "login-complete");
+            AlienXpRuntimeService.TryApplyBankedAlienLevelUps(character);
             LogXpWireSnapshot(character, "CombatXpRuntimeService", "login-prepare-after");
         }
 

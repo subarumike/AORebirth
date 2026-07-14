@@ -327,8 +327,7 @@ namespace AORebirth.Core.Playfields
                     previousTarget,
                     targetInstance)
                 && !NpcCombatAttackRules.ShouldSendPlayerOwnedAttackPetAttackStartContext(
-                    PetCombatRules.IsPlayerOwnedMewAttackPet(attacker)
-                    || PetCombatRules.IsPlayerOwnedBureaucratCompanionPet(attacker),
+                    PetCombatRules.IsPlayerOwnedMeleeCombatPet(attacker),
                     previousTarget,
                     targetInstance))
             {
@@ -338,6 +337,20 @@ namespace AORebirth.Core.Playfields
             this.lastNpcSpecialAttackWeaponTargets[attackerInstance] = targetInstance;
             if (PetBureaucratGuardianAppearance.IsGuardianPet(attacker))
             {
+                // Guardians use one equipped right-hand sword (not MEW dual-wield templates).
+                // Empty SpecialAttackWeapon + AttackMessage matches equipped-weapon NPC combat start.
+                this.playfield.Announce(
+                    new SpecialAttackWeaponMessage
+                    {
+                        Identity = attacker.Identity,
+                        Unknown = 0,
+                        Specials = new SpecialAttack[0],
+                        Unknown1 = 0,
+                        Unknown2 = 0,
+                        Unknown3 = 0,
+                        Unknown4 = 0,
+                        Unknown5 = 0
+                    });
                 this.playfield.Announce(
                     new AttackMessage
                     {
@@ -700,8 +713,8 @@ namespace AORebirth.Core.Playfields
                            UsesEquippedWeapon = true,
                            AttackInfoAmmoCount = NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
                            AttackInfoWeaponSlot = (int)WeaponSlots.Righthand,
-                           AttackInfoUnk1 = 4,
-                           AttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType,
+                           AttackInfoUnk1 = PetCombatRules.AttackPetAttackInfoUnk1,
+                           AttackInfoHitType = PetCombatRules.AttackPetAttackInfoHitType,
                            AttackInfoWeaponInstance = 0,
                            SendAttackInfo = true
                        };

@@ -488,7 +488,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "public sealed class InventoryContainerRuntimeService");
             AssertContains(service, "TryHandleGenericCmdUse");
             AssertContains(service, "TryHandleUseItemOnItem");
-            AssertContains(service, "this.UseInventoryItem(client.Controller.Character, target);");
+            AssertContains(service, "if (this.UseInventoryItem(client.Controller.Character, target))");
+            AssertContains(service, "GenericCmdMessageHandler.Default.AcknowledgeDenied(client.Controller.Character, message)");
             AssertContains(service, "this.TryUseBackpackContainer(client.Controller.Character, target)");
             AssertContains(service, "BackpackContainerActionMessageHandler.Default.SendClose");
             AssertContains(service, "client.Controller.UseStatel(message.Target[1], EventType.OnUseItemOn);");
@@ -1000,7 +1001,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "character.BaseInventory.RemoveItem(");
             AssertContains(service, "CharacterActionMessageHandler.Default.SendDeleteItem(");
             AssertContains(service, "item.PerformAction(character, EventType.OnUse, itemPosition.Instance);");
-            AssertContains(service, "this.UseInventoryItem(client.Controller.Character, target);");
+            AssertContains(service, "if (this.UseInventoryItem(client.Controller.Character, target))");
+            AssertContains(service, "GenericCmdMessageHandler.Default.AcknowledgeDenied(client.Controller.Character, message)");
 
             AssertContains(
                 playerController,
