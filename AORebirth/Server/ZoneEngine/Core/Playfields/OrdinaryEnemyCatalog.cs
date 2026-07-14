@@ -501,6 +501,26 @@ namespace AORebirth.Core.Playfields
                     79);
             }
 
+            if (monsterData == 17649)
+            {
+                // Identity-correlated official-live corpses prove level-conditioned values.
+                // Keep unobserved levels unresolved instead of inventing a global range or formula.
+                return new OrdinaryEnemyLootProfile(
+                    evidence,
+                    entries,
+                    OrdinaryEnemyEvidenceState.Observed,
+                    null,
+                    null,
+                    new[]
+                        {
+                            new OrdinaryEnemyLevelCreditRule(5, 6, 6, 2, "20260709-210452"),
+                            new OrdinaryEnemyLevelCreditRule(6, 8, 8, 2, "20260709-210452,20260712-153918"),
+                            new OrdinaryEnemyLevelCreditRule(8, 10, 10, 4, "20260708-143600,20260709-205921,20260713-033511"),
+                            new OrdinaryEnemyLevelCreditRule(9, 11, 11, 3, "20260709-220439,20260712-160257,20260713-014714"),
+                            new OrdinaryEnemyLevelCreditRule(10, 12, 12, 2, "20260709-220439")
+                        });
+            }
+
             return new OrdinaryEnemyLootProfile(
                 evidence,
                 entries,

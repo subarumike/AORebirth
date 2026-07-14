@@ -181,6 +181,12 @@ Alternative when Mike provides the client process id:
 cmd /d /c tools-temp\start-aosharp-live-capture.cmd --pid <ao-client-pid>
 ```
 
+For a one-enemy ten-corpse loot sample, Codex arms validation through the same approved launcher; Mike does not type an in-game capture command:
+
+```cmd
+cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "<AO window title>" --loot-10
+```
+
 This wrapper is the only approved Codex startup command for AOSharp live capture. It starts the existing AOSharp injector against an already-running AO client and reports only the exact injector command, success or failure, capture output path, and failure log path. It does not launch the AO game/client.
 
 Build the capture plugin after capture-tool source changes with:
@@ -189,13 +195,21 @@ Build the capture plugin after capture-tool source changes with:
 cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.csproj /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 ```
 
-One-pass NPC captures preserve raw packets in `packets.hex.log` and promote reusable evidence into `enemy-full-updates.csv`, `enemy-state.csv`, `enemy-dossier.json`, `enemy-movement.csv`, `movement-packets.csv`, `enemy-combat.csv`, `enemy-stat-updates.csv`, `npc-lifecycle.csv`, `corpse-full-updates.csv`, `enemy-respawns.csv`, and `inventory-updates.csv`. `enemy-state.csv` rows include source direction, packet sequence, message type, and evidence source. For respawn timing captures, Mike should write a respawn marker such as `/aocap mark respawn-start` before the kill/wait loop; marked respawn captures validate incomplete unless a same-archetype same-position respawn is correlated. Final capture validation must report incomplete when corpse presence or inventory was observed without a successfully decoded identity-linked `CorpseFullUpdate`.
+The default capture always records the comprehensive raw packet superset in independently auto-flushed `packets.hex.log` and `raw-packets.csv`; it never narrows recording by focus, enemy type, marker, or validation mode. Either raw sink, or their complete union, is sufficient for offline recovery. It also directly decodes raw `SimpleCharFullUpdate` packets into reusable SCFU evidence and promotes NPC evidence into `enemy-full-updates.csv`, `enemy-state.csv`, `enemy-dossier.json`, `enemy-movement.csv`, `movement-packets.csv`, `enemy-combat.csv`, `enemy-stat-updates.csv`, `npc-lifecycle.csv`, `corpse-full-updates.csv`, `enemy-respawns.csv`, `inventory-updates.csv`, and `corpse-loot-observations.csv`. `enemy-state.csv` rows include source direction, packet sequence, message type, and evidence source. Markers and modes such as `/aocap mark respawn-start` and `--loot-10` only label the session or add acceptance requirements; they must never filter, suppress, or narrow captured evidence. A marked respawn capture validates incomplete unless the required respawn is correlated. A `--loot-10` capture validates incomplete if fewer than ten initial corpse snapshots or more than one enemy type is present, while still recording the same comprehensive superset. Final capture validation must report incomplete when corpse presence or inventory was observed without a successfully decoded identity-linked `CorpseFullUpdate`.
+
+If either raw sink contains the raw packet but a decoder or promoted export fails, the gameplay capture remains intact. Treat that result as an offline-decoder task with `recaptureRequired=false`; repair and rerun the offline decoder instead of asking Mike to repeat the gameplay capture.
 
 Existing capture folders can be retro-decoded without repeating gameplay:
 
 ```cmd
+cmd /d /c MSBuild.exe tools-temp\AOSharpCaptureAnalyzer\AOSharpCaptureAnalyzer.csproj /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
+cmd /d /c tools-temp\AOSharpCaptureAnalyzer\bin\Debug\AOSharpCaptureAnalyzer.exe --self-test
+cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py --self-test
+cmd /d /c tools-temp\AOSharpCaptureAnalyzer\bin\Debug\AOSharpCaptureAnalyzer.exe "<capture-folder>"
 cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py <capture-folder>
 ```
+
+Run the analyzer first to recover direct SCFU evidence from raw packets, then run the lifecycle decoder to rebuild correlated NPC lifecycle outputs.
 
 Before running the wrapper, do not run `rg`, `dir`, `tasklist`, recursive searches, process sweeps, source inspection, build-folder enumeration, or old-log scraping to rediscover how capture startup works. Use the wrapper directly.
 

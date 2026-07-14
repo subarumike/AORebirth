@@ -266,6 +266,26 @@ namespace ZoneEngine.Core
 
         public const int MoveToInventoryPlacement = 0x6f;
 
+        public static bool TryGetObservedCreditRange(
+            string name,
+            int monsterData,
+            out int minimumCredits,
+            out int maximumCredits)
+        {
+            ObservedCorpseCreditRule rule = ObservedCreditRules.FirstOrDefault(
+                value => value.Matches(name, monsterData));
+            if (rule == null)
+            {
+                minimumCredits = 0;
+                maximumCredits = 0;
+                return false;
+            }
+
+            minimumCredits = rule.MinCredits;
+            maximumCredits = rule.MaxCredits;
+            return true;
+        }
+
         public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(1);
 
         public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(30);
@@ -461,7 +481,9 @@ namespace ZoneEngine.Core
             {
                 { 247831, 247826 },
                 { 247832, 247821 },
-                { 31114, 31102 }
+                { 31114, 31102 },
+                { 17649, 15215 },
+                { 203748, 5921 }
             };
 
             foreach (KeyValuePair<int, int> mapping in CombatTestMobArchetype.CorpseVisualMappings())

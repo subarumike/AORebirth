@@ -266,12 +266,30 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemyEvidenceState creditEvidence,
             int? minimumCredits,
             int? maximumCredits)
+            : this(
+                evidence,
+                entries,
+                creditEvidence,
+                minimumCredits,
+                maximumCredits,
+                new OrdinaryEnemyLevelCreditRule[0])
+        {
+        }
+
+        internal OrdinaryEnemyLootProfile(
+            OrdinaryEnemyLootEvidence evidence,
+            OrdinaryEnemyLootEntry[] entries,
+            OrdinaryEnemyEvidenceState creditEvidence,
+            int? minimumCredits,
+            int? maximumCredits,
+            OrdinaryEnemyLevelCreditRule[] levelCreditRules)
         {
             this.Evidence = evidence;
             this.Entries = entries ?? new OrdinaryEnemyLootEntry[0];
             this.CreditEvidence = creditEvidence;
             this.MinimumCredits = minimumCredits;
             this.MaximumCredits = maximumCredits;
+            this.LevelCreditRules = levelCreditRules ?? new OrdinaryEnemyLevelCreditRule[0];
         }
 
         internal OrdinaryEnemyLootEvidence Evidence { get; private set; }
@@ -279,6 +297,50 @@ namespace AORebirth.Core.Playfields
         internal OrdinaryEnemyEvidenceState CreditEvidence { get; private set; }
         internal int? MinimumCredits { get; private set; }
         internal int? MaximumCredits { get; private set; }
+        internal OrdinaryEnemyLevelCreditRule[] LevelCreditRules { get; private set; }
+    }
+
+    internal sealed class OrdinaryEnemyLevelCreditRule
+    {
+        internal OrdinaryEnemyLevelCreditRule(
+            int enemyLevel,
+            int minimumCredits,
+            int maximumCredits,
+            int observedCorpses,
+            string evidence)
+        {
+            if (enemyLevel <= 0)
+            {
+                throw new ArgumentOutOfRangeException("enemyLevel");
+            }
+
+            if (minimumCredits < 0 || maximumCredits < minimumCredits)
+            {
+                throw new ArgumentOutOfRangeException("minimumCredits");
+            }
+
+            if (observedCorpses <= 0)
+            {
+                throw new ArgumentOutOfRangeException("observedCorpses");
+            }
+
+            if (string.IsNullOrWhiteSpace(evidence))
+            {
+                throw new ArgumentException("Credit evidence is required.", "evidence");
+            }
+
+            this.EnemyLevel = enemyLevel;
+            this.MinimumCredits = minimumCredits;
+            this.MaximumCredits = maximumCredits;
+            this.ObservedCorpses = observedCorpses;
+            this.Evidence = evidence;
+        }
+
+        internal int EnemyLevel { get; private set; }
+        internal int MinimumCredits { get; private set; }
+        internal int MaximumCredits { get; private set; }
+        internal int ObservedCorpses { get; private set; }
+        internal string Evidence { get; private set; }
     }
 
     internal sealed class OrdinaryEnemyCorpseProfile

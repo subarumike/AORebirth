@@ -26,6 +26,16 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         [AoMember(1)]
         public short LosHeight { get; set; }
 
+        // Captured immediately after the compact NPC family/LOS fields.
+        // Most legacy NPCs use 0; Subway Infectors use 0x0A.
+        public short UnknownData { get; set; }
+
+        // The live SCFU NPC block always carries this short. When it is non-zero,
+        // one additional byte follows it. Preserve both instead of discarding them.
+        public short UnknownData2 { get; set; }
+
+        public byte UnknownData3 { get; set; }
+
         #endregion
     }
 }

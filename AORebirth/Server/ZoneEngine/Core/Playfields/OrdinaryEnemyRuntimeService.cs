@@ -36,9 +36,6 @@ namespace AORebirth.Core.Playfields
         private readonly Dictionary<int, int> activeRuntimeIdentityBySource =
             new Dictionary<int, int>();
 
-        private readonly Dictionary<int, OrdinaryEnemyRespawnState> pendingRespawns =
-            new Dictionary<int, OrdinaryEnemyRespawnState>();
-
         internal OrdinaryEnemyRuntimeService(
             OrdinaryEnemyCatalog catalog,
             NpcPatrolReplayCoordinator patrolReplay,
@@ -51,28 +48,21 @@ namespace AORebirth.Core.Playfields
             this.activateNpc = activateNpc;
         }
 
-        internal void SpawnForPlayfield(Playfield playfield, Identity playfieldIdentity)
+        internal bool SpawnFromPopulation(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            OrdinaryEnemySpawnDefinition spawn,
+            out Identity runtimeIdentity)
         {
-            foreach (OrdinaryEnemySpawnDefinition spawn in
-                this.catalog.GetRuntimeSpawns(playfieldIdentity.Instance))
+            runtimeIdentity = Identity.None;
+            if (spawn == null || this.activeRuntimeIdentityBySource.ContainsKey(spawn.SourceIdentity))
             {
-                if (this.activeRuntimeIdentityBySource.ContainsKey(spawn.SourceIdentity)
-                    || this.pendingRespawns.ContainsKey(spawn.SourceIdentity))
-                {
-                    continue;
-                }
-
-                OrdinaryEnemyProfile profile;
-                if (!this.catalog.TryGetProfile(spawn.ProfileKey, out profile))
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Error,
-                        "Ordinary enemy spawn has no profile key=" + spawn.ProfileKey);
-                    continue;
-                }
-
-                this.Spawn(playfield, playfieldIdentity, spawn, profile);
+                return false;
             }
+
+            OrdinaryEnemyProfile profile;
+            if (!this.catalog.TryGetProfile(spawn.ProfileKey, out profile)) return false;
+            return this.Spawn(playfield, playfieldIdentity, spawn, profile, out runtimeIdentity);
         }
 
         internal void ClearRuntimeState(int playfieldInstance)
@@ -86,67 +76,19 @@ namespace AORebirth.Core.Playfields
 
             this.activeByRuntimeIdentity.Clear();
             this.activeRuntimeIdentityBySource.Clear();
-            this.pendingRespawns.Clear();
             OrdinaryEnemyRuntimeRegistry.RemoveForPlayfield(playfieldInstance);
         }
 
-        internal void ScheduleRespawnAfterDespawn(ICharacter target, DateTime despawnedAtUtc)
+        internal bool ReleasePopulationRuntime(
+            ICharacter target,
+            out OrdinaryEnemyRuntimeDefinition definition)
         {
-            if (target == null)
-            {
-                return;
-            }
-
-            OrdinaryEnemyRuntimeDefinition definition;
-            if (!this.activeByRuntimeIdentity.TryGetValue(target.Identity.Instance, out definition))
-            {
-                return;
-            }
+            definition = null;
+            if (target == null || !this.activeByRuntimeIdentity.TryGetValue(target.Identity.Instance, out definition)) return false;
 
             this.activeByRuntimeIdentity.Remove(target.Identity.Instance);
             this.activeRuntimeIdentityBySource.Remove(definition.Spawn.SourceIdentity);
-            if (!definition.Spawn.HasRespawnDelay)
-            {
-                return;
-            }
-
-            DateTime dueAtUtc = despawnedAtUtc.AddSeconds(definition.Spawn.RespawnDelaySeconds.Value);
-            this.pendingRespawns[definition.Spawn.SourceIdentity] =
-                new OrdinaryEnemyRespawnState(definition.Spawn, definition.Profile, dueAtUtc);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Ordinary enemy respawn scheduled sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} profile={2} dueAtUtc={3:o}",
-                    definition.Spawn.SourceIdentity,
-                    target.Identity,
-                    definition.Profile.ProfileKey,
-                    dueAtUtc));
-        }
-
-        internal void ProcessDueRespawns(
-            Playfield playfield,
-            Identity playfieldIdentity,
-            DateTime utcNow)
-        {
-            foreach (OrdinaryEnemyRespawnState state in this.pendingRespawns
-                .Where(
-                    value => value.Value.Spawn.PlayfieldInstance == playfieldIdentity.Instance
-                             && value.Value.DueAtUtc <= utcNow)
-                .Select(value => value.Value)
-                .ToArray())
-            {
-                this.pendingRespawns.Remove(state.Spawn.SourceIdentity);
-                if (this.Spawn(playfield, playfieldIdentity, state.Spawn, state.Profile))
-                {
-                    continue;
-                }
-
-                DateTime retryAtUtc = utcNow.AddSeconds(5.0);
-                this.pendingRespawns[state.Spawn.SourceIdentity] =
-                    new OrdinaryEnemyRespawnState(state.Spawn, state.Profile, retryAtUtc);
-            }
+            return true;
         }
 
         internal ICharacter FindAutomaticAggroTarget(ICharacter npc)
@@ -210,8 +152,10 @@ namespace AORebirth.Core.Playfields
             Playfield playfield,
             Identity playfieldIdentity,
             OrdinaryEnemySpawnDefinition spawn,
-            OrdinaryEnemyProfile profile)
+            OrdinaryEnemyProfile profile,
+            out Identity runtimeIdentity)
         {
+            runtimeIdentity = Identity.None;
             var controller = new NPCController();
             Character character = this.ConstructCharacter(
                 playfield,
@@ -259,6 +203,7 @@ namespace AORebirth.Core.Playfields
                 character.Identity.Instance,
                 spawn.SourceIdentity);
             playfield.AnnounceSpawnedCharacterVisibility(character, Identity.None);
+            runtimeIdentity = character.Identity;
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
@@ -484,22 +429,6 @@ namespace AORebirth.Core.Playfields
             character.Stats.SetBaseValueWithoutTriggering((int)stat, (uint)Math.Max(0, value));
         }
 
-        private sealed class OrdinaryEnemyRespawnState
-        {
-            internal OrdinaryEnemyRespawnState(
-                OrdinaryEnemySpawnDefinition spawn,
-                OrdinaryEnemyProfile profile,
-                DateTime dueAtUtc)
-            {
-                this.Spawn = spawn;
-                this.Profile = profile;
-                this.DueAtUtc = dueAtUtc;
-            }
-
-            internal OrdinaryEnemySpawnDefinition Spawn { get; private set; }
-            internal OrdinaryEnemyProfile Profile { get; private set; }
-            internal DateTime DueAtUtc { get; private set; }
-        }
     }
 
     internal sealed class OrdinaryEnemyRuntimeDefinition
