@@ -62,6 +62,7 @@ namespace ZoneEngine.Core.Packets
     public static class SimpleCharFullUpdate
     {
         private const int SubwayPlayfieldResource = 127;
+        private const int ClientScfuWaypointLimit = 30;
 
         private static readonly byte[] CapturedSubwayFilthFleaExtendedTextureOverrideData =
             new byte[]
@@ -554,7 +555,9 @@ namespace ZoneEngine.Core.Packets
                                 X = waypoint.X,
                                 Y = waypoint.Y,
                                 Z = waypoint.Z
-                            }).ToArray();
+                            })
+                        .Take(ClientScfuWaypointLimit)
+                        .ToArray();
             }
 
             return scfu;
