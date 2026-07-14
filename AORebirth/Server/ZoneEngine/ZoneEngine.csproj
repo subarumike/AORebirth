@@ -93,6 +93,7 @@
     <Compile Include="ChatCommands\ChatCommandGiveItem.cs" />
     <Compile Include="ChatCommands\ChatCommandGivePetShell.cs" />
     <Compile Include="ChatCommands\ChatCommandSet.cs" />
+    <Compile Include="ChatCommands\ChatCommandTerminate.cs" />
     <Compile Include="ChatCommands\DebugItem.cs" />
     <Compile Include="ChatCommands\FindWeaponVisual.cs" />
     <Compile Include="ChatCommands\InstaGrid.cs" />
@@ -177,6 +178,7 @@
     <Compile Include="Core\Functions\GameFunctions\modify.cs" />
     <Compile Include="Core\Functions\GameFunctions\modifypercentage.cs" />
     <Compile Include="Core\Functions\GameFunctions\openbank.cs" />
+    <Compile Include="Core\Functions\GameFunctions\savechar.cs" />
     <Compile Include="Core\Functions\GameFunctions\shouldermesh.cs" />
     <Compile Include="Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs" />
     <Compile Include="Core\Functions\GameFunctions\teleportproxy.cs">

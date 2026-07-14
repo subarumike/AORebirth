@@ -2084,6 +2084,7 @@ namespace AORebirth.Core.Playfields
             {
                 // AIXP is never lost on death; only KilledByInvaders increments for alien killers.
                 AlienXpRuntimeService.RecordPlayerKilledByInvader(attacker, target);
+                CombatXpRuntimeService.ApplyDeathUninsuredXpLoss(target);
                 this.runtimeSystems.BeginPlayerDeath(target, this.KillPlayerTarget);
             }
             else
@@ -2097,6 +2098,19 @@ namespace AORebirth.Core.Playfields
                     this.runtimeSystems.ClearPlayerFightingTarget(attacker, this.ClearCombatTracking);
                 }
             }
+        }
+
+        /// <summary>
+        /// Force player death without an NPC killer (/terminate suicide path).
+        /// </summary>
+        public void ForcePlayerDeath(ICharacter target)
+        {
+            if (target == null || !(target.Controller is PlayerController))
+            {
+                return;
+            }
+
+            this.runtimeSystems.BeginPlayerDeath(target, this.KillPlayerTarget);
         }
 
         internal void StopDyingNpcCombatState(ICharacter target)

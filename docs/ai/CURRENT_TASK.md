@@ -2,26 +2,27 @@
 
 ## Current Focus
 
-Complete the Subway dungeon, resource/playfield `127`, through incremental capture-backed implementation and live validation.
+Insurance Terminal + `/terminate` death XP pool (restored after git wipe) + respawn at bind.
 
 ## Done in this slice
 
-- Synced and consolidated `origin/master` without discarding the existing Subway work.
-- Preserved the confirmed PF127 entrance reverse exit while removing the unproven position-only proxy exit that force-zoned players from inside the Subway.
-- Preserved ordinary PF127 interior door statels and canonicalized inbound proxy travel to entrance door `0xC006007F`.
-- Preserved both the incoming inventory-use regressions and the local Subway door regressions in the shared test file.
-- Added the completed Disobedient Bot combat packet byte-vector regression.
-- Retained the incoming Alien XP, stim/recharger, combat, and inventory changes as merged work; Alien XP is not the active Subway priority.
+- Restored files lost when git pull overwrote uncommitted Insurance/`terminate` work:
+  - `savechar.cs` (SaveChar 53032), `ChatCommandTerminate.cs`, `ForcePlayerDeath`, Statel ACK, no debug Statel chat.
+- `/terminate` Yes → uninsured XP loss + force death (no pre-zero HP / no “already dead” skip loop).
+- Level &lt; 220: lost XP goes into UnsavedXP death pool; each kill awards mob XP + **5% of remaining pool** until pool is 0.
+- Level 220+: still clips XP to insurance watermark; no death-pool recovery.
+- SavedXP watermark preserved across kill/login normalize.
+- Death XP loss also applied on normal combat player deaths.
 
 ## Remaining
 
-1. Live-validate Vergil Aeneid retaliation after the hostile-NPC suppression-gas fix.
-2. Live-validate that only the confirmed Subway entrance door exits PF127 and that ordinary interior doors no longer force-zone the player.
-3. Continue room-by-room Subway population, encounter, object, loot, and progression work from completed captures.
+1. Restart engines, live-validate: Insurance Terminal → `/terminate` Yes → Die → respawn at bind.
+2. Live-validate death pool recover: kill mobs, pool shrinks 5%/kill + mob XP (char level &lt; 220).
+3. Shadowknowledge amount in “Character stored” still 0.
+4. Commit this work (previous “Fixed Insurance Terminal” commit only had `.vsidx` junk).
+5. Continue Subway when Mike returns that priority.
 
 ## Constraints
 
-- Use official-live capture evidence for Subway behavior and content.
-- Do not reintroduce a position-only PF127 proxy exit.
-- Do not remove ordinary Subway interior door statels.
-- Do not treat provisional Alien XP reward values as capture-confirmed.
+- Do not invent fee formulas beyond capture-backed level×100 without a second capture.
+- Do not change database schemas.
