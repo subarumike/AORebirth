@@ -166,6 +166,87 @@ namespace AORebirth.Core.Playfields
         }
     }
 
+    internal sealed class CapturedEnemyParallelAttackStreamDefinition
+    {
+        internal CapturedEnemyParallelAttackStreamDefinition(
+            double initialDelaySeconds,
+            CapturedEnemyCombatAttackDefinition attack)
+        {
+            this.InitialDelaySeconds = initialDelaySeconds;
+            this.Attack = attack;
+        }
+
+        internal double InitialDelaySeconds { get; private set; }
+
+        internal CapturedEnemyCombatAttackDefinition Attack { get; private set; }
+
+        internal bool IsValid
+        {
+            get
+            {
+                return this.InitialDelaySeconds >= 0
+                       && this.Attack != null
+                       && this.Attack.IsValid;
+            }
+        }
+    }
+
+    internal sealed class CapturedEnemyParallelAttackSequenceDefinition
+    {
+        internal CapturedEnemyParallelAttackSequenceDefinition(
+            CapturedEnemyParallelAttackStreamDefinition[] streams,
+            CapturedEnemySpecialAttackDefinition[] specialAttacks,
+            int specialAttackWeaponUnknown1,
+            int specialAttackWeaponUnknown2,
+            int specialAttackWeaponUnknown3,
+            int specialAttackWeaponUnknown4,
+            int specialAttackWeaponUnknown5)
+        {
+            this.Streams = streams ?? new CapturedEnemyParallelAttackStreamDefinition[0];
+            this.SpecialAttacks = specialAttacks ?? new CapturedEnemySpecialAttackDefinition[0];
+            this.SpecialAttackWeaponUnknown1 = specialAttackWeaponUnknown1;
+            this.SpecialAttackWeaponUnknown2 = specialAttackWeaponUnknown2;
+            this.SpecialAttackWeaponUnknown3 = specialAttackWeaponUnknown3;
+            this.SpecialAttackWeaponUnknown4 = specialAttackWeaponUnknown4;
+            this.SpecialAttackWeaponUnknown5 = specialAttackWeaponUnknown5;
+        }
+
+        internal CapturedEnemyParallelAttackStreamDefinition[] Streams { get; private set; }
+
+        internal CapturedEnemySpecialAttackDefinition[] SpecialAttacks { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown1 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown2 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown3 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown4 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown5 { get; private set; }
+
+        internal bool IsValid
+        {
+            get
+            {
+                if (this.Streams.Length == 0)
+                {
+                    return false;
+                }
+
+                foreach (CapturedEnemyParallelAttackStreamDefinition stream in this.Streams)
+                {
+                    if (stream == null || !stream.IsValid)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+    }
+
     internal sealed class CapturedEnemyCombatContract
     {
         private CapturedEnemyCombatContract()
@@ -230,6 +311,8 @@ namespace AORebirth.Core.Playfields
 
         internal CapturedEnemySpecialAttackSequenceDefinition SpecialAttackSequence { get; private set; }
 
+        internal CapturedEnemyParallelAttackSequenceDefinition ParallelAttackSequence { get; private set; }
+
         internal bool IsCombatReady
         {
             get
@@ -249,8 +332,10 @@ namespace AORebirth.Core.Playfields
                                && this.WeaponQuality > 0
                                && this.WeaponInventorySlot > 0;
                     case CapturedEnemyAttackModel.Specialized:
-                        return this.SpecialAttackSequence != null
-                               && this.SpecialAttackSequence.IsValid;
+                        return (this.SpecialAttackSequence != null
+                                && this.SpecialAttackSequence.IsValid)
+                               || (this.ParallelAttackSequence != null
+                                   && this.ParallelAttackSequence.IsValid);
                     default:
                         return false;
                 }
@@ -362,6 +447,20 @@ namespace AORebirth.Core.Playfields
                 AiProfile = NpcAiProfile.Passive,
                 AttackModel = CapturedEnemyAttackModel.Specialized,
                 SpecialAttackSequence = specialAttackSequence
+            };
+        }
+
+        internal static CapturedEnemyCombatContract CapturedParallelAttackSequence(
+            string evidence,
+            CapturedEnemyParallelAttackSequenceDefinition parallelAttackSequence)
+        {
+            return new CapturedEnemyCombatContract
+            {
+                Evidence = evidence,
+                Retaliates = true,
+                AiProfile = NpcAiProfile.Passive,
+                AttackModel = CapturedEnemyAttackModel.Specialized,
+                ParallelAttackSequence = parallelAttackSequence
             };
         }
 
@@ -537,6 +636,121 @@ namespace AORebirth.Core.Playfields
         {
             switch (monsterData)
             {
+                case 203748:
+                    return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
+                        "20260712-232711/234401: Vergil Aeneid QL23 Cast-Off E-Beamer 122123; 23-25 player damage, 23-34 all-target damage, captured attack-start/first-hit timing, and weapon-owned roll/cadence",
+                        NpcCombatAttackRules.CapturedSubwayVergilWeaponTemplate,
+                        NpcCombatAttackRules.CapturedSubwayVergilWeaponTemplate,
+                        NpcCombatAttackRules.CapturedSubwayVergilWeaponQuality,
+                        (int)WeaponSlots.Righthand,
+                        NpcCombatAttackRules.CapturedSubwayVergilWeaponDamageMinimumOverride,
+                        NpcCombatAttackRules.CapturedSubwayVergilWeaponDamageMaximumOverride,
+                        NpcCombatAttackRules.CapturedSubwayVergilAttackStartDelaySeconds,
+                        NpcCombatAttackRules.CapturedSubwayVergilMovementTransitionDelaySeconds,
+                        NpcCombatAttackRules.CapturedSubwayVergilFirstHitDelaySeconds,
+                        NpcCombatAttackRules.CapturedSubwayVergilRechargeOverrideSeconds,
+                        true,
+                        NpcCombatAttackRules.CapturedSubwayVergilInitialAttackInfoAmmoCount,
+                        NpcCombatAttackRules.CapturedSubwayVergilAttackInfoUnknown,
+                        NpcCombatAttackRules.CapturedSubwayVergilSpecialAttackWeaponValue,
+                        NpcCombatAttackRules.CapturedSubwayVergilSpecialAttackWeaponValue,
+                        NpcCombatAttackRules.CapturedSubwayVergilSpecialAttackWeaponValue,
+                        NpcCombatAttackRules.CapturedSubwayVergilSpecialAttackWeaponValue,
+                        NpcCombatAttackRules.CapturedSubwayVergilSpecialAttackWeaponLastValue);
+                case 155962:
+                    CapturedEnemyCombatAttackDefinition abmouthXopzAttack =
+                        new CapturedEnemyCombatAttackDefinition(
+                            NpcCombatAttackRules.CapturedSubwayAbmouthXopzMinimumDamage,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthXopzMaximumDamage,
+                            0,
+                            NpcCombatAttackRules.MaxMeleeCombatDistance,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthAttackCycleSeconds,
+                            false,
+                            NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthXopzWeaponSlot,
+                            0,
+                            NpcCombatAttackRules.NormalAttackInfoHitType,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthXopzTag,
+                            true);
+                    CapturedEnemyCombatAttackDefinition abmouthDenwAttack =
+                        new CapturedEnemyCombatAttackDefinition(
+                            NpcCombatAttackRules.CapturedSubwayAbmouthDenwMinimumDamage,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthDenwMaximumDamage,
+                            0,
+                            NpcCombatAttackRules.MaxMeleeCombatDistance,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthAttackCycleSeconds,
+                            false,
+                            NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthDenwWeaponSlot,
+                            0,
+                            NpcCombatAttackRules.NormalAttackInfoHitType,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthDenwTag,
+                            true);
+                    return CapturedEnemyCombatContract.CapturedParallelAttackSequence(
+                        "20260712-224840/232137: Abmouth XOPZ paired stream, DENW stream, and captured SIW context",
+                        new CapturedEnemyParallelAttackSequenceDefinition(
+                            new[]
+                            {
+                                new CapturedEnemyParallelAttackStreamDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthXopzFirstInitialSeconds,
+                                    abmouthXopzAttack),
+                                new CapturedEnemyParallelAttackStreamDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthDenwInitialSeconds,
+                                    abmouthDenwAttack),
+                                new CapturedEnemyParallelAttackStreamDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthXopzSecondInitialSeconds,
+                                    abmouthXopzAttack)
+                            },
+                            new[]
+                            {
+                                new CapturedEnemySpecialAttackDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthXopzLowTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthXopzHighTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthXopzTag,
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthXopzName),
+                                new CapturedEnemySpecialAttackDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthDenwLowTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthDenwHighTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthDenwTag,
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthDenwName)
+                            },
+                            NpcCombatAttackRules.CapturedSubwayAbmouthSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthSpecialAttackWeaponLastValue));
+                case 31909:
+                    return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                        "20260712-224840/232137: Abmouth-owned Infector DMXF attacks, 21-26 player damage, and 3.7-second cadence",
+                        new CapturedEnemySpecialAttackSequenceDefinition(
+                            NpcCombatAttackRules.CapturedSubwayAbmouthInfectorInitialAttackSeconds,
+                            null,
+                            new CapturedEnemyCombatAttackDefinition(
+                                NpcCombatAttackRules.CapturedSubwayAbmouthInfectorMinimumDamage,
+                                NpcCombatAttackRules.CapturedSubwayAbmouthInfectorMaximumDamage,
+                                0,
+                                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                                NpcCombatAttackRules.CapturedSubwayAbmouthInfectorRechargeSeconds,
+                                false,
+                                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                                NpcCombatAttackRules.CapturedSubwayAbmouthInfectorWeaponSlot,
+                                0,
+                                NpcCombatAttackRules.NormalAttackInfoHitType,
+                                NpcCombatAttackRules.CapturedSubwayAbmouthInfectorTag,
+                                true),
+                            new[]
+                            {
+                                new CapturedEnemySpecialAttackDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthInfectorLowTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthInfectorHighTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthInfectorTag,
+                                    NpcCombatAttackRules.CapturedSubwayAbmouthInfectorName)
+                            },
+                            NpcCombatAttackRules.CapturedSubwayAbmouthInfectorSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthInfectorSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthInfectorSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthInfectorSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayAbmouthInfectorSpecialAttackWeaponLastValue));
                 case 17657:
                     return CapturedEnemyCombatContract.CapturedSpecialSequence(
                         "20260709-193914: Filth Flea poison opener and melee cycle",
@@ -596,9 +810,37 @@ namespace AORebirth.Core.Playfields
                         0,
                         1397315377);
                 case 17649:
-                    return CapturedEnemyCombatContract.Unresolved(
-                        "20260709-220439: Disobedient Bot retaliation observed; no hit landed",
-                        true);
+                    return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                        "20260713-014714 packets 123-346: Disobedient Bot SIW1 attack context, 10-11 melee damage, 3.270444-second first hit, and 5.973723-second repeat",
+                        new CapturedEnemySpecialAttackSequenceDefinition(
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotInitialAttackSeconds,
+                            null,
+                            new CapturedEnemyCombatAttackDefinition(
+                                NpcCombatAttackRules.CapturedSubwayDisobedientBotMinimumDamage,
+                                NpcCombatAttackRules.CapturedSubwayDisobedientBotMaximumDamage,
+                                0,
+                                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                                NpcCombatAttackRules.CapturedSubwayDisobedientBotRechargeSeconds,
+                                false,
+                                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                                NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponSlot,
+                                0,
+                                NpcCombatAttackRules.NormalAttackInfoHitType,
+                                NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponTag,
+                                true),
+                            new[]
+                            {
+                                new CapturedEnemySpecialAttackDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayDisobedientBotLowTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayDisobedientBotHighTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponTag,
+                                    NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponName)
+                            },
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponLastValue));
                 case 203734:
                     return CapturedEnemyCombatContract.FixedAttack(
                         "20260709-210452/212115/212336/220439: Mugger AttackInfo",

@@ -166,6 +166,7 @@ namespace AORebirth.Core.Playfields
                 LootTableDefinition table = resolvedAssignment.Table;
                 result.AppliedAssignmentKeys.Add(resolvedAssignment.Assignment.AssignmentKey);
                 result.AppliedTableKeys.Add(table.LootTableKey);
+                result.LootUnresolved |= table.ItemPoolUnresolved;
                 foreach (LootGroupDefinition group in table.RollGroups.OrderBy(x => x.LootGroupKey, StringComparer.Ordinal))
                 {
                     this.RollGroup(result, table, group, context, random);
@@ -202,6 +203,10 @@ namespace AORebirth.Core.Playfields
             {
                 case LootRollMode.Guaranteed:
                 case LootRollMode.All:
+                    foreach (LootEntryDefinition entry in entries) this.TryGenerate(result, table, group, entry, context, random, true);
+                    break;
+                case LootRollMode.ObservedSnapshot:
+                    result.LootUnresolved = true;
                     foreach (LootEntryDefinition entry in entries) this.TryGenerate(result, table, group, entry, context, random, true);
                     break;
                 case LootRollMode.Independent:
@@ -315,6 +320,13 @@ namespace AORebirth.Core.Playfields
                 case CreditsPolicyMode.None: result.Credits = 0; result.CreditsUnresolved = false; break;
                 case CreditsPolicyMode.Fixed: result.Credits = policy.MinimumCredits; result.CreditsUnresolved = false; break;
                 case CreditsPolicyMode.Range: result.Credits = NextInclusive(random, policy.MinimumCredits, policy.MaximumCredits); result.CreditsUnresolved = false; break;
+                case CreditsPolicyMode.ObservedSet:
+                {
+                    int[] observed = policy.ObservedCredits ?? new int[0];
+                    result.Credits = observed.Length == 0 ? 0 : observed[random.Next(observed.Length)];
+                    result.CreditsUnresolved = true;
+                    break;
+                }
                 case CreditsPolicyMode.Unresolved: result.CreditsUnresolved = true; break;
             }
         }

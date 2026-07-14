@@ -323,6 +323,7 @@
     <Compile Include="Core\Playfields\CapturedSubwayContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatContract.cs" />
+    <Compile Include="Core\Playfields\CapturedSubwayEncounterRuntimeService.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyCatalog.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyProfile.cs" />
     <Compile Include="Core\Playfields\LootDefinitions.cs" />

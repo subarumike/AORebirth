@@ -72,6 +72,7 @@
     <Compile Include="N3RecoveredContractTests.cs" />
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
+    <Compile Include="AbmouthEncounterRuntimeServiceTests.cs" />
     <Compile Include="GlobalLootFoundationTests.cs" />
     <Compile Include="WorldPopulationFoundationTests.cs" />
     <Compile Include="SubwayLootPoolRulesTests.cs" />

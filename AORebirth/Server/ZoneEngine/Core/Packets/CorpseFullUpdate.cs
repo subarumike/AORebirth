@@ -10,6 +10,8 @@ namespace ZoneEngine.Core.Packets
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.Core.Playfields;
+
     public static class CorpseFullUpdate
     {
         private const int OriginalEncodedNameLength = 27;
@@ -46,6 +48,14 @@ namespace ZoneEngine.Core.Packets
         private const int CapturedSubwayThiefMonsterDataOffset = 324;
         private const int CapturedSubwayThiefTailDeadNpcInstanceOffset = 336;
 
+        private const int CapturedSubwayAbmouthPacketLength = 415;
+        private const int CapturedSubwayAbmouthMonsterDataOffset = 331;
+        private const int CapturedSubwayAbmouthTailDeadNpcInstanceOffset = 343;
+
+        private const int CapturedSubwayVergilPacketLength = 420;
+        private const int CapturedSubwayVergilMonsterDataOffset = 336;
+        private const int CapturedSubwayVergilTailDeadNpcInstanceOffset = 348;
+
         private static readonly byte[] Template = HexToBytes(
             "0000000a0001019e000000003cac6f144f474e050000c76a00f0f00100000000080000000b00000000000000004504a4df41c5ea1244cb530d000000003e8fb30a000000003f75b5e0000002350000000000000000006f000046f200000000001818050000001700000000000002bd00000000000002be00000000000002bf000000000000019c000000010000016800000062000000df000000000000003b00000003000000040000000700000059000000010000019f0000c350000001a0776b95780000002a0000797e0000003d000000000000000800004650000000220000003c0000001b52656d61696e73206f66205268696e6f6d616e204d6f74686572000000000200000032000003f100000003000007e20000cf2738f46cbe0000000400000000000000010000000000000000000000000000000000000000000001f700000001000000040000798a000000000000c350776b9578000017a600000000000000000000000000000001000000000000000000000002000000000000000000000003000000000000000000000004000000000000000000000000");
 
@@ -74,6 +84,31 @@ namespace ZoneEngine.Core.Packets
             + "0000000000000001F70000000100000004000065EC000000000000C3507957E61A000017A600000000000024CA000000000000000100002219000000000000"
             + "0002000024CC0000000000000003000024CB0000000000000004000024CD0000000000000000");
 
+        // Official live Subway capture 20260712-232137, CorpseFullUpdate packet #3124.
+        // Keep the captured boss body and material tail intact; only runtime identity,
+        // position, playfield, CATMesh, credits, and MonsterData fields are patched.
+        private static readonly byte[] CapturedSubwayAbmouthTemplate = HexToBytes(
+            "0E6B000A0001019F00000DB47944C0654F474E050000C76A00F6C00200000000080000000B000000000000000043AA09E642933C6442C459E000000000"
+            + "BF7C21E7000000003E3152F8001530080000000000000000006F000046F200000000001818050000001700000000000002BD00000000000002BE00000000"
+            + "000002BF000000000000019C0000000100000168000000A2000000DF000000000000003B00000000000000040000000600000059000000010000019F0000"
+            + "C350000001A079607A350000002A00025F9C0000003D0000024B000000080002BF20000000220000003C0000001C52656D61696E73206F662041626D6F7574"
+            + "682053757072656D7573000000000200000032000003F100000003000007E20000CF27397C2768000000040000000000000001000000000000000000000000"
+            + "0000000000000000000001F400000001000000040002613A000000000000C35079607A35000017A60000000000000000000000000000000100000000000000"
+            + "0000000002000000000000000000000003000000000000000000000004000000000000000000000000");
+
+        // Official live Subway capture 20260712-234401, CorpseFullUpdate packet #735.
+        // Preserve Vergil's exact 420-byte boss corpse, CATMesh 5921, body fields,
+        // and visual tail while patching runtime identity, location, credits, and
+        // MonsterData fields.
+        private static readonly byte[] CapturedSubwayVergilTemplate = HexToBytes(
+            "06ED000A000101A400000DB47944C0654F474E050000C76A00F6C01400000000080000000B0000000000000000438C819A4292093142C62FE2000000"
+            + "00BF2D43E6800000003F3C7465001530080000000000000000006F00004AE300000000001818050000001700000000000002BD00000000000002BE00"
+            + "000000000002BF000000000000019C000000010000016800000084000000DF000000010000003B000000020000000400000003000000590000000100"
+            + "00019F0000C350000001A079607AE50000002A000017210000003D0000024B000000080002BF20000000220000003C0000004000009CEB0000001952"
+            + "656D61696E73206F662056657267696C2041656E656964000000000200000032000003F100000003000007E20000CF27397C279A0000000400000000"
+            + "000000010000000000000000000000000000000000000000000001F4000000010000000400031BE4000000000000C35079607AE5000017A600000000"
+            + "0001CB9500000000000000010000258900000000000000020000258F0000000000000003000025870000000000000004000025960000000000000000");
+
         public static byte[] Build(
             ICharacter deadNpc,
             Identity corpseIdentity,
@@ -83,6 +118,40 @@ namespace ZoneEngine.Core.Packets
             int corpseMonsterData,
             int corpseCredits)
         {
+            if (deadNpc != null
+                && corpseMonsterData == NpcCombatAttackRules.CapturedSubwayVergilMonsterData)
+            {
+                return BuildCapturedSubwayVergil(
+                    deadNpc,
+                    corpseIdentity,
+                    receiver,
+                    serverId,
+                    corpseCatMesh,
+                    corpseMonsterData,
+                    corpseCredits);
+            }
+
+            CapturedEncounterRuntimeDefinition encounterRuntime;
+            if (deadNpc != null
+                && CapturedEncounterRuntimeRegistry.TryGet(
+                    deadNpc.Identity.Instance,
+                    out encounterRuntime)
+                && encounterRuntime.IsBoss
+                && string.Equals(
+                    encounterRuntime.ProfileKey,
+                    AbmouthEncounterRuntimeService.AbmouthProfileKey,
+                    StringComparison.Ordinal))
+            {
+                return BuildCapturedSubwayAbmouth(
+                    deadNpc,
+                    corpseIdentity,
+                    receiver,
+                    serverId,
+                    corpseCatMesh,
+                    corpseMonsterData,
+                    corpseCredits);
+            }
+
             OrdinaryEnemyRuntimeDefinition ordinaryRuntime = null;
             bool hasOrdinaryRuntime = deadNpc != null
                 && OrdinaryEnemyRuntimeRegistry.TryGet(
@@ -154,6 +223,76 @@ namespace ZoneEngine.Core.Packets
             WriteInt32(buffer, NameLengthOffset, encodedNameLength);
             WriteInt32(buffer, CorpseMonsterDataOffset + afterNameDelta, corpseMonsterData);
             WriteInt32(buffer, TailDeadNpcInstanceOffset + afterNameDelta, deadNpc.Identity.Instance);
+
+            return buffer;
+        }
+
+        private static byte[] BuildCapturedSubwayVergil(
+            ICharacter deadNpc,
+            Identity corpseIdentity,
+            Identity receiver,
+            int serverId,
+            int corpseCatMesh,
+            int corpseMonsterData,
+            int corpseCredits)
+        {
+            byte[] buffer = (byte[])CapturedSubwayVergilTemplate.Clone();
+            if (buffer.Length != CapturedSubwayVergilPacketLength)
+            {
+                throw new InvalidOperationException("Captured Subway Vergil corpse template length changed.");
+            }
+
+            WritePacketLength(buffer, buffer.Length);
+            WriteInt32(buffer, ServerIdOffset, serverId);
+            WriteInt32(buffer, ReceiverInstanceOffset, receiver.Instance);
+            WriteInt32(buffer, CorpseInstanceOffset, corpseIdentity.Instance);
+            WriteSingle(buffer, PositionXOffset, deadNpc.RawCoordinates.X);
+            WriteSingle(buffer, PositionYOffset, deadNpc.RawCoordinates.Y);
+            WriteSingle(buffer, PositionZOffset, deadNpc.RawCoordinates.Z);
+            WriteInt32(buffer, PlayfieldIdOffset, deadNpc.Playfield.Identity.Instance);
+            WriteInt32(buffer, DeadNpcInstanceOffset, deadNpc.Identity.Instance);
+            WriteInt32(buffer, CorpseCatMeshOffset, corpseCatMesh);
+            WriteInt32(buffer, CorpseCashValueOffset, Math.Max(0, corpseCredits));
+            WriteInt32(buffer, CapturedSubwayVergilMonsterDataOffset, corpseMonsterData);
+            WriteInt32(
+                buffer,
+                CapturedSubwayVergilTailDeadNpcInstanceOffset,
+                deadNpc.Identity.Instance);
+
+            return buffer;
+        }
+
+        private static byte[] BuildCapturedSubwayAbmouth(
+            ICharacter deadNpc,
+            Identity corpseIdentity,
+            Identity receiver,
+            int serverId,
+            int corpseCatMesh,
+            int corpseMonsterData,
+            int corpseCredits)
+        {
+            byte[] buffer = (byte[])CapturedSubwayAbmouthTemplate.Clone();
+            if (buffer.Length != CapturedSubwayAbmouthPacketLength)
+            {
+                throw new InvalidOperationException("Captured Subway Abmouth corpse template length changed.");
+            }
+
+            WritePacketLength(buffer, buffer.Length);
+            WriteInt32(buffer, ServerIdOffset, serverId);
+            WriteInt32(buffer, ReceiverInstanceOffset, receiver.Instance);
+            WriteInt32(buffer, CorpseInstanceOffset, corpseIdentity.Instance);
+            WriteSingle(buffer, PositionXOffset, deadNpc.RawCoordinates.X);
+            WriteSingle(buffer, PositionYOffset, deadNpc.RawCoordinates.Y);
+            WriteSingle(buffer, PositionZOffset, deadNpc.RawCoordinates.Z);
+            WriteInt32(buffer, PlayfieldIdOffset, deadNpc.Playfield.Identity.Instance);
+            WriteInt32(buffer, DeadNpcInstanceOffset, deadNpc.Identity.Instance);
+            WriteInt32(buffer, CorpseCatMeshOffset, corpseCatMesh);
+            WriteInt32(buffer, CorpseCashValueOffset, Math.Max(0, corpseCredits));
+            WriteInt32(buffer, CapturedSubwayAbmouthMonsterDataOffset, corpseMonsterData);
+            WriteInt32(
+                buffer,
+                CapturedSubwayAbmouthTailDeadNpcInstanceOffset,
+                deadNpc.Identity.Instance);
 
             return buffer;
         }

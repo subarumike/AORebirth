@@ -62,7 +62,6 @@ namespace ZoneEngine.Core.Packets
     public static class SimpleCharFullUpdate
     {
         private const int SubwayPlayfieldResource = 127;
-
         private static readonly byte[] CapturedSubwayFilthFleaExtendedTextureOverrideData =
             new byte[]
                 {
@@ -246,12 +245,16 @@ namespace ZoneEngine.Core.Packets
             OrdinaryEnemyRuntimeDefinition ordinaryRuntime;
             bool hasOrdinaryRuntime =
                 OrdinaryEnemyRuntimeRegistry.TryGet(character.Identity.Instance, out ordinaryRuntime);
+            CapturedEncounterRuntimeDefinition encounterRuntime;
+            bool hasEncounterRuntime =
+                CapturedEncounterRuntimeRegistry.TryGet(character.Identity.Instance, out encounterRuntime);
 
             // affected identity
             scfu.Identity = charId;
 
             scfu.Version = 57; // SCFU packet version (57/0x39)
-            if ((hasOrdinaryRuntime
+            if (hasEncounterRuntime
+                || (hasOrdinaryRuntime
                  && ordinaryRuntime.Profile.Appearance.ScfuProfile
                  == OrdinaryEnemyScfuProfile.CapturedThief)
                 || (charPlayfield == SubwayPlayfieldResource
@@ -291,14 +294,28 @@ namespace ZoneEngine.Core.Packets
             // Race
             scfu.Appearance = new Appearance
                               {
-                                  Side = (Side)sideValue,
-                                  Fatness = (Fatness)fatValue,
-                                  Breed = (Breed)breedValue,
-                                  Gender = (Gender)sexValue,
-                                  Race = raceValue
+                                  Side = hasEncounterRuntime
+                                             ? (Side)encounterRuntime.Side
+                                             : (Side)sideValue,
+                                  Fatness = hasEncounterRuntime
+                                                ? (Fatness)encounterRuntime.Fatness
+                                                : (Fatness)fatValue,
+                                  Breed = hasEncounterRuntime
+                                              ? (Breed)encounterRuntime.Breed
+                                              : (Breed)breedValue,
+                                  Gender = hasEncounterRuntime
+                                               ? (Gender)encounterRuntime.Sex
+                                               : (Gender)sexValue,
+                                  Race = hasEncounterRuntime
+                                             ? (uint)encounterRuntime.Race
+                                             : raceValue
                               }; // appearance
 
-            if (hasOrdinaryRuntime
+            if (hasEncounterRuntime)
+            {
+                scfu.Appearance.Value = encounterRuntime.AppearanceValue;
+            }
+            else if (hasOrdinaryRuntime
                 && ordinaryRuntime.Profile.Appearance.ScfuProfile
                 == OrdinaryEnemyScfuProfile.CapturedThief)
             {
@@ -412,13 +429,18 @@ namespace ZoneEngine.Core.Packets
                     | SimpleCharFullUpdateFlags.UnknownDataFlag;
             }
 
-            if (headMeshValue != 0)
+            int emittedHeadMesh = hasEncounterRuntime
+                                      ? encounterRuntime.HeadMesh
+                                      : headMeshValue;
+            if (emittedHeadMesh != 0)
             {
-                scfu.HeadMesh = (uint?)headMeshValue; // Headmesh
+                scfu.HeadMesh = (uint?)emittedHeadMesh; // Headmesh
             }
 
             // Runspeed
-            scfu.RunSpeedBase = (short)runSpeedBaseValue;
+            scfu.RunSpeedBase = hasEncounterRuntime
+                                    ? (short)encounterRuntime.CapturedScfuRunSpeedBase
+                                    : (short)runSpeedBaseValue;
 
             if (hasOrdinaryRuntime
                 && ordinaryRuntime.Profile.Appearance.ScfuProfile
@@ -516,7 +538,51 @@ namespace ZoneEngine.Core.Packets
             scfu.Flags2 = 0; // packetFlags2
             scfu.Unknown2 = 0;
 
-            if (hasOrdinaryRuntime && ordinaryRuntime.Spawn.HasCapturedScfuOverride)
+            if (hasEncounterRuntime)
+            {
+                var capturedFlags = (SimpleCharFullUpdateFlags)encounterRuntime.CapturedScfuFlags;
+                var capturedNpcInfo = scfu.CharacterInfo as SimpleNpcInfo;
+                if (capturedNpcInfo != null)
+                {
+                    capturedNpcInfo.Family = (short)encounterRuntime.NpcFamily;
+                    capturedNpcInfo.LosHeight = (short)encounterRuntime.NpcLosHeight;
+                    capturedNpcInfo.UnknownData = (byte)encounterRuntime.CapturedScfuNpcUnknownData;
+                }
+                scfu.AdditionalFlags = capturedFlags;
+                scfu.SuppressedFlags = ~capturedFlags;
+                scfu.Flags2 = (byte)encounterRuntime.CapturedScfuFlags2;
+                scfu.Unknown1 = encounterRuntime.CapturedScfuUnknown1.ToArray();
+                scfu.Unknown2 = (byte)encounterRuntime.CapturedScfuUnknown2;
+                scfu.Textures =
+                    encounterRuntime.Textures.Select(
+                        texture =>
+                            new Texture
+                            {
+                                Place = texture.Place,
+                                Id = texture.Id,
+                                Unknown = texture.Unknown
+                            }).ToArray();
+                scfu.Meshes =
+                    encounterRuntime.Meshes.Select(
+                        mesh =>
+                            new Mesh
+                            {
+                                Position = (byte)mesh.Position,
+                                Id = mesh.Id,
+                                OverrideTextureId = mesh.OverrideTextureId,
+                                Layer = (byte)mesh.Layer
+                            }).ToArray();
+                scfu.Waypoints =
+                    encounterRuntime.Waypoints.Select(
+                        waypoint =>
+                            new Vector3
+                            {
+                                X = waypoint.X,
+                                Y = waypoint.Y,
+                                Z = waypoint.Z
+                            }).ToArray();
+            }
+            else if (hasOrdinaryRuntime && ordinaryRuntime.Spawn.HasCapturedScfuOverride)
             {
                 OrdinaryEnemySpawnDefinition spawn = ordinaryRuntime.Spawn;
                 OrdinaryEnemyAppearanceProfile appearance = ordinaryRuntime.Profile.Appearance;

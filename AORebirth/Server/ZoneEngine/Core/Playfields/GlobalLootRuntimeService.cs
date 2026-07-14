@@ -11,6 +11,7 @@ namespace AORebirth.Core.Playfields
     using AORebirth.Database.Entities;
     using AORebirth.Enums;
     using ZoneEngine.Core;
+    using ZoneEngine.Core.Playfields;
     using Utility;
 
     internal sealed class GlobalLootRuntimeService
@@ -18,6 +19,15 @@ namespace AORebirth.Core.Playfields
         private const string CleaningRobotProfileKey = "captured.arete.cleaning-robot";
         private const int CleaningRobotMonsterData = 297023;
         private const int CleaningRobotCredits = 5;
+        private const int CapturedAbmouthCredits = 587;
+        private const int CapturedInfectorCredits = 150;
+        private const string CapturedVergilProfileKey = "subway.127.boss.vergil-aeneid";
+        private const int CapturedVergilMonsterData = 203748;
+        private const string CapturedAbmouthLootEvidence =
+            "official-live-capture-20260712-232137 corpse F6C002; one observed corpse, probabilities unresolved";
+        private const string CapturedVergilLootEvidence =
+            "official-live-captures 20260712-232711/234401; two observed three-item corpses and exact credit outcomes 610/587; probabilities and wider pool unresolved";
+        private static readonly int[] CapturedVergilCreditOutcomes = { 587, 610 };
         private readonly object sync = new object();
         private readonly object productionRandomSync = new object();
         private readonly Random productionRandom = new Random();
@@ -71,19 +81,35 @@ namespace AORebirth.Core.Playfields
 
         private LootGenerationContext BuildContext(ICharacter target, int playfieldId)
         {
+            CapturedEncounterRuntimeDefinition encounter;
+            bool hasEncounter = CapturedEncounterRuntimeRegistry.TryGet(
+                target.Identity.Instance,
+                out encounter);
             OrdinaryEnemyRuntimeDefinition ordinary;
             bool hasOrdinary = OrdinaryEnemyRuntimeRegistry.TryGet(target.Identity.Instance, out ordinary);
             bool owned = PetCombatRules.IsPlayerOwnedPet(target);
+            int monsterData = target.Stats[StatIds.monsterdata].Value;
+            bool isCapturedVergil = !owned && monsterData == CapturedVergilMonsterData;
             return new LootGenerationContext
             {
-                EnemyProfileKey = owned ? "owned-summon" : hasOrdinary ? ordinary.Profile.ProfileKey : LegacyProfileKey(target),
+                EnemyProfileKey = isCapturedVergil
+                    ? CapturedVergilProfileKey
+                    : hasEncounter
+                    ? encounter.ProfileKey
+                    : owned ? "owned-summon" : hasOrdinary ? ordinary.Profile.ProfileKey : LegacyProfileKey(target),
                 EnemyIdentityInstance = target.Identity.Instance,
-                MonsterData = target.Stats[StatIds.monsterdata].Value,
-                FamilyKey = hasOrdinary ? ordinary.Profile.FamilyKey : "legacy." + target.Stats[StatIds.npcfamily].Value,
+                MonsterData = monsterData,
+                FamilyKey = isCapturedVergil
+                    ? "subway.127.named-boss"
+                    : hasEncounter
+                    ? "encounter." + encounter.EncounterKey
+                    : hasOrdinary ? ordinary.Profile.FamilyKey : "legacy." + target.Stats[StatIds.npcfamily].Value,
                 Level = target.Stats[StatIds.level].Value,
                 PlayfieldId = playfieldId,
-                SpawnKey = hasOrdinary ? ordinary.Spawn.SpawnKey : null,
-                IsOwnedSummon = owned
+                SpawnKey = hasEncounter ? encounter.SpawnKey : hasOrdinary ? ordinary.Spawn.SpawnKey : null,
+                EncounterKey = hasEncounter ? encounter.EncounterKey : null,
+                IsBoss = isCapturedVergil || (hasEncounter && encounter.IsBoss),
+                IsOwnedSummon = owned && !hasEncounter
             };
         }
 
@@ -92,6 +118,24 @@ namespace AORebirth.Core.Playfields
             if (context.IsOwnedSummon) return;
             lock (this.sync)
             {
+                if (string.Equals(
+                    context.EnemyProfileKey,
+                    CapturedVergilProfileKey,
+                    StringComparison.Ordinal))
+                {
+                    this.EnsureCapturedVergil();
+                    return;
+                }
+
+                CapturedEncounterRuntimeDefinition encounter;
+                if (CapturedEncounterRuntimeRegistry.TryGet(
+                    target.Identity.Instance,
+                    out encounter))
+                {
+                    this.EnsureCapturedEncounter(encounter);
+                    return;
+                }
+
                 if (context.MonsterData == CleaningRobotMonsterData)
                 {
                     this.EnsureCleaningRobot();
@@ -109,6 +153,232 @@ namespace AORebirth.Core.Playfields
                 this.EnsureDatabaseLoaded();
                 this.EnsureLegacyTarget(target, context.EnemyProfileKey);
             }
+        }
+
+        private void EnsureCapturedEncounter(CapturedEncounterRuntimeDefinition encounter)
+        {
+            string tableKey = "captured." + encounter.ProfileKey;
+            if (this.registry.ContainsTable(tableKey)) return;
+
+            bool isAbmouth = encounter.IsBoss
+                && string.Equals(
+                    encounter.ProfileKey,
+                    AbmouthEncounterRuntimeService.AbmouthProfileKey,
+                    StringComparison.Ordinal);
+            bool isInfector = string.Equals(
+                encounter.ProfileKey,
+                AbmouthEncounterRuntimeService.InfectorProfileKey,
+                StringComparison.Ordinal);
+            if (!isAbmouth && !isInfector) return;
+
+            LootGroupDefinition[] groups = isAbmouth
+                ? new[]
+                {
+                    ObservedSnapshotGroup(0, 136622, 136623, 30),
+                    ObservedSnapshotGroup(1, 202717, 202718, 28),
+                    ObservedSnapshotGroup(2, 107933, 107934, 23),
+                    ObservedSnapshotGroup(3, 85693, 27389, 30),
+                    ObservedSnapshotGroup(4, 287146, 287146, 200)
+                }
+                : new LootGroupDefinition[0];
+            var table = new LootTableDefinition
+            {
+                LootTableKey = tableKey,
+                DisplayName = encounter.DisplayName + " captured corpse",
+                TableType = isAbmouth ? LootTableType.Boss : LootTableType.EnemyType,
+                RollGroups = groups,
+                CreditsPolicy = CreditsRange(
+                    isAbmouth ? CapturedAbmouthCredits : CapturedInfectorCredits,
+                    isAbmouth ? CapturedAbmouthCredits : CapturedInfectorCredits,
+                    LootEvidenceConfidence.ProvenCapture),
+                QualityPolicy = isAbmouth ? "captured-observed-snapshot" : "unresolved",
+                Evidence = isAbmouth ? CapturedAbmouthLootEvidence : encounter.Evidence + "; item pool unresolved",
+                Confidence = isAbmouth
+                    ? LootEvidenceConfidence.ObservedAvailableLoot
+                    : LootEvidenceConfidence.Unresolved,
+                ItemPoolUnresolved = true,
+                Enabled = true
+            };
+            this.registry.RegisterTable(table);
+            this.registry.RegisterAssignment(new LootAssignmentDefinition
+            {
+                AssignmentKey = tableKey,
+                TargetType = isAbmouth
+                    ? LootAssignmentTargetType.Boss
+                    : LootAssignmentTargetType.EnemyType,
+                TargetKey = encounter.ProfileKey,
+                LootTableKey = tableKey,
+                PlayfieldId = AbmouthEncounterRuntimeService.SubwayPlayfieldId,
+                EncounterKey = encounter.EncounterKey,
+                Priority = 0,
+                Conditions = new string[0],
+                Evidence = table.Evidence,
+                Confidence = table.Confidence,
+                Enabled = true
+            });
+        }
+
+        private void EnsureCapturedVergil()
+        {
+            string tableKey = "captured." + CapturedVergilProfileKey;
+            if (this.registry.ContainsTable(tableKey)) return;
+
+            this.registry.RegisterTable(new LootTableDefinition
+            {
+                LootTableKey = tableKey,
+                DisplayName = "Vergil Aeneid captured corpse alternatives",
+                TableType = LootTableType.Boss,
+                RollGroups = new[]
+                {
+                    ObservedAlternativeGroup(
+                        0,
+                        ObservedAlternativeEntry(
+                            "capture.20260712-232711",
+                            301713,
+                            301713,
+                            1,
+                            CapturedVergilLootEvidence),
+                        ObservedAlternativeEntry(
+                            "capture.20260712-234401",
+                            301714,
+                            301714,
+                            1,
+                            CapturedVergilLootEvidence)),
+                    ObservedAlternativeGroup(
+                        1,
+                        ObservedAlternativeEntry(
+                            "capture.20260712-232711",
+                            202743,
+                            202744,
+                            32,
+                            CapturedVergilLootEvidence),
+                        ObservedAlternativeEntry(
+                            "capture.20260712-234401",
+                            123571,
+                            123572,
+                            23,
+                            CapturedVergilLootEvidence)),
+                    ObservedSnapshotGroup(
+                        2,
+                        287146,
+                        287146,
+                        200,
+                        CapturedVergilLootEvidence)
+                },
+                CreditsPolicy = CreditsObservedSet(CapturedVergilCreditOutcomes),
+                QualityPolicy = "captured-observed-alternatives",
+                Evidence = CapturedVergilLootEvidence,
+                Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                ItemPoolUnresolved = true,
+                Enabled = true
+            });
+            this.registry.RegisterAssignment(new LootAssignmentDefinition
+            {
+                AssignmentKey = tableKey,
+                TargetType = LootAssignmentTargetType.Boss,
+                TargetKey = CapturedVergilProfileKey,
+                LootTableKey = tableKey,
+                PlayfieldId = NpcCombatAttackRules.CapturedSubwayPlayfield,
+                Priority = 0,
+                Conditions = new string[0],
+                Evidence = CapturedVergilLootEvidence,
+                Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                Enabled = true
+            });
+        }
+
+        private static LootGroupDefinition ObservedAlternativeGroup(
+            int slot,
+            params LootEntryDefinition[] entries)
+        {
+            return new LootGroupDefinition
+            {
+                LootGroupKey = "observed.slot." + slot.ToString(CultureInfo.InvariantCulture),
+                RollMode = LootRollMode.WeightedOne,
+                RollCount = 1,
+                EmptyWeight = 0,
+                DropChanceBasisPoints = 0,
+                Entries = entries ?? new LootEntryDefinition[0],
+                Conditions = new string[0]
+            };
+        }
+
+        private static LootEntryDefinition ObservedAlternativeEntry(
+            string selectionKey,
+            int itemTemplateId,
+            int highItemTemplateId,
+            int quality,
+            string evidence)
+        {
+            return new LootEntryDefinition
+            {
+                SelectionKey = selectionKey,
+                ItemTemplateId = itemTemplateId,
+                HighItemTemplateId = highItemTemplateId,
+                FixedQuality = quality,
+                MinimumQuality = quality,
+                MaximumQuality = quality,
+                MinimumQuantity = 1,
+                MaximumQuantity = 1,
+                Weight = 1,
+                DropChanceBasisPoints = 0,
+                UniquePerCorpse = true,
+                Semantics = LootSemantics.ObservedAvailable,
+                Evidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                EvidenceReference = evidence + "; " + selectionKey
+            };
+        }
+
+        private static LootGroupDefinition ObservedSnapshotGroup(
+            int slot,
+            int itemTemplateId,
+            int highItemTemplateId,
+            int quality)
+        {
+            return ObservedSnapshotGroup(
+                slot,
+                itemTemplateId,
+                highItemTemplateId,
+                quality,
+                CapturedAbmouthLootEvidence);
+        }
+
+        private static LootGroupDefinition ObservedSnapshotGroup(
+            int slot,
+            int itemTemplateId,
+            int highItemTemplateId,
+            int quality,
+            string evidence)
+        {
+            string slotKey = "observed.slot." + slot.ToString(CultureInfo.InvariantCulture);
+            return new LootGroupDefinition
+            {
+                LootGroupKey = slotKey,
+                RollMode = LootRollMode.ObservedSnapshot,
+                RollCount = 1,
+                DropChanceBasisPoints = 0,
+                Entries = new[]
+                {
+                    new LootEntryDefinition
+                    {
+                        SelectionKey = slotKey,
+                        ItemTemplateId = itemTemplateId,
+                        HighItemTemplateId = highItemTemplateId,
+                        FixedQuality = quality,
+                        MinimumQuality = quality,
+                        MaximumQuality = quality,
+                        MinimumQuantity = 1,
+                        MaximumQuantity = 1,
+                        Weight = 0,
+                        DropChanceBasisPoints = 0,
+                        UniquePerCorpse = true,
+                        Semantics = LootSemantics.ObservedAvailable,
+                        Evidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                        EvidenceReference = evidence + "; " + slotKey
+                    }
+                },
+                Conditions = new string[0]
+            };
         }
 
         private void EnsureOrdinary(OrdinaryEnemyProfile profile, int targetLevel)
@@ -376,6 +646,31 @@ namespace AORebirth.Core.Playfields
                 MinimumCredits = minimum,
                 MaximumCredits = maximum,
                 Evidence = evidence
+            };
+        }
+
+        private static CreditsPolicyDefinition CreditsObservedSet(params int[] outcomes)
+        {
+            int[] observed = (outcomes ?? new int[0])
+                .Distinct()
+                .OrderBy(value => value)
+                .ToArray();
+            if (observed.Length == 0)
+            {
+                return new CreditsPolicyDefinition
+                {
+                    Mode = CreditsPolicyMode.Unresolved,
+                    Evidence = LootEvidenceConfidence.Unresolved
+                };
+            }
+
+            return new CreditsPolicyDefinition
+            {
+                Mode = CreditsPolicyMode.ObservedSet,
+                MinimumCredits = observed[0],
+                MaximumCredits = observed[observed.Length - 1],
+                ObservedCredits = observed,
+                Evidence = LootEvidenceConfidence.ObservedAvailableLoot
             };
         }
 

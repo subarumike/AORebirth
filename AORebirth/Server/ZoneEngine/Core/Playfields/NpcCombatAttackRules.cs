@@ -56,6 +56,122 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayThiefMonsterData = 26092;
 
+        public const int CapturedSubwayDisobedientBotMonsterData = 17649;
+
+        public const int CapturedSubwayDisobedientBotMinimumDamage = 10;
+
+        public const int CapturedSubwayDisobedientBotMaximumDamage = 11;
+
+        public const double CapturedSubwayDisobedientBotInitialAttackSeconds = 3.270444;
+
+        public const double CapturedSubwayDisobedientBotRechargeSeconds = 5.973723;
+
+        public const int CapturedSubwayDisobedientBotWeaponSlot = 0;
+
+        public const int CapturedSubwayDisobedientBotLowTemplate = 0x00023566;
+
+        public const int CapturedSubwayDisobedientBotHighTemplate = 0x00023567;
+
+        public const int CapturedSubwayDisobedientBotWeaponTag = 0x53495731;
+
+        public const string CapturedSubwayDisobedientBotWeaponName = "SIW1";
+
+        public const int CapturedSubwayDisobedientBotSpecialAttackWeaponValue = 49;
+
+        public const int CapturedSubwayDisobedientBotSpecialAttackWeaponLastValue = 0;
+
+        public const int CapturedSubwayVergilMonsterData = 203748;
+
+        public const int CapturedSubwayVergilWeaponTemplate = 122123;
+
+        public const int CapturedSubwayVergilWeaponQuality = 23;
+
+        public const int CapturedSubwayVergilWeaponDamageMinimumOverride = 0;
+
+        public const int CapturedSubwayVergilWeaponDamageMaximumOverride = 0;
+
+        public const double CapturedSubwayVergilAttackStartDelaySeconds = 0.646433;
+
+        public const double CapturedSubwayVergilMovementTransitionDelaySeconds = 0.001000;
+
+        public const double CapturedSubwayVergilFirstHitDelaySeconds = 2.787410;
+
+        public const double CapturedSubwayVergilRechargeOverrideSeconds = 0.0;
+
+        public const int CapturedSubwayVergilInitialAttackInfoAmmoCount = 19;
+
+        public const int CapturedSubwayVergilAttackInfoUnknown = 0;
+
+        public const int CapturedSubwayVergilSpecialAttackWeaponValue = 167;
+
+        public const int CapturedSubwayVergilSpecialAttackWeaponLastValue = 0;
+
+        public const int CapturedSubwayAbmouthMonsterData = 155962;
+
+        public const int CapturedSubwayAbmouthXopzMinimumDamage = 74;
+
+        public const int CapturedSubwayAbmouthXopzMaximumDamage = 96;
+
+        public const double CapturedSubwayAbmouthXopzFirstInitialSeconds = 0.0;
+
+        public const double CapturedSubwayAbmouthDenwInitialSeconds = 1.476528;
+
+        public const double CapturedSubwayAbmouthXopzSecondInitialSeconds = 3.425454;
+
+        public const double CapturedSubwayAbmouthAttackCycleSeconds = 6.3;
+
+        public const int CapturedSubwayAbmouthXopzWeaponSlot = 1;
+
+        public const int CapturedSubwayAbmouthXopzLowTemplate = 203781;
+
+        public const int CapturedSubwayAbmouthXopzHighTemplate = 203782;
+
+        public const int CapturedSubwayAbmouthXopzTag = 0x584F505A;
+
+        public const string CapturedSubwayAbmouthXopzName = "XOPZ";
+
+        public const int CapturedSubwayAbmouthDenwMinimumDamage = 115;
+
+        public const int CapturedSubwayAbmouthDenwMaximumDamage = 126;
+
+        public const int CapturedSubwayAbmouthDenwWeaponSlot = 0;
+
+        public const int CapturedSubwayAbmouthDenwLowTemplate = 203778;
+
+        public const int CapturedSubwayAbmouthDenwHighTemplate = 203779;
+
+        public const int CapturedSubwayAbmouthDenwTag = 0x44454E57;
+
+        public const string CapturedSubwayAbmouthDenwName = "DENW";
+
+        public const int CapturedSubwayAbmouthSpecialAttackWeaponValue = 167;
+
+        public const int CapturedSubwayAbmouthSpecialAttackWeaponLastValue = 0;
+
+        public const int CapturedSubwayAbmouthInfectorMonsterData = 31909;
+
+        public const int CapturedSubwayAbmouthInfectorMinimumDamage = 21;
+
+        public const int CapturedSubwayAbmouthInfectorMaximumDamage = 26;
+
+        public const double CapturedSubwayAbmouthInfectorInitialAttackSeconds = 2.2;
+
+        public const double CapturedSubwayAbmouthInfectorRechargeSeconds = 3.7;
+
+        public const int CapturedSubwayAbmouthInfectorWeaponSlot = 0;
+
+        public const int CapturedSubwayAbmouthInfectorLowTemplate = 201062;
+
+        public const int CapturedSubwayAbmouthInfectorHighTemplate = 201063;
+
+        public const int CapturedSubwayAbmouthInfectorTag = 0x444D5846;
+
+        public const string CapturedSubwayAbmouthInfectorName = "DMXF";
+
+        public const int CapturedSubwayAbmouthInfectorSpecialAttackWeaponValue = 107;
+
+        public const int CapturedSubwayAbmouthInfectorSpecialAttackWeaponLastValue = 100;
+
         public const int NpcUnarmedRightAttackInfoWeaponSlot = 0;
 
         public const int NpcUnarmedLeftAttackInfoWeaponSlot = 1;

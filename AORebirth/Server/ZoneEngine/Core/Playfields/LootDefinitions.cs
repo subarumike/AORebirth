@@ -10,7 +10,7 @@ namespace AORebirth.Core.Playfields
         DynaLevelBand, DynaFamily, Encounter, Mission, Dungeon, Event, Quest
     }
 
-    internal enum LootRollMode { All, WeightedOne, WeightedMany, Independent, Guaranteed }
+    internal enum LootRollMode { All, WeightedOne, WeightedMany, Independent, Guaranteed, ObservedSnapshot }
     internal enum LootEvidenceConfidence
     {
         ProvenRepository, ProvenCapture, ProvenPrimarySource, CommunityDocumented,
@@ -25,7 +25,7 @@ namespace AORebirth.Core.Playfields
         Global, Family, EnemyType, Spawn, Boss, DynaGlobal, DynaLevelBand,
         DynaFamily, Encounter, Mission, Dungeon, Event, Quest
     }
-    internal enum CreditsPolicyMode { None, Fixed, Range, Unresolved }
+    internal enum CreditsPolicyMode { None, Fixed, Range, ObservedSet, Unresolved }
     internal enum CorpseLootRightsPolicy { Public, OwnerOnly, Team, Personal, Scripted, Unresolved }
 
     internal sealed class CreditsPolicyDefinition
@@ -33,6 +33,7 @@ namespace AORebirth.Core.Playfields
         internal CreditsPolicyMode Mode { get; set; }
         internal int MinimumCredits { get; set; }
         internal int MaximumCredits { get; set; }
+        internal int[] ObservedCredits { get; set; }
         internal LootEvidenceConfidence Evidence { get; set; }
     }
 
@@ -75,6 +76,7 @@ namespace AORebirth.Core.Playfields
         internal string QualityPolicy { get; set; }
         internal string Evidence { get; set; }
         internal LootEvidenceConfidence Confidence { get; set; }
+        internal bool ItemPoolUnresolved { get; set; }
         internal bool Enabled { get; set; }
     }
 
@@ -202,6 +204,27 @@ namespace AORebirth.Core.Playfields
             if (policy.Mode == CreditsPolicyMode.Fixed && policy.MinimumCredits != policy.MaximumCredits)
             {
                 throw new LootDefinitionValidationException("Fixed credits require equal bounds in " + tableKey);
+            }
+            if (policy.Mode == CreditsPolicyMode.ObservedSet)
+            {
+                int[] outcomes = (policy.ObservedCredits ?? new int[0])
+                    .Distinct()
+                    .OrderBy(value => value)
+                    .ToArray();
+                if (outcomes.Length == 0 || outcomes.Any(value => value < 0))
+                {
+                    throw new LootDefinitionValidationException(
+                        "Observed credits require at least one non-negative outcome in " + tableKey);
+                }
+
+                if (policy.MinimumCredits != outcomes[0]
+                    || policy.MaximumCredits != outcomes[outcomes.Length - 1])
+                {
+                    throw new LootDefinitionValidationException(
+                        "Observed credit bounds must match the captured outcome set in " + tableKey);
+                }
+
+                policy.ObservedCredits = outcomes;
             }
         }
 
