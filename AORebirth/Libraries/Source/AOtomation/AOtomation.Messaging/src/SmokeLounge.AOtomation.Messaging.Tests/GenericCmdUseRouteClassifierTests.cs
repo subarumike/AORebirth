@@ -209,6 +209,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string statelTransitions =
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs");
             string playfield = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+            string playfieldLoader =
+                ReadRepositoryFile(@"AORebirth\Libraries\Source\PlayfieldLoader\PlayfieldLoader.cs");
             string project = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
 
             AssertContains(rules, "public const int CapturedSubwayPlayfieldId = 127;");
@@ -226,15 +228,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(statelTransitions, "private const uint CapturedSubwayEntrySourceDoorInstance = 0xC01A028F;");
             AssertContains(statelTransitions, "private const float CapturedSubwayEntranceLandingX = 71.4f;");
             AssertContains(statelTransitions, "TryHandleCapturedSubwayProxyEntry");
-            AssertContains(statelTransitions, "private const float CapturedSubwayExitSourceX = 64.2f;");
-            AssertContains(statelTransitions, "TryHandleCapturedSubwayProxyExit");
-            AssertContains(statelTransitions, "Func<ICharacter, ProxyPlayfieldExitDestination> resolveProxyExitDestination");
-            AssertContains(playfield, "ResolveProxyExitDestination");
-            AssertContains(playfield, "character.Stats[StatIds.externaldoorinstance].BaseValue");
-            AssertContains(playfield, "character.Stats[StatIds.externalplayfieldinstance].Value");
-            AssertContains(playfield, "externalPlayfieldId == 655 && externalDoorInstance == 0xC01A028F");
-            AssertContains(playfield, "position.x = 3294.2f;");
-            AssertContains(playfield, "position.z = 843.7f;");
+            Assert.IsFalse(
+                statelTransitions.Contains("TryHandleCapturedSubwayProxyExit")
+                || statelTransitions.Contains("CapturedSubwayExitSource")
+                || playfield.Contains("ResolveProxyExitDestination"),
+                "Walking through the PF127 entrance room must not invoke the unproven position-only proxy exit.");
+            AssertContains(playfieldLoader, "private const int SubwayPlayfieldId = 127;");
+            AssertContains(
+                playfieldLoader,
+                "private const int SubwayEntranceDestinationDoorInstance = unchecked((int)0xC006007F);");
+            AssertContains(
+                playfieldLoader,
+                "if (foundproxyteleport && resolvedDestinationPlayfieldId == SubwayPlayfieldId)");
+            AssertContains(playfieldLoader, "playfieldid = SubwayPlayfieldId;");
+            AssertContains(
+                playfieldLoader,
+                "doorinstance = SubwayEntranceDestinationDoorInstance;");
+            AssertContains(playfieldLoader, "ShouldSynthesizeReverseProxyExit(");
+            AssertContains(playfieldLoader, "destinationPlayfieldId != SubwayPlayfieldId");
+            AssertContains(
+                playfieldLoader,
+                "destinationDoorInstance == SubwayEntranceDestinationDoorInstance");
+            Assert.IsFalse(
+                playfieldLoader.Contains("RemoveSubwayNonEntranceDoorStatels"),
+                "PF127 ordinary interior door statels must remain loaded.");
             AssertContains(project, @"Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs");
         }
 

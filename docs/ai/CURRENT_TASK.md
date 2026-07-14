@@ -2,24 +2,26 @@
 
 ## Current Focus
 
-Alien XP / Alien Level (AIXP) — capture-backed completion of kill rewards and AI level 1–30 progression.
+Complete the Subway dungeon, resource/playfield `127`, through incremental capture-backed implementation and live validation.
 
 ## Done in this slice
 
-- Award AIXP when killing mobs marked with Flags bit `0x4000` (Alien Invasion templates such as Alien Spider - Zix).
-- Progress Alien Level 1–30 using existing `XPTable.TableAlienXP` thresholds.
-- Enforce Rubi-Ka min-level gates: fill AIXP bar up to next AI need while gated (e.g. RK15/AI2 → 22500), then stop AIXP until next RK min; auto AI level when RK unlocks (login / RK level-up).
-- Test spider: level 7, 500 AIXP/kill, respects bar/RK caps (no gate bypass).
-- InvadersKilled / KilledByInvaders counters; no AIXP loss on death.
+- Synced and consolidated `origin/master` without discarding the existing Subway work.
+- Preserved the confirmed PF127 entrance reverse exit while removing the unproven position-only proxy exit that force-zoned players from inside the Subway.
+- Preserved ordinary PF127 interior door statels and canonicalized inbound proxy travel to entrance door `0xC006007F`.
+- Preserved both the incoming inventory-use regressions and the local Subway door regressions in the shared test file.
+- Added the completed Disobedient Bot combat packet byte-vector regression.
+- Retained the incoming Alien XP, stim/recharger, combat, and inventory changes as merged work; Alien XP is not the active Subway priority.
 
 ## Remaining
 
-1. Capture live AXP-per-kill amounts vs mob level / con color (current formula is provisional: `max(10, mobLevel*25)` with grey-cap).
-2. Confirm live chat and Stat packet order for AIXP / Alien Level-up.
-3. IPR grants at AI 15 and AI 30 (deferred).
-4. Mike live-validates kills on alien-flagged templates; if an already-stuck over-cap bar remains from older writes, clamp/reset once.
+1. Live-validate Vergil Aeneid retaliation after the hostile-NPC suppression-gas fix.
+2. Live-validate that only the confirmed Subway entrance door exits PF127 and that ordinary interior doors no longer force-zone the player.
+3. Continue room-by-room Subway population, encounter, object, loot, and progression work from completed captures.
 
 ## Constraints
 
-- Do not invent capture-shaped AXP wire packets without evidence.
-- Keep regular RK combat XP path unchanged except the Alien award hook after kill XP.
+- Use official-live capture evidence for Subway behavior and content.
+- Do not reintroduce a position-only PF127 proxy exit.
+- Do not remove ordinary Subway interior door statels.
+- Do not treat provisional Alien XP reward values as capture-confirmed.

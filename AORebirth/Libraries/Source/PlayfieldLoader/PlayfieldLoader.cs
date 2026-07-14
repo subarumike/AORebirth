@@ -64,6 +64,10 @@ namespace ZoneEngine.Core.Playfields
         /// </summary>
         public static Dictionary<int, PlayfieldData> PFData = new Dictionary<int, PlayfieldData>();
 
+        private const int SubwayPlayfieldId = 127;
+
+        private const int SubwayEntranceDestinationDoorInstance = unchecked((int)0xC006007F);
+
         #endregion
 
         #region Public Methods and Operators
@@ -99,6 +103,7 @@ namespace ZoneEngine.Core.Playfields
                 {
                     bool foundproxyteleport = false;
                     int playfieldid = 0;
+                    int resolvedDestinationPlayfieldId = 0;
                     int doorinstance = 0;
                     foreach (Event ev in sd.Events)
                     {
@@ -108,6 +113,7 @@ namespace ZoneEngine.Core.Playfields
                             {
                                 foundproxyteleport = true;
                                 playfieldid = f.Arguments.Values[1].AsInt32();
+                                resolvedDestinationPlayfieldId = playfieldid;
                                 doorinstance =
                                     unchecked(
                                         (int)
@@ -125,6 +131,7 @@ namespace ZoneEngine.Core.Playfields
                                 if (teleporter != null)
                                 {
                                     doorinstance = (int)teleporter.destinationInstance;
+                                    resolvedDestinationPlayfieldId = teleporter.destinationPlayfield;
                                     f.Arguments.Values[1] = new MessagePackObject(teleporter.destinationPlayfield);
                                     f.Arguments.Values[2] = new MessagePackObject(((doorinstance >> 16) & 0xff));
                                 }
@@ -174,7 +181,16 @@ namespace ZoneEngine.Core.Playfields
                         }
                     }
 
-                    if (foundproxyteleport)
+                    if (foundproxyteleport && resolvedDestinationPlayfieldId == SubwayPlayfieldId)
+                    {
+                        playfieldid = SubwayPlayfieldId;
+                        doorinstance = SubwayEntranceDestinationDoorInstance;
+                    }
+
+                    if (foundproxyteleport
+                        && ShouldSynthesizeReverseProxyExit(
+                            resolvedDestinationPlayfieldId,
+                            doorinstance))
                     {
                         if (PFData.ContainsKey(playfieldid))
                         {
@@ -196,6 +212,16 @@ namespace ZoneEngine.Core.Playfields
             }
 
             return PFData.Count;
+        }
+
+        private static bool ShouldSynthesizeReverseProxyExit(
+            int destinationPlayfieldId,
+            int destinationDoorInstance)
+        {
+            // PF127 contains ordinary interior doors. Only its confirmed entrance door
+            // may receive the synthetic reverse-proxy exit used to leave the Subway.
+            return destinationPlayfieldId != SubwayPlayfieldId
+                   || destinationDoorInstance == SubwayEntranceDestinationDoorInstance;
         }
 
         #endregion
