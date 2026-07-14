@@ -545,6 +545,37 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void PvpAuthorizationDoesNotBlockHostileNpcRetaliationInHighGas()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string rulesText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PlayerVersusPlayerCombatRules.cs"));
+            string playerControlledCombatant = ExtractMethodBlock(
+                rulesText,
+                "internal static bool IsPlayerControlledCombatant");
+            string canEngage = ExtractMethodBlock(
+                rulesText,
+                "internal static bool CanEngagePlayerVersusPlayerCombat");
+
+            Assert.IsTrue(
+                playerControlledCombatant.Contains("IsPlayerCharacter(character)")
+                && playerControlledCombatant.Contains("PetCombatRules.IsPlayerOwnedPet(character)"),
+                "PvP authorization must identify only players and player-owned pets as player-controlled attackers.");
+            Assert.IsTrue(
+                canEngage.Contains("!IsPlayerControlledCombatant(attacker)")
+                && canEngage.Contains("!IsProtectedPlayerVersusPlayerTarget(target)")
+                && canEngage.Contains("return true;"),
+                "Ordinary hostile NPCs must bypass player suppression-gas authorization and retain player retaliation targets.");
+            AssertTextBefore(
+                canEngage,
+                "!IsPlayerControlledCombatant(attacker)",
+                "int attackerGas = ResolveSuppressionGas(attacker);");
+            Assert.IsTrue(
+                canEngage.Contains("return IsPvpFlagged(attacker) || IsPvpFlagged(target);"),
+                "Player and player-owned-pet combat against protected targets must remain suppression-gas gated.");
+        }
+
+        [TestMethod]
         public void PlayerCombatRuntimeServiceFinalBoundaryOwnsLifecycleOrchestrationOnly()
         {
             string repositoryRoot = FindRepositoryRoot();
