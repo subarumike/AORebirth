@@ -43,6 +43,11 @@ namespace ZoneEngine.Core
             return IsPlayerCharacter(target) || IsPlayerOwnedPetTarget(target);
         }
 
+        internal static bool IsPlayerControlledCombatant(ICharacter character)
+        {
+            return IsPlayerCharacter(character) || PetCombatRules.IsPlayerOwnedPet(character);
+        }
+
         internal static bool CanEngagePlayerVersusPlayerCombat(ICharacter attacker, ICharacter target)
         {
             if (attacker == null || target == null)
@@ -50,7 +55,8 @@ namespace ZoneEngine.Core
                 return false;
             }
 
-            if (!IsProtectedPlayerVersusPlayerTarget(target))
+            if (!IsPlayerControlledCombatant(attacker)
+                || !IsProtectedPlayerVersusPlayerTarget(target))
             {
                 return true;
             }
