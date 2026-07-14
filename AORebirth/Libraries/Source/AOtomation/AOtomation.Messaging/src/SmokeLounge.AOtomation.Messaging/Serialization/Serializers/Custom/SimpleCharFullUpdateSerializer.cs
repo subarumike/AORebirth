@@ -15,9 +15,11 @@
 namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq.Expressions;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     // TODO: Check the client side of this message for the possibly missing parts.
@@ -57,7 +59,173 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             SerializationContext serializationContext,
             PropertyMetaData propertyMetaData = null)
         {
-            return new SimpleCharFullUpdateMessage();
+            long bodyStart = streamReader.Position;
+            byte[] rawBody = streamReader.ReadBytes((int)(streamReader.Length - bodyStart));
+            streamReader.Position = bodyStart;
+
+            var message = new SimpleCharFullUpdateMessage
+            {
+                RawBody = rawBody,
+                N3MessageType = (N3MessageType)streamReader.ReadInt32(),
+                Identity = streamReader.ReadIdentity(),
+                Unknown = streamReader.ReadByte(),
+                Version = streamReader.ReadByte(),
+                Flags = (SimpleCharFullUpdateFlags)streamReader.ReadInt32()
+            };
+
+            SimpleCharFullUpdateFlags flags = message.Flags;
+            if (flags.HasFlag(SimpleCharFullUpdateFlags.HasPlayfieldId))
+            {
+                message.PlayfieldId = streamReader.ReadInt32();
+            }
+
+            if (flags.HasFlag(SimpleCharFullUpdateFlags.HasFightingTarget))
+            {
+                message.FightingTarget = streamReader.ReadIdentity();
+            }
+
+            message.Coordinates = ReadVector3(streamReader);
+            if (flags.HasFlag(SimpleCharFullUpdateFlags.HasHeading))
+            {
+                message.Heading = new Quaternion
+                {
+                    X = streamReader.ReadSingle(),
+                    Y = streamReader.ReadSingle(),
+                    Z = streamReader.ReadSingle(),
+                    W = streamReader.ReadSingle()
+                };
+            }
+
+            message.Appearance = new Appearance { Value = streamReader.ReadUInt32() };
+            message.Name = streamReader.ReadString(streamReader.ReadByte());
+            message.CharacterFlags = (CharacterFlags)streamReader.ReadInt32();
+            message.AccountFlags = streamReader.ReadInt16();
+            message.Expansions = streamReader.ReadInt16();
+
+            if (flags.HasFlag(SimpleCharFullUpdateFlags.IsNpc))
+            {
+                var npc = new SimpleNpcInfo
+                {
+                    Family = flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallNpcFamily)
+                                 ? streamReader.ReadByte()
+                                 : streamReader.ReadInt16(),
+                    LosHeight = flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallNpcLosHeight)
+                                    ? streamReader.ReadByte()
+                                    : streamReader.ReadInt16(),
+                    UnknownData = flags.HasFlag(SimpleCharFullUpdateFlags.UnknownDataFlag)
+                                      ? streamReader.ReadByte()
+                                      : streamReader.ReadInt16(),
+                    UnknownData2 = streamReader.ReadInt16()
+                };
+                if (npc.UnknownData2 > 0)
+                {
+                    npc.UnknownData3 = streamReader.ReadByte();
+                }
+
+                message.CharacterInfo = npc;
+            }
+            else
+            {
+                var pc = new SimplePcInfo
+                {
+                    CurrentNano = streamReader.ReadUInt32(),
+                    Team = streamReader.ReadInt32(),
+                    Swim = streamReader.ReadInt16(),
+                    StrengthBase = streamReader.ReadInt16(),
+                    AgilityBase = streamReader.ReadInt16(),
+                    StaminaBase = streamReader.ReadInt16(),
+                    IntelligenceBase = streamReader.ReadInt16(),
+                    SenseBase = streamReader.ReadInt16(),
+                    PsychicBase = streamReader.ReadInt16(),
+                    FirstName = string.Empty,
+                    LastName = string.Empty,
+                    OrgName = string.Empty
+                };
+                if (message.CharacterFlags.HasFlag(CharacterFlags.HasVisibleName))
+                {
+                    pc.FirstName = streamReader.ReadString(streamReader.ReadInt16());
+                    pc.LastName = streamReader.ReadString(streamReader.ReadInt16());
+                }
+
+                if (flags.HasFlag(SimpleCharFullUpdateFlags.HasOrgName))
+                {
+                    pc.OrgName = streamReader.ReadString(streamReader.ReadInt16());
+                }
+
+                message.CharacterInfo = pc;
+            }
+
+            message.Level = flags.HasFlag(SimpleCharFullUpdateFlags.HasExtendedLevel)
+                                ? streamReader.ReadInt16()
+                                : streamReader.ReadByte();
+            message.Health = flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallHealth)
+                                 ? streamReader.ReadInt16()
+                                 : streamReader.ReadInt32();
+            if (flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallHealthDamage))
+            {
+                message.HealthDamage = streamReader.ReadByte();
+            }
+            else if (flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallHealth))
+            {
+                message.HealthDamage = streamReader.ReadInt16();
+            }
+            else
+            {
+                message.HealthDamage = streamReader.ReadInt32();
+            }
+
+            message.MonsterData = streamReader.ReadUInt32();
+            message.MonsterScale = streamReader.ReadInt16();
+            message.VisualFlags = streamReader.ReadInt16();
+            message.VisibleTitle = streamReader.ReadByte();
+
+            int unknownLength = streamReader.ReadInt32();
+            if (unknownLength < 0 || unknownLength > streamReader.Length - streamReader.Position)
+            {
+                throw new System.IO.InvalidDataException("Invalid SimpleCharFullUpdate Unknown1 length.");
+            }
+
+            message.Unknown1 = streamReader.ReadBytes(unknownLength);
+            if (flags.HasFlag(SimpleCharFullUpdateFlags.HasHeadMesh))
+            {
+                message.HeadMesh = streamReader.ReadUInt32();
+            }
+
+            message.RunSpeedBase = flags.HasFlag(SimpleCharFullUpdateFlags.HasExtendedRunSpeed)
+                                       ? streamReader.ReadInt16()
+                                       : streamReader.ReadByte();
+            if (flags.HasFlag(SimpleCharFullUpdateFlags.IsUnderAttack))
+            {
+                message.FightingTarget = streamReader.ReadIdentity();
+            }
+
+            byte[] remaining = streamReader.ReadBytes((int)(streamReader.Length - streamReader.Position));
+            ScfuTail tail;
+            if (TryDecodeTail(remaining, flags, message.Identity, out tail))
+            {
+                message.ExtendedTextureOverrideData = tail.ExtendedTextureOverrideData;
+                message.ActiveNanos = tail.ActiveNanos;
+                message.Waypoints = tail.Waypoints;
+                message.Textures = tail.Textures;
+                message.Meshes = tail.Meshes;
+                message.Flags2 = tail.Flags2;
+                message.Unknown2 = tail.Unknown2;
+                message.Unknown4 = tail.Unknown4;
+                message.TailFullyDecoded = true;
+                message.UndecodedTail = new byte[0];
+            }
+            else
+            {
+                message.ExtendedTextureOverrideData = new byte[0];
+                message.ActiveNanos = new ActiveNano[0];
+                message.Waypoints = new Vector3[0];
+                message.Textures = new Texture[0];
+                message.Meshes = new Mesh[0];
+                message.TailFullyDecoded = false;
+                message.UndecodedTail = remaining;
+            }
+
+            return message;
         }
 
         public Expression DeserializerExpression(
@@ -171,12 +339,13 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 // SimpleCharFullUPdateFlags.UnknownDataFlag
                 // unset if short, set if byte
                 flags |= SimpleCharFullUpdateFlags.UnknownDataFlag;
-                streamWriter.WriteByte(0);
+                streamWriter.WriteByte((byte)snpc.UnknownData);
 
-                // Missing data:
-                // short
-                // if greater than 0 add another byte
-                streamWriter.WriteInt16(0);
+                streamWriter.WriteInt16(snpc.UnknownData2);
+                if (snpc.UnknownData2 > 0)
+                {
+                    streamWriter.WriteByte(snpc.UnknownData3);
+                }
 
                 flags |= SimpleCharFullUpdateFlags.UnknownFlag;
                 flags |= SimpleCharFullUpdateFlags.UnknownFlag2;
@@ -368,6 +537,10 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
 
             streamWriter.WriteInt32(scfu.Flags2);
             streamWriter.WriteByte(scfu.Unknown2);
+            if ((scfu.Flags2 & 0x2) != 0)
+            {
+                streamWriter.WriteByte(scfu.Unknown4);
+            }
 
             flags |= scfu.AdditionalFlags;
             flags &= ~scfu.SuppressedFlags;
@@ -410,6 +583,203 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                         Expression.Constant(propertyMetaData, typeof(PropertyMetaData))
                     });
             return callExp;
+        }
+
+        private static Vector3 ReadVector3(StreamReader streamReader)
+        {
+            return new Vector3
+            {
+                X = streamReader.ReadSingle(),
+                Y = streamReader.ReadSingle(),
+                Z = streamReader.ReadSingle()
+            };
+        }
+
+        private static bool TryDecodeTail(
+            byte[] bytes,
+            SimpleCharFullUpdateFlags flags,
+            Identity identity,
+            out ScfuTail result)
+        {
+            result = null;
+            int firstOffset = flags.HasFlag(SimpleCharFullUpdateFlags.HasExtendedTextures) ? 1 : 0;
+            int lastOffset = flags.HasFlag(SimpleCharFullUpdateFlags.HasExtendedTextures)
+                                 ? Math.Max(1, bytes.Length - 17)
+                                 : 0;
+
+            for (int offset = firstOffset; offset <= lastOffset; offset++)
+            {
+                ScfuTail candidate;
+                if (TryDecodeTailAt(bytes, offset, flags, identity, out candidate))
+                {
+                    candidate.ExtendedTextureOverrideData = new byte[offset];
+                    Buffer.BlockCopy(bytes, 0, candidate.ExtendedTextureOverrideData, 0, offset);
+                    result = candidate;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryDecodeTailAt(
+            byte[] bytes,
+            int offset,
+            SimpleCharFullUpdateFlags flags,
+            Identity identity,
+            out ScfuTail result)
+        {
+            result = null;
+            try
+            {
+                using (var memoryStream = new System.IO.MemoryStream(bytes, false))
+                using (var reader = new StreamReader(memoryStream))
+                {
+                    reader.Position = offset;
+                    int count;
+                    if (!TryReadX3F1Count(reader, out count))
+                    {
+                        return false;
+                    }
+
+                    var activeNanos = new List<ActiveNano>(count);
+                    for (int index = 0; index < count; index++)
+                    {
+                        activeNanos.Add(
+                            new ActiveNano
+                            {
+                                NanoId = reader.ReadInt32(),
+                                NanoInstance = reader.ReadInt32(),
+                                Time1 = reader.ReadInt32(),
+                                Time2 = reader.ReadInt32()
+                            });
+                    }
+
+                    var waypoints = new List<Vector3>();
+                    if (flags.HasFlag(SimpleCharFullUpdateFlags.HasWaypoints))
+                    {
+                        Identity waypointOwner = reader.ReadIdentity();
+                        if (waypointOwner.Type != identity.Type || waypointOwner.Instance != identity.Instance)
+                        {
+                            return false;
+                        }
+
+                        int waypointCount = reader.ReadInt32();
+                        if (waypointCount < 0 || waypointCount > 4096)
+                        {
+                            return false;
+                        }
+
+                        for (int index = 0; index < waypointCount; index++)
+                        {
+                            waypoints.Add(ReadVector3(reader));
+                        }
+                    }
+
+                    if (!TryReadX3F1Count(reader, out count))
+                    {
+                        return false;
+                    }
+
+                    var textures = new List<Texture>(count);
+                    for (int index = 0; index < count; index++)
+                    {
+                        textures.Add(
+                            new Texture
+                            {
+                                Place = reader.ReadInt32(),
+                                Id = reader.ReadInt32(),
+                                Unknown = reader.ReadInt32()
+                            });
+                    }
+
+                    if (!TryReadX3F1Count(reader, out count))
+                    {
+                        return false;
+                    }
+
+                    var meshes = new List<Mesh>(count);
+                    for (int index = 0; index < count; index++)
+                    {
+                        meshes.Add(
+                            new Mesh
+                            {
+                                Position = reader.ReadByte(),
+                                Id = reader.ReadUInt32(),
+                                OverrideTextureId = reader.ReadInt32(),
+                                Layer = reader.ReadByte()
+                            });
+                    }
+
+                    if (reader.Length - reader.Position < 5)
+                    {
+                        return false;
+                    }
+
+                    int flags2 = reader.ReadInt32();
+                    int trailingByteCount = (flags2 & 0x2) != 0 ? 2 : 1;
+                    if (reader.Length - reader.Position != trailingByteCount)
+                    {
+                        return false;
+                    }
+
+                    byte unknown2 = reader.ReadByte();
+                    byte unknown4 = (flags2 & 0x2) != 0 ? reader.ReadByte() : (byte)0;
+
+                    result = new ScfuTail
+                    {
+                        ActiveNanos = activeNanos.ToArray(),
+                        Waypoints = waypoints.ToArray(),
+                        Textures = textures.ToArray(),
+                        Meshes = meshes.ToArray(),
+                        Flags2 = flags2,
+                        Unknown2 = unknown2,
+                        Unknown4 = unknown4
+                    };
+                    return reader.Position == reader.Length;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private static bool TryReadX3F1Count(StreamReader reader, out int count)
+        {
+            count = 0;
+            if (reader.Length - reader.Position < 4)
+            {
+                return false;
+            }
+
+            int marker = reader.ReadInt32();
+            if (marker < 0x3F1 || marker % 0x3F1 != 0)
+            {
+                return false;
+            }
+
+            count = (marker / 0x3F1) - 1;
+            return count >= 0 && count <= 4096;
+        }
+
+        private sealed class ScfuTail
+        {
+            public byte[] ExtendedTextureOverrideData { get; set; }
+
+            public ActiveNano[] ActiveNanos { get; set; }
+
+            public Vector3[] Waypoints { get; set; }
+
+            public Texture[] Textures { get; set; }
+
+            public Mesh[] Meshes { get; set; }
+
+            public int Flags2 { get; set; }
+
+            public byte Unknown2 { get; set; }
+
+            public byte Unknown4 { get; set; }
         }
 
         #endregion

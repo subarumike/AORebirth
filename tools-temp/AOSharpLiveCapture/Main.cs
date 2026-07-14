@@ -2501,19 +2501,28 @@ namespace AOSharpLiveCapture
                 direction,
                 sequence,
                 message,
-                "enemy-fight-export",
+                "enemy-fight-annotation",
                 () =>
                 {
                     if (this.ShouldCaptureEnemyFightEvidence(direction, sequence, message))
                     {
                         this.LogEnemyFightEvent(direction, sequence, message);
                     }
-
-                    // Classification is downstream. Preserve every decoded combat,
-                    // movement, stat, lifecycle, and state message in the capture.
-                    this.ExportEnemyN3Evidence(direction, sequence, message);
-                    this.TrackEnemyStateFromMessage(direction, sequence, message);
                 });
+            // Focus/manual modes only annotate. Independent stages preserve every
+            // decoded combat/state message even if annotation or classification fails.
+            this.RunN3CaptureStage(
+                direction,
+                sequence,
+                message,
+                "enemy-evidence-export",
+                () => this.ExportEnemyN3Evidence(direction, sequence, message));
+            this.RunN3CaptureStage(
+                direction,
+                sequence,
+                message,
+                "enemy-state-track",
+                () => this.TrackEnemyStateFromMessage(direction, sequence, message));
             this.RunN3CaptureStage(
                 direction,
                 sequence,
@@ -2549,10 +2558,12 @@ namespace AOSharpLiveCapture
                 "inventory-export",
                 () =>
                 {
-                    InventoryUpdateMessage inventoryUpdate = message as InventoryUpdateMessage;
-                    if (inventoryUpdate != null)
+                    if (string.Equals(
+                        message.N3MessageType.ToString(),
+                        "InventoryUpdate",
+                        StringComparison.OrdinalIgnoreCase))
                     {
-                        this.ExportInventoryUpdate(direction, sequence, inventoryUpdate);
+                        this.ExportInventoryUpdate(direction, sequence, message);
                     }
                 });
         }
@@ -2949,15 +2960,29 @@ namespace AOSharpLiveCapture
             }
         }
 
-        private void ExportInventoryUpdate(string direction, int sequence, InventoryUpdateMessage message)
+        private void ExportInventoryUpdate(string direction, int sequence, N3Message message)
         {
-            InventorySlot[] items = message.Items ?? new InventorySlot[0];
+            object itemsValue = GetMemberValue(message, "Items");
+            IEnumerable enumerableItems = itemsValue as IEnumerable;
+            if (itemsValue != null && enumerableItems == null)
+            {
+                throw new InvalidDataException("InventoryUpdate.Items was not enumerable.");
+            }
+
+            List<object> items = new List<object>();
+            if (enumerableItems != null)
+            {
+                foreach (object item in enumerableItems)
+                {
+                    items.Add(item);
+                }
+            }
 
             lock (this.syncRoot)
             {
                 this.inventoryUpdateMessageCount++;
                 string capturedUtc = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
-                string inventoryIdentity = message.InventoryIdentity.ToString();
+                string inventoryIdentity = GetMemberString(message, "InventoryIdentity");
                 bool isCorpseInventory = inventoryIdentity.IndexOf("Corpse:", StringComparison.OrdinalIgnoreCase) >= 0;
                 if (isCorpseInventory)
                 {
@@ -3026,10 +3051,10 @@ namespace AOSharpLiveCapture
                             item => string.Format(
                                 CultureInfo.InvariantCulture,
                                 "{0}:{1}:{2}:{3}",
-                                item.ItemLowId,
-                                item.ItemHighId,
-                                item.Quality,
-                                item.Count)).ToArray());
+                                GetMemberString(item, "ItemLowId"),
+                                GetMemberString(item, "ItemHighId"),
+                                GetMemberString(item, "Quality"),
+                                GetMemberString(item, "Count"))).ToArray());
                     this.corpseLootObservationRowCount++;
                     this.corpseLootObservationsLog.WriteLine(
                         string.Join(
@@ -3040,7 +3065,7 @@ namespace AOSharpLiveCapture
                             Csv(inventoryIdentity),
                             openOrdinal.ToString(CultureInfo.InvariantCulture),
                             initialSnapshot ? "true" : "false",
-                            items.Length.ToString(CultureInfo.InvariantCulture),
+                            items.Count.ToString(CultureInfo.InvariantCulture),
                             Csv(corpse == null ? string.Empty : corpse.DeadNpcIdentity),
                             Csv(enemy == null ? string.Empty : enemy.Name),
                             Csv(corpse == null ? string.Empty : corpse.CorpseMonsterData.ToString(CultureInfo.InvariantCulture)),
@@ -3058,10 +3083,9 @@ namespace AOSharpLiveCapture
                     this.corpseLootObservationsLog.Flush();
                 }
 
-                for (int i = 0; i < items.Length; i++)
+                for (int i = 0; i < items.Count; i++)
                 {
-                    InventorySlot item = items[i];
-                    this.inventoryUpdateRowCount++;
+                    object item = items[i];
                     this.inventoryUpdatesLog.WriteLine(
                         string.Join(
                             ",",
@@ -3069,16 +3093,17 @@ namespace AOSharpLiveCapture
                             Csv(direction),
                             sequence.ToString(CultureInfo.InvariantCulture),
                             Csv(inventoryIdentity),
-                            message.Handle.ToString(CultureInfo.InvariantCulture),
+                            Csv(GetMemberString(message, "Handle")),
                             i.ToString(CultureInfo.InvariantCulture),
-                            item.Placement.ToString(CultureInfo.InvariantCulture),
-                            item.Flags.ToString(CultureInfo.InvariantCulture),
-                            item.Count.ToString(CultureInfo.InvariantCulture),
-                            Csv(item.Identity.ToString()),
-                            item.ItemLowId.ToString(CultureInfo.InvariantCulture),
-                            item.ItemHighId.ToString(CultureInfo.InvariantCulture),
-                            item.Quality.ToString(CultureInfo.InvariantCulture),
-                            item.Unknown.ToString(CultureInfo.InvariantCulture)));
+                            Csv(GetMemberString(item, "Placement")),
+                            Csv(GetMemberString(item, "Flags")),
+                            Csv(GetMemberString(item, "Count")),
+                            Csv(GetMemberString(item, "Identity")),
+                            Csv(GetMemberString(item, "ItemLowId")),
+                            Csv(GetMemberString(item, "ItemHighId")),
+                            Csv(GetMemberString(item, "Quality")),
+                            Csv(GetMemberString(item, "Unknown"))));
+                    this.inventoryUpdateRowCount++;
                 }
 
                 this.inventoryUpdatesLog.Flush();
@@ -3159,20 +3184,19 @@ namespace AOSharpLiveCapture
                 return;
             }
 
-            if (message is AttackMessage
-                || message is AttackInfoMessage
-                || string.Equals(message.N3MessageType.ToString(), "SpecialAttackWeapon", StringComparison.OrdinalIgnoreCase)
-                || message is SpecialAttackInfoMessage
-                || message is MissedAttackInfoMessage
-                || message is HealthDamageMessage
-                || message is CharacterActionMessage
-                || message is StopFightMessage)
+            if (IsEnemyCombatEvidenceMessage(message))
             {
                 object target = GetMemberValue(message, "Target")
                     ?? GetMemberValue(message, "Defender")
+                    ?? GetMemberValue(message, "Victim")
                     ?? GetMemberValue(message, "Unknown4");
-                object aux1 = GetMemberValue(message, "Unknown3");
-                object aux2 = GetMemberValue(message, "Unknown4");
+                object aux1 = GetMemberValue(message, "Attacker")
+                    ?? GetMemberValue(message, "Source")
+                    ?? GetMemberValue(message, "Caster")
+                    ?? GetMemberValue(message, "Unknown3");
+                object aux2 = GetMemberValue(message, "Weapon")
+                    ?? GetMemberValue(message, "Nano")
+                    ?? GetMemberValue(message, "Unknown4");
 
                 this.ExportEnemyCombat(direction, sequence, message, target, aux1, aux2);
             }
@@ -3205,9 +3229,17 @@ namespace AOSharpLiveCapture
                 return false;
             }
 
+            bool isCombatEvidence = IsEnemyCombatEvidenceMessage(message);
+            if (isCombatEvidence)
+            {
+                // This flag describes observed evidence. Manual/auto modes only
+                // control the focused human-readable fight log; they never gate
+                // structured combat collection.
+                this.enemyFightCaptureStarted = true;
+            }
+
             if (this.enemyFightCaptureEnabled)
             {
-                this.enemyFightCaptureStarted = true;
                 return true;
             }
 
@@ -3217,9 +3249,8 @@ namespace AOSharpLiveCapture
             }
 
             bool registered = this.TryRegisterFocusedEnemyFromMessage(direction, sequence, message);
-            if (IsEnemyCombatEvidenceMessage(message))
+            if (isCombatEvidence)
             {
-                this.enemyFightCaptureStarted = true;
                 return true;
             }
 
@@ -3242,8 +3273,13 @@ namespace AOSharpLiveCapture
                    || string.Equals(messageName, "AttackInfo", StringComparison.OrdinalIgnoreCase)
                    || string.Equals(messageName, "SpecialAttackWeapon", StringComparison.OrdinalIgnoreCase)
                    || string.Equals(messageName, "SpecialAttackInfo", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "CharSecSpecAttack", StringComparison.OrdinalIgnoreCase)
                    || string.Equals(messageName, "MissedAttackInfo", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "CastNanoSpell", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "CharacterAction", StringComparison.OrdinalIgnoreCase)
                    || string.Equals(messageName, "HealthDamage", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "Buff", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "Reload", StringComparison.OrdinalIgnoreCase)
                    || string.Equals(messageName, "StopFight", StringComparison.OrdinalIgnoreCase);
         }
 
@@ -4848,13 +4884,13 @@ namespace AOSharpLiveCapture
                 issues.Add("Combat packets were observed, but enemy-state.csv has no rows.");
             }
 
-            if (this.focusedEnemyIdentities.Count == 0 && !this.enemyFightCaptureEnabled)
+            if (this.enemyCombatEventCount == 0 && this.enemyCombatRowCount == 0)
             {
-                notes.Add("No local-player enemy fight was auto-detected; enemy behavior files are empty unless combat happened.");
+                notes.Add("No decoded combat evidence packets were observed.");
             }
-            else if (this.enemyCombatEventCount == 0 && this.enemyCombatRowCount == 0)
+            else if (this.focusedEnemyIdentities.Count == 0 && !this.enemyFightCaptureEnabled)
             {
-                notes.Add("No enemy combat packets were observed.");
+                notes.Add("Combat evidence was exported without a focused local-player fight annotation.");
             }
 
             if (this.movementFollowTargetPacketCount > 0 && this.movementUsableFollowTargetPacketCount == 0)

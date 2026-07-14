@@ -482,7 +482,8 @@ namespace ZoneEngine.Core
                 { 247831, 247826 },
                 { 247832, 247821 },
                 { 31114, 31102 },
-                { 17649, 15215 }
+                { 17649, 15215 },
+                { 203748, 5921 }
             };
 
             foreach (KeyValuePair<int, int> mapping in CombatTestMobArchetype.CorpseVisualMappings())

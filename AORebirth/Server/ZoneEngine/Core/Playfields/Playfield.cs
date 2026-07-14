@@ -2887,6 +2887,17 @@ namespace AORebirth.Core.Playfields
             ICharacter target,
             CombatCorpseLootClass lootClass)
         {
+            CapturedEncounterRuntimeDefinition encounterDefinition;
+            if (target != null
+                && CapturedEncounterRuntimeRegistry.TryGet(
+                    target.Identity.Instance,
+                    out encounterDefinition))
+            {
+                return lootClass == CombatCorpseLootClass.Empty
+                    ? TimeSpan.FromSeconds(encounterDefinition.LootedCleanupSeconds)
+                    : TimeSpan.FromSeconds(encounterDefinition.UnlootedCorpseLifetimeSeconds);
+            }
+
             OrdinaryEnemyRuntimeDefinition definition;
             if (target != null
                 && OrdinaryEnemyRuntimeRegistry.TryGet(target.Identity.Instance, out definition))
@@ -2904,8 +2915,8 @@ namespace AORebirth.Core.Playfields
             IList<CorpseLootItem> lootItems,
             int credits)
         {
-            // Boss classification is intentionally conservative until we have capture-backed
-            // identification rules for major encounter tiers.
+            // Major-boss loot classification remains unresolved. Captured encounter
+            // corpse lifetimes are applied separately from this classification.
             return CombatCorpseRules.LootClassFor(lootItems.Count, credits, false);
         }
 
@@ -2981,13 +2992,26 @@ namespace AORebirth.Core.Playfields
             TimeSpan lifetime = CorpseLifetimeFor(target, lootClass);
             TimeSpan itemLootLifetime = CombatCorpseRules.RegularLootCorpseLifetime;
             TimeSpan emptyCleanupDelay = CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay;
-            OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
-            if (OrdinaryEnemyRuntimeRegistry.TryGet(target.Identity.Instance, out ordinaryDefinition))
+            CapturedEncounterRuntimeDefinition encounterDefinition;
+            if (CapturedEncounterRuntimeRegistry.TryGet(
+                target.Identity.Instance,
+                out encounterDefinition))
             {
                 itemLootLifetime = TimeSpan.FromSeconds(
-                    ordinaryDefinition.Profile.Corpse.UnlootedLifetimeSeconds);
+                    encounterDefinition.UnlootedCorpseLifetimeSeconds);
                 emptyCleanupDelay = TimeSpan.FromSeconds(
-                    ordinaryDefinition.Profile.Corpse.LootedCleanupSeconds);
+                    encounterDefinition.LootedCleanupSeconds);
+            }
+            else
+            {
+                OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
+                if (OrdinaryEnemyRuntimeRegistry.TryGet(target.Identity.Instance, out ordinaryDefinition))
+                {
+                    itemLootLifetime = TimeSpan.FromSeconds(
+                        ordinaryDefinition.Profile.Corpse.UnlootedLifetimeSeconds);
+                    emptyCleanupDelay = TimeSpan.FromSeconds(
+                        ordinaryDefinition.Profile.Corpse.LootedCleanupSeconds);
+                }
             }
 
             DateTime expiresAtUtc = DateTime.UtcNow + lifetime;
@@ -3141,7 +3165,13 @@ namespace AORebirth.Core.Playfields
 
         internal bool CanBuildKnownCorpseVisual(ICharacter target)
         {
-            return IsCapturedCleaningRobot(target)
+            CapturedEncounterRuntimeDefinition encounterDefinition;
+            return (target != null
+                    && CapturedEncounterRuntimeRegistry.TryGet(
+                        target.Identity.Instance,
+                        out encounterDefinition)
+                    && CombatCorpseVisuals.IsUsableVisualId(encounterDefinition.CorpseCatMesh))
+                   || IsCapturedCleaningRobot(target)
                    || UsesCapturedThiefCorpseProfile(target)
                    || CombatCorpseVisuals.IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
                    || MonsterDataToCorpseCatMesh.ContainsKey(target.Stats[StatIds.monsterdata].Value);
@@ -3149,6 +3179,15 @@ namespace AORebirth.Core.Playfields
 
         private static int CorpseCatMeshFor(ICharacter target)
         {
+            CapturedEncounterRuntimeDefinition encounterDefinition;
+            if (target != null
+                && CapturedEncounterRuntimeRegistry.TryGet(
+                    target.Identity.Instance,
+                    out encounterDefinition))
+            {
+                return encounterDefinition.CorpseCatMesh;
+            }
+
             if (IsCapturedCleaningRobot(target))
             {
                 return CapturedCleaningRobotCorpseCatMesh;
@@ -3189,6 +3228,15 @@ namespace AORebirth.Core.Playfields
 
         private static int CorpseMonsterDataFor(ICharacter target)
         {
+            CapturedEncounterRuntimeDefinition encounterDefinition;
+            if (target != null
+                && CapturedEncounterRuntimeRegistry.TryGet(
+                    target.Identity.Instance,
+                    out encounterDefinition))
+            {
+                return encounterDefinition.MonsterData;
+            }
+
             return CombatCorpseVisuals.CorpseMonsterDataFor(
                 target.Stats[StatIds.monsterdata].Value,
                 CorpseCatMeshFor(target));
