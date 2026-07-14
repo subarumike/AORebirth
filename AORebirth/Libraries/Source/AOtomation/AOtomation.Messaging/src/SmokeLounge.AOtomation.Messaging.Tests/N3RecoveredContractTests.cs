@@ -735,6 +735,69 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Serialize(attackInfo));
         }
 
+        [TestMethod]
+        public void OfficialSubwayDisobedientBotCombatPacketsMatchCapturedBytes()
+        {
+            Identity bot = new Identity { Type = IdentityType.CanbeAffected, Instance = unchecked((int)0x79607CD0) };
+            Identity player = new Identity { Type = IdentityType.CanbeAffected, Instance = unchecked((int)0x7944C065) };
+
+            var specialAttackWeapon = new SpecialAttackWeaponMessage
+                                      {
+                                          Identity = bot,
+                                          Unknown = 0,
+                                          Specials = new[]
+                                                     {
+                                                         new SpecialAttack
+                                                         {
+                                                             Unknown1 = 0x00023566,
+                                                             Unknown2 = 0x00023567,
+                                                             Unknown3 = 0x53495731,
+                                                             Unknown4 = "SIW1"
+                                                         }
+                                                     },
+                                          Unknown1 = 49,
+                                          Unknown2 = 49,
+                                          Unknown3 = 49,
+                                          Unknown4 = 49,
+                                          Unknown5 = 0
+                                      };
+            CollectionAssert.AreEqual(
+                HexToBytes("1D3C0F1C0000C35079607CD000000007E2000235660002356753495731534957310000003100000031000000310000003100000000"),
+                Serialize(specialAttackWeapon));
+
+            var attack = new AttackMessage
+                         {
+                             Identity = bot,
+                             Unknown = 0,
+                             Target = player,
+                             Action = 0
+                         };
+            CollectionAssert.AreEqual(
+                HexToBytes("284940700000C35079607CD0000000C3507944C06500"),
+                Serialize(attack));
+
+            var attackInfo = new AttackInfoMessage
+                             {
+                                 Identity = bot,
+                                 Unknown = 0,
+                                 Unknown1 = 10,
+                                 Unknown2 = -1,
+                                 Unknown3 = 0,
+                                 Target = player,
+                                 Unknown4 = 0,
+                                 Unknown5 = 3,
+                                 Unknown6 = 0x53495731
+                             };
+            CollectionAssert.AreEqual(
+                HexToBytes("46002F160000C35079607CD0000000000AFFFFFFFF000000000000C3507944C065000000000000000353495731"),
+                Serialize(attackInfo));
+
+            attackInfo.Unknown1 = 11;
+            CollectionAssert.AreEqual(
+                HexToBytes("46002F160000C35079607CD0000000000BFFFFFFFF000000000000C3507944C065000000000000000353495731"),
+                Serialize(attackInfo));
+        }
+
         private static void AssertSerializedSize(MessageBody body, int expectedSize)
         {
             byte[] bytes = Serialize(body);

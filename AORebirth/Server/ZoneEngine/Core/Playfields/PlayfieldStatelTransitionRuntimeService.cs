@@ -99,16 +99,6 @@ namespace AORebirth.Core.Playfields
 
         private const float CapturedSubwayEntranceHeadingW = 0.0f;
 
-        private const float CapturedSubwayExitSourceX = 64.2f;
-
-        private const float CapturedSubwayExitSourceY = 115.6f;
-
-        private const float CapturedSubwayExitSourceZ = 319.3f;
-
-        private const float CapturedSubwayExitRadius = 4.0f;
-
-        private const float CapturedSubwayExitVerticalTolerance = 8.0f;
-
         private static readonly Dictionary<int, DateTime> PostZoneCollisionGraceUntil =
             new Dictionary<int, DateTime>();
 
@@ -197,7 +187,6 @@ namespace AORebirth.Core.Playfields
             IEnumerable<StatelData> collisionStatels,
             Func<ICharacter, int> resolvePrivateCityDestinationPlayfield,
             Func<ICharacter, int> resolveCharacterOrganizationInstance,
-            Func<ICharacter, ProxyPlayfieldExitDestination> resolveProxyExitDestination,
             Action<ICharacter> stopMovement,
             Action<ICharacter> sendCapturedPrivateCityEntrySocialStatus,
             Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
@@ -231,16 +220,6 @@ namespace AORebirth.Core.Playfields
             if (this.TryHandleUserConfirmedMontroyalPrivateCityExit(
                 dynel,
                 playfieldIdentity,
-                stopMovement,
-                teleportToPlayfield))
-            {
-                return;
-            }
-
-            if (this.TryHandleCapturedSubwayProxyExit(
-                dynel,
-                playfieldIdentity,
-                resolveProxyExitDestination,
                 stopMovement,
                 teleportToPlayfield))
             {
@@ -451,85 +430,6 @@ namespace AORebirth.Core.Playfields
             return true;
         }
 
-        private bool TryHandleCapturedSubwayProxyExit(
-            ICharacter character,
-            Identity playfieldIdentity,
-            Func<ICharacter, ProxyPlayfieldExitDestination> resolveProxyExitDestination,
-            Action<ICharacter> stopMovement,
-            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
-        {
-            if (character == null
-                || playfieldIdentity.Instance != CapturedSubwayPlayfieldId
-                || character.Controller == null
-                || character.Controller.Client == null
-                || character.DoNotDoTimers)
-            {
-                return false;
-            }
-
-            var dynel = character as Dynel;
-            if (dynel == null)
-            {
-                return false;
-            }
-
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
-            double deltaX = sourceX - CapturedSubwayExitSourceX;
-            double deltaZ = sourceZ - CapturedSubwayExitSourceZ;
-            double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
-            double verticalDistance = Math.Abs(sourceY - CapturedSubwayExitSourceY);
-            if (horizontalDistanceSquared > CapturedSubwayExitRadius * CapturedSubwayExitRadius
-                || verticalDistance > CapturedSubwayExitVerticalTolerance)
-            {
-                return false;
-            }
-
-            ProxyPlayfieldExitDestination exitDestination =
-                resolveProxyExitDestination == null ? null : resolveProxyExitDestination(character);
-            if (exitDestination == null)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Zoning,
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Subway proxy exit skipped character={0} source=({1:F3},{2:F3},{3:F3}) externalDoor={4:X8} externalPf={5} reason=missing-external-door evidence=server_log_20260708_1609",
-                        character.Identity.ToString(true),
-                        sourceX,
-                        sourceY,
-                        sourceZ,
-                        character.Stats[StatIds.externaldoorinstance].BaseValue,
-                        character.Stats[StatIds.externalplayfieldinstance].Value));
-                return false;
-            }
-
-            stopMovement(character);
-            teleportToPlayfield(
-                dynel,
-                exitDestination.Destination,
-                exitDestination.Heading,
-                exitDestination.PlayfieldId);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Zoning,
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Subway proxy exit teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) externalDoor={5:X8} destPf={6} dest=({7:F3},{8:F3},{9:F3}) evidence=server_log_20260708_1609",
-                    character.Identity.ToString(true),
-                    playfieldIdentity.Instance,
-                    sourceX,
-                    sourceY,
-                    sourceZ,
-                    exitDestination.ExternalDoorInstance,
-                    exitDestination.PlayfieldId,
-                    exitDestination.Destination.x,
-                    exitDestination.Destination.y,
-                    exitDestination.Destination.z));
-
-            return true;
-        }
-
         private bool TryHandleCapturedMontroyalPrivateCityEntry(
             ICharacter character,
             Identity playfieldIdentity,
@@ -661,26 +561,4 @@ namespace AORebirth.Core.Playfields
         }
     }
 
-    internal sealed class ProxyPlayfieldExitDestination
-    {
-        internal ProxyPlayfieldExitDestination(
-            int playfieldId,
-            uint externalDoorInstance,
-            Coordinate destination,
-            RuntimeQuaternion heading)
-        {
-            this.PlayfieldId = playfieldId;
-            this.ExternalDoorInstance = externalDoorInstance;
-            this.Destination = destination;
-            this.Heading = heading;
-        }
-
-        internal int PlayfieldId { get; private set; }
-
-        internal uint ExternalDoorInstance { get; private set; }
-
-        internal Coordinate Destination { get; private set; }
-
-        internal RuntimeQuaternion Heading { get; private set; }
-    }
 }
