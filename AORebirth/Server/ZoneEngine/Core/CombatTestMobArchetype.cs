@@ -173,7 +173,7 @@ namespace ZoneEngine.Core
             new[] { "alienspider", "spider", "zix" },
             "A026",
             "Codex Test Alien Spider - Zix",
-            2,
+            7,
             34,
             247728,
             31774,
@@ -372,6 +372,12 @@ namespace ZoneEngine.Core
             SetMobStat(mobCharacter, StatIds.sex, entry.Sex);
             SetMobStat(mobCharacter, StatIds.race, 1);
             SetMobStat(mobCharacter, StatIds.npcfamily, entry.NpcFamily);
+            if (entry == AlienSpiderZix)
+            {
+                // Live mobtemplate A026 Flags — includes Alien AXP bit 0x4000 (268980737).
+                SetMobStat(mobCharacter, StatIds.flags, 268980737);
+            }
+
             SetMobStat(mobCharacter, StatIds.itemanim, entry.DeathAnimationKey);
             SetMobStat(mobCharacter, StatIds.corpseanimkey, entry.DeathAnimationKey);
             SetMobStat(mobCharacter, StatIds.dieanim, entry.DeathAnimationKey);

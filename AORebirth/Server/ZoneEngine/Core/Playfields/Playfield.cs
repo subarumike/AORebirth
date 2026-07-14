@@ -2173,6 +2173,8 @@ namespace AORebirth.Core.Playfields
             }
             else if (target.Controller is PlayerController)
             {
+                // AIXP is never lost on death; only KilledByInvaders increments for alien killers.
+                AlienXpRuntimeService.RecordPlayerKilledByInvader(attacker, target);
                 this.runtimeSystems.BeginPlayerDeath(target, this.KillPlayerTarget);
             }
             else

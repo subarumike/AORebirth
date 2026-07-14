@@ -153,6 +153,7 @@
     <Compile Include="Core\CombatDamageRules.cs" />
     <Compile Include="Core\DamageCalculation.cs" />
     <Compile Include="Core\CombatXpRuntimeService.cs" />
+    <Compile Include="Core\AlienXpRuntimeService.cs" />
     <Compile Include="Core\SocialActionRuntimeService.cs" />
     <Compile Include="Core\CombatTestMobArchetype.cs" />
     <Compile Include="Core\ChatCommandText.cs" />

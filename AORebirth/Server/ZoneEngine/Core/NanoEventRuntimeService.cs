@@ -18,6 +18,8 @@ namespace ZoneEngine.Core
     using AORebirth.Core.Nanos;
     using AORebirth.Enums;
 
+    using MsgPack;
+
     #endregion
 
     public sealed class NanoEventRuntimeService
@@ -83,6 +85,47 @@ namespace ZoneEngine.Core
                 {
                     if (function.FunctionType == SummonPetFunctionId
                         || function.FunctionType == SummonPetsFunctionId)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public bool HasOffensiveHitOnUse(NanoFormula nano)
+        {
+            if (nano == null || nano.Events == null)
+            {
+                return false;
+            }
+
+            int hitFunctionId = (int)FunctionType.Hit;
+            foreach (Event nanoEvent in nano.Events.Where(x => x.EventType == EventType.OnUse))
+            {
+                if (nanoEvent.Functions == null)
+                {
+                    continue;
+                }
+
+                foreach (Function function in nanoEvent.Functions)
+                {
+                    if (function.FunctionType != hitFunctionId
+                        || function.Arguments == null
+                        || function.Arguments.Values.Count < 2)
+                    {
+                        continue;
+                    }
+
+                    int amount = function.Arguments.Values[1].AsInt32();
+                    if (amount < 0)
+                    {
+                        return true;
+                    }
+
+                    if (function.Arguments.Values.Count >= 3
+                        && function.Arguments.Values[2].AsInt32() < 0)
                     {
                         return true;
                     }

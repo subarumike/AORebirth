@@ -34,6 +34,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
     #region Usings ...
 
     using System;
+    using System.Threading;
 
     using AORebirth.Core.Entities;
     using AORebirth.Enums;
@@ -42,6 +43,8 @@ namespace ZoneEngine.Core.Functions.GameFunctions
     using MsgPack;
 
     using Utility;
+
+    using ZoneEngine.Core.MessageHandlers;
 
     #endregion
 
@@ -71,6 +74,8 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             }
 
             character.LockSkill(statId, durationSeconds);
+            CharacterActionMessageHandler.Default.SendSkillUnavailable(character, statId, durationSeconds);
+            ScheduleSkillAvailable(character, statId, durationSeconds);
 
             LogUtil.Debug(
                 DebugInfoDetail.GameFunctions,
@@ -81,6 +86,32 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                     durationSeconds));
 
             return true;
+        }
+
+        private static void ScheduleSkillAvailable(Character character, int statId, int durationSeconds)
+        {
+            if (character == null || durationSeconds <= 0)
+            {
+                return;
+            }
+
+            int delayMs = Math.Max(1, durationSeconds) * 1000;
+            ThreadPool.QueueUserWorkItem(
+                _ =>
+                {
+                    Thread.Sleep(delayMs);
+                    if (character.Controller == null || character.Controller.Client == null)
+                    {
+                        return;
+                    }
+
+                    if (character.GetSkillLockRemainingSeconds(statId) > 0)
+                    {
+                        return;
+                    }
+
+                    CharacterActionMessageHandler.Default.SendSkillAvailable(character, statId);
+                });
         }
 
         public static bool TryReadArguments(MessagePackObject[] arguments, out int statId, out int durationSeconds)

@@ -130,13 +130,68 @@ namespace ZoneEngine.Core.Controllers
 
         public void CallFunction(Function function, IEntity caller)
         {
-            // TODO: Make it more versatile, not just applying stuff on yourself
+            IInstancedEntity functionTarget;
+            if (!this.TryResolveFunctionTarget(function, out functionTarget))
+            {
+                return;
+            }
+
             FunctionCollection.Instance.CallFunction(
                 function.FunctionType,
                 this.Character,
                 caller,
-                this.Character,
+                functionTarget,
                 function.Arguments.Values.ToArray());
+        }
+
+        private bool TryResolveFunctionTarget(Function function, out IInstancedEntity functionTarget)
+        {
+            functionTarget = this.Character;
+            if (function == null || this.Character == null || this.Character.Playfield == null)
+            {
+                return functionTarget != null;
+            }
+
+            switch ((ItemTarget)function.Target)
+            {
+                case ItemTarget.Target:
+                case ItemTarget.Selectedtarget:
+                {
+                    if (this.Character.SelectedTarget.Instance == 0
+                        || this.Character.SelectedTarget.Instance == this.Character.Identity.Instance)
+                    {
+                        // Inventory treatment (rechargers/stims): no other target → self.
+                        functionTarget = this.Character;
+                        return true;
+                    }
+
+                    functionTarget =
+                        this.Character.Playfield.FindByIdentity(this.Character.SelectedTarget);
+                    if (functionTarget == null)
+                    {
+                        functionTarget = this.Character;
+                    }
+
+                    return true;
+                }
+
+                case ItemTarget.Fightingtarget:
+                {
+                    Identity fightTarget = this.Character.FightingTarget.Instance != 0
+                        ? this.Character.FightingTarget
+                        : this.Character.SelectedTarget;
+                    if (fightTarget.Instance == 0)
+                    {
+                        return false;
+                    }
+
+                    functionTarget = this.Character.Playfield.FindByIdentity(fightTarget);
+                    return functionTarget != null;
+                }
+            }
+
+            functionTarget = this.Character;
+            return true;
         }
 
         public void MoveTo(Vector3 destination)
@@ -393,11 +448,24 @@ namespace ZoneEngine.Core.Controllers
             }
             else
             {
-                CharacterActionMessageHandler.Default.SetNanoDuration(
-                    this.Character,
-                    target,
-                    nanoId,
-                    duration);
+                // Instant OnUse Hit/effects (e.g. Trader Weak/Patchy Health Funnel):
+                // cast target must be SelectedTarget so Function.Target resolves to the mob.
+                if (target.Instance != 0)
+                {
+                    this.Character.SetTarget(target);
+                }
+
+                NanoEventRuntimeService.Default.ExecuteOnUseEvents(this.Character, nano);
+
+                // Instant Hit drain nanos must not be treated as NCU buffs on the caster.
+                if (duration > 0 && !NanoEventRuntimeService.Default.HasOffensiveHitOnUse(nano))
+                {
+                    CharacterActionMessageHandler.Default.SetNanoDuration(
+                        this.Character,
+                        target,
+                        nanoId,
+                        duration);
+                }
             }
 
             Thread.Sleep(nano.getItemAttribute(210) * 10); // Recharge Delay

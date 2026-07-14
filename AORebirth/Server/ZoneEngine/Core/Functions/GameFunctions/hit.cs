@@ -1,31 +1,8 @@
 #region License
 
 // Copyright (c) 2005-2014, CellAO Team
-// 
-// 
+//
 // All rights reserved.
-// 
-// 
-// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-// 
-// 
-//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-// 
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
 
 #endregion
 
@@ -36,29 +13,37 @@ namespace ZoneEngine.Core.Functions.GameFunctions
     using System;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Playfields;
     using AORebirth.Enums;
     using AORebirth.Interfaces;
 
     using MsgPack;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+
+    using ZoneEngine.Core.MessageHandlers;
+
     #endregion
 
     /// <summary>
+    /// FunctionType.Hit — adjust a.stat on the function target (heal/damage).
+    /// Hit args are: Stat, Min, Max [, DamageType/AC ].
+    /// Some nanos store collapsed Min==Max as Stat, Amount, ACType (3 args) — the third value
+    /// is AC type when it is positive while Amount is negative, not a damage maximum.
     /// </summary>
     internal class hit : FunctionPrototype
     {
-        #region Constants
-
-        /// <summary>
-        /// </summary>
         private const FunctionType functionId = FunctionType.Hit;
 
-        #endregion
+        private const int UnarmedAttackInfoAmmoCount = -1;
 
-        #region Public Properties
+        private const int AttackInfoWeaponSlot = 0;
 
-        /// <summary>
-        /// </summary>
+        private const int AttackInfoUnk1 = 4;
+
+        private const int AttackInfoHitType = 1;
+
         public override FunctionType FunctionId
         {
             get
@@ -67,92 +52,225 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             }
         }
 
-        #endregion
-
-        #region Public Methods and Operators
-
-        /// <summary>
-        /// </summary>
-        /// <param name="self">
-        /// </param>
-        /// <param name="caller">
-        /// </param>
-        /// <param name="target">
-        /// </param>
-        /// <param name="arguments">
-        /// </param>
-        /// <returns>
-        /// </returns>
         public override bool Execute(
             INamedEntity self,
             IEntity caller,
             IInstancedEntity target,
             MessagePackObject[] arguments)
         {
+            if (target == null)
+            {
+                return false;
+            }
+
             lock (target)
             {
                 return this.FunctionExecute(self, caller, target, arguments);
             }
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="Self">
-        /// </param>
-        /// <param name="Caller">
-        /// </param>
-        /// <param name="Target">
-        /// </param>
-        /// <param name="Arguments">
-        /// </param>
-        /// <returns>
-        /// </returns>
         public bool FunctionExecute(
             INamedEntity Self,
             IEntity Caller,
             IInstancedEntity Target,
             MessagePackObject[] Arguments)
         {
-            int Statnumber;
-            int minhit;
-            int maxhit;
-
-            Statnumber = (int)Arguments[0];
-            minhit = (int)Arguments[1];
-            maxhit = (int)Arguments[2];
-            if (minhit > maxhit)
+            if (Arguments == null || Arguments.Length < 2)
             {
-                minhit = maxhit;
-                maxhit = (int)Arguments[1];
+                return false;
             }
 
-            Random rnd = new Random();
-            int random = rnd.Next(minhit, maxhit);
-            Character ch = (Character)Self;
-
-            // Increase only to maximum value. if max value is lower then actual value, half of the random will be subtracted
-            if (Statnumber == 27)
+            Character affected = Target as Character;
+            if (affected == null)
             {
-                random = Math.Min(random, ch.Stats[StatIds.life].Value - ch.Stats[StatIds.health].Value);
+                return false;
             }
 
-            if (Statnumber == 132)
+            Character source = Self as Character;
+            if (source == null)
             {
-                random = Math.Min(
-                    random,
-                    ch.Stats[StatIds.maxnanoenergy].Value - ch.Stats[StatIds.nanoenergypool].Value);
+                source = Caller as Character;
             }
 
-            if (random < 0)
+            int statNumber = Arguments[0].AsInt32();
+            int delta = ResolveHitDelta(Arguments);
+
+            if (statNumber == (int)StatIds.health)
             {
-                random /= 2;
+                return ApplyHealthDelta(source, affected, delta);
             }
 
-            ((Character)Self).Stats[Statnumber].Value += random;
+            if (statNumber == (int)StatIds.currentnano || statNumber == (int)StatIds.nanoenergypool)
+            {
+                return ApplyNanoDelta(affected, delta);
+            }
+
+            affected.Stats[statNumber].Value += delta;
+            SendStats(affected);
+            return true;
+        }
+
+        internal static int ResolveHitDelta(MessagePackObject[] arguments)
+        {
+            int minHit = arguments[1].AsInt32();
+            int maxHit = minHit;
+
+            if (arguments.Length >= 3)
+            {
+                maxHit = arguments[2].AsInt32();
+
+                // Stat, Amount, ACType — AC type is a positive type id, not a max roll.
+                if (arguments.Length == 3 && minHit < 0 && maxHit > 0)
+                {
+                    maxHit = minHit;
+                }
+                else if (arguments.Length >= 4 && minHit < 0 && maxHit > 0)
+                {
+                    // Stat, Min, Max, ACType with Max accidentally positive: prefer Min.
+                    maxHit = minHit;
+                }
+            }
+
+            if (minHit > maxHit)
+            {
+                int swap = minHit;
+                minHit = maxHit;
+                maxHit = swap;
+            }
+
+            return minHit == maxHit
+                ? minHit
+                : new Random().Next(minHit, maxHit + 1);
+        }
+
+        private static bool ApplyHealthDelta(Character source, Character affected, int delta)
+        {
+            int maxLife = Math.Max(1, affected.Stats[StatIds.life].Value);
+            int current = affected.Stats[StatIds.health].Value;
+
+            if (delta >= 0)
+            {
+                int room = Math.Max(0, maxLife - current);
+                int applied = Math.Min(delta, room);
+                if (applied <= 0)
+                {
+                    return true;
+                }
+
+                affected.Stats[StatIds.health].Value = current + applied;
+                SendStats(affected);
+                AnnounceHeal(source, affected, applied);
+                return true;
+            }
+
+            int newHealth = Math.Max(0, current + delta);
+            int actualDamage = current - newHealth;
+            affected.Stats[StatIds.health].Value = newHealth;
+            SendStats(affected);
+
+            if (actualDamage <= 0 || source == null || affected.Playfield == null)
+            {
+                return true;
+            }
+
+            Playfield playfield = affected.Playfield as Playfield;
+            if (playfield == null)
+            {
+                return true;
+            }
+
+            playfield.Announce(
+                new AttackInfoMessage
+                {
+                    Identity = source.Identity,
+                    Unknown = 0,
+                    Target = affected.Identity,
+                    Unknown1 = actualDamage,
+                    Unknown2 = UnarmedAttackInfoAmmoCount,
+                    Unknown3 = AttackInfoWeaponSlot,
+                    Unknown4 = AttackInfoUnk1,
+                    Unknown5 = AttackInfoHitType,
+                    Unknown6 = 0
+                });
+
+            if (source.Controller != null && source.Controller.Client != null)
+            {
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    string.Format(
+                        "You hit {0} for {1} points of energy damage.",
+                        string.IsNullOrWhiteSpace(affected.Name) ? "target" : affected.Name,
+                        actualDamage));
+            }
+
+            if (source.Identity != affected.Identity)
+            {
+                playfield.AcquireNpcAggro(source, affected);
+                playfield.SuspendNpcRegen(affected);
+            }
+
+            if (newHealth == 0)
+            {
+                playfield.HandleCombatKillingHit(source, affected);
+            }
 
             return true;
         }
 
-        #endregion
+        private static bool ApplyNanoDelta(Character affected, int delta)
+        {
+            int maxNano = Math.Max(0, affected.Stats[StatIds.maxnanoenergy].Value);
+            int current = affected.Stats[StatIds.currentnano].Value;
+
+            if (delta >= 0)
+            {
+                int room = Math.Max(0, maxNano - current);
+                int applied = Math.Min(delta, room);
+                if (applied <= 0)
+                {
+                    return true;
+                }
+
+                affected.Stats[StatIds.currentnano].Value = current + applied;
+            }
+            else
+            {
+                affected.Stats[StatIds.currentnano].Value = Math.Max(0, current + delta);
+            }
+
+            SendStats(affected);
+            return true;
+        }
+
+        private static void AnnounceHeal(Character source, Character affected, int healAmount)
+        {
+            if (healAmount <= 0)
+            {
+                return;
+            }
+
+            if (source != null && source.Controller != null && source.Controller.Client != null)
+            {
+                string targetName = source.Identity == affected.Identity
+                    ? "yourself"
+                    : (string.IsNullOrWhiteSpace(affected.Name) ? "target" : affected.Name);
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    string.Format("You healed {0} for {1} points.", targetName, healAmount));
+            }
+
+            SendStats(affected);
+        }
+
+        private static void SendStats(Character character)
+        {
+            if (character.Controller != null)
+            {
+                character.Controller.SendChangedStats();
+                return;
+            }
+
+            StatMessageHandler.Default.SendChanged(character);
+        }
     }
 }
