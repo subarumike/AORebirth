@@ -26,13 +26,10 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\AOSharpCaptureProtocol\RawSimpleCharFullUpdateDecoder.cs">
+      <Link>RawSimpleCharFullUpdateDecoder.cs</Link>
+    </Compile>
     <Compile Include="Program.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\external\aosharp-github\AOSharp.Common\AOSharp.Common.csproj">
-      <Project>{2F48116B-5D7E-449C-A05A-7D82EA7169A3}</Project>
-      <Name>AOSharp.Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

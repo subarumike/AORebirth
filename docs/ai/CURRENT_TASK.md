@@ -2,23 +2,21 @@
 
 ## Current Focus
 
-Live-validate the global loot and ordinary-population foundations for Subway playfield `127`.
+Resume Abmouth implementation from the already-completed captures now that AOSharpLiveCapture preserves a complete, replayable evidence set by default.
 
 ## Remaining Step
 
-1. Capture ten kills and initial corpse opens for one enemy type in one session.
-2. Use `corpse-loot-observations.csv` to retain empty outcomes, credits, enemy level, player level, item rows, and identity correlation.
-3. Add only newly proven membership and weights to the global registry without treating the sample as complete or guaranteed.
-4. Live-validate item variety, empty outcomes, credit conditioning, corpse lifetime, reopen, final-loot cleanup, and respawn.
+1. Use captures `20260712-224840` and `20260712-232137` to finish the captured Abmouth spawn/fight slice without inventing unobserved boss behavior.
+2. Treat decoder/export failures with intact raw packets as offline work, not a reason to repeat gameplay.
 
 ## Constraints
 
-- Ordinary enemies resolve the Subway dungeon-wide pool plus their enemy-type pool.
-- Named enemies and bosses use dedicated tables rather than the ordinary enemy-type fallback.
-- Capture counts are evidence and candidate weights, never proof of guaranteed loot or a complete pool.
-- Do not infer player-level, enemy-level, quality, or drop-rate formulas beyond captured evidence.
+- Default capture must never filter by focus, enemy type, marker, or validation mode.
+- Preserve exact raw bytes before attempting classification or semantic decoding.
+- Existing raw captures must be retro-decoded before requesting another gameplay capture.
+- Capture counts are evidence, never proof of a complete loot pool or unobserved behavior.
 - Do not change database schemas or write runtime loot data to the database.
 
 ## Completion Evidence
 
-The global loot registry, corpse inventory owner, normalized spawn/group/respawn definitions, population controller, and shared scheduler are active. Automated parity is complete; live Thief, Filth Flea, and loot validation remains outstanding.
+The lossless raw packet index, shared direct SCFU decoder, durable stop/finalization path, offline retro-decoder, and exact fixture validation are complete. The global loot registry, corpse inventory owner, normalized spawn/group/respawn definitions, population controller, and shared scheduler are active. Live Thief and Filth Flea behavior is accepted. The two completed Abmouth captures contain recoverable raw SCFU/lifecycle evidence; no repeat capture is required for those observed events.

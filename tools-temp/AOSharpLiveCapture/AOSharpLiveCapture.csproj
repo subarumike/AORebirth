@@ -40,6 +40,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\AOSharpCaptureProtocol\RawSimpleCharFullUpdateDecoder.cs">
+      <Link>RawSimpleCharFullUpdateDecoder.cs</Link>
+    </Compile>
     <Compile Include="CombatLootSmoke.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
