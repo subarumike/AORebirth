@@ -435,7 +435,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 streamWriter.WriteUInt32(scfu.HeadMesh.Value);
             }
 
-            if (scfu.RunSpeedBase > sbyte.MaxValue)
+            if (scfu.RunSpeedBase > byte.MaxValue)
             {
                 flags |= SimpleCharFullUpdateFlags.HasExtendedRunSpeed;
                 streamWriter.WriteInt16(scfu.RunSpeedBase);
@@ -545,8 +545,25 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             flags |= scfu.AdditionalFlags;
             flags &= ~scfu.SuppressedFlags;
 
-            // The header flag must agree with the optional block already written above.
-            // Captured flags can include HasWaypoints even when the runtime has no block.
+            // Structural header flags must agree with the fields already written above.
+            if (scfu.RunSpeedBase > byte.MaxValue)
+            {
+                flags |= SimpleCharFullUpdateFlags.HasExtendedRunSpeed;
+            }
+            else
+            {
+                flags &= ~SimpleCharFullUpdateFlags.HasExtendedRunSpeed;
+            }
+
+            if (scfu.FightingTarget != null)
+            {
+                flags |= SimpleCharFullUpdateFlags.IsUnderAttack;
+            }
+            else
+            {
+                flags &= ~SimpleCharFullUpdateFlags.IsUnderAttack;
+            }
+
             if (scfu.Waypoints != null && scfu.Waypoints.Length > 0)
             {
                 flags |= SimpleCharFullUpdateFlags.HasWaypoints;

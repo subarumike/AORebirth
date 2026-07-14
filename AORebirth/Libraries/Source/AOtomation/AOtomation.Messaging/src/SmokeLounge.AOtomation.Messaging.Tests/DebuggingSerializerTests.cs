@@ -97,6 +97,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     {
                         Identity = new Identity { Type = IdentityType.CanbeAffected, Instance = 0x7953A9B6 },
                         Version = 58,
+                        PlayfieldId = 127,
                         Coordinates = new Vector3 { X = 337.797058f, Y = 102.4164f, Z = 245.4825f },
                         Heading = new Quaternion { X = 0, Y = 0.5905517f, Z = 0, W = 0.8069998f },
                         Appearance = new Appearance { Value = 1579 },
@@ -144,6 +145,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             using (var streamWriter = new StreamWriter(memoryStream))
             using (var streamReader = new StreamReader(memoryStream))
             {
+                streamWriter.Position = 16;
                 new SimpleCharFullUpdateSerializer().Serialize(
                     streamWriter,
                     serializationContext,
@@ -153,18 +155,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             message.Waypoints = new Vector3[0];
+            message.RunSpeedBase = 134;
+            message.FightingTarget =
+                new Identity { Type = IdentityType.CanbeAffected, Instance = 0x7953A9C0 };
             using (var memoryStream = new MemoryStream())
             using (var streamWriter = new StreamWriter(memoryStream))
             using (var streamReader = new StreamReader(memoryStream))
             {
+                streamWriter.Position = 16;
                 new SimpleCharFullUpdateSerializer().Serialize(
                     streamWriter,
                     serializationContext,
                     message);
                 memoryStream.Position = 30;
                 Assert.AreEqual(
-                    (int)(capturedFlags & ~SimpleCharFullUpdateFlags.HasWaypoints),
+                    (int)((capturedFlags & ~SimpleCharFullUpdateFlags.HasWaypoints)
+                          | SimpleCharFullUpdateFlags.IsUnderAttack),
                     streamReader.ReadInt32());
+
+                memoryStream.Position = 16;
+                var decoded =
+                    (SimpleCharFullUpdateMessage)new SimpleCharFullUpdateSerializer().Deserialize(
+                        streamReader,
+                        serializationContext);
+                Assert.AreEqual((short)134, decoded.RunSpeedBase);
+                Assert.AreEqual(message.FightingTarget, decoded.FightingTarget);
+                Assert.IsTrue(decoded.TailFullyDecoded);
             }
         }
 
