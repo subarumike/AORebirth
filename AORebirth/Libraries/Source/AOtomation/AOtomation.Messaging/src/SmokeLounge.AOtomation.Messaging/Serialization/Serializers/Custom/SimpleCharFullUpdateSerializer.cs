@@ -372,6 +372,17 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             flags |= scfu.AdditionalFlags;
             flags &= ~scfu.SuppressedFlags;
 
+            // The header flag must agree with the optional block already written above.
+            // Captured flags can include HasWaypoints even when the runtime has no block.
+            if (scfu.Waypoints != null && scfu.Waypoints.Length > 0)
+            {
+                flags |= SimpleCharFullUpdateFlags.HasWaypoints;
+            }
+            else
+            {
+                flags &= ~SimpleCharFullUpdateFlags.HasWaypoints;
+            }
+
             var pos = streamWriter.Position;
             streamWriter.Position = 30;
             streamWriter.WriteInt32((int)flags);

@@ -151,6 +151,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 memoryStream.Position = 30;
                 Assert.AreEqual((int)capturedFlags, streamReader.ReadInt32());
             }
+
+            message.Waypoints = new Vector3[0];
+            using (var memoryStream = new MemoryStream())
+            using (var streamWriter = new StreamWriter(memoryStream))
+            using (var streamReader = new StreamReader(memoryStream))
+            {
+                new SimpleCharFullUpdateSerializer().Serialize(
+                    streamWriter,
+                    serializationContext,
+                    message);
+                memoryStream.Position = 30;
+                Assert.AreEqual(
+                    (int)(capturedFlags & ~SimpleCharFullUpdateFlags.HasWaypoints),
+                    streamReader.ReadInt32());
+            }
         }
 
         #endregion
