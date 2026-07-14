@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
 
-set MSBUILD=C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe
+set MSBUILD=C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe
 set RESTORE_LOG=build_package_restore.log
 set RESTORE_CMD=%TEMP%\aorebirth_package_restore_%RANDOM%.cmd
 set RESTORE_DONE=%TEMP%\aorebirth_package_restore_done_%RANDOM%.tmp

@@ -109,11 +109,42 @@ namespace ZoneEngine.Core
 
             uint floorXp = GetCumulativeXpForLevelStart(levelBefore);
             uint progressBefore = GetBarProgress(xpRecipient);
-            uint newProgress = AddClamped(progressBefore, xpReward);
+            uint deathPoolBefore = GetDeathXpPool(xpRecipient);
+            int recoveredFromPool = 0;
+            if (levelBefore < MaxLevel && deathPoolBefore > 0)
+            {
+                // Mike: each kill recovers 5% of remaining UnsavedXP death pool + mob XP.
+                recoveredFromPool = (int)(deathPoolBefore * 5u / 100u);
+                if (recoveredFromPool <= 0 && deathPoolBefore > 0)
+                {
+                    recoveredFromPool = 1;
+                }
 
-            SetXpStat(xpRecipient, StatIds.unsavedxp, newProgress, "kill-add-unsaved");
+                if ((uint)recoveredFromPool > deathPoolBefore)
+                {
+                    recoveredFromPool = (int)deathPoolBefore;
+                }
+            }
+
+            int totalGain = xpReward + recoveredFromPool;
+            uint newProgress = AddClamped(progressBefore, totalGain);
+            uint deathPoolAfter = deathPoolBefore > (uint)recoveredFromPool
+                ? deathPoolBefore - (uint)recoveredFromPool
+                : 0;
+
             SetXpStat(xpRecipient, StatIds.xp, floorXp + newProgress, "kill-add-cumulative");
-            SetXpStat(xpRecipient, StatIds.lastxp, (uint)xpReward, "kill-add-lastxp");
+            SetXpStat(xpRecipient, StatIds.lastxp, (uint)totalGain, "kill-add-lastxp");
+            if (deathPoolAfter > 0)
+            {
+                // Keep UnsavedXP as remaining death pool until drained.
+                SetXpStat(xpRecipient, StatIds.unsavedxp, deathPoolAfter, "kill-death-pool-remain");
+            }
+            else
+            {
+                // Mirror bar progress once pool is empty (client UnsavedXP wire).
+                SetXpStat(xpRecipient, StatIds.unsavedxp, newProgress, "kill-add-unsaved");
+            }
+
             EnsureLevelXpThresholds(xpRecipient, "kill-add-thresholds");
 
             LogXpTrace(
@@ -121,6 +152,9 @@ namespace ZoneEngine.Core
                 "kill-after-add",
                 "progressBefore=" + progressBefore.ToString(CultureInfo.InvariantCulture)
                 + " progressAfter=" + newProgress.ToString(CultureInfo.InvariantCulture)
+                + " poolBefore=" + deathPoolBefore.ToString(CultureInfo.InvariantCulture)
+                + " poolRecover=" + recoveredFromPool.ToString(CultureInfo.InvariantCulture)
+                + " poolAfter=" + deathPoolAfter.ToString(CultureInfo.InvariantCulture)
                 + " cumulative=" + xpRecipient.Stats[StatIds.xp].BaseValue.ToString(CultureInfo.InvariantCulture));
 
             bool leveledUp = ApplyPendingLevelUps(xpRecipient, levelBefore);
@@ -167,6 +201,72 @@ namespace ZoneEngine.Core
                 + " levelAfter=" + GetCurrentLevel(xpRecipient).ToString(CultureInfo.InvariantCulture)
                 + " leveledUp=" + leveledUp.ToString(CultureInfo.InvariantCulture)
                 + " wire=" + (leveledUp ? "levelup-packets" : "xp-only"));
+        }
+
+        /// <summary>
+        /// On death /terminate: clip XP to Insurance SavedXP watermark (or level floor), and for
+        /// levels under 220 move the lost amount into UnsavedXP as a death recovery pool.
+        /// Each later kill recovers 5% of that pool + mob XP until the pool hits 0.
+        /// </summary>
+        internal static void ApplyDeathUninsuredXpLoss(ICharacter character)
+        {
+            if (character == null || !(character.Controller is Controllers.PlayerController))
+            {
+                return;
+            }
+
+            int level = GetCurrentLevel(character);
+            uint floor = GetCumulativeXpForLevelStart(level);
+            uint currentXp = NormalizeStatValue(character.Stats[StatIds.xp].BaseValue);
+            uint watermark = NormalizeStatValue(character.Stats[StatIds.savedxp].BaseValue);
+            uint existingPool = GetDeathXpPool(character);
+
+            uint protectedXp = watermark > floor ? watermark : floor;
+            if (protectedXp > currentXp)
+            {
+                protectedXp = currentXp;
+            }
+
+            uint lost = currentXp > protectedXp ? currentXp - protectedXp : 0;
+            uint newProgress = protectedXp >= floor ? protectedXp - floor : 0;
+            uint newPool = existingPool;
+            if (level < MaxLevel && lost > 0)
+            {
+                newPool = AddClamped(existingPool, (int)lost);
+            }
+
+            LogXpTrace(
+                character,
+                "death-xp-loss",
+                "level=" + level.ToString(CultureInfo.InvariantCulture)
+                + " xpBefore=" + currentXp.ToString(CultureInfo.InvariantCulture)
+                + " watermark=" + watermark.ToString(CultureInfo.InvariantCulture)
+                + " floor=" + floor.ToString(CultureInfo.InvariantCulture)
+                + " xpAfter=" + protectedXp.ToString(CultureInfo.InvariantCulture)
+                + " lost=" + lost.ToString(CultureInfo.InvariantCulture)
+                + " poolAfter=" + newPool.ToString(CultureInfo.InvariantCulture));
+
+            SetXpStat(character, StatIds.xp, protectedXp, "death-xp-loss");
+            if (newPool > 0)
+            {
+                SetXpStat(character, StatIds.unsavedxp, newPool, "death-xp-pool");
+            }
+            else
+            {
+                SetXpStat(character, StatIds.unsavedxp, newProgress, "death-xp-progress");
+            }
+
+            IZoneClient client = character.Controller.Client;
+            if (client != null)
+            {
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.xp, protectedXp);
+                StatMessageHandler.Default.SendSingle(
+                    character,
+                    (int)StatIds.unsavedxp,
+                    newPool > 0 ? newPool : newProgress);
+            }
+
+            WriteXpStatsToDb(character, "death-xp-loss");
         }
 
         internal static void PrepareXpStatsForLogin(ICharacter character)
@@ -366,6 +466,8 @@ namespace ZoneEngine.Core
                 int newLevel = currentLevel + 1;
                 uint remainder = barProgress - (uint)nextXpRequired;
                 uint newFloor = GetCumulativeXpForLevelStart(newLevel);
+                // Capture before XP/UnsavedXP rewrite so bar remainder is not mistaken for a pool.
+                uint deathPool = GetDeathXpPool(character);
 
                 LogXpTrace(
                     character,
@@ -380,8 +482,16 @@ namespace ZoneEngine.Core
                 SetXpStat(character, StatIds.level, (uint)newLevel, "levelup-apply-level");
                 ClearDbManagedFloorStats(character, "levelup-apply");
                 SetXpStat(character, StatIds.nextxp, (uint)GetNextXpRequiredForLevel(newLevel), "levelup-apply-next");
-                SetXpStat(character, StatIds.unsavedxp, remainder, "levelup-apply-unsaved");
                 SetXpStat(character, StatIds.xp, newFloor + remainder, "levelup-apply-cumulative");
+
+                if (deathPool > 0)
+                {
+                    SetXpStat(character, StatIds.unsavedxp, deathPool, "levelup-keep-death-pool");
+                }
+                else
+                {
+                    SetXpStat(character, StatIds.unsavedxp, remainder, "levelup-apply-unsaved");
+                }
 
                 highestLevelReached = newLevel;
             }
@@ -420,16 +530,42 @@ namespace ZoneEngine.Core
             // Stats 334/372 are not used for manual save XP yet; discard any legacy DB floor values.
             ClearDbManagedFloorStats(character, "login-normalize-clear-db-floor");
 
-            uint progress = ResolveStoredProgress(level, floor, xp, unsavedXp);
+            // Prefer cumulative XP as bar source of truth. UnsavedXP may hold a death recovery
+            // pool (level under 220) after insurance/death — do not fold that back into XP.
+            uint progressFromXp = xp >= floor ? xp - floor : 0;
+            uint deathPool = 0;
+            if (level < MaxLevel && unsavedXp > 0 && unsavedXp != progressFromXp)
+            {
+                deathPool = unsavedXp;
+            }
 
-            SetXpStat(character, StatIds.unsavedxp, progress, "login-normalize-unsaved");
+            uint progress = progressFromXp;
+            if (deathPool == 0 && unsavedXp > 0 && unsavedXp == progressFromXp)
+            {
+                progress = unsavedXp;
+            }
+            else if (deathPool == 0 && unsavedXp > 0 && progressFromXp == 0 && xp == 0)
+            {
+                progress = ResolveStoredProgress(level, floor, xp, unsavedXp);
+            }
+
             SetXpStat(character, StatIds.xp, floor + progress, "login-normalize-cumulative");
+            if (deathPool > 0)
+            {
+                SetXpStat(character, StatIds.unsavedxp, deathPool, "login-normalize-death-pool");
+            }
+            else
+            {
+                SetXpStat(character, StatIds.unsavedxp, progress, "login-normalize-unsaved");
+            }
+
             EnsureLevelXpThresholds(character, "login-normalize-thresholds");
 
             LogXpTrace(
                 character,
                 "login-normalize-after",
-                "resolvedProgress=" + progress.ToString(CultureInfo.InvariantCulture));
+                "resolvedProgress=" + progress.ToString(CultureInfo.InvariantCulture)
+                + " deathPool=" + deathPool.ToString(CultureInfo.InvariantCulture));
 
             ApplyPendingLevelUps(character, level);
         }
@@ -468,19 +604,48 @@ namespace ZoneEngine.Core
         {
             int level = GetCurrentLevel(character);
             uint floor = GetCumulativeXpForLevelStart(level);
-            uint unsaved = NormalizeStatValue(character.Stats[StatIds.unsavedxp].BaseValue);
-            if (unsaved > 0)
-            {
-                return unsaved;
-            }
-
             uint xp = NormalizeStatValue(character.Stats[StatIds.xp].BaseValue);
             if (xp >= floor)
             {
                 return xp - floor;
             }
 
+            // Fallback when XP not yet set: only use UnsavedXP if it is not a death pool.
+            uint unsaved = NormalizeStatValue(character.Stats[StatIds.unsavedxp].BaseValue);
+            if (unsaved > 0 && GetDeathXpPool(character) == 0)
+            {
+                return unsaved;
+            }
+
             return xp;
+        }
+
+        /// <summary>
+        /// Death recovery pool lives in UnsavedXP while it differs from live bar progress.
+        /// </summary>
+        private static uint GetDeathXpPool(ICharacter character)
+        {
+            if (character == null)
+            {
+                return 0;
+            }
+
+            int level = GetCurrentLevel(character);
+            if (level >= MaxLevel)
+            {
+                return 0;
+            }
+
+            uint floor = GetCumulativeXpForLevelStart(level);
+            uint xp = NormalizeStatValue(character.Stats[StatIds.xp].BaseValue);
+            uint progress = xp >= floor ? xp - floor : 0;
+            uint unsaved = NormalizeStatValue(character.Stats[StatIds.unsavedxp].BaseValue);
+            if (unsaved > 0 && unsaved != progress)
+            {
+                return unsaved;
+            }
+
+            return 0;
         }
 
         private static void ClearManualXpWireStatChangedFlags(ICharacter character, bool leveled)
@@ -516,13 +681,13 @@ namespace ZoneEngine.Core
         }
 
         /// <summary>
-        /// SavedXP (334) and LastSaveXP (372) are not persisted until manual save XP exists.
-        /// Level floor for bar/kill wire is computed from the RK table at send time.
+        /// LastSaveXP (372) is the temporary level-up floor wire value; compute live from the RK
+        /// table and clear it after use. SavedXP (334) is the Insurance Terminal watermark from
+        /// SaveChar and must not be wiped on kill/login normalize.
         /// </summary>
         private static void ClearDbManagedFloorStats(ICharacter character, string source)
         {
             SetXpStat(character, StatIds.lastsavexp, 0, source + ":lastsave");
-            SetXpStat(character, StatIds.savedxp, 0, source + ":saved");
         }
 
         private static void SendNormalKillXpPacket(IZoneClient client, ICharacter character)
