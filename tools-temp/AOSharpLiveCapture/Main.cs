@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 
+using AORebirth.CaptureProtocol;
 using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
@@ -23,6 +24,11 @@ namespace AOSharpLiveCapture
     {
         private static readonly object LifecycleSyncRoot = new object();
         private const int LocalEnemyCombatContextSeconds = 10;
+        private const int CaptureStopQuietPeriodSeconds = 2;
+        private const int CaptureStopMaximumDrainSeconds = 5;
+        private const int RawCaptureGateOpen = 0;
+        private const int RawCaptureGateTentative = 1;
+        private const int RawCaptureGateClosed = 2;
         private static Main activeInstance;
 
         private readonly object syncRoot = new object();
@@ -39,12 +45,16 @@ namespace AOSharpLiveCapture
         private readonly Dictionary<string, List<EnemyStateEvent>> enemyStateTimeline = new Dictionary<string, List<EnemyStateEvent>>();
         private readonly Dictionary<string, CorpseLifecycleEvidence> corpseEvidenceByDeadNpc =
             new Dictionary<string, CorpseLifecycleEvidence>();
+        private readonly Dictionary<string, int> corpseInventorySnapshotCounts =
+            new Dictionary<string, int>();
+        private readonly HashSet<string> corpseLootInitialEnemyKeys = new HashSet<string>();
 
         private const int CorpseFullUpdateDeadNpcTypeOffset = 183;
         private const int CorpseFullUpdateDeadNpcInstanceOffset = 191;
         private const int CorpseFullUpdateMonsterDataSuffixOffset = 72;
         private const int CorpseFullUpdateTailDeadNpcTypeSuffixOffset = 80;
         private const int CorpseFullUpdateTailDeadNpcInstanceSuffixOffset = 84;
+        private const string LootCaptureRequestFileName = "loot-10.request";
         private readonly HashSet<string> interestingMessageNames = new HashSet<string>
         {
             "SimpleCharFullUpdate",
@@ -60,6 +70,7 @@ namespace AOSharpLiveCapture
             "FightModeUpdate",
             "Attack",
             "AttackInfo",
+            "SpecialAttackWeapon",
             "HealthDamage",
             "MissedAttackInfo",
             "SpecialAttackInfo",
@@ -103,12 +114,15 @@ namespace AOSharpLiveCapture
         private string pluginDirectory;
         private StreamWriter eventsLog;
         private StreamWriter packetsLog;
+        private StreamWriter rawPacketsCsvLog;
+        private StreamWriter scfuAppearanceLog;
         private StreamWriter shopUpdatesLog;
         private StreamWriter vendorFullUpdatesLog;
         private StreamWriter systemMessagesLog;
         private StreamWriter chatDialogueLog;
         private StreamWriter npcInteractionsLog;
         private StreamWriter inventoryUpdatesLog;
+        private StreamWriter corpseLootObservationsLog;
         private StreamWriter enemyStateLog;
         private StreamWriter enemyFullUpdatesLog;
         private StreamWriter enemyCombatLog;
@@ -120,10 +134,35 @@ namespace AOSharpLiveCapture
         private StreamWriter npcLifecycleLog;
         private bool enabled;
         private bool captureFinalized;
+        private bool captureStopDrainRequested;
+        private DateTime? captureStopRequestedUtc;
+        private DateTime? captureStopQuietDeadlineUtc;
+        private DateTime? captureStopMaximumDeadlineUtc;
+        private DateTime? captureFinalizedUtc;
+        private bool captureQuietPeriodPassed;
         private int inboundPacketCount;
         private int outboundPacketCount;
         private int decodedInboundCount;
         private int decodedOutboundCount;
+        private int decodedN3EventRowCount;
+        private int n3CaptureStageErrorCount;
+        private int rawCombatPacketCount;
+        private int rawSimpleCharFullUpdatePacketCount;
+        private int rawSimpleCharFullUpdateDecodeCount;
+        private int rawSimpleCharFullUpdateDecodeErrorCount;
+        private int rawSimpleCharFullUpdateIncompleteDecodeCount;
+        private int rawNpcSimpleCharFullUpdateCount;
+        private int scfuAppearanceRowCount;
+        private int rawPacketLogRowCount;
+        private int rawPacketIndexRowCount;
+        private int rawPacketPreservedCount;
+        private int rawPacketWriteErrorCount;
+        private int rawPacketProjectionErrorCount;
+        private long rawPacketGlobalOrdinal;
+        private int rawPacketCallbacksInFlight;
+        private int rawCaptureGateState;
+        private int rawPacketCallbackDrainTimeoutCount;
+        private readonly Stopwatch captureClock = new Stopwatch();
         private int shopUpdateMessageCount;
         private int shopUpdateRowCount;
         private int vendorFullUpdateMessageCount;
@@ -132,6 +171,10 @@ namespace AOSharpLiveCapture
         private int npcInteractionCount;
         private int inventoryUpdateMessageCount;
         private int inventoryUpdateRowCount;
+        private int corpseLootObservationRowCount;
+        private int corpseLootInitialSnapshotCount;
+        private int corpseLootUnlinkedSnapshotCount;
+        private int corpseLootMissingPlayerContextCount;
         private int vendorInteractionAttemptCount;
         private int enemyStateRowCount;
         private int enemyCombatEventCount;
@@ -172,6 +215,7 @@ namespace AOSharpLiveCapture
         private bool enemyFightAutoCaptureEnabled = true;
         private bool enemyFightCaptureStarted;
         private bool respawnCaptureRequested;
+        private bool lootCaptureRequested;
 
         public override void Run(string pluginDir)
         {
@@ -189,11 +233,16 @@ namespace AOSharpLiveCapture
             try
             {
             this.pluginDirectory = pluginDir;
-            this.OpenFreshCaptureSession(pluginDir, true);
+            lock (this.syncRoot)
+            {
+                this.OpenFreshCaptureSession(pluginDir, true, false);
+                Network.PacketReceived += this.OnPacketReceived;
+                Network.PacketSent += this.OnPacketSent;
+                this.ActivateCaptureSession();
+            }
+
             this.combatLootSmoke = new CombatLootSmoke(pluginDir, this.LogSmokeEvent);
 
-            Network.PacketReceived += this.OnPacketReceived;
-            Network.PacketSent += this.OnPacketSent;
             Network.N3MessageReceived += this.OnN3MessageReceived;
             Network.N3MessageSent += this.OnN3MessageSent;
             Network.ChatMessageReceived += this.OnChatMessageReceived;
@@ -217,6 +266,7 @@ namespace AOSharpLiveCapture
             this.LogEvent("PLUGIN", "Chat/dialogue log: " + Path.Combine(this.sessionDirectory, "chat-dialogue.log"));
             this.LogEvent("PLUGIN", "NPC interactions log: " + Path.Combine(this.sessionDirectory, "npc-interactions.log"));
             this.LogEvent("PLUGIN", "Inventory update CSV: " + Path.Combine(this.sessionDirectory, "inventory-updates.csv"));
+            this.LogEvent("PLUGIN", "Corpse loot observations CSV: " + Path.Combine(this.sessionDirectory, "corpse-loot-observations.csv"));
             this.LogEvent("PLUGIN", "Enemy state CSV: " + Path.Combine(this.sessionDirectory, "enemy-state.csv"));
             this.LogEvent("PLUGIN", "Enemy full update CSV: " + Path.Combine(this.sessionDirectory, "enemy-full-updates.csv"));
             this.LogEvent("PLUGIN", "Enemy combat CSV: " + Path.Combine(this.sessionDirectory, "enemy-combat.csv"));
@@ -275,8 +325,11 @@ namespace AOSharpLiveCapture
             Game.OnUpdate -= this.OnUpdate;
             this.combatLootSmoke?.Teardown();
 
-            this.LogEvent("PLUGIN", "AOSharpLiveCapture teardown.");
-            this.FinalizeCapture();
+            if (!this.captureFinalized)
+            {
+                this.LogEvent("PLUGIN", "AOSharpLiveCapture teardown.");
+                this.FinalizeCapture();
+            }
 
             lock (LifecycleSyncRoot)
             {
@@ -295,24 +348,23 @@ namespace AOSharpLiveCapture
             switch (subCommand)
             {
                 case "start":
-                    this.OpenFreshCaptureSession(this.pluginDirectory, true);
+                    this.OpenFreshCaptureSession(this.pluginDirectory, true, true);
                     this.LogEvent("COMMAND", "capture started");
                     chatWindow.WriteLine("AO capture started: " + this.sessionDirectory, ChatColor.Gold);
                     break;
 
                 case "stop":
                     DateTime stopUtc = DateTime.UtcNow;
-                    this.LogEvent("COMMAND", "capture stopped");
-                    this.enabled = false;
-                    this.Flush();
-                    this.WriteEnemyStateJson();
-                    this.WriteEnemyDossierJson();
-                    this.WriteMovementSummaryJson();
-                    this.WriteEnemyRespawnCsv(stopUtc);
-                    CaptureValidation stopValidation = this.ValidateCapture();
-                    this.WriteCaptureHealth(stopValidation);
-                    this.WriteCaptureInfo(stopUtc, stopValidation);
-                    chatWindow.WriteLine("AO capture stopped.", ChatColor.Gold);
+                    if (!this.captureStopDrainRequested)
+                    {
+                        this.captureStopDrainRequested = true;
+                        this.captureStopRequestedUtc = stopUtc;
+                        this.captureStopQuietDeadlineUtc = stopUtc.AddSeconds(CaptureStopQuietPeriodSeconds);
+                        this.captureStopMaximumDeadlineUtc = stopUtc.AddSeconds(CaptureStopMaximumDrainSeconds);
+                        this.LogEvent("COMMAND", "capture stop requested; draining raw packets until quiet");
+                        this.Flush();
+                        chatWindow.WriteLine("AO capture stop requested; finalizing after the packet drain.", ChatColor.Gold);
+                    }
                     break;
 
                 case "mark":
@@ -320,6 +372,11 @@ namespace AOSharpLiveCapture
                     if (marker.IndexOf("respawn", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         this.respawnCaptureRequested = true;
+                    }
+
+                    if (marker.IndexOf("loot", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        this.lootCaptureRequested = true;
                     }
 
                     this.LogEvent("MARK", marker);
@@ -865,65 +922,181 @@ namespace AOSharpLiveCapture
 
         private void OnPacketReceived(object sender, byte[] packet)
         {
-            if (!this.enabled)
-            {
-                return;
-            }
-
-            this.inboundPacketCount++;
-            this.lastPacketUtc = DateTime.UtcNow;
-            this.LogPacket("IN", this.inboundPacketCount, packet);
+            this.CaptureNetworkPacketNoThrow("IN", packet, true);
         }
 
         private void OnPacketSent(object sender, byte[] packet)
         {
-            if (!this.enabled)
+            this.CaptureNetworkPacketNoThrow("OUT", packet, false);
+        }
+
+        private void CaptureNetworkPacketNoThrow(string direction, byte[] packet, bool inbound)
+        {
+            while (true)
             {
-                return;
+                int gateState = Volatile.Read(ref this.rawCaptureGateState);
+                if (gateState == RawCaptureGateClosed)
+                {
+                    return;
+                }
+
+                if (gateState == RawCaptureGateTentative)
+                {
+                    Thread.Yield();
+                    continue;
+                }
+
+                Interlocked.Increment(ref this.rawPacketCallbacksInFlight);
+                if (Volatile.Read(ref this.rawCaptureGateState) == RawCaptureGateOpen)
+                {
+                    break;
+                }
+
+                this.ReleaseRawPacketCallbackRegistration();
             }
 
-            this.outboundPacketCount++;
-            this.lastPacketUtc = DateTime.UtcNow;
-            this.LogPacket("OUT", this.outboundPacketCount, packet);
+            try
+            {
+                lock (this.syncRoot)
+                {
+                    if (!this.enabled)
+                    {
+                        return;
+                    }
+
+                    int sequence;
+                    if (inbound)
+                    {
+                        sequence = ++this.inboundPacketCount;
+                    }
+                    else
+                    {
+                        sequence = ++this.outboundPacketCount;
+                    }
+
+                    this.lastPacketUtc = DateTime.UtcNow;
+                    this.LogPacket(direction, sequence, packet);
+                }
+            }
+            catch (Exception ex)
+            {
+                Interlocked.Increment(ref this.rawPacketWriteErrorCount);
+                this.LogEvent(
+                    "RAW-PACKET-CALLBACK-ERROR",
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "direction={0} error={1}: {2}",
+                        direction,
+                        ex.GetType().Name,
+                        ex.Message));
+            }
+            finally
+            {
+                this.ReleaseRawPacketCallbackRegistration();
+            }
+        }
+
+        private void ReleaseRawPacketCallbackRegistration()
+        {
+            if (Interlocked.Decrement(ref this.rawPacketCallbacksInFlight) == 0)
+            {
+                lock (this.syncRoot)
+                {
+                    Monitor.PulseAll(this.syncRoot);
+                }
+            }
         }
 
         private void OnN3MessageReceived(object sender, N3Message message)
         {
-            this.combatLootSmoke?.OnN3MessageReceived(message);
-
-            if (!this.enabled || message == null)
+            try
             {
-                return;
-            }
+                lock (this.syncRoot)
+                {
+                    if (!this.enabled || message == null)
+                    {
+                        return;
+                    }
 
-            this.decodedInboundCount++;
-            this.lastPacketUtc = DateTime.UtcNow;
-            this.LogN3Message("IN-N3", this.decodedInboundCount, message);
+                    this.decodedInboundCount++;
+                    this.lastPacketUtc = DateTime.UtcNow;
+                    int sequence = this.decodedInboundCount;
+                    this.RunN3CaptureStage(
+                        "IN-N3",
+                        sequence,
+                        message,
+                        "combat-loot-smoke",
+                        () => this.combatLootSmoke?.OnN3MessageReceived(message));
+                    this.RunN3CaptureStage(
+                        "IN-N3",
+                        sequence,
+                        message,
+                        "decoded-message-pipeline",
+                        () => this.LogN3Message("IN-N3", sequence, message));
+                }
+            }
+            catch (Exception ex)
+            {
+                this.n3CaptureStageErrorCount++;
+                this.LogEvent("IN-N3-CALLBACK-ERROR", ex.GetType().Name + ": " + ex.Message);
+            }
         }
 
         private void OnN3MessageSent(object sender, N3Message message)
         {
-            this.combatLootSmoke?.OnN3MessageSent(message);
-
-            if (!this.enabled || message == null)
+            try
             {
-                return;
-            }
+                lock (this.syncRoot)
+                {
+                    if (!this.enabled || message == null)
+                    {
+                        return;
+                    }
 
-            this.decodedOutboundCount++;
-            this.lastPacketUtc = DateTime.UtcNow;
-            this.LogN3Message("OUT-N3", this.decodedOutboundCount, message);
+                    this.decodedOutboundCount++;
+                    this.lastPacketUtc = DateTime.UtcNow;
+                    int sequence = this.decodedOutboundCount;
+                    this.RunN3CaptureStage(
+                        "OUT-N3",
+                        sequence,
+                        message,
+                        "combat-loot-smoke",
+                        () => this.combatLootSmoke?.OnN3MessageSent(message));
+                    this.RunN3CaptureStage(
+                        "OUT-N3",
+                        sequence,
+                        message,
+                        "decoded-message-pipeline",
+                        () => this.LogN3Message("OUT-N3", sequence, message));
+                }
+            }
+            catch (Exception ex)
+            {
+                this.n3CaptureStageErrorCount++;
+                this.LogEvent("OUT-N3-CALLBACK-ERROR", ex.GetType().Name + ": " + ex.Message);
+            }
         }
 
         private void OnChatMessageReceived(object sender, ChatMessageBody message)
         {
-            if (!this.enabled || message == null)
+            try
             {
-                return;
-            }
+                lock (this.syncRoot)
+                {
+                    if (!this.enabled || message == null)
+                    {
+                        return;
+                    }
 
-            this.LogEvent("CHAT", this.DescribeObject(message));
-            this.LogChatDialogue("CHAT", 0, message.PacketType.ToString(), "chat-protocol", this.DescribeObject(message));
+                    this.LogEvent("CHAT", this.DescribeObject(message));
+                    this.LogChatDialogue("CHAT", 0, message.PacketType.ToString(), "chat-protocol", this.DescribeObject(message));
+                }
+            }
+            catch (Exception ex)
+            {
+                this.rawPacketProjectionErrorCount++;
+                this.LogEvent("CHAT-CALLBACK-ERROR", ex.GetType().Name + ": " + ex.Message);
+            }
         }
 
         private void OnDynelSpawned(object sender, Dynel dynel)
@@ -950,6 +1123,11 @@ namespace AOSharpLiveCapture
 
         private void OnPlayfieldInit(object sender, uint playfieldId)
         {
+            if (!this.enabled)
+            {
+                return;
+            }
+
             this.lastPlayfieldId = playfieldId.ToString(CultureInfo.InvariantCulture);
             this.lastCapturePlayfieldIdentity = Safe(() => Playfield.Identity.ToString());
             this.LogEvent("PLAYFIELD-INIT", this.lastPlayfieldId);
@@ -960,28 +1138,43 @@ namespace AOSharpLiveCapture
 
         private void OnTeleportStarted(object sender, EventArgs e)
         {
+            if (!this.enabled)
+            {
+                return;
+            }
+
             this.LogEvent("TELEPORT", "started");
         }
 
         private void OnTeleportEnded(object sender, EventArgs e)
         {
+            if (!this.enabled)
+            {
+                return;
+            }
+
             this.LogEvent("TELEPORT", "ended");
             this.LogSnapshot("teleport-ended");
         }
 
         private void OnTeleportFailed(object sender, EventArgs e)
         {
+            if (!this.enabled)
+            {
+                return;
+            }
+
             this.LogEvent("TELEPORT", "failed");
         }
 
         private void OnUpdate(object sender, float deltaTime)
         {
-            this.combatLootSmoke?.Update(deltaTime);
-
             if (!this.enabled)
             {
                 return;
             }
+
+            this.combatLootSmoke?.Update(deltaTime);
 
             DateTime now = DateTime.UtcNow;
             if (now >= this.nextSnapshotUtc)
@@ -994,6 +1187,167 @@ namespace AOSharpLiveCapture
             {
                 this.nextFlushUtc = now.AddSeconds(2);
                 this.Flush();
+            }
+
+            if (this.captureStopDrainRequested
+                && this.captureStopQuietDeadlineUtc.HasValue
+                && this.captureStopMaximumDeadlineUtc.HasValue)
+            {
+                bool captureBoundaryClosed = Volatile.Read(ref this.rawCaptureGateState)
+                                             == RawCaptureGateClosed;
+                bool quietPeriodPassed = now >= this.captureStopQuietDeadlineUtc.Value
+                    && (now - this.lastPacketUtc).TotalSeconds >= CaptureStopQuietPeriodSeconds;
+                bool maximumDrainReached = now >= this.captureStopMaximumDeadlineUtc.Value;
+                if (captureBoundaryClosed || quietPeriodPassed || maximumDrainReached)
+                {
+                    this.CompleteCaptureStop(now, quietPeriodPassed, true);
+                }
+            }
+        }
+
+        private void CompleteCaptureStop(
+            DateTime finalizedUtc,
+            bool quietPeriodPassed,
+            bool recheckDrainDeadline)
+        {
+            lock (this.syncRoot)
+            {
+                if (this.captureFinalized)
+                {
+                    return;
+                }
+
+                if (recheckDrainDeadline)
+                {
+                    int gateState = Volatile.Read(ref this.rawCaptureGateState);
+                    if (gateState != RawCaptureGateClosed)
+                    {
+                        finalizedUtc = DateTime.UtcNow;
+                        quietPeriodPassed = this.captureStopQuietDeadlineUtc.HasValue
+                                            && finalizedUtc >= this.captureStopQuietDeadlineUtc.Value
+                                            && (finalizedUtc - this.lastPacketUtc).TotalSeconds
+                                            >= CaptureStopQuietPeriodSeconds;
+                        bool maximumDrainReached = this.captureStopMaximumDeadlineUtc.HasValue
+                                                   && finalizedUtc >= this.captureStopMaximumDeadlineUtc.Value;
+                        if (!quietPeriodPassed && !maximumDrainReached)
+                        {
+                            return;
+                        }
+
+                        if (maximumDrainReached)
+                        {
+                            Interlocked.Exchange(
+                                ref this.rawCaptureGateState,
+                                RawCaptureGateClosed);
+                        }
+                        else
+                        {
+                            Interlocked.Exchange(
+                                ref this.rawCaptureGateState,
+                                RawCaptureGateTentative);
+                            if (Volatile.Read(ref this.rawPacketCallbacksInFlight) != 0)
+                            {
+                                Interlocked.Exchange(
+                                    ref this.rawCaptureGateState,
+                                    RawCaptureGateOpen);
+                                return;
+                            }
+
+                            Interlocked.Exchange(
+                                ref this.rawCaptureGateState,
+                                RawCaptureGateClosed);
+                        }
+
+                        this.captureQuietPeriodPassed = quietPeriodPassed;
+                    }
+
+                    quietPeriodPassed = this.captureQuietPeriodPassed;
+                    if (Volatile.Read(ref this.rawPacketCallbacksInFlight) != 0)
+                    {
+                        return;
+                    }
+
+                    finalizedUtc = DateTime.UtcNow;
+                }
+
+                this.captureFinalized = true;
+                this.captureFinalizedUtc = finalizedUtc;
+                this.captureQuietPeriodPassed = quietPeriodPassed;
+                this.captureStopDrainRequested = false;
+                this.captureStopRequestedUtc = this.captureStopRequestedUtc ?? finalizedUtc;
+                this.enabled = false;
+                this.captureClock.Stop();
+
+                this.FlushAndCloseRawWritersNoThrow();
+                this.RunFinalizationStage("enemy-state-json", this.WriteEnemyStateJson);
+                this.RunFinalizationStage("enemy-dossier-json", this.WriteEnemyDossierJson);
+                this.RunFinalizationStage("movement-summary-json", this.WriteMovementSummaryJson);
+                this.RunFinalizationStage("enemy-respawn-csv", () => this.WriteEnemyRespawnCsv(finalizedUtc));
+                this.Flush();
+
+                CaptureValidation validation;
+                try
+                {
+                    validation = this.ValidateCapture();
+                }
+                catch (Exception ex)
+                {
+                    this.rawPacketProjectionErrorCount++;
+                    bool recaptureRequired = this.IsRawRecaptureRequired();
+                    validation = new CaptureValidation(
+                        "incomplete",
+                        false,
+                        recaptureRequired,
+                        !recaptureRequired,
+                        new List<string>
+                        {
+                            "Capture validation failed: " + ex.GetType().Name + ": " + ex.Message
+                        },
+                        new List<string>());
+                }
+
+                this.RunFinalizationStage("capture-health", () => this.WriteCaptureHealth(validation));
+                this.RunFinalizationStage("capture-info", () => this.WriteCaptureInfo(finalizedUtc, validation));
+                this.LogEvent(
+                    "CAPTURE-VALIDATION",
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "status={0} processingAllowed={1} recaptureRequired={2} offlineDecodeRequired={3} issues={4} quietPeriodPassed={5}",
+                        validation.Status,
+                        validation.ProcessingAllowed,
+                        validation.RecaptureRequired,
+                        validation.OfflineDecodeRequired,
+                        validation.Issues.Count,
+                        quietPeriodPassed));
+                this.FlushAndClose();
+            }
+
+            try
+            {
+                Chat.WriteLine("AO capture finalized: " + this.sessionDirectory, ChatColor.Gold);
+            }
+            catch
+            {
+            }
+        }
+
+        private void RunFinalizationStage(string stage, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                this.rawPacketProjectionErrorCount++;
+                this.LogEvent(
+                    "CAPTURE-FINALIZATION-ERROR",
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "stage={0} error={1}: {2}",
+                        stage,
+                        ex.GetType().Name,
+                        ex.Message));
             }
         }
 
@@ -1133,22 +1487,324 @@ namespace AOSharpLiveCapture
 
         private void LogPacket(string direction, int sequence, byte[] packet)
         {
-            lock (this.syncRoot)
+            DateTime capturedUtc = DateTime.UtcNow;
+            double elapsedMilliseconds = this.captureClock.Elapsed.TotalMilliseconds;
+            long globalOrdinal = Interlocked.Increment(ref this.rawPacketGlobalOrdinal);
+            if (this.captureStopDrainRequested && this.captureStopMaximumDeadlineUtc.HasValue)
             {
+                DateTime quietDeadline = capturedUtc.AddSeconds(CaptureStopQuietPeriodSeconds);
+                this.captureStopQuietDeadlineUtc = quietDeadline < this.captureStopMaximumDeadlineUtc.Value
+                                                       ? quietDeadline
+                                                       : this.captureStopMaximumDeadlineUtc.Value;
+            }
+
+            int n3TypeValue = packet != null && packet.Length >= 20
+                                  ? ReadInt32BigEndian(packet, 16)
+                                  : 0;
+            int identityType = packet != null && packet.Length >= 28
+                                   ? ReadInt32BigEndian(packet, 20)
+                                   : 0;
+            int identityInstance = packet != null && packet.Length >= 28
+                                       ? ReadInt32BigEndian(packet, 24)
+                                       : 0;
+
+            if (IsRawCombatEvidencePacket(packet))
+            {
+                this.rawCombatPacketCount++;
+            }
+
+            if (packet != null
+                && packet.Length >= 20
+                && n3TypeValue == (int)N3MessageType.SimpleCharFullUpdate)
+            {
+                this.rawSimpleCharFullUpdatePacketCount++;
+            }
+
+            string rawHex = ToHex(packet);
+            bool packetLogWritten = false;
+            bool packetIndexWritten = false;
+
+            try
+            {
+                if (this.packetsLog == null)
+                {
+                    throw new ObjectDisposedException("packets.hex.log");
+                }
+
                 this.packetsLog.WriteLine(
                     string.Format(
                         CultureInfo.InvariantCulture,
                         "{0:o} {1} #{2} len={3} {4} hex={5}",
-                        DateTime.UtcNow,
+                        capturedUtc,
                         direction,
                         sequence,
                         packet == null ? 0 : packet.Length,
                         this.DescribeRawPacket(packet),
-                        ToHex(packet)));
+                        rawHex));
+                if (packet != null)
+                {
+                    this.rawPacketLogRowCount++;
+                    packetLogWritten = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                this.rawPacketWriteErrorCount++;
+                this.LogEvent(
+                    "RAW-PACKET-WRITE-ERROR",
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "sink=packets.hex.log direction={0} sequence={1} ordinal={2} error={3}: {4}",
+                        direction,
+                        sequence,
+                        globalOrdinal,
+                        ex.GetType().Name,
+                        ex.Message));
             }
 
-            this.ExportMovementPacket(direction, sequence, packet);
-            this.ExportNpcLifecyclePacket(direction, sequence, packet);
+            try
+            {
+                if (this.rawPacketsCsvLog == null)
+                {
+                    throw new ObjectDisposedException("raw-packets.csv");
+                }
+
+                this.rawPacketsCsvLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                        elapsedMilliseconds.ToString("0.###", CultureInfo.InvariantCulture),
+                        Csv(direction),
+                        globalOrdinal.ToString(CultureInfo.InvariantCulture),
+                        sequence.ToString(CultureInfo.InvariantCulture),
+                        (packet == null ? 0 : packet.Length).ToString(CultureInfo.InvariantCulture),
+                        n3TypeValue.ToString(CultureInfo.InvariantCulture),
+                        Csv(packet != null && packet.Length >= 20 ? ((N3MessageType)n3TypeValue).ToString() : string.Empty),
+                        identityType.ToString(CultureInfo.InvariantCulture),
+                        identityInstance.ToString(CultureInfo.InvariantCulture),
+                        Csv(packet == null ? "raw_missing" : "raw_complete"),
+                        Csv(rawHex)));
+                if (packet != null)
+                {
+                    this.rawPacketIndexRowCount++;
+                    packetIndexWritten = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                this.rawPacketWriteErrorCount++;
+                this.LogEvent(
+                    "RAW-PACKET-WRITE-ERROR",
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "sink=raw-packets.csv direction={0} sequence={1} ordinal={2} error={3}: {4}",
+                        direction,
+                        sequence,
+                        globalOrdinal,
+                        ex.GetType().Name,
+                        ex.Message));
+            }
+
+            if (packetLogWritten || packetIndexWritten)
+            {
+                this.rawPacketPreservedCount++;
+            }
+            else if (packet == null)
+            {
+                this.rawPacketWriteErrorCount++;
+                this.LogEvent(
+                    "RAW-PACKET-WRITE-ERROR",
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "direction={0} sequence={1} ordinal={2} error=packet bytes were null",
+                        direction,
+                        sequence,
+                        globalOrdinal));
+            }
+
+            if (n3TypeValue == (int)N3MessageType.SimpleCharFullUpdate)
+            {
+                this.RunRawPacketProjectionStage(
+                    "scfu",
+                    direction,
+                    sequence,
+                    globalOrdinal,
+                    () => this.DecodeAndExportRawSimpleCharFullUpdate(
+                        capturedUtc,
+                        elapsedMilliseconds,
+                        direction,
+                        globalOrdinal,
+                        sequence,
+                        packet));
+            }
+
+            this.RunRawPacketProjectionStage(
+                "movement",
+                direction,
+                sequence,
+                globalOrdinal,
+                () => this.ExportMovementPacket(direction, sequence, packet));
+            this.RunRawPacketProjectionStage(
+                "npc-lifecycle",
+                direction,
+                sequence,
+                globalOrdinal,
+                () => this.ExportNpcLifecyclePacket(direction, sequence, packet));
+        }
+
+        private void RunRawPacketProjectionStage(
+            string stage,
+            string direction,
+            int sequence,
+            long globalOrdinal,
+            Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                this.rawPacketProjectionErrorCount++;
+                this.LogEvent(
+                    "RAW-PACKET-PROJECTION-ERROR",
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "stage={0} direction={1} sequence={2} ordinal={3} error={4}: {5}",
+                        stage,
+                        direction,
+                        sequence,
+                        globalOrdinal,
+                        ex.GetType().Name,
+                        ex.Message));
+            }
+        }
+
+        private void DecodeAndExportRawSimpleCharFullUpdate(
+            DateTime capturedUtc,
+            double elapsedMilliseconds,
+            string direction,
+            long globalOrdinal,
+            int sequence,
+            byte[] packet)
+        {
+            RawSimpleCharFullUpdate message;
+            string decodeError;
+            bool decoded = RawSimpleCharFullUpdateDecoder.TryDecodePacket(
+                packet,
+                out message,
+                out decodeError);
+
+            if (decoded)
+            {
+                this.rawSimpleCharFullUpdateDecodeCount++;
+                if (!message.DecodeFullyConsumed)
+                {
+                    this.rawSimpleCharFullUpdateIncompleteDecodeCount++;
+                }
+
+                if (message.Npc != null)
+                {
+                    this.rawNpcSimpleCharFullUpdateCount++;
+                }
+            }
+            else
+            {
+                this.rawSimpleCharFullUpdateDecodeErrorCount++;
+            }
+
+            var metadata = new RawScfuCaptureMetadata
+            {
+                CapturedUtc = capturedUtc.ToString("o", CultureInfo.InvariantCulture),
+                ElapsedMilliseconds = elapsedMilliseconds.ToString("0.###", CultureInfo.InvariantCulture),
+                Direction = direction,
+                GlobalOrdinal = globalOrdinal.ToString(CultureInfo.InvariantCulture),
+                Sequence = sequence.ToString(CultureInfo.InvariantCulture)
+            };
+
+            lock (this.syncRoot)
+            {
+                this.scfuAppearanceLog.WriteLine(
+                    RawScfuAppearanceCsv.FormatRow(
+                        metadata,
+                        packet,
+                        message,
+                        decodeError));
+                this.scfuAppearanceLog.Flush();
+                this.scfuAppearanceRowCount++;
+            }
+
+            if (decoded && message.Npc != null)
+            {
+                this.ExportEnemyFullUpdate(capturedUtc, direction, sequence, message);
+                SimpleCharFullUpdateMessage adapted = AdaptRawSimpleCharFullUpdate(message);
+                this.CacheEnemyFullUpdate(direction, sequence, adapted);
+                this.TrackEnemyFromSimpleCharFullUpdate(direction, sequence, adapted);
+            }
+
+            if (!decoded || !message.DecodeFullyConsumed)
+            {
+                this.LogEvent(
+                    decoded ? "RAW-SCFU-DECODE-PENDING" : "RAW-SCFU-DECODE-ERROR",
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "direction={0} sequence={1} ordinal={2} error={3} undecodedTailBytes={4}",
+                        direction,
+                        sequence,
+                        globalOrdinal,
+                        decodeError,
+                        message == null || message.UndecodedTail == null ? 0 : message.UndecodedTail.Length));
+            }
+        }
+
+        private static SimpleCharFullUpdateMessage AdaptRawSimpleCharFullUpdate(
+            RawSimpleCharFullUpdate raw)
+        {
+            var message = new SimpleCharFullUpdateMessage
+            {
+                Identity = ToAoIdentity(raw.Identity),
+                Unknown = raw.HeaderUnknown,
+                Version = raw.Version,
+                Flags = (SimpleCharFullUpdateFlags)raw.Flags,
+                PlayfieldId = raw.PlayfieldId,
+                FightingTarget = raw.FightingTarget.HasValue
+                                     ? (Identity?)ToAoIdentity(raw.FightingTarget.Value)
+                                     : null,
+                Position = new Vector3(raw.Position.X, raw.Position.Y, raw.Position.Z),
+                Heading = new Quaternion(raw.Heading.X, raw.Heading.Y, raw.Heading.Z, raw.Heading.W),
+                Appearance = new Appearance { Value = raw.AppearanceValue },
+                Name = raw.Name,
+                CharacterFlags = (CharacterFlags)raw.CharacterFlags,
+                AccountFlags = raw.AccountFlags,
+                Expansions = raw.Expansions,
+                CharacterInfo = new SimpleCharInfo.NPCInfo
+                {
+                    Family = raw.Npc.Family,
+                    LosHeight = raw.Npc.LosHeight
+                },
+                Level = raw.Level,
+                Health = raw.Health,
+                HealthDamage = raw.HealthDamage,
+                MonsterData = raw.MonsterData,
+                MonsterScale = raw.MonsterScale,
+                VisualFlags = raw.VisualFlags,
+                VisibleTitle = raw.VisibleTitle,
+                ScfuUnk1 = raw.Unknown1,
+                HeadMesh = raw.HeadMesh,
+                RunSpeedBase = raw.RunSpeedBase,
+                Flags2 = (ScfuFlags2)raw.Flags2,
+                Owner = raw.Owner.HasValue ? (Identity?)ToAoIdentity(raw.Owner.Value) : null,
+                ScfuUnk2 = raw.Unknown2,
+                ScfuUnk4 = raw.Unknown4.GetValueOrDefault(),
+                ScfuTowerUnk = raw.TowerUnknown.GetValueOrDefault()
+            };
+
+            return message;
+        }
+
+        private static Identity ToAoIdentity(RawScfuIdentity raw)
+        {
+            return new Identity((IdentityType)raw.Type, raw.Instance);
         }
 
         private void ExportNpcLifecyclePacket(string direction, int sequence, byte[] packet)
@@ -1217,6 +1873,7 @@ namespace AOSharpLiveCapture
                         DeadNpcIdentity = deadNpcIdentity,
                         CorpseIdentity = corpseIdentity,
                         CorpseSeenUtc = capturedUtc,
+                        PlayfieldId = ReadInt32BigEndian(packet, 73),
                         CorpseCredits = ReadInt32BigEndian(packet, 207),
                         CorpseMonsterData = ReadInt32BigEndian(packet, monsterDataOffset)
                     };
@@ -1801,45 +2458,137 @@ namespace AOSharpLiveCapture
 
         private void LogN3Message(string direction, int sequence, N3Message message)
         {
-            string messageName = message.N3MessageType.ToString();
-            bool interesting = this.interestingMessageNames.Contains(messageName);
-            string detail = interesting ? this.DescribeN3Message(message) : string.Empty;
-            this.ExportSpecializedMessage(direction, sequence, message);
-            this.ExportNpcLifecycleMessage(direction, sequence, message);
-            this.CacheEnemyFullUpdate(direction, sequence, message);
-            if (this.ShouldCaptureEnemyFightEvidence(direction, sequence, message))
-            {
-                this.LogEnemyFightEvent(direction, sequence, message);
-                this.ExportEnemyN3Evidence(direction, sequence, message);
-                this.TrackEnemyStateFromMessage(direction, sequence, message);
-            }
-            ShopUpdateMessage shopUpdate = message as ShopUpdateMessage;
-            if (shopUpdate != null)
-            {
-                this.ExportShopUpdate(direction, sequence, shopUpdate);
-            }
-
-            VendingMachineFullUpdateMessage vendorFullUpdate = message as VendingMachineFullUpdateMessage;
-            if (vendorFullUpdate != null)
-            {
-                this.ExportVendorFullUpdate(direction, sequence, vendorFullUpdate);
-            }
-
-            InventoryUpdateMessage inventoryUpdate = message as InventoryUpdateMessage;
-            if (inventoryUpdate != null)
-            {
-                this.ExportInventoryUpdate(direction, sequence, inventoryUpdate);
-            }
-
+            string messageName = Safe(() => message.N3MessageType.ToString());
             this.LogEvent(
                 direction,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "#{0} type={1} identity={2}{3}",
+                    "#{0} type={1} identity={2}",
                     sequence,
-                    message.N3MessageType,
-                    message.Identity,
-                    string.IsNullOrEmpty(detail) ? string.Empty : " " + detail));
+                    messageName,
+                    Safe(() => message.Identity.ToString())));
+            this.decodedN3EventRowCount++;
+
+            if (this.interestingMessageNames.Contains(messageName))
+            {
+                this.RunN3CaptureStage(
+                    direction,
+                    sequence,
+                    message,
+                    "decoded-detail",
+                    () => this.LogEvent(direction + "-DETAIL", this.DescribeN3Message(message)));
+            }
+
+            this.RunN3CaptureStage(
+                direction,
+                sequence,
+                message,
+                "specialized-export",
+                () => this.ExportSpecializedMessage(direction, sequence, message));
+            this.RunN3CaptureStage(
+                direction,
+                sequence,
+                message,
+                "npc-lifecycle-export",
+                () => this.ExportNpcLifecycleMessage(direction, sequence, message));
+            this.RunN3CaptureStage(
+                direction,
+                sequence,
+                message,
+                "enemy-full-update-cache",
+                () => this.CacheEnemyFullUpdate(direction, sequence, message));
+            this.RunN3CaptureStage(
+                direction,
+                sequence,
+                message,
+                "enemy-fight-export",
+                () =>
+                {
+                    if (this.ShouldCaptureEnemyFightEvidence(direction, sequence, message))
+                    {
+                        this.LogEnemyFightEvent(direction, sequence, message);
+                    }
+
+                    // Classification is downstream. Preserve every decoded combat,
+                    // movement, stat, lifecycle, and state message in the capture.
+                    this.ExportEnemyN3Evidence(direction, sequence, message);
+                    this.TrackEnemyStateFromMessage(direction, sequence, message);
+                });
+            this.RunN3CaptureStage(
+                direction,
+                sequence,
+                message,
+                "shop-export",
+                () =>
+                {
+                    ShopUpdateMessage shopUpdate = message as ShopUpdateMessage;
+                    if (shopUpdate != null)
+                    {
+                        this.ExportShopUpdate(direction, sequence, shopUpdate);
+                    }
+                });
+            this.RunN3CaptureStage(
+                direction,
+                sequence,
+                message,
+                "vendor-full-update-export",
+                () =>
+                {
+                    if (string.Equals(
+                        message.N3MessageType.ToString(),
+                        "VendingMachineFullUpdate",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.ExportVendorFullUpdate(direction, sequence, message);
+                    }
+                });
+            this.RunN3CaptureStage(
+                direction,
+                sequence,
+                message,
+                "inventory-export",
+                () =>
+                {
+                    InventoryUpdateMessage inventoryUpdate = message as InventoryUpdateMessage;
+                    if (inventoryUpdate != null)
+                    {
+                        this.ExportInventoryUpdate(direction, sequence, inventoryUpdate);
+                    }
+                });
+        }
+
+        private void RunN3CaptureStage(
+            string direction,
+            int sequence,
+            N3Message message,
+            string stage,
+            Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                this.n3CaptureStageErrorCount++;
+                try
+                {
+                    this.LogEvent(
+                        "N3-STAGE-ERROR",
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "direction={0} sequence={1} type={2} stage={3} error={4}: {5}",
+                            direction,
+                            sequence,
+                            message == null ? "<null>" : Safe(() => message.N3MessageType.ToString()),
+                            stage,
+                            ex.GetType().Name,
+                            OneLine(ex.Message)));
+                }
+                catch
+                {
+                }
+            }
         }
 
         private void ExportNpcLifecycleMessage(string direction, int sequence, N3Message message)
@@ -2163,13 +2912,15 @@ namespace AOSharpLiveCapture
                 Path.Combine(this.sessionDirectory, "shop-updates.csv")));
         }
 
-        private void ExportVendorFullUpdate(string direction, int sequence, VendingMachineFullUpdateMessage message)
+        private void ExportVendorFullUpdate(string direction, int sequence, N3Message message)
         {
-            GameTuple<Stat, int>[] stats = message.Stats ?? new GameTuple<Stat, int>[0];
+            GameTuple<Stat, int>[] stats = GetMemberValue(message, "Stats") as GameTuple<Stat, int>[]
+                ?? new GameTuple<Stat, int>[0];
             int template = GetStatValue(stats, (Stat)23);
             int mesh = GetStatValue(stats, (Stat)12);
             int buyModifier = GetStatValue(stats, (Stat)426);
             int sellModifier = GetStatValue(stats, (Stat)427);
+            object position = GetMemberValue(message, "Position");
 
             lock (this.syncRoot)
             {
@@ -2182,13 +2933,13 @@ namespace AOSharpLiveCapture
                         Csv(direction),
                         sequence.ToString(CultureInfo.InvariantCulture),
                         Csv(message.Identity.ToString()),
-                        message.OwnerType.ToString(CultureInfo.InvariantCulture),
-                        message.OwnerInstance.ToString(CultureInfo.InvariantCulture),
-                        message.PlayfieldId.ToString(CultureInfo.InvariantCulture),
-                        OptionalFloat(() => message.Position.Value.X),
-                        OptionalFloat(() => message.Position.Value.Y),
-                        OptionalFloat(() => message.Position.Value.Z),
-                        message.Unknown7.ToString(CultureInfo.InvariantCulture),
+                        Csv(GetMemberString(message, "OwnerType")),
+                        Csv(GetMemberString(message, "OwnerInstance")),
+                        Csv(GetMemberString(message, "PlayfieldId")),
+                        Csv(MemberComponent(position, "X")),
+                        Csv(MemberComponent(position, "Y")),
+                        Csv(MemberComponent(position, "Z")),
+                        Csv(GetMemberString(message, "Unknown7")),
                         template.ToString(CultureInfo.InvariantCulture),
                         mesh.ToString(CultureInfo.InvariantCulture),
                         buyModifier.ToString(CultureInfo.InvariantCulture),
@@ -2207,9 +2958,104 @@ namespace AOSharpLiveCapture
                 this.inventoryUpdateMessageCount++;
                 string capturedUtc = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
                 string inventoryIdentity = message.InventoryIdentity.ToString();
-                if (inventoryIdentity.IndexOf("(Corpse:", StringComparison.OrdinalIgnoreCase) >= 0)
+                bool isCorpseInventory = inventoryIdentity.IndexOf("Corpse:", StringComparison.OrdinalIgnoreCase) >= 0;
+                if (isCorpseInventory)
                 {
                     this.corpseInventoryUpdateCount++;
+                    string normalizedCorpseIdentity = NormalizeIdentityKey(inventoryIdentity);
+                    int priorSnapshotCount;
+                    this.corpseInventorySnapshotCounts.TryGetValue(normalizedCorpseIdentity, out priorSnapshotCount);
+                    int openOrdinal = priorSnapshotCount + 1;
+                    bool initialSnapshot = openOrdinal == 1;
+                    this.corpseInventorySnapshotCounts[normalizedCorpseIdentity] = openOrdinal;
+                    if (initialSnapshot)
+                    {
+                        this.corpseLootInitialSnapshotCount++;
+                    }
+
+                    CorpseLifecycleEvidence corpse = this.corpseEvidenceByDeadNpc.Values.FirstOrDefault(
+                        value => string.Equals(
+                            NormalizeIdentityKey(value.CorpseIdentity),
+                            normalizedCorpseIdentity,
+                            StringComparison.OrdinalIgnoreCase));
+                    EnemyEntityState enemy = corpse == null
+                        ? null
+                        : this.enemyStates.Values.FirstOrDefault(
+                            value => string.Equals(
+                                NormalizeIdentityKey(value.EntityId),
+                                NormalizeIdentityKey(corpse.DeadNpcIdentity),
+                                StringComparison.OrdinalIgnoreCase));
+                    if (corpse == null)
+                    {
+                        this.corpseLootUnlinkedSnapshotCount++;
+                    }
+                    else if (initialSnapshot)
+                    {
+                        this.corpseLootInitialEnemyKeys.Add(
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                "{0}|{1}",
+                                corpse.CorpseMonsterData,
+                                enemy == null ? string.Empty : enemy.Name));
+                    }
+
+                    LocalPlayer localPlayer = DynelManager.LocalPlayer;
+                    string localPlayerIdentity = localPlayer == null
+                        ? string.Empty
+                        : Safe(() => localPlayer.Identity.ToString());
+                    string localPlayerLevel = localPlayer == null
+                        ? string.Empty
+                        : SafeStat(localPlayer, Stat.Level);
+                    int parsedLocalPlayerLevel;
+                    if (initialSnapshot
+                        && (string.IsNullOrWhiteSpace(localPlayerIdentity)
+                            || !int.TryParse(
+                                localPlayerLevel,
+                                NumberStyles.Integer,
+                                CultureInfo.InvariantCulture,
+                                out parsedLocalPlayerLevel)
+                            || parsedLocalPlayerLevel <= 0
+                            || (corpse == null && string.IsNullOrWhiteSpace(this.lastPlayfieldId))))
+                    {
+                        this.corpseLootMissingPlayerContextCount++;
+                    }
+
+                    string itemSummary = string.Join(
+                        ";",
+                        items.Select(
+                            item => string.Format(
+                                CultureInfo.InvariantCulture,
+                                "{0}:{1}:{2}:{3}",
+                                item.ItemLowId,
+                                item.ItemHighId,
+                                item.Quality,
+                                item.Count)).ToArray());
+                    this.corpseLootObservationRowCount++;
+                    this.corpseLootObservationsLog.WriteLine(
+                        string.Join(
+                            ",",
+                            Csv(capturedUtc),
+                            Csv(direction),
+                            sequence.ToString(CultureInfo.InvariantCulture),
+                            Csv(inventoryIdentity),
+                            openOrdinal.ToString(CultureInfo.InvariantCulture),
+                            initialSnapshot ? "true" : "false",
+                            items.Length.ToString(CultureInfo.InvariantCulture),
+                            Csv(corpse == null ? string.Empty : corpse.DeadNpcIdentity),
+                            Csv(enemy == null ? string.Empty : enemy.Name),
+                            Csv(corpse == null ? string.Empty : corpse.CorpseMonsterData.ToString(CultureInfo.InvariantCulture)),
+                            Csv(enemy == null || !enemy.Level.HasValue
+                                ? string.Empty
+                                : enemy.Level.Value.ToString(CultureInfo.InvariantCulture)),
+                            Csv(corpse == null ? string.Empty : corpse.CorpseCredits.ToString(CultureInfo.InvariantCulture)),
+                            Csv(localPlayerIdentity),
+                            Csv(localPlayerLevel),
+                            Csv(corpse == null
+                                ? this.lastPlayfieldId
+                                : corpse.PlayfieldId.ToString(CultureInfo.InvariantCulture)),
+                            Csv(itemSummary),
+                            Csv(corpse == null ? "unlinked" : "linked")));
+                    this.corpseLootObservationsLog.Flush();
                 }
 
                 for (int i = 0; i < items.Length; i++)
@@ -2244,7 +3090,8 @@ namespace AOSharpLiveCapture
             SimpleCharFullUpdateMessage simpleCharFullUpdate = message as SimpleCharFullUpdateMessage;
             if (simpleCharFullUpdate != null)
             {
-                this.ExportEnemyFullUpdate(direction, sequence, simpleCharFullUpdate);
+                // Raw packet handling owns SCFU export so it cannot be lost when the
+                // AOSharp decoded-message callback is absent.
                 return;
             }
 
@@ -2255,16 +3102,18 @@ namespace AOSharpLiveCapture
                 return;
             }
 
-            SimpleItemFullUpdateMessage simpleItemFullUpdate = message as SimpleItemFullUpdateMessage;
-            if (simpleItemFullUpdate != null)
+            if (string.Equals(
+                message.N3MessageType.ToString(),
+                "SimpleItemFullUpdate",
+                StringComparison.OrdinalIgnoreCase))
             {
                 this.ExportEnemyStatUpdates(
                     direction,
                     sequence,
                     message,
                     message.Identity,
-                    GetMemberValue(simpleItemFullUpdate, "Stats"),
-                    GetMemberValue(simpleItemFullUpdate, "Position"));
+                    GetMemberValue(message, "Stats"),
+                    GetMemberValue(message, "Position"));
                 return;
             }
 
@@ -2312,6 +3161,7 @@ namespace AOSharpLiveCapture
 
             if (message is AttackMessage
                 || message is AttackInfoMessage
+                || string.Equals(message.N3MessageType.ToString(), "SpecialAttackWeapon", StringComparison.OrdinalIgnoreCase)
                 || message is SpecialAttackInfoMessage
                 || message is MissedAttackInfoMessage
                 || message is HealthDamageMessage
@@ -2367,11 +3217,34 @@ namespace AOSharpLiveCapture
             }
 
             bool registered = this.TryRegisterFocusedEnemyFromMessage(direction, sequence, message);
+            if (IsEnemyCombatEvidenceMessage(message))
+            {
+                this.enemyFightCaptureStarted = true;
+                return true;
+            }
+
             SimpleCharFullUpdateMessage simpleCharFullUpdate = message as SimpleCharFullUpdateMessage;
             return registered
                 || this.MessageTouchesFocusedEnemy(message)
                 || (simpleCharFullUpdate != null && this.IsEnemySimpleCharUpdate(simpleCharFullUpdate))
                 || this.IsTrackableEnemyIdentity(message.Identity);
+        }
+
+        private static bool IsEnemyCombatEvidenceMessage(N3Message message)
+        {
+            if (message == null)
+            {
+                return false;
+            }
+
+            string messageName = message.N3MessageType.ToString();
+            return string.Equals(messageName, "Attack", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "AttackInfo", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "SpecialAttackWeapon", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "SpecialAttackInfo", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "MissedAttackInfo", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "HealthDamage", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "StopFight", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool TryRegisterFocusedEnemyFromMessage(string direction, int sequence, N3Message message)
@@ -2463,7 +3336,6 @@ namespace AOSharpLiveCapture
                 }
             }
 
-            this.ExportEnemyFullUpdate(evidence.Direction, evidence.Sequence, evidence.Message);
             this.TrackEnemyFromSimpleCharFullUpdate(evidence.Direction, evidence.Sequence, evidence.Message);
         }
 
@@ -2495,69 +3367,89 @@ namespace AOSharpLiveCapture
             }
         }
 
-        private void ExportEnemyFullUpdate(string direction, int sequence, SimpleCharFullUpdateMessage message)
+        private void ExportEnemyFullUpdate(
+            DateTime capturedUtc,
+            string direction,
+            int sequence,
+            RawSimpleCharFullUpdate message)
         {
-            object characterInfo = GetMemberValue(message, "CharacterInfo");
-            if (!this.IsNpcCharacterInfo(characterInfo))
+            if (message == null || message.Npc == null)
             {
                 return;
             }
 
-            object position = GetMemberValue(message, "Position") ?? GetMemberValue(message, "Coordinates");
-            object heading = GetMemberValue(message, "Heading");
-            object fightingTarget = GetMemberValue(message, "FightingTarget");
             string fightingTargetRole;
             string fightingTargetIdentity;
-            this.DescribeIdentityForEnemyOutput(fightingTarget, out fightingTargetRole, out fightingTargetIdentity);
+            object fightingTarget = message.FightingTarget.HasValue
+                                        ? (object)ToAoIdentity(message.FightingTarget.Value)
+                                        : null;
+            this.DescribeIdentityForEnemyOutput(
+                fightingTarget,
+                out fightingTargetRole,
+                out fightingTargetIdentity);
 
             lock (this.syncRoot)
             {
-                this.enemyFullUpdateRowCount++;
                 this.enemyFullUpdatesLog.WriteLine(
                     string.Join(
                         ",",
-                        Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
                         Csv(direction),
                         sequence.ToString(CultureInfo.InvariantCulture),
                         Csv(message.Identity.ToString()),
-                        Csv(GetMemberString(message, "Name")),
-                        Csv(GetMemberString(message, "PlayfieldId")),
-                        MemberComponent(position, "X"),
-                        MemberComponent(position, "Y"),
-                        MemberComponent(position, "Z"),
-                        MemberComponent(heading, "X"),
-                        MemberComponent(heading, "Y"),
-                        MemberComponent(heading, "Z"),
-                        MemberComponent(heading, "W"),
+                        Csv(message.Name),
+                        Csv(message.PlayfieldId.HasValue ? message.PlayfieldId.Value.ToString(CultureInfo.InvariantCulture) : string.Empty),
+                        message.Position.X.ToString("R", CultureInfo.InvariantCulture),
+                        message.Position.Y.ToString("R", CultureInfo.InvariantCulture),
+                        message.Position.Z.ToString("R", CultureInfo.InvariantCulture),
+                        message.Heading.X.ToString("R", CultureInfo.InvariantCulture),
+                        message.Heading.Y.ToString("R", CultureInfo.InvariantCulture),
+                        message.Heading.Z.ToString("R", CultureInfo.InvariantCulture),
+                        message.Heading.W.ToString("R", CultureInfo.InvariantCulture),
                         Csv(fightingTargetRole),
                         Csv(fightingTargetIdentity),
-                        Csv(GetMemberString(message, "Version")),
-                        Csv(GetMemberString(message, "Flags")),
-                        Csv(GetMemberString(message, "CharacterFlags")),
-                        Csv(GetMemberString(message, "AccountFlags")),
-                        Csv(GetMemberString(message, "Expansions")),
-                        Csv(characterInfo == null ? string.Empty : characterInfo.GetType().Name),
-                        Csv(GetMemberString(characterInfo, "Family")),
-                        Csv(GetMemberString(characterInfo, "LosHeight")),
-                        Csv(GetMemberString(message, "Level")),
-                        Csv(GetMemberString(message, "Health")),
-                        Csv(GetMemberString(message, "HealthDamage")),
-                        Csv(GetMemberString(message, "MonsterData")),
-                        Csv(GetMemberString(message, "MonsterScale")),
-                        Csv(GetMemberString(message, "VisualFlags")),
-                        Csv(GetMemberString(message, "VisibleTitle")),
-                        Csv(GetByteArrayLengthString(GetMemberValue(message, "Unknown1"))),
-                        Csv(GetMemberString(message, "HeadMesh")),
-                        Csv(GetMemberString(message, "RunSpeedBase")),
-                        Csv(GetCountString(GetMemberValue(message, "ActiveNanos"))),
-                        Csv(GetCountString(GetMemberValue(message, "Textures"))),
-                        Csv(FormatValue(GetMemberValue(message, "Textures"))),
-                        Csv(GetCountString(GetMemberValue(message, "Meshes"))),
-                        Csv(FormatValue(GetMemberValue(message, "Meshes"))),
-                        Csv(GetMemberString(message, "Flags2")),
-                        Csv(GetMemberString(message, "Unknown2")),
-                        Csv(this.DescribeObject(message))));
+                        Csv(message.Version.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.FlagsText),
+                        Csv(message.CharacterFlags.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.AccountFlags.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.Expansions.ToString(CultureInfo.InvariantCulture)),
+                        Csv("NPCInfo"),
+                        Csv(message.Npc.Family.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.Npc.LosHeight.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.Npc.UnknownData.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.Npc.UnknownData2.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.Npc.UnknownData3.HasValue ? message.Npc.UnknownData3.Value.ToString(CultureInfo.InvariantCulture) : string.Empty),
+                        Csv(message.Level.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.Health.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.HealthDamage.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.MonsterData.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.MonsterScale.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.VisualFlags.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.VisibleTitle.ToString(CultureInfo.InvariantCulture)),
+                        Csv((message.Unknown1 == null ? 0 : message.Unknown1.Length).ToString(CultureInfo.InvariantCulture)),
+                        Csv(RawScfuFormatting.ToHex(message.Unknown1)),
+                        Csv(message.HeadMesh.HasValue ? message.HeadMesh.Value.ToString(CultureInfo.InvariantCulture) : string.Empty),
+                        Csv(message.RunSpeedBase.ToString(CultureInfo.InvariantCulture)),
+                        Csv((message.ActiveNanos == null ? 0 : message.ActiveNanos.Length).ToString(CultureInfo.InvariantCulture)),
+                        Csv(RawScfuFormatting.FormatActiveNanos(message.ActiveNanos)),
+                        Csv((message.Waypoints == null ? 0 : message.Waypoints.Length).ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.WaypointOwner.HasValue ? message.WaypointOwner.Value.ToString() : string.Empty),
+                        Csv(RawScfuFormatting.FormatWaypoints(message.Waypoints)),
+                        Csv((message.TextureOverrides == null ? 0 : message.TextureOverrides.Length).ToString(CultureInfo.InvariantCulture)),
+                        Csv(RawScfuFormatting.FormatTextureOverrides(message.TextureOverrides)),
+                        Csv((message.Textures == null ? 0 : message.Textures.Length).ToString(CultureInfo.InvariantCulture)),
+                        Csv(RawScfuFormatting.FormatTextures(message.Textures)),
+                        Csv((message.Meshes == null ? 0 : message.Meshes.Length).ToString(CultureInfo.InvariantCulture)),
+                        Csv(RawScfuFormatting.FormatMeshes(message.Meshes)),
+                        Csv(message.Flags2Text),
+                        Csv(message.Unknown2.ToString(CultureInfo.InvariantCulture)),
+                        Csv(message.Unknown4.HasValue ? message.Unknown4.Value.ToString(CultureInfo.InvariantCulture) : string.Empty),
+                        Csv(message.DecodeFullyConsumed ? "true" : "false"),
+                        Csv(RawScfuFormatting.ToHex(message.UndecodedTail)),
+                        Csv(RawScfuFormatting.ToHex(message.RawBody)),
+                        Csv("raw-scfu flags=" + message.FlagsText + " flags2=" + message.Flags2Text)));
                 this.enemyFullUpdatesLog.Flush();
+                this.enemyFullUpdateRowCount++;
             }
         }
 
@@ -2594,14 +3486,6 @@ namespace AOSharpLiveCapture
                 if (hasEnemyRole && hasLocalPlayerRole)
                 {
                     this.localEnemyCombatContextUntilUtc = capturedUtc.AddSeconds(LocalEnemyCombatContextSeconds);
-                }
-
-                bool includeLocalTerminalRow = hasLocalPlayerRole
-                    && IsLocalPlayerCombatTerminalMessage(message, sourceRole)
-                    && capturedUtc <= this.localEnemyCombatContextUntilUtc;
-                if (!hasEnemyRole && !includeLocalTerminalRow)
-                {
-                    return;
                 }
 
                 this.enemyCombatRowCount++;
@@ -2646,10 +3530,6 @@ namespace AOSharpLiveCapture
             string role;
             string safeIdentity;
             this.DescribeIdentityForEnemyOutput(identity, out role, out safeIdentity);
-            if (!IsEnemyRole(role))
-            {
-                return;
-            }
 
             lock (this.syncRoot)
             {
@@ -2690,20 +3570,38 @@ namespace AOSharpLiveCapture
             string role;
             string safeIdentity;
             this.DescribeIdentityForEnemyOutput(identity, out role, out safeIdentity);
-            if (!IsEnemyRole(role))
-            {
-                return;
-            }
-
             IEnumerable stats = statsObject as IEnumerable;
-            if (stats == null)
-            {
-                return;
-            }
-
             string capturedUtc = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
             string statsCount = GetCountString(statsObject);
             string detail = this.DescribeObject(message);
+
+            if (stats == null)
+            {
+                lock (this.syncRoot)
+                {
+                    this.enemyStatUpdateRowCount++;
+                    this.enemyStatUpdatesLog.WriteLine(
+                        string.Join(
+                            ",",
+                            Csv(capturedUtc),
+                            Csv(direction),
+                            sequence.ToString(CultureInfo.InvariantCulture),
+                            Csv(message.N3MessageType.ToString()),
+                            Csv(role),
+                            Csv(safeIdentity),
+                            Csv(string.Empty),
+                            Csv(string.Empty),
+                            Csv(string.Empty),
+                            MemberComponent(position, "X"),
+                            MemberComponent(position, "Y"),
+                            MemberComponent(position, "Z"),
+                            Csv("0"),
+                            Csv(detail)));
+                    this.enemyStatUpdatesLog.Flush();
+                }
+
+                return;
+            }
 
             lock (this.syncRoot)
             {
@@ -2821,10 +3719,12 @@ namespace AOSharpLiveCapture
                 return;
             }
 
-            SimpleItemFullUpdateMessage simpleItemFullUpdate = message as SimpleItemFullUpdateMessage;
-            if (simpleItemFullUpdate != null)
+            if (string.Equals(
+                message.N3MessageType.ToString(),
+                "SimpleItemFullUpdate",
+                StringComparison.OrdinalIgnoreCase))
             {
-                this.TrackEnemyFromSimpleItemFullUpdate(direction, sequence, simpleItemFullUpdate);
+                this.TrackEnemyFromSimpleItemFullUpdate(direction, sequence, message);
             }
         }
 
@@ -2965,15 +3865,16 @@ namespace AOSharpLiveCapture
             }
         }
 
-        private void TrackEnemyFromSimpleItemFullUpdate(string direction, int sequence, SimpleItemFullUpdateMessage message)
+        private void TrackEnemyFromSimpleItemFullUpdate(string direction, int sequence, N3Message message)
         {
             if (!this.IsTrackableEnemyIdentity(message.Identity))
             {
                 return;
             }
 
-            GameTuple<Stat, int>[] stats = message.Stats ?? new GameTuple<Stat, int>[0];
-            if (!ContainsEnemyStateStats(stats) && !message.Position.HasValue)
+            GameTuple<Stat, int>[] stats = GetMemberValue(message, "Stats") as GameTuple<Stat, int>[]
+                ?? new GameTuple<Stat, int>[0];
+            if (!ContainsEnemyStateStats(stats))
             {
                 return;
             }
@@ -2987,12 +3888,6 @@ namespace AOSharpLiveCapture
                 foreach (GameTuple<Stat, int> stat in stats)
                 {
                     changed |= this.ApplyEnemyStat(state, stat.Value1, stat.Value2);
-                }
-
-                if (message.Position.HasValue && this.UpdateEnemyPosition(state, message.Position.Value))
-                {
-                    changed = true;
-                    this.enemyPositionUpdateCount++;
                 }
 
                 if (changed)
@@ -3718,31 +4613,46 @@ namespace AOSharpLiveCapture
                 return;
             }
 
-            this.captureFinalized = true;
-            this.enabled = false;
+            DateTime finalizedUtc = DateTime.UtcNow;
+            if (!this.captureStopRequestedUtc.HasValue)
+            {
+                this.captureStopRequestedUtc = finalizedUtc;
+            }
 
-            this.LogEvent("PLUGIN", "Final capture flush delay starting: 5 seconds.");
-            this.Flush();
-            Thread.Sleep(TimeSpan.FromSeconds(5));
-            this.Flush();
-            this.WriteEnemyStateJson();
-            this.WriteEnemyDossierJson();
-            this.WriteMovementSummaryJson();
-            this.WriteEnemyRespawnCsv(DateTime.UtcNow);
+            // Teardown means the client/plugin is already leaving; flush everything
+            // captured so far immediately. Normal /aocap stop uses the quiet drain.
+            if (!this.CloseRawCaptureBoundaryAndWait(TimeSpan.FromSeconds(5)))
+            {
+                this.rawPacketCallbackDrainTimeoutCount++;
+                this.LogEvent(
+                    "RAW-PACKET-DRAIN-TIMEOUT",
+                    "A registered raw packet callback did not finish before teardown finalization.");
+            }
 
-            CaptureValidation validation = this.ValidateCapture();
-            this.WriteCaptureHealth(validation);
-            this.WriteCaptureInfo(DateTime.UtcNow, validation);
-            this.LogEvent(
-                "CAPTURE-VALIDATION",
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "status={0} processingAllowed={1} issues={2}",
-                    validation.Status,
-                    validation.ProcessingAllowed,
-                    validation.Issues.Count));
+            this.CompleteCaptureStop(finalizedUtc, false, false);
+        }
 
-            this.FlushAndClose();
+        private bool CloseRawCaptureBoundaryAndWait(TimeSpan timeout)
+        {
+            lock (this.syncRoot)
+            {
+                Interlocked.Exchange(
+                    ref this.rawCaptureGateState,
+                    RawCaptureGateClosed);
+
+                DateTime deadlineUtc = DateTime.UtcNow.Add(timeout);
+                while (Volatile.Read(ref this.rawPacketCallbacksInFlight) != 0)
+                {
+                    TimeSpan remaining = deadlineUtc - DateTime.UtcNow;
+                    if (remaining <= TimeSpan.Zero
+                        || !Monitor.Wait(this.syncRoot, remaining))
+                    {
+                        return Volatile.Read(ref this.rawPacketCallbacksInFlight) == 0;
+                    }
+                }
+
+                return true;
+            }
         }
 
         private CaptureValidation ValidateCapture()
@@ -3759,9 +4669,146 @@ namespace AOSharpLiveCapture
                 issues.Add("events.log is empty or missing.");
             }
 
-            if (this.GetSessionFileLength("packets.hex.log") <= 0)
+            if (this.decodedInboundCount + this.decodedOutboundCount > 0 && this.decodedN3EventRowCount == 0)
             {
-                notes.Add("packets.hex.log is empty; no raw packets were observed in this session.");
+                issues.Add("Decoded N3 messages were observed, but events.log has no decoded-message rows.");
+            }
+
+            if (this.n3CaptureStageErrorCount > 0)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Decoded N3 capture stages failed {0} time(s); inspect N3-STAGE-ERROR rows in events.log.",
+                        this.n3CaptureStageErrorCount));
+            }
+
+            if (this.rawCombatPacketCount > 0 && this.enemyCombatRowCount == 0)
+            {
+                issues.Add("Raw combat packets were observed, but enemy-combat.csv has no rows.");
+            }
+
+            int observedRawPackets = this.inboundPacketCount + this.outboundPacketCount;
+            bool recaptureRequired = this.IsRawRecaptureRequired();
+            bool rawSinkIncomplete = this.rawPacketLogRowCount != observedRawPackets
+                                     && this.rawPacketIndexRowCount != observedRawPackets
+                                     && this.rawPacketPreservedCount != observedRawPackets;
+            if (rawSinkIncomplete)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Neither authoritative raw sink is complete: observed={0}, packetLogRows={1}, packetIndexRows={2}, preservedAcrossSinks={3}.",
+                        observedRawPackets,
+                        this.rawPacketLogRowCount,
+                        this.rawPacketIndexRowCount,
+                        this.rawPacketPreservedCount));
+            }
+
+            if (this.rawPacketCallbackDrainTimeoutCount > 0)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Raw packet callback drain timed out {0} time(s); one or more pre-teardown packets may be missing.",
+                        this.rawPacketCallbackDrainTimeoutCount));
+            }
+
+            if (this.rawPacketLogRowCount != observedRawPackets)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "packets.hex.log row mismatch: observed={0}, rows={1}.",
+                        observedRawPackets,
+                        this.rawPacketLogRowCount));
+            }
+
+            if (this.rawPacketIndexRowCount != observedRawPackets)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "raw-packets.csv row mismatch: observed={0}, rows={1}.",
+                        observedRawPackets,
+                        this.rawPacketIndexRowCount));
+            }
+
+            if (this.rawPacketWriteErrorCount > 0)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Raw packet sinks reported {0} write/flush/close error(s).",
+                        this.rawPacketWriteErrorCount));
+            }
+
+            if (this.rawPacketProjectionErrorCount > 0)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Raw packet projection/finalization stages reported {0} error(s).",
+                        this.rawPacketProjectionErrorCount));
+            }
+
+            if (this.rawSimpleCharFullUpdatePacketCount
+                != this.rawSimpleCharFullUpdateDecodeCount + this.rawSimpleCharFullUpdateDecodeErrorCount)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Raw SCFU accounting mismatch: raw={0}, decoded={1}, errors={2}.",
+                        this.rawSimpleCharFullUpdatePacketCount,
+                        this.rawSimpleCharFullUpdateDecodeCount,
+                        this.rawSimpleCharFullUpdateDecodeErrorCount));
+            }
+
+            if (this.scfuAppearanceRowCount != this.rawSimpleCharFullUpdatePacketCount)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Raw SCFU projection mismatch: raw={0}, scfu-appearance.csv rows={1}.",
+                        this.rawSimpleCharFullUpdatePacketCount,
+                        this.scfuAppearanceRowCount));
+            }
+
+            if (this.rawSimpleCharFullUpdateDecodeErrorCount > 0)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "SCFU decode failed for {0} raw packet(s). If either raw sink preserved the packet, repair the decoder offline; the capture-level recaptureRequired flag is authoritative.",
+                        this.rawSimpleCharFullUpdateDecodeErrorCount));
+            }
+
+            if (this.rawSimpleCharFullUpdateIncompleteDecodeCount > 0)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "SCFU decoding left undecoded tails for {0} raw packet(s); offline decoding is required.",
+                        this.rawSimpleCharFullUpdateIncompleteDecodeCount));
+            }
+
+            if (this.enemyFullUpdateRowCount != this.rawNpcSimpleCharFullUpdateCount)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "NPC SCFU projection mismatch: decoded NPC SCFUs={0}, enemy-full-updates.csv rows={1}.",
+                        this.rawNpcSimpleCharFullUpdateCount,
+                        this.enemyFullUpdateRowCount));
+            }
+
+            if (observedRawPackets == 0)
+            {
+                notes.Add("No inbound or outbound raw packets were observed in this session.");
+            }
+            else if (this.rawPacketLogRowCount == 0 && this.rawPacketIndexRowCount == observedRawPackets)
+            {
+                notes.Add("packets.hex.log is empty, but raw-packets.csv contains the complete raw packet stream.");
             }
 
             if (this.vendorInteractionAttemptCount > 0 && this.shopUpdateRowCount == 0)
@@ -3866,6 +4913,57 @@ namespace AOSharpLiveCapture
                         this.corpseFullUpdatePacketCount));
             }
 
+            if (this.corpseInventoryUpdateCount > 0
+                && this.corpseLootObservationRowCount != this.corpseInventoryUpdateCount)
+            {
+                issues.Add("Corpse inventory updates were observed, but corpse-loot-observations.csv is missing container snapshots.");
+            }
+
+            if (this.corpseLootUnlinkedSnapshotCount > 0)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Corpse loot snapshots could not be identity-linked to CorpseFullUpdate evidence: {0}.",
+                        this.corpseLootUnlinkedSnapshotCount));
+            }
+
+            if (this.corpseLootMissingPlayerContextCount > 0)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Initial corpse loot snapshots are missing local-player identity, player level, or playfield context: {0}.",
+                        this.corpseLootMissingPlayerContextCount));
+            }
+
+            if (this.corpseLootInitialSnapshotCount > 0)
+            {
+                notes.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Identity-linked initial corpse loot snapshots: {0}.",
+                        this.corpseLootInitialSnapshotCount));
+            }
+
+            if (this.lootCaptureRequested && this.corpseLootInitialSnapshotCount < 10)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Ten-kill loot capture was requested, but only {0} initial corpse snapshots were recorded.",
+                        this.corpseLootInitialSnapshotCount));
+            }
+
+            if (this.lootCaptureRequested && this.corpseLootInitialEnemyKeys.Count != 1)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Ten-kill loot capture must contain one enemy type; correlated enemy-type count was {0}.",
+                        this.corpseLootInitialEnemyKeys.Count));
+            }
+
             if (this.enemyDeathEventCount > 0
                 && this.corpseSeenEventCount == 0
                 && this.corpseFullUpdateRowCount == 0)
@@ -3899,8 +4997,65 @@ namespace AOSharpLiveCapture
                 issues.Add("Respawn capture produced ambiguous same-position candidates; inspect enemy-respawns.csv before accepting timing.");
             }
 
-            string status = issues.Count == 0 ? "complete" : "incomplete";
-            return new CaptureValidation(status, issues.Count == 0, issues, notes);
+            bool offlineDecodeRequired = !recaptureRequired && this.HasOfflineDecodeWork(observedRawPackets);
+            if (offlineDecodeRequired && issues.Count == 0)
+            {
+                issues.Add("One or more raw-to-derived decoders or projections require offline repair.");
+            }
+
+            bool processingAllowed = issues.Count == 0
+                                     && !recaptureRequired
+                                     && !offlineDecodeRequired;
+            string status = processingAllowed ? "complete" : "incomplete";
+            return new CaptureValidation(
+                status,
+                processingAllowed,
+                recaptureRequired,
+                offlineDecodeRequired,
+                issues,
+                notes);
+        }
+
+        private bool IsRawRecaptureRequired()
+        {
+            int observedRawPackets = this.inboundPacketCount + this.outboundPacketCount;
+            return (this.rawPacketLogRowCount != observedRawPackets
+                    && this.rawPacketIndexRowCount != observedRawPackets
+                    && this.rawPacketPreservedCount != observedRawPackets)
+                   || this.rawPacketCallbackDrainTimeoutCount > 0;
+        }
+
+        private bool HasOfflineDecodeWork(int observedRawPackets)
+        {
+            return this.rawPacketLogRowCount != observedRawPackets
+                   || this.rawPacketIndexRowCount != observedRawPackets
+                   || this.rawPacketWriteErrorCount > 0
+                   || this.rawPacketCallbackDrainTimeoutCount > 0
+                   || this.rawPacketProjectionErrorCount > 0
+                   || this.n3CaptureStageErrorCount > 0
+                   || (this.decodedInboundCount + this.decodedOutboundCount > 0
+                       && this.decodedN3EventRowCount == 0)
+                   || (this.rawCombatPacketCount > 0 && this.enemyCombatRowCount == 0)
+                   || this.rawSimpleCharFullUpdatePacketCount
+                      != this.rawSimpleCharFullUpdateDecodeCount
+                         + this.rawSimpleCharFullUpdateDecodeErrorCount
+                   || this.scfuAppearanceRowCount != this.rawSimpleCharFullUpdatePacketCount
+                   || this.rawSimpleCharFullUpdateDecodeErrorCount > 0
+                   || this.rawSimpleCharFullUpdateIncompleteDecodeCount > 0
+                   || this.enemyFullUpdateRowCount != this.rawNpcSimpleCharFullUpdateCount
+                   || this.movementDecodeErrorCount > 0
+                   || (this.movementFollowTargetPacketCount > 0
+                       && this.movementUsableFollowTargetPacketCount == 0)
+                   || this.corpseFullUpdateDecodeErrorCount > 0
+                   || (this.corpseFullUpdatePacketCount > 0
+                       && this.corpseFullUpdateRowCount == 0)
+                   || (this.corpseInventoryUpdateCount > 0
+                       && this.corpseLootObservationRowCount != this.corpseInventoryUpdateCount)
+                   || this.corpseLootUnlinkedSnapshotCount > 0
+                   || this.corpseLootMissingPlayerContextCount > 0
+                   || (this.vendorInteractionAttemptCount > 0 && this.shopUpdateRowCount == 0)
+                   || (this.vendorInteractionAttemptCount > 0
+                       && this.vendorFullUpdateMessageCount == 0);
         }
 
         private void WriteEnemyRespawnCsv(DateTime captureEndUtc)
@@ -4419,11 +5574,32 @@ namespace AOSharpLiveCapture
                 json.Append("  \"captureEndUtc\": ");
                 json.Append(captureEndUtc.HasValue ? Json(captureEndUtc.Value.ToString("o", CultureInfo.InvariantCulture)) : "null");
                 json.AppendLine(",");
+                json.Append("  \"captureStopRequestedUtc\": ");
+                json.Append(this.captureStopRequestedUtc.HasValue ? Json(this.captureStopRequestedUtc.Value.ToString("o", CultureInfo.InvariantCulture)) : "null");
+                json.AppendLine(",");
+                json.Append("  \"lastRawPacketUtc\": ");
+                json.Append(Json(this.lastPacketUtc.ToString("o", CultureInfo.InvariantCulture)));
+                json.AppendLine(",");
+                json.Append("  \"captureFinalizedUtc\": ");
+                json.Append(this.captureFinalizedUtc.HasValue ? Json(this.captureFinalizedUtc.Value.ToString("o", CultureInfo.InvariantCulture)) : "null");
+                json.AppendLine(",");
+                json.Append("  \"quietPeriodPassed\": ");
+                json.Append(this.captureQuietPeriodPassed ? "true" : "false");
+                json.AppendLine(",");
                 json.Append("  \"sessionDurationSeconds\": ");
                 json.Append(Math.Max(0, (durationEndUtc - this.captureStartUtc).TotalSeconds).ToString("0.###", CultureInfo.InvariantCulture));
                 json.AppendLine(",");
                 json.Append("  \"captureFolderPath\": ");
                 json.Append(Json(this.sessionDirectory));
+                json.AppendLine(",");
+                json.Append("  \"rawPacketLogPath\": ");
+                json.Append(Json(Path.Combine(this.sessionDirectory, "packets.hex.log")));
+                json.AppendLine(",");
+                json.Append("  \"rawPacketIndexPath\": ");
+                json.Append(Json(Path.Combine(this.sessionDirectory, "raw-packets.csv")));
+                json.AppendLine(",");
+                json.Append("  \"scfuAppearancePath\": ");
+                json.Append(Json(Path.Combine(this.sessionDirectory, "scfu-appearance.csv")));
                 json.AppendLine(",");
                 json.Append("  \"characterName\": ");
                 json.Append(Json(this.GetLocalCharacterName()));
@@ -4443,6 +5619,51 @@ namespace AOSharpLiveCapture
                 json.AppendLine(",");
                 json.Append("    \"decodedOutboundN3\": ");
                 json.Append(this.decodedOutboundCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"decodedN3EventRows\": ");
+                json.Append(this.decodedN3EventRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"decodedN3StageErrors\": ");
+                json.Append(this.n3CaptureStageErrorCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawCombatPackets\": ");
+                json.Append(this.rawCombatPacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawSimpleCharFullUpdatePackets\": ");
+                json.Append(this.rawSimpleCharFullUpdatePacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawPacketLogRows\": ");
+                json.Append(this.rawPacketLogRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawPacketIndexRows\": ");
+                json.Append(this.rawPacketIndexRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawPacketPreserved\": ");
+                json.Append(this.rawPacketPreservedCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawPacketWriteErrors\": ");
+                json.Append(this.rawPacketWriteErrorCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawPacketCallbackDrainTimeouts\": ");
+                json.Append(this.rawPacketCallbackDrainTimeoutCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawPacketProjectionErrors\": ");
+                json.Append(this.rawPacketProjectionErrorCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawSimpleCharFullUpdateDecoded\": ");
+                json.Append(this.rawSimpleCharFullUpdateDecodeCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawSimpleCharFullUpdateDecodeErrors\": ");
+                json.Append(this.rawSimpleCharFullUpdateDecodeErrorCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawSimpleCharFullUpdateIncompleteDecodes\": ");
+                json.Append(this.rawSimpleCharFullUpdateIncompleteDecodeCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawNpcSimpleCharFullUpdates\": ");
+                json.Append(this.rawNpcSimpleCharFullUpdateCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"scfuAppearanceRows\": ");
+                json.Append(this.scfuAppearanceRowCount.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine();
                 json.AppendLine("  },");
                 json.AppendLine("  \"captureCounts\": {");
@@ -4530,6 +5751,18 @@ namespace AOSharpLiveCapture
                 json.Append("    \"corpseInventoryUpdates\": ");
                 json.Append(this.corpseInventoryUpdateCount.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine(",");
+                json.Append("    \"corpseLootObservationRows\": ");
+                json.Append(this.corpseLootObservationRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"corpseLootInitialSnapshots\": ");
+                json.Append(this.corpseLootInitialSnapshotCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"corpseLootUnlinkedSnapshots\": ");
+                json.Append(this.corpseLootUnlinkedSnapshotCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"corpseLootMissingPlayerContext\": ");
+                json.Append(this.corpseLootMissingPlayerContextCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
                 json.Append("    \"corpseSeenEvents\": ");
                 json.Append(this.corpseSeenEventCount.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine(",");
@@ -4563,6 +5796,12 @@ namespace AOSharpLiveCapture
                 json.AppendLine(",");
                 json.Append("    \"respawnCaptureRequested\": ");
                 json.Append(this.respawnCaptureRequested ? "true" : "false");
+                json.AppendLine(",");
+                json.Append("    \"lootCaptureRequested\": ");
+                json.Append(this.lootCaptureRequested ? "true" : "false");
+                json.AppendLine(",");
+                json.Append("    \"lootCaptureEnemyTypes\": ");
+                json.Append(this.corpseLootInitialEnemyKeys.Count.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine(",");
                 json.Append("    \"enemyHealthUpdates\": ");
                 json.Append(this.enemyHealthUpdateCount.ToString(CultureInfo.InvariantCulture));
@@ -4609,6 +5848,14 @@ namespace AOSharpLiveCapture
             json.Append(indent);
             json.Append("  \"processingAllowed\": ");
             json.Append(validation.ProcessingAllowed ? "true" : "false");
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"recaptureRequired\": ");
+            json.Append(validation.RecaptureRequired ? "true" : "false");
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"offlineDecodeRequired\": ");
+            json.Append(validation.OfflineDecodeRequired ? "true" : "false");
             json.AppendLine(",");
             json.Append(indent);
             json.Append("  \"issues\": ");
@@ -4684,10 +5931,18 @@ namespace AOSharpLiveCapture
 
         private sealed class CaptureValidation
         {
-            public CaptureValidation(string status, bool processingAllowed, List<string> issues, List<string> notes)
+            public CaptureValidation(
+                string status,
+                bool processingAllowed,
+                bool recaptureRequired,
+                bool offlineDecodeRequired,
+                List<string> issues,
+                List<string> notes)
             {
                 this.Status = status;
                 this.ProcessingAllowed = processingAllowed;
+                this.RecaptureRequired = recaptureRequired;
+                this.OfflineDecodeRequired = offlineDecodeRequired;
                 this.Issues = issues;
                 this.Notes = notes;
             }
@@ -4695,6 +5950,10 @@ namespace AOSharpLiveCapture
             public string Status { get; private set; }
 
             public bool ProcessingAllowed { get; private set; }
+
+            public bool RecaptureRequired { get; private set; }
+
+            public bool OfflineDecodeRequired { get; private set; }
 
             public List<string> Issues { get; private set; }
 
@@ -4704,6 +5963,8 @@ namespace AOSharpLiveCapture
             {
                 return new CaptureValidation(
                     "running",
+                    false,
+                    false,
                     false,
                     new List<string>(),
                     new List<string> { "Capture is active; final validation runs during plugin teardown." });
@@ -5027,6 +6288,8 @@ namespace AOSharpLiveCapture
 
             public DateTime? CorpseGoneUtc { get; set; }
 
+            public int PlayfieldId { get; set; }
+
             public int CorpseCredits { get; set; }
 
             public int CorpseMonsterData { get; set; }
@@ -5056,15 +6319,28 @@ namespace AOSharpLiveCapture
 
         private void LogEvent(string category, string message)
         {
-            lock (this.syncRoot)
+            try
             {
-                this.eventsLog.WriteLine(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "{0:o} [{1}] {2}",
-                        DateTime.UtcNow,
-                        category,
-                        OneLine(message)));
+                lock (this.syncRoot)
+                {
+                    if (this.eventsLog == null)
+                    {
+                        return;
+                    }
+
+                    this.eventsLog.WriteLine(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "{0:o} [{1}] {2}",
+                            DateTime.UtcNow,
+                            category,
+                            OneLine(message)));
+                }
+            }
+            catch
+            {
+                // Capture diagnostics must never escape into the AO client.
+                Interlocked.Increment(ref this.rawPacketProjectionErrorCount);
             }
         }
 
@@ -5086,6 +6362,29 @@ namespace AOSharpLiveCapture
                 : "0x" + typeValue.ToString("X8", CultureInfo.InvariantCulture);
 
             return "n3=" + typeName;
+        }
+
+        private static bool IsRawCombatEvidencePacket(byte[] packet)
+        {
+            if (packet == null || packet.Length < 20)
+            {
+                return false;
+            }
+
+            int typeValue = ReadInt32BigEndian(packet, 16);
+            if (!Enum.IsDefined(typeof(N3MessageType), typeValue))
+            {
+                return false;
+            }
+
+            string messageName = ((N3MessageType)typeValue).ToString();
+            return string.Equals(messageName, "Attack", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "AttackInfo", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "SpecialAttackWeapon", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "SpecialAttackInfo", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "MissedAttackInfo", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "HealthDamage", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(messageName, "StopFight", StringComparison.OrdinalIgnoreCase);
         }
 
         private string ResolveDynelName(uint identityType, uint identityInstance)
@@ -5411,6 +6710,12 @@ namespace AOSharpLiveCapture
             return bytes == null ? string.Empty : bytes.Length.ToString(CultureInfo.InvariantCulture);
         }
 
+        private static string GetByteArrayHexString(object value)
+        {
+            byte[] bytes = value as byte[];
+            return bytes == null ? string.Empty : ToHex(bytes);
+        }
+
         private static string FormatValue(object value)
         {
             if (value == null)
@@ -5529,23 +6834,32 @@ namespace AOSharpLiveCapture
             return string.Empty;
         }
 
-        private void OpenFreshCaptureSession(string pluginDir, bool resetState)
+        private void OpenFreshCaptureSession(string pluginDir, bool resetState, bool activate)
         {
-            this.enabled = false;
-            this.FlushAndClose();
+            lock (this.syncRoot)
+            {
+                if (this.enabled && !this.captureFinalized)
+                {
+                    this.CompleteCaptureStop(DateTime.UtcNow, false, false);
+                }
+
+                this.enabled = false;
+                this.FlushAndClose();
 
             if (resetState)
             {
                 this.ResetCaptureState();
             }
 
-            this.captureStartUtc = DateTime.UtcNow;
-            this.captureStartLocal = DateTime.Now;
-            this.lastPacketUtc = this.captureStartUtc;
+            this.ApplyExternalCaptureRequest(pluginDir);
 
             this.sessionDirectory = CreateSessionDirectory(pluginDir);
             this.eventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "events.log"));
-            this.packetsLog = CreateWriter(Path.Combine(this.sessionDirectory, "packets.hex.log"));
+            this.packetsLog = CreateWriter(Path.Combine(this.sessionDirectory, "packets.hex.log"), true);
+            this.rawPacketsCsvLog = CreateWriter(Path.Combine(this.sessionDirectory, "raw-packets.csv"), true);
+            this.rawPacketsCsvLog.WriteLine("CapturedUtc,ElapsedMilliseconds,Direction,GlobalOrdinal,Sequence,PacketLength,N3TypeValue,N3TypeName,IdentityType,IdentityInstance,PreservationStatus,RawHex");
+            this.scfuAppearanceLog = CreateWriter(Path.Combine(this.sessionDirectory, "scfu-appearance.csv"));
+            this.scfuAppearanceLog.WriteLine(RawScfuAppearanceCsv.Header);
             this.shopUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "shop-updates.csv"));
             this.shopUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,TerminalIdentity,Slot,LowId,HighId,Quality");
             this.vendorFullUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
@@ -5555,10 +6869,12 @@ namespace AOSharpLiveCapture
             this.npcInteractionsLog = CreateWriter(Path.Combine(this.sessionDirectory, "npc-interactions.log"));
             this.inventoryUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "inventory-updates.csv"));
             this.inventoryUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,InventoryIdentity,Handle,Slot,Placement,Flags,Count,ItemIdentity,LowId,HighId,Quality,Unknown");
+            this.corpseLootObservationsLog = CreateWriter(Path.Combine(this.sessionDirectory, "corpse-loot-observations.csv"));
+            this.corpseLootObservationsLog.WriteLine("CapturedUtc,Direction,Sequence,CorpseIdentity,OpenOrdinal,InitialSnapshot,ItemCount,DeadNpcIdentity,EnemyName,MonsterData,EnemyLevel,CorpseCredits,PlayerIdentity,PlayerLevel,PlayfieldId,Items,CorrelationStatus");
             this.enemyStateLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-state.csv"));
             this.enemyStateLog.WriteLine("timestamp,direction,sequence,messageType,evidenceSource,entityId,level,currentHealth,maxHealth,x,y,z,eventType");
             this.enemyFullUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-full-updates.csv"));
-            this.enemyFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,Identity,Name,PlayfieldId,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,FightingTargetRole,FightingTargetIdentity,Version,Flags,CharacterFlags,AccountFlags,Expansions,CharacterInfoType,NPCFamily,LosHeight,Level,Health,HealthDamage,MonsterData,MonsterScale,VisualFlags,VisibleTitle,Unknown1Length,HeadMesh,RunSpeedBase,ActiveNanoCount,TextureCount,Textures,MeshCount,Meshes,Flags2,Unknown2,Detail");
+            this.enemyFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,Identity,Name,PlayfieldId,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,FightingTargetRole,FightingTargetIdentity,Version,Flags,CharacterFlags,AccountFlags,Expansions,CharacterInfoType,NPCFamily,LosHeight,NpcUnknownData,NpcUnknownData2,NpcUnknownData3,Level,Health,HealthDamage,MonsterData,MonsterScale,VisualFlags,VisibleTitle,Unknown1Length,Unknown1Hex,HeadMesh,RunSpeedBase,ActiveNanoCount,ActiveNanos,WaypointCount,WaypointOwner,Waypoints,TextureOverrideCount,TextureOverrides,TextureCount,Textures,MeshCount,Meshes,Flags2,Unknown2,Unknown4,DecodeFullyConsumed,UndecodedTailHex,RawBodyHex,Detail");
             this.enemyCombatLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-combat.csv"));
             this.enemyCombatLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail");
             this.enemyMovementLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-movement.csv"));
@@ -5575,8 +6891,30 @@ namespace AOSharpLiveCapture
             this.WriteEnemyStateJson();
             this.WriteEnemyDossierJson();
             this.WriteMovementSummaryJson();
+                if (activate)
+                {
+                    this.ActivateCaptureSession();
+                }
+            }
+        }
+
+        private void ActivateCaptureSession()
+        {
+            Interlocked.Exchange(
+                ref this.rawCaptureGateState,
+                RawCaptureGateOpen);
+
+            this.captureStartUtc = DateTime.UtcNow;
+            this.captureStartLocal = DateTime.Now;
+            this.lastPacketUtc = this.captureStartUtc;
             this.WriteCaptureSessionMetadata(this.captureStartUtc, this.captureStartLocal);
             this.WriteCaptureInfo(null, CaptureValidation.Running());
+            this.captureClock.Restart();
+            if (this.lootCaptureRequested)
+            {
+                this.LogEvent("CAPTURE-MODE", "loot-10 armed by approved launcher");
+            }
+
             this.enabled = true;
             this.nextFlushUtc = DateTime.UtcNow.AddSeconds(2);
             this.nextSnapshotUtc = DateTime.UtcNow.AddSeconds(1);
@@ -5595,12 +6933,37 @@ namespace AOSharpLiveCapture
             this.enemyStates.Clear();
             this.enemyStateTimeline.Clear();
             this.corpseEvidenceByDeadNpc.Clear();
+            this.corpseInventorySnapshotCounts.Clear();
+            this.corpseLootInitialEnemyKeys.Clear();
 
             this.captureFinalized = false;
+            this.captureStopDrainRequested = false;
+            this.captureStopRequestedUtc = null;
+            this.captureStopQuietDeadlineUtc = null;
+            this.captureStopMaximumDeadlineUtc = null;
+            this.captureFinalizedUtc = null;
+            this.captureQuietPeriodPassed = false;
             this.inboundPacketCount = 0;
             this.outboundPacketCount = 0;
             this.decodedInboundCount = 0;
             this.decodedOutboundCount = 0;
+            this.decodedN3EventRowCount = 0;
+            this.n3CaptureStageErrorCount = 0;
+            this.rawCombatPacketCount = 0;
+            this.rawSimpleCharFullUpdatePacketCount = 0;
+            this.rawSimpleCharFullUpdateDecodeCount = 0;
+            this.rawSimpleCharFullUpdateDecodeErrorCount = 0;
+            this.rawSimpleCharFullUpdateIncompleteDecodeCount = 0;
+            this.rawNpcSimpleCharFullUpdateCount = 0;
+            this.scfuAppearanceRowCount = 0;
+            this.rawPacketLogRowCount = 0;
+            this.rawPacketIndexRowCount = 0;
+            this.rawPacketPreservedCount = 0;
+            this.rawPacketWriteErrorCount = 0;
+            this.rawPacketCallbackDrainTimeoutCount = 0;
+            this.rawPacketProjectionErrorCount = 0;
+            this.rawPacketGlobalOrdinal = 0;
+            this.captureClock.Reset();
             this.shopUpdateMessageCount = 0;
             this.shopUpdateRowCount = 0;
             this.vendorFullUpdateMessageCount = 0;
@@ -5609,6 +6972,10 @@ namespace AOSharpLiveCapture
             this.npcInteractionCount = 0;
             this.inventoryUpdateMessageCount = 0;
             this.inventoryUpdateRowCount = 0;
+            this.corpseLootObservationRowCount = 0;
+            this.corpseLootInitialSnapshotCount = 0;
+            this.corpseLootUnlinkedSnapshotCount = 0;
+            this.corpseLootMissingPlayerContextCount = 0;
             this.vendorInteractionAttemptCount = 0;
             this.enemyStateRowCount = 0;
             this.enemyCombatEventCount = 0;
@@ -5641,102 +7008,167 @@ namespace AOSharpLiveCapture
             this.enemyFightCaptureEnabled = false;
             this.enemyFightCaptureStarted = false;
             this.respawnCaptureRequested = false;
+            this.lootCaptureRequested = false;
+        }
+
+        private void ApplyExternalCaptureRequest(string pluginDir)
+        {
+            if (string.IsNullOrWhiteSpace(pluginDir))
+            {
+                return;
+            }
+
+            string requestPath = Path.Combine(pluginDir, LootCaptureRequestFileName);
+            if (!File.Exists(requestPath))
+            {
+                return;
+            }
+
+            this.lootCaptureRequested = true;
+            try
+            {
+                File.Delete(requestPath);
+            }
+            catch
+            {
+                // The capture is still armed. A stale marker is harmless and can be
+                // removed by the next approved launcher invocation.
+            }
         }
 
         private void Flush()
         {
             lock (this.syncRoot)
             {
-                this.eventsLog.Flush();
-                this.packetsLog.Flush();
-                this.shopUpdatesLog.Flush();
-                this.vendorFullUpdatesLog.Flush();
-                this.systemMessagesLog.Flush();
-                this.chatDialogueLog.Flush();
-                this.npcInteractionsLog.Flush();
-                this.inventoryUpdatesLog.Flush();
-                this.enemyStateLog.Flush();
-                this.enemyFullUpdatesLog.Flush();
-                this.enemyCombatLog.Flush();
-                this.enemyMovementLog.Flush();
-                this.movementPacketsLog.Flush();
-                this.enemyStatUpdatesLog.Flush();
-                this.enemyFightEventsLog.Flush();
-                this.corpseFullUpdatesLog.Flush();
-                this.npcLifecycleLog.Flush();
+                this.FlushWriterNoThrow(this.packetsLog, true);
+                this.FlushWriterNoThrow(this.rawPacketsCsvLog, true);
+                this.FlushWriterNoThrow(this.eventsLog, false);
+                this.FlushWriterNoThrow(this.scfuAppearanceLog, false);
+                this.FlushWriterNoThrow(this.shopUpdatesLog, false);
+                this.FlushWriterNoThrow(this.vendorFullUpdatesLog, false);
+                this.FlushWriterNoThrow(this.systemMessagesLog, false);
+                this.FlushWriterNoThrow(this.chatDialogueLog, false);
+                this.FlushWriterNoThrow(this.npcInteractionsLog, false);
+                this.FlushWriterNoThrow(this.inventoryUpdatesLog, false);
+                this.FlushWriterNoThrow(this.corpseLootObservationsLog, false);
+                this.FlushWriterNoThrow(this.enemyStateLog, false);
+                this.FlushWriterNoThrow(this.enemyFullUpdatesLog, false);
+                this.FlushWriterNoThrow(this.enemyCombatLog, false);
+                this.FlushWriterNoThrow(this.enemyMovementLog, false);
+                this.FlushWriterNoThrow(this.movementPacketsLog, false);
+                this.FlushWriterNoThrow(this.enemyStatUpdatesLog, false);
+                this.FlushWriterNoThrow(this.enemyFightEventsLog, false);
+                this.FlushWriterNoThrow(this.corpseFullUpdatesLog, false);
+                this.FlushWriterNoThrow(this.npcLifecycleLog, false);
             }
+        }
+
+        private void FlushAndCloseRawWritersNoThrow()
+        {
+            this.packetsLog = this.CloseWriterNoThrow(this.packetsLog, true);
+            this.rawPacketsCsvLog = this.CloseWriterNoThrow(this.rawPacketsCsvLog, true);
         }
 
         private void FlushAndClose()
         {
             lock (this.syncRoot)
             {
-                this.eventsLog?.Flush();
-                this.packetsLog?.Flush();
-                this.shopUpdatesLog?.Flush();
-                this.vendorFullUpdatesLog?.Flush();
-                this.systemMessagesLog?.Flush();
-                this.chatDialogueLog?.Flush();
-                this.npcInteractionsLog?.Flush();
-                this.inventoryUpdatesLog?.Flush();
-                this.enemyStateLog?.Flush();
-                this.enemyFullUpdatesLog?.Flush();
-                this.enemyCombatLog?.Flush();
-                this.enemyMovementLog?.Flush();
-                this.movementPacketsLog?.Flush();
-                this.enemyStatUpdatesLog?.Flush();
-                this.enemyFightEventsLog?.Flush();
-                this.corpseFullUpdatesLog?.Flush();
-                this.npcLifecycleLog?.Flush();
-                this.eventsLog?.Dispose();
-                this.packetsLog?.Dispose();
-                this.shopUpdatesLog?.Dispose();
-                this.vendorFullUpdatesLog?.Dispose();
-                this.systemMessagesLog?.Dispose();
-                this.chatDialogueLog?.Dispose();
-                this.npcInteractionsLog?.Dispose();
-                this.inventoryUpdatesLog?.Dispose();
-                this.enemyStateLog?.Dispose();
-                this.enemyFullUpdatesLog?.Dispose();
-                this.enemyCombatLog?.Dispose();
-                this.enemyMovementLog?.Dispose();
-                this.movementPacketsLog?.Dispose();
-                this.enemyStatUpdatesLog?.Dispose();
-                this.enemyFightEventsLog?.Dispose();
-                this.corpseFullUpdatesLog?.Dispose();
-                this.npcLifecycleLog?.Dispose();
-                this.eventsLog = null;
-                this.packetsLog = null;
-                this.shopUpdatesLog = null;
-                this.vendorFullUpdatesLog = null;
-                this.systemMessagesLog = null;
-                this.chatDialogueLog = null;
-                this.npcInteractionsLog = null;
-                this.inventoryUpdatesLog = null;
-                this.enemyStateLog = null;
-                this.enemyFullUpdatesLog = null;
-                this.enemyCombatLog = null;
-                this.enemyMovementLog = null;
-                this.movementPacketsLog = null;
-                this.enemyStatUpdatesLog = null;
-                this.enemyFightEventsLog = null;
-                this.corpseFullUpdatesLog = null;
-                this.npcLifecycleLog = null;
+                this.FlushAndCloseRawWritersNoThrow();
+                this.eventsLog = this.CloseWriterNoThrow(this.eventsLog, false);
+                this.scfuAppearanceLog = this.CloseWriterNoThrow(this.scfuAppearanceLog, false);
+                this.shopUpdatesLog = this.CloseWriterNoThrow(this.shopUpdatesLog, false);
+                this.vendorFullUpdatesLog = this.CloseWriterNoThrow(this.vendorFullUpdatesLog, false);
+                this.systemMessagesLog = this.CloseWriterNoThrow(this.systemMessagesLog, false);
+                this.chatDialogueLog = this.CloseWriterNoThrow(this.chatDialogueLog, false);
+                this.npcInteractionsLog = this.CloseWriterNoThrow(this.npcInteractionsLog, false);
+                this.inventoryUpdatesLog = this.CloseWriterNoThrow(this.inventoryUpdatesLog, false);
+                this.corpseLootObservationsLog = this.CloseWriterNoThrow(this.corpseLootObservationsLog, false);
+                this.enemyStateLog = this.CloseWriterNoThrow(this.enemyStateLog, false);
+                this.enemyFullUpdatesLog = this.CloseWriterNoThrow(this.enemyFullUpdatesLog, false);
+                this.enemyCombatLog = this.CloseWriterNoThrow(this.enemyCombatLog, false);
+                this.enemyMovementLog = this.CloseWriterNoThrow(this.enemyMovementLog, false);
+                this.movementPacketsLog = this.CloseWriterNoThrow(this.movementPacketsLog, false);
+                this.enemyStatUpdatesLog = this.CloseWriterNoThrow(this.enemyStatUpdatesLog, false);
+                this.enemyFightEventsLog = this.CloseWriterNoThrow(this.enemyFightEventsLog, false);
+                this.corpseFullUpdatesLog = this.CloseWriterNoThrow(this.corpseFullUpdatesLog, false);
+                this.npcLifecycleLog = this.CloseWriterNoThrow(this.npcLifecycleLog, false);
             }
         }
 
-        private static StreamWriter CreateWriter(string path)
+        private void FlushWriterNoThrow(StreamWriter writer, bool rawSink)
+        {
+            if (writer == null)
+            {
+                return;
+            }
+
+            try
+            {
+                writer.Flush();
+            }
+            catch
+            {
+                if (rawSink)
+                {
+                    this.rawPacketWriteErrorCount++;
+                }
+                else
+                {
+                    this.rawPacketProjectionErrorCount++;
+                }
+            }
+        }
+
+        private StreamWriter CloseWriterNoThrow(StreamWriter writer, bool rawSink)
+        {
+            if (writer == null)
+            {
+                return null;
+            }
+
+            this.FlushWriterNoThrow(writer, rawSink);
+            try
+            {
+                writer.Dispose();
+            }
+            catch
+            {
+                if (rawSink)
+                {
+                    this.rawPacketWriteErrorCount++;
+                }
+                else
+                {
+                    this.rawPacketProjectionErrorCount++;
+                }
+            }
+
+            return null;
+        }
+
+        private static StreamWriter CreateWriter(string path, bool autoFlush = false)
         {
             return new StreamWriter(new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite), Encoding.UTF8)
             {
-                AutoFlush = false
+                AutoFlush = autoFlush
             };
         }
 
         private static string CreateSessionDirectory(string pluginDir)
         {
             string baseDirectory = string.IsNullOrWhiteSpace(pluginDir) ? Directory.GetCurrentDirectory() : pluginDir;
-            string directory = Path.Combine(baseDirectory, "captures", DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture));
+            string capturesDirectory = Path.Combine(baseDirectory, "captures");
+            string stem = DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
+            string directory = Path.Combine(capturesDirectory, stem);
+            int suffix = 1;
+            while (Directory.Exists(directory))
+            {
+                directory = Path.Combine(
+                    capturesDirectory,
+                    stem + "-" + suffix.ToString("00", CultureInfo.InvariantCulture));
+                suffix++;
+            }
+
             Directory.CreateDirectory(directory);
             return directory;
         }
