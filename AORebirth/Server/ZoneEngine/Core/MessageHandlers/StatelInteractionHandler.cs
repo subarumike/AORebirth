@@ -2,8 +2,6 @@ namespace ZoneEngine.Core.MessageHandlers
 {
     #region Usings ...
 
-    using System;
-
     using AORebirth.Core.Network;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -27,17 +25,8 @@ namespace ZoneEngine.Core.MessageHandlers
                 return false;
             }
 
-#if DEBUG
-            string s = string.Format(
-                "Generic Command received:\r\nAction: {0} ({1}){2}Target: {3} {4}",
-                message.Action,
-                (int)message.Action,
-                Environment.NewLine,
-                target.Type,
-                target.ToString(true));
-            ChatTextMessageHandler.Default.Send(client.Controller.Character, s);
-#endif
             client.Controller.UseStatel(target);
+            GenericCmdMessageHandler.Default.Acknowledge(client.Controller.Character, message);
             return true;
         }
     }

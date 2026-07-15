@@ -699,7 +699,6 @@ namespace ZoneEngine.Core.Controllers
 
                 if (sd != null)
                 {
-                    this.SendChatText("Found Statel with " + sd.Events.Count + " events");
                     Event onUse = sd.Events.FirstOrDefault(x => x.EventType == eventType);
                     if (onUse != null)
                     {
