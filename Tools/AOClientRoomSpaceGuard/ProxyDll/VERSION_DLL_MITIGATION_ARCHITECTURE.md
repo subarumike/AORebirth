@@ -12,9 +12,17 @@ testable compatibility layer while preserving the central safety rule:
 > result are proven. Otherwise record evidence and continue normal exception
 > search.
 
-The existing `version.dll` forwarding model is structurally usable. A rewrite
-is not required. The installer, exact N3 profile hashes, Windows export
-forwarding, offline self-tests, and crash dumps are a sound base.
+The existing `version.dll` forwarding model is structurally usable as the
+bootstrap, profile/policy owner, evidence collector, and recovery coordinator.
+It must not become a monolithic renderer implementation. Graphics compatibility
+belongs in dedicated modules and is authorized only after complete graphics
+interface ownership and true frame/device boundaries are proven. The installer,
+exact N3 profile hashes, Windows export forwarding, offline self-tests, and
+crash dumps are a sound base.
+
+Architectural invariant:
+
+> No graphics COM interface visible to AO may bypass the proxy registry.
 
 ## Proposed components
 
@@ -25,13 +33,24 @@ VersionProxy
        -> CompatibilityPolicy
        -> HookTransactionManager
        -> ExactGuardSet
-       -> RenderValidation
+       -> GraphicsCompatibility (dedicated, proof-gated)
+            -> ComIdentityRegistry
+            -> GraphicsInterfaceProxies
+            -> RenderValidation
+            -> FrameStateTracker
+            -> DeviceGenerationManager
        -> ControlFlowValidation
-       -> StreamResourceDiagnostics
-       -> RendererRecovery
+       -> GamecodeDeserializationValidation
+       -> ResourcePublicationDiagnostics
+       -> RendererRecoveryCoordinator
        -> EvidenceLogger
        -> CrashReporter
 ```
+
+`GraphicsCompatibility` is a future component boundary, not authorization to
+build a partial D3D/DDRAW wrapper. It may be implemented only after the proof
+package inventories every created, queried, returned, retained, and released
+interface used by both clients.
 
 ### VersionProxy
 
@@ -90,7 +109,7 @@ Proposed levels:
 | 0 | diagnostics | version forwarding, compact startup log, crash dumps only |
 | 1 | exact guards | only existing, audited exact guards |
 | 2 | AO render validation | proven AO-side object/submission validation |
-| 3 | stream/resource containment | only after stream/resource contracts are proven |
+| 3 | Gamecode/resource containment | only after whole-object rejection and resource lifetime/publication contracts are proven |
 | 4 | renderer recovery | explicit frame/batch/device recovery with proven cleanup |
 
 Every mitigation is independently selectable. Level is a convenience default,
@@ -109,8 +128,9 @@ oldrender.nvidia-exact-draw-fallback
 oldrender.gui-batch-cleanup
 oldrender.force-plain-hal
 newgui.helper-control-flow
-stream.observe
-stream.reject-proven-overrun
+gamecode.deserialize-count-observe
+gamecode.reject-proven-oversize-object
+stream.capacity-observe-independent
 resource.observe
 renderer.recover-frame
 ```
@@ -193,6 +213,33 @@ Readability never proves object type or lifetime. Executability never proves a
 valid target ABI. Those require a typed boundary and approved module/function
 set.
 
+### ComIdentityRegistry and graphics-interface closure
+
+The renderer proxy is all-or-nothing at the interface boundary. Intercepting
+`Direct3DCreate9`, `DirectDrawCreateEx`, or `DirectDrawCreate` without wrapping
+every descendant-returning method would allow raw objects to escape and split
+identity/lifetime accounting.
+
+The registry must provide:
+
+- one stable proxy identity per underlying COM identity;
+- stable `QueryInterface(IID_IUnknown)` identity;
+- thread-safe lookup, insertion, reference accounting, and teardown;
+- exact `QueryInterface`, `AddRef`, and `Release` semantics for every accepted
+  IID and interface tear-off;
+- proxy wrapping for every interface returned through creation, lookup,
+  parent/attached-object access, or `QueryInterface`;
+- a device generation on every device-owned object;
+- deterministic stale-wrapper rejection after device teardown/recreation;
+- no raw underlying pointer returned to AO.
+
+The C/new client has dual-path exposure: Cheetah contains D3D9 creation while
+randy also contains a retained DirectDraw path. The D/old client has DirectDraw
+creation origins in both randy and DisplaySystem (the latter is a capability
+probe). A D3D9-only or one-factory wrapper violates the invariant.
+Implementation is blocked until accepted IIDs, returning methods, raw storage
+sites, and release sites are completely inventoried for both clients.
+
 ### RenderValidation
 
 Validation is attached to a proven AO-side construction or submission
@@ -260,50 +307,128 @@ Current indirect-dispatch inventory:
 | C/new GUI helper `+0x14CA77` | outer callers/ABI proven; exact inner non-executable target transfer not located | unresolved; outer catch defaults off |
 | generic callback/deferred render sites for EIP 0/2/5/8 | no stable mapped caller | unresolved; no process-wide hook |
 
-### StreamResourceDiagnostics and containment
+### Gamecode deserialization and resource publication
 
-Rendering and stream/resource code remain independent components.
+Rendering, Gamecode deserialization, and resource-worker code remain
+independent components. Evidence from one does not authorize recovery in
+another.
 
-Initial `stream.observe` is diagnostic-only. At the proven reserve/grow/write
-boundary it records:
+The repeated `BinaryStream+0x1B1D` family is not a stream-capacity store.
+`BinaryStream::operator>>(float*)` writes zero to its caller-supplied output
+before reading. The owning Gamecode function deserializes a count into
+`object+0x19C`, loops over 12-byte entries beginning at `object+0x1A0`, and
+checks the 30-entry limit only after the loop.
+
+Initial `gamecode.deserialize-count-observe` records only proven fields:
 
 ```text
-stream pointer
-buffer base
-position
-logical length
-capacity
-requested bytes
-growth decision/result
-caller RVA
-resource identity and worker thread
+object and exact Gamecode profile
+decoded count and loop limit
+destination base, stride, current index, checked destination end
+BinaryStream object and enclosing caller
+message/object identity when proven
+native return/publication state when proven
 ```
 
-Production containment is eligible only after the stream ABI and ownership are
-established. Preferred actions:
+Production rejection is eligible only at a whole-object boundary that proves
+how malformed payload is consumed or discarded, how partial state is prevented
+from publication, and how all ownership is released exactly once. Clamping the
+count and continuing is forbidden because it can leave unread entry payload
+and desynchronize later decoding.
 
-1. invoke the native growth path before the proven write;
-2. reject the malformed write with the caller's native failure result;
-3. quarantine the identified resource;
-4. skip resource consumption with complete ownership cleanup.
+BinaryStream cursor/capacity/growth/terminator/alignment work is a separate
+future investigation and must not be represented as a repair for this family.
 
-Guard pages are diagnostic evidence only.
+Paired crash addresses strongly link this overwrite to two downstream families:
+the E24/E25 allocator value lies inside its paired Gamecode overwrite interval,
+and the E29/E30 ResourceManager request lies inside its paired interval with a
+zeroed sentinel. Common PID/timestamp confirmation is still missing, so the
+links remain conditional, but upstream Gamecode repair must be tested before
+any downstream mitigation.
 
-### RendererRecovery
+ResourceManager containment remains diagnostic-only until the complete state
+machine is proven:
+
+```text
+job creation -> queue ownership -> worker consume -> allocation/load
+-> result ownership -> publication/cache insertion -> waiter notification
+-> success/failure release
+```
+
+Every edge requires its lock, reference owner, failure result, retry rule, and
+exception policy. Raw return or worker-exception suppression is forbidden until
+the native cancellation/publication contract is known. The exact current
+notifier is `ResourceManager+0x3D7B..+0x3DB4`; its worker caller at
+`+0x3F97/+0x40F6` has already unlocked and stored/AddRef'd the resolved
+resource into the request before notification. Global cache publication remains
+unproven. A skipped notification can strand waiters.
+
+### RendererRecoveryCoordinator and frame state
 
 Recovery policies are named and exact. Each defines:
 
 ```text
-entry boundary
-owned locks/allocations/state
-cleanup order
+entry boundary and renderer-thread proof
+submission state on entry and failure
+owned locks/allocations/resources/state
+cleanup order and exact unwind contract
 neutral return contract
-postcondition
+postcondition and device generation
 allowed signatures
 ```
 
-The existing GUI batch cleanup is a candidate policy. Arbitrary driver faults,
-invalid return addresses, and unknown helper phases have no recovery policy.
+The compatibility layer tracks explicit external-submission state:
+
+```text
+validated-unsubmitted
+    -> compatibility-queued (optional; still proxy-owned)
+    -> submitted-synchronous
+    -> driver-accepted
+    -> presented
+```
+
+Immediate forwarding followed by SEH is not a transaction. Once an underlying
+resource/state/draw call runs, external state may have changed or deferred
+driver work may exist. The only generally reversible state is validated work
+that has not been submitted or commands still held exclusively in a
+compatibility-owned queue.
+
+Recovery selection is:
+
+- pre-submit validation failure: abort at the proven command/batch/frame owner;
+- AO-side exception with intact unwind and a known postcondition: abandon the
+  frame and reset only fully tracked AO/compatibility state;
+- driver exception or uncertain external state: poison the device generation
+  and execute only a proven destroy/recreate path;
+- stack, heap, unwind, lock, or control-flow corruption: terminate/restart.
+
+SEH is eligible only on the proven renderer thread, within a named supervised
+region, after exact unwind proof, with no suspected heap corruption, driver
+lock, or deferred work, and when every owned resource can return to a known
+state. The existing broad C/new helper wrapper does not meet these gates.
+
+The existing GUI batch cleanup is a candidate batch policy, not frame recovery.
+Arbitrary driver faults, invalid return addresses, and unknown helper phases
+have no recovery policy.
+
+Last-good-frame presentation requires a compatibility-owned retained
+backbuffer. Without it, only an exact pre-Present AO/proxy failure with a
+proven-intact device may skip Present and enter a proven next-frame
+reinitialization path. Driver or uncertain faults poison the generation and
+must recover through the proven device path or restart.
+
+`DisplaySystem_t::Commit` is the proven shared central boundary (C/new actual
+`+0x796F5`, D/old `+0x789BB`), but it is not a safe whole-function catch. C/new
+runs timer/resource/main-thread/graphics/frame-rate/memory maintenance after its
+internal render call; D/old performs device-loss/surface restoration,
+viewport processing, and DynamicVB reset. A supervised region must be narrower
+and preserve the mandatory tail.
+
+Cheetah exposes a native C/new reset/callback path that is a candidate reset
+primitive, not proof of complete device destruction/recreation. D/old proves
+lost-device detection and surface restoration but no recreation path outside
+Randy initialization. A poisoned generation therefore requires restart until
+complete ownership/rebinding is proven.
 
 Each recovery policy has an atomic circuit breaker. Repeated cleanup failure,
 an invalid postcondition, or exhaustion of a small configured recovery budget
@@ -351,13 +476,14 @@ cleanup/action/postcondition
 signature/count
 ```
 
-Stream/resource record:
+Gamecode/resource record:
 
 ```text
 time/thread/profile
-stream/buffer/position/length/capacity/request
-caller and resource identity
-growth/rejection/quarantine decision
+object/count/limit/destination/stride/index/checked end
+BinaryStream, enclosing caller, message/resource identity
+whole-object rejection/consumption/publication decision
+ResourceManager request/sentinel/worker/publication/notification state
 signature/count
 ```
 
@@ -391,8 +517,8 @@ not inferred merely because a pointer was readable.
 | proven inner render indirect dispatch | not yet located for F11/F12 | none | unknown | none | unknown stack/object/frame state | no hook until exact call, ABI, and cleanup are captured |
 | geometry traversal | coordinate-like registers/targets and GUI/randy consumer sites only | vertex/transform/bounds object, size and lifetime not known | traversal phase unknown | no safe object/frame discard contract | could leave batch lists, refcounts or transform stack inconsistent | render thread I; evidence-only, hook RVA TBD |
 | resource creation/release | only GUI heap/static index distinction and crash-time resource candidates | general resource owner/refcount/destructor not known | creation/release can mutate global caches and worker queues | no generic reject/drop | AddRef/Release, partial allocation and callback obligations unknown | render and worker threads; identity instrumentation only |
-| Gamecode whole serialization caller `+0x7A945/+0x7A954` | caller operation and BinaryStream call boundary | stable chain known; stream fields, capacity/grow API and error contract unknown | earlier bytes/cursor may already be mutated | no safe partial skip; eventual whole-operation reject only | must prove no partial send/consume and exact ownership | main/client thread I; diagnostic-only first |
-| ResourceManager observed worker frame report-logical `+0x201`, actual `+0x1201` | request/result candidates and ACE worker context | function role/boundary, object fields, queue lock, refcount and cancel/failure callback unknown | worker/queue state may already be held | no safe raw return/drop | leak, double-release, lock retention and race risk | worker thread; boundary TBD, diagnostic-only until native cancel path proven |
+| Gamecode count extraction and fixed-array loop `+0x7A910..+0x7A962` | object, decoded count at `+0x19C`, destination `+0x1A0`, 12-byte stride, three float reads, post-loop limit 30 | exact loop and PID 29984 state proven; enclosing message/object reject and remaining-payload contract unknown | count is read before loop; no entry write need occur before a new pre-loop decision | reject only at a proven whole-object/message boundary; never clamp and continue | must consume/discard payload consistently and prevent partial publication/release errors | main/client thread I; pre-loop diagnostic eligible, behavior blocked on owner contract |
+| ResourceManager notifier `+0x3D7B..+0x3DB4`, worker caller `+0x3F97/+0x40F6` | request/list sentinel at `+0`, callback/context nodes, worker lock/pop, request-local resource store/AddRef and notification path | list construction and notifier ABI proven; destruction race, request ref owner, global publication/cancel/failure contract unresolved | worker has unlocked and assigned/AddRef'd the resolved resource into request before notification | no safe raw return/drop; skipping can strand waiters | request may be destroyed/cleared; leak, double-release, missed callback and race risk | worker thread; diagnostic-only until lifetime/publication proof |
 | N3 login/vehicle before `N3+0x15040` | current register/stack values only | object/type/owner/failure return unknown | initialization may be partially complete | none | vehicle/world initialization may be poisoned | main thread I; isolate RoomSpace, do not catch |
 
 ## Render-validation proof matrix
@@ -433,8 +559,8 @@ generic “all render pointers are valid” scanner.
 | deferred GUI/VB | whole GUI batch | exact driver/GUI cleanup | native batch owner/postcondition |
 | GUI tree | tree entry | low key to native not-found | high-key lifetime/provenance |
 | invalid EIP | proven render dispatch shim | none generically | exact dispatch site/ABI/cleanup |
-| BinaryStream | whole Gamecode serialization first; reserve/grow/write after ABI proof | crash dump only | stream fields and caller result |
-| ResourceManager | observed worker frame; consume/cancel boundary TBD | crash dump only | function role, resource identity/ref ownership |
+| Gamecode deserialization | count extraction before `+0x7A922` loop; whole-object/message owner TBD | exact loop and PID 29984 state | reject/consume/publication contract and malformed-count producer |
+| ResourceManager | notifier `+0x3D7B`; worker request-assignment/AddRef then notify `+0x3F97/+0x40F6` | exact notifier/list/worker path | global publication, destruction/clear site, request ref ownership, waiter failure/retry contract |
 | N3 login/vehicle | typed initialization boundary | crash dump only | object type/layout and failure result |
 
 ## Threading model
@@ -460,6 +586,13 @@ generic “all render pointers are valid” scanner.
   fail fast; do not continue a partially patched process.
 - Invalid object without a proven neutral contract: record and follow the
   original failure path.
+- Pre-submit rejection at a proven owner: abandon only the owned
+  command/batch/frame and restore its proven postcondition.
+- AO-side exception with exact unwind and tracked state: abandon the frame only
+  under its named recovery policy.
+- Driver exception or uncertain external submission: poison the current device
+  generation; recreate only through a proven path, otherwise restart.
+- Stack/heap/unwind/lock/control-flow corruption: terminate/restart.
 - Unknown exception: dump and continue normal exception search.
 
 ## Runtime ownership and unhook
@@ -487,3 +620,6 @@ fallbacks for the one verified driver image. Do not generalize by RVA across
 driver versions or GPU generations. Each new driver requires its own module
 identity, instruction/register proof, cleanup policy, and post-fault device
 validation until AO-side validation makes the driver fallback unnecessary.
+Remove a driver-RVA hook only after the complete graphics proxy prevents that
+exact reproduction across the hardware/driver soak matrix; interface wrapping
+or one successful session is not sufficient.
