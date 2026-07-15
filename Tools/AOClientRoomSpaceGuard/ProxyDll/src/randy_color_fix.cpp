@@ -21,6 +21,7 @@ namespace
     uintptr_t DwordColorFaultAddress = 0;
     uintptr_t DwordColorResumeAddress = 0;
     uintptr_t GuiRenderBatchAddress = 0;
+    uintptr_t GuiTreeFindResumeAddress = 0;
     volatile LONG* RendererDeviceSelectorAddress = nullptr;
     LONG RenderStateSkipCount = 0;
     LONG IndirectColorSkipCount = 0;
@@ -28,6 +29,7 @@ namespace
     LONG DriverDrawInputSkipCount = 0;
     LONG DriverDrawExceptionSkipCount = 0;
     LONG GuiBatchExceptionSkipCount = 0;
+    LONG GuiTreeInvalidKeySkipCount = 0;
 
     using DrawIndexedPrimitiveVbFunction = HRESULT (WINAPI*)(
         void*,
@@ -174,6 +176,32 @@ namespace
         if (readable != PAGE_READONLY && readable != PAGE_READWRITE &&
             readable != PAGE_WRITECOPY && readable != PAGE_EXECUTE_READ &&
             readable != PAGE_EXECUTE_READWRITE && readable != PAGE_EXECUTE_WRITECOPY)
+        {
+            return false;
+        }
+
+        uintptr_t address = reinterpret_cast<uintptr_t>(pointer);
+        uintptr_t regionEnd = reinterpret_cast<uintptr_t>(memory.BaseAddress) +
+            memory.RegionSize;
+        return regionEnd >= address && regionEnd - address >= size;
+    }
+
+    bool IsWritableRange(void* pointer, size_t size)
+    {
+        MEMORY_BASIC_INFORMATION memory = {};
+        if (!pointer || size == 0 ||
+            VirtualQuery(pointer, &memory, sizeof(memory)) != sizeof(memory) ||
+            memory.State != MEM_COMMIT ||
+            (memory.Protect & (PAGE_GUARD | PAGE_NOACCESS)) != 0)
+        {
+            return false;
+        }
+
+        DWORD protection = memory.Protect & 0xFF;
+        if (protection != PAGE_READWRITE &&
+            protection != PAGE_WRITECOPY &&
+            protection != PAGE_EXECUTE_READWRITE &&
+            protection != PAGE_EXECUTE_WRITECOPY)
         {
             return false;
         }
@@ -632,6 +660,92 @@ namespace
         }
     }
 
+    __declspec(naked) void GuiTreeFindOriginalTrampoline()
+    {
+        __asm
+        {
+            push ebp
+            mov ebp, esp
+            push ecx
+            push esi
+            jmp dword ptr [GuiTreeFindResumeAddress]
+        }
+    }
+
+    void* InvokeGuiTreeFindOriginal(
+        void* tree,
+        void** output,
+        const void* key)
+    {
+        void* result = nullptr;
+        __asm
+        {
+            push key
+            push output
+            mov ecx, tree
+            call GuiTreeFindOriginalTrampoline
+            mov result, eax
+        }
+        return result;
+    }
+
+    void* __stdcall GuardedGuiTreeFind(
+        void* tree,
+        void** output,
+        const void* key)
+    {
+        // Ordinary tree lookups are a hot GUI path.  Only divert impossible
+        // low addresses such as the observed key=0x8; all normal keys go
+        // straight to the original implementation without VirtualQuery.
+        if (reinterpret_cast<uintptr_t>(key) >= 0x10000u)
+        {
+            return InvokeGuiTreeFindOriginal(tree, output, key);
+        }
+
+        auto sentinelAddress = reinterpret_cast<void*>(
+            reinterpret_cast<uintptr_t>(tree) + sizeof(void*));
+        if (!IsReadableRange(sentinelAddress, sizeof(void*)) ||
+            !IsWritableRange(output, sizeof(void*)))
+        {
+            return InvokeGuiTreeFindOriginal(tree, output, key);
+        }
+
+        void* sentinel = nullptr;
+        std::memcpy(&sentinel, sentinelAddress, sizeof(sentinel));
+        std::memcpy(output, &sentinel, sizeof(sentinel));
+
+        LONG count = InterlockedIncrement(&GuiTreeInvalidKeySkipCount);
+        if (count <= 16 || count % 100 == 0)
+        {
+            aorf::Log(
+                "PATCH HIT GUI tree invalid key treated as not found "
+                "tree=0x%08lX output=0x%08lX key=0x%08lX "
+                "sentinel=0x%08lX count=%ld",
+                static_cast<unsigned long>(
+                    reinterpret_cast<uintptr_t>(tree)),
+                static_cast<unsigned long>(
+                    reinterpret_cast<uintptr_t>(output)),
+                static_cast<unsigned long>(
+                    reinterpret_cast<uintptr_t>(key)),
+                static_cast<unsigned long>(
+                    reinterpret_cast<uintptr_t>(sentinel)),
+                static_cast<long>(count));
+        }
+        return output;
+    }
+
+    __declspec(naked) void GuardedGuiTreeFindThunk()
+    {
+        __asm
+        {
+            push dword ptr [esp + 8]
+            push dword ptr [esp + 8]
+            push ecx
+            call GuardedGuiTreeFind
+            ret 8
+        }
+    }
+
     HRESULT WINAPI GuardedDrawIndexedPrimitiveVb(
         void* device,
         DWORD primitiveType,
@@ -888,6 +1002,109 @@ namespace
                 sizeof(ExpectedCall),
                 oldProtection,
                 "GUI render-batch patch");
+            return false;
+        }
+        return true;
+    }
+
+    void RestoreGuiRenderBatchCall(uint8_t* callsite)
+    {
+        constexpr uint8_t OriginalCall[] =
+        {
+            0xE8, 0xC9, 0xDF, 0xFF, 0xFF
+        };
+        DWORD oldProtection = 0;
+        if (!VirtualProtect(
+                callsite,
+                sizeof(OriginalCall),
+                PAGE_EXECUTE_READWRITE,
+                &oldProtection))
+        {
+            FailFastPatchRollback("GUI render-batch patch");
+        }
+        std::memcpy(callsite, OriginalCall, sizeof(OriginalCall));
+        bool flushed = FlushInstructionCache(
+            GetCurrentProcess(),
+            callsite,
+            sizeof(OriginalCall)) != FALSE;
+        bool verified = std::memcmp(
+            callsite,
+            OriginalCall,
+            sizeof(OriginalCall)) == 0;
+        DWORD ignored = 0;
+        bool restored = VirtualProtect(
+            callsite,
+            sizeof(OriginalCall),
+            oldProtection,
+            &ignored) != FALSE;
+        if (!flushed || !verified || !restored)
+        {
+            FailFastPatchRollback("GUI render-batch patch");
+        }
+    }
+
+    bool PatchGuiTreeFindEntry(uint8_t* entry)
+    {
+        constexpr uint8_t ExpectedPrologue[] =
+        {
+            0x55, 0x8B, 0xEC, 0x51, 0x56
+        };
+        if (std::memcmp(entry, ExpectedPrologue, sizeof(ExpectedPrologue)) != 0)
+        {
+            return false;
+        }
+
+        uint8_t patchedJump[sizeof(ExpectedPrologue)] = { 0xE9, 0, 0, 0, 0 };
+        uint32_t nextInstruction = static_cast<uint32_t>(
+            reinterpret_cast<uintptr_t>(entry + sizeof(patchedJump)));
+        uint32_t destination = static_cast<uint32_t>(
+            reinterpret_cast<uintptr_t>(&GuardedGuiTreeFindThunk));
+        int32_t displacement = static_cast<int32_t>(destination - nextInstruction);
+        std::memcpy(patchedJump + 1, &displacement, sizeof(displacement));
+
+        DWORD oldProtection = 0;
+        if (!VirtualProtect(
+                entry,
+                sizeof(patchedJump),
+                PAGE_EXECUTE_READWRITE,
+                &oldProtection))
+        {
+            return false;
+        }
+
+        std::memcpy(entry, patchedJump, sizeof(patchedJump));
+        bool flushed = FlushInstructionCache(
+            GetCurrentProcess(),
+            entry,
+            sizeof(patchedJump)) != FALSE;
+        bool verified = std::memcmp(
+            entry,
+            patchedJump,
+            sizeof(patchedJump)) == 0;
+        if (!flushed || !verified)
+        {
+            RestorePatchedBytesOrTerminate(
+                entry,
+                ExpectedPrologue,
+                sizeof(ExpectedPrologue),
+                oldProtection,
+                "GUI tree-find patch");
+            return false;
+        }
+
+        DWORD ignored = 0;
+        if (!VirtualProtect(
+                entry,
+                sizeof(patchedJump),
+                oldProtection,
+                &ignored))
+        {
+            RestorePatchedBytesOrTerminate(
+                entry,
+                ExpectedPrologue,
+                sizeof(ExpectedPrologue),
+                oldProtection,
+                "GUI tree-find patch");
             return false;
         }
         return true;
@@ -1183,6 +1400,27 @@ namespace aorf
             0x8B, 0x45, 0xFC,
             0x59
         };
+        constexpr uint8_t ExpectedGuiTreeFindResume[] =
+        {
+            0xFF, 0x75, 0x0C,
+            0x8B, 0xF1,
+            0xE8, 0xA5, 0xFD, 0xFF, 0xFF,
+            0x8B, 0x76, 0x04,
+            0x89, 0x45, 0xFC,
+            0x3B, 0xC6,
+            0x74, 0x17
+        };
+        constexpr uint8_t ExpectedGuiTreeFindNotFound[] =
+        {
+            0x89, 0x75, 0x0C,
+            0x8D, 0x45, 0x0C,
+            0x8B, 0x08,
+            0x8B, 0x45, 0x08,
+            0x89, 0x08,
+            0x5E,
+            0xC9,
+            0xC2, 0x08, 0x00
+        };
         if (std::memcmp(
                 base + 0x6C3A1,
                 ExpectedFaultSequence,
@@ -1230,7 +1468,15 @@ namespace aorf
             std::memcmp(
                 guiBase + 0x152E38,
                 ExpectedGuiBatchCaller,
-                sizeof(ExpectedGuiBatchCaller)) != 0)
+                sizeof(ExpectedGuiBatchCaller)) != 0 ||
+            std::memcmp(
+                guiBase + 0x4F2F4,
+                ExpectedGuiTreeFindResume,
+                sizeof(ExpectedGuiTreeFindResume)) != 0 ||
+            std::memcmp(
+                guiBase + 0x4F31F,
+                ExpectedGuiTreeFindNotFound,
+                sizeof(ExpectedGuiTreeFindNotFound)) != 0)
         {
             Log("ERROR unsupported randy31 renderer layout");
             return false;
@@ -1246,6 +1492,7 @@ namespace aorf
         DwordColorFaultAddress = reinterpret_cast<uintptr_t>(base + 0x6C51D);
         DwordColorResumeAddress = reinterpret_cast<uintptr_t>(base + 0x6C51F);
         GuiRenderBatchAddress = reinterpret_cast<uintptr_t>(guiBase + 0x150E17);
+        GuiTreeFindResumeAddress = reinterpret_cast<uintptr_t>(guiBase + 0x4F2F4);
         RendererDeviceSelectorAddress = reinterpret_cast<volatile LONG*>(
             base + 0xB772C);
         uintptr_t d3dimBegin = 0;
@@ -1327,6 +1574,15 @@ namespace aorf
                 if (contextsRead)
                 {
                     contextsRead = suspension.IsAnyThreadExecutingInRange(
+                        reinterpret_cast<uintptr_t>(guiBase + 0x4F2EF),
+                        reinterpret_cast<uintptr_t>(guiBase + 0x4F2F4),
+                        &executing);
+                    unsafeRendererExecution =
+                        unsafeRendererExecution || executing;
+                }
+                if (contextsRead)
+                {
+                    contextsRead = suspension.IsAnyThreadExecutingInRange(
                         d3dimBegin,
                         d3dimEnd,
                         &executing);
@@ -1397,6 +1653,15 @@ namespace aorf
                             RendererDeviceSelectorAddress);
                         patchFailure = "GUI render-batch patch failed";
                     }
+                    else if (!PatchGuiTreeFindEntry(guiBase + 0x4F2EF))
+                    {
+                        RestoreGuiRenderBatchCall(guiBase + 0x152E49);
+                        RestoreDriverDrawCall(base + 0x219B4);
+                        RestoreRendererDeviceSelectorLoad(
+                            base + 0x43B99,
+                            RendererDeviceSelectorAddress);
+                        patchFailure = "GUI tree-find patch failed";
+                    }
                     else
                     {
                         patchTransactionInstalled = true;
@@ -1418,6 +1683,7 @@ namespace aorf
             DwordColorFaultAddress = 0;
             DwordColorResumeAddress = 0;
             GuiRenderBatchAddress = 0;
+            GuiTreeFindResumeAddress = 0;
             Log("ERROR randy31 renderer patch transaction failed: %s",
                 patchFailure ? patchFailure : "unknown failure");
             return false;
@@ -1425,7 +1691,7 @@ namespace aorf
 
         Log("PATCH PASS randy31 renderer/color/driver guards "
             "deviceSelectorRva=0x43B99 drawCallRva=0x219B4 "
-            "guiBatchCallRva=0x152E49 "
+            "guiBatchCallRva=0x152E49 guiTreeFindRva=0x4F2EF "
             "faultRvas=0x21A94,0x2511A,0x6C3A1,0x6C476,0x6C51D");
         return true;
     }

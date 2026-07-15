@@ -64,6 +64,10 @@ verified void GUI batch and skips that batch only for the exact NVIDIA
 32.0.15.9186 read-from-0x14 instruction. The plain-HAL selection is the
 preventive repair for that deferred-flush path.
 
+The old GUI repair also contains the verified tree-lookup crash where GUI was
+given pointer 0x8 instead of a four-byte key. Invalid or unreadable key pointers
+use GUI's existing not-found result; valid keys use the original lookup.
+
 For the verified old-client build, the repair automatically maps AO's existing
 T&L HAL selection to its existing plain Direct3D HAL selection before creating
 the persistent renderer device. This keeps GPU rasterization while the legacy

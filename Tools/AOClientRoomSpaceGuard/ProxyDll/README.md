@@ -76,6 +76,13 @@ boundary and skips the current GUI batch. The caller ignores the helper return
 and advances normally. Plain-HAL device normalization remains the pre-fault
 mitigation for this deferred path.
 
+The old GUI repair also verifies the map/tree `find` entry at
+`GUI.dll +0x4F2EF`, its comparator path, and its native not-found tail. If a
+caller supplies a null, low, or unreadable four-byte lookup key such as the
+observed pointer `0x8`, the guard writes the tree's own sentinel to the output
+and returns the output pointer exactly as the original not-found branch does.
+Readable keys continue through a trampoline containing the original prologue.
+
 For the verified old-client build, the proxy also normalizes AO's renderer
 selector from its existing T&L HAL mode to its existing plain Direct3D HAL mode
 before the persistent device is created. Plain HAL keeps hardware rasterization
