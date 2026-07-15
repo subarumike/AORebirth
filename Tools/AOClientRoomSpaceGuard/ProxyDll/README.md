@@ -44,17 +44,49 @@ unchanged.
 
 The old live renderer repair verifies the exact `randy31.dll +0x21A94`
 draw-resource pointer read, `randy31.dll +0x2511A` render-state lookup,
-`randy31.dll +0x6C3A1` byte-color read, and `randy31.dll +0x6C51D`
-packed-color read. If the draw wrapper receives an invalid low resource
-pointer, the process-level guard returns from that one draw call without
-submitting it. If a render-state entry contains an impossible state id, the
-guard skips that one state entry and continues the state-application loop. If
-either color instruction receives an invalid low pointer, the guard substitutes
-black color components and resumes after the unsafe read. All other renderer
-exceptions continue through the normal client exception path unchanged.
+`randy31.dll +0x6C3A1` byte-color read, `randy31.dll +0x6C476` indirect
+color-sample read, and `randy31.dll +0x6C51D` packed-color read. If the draw
+wrapper receives an invalid low resource pointer, the process-level guard
+returns from that one draw call without submitting it. If a render-state entry
+contains an impossible state id, the guard skips that one state entry and
+continues the state-application loop. Invalid low color pointers use the
+verified helper's existing missing-sample path or substitute black components
+before resuming after the unsafe read.
+
+The repair also byte-verifies the old renderer's single
+`DrawIndexedPrimitiveVB` dispatch at `randy31.dll +0x219B4`. The fallback is
+restricted to NVIDIA driver `32.0.15.9186`, its verified image identity, and
+the two observed null-read instructions at driver RVAs `0x172776C` and
+`0x173A009`. Only while that one triangle-batch call is active, a matching
+read access violation is unwound to the AO-to-Direct3D call boundary and the
+bad draw is skipped. Other NVIDIA versions or instructions, other renderer
+calls, and exceptions that do not match that exact filter continue through
+the normal client exception path unchanged. Driver recovery after an access
+violation is containment, not a guarantee that NVIDIA's internal state remains
+usable.
+
+The separate observed NVIDIA RVA `0x170C490` occurs while
+`IDirect3DVertexBuffer7::Lock` flushes earlier queued work. Randy discards the
+Lock result and GUI immediately writes through the returned pointer, so turning
+that exception into a null or failed Lock would only move the crash into GUI.
+The proxy therefore does not intercept the Lock itself. It byte-verifies and
+wraps the complete void GUI batch helper called at `GUI.dll +0x152E49`; only the
+exact NVIDIA `0x170C490`, `EAX=4`, read-from-`0x14` failure unwinds to that
+boundary and skips the current GUI batch. The caller ignores the helper return
+and advances normally. Plain-HAL device normalization remains the pre-fault
+mitigation for this deferred path.
+
+For the verified old-client build, the proxy also normalizes AO's renderer
+selector from its existing T&L HAL mode to its existing plain Direct3D HAL mode
+before the persistent device is created. Plain HAL keeps hardware rasterization
+but moves transformation and lighting into the legacy Direct3D software
+pipeline. The selector, both device GUIDs, and the selection block are all
+byte-verified before this repair is enabled. This is a client-supported renderer
+choice, not a fabricated capability or gameplay limit; the scoped draw guard
+remains a fallback if the NVIDIA rasterization layer still faults.
 
 The crash dump handler does not suppress arbitrary access violations, C++
-exceptions, driver faults, stack corruption, or unknown callsite failures.
+exceptions, arbitrary driver faults, stack corruption, or unknown callsite failures.
 Only the targeted, byte-verified repairs listed above resume execution. The
 proxy never modifies AO files after installation. It contains no
 LargeAddressAware patch, XML/settings changes, DValues, camera/input hooks,
