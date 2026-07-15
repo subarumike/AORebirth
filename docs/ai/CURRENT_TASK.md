@@ -14,6 +14,7 @@ Insurance Terminal + `/terminate` death XP pool (restored after git wipe) + resp
 - SavedXP watermark preserved across kill/login normalize.
 - Death XP loss also applied on normal combat player deaths.
 - Captured two matching official-live client dumps for the `VetoPosition -> PosToRoom` crash, proved the exception is `std::bad_cast` (`Bad dynamic_cast!`), and extended the existing non-throwing RoomSpace wrapper to the fifth audited callsite in both client profiles. The rebuilt proxy package is installed in both approved client directories; in-game regression validation remains pending.
+- Analyzed the repeated official old-client NVIDIA 591.86 and randy31 crashes. The installed proxy now normalizes T&L HAL to AO's existing plain HAL path, guards the exact `randy31 +0x6C476` indirect color read, contains the two verified `DrawIndexedPrimitiveVB` driver null reads, and contains the verified deferred-flush failure at the whole GUI batch boundary. The rebuilt package is installed in both approved client directories, and the active D: old-client profile selects plain HAL; live regression validation remains pending.
 - Restarted Chat, Login, and Zone successfully after the client-guard build.
 
 ## Remaining
@@ -21,8 +22,9 @@ Insurance Terminal + `/terminate` death XP pool (restored after git wipe) + resp
 1. Live-validate: Insurance Terminal → `/terminate` Yes → Die → respawn at bind.
 2. Live-validate death pool recover: kill mobs, pool shrinks 5%/kill + mob XP (char level &lt; 220).
 3. Re-test the official-live location that repeatedly produced `N3!n3Playfield_t::PosToRoom+0x44` and confirm the fifth RoomSpace callsite prevents the crash.
-4. Shadowknowledge amount in “Character stored” still 0.
-5. Continue Subway when Mike returns that priority.
+4. Re-test the D: official old client in the Subway/render-heavy locations and confirm the new randy31/NVIDIA guard logs `PATCH PASS` plus the plain-HAL selector normalization without another matching crash.
+5. Shadowknowledge amount in “Character stored” still 0.
+6. Continue Subway when Mike returns that priority.
 
 ## Constraints
 
