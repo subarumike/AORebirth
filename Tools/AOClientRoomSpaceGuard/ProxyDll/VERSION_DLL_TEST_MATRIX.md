@@ -194,18 +194,20 @@ Diagnostic phase only:
 - verify the four known dumps reproduce ESI as the caller output address at
   `BinaryStream+0x1B1D`;
 - record Gamecode object, stream, decoded count, destination range, loop index,
-  enclosing caller/message, and thread at `Gamecode+0x7A919`;
+  enclosing caller/message, and thread at C `Gamecode+0x7A919` or D
+  `Gamecode+0x79647`;
 - test valid counts 0, 1, and 30 plus 31, truncated payload, byte-order-wrong,
   and very large counts;
 - prove the diagnostic does not change parsing or publication;
 - confirm whether paired E24/E25 and E29/E30 share PID/time identity.
 
-Behavioral tests begin only after whole-object failure semantics are proven.
-Verify rejection occurs before the first entry write, consumes/discards the
-entire malformed object without desynchronizing the next decode, publishes no
-partial state, and releases ownership exactly once. Never validate a clamp-and-
-continue repair. BinaryStream capacity/growth tests are out of scope for this
-family.
+Whole-object failure semantics are proven for the exact observed C/D N3 caller.
+Behavioral tests begin only after emitted-code, ABI, caller-return, and patch-
+transaction readiness pass. Verify rejection occurs before the first entry
+write, discards the enclosing message without a subsequent decode at the unread
+payload, publishes no partial state, and releases ownership exactly once.
+Never validate a clamp-and-continue repair. BinaryStream capacity/growth tests
+are out of scope for this family.
 
 ### ResourceManager worker
 
@@ -288,8 +290,9 @@ Documentation/log-format-only changes do not reset hardware soak evidence.
   unwind, and mandatory Commit-tail preservation pass;
 - no poisoned-device continuation until reset/recreate/rebind and first/subsequent
   Present pass; otherwise restart is required;
-- no Gamecode behavioral repair until whole-object reject/consume/ref semantics
-  pass without stream desynchronization;
+- no Gamecode behavioral repair until the proven Strategy D design also passes
+  emitted ABI, transactional rollback, exact-caller, malformed-stream,
+  no-publication, retry, C/D runtime, performance, and soak gates;
 - official live and AORebirth/private results remain separate evidence lanes;
 - single-client and multi-client runs pass with AOSharp absent; any AOSharp
   compatibility run is labeled separately;
