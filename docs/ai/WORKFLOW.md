@@ -10,6 +10,18 @@ git status --short --branch
 
 Identify dirty files before editing. Do not revert user or previous-agent work unless Mike explicitly asks.
 
+## Git Pull Safety (subsystems)
+
+- Commit subsystem work **before** pulling. Uncommitted Mail/Pets/etc. gets dropped by rebase.
+- Always merge:
+
+```cmd
+git pull --no-rebase origin master
+```
+
+- Never `git pull --rebase` when you have local gameplay subsystem commits.
+- See `docs/project/SUBSYSTEMS.md`.
+
 ## Known Workflow First
 
 - Before exploratory commands, check the project AI docs for the documented workflow.

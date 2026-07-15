@@ -164,3 +164,19 @@ Reason: The same inventory packet families are used by loot and trade; broad fix
 Alternatives considered: Clamp suspicious credit values or forcibly refresh inventories.
 
 Consequences: Trace root cause first, then patch the confirmed emitter.
+
+## Gameplay Systems Own A Subsystem Folder
+
+Decision: New and active gameplay systems (Mail, Pets, Insurance, Bank, etc.) live under `AORebirth/Server/ZoneEngine/Core/<System>/`, not inside `Playfields/Playfield.cs`. See `docs/project/SUBSYSTEMS.md`.
+
+Reason: Playfield monolith merges and git rebase pulls repeatedly wiped or collided with in-progress systems (Mail). Folder ownership makes commits, reviews, and merges survivable.
+
+Required workflow:
+
+- Commit the subsystem before every pull.
+- Use `git pull --no-rebase` (merge), never rebase local subsystem work onto origin.
+- Push subsystem commits so GitHub holds the backup.
+
+Alternatives considered: Keep growing `Playfield.cs`; only use separate VS projects for every system.
+
+Consequences: Agents extract systems into `Core/<System>/` when touching them. Wire models stay in AOtomation.Messaging.

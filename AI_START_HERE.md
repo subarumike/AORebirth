@@ -11,8 +11,9 @@ Expected startup context/read order:
 3. [docs/project/PROJECT_STATE.md](docs/project/PROJECT_STATE.md)
 4. [docs/ai/CURRENT_TASK.md](docs/ai/CURRENT_TASK.md)
 5. [docs/project/KNOWN_DECISIONS.md](docs/project/KNOWN_DECISIONS.md)
-6. [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md)
-7. [docs/ai/WORKFLOW.md](docs/ai/WORKFLOW.md)
+6. [docs/project/SUBSYSTEMS.md](docs/project/SUBSYSTEMS.md) — Mail/Pets/etc. folder ownership + pull workflow
+7. [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md)
+8. [docs/ai/WORKFLOW.md](docs/ai/WORKFLOW.md)
 
 Before exploratory commands for recurring build, engine, capture, or validation work, read the documented workflow and use the approved wrapper/command first. If the documented command is missing, ambiguous, or stale, stop and report the documentation gap instead of rediscovering the workflow.
 
