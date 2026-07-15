@@ -248,6 +248,9 @@
     <Compile Include="Messages\N3Messages\KnuBotStartTradeMessage.cs" />
     <Compile Include="Messages\N3Messages\KnuBotTradeMessage.cs" />
     <Compile Include="Messages\N3Messages\LookAtMessage.cs" />
+    <Compile Include="Messages\N3Messages\MailAction.cs" />
+    <Compile Include="Messages\N3Messages\MailListEntry.cs" />
+    <Compile Include="Messages\N3Messages\MailMessage.cs" />
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\MessageBody.cs" />
     <Compile Include="Messages\N3Message.cs" />
@@ -362,6 +365,7 @@
     <Compile Include="Serialization\Serializers\Custom\AOTransportSignalMessageSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\FollowInfoSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\GenericCmdSerializer.cs" />
+    <Compile Include="Serialization\Serializers\Custom\MailMessageSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\IdentityOnlyN3MessageSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\N3TeleportMessageSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\PlayfieldAnarchyFMessageSerializer.cs" />

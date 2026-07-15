@@ -112,7 +112,7 @@ namespace ZoneEngine.Core.MessageHandlers
                         new InventoryEntry()
                         {
                             Slotnumber = kv.Key,
-                            Identity = Identity.None,
+                            Identity = ResolveInventoryEntryIdentity(character, page, kv.Key, kv.Value),
                             Quality = kv.Value.Quality,
                             HighId = kv.Value.HighID,
                             LowId = kv.Value.LowID,
@@ -179,6 +179,49 @@ namespace ZoneEngine.Core.MessageHandlers
         private int GetItemCount(IItem item)
         {
             return item.MultipleCount > 0 ? item.MultipleCount : 1;
+        }
+
+        /// <summary>
+        /// Live mail GUI Feedback_MailNoChests blocks IdentityType.Container.
+        /// Keep backpack templates as containers on inventory wire updates.
+        /// </summary>
+        private static Identity ResolveInventoryEntryIdentity(
+            ICharacter character,
+            IInventoryPage page,
+            int placement,
+            IItem item)
+        {
+            if (item == null)
+            {
+                return Identity.None;
+            }
+
+            if (item.Identity != null && item.Identity.Type == IdentityType.Container)
+            {
+                return item.Identity;
+            }
+
+            if (character == null || page == null)
+            {
+                return Identity.None;
+            }
+
+            Identity itemPosition = new Identity
+            {
+                Type = page.Identity != null ? page.Identity.Type : IdentityType.Inventory,
+                Instance = placement
+            };
+            Identity backpackContainerIdentity;
+            if (InventoryItemRules.TryEnsureMailForbiddenContainerIdentity(
+                    item,
+                    character.Identity,
+                    itemPosition,
+                    out backpackContainerIdentity))
+            {
+                return backpackContainerIdentity;
+            }
+
+            return Identity.None;
         }
 
     }
