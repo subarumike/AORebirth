@@ -60,8 +60,6 @@ namespace ZoneEngine.Core.Mail
         public const string FailureNoChests =
             "You can not send container items through the mail system.";
 
-        private static readonly DateTime UnixEpochDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
         private static int nextMailId = unchecked((int)0x014A11CC);
 
         private static readonly ConcurrentDictionary<string, ConcurrentQueue<StoredMail>> ByRecipient =
@@ -182,6 +180,7 @@ namespace ZoneEngine.Core.Mail
             int storedCredits = message.Credits;
 
             mailId = AllocateMailId();
+            DateTime arrivedAt = DateTime.Now;
             var stored = new StoredMail
             {
                 MailId = mailId,
@@ -199,7 +198,8 @@ namespace ZoneEngine.Core.Mail
                 AcgMultipleCount = acgMultipleCount,
                 Credits = storedCredits,
                 ExpressFlag = message.ExpressFlag,
-                SentAt = DateTime.Now,
+                SentAt = arrivedAt,
+                SentDayNumber = ToMailTimeField(arrivedAt),
                 IsRead = false
             };
 
@@ -244,12 +244,19 @@ namespace ZoneEngine.Core.Mail
 
         private static void PurgeExpiredMail(string characterName, ConcurrentQueue<StoredMail> queue)
         {
-            DateTime cutoff = DateTime.Now.Date.AddDays(-MailRetentionDays);
+            // Client Expires column = Sent day + MailRetentionDays. Drop once past that calendar day.
+            DateTime today = DateTime.Now.Date;
             var kept = new List<StoredMail>();
             StoredMail mail;
             while (queue.TryDequeue(out mail))
             {
-                if (mail != null && mail.SentAt.Date >= cutoff)
+                if (mail == null)
+                {
+                    continue;
+                }
+
+                DateTime expiresOn = mail.SentAt.Date.AddDays(MailRetentionDays);
+                if (today <= expiresOn)
                 {
                     kept.Add(mail);
                 }
@@ -437,6 +444,95 @@ namespace ZoneEngine.Core.Mail
             return true;
         }
 
+        /// <summary>
+        /// N3Msg_ReturnMail (action 7): move remaining contents back to the original sender.
+        /// Returned letter arrives now; Expires = Sent + MailRetentionDays on the client.
+        /// </summary>
+        public static bool TryReturnToSender(ICharacter character, ulong mailId, out string failureReason)
+        {
+            failureReason = null;
+            if (character == null || string.IsNullOrEmpty(character.Name))
+            {
+                failureReason = "Return to sender failed.";
+                return false;
+            }
+
+            StoredMail mail = FindMail(character.Name, mailId);
+            if (mail == null)
+            {
+                failureReason = "Mail not found.";
+                return false;
+            }
+
+            string originalSender = (mail.SenderName ?? string.Empty).Trim();
+            if (originalSender.Length == 0)
+            {
+                failureReason = "Original sender is unknown.";
+                return false;
+            }
+
+            if (string.Equals(originalSender, character.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                failureReason = "Cannot return mail to yourself.";
+                return false;
+            }
+
+            DBCharacter senderRow = CharacterDao.Instance.GetByCharName(originalSender);
+            if (senderRow == null)
+            {
+                failureReason = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Original sender \"{0}\" is unknown.",
+                    originalSender);
+                return false;
+            }
+
+            if (!RemoveMail(character.Name, mailId))
+            {
+                failureReason = "Mail not found.";
+                return false;
+            }
+
+            DateTime arrivedAt = DateTime.Now;
+            string subject = mail.Subject ?? string.Empty;
+            if (!subject.StartsWith("Returned:", StringComparison.OrdinalIgnoreCase))
+            {
+                subject = "Returned: " + subject;
+            }
+
+            int returnedId = AllocateMailId();
+            var returned = new StoredMail
+            {
+                MailId = returnedId,
+                SenderName = character.Name ?? string.Empty,
+                SenderId = character.Identity.Instance,
+                RecipientName = senderRow.Name,
+                RecipientId = senderRow.Id,
+                Subject = subject,
+                Body = mail.Body ?? string.Empty,
+                ItemField1 = 0,
+                ItemField2 = 0,
+                AcgLow = mail.AcgLow,
+                AcgHigh = mail.AcgHigh,
+                AcgLevel = mail.AcgLevel,
+                AcgMultipleCount = mail.AcgMultipleCount,
+                Credits = mail.Credits,
+                ExpressFlag = 0,
+                SentAt = arrivedAt,
+                SentDayNumber = ToMailTimeField(arrivedAt),
+                IsRead = false
+            };
+
+            ConcurrentQueue<StoredMail> queue = ByRecipient.GetOrAdd(
+                senderRow.Name,
+                _ => new ConcurrentQueue<StoredMail>());
+            queue.Enqueue(returned);
+
+            NotifyRecipientEnvelope(senderRow.Name);
+            SyncUnreadMailEnvelope(character);
+            return true;
+        }
+
         private static bool RemoveMail(string characterName, ulong mailId)
         {
             ConcurrentQueue<StoredMail> queue;
@@ -515,6 +611,7 @@ namespace ZoneEngine.Core.Mail
                     Credits = codAmount,
                     ExpressFlag = 0,
                     SentAt = DateTime.Now,
+                    SentDayNumber = ToMailTimeField(DateTime.Now),
                     IsRead = false
                 });
         }
@@ -797,10 +894,11 @@ namespace ZoneEngine.Core.Mail
             // negative = COD to pay. CreditsField/CodField still written for list wire.
             // FlagsField: bit0 marks read so inbox shows open envelope after open/Take All.
             // ExtendedField74: stack count for ItemSlotView (avoid template MaxEnergy overlay).
+            int sentDay = mail.SentDayNumber > 0 ? mail.SentDayNumber : ToMailTimeField(mail.SentAt);
             return new MailListEntry
             {
                 MailId = unchecked((ulong)(uint)mail.MailId),
-                TimeField = ToMailTimeField(mail.SentAt),
+                TimeField = sentDay,
                 From = mail.SenderName ?? string.Empty,
                 Subject = mail.Subject ?? string.Empty,
                 CreditsField = credits,
@@ -818,9 +916,9 @@ namespace ZoneEngine.Core.Mail
 
         /// <summary>
         /// GUI inbox formats TimeField with boost::posix_time as a calendar day
-        /// ("YYYY-Mon-DD 00:00"). Value is whole days since 1970-01-01; Expires = Sent+2.
-        /// Unix seconds / FILETIME high dword are out of day-number range and render as
-        /// 1970-Jan-01 00:00.
+        /// ("YYYY-Mon-DD 00:00"). Value is whole days since 1970-01-01 (local arrival date).
+        /// Inbox Expires column is client-side Sent + MailRetentionDays (2).
+        /// Do not send unix seconds / FILETIME — those render as 1970-Jan-01.
         /// </summary>
         private static int ToMailTimeField(DateTime localOrUnspecified)
         {
@@ -829,19 +927,16 @@ namespace ZoneEngine.Core.Mail
             {
                 local = local.ToLocalTime();
             }
-            else if (local.Kind == DateTimeKind.Unspecified)
-            {
-                local = DateTime.SpecifyKind(local, DateTimeKind.Local);
-            }
 
             if (local.Year < 1970)
             {
                 local = DateTime.Now;
             }
 
-            // Calendar date in local server time, encoded as UTC-midnight day count.
-            var day = new DateTime(local.Year, local.Month, local.Day, 0, 0, 0, DateTimeKind.Utc);
-            int days = (int)(day - UnixEpochDate).TotalDays;
+            // Local calendar arrival day → day-number since 1970-01-01.
+            DateTime arrivalDay = local.Date;
+            DateTime epochDay = new DateTime(1970, 1, 1);
+            int days = (int)(arrivalDay - epochDay).TotalDays;
             return days < 0 ? 0 : days;
         }
 
@@ -932,6 +1027,12 @@ namespace ZoneEngine.Core.Mail
             public byte ExpressFlag { get; set; }
 
             public DateTime SentAt { get; set; }
+
+            /// <summary>
+            /// Wire TimeField snapshot at arrival (local day number since 1970-01-01).
+            /// Expires in the client UI is this day + MailRetentionDays.
+            /// </summary>
+            public int SentDayNumber { get; set; }
 
             public bool IsRead { get; set; }
         }

@@ -2,22 +2,21 @@
 
 ## Current Focus
 
-Mail lives in subsystem `ZoneEngine/Core/Mail/`. Documented pull/merge rules so subsystem work survives GitHub pulls. Pets extraction is next when Mike prioritizes it.
+Mail subsystem (`Core/Mail`): Return to Sender (action 7) + Sent/Expires day encoding.
 
 ## Done in this slice
 
-- Moved Mail runtime + handler into `AORebirth/Server/ZoneEngine/Core/Mail/` (`ZoneEngine.Core.Mail`).
-- Added `docs/project/SUBSYSTEMS.md` and Known Decision: systems own a folder; commit before pull; always `--no-rebase`.
-- Updated Architecture / AI_START_HERE pointers.
+- Implemented `MailAction.ReturnToSender` (7): remaining attachments/credits return to original sender as new mail (`Returned: …`), arrival time = now.
+- Sent uses local arrival day as wire `TimeField` (days since 1970-01-01). Client Expires = Sent + 2 days. Server purge matches that expiry day.
+- Snapshot `SentDayNumber` at enqueue so list/detail stay stable.
 
 ## Remaining
 
-1. Live-validate Mail after engines restart (attach / Take All / NoDrop).
-2. Extract Pets into `Core/Pets/` when Mike asks (currently `Pet*.cs` still under Core root).
+1. Restart engines and live-validate: new mail shows today’s Sent and Expires = +2 days; Return to Sender delivers letter back.
+2. Live GUI shows Sent/Expires as `YYYY-Mon-DD 00:00` (day resolution — live client does not show wall-clock time on those columns).
 3. Subway when Mike returns that priority.
 
 ## Constraints
 
-- Do not grow new system logic in `Playfield.cs`.
-- Mail still in-memory only; no DB schema without approval.
-- Always `git pull --no-rebase`; commit subsystem first.
+- Mail still in-memory only.
+- Commit Mail before pull; `git pull --no-rebase`.
