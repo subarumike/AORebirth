@@ -106,13 +106,13 @@ primary evidence, and some pasted stacks are truncated.
 | E21 | F01 | discussion; time U | D/old | read `0`, `Utils+0x82F1` | render I; Utils -> GUI | U / U | exact duplicate; sixth F01 report |
 | E22 | F12 | new-client discussion; time U | C/new | EIP/target `0x41C80000`; reporter says write | render; GUI -> Display | U / U | narrow outer helper wrapper exists; cleanup unproven |
 | E23 | F04 | `2026-07-13 01:40:25` | D/old | read `0x84B7A0F4`, `randy+0x2511A`; observed stack/argument `0x0A` | render; randy -> GUI -> Display | P-A / NV-A | exact state lookup skip available; dump PID 14448 |
-| E24 | F13 | `2026-07-13 21:20:05` | C/new | write `0x26ED3000`, `BinaryStream+0x1B1D`; page boundary | main I; BinaryStream -> Gamecode -> N3 -> Interfaces | P-B / NV-A | no safe guard; dump PID 29984 |
-| E25 | F14 | concatenated discussion; time U | C/new | read `0`, `ntdll+0x431E9` | worker; heap/MSVCR -> Interfaces -> Connection -> ACE | U / U | no catch; possible secondary corruption |
-| E26 | F13 | discussion; time U | C/new | write `0x2525E000`, `BinaryStream+0x1B1D` | same serialization chain | U / U | same stable signature |
-| E27 | F13 | discussion; time U | C/new | write `0x1E101000`, `BinaryStream+0x1B1D` | same serialization chain | U / U | same stable signature |
-| E28 | F13 | `2026-07-13 22:14:24` | C/new | write `0x25634000`, `BinaryStream+0x1B1D` | same serialization chain | P-B / NV-A | dump PID 24200; repeat |
-| E29 | F15 | concatenated discussion; time U | C/new | read `0`, `ResourceManager+0x3D84` | worker; ResourceManager -> ACE | U / U | no safe skip/cancel contract proven |
-| E30 | F13 | `2026-07-13 22:30:05` | C/new | write `0x25B2A000`, `BinaryStream+0x1B1D` | same serialization chain | P-B / NV-A | dump PID 33032; fifth pasted F13 |
+| E24 | F13 | `2026-07-13 21:20:05` | C/new | write `0x26ED3000`, `BinaryStream+0x1B1D`; caller output pointer | main I; BinaryStream -> Gamecode -> N3 -> Interfaces | P-B / NV-A | dump PID 29984 proves Gamecode fixed-array loop overrun; whole-object reject contract unresolved |
+| E25 | F14 | interleaved with E24; time/PID U | C/new | read `0`, `ntdll+0x431E9`; `EAX=0x26E90214` inside E24 overwrite range | worker; heap/MSVCR -> Interfaces -> Connection -> ACE | U / U | strong conditional secondary-victim link to F13; never catch allocator fault |
+| E26 | F13 | discussion; time U | C/new | write `0x2525E000`, `BinaryStream+0x1B1D` | same deserialization chain | U / U | same caller-output signature |
+| E27 | F13 | discussion; time U | C/new | write `0x1E101000`, `BinaryStream+0x1B1D` | same deserialization chain | U / U | same caller-output signature |
+| E28 | F13 | `2026-07-13 22:14:24` | C/new | write `0x25634000`, `BinaryStream+0x1B1D` | same deserialization chain | P-B / NV-A | dump PID 24200; repeat caller-output signature |
+| E29 | F15 | interleaved with E30; time/PID U | C/new | read `0`, `ResourceManager+0x3D84`; request `0x25B287B0` inside E30 overwrite range | worker; ResourceManager -> ACE | U / U | strong conditional secondary-victim link to F13; notifier skip unsafe |
+| E30 | F13 | `2026-07-13 22:30:05` | C/new | write `0x25B2A000`, `BinaryStream+0x1B1D` | same deserialization chain | P-B / NV-A | dump PID 33032; fifth caller-output signature |
 | E31 | F11 | discussion; time U | D/old | EIP/target `2`; likely execute; GUI state present | GUI stack; later unwind truncated | P-B I / NV-A I | no generic guard; possible link to A02 is unproven |
 | E32 | F18 | live discussion; time U | D/live | `E06D7363`, N3/Gamecode | main I; MSVCR100 -> N3 -> Gamecode | U / U | diagnostic only; repeat family |
 | E33 | F18 | `2026-07-14 22:53:11` | D/live | same throw chain | same stable chain | P-B / NV-A | dump PID 19308; repeat |
@@ -144,9 +144,9 @@ primary evidence, and some pasted stacks are truncated.
 | F10 GUI tree/object | 1 | read8 at `GUI+0x4ED00`, broken frame | low key observed upstream / GUI lookup | low-key sentinel at `GUI+0x4F2EF` | one producer case prevented; direct fault not characterized |
 | F11 tiny target | 4 | execute-like EIP 0/2/8; dump proves EIP 0 access type 8 | unknown indirect caller / CPU instruction fetch | no family-wide guard | invalid control flow; origin unresolved |
 | F12 data as code | 2 | EIP float 25.0 or 35.1100006 | C event through GUI helper; D event unknown / CPU fetch | C outer helper containment only | float/slot confusion likely; common callsite not proven |
-| F13 BinaryStream | 5 | page-aligned write at an apparent buffer boundary, `BinaryStream+0x1B1D` | Gamecode serialization operation / BinaryStream store | none | capacity/cursor/growth failure strongly indicated; exact layout unresolved |
-| F14 heap | 1 | null read `ntdll+0x431E9` | unknown earlier corruptor / allocator | none | likely secondary corruption, but no causal link proven |
-| F15 ResourceManager | 1 | null read `ResourceManager+0x3D84` on ACE worker | async request/completion / ResourceManager | none | null/stale completion or lifetime race plausible; unresolved |
+| F13 Gamecode deserialization | 5 | caller-supplied float destination faults at `BinaryStream+0x1B1D` | count read and fixed-array loop in Gamecode / float extractor initializes output | none | count is checked against 30 only after the loop; PID 29984 proves runaway 12-byte-stride destination; reject/consume contract unresolved |
+| F14 heap | 1 | null read `ntdll+0x431E9`; allocator value lies inside paired F13 overwrite interval | Gamecode fixed-array overflow conditional on paired PID / allocator | none | strong paired-address secondary-victim evidence; not a hook point |
+| F15 ResourceManager | 1 | null sentinel read `ResourceManager+0x3D84`; request lies inside paired F13 overwrite interval | Gamecode fixed-array overflow conditional on paired PID / notifier | none | strong paired-address secondary-victim evidence; upstream repair first |
 | F16 N3 login | 2 | read float 2.0 at `N3+0x15040`, VERSION/Vehicle path | unknown; source audit places it 0x14 before a RoomSpace-patched call / N3 | none | proxy involvement unresolved; RoomSpace A/B required |
 | F17 C native throw | 1 | E06D, N3/Gamecode | AO native precondition / MSVC exception machinery | diagnostic dump only | exception type/message unavailable |
 | F18 D native throw | 2 | repeat E06D Gamecode chain | AO native precondition / MSVC exception machinery | diagnostic dump only | same limitation |

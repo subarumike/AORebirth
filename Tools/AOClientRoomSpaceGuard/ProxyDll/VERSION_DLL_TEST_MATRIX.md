@@ -159,27 +159,65 @@ file I/O, `VirtualQuery`, module enumeration, or unbounded geometry scans.
   approved module, and unknown executable mapping;
 - unknown post-entry AV continues search.
 
-### BinaryStream/resource
+### Graphics COM identity and closure
+
+Isolated tests precede any AO deployment:
+
+- stable `QueryInterface(IID_IUnknown)` identity across every used interface;
+- successful/failed `QueryInterface`, `AddRef`, and `Release` counts including
+  concurrent lookup/release and interface tear-offs;
+- every used factory/create/lookup/getter method returns a registered wrapper;
+- no raw underlying pointer escapes through any supported method;
+- device generation invalidates every stale device-owned wrapper;
+- teardown cannot race lookup, callback, or final release;
+- C/new D3D9 and DirectDraw paths and both D/old DirectDraw origins are tested
+  independently and together.
+
+Any uncovered IID or raw-return path fails the complete proxy release gate.
+
+### Frame transaction and device recovery
+
+- prove exact frame-begin and Flip/Present owners for each client;
+- inject failure at validated-unsubmitted, optional compatibility-queued,
+  submitted-synchronous, driver-accepted, and presented transitions;
+- prove only unsubmitted/locally queued work is described as rolled back;
+- verify exact renderer-thread and unwind/FPU/SSE/nonvolatile state gates;
+- prove device poison invalidates the generation and prevents further use;
+- prove complete destroy/recreate/resource restore/first Present, or require a
+  controlled restart;
+- test last-good-frame only with a compatibility-owned retained backbuffer.
+
+### Gamecode fixed-array deserialization
 
 Diagnostic phase only:
 
-- reproduce the same resource/location five or more times;
-- record stream/buffer/position/length/capacity/request and caller;
-- correlate resource identity into ResourceManager consumption;
-- verify diagnostic logging does not change allocation/growth behavior;
-- do not test production rejection until caller failure semantics are proven.
+- verify the four known dumps reproduce ESI as the caller output address at
+  `BinaryStream+0x1B1D`;
+- record Gamecode object, stream, decoded count, destination range, loop index,
+  enclosing caller/message, and thread at `Gamecode+0x7A919`;
+- test valid counts 0, 1, and 30 plus 31, truncated payload, byte-order-wrong,
+  and very large counts;
+- prove the diagnostic does not change parsing or publication;
+- confirm whether paired E24/E25 and E29/E30 share PID/time identity.
 
-After those semantics are proven, test exact-capacity, one-unit overflow,
-integer-overflow, allocation-failure, native-growth, and whole-operation reject
-paths. Prove that rejection sends/consumes no partial stream and releases only
-owned resources.
+Behavioral tests begin only after whole-object failure semantics are proven.
+Verify rejection occurs before the first entry write, consumes/discards the
+entire malformed object without desynchronizing the next decode, publishes no
+partial state, and releases ownership exactly once. Never validate a clamp-and-
+continue repair. BinaryStream capacity/growth tests are out of scope for this
+family.
 
 ### ResourceManager worker
 
-- keep its request/cancel tests separate from BinaryStream causality;
-- test native failure callback, exact AddRef/Release ownership, queue-lock
-  scope, cancellation race, and worker survival;
-- never validate by returning from the faulting worker instruction.
+- first test whether the upstream Gamecode repair prevents the paired E29
+  notifier failure;
+- preserve the paired-address causal qualification unless common PID/time is
+  confirmed;
+- independently test construction/destruction/clear sequence, native failure
+  callback, exact AddRef/Release ownership, queue-lock scope, publication,
+  waiter notification/retry, cancellation race, and worker survival;
+- never validate by returning from the faulting notifier instruction or
+  skipping notification.
 
 ### N3 login/vehicle
 
@@ -244,6 +282,14 @@ Documentation/log-format-only changes do not reset hardware soak evidence.
 - no unexplained visual corruption;
 - no meaningful performance regression;
 - exact NVIDIA positives only on approved driver identity;
+- no graphics proxy deployment until the used IID/method graph is complete and
+  exhaustive tests prove no raw interface escape or identity/refcount drift;
+- no frame recovery until exact frame/Present ownership, transition state,
+  unwind, and mandatory Commit-tail preservation pass;
+- no poisoned-device continuation until reset/recreate/rebind and first/subsequent
+  Present pass; otherwise restart is required;
+- no Gamecode behavioral repair until whole-object reject/consume/ref semantics
+  pass without stream desynchronization;
 - official live and AORebirth/private results remain separate evidence lanes;
 - single-client and multi-client runs pass with AOSharp absent; any AOSharp
   compatibility run is labeled separately;
