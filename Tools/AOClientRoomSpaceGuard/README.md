@@ -9,9 +9,9 @@ The guard:
   shortcut invocation fails closed instead of starting an unguarded client;
 - waits for `anarchyonline.exe` from the requested client directory;
 - verifies that the loaded `N3.dll` came from the same directory;
-- patches only four audited surface-collision callsites (`CalculateClosestPoint`, `GetTileTriangles`, and the two `GetLineIntersection` lookups) with a checked `Space_i` to `n3RoomSpace_t` preflight;
+- patches only five audited room-resolution callsites (`CalculateClosestPoint`, `GetTileTriangles`, the two `GetLineIntersection` lookups, and `n3RoomSurface_t::VetoPosition`) with a checked `Space_i` to `n3RoomSpace_t` preflight;
 - uses the checked `n3RoomSpace_t*` directly for `GetInsideCell` and the original room lookup, avoiding a second throwing cast;
-- returns `nullptr` only to that collision caller when the checked cast or cell lookup fails; that caller already handles the no-room result;
+- returns `nullptr` only to the guarded caller when the checked cast or cell lookup fails; each caller already handles the no-room result;
 - leaves every other `PosToRoom` call unchanged;
 - suspends the client briefly while replacing the single call instruction;
 - verifies the in-memory bytes and flushes the instruction cache;
@@ -33,7 +33,7 @@ The patch exists only in process memory and must be applied on each client launc
 
 `ProxyDll` is the normal-shortcut distribution lane. It packages the proven RoomSpace
 repair as an x86 `version.dll` proxy that forwards the Windows version APIs and applies
-the same four audited callsite changes in process memory. It supports only the exact
+the same five audited callsite changes in process memory. It supports only the exact
 approved old- and new-client `N3.dll` SHA-256 hashes. Its installer refuses a client
 directory that already contains `version.dll`, and the package includes matching install
 and uninstall commands plus the required AOReloaded MIT attribution.
@@ -50,7 +50,7 @@ smoke described in `ProxyDll\README.md`.
 
 Telemetry messages:
 
-- `PATCH PASS`: all four calls and the telemetry wrapper were installed and verified.
+- `PATCH PASS`: all five calls and the telemetry wrapper were installed and verified.
 - `LAUNCH PASS`: the guard acquired its profile lock and launched the requested AO client.
 - `MONITOR START`: the minimized guard is watching the patched process.
 - `GUARD HIT first`: the first failed cast or invalid-cell result for that callsite,

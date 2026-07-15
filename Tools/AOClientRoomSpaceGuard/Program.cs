@@ -39,7 +39,7 @@ internal static class Program
         new PatchProfile(
             "new-client",
             "E242F4855DE93094161B619047CD838B6A3261BB53A5EB17065F60EDA5239168",
-            new[] { 0x157BC, 0x16144, 0x168E2, 0x168F6 },
+            new[] { 0x157BC, 0x16144, 0x168E2, 0x168F6, 0x16F98 },
             0xE095,
             0x3AAEA,
             0x5F894,
@@ -49,7 +49,7 @@ internal static class Program
         new PatchProfile(
             "old-client",
             "8C019EFD72D547879A06585B69147AB1546B9617A2FCE090E5863791AEC8B0BB",
-            new[] { 0x13F2E, 0x148B6, 0x15054, 0x15068 },
+            new[] { 0x13F2E, 0x148B6, 0x15054, 0x15068, 0x1570A },
             0xC8AA,
             0x3894A,
             0x5B80C,
