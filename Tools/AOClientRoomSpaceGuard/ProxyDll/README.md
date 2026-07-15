@@ -14,12 +14,12 @@ real DLL under the 32-bit Windows system directory. A deferred worker then:
 2. waits for `N3.dll` outside loader lock;
 3. hashes the exact file backing the loaded module;
 4. selects only the approved new-client or old-client profile;
-5. verifies all four original calls still target the expected `PosToRoom` RVA;
+5. verifies all five original calls still target the expected `PosToRoom` RVA;
 6. emits the same proven x86 checked-cast/negative-cell wrapper as the external
    `AOClientRoomSpaceGuard`;
 7. requires repeated stable thread snapshots and aborts if any client thread
    cannot be opened, suspended, or completely enumerated;
-8. applies and verifies all four calls as one transaction, requires every
+8. applies and verifies all five calls as one transaction, requires every
    instruction-cache flush, and verifies page-protection restoration and thread
    resumption before reporting readiness;
 9. verifies rollback before freeing the wrapper and retains that allocation if
