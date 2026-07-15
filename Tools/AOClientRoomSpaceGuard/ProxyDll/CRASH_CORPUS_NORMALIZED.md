@@ -106,7 +106,7 @@ primary evidence, and some pasted stacks are truncated.
 | E21 | F01 | discussion; time U | D/old | read `0`, `Utils+0x82F1` | render I; Utils -> GUI | U / U | exact duplicate; sixth F01 report |
 | E22 | F12 | new-client discussion; time U | C/new | EIP/target `0x41C80000`; reporter says write | render; GUI -> Display | U / U | narrow outer helper wrapper exists; cleanup unproven |
 | E23 | F04 | `2026-07-13 01:40:25` | D/old | read `0x84B7A0F4`, `randy+0x2511A`; observed stack/argument `0x0A` | render; randy -> GUI -> Display | P-A / NV-A | exact state lookup skip available; dump PID 14448 |
-| E24 | F13 | `2026-07-13 21:20:05` | C/new | write `0x26ED3000`, `BinaryStream+0x1B1D`; caller output pointer | main I; BinaryStream -> Gamecode -> N3 -> Interfaces | P-B / NV-A | dump PID 29984 proves Gamecode fixed-array loop overrun; whole-object reject contract unresolved |
+| E24 | F13 | `2026-07-13 21:20:05` | C/new | write `0x26ED3000`, `BinaryStream+0x1B1D`; caller output pointer | main I; BinaryStream -> Gamecode -> N3 -> Interfaces | P-B / NV-A | dump PID 29984 proves Gamecode fixed-array loop overrun; Strategy D contract proven for exact N3 caller, emitted hook/runtime validation unresolved |
 | E25 | F14 | interleaved with E24; time/PID U | C/new | read `0`, `ntdll+0x431E9`; `EAX=0x26E90214` inside E24 overwrite range | worker; heap/MSVCR -> Interfaces -> Connection -> ACE | U / U | strong conditional secondary-victim link to F13; never catch allocator fault |
 | E26 | F13 | discussion; time U | C/new | write `0x2525E000`, `BinaryStream+0x1B1D` | same deserialization chain | U / U | same caller-output signature |
 | E27 | F13 | discussion; time U | C/new | write `0x1E101000`, `BinaryStream+0x1B1D` | same deserialization chain | U / U | same caller-output signature |
@@ -144,7 +144,7 @@ primary evidence, and some pasted stacks are truncated.
 | F10 GUI tree/object | 1 | read8 at `GUI+0x4ED00`, broken frame | low key observed upstream / GUI lookup | low-key sentinel at `GUI+0x4F2EF` | one producer case prevented; direct fault not characterized |
 | F11 tiny target | 4 | execute-like EIP 0/2/8; dump proves EIP 0 access type 8 | unknown indirect caller / CPU instruction fetch | no family-wide guard | invalid control flow; origin unresolved |
 | F12 data as code | 2 | EIP float 25.0 or 35.1100006 | C event through GUI helper; D event unknown / CPU fetch | C outer helper containment only | float/slot confusion likely; common callsite not proven |
-| F13 Gamecode deserialization | 5 | caller-supplied float destination faults at `BinaryStream+0x1B1D` | count read and fixed-array loop in Gamecode / float extractor initializes output | none | count is checked against 30 only after the loop; PID 29984 proves runaway 12-byte-stride destination; reject/consume contract unresolved |
+| F13 Gamecode deserialization | 5 | caller-supplied float destination faults at `BinaryStream+0x1B1D` | signed waypoint count and fixed 30-entry array in `SimpleCharFullUpdateIIR_t` / float extractor initializes output | none | post-loop comparison with 30 only controls zero-fill; PID 29984 proves runaway 12-byte-stride destination; Strategy D design proven, implementation/runtime validation pending |
 | F14 heap | 1 | null read `ntdll+0x431E9`; allocator value lies inside paired F13 overwrite interval | Gamecode fixed-array overflow conditional on paired PID / allocator | none | strong paired-address secondary-victim evidence; not a hook point |
 | F15 ResourceManager | 1 | null sentinel read `ResourceManager+0x3D84`; request lies inside paired F13 overwrite interval | Gamecode fixed-array overflow conditional on paired PID / notifier | none | strong paired-address secondary-victim evidence; upstream repair first |
 | F16 N3 login | 2 | read float 2.0 at `N3+0x15040`, VERSION/Vehicle path | unknown; source audit places it 0x14 before a RoomSpace-patched call / N3 | none | proxy involvement unresolved; RoomSpace A/B required |
@@ -288,9 +288,10 @@ address as recoverable.
 - Medium confidence: main/render versus worker classification from stable
   stacks; float/slot confusion as a class; the AO DrawIndexed boundary as the
   common upstream choke for F05/F06/F21.
-- Low or unresolved: producer of the D `0x420C70A4` target; causality between
-  F13 and F14/F15; native exception types/messages; high-pointer randy object
-  layouts; driver state after an intercepted NVIDIA AV.
+- Low or unresolved: producer of the D `0x420C70A4` target; absolute
+  process/session proof for the strongly supported F13-to-F14/F15 links;
+  native exception types/messages; high-pointer randy object layouts; driver
+  state after an intercepted NVIDIA AV.
 - The data does not show millions of independent bad objects.  It shows a much
   smaller set of repeated consumer sites receiving bad state.
 - A top frame in NVIDIA, ntdll, KERNELBASE, or the CLR identifies the final
