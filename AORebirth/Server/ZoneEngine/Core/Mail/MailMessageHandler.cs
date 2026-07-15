@@ -75,6 +75,10 @@ namespace ZoneEngine.Core.Mail
                     this.HandleDelete(character, message.RequestedMailId);
                     break;
 
+                case MailAction.ReturnToSender:
+                    this.HandleReturnToSender(character, message.RequestedMailId);
+                    break;
+
                 default:
                     ChatTextMessageHandler.Default.Send(
                         character,
@@ -181,6 +185,19 @@ namespace ZoneEngine.Core.Mail
             MailRuntimeService.SyncUnreadMailEnvelope(character);
             this.SendMailboxList(character);
             ChatTextMessageHandler.Default.Send(character, "Mail deleted.");
+        }
+
+        private void HandleReturnToSender(ICharacter character, ulong mailId)
+        {
+            string failure;
+            if (!MailRuntimeService.TryReturnToSender(character, mailId, out failure))
+            {
+                ChatTextMessageHandler.Default.Send(character, failure ?? "Return to sender failed.");
+                return;
+            }
+
+            this.SendMailboxList(character);
+            ChatTextMessageHandler.Default.Send(character, "Mail returned to sender.");
         }
 
         /// <summary>
