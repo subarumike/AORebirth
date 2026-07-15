@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SerializerResolverBuilder.cs" company="SmokeLounge">
-//   Copyright © 2013 SmokeLounge.
+//   Copyright ï¿½ 2013 SmokeLounge.
 //   This program is free software. It comes without any warranty, to
 //   the extent permitted by applicable law. You can redistribute it
 //   and/or modify it under the terms of the Do What The Fuck You Want
@@ -75,6 +75,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization
                                            typeof(VendingMachineFullUpdateMessage), new VendingMachineFullUpdateMessageSerializer()
                                        },
                                        { typeof(GenericCmdMessage), new GenericCmdSerializer() },
+                                       { typeof(MailMessage), new MailMessageSerializer() },
                                        { typeof(AOTransportSignalMessage), new AOTransportSignalMessageSerializer() },
                                        { typeof(N3TeleportMessage), new N3TeleportMessageSerializer() },
                                        { typeof(PlayfieldAnarchyFMessage), new PlayfieldAnarchyFMessageSerializer() },

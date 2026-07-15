@@ -67,6 +67,110 @@ namespace ZoneEngine.Core
             }
         }
 
+        /// <summary>
+        /// Live Feedback_MailNoChests rejects mail Item-field drops when the bag is a
+        /// Container dynel bound like an opened backpack (ChestItemFullUpdate + open).
+        /// Publish that bind then close immediately so the Item field blocks without
+        /// leaving backpack windows open. Capture: 20260715-100540.
+        /// </summary>
+        public void PublishMailBlockedContainerLinks(ICharacter character)
+        {
+            if (character == null || character.BaseInventory == null)
+            {
+                return;
+            }
+
+            IInventoryPage inventoryPage;
+            if (!character.BaseInventory.Pages.TryGetValue((int)IdentityType.Inventory, out inventoryPage)
+                || inventoryPage == null)
+            {
+                return;
+            }
+
+            int published = 0;
+            foreach (KeyValuePair<int, IItem> entry in inventoryPage.List())
+            {
+                Item item = entry.Value as Item;
+                if (item == null)
+                {
+                    continue;
+                }
+
+                int placement = entry.Key;
+                if (placement < inventoryPage.FirstSlotNumber)
+                {
+                    placement = inventoryPage.FirstSlotNumber + placement;
+                }
+
+                Identity itemPosition = new Identity
+                {
+                    Type = IdentityType.Inventory,
+                    Instance = placement
+                };
+                Identity containerIdentity;
+                if (!InventoryItemRules.TryEnsureMailForbiddenContainerIdentity(
+                        item,
+                        character.Identity,
+                        itemPosition,
+                        out containerIdentity))
+                {
+                    continue;
+                }
+
+                IInventoryPage backpackPage = character.BaseInventory.GetOrCreateBackpackPage(containerIdentity);
+                bool isEmpty = !backpackPage.List().Any();
+                int openHandle = InventoryUpdateMessageHandler.Default.ReserveBackpackInventoryHandle();
+
+                // Match live open bind path so client treats the inv icon as Container (0xC749).
+                if (isEmpty)
+                {
+                    int introduceHandle = InventoryUpdateMessageHandler.Default.ReserveBackpackInventoryHandle();
+                    InventoryUpdateMessageHandler.Default.SendContainerIntroduce(
+                        character,
+                        backpackPage,
+                        introduceHandle);
+                    ChestItemFullUpdateMessageHandler.Default.Send(
+                        character,
+                        item,
+                        itemPosition,
+                        backpackPage.Identity);
+                    InventoryUpdateMessageHandler.Default.SendFreshContainerOpen(
+                        character,
+                        backpackPage,
+                        openHandle);
+                }
+                else
+                {
+                    ChestItemFullUpdateMessageHandler.Default.Send(
+                        character,
+                        item,
+                        itemPosition,
+                        backpackPage.Identity);
+                    InventoryUpdateMessageHandler.Default.SendContainerOpen(
+                        character,
+                        backpackPage,
+                        openHandle);
+                }
+
+                BackpackContainerActionMessageHandler.Default.SendClose(character, containerIdentity);
+                character.BaseInventory.MarkBackpackClosed(containerIdentity);
+                published++;
+            }
+
+            if (published > 0)
+            {
+                InventoryUpdateMessageHandler.Default.Send(character, inventoryPage);
+            }
+
+            if (character.Controller != null && character.Controller.Client != null)
+            {
+                character.Controller.Client.Server.Info(
+                    character.Controller.Client,
+                    "Mail container guard: published {0} Container link(s) for Feedback_MailNoChests",
+                    published);
+            }
+        }
+
         public void EnsureWeaponVisualMeshes(ICharacter character, bool announceAppearanceUpdate)
         {
             if (PetBureaucratGuardianAppearance.IsGuardianPet(character))

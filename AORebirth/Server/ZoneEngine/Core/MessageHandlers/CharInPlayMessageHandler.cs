@@ -46,6 +46,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using Utility;
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
 
@@ -158,7 +159,14 @@ namespace ZoneEngine.Core.MessageHandlers
                 "WeaponItemFullUpdate",
                 client.Controller.Character.Identity);
             WeaponItemFullUpdate.SendWeaponDefinitions(client.Controller.Character);
+            // Link backpacks as Container dynels so mail Item field gets Feedback_MailNoChests.
+            InventoryContainerRuntimeService.Default.PublishMailBlockedContainerLinks(
+                client.Controller.Character);
             Playfield.ArmPostZoneCollisionGrace(client.Controller.Character);
+
+            // In-memory mail pending while offline → show envelope on enter world.
+            MailRuntimeService.SyncUnreadMailEnvelope(client.Controller.Character);
+
             client.Controller.Character.DoNotDoTimers = false;
             PlayfieldLifecycleTrace.Record(
                 PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,

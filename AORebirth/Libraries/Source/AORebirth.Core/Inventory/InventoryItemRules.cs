@@ -72,6 +72,56 @@ namespace AORebirth.Core.Inventory
             return IsBackpackContainerTemplate(item);
         }
 
+        /// <summary>
+        /// Items live mail Feedback_MailNoChests should block (Item field + send).
+        /// Broader than <see cref="IsBackpackContainerItem"/>: ItemClass 2 bags and Backpack identities.
+        /// </summary>
+        public static bool IsMailForbiddenContainerItem(IItem item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+
+            if (IsBackpackContainerItem(item))
+            {
+                return true;
+            }
+
+            if (item.Identity != null && item.Identity.Type == IdentityType.Backpack)
+            {
+                return true;
+            }
+
+            if (item.GetAttribute((int)StatIds.itemclass) == 2)
+            {
+                return true;
+            }
+
+            // Template ItemClass when instance attributes are missing/default.
+            ItemTemplate template;
+            if (ItemLoader.ItemList.TryGetValue(item.LowID, out template)
+                && template != null
+                && template.Stats != null
+                && template.Stats.ContainsKey((int)StatIds.itemclass)
+                && template.Stats[(int)StatIds.itemclass] == 2)
+            {
+                return true;
+            }
+
+            if (item.HighID != item.LowID
+                && ItemLoader.ItemList.TryGetValue(item.HighID, out template)
+                && template != null
+                && template.Stats != null
+                && template.Stats.ContainsKey((int)StatIds.itemclass)
+                && template.Stats[(int)StatIds.itemclass] == 2)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public static bool HasSameUniqueItem(IItem candidate, IEnumerable<IItem> existingItems)
         {
             if (!IsUnique(candidate) || existingItems == null)
@@ -116,15 +166,33 @@ namespace AORebirth.Core.Inventory
                 return false;
             }
 
-            containerIdentity = CreateLegacyBackpackContainerIdentity(ownerIdentity, itemPosition, item);
+            return AssignContainerIdentity(item, ownerIdentity, itemPosition, out containerIdentity);
+        }
 
-            Item concreteItem = item as Item;
-            if (concreteItem != null)
+        /// <summary>
+        /// Wire IdentityType.Container for any mail-blocked bag so the client
+        /// Feedback_MailNoChests dialog rejects the mail Item field (same chrome as NoDrop).
+        /// </summary>
+        public static bool TryEnsureMailForbiddenContainerIdentity(
+            IItem item,
+            Identity ownerIdentity,
+            Identity itemPosition,
+            out Identity containerIdentity)
+        {
+            containerIdentity = Identity.None;
+
+            if (item == null || !IsMailForbiddenContainerItem(item))
             {
-                concreteItem.Identity = containerIdentity;
+                return false;
             }
 
-            return true;
+            if ((item.Identity != null) && (item.Identity.Type == IdentityType.Container))
+            {
+                containerIdentity = item.Identity;
+                return true;
+            }
+
+            return AssignContainerIdentity(item, ownerIdentity, itemPosition, out containerIdentity);
         }
 
         public static bool IsLegacyBackpackTemplate(IItem item)
@@ -155,6 +223,23 @@ namespace AORebirth.Core.Inventory
             return item.Events.Any(
                 x => x.EventType == EventType.OnWear
                      && x.Functions.Any(y => y.FunctionType == (int)FunctionType.BackMesh));
+        }
+
+        private static bool AssignContainerIdentity(
+            IItem item,
+            Identity ownerIdentity,
+            Identity itemPosition,
+            out Identity containerIdentity)
+        {
+            containerIdentity = CreateLegacyBackpackContainerIdentity(ownerIdentity, itemPosition, item);
+
+            Item concreteItem = item as Item;
+            if (concreteItem != null)
+            {
+                concreteItem.Identity = containerIdentity;
+            }
+
+            return true;
         }
 
         private static bool IsBackpackContainerTemplate(IItem item)

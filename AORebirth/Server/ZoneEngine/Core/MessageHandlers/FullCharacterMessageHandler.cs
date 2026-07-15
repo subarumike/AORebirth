@@ -104,7 +104,7 @@ namespace ZoneEngine.Core.MessageHandlers
                                        Placement = kv.Key,
                                        Flags = GetInventorySlotFlags(kv.Value),
                                        Count = (short)kv.Value.MultipleCount,
-                                       Identity = GetInventorySlotIdentity(ivp, kv.Value),
+                                       Identity = GetInventorySlotIdentity(ivp, kv.Key, kv.Value),
                                        ItemLowId = kv.Value.LowID,
                                        ItemHighId = kv.Value.HighID,
                                        Quality = kv.Value.Quality,
@@ -886,11 +886,58 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         /// <param name="statId">
         /// </param>
-        private static Identity GetInventorySlotIdentity(IInventoryPage page, IItem item)
+        private static Identity GetInventorySlotIdentity(IInventoryPage page, int placement, IItem item)
         {
             if (item == null)
             {
                 return Identity.None;
+            }
+
+            // Mail GUI Feedback_MailNoChests: cmp Identity.Type == Container (0xC749).
+            // Must run before the weapon path — backpacks are wearable (ToWield).
+            // PlayerInventoryPage stores character id in Identity.Type; use Inventory+slot
+            // so hashes match backpack open / ChestItemFullUpdate.
+            if (page != null)
+            {
+                Identity ownerIdentity;
+                if (page is PlayerInventoryPage)
+                {
+                    ownerIdentity = new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = (int)page.Identity.Type
+                    };
+                }
+                else if (page.Identity != null)
+                {
+                    ownerIdentity = new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = page.Identity.Instance
+                    };
+                }
+                else
+                {
+                    ownerIdentity = Identity.None;
+                }
+
+                Identity itemPosition = new Identity
+                {
+                    Type = page is PlayerInventoryPage
+                               ? IdentityType.Inventory
+                               : (page.Identity != null ? page.Identity.Type : IdentityType.Inventory),
+                    Instance = placement
+                };
+                Identity backpackContainerIdentity;
+                if (ownerIdentity.Instance != 0
+                    && InventoryItemRules.TryEnsureMailForbiddenContainerIdentity(
+                        item,
+                        ownerIdentity,
+                        itemPosition,
+                        out backpackContainerIdentity))
+                {
+                    return backpackContainerIdentity;
+                }
             }
 
             if (IsWeaponItem(page, item))
