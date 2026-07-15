@@ -332,9 +332,9 @@ buffer cursor or capacity.
 +1B35 ret 4
 ```
 
-The owning C/new Gamecode deserializer spans actual
-`Gamecode+0x7A41E..+0x7AAEE`; the nearest public symbol name is not reliable.
-Its defective block around `Gamecode+0x7A90A..+0x7A962`:
+The owning C/new Gamecode deserializer is the `SimpleCharFullUpdateIIR_t`
+waypoint reader at actual `Gamecode+0x7A41E..+0x7AAEE`. Its defective block
+around `Gamecode+0x7A90A..+0x7A962`:
 
 1. deserializes a count into `object+0x19C`;
 2. immediately loops that count;
@@ -357,12 +357,18 @@ same instruction:
 | 33032 | `0x25B2A000` | `0x25AE4F28` | `0x1CB95` | `0x5BEF` |
 | 34884 | `0x22AB0000` | `0x22AAB3E0` | `0x1CB95` | `0x635` |
 
+The same defect exists in D/old at `Gamecode+0x7916D`, with the count boundary
+at `+0x7964B`. The array ends at `object+0x307`; count 31 first corrupts
+`object+0x308`, and count 34 crosses the `0x330` allocation boundary.
+
 Permanent repair boundary: validate the decoded count immediately after the
 integer extraction and before the first entry write. The repair cannot simply
 clamp to 30 and continue, because unread entry payload would remain in the
-stream and desynchronize subsequent decoding. Required proof is the enclosing
-object/message failure contract: reject/consume/quarantine the whole malformed
-object without publishing partial state, and release it exactly once.
+stream and desynchronize subsequent decoding. Static reconstruction now proves
+Strategy D for the observed C and D N3 path: deserializer failure deletes the
+partial object, returns null, destroys the temporary stream, and abandons the
+remaining buffer. Production code remains blocked on exact hook transaction
+and runtime validation gates.
 
 The following earlier proposal is withdrawn for this crash family: changing
 BinaryStream capacity, growth, terminator, alignment, or allocation policy.
@@ -374,11 +380,13 @@ bug.
 Two interleaved pasted event pairs place later fault objects inside the exact
 Gamecode overwrite range:
 
-- E24/E25: object `0x26D6A930`, overwrite begins `0x26D6AAD0` and continues to
-  attempted boundary `0x26ED3000`; the simultaneous ntdll allocator event has
+- E24/E25: object `0x26D6A930`; out-of-bounds corruption begins
+  `0x26D6AC38` and continues to attempted boundary `0x26ED3000`; the
+  simultaneous ntdll allocator event has
   `EAX=0x26E90214`, inside that interval.
-- E29/E30: object `0x25AE4F28`, overwrite begins `0x25AE50C8` and continues to
-  attempted boundary `0x25B2A000`; the simultaneous ResourceManager notifier
+- E29/E30: object `0x25AE4F28`; out-of-bounds corruption begins
+  `0x25AE5230` and continues to attempted boundary `0x25B2A000`; the
+  simultaneous ResourceManager notifier
   request is `0x25B287B0`, inside that interval, with its sentinel already zero.
 
 The blocks are textually interleaved and their address spaces align exactly,
@@ -466,7 +474,8 @@ wrapped draw call does not justify frame or device recovery.
 - true frame-begin, submission, and Present owners for both clients;
 - reversible/irreversible classification at each actual graphics method used;
 - native device-loss or destroy/recreate sequence;
-- Gamecode enclosing object/message rejection and stream-consumption contract;
+- Gamecode unknown Construct caller enumeration, emitted-thunk/transaction
+  proof, and runtime promotion gates;
 - ResourceManager job/publication/waiter/refcount state machine;
 - deterministic tests and long hardware/driver soaks for each promoted repair.
 

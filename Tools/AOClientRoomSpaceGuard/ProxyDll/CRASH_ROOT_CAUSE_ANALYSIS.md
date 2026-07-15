@@ -53,7 +53,7 @@ production mitigation. Exact event normalization is in
 | F10 | invalid GUI tree/object key | low key observed / GUI comparator proven | medium | GUI tree entry | none |
 | F11 | tiny invalid control target | callback/vtable/return producer U / CPU fetch | high class, origin U | exact typed dispatch TBD | none |
 | F12 | coordinate-like data consumed as control target | C helper candidate; D producer U / CPU fetch | medium class | exact inner GUI/render dispatch TBD | none |
-| F13 | caller-side fixed-array deserialization overrun; count limit checked after loop | Gamecode deserializer / `BinaryStream::operator>>(float*)` output initialization | high instruction and loop proof; malformed-count producer U | whole-object count validation/rejection before loop | none |
+| F13 | caller-side fixed-array waypoint deserialization overrun; post-loop 30 comparison only controls zero-fill | Gamecode deserializer / `BinaryStream::operator>>(float*)` output initialization | high instruction, layout, and exact-caller Strategy D proof; malformed-count producer U | pre-write whole-message rejection after emitted/runtime gates | none |
 | F14 | allocator is a secondary victim inside the Gamecode overwrite range in paired E24/E25 | Gamecode fixed-array overflow conditional on paired PID / ntdll allocator | strong paired-address evidence; pair PID U | repair F13 upstream; no allocator hook | none |
 | F15 | ResourceManager request/list sentinel overwritten in paired E29/E30 | Gamecode fixed-array overflow conditional on paired PID / ResourceManager notifier | strong paired-address evidence; pair PID U | repair F13 upstream; retain notifier diagnostics only | none |
 | F16 | N3 layout/argument confusion near RoomSpace site | proxy involvement unresolved / N3 `+0x15040` | medium correlation | RoomSpace off/on isolation, then typed init | none |
@@ -213,22 +213,26 @@ the caller-supplied float destination to zero at `+0x1B1D` before invoking the
 underlying read. The attempted address is the caller's output pointer, not a
 BinaryStream buffer/cursor/capacity field.
 
-The owning Gamecode loop first deserializes a count into `object+0x19C`, then
-writes three floats per entry beginning at `object+0x1A0` with stride `0x0C`.
-It compares against the 30-entry limit only after the loop. PID 29984 proves
+The owning `SimpleCharFullUpdateIIR_t` waypoint loop first deserializes a signed
+int32 count into `object+0x19C`, then writes three floats per entry beginning at
+`object+0x1A0` with stride `0x0C`. The array has 30 entries and ends at
+`object+0x307`. Its comparison with 30 after the loop only controls zero-fill;
+it does not reject excessive counts. PID 29984 proves
 object `0x26D6A930`, count `0x5A000000`, loop index `0x1E06E`, current
 destination `0x26ED2FFC`, and next attempted destination `0x26ED3000`. This is
 a fixed-array overwrite driven by an unvalidated or incorrectly decoded count.
 PIDs 24200, 33032, and 34884 independently show the same instruction with ESI
 equal to the attempted destination and the same runaway loop shape.
 
-The repair boundary is immediately after count extraction and before the first
-entry write. A blind clamp is not safe: leaving unread entry payload in the
-stream would desynchronize subsequent decoding. The enclosing object/message
-must have a proven whole-operation rejection, consumption, ownership, and
-release contract before production behavior changes. BinaryStream growth,
-capacity, terminator, alignment, and allocation changes are not repairs for
-this family.
+The same defect is statically present in D/old. The repair boundary is
+immediately after count extraction and before the first entry write. A blind
+clamp is not safe: leaving unread entry payload in the stream would
+desynchronize subsequent decoding. The observed C/D N3 caller contract now
+proves whole-message abort: failure deletes the partial object, returns null,
+destroys the temporary stream, and stops parsing the supplied buffer. Exact
+hook integration and runtime validation remain production blockers.
+BinaryStream growth, capacity, terminator, alignment, and allocation changes
+are not repairs for this family.
 
 ### ResourceManager worker
 
@@ -241,9 +245,10 @@ notification; this is request-local assignment, not proven global cache
 publication. Skipping the notifier could strand waiters.
 
 The interleaved E29/E30 pair supplies strong upstream evidence. The Gamecode
-object is `0x25AE4F28`, its contiguous overwrite begins at `0x25AE50C8` and
-runs to attempted boundary `0x25B2A000`, while the ResourceManager request
-`0x25B287B0` lies inside that interval and its sentinel is zero. The two pasted
+object is `0x25AE4F28`; its total waypoint write span begins at `0x25AE50C8`,
+actual out-of-bounds corruption begins at `0x25AE5230`, and writes run to the
+attempted boundary `0x25B2A000`. The ResourceManager request `0x25B287B0` lies
+inside the OOB interval and its sentinel is zero. The two pasted
 blocks lack an independently preserved common PID/timestamp, so the link is
 conditional, but address-space and range agreement make the Gamecode overwrite
 the leading cause of this observed ResourceManager fault.
@@ -252,11 +257,12 @@ the leading cause of this observed ResourceManager fault.
 
 One worker-thread report faults in `ntdll` allocator code with
 `MSVCR100 -> Interfaces -> Connection -> ACE` below it. In the interleaved
-E24/E25 pair, Gamecode object `0x26D6A930` produces a contiguous overwrite from
-`0x26D6AAD0` to attempted boundary `0x26ED3000`; allocator value
-`0x26E90214` lies inside that interval. Subject to the same missing paired PID,
-this is strong evidence that the allocator is a secondary victim of F13, not a
-separate repair site. Allocator exceptions must never be swallowed.
+E24/E25 pair, Gamecode object `0x26D6A930` begins its total waypoint write span
+at `0x26D6AAD0`; actual OOB corruption begins at `0x26D6AC38` and continues to
+attempted boundary `0x26ED3000`. Allocator value `0x26E90214` lies inside that
+OOB interval. Subject to the same missing paired PID, this is strong evidence
+that the allocator is a secondary victim of F13, not a separate repair site.
+Allocator exceptions must never be swallowed.
 
 ### N3 login/vehicle initialization
 
@@ -287,9 +293,10 @@ No evidence currently places a renderer object inside a Gamecode overwrite
 range, so renderer and Gamecode groups remain separate.
 
 The paired non-renderer events are different. E24/E25 places allocator value
-`0x26E90214` inside overwrite interval `0x26D6AAD0..0x26ED3000`; E29/E30
+`0x26E90214` inside the out-of-bounds interval
+`0x26D6AC38..0x26ED3000`; E29/E30
 places ResourceManager request `0x25B287B0` inside interval
-`0x25AE50C8..0x25B2A000`. This is strong address-range causality conditional
+`0x25AE5230..0x25B2A000`. This is strong address-range causality conditional
 on confirming that both halves of each interleaved paste share PID/time. It is
 not a license to catch the downstream faults: repair and validate the Gamecode
 producer first.
@@ -300,8 +307,9 @@ producer first.
 2. Proven AO/randy draw-submission boundary before D3D7.
 3. Proven GUI tree and rectangle construction entries.
 4. A yet-to-be-proven AO render-object virtual/callback dispatch choke point.
-5. The proven Gamecode count extraction before the fixed-array deserialization
-   loop, with whole-object rejection/consumption semantics still required.
+5. The proven Gamecode count extraction and Strategy D owner boundary before
+   the fixed-array loop, with unknown-caller and runtime promotion gates still
+   required.
 6. A diagnostic-only resource-worker consumption boundary with resource ID.
 
 Driver RVAs remain fallbacks for one verified NVIDIA image. They are not a

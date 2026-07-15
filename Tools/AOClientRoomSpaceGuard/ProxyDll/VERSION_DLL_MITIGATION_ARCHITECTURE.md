@@ -109,7 +109,7 @@ Proposed levels:
 | 0 | diagnostics | version forwarding, compact startup log, crash dumps only |
 | 1 | exact guards | only existing, audited exact guards |
 | 2 | AO render validation | proven AO-side object/submission validation |
-| 3 | Gamecode/resource containment | only after whole-object rejection and resource lifetime/publication contracts are proven |
+| 3 | Gamecode/resource containment | Gamecode whole-message abort is proven for the observed caller but remains blocked on exact hook/runtime gates; ResourceManager lifetime/publication remains unproven |
 | 4 | renderer recovery | explicit frame/batch/device recovery with proven cleanup |
 
 Every mitigation is independently selectable. Level is a convenience default,
@@ -315,9 +315,15 @@ another.
 
 The repeated `BinaryStream+0x1B1D` family is not a stream-capacity store.
 `BinaryStream::operator>>(float*)` writes zero to its caller-supplied output
-before reading. The owning Gamecode function deserializes a count into
-`object+0x19C`, loops over 12-byte entries beginning at `object+0x1A0`, and
-checks the 30-entry limit only after the loop.
+before reading. The root is `SimpleCharFullUpdateIIR_t` waypoint deserialization
+in Gamecode. Both C/new (`+0x7A41E`) and D/old (`+0x7916D`) read a signed count
+into `object+0x19C` and write 12-byte Vector3 entries into the fixed 30-entry
+array at `object+0x1A0..+0x307`.
+
+The comparison with 30 at C `+0x7A962` / D `+0x79690` is not a rejection. It
+occurs after all declared records have been written and only controls zero-fill
+of unused slots. Count 31 first corrupts `object+0x308`; count 34 reaches beyond
+the proven `0x330`-byte object allocation.
 
 Initial `gamecode.deserialize-count-observe` records only proven fields:
 
@@ -330,11 +336,19 @@ message/object identity when proven
 native return/publication state when proven
 ```
 
-Production rejection is eligible only at a whole-object boundary that proves
-how malformed payload is consumed or discarded, how partial state is prevented
-from publication, and how all ownership is released exactly once. Clamping the
-count and continuing is forbidden because it can leave unread entry payload
-and desynchronize later decoding.
+The observed whole-object boundary is now proven. For exact supported N3
+profiles, a nonzero virtual-deserializer result causes Construct to destroy the
+partial object and return null; AddNetworkMessage then destroys its temporary
+BinaryStream and abandons the remaining supplied buffer. The selected design is
+therefore Strategy D: return failure before the first waypoint read and let the
+owner discard the complete message. Clamping, consuming an untrusted huge
+count, or continuing at the next field remains forbidden.
+
+Production behavior is still blocked until the exact C/D emitted thunks,
+caller-return gate, transactional patch/rollback lifecycle, deferred
+diagnostics, and runtime C/D rejection/soak tests in
+`GAMECODE_OVERFLOW_VALIDATION.md` pass. Unknown Construct callers must not use
+consume-nothing semantics.
 
 BinaryStream cursor/capacity/growth/terminator/alignment work is a separate
 future investigation and must not be represented as a repair for this family.
@@ -345,6 +359,11 @@ and the E29/E30 ResourceManager request lies inside its paired interval with a
 zeroed sentinel. Common PID/timestamp confirmation is still missing, so the
 links remain conditional, but upstream Gamecode repair must be tested before
 any downstream mitigation.
+
+This makes the Gamecode waypoint guard the first corruption repair to validate.
+It does not supersede renderer virtualization: the independent GUI/randy/NVIDIA
+families have no proven identity inside these overwrite spans and still require
+their own typed graphics boundaries.
 
 ResourceManager containment remains diagnostic-only until the complete state
 machine is proven:
@@ -517,7 +536,7 @@ not inferred merely because a pointer was readable.
 | proven inner render indirect dispatch | not yet located for F11/F12 | none | unknown | none | unknown stack/object/frame state | no hook until exact call, ABI, and cleanup are captured |
 | geometry traversal | coordinate-like registers/targets and GUI/randy consumer sites only | vertex/transform/bounds object, size and lifetime not known | traversal phase unknown | no safe object/frame discard contract | could leave batch lists, refcounts or transform stack inconsistent | render thread I; evidence-only, hook RVA TBD |
 | resource creation/release | only GUI heap/static index distinction and crash-time resource candidates | general resource owner/refcount/destructor not known | creation/release can mutate global caches and worker queues | no generic reject/drop | AddRef/Release, partial allocation and callback obligations unknown | render and worker threads; identity instrumentation only |
-| Gamecode count extraction and fixed-array loop `+0x7A910..+0x7A962` | object, decoded count at `+0x19C`, destination `+0x1A0`, 12-byte stride, three float reads, post-loop limit 30 | exact loop and PID 29984 state proven; enclosing message/object reject and remaining-payload contract unknown | count is read before loop; no entry write need occur before a new pre-loop decision | reject only at a proven whole-object/message boundary; never clamp and continue | must consume/discard payload consistently and prevent partial publication/release errors | main/client thread I; pre-loop diagnostic eligible, behavior blocked on owner contract |
+| Gamecode waypoint count/loop: C `+0x7A913..+0x7A965`, D `+0x79641..+0x79693` | `SimpleCharFullUpdateIIR_t`, signed count `+0x19C`, fixed 30 x Vector3 array `+0x1A0..+0x307`, adjacent fields through `+0x32F` | exact C/D loop, allocation, caller-return, failure result, object deletion, null publication result, and temporary-stream discard proven for observed N3 path | count is available before first entry; tail allocations have not occurred | Strategy D: reject positive count >30 only for exact proven caller; never clamp or consume huge count | emitted ABI/transaction/rollback and live no-publication/retry/performance gates remain | main/client thread; design proven, production behavior blocked on validation |
 | ResourceManager notifier `+0x3D7B..+0x3DB4`, worker caller `+0x3F97/+0x40F6` | request/list sentinel at `+0`, callback/context nodes, worker lock/pop, request-local resource store/AddRef and notification path | list construction and notifier ABI proven; destruction race, request ref owner, global publication/cancel/failure contract unresolved | worker has unlocked and assigned/AddRef'd the resolved resource into request before notification | no safe raw return/drop; skipping can strand waiters | request may be destroyed/cleared; leak, double-release, missed callback and race risk | worker thread; diagnostic-only until lifetime/publication proof |
 | N3 login/vehicle before `N3+0x15040` | current register/stack values only | object/type/owner/failure return unknown | initialization may be partially complete | none | vehicle/world initialization may be poisoned | main thread I; isolate RoomSpace, do not catch |
 
@@ -559,7 +578,7 @@ generic “all render pointers are valid” scanner.
 | deferred GUI/VB | whole GUI batch | exact driver/GUI cleanup | native batch owner/postcondition |
 | GUI tree | tree entry | low key to native not-found | high-key lifetime/provenance |
 | invalid EIP | proven render dispatch shim | none generically | exact dispatch site/ABI/cleanup |
-| Gamecode deserialization | count extraction before `+0x7A922` loop; whole-object/message owner TBD | exact loop and PID 29984 state | reject/consume/publication contract and malformed-count producer |
+| Gamecode deserialization | exact C/D post-count sites and proven N3 network-buffer owner | exact type/layout/loop, Strategy D discard contract, native failure tails | emitted hook transaction, caller near misses, malformed-count producer, runtime publication/retry/performance validation |
 | ResourceManager | notifier `+0x3D7B`; worker request-assignment/AddRef then notify `+0x3F97/+0x40F6` | exact notifier/list/worker path | global publication, destruction/clear site, request ref ownership, waiter failure/retry contract |
 | N3 login/vehicle | typed initialization boundary | crash dump only | object type/layout and failure result |
 
