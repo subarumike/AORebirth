@@ -47,6 +47,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using Utility;
     using ZoneEngine.Core;
+    using ZoneEngine.Core.Mail;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
 

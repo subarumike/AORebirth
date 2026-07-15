@@ -228,8 +228,8 @@
     <Compile Include="Core\MessageHandlers\AppearanceUpdateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\AttackMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\BankMessageHandler.cs" />
-    <Compile Include="Core\MessageHandlers\MailMessageHandler.cs" />
-    <Compile Include="Core\MailRuntimeService.cs" />
+    <Compile Include="Core\Mail\MailMessageHandler.cs" />
+    <Compile Include="Core\Mail\MailRuntimeService.cs" />
     <Compile Include="Core\MessageHandlers\BuffMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\AddPetMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\RemovePetMessageHandler.cs" />

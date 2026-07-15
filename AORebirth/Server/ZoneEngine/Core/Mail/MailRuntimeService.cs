@@ -5,7 +5,7 @@
 
 #endregion
 
-namespace ZoneEngine.Core
+namespace ZoneEngine.Core.Mail
 {
     #region Usings ...
 

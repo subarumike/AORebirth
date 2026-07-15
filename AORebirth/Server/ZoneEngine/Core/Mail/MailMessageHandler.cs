@@ -5,7 +5,7 @@
 
 #endregion
 
-namespace ZoneEngine.Core.MessageHandlers
+namespace ZoneEngine.Core.Mail
 {
     #region Usings ...
 
@@ -19,7 +19,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine.Core;
+    using ZoneEngine.Core.MessageHandlers;
 
     #endregion
 

@@ -2,19 +2,22 @@
 
 ## Current Focus
 
-Mail Terminal restored from orphaned commit `d63ce53a` ("Fixing mail") that was dropped when pull rebased onto `8bb22776` (Contain invalid GUI tree keys). That pull is client-proxy only; it did not contain mail fixes — the rebase discarded local "Fixing mail".
+Mail lives in subsystem `ZoneEngine/Core/Mail/`. Documented pull/merge rules so subsystem work survives GitHub pulls. Pets extraction is next when Mike prioritizes it.
 
 ## Done in this slice
 
-- Recovered mail stack from `d63ce53a`: Messaging types/serializer, `MailRuntimeService` (939-line attach/TakeAll/Delete path with RemoveItem+SendDeleteItem), handler, InventoryItemRules mail guards, FullCharacter/InventoryUpdate container identity helpers, CharInPlay envelope sync.
+- Moved Mail runtime + handler into `AORebirth/Server/ZoneEngine/Core/Mail/` (`ZoneEngine.Core.Mail`).
+- Added `docs/project/SUBSYSTEMS.md` and Known Decision: systems own a folder; commit before pull; always `--no-rebase`.
+- Updated Architecture / AI_START_HERE pointers.
 
 ## Remaining
 
-1. Restart engines and live-validate: attach item leaves sender inventory; recipient Take All gets real item; NoDrop/container send reject; credits still OK.
-2. Backpack still may drag into Item field (client GUI) until Container dynel binding is proven — send must still reject.
+1. Live-validate Mail after engines restart (attach / Take All / NoDrop).
+2. Extract Pets into `Core/Pets/` when Mike asks (currently `Pet*.cs` still under Core root).
 3. Subway when Mike returns that priority.
 
 ## Constraints
 
-- Mail is in-memory only (cleared on Zone restart).
-- Do not change database schemas.
+- Do not grow new system logic in `Playfield.cs`.
+- Mail still in-memory only; no DB schema without approval.
+- Always `git pull --no-rebase`; commit subsystem first.
