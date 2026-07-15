@@ -14,9 +14,11 @@ production mitigation. Exact event normalization is in
 3. The NVIDIA faults occur downstream of the AO draw boundary. The driver
    consumes null/invalid internal or submitted state, but the AO object/resource
    that produced that state is not yet identified in most records.
-4. `BinaryStream`, `ResourceManager`, and the allocator failure are a separate
-   evidence family. A causal connection to later renderer corruption is
-   plausible but not demonstrated.
+4. The apparent `BinaryStream` family is a proven Gamecode fixed-array
+   deserialization overwrite. In the paired reports, its overwrite ranges
+   contain both the allocator state and ResourceManager request, giving strong
+   conditional evidence that those two faults are downstream victims. Common
+   PID/time confirmation remains missing; no link to renderer faults is proven.
 5. EIP values `0`, `2`, `5`, `8`, `0x41C80000`, and `0x420C70A4` strongly
    indicate damaged control flow; E42's dump proves execute access. They do not
    identify whether the producer was a stack
@@ -51,9 +53,9 @@ production mitigation. Exact event normalization is in
 | F10 | invalid GUI tree/object key | low key observed / GUI comparator proven | medium | GUI tree entry | none |
 | F11 | tiny invalid control target | callback/vtable/return producer U / CPU fetch | high class, origin U | exact typed dispatch TBD | none |
 | F12 | coordinate-like data consumed as control target | C helper candidate; D producer U / CPU fetch | medium class | exact inner GUI/render dispatch TBD | none |
-| F13 | stream cursor/capacity/growth failure at boundary store | Gamecode serialization / BinaryStream store | high symptom | whole serialization, then proven reserve/grow/write | none |
-| F14 | allocator observes prior corruption/double-free/race | first corruptor U / ntdll allocator | low origin | no production hook; lab PageHeap | none |
-| F15 | null/stale async request or completion | resource lifecycle U / ResourceManager worker | medium | proven request consume/cancel boundary TBD | none |
+| F13 | caller-side fixed-array deserialization overrun; count limit checked after loop | Gamecode deserializer / `BinaryStream::operator>>(float*)` output initialization | high instruction and loop proof; malformed-count producer U | whole-object count validation/rejection before loop | none |
+| F14 | allocator is a secondary victim inside the Gamecode overwrite range in paired E24/E25 | Gamecode fixed-array overflow conditional on paired PID / ntdll allocator | strong paired-address evidence; pair PID U | repair F13 upstream; no allocator hook | none |
+| F15 | ResourceManager request/list sentinel overwritten in paired E29/E30 | Gamecode fixed-array overflow conditional on paired PID / ResourceManager notifier | strong paired-address evidence; pair PID U | repair F13 upstream; retain notifier diagnostics only | none |
 | F16 | N3 layout/argument confusion near RoomSpace site | proxy involvement unresolved / N3 `+0x15040` | medium correlation | RoomSpace off/on isolation, then typed init | none |
 | F17 | native C++ precondition/throw in C client | N3/Gamecode / MSVC throw machinery | low without type | typed AO caller only after throw decode | none |
 | F18 | repeated native C++ Gamecode/N3 throw in D | Gamecode/N3 / MSVC throw machinery | medium family | typed AO caller only after throw decode | none |
@@ -197,43 +199,64 @@ The existing new-client helper wrapper is only relevant when the fault occurs
 inside one of its two verified callers. The latest report does not prove that
 boundary.
 
-## BinaryStream, resources, and heap
+## Gamecode deserialization, resources, and heap
 
-### BinaryStream boundary write
+### Gamecode fixed-array deserialization overrun
 
 Five reports fault at crash-report logical `BinaryStream.dll +0xB1D`, actual
-image RVA `BinaryStream.dll +0x1B1D`, while
-writing to page-aligned addresses at apparent buffer boundaries. The recurring
-caller chain is `Gamecode -> N3 -> Interfaces`.
+image RVA `BinaryStream.dll +0x1B1D`, while the recurring caller chain is
+`Gamecode -> N3 -> Interfaces`.
 
-High-confidence finding: the stream consumer attempts to write beyond the
-currently writable region. Unproven fields include stream position, logical
-length, capacity, requested write, growth policy, ownership, and whether the
-write is payload, terminator, or alignment. Therefore neither a size cap nor a
-global allocation enlargement is justified.
+Static bytes correct the earlier capacity hypothesis. The faulting function is
+`BinaryStream::operator>>(float*)`, actual `+0x1B14..+0x1B37`. It initializes
+the caller-supplied float destination to zero at `+0x1B1D` before invoking the
+underlying read. The attempted address is the caller's output pointer, not a
+BinaryStream buffer/cursor/capacity field.
 
-Required next evidence begins at the stable whole-Gamecode serialization caller.
-A nearer reserve/grow/write boundary is only a candidate after static ABI proof;
-then diagnostics can capture stream pointer, buffer base, cursor, length,
-capacity, requested bytes, return contract, caller, and resource identity.
-Production behavior must remain unchanged until those offsets and semantics are
-proven.
+The owning Gamecode loop first deserializes a count into `object+0x19C`, then
+writes three floats per entry beginning at `object+0x1A0` with stride `0x0C`.
+It compares against the 30-entry limit only after the loop. PID 29984 proves
+object `0x26D6A930`, count `0x5A000000`, loop index `0x1E06E`, current
+destination `0x26ED2FFC`, and next attempted destination `0x26ED3000`. This is
+a fixed-array overwrite driven by an unvalidated or incorrectly decoded count.
+PIDs 24200, 33032, and 34884 independently show the same instruction with ESI
+equal to the attempted destination and the same runaway loop shape.
+
+The repair boundary is immediately after count extraction and before the first
+entry write. A blind clamp is not safe: leaving unread entry payload in the
+stream would desynchronize subsequent decoding. The enclosing object/message
+must have a proven whole-operation rejection, consumption, ownership, and
+release contract before production behavior changes. BinaryStream growth,
+capacity, terminator, alignment, and allocation changes are not repairs for
+this family.
 
 ### ResourceManager worker
 
 One worker-thread report reads null at crash-report logical
-`ResourceManager.dll +0x2D84`, followed by ResourceManager and ACE worker
-frames. It may be an independent stale/null resource or a later consumer of
-corrupted stream data. No temporal or identity link to a BinaryStream event is
-present. Causality is **unresolved**.
+`ResourceManager.dll+0x2D84`, actual `+0x3D84`, in a notifier that dereferences
+the request/list sentinel at `request+0`. Construction normally allocates a
+0x18-byte self-linked sentinel. The worker has removed work under lock,
+unlocked, and stored/AddRef'd the resolved resource into the request before
+notification; this is request-local assignment, not proven global cache
+publication. Skipping the notifier could strand waiters.
+
+The interleaved E29/E30 pair supplies strong upstream evidence. The Gamecode
+object is `0x25AE4F28`, its contiguous overwrite begins at `0x25AE50C8` and
+runs to attempted boundary `0x25B2A000`, while the ResourceManager request
+`0x25B287B0` lies inside that interval and its sentinel is zero. The two pasted
+blocks lack an independently preserved common PID/timestamp, so the link is
+conditional, but address-space and range agreement make the Gamecode overwrite
+the leading cause of this observed ResourceManager fault.
 
 ### ntdll allocator
 
 One worker-thread report faults in `ntdll` allocator code with
-`MSVCR100 -> Interfaces -> Connection -> ACE` below it. Heap metadata damage
-from an earlier overrun is plausible, but allocator crashes can also result
-from double free or lifetime races. It is a likely secondary symptom, not a
-safe hook point.
+`MSVCR100 -> Interfaces -> Connection -> ACE` below it. In the interleaved
+E24/E25 pair, Gamecode object `0x26D6A930` produces a contiguous overwrite from
+`0x26D6AAD0` to attempted boundary `0x26ED3000`; allocator value
+`0x26E90214` lies inside that interval. Subject to the same missing paired PID,
+this is strong evidence that the allocator is a secondary victim of F13, not a
+separate repair site. Allocator exceptions must never be swallowed.
 
 ### N3 login/vehicle initialization
 
@@ -260,14 +283,16 @@ from native-client compatibility decisions.
 
 ## Cross-family causality
 
-BinaryStream corruption could plausibly damage an object later consumed by the
-renderer, but the current evidence does not establish same process, same
-allocation, same resource identity, or temporal ordering. The renderer and
-stream/resource groups must remain separate until allocation/resource identity
-logging links them.
+No evidence currently places a renderer object inside a Gamecode overwrite
+range, so renderer and Gamecode groups remain separate.
 
-The same rule applies to `ntdll` and ResourceManager: they must not be labeled
-BinaryStream consequences merely because they involve memory management.
+The paired non-renderer events are different. E24/E25 places allocator value
+`0x26E90214` inside overwrite interval `0x26D6AAD0..0x26ED3000`; E29/E30
+places ResourceManager request `0x25B287B0` inside interval
+`0x25AE50C8..0x25B2A000`. This is strong address-range causality conditional
+on confirming that both halves of each interleaved paste share PID/time. It is
+not a license to catch the downstream faults: repair and validate the Gamecode
+producer first.
 
 ## Highest-value root-level boundaries
 
@@ -275,8 +300,8 @@ BinaryStream consequences merely because they involve memory management.
 2. Proven AO/randy draw-submission boundary before D3D7.
 3. Proven GUI tree and rectangle construction entries.
 4. A yet-to-be-proven AO render-object virtual/callback dispatch choke point.
-5. The stable whole-Gamecode serialization caller, with a nearer
-   BinaryStream reserve/grow/write boundary only after ABI proof.
+5. The proven Gamecode count extraction before the fixed-array deserialization
+   loop, with whole-object rejection/consumption semantics still required.
 6. A diagnostic-only resource-worker consumption boundary with resource ID.
 
 Driver RVAs remain fallbacks for one verified NVIDIA image. They are not a
@@ -288,6 +313,7 @@ driver catch until cleanup and post-fault state are proven.
 - process-wide access-violation suppression;
 - process-wide indirect-call validation;
 - arbitrary geometry count caps;
+- clamping the Gamecode deserialization count while leaving unread payload;
 - invented object layouts or reference-count rules;
 - returning success after unknown driver or resource failures;
 - globally enlarging BinaryStream allocations;

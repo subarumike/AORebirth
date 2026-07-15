@@ -180,6 +180,78 @@ Needed: memory ownership for the buffer containing the coordinate values,
 write history, and the target object/stack field it overwrote or replaced.
 Float decoding is evidence of data shape, not proof of overwrite direction.
 
+## Graphics interface, frame, and device closure
+
+### G01 — Complete graphics IID/interface-return inventory
+
+Known: C/new has dual-path exposure (`Cheetah -> Direct3DCreate9` plus
+`randy31 -> DirectDrawCreateEx`). D/old uses
+`randy31 -> DirectDrawCreateEx`; `DisplaySystem -> DirectDrawCreate` is a
+proven capability probe that releases its queried interfaces. The sole static
+Cheetah Direct3DCreate9 site creates a REF device, so the production hardware
+device origin remains unresolved.
+
+Needed for both clients: every accepted IID and every interface returned by
+factory, create, `QueryInterface`, attached/parent lookup, and resource getter;
+every AO retention/storage site; and every release site. Factory interception
+alone is not closure.
+
+### G02 — COM identity and lifetime contract
+
+Needed: stable `IID_IUnknown` identity, aggregation/tear-off behavior,
+thread-safe registry insertion/lookup/final release, exact
+`QueryInterface`/`AddRef`/`Release` forwarding, reentrancy, teardown races,
+device generations, and stale-wrapper rejection. Prove that no used method can
+return a raw underlying interface to AO.
+
+### G03 — C/new true frame and Present owner
+
+Known: patched helper `GUI+0x14CA77` is not a frame boundary;
+`DisplaySystem_t::Commit` actual `+0x796F5` is central but has multiple callers
+and required timer/resource/task/render/tick/memory work after its internal
+render call. Needed: exact frame-begin, command submission, backbuffer, and
+Present owner with ABI, thread, locks, lists, resources, cleanup, and failure
+return. Whole-Commit catch is forbidden.
+
+### G04 — D/old true frame and Present owner
+
+Known: `randy+0x219B4` is one draw, `GUI+0x150E17` is one batch,
+`GUI+0x220E2..+0x22186` calls `DisplaySystem_t::Commit` actual `+0x789BB`,
+and Commit performs lost-device/surface recovery, viewport work, and DynamicVB
+reset. None is yet tied to a proven sole Flip/Present owner. Needed: exact owner
+and postcondition through the `GUI -> DisplaySystem -> GUI -> AFCM` path.
+
+### G05 — Submission reversibility
+
+Needed: classify every used operation at validated-unsubmitted, optional
+compatibility-queued, submitted-synchronous, driver-accepted, and presented
+states. Prove which mutations remain solely compatibility-owned. SEH around an
+immediately forwarded call is not rollback.
+
+### G06 — Renderer-thread and unwind eligibility
+
+Needed at every proposed SEH region: renderer-thread identity, exact stack and
+nonvolatile/FPU/SSE unwind, language/runtime cleanup, heap integrity, driver
+lock/deferred-work absence, resource postcondition, and near-miss rejection.
+
+### G07 — Device poison and recreation
+
+Known: Cheetah provides native C/new reset callbacks and a Reset path; this is
+not complete destroy/recreate proof. D/old proves IsDeviceLost and surface
+restoration, while Device7 creation is only observed inside Randy Initialize.
+
+Needed: owner and release/recreate order for window, roots, device, surfaces,
+depth/palette/textures/buffers/state caches; client callbacks; generation
+invalidation; restoration; first Present; and subsequent-frame soak. Until
+proven, poisoned device means controlled restart.
+
+### G08 — Last-good-frame ownership
+
+Needed: a compatibility-owned retained backbuffer and copy/Present path.
+Without it, an exact pre-Present AO/proxy failure may skip Present and use a
+proven next-frame path only when the device is known intact. Driver/uncertain
+faults poison and require proven recovery or restart; they may not continue.
+
 ## NVIDIA and Direct3D
 
 ### N01 — Cross-driver producer identity
@@ -224,53 +296,69 @@ native outer cleanup or device-quarantine postcondition, subsequent-frame
 integrity, circuit-break behavior, and driver-specific exact/near-miss tests.
 RVA/instruction repetition alone is insufficient.
 
-## BinaryStream and resources
+## Gamecode, BinaryStream, and resources
 
-### S01 — BinaryStream report-logical `+0xB1D`, actual `+0x1B1D`, function and ABI
+### S01 — Resolved correction: `BinaryStream+0x1B1D`
 
-Needed:
+Known: actual `+0x1B14..+0x1B37` is
+`BinaryStream::operator>>(float*)`, x86 thiscall with one caller output pointer
+and `ret 4`. `+0x1B1D` initializes that output to zero before the stream read.
+Four dumps prove ESI equals the attempted caller output. The top fault is not a
+BinaryStream capacity/growth store.
 
-- function start/end and faulting instruction;
-- calling convention and arguments;
-- five caller module+RVA contexts;
-- return/error contract;
-- overwritten-instruction/trampoline proof before any hook proposal.
+### S02 — Malformed-count producer and object/message identity
 
-### S02 — Stream object fields
+Known: Gamecode deserializer `+0x7A41E..+0x7AAEE` reads count at `+0x7A913`,
+loops over three-float/12-byte entries, and checks limit 30 only at `+0x7A962`
+after the unsafe loop.
 
-Needed from static usage and dumps:
+Needed: enclosing object/message identity, where counts such as `0x5A000000`
+and `0x1CB95` originate, byte-order/validation path, and caller ownership.
 
-```text
-buffer base
-position
-logical length
-allocated capacity
-requested write
-growth-needed flag/result
-terminator/alignment behavior
-ownership transfer
-```
+### S03 — Whole-object rejection and stream synchronization
 
-### S03 — Why growth did not precede the write
+Needed: immediate post-count/pre-loop branch ABI; native failure result; how the
+remaining malformed object's bytes are consumed or discarded; proof that no
+partial object/cache state is published; and exact one-time release. Clamping
+to 30 and continuing is forbidden because it can desynchronize later reads.
 
-Needed: native reserve/grow call path, integer arithmetic, allocation result,
-and exact branch that reaches `+0xB1D`. Distinguish missing growth, failed
-growth, integer overflow, stale cursor, and malformed request.
+### S04 — Paired crash provenance
 
-### S04 — Resource identity
+Known: E24/E25 allocator state lies inside the paired Gamecode overwrite range;
+E29/E30 ResourceManager request lies inside its paired range. The exception
+blocks are interleaved and addresses align in one 32-bit address space.
 
-Needed: packet/resource/template/file identity for each BinaryStream failure,
-and the worker that consumes it. Without this, quarantine cannot be scoped.
+Needed for absolute rather than strong conditional causality: common PID,
+timestamp, dump/process identity, and thread ordering for both halves of each
+pair.
 
-### S05 — BinaryStream-to-heap causality
+### S05 — Heap secondary-victim validation
 
-Needed: same process/allocation identity and temporal ordering linking the
-overrun to the `ntdll` allocator event. Similar memory symptoms are not enough.
+Known: in E24/E25, overwrite interval `0x26D6AAD0..0x26ED3000` contains
+allocator value `0x26E90214`. Needed: paired PID confirmation and an upstream-
+repair run proving the allocator event disappears. Never catch allocator
+exceptions.
 
-### S06 — BinaryStream-to-ResourceManager causality
+### S06 — ResourceManager secondary-victim and standalone lifetime
 
-Needed: same resource identity or buffer passed from the stream caller into the
-ResourceManager worker before its null/stale read.
+Known: in E29/E30, overwrite interval `0x25AE50C8..0x25B2A000` contains
+request `0x25B287B0`; its sentinel is zero at notifier
+`ResourceManager+0x3D84`. Static proof identifies notifier
+`+0x3D7B..+0x3DB4` and worker call `+0x40F6` after unlock and
+request-local resource assignment/AddRef. Global cache publication is not
+proven.
+
+Needed: paired PID confirmation; upstream-repair reproduction; request
+destruction/clear site; reference owner across notification; cache publication;
+waiter failure/retry; cancellation race; and native exception policy. Do not
+skip notification.
+
+### S07 — Independent BinaryStream capacity/growth family
+
+No observed crash in this corpus currently proves a stream-capacity failure.
+Cursor, capacity, growth, terminator/alignment, allocator, and old-pointer
+retention work is authorized only if a separate exact failure demonstrates that
+boundary; it is not part of the F13 repair.
 
 ## N3, Vehicle, and C++ exceptions
 

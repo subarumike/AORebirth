@@ -14,7 +14,33 @@ planning task.
   and existing proxy changes in `README.md`, `PACKAGE-README.txt`,
   `src/gui_rect_fix.cpp`, and `src/randy_color_fix.cpp` are preserved.
 
-## Priority sequence
+## Implementation authorization order
+
+The proof package supersedes any reading of the work-package numbers as
+permission to build a whole renderer proxy. The mandatory dependency order is:
+
+1. prove the true frame and Present owners for C/new and D/old;
+2. inventory every created, queried, returned, retained, and released graphics
+   interface/IID on both graphics paths;
+3. build and unit-test the COM identity/lifetime registry in isolation;
+4. proxy every used interface-returning method and prove that no raw interface
+   can escape;
+5. add typed pre-submit validation;
+6. add a frame model only around compatibility-owned queued state;
+7. prove device generation poison/destroy/recreate, or require restart;
+8. repair the proven Gamecode count-before-loop bug only at a whole-object
+   rejection/consumption boundary;
+9. prove ResourceManager request/publication/waiter ownership before changing
+   its worker path;
+10. retain exact current guards until upstream prevention is demonstrated;
+11. remove driver-RVA hooks only after the complete proxy prevents their exact
+    reproductions in the hardware/driver soak matrix.
+
+Current authorization is static proof, behavior-neutral instrumentation, and
+isolated unit-test foundations only. A partial graphics proxy, catch-all SEH,
+or guessed device reset is not authorized.
+
+## Work packages
 
 ### P0 — Make current behavior auditable and fail-safe
 
@@ -266,6 +292,30 @@ Acceptance:
   D3D target, proven counts/pointers, action, and signature;
 - no unproven pointer is dereferenced for logging.
 
+### P2.5 — Graphics API closure and COM foundation
+
+Proven creation origins are C/new `Cheetah -> Direct3DCreate9`, C/new and D/old
+`randy31 -> DirectDrawCreateEx`, and D/old
+`DisplaySystem -> DirectDrawCreate`. C/new has dual-path exposure, so neither a
+D3D9-only nor a one-factory proxy is complete. The sole static Cheetah
+Direct3DCreate9 site creates a REF device; the production hardware-device
+root/dynamic path must be found before runtime proxy work.
+
+Proof sequence:
+
+1. inventory every accepted IID and every interface returned by factory,
+   creation, `QueryInterface`, attached/parent lookup, and resource getter;
+2. identify every AO storage/retention and release site;
+3. prove COM aggregation/identity behavior used by each client;
+4. define one thread-safe proxy identity per underlying COM identity;
+5. define exact `QueryInterface`/`AddRef`/`Release`, teardown, generation, and
+   stale-wrapper semantics;
+6. unit-test the registry and interface wrappers without AO;
+7. prove that no method can return an unregistered raw interface.
+
+Only then may the factory interception and complete used-interface set be
+enabled together. Partial runtime deployment is forbidden.
+
 ### P3 — Prove a central AO render-object/dispatch boundary
 
 Static and dump work:
@@ -305,42 +355,61 @@ Plain-HAL normalization (`randy31 +0x43B99`) remains independently gated. Test
 it separately because it changes renderer selection rather than containing an
 exception.
 
-### P5 — BinaryStream diagnostic proof
+### P5 — Gamecode deserialization repair proof
 
-Target family: crash-report logical `BinaryStream.dll +0xB1D`.
+Target family: crash-report logical `BinaryStream.dll+0xB1D`, now proven to be
+`BinaryStream::operator>>(float*)` actual `+0x1B14..+0x1B37` initializing a
+caller-supplied output pointer.
 
-Investigation sequence:
+Proven producer path: Gamecode `+0x7A910..+0x7A962` reads a count into
+`object+0x19C`, loops over three floats per 12-byte entry at `object+0x1A0`, and
+checks the 30-entry limit only after the loop. PID 29984 proves the runaway
+destination state.
 
-1. recover exact function start/end and disassemble the faulting instruction;
-2. recover caller ABI and five caller contexts;
-3. map stream object fields only through observed reads/writes;
-4. identify buffer, position, logical length, capacity, request, and growth
-   decision;
-5. identify resource/message owner and native failure return;
-6. instrument the whole stable Gamecode serialization operation first; move
-   closer to reserve/grow/write only after that ABI is proven;
-7. reproduce the same location repeatedly;
-8. decide among native growth, clean rejection, or resource quarantine.
+Remaining proof sequence:
+
+1. identify the enclosing object/message type and malformed-count producer;
+2. prove the immediate post-count/pre-loop branch ABI;
+3. prove how the entire malformed object's remaining payload is consumed or
+   discarded without desynchronizing later stream reads;
+4. prove partial state is never published and ownership is released exactly
+   once;
+5. reproduce oversize, byte-order-wrong, truncated, and valid 0/1/30-entry
+   cases;
+6. implement checked pre-loop whole-object rejection only after the native
+   failure contract is known.
 
 Expected future files, after proof:
 
 ```text
-src/stream_diagnostics.h/.cpp     new
-src/resource_diagnostics.h/.cpp  new
+src/gamecode_deserialization.h/.cpp  new
 src/dllmain.cpp
 Build-Package.cmd
 ```
 
-Do not add count caps, unconditional reallocations, guard-page recovery, or
-“write and continue” behavior.
+Do not clamp the count and continue, change BinaryStream capacity/growth,
+unconditionally reallocate, use guard-page recovery, or “write and continue.”
+Any independent BinaryStream capacity investigation requires a separate proven
+crash family.
 
-### P6 — ResourceManager and heap correlation
+### P6 — ResourceManager publication/lifetime proof
 
-Add resource/allocation identity to P5 events, then compare with the
-ResourceManager worker and allocator dumps. Promote causality only when the same
-resource or allocation is linked temporally. Otherwise keep independent. Use
-PageHeap/Application Verifier only in a controlled lab run to find the first
-corruptor; never catch allocator faults in production.
+The exact notifier at `ResourceManager+0x3D7B..+0x3DB4` dereferences a null
+request/list sentinel at `+0x3D84`. Its worker caller `+0x3F97`, call
+`+0x40F6`, has already removed work under lock, unlocked, and stored/AddRef'd
+the resolved resource into the request before notification. This is
+request-local assignment, not proven global cache publication. Construction
+proves a self-linked 0x18-byte sentinel; no protecting request lock/ref
+increment is visible across notification.
+
+Prove the request destruction/clear site, reference owner, cache publication,
+waiter notification/failure result, retry rule, and exception policy. A
+lifetime race is plausible, not proven. Skipping the notification is forbidden
+because it can strand waiters. Correlate this with P5 only if the same
+allocation/resource identity and temporal order are demonstrated; otherwise
+keep the families independent. Use PageHeap/Application Verifier only in a
+controlled lab run to find a first corruptor; never catch allocator faults in
+production.
 
 ### P7 — N3 login/vehicle initialization
 
@@ -354,13 +423,34 @@ object field. No
 skip/retry is planned until the initialization owner and failure contract are
 known.
 
-### P8 — Renderer frame recovery
+### P8 — Renderer frame and device recovery
 
-Only after AO defines a frame owner and reset contract, add a level-4 policy
-that can abort one frame and reset known state. Do not infer frame recovery from
-the existing batch cleanup; batch and frame ownership are different. Add a
-bounded per-policy circuit breaker so a failed cleanup disables recovery and
-the next matching exception dumps normally.
+First prove the frame-begin and Flip/Present owners independently for C/new and
+D/old. `DisplaySystem_t::Commit` is central at C/new `+0x796F5` and D/old
+`+0x789BB`, but its virtual dispatch has not been tied to the exact legacy Flip
+methods and Cheetah's exact Device9 Present remains unresolved. Commit also has
+mandatory maintenance/reset tails and is not safely catchable whole. The C/new
+GUI helper and D/old GUI batch are not frame owners.
+
+Track `validated-unsubmitted -> optional compatibility-queued ->
+submitted-synchronous -> driver-accepted -> presented`. Recovery rules are:
+
+- reject pre-submit at the proven owner;
+- abandon a frame only after exact AO-side unwind and tracked-state reset;
+- poison the device on driver/uncertain external state;
+- terminate/restart on stack, heap, unwind, lock, or control-flow corruption.
+
+Prove device destroy/recreate, generation invalidation, resource restoration,
+and subsequent Present before attempting in-process recovery. C/new has a
+native Cheetah reset/callback path but no proven complete rebind; D/old has
+lost-surface restoration but no proven post-initialization Device7 recreation.
+Without complete proof, a poisoned device requires restart. Last-good-frame
+presentation is available only if the compatibility layer owns a retained
+backbuffer.
+
+Do not infer frame recovery from existing batch cleanup. Add a bounded
+per-policy circuit breaker so a failed cleanup disables recovery and the next
+matching exception dumps normally.
 
 ## Per-step engineering contract
 
@@ -378,12 +468,13 @@ proof.
 | P0.5 build/docs | `Build-Package.cmd`, both READMEs, `self_test.cpp`; no AO site | current artifact/disassembly | false CFG/safety claim | compiler option, PE metadata, indirect-call disassembly, docs agree | restore build flag only with claim removed |
 | P1 audited current features | `roomspace_fix.cpp`, `gui_rect_fix.cpp`, `randy_color_fix.cpp`, `self_test.cpp`; strong exact H3/H7/H8-H12, H5 preflight, plus separately disabled/experimental H5 driver and H6 `GUI+0x152E49` recovery; H1 RoomSpace remains independent | P0.1/P0.2/P0.4 | ABI/context near-miss, x87/stack damage, or post-driver poison | positive and one-field near-miss tests; emitted x86; both profiles; Level-4 recovery remains off until postcondition tests | disable one feature; exact transactional byte restore where patched |
 | P2 render evidence | new `module_catalog.*`, `render_evidence.*`, existing `evidence_logger.*`, randy/GUI exact sites `+0x219B4/+0x152E49/+0x4F2EF` | P0.4, P1 | diagnostic dereferences bad object or costs FPS | proven fields only; bounded counters; same-scene performance gate | disable evidence feature; no behavior changes to roll back |
+| P2.5 COM closure | future dedicated `graphics_compatibility/` modules and isolated tests; Cheetah D3D9 plus all randy/DisplaySystem DDRAW creation/return sites | complete IID/return/storage/release inventory | raw-interface escape, split COM identity, refcount/use-after-free, stale generation | stable IUnknown identity; exact QI/AddRef/Release; thread/race tests; no raw descendant in exhaustive used-method tests | do not deploy partial proxy; isolated code remains disconnected |
 | P3 control flow | new `control_flow_validation.*`, likely `gui_rect_fix.cpp` or `randy_color_fix.cpp`, `self_test.cpp`; hook RVA **TBD pending dump/static proof** | P2 manifest/evidence | generic target filter or wrong return/cleanup | exact call bytes/ABI, initial transfer proof, two matching records or deterministic reproduction | feature remains off until proven; exact transaction rollback afterward |
 | P4 AO render validation | new `render_validation.*`, `randy_color_fix.cpp`, module catalog/self-tests; primary site randy `+0x219B4`, earlier typed site TBD | P1/P2; P3 if virtual dispatch used | false object rejection, visual loss, hot-path regression | allocation-derived checks only; exact/near-miss tests; cross-driver soak | disable L2 validator; retain diagnostic/exact L1 independently |
-| P5 stream proof | new `stream_diagnostics.*`, `resource_diagnostics.*`, `dllmain.cpp`; stable Gamecode callers `+0x7A945/+0x7A954`, BinaryStream fault `+0x1B1D` | P0.4/module manifest | observing guessed fields changes memory or partial operation | function/ABI/fields/grow/error contract proven; repeated exact resource identity | diagnostic feature off; no stream behavior changed during proof |
-| P6 resource/heap | `resource_diagnostics.*`, `evidence_logger.*`; ResourceManager request boundary **TBD**, fault `+0x3D84`; lab verifier configuration outside package | P5 identities | false causal merge, ref leak/double free, worker lock retention | same allocation/resource/time link or families remain separate; native cancel/refcount tests before behavior | disable diagnostics/cancel feature; never catch allocator fault |
+| P5 Gamecode deserialize | future `gamecode_deserialization.*`; count extraction and loop `Gamecode+0x7A910..+0x7A962`, BinaryStream output initializer `+0x1B1D` | P0.4/module manifest; exact loop proof complete | clamping desynchronizes stream; partial object publication or wrong release | enclosing message type, whole-object reject/consume/failure/ref contract; valid 0/1/30 and malformed tests | diagnostic off; no behavior until full contract; never change stream capacity for F13 |
+| P6 resource publication | `resource_diagnostics.*`, `evidence_logger.*`; notifier `ResourceManager+0x3D7B`, worker call `+0x40F6`; lab verifier outside package | request destruction/ref/publication proof; P5 identity only if actually linked | missed waiter, ref leak/double free, lifetime race, false causal merge | destruction/clear site and native waiter failure/retry/refcount tests; otherwise families remain separate | disable diagnostics; never skip notification or catch allocator fault |
 | P7 N3 initialization | `dllmain.cpp`, `roomspace_fix.cpp`, `module_catalog.*`, evidence logger; fault `N3+0x15040`, nearby RoomSpace call `+0x15054` | P0.1 independent RoomSpace flag | catching intentional failure or misattributing proxy | repeated RoomSpace off/on, full manifest/object and native failure contract | RoomSpace off; no N3 catch installed |
-| P8 frame recovery | new `renderer_recovery.*`, likely randy/GUI integration; exact frame-owner hook **TBD** | P2/P4 and proven owner/reset contract | corrupted driver/device/locks after continuation | cleanup postcondition, subsequent-frame integrity, circuit breaker, long soak | recovery off; next fault dumps normally; process restart for active patch changes |
+| P8 frame/device recovery | future `frame_state.*`, `device_generation.*`, recovery coordinator; exact frame/Present owners **TBD** | P2.5 complete closure, P4 validation, proven owner/reset/recreate | false rollback after submit, corrupted driver/device/locks, stale wrappers | submission transition proof, exact unwind, device recreate/generation/resource restore, subsequent Present, long soak | recovery off; poisoned device restarts unless recreate is proven |
 
 ## Files expected to remain unchanged initially
 
@@ -419,11 +510,13 @@ proof.
 
 ## Explicit non-goals
 
-- replacing AO's renderer;
+- rewriting/replacing AO's renderer (a proof-gated API compatibility boundary
+  is not an engine rewrite);
+- deploying a partial graphics COM proxy;
 - disabling client integrity checks;
 - modifying NVIDIA/system DLLs;
 - generic SEH/VEH crash swallowing;
 - global vtable scanning;
 - global heap interception;
 - arbitrary geometry caps;
-- combining stream and renderer recovery without identity evidence.
+- combining Gamecode/resource and renderer recovery without identity evidence.
