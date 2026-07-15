@@ -35,8 +35,9 @@ namespace ZoneEngine.Core.Mail
     /// <summary>
     /// In-memory mail store. Postage capture 20260714-182726. Take All delivers credits/items.
     /// Envelope HUD uses UnreadMailCount (unread only).
-    /// Wire TimeField is days since 1970-01-01 (GUI boost date → "YYYY-Mon-DD 00:00");
-    /// inbox Expires column is Sent + 2 days. Server drops mail after MailRetentionDays.
+    /// Wire TimeField is unused (0) on live Market receive capture; Sent/Expires are unix
+    /// seconds in the list ints after Subject. ExtendedField64 carries credits/COD. Expires = Sent + 2 days
+    /// for ordinary player mail (Credit delivery capture); server drops after MailRetentionDays.
     /// </summary>
     internal static class MailRuntimeService
     {
@@ -886,24 +887,24 @@ namespace ZoneEngine.Core.Mail
 
         private static MailListEntry ToListEntry(StoredMail mail, bool summary)
         {
-            int credits = mail.Credits > 0 ? mail.Credits : 0;
-            int cod = mail.Credits < 0 ? -mail.Credits : 0;
+            // Capture 20260715-Recive-mail-datetime-stamp (live Market mail):
+            //   TimeField = 0
+            //   wire after Subject: Sent unix (UTC) then Expire unix (Sent+2d for player/COD mail)
+            //   FlagsField = 0x7C base; bit0 marks read
+            //   ExtendedField64 = signed money (+gift / -COD), not the Sent/Expire slots
+            int sentUnix = ToMailUnixSeconds(mail.SentAt);
+            int expireUnix = sentUnix + (MailRetentionDays * 86400);
+            int flags = 0x7C | (mail.IsRead ? 1 : 0);
 
-            // GUI MailMessageWindow +0x11c (= MailMessage +0x64 ExtendedField64) drives
-            // Credits/COD TextInputs and ConfirmTakeMailItems: positive = gift credits,
-            // negative = COD to pay. CreditsField/CodField still written for list wire.
-            // FlagsField: bit0 marks read so inbox shows open envelope after open/Take All.
-            // ExtendedField74: stack count for ItemSlotView (avoid template MaxEnergy overlay).
-            int sentDay = mail.SentDayNumber > 0 ? mail.SentDayNumber : ToMailTimeField(mail.SentAt);
             return new MailListEntry
             {
                 MailId = unchecked((ulong)(uint)mail.MailId),
-                TimeField = sentDay,
+                TimeField = 0,
                 From = mail.SenderName ?? string.Empty,
                 Subject = mail.Subject ?? string.Empty,
-                CreditsField = credits,
-                CodField = cod,
-                FlagsField = mail.IsRead ? 1 : 0,
+                CreditsField = sentUnix,
+                CodField = expireUnix,
+                FlagsField = flags,
                 IsSummary = summary,
                 ExtendedField64 = mail.Credits,
                 AcgLow = mail.AcgLow,
@@ -915,10 +916,45 @@ namespace ZoneEngine.Core.Mail
         }
 
         /// <summary>
-        /// GUI inbox formats TimeField with boost::posix_time as a calendar day
-        /// ("YYYY-Mon-DD 00:00"). Value is whole days since 1970-01-01 (local arrival date).
-        /// Inbox Expires column is client-side Sent + MailRetentionDays (2).
-        /// Do not send unix seconds / FILETIME — those render as 1970-Jan-01.
+        /// Live Sent/Expires wire ints are UTC unix seconds (capture Credit delivery + Market).
+        /// </summary>
+        private static int ToMailUnixSeconds(DateTime localOrUnspecified)
+        {
+            DateTime utc;
+            if (localOrUnspecified.Kind == DateTimeKind.Utc)
+            {
+                utc = localOrUnspecified;
+            }
+            else if (localOrUnspecified.Kind == DateTimeKind.Local)
+            {
+                utc = localOrUnspecified.ToUniversalTime();
+            }
+            else
+            {
+                utc = DateTime.SpecifyKind(localOrUnspecified, DateTimeKind.Local).ToUniversalTime();
+            }
+
+            if (utc.Year < 1970)
+            {
+                utc = DateTime.UtcNow;
+            }
+
+            long seconds = (long)(utc - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+            if (seconds < 0)
+            {
+                return 0;
+            }
+
+            if (seconds > int.MaxValue)
+            {
+                return int.MaxValue;
+            }
+
+            return (int)seconds;
+        }
+
+        /// <summary>
+        /// Kept for SentDayNumber snapshot / purge helpers; UI Sent/Expires use unix wire ints.
         /// </summary>
         private static int ToMailTimeField(DateTime localOrUnspecified)
         {
@@ -933,7 +969,6 @@ namespace ZoneEngine.Core.Mail
                 local = DateTime.Now;
             }
 
-            // Local calendar arrival day → day-number since 1970-01-01.
             DateTime arrivalDay = local.Date;
             DateTime epochDay = new DateTime(1970, 1, 1);
             int days = (int)(arrivalDay - epochDay).TotalDays;

@@ -24,8 +24,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         public ulong MailId { get; set; }
 
         /// <summary>
-        /// Sent date as whole days since 1970-01-01 (GUI boost date; shows YYYY-Mon-DD 00:00).
-        /// Inbox Expires column is this value + 2 days.
+        /// First int after id. Live Market receive capture keeps this 0; Sent/Expires use the
+        /// wire ints historically named CreditsField/CodField (unix seconds).
         /// </summary>
         public int TimeField { get; set; }
 
@@ -33,10 +33,21 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         public string Subject { get; set; }
 
+        /// <summary>
+        /// Legacy name: wire int after Subject. Live capture 20260715-Recive-mail-datetime-stamp:
+        /// this is Sent unix time (UTC seconds), NOT gift credits. Credits are ExtendedField64.
+        /// </summary>
         public int CreditsField { get; set; }
 
+        /// <summary>
+        /// Legacy name: wire int after Sent. Live capture: Expires unix time (UTC seconds),
+        /// typically Sent + 2 days. Not COD amount — COD is negative ExtendedField64.
+        /// </summary>
         public int CodField { get; set; }
 
+        /// <summary>
+        /// Live Market mail used 0x7C in this capture. bit0 = read icon.
+        /// </summary>
         public int FlagsField { get; set; }
 
         /// <summary>True = inbox list row (wire byte 1). False = full detail (byte 0 + body/item).</summary>
