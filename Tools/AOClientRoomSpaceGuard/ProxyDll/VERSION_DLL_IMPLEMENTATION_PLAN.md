@@ -355,29 +355,45 @@ Plain-HAL normalization (`randy31 +0x43B99`) remains independently gated. Test
 it separately because it changes renderer selection rather than containing an
 exception.
 
-### P5 — Gamecode deserialization repair proof
+### P5 — Gamecode waypoint deserialization repair
+
+BinaryStream is not the root cause of this family. The root is Gamecode's
+fixed-array waypoint deserialization. Validate this Gamecode corruption repair
+before adding any downstream allocator or ResourceManager behavior. Renderer
+virtualization remains independently necessary for the separately proven
+GUI/randy/NVIDIA defects and is not replaced by P5.
 
 Target family: crash-report logical `BinaryStream.dll+0xB1D`, now proven to be
 `BinaryStream::operator>>(float*)` actual `+0x1B14..+0x1B37` initializing a
 caller-supplied output pointer.
 
-Proven producer path: Gamecode `+0x7A910..+0x7A962` reads a count into
-`object+0x19C`, loops over three floats per 12-byte entry at `object+0x1A0`, and
-checks the 30-entry limit only after the loop. PID 29984 proves the runaway
-destination state.
+The object is `SimpleCharFullUpdateIIR_t`; flag `0x00010000` is HasWaypoints.
+C/new `+0x7A913` and D/old `+0x79641` read a signed int32 count into
+`object+0x19C`, then write three floats per 12-byte record at
+`object+0x1A0`. The array has exactly 30 records. The post-loop comparison with
+30 only controls zero-fill and never rejects an excessive count.
 
-Remaining proof sequence:
+The observed N3 failure contract is proven for both profiles: deserializer
+failure `1` makes Construct delete the partial object and return null;
+AddNetworkMessage destroys the temporary stream and abandons the remaining
+buffer before publication. The selected repair design is a five-byte direct
+detour at C `+0x7A91D` / D `+0x7964B`, preserving counts `<=30` and returning
+through the native failure tail for positive counts above 30. Exact caller
+return must match C `N3+0xB735` / D `N3+0x9C18` before consume-nothing
+rejection is allowed.
 
-1. identify the enclosing object/message type and malformed-count producer;
-2. prove the immediate post-count/pre-loop branch ABI;
-3. prove how the entire malformed object's remaining payload is consumed or
-   discarded without desynchronizing later stream reads;
-4. prove partial state is never published and ownership is released exactly
-   once;
-5. reproduce oversize, byte-order-wrong, truncated, and valid 0/1/30-entry
-   cases;
-6. implement checked pre-loop whole-object rejection only after the native
-   failure contract is known.
+Remaining implementation sequence:
+
+1. add isolated emitted-x86 tests for both exact Gamecode/N3 profiles;
+2. prove caller-return near misses pass through and all accepted branches are
+   native-equivalent;
+3. integrate an all-or-nothing patch transaction with thread-IP exclusion and
+   verified rollback;
+4. add bounded deferred diagnostics, diagnostic-only mode, feature flag, and
+   kill switch without hook-path I/O or lookup;
+5. run the malformed, short-read, C/D, publication, retry, performance, and soak
+   matrix in `GAMECODE_OVERFLOW_VALIDATION.md`;
+6. implement production behavior only after every gate passes.
 
 Expected future files, after proof:
 
@@ -387,7 +403,8 @@ src/dllmain.cpp
 Build-Package.cmd
 ```
 
-Do not clamp the count and continue, change BinaryStream capacity/growth,
+Current outcome is **B: repair design proven, implementation blocked**. Do not
+clamp the count and continue, change BinaryStream capacity/growth,
 unconditionally reallocate, use guard-page recovery, or “write and continue.”
 Any independent BinaryStream capacity investigation requires a separate proven
 crash family.
@@ -471,7 +488,7 @@ proof.
 | P2.5 COM closure | future dedicated `graphics_compatibility/` modules and isolated tests; Cheetah D3D9 plus all randy/DisplaySystem DDRAW creation/return sites | complete IID/return/storage/release inventory | raw-interface escape, split COM identity, refcount/use-after-free, stale generation | stable IUnknown identity; exact QI/AddRef/Release; thread/race tests; no raw descendant in exhaustive used-method tests | do not deploy partial proxy; isolated code remains disconnected |
 | P3 control flow | new `control_flow_validation.*`, likely `gui_rect_fix.cpp` or `randy_color_fix.cpp`, `self_test.cpp`; hook RVA **TBD pending dump/static proof** | P2 manifest/evidence | generic target filter or wrong return/cleanup | exact call bytes/ABI, initial transfer proof, two matching records or deterministic reproduction | feature remains off until proven; exact transaction rollback afterward |
 | P4 AO render validation | new `render_validation.*`, `randy_color_fix.cpp`, module catalog/self-tests; primary site randy `+0x219B4`, earlier typed site TBD | P1/P2; P3 if virtual dispatch used | false object rejection, visual loss, hot-path regression | allocation-derived checks only; exact/near-miss tests; cross-driver soak | disable L2 validator; retain diagnostic/exact L1 independently |
-| P5 Gamecode deserialize | future `gamecode_deserialization.*`; count extraction and loop `Gamecode+0x7A910..+0x7A962`, BinaryStream output initializer `+0x1B1D` | P0.4/module manifest; exact loop proof complete | clamping desynchronizes stream; partial object publication or wrong release | enclosing message type, whole-object reject/consume/failure/ref contract; valid 0/1/30 and malformed tests | diagnostic off; no behavior until full contract; never change stream capacity for F13 |
+| P5 Gamecode deserialize | future `gamecode_waypoint_guard.*`; C hook `+0x7A91D`, D hook `+0x7964B`; exact native failure tails and N3 caller returns | P0.4/module manifest; type/layout/Strategy D owner contract proven | wrong caller, partial transaction, ABI drift, hot-path logging, retry/publication regression | exact emitted C/D contexts, caller near misses, rollback injection, count/malformed stream, no-publication, runtime/FPS/soak matrix | diagnostic/behavior off until validation; never clamp or change BinaryStream capacity |
 | P6 resource publication | `resource_diagnostics.*`, `evidence_logger.*`; notifier `ResourceManager+0x3D7B`, worker call `+0x40F6`; lab verifier outside package | request destruction/ref/publication proof; P5 identity only if actually linked | missed waiter, ref leak/double free, lifetime race, false causal merge | destruction/clear site and native waiter failure/retry/refcount tests; otherwise families remain separate | disable diagnostics; never skip notification or catch allocator fault |
 | P7 N3 initialization | `dllmain.cpp`, `roomspace_fix.cpp`, `module_catalog.*`, evidence logger; fault `N3+0x15040`, nearby RoomSpace call `+0x15054` | P0.1 independent RoomSpace flag | catching intentional failure or misattributing proxy | repeated RoomSpace off/on, full manifest/object and native failure contract | RoomSpace off; no N3 catch installed |
 | P8 frame/device recovery | future `frame_state.*`, `device_generation.*`, recovery coordinator; exact frame/Present owners **TBD** | P2.5 complete closure, P4 validation, proven owner/reset/recreate | false rollback after submit, corrupted driver/device/locks, stale wrappers | submission transition proof, exact unwind, device recreate/generation/resource restore, subsequent Present, long soak | recovery off; poisoned device restarts unless recreate is proven |
