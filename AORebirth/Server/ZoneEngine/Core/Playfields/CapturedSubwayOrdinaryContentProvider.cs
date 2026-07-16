@@ -749,26 +749,6 @@ namespace AORebirth.Core.Playfields
                 "20260709-212336",
                 "2026-07-10T02:33:47.2707446Z"),
             new CapturedSubwayOrdinarySpawnDefinition(
-                0x795450A1,
-                "bloodcreeper",
-                25,
-                724,
-                0,
-                70,
-                86,
-                238.607025f, 72.81637f, 35.66259f,
-                0.0f, 0.143367931f, 0.0f, 0.9896694f,
-                (SimpleCharFullUpdateFlags)0x022A4A43,
-                0,
-                "00000000000000000000000003010001000100010001000000020000",
-                0,
-                new CapturedSubwayWaypointDefinition[]
-                {
-                },
-                "",
-                "20260709-222339",
-                "2026-07-10T03:29:20.7195387Z"),
-            new CapturedSubwayOrdinarySpawnDefinition(
                 0x795451C5,
                 "bloodcreeper",
                 24,

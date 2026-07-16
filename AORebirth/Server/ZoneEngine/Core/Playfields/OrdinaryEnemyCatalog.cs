@@ -380,8 +380,32 @@ namespace AORebirth.Core.Playfields
                             : OrdinaryEnemyRuntimeDisposition.Active,
                         source.SourceOwnerIdentity,
                         source.EvidenceCapture,
-                        source.EvidenceTimestamp));
+                        source.EvidenceTimestamp,
+                        string.Equals(
+                            source.ArchetypeKey,
+                            "bloodcreeper",
+                            StringComparison.Ordinal)
+                            ? BloodcreeperSpawnLevelRange()
+                            : null));
             }
+        }
+
+        private static OrdinaryEnemySpawnLevelRange BloodcreeperSpawnLevelRange()
+        {
+            return new OrdinaryEnemySpawnLevelRange(
+                15,
+                25,
+                24,
+                691,
+                33,
+                0,
+                70,
+                83,
+                3,
+                OrdinaryEnemyEvidenceState.Policy,
+                "community-range:docs/generated/enemy_catalog/enemy_catalog.csv;"
+                + "captured-anchor:20260709-222339;"
+                + "focused-combat:20260716-033326,20260716-034104");
         }
 
         private static OrdinaryEnemyAppearanceProfile BuildSupportedAppearance(
@@ -549,13 +573,14 @@ namespace AORebirth.Core.Playfields
             if (monsterData == BloodcreeperMonsterData)
             {
                 // Both completed level-24 official-live fights carried 150 credits.
-                // Keep other Bloodcreeper levels unresolved until identity-correlated evidence exists.
+                // Preserve that value across the configured private level range as policy;
+                // level 24 retains its exact observed rule and evidence.
                 return new OrdinaryEnemyLootProfile(
                     evidence,
                     entries,
-                    OrdinaryEnemyEvidenceState.Observed,
-                    null,
-                    null,
+                    OrdinaryEnemyEvidenceState.Policy,
+                    150,
+                    150,
                     new[]
                         {
                             new OrdinaryEnemyLevelCreditRule(

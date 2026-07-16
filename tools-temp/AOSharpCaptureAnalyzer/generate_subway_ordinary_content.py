@@ -29,6 +29,9 @@ CAPTURE_ARCHETYPE_FILTERS = {
 ARCHETYPE_CAPTURE_FILTERS = {
     "Deranged Shopper": frozenset(("20260710-202132",)),
 }
+ARCHETYPE_SPAWN_IDENTITY_FILTERS = {
+    "Bloodcreeper": frozenset(("(SimpleChar:795451C5)",)),
+}
 OUTPUT = (
     REPO
     / "AORebirth"
@@ -198,6 +201,9 @@ def classify_spawn_candidate(row: dict[str, str]) -> str:
     if row["Name"] not in ARCHETYPES:
         return CANDIDATE_UNSUPPORTED
     if not capture_allows_archetype(row["EvidenceCapture"], row["Name"]):
+        return CANDIDATE_UNSUPPORTED
+    allowed_identities = ARCHETYPE_SPAWN_IDENTITY_FILTERS.get(row["Name"])
+    if allowed_identities is not None and row["Identity"] not in allowed_identities:
         return CANDIDATE_UNSUPPORTED
     return CANDIDATE_ACCEPTED
 

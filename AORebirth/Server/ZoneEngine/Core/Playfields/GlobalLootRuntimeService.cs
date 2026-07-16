@@ -457,9 +457,15 @@ namespace AORebirth.Core.Playfields
         {
             OrdinaryEnemyLevelCreditRule level = loot.LevelCreditRules.FirstOrDefault(x => x.EnemyLevel == targetLevel);
             if (level != null) return CreditsRange(level.MinimumCredits, level.MaximumCredits, LootEvidenceConfidence.ProvenCapture);
-            if (loot.CreditEvidence == OrdinaryEnemyEvidenceState.Observed
+            if ((loot.CreditEvidence == OrdinaryEnemyEvidenceState.Observed
+                 || loot.CreditEvidence == OrdinaryEnemyEvidenceState.Policy)
                 && loot.MinimumCredits.HasValue && loot.MaximumCredits.HasValue)
-                return CreditsRange(loot.MinimumCredits.Value, loot.MaximumCredits.Value, LootEvidenceConfidence.ProvenCapture);
+                return CreditsRange(
+                    loot.MinimumCredits.Value,
+                    loot.MaximumCredits.Value,
+                    loot.CreditEvidence == OrdinaryEnemyEvidenceState.Observed
+                        ? LootEvidenceConfidence.ProvenCapture
+                        : LootEvidenceConfidence.Inferred);
             return new CreditsPolicyDefinition { Mode = CreditsPolicyMode.Unresolved, Evidence = LootEvidenceConfidence.Unresolved };
         }
 

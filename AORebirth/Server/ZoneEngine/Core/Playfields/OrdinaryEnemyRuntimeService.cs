@@ -30,6 +30,8 @@ namespace AORebirth.Core.Playfields
 
         private readonly Action<ICharacter> activateNpc;
 
+        private readonly Random spawnRandom = new Random();
+
         private readonly Dictionary<int, OrdinaryEnemyRuntimeDefinition> activeByRuntimeIdentity =
             new Dictionary<int, OrdinaryEnemyRuntimeDefinition>();
 
@@ -157,10 +159,12 @@ namespace AORebirth.Core.Playfields
         {
             runtimeIdentity = Identity.None;
             var controller = new NPCController();
+            OrdinaryEnemySpawnVariant variant = spawn.SelectVariant(this.spawnRandom.Next);
             Character character = this.ConstructCharacter(
                 playfield,
                 playfieldIdentity,
                 spawn,
+                variant,
                 profile,
                 controller);
             if (character == null)
@@ -171,7 +175,7 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            ApplyStats(character, spawn, profile);
+            ApplyStats(character, variant, profile);
             ApplyAppearance(character, profile);
             this.ApplyMovement(character, controller, spawn);
 
@@ -209,12 +213,13 @@ namespace AORebirth.Core.Playfields
                 DebugInfoDetail.Engine,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Ordinary enemy spawned sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} profile={2} name={3} monsterData={4} position=({5},{6},{7}) combatModel={8} combatReady={9}",
+                    "Ordinary enemy spawned sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} profile={2} name={3} monsterData={4} level={5} position=({6},{7},{8}) combatModel={9} combatReady={10}",
                     spawn.SourceIdentity,
                     character.Identity,
                     profile.ProfileKey,
                     profile.DisplayName,
                     profile.MonsterData,
+                    variant.Level,
                     spawn.X,
                     spawn.Y,
                     spawn.Z,
@@ -227,6 +232,7 @@ namespace AORebirth.Core.Playfields
             Playfield playfield,
             Identity playfieldIdentity,
             OrdinaryEnemySpawnDefinition spawn,
+            OrdinaryEnemySpawnVariant variant,
             OrdinaryEnemyProfile profile,
             NPCController controller)
         {
@@ -239,7 +245,7 @@ namespace AORebirth.Core.Playfields
                     new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z },
                     new AORebirth.Core.Vector.Quaternion(0, 0, 0, 1),
                     controller,
-                    spawn.Level);
+                    variant.Level);
             }
             else
             {
@@ -326,7 +332,7 @@ namespace AORebirth.Core.Playfields
 
         private static void ApplyStats(
             Character character,
-            OrdinaryEnemySpawnDefinition spawn,
+            OrdinaryEnemySpawnVariant variant,
             OrdinaryEnemyProfile profile)
         {
             OrdinaryEnemyAppearanceProfile appearance = profile.Appearance;
@@ -341,19 +347,19 @@ namespace AORebirth.Core.Playfields
             SetMobStat(character, StatIds.npcfamily, appearance.NpcFamily, profile.ConstructionMode);
             SetMobStat(character, StatIds.losheight, appearance.NpcLosHeight, profile.ConstructionMode);
             SetMobStat(character, StatIds.monsterdata, profile.MonsterData, profile.ConstructionMode);
-            SetMobStat(character, StatIds.monsterscale, spawn.MonsterScale, profile.ConstructionMode);
+            SetMobStat(character, StatIds.monsterscale, variant.MonsterScale, profile.ConstructionMode);
             SetMobStat(character, StatIds.visualflags, appearance.VisualFlags, profile.ConstructionMode);
             SetMobStat(character, StatIds.currentmovementmode, (int)MoveModes.Run, profile.ConstructionMode);
             SetMobStat(character, StatIds.prevmovementmode, (int)MoveModes.Run, profile.ConstructionMode);
-            SetMobStat(character, StatIds.runspeed, spawn.RunSpeed, profile.ConstructionMode);
+            SetMobStat(character, StatIds.runspeed, variant.RunSpeed, profile.ConstructionMode);
             SetMobStat(character, StatIds.profession, 1, profile.ConstructionMode);
             SetMobStat(character, StatIds.titlelevel, 1, profile.ConstructionMode);
-            SetMobStat(character, StatIds.level, spawn.Level, profile.ConstructionMode);
-            SetMobStat(character, StatIds.life, spawn.Health, profile.ConstructionMode);
+            SetMobStat(character, StatIds.level, variant.Level, profile.ConstructionMode);
+            SetMobStat(character, StatIds.life, variant.Health, profile.ConstructionMode);
             SetMobStat(
                 character,
                 StatIds.health,
-                Math.Max(0, spawn.Health - spawn.HealthDamage),
+                Math.Max(0, variant.Health - variant.HealthDamage),
                 profile.ConstructionMode);
             if (profile.ConstructionMode == OrdinaryEnemyConstructionMode.CapturedDirect)
             {

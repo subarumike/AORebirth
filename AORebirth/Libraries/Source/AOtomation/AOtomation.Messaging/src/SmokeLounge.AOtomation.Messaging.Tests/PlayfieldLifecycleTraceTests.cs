@@ -1958,9 +1958,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CountOccurrences(providerText, "            new CapturedSubwayOrdinaryArchetypeDefinition("),
                 "The eleven ordinary families must retain twelve captured visual/template variants because Workman and Architect Striker differ.");
             Assert.AreEqual(
-                137,
+                136,
                 CountOccurrences(providerText, "            new CapturedSubwayOrdinarySpawnDefinition("),
-                "The completed capture survey must register all 137 spatially deduplicated ordinary spawn positions.");
+                "The completed capture survey must register all 136 spatially deduplicated ordinary spawn positions.");
 
             string[] restoredOrdinarySourceInstances =
                 {
@@ -2038,7 +2038,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 catalogText.Contains("OrdinaryEnemyConstructionMode.CapturedDirect")
                 && orchestratorText.Contains("if (profile.ConstructionMode == OrdinaryEnemyConstructionMode.TemplateBacked)")
                 && orchestratorText.Contains("Pool.Instance.GetFreeInstance<Character>")
-                && orchestratorText.Contains("ApplyStats(character, spawn, profile)")
+                && orchestratorText.Contains("ApplyStats(character, variant, profile)")
                 && orchestratorText.Contains("ApplyAppearance(character, profile)")
                 && orchestratorText.Contains("OrdinaryEnemyRuntimeRegistry.Register")
                 && orchestratorText.Contains("character.Stats.SetBaseValueWithoutTriggering("),
@@ -2096,8 +2096,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.IsTrue(
-                providerText.Contains("0x795450A1")
-                && providerText.Contains("0x795451C5")
+                providerText.Contains("0x795451C5")
+                && !providerText.Contains("0x795450A1")
+                && catalogText.Contains("BloodcreeperSpawnLevelRange()")
+                && catalogText.Contains("new OrdinaryEnemySpawnLevelRange(")
+                && catalogText.Contains("                15,")
+                && catalogText.Contains("                25,")
+                && catalogText.Contains("                24,")
+                && catalogText.Contains("                691,")
+                && catalogText.Contains("                33,")
+                && profileText.Contains("internal sealed class OrdinaryEnemySpawnVariant")
+                && profileText.Contains("internal sealed class OrdinaryEnemySpawnLevelRange")
+                && profileText.Contains("return this.Resolve(this.MinimumLevel + offset);")
+                && orchestratorText.Contains("OrdinaryEnemySpawnVariant variant = spawn.SelectVariant(this.spawnRandom.Next);")
+                && orchestratorText.Contains("ApplyStats(character, variant, profile);")
                 && catalogText.Contains("BloodcreeperAutomaticAggroRadius = 7.0")
                 && catalogText.Contains("BloodcreeperPrivateRespawnSeconds = 240.0")
                 && catalogText.Contains("OrdinaryEnemyEvidenceState.Policy")
@@ -2105,6 +2117,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && populationText.Contains("row.HasRespawnDelay ? WorldRespawnMode.FixedDelay : WorldRespawnMode.None")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(")
                 && catalogText.Contains("\"20260716-033326,20260716-034104\"")
+                && globalLootText.Contains("loot.CreditEvidence == OrdinaryEnemyEvidenceState.Policy")
+                && globalLootText.Contains("LootEvidenceConfidence.Inferred")
                 && combatContractText.Contains("CapturedSubwayBloodcreeperSpitInitialSeconds")
                 && combatContractText.Contains("CapturedSubwayBloodcreeperBiteInitialSeconds")
                 && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperBiteMinimumDamage = 21")
@@ -2114,7 +2128,62 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperBiteLowTemplate = 121091")
                 && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperSpitLowTemplate = 121094")
                 && corpseRulesText.Contains("{ 30379, 26978 }"),
-                "Bloodcreeper must retain its two captured spawns, proactive aggro, dual rolled natural attacks, exact corpse visual, and level-24 credit evidence.");
+                "Bloodcreeper must retain one ranged-level spawn, proactive aggro, dual rolled natural attacks, exact corpse visual, and captured-plus-policy credit handling.");
+        }
+
+        [TestMethod]
+        public void BloodcreeperSingleSpawnRollsInclusiveDocumentedLevelRange()
+        {
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider());
+            OrdinaryEnemySpawnDefinition[] bloodcreeperSpawns = catalog.GetSpawns()
+                .Where(row => row.SourceIdentity == 0x795451C5)
+                .ToArray();
+            Assert.AreEqual(1, bloodcreeperSpawns.Length, "Bloodcreeper must use one runtime spawn row.");
+
+            OrdinaryEnemySpawnDefinition bloodcreeperSpawn = bloodcreeperSpawns[0];
+            Assert.IsNotNull(bloodcreeperSpawn.LevelRange, "Bloodcreeper must declare a reusable level range.");
+            Assert.AreEqual(15, bloodcreeperSpawn.LevelRange.MinimumLevel);
+            Assert.AreEqual(25, bloodcreeperSpawn.LevelRange.MaximumLevel);
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Policy, bloodcreeperSpawn.LevelRange.EvidenceState);
+
+            OrdinaryEnemySpawnVariant minimum = bloodcreeperSpawn.SelectVariant(
+                levelCount =>
+                    {
+                        Assert.AreEqual(11, levelCount);
+                        return 0;
+                    });
+            Assert.AreEqual(15, minimum.Level);
+            Assert.AreEqual(394, minimum.Health);
+            Assert.AreEqual(56, minimum.RunSpeed);
+            Assert.AreEqual(70, minimum.MonsterScale);
+
+            OrdinaryEnemySpawnVariant maximum = bloodcreeperSpawn.SelectVariant(levelCount => levelCount - 1);
+            Assert.AreEqual(25, maximum.Level);
+            Assert.AreEqual(724, maximum.Health);
+            Assert.AreEqual(86, maximum.RunSpeed);
+            Assert.AreEqual(70, maximum.MonsterScale);
+
+            int roll = 0;
+            int[] offsets = { 2, 8 };
+            OrdinaryEnemySpawnVariant firstRoll = bloodcreeperSpawn.SelectVariant(levelCount => offsets[roll++]);
+            OrdinaryEnemySpawnVariant secondRoll = bloodcreeperSpawn.SelectVariant(levelCount => offsets[roll++]);
+            Assert.AreEqual(17, firstRoll.Level);
+            Assert.AreEqual(23, secondRoll.Level);
+            Assert.AreNotEqual(firstRoll.Level, secondRoll.Level, "Separate spawn calls must reroll the level.");
+
+            OrdinaryEnemyProfile profile = catalog.GetProfiles()
+                .Single(value => value.MonsterData == 30379);
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Policy, profile.Loot.CreditEvidence);
+            Assert.AreEqual(150, profile.Loot.MinimumCredits);
+            Assert.AreEqual(150, profile.Loot.MaximumCredits);
+            Assert.IsTrue(
+                profile.Loot.LevelCreditRules.Any(
+                    value => value.EnemyLevel == 24
+                             && value.MinimumCredits == 150
+                             && value.MaximumCredits == 150),
+                "Level 24 must retain the exact repeated capture evidence.");
         }
 
         [TestMethod]
