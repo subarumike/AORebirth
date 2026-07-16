@@ -70,11 +70,31 @@ The separate observed NVIDIA RVA `0x170C490` occurs while
 Lock result and GUI immediately writes through the returned pointer, so turning
 that exception into a null or failed Lock would only move the crash into GUI.
 The proxy therefore does not intercept the Lock itself. It byte-verifies and
-wraps the complete void GUI batch helper called at `GUI.dll +0x152E49`; only the
+wraps the complete void GUI batch helper called at `GUI.dll +0x152E49`. The
 exact NVIDIA `0x170C490`, `EAX=4`, read-from-`0x14` failure unwinds to that
-boundary and skips the current GUI batch. The caller ignores the helper return
-and advances normally. Plain-HAL device normalization remains the pre-fault
-mitigation for this deferred path.
+boundary and skips the current GUI batch. The same boundary also contains the
+verified `GUI.dll +0x150F22` null-lock result: randy returned a low destination
+equal to `0x1C * baseVertex`, and GUI attempted `rep movsd` through it. Before
+discarding either batch, the handler invokes AO's conditional native
+`GetVB(0x144)` unlock and resets the viewport material and selected state blob.
+The null-destination path additionally releases its heap index buffer when one
+was allocated. The caller then advances normally. These scoped guards contain
+the verified deferred failures without changing AO's selected renderer.
+
+This is deliberately not a process-wide "continue every exception" handler.
+Unknown access violations retain the normal crash/dump path because an
+arbitrary failure can occur while AO owns a lock, allocation, or partially
+mutated state. A fault is contained only when its byte signature, live register
+state, helper locals, batch object, viewport, and one of the three state blobs
+prove that the matching native cleanup is safe.
+
+The old-client guards do not query Windows virtual-memory metadata during a
+successful draw or rectangle operation. Draw inputs are checked with bounded
+integer arithmetic and direct first/last probes inside the existing exception
+boundary; the expensive module and byte verification runs only after a fault.
+The rectangle call remains pointed directly at AO's original Utils helper, so
+its proxy handler also runs only when that helper raises the two exact verified
+read faults.
 
 The old GUI repair also verifies the map/tree `find` entry at
 `GUI.dll +0x4F2EF`, its comparator path, and its native not-found tail. If a
@@ -83,14 +103,11 @@ observed pointer `0x8`, the guard writes the tree's own sentinel to the output
 and returns the output pointer exactly as the original not-found branch does.
 Readable keys continue through a trampoline containing the original prologue.
 
-For the verified old-client build, the proxy also normalizes AO's renderer
-selector from its existing T&L HAL mode to its existing plain Direct3D HAL mode
-before the persistent device is created. Plain HAL keeps hardware rasterization
-but moves transformation and lighting into the legacy Direct3D software
-pipeline. The selector, both device GUIDs, and the selection block are all
-byte-verified before this repair is enabled. This is a client-supported renderer
-choice, not a fabricated capability or gameplay limit; the scoped draw guard
-remains a fallback if the NVIDIA rasterization layer still faults.
+For the verified old-client build, the proxy preserves AO's renderer selection.
+Direct3D T&L HAL remains T&L HAL, so hardware transformation and lighting are not
+silently moved into the legacy Direct3D software pipeline. The scoped draw guard
+remains responsible for the verified NVIDIA rasterization faults without
+changing the renderer chosen in AO's launcher.
 
 The crash dump handler does not suppress arbitrary access violations, C++
 exceptions, arbitrary driver faults, stack corruption, or unknown callsite failures.
