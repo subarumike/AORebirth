@@ -233,7 +233,21 @@ namespace AORebirth.Core.Playfields
                     && movementContract.IsCombatReady
                     && movementContract.HasCapturedCombatStopSequence)
                 {
-                    npcController.StopFollowForCapturedCombatRange(target.Coordinates().coordinate);
+                    CombatAttackSource movementAttackSource = this.GetCombatAttackSource(attacker);
+                    AORebirth.Core.Vector.Vector3 movementDestination;
+                    if (!this.playfield.TryResolveCapturedNpcMovementDestination(
+                            attacker,
+                            target,
+                            movementAttackSource.Range,
+                            DateTime.UtcNow,
+                            out movementDestination))
+                    {
+                        movementDestination = attacker.Coordinates().coordinate;
+                    }
+
+                    npcController.StopFollowForCapturedCombatRange(
+                        target.Coordinates().coordinate,
+                        movementDestination);
                 }
 
                 this.pendingCapturedMovementTransitions.Remove(attacker.Identity.Instance);
@@ -269,49 +283,18 @@ namespace AORebirth.Core.Playfields
             if (this.nextCombatTicks.TryGetValue(attacker.Identity.Instance, out nextTick)
                 && nextTick > now)
             {
-                if (this.IsLineOfSightRetryPending(attacker, now))
-                {
-                    return;
-                }
-
                 if (maintainMovementDuringRecharge
-                    && !this.playfield.IsInCombatRange(attacker, target, attackSource.Range))
+                    && (this.playfield.HasActiveNpcChaseNavigation(attacker)
+                        || !this.playfield.IsInCombatRange(attacker, target, attackSource.Range)))
                 {
-                    if (!this.CanApplyNpcDamage(
-                            attacker,
-                            target,
-                            activeCapturedContract,
-                            now))
-                    {
-                        return;
-                    }
-
                     this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
                 }
                 else if (maintainMovementDuringRecharge
                          && attackSource.Range <= NpcCombatAttackRules.MaxMeleeCombatDistance)
                 {
-                    if (!this.CanApplyNpcDamage(
-                            attacker,
-                            target,
-                            activeCapturedContract,
-                            now))
-                    {
-                        return;
-                    }
-
                     this.playfield.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);
                 }
 
-                return;
-            }
-
-            if (!this.CanApplyNpcDamage(
-                    attacker,
-                    target,
-                    activeCapturedContract,
-                    now))
-            {
                 return;
             }
 
@@ -322,6 +305,18 @@ namespace AORebirth.Core.Playfields
                     DateTime.UtcNow + TimeSpan.FromSeconds(NpcCombatAttackRules.OutOfRangeRetrySeconds);
                 return;
             }
+
+            if (!this.CanApplyNpcDamage(
+                    attacker,
+                    target,
+                    activeCapturedContract,
+                    now))
+            {
+                this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
+                return;
+            }
+
+            this.playfield.HoldNpcAtCombatPosition(attacker, target);
 
             if (attackSource.Range <= NpcCombatAttackRules.MaxMeleeCombatDistance)
             {
@@ -403,42 +398,72 @@ namespace AORebirth.Core.Playfields
                     capturedContract == null
                         ? (bool?)null
                         : capturedContract.RequiresDamageLineOfSight);
-            if (!requiresDamageLineOfSight)
-            {
-                this.nextLineOfSightRetryTicks.Remove(attacker.Identity.Instance);
-                return true;
-            }
-
             if (this.IsLineOfSightRetryPending(attacker, utcNow))
             {
                 return false;
             }
 
-            var start = new CollisionPoint3(
-                attacker.RawCoordinates.X,
-                attacker.RawCoordinates.Y,
-                attacker.RawCoordinates.Z);
-            var end = new CollisionPoint3(
-                target.RawCoordinates.X,
-                target.RawCoordinates.Y,
-                target.RawCoordinates.Z);
-            SegmentTriangleHit hit;
-            NpcDamageLineOfSightDecision decision = this.damageLineOfSight.Evaluate(
-                true,
-                start,
-                end,
-                out hit);
-            if (decision == NpcDamageLineOfSightDecision.AllowedClear
-                || decision == NpcDamageLineOfSightDecision.AllowedNotRequired)
+            if (requiresDamageLineOfSight)
             {
-                this.nextLineOfSightRetryTicks.Remove(attacker.Identity.Instance);
-                return true;
+                var start = new CollisionPoint3(
+                    attacker.RawCoordinates.X,
+                    attacker.RawCoordinates.Y,
+                    attacker.RawCoordinates.Z);
+                var end = new CollisionPoint3(
+                    target.RawCoordinates.X,
+                    target.RawCoordinates.Y,
+                    target.RawCoordinates.Z);
+                SegmentTriangleHit hit;
+                NpcDamageLineOfSightDecision decision = this.damageLineOfSight.Evaluate(
+                    true,
+                    start,
+                    end,
+                    out hit);
+                if (decision != NpcDamageLineOfSightDecision.AllowedClear
+                    && decision != NpcDamageLineOfSightDecision.AllowedNotRequired)
+                {
+                    this.nextLineOfSightRetryTicks[attacker.Identity.Instance] =
+                        utcNow + TimeSpan.FromSeconds(NpcCombatAttackRules.OutOfRangeRetrySeconds);
+                    this.LogLineOfSightDenied(attacker, target, decision, hit, utcNow);
+                    return false;
+                }
             }
 
-            this.nextLineOfSightRetryTicks[attacker.Identity.Instance] =
-                utcNow + TimeSpan.FromSeconds(NpcCombatAttackRules.OutOfRangeRetrySeconds);
-            this.LogLineOfSightDenied(attacker, target, decision, hit, utcNow);
-            return false;
+            if (!this.playfield.IsNpcAttackPathTraversable(attacker, target))
+            {
+                this.nextLineOfSightRetryTicks[attacker.Identity.Instance] =
+                    utcNow + TimeSpan.FromSeconds(NpcCombatAttackRules.OutOfRangeRetrySeconds);
+                this.LogNavigationDenied(attacker, target, utcNow);
+                return false;
+            }
+
+            this.nextLineOfSightRetryTicks.Remove(attacker.Identity.Instance);
+            return true;
+        }
+
+        private void LogNavigationDenied(
+            ICharacter attacker,
+            ICharacter target,
+            DateTime utcNow)
+        {
+            DateTime nextDiagnostic;
+            if (this.nextLineOfSightDiagnosticTicks.TryGetValue(
+                    attacker.Identity.Instance,
+                    out nextDiagnostic)
+                && nextDiagnostic > utcNow)
+            {
+                return;
+            }
+
+            this.nextLineOfSightDiagnosticTicks[attacker.Identity.Instance] =
+                utcNow + TimeSpan.FromSeconds(10.0);
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "NpcChaseNavigationAttackDenied attacker={0} target={1} reason=movement-segment-blocked",
+                    attacker.Identity,
+                    target.Identity));
         }
 
         private void LogLineOfSightDenied(
@@ -689,11 +714,6 @@ namespace AORebirth.Core.Playfields
             CapturedEnemyParallelAttackSequenceDefinition sequence = contract.ParallelAttackSequence;
             CapturedEnemyParallelAttackStreamDefinition[] streams = sequence.Streams;
             DateTime now = DateTime.UtcNow;
-            if (!this.CanApplyNpcDamage(attacker, target, contract, now))
-            {
-                return;
-            }
-
             double maximumRange = streams.Max(value => value.Attack.Range);
             if (!this.playfield.IsInCombatRange(attacker, target, maximumRange))
             {
@@ -701,6 +721,13 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (!this.CanApplyNpcDamage(attacker, target, contract, now))
+            {
+                this.playfield.TryMoveNpcIntoCombatRange(attacker, target, maximumRange);
+                return;
+            }
+
+            this.playfield.HoldNpcAtCombatPosition(attacker, target);
             this.playfield.UpdateNpcMeleeFollowHold(attacker, target, maximumRange);
             DateTime[] nextTicks;
             if (!this.startedCapturedParallelAttackClocks.Contains(attacker.Identity.Instance)

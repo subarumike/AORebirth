@@ -72,6 +72,7 @@
     <Compile Include="GenericCmdUseRouteClassifierTests.cs" />
     <Compile Include="InfoPacketTests.cs" />
     <Compile Include="N3RecoveredContractTests.cs" />
+    <Compile Include="NpcChaseNavigationTests.cs" />
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
     <Compile Include="PlayfieldCollisionGeometryTests.cs" />
@@ -158,6 +159,24 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcDamageLineOfSightRuntimeService.cs">
       <Link>NpcDamageLineOfSightRuntimeService.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\BoundedGridChaseRoutePlanner.cs">
+      <Link>BoundedGridChaseRoutePlanner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\ChaseNavigationContracts.cs">
+      <Link>ChaseNavigationContracts.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\NpcChaseNavigationRuntimeService.cs">
+      <Link>NpcChaseNavigationRuntimeService.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\NpcChaseRouteFollower.cs">
+      <Link>NpcChaseRouteFollower.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\NpcChaseRouteState.cs">
+      <Link>NpcChaseRouteState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\Pf127ChaseNavigationProvider.cs">
+      <Link>Pf127ChaseNavigationProvider.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcCorpseLifecycleRules.cs">
       <Link>NpcCorpseLifecycleRules.cs</Link>

@@ -162,6 +162,16 @@ cmd /d /c tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifi
 
 The wrapper builds the test project with the repository's single-node MSBuild settings, locates `vstest.console.exe` through Visual Studio Installer's `vswhere.exe`, and then runs the generated .NET Framework 4.8 test assembly. Do not substitute `dotnet test` for this legacy project.
 
+### NPC Chase Navigation Validation
+
+Run the focused shared/PF127 navigation suite first:
+
+```cmd
+cmd /d /c tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifiedName~SmokeLounge.AOtomation.Messaging.Tests.NpcChaseNavigationTests"
+```
+
+The global owner is `ZoneEngine.Core.Navigation`. PF127 is the first enabled provider and Vergil is its representative end-to-end case; no capture launcher or client injection is part of this deterministic validation. To enable another playfield, first promote authoritative versioned collision/navigation input, add an `IPlayfieldChaseNavigationProvider`, register it in `PlayfieldChaseNavigationProviderFactory`, add representative collision/route/failure/combat tests, and then perform private-client validation. Do not add enemy-specific pathfinding or reuse PF127 assumptions in another playfield.
+
 ## Database
 
 - Use only `cellao_codex_clean`; this is the active legacy database name retained for local compatibility.

@@ -77,6 +77,7 @@ Important files and directories:
 - `AORebirth/Libraries/Source/AORebirth.Core/Inventory`: inventory pages and item movement models.
 - `AORebirth/Server/ZoneEngine/Core/Controllers/PlayerController.cs`: player runtime controller.
 - `AORebirth/Server/ZoneEngine/Core/Controllers/NPCController.cs`: NPC runtime controller and movement/combat behavior.
+- `AORebirth/Server/ZoneEngine/Core/Navigation/`: global hostile-NPC chase capability, bounded route planning/following, route lifecycle state, and playfield navigation-provider contract. PF127 is the first provider; see `docs/project/NPC_CHASE_NAVIGATION.md`.
 - `AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyProfile.cs`, `OrdinaryEnemyCatalog.cs`, and `OrdinaryEnemyRuntimeService.cs`: validated ordinary-enemy type/spawn data and the single shared runtime path. See `docs/project/ORDINARY_ENEMY_RUNTIME.md`.
 - `AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs`: playfield entity registry, combat, death, corpse, loot, despawn, and broad gameplay flow — **do not add new system ecosystems here**; extract to `Core/<System>/` (see `docs/project/SUBSYSTEMS.md`).
 - `AORebirth/Server/ZoneEngine/Core/Mail/`: Mail Terminal runtime + handler subsystem.
@@ -156,3 +157,9 @@ flowchart TB
 - Some current-client packet contracts differ from old AO Rebirth assumptions.
 - Movement and NPC behavior need capture/replay validation before more runtime edits.
 - Tests are mostly smoke/source assertions; they are useful but not full simulation coverage.
+
+## Hostile NPC Chase Navigation
+
+The global navigation boundary is `ZoneEngine.Core.Navigation`, not an enemy or playfield content profile. Existing combat policy requests pursuit through `PlayfieldNpcCombatMovementRuntimeService`; `NpcChaseNavigationRuntimeService` chooses direct movement, a cached provider route, or a fail-closed hold. `IPlayfieldChaseNavigationProvider` supplies authoritative segment checks and route generation without exposing PF127 details to combat code. Valid destinations continue through `NPCController.MoveTo`, preserving server movement cadence and client synchronization.
+
+PF127/resource `127` is currently the only supported provider. It derives a bounded same-elevation grid from the promoted collision geometry and validates every segment against that geometry. Other playfields explicitly remain unsupported and preserve legacy direct chase. See `docs/project/NPC_CHASE_NAVIGATION.md` for exact limits, failure behavior, lifecycle cleanup, validation, and the provider-adoption process.
