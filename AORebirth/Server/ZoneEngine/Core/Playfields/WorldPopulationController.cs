@@ -13,10 +13,14 @@ namespace AORebirth.Core.Playfields
     internal sealed class WorldPopulationController
     {
         private const int MaximumRespawnsPerTick = 32;
+        private const double OrdinaryEnemyDefaultRespawnSeconds = 240.0;
+        private const string OrdinaryEnemyDefaultRespawnPolicyKey = "ordinary.default.240";
         private readonly Playfield playfield;
         private readonly OrdinaryEnemyCatalog catalog;
         private readonly OrdinaryEnemyRuntimeService runtime;
         private readonly WorldRespawnScheduler scheduler;
+        private readonly IDictionary<string, RespawnPolicyDefinition> ordinaryGroupRespawnPolicies;
+        private readonly IPopulationRandomSource respawnRandom;
         private readonly Dictionary<string, WorldSpawnDefinition> definitions = new Dictionary<string, WorldSpawnDefinition>(StringComparer.Ordinal);
         private readonly Dictionary<string, SpawnGroupDefinition> groups = new Dictionary<string, SpawnGroupDefinition>(StringComparer.Ordinal);
         private readonly Dictionary<string, RespawnPolicyDefinition> policies = new Dictionary<string, RespawnPolicyDefinition>(StringComparer.Ordinal);
@@ -25,12 +29,21 @@ namespace AORebirth.Core.Playfields
         private readonly Dictionary<int, string> spawnKeyByRuntimeIdentity = new Dictionary<int, string>();
         private readonly bool diagnosticsEnabled = string.Equals(Environment.GetEnvironmentVariable("AO_REBIRTH_POPULATION_DIAGNOSTICS"), "1", StringComparison.Ordinal);
 
-        internal WorldPopulationController(Playfield playfield, OrdinaryEnemyCatalog catalog, OrdinaryEnemyRuntimeService runtime)
+        internal WorldPopulationController(
+            Playfield playfield,
+            OrdinaryEnemyCatalog catalog,
+            OrdinaryEnemyRuntimeService runtime,
+            IDictionary<string, RespawnPolicyDefinition> ordinaryGroupRespawnPolicies = null,
+            IPopulationRandomSource respawnRandom = null)
         {
             this.playfield = playfield;
             this.catalog = catalog;
             this.runtime = runtime;
             this.scheduler = new WorldRespawnScheduler();
+            this.ordinaryGroupRespawnPolicies = ordinaryGroupRespawnPolicies == null
+                ? new Dictionary<string, RespawnPolicyDefinition>(StringComparer.Ordinal)
+                : new Dictionary<string, RespawnPolicyDefinition>(ordinaryGroupRespawnPolicies, StringComparer.Ordinal);
+            this.respawnRandom = respawnRandom ?? new SystemPopulationRandomSource();
             this.RegisterOrdinaryDefinitions();
         }
 
@@ -61,13 +74,14 @@ namespace AORebirth.Core.Playfields
         internal void RegisterGroup(SpawnGroupDefinition group)
         {
             if (group == null || this.groups.ContainsKey(group.SpawnGroupKey)) throw new InvalidOperationException("Duplicate or missing spawn group: " + (group == null ? "null" : group.SpawnGroupKey));
+            if (!string.IsNullOrWhiteSpace(group.SharedRespawnPolicyKey) && !this.policies.ContainsKey(group.SharedRespawnPolicyKey))
+                throw new InvalidOperationException("Missing shared respawn policy: " + group.SharedRespawnPolicyKey);
             this.groups.Add(group.SpawnGroupKey, group);
         }
 
         internal void RegisterRespawnPolicy(RespawnPolicyDefinition policy)
         {
-            if (policy == null || this.policies.ContainsKey(policy.RespawnPolicyKey)) throw new InvalidOperationException("Duplicate or missing respawn policy: " + (policy == null ? "null" : policy.RespawnPolicyKey));
-            this.policies.Add(policy.RespawnPolicyKey, policy);
+            WorldRespawnPolicyValidator.RegisterOrRejectConflict(this.policies, policy);
         }
 
         internal bool Spawn(string spawnKey)
@@ -84,10 +98,7 @@ namespace AORebirth.Core.Playfields
             foreach (PopulationRuntimeState state in this.states.Values.Where(x => x.PlayfieldId == playfieldId))
             {
                 if (state.CurrentRuntimeIdentity.Instance != 0) this.spawnKeyByRuntimeIdentity.Remove(state.CurrentRuntimeIdentity.Instance);
-                state.CurrentRuntimeIdentity = Identity.None;
-                state.RespawnDueAt = null;
-                state.LifecycleState = PopulationLifecycleState.Despawned;
-                state.LastTransition = DateTime.UtcNow;
+                WorldPopulationGenerationLifecycle.ClearRuntime(state, DateTime.UtcNow);
             }
         }
 
@@ -117,6 +128,9 @@ namespace AORebirth.Core.Playfields
             state.LifecycleState = PopulationLifecycleState.Despawned;
             state.LastTransition = despawnedAtUtc;
             this.ScheduleIfStartMatches(spawnKey, RespawnDelayStartsAt.NpcDespawn, despawnedAtUtc);
+            RespawnPolicyDefinition policy = this.policies[this.definitions[spawnKey].RespawnPolicyKey];
+            if (WorldRespawnScheduler.TryResumePendingAfterRuntimeRelease(this.scheduler, state, policy, despawnedAtUtc))
+                this.Trace("respawn-resumed-after-despawn", state, null);
         }
 
         internal void NotifyCorpseRemoved(Identity corpseIdentity, DateTime removedAtUtc)
@@ -133,7 +147,12 @@ namespace AORebirth.Core.Playfields
             foreach (WorldRespawnSchedule due in this.scheduler.TakeDue(utcNow, MaximumRespawnsPerTick))
             {
                 PopulationRuntimeState state = this.states[due.SpawnKey];
-                if (state.Generation != due.Generation || state.CurrentRuntimeIdentity.Instance != 0) continue;
+                if (state.Generation != due.Generation)
+                {
+                    if (state.RespawnDueAt == due.DueAtUtc) state.RespawnDueAt = null;
+                    continue;
+                }
+                if (state.CurrentRuntimeIdentity.Instance != 0) continue;
                 state.LifecycleState = PopulationLifecycleState.Respawning;
                 state.RespawnDueAt = null;
                 this.Spawn(this.definitions[due.SpawnKey], state, true);
@@ -163,37 +182,67 @@ namespace AORebirth.Core.Playfields
 
         private void RegisterOrdinaryDefinitions()
         {
-            foreach (OrdinaryEnemySpawnDefinition row in this.catalog.GetSpawns().OrderBy(x => x.SourceIdentity))
+            RespawnPolicyDefinition ordinaryDefault = new RespawnPolicyDefinition
             {
-                string policyKey = row.HasRespawnDelay ? "ordinary.fixed." + row.RespawnDelaySeconds.Value.ToString("0.###", CultureInfo.InvariantCulture) : "ordinary.none";
-                if (!this.policies.ContainsKey(policyKey)) this.policies.Add(policyKey, new RespawnPolicyDefinition
+                RespawnPolicyKey = OrdinaryEnemyDefaultRespawnPolicyKey,
+                Mode = WorldRespawnMode.FixedDelay,
+                FixedDelaySeconds = OrdinaryEnemyDefaultRespawnSeconds,
+                RespawnAtOriginalPosition = true,
+                ResetHealth = true,
+                ResetMovementState = true,
+                ResetAggressionState = true,
+                DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
+                Evidence = "PF127 ordinary-enemy project policy; not universal official AO timing",
+                Confidence = "POLICY",
+                Enabled = true
+            };
+            WorldRespawnPolicyValidator.RegisterOrRejectConflict(this.policies, ordinaryDefault);
+            OrdinaryEnemySpawnDefinition[] ordinaryRows = this.catalog.GetSpawns().OrderBy(x => x.SourceIdentity).ToArray();
+            foreach (IGrouping<int, OrdinaryEnemySpawnDefinition> playfieldRows in ordinaryRows.GroupBy(x => x.PlayfieldInstance))
+            {
+                string key = "ordinary.playfield." + playfieldRows.Key;
+                var group = new SpawnGroupDefinition { SpawnGroupKey = key, DisplayName = key, PlayfieldId = playfieldRows.Key,
+                    SpawnKeys = playfieldRows.Select(x => x.SpawnKey).OrderBy(x => x, StringComparer.Ordinal).ToArray(), ActivationPolicy = WorldSpawnActivationPolicy.PlayfieldStart,
+                    MinimumAlive = 0, MaximumAlive = playfieldRows.Count(x => x.Disposition == OrdinaryEnemyRuntimeDisposition.Active), Enabled = true,
+                    Evidence = "ordinary-catalog", Confidence = "CAPTURE_BACKED" };
+                WorldRespawnPolicyResolver.ApplyGroupConfiguration(group, this.ordinaryGroupRespawnPolicies, this.policies);
+                this.groups.Add(key, group);
+            }
+            string unusedGroupPolicy = this.ordinaryGroupRespawnPolicies.Keys.FirstOrDefault(key => !this.groups.ContainsKey(key));
+            if (unusedGroupPolicy != null)
+                throw new InvalidOperationException("Unknown ordinary respawn group configuration: " + unusedGroupPolicy);
+            foreach (OrdinaryEnemySpawnDefinition row in ordinaryRows)
+            {
+                string groupKey = "ordinary.playfield." + row.PlayfieldInstance;
+                WorldRespawnPolicyResolution respawn = WorldRespawnPolicyResolver.Resolve(
+                    WorldPopulationClassification.OrdinaryEnemy,
+                    row.RespawnPolicy,
+                    WorldRespawnPolicyResolver.ResolveGroupAssignment(this.groups[groupKey], this.policies),
+                    ordinaryDefault);
+                if (!respawn.IsValid)
                 {
-                    RespawnPolicyKey = policyKey, Mode = row.HasRespawnDelay ? WorldRespawnMode.FixedDelay : WorldRespawnMode.None,
-                    FixedDelaySeconds = row.RespawnDelaySeconds, RespawnAtOriginalPosition = true, ResetHealth = true,
-                    ResetMovementState = true, ResetAggressionState = true, DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
-                    Evidence = row.SourceCapture, Confidence = row.RespawnEvidence.ToString(), Enabled = true
-                });
+                    throw new InvalidOperationException(
+                        "Ordinary enemy respawn policy failed closed: " + row.SpawnKey);
+                }
+
+                RespawnPolicyDefinition resolvedPolicy = respawn.Policy;
+                WorldRespawnPolicyValidator.RegisterOrRejectConflict(this.policies, resolvedPolicy);
                 var definition = new WorldSpawnDefinition
                 {
                     SpawnKey = row.SpawnKey, EnemyProfileKey = row.ProfileKey,
                     ConfiguredIdentity = new Identity { Type = IdentityType.CanbeAffected, Instance = row.SourceIdentity },
                     PlayfieldId = row.PlayfieldInstance, X = row.X, Y = row.Y, Z = row.Z,
                     OrientationX = row.HeadingX, OrientationY = row.HeadingY, OrientationZ = row.HeadingZ, OrientationW = row.HeadingW,
-                    SpawnGroupKey = "ordinary.playfield." + row.PlayfieldInstance, RespawnPolicyKey = policyKey,
+                    SpawnGroupKey = groupKey,
+                    RespawnPolicyKey = resolvedPolicy.RespawnPolicyKey,
                     ActivationPolicy = WorldSpawnActivationPolicy.PlayfieldStart,
+                    Classification = WorldPopulationClassification.OrdinaryEnemy,
                     Enabled = row.Disposition == OrdinaryEnemyRuntimeDisposition.Active,
                     Quarantined = row.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined,
                     Evidence = row.SourceCapture, Confidence = "CAPTURE_BACKED", Source = row.SourceOwnerIdentity
                 };
                 this.definitions.Add(definition.SpawnKey, definition); this.ordinaryRows.Add(definition.SpawnKey, row);
                 this.states.Add(definition.SpawnKey, NewState(definition));
-            }
-            foreach (IGrouping<int, WorldSpawnDefinition> playfieldRows in this.definitions.Values.GroupBy(x => x.PlayfieldId))
-            {
-                string key = "ordinary.playfield." + playfieldRows.Key;
-                this.groups.Add(key, new SpawnGroupDefinition { SpawnGroupKey = key, DisplayName = key, PlayfieldId = playfieldRows.Key,
-                    SpawnKeys = playfieldRows.Select(x => x.SpawnKey).OrderBy(x => x, StringComparer.Ordinal).ToArray(), ActivationPolicy = WorldSpawnActivationPolicy.PlayfieldStart,
-                    MinimumAlive = 0, MaximumAlive = playfieldRows.Count(x => x.Enabled), Enabled = true, Evidence = "ordinary-catalog", Confidence = "CAPTURE_BACKED" });
             }
             WorldPopulationDefinitionValidator.Validate(this.definitions.Values, this.groups.Values, this.policies.Values, this.catalog.GetProfiles().Select(x => x.ProfileKey));
         }
@@ -205,25 +254,30 @@ namespace AORebirth.Core.Playfields
             int alive = group.SpawnKeys.Count(x => this.states[x].LifecycleState == PopulationLifecycleState.Alive);
             if (!group.Enabled || alive >= group.MaximumAlive) return;
             state.LifecycleState = respawn ? PopulationLifecycleState.Respawning : PopulationLifecycleState.Spawning;
+            state.SelectedLevel = null;
+            int nextGeneration = checked(state.Generation + 1);
             Identity runtimeIdentity;
-            if (!this.runtime.SpawnFromPopulation(this.playfield, this.playfield.Identity, this.ordinaryRows[definition.SpawnKey], out runtimeIdentity))
+            OrdinaryEnemySpawnGeneration selectedGeneration;
+            if (!this.runtime.SpawnFromPopulation(
+                this.playfield,
+                this.playfield.Identity,
+                this.ordinaryRows[definition.SpawnKey],
+                nextGeneration,
+                out runtimeIdentity,
+                out selectedGeneration))
             {
                 state.LifecycleState = PopulationLifecycleState.Failed; state.FailureState = "ordinary-runtime-spawn-failed"; state.LastTransition = DateTime.UtcNow; return;
             }
-            state.CurrentRuntimeIdentity = runtimeIdentity; state.SpawnedAt = DateTime.UtcNow; state.Generation++; state.LifecycleState = PopulationLifecycleState.Alive;
-            state.LastTransition = state.SpawnedAt.Value; state.FailureState = null; state.CorpseIdentity = Identity.None; this.spawnKeyByRuntimeIdentity[runtimeIdentity.Instance] = definition.SpawnKey;
+            WorldPopulationGenerationLifecycle.ApplySpawnSuccess(state, runtimeIdentity, selectedGeneration, DateTime.UtcNow);
+            this.spawnKeyByRuntimeIdentity[runtimeIdentity.Instance] = definition.SpawnKey;
             this.Trace(respawn ? "respawn-completed" : "spawn-success", state, null);
         }
 
         private void ScheduleIfStartMatches(string spawnKey, RespawnDelayStartsAt start, DateTime startedAtUtc)
         {
             RespawnPolicyDefinition policy = this.policies[this.definitions[spawnKey].RespawnPolicyKey];
-            if (!policy.Enabled || policy.Mode == WorldRespawnMode.None || policy.DelayStartsAt != start) return;
-            if (policy.Mode == WorldRespawnMode.Scripted || policy.Mode == WorldRespawnMode.Unresolved) return;
             PopulationRuntimeState state = this.states[spawnKey];
-            DateTime due = startedAtUtc.Add(WorldRespawnScheduler.SelectDelay(policy, null));
-            if (!this.scheduler.Schedule(new WorldRespawnSchedule { SpawnKey = spawnKey, GroupKey = state.SpawnGroupKey, PlayfieldId = state.PlayfieldId, DueAtUtc = due, Generation = state.Generation })) return;
-            state.RespawnDueAt = due; state.LifecycleState = PopulationLifecycleState.WaitingForRespawn; state.LastTransition = startedAtUtc; this.Trace("respawn-scheduled", state, null);
+            if (WorldRespawnScheduler.TryScheduleForLifecycle(this.scheduler, state, policy, start, startedAtUtc, this.respawnRandom)) this.Trace("respawn-scheduled", state, null);
         }
 
         private static PopulationRuntimeState NewState(WorldSpawnDefinition value) { return new PopulationRuntimeState { SpawnKey = value.SpawnKey, SpawnGroupKey = value.SpawnGroupKey,

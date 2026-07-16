@@ -162,6 +162,28 @@ cmd /d /c tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifi
 
 The wrapper builds the test project with the repository's single-node MSBuild settings, locates `vstest.console.exe` through Visual Studio Installer's `vswhere.exe`, and then runs the generated .NET Framework 4.8 test assembly. Do not substitute `dotnet test` for this legacy project.
 
+### Ordinary Enemy Level And Respawn Foundation
+
+Run the deterministic shared-model, policy-resolution, scheduler, generation,
+exception, exclusion, and population-boundary suite with:
+
+```cmd
+cmd /d /c tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifiedName~SmokeLounge.AOtomation.Messaging.Tests.WorldPopulationFoundationTests"
+```
+
+Then run the affected ordinary lifecycle tests with individual focused filters
+before the established broader regression suites. Do not combine multiple
+filters with an unescaped command-shell pipe.
+
+Eligible PF127 ordinary rows inherit the documented 240-second private-project
+policy unless explicit spawn/archetype or group data overrides it. Thief remains
+60 seconds; Filth Flea and Bloodcreeper remain explicit 240-second policies.
+Future live respawn captures identify exceptions or disputed timing; they are
+not required once per ordinary enemy to re-prove the project default. Named,
+boss, scripted, summon, pet, temporary-add, vendor, static, container, and
+quest-owned content must stay with their explicit owners and cannot inherit the
+ordinary policy.
+
 ### NPC Chase Navigation Validation
 
 Run the focused shared/PF127 navigation suite first:

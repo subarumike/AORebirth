@@ -2,29 +2,67 @@
 
 ## Current Focus
 
-Bloodcreeper is now activated through the shared PF127 ordinary-enemy runtime from completed official-live captures. Private-client validation is next.
+The shared ordinary-enemy level and respawn foundation is complete for PF127.
+The next Subway task should use this foundation to finish the next ordinary
+enemy from the existing capture corpus rather than adding another bespoke
+runtime path.
 
 ## Done in this slice
 
-- Capture survey `20260709-222339` supplies the level-24 Bloodcreeper appearance/patrol row and the captured adjacent level-25 stat point. Mike confirmed there is one Bloodcreeper spawn; the second survey identity is stat-progression evidence, not another population row.
-- Fight captures `20260716-033326` and `20260716-034104` prove proactive aggro, chase/retarget behavior, and independent Skinspider Bite (`SKW1`) and Skinspider Spit (`SKW2`) attack streams.
-- The shared captured combat contract now rolls Bite damage `21..35` and Spit damage `21..41`, with their captured initial delays, roughly `7.4`-second independent cadence, exact special-attack templates, slots, and weapon-instance tags.
-- Bloodcreeper was removed from the named-boss exclusion and regenerated as one ordinary captured-direct spawn. It now rolls an inclusive `L15..L25` level range on every spawn/respawn from the repository's community-documented Bloodcreeper band. The exact captured `L24/691 HP/run 83` and `L25/724 HP/run 86` points establish a derived private progression of `+33 HP` and `+3 run speed` per level; extrapolated `L15..L23` stats are policy, not claims of capture parity.
-- A bounded private-server automatic-aggro radius of `7` units is enabled from the observed acquisition at about `6.25` units.
-- The exact corpse CATMesh `26978` is mapped for MonsterData `30379`. Both level-24 fights prove `150` corpse credits; the same value is retained across the configured private level range as inferred policy so non-level-24 rolls do not lose credits. Item loot remains unresolved.
-- Bloodcreeper uses the explicit private regular-enemy respawn policy of four minutes. This is a close-enough gameplay policy, not a claim of exact official-live timing.
-- The combat evidence analyzer now retains the two new captures and reports both Bloodcreeper attack shapes instead of collapsing them into the older single-slot sample.
-- The generated ordinary-content equivalence check, focused Subway tests, AORebirth.Core/ZoneEngine Debug build, and engine restart pass.
+- All 260 represented Subway population rows now carry a non-null generic level
+  definition. The same 222 rows remain active and the same 38 remain
+  quarantined.
+- Fixed captured rows stay fixed across respawns. Bloodcreeper is the only
+  current inclusive range (`L15..L25`) and selects once per new population
+  generation through the generic data path.
+- Level selection is injectable for deterministic tests. The selected variant
+  and generation are stored in the ordinary runtime definition and are resolved
+  before level-dependent stats and combat preparation.
+- Visibility loss/re-entry, combat reset, corpse transitions, runtime ticks, and
+  navigation cannot reroll a level. Failed materialization retries reuse the
+  selection for the same generation; stale generations fail closed.
+- Eligible ordinary enemies now inherit the centralized 240-second PF127
+  post-NPC-despawn policy unless explicit data overrides it.
+- Explicit policies retain precedence: Thief remains 60 seconds; Filth Flea and
+  Bloodcreeper remain 240 seconds.
+- Named enemies, bosses, scripted encounters, summons, pets, temporary encounter
+  adds, vendors, static objects, containers, quest-owned entities, explicit
+  no-respawn rows, and unsupported classifications cannot inherit the ordinary
+  default.
+- The existing `WorldPopulationController` and `WorldRespawnScheduler` retain
+  generation and scheduling ownership; no second scheduler was added.
+- Deterministic level, respawn-resolution, exclusion, validation, scheduler,
+  population-count, Bloodcreeper, and ordinary-profile tests pass.
+- The generic foundation suite passes `24/24`. The full supported test assembly
+  passes `322/335`; its 13 failures are the established unrelated baseline:
+  three damage-evidence checks, one inventory-ownership guardrail, six
+  session/lifecycle source guardrails, and three visibility-integration source
+  guardrails. The focused lifecycle class remains `53/59` with exactly those six
+  established session/lifecycle failures.
+- The approved Debug build compiles AORebirth.Core and ZoneEngine source. Final
+  ZoneEngine output copy remains blocked only because the running private server
+  holds `Built\Debug\ZoneEngine.exe`; the engine was not stopped for this task.
 
 ## Remaining
 
-1. Private-client validate the single Bloodcreeper spawn, `L15..L25` level reroll, derived HP/run-speed progression, proactive acquisition/chase, varied incoming damage, corpse visual, `150` credits, and four-minute respawn.
-2. Keep Bloodcreeper outside the accepted whole-enemy gate until private validation succeeds and unresolved item-loot handling is explicitly accepted or extended from a larger kill sample.
-3. Do not auto-attach or launch AO/capture tooling. Mike runs gameplay and supplies completed captures when requested.
+1. Private-client validation of Bloodcreeper remains pending; do not describe it
+   as accepted until gameplay confirms the existing spawn/combat/corpse/credit
+   slice and unresolved item-loot handling is explicitly accepted or extended.
+2. Continue whole-enemy acceptance work on the next ordinary Subway archetype
+   using existing captures first. New respawn captures are for proven exceptions
+   or disputed timing, not one capture per ordinary enemy.
+3. Keep level ranges fixed unless existing evidence or an approved design
+   decision establishes an inclusive band.
 
 ## Constraints
 
+- The 240-second ordinary default is a private-project policy, not a claim that
+  every official AO Subway enemy uses the same exact timer.
 - Bloodcreeper is ordinary content, not a unique boss or scripted encounter.
-- Do not turn two observed empty item snapshots into proof of an empty item pool.
-- The official-live respawn delay remains unresolved; the four-minute value is an explicit private-server regular-enemy policy.
-- Existing working Subway combat, loot, corpse, respawn, navigation, and population behavior must remain unchanged.
+- Do not turn two observed empty Bloodcreeper item snapshots into proof of an
+  empty item pool.
+- Do not activate the 38 quarantined rows or populate unresolved loot pools.
+- Existing encounter, pet, vendor, static, quest, navigation, LOS, leash, corpse,
+  loot, and combat ownership remains unchanged.
+- Do not auto-attach or launch AO/capture tooling. Mike runs gameplay and supplies
+  completed captures when requested.
