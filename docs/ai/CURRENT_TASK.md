@@ -2,20 +2,25 @@
 
 ## Current Focus
 
-Mail Sent/Expires timestamps fixed from live capture `20260715-Recive-mail-datetime-stamp`.
+Complete PF127 ranged-enemy behavior after the damage line-of-sight repair: Vergil must route around blocking Subway walls to regain a clear shot instead of remaining stationary behind them.
 
 ## Done in this slice
 
-- Capture truth: list/detail wire ints after Subject are **Sent unix** and **Expire unix** (not credits/COD). Money is `ExtendedField64`. `TimeField` = 0 on live Market mail.
-- Credit-delivery expire = Sent + 2 days; player mail uses the same.
-- Flags base `0x7C`, bit0 = read.
+- Promoted PF127 collision geometry from completed geometry-only safe capture `20260714-185728` into the server content asset.
+- Added fail-closed geometry loading, segment/triangle collision queries, and contract-gated NPC damage line-of-sight checks.
+- Enabled the LOS requirement for Vergil Aeneid without changing unrelated NPC combat contracts.
+- Mike live-validated that Vergil can no longer damage the player through walls and resumes attacking with clear LOS.
+- Added geometry-only capture safety, snapshot/promotion validation, analyzer support, and focused regression coverage.
+- Synced the work with the current remote Mail subsystem and preserved both sets of `ZoneEngine.csproj` entries.
 
 ## Remaining
 
-1. Restart engines; send **new** mail; confirm Sent ≈ now and Expires ≈ +2 days.
-2. Subway when Mike returns that priority.
+1. Implement and validate PF127 chase/path selection around blocking walls without weakening the proven damage LOS gate.
+2. Keep the movement change capture-backed; do not invent a general navigation system from the LOS result alone.
+3. Do not auto-attach or launch AO/capture tooling. Mike runs gameplay and supplies completed captures when requested.
 
 ## Constraints
 
-- Mail in-memory only.
-- Commit Mail before pull; `git pull --no-rebase`.
+- PF127/resource `127` only for the active gameplay slice.
+- The promoted collision asset and LOS gate fail closed when evidence or geometry is missing/invalid.
+- Existing working Subway combat, loot, corpse, respawn, and population behavior must remain unchanged.

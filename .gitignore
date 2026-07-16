@@ -129,6 +129,8 @@ tools-temp/**/__pycache__/
 tools-temp/*.png
 tools-temp/screen-captures/
 tools-temp/worktree-snapshots/
+tools-temp/AOSharpCaptureAnalyzer/snapshots/
+tools-temp/AOSharpCaptureAnalyzer/reviewed/
 tools-temp/db-backups/
 .local/
 __pycache__/

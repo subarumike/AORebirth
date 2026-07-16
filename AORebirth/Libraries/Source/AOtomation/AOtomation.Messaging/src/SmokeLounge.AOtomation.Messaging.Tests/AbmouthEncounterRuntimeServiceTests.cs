@@ -553,7 +553,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Both authoritative raw sinks must auto-flush and increment their parity counters only after a successful write.");
             Assert.IsTrue(
                 captureTool.Contains("private void CaptureNetworkPacketNoThrow(")
-                && captureTool.Contains("RAW-PACKET-CALLBACK-ERROR")
+                && captureTool.Contains("private void OnPacketReceivedBoundary(")
+                && captureTool.Contains("private void OnPacketSentBoundary(")
+                && captureTool.Contains("\"Network.PacketReceived\"")
+                && captureTool.Contains("\"Network.PacketSent\"")
+                && captureTool.Contains("capture-callback-errors.log")
+                && captureTool.Contains("CaptureCallbackBoundarySnapshot callbackHealth")
                 && captureTool.Contains("private void RunRawPacketProjectionStage(")
                 && captureTool.Contains("RAW-PACKET-PROJECTION-ERROR")
                 && captureTool.Contains("if (packetLogWritten || packetIndexWritten)")
@@ -625,16 +630,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 callbackRegistered,
                 StringComparison.Ordinal);
             int run = captureTool.IndexOf("public override void Run(string pluginDir)", StringComparison.Ordinal);
-            int openInactive = captureTool.IndexOf(
-                "this.OpenFreshCaptureSession(pluginDir, true, false);",
+            int initialize = captureTool.IndexOf(
+                "private void Initialize(string pluginDir)",
                 run,
                 StringComparison.Ordinal);
+            int openInactive = captureTool.IndexOf(
+                "this.OpenFreshCaptureSession(pluginDir, true, false);",
+                initialize,
+                StringComparison.Ordinal);
             int subscribeInbound = captureTool.IndexOf(
-                "Network.PacketReceived += this.OnPacketReceived;",
+                "Network.PacketReceived += this.OnPacketReceivedBoundary;",
                 openInactive,
                 StringComparison.Ordinal);
             int subscribeOutbound = captureTool.IndexOf(
-                "Network.PacketSent += this.OnPacketSent;",
+                "Network.PacketSent += this.OnPacketSentBoundary;",
                 subscribeInbound,
                 StringComparison.Ordinal);
             int activateInitial = captureTool.IndexOf(
@@ -697,7 +706,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && validate > closeRaw,
                 "Quiet stop must tentatively block new callbacks, reopen when a registered callback extends quiet, close at the maximum deadline, and wait for every accepted callback before raw sinks close and validation starts.");
             Assert.IsTrue(
-                openInactive > run
+                initialize > run
+                && openInactive > initialize
                 && subscribeInbound > openInactive
                 && subscribeOutbound > subscribeInbound
                 && activateInitial > subscribeOutbound
@@ -712,6 +722,471 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && captureTool.Contains("this.rawPacketCallbackDrainTimeoutCount++")
                 && captureTool.Contains("|| this.rawPacketCallbackDrainTimeoutCount > 0;"),
                 "Initial start must attach raw hooks before activation, active restart must remain serialized, and teardown must close the gate, drain accepted callbacks, and require recapture after a timeout.");
+        }
+
+        [TestMethod]
+        public void CaptureToolExportsPf127GeometryAndLineOfSightAlwaysOn()
+        {
+            string root = FindRepositoryRoot();
+            string captureTool = File.ReadAllText(
+                    Path.Combine(root, @"tools-temp\AOSharpLiveCapture\Main.cs"))
+                .Replace("\r\n", "\n");
+            string geometryCapture = File.ReadAllText(
+                    Path.Combine(root, @"tools-temp\AOSharpLiveCapture\Pf127GeometryCapture.cs"))
+                .Replace("\r\n", "\n");
+            string minimalCapture = File.ReadAllText(
+                    Path.Combine(root, @"tools-temp\AOSharpLiveCapture\MinimalPf127Capture.cs"))
+                .Replace("\r\n", "\n");
+            string captureProject = File.ReadAllText(
+                Path.Combine(root, @"tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.csproj"));
+            string activateCapture = ExtractMethodBlock(
+                captureTool,
+                "private void ActivateCaptureSession()");
+            string playfieldInit = ExtractMethodBlock(
+                captureTool,
+                "private void OnPlayfieldInit(object sender, uint playfieldId)");
+            string teleportStarted = ExtractMethodBlock(
+                captureTool,
+                "private void OnTeleportStarted(object sender, EventArgs e)");
+            string teleportEnded = ExtractMethodBlock(
+                captureTool,
+                "private void OnTeleportEnded(object sender, EventArgs e)");
+            string mainUpdate = ExtractMethodBlock(
+                captureTool,
+                "private void OnUpdate(object sender, float deltaTime)");
+            string rawPacketCapture = ExtractMethodBlock(
+                captureTool,
+                "private void LogPacket(string direction, int sequence, byte[] packet)");
+            string pf127Detection = ExtractMethodBlock(
+                captureTool,
+                "private bool IsDetectedResourcePlayfield127()");
+            string resourcePlayfieldDetection = ExtractMethodBlock(
+                captureTool,
+                "private string GetDetectedResourcePlayfieldId()");
+            string minimalUpdate = ExtractMethodBlock(
+                minimalCapture,
+                "private void UpdateCore(DateTime capturedUtc)");
+            string geometryUpdate = ExtractMethodBlock(
+                geometryCapture,
+                "public void Update(DateTime nowUtc, bool isPf127, string runtimePlayfieldId)");
+            string playfieldChange = ExtractMethodBlock(
+                geometryCapture,
+                "public void NotifyPlayfieldChanged(bool isPf127)");
+            string combatRequest = ExtractMethodBlock(
+                geometryCapture,
+                "public void RequestCombatSample()");
+            string geometryWriter = ExtractMethodBlock(
+                geometryCapture,
+                "private void TryWriteCanonicalGeometry()");
+            string geometryAttempt = ExtractMethodBlock(
+                geometryCapture,
+                "private static GeometryWriteResult WriteCanonicalGeometryAttempt(string path)");
+            string staticDoorCapture = ExtractMethodBlock(
+                geometryCapture,
+                "private static List<DoorSnapshot> CaptureStaticDoorSnapshots()");
+            string doorStateBatch = ExtractMethodBlock(
+                geometryCapture,
+                "private DoorStateBatchResult CaptureDoorStateBatch(");
+            string lineOfSightSampler = ExtractMethodBlock(
+                geometryCapture,
+                "private void SampleLineOfSight(");
+            string lineOfSightRow = ExtractMethodBlock(
+                geometryCapture,
+                "private LineOfSightTargetBatchResult WriteLineOfSightRows(");
+            string lineOfSightVariantRow = ExtractMethodBlock(
+                geometryCapture,
+                "private bool WriteLineOfSightVariantRow(");
+            string roomGeometryProjection = ExtractMethodBlock(
+                geometryCapture,
+                "private static RoomGeometrySourceSnapshot CaptureRoomGeometrySourceSnapshot(Room room)");
+            string meshGeometryProjection = ExtractMethodBlock(
+                geometryCapture,
+                "private static MeshGeometrySourceSnapshot CaptureMeshGeometrySourceSnapshot(");
+            string staticDoorProjection = ExtractMethodBlock(
+                geometryCapture,
+                "private static DoorSnapshot CaptureStaticDoorSnapshot(Door door)");
+
+            Assert.IsTrue(
+                captureProject.Contains("<Compile Include=\"Pf127GeometryCapture.cs\" />")
+                && captureProject.Contains("<Compile Include=\"MinimalPf127Capture.cs\" />")
+                && captureTool.Contains("new Pf127GeometryCapture(this.sessionDirectory, this.LogEvent)")
+                && geometryCapture.Contains("Path.Combine(sessionDirectory, \"pf127-geometry.json\")")
+                && geometryCapture.Contains("Path.Combine(sessionDirectory, \"pf127-line-of-sight.csv\")")
+                && geometryCapture.Contains("Path.Combine(sessionDirectory, \"pf127-door-state.csv\")"),
+                "The live capture project must always ship the dedicated PF127 geometry, line-of-sight, and dynamic door-state evidence files.");
+            int modelIdentityDetection = resourcePlayfieldDetection.IndexOf(
+                "Playfield.ModelIdentity.Instance == 127",
+                StringComparison.Ordinal);
+            int captureObjectFallback = resourcePlayfieldDetection.IndexOf(
+                "\"122002\"",
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                pf127Detection.Contains("this.GetDetectedResourcePlayfieldId()")
+                && pf127Detection.Contains("\"127\"")
+                && modelIdentityDetection >= 0
+                && captureObjectFallback > modelIdentityDetection
+                && !activateCapture.Contains("Playfield.")
+                && !activateCapture.Contains("IsDetectedResourcePlayfield127()")
+                && !activateCapture.Contains("NotifyPlayfieldChanged(")
+                && !activateCapture.Contains("RequestImmediateUpdate()")
+                && playfieldInit.Contains("this.lastPlayfieldId = playfieldId.ToString")
+                && playfieldInit.Contains("ref this.playfieldInitGeneration")
+                && playfieldInit.Contains("NotifyPlayfieldChanged(false)")
+                && !playfieldInit.Contains("Playfield.")
+                && !playfieldInit.Contains("IsDetectedResourcePlayfield127()")
+                && !playfieldInit.Contains("RequestImmediateUpdate()")
+                && teleportStarted.Contains("Interlocked.Increment(ref this.teleportGeneration)")
+                && teleportStarted.Contains("Interlocked.Exchange(ref this.teleportInProgress, 1)")
+                && teleportStarted.Contains("Interlocked.Exchange(ref this.pf127CollectionArmed, 0)")
+                && teleportStarted.Contains("NotifyPlayfieldChanged(false)")
+                && teleportEnded.Contains("matchingPlayfieldInit")
+                && teleportEnded.Contains("string.Equals(this.lastPlayfieldId, \"127\"")
+                && teleportEnded.Contains("NotifyPlayfieldChanged(isPf127)")
+                && teleportEnded.Contains("RequestImmediateUpdate()")
+                && mainUpdate.Contains("geometryCapture.ExecuteUpdateBoundary(")
+                && mainUpdate.Contains("Volatile.Read(ref this.pf127CaptureRuntimeReady) != 0")
+                && mainUpdate.Contains("Volatile.Read(ref this.teleportInProgress) == 0")
+                && mainUpdate.Contains("Volatile.Read(ref this.pf127CollectionArmed) != 0")
+                && mainUpdate.Contains("this.IsDetectedResourcePlayfield127()")
+                && mainUpdate.Contains("this.GetDetectedPlayfieldId()")
+                && minimalCapture.Contains("RequiredStableDuration = TimeSpan.FromSeconds(5)")
+                && minimalCapture.Contains("RequiredStableTicks = 20")
+                && minimalUpdate.Contains("if (Game.IsZoning)")
+                && minimalUpdate.Contains("TryCaptureStableSignal")
+                && minimalUpdate.Contains("this.geometryCapture.ExecuteUpdateBoundary("),
+                "Comprehensive capture must not touch PF native wrappers during activation or PlayfieldInit; matching TeleportEnded arms collection, while explicit geometry-only mode safely handles attach-inside after a stable gate.");
+            Assert.IsTrue(
+                playfieldChange.Contains("Interlocked.Exchange(ref this.pf127Observed, 1)")
+                && geometryUpdate.Contains("!this.GeometryWritten")
+                && geometryUpdate.Contains("nowUtc >= this.nextGeometryAttemptUtc")
+                && geometryUpdate.Contains("this.TryWriteCanonicalGeometry()")
+                && geometryUpdate.Contains("this.combatRequestGate.TryBegin(")
+                && geometryUpdate.Contains("\"combat\"")
+                && geometryUpdate.Contains("\"periodic\"")
+                && geometryCapture.Contains("GeometryRetryInterval = TimeSpan.FromSeconds(1)")
+                && geometryCapture.Contains("PeriodicLineOfSightInterval = TimeSpan.FromSeconds(1)"),
+                "PF127 geometry must retry until promoted, while LOS evidence is sampled both periodically and immediately after combat evidence.");
+            Assert.IsTrue(
+                rawPacketCapture.Contains("IsRawCombatEvidencePacket(packet)")
+                && rawPacketCapture.Contains("this.rawCombatPacketCount++")
+                && rawPacketCapture.Contains("this.pf127GeometryCapture?.RequestCombatSample()")
+                && combatRequest.Contains("this.isPf127Active")
+                && combatRequest.Contains("this.pf127CombatObserved")
+                && combatRequest.Contains("this.combatTriggerCount")
+                && combatRequest.Contains("this.combatRequestGate.Request()"),
+                "Every raw PF127 combat packet must request LOS evidence independently of decoded combat classification.");
+
+            int updateArmedGate = mainUpdate.IndexOf(
+                "Volatile.Read(ref this.pf127CollectionArmed) != 0",
+                StringComparison.Ordinal);
+            int updateCollector = mainUpdate.IndexOf(
+                "geometryCapture.ExecuteUpdateBoundary(",
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                updateArmedGate >= 0 && updateCollector > updateArmedGate,
+                "The PF127 armed/stability gate must be evaluated before any native geometry collection call.");
+            string alwaysOnPath = teleportStarted
+                                  + playfieldInit
+                                  + teleportEnded
+                                  + mainUpdate
+                                  + rawPacketCapture
+                                  + geometryUpdate
+                                  + lineOfSightSampler;
+            Assert.IsFalse(
+                alwaysOnPath.Contains("enemyFightCapture")
+                || alwaysOnPath.Contains("focusedEnemyIdentities")
+                || alwaysOnPath.Contains("lootCaptureRequested")
+                || alwaysOnPath.Contains("respawnCaptureRequested")
+                || alwaysOnPath.Contains("MARK"),
+                "PF127 geometry and LOS evidence must never depend on a focus, fight, loot, respawn, or marker mode.");
+
+            Assert.IsTrue(
+                geometryCapture.Contains("private static bool IsCanonicalGeometryReady()")
+                && geometryWriter.Contains("DevExtras.LoadAllSurfaces()")
+                && geometryWriter.Contains("GeometryStageWaitingForReadiness")
+                && geometryWriter.Contains("GeometryStageReadinessObserved")
+                && geometryWriter.Contains("GeometryStageSurfacesLoaded")
+                && geometryWriter.Contains("GeometryStageCircuitBroken")
+                && geometryWriter.Contains("this.loadAllSurfacesCallCount")
+                && geometryWriter.Contains("return;")
+                && geometryWriter.Contains("WriteCanonicalGeometryAttempt(attemptPath)")
+                && geometryWriter.Contains("this.stableGeometryCandidateSha256")
+                && geometryWriter.Contains("ComputeFileSha256(attemptPath)")
+                && geometryWriter.Contains("ComputeFileSha256(candidatePath)")
+                && geometryWriter.Contains("PromoteAttemptFile(attemptPath, candidatePath)")
+                && geometryWriter.Contains("PromoteAttemptFile(attemptPath, this.geometryPath)")
+                && geometryAttempt.Contains("modelIdentity.Instance != ResourcePlayfieldId")
+                && geometryAttempt.Contains("Playfield.Zones")
+                && geometryAttempt.Contains("Playfield.Rooms")
+                && geometryAttempt.Contains("SnapshotReferenceCollection(liveZones")
+                && geometryAttempt.Contains("SnapshotReferenceCollection(liveRooms")
+                && geometryAttempt.Contains("zoneInstances.SequenceEqual(roomInstances)")
+                && geometryAttempt.Contains("foreach (RoomGeometrySourceSnapshot room in rooms)")
+                && geometryAttempt.Contains("mesh.Vertices")
+                && geometryAttempt.Contains("mesh.TriangleIndices")
+                && geometryAttempt.Contains("mesh.LocalToWorld")
+                && geometryAttempt.Contains("MultiplyPoint3x4")
+                && geometryAttempt.Contains("roomSnapshot.VertexCount == 0")
+                && geometryAttempt.Contains("roomSnapshot.SourceTriangleIndexCount == 0")
+                && geometryAttempt.Contains("roomSnapshot.TriangleCount == 0")
+                && geometryAttempt.Contains("roomSnapshots.Sum(room => room.MeshCount) != result.MeshCount")
+                && staticDoorCapture.Contains("Playfield.Doors")
+                && staticDoorCapture.Contains("CaptureStaticDoorSnapshot(door)")
+                && staticDoorProjection.Contains("Link1Resolution = DoorLinkUnavailableForClientSafety")
+                && staticDoorProjection.Contains("Link2Resolution = DoorLinkUnavailableForClientSafety")
+                && !geometryCapture.Contains("door.RoomLink1")
+                && !geometryCapture.Contains("door.RoomLink2")
+                && !geometryCapture.Contains("room.Doors")
+                && !geometryCapture.Contains("PropertyInfo")
+                && !geometryCapture.Contains("BindingFlags")
+                && !geometryCapture.Contains("GetValue(door")
+                && !geometryCapture.Contains("room.NumDoors")
+                && roomGeometryProjection.Contains("N3Zone_t.GetSurface(room.Pointer)")
+                && roomGeometryProjection.IndexOf("N3Zone_t.GetSurface(room.Pointer)", StringComparison.Ordinal)
+                   < roomGeometryProjection.IndexOf("SurfaceResource surface = room.SurfaceResource", StringComparison.Ordinal)
+                && roomGeometryProjection.Contains("SurfaceResource surface = room.SurfaceResource")
+                && roomGeometryProjection.Contains("SnapshotReferenceCollection(")
+                && meshGeometryProjection.Contains("IEnumerable<Vector3> liveVertices = mesh.Vertices")
+                && meshGeometryProjection.Contains("IEnumerable<int> liveTriangles = mesh.Triangles")
+                && meshGeometryProjection.Contains("Matrix4x4 localToWorld = mesh.LocalToWorldMatrix")
+                && geometryCapture.Contains("\\\"rooms\\\"")
+                && geometryCapture.Contains("\\\"doors\\\"")
+                && geometryCapture.Contains("\\\"triangles\\\"")
+                && geometryCapture.Contains("\\\"doorLinkSchemaVersion\\\"")
+                && geometryCapture.Contains("\\\"doorLinkCapturePolicy\\\"")
+                && geometryCapture.Contains("unavailable_not_read_for_client_safety")
+                && geometryCapture.Contains("\\\"rawLink1Index\\\"")
+                && geometryCapture.Contains("\\\"link1Resolution\\\"")
+                && geometryCapture.Contains("\\\"rawLink2Index\\\"")
+                && geometryCapture.Contains("\\\"link2Resolution\\\"")
+                && geometryCapture.Contains("\\\"roomInstances\\\"")
+                && geometryCapture.Contains("\\\"meshes\\\""),
+                "The streamed canonical PF127 artifact must validate complete world-space room collision geometry while explicitly omitting unsafe in-process door-link reads.");
+            Assert.IsFalse(
+                staticDoorCapture.Contains("door.IsOpen")
+                || staticDoorCapture.Contains("door.IsLocked")
+                || geometryAttempt.Contains("\\\"isOpen\\\"")
+                || geometryAttempt.Contains("\\\"isLocked\\\"")
+                || geometryCapture.Contains("GeometrySnapshot")
+                || geometryCapture.Contains("TriangleSnapshot")
+                || geometryCapture.Contains("worldVertices")
+                || geometryCapture.Contains("GetBytes(content)")
+                || geometryCapture.Contains("File.WriteAllText"),
+                "Canonical geometry must exclude transient client door open/locked state so identical geometry snapshots remain promotable.");
+            Assert.IsTrue(
+                lineOfSightSampler.Contains("DynelManager.LocalPlayer")
+                && lineOfSightSampler.Contains("DynelManager.Characters")
+                && lineOfSightSampler.Contains("foreach (LineOfSightTargetSnapshot target in characterSnapshots)")
+                && lineOfSightSampler.Contains("this.WriteLineOfSightRows(")
+                && lineOfSightSampler.Contains("targetResult.HasUsableVariantPair")
+                && lineOfSightSampler.Contains("doorState.Usable")
+                && lineOfSightSampler.Contains("VergilAeneidMonsterData")
+                && lineOfSightSampler.Contains("() => character.IsInLineOfSight")
+                && lineOfSightRow.Contains("target.SimpleCharLineOfSight")
+                && !geometryCapture.Contains("target.Character")
+                && lineOfSightRow.Contains("\"raw\"")
+                && lineOfSightRow.Contains("\"plus-one-y\"")
+                && lineOfSightRow.Contains("rawUsable && plusOneUsable")
+                && lineOfSightRow.Contains("localPosition + new Vector3(0f, 1f, 0f)")
+                && lineOfSightRow.Contains("targetPosition + new Vector3(0f, 1f, 0f)")
+                && lineOfSightVariantRow.Contains("Playfield.LineOfSight(")
+                && lineOfSightVariantRow.Contains("Playfield.Raycast(")
+                && lineOfSightVariantRow.Contains("localIdentity.ToString()")
+                && lineOfSightVariantRow.Contains("targetIdentity.ToString()")
+                && lineOfSightVariantRow.Contains("targetIdentity.Instance")
+                && lineOfSightVariantRow.Contains("FloatCsv(origin.X)")
+                && lineOfSightVariantRow.Contains("FloatCsv(origin.Y)")
+                && lineOfSightVariantRow.Contains("FloatCsv(origin.Z)")
+                && geometryCapture.Contains("ProbeVariant,ProbeHeight")
+                && geometryCapture.Contains("DoorStateRevision,EvidenceBatchId")
+                && geometryCapture.Contains("OriginX,OriginY,OriginZ")
+                && geometryCapture.Contains("TargetIdentity,TargetIdentityType,TargetIdentityInstance,TargetMonsterData,TargetName")
+                && geometryCapture.Contains("TargetX,TargetY,TargetZ")
+                && geometryCapture.Contains("SimpleCharIsInLineOfSight,PlayfieldLineOfSight,RaycastHit")
+                && geometryCapture.Contains("RaycastHitX,RaycastHitY,RaycastHitZ")
+                && geometryCapture.Contains("RaycastNormalX,RaycastNormalY,RaycastNormalZ,Usable,Error")
+                && geometryCapture.Contains("!IsFinite(position) || !IsFinite(rotation)")
+                && doorStateBatch.Contains("evidenceBatchId")
+                && doorStateBatch.Contains("this.usableDoorStateBatchCount")
+                && geometryCapture.Contains("CapturedUtc,Trigger,Revision,EvidenceBatchId")
+                && geometryCapture.Contains("DoorLinkSchemaVersion,RawLink1Index,Link1Resolution,Room1Instance,RawLink2Index,Link2Resolution,Room2Instance")
+                && geometryCapture.Contains("PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,RotationW"),
+                "Each LOS batch must pair both variants for the same identified target with a finite dynamic door-state revision and all client obstruction probe details.");
+        }
+
+        [TestMethod]
+        public void CaptureToolFailsClosedWhenPf127GeometryOrLosEvidenceIsIncomplete()
+        {
+            string root = FindRepositoryRoot();
+            string captureTool = File.ReadAllText(
+                    Path.Combine(root, @"tools-temp\AOSharpLiveCapture\Main.cs"))
+                .Replace("\r\n", "\n");
+            string geometryCapture = File.ReadAllText(
+                    Path.Combine(root, @"tools-temp\AOSharpLiveCapture\Pf127GeometryCapture.cs"))
+                .Replace("\r\n", "\n");
+            string recaptureContract = ExtractMethodBlock(
+                geometryCapture,
+                "public bool RecaptureRequired");
+            string geometryValidation = ExtractMethodBlock(
+                geometryCapture,
+                "public void AppendValidation(List<string> issues, List<string> notes)");
+            string captureValidation = ExtractMethodBlock(
+                captureTool,
+                "private CaptureValidation ValidateCapture()");
+            string recaptureAggregation = ExtractMethodBlock(
+                captureTool,
+                "private bool IsCaptureRecaptureRequired()");
+            string geometryWriter = ExtractMethodBlock(
+                geometryCapture,
+                "private void TryWriteCanonicalGeometry()");
+            string geometryAttempt = ExtractMethodBlock(
+                geometryCapture,
+                "private static GeometryWriteResult WriteCanonicalGeometryAttempt(string path)");
+            string doorStateBatch = ExtractMethodBlock(
+                geometryCapture,
+                "private DoorStateBatchResult CaptureDoorStateBatch(");
+            string lineOfSightRow = ExtractMethodBlock(
+                geometryCapture,
+                "private LineOfSightTargetBatchResult WriteLineOfSightRows(");
+            string lineOfSightVariantRow = ExtractMethodBlock(
+                geometryCapture,
+                "private bool WriteLineOfSightVariantRow(");
+
+            Assert.IsTrue(
+                recaptureContract.Contains("this.Pf127Observed")
+                && recaptureContract.Contains("!this.GeometryWritten")
+                && recaptureContract.Contains("this.Pf127CombatObserved")
+                && recaptureContract.Contains("this.combatUsableRawVariantRowCount")
+                && recaptureContract.Contains("this.combatUsablePlusOneVariantRowCount")
+                && recaptureContract.Contains("this.combatMatchedDoorAndLosBatchCount")
+                && recaptureContract.Contains("this.vergilCombatObserved")
+                && recaptureContract.Contains("this.vergilCombatMatchedDoorAndLosBatchCount")
+                && recaptureContract.Contains("this.usableDoorStateBatchCount")
+                && recaptureContract.Contains("this.lineOfSightWriteErrorCount")
+                && recaptureContract.Contains("this.doorStateWriteErrorCount")
+                && recaptureContract.Contains("this.RuntimeBoundaryCircuitBroken"),
+                "PF127 runtime-only geometry loss, unrecovered same-target raw/plus-one combat LOS and door-state coverage, or evidence writer failure must require recapture.");
+            Assert.IsFalse(
+                recaptureContract.Contains("this.lineOfSightProbeErrorCount"),
+                "A transient LOS probe failure must remain recoverable when later raw and plus-one-Y coverage succeeds.");
+            int probeValidationStart = geometryValidation.IndexOf(
+                "int probeErrors = Volatile.Read(ref this.lineOfSightProbeErrorCount)",
+                StringComparison.Ordinal);
+            int writerValidationStart = geometryValidation.IndexOf(
+                "int writeErrors = Volatile.Read(ref this.lineOfSightWriteErrorCount)",
+                StringComparison.Ordinal);
+            string probeValidation = probeValidationStart >= 0 && writerValidationStart > probeValidationStart
+                                         ? geometryValidation.Substring(
+                                             probeValidationStart,
+                                             writerValidationStart - probeValidationStart)
+                                         : string.Empty;
+            string writerValidation = writerValidationStart >= 0
+                                          ? geometryValidation.Substring(writerValidationStart)
+                                          : string.Empty;
+            Assert.IsTrue(
+                geometryValidation.Contains("if (!this.Pf127Observed)")
+                && geometryValidation.Contains("if (!this.GeometryWritten)")
+                && geometryValidation.Contains("issues.Add(")
+                && geometryValidation.Contains("deterministic pf127-geometry.json was not written")
+                && geometryValidation.Contains("this.Pf127CombatObserved")
+                && geometryValidation.Contains("this.combatUsableRawVariantRowCount")
+                && geometryValidation.Contains("this.combatUsablePlusOneVariantRowCount")
+                && geometryValidation.Contains("this.combatMatchedDoorAndLosBatchCount")
+                && geometryValidation.Contains("this.vergilCombatMatchedDoorAndLosBatchCount")
+                && geometryValidation.Contains("this.usableDoorStateBatchCount")
+                && geometryValidation.Contains("same-batch combat-target match")
+                && geometryValidation.Contains("this.lineOfSightProbeErrorCount")
+                && geometryValidation.Contains("this.lineOfSightWriteErrorCount")
+                && geometryValidation.Contains("this.doorStateWriteErrorCount")
+                && probeValidation.Contains("notes.Add(")
+                && !probeValidation.Contains("issues.Add(")
+                && writerValidation.Contains("issues.Add("),
+                "PF127 validation must fail closed for missing required evidence and writer loss while reporting recovered probe errors without permanently poisoning the capture.");
+            Assert.IsTrue(
+                recaptureAggregation.Contains("this.IsRawRecaptureRequired()")
+                && recaptureAggregation.Contains("this.pf127GeometryCapture.RecaptureRequired")
+                && captureValidation.Contains("bool recaptureRequired = this.IsCaptureRecaptureRequired()")
+                && captureValidation.Contains("this.pf127GeometryCapture?.AppendValidation(issues, notes)")
+                && captureValidation.Contains("bool offlineDecodeRequired = !recaptureRequired")
+                && captureValidation.Contains("bool processingAllowed = issues.Count == 0")
+                && captureValidation.IndexOf(
+                    "this.pf127GeometryCapture?.AppendValidation(issues, notes)",
+                    StringComparison.Ordinal)
+                   < captureValidation.IndexOf(
+                       "bool offlineDecodeRequired = !recaptureRequired",
+                       StringComparison.Ordinal),
+                "PF127 runtime evidence must participate in the authoritative recapture decision before offline-repair and complete-status decisions are made.");
+            Assert.IsTrue(
+                geometryCapture.Contains("\"pf127Observed\"")
+                && geometryCapture.Contains("\"pf127CombatObserved\"")
+                && geometryCapture.Contains("\"complete\"")
+                && geometryCapture.Contains("\"recaptureRequired\"")
+                && geometryCapture.Contains("\"attempts\"")
+                && geometryCapture.Contains("\"failures\"")
+                && geometryCapture.Contains("\"stage\"")
+                && geometryCapture.Contains("\"circuitBroken\"")
+                && geometryCapture.Contains("\"loadAllSurfacesCalls\"")
+                && geometryCapture.Contains("\"combatTriggers\"")
+                && geometryCapture.Contains("\"periodicBatches\"")
+                && geometryCapture.Contains("\"combatBatches\"")
+                && geometryCapture.Contains("\"combatUsableRows\"")
+                && geometryCapture.Contains("\"combatUsableRawVariantRows\"")
+                && geometryCapture.Contains("\"combatUsablePlusOneVariantRows\"")
+                && geometryCapture.Contains("\"vergilCombatMatchedDoorAndLosBatches\"")
+                && geometryCapture.Contains("\"doorStatePath\"")
+                && geometryCapture.Contains("\"usableBatches\"")
+                && geometryCapture.Contains("\"combatMatchedLosBatches\"")
+                && geometryCapture.Contains("\"probeErrors\"")
+                && geometryCapture.Contains("\"writeErrors\"")
+                && captureTool.Contains("this.pf127GeometryCapture.AppendHealthJson(json, \"  \")"),
+                "capture-health and capture-info must expose the PF127 completeness, retry, sampling, usability, and error counters used by validation.");
+
+            int streamedGeometryWrite = geometryWriter.IndexOf(
+                "WriteCanonicalGeometryAttempt(attemptPath)",
+                StringComparison.Ordinal);
+            int hashGeometry = geometryWriter.IndexOf(
+                "ComputeFileSha256(attemptPath)",
+                StringComparison.Ordinal);
+            int promoteGeometry = geometryWriter.IndexOf(
+                "PromoteAttemptFile(attemptPath, this.geometryPath)",
+                StringComparison.Ordinal);
+            int geometryComplete = geometryWriter.IndexOf(
+                "Interlocked.Exchange(ref this.geometryWritten, 1)",
+                StringComparison.Ordinal);
+            int losWrite = lineOfSightVariantRow.IndexOf(
+                "this.lineOfSightWriter.WriteLine(row)",
+                StringComparison.Ordinal);
+            int losRowCount = lineOfSightVariantRow.IndexOf(
+                "Interlocked.Increment(ref this.lineOfSightRowCount)",
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                streamedGeometryWrite >= 0
+                && hashGeometry > streamedGeometryWrite
+                && promoteGeometry > hashGeometry
+                && geometryComplete > promoteGeometry
+                && geometryAttempt.Contains("zoneInstances.SequenceEqual(roomInstances)")
+                && geometryAttempt.Contains("roomSnapshot.VertexCount == 0")
+                && geometryAttempt.Contains("roomSnapshot.SourceTriangleIndexCount == 0")
+                && geometryAttempt.Contains("roomSnapshot.TriangleCount == 0")
+                && geometryAttempt.Contains("CaptureStaticDoorSnapshots()")
+                && geometryAttempt.Contains("doors.Count == 0")
+                && geometryAttempt.Contains("unavailable_not_read_for_client_safety")
+                && geometryWriter.Contains("Interlocked.Increment(ref this.geometryFailureCount)")
+                && geometryWriter.Contains("GeometryStageCircuitBroken")
+                && geometryWriter.Contains("DeleteFileNoThrow(attemptPath)")
+                && losWrite >= 0
+                && losRowCount > losWrite
+                && lineOfSightRow.Contains("Interlocked.Increment(ref this.lineOfSightProbeErrorCount)")
+                && lineOfSightVariantRow.Contains("Interlocked.Increment(ref this.lineOfSightProbeErrorCount)")
+                && lineOfSightRow.Contains("rawUsable && plusOneUsable")
+                && geometryCapture.Contains("!IsFinite(position) || !IsFinite(rotation)")
+                && doorStateBatch.IndexOf(
+                    "this.doorStateWriter.WriteLine(row)",
+                    StringComparison.Ordinal)
+                   < doorStateBatch.IndexOf(
+                       "Interlocked.Increment(ref this.usableDoorStateBatchCount)",
+                       StringComparison.Ordinal),
+                "Geometry may become complete only after validated streamed hashing and atomic promotion, while LOS and finite door-state counters advance only after preserved same-batch evidence.");
         }
 
         [TestMethod]
@@ -855,6 +1330,74 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             return count;
+        }
+
+        private static string ExtractMethodBlock(string text, string methodMarker)
+        {
+            int signatureIndex = text.IndexOf(methodMarker, StringComparison.Ordinal);
+            Assert.IsTrue(signatureIndex >= 0, "Missing method or member " + methodMarker + ".");
+
+            int startIndex = text.IndexOf("{", signatureIndex, StringComparison.Ordinal);
+            Assert.IsTrue(startIndex >= 0, "Missing body for " + methodMarker + ".");
+
+            int depth = 0;
+            bool insideString = false;
+            bool insideCharacter = false;
+            bool escaped = false;
+            for (int index = startIndex; index < text.Length; index++)
+            {
+                char current = text[index];
+                if (insideString || insideCharacter)
+                {
+                    if (escaped)
+                    {
+                        escaped = false;
+                        continue;
+                    }
+
+                    if (current == '\\')
+                    {
+                        escaped = true;
+                        continue;
+                    }
+
+                    if ((insideString && current == '"') || (insideCharacter && current == '\''))
+                    {
+                        insideString = false;
+                        insideCharacter = false;
+                    }
+
+                    continue;
+                }
+
+                if (current == '"')
+                {
+                    insideString = true;
+                    continue;
+                }
+
+                if (current == '\'')
+                {
+                    insideCharacter = true;
+                    continue;
+                }
+
+                if (current == '{')
+                {
+                    depth++;
+                }
+                else if (current == '}')
+                {
+                    depth--;
+                    if (depth == 0)
+                    {
+                        return text.Substring(startIndex, index - startIndex + 1);
+                    }
+                }
+            }
+
+            Assert.Fail("Unterminated body for " + methodMarker + ".");
+            return string.Empty;
         }
 
         private static byte[] HexToBytes(string hex)

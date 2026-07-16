@@ -342,12 +342,14 @@
     <Compile Include="Core\Playfields\OrdinaryEnemyRuntimeService.cs" />
     <Compile Include="Core\Playfields\NpcCombatAttackRules.cs" />
     <Compile Include="Core\Playfields\NpcCombatTickCoordinator.cs" />
+    <Compile Include="Core\Playfields\NpcDamageLineOfSightRuntimeService.cs" />
     <Compile Include="Core\Playfields\NpcCorpseLifecycleCoordinator.cs" />
     <Compile Include="Core\Playfields\NpcCorpseLifecycleRules.cs" />
     <Compile Include="Core\Playfields\NPCRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs" />
     <Compile Include="Core\Playfields\NpcPatrolReplayCoordinator.cs" />
     <Compile Include="Core\Playfields\PlayerCombatRuntimeService.cs" />
+    <Compile Include="Core\Playfields\PlayfieldCollisionGeometry.cs" />
     <Compile Include="Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldEnvironmentFunctionRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldInteractionRuntimeService.cs" />
@@ -387,6 +389,7 @@
     <Compile Include="Core\Playfields\SubwayVisibilitySpatialInterestMetrics.cs" />
     <Compile Include="Core\Playfields\SubwayVisibilitySnapshotDiagnostics.cs" />
     <Compile Include="Core\Playfields\PlayfieldWallCollisionRuntimeService.cs" />
+    <Compile Include="Core\Playfields\Pf127CollisionGeometryLoader.cs" />
     <Compile Include="Core\Playfields\Playfields.cs" />
     <Compile Include="Core\Playfields\WallCollision.cs" />
     <Compile Include="Core\Playfields\WallCollisionResult.cs" />
@@ -476,6 +479,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Captured\Arete\cleaning_robot_patrol_replay.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Captured\Subway\pf127-geometry.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\dummy.txt">

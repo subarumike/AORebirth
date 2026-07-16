@@ -309,6 +309,8 @@ namespace AORebirth.Core.Playfields
 
         internal bool SendStopFightOnDeath { get; private set; }
 
+        internal bool RequiresDamageLineOfSight { get; private set; }
+
         internal CapturedEnemySpecialAttackSequenceDefinition SpecialAttackSequence { get; private set; }
 
         internal CapturedEnemyParallelAttackSequenceDefinition ParallelAttackSequence { get; private set; }
@@ -405,7 +407,8 @@ namespace AORebirth.Core.Playfields
             int unknown2,
             int unknown3,
             int unknown4,
-            int unknown5)
+            int unknown5,
+            bool requiresDamageLineOfSight = false)
         {
             CapturedEnemyCombatContract contract = EquippedWeapon(
                 evidence,
@@ -433,6 +436,7 @@ namespace AORebirth.Core.Playfields
             contract.SpecialAttackWeaponUnknown3 = unknown3;
             contract.SpecialAttackWeaponUnknown4 = unknown4;
             contract.SpecialAttackWeaponUnknown5 = unknown5;
+            contract.RequiresDamageLineOfSight = requiresDamageLineOfSight;
             return contract;
         }
 
@@ -452,7 +456,8 @@ namespace AORebirth.Core.Playfields
 
         internal static CapturedEnemyCombatContract CapturedParallelAttackSequence(
             string evidence,
-            CapturedEnemyParallelAttackSequenceDefinition parallelAttackSequence)
+            CapturedEnemyParallelAttackSequenceDefinition parallelAttackSequence,
+            bool requiresDamageLineOfSight = false)
         {
             return new CapturedEnemyCombatContract
             {
@@ -460,7 +465,8 @@ namespace AORebirth.Core.Playfields
                 Retaliates = true,
                 AiProfile = NpcAiProfile.Passive,
                 AttackModel = CapturedEnemyAttackModel.Specialized,
-                ParallelAttackSequence = parallelAttackSequence
+                ParallelAttackSequence = parallelAttackSequence,
+                RequiresDamageLineOfSight = requiresDamageLineOfSight
             };
         }
 
@@ -656,7 +662,8 @@ namespace AORebirth.Core.Playfields
                         NpcCombatAttackRules.CapturedSubwayVergilSpecialAttackWeaponValue,
                         NpcCombatAttackRules.CapturedSubwayVergilSpecialAttackWeaponValue,
                         NpcCombatAttackRules.CapturedSubwayVergilSpecialAttackWeaponValue,
-                        NpcCombatAttackRules.CapturedSubwayVergilSpecialAttackWeaponLastValue);
+                        NpcCombatAttackRules.CapturedSubwayVergilSpecialAttackWeaponLastValue,
+                        requiresDamageLineOfSight: true);
                 case 155962:
                     CapturedEnemyCombatAttackDefinition abmouthXopzAttack =
                         new CapturedEnemyCombatAttackDefinition(
