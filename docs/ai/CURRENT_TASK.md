@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Validate the corrected PF127 doorway attack line and combat leash in the private client: Vergil must fire through the visibly open doorway, remain blocked by real walls, and disengage/return home instead of chasing across the full Subway playfield.
+The corrected PF127 doorway attack line and combat leash are live-validated in the private client.
 
 ## Done in this slice
 
@@ -21,13 +21,13 @@ Validate the corrected PF127 doorway attack line and combat leash in the private
 - Added a shared PF127 combat leash. NPC homes register at activation; non-player-owned hostile NPCs disengage beyond `100` horizontal units from home, send `StopFight`, suppress aggro while returning, and use the same collision-aware route service to move home without teleporting.
 - Leash reset clears Vergil healing state and cancels/despawns Abmouth's active combat-only Infector summons. Player-controlled pets are excluded.
 - AORebirth.Core and ZoneEngine Debug builds pass. Navigation `36/36`, PF127 collision/LOS `17/17`, and Abmouth/Vergil `20/20` pass; lifecycle remains at the same six unrelated baseline guardrail failures.
+- Mike live-validated the final behavior: Vergil fires through the open doorway, remains blocked by real walls, and the leash behaves as intended.
 
 ## Remaining
 
-1. Mike performs one private-client Vergil test: use the pictured open doorway and confirm he fires through the opening while real walls still stop damage.
-2. Kite Vergil more than `100` horizontal units from his spawn and confirm he stops fighting, returns through the shared route path, and cannot immediately reacquire combat until home.
-3. If client-visible movement differs from the deterministic route tests, inspect the existing server logs/capture evidence before changing planner limits, leash distance, or movement packets.
-4. Do not auto-attach or launch AO/capture tooling. Mike runs gameplay and supplies completed captures when requested.
+1. This doorway/LOS/leash slice is complete.
+2. Continue with the next user-selected Subway gameplay issue.
+3. Do not auto-attach or launch AO/capture tooling. Mike runs gameplay and supplies completed captures when requested.
 
 ## Constraints
 
