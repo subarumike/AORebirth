@@ -46,7 +46,7 @@ PF127 now has a reusable home-based hostile-NPC leash:
 - Vergil leash reset cancels pending healing state;
 - Abmouth leash reset cancels pending Infector timers and immediately despawns active combat-only summons.
 
-The `100.0`-unit boundary preserves the established roughly `89.8`-unit representative Vergil route case while stopping the observed greater-than-`100`-unit full-playfield chase. It is a provisional private-server gameplay boundary, not a claim of the official-live leash maximum.
+The `100.0`-unit boundary preserves the established roughly `89.8`-unit representative Vergil route case while stopping the observed greater-than-`100`-unit full-playfield chase. Mike accepted this as the private-server gameplay boundary; exact official-live leash and pathfinding parity are not required for this slice.
 
 ## Search and following limits
 
