@@ -21,7 +21,8 @@ namespace AORebirth.Core.Playfields
 
         private const double BloodcreeperAutomaticAggroRadius = 7.0;
 
-        private const double BloodcreeperPrivateRespawnSeconds = 240.0;
+        private static readonly Dictionary<string, OrdinaryEnemySpawnPolicyConfiguration>
+            CapturedOrdinarySpawnPolicies = BuildCapturedOrdinarySpawnPolicies();
 
         private static readonly OrdinaryEnemyAggressionProfile RetaliateChasingAggression =
             new OrdinaryEnemyAggressionProfile(
@@ -328,6 +329,10 @@ namespace AORebirth.Core.Playfields
 
             foreach (CapturedSubwayOrdinarySpawnDefinition source in content.GetAllSpawns())
             {
+                OrdinaryEnemySpawnPolicyConfiguration policyConfiguration;
+                CapturedOrdinarySpawnPolicies.TryGetValue(
+                    source.ArchetypeKey,
+                    out policyConfiguration);
                 OrdinaryEnemyWaypoint[] waypoints = source.Waypoints
                     .Select(value => new OrdinaryEnemyWaypoint(value.X, value.Y, value.Z))
                     .ToArray();
@@ -360,17 +365,14 @@ namespace AORebirth.Core.Playfields
                         source.CapturedFlags2,
                         source.Unknown1,
                         source.Unknown2,
-                        string.Equals(
-                            source.ArchetypeKey,
-                            "bloodcreeper",
-                            StringComparison.Ordinal)
+                        policyConfiguration != null
+                        && policyConfiguration.RespawnPolicy.Mode
+                           == WorldRespawnPolicyAssignmentMode.Explicit
                             ? OrdinaryEnemyEvidenceState.Policy
                             : OrdinaryEnemyEvidenceState.Unresolved,
-                        string.Equals(
-                            source.ArchetypeKey,
-                            "bloodcreeper",
-                            StringComparison.Ordinal)
-                            ? (double?)BloodcreeperPrivateRespawnSeconds
+                        policyConfiguration != null
+                        && policyConfiguration.RespawnPolicy.ExplicitPolicy != null
+                            ? policyConfiguration.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds
                             : null,
                         string.Equals(
                             source.EvidenceCapture,
@@ -381,31 +383,55 @@ namespace AORebirth.Core.Playfields
                         source.SourceOwnerIdentity,
                         source.EvidenceCapture,
                         source.EvidenceTimestamp,
-                        string.Equals(
-                            source.ArchetypeKey,
-                            "bloodcreeper",
-                            StringComparison.Ordinal)
-                            ? BloodcreeperSpawnLevelRange()
-                            : null));
+                        policyConfiguration == null
+                            ? null
+                            : policyConfiguration.LevelDefinition,
+                        policyConfiguration == null
+                            ? null
+                            : policyConfiguration.RespawnPolicy));
             }
         }
 
-        private static OrdinaryEnemySpawnLevelRange BloodcreeperSpawnLevelRange()
+        private static Dictionary<string, OrdinaryEnemySpawnPolicyConfiguration>
+            BuildCapturedOrdinarySpawnPolicies()
         {
-            return new OrdinaryEnemySpawnLevelRange(
-                15,
-                25,
-                24,
-                691,
-                33,
-                0,
-                70,
-                83,
-                3,
-                OrdinaryEnemyEvidenceState.Policy,
-                "community-range:docs/generated/enemy_catalog/enemy_catalog.csv;"
-                + "captured-anchor:20260709-222339;"
-                + "focused-combat:20260716-033326,20260716-034104");
+            var result = new Dictionary<string, OrdinaryEnemySpawnPolicyConfiguration>(
+                StringComparer.Ordinal);
+            result.Add(
+                "bloodcreeper",
+                new OrdinaryEnemySpawnPolicyConfiguration(
+                    new OrdinaryEnemySpawnLevelDefinition(
+                        OrdinaryEnemySpawnLevelMode.InclusiveRange,
+                        15,
+                        25,
+                        24,
+                        691,
+                        33,
+                        0,
+                        70,
+                        83,
+                        3,
+                        OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration,
+                        OrdinaryEnemyEvidenceState.Policy,
+                        "community-range:docs/generated/enemy_catalog/enemy_catalog.csv;"
+                        + "captured-anchor:20260709-222339;"
+                        + "focused-combat:20260716-033326,20260716-034104"),
+                    WorldRespawnPolicyAssignment.Explicit(
+                        new RespawnPolicyDefinition
+                        {
+                            RespawnPolicyKey = "ordinary.bloodcreeper.240",
+                            Mode = WorldRespawnMode.FixedDelay,
+                            FixedDelaySeconds = 240.0,
+                            RespawnAtOriginalPosition = true,
+                            ResetHealth = true,
+                            ResetMovementState = true,
+                            ResetAggressionState = true,
+                            DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
+                            Evidence = "private-regular-enemy-policy;20260716-033326;20260716-034104",
+                            Confidence = "POLICY",
+                            Enabled = true
+                        })));
+            return result;
         }
 
         private static OrdinaryEnemyAppearanceProfile BuildSupportedAppearance(
@@ -631,6 +657,20 @@ namespace AORebirth.Core.Playfields
         private static string SpawnKey(int sourceIdentity)
         {
             return string.Format(CultureInfo.InvariantCulture, "subway.{0:X8}", sourceIdentity);
+        }
+
+        private sealed class OrdinaryEnemySpawnPolicyConfiguration
+        {
+            internal OrdinaryEnemySpawnPolicyConfiguration(
+                OrdinaryEnemySpawnLevelDefinition levelDefinition,
+                WorldRespawnPolicyAssignment respawnPolicy)
+            {
+                this.LevelDefinition = levelDefinition;
+                this.RespawnPolicy = respawnPolicy;
+            }
+
+            internal OrdinaryEnemySpawnLevelDefinition LevelDefinition { get; private set; }
+            internal WorldRespawnPolicyAssignment RespawnPolicy { get; private set; }
         }
     }
 }

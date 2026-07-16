@@ -454,9 +454,24 @@ namespace AORebirth.Core.Playfields
         internal string Evidence { get; private set; }
     }
 
-    internal sealed class OrdinaryEnemySpawnLevelRange
+    internal enum OrdinaryEnemySpawnLevelMode
     {
-        internal OrdinaryEnemySpawnLevelRange(
+        Invalid = 0,
+        Fixed = 1,
+        InclusiveRange = 2
+    }
+
+    internal enum OrdinaryEnemyLevelRerollPolicy
+    {
+        Invalid = 0,
+        Never = 1,
+        NewPopulationGeneration = 2
+    }
+
+    internal sealed class OrdinaryEnemySpawnLevelDefinition
+    {
+        internal OrdinaryEnemySpawnLevelDefinition(
+            OrdinaryEnemySpawnLevelMode mode,
             int minimumLevel,
             int maximumLevel,
             int referenceLevel,
@@ -466,9 +481,11 @@ namespace AORebirth.Core.Playfields
             int monsterScale,
             int referenceRunSpeed,
             int runSpeedPerLevel,
+            OrdinaryEnemyLevelRerollPolicy rerollPolicy,
             OrdinaryEnemyEvidenceState evidenceState,
             string evidence)
         {
+            this.Mode = mode;
             this.MinimumLevel = minimumLevel;
             this.MaximumLevel = maximumLevel;
             this.ReferenceLevel = referenceLevel;
@@ -478,10 +495,12 @@ namespace AORebirth.Core.Playfields
             this.MonsterScale = monsterScale;
             this.ReferenceRunSpeed = referenceRunSpeed;
             this.RunSpeedPerLevel = runSpeedPerLevel;
+            this.RerollPolicy = rerollPolicy;
             this.EvidenceState = evidenceState;
             this.Evidence = evidence ?? string.Empty;
         }
 
+        internal OrdinaryEnemySpawnLevelMode Mode { get; private set; }
         internal int MinimumLevel { get; private set; }
         internal int MaximumLevel { get; private set; }
         internal int ReferenceLevel { get; private set; }
@@ -491,14 +510,43 @@ namespace AORebirth.Core.Playfields
         internal int MonsterScale { get; private set; }
         internal int ReferenceRunSpeed { get; private set; }
         internal int RunSpeedPerLevel { get; private set; }
+        internal OrdinaryEnemyLevelRerollPolicy RerollPolicy { get; private set; }
         internal OrdinaryEnemyEvidenceState EvidenceState { get; private set; }
         internal string Evidence { get; private set; }
+
+        internal static OrdinaryEnemySpawnLevelDefinition Fixed(
+            OrdinaryEnemySpawnVariant variant,
+            OrdinaryEnemyEvidenceState evidenceState,
+            string evidence)
+        {
+            if (variant == null)
+            {
+                throw new ArgumentNullException("variant");
+            }
+
+            return new OrdinaryEnemySpawnLevelDefinition(
+                OrdinaryEnemySpawnLevelMode.Fixed,
+                variant.Level,
+                variant.Level,
+                variant.Level,
+                variant.Health,
+                0,
+                variant.HealthDamage,
+                variant.MonsterScale,
+                variant.RunSpeed,
+                0,
+                OrdinaryEnemyLevelRerollPolicy.Never,
+                evidenceState,
+                evidence);
+        }
 
         internal bool IsValid
         {
             get
             {
-                if (this.MinimumLevel <= 0
+                if ((this.Mode != OrdinaryEnemySpawnLevelMode.Fixed
+                     && this.Mode != OrdinaryEnemySpawnLevelMode.InclusiveRange)
+                    || this.MinimumLevel <= 0
                     || this.MaximumLevel < this.MinimumLevel
                     || this.ReferenceLevel < this.MinimumLevel
                     || this.ReferenceLevel > this.MaximumLevel
@@ -508,6 +556,8 @@ namespace AORebirth.Core.Playfields
                     || this.MonsterScale <= 0
                     || this.ReferenceRunSpeed <= 0
                     || this.RunSpeedPerLevel < 0
+                    || (this.RerollPolicy != OrdinaryEnemyLevelRerollPolicy.Never
+                        && this.RerollPolicy != OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration)
                     || (this.EvidenceState != OrdinaryEnemyEvidenceState.Observed
                         && this.EvidenceState != OrdinaryEnemyEvidenceState.Policy)
                     || string.IsNullOrWhiteSpace(this.Evidence))
@@ -515,16 +565,51 @@ namespace AORebirth.Core.Playfields
                     return false;
                 }
 
-                int minimumHealth = this.HealthAt(this.MinimumLevel);
-                int minimumRunSpeed = this.RunSpeedAt(this.MinimumLevel);
+                if (this.Mode == OrdinaryEnemySpawnLevelMode.Fixed
+                    && (this.MinimumLevel != this.MaximumLevel
+                        || this.ReferenceLevel != this.MinimumLevel
+                        || this.HealthPerLevel != 0
+                        || this.RunSpeedPerLevel != 0
+                        || this.RerollPolicy != OrdinaryEnemyLevelRerollPolicy.Never))
+                {
+                    return false;
+                }
+
+                if (this.Mode == OrdinaryEnemySpawnLevelMode.InclusiveRange
+                    && this.MaximumLevel == this.MinimumLevel)
+                {
+                    return false;
+                }
+
+                long minimumHealth = this.HealthAt(this.MinimumLevel);
+                long maximumHealth = this.HealthAt(this.MaximumLevel);
+                long minimumRunSpeed = this.RunSpeedAt(this.MinimumLevel);
+                long maximumRunSpeed = this.RunSpeedAt(this.MaximumLevel);
                 return minimumHealth > 0
+                       && minimumHealth <= int.MaxValue
                        && this.HealthDamage < minimumHealth
-                       && minimumRunSpeed > 0;
+                       && maximumHealth > 0
+                       && maximumHealth <= int.MaxValue
+                       && this.HealthDamage < maximumHealth
+                       && minimumRunSpeed > 0
+                       && minimumRunSpeed <= int.MaxValue
+                       && maximumRunSpeed > 0
+                       && maximumRunSpeed <= int.MaxValue;
             }
         }
 
         internal OrdinaryEnemySpawnVariant SelectVariant(Func<int, int> nextRandom)
         {
+            if (!this.IsValid)
+            {
+                throw new InvalidOperationException("Ordinary enemy spawn level definition is invalid.");
+            }
+
+            if (this.Mode == OrdinaryEnemySpawnLevelMode.Fixed)
+            {
+                return this.Resolve(this.MinimumLevel);
+            }
+
             if (nextRandom == null)
             {
                 throw new ArgumentNullException("nextRandom");
@@ -542,6 +627,11 @@ namespace AORebirth.Core.Playfields
 
         internal OrdinaryEnemySpawnVariant Resolve(int level)
         {
+            if (!this.IsValid)
+            {
+                throw new InvalidOperationException("Ordinary enemy spawn level definition is invalid.");
+            }
+
             if (level < this.MinimumLevel || level > this.MaximumLevel)
             {
                 throw new ArgumentOutOfRangeException("level");
@@ -549,21 +639,91 @@ namespace AORebirth.Core.Playfields
 
             return new OrdinaryEnemySpawnVariant(
                 level,
-                this.HealthAt(level),
+                (int)this.HealthAt(level),
                 this.HealthDamage,
                 this.MonsterScale,
-                this.RunSpeedAt(level),
+                (int)this.RunSpeedAt(level),
                 this.Evidence);
         }
 
-        private int HealthAt(int level)
+        private long HealthAt(int level)
         {
-            return this.ReferenceHealth + ((level - this.ReferenceLevel) * this.HealthPerLevel);
+            return (long)this.ReferenceHealth + ((long)(level - this.ReferenceLevel) * this.HealthPerLevel);
         }
 
-        private int RunSpeedAt(int level)
+        private long RunSpeedAt(int level)
         {
-            return this.ReferenceRunSpeed + ((level - this.ReferenceLevel) * this.RunSpeedPerLevel);
+            return (long)this.ReferenceRunSpeed + ((long)(level - this.ReferenceLevel) * this.RunSpeedPerLevel);
+        }
+    }
+
+    internal sealed class OrdinaryEnemySpawnGeneration
+    {
+        internal OrdinaryEnemySpawnGeneration(int number, OrdinaryEnemySpawnVariant selectedVariant)
+        {
+            if (number <= 0)
+            {
+                throw new ArgumentOutOfRangeException("number");
+            }
+
+            if (selectedVariant == null)
+            {
+                throw new ArgumentNullException("selectedVariant");
+            }
+
+            this.Number = number;
+            this.SelectedVariant = selectedVariant;
+        }
+
+        internal int Number { get; private set; }
+        internal OrdinaryEnemySpawnVariant SelectedVariant { get; private set; }
+    }
+
+    internal sealed class OrdinaryEnemyLevelSelectionState
+    {
+        private OrdinaryEnemySpawnGeneration current;
+
+        internal OrdinaryEnemySpawnGeneration ResolveForGeneration(
+            OrdinaryEnemySpawnLevelDefinition definition,
+            int generation,
+            Func<int, int> nextRandom)
+        {
+            if (definition == null || !definition.IsValid)
+            {
+                throw new InvalidOperationException("A valid ordinary enemy level definition is required.");
+            }
+
+            if (generation <= 0)
+            {
+                throw new ArgumentOutOfRangeException("generation");
+            }
+
+            if (this.current != null)
+            {
+                if (generation < this.current.Number)
+                {
+                    throw new InvalidOperationException(
+                        "A stale population generation cannot replace the current level selection.");
+                }
+
+                if (generation == this.current.Number)
+                {
+                    return this.current;
+                }
+            }
+
+            OrdinaryEnemySpawnVariant variant =
+                this.current != null
+                && definition.RerollPolicy == OrdinaryEnemyLevelRerollPolicy.Never
+                    ? definition.Resolve(this.current.SelectedVariant.Level)
+                    : definition.SelectVariant(nextRandom);
+            this.current = new OrdinaryEnemySpawnGeneration(generation, variant);
+            return this.current;
+        }
+
+        internal OrdinaryEnemySpawnGeneration Current
+        {
+            get { return this.current; }
         }
     }
 
@@ -601,7 +761,8 @@ namespace AORebirth.Core.Playfields
             string sourceOwnerIdentity,
             string sourceCapture,
             string sourceTimestamp,
-            OrdinaryEnemySpawnLevelRange levelRange = null)
+            OrdinaryEnemySpawnLevelDefinition levelDefinition = null,
+            WorldRespawnPolicyAssignment respawnPolicy = null)
         {
             this.SpawnKey = spawnKey;
             this.SourceIdentity = sourceIdentity;
@@ -634,7 +795,6 @@ namespace AORebirth.Core.Playfields
             this.SourceOwnerIdentity = sourceOwnerIdentity;
             this.SourceCapture = sourceCapture;
             this.SourceTimestamp = sourceTimestamp;
-            this.LevelRange = levelRange;
             this.DefaultVariant = new OrdinaryEnemySpawnVariant(
                 level,
                 health,
@@ -642,6 +802,20 @@ namespace AORebirth.Core.Playfields
                 monsterScale,
                 runSpeed,
                 sourceCapture);
+            this.LevelDefinition = levelDefinition
+                                   ?? OrdinaryEnemySpawnLevelDefinition.Fixed(
+                                       this.DefaultVariant,
+                                       OrdinaryEnemyEvidenceState.Observed,
+                                       string.IsNullOrWhiteSpace(sourceCapture)
+                                           ? "captured-fixed:" + spawnKey
+                                           : sourceCapture);
+            this.RespawnPolicy = respawnPolicy
+                                 ?? BuildCompatibilityRespawnPolicy(
+                                     spawnKey,
+                                     sourceIdentity,
+                                     respawnEvidence,
+                                     respawnDelaySeconds,
+                                     sourceCapture);
         }
 
         internal string SpawnKey { get; private set; }
@@ -675,18 +849,14 @@ namespace AORebirth.Core.Playfields
         internal string SourceOwnerIdentity { get; private set; }
         internal string SourceCapture { get; private set; }
         internal string SourceTimestamp { get; private set; }
-        internal OrdinaryEnemySpawnLevelRange LevelRange { get; private set; }
+        internal OrdinaryEnemySpawnLevelDefinition LevelDefinition { get; private set; }
+        internal WorldRespawnPolicyAssignment RespawnPolicy { get; private set; }
 
         private OrdinaryEnemySpawnVariant DefaultVariant { get; set; }
 
         internal OrdinaryEnemySpawnVariant SelectVariant(Func<int, int> nextRandom)
         {
-            if (this.LevelRange == null)
-            {
-                return this.DefaultVariant;
-            }
-
-            return this.LevelRange.SelectVariant(nextRandom);
+            return this.LevelDefinition.SelectVariant(nextRandom);
         }
 
         internal bool HasRespawnDelay
@@ -698,6 +868,41 @@ namespace AORebirth.Core.Playfields
                        && this.RespawnDelaySeconds.HasValue
                        && this.RespawnDelaySeconds.Value > 0.0;
             }
+        }
+
+        private static WorldRespawnPolicyAssignment BuildCompatibilityRespawnPolicy(
+            string spawnKey,
+            int sourceIdentity,
+            OrdinaryEnemyEvidenceState respawnEvidence,
+            double? respawnDelaySeconds,
+            string sourceCapture)
+        {
+            if (respawnEvidence == OrdinaryEnemyEvidenceState.Observed
+                || respawnEvidence == OrdinaryEnemyEvidenceState.Policy)
+            {
+                return WorldRespawnPolicyAssignment.Explicit(
+                    new RespawnPolicyDefinition
+                    {
+                        RespawnPolicyKey = "ordinary.explicit."
+                                           + sourceIdentity.ToString(
+                                               System.Globalization.CultureInfo.InvariantCulture),
+                        Mode = WorldRespawnMode.FixedDelay,
+                        FixedDelaySeconds = respawnDelaySeconds,
+                        RespawnAtOriginalPosition = true,
+                        ResetHealth = true,
+                        ResetMovementState = true,
+                        ResetAggressionState = true,
+                        DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
+                        Evidence = sourceCapture,
+                        Confidence = respawnEvidence.ToString(),
+                        Enabled = true
+                    });
+            }
+
+            return WorldRespawnPolicyAssignment.Inherit(
+                string.IsNullOrWhiteSpace(sourceCapture)
+                    ? "ordinary-default:" + spawnKey
+                    : sourceCapture);
         }
     }
 
@@ -850,26 +1055,43 @@ namespace AORebirth.Core.Playfields
                     throw new InvalidOperationException("Observed or policy respawn requires a positive delay: " + spawn.SpawnKey);
                 }
 
-                if (spawn.LevelRange != null)
+                if (spawn.LevelDefinition == null || !spawn.LevelDefinition.IsValid)
                 {
-                    OrdinaryEnemySpawnVariant sourceVariant =
-                        spawn.LevelRange.IsValid
-                        && spawn.Level >= spawn.LevelRange.MinimumLevel
-                        && spawn.Level <= spawn.LevelRange.MaximumLevel
-                            ? spawn.LevelRange.Resolve(spawn.Level)
-                            : null;
-                    if (sourceVariant == null
-                        || sourceVariant.Health != spawn.Health
-                        || sourceVariant.HealthDamage != spawn.HealthDamage
-                        || sourceVariant.MonsterScale != spawn.MonsterScale
-                        || sourceVariant.RunSpeed != spawn.RunSpeed)
-                    {
-                        throw new InvalidOperationException(
-                            "Ordinary enemy spawn level range is invalid or does not preserve its source row: "
-                            + spawn.SpawnKey);
-                    }
+                    throw new InvalidOperationException(
+                        "Ordinary enemy spawn level definition is invalid: " + spawn.SpawnKey);
+                }
+
+                OrdinaryEnemySpawnVariant sourceVariant =
+                    spawn.Level >= spawn.LevelDefinition.MinimumLevel
+                    && spawn.Level <= spawn.LevelDefinition.MaximumLevel
+                        ? spawn.LevelDefinition.Resolve(spawn.Level)
+                        : null;
+                if (sourceVariant == null
+                    || sourceVariant.Health != spawn.Health
+                    || sourceVariant.HealthDamage != spawn.HealthDamage
+                    || sourceVariant.MonsterScale != spawn.MonsterScale
+                    || sourceVariant.RunSpeed != spawn.RunSpeed)
+                {
+                    throw new InvalidOperationException(
+                        "Ordinary enemy spawn level definition does not preserve its source row: "
+                        + spawn.SpawnKey);
+                }
+
+                if (spawn.RespawnPolicy == null
+                    || !Enum.IsDefined(typeof(WorldRespawnPolicyAssignmentMode), spawn.RespawnPolicy.Mode)
+                    || spawn.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Invalid
+                    || spawn.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Unresolved
+                    || (spawn.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.NoRespawn
+                        && string.IsNullOrWhiteSpace(spawn.RespawnPolicy.PolicyKey))
+                    || (spawn.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Explicit
+                        && !WorldRespawnPolicyValidator.IsSchedulable(
+                            spawn.RespawnPolicy.ExplicitPolicy)))
+                {
+                    throw new InvalidOperationException(
+                        "Ordinary enemy spawn respawn policy is invalid: " + spawn.SpawnKey);
                 }
             }
         }
+
     }
 }

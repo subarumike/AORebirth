@@ -2098,23 +2098,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 providerText.Contains("0x795451C5")
                 && !providerText.Contains("0x795450A1")
-                && catalogText.Contains("BloodcreeperSpawnLevelRange()")
-                && catalogText.Contains("new OrdinaryEnemySpawnLevelRange(")
+                && catalogText.Contains("BuildCapturedOrdinarySpawnPolicies()")
+                && catalogText.Contains("new OrdinaryEnemySpawnLevelDefinition(")
+                && catalogText.Contains("OrdinaryEnemySpawnLevelMode.InclusiveRange")
+                && catalogText.Contains("OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration")
                 && catalogText.Contains("                15,")
                 && catalogText.Contains("                25,")
                 && catalogText.Contains("                24,")
                 && catalogText.Contains("                691,")
                 && catalogText.Contains("                33,")
                 && profileText.Contains("internal sealed class OrdinaryEnemySpawnVariant")
-                && profileText.Contains("internal sealed class OrdinaryEnemySpawnLevelRange")
+                && profileText.Contains("internal sealed class OrdinaryEnemySpawnLevelDefinition")
+                && profileText.Contains("internal sealed class OrdinaryEnemyLevelSelectionState")
                 && profileText.Contains("return this.Resolve(this.MinimumLevel + offset);")
-                && orchestratorText.Contains("OrdinaryEnemySpawnVariant variant = spawn.SelectVariant(this.spawnRandom.Next);")
+                && orchestratorText.Contains("Func<int, int> levelSelector = null")
+                && orchestratorText.Contains("selectionState.ResolveForGeneration(")
+                && orchestratorText.Contains("OrdinaryEnemySpawnVariant variant = spawnGeneration.SelectedVariant;")
+                && !orchestratorText.Contains("bloodcreeper")
+                && !orchestratorText.Contains("30379")
                 && orchestratorText.Contains("ApplyStats(character, variant, profile);")
                 && catalogText.Contains("BloodcreeperAutomaticAggroRadius = 7.0")
-                && catalogText.Contains("BloodcreeperPrivateRespawnSeconds = 240.0")
+                && catalogText.Contains("RespawnPolicyKey = \"ordinary.bloodcreeper.240\"")
                 && catalogText.Contains("OrdinaryEnemyEvidenceState.Policy")
                 && profileText.Contains("this.RespawnEvidence == OrdinaryEnemyEvidenceState.Policy")
-                && populationText.Contains("row.HasRespawnDelay ? WorldRespawnMode.FixedDelay : WorldRespawnMode.None")
+                && populationText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
+                && populationText.Contains("WorldRespawnPolicyResolver.Resolve(")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(")
                 && catalogText.Contains("\"20260716-033326,20260716-034104\"")
                 && globalLootText.Contains("loot.CreditEvidence == OrdinaryEnemyEvidenceState.Policy")
@@ -2143,10 +2151,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1, bloodcreeperSpawns.Length, "Bloodcreeper must use one runtime spawn row.");
 
             OrdinaryEnemySpawnDefinition bloodcreeperSpawn = bloodcreeperSpawns[0];
-            Assert.IsNotNull(bloodcreeperSpawn.LevelRange, "Bloodcreeper must declare a reusable level range.");
-            Assert.AreEqual(15, bloodcreeperSpawn.LevelRange.MinimumLevel);
-            Assert.AreEqual(25, bloodcreeperSpawn.LevelRange.MaximumLevel);
-            Assert.AreEqual(OrdinaryEnemyEvidenceState.Policy, bloodcreeperSpawn.LevelRange.EvidenceState);
+            Assert.IsNotNull(bloodcreeperSpawn.LevelDefinition, "Bloodcreeper must declare a reusable level definition.");
+            Assert.AreEqual(OrdinaryEnemySpawnLevelMode.InclusiveRange, bloodcreeperSpawn.LevelDefinition.Mode);
+            Assert.AreEqual(15, bloodcreeperSpawn.LevelDefinition.MinimumLevel);
+            Assert.AreEqual(25, bloodcreeperSpawn.LevelDefinition.MaximumLevel);
+            Assert.AreEqual(OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration, bloodcreeperSpawn.LevelDefinition.RerollPolicy);
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Policy, bloodcreeperSpawn.LevelDefinition.EvidenceState);
 
             OrdinaryEnemySpawnVariant minimum = bloodcreeperSpawn.SelectVariant(
                 levelCount =>
@@ -2795,6 +2805,49 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             0.0)
                     },
                 "Observed respawn evidence requires a positive delay.");
+
+            OrdinaryEnemySpawnLevelDefinition invalidRange = new OrdinaryEnemySpawnLevelDefinition(
+                OrdinaryEnemySpawnLevelMode.InclusiveRange,
+                25,
+                15,
+                24,
+                691,
+                33,
+                0,
+                70,
+                83,
+                3,
+                OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration,
+                OrdinaryEnemyEvidenceState.Policy,
+                "invalid-range");
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profile },
+                new[]
+                    {
+                        CreateOrdinaryEnemySpawn(
+                            "spawn.invalid-range",
+                            10,
+                            profile.ProfileKey,
+                            levelDefinition: invalidRange)
+                    },
+                "Invalid level ranges must fail profile validation.");
+
+            AssertOrdinaryEnemyValidationFails(
+                new[] { profile },
+                new[]
+                    {
+                        CreateOrdinaryEnemySpawn(
+                            "spawn.invalid-respawn-assignment",
+                            10,
+                            profile.ProfileKey,
+                            respawnPolicy: new WorldRespawnPolicyAssignment(
+                                (WorldRespawnPolicyAssignmentMode)999,
+                                null,
+                                null,
+                                "unsupported-assignment",
+                                "UNRESOLVED"))
+                    },
+                "Unsupported respawn assignment modes must fail profile validation.");
 
             OrdinaryEnemySpawnDefinition observedRespawn = CreateOrdinaryEnemySpawn(
                 "spawn.respawn-valid",
@@ -6567,7 +6620,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             OrdinaryEnemyWaypoint[] waypoints = null,
             bool useCapturedPatrolReplay = false,
             OrdinaryEnemyEvidenceState respawnEvidence = OrdinaryEnemyEvidenceState.Unresolved,
-            double? respawnDelaySeconds = null)
+            double? respawnDelaySeconds = null,
+            OrdinaryEnemySpawnLevelDefinition levelDefinition = null,
+            WorldRespawnPolicyAssignment respawnPolicy = null)
         {
             return new OrdinaryEnemySpawnDefinition(
                 spawnKey,
@@ -6600,7 +6655,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 OrdinaryEnemyRuntimeDisposition.Active,
                 string.Empty,
                 "test-capture",
-                "test-timestamp");
+                "test-timestamp",
+                levelDefinition,
+                respawnPolicy);
         }
 
         private static void AssertOrdinaryEnemyValidationFails(

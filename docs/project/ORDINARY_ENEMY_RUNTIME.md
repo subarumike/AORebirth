@@ -1,6 +1,6 @@
 # Generic Ordinary-Enemy Runtime
 
-Population ownership: profile-backed Subway rows are activated and respawned by `WorldPopulationController`. `OrdinaryEnemyRuntimeService` materializes requested rows only and no longer enumerates population or owns respawn timers. The catalog remains the capture-backed adapter with 259 rows, 221 active and 38 quarantined.
+Population ownership: profile-backed Subway rows are activated and respawned by `WorldPopulationController`. `OrdinaryEnemyRuntimeService` materializes requested rows only and does not enumerate population or own respawn timers. The catalog remains the capture-backed adapter with 260 rows, 222 active, and 38 quarantined.
 
 ## Decision
 
@@ -31,17 +31,18 @@ them as normal enemies.
 
 - stable spawn key and captured source identity;
 - profile key and playfield;
-- level, health, health damage, scale, and run speed;
+- captured source level, health, health damage, scale, and run speed;
+- one non-null generic level definition (`Fixed` or `InclusiveRange`), its evidence status, and its generation reroll policy;
 - exact position and orientation;
 - static, patrol, or captured-route movement data;
 - exact captured SCFU overrides when present;
-- explicit respawn evidence and delay;
+- explicit respawn assignment (`Inherit`, `Explicit`, or `NoRespawn`) plus evidence;
 - active or quarantined runtime disposition;
 - capture, timestamp, and owner provenance.
 
-Unknown combat, loot, credit, movement, and respawn evidence remains explicit.
-It is not converted into a zero, false, guaranteed drop, guessed delay, or
-working combat contract. The validator rejects duplicate profile keys, spawn
+Unknown combat, loot, credit, movement, and exact official respawn timing remains explicit.
+It is not converted into a zero, false, guaranteed drop, guessed level range, or
+working combat contract. Eligible ordinary rows without an explicit respawn exception inherit the documented PF127 project policy. The validator rejects duplicate profile keys, spawn
 keys, source identities, missing profile references, invalid controlled values,
 owned spawns, and scripted/boss rows.
 
@@ -55,6 +56,11 @@ owned spawns, and scripted/boss rows.
   or explicit unresolved.
 - Loot evidence: guaranteed proven, observed available, profile inherited,
   none proven, or unresolved.
+- Level: captured fixed value or an inclusive evidence-backed/policy range.
+- Level reroll: never for fixed rows; once per new population generation for a
+  range that explicitly selects `NewPopulationGeneration`.
+- Respawn: inherit the ordinary default, use an explicit policy, explicitly do
+  not respawn, or fail closed as unresolved.
 
 Scripted modes are modeled so imports can classify them, but the ordinary
 runtime validator rejects them and directs them to a custom encounter module.
@@ -63,17 +69,27 @@ the shared waypoint movement path until stronger behavior evidence exists.
 
 ## Runtime ownership
 
-`OrdinaryEnemyRuntimeService` is the only PF127 ordinary spawn coordinator. It:
+`WorldPopulationController` is the PF127 ordinary population owner. It selects
+enabled rows, resolves their effective respawn policy, creates generation
+numbers, delegates materialization, and schedules respawns through the single
+`WorldRespawnScheduler`.
 
-1. selects enabled rows from `OrdinaryEnemyCatalog`;
-2. constructs a template-backed or captured-direct `Character`;
-3. applies profile stats, appearance, movement, and combat data;
-4. registers the normalized runtime definition;
-5. preserves direct-spawn packet order: SCFU, then visible weapon definitions;
-6. delegates visibility replay to the existing visibility services;
-7. prevents duplicate source registration;
-8. schedules evidence-backed respawns and retries failed respawns after five seconds;
-9. removes runtime state during final despawn.
+`OrdinaryEnemyRuntimeService` is the only PF127 ordinary materializer. It:
+
+1. receives one population generation and selects its level exactly once through an injected selector;
+2. reuses that immutable selection for retries of the same generation;
+3. constructs a template-backed or captured-direct `Character`;
+4. applies the selected level, health, health damage, scale, and run speed before combat preparation;
+5. applies profile appearance and movement data and prepares the combat contract;
+6. stores the generation and selected variant in the normalized runtime definition;
+7. preserves direct-spawn packet order: SCFU, then visible weapon definitions;
+8. delegates visibility replay to the existing visibility services;
+9. prevents duplicate source registration and removes runtime state during final despawn.
+
+Visibility loss/re-entry, combat reset, corpse transitions, route recalculation,
+and ordinary runtime ticks do not call the selector. A ranged row rerolls only
+when `WorldPopulationController` requests a new generation. Fixed rows remain
+fixed after respawn.
 
 Existing services retain their established responsibilities:
 
@@ -113,15 +129,15 @@ services remain their established owners.
 ## Subway migration
 
 The catalog normalizes all existing supported-family and generated ordinary
-Subway evidence into 17 reusable type profiles and 259 exact spawn rows:
+Subway evidence into 18 reusable type profiles and 260 exact spawn rows:
 
 - supported profiles: Filth Flea, Discarded Pet, Disobedient Bot, Mugger, Thief,
   and Violent Vagabond;
 - generated ordinary profiles: Shadow, Stim Fiend, Workman Striker, Architect
   Striker, Workman, Architect, Looter, Deranged Shopper, Infector, Striker, and
-  Lost Thought.
+  Lost Thought, and Bloodcreeper.
 
-The existing safe activation boundary remains 221 active rows. The 29
+The existing safe activation boundary remains 222 active rows. The 29
 supported-family and 9 generated ordinary rows in the PF127 diagnostic slice
 remain present as data but quarantined by default. Profile or spawn existence
 does not enable a row.
@@ -150,6 +166,53 @@ range `29..79`, and 240-second post-despawn respawn.
 The combat tick no longer identifies Filth Flea by name or `MonsterData`.
 Opening and repeating special attacks are generic captured-contract data.
 
+## Bloodcreeper level policy
+
+Bloodcreeper is the only current ordinary row with an inclusive level
+definition. Catalog data configures `L15..L25`, rerolled once per new population
+generation through the same selector used by every ordinary row. Captured
+`L24/691 HP/run 83` and `L25/724 HP/run 86` anchor the existing private derived
+progression. The level 15-23 values remain documented policy, not capture claims.
+All other 259 rows remain explicit fixed-level definitions until evidence or an
+approved design decision establishes a range; the shared mechanism does not
+guess one.
+
+## Ordinary respawn policy
+
+PF127 eligible ordinary enemies inherit a 240-second post-NPC-despawn default.
+This is a private-project regular-enemy policy, not proof that every official AO
+Subway enemy uses one exact timer.
+
+Resolution precedence is:
+
+1. explicit per-spawn or per-archetype policy;
+2. explicit group/encounter policy where a group supplies one;
+3. the shared 240-second ordinary default for `OrdinaryEnemy` classifications;
+4. explicit no-respawn or unresolved/fail-closed behavior.
+
+Current explicit exceptions remain Thief at 60 seconds, Filth Flea at 240
+seconds, and Bloodcreeper at 240 seconds. The catalog contains 53 explicit
+spawn rows (the captured Thief row, the captured Filth Flea rows, and the
+Bloodcreeper row); the other 207 represented ordinary rows inherit the default
+without changing whether they are active or quarantined. Named enemies, bosses, scripted
+encounters, summons, pets, temporary encounter adds, vendors, static objects,
+containers, and quest-owned entities cannot inherit the ordinary default.
+Their existing owners and encounter-specific policies remain separate.
+
+Group policy references resolve through the same controller registration path;
+optional group overrides are injected before ordinary definitions resolve, and
+missing or unused group references fail closed. Policy registration rejects
+conflicting bodies that reuse one key, disabled overrides, invalid
+lifecycle-start values, non-finite/out-of-range delays, and zero-delay
+schedules. Bounded-random delays require the controller's explicit random
+source. Scripted policies remain with encounter owners, and scaffolded
+group-shared timers are rejected until synchronized semantics exist. Explicit
+no-respawn assignments carry stable policy keys so distinct provenance cannot
+collide. The single keyed scheduler rejects duplicate death or corpse-cleanup
+work and stale generation tokens. An early death/corpse-removal timer retains
+its pending due state and resumes when the dead runtime is released; it is not
+dropped merely because materialization was not yet safe.
+
 ## Capture-to-profile workflow
 
 `tools-temp/AOSharpCaptureAnalyzer/generate_subway_ordinary_content.py` is the
@@ -174,7 +237,7 @@ were emitted.
 
 1. Finish a comprehensive live capture and run the analyzer in `--check` mode.
 2. Review identity, placement, appearance, movement, combat, loot, corpse, and
-   respawn evidence. Leave unknowns explicit.
+   respawn-exception evidence. Leave unknowns explicit.
 3. Add or reuse one mechanically accurate type profile.
 4. Add exact spawn rows referencing that profile.
 5. Keep new rows quarantined until the accepted-enemy coverage and runtime gate
@@ -183,6 +246,10 @@ were emitted.
    generator, and ZoneEngine validation.
 
 No enemy-specific runtime class is added.
+
+Future respawn captures should identify exceptions, named/encounter behavior,
+or disputed timing. They are not required to prove the shared project default
+individually for every ordinary row.
 
 ## Adding a scripted boss
 
@@ -200,5 +267,7 @@ visibility suppression. Enabling many quarantined rows can still exercise that
 known boundary.
 
 Current unresolved data remains fail-closed, including combat sources without a
-landed captured hit, ordinary respawn delays not yet captured, automatic-aggro
-radii not yet captured, and random roam behavior not proven by movement evidence.
+landed captured hit, unsupported/nonordinary respawn classifications without an
+explicit owner policy, automatic-aggro radii not yet captured, level ranges not
+established by evidence or decision, and random roam behavior not proven by
+movement evidence. The same 38 diagnostic rows remain quarantined.

@@ -55,6 +55,7 @@ namespace ZoneEngine.Core.Playfields
                 SpawnGroupKey = "legacy-db.playfield." + mob.Playfield.ToString(CultureInfo.InvariantCulture),
                 RespawnPolicyKey = "legacy-db.unresolved",
                 ActivationPolicy = WorldSpawnActivationPolicy.Disabled,
+                Classification = WorldPopulationClassification.Unsupported,
                 Enabled = false,
                 Evidence = "legacy-database",
                 Confidence = "LEGACY_ACTIVE_WITH_TRACKED_OWNER",
