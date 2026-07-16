@@ -2,20 +2,19 @@
 
 ## Current Focus
 
-Mail Sent/Expires timestamps fixed from live capture `20260715-Recive-mail-datetime-stamp`.
+Nascence garden passage + zone Thrak statue teleports from capture `20260716-nascense-statues`.
 
-## Done in this slice
+## Implemented
 
-- Capture truth: list/detail wire ints after Subject are **Sent unix** and **Expire unix** (not credits/COD). Money is `ExtendedField64`. `TimeField` = 0 on live Market mail.
-- Credit-delivery expire = Sent + 2 days; player mail uses the same.
-- Flags base `0x7C`, bit0 = read.
+- Garden PF 4676/4677: **Use** on passage terminals → zones 4310/4311/4312 (capture coords).
+- Zone PF 4310/4311/4312: **UseItemOnItem** Tharak Insignia `281129` on Thrak statue → garden (4677 unredeemed / 4676 redeemed by OTUnredeemed).
 
-## Remaining
+## Retest
 
-1. Restart engines; send **new** mail; confirm Sent ≈ now and Expires ≈ +2 days.
-2. Subway when Mike returns that priority.
+Restart engines → garden passages out to each zone → insignia on zone Thrak statue back to garden.
 
-## Constraints
+## Gaps
 
-- Mail in-memory only.
-- Commit Mail before pull; `git pull --no-rebase`.
+- Redeemed garden return pos (4676) is staticdynels approx, not capture-backed.
+- PF 4313 Training Ground not in capture/DB.
+- Omni NPC Tharak dialog teleport not captured.
