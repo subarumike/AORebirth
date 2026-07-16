@@ -44,7 +44,10 @@
       <Link>RawSimpleCharFullUpdateDecoder.cs</Link>
     </Compile>
     <Compile Include="CombatLootSmoke.cs" />
+    <Compile Include="CaptureRuntimeSafety.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="MinimalPf127Capture.cs" />
+    <Compile Include="Pf127GeometryCapture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

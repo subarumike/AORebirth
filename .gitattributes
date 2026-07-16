@@ -9,6 +9,9 @@
 *.fsproj merge=union
 *.dbproj merge=union
 
+# Capture-backed PF127 geometry is byte-hash validated and must remain LF-only.
+AORebirth/Server/ZoneEngine/Content/Captured/Subway/pf127-geometry.json text eol=lf
+
 # Standard to msysgit
 *.doc	 diff=astextplain
 *.DOC	 diff=astextplain

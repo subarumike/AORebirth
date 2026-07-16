@@ -870,11 +870,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 decodedPipeline.Contains("this.decodedN3EventRowCount++;")
                 && decodedPipeline.Contains("\"npc-lifecycle-export\"")
-                && decodedPipeline.Contains("\"enemy-fight-export\"")
+                && decodedPipeline.Contains("\"enemy-fight-annotation\"")
+                && decodedPipeline.Contains("\"enemy-evidence-export\"")
                 && captureText.Contains("N3-STAGE-ERROR"),
                 "Decoded metadata must be logged first and every evidence exporter must be failure-isolated.");
             Assert.IsTrue(
-                fightSelector.Contains("if (IsEnemyCombatEvidenceMessage(message))")
+                fightSelector.Contains("bool isCombatEvidence = IsEnemyCombatEvidenceMessage(message);")
+                && fightSelector.Contains("if (isCombatEvidence)")
                 && fightSelector.Contains("this.enemyFightCaptureStarted = true;")
                 && captureText.Contains("\"SpecialAttackWeapon\"")
                 && captureText.Contains("IsRawCombatEvidencePacket(packet)"),
@@ -907,6 +909,279 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && captureText.Contains("LootCaptureRequestFileName")
                 && captureText.Contains("loot-10 armed by approved launcher"),
                 "Codex must be able to arm ten-kill loot validation through the approved external launcher without asking Mike to type an in-game command.");
+        }
+
+        [TestMethod]
+        public void AOSharpPf127CaptureContainsRuntimeFailuresAndSnapshotsCharacterWrappersOnce()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string mainText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"tools-temp\AOSharpLiveCapture\Main.cs"));
+            string geometryText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"tools-temp\AOSharpLiveCapture\Pf127GeometryCapture.cs"));
+            string runtimeSafetyText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"tools-temp\AOSharpLiveCapture\CaptureRuntimeSafety.cs"));
+            string mainUpdate = ExtractMethodBlock(
+                mainText,
+                "private void OnUpdate(object sender, float deltaTime)");
+            string runMethod = ExtractMethodBlock(
+                mainText,
+                "private void Initialize(string pluginDir)");
+            string lineOfSightSample = ExtractMethodBlock(
+                geometryText,
+                "private void SampleLineOfSight(");
+            string geometryWriter = ExtractMethodBlock(
+                geometryText,
+                "private void TryWriteCanonicalGeometry()");
+            int readinessObserved = geometryWriter.IndexOf(
+                "Interlocked.Exchange(ref this.geometryStage, GeometryStageReadinessObserved)",
+                StringComparison.Ordinal);
+            int loadSurfaces = geometryWriter.IndexOf("DevExtras.LoadAllSurfaces()", StringComparison.Ordinal);
+            int surfacesLoaded = geometryWriter.IndexOf(
+                "Interlocked.Exchange(ref this.geometryStage, GeometryStageSurfacesLoaded)",
+                StringComparison.Ordinal);
+            int serializeGeometry = geometryWriter.IndexOf(
+                "WriteCanonicalGeometryAttempt(attemptPath)",
+                StringComparison.Ordinal);
+
+            Assert.IsTrue(
+                mainUpdate.Contains("Volatile.Read(ref this.pf127CaptureRuntimeReady) != 0")
+                && mainUpdate.Contains("geometryCapture.ExecuteUpdateBoundary(")
+                && runMethod.IndexOf("this.LogSnapshot(\"initial\")", StringComparison.Ordinal)
+                   < runMethod.IndexOf("Interlocked.Exchange(ref this.pf127CaptureRuntimeReady, 1)", StringComparison.Ordinal)
+                && runMethod.IndexOf("Interlocked.Exchange(ref this.pf127CaptureRuntimeReady, 1)", StringComparison.Ordinal)
+                   < runMethod.IndexOf("Game.OnUpdate += this.OnUpdateBoundary", StringComparison.Ordinal),
+                "PF127 instrumentation must start only after plugin startup and must never escape Game.OnUpdate.");
+            Assert.IsTrue(
+                geometryText.Contains("pf127-capture-errors.log")
+                && geometryText.Contains("CaptureRuntimeCircuitBreaker")
+                && geometryText.Contains("runtime circuit breaker tripped")
+                && geometryText.Contains("GeometryStageReadinessObserved")
+                && geometryText.Contains("GeometryStageSurfacesLoaded")
+                && geometryText.Contains("GeometryStageCircuitBroken")
+                && geometryText.Contains("ex.ToString()")
+                && readinessObserved >= 0
+                && loadSurfaces > readinessObserved
+                && surfacesLoaded > readinessObserved
+                && serializeGeometry > surfacesLoaded
+                && geometryWriter.Contains("this.residentSurfacesOnly")
+                && geometryWriter.Contains("canonical serialization is deferred to the next update")
+                && geometryWriter.Contains("surface loading is deferred to the next update"),
+                "PF127 runtime failures must retain full durable evidence and fail validation closed without native retries.");
+            Assert.IsTrue(
+                lineOfSightSample.Contains("CaptureRuntimeSafety.TrySnapshot<SimpleChar, LineOfSightTargetSnapshot>(")
+                && lineOfSightSample.Contains("Identity identity = character.Identity;")
+                && lineOfSightSample.Contains("TryReadMonsterData(")
+                && lineOfSightSample.Contains("() => character.IsInLineOfSight")
+                && lineOfSightSample.Contains("characterSnapshots.RemoveAll(character => character.Identity == localIdentity)")
+                && geometryText.Contains("this.combatRequestGate.TryBegin(")
+                && geometryText.Contains("batchHasOnlyUsableNpcPairs")
+                && geometryText.Contains("this.combatRequestGate.MarkRetryRequired()")
+                && geometryText.Contains("this.CompleteCombatRequest(combatRequest.Generation)")
+                && runtimeSafetyText.Contains("internal sealed class CaptureCombatRequestGate")
+                && runtimeSafetyText.Contains("private readonly object syncRoot = new object()")
+                && runtimeSafetyText.Contains("this.generation++;")
+                && runtimeSafetyText.Contains("this.generation != sampledGeneration"),
+                "LOS sampling must capture wrapper identity once, skip invalid wrappers, and retry incomplete combat evidence.");
+            Assert.IsFalse(
+                lineOfSightSample.Contains(".Where(character =>")
+                || lineOfSightSample.Contains(".OrderBy(character =>")
+                || lineOfSightSample.Contains(".ThenBy(character =>")
+                || geometryText.Contains("target.Character")
+                || geometryText.Contains("public SimpleChar Character")
+                || geometryText.Contains("Playfield.Doors == null")
+                || geometryText.Contains("room.Doors == null")
+                || geometryText.Contains("zones.Any(zone =>")
+                || geometryText.Contains(".Select(door => DoorIdentityKey((int)door.Identity.Type")
+                || geometryText.Contains("nextCombatSampleRetryUtc")
+                || geometryText.Contains("combatRequestGeneration")
+                || mainText.Contains("RequestCombatSample(identityType, identityInstance)"),
+                "LOS collection ordering must not repeatedly dereference live AO character wrappers.");
+        }
+
+        [TestMethod]
+        public void AOSharpLiveCaptureRoutesEveryRegisteredCallbackThroughOneDurableNoThrowBoundary()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string mainText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"tools-temp\AOSharpLiveCapture\Main.cs"));
+            string runtimeSafetyText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"tools-temp\AOSharpLiveCapture\CaptureRuntimeSafety.cs"));
+            string runMethod = ExtractMethodBlock(mainText, "public override void Run(string pluginDir)");
+            string initializeMethod = ExtractMethodBlock(mainText, "private void Initialize(string pluginDir)");
+            string teardownMethod = ExtractMethodBlock(mainText, "public override void Teardown()");
+            string unsubscribeMethod = ExtractMethodBlock(mainText, "private void UnsubscribeCallbacksNoThrow()");
+            string dispatchMethod = ExtractMethodBlock(
+                mainText,
+                "private void DispatchCallback(string callbackName, Action callback)");
+            string startMinimalMethod = ExtractMethodBlock(
+                mainText,
+                "private void StartMinimalPf127CaptureNoThrow(string pluginDir)");
+            string teardownMinimalMethod = ExtractMethodBlock(
+                mainText,
+                "private void TeardownMinimalPf127CaptureNoThrow()");
+            string validationMethod = ExtractMethodBlock(mainText, "private CaptureValidation ValidateCapture()");
+            string healthMethod = ExtractMethodBlock(
+                mainText,
+                "private void WriteCaptureHealth(CaptureValidation validation)");
+
+            string[] registrations =
+            {
+                "Network.PacketReceived += this.OnPacketReceivedBoundary;",
+                "Network.PacketSent += this.OnPacketSentBoundary;",
+                "Network.N3MessageReceived += this.OnN3MessageReceivedBoundary;",
+                "Network.N3MessageSent += this.OnN3MessageSentBoundary;",
+                "Network.ChatMessageReceived += this.OnChatMessageReceivedBoundary;",
+                "DynelManager.DynelSpawned += this.OnDynelSpawnedBoundary;",
+                "DynelManager.CharInPlay += this.OnCharInPlayBoundary;",
+                "Game.PlayfieldInit += this.OnPlayfieldInitBoundary;",
+                "Game.TeleportStarted += this.OnTeleportStartedBoundary;",
+                "Game.TeleportEnded += this.OnTeleportEndedBoundary;",
+                "Game.TeleportFailed += this.OnTeleportFailedBoundary;",
+                "Game.OnUpdate += this.OnUpdateBoundary;",
+                "Chat.RegisterCommand(\"aocap\", this.OnCommandBoundary);",
+                "Chat.RegisterCommand(\"aosmoke\", this.OnSmokeCommandBoundary);"
+            };
+            string[] callbackNames =
+            {
+                "Chat.Command.aocap",
+                "Chat.Command.aosmoke",
+                "Network.PacketReceived",
+                "Network.PacketSent",
+                "Network.N3MessageReceived",
+                "Network.N3MessageSent",
+                "Network.ChatMessageReceived",
+                "DynelManager.DynelSpawned",
+                "DynelManager.CharInPlay",
+                "Game.PlayfieldInit",
+                "Game.TeleportStarted",
+                "Game.TeleportEnded",
+                "Game.TeleportFailed",
+                "Game.OnUpdate",
+                "Game.OnUpdate.MinimalPf127Capture"
+            };
+            string[] unsubscriptions =
+            {
+                "Network.PacketReceived -= this.OnPacketReceivedBoundary",
+                "Network.PacketSent -= this.OnPacketSentBoundary",
+                "Network.N3MessageReceived -= this.OnN3MessageReceivedBoundary",
+                "Network.N3MessageSent -= this.OnN3MessageSentBoundary",
+                "Network.ChatMessageReceived -= this.OnChatMessageReceivedBoundary",
+                "DynelManager.DynelSpawned -= this.OnDynelSpawnedBoundary",
+                "DynelManager.CharInPlay -= this.OnCharInPlayBoundary",
+                "Game.PlayfieldInit -= this.OnPlayfieldInitBoundary",
+                "Game.TeleportStarted -= this.OnTeleportStartedBoundary",
+                "Game.TeleportEnded -= this.OnTeleportEndedBoundary",
+                "Game.TeleportFailed -= this.OnTeleportFailedBoundary",
+                "Game.OnUpdate -= this.OnUpdateBoundary"
+            };
+
+            foreach (string registration in registrations)
+            {
+                StringAssert.Contains(initializeMethod, registration);
+            }
+
+            foreach (string callbackName in callbackNames)
+            {
+                StringAssert.Contains(mainText, "\"" + callbackName + "\"");
+            }
+
+            foreach (string unsubscription in unsubscriptions)
+            {
+                StringAssert.Contains(unsubscribeMethod, unsubscription);
+            }
+
+            Assert.IsTrue(
+                runMethod.Contains("this.callbackBoundary.Dispatch(")
+                && runMethod.Contains("this.DisableAfterInitializationFailureNoThrow();")
+                && !runMethod.Contains("throw;")
+                && teardownMethod.Contains("this.callbackBoundary.Dispatch(\"Plugin.Teardown\"")
+                && dispatchMethod.Contains("Volatile.Read(ref this.callbackDispatchEnabled) == 0")
+                && dispatchMethod.Contains("this.callbackBoundary.Dispatch("),
+                "Initialization, teardown, retained commands, and every subscribed callback must be no-throw through one dispatcher.");
+            AssertTextBefore(
+                initializeMethod,
+                "Game.OnUpdate += this.OnUpdateBoundary;",
+                "Chat.RegisterCommand(\"aocap\", this.OnCommandBoundary);");
+            AssertTextBefore(
+                runMethod,
+                "MinimalPf127Capture.ConsumeRequestNoThrow(pluginDir)",
+                "this.Initialize(pluginDir);");
+            Assert.IsTrue(
+                startMinimalMethod.Contains("Game.OnUpdate += this.OnMinimalPf127CaptureUpdateBoundary;")
+                && mainText.Contains("private void OnMinimalPf127CaptureUpdateBoundary")
+                && mainText.Contains("\"Game.OnUpdate.MinimalPf127Capture\"")
+                && teardownMinimalMethod.Contains("Game.OnUpdate -= this.OnMinimalPf127CaptureUpdateBoundary")
+                && runMethod.Contains("return;")
+                && startMinimalMethod.Contains("this.initialized = true;")
+                && startMinimalMethod.Contains("return;")
+                && !startMinimalMethod.Contains("this.Initialize("),
+                "Geometry-only mode must use the same no-throw callback boundary and never fall through to comprehensive subscriptions.");
+            Assert.IsTrue(
+                runtimeSafetyText.Contains("internal sealed class CaptureCallbackBoundary")
+                && runtimeSafetyText.Contains("File.AppendAllText(path, evidence, Encoding.UTF8)")
+                && runtimeSafetyText.Contains("exception.ToString()")
+                && runtimeSafetyText.Contains("this.totalInvocationCount++")
+                && runtimeSafetyText.Contains("this.totalErrorCount++")
+                && mainText.Contains("capture-callback-errors.log")
+                && mainText.Contains("this.callbackBoundary.BeginSession("),
+                "Callback failures must retain full durable evidence and per-callback accounting for the active capture.");
+            Assert.IsTrue(
+                validationMethod.Contains("CaptureCallbackBoundarySnapshot callbackHealth")
+                && validationMethod.Contains("callbackHealth.TotalErrorCount > 0")
+                && healthMethod.Contains("this.AppendCallbackHealthJson(json, \"  \")")
+                && mainText.Contains("\\\"callbackHealth\\\"")
+                && mainText.Contains("callbackHealth.TotalErrorCount > 0"),
+                "Any callback failure must make comprehensive capture validation incomplete and appear in capture health.");
+        }
+
+        [TestMethod]
+        public void AOSharpPf127NativeCollectionWaitsForMatchingTeleportEnd()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string mainText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"tools-temp\AOSharpLiveCapture\Main.cs"));
+            string playfieldInit = ExtractMethodBlock(
+                mainText,
+                "private void OnPlayfieldInit(object sender, uint playfieldId)");
+            string teleportStarted = ExtractMethodBlock(
+                mainText,
+                "private void OnTeleportStarted(object sender, EventArgs e)");
+            string teleportEnded = ExtractMethodBlock(
+                mainText,
+                "private void OnTeleportEnded(object sender, EventArgs e)");
+            string update = ExtractMethodBlock(
+                mainText,
+                "private void OnUpdate(object sender, float deltaTime)");
+            string activate = ExtractMethodBlock(mainText, "private void ActivateCaptureSession()");
+
+            Assert.IsTrue(
+                teleportStarted.Contains("Interlocked.Increment(ref this.teleportGeneration)")
+                && teleportStarted.Contains("Interlocked.Exchange(ref this.teleportInProgress, 1)")
+                && teleportStarted.Contains("Interlocked.Exchange(ref this.pf127CollectionArmed, 0)")
+                && teleportStarted.Contains("NotifyPlayfieldChanged(false)"),
+                "Teleport start must synchronously cancel native PF collection.");
+            Assert.IsTrue(
+                playfieldInit.Contains("this.lastPlayfieldId = playfieldId.ToString")
+                && playfieldInit.Contains("ref this.playfieldInitGeneration")
+                && playfieldInit.Contains("NotifyPlayfieldChanged(false)")
+                && !playfieldInit.Contains("Playfield.")
+                && !playfieldInit.Contains("LogSnapshot(")
+                && !playfieldInit.Contains("RequestImmediateUpdate()"),
+                "PlayfieldInit may record only the numeric generation while AO native wrappers are unstable.");
+            Assert.IsTrue(
+                teleportEnded.Contains("matchingPlayfieldInit")
+                && teleportEnded.Contains("string.Equals(this.lastPlayfieldId, \"127\"")
+                && teleportEnded.Contains("Interlocked.Exchange(ref this.teleportInProgress, 0)")
+                && teleportEnded.Contains("NotifyPlayfieldChanged(isPf127)")
+                && update.Contains("Volatile.Read(ref this.teleportInProgress) == 0")
+                && update.Contains("Volatile.Read(ref this.pf127CollectionArmed) != 0"),
+                "Only the matching stable teleport end may arm PF127 Rooms, Doors, and LOS access.");
+            Assert.IsFalse(
+                activate.Contains("IsDetectedResourcePlayfield127()")
+                || activate.Contains("NotifyPlayfieldChanged(")
+                || activate.Contains("RequestImmediateUpdate()"),
+                "Opening or restarting raw capture must not bypass the teleport stability gate.");
         }
 
         [TestMethod]
