@@ -50,6 +50,11 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
+            if (NascenceStatueTeleportInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
             if (SurgeryClinicInteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;

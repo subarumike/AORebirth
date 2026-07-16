@@ -21,6 +21,11 @@ namespace ZoneEngine.Core.MessageHandlers
 
         public bool TryHandle(IZoneClient client, GenericCmdMessage message)
         {
+            if (NascenceStatueTeleportInteractionHandler.Default.TryHandleUseItemOnItem(client, message))
+            {
+                return true;
+            }
+
             return InventoryContainerRuntimeService.Default.TryHandleUseItemOnItem(client, message);
         }
     }

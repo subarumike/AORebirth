@@ -169,6 +169,14 @@
     <Compile Include="Core\Functions\GameFunctions\changebodymesh.cs" />
     <Compile Include="Core\Functions\GameFunctions\changeactionrestriction.cs" />
     <Compile Include="Core\Functions\GameFunctions\lockskill.cs" />
+    <Compile Include="Core\Functions\GameFunctions\lockperk.cs" />
+    <Compile Include="Core\Functions\GameFunctions\castnano.cs" />
+    <Compile Include="Core\Functions\GameFunctions\teamcastnano.cs" />
+    <Compile Include="Core\Functions\GameFunctions\areacastnano.cs" />
+    <Compile Include="Core\Functions\GameFunctions\undefined.cs" />
+    <Compile Include="Core\Functions\GameFunctions\specialhit.cs" />
+    <Compile Include="Core\Functions\GameFunctions\drainhit.cs" />
+    <Compile Include="Core\Functions\GameFunctions\reducenanostrainduration.cs" />
     <Compile Include="Core\Functions\GameFunctions\shophash.cs" />
     <Compile Include="Core\Functions\GameFunctions\exitproxyplayfield.cs" />
     <Compile Include="Core\Functions\GameFunctions\headmesh.cs" />
@@ -214,6 +222,7 @@
     <Compile Include="Core\PetAttackPetCombatCatalog.cs" />
     <Compile Include="Core\PetHealingPetScfuCatalog.cs" />
     <Compile Include="Core\PetMobTemplateResolver.cs" />
+    <Compile Include="Core\SoothingSpiritsHealPetLadder.cs" />
     <Compile Include="Core\PetSlotClassifier.cs" />
     <Compile Include="Core\PetBureaucratCompanionAppearance.cs" />
     <Compile Include="Core\PetBureaucratGuardianAppearance.cs" />
@@ -230,6 +239,11 @@
     <Compile Include="Core\MessageHandlers\BankMessageHandler.cs" />
     <Compile Include="Core\Mail\MailMessageHandler.cs" />
     <Compile Include="Core\Mail\MailRuntimeService.cs" />
+    <Compile Include="Core\GMI\GmiRuntimeService.cs" />
+    <Compile Include="Core\GMI\MarketSendMessageHandler.cs" />
+    <Compile Include="Core\Perks\PerkDefinition.cs" />
+    <Compile Include="Core\Perks\PerkCatalog.cs" />
+    <Compile Include="Core\Perks\PerkRuntimeService.cs" />
     <Compile Include="Core\MessageHandlers\BuffMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\AddPetMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\RemovePetMessageHandler.cs" />
@@ -262,6 +276,8 @@
     <Compile Include="Core\MessageHandlers\GridTerminalInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\GuestKeyGeneratorInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\GuestKeyGeneratorInteractionRules.cs" />
+    <Compile Include="Core\MessageHandlers\NascenceStatueTeleportCatalog.cs" />
+    <Compile Include="Core\MessageHandlers\NascenceStatueTeleportInteractionHandler.cs" />
     <Compile Include="Core\InventoryContainerRuntimeService.cs" />
     <Compile Include="Core\PacketSequencingCoordinator.cs" />
     <Compile Include="Core\MessageHandlers\InventoryContainerInteractionHandler.cs" />
@@ -317,6 +333,7 @@
     <Compile Include="Core\Packets\UnEquip.cs" />
     <Compile Include="Core\Packets\WeaponItemFullUpdate.cs" />
     <Compile Include="Core\Playfields\Content\AreteContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\JobePlatformContentModule.cs" />
     <Compile Include="Core\Playfields\Content\IPlayfieldContentModule.cs" />
     <Compile Include="Core\Playfields\Content\MontroyalContentModule.cs" />
     <Compile Include="Core\Playfields\Content\PlayfieldContentCoordinator.cs" />
@@ -325,6 +342,7 @@
     <Compile Include="Core\Playfields\Content\SubwayContentModule.cs" />
     <Compile Include="Core\Playfields\CapturedAreteRobotContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs" />
+    <Compile Include="Core\Playfields\PerkResetServiceProviderSpawn.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatContract.cs" />
@@ -407,6 +425,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Compile Include="Scripts\KnuBotItemGiver.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Scripts\PerkResetService.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Script\IAOScript.cs" />
@@ -542,6 +563,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML Data\Perks.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\PerkActions.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML Data\Playfields.xml">
