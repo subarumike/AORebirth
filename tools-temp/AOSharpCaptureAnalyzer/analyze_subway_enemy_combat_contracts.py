@@ -22,6 +22,8 @@ CAPTURES = (
     "20260709-220439",
     "20260709-222339",
     "20260710-205400",
+    "20260716-033326",
+    "20260716-034104",
 )
 OUTPUT = REPO / "docs" / "generated" / "subway_enemy_combat_contracts.json"
 
@@ -33,6 +35,7 @@ WEAPON_UPDATE = re.compile(
     r"Owner=(?P<owner>\(SimpleChar:[0-9A-F]+\)).*"
     r"ACGItemLevel=(?P<quality>\d+).*ACGItemTemplateID=(?P<template>\d+)"
 )
+MONSTER_DATA_DETAIL = re.compile(r"\bmonsterData=(?P<monster_data>\d+)")
 
 
 def read_csv(path: Path):
@@ -44,6 +47,53 @@ def read_csv(path: Path):
 
 def parse_time(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def first_value(row: dict[str, str], *names: str) -> str:
+    for name in names:
+        value = row.get(name, "").strip()
+        if value:
+            return value
+    return ""
+
+
+def simple_char_identity(value: str) -> str:
+    value = value.strip()
+    if value.startswith("(SimpleChar:") and value.endswith(")"):
+        return value
+    if value.startswith("SimpleChar:"):
+        return f"({value})"
+    if re.fullmatch(r"[0-9A-Fa-f]{8}", value):
+        return f"(SimpleChar:{value.upper()})"
+    return ""
+
+
+def add_identity(identities: dict[str, dict[str, object]], row: dict[str, str]):
+    identity = simple_char_identity(
+        first_value(
+            row,
+            "Identity",
+            "NpcIdentity",
+            "NPCIdentity",
+            "EnemyIdentity",
+            "CharacterIdentity",
+            "PrimaryIdentity",
+        )
+    )
+    name = first_value(row, "Name", "NpcName", "NPCName", "EnemyName")
+    if not identity or not name or name.startswith("Remains of "):
+        return
+    monster_data_value = first_value(row, "MonsterData", "MonsterDataId")
+    if not monster_data_value:
+        match = MONSTER_DATA_DETAIL.search(row.get("Detail", ""))
+        monster_data_value = match.group("monster_data") if match else ""
+    monster_data = int(monster_data_value or 0)
+    current = identities.get(identity)
+    if current is None or (not current["monsterData"] and monster_data):
+        identities[identity] = {
+            "name": name,
+            "monsterData": monster_data,
+        }
 
 
 def main():
@@ -62,10 +112,9 @@ def main():
         folder = CAPTURE_ROOT / capture_name
         identities = {}
         for row in read_csv(folder / "enemy-full-updates.csv"):
-            identities[row["Identity"]] = {
-                "name": row["Name"],
-                "monsterData": int(row["MonsterData"] or 0),
-            }
+            add_identity(identities, row)
+        for row in read_csv(folder / "npc-lifecycle.csv"):
+            add_identity(identities, row)
 
         for row in read_csv(folder / "enemy-combat.csv"):
             source = row.get("SourceIdentity", "")
@@ -87,6 +136,7 @@ def main():
                 continue
             group["attacks"].append(
                 {
+                    "capture": capture_name,
                     "identity": source,
                     "capturedUtc": row["CapturedUtc"],
                     "amount": amount,
@@ -121,10 +171,18 @@ def main():
     for name, group in sorted(grouped.items()):
         attacks = group["attacks"]
         intervals = []
-        by_identity = defaultdict(list)
+        by_identity_shape = defaultdict(list)
         for attack in attacks:
-            by_identity[attack["identity"]].append(parse_time(attack["capturedUtc"]))
-        for times in by_identity.values():
+            by_identity_shape[
+                (
+                    attack["capture"],
+                    attack["identity"],
+                    attack["weaponSlot"],
+                    attack["attackInfoUnknown"],
+                    attack["weaponInstance"],
+                )
+            ].append(parse_time(attack["capturedUtc"]))
+        for times in by_identity_shape.values():
             times.sort()
             for previous, current in zip(times, times[1:]):
                 seconds = (current - previous).total_seconds()
@@ -139,6 +197,53 @@ def main():
             (row["templateId"], row["quality"])
             for row in group["weapons"]
         )
+        attack_shape_evidence = []
+        for (shape_slot, shape_unknown, shape_instance), rows in sorted(
+            attack_shapes.items(),
+            key=lambda item: (-item[1], item[0]),
+        ):
+            matching = [
+                row
+                for row in attacks
+                if (
+                    row["weaponSlot"],
+                    row["attackInfoUnknown"],
+                    row["weaponInstance"],
+                )
+                == (shape_slot, shape_unknown, shape_instance)
+            ]
+            shape_intervals = []
+            matching_by_identity = defaultdict(list)
+            for row in matching:
+                matching_by_identity[(row["capture"], row["identity"])].append(
+                    parse_time(row["capturedUtc"])
+                )
+            for times in matching_by_identity.values():
+                times.sort()
+                for previous, current in zip(times, times[1:]):
+                    seconds = (current - previous).total_seconds()
+                    if 0.5 <= seconds <= 10.0:
+                        shape_intervals.append(seconds)
+            shape_intervals.sort()
+            attack_shape_evidence.append(
+                {
+                    "weaponSlot": shape_slot,
+                    "attackInfoUnknown": shape_unknown,
+                    "weaponInstance": shape_instance,
+                    "rows": rows,
+                    "captures": sorted({row["capture"] for row in matching}),
+                    "minDamage": min(row["amount"] for row in matching),
+                    "maxDamage": max(row["amount"] for row in matching),
+                    "intervalRows": len(shape_intervals),
+                    "minIntervalSeconds": min(shape_intervals) if shape_intervals else None,
+                    "medianIntervalSeconds": (
+                        shape_intervals[(len(shape_intervals) - 1) // 2]
+                        if shape_intervals
+                        else None
+                    ),
+                    "maxIntervalSeconds": max(shape_intervals) if shape_intervals else None,
+                }
+            )
         slot, unknown, instance = attack_shapes.most_common(1)[0][0] if attack_shapes else (0, 0, 0)
         template_id, quality = weapon_shapes.most_common(1)[0][0] if weapon_shapes else (0, 0)
         report[name] = {
@@ -155,6 +260,7 @@ def main():
             "weaponSlot": slot,
             "attackInfoUnknown": unknown,
             "attackInfoWeaponInstance": instance,
+            "attackShapes": attack_shape_evidence,
             "equippedWeaponObserved": bool(weapon_shapes),
             "equippedWeaponTemplateId": template_id,
             "equippedWeaponQuality": quality,

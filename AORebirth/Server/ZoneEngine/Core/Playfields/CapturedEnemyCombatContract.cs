@@ -848,6 +848,61 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
                             NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
                             NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponLastValue));
+                case 30379:
+                    return CapturedEnemyCombatContract.CapturedParallelAttackSequence(
+                        "20260709-222339 and 20260716-033326/034104: Bloodcreeper proactive dual Skinspider Bite/Spit natural attacks, 21-41 rolled damage, and independent captured hand cadence",
+                        new CapturedEnemyParallelAttackSequenceDefinition(
+                            new[]
+                            {
+                                new CapturedEnemyParallelAttackStreamDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayBloodcreeperSpitInitialSeconds,
+                                    new CapturedEnemyCombatAttackDefinition(
+                                        NpcCombatAttackRules.CapturedSubwayBloodcreeperSpitMinimumDamage,
+                                        NpcCombatAttackRules.CapturedSubwayBloodcreeperSpitMaximumDamage,
+                                        0,
+                                        NpcCombatAttackRules.MaxMeleeCombatDistance,
+                                        NpcCombatAttackRules.CapturedSubwayBloodcreeperSpitRechargeSeconds,
+                                        false,
+                                        NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                                        NpcCombatAttackRules.CapturedSubwayBloodcreeperSpitWeaponSlot,
+                                        0,
+                                        NpcCombatAttackRules.NormalAttackInfoHitType,
+                                        NpcCombatAttackRules.CapturedSubwayBloodcreeperSpitTag,
+                                        true)),
+                                new CapturedEnemyParallelAttackStreamDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayBloodcreeperBiteInitialSeconds,
+                                    new CapturedEnemyCombatAttackDefinition(
+                                        NpcCombatAttackRules.CapturedSubwayBloodcreeperBiteMinimumDamage,
+                                        NpcCombatAttackRules.CapturedSubwayBloodcreeperBiteMaximumDamage,
+                                        0,
+                                        NpcCombatAttackRules.MaxMeleeCombatDistance,
+                                        NpcCombatAttackRules.CapturedSubwayBloodcreeperBiteRechargeSeconds,
+                                        false,
+                                        NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                                        NpcCombatAttackRules.CapturedSubwayBloodcreeperBiteWeaponSlot,
+                                        0,
+                                        NpcCombatAttackRules.NormalAttackInfoHitType,
+                                        NpcCombatAttackRules.CapturedSubwayBloodcreeperBiteTag,
+                                        true))
+                            },
+                            new[]
+                            {
+                                new CapturedEnemySpecialAttackDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayBloodcreeperSpitLowTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayBloodcreeperSpitHighTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayBloodcreeperSpitTag,
+                                    NpcCombatAttackRules.CapturedSubwayBloodcreeperSpitName),
+                                new CapturedEnemySpecialAttackDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayBloodcreeperBiteLowTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayBloodcreeperBiteHighTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayBloodcreeperBiteTag,
+                                    NpcCombatAttackRules.CapturedSubwayBloodcreeperBiteName)
+                            },
+                            NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponLastValue));
                 case 203734:
                     return CapturedEnemyCombatContract.FixedAttack(
                         "20260709-210452/212115/212336/220439: Mugger AttackInfo",
@@ -895,6 +950,12 @@ namespace AORebirth.Core.Playfields
         internal static CapturedEnemyCombatContract ForOrdinary(
             CapturedSubwayOrdinaryArchetypeDefinition archetype)
         {
+            if (archetype != null
+                && archetype.MonsterData == NpcCombatAttackRules.CapturedSubwayBloodcreeperMonsterData)
+            {
+                return For(archetype.Name, archetype.MonsterData);
+            }
+
             CapturedSubwayCombatEvidenceDefinition combat = archetype.Combat;
             if (combat == null || !combat.Observed)
             {

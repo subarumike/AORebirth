@@ -30,11 +30,11 @@ SUPPORTED_NAMES = {
 }
 
 ORDINARY_NAMES = {
-    "Looter", "Stim Fiend", "Deranged Shopper",
+    "Looter", "Stim Fiend", "Deranged Shopper", "Bloodcreeper",
 }
 
 NAMED_BOSSES = {
-    "Abmouth Supremus", "Bitaxel", "Bloodcreeper", "Empty Shell",
+    "Abmouth Supremus", "Bitaxel", "Empty Shell",
     "Eumenides", "Fragmented Soul", "Incomplete Rebuild", "Melded Patterns",
     "Molested Molecules", "Premature Pattern", "Redundant Scan", "Strike Foreman",
     "Vergil Aeneid",

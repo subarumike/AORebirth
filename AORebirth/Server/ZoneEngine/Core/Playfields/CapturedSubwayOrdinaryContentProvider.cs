@@ -517,6 +517,47 @@ namespace AORebirth.Core.Playfields
                     "20260709-222339"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
+                "bloodcreeper",
+                "bloodcreeper",
+                "Bloodcreeper",
+                30379,
+                63,
+                0,
+                268980737,
+                0,
+                0,
+                31,
+                0,
+                1483u,
+                0,
+                new CapturedSubwayTextureDefinition[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 0, 0),
+                    new CapturedSubwayTextureDefinition(1, 0, 0),
+                    new CapturedSubwayTextureDefinition(2, 0, 0),
+                    new CapturedSubwayTextureDefinition(3, 0, 0),
+                    new CapturedSubwayTextureDefinition(4, 0, 0)
+                },
+                new CapturedSubwayMeshDefinition[]
+                {
+                },
+                new CapturedSubwayCombatEvidenceDefinition(
+                    true,
+                    21,
+                    41,
+                    6.499240,
+                    1,
+                    0,
+                    1397446450,
+                    6),
+                new CapturedSubwayLootEvidenceDefinition[]
+                {
+                },
+                new string[]
+                {
+                    "20260709-222339"
+                }),
+            new CapturedSubwayOrdinaryArchetypeDefinition(
                 "deranged_shopper",
                 "deranged_shopper",
                 "Deranged Shopper",
@@ -707,6 +748,48 @@ namespace AORebirth.Core.Playfields
                 "",
                 "20260709-212336",
                 "2026-07-10T02:33:47.2707446Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795450A1,
+                "bloodcreeper",
+                25,
+                724,
+                0,
+                70,
+                86,
+                238.607025f, 72.81637f, 35.66259f,
+                0.0f, 0.143367931f, 0.0f, 0.9896694f,
+                (SimpleCharFullUpdateFlags)0x022A4A43,
+                0,
+                "00000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7195387Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451C5,
+                "bloodcreeper",
+                24,
+                691,
+                0,
+                70,
+                83,
+                221.830154f, 73.01637f, 99.27147f,
+                0.0f, 0.699244559f, 0.0f, 0.714882553f,
+                (SimpleCharFullUpdateFlags)0x022B4A43,
+                0,
+                "3FBFF3F83A4FE0A33D07DE7102020101000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(221.830154f, 73.01637f, 99.27147f),
+                    new CapturedSubwayWaypointDefinition(224.475189f, 73.01795f, 99.3299561f)
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:28:28.9690500Z"),
             new CapturedSubwayOrdinarySpawnDefinition(
                 0x79574527,
                 "deranged_shopper",
