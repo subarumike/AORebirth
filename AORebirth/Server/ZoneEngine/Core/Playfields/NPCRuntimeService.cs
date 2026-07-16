@@ -17,6 +17,7 @@ namespace AORebirth.Core.Playfields
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Navigation;
     using ZoneEngine.Core.Playfields;
 
     #endregion
@@ -32,6 +33,8 @@ namespace AORebirth.Core.Playfields
         private readonly NpcCorpseLifecycleCoordinator corpseLifecycle;
 
         private readonly NpcCombatTickCoordinator combatTick;
+
+        private readonly NpcChaseNavigationRuntimeService chaseNavigation;
 
         private readonly CapturedAreteRobotContentProvider capturedAreteRobotContent;
 
@@ -58,11 +61,14 @@ namespace AORebirth.Core.Playfields
         internal NPCRuntimeService(
             Playfield playfield,
             PlayfieldDynelRegistry dynelRegistry,
-            PlayfieldRewardRuntimeService rewards)
+            PlayfieldRewardRuntimeService rewards,
+            NpcChaseNavigationRuntimeService chaseNavigation)
         {
             this.playfield = playfield;
             this.dynelRegistry = dynelRegistry;
             this.rewards = rewards ?? new PlayfieldRewardRuntimeService();
+            this.chaseNavigation = chaseNavigation
+                                   ?? throw new ArgumentNullException("chaseNavigation");
             this.corpseLifecycle = new NpcCorpseLifecycleCoordinator(playfield, this.RemoveNpcHome);
             this.combatTick = new NpcCombatTickCoordinator(playfield);
             this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
@@ -101,6 +107,7 @@ namespace AORebirth.Core.Playfields
 
         internal void ClearRuntimeState()
         {
+            this.chaseNavigation.ClearAll(NpcChaseInvalidationReason.PlayfieldReset);
             foreach (ICharacter character in this.dynelRegistry.Characters())
             {
                 if (character.Controller is NPCController)
@@ -111,6 +118,7 @@ namespace AORebirth.Core.Playfields
 
             this.worldPopulation.ClearPlayfield(this.playfield.Identity.Instance);
             this.ordinaryEnemies.ClearRuntimeState(this.playfield.Identity.Instance);
+            this.chaseNavigation.ClearAll(NpcChaseInvalidationReason.EncounterReset);
             this.capturedSubwayEncounters.ClearRuntimeState();
             this.npcHomeStates.Clear();
             this.corpseDespawnTicks.Clear();
@@ -208,6 +216,9 @@ namespace AORebirth.Core.Playfields
                 corpseIdentity = this.playfield.AllocateCorpseIdentity();
             }
 
+            this.chaseNavigation.Clear(
+                target.Identity.Instance,
+                NpcChaseInvalidationReason.CorpseTransition);
             this.playfield.MarkNpcDead(target);
             this.playfield.StopFightingDeadTarget(target.Identity);
             this.playfield.StopDyingNpcCombatState(target);
@@ -252,6 +263,9 @@ namespace AORebirth.Core.Playfields
 
         internal void FinalizeNpcDespawn(ICharacter target)
         {
+            this.chaseNavigation.Clear(
+                target.Identity.Instance,
+                NpcChaseInvalidationReason.Despawn);
             DateTime utcNow = DateTime.UtcNow;
             this.worldPopulation.NotifyNpcDespawn(target, utcNow);
             this.capturedSubwayEncounters.NotifyNpcDespawn(target, utcNow);
@@ -286,14 +300,18 @@ namespace AORebirth.Core.Playfields
         internal void ClearFightingTarget(ICharacter character)
         {
             character.SetFightingTarget(Identity.None);
-            this.ClearCombatTracking(character.Identity);
+            this.ClearCombatTracking(
+                character.Identity,
+                NpcChaseInvalidationReason.TargetLost);
         }
 
         internal void StopDyingNpcCombatState(ICharacter target)
         {
             target.SetTarget(Identity.None);
             target.SetFightingTarget(Identity.None);
-            this.ClearCombatTracking(target.Identity);
+            this.ClearCombatTracking(
+                target.Identity,
+                NpcChaseInvalidationReason.Death);
 
             NPCController npcController = target.Controller as NPCController;
             if (npcController != null)
@@ -379,6 +397,10 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            this.chaseNavigation.Clear(
+                character.Identity.Instance,
+                NpcChaseInvalidationReason.LeashReset);
+
             this.ordinaryEnemies.TryReturnToSpawn(character);
 
             if (character.Controller.IsFollowing())
@@ -395,7 +417,15 @@ namespace AORebirth.Core.Playfields
 
         internal void ClearCombatTracking(Identity identity)
         {
+            this.ClearCombatTracking(identity, NpcChaseInvalidationReason.CombatCancelled);
+        }
+
+        private void ClearCombatTracking(
+            Identity identity,
+            NpcChaseInvalidationReason navigationReason)
+        {
             this.combatTick.ClearTracking(identity);
+            this.chaseNavigation.Clear(identity.Instance, navigationReason);
         }
 
         private void StartCombatWithAcquiredTarget(
@@ -403,6 +433,9 @@ namespace AORebirth.Core.Playfields
             ICharacter target,
             CapturedEnemyCombatContract capturedContract)
         {
+            this.chaseNavigation.Clear(
+                target.Identity.Instance,
+                NpcChaseInvalidationReason.TargetReplaced);
             target.SetTarget(attacker.Identity);
             target.SetFightingTarget(attacker.Identity);
 

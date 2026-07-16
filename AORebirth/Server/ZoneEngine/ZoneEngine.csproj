@@ -305,6 +305,12 @@
     <Compile Include="Core\MessageHandlers\VicinityChatMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\WeatherControlMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ZoneLoginMessageHandler.cs" />
+    <Compile Include="Core\Navigation\BoundedGridChaseRoutePlanner.cs" />
+    <Compile Include="Core\Navigation\ChaseNavigationContracts.cs" />
+    <Compile Include="Core\Navigation\NpcChaseNavigationRuntimeService.cs" />
+    <Compile Include="Core\Navigation\NpcChaseRouteFollower.cs" />
+    <Compile Include="Core\Navigation\NpcChaseRouteState.cs" />
+    <Compile Include="Core\Navigation\Pf127ChaseNavigationProvider.cs" />
     <Compile Include="Core\PacketHandlers\ClientConnected.cs" />
     <Compile Include="Core\PacketHandlers\OrgClient.cs" />
     <Compile Include="Core\PacketHandlers\TradeSkillReceiver.cs" />

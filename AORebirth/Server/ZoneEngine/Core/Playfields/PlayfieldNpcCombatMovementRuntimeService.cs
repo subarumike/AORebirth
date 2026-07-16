@@ -12,11 +12,14 @@ namespace ZoneEngine.Core.Playfields
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Navigation;
 
     #endregion
 
     internal sealed class PlayfieldNpcCombatMovementRuntimeService
     {
+        private readonly NpcChaseNavigationRuntimeService chaseNavigation;
+
         private const double MaxMeleeCombatDistance = NpcCombatAttackRules.MaxMeleeCombatDistance;
 
         private const double MaxMeleeFollowHoldDistance = 3.0;
@@ -26,6 +29,46 @@ namespace ZoneEngine.Core.Playfields
         private const int CapturedCleaningRobotMonsterData = 297023;
 
         private const double CapturedCleaningRobotFollowStopDistance = 0.0;
+
+        internal PlayfieldNpcCombatMovementRuntimeService(
+            NpcChaseNavigationRuntimeService chaseNavigation)
+        {
+            this.chaseNavigation = chaseNavigation
+                                   ?? throw new ArgumentNullException("chaseNavigation");
+        }
+
+        internal ChaseNavigationCapability NavigationCapability
+        {
+            get { return this.chaseNavigation.Capability; }
+        }
+
+        internal bool HasActiveNavigation(ICharacter attacker)
+        {
+            return attacker != null
+                   && this.chaseNavigation.HasActivePursuit(attacker.Identity.Instance);
+        }
+
+        internal bool IsAttackPathTraversable(ICharacter attacker, ICharacter target)
+        {
+            if (attacker == null || target == null)
+            {
+                return false;
+            }
+
+            return this.chaseNavigation.IsAttackPathTraversable(
+                ToNavigationPoint(GetCombatPosition(attacker)),
+                ToNavigationPoint(GetCombatPosition(target)));
+        }
+
+        internal void ClearNavigation(Identity identity, NpcChaseInvalidationReason reason)
+        {
+            this.chaseNavigation.Clear(identity.Instance, reason);
+        }
+
+        internal void ClearAllNavigation(NpcChaseInvalidationReason reason)
+        {
+            this.chaseNavigation.ClearAll(reason);
+        }
 
         internal bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)
         {
@@ -99,6 +142,63 @@ namespace ZoneEngine.Core.Playfields
                 "out-of-range",
                 moveNpcToPosition,
                 logNpcBrain);
+        }
+
+        internal void HoldNpcAtCombatPosition(ICharacter attacker, ICharacter target)
+        {
+            if (attacker == null
+                || target == null
+                || this.chaseNavigation.Capability != ChaseNavigationCapability.Supported
+                || !this.chaseNavigation.HasActivePursuit(attacker.Identity.Instance))
+            {
+                return;
+            }
+
+            this.chaseNavigation.Clear(
+                attacker.Identity.Instance,
+                NpcChaseInvalidationReason.DirectPathRestored);
+            NPCController controller = attacker.Controller as NPCController;
+            if (controller != null && controller.IsFollowing())
+            {
+                controller.StopFollowForCombatRange(GetCombatPosition(target));
+            }
+        }
+
+        internal bool TryResolveCapturedMovementDestination(
+            ICharacter attacker,
+            ICharacter target,
+            double range,
+            DateTime utcNow,
+            out AORebirth.Core.Vector.Vector3 destination)
+        {
+            destination = attacker == null
+                              ? new AORebirth.Core.Vector.Vector3()
+                              : GetCombatPosition(attacker);
+            if (attacker == null || target == null)
+            {
+                return false;
+            }
+
+            if (this.chaseNavigation.Capability == ChaseNavigationCapability.Unsupported)
+            {
+                destination = GetCombatPosition(target);
+                return true;
+            }
+
+            NpcChaseUpdateResult result = this.chaseNavigation.UpdatePursuit(
+                attacker.Identity.Instance,
+                target.Identity.Instance,
+                ToNavigationPoint(GetCombatPosition(attacker)),
+                ToNavigationPoint(GetCombatPosition(target)),
+                BuildNpcCombatStopDistance(range),
+                utcNow);
+            if (!result.HasDestination)
+            {
+                return false;
+            }
+
+            destination = ToRuntimeVector(result.Destination);
+            return true;
         }
 
         internal static double GetCombatDistance(ICharacter attacker, ICharacter target)
@@ -182,6 +282,67 @@ namespace ZoneEngine.Core.Playfields
                                       : BuildNpcCombatStopDistance(range);
             double distance = attackerPosition.Distance2D(targetPosition);
 
+            NpcChaseUpdateResult navigationResult = this.chaseNavigation.UpdatePursuit(
+                attacker.Identity.Instance,
+                target.Identity.Instance,
+                ToNavigationPoint(attackerPosition),
+                ToNavigationPoint(targetPosition),
+                stopDistance,
+                DateTime.UtcNow);
+            if (navigationResult.Kind == NpcChaseMovementKind.Unavailable)
+            {
+                npcController.SnapshotCurrentMotionPosition();
+                npcController.StopFollow();
+                logNpcBrain("ChaseNavigationHold", "navigation-unavailable", attacker, target, range, distance);
+                return;
+            }
+
+            if (navigationResult.Kind != NpcChaseMovementKind.Unsupported)
+            {
+                if (navigationResult.Kind == NpcChaseMovementKind.Hold)
+                {
+                    if (!this.chaseNavigation.HasActivePursuit(attacker.Identity.Instance))
+                    {
+                        npcController.SnapshotCurrentMotionPosition();
+                        npcController.StopFollow();
+                    }
+
+                    return;
+                }
+
+                if (navigationResult.HasDestination
+                    && (navigationResult.ShouldIssueMovement || !npcController.IsFollowing()))
+                {
+                    bool wasFollowing = npcController.IsFollowing();
+                    AORebirth.Core.Vector.Vector3 current = GetCombatPosition(attacker);
+                    if (!wasFollowing)
+                    {
+                        moveNpcToPosition(attacker, current);
+                    }
+
+                    AORebirth.Core.Vector.Vector3 destination =
+                        ToRuntimeVector(navigationResult.Destination);
+                    npcController.MoveTo(
+                        new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                        {
+                            X = destination.xf,
+                            Y = destination.yf,
+                            Z = destination.zf
+                        });
+                    logNpcBrain(
+                        navigationResult.Kind == NpcChaseMovementKind.Route
+                            ? "ChaseRouteSegment"
+                            : "ChaseDirectSegment",
+                        reason,
+                        attacker,
+                        target,
+                        range,
+                        distance);
+                }
+
+                return;
+            }
+
             if (!npcController.IsFollowing(target.Identity))
             {
                 // Live NPC combat starts with an authoritative current-position SetPos,
@@ -193,6 +354,17 @@ namespace ZoneEngine.Core.Playfields
             }
 
             logNpcBrain("FollowTargetContinue", reason, attacker, target, range, distance);
+        }
+
+        private static ChaseNavigationPoint ToNavigationPoint(
+            AORebirth.Core.Vector.Vector3 point)
+        {
+            return new ChaseNavigationPoint(point.x, point.y, point.z);
+        }
+
+        private static AORebirth.Core.Vector.Vector3 ToRuntimeVector(ChaseNavigationPoint point)
+        {
+            return new AORebirth.Core.Vector.Vector3(point.X, point.Y, point.Z);
         }
 
         private static void Require(Delegate callback, string name)

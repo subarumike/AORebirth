@@ -23,6 +23,7 @@ namespace ZoneEngine.Core.Playfields
     using ZoneEngine.Core;
     using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Navigation;
     using ZoneEngine.Core.Playfields.Content;
 
     #endregion
@@ -62,6 +63,8 @@ namespace ZoneEngine.Core.Playfields
         private readonly NPCRuntimeService npcRuntime;
 
         private readonly PlayfieldNpcCombatMovementRuntimeService npcCombatMovement;
+
+        private readonly NpcChaseNavigationRuntimeService npcChaseNavigation;
 
         private readonly PlayfieldRewardRuntimeService rewards;
 
@@ -130,8 +133,17 @@ namespace ZoneEngine.Core.Playfields
             this.publishFanout = new PlayfieldPublishFanoutRuntimeService();
             this.inventoryContainer = InventoryContainerRuntimeService.Default;
             this.rewards = new PlayfieldRewardRuntimeService();
-            this.npcRuntime = new NPCRuntimeService(playfield, this.dynelRegistry, this.rewards);
-            this.npcCombatMovement = new PlayfieldNpcCombatMovementRuntimeService();
+            this.npcChaseNavigation =
+                new NpcChaseNavigationRuntimeService(
+                    PlayfieldChaseNavigationProviderFactory.Create(playfieldIdentity.Instance));
+            this.npcRuntime =
+                new NPCRuntimeService(
+                    playfield,
+                    this.dynelRegistry,
+                    this.rewards,
+                    this.npcChaseNavigation);
+            this.npcCombatMovement =
+                new PlayfieldNpcCombatMovementRuntimeService(this.npcChaseNavigation);
             this.lifecycle = new PlayfieldLifecycleRuntimeService();
             this.playerDeathRespawn = new PlayfieldPlayerDeathRespawnRuntimeService();
             this.interaction = new PlayfieldInteractionRuntimeService();
@@ -202,6 +214,7 @@ namespace ZoneEngine.Core.Playfields
         internal void ClearNpcRuntimeState()
         {
             this.npcRuntime.ClearRuntimeState();
+            this.npcChaseNavigation.Dispose();
             this.visibilityInterest.Clear();
         }
 
@@ -602,6 +615,36 @@ namespace ZoneEngine.Core.Playfields
         internal bool IsInNpcCombatRange(ICharacter attacker, ICharacter target, double range)
         {
             return this.npcCombatMovement.IsInCombatRange(attacker, target, range);
+        }
+
+        internal bool HasActiveNpcChaseNavigation(ICharacter attacker)
+        {
+            return this.npcCombatMovement.HasActiveNavigation(attacker);
+        }
+
+        internal bool IsNpcAttackPathTraversable(ICharacter attacker, ICharacter target)
+        {
+            return this.npcCombatMovement.IsAttackPathTraversable(attacker, target);
+        }
+
+        internal void HoldNpcAtCombatPosition(ICharacter attacker, ICharacter target)
+        {
+            this.npcCombatMovement.HoldNpcAtCombatPosition(attacker, target);
+        }
+
+        internal bool TryResolveCapturedNpcMovementDestination(
+            ICharacter attacker,
+            ICharacter target,
+            double range,
+            DateTime utcNow,
+            out AORebirth.Core.Vector.Vector3 destination)
+        {
+            return this.npcCombatMovement.TryResolveCapturedMovementDestination(
+                attacker,
+                target,
+                range,
+                utcNow,
+                out destination);
         }
 
         internal void UpdateNpcMeleeFollowHold(

@@ -2036,6 +2036,36 @@ namespace AORebirth.Core.Playfields
                 LogNpcBrain);
         }
 
+        internal bool HasActiveNpcChaseNavigation(ICharacter attacker)
+        {
+            return this.runtimeSystems.HasActiveNpcChaseNavigation(attacker);
+        }
+
+        internal bool IsNpcAttackPathTraversable(ICharacter attacker, ICharacter target)
+        {
+            return this.runtimeSystems.IsNpcAttackPathTraversable(attacker, target);
+        }
+
+        internal void HoldNpcAtCombatPosition(ICharacter attacker, ICharacter target)
+        {
+            this.runtimeSystems.HoldNpcAtCombatPosition(attacker, target);
+        }
+
+        internal bool TryResolveCapturedNpcMovementDestination(
+            ICharacter attacker,
+            ICharacter target,
+            double range,
+            DateTime utcNow,
+            out AORebirth.Core.Vector.Vector3 destination)
+        {
+            return this.runtimeSystems.TryResolveCapturedNpcMovementDestination(
+                attacker,
+                target,
+                range,
+                utcNow,
+                out destination);
+        }
+
         internal void TryMoveNpcIntoCombatRange(ICharacter attacker, ICharacter target, double range)
         {
             this.runtimeSystems.TryMoveNpcIntoCombatRange(

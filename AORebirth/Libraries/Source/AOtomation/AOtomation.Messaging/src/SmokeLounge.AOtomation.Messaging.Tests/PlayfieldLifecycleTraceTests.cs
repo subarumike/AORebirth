@@ -2904,12 +2904,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new PlayfieldObjectMaterializationRuntimeService()",
                     "new PlayfieldDbMobSpawnRuntimeService()",
                     "new PlayfieldEnvironmentFunctionRuntimeService()",
-                    "new PlayfieldNpcCombatMovementRuntimeService()",
+                    "new NpcChaseNavigationRuntimeService(",
+                    "new PlayfieldNpcCombatMovementRuntimeService(this.npcChaseNavigation)",
                     "new PlayfieldCharacterHeartbeatRuntimeService()",
                     "new PlayfieldPacketSequencingRuntimeService(this.packetSequencing)",
                     "new PlayfieldCorpseAccessRuntimeService()",
                     "new PlayfieldRewardRuntimeService()",
-                    "new NPCRuntimeService(playfield, this.dynelRegistry, this.rewards)",
+                    "new NPCRuntimeService(",
                     "new PlayfieldLifecycleRuntimeService()",
                     "new PlayfieldPlayerDeathRespawnRuntimeService()",
                     "new PlayfieldStatelTransitionRuntimeService()",
@@ -3775,9 +3776,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 npcCombatMovementText,
                 "private void MoveNpcTowardCombatTarget(");
             Assert.IsFalse(
-                moveNpcTowardCombatTarget.Contains("npcController.StopFollow();")
-                || moveNpcTowardCombatTarget.Contains("moveNpcToPosition(attacker, nextPosition)"),
-                "Generic NPC chase must not clear follow state and warp through periodic SetPos steps.");
+                moveNpcTowardCombatTarget.Contains("moveNpcToPosition(attacker, nextPosition)"),
+                "Generic NPC chase must not warp through periodic SetPos steps.");
+            Assert.IsTrue(
+                moveNpcTowardCombatTarget.Contains("navigationResult.HasDestination")
+                && moveNpcTowardCombatTarget.Contains("npcController.MoveTo("),
+                "Geometry-aware chase segments must continue through the existing controller movement pipeline.");
             Assert.IsFalse(
                 playfieldText.Contains("private void MoveNpcTowardCombatTarget(")
                 || playfieldText.Contains("private void MoveCapturedCleaningRobotTowardCombatTarget(")
@@ -3879,8 +3883,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && npcCombatTickText.Contains("!this.playfield.IsInCombatRange(attacker, target, attackSource.Range)")
                 && npcCombatTickText.Contains("this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);")
                 && npcCombatTickText.Contains("this.playfield.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);")
-                && npcCombatTickText.Contains(
-                    "npcController.StopFollowForCapturedCombatRange(target.Coordinates().coordinate);"),
+                && npcCombatTickText.Contains("npcController.StopFollowForCapturedCombatRange(")
+                && npcCombatTickText.Contains("movementDestination);"),
                 "Captured and existing known combat paths must maintain chase and melee hold while Thief preserves its delayed transition.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.SpawnCapturedNpcContent(playfieldIdentity);"),
