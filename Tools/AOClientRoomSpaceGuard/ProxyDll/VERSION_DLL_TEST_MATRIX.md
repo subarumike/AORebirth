@@ -32,7 +32,7 @@ whether a mitigation actually fired.
 | --- | --- |
 | client | C/new graphics; D/old graphics |
 | policy | forward-only; diagnostic-only; exact guards; each candidate feature alone; intended combined policy |
-| renderer selector | AO original selection; plain HAL normalization, independently |
+| renderer selector | AO original selection preserved; test plain HAL only when selected in AO's launcher |
 | proxy | absent baseline; installed diagnostic; installed mitigation |
 | session | clean launch; relaunch; zone transition; long soak |
 
