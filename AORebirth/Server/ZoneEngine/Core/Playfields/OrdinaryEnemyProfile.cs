@@ -66,7 +66,8 @@ namespace AORebirth.Core.Playfields
         Invalid = 0,
         Observed = 1,
         Unresolved = 2,
-        Conflicting = 3
+        Conflicting = 3,
+        Policy = 4
     }
 
     internal enum OrdinaryEnemyRuntimeDisposition
@@ -531,7 +532,8 @@ namespace AORebirth.Core.Playfields
         {
             get
             {
-                return this.RespawnEvidence == OrdinaryEnemyEvidenceState.Observed
+                return (this.RespawnEvidence == OrdinaryEnemyEvidenceState.Observed
+                        || this.RespawnEvidence == OrdinaryEnemyEvidenceState.Policy)
                        && this.RespawnDelaySeconds.HasValue
                        && this.RespawnDelaySeconds.Value > 0.0;
             }
@@ -680,10 +682,11 @@ namespace AORebirth.Core.Playfields
                     throw new InvalidOperationException("Scripted movement must use a custom encounter module: " + spawn.SpawnKey);
                 }
 
-                if (spawn.RespawnEvidence == OrdinaryEnemyEvidenceState.Observed
+                if ((spawn.RespawnEvidence == OrdinaryEnemyEvidenceState.Observed
+                     || spawn.RespawnEvidence == OrdinaryEnemyEvidenceState.Policy)
                     && !spawn.HasRespawnDelay)
                 {
-                    throw new InvalidOperationException("Observed respawn requires a positive delay: " + spawn.SpawnKey);
+                    throw new InvalidOperationException("Observed or policy respawn requires a positive delay: " + spawn.SpawnKey);
                 }
             }
         }

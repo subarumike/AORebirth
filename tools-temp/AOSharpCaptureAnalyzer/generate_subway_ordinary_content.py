@@ -50,6 +50,7 @@ ARCHETYPES = {
     "Infector": ("infector", "infector"),
     "Lost Thought": ("lost_thought", "lost_thought"),
     "Neural Burnout": ("neural_burnout", "neural_burnout"),
+    "Bloodcreeper": ("bloodcreeper", "bloodcreeper"),
     "Deranged Shopper": ("deranged_shopper", "deranged_shopper"),
 }
 
@@ -57,7 +58,6 @@ NAMED_BOSSES = frozenset(
     (
         "Abmouth Supremus",
         "Bitaxel",
-        "Bloodcreeper",
         "Empty Shell",
         "Eumenides",
         "Fragmented Soul",

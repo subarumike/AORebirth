@@ -2,36 +2,29 @@
 
 ## Current Focus
 
-The corrected PF127 doorway attack line and combat leash are live-validated in the private client.
+Bloodcreeper is now activated through the shared PF127 ordinary-enemy runtime from completed official-live captures. Private-client validation is next.
 
 ## Done in this slice
 
-- Promoted PF127 collision geometry from completed geometry-only safe capture `20260714-185728` into the server content asset.
-- Added fail-closed geometry loading, segment/triangle collision queries, and contract-gated NPC damage line-of-sight checks.
-- Enabled the LOS requirement for Vergil Aeneid without changing unrelated NPC combat contracts.
-- Mike live-validated that Vergil can no longer damage the player through walls and resumes attacking with clear LOS.
-- Added geometry-only capture safety, snapshot/promotion validation, analyzer support, and focused regression coverage.
-- Synced the work with the current remote Mail subsystem and preserved both sets of `ZoneEngine.csproj` entries.
-- Added a global `ZoneEngine.Core.Navigation` chase service with explicit playfield capability providers, bounded deterministic route planning, reusable route state, collision-valid route following, retry suppression, and complete NPC lifecycle cleanup.
-- Enabled PF127 as the first provider using the promoted authoritative collision geometry; other playfields remain explicitly unsupported and retain legacy direct chase.
-- Routed shared hostile-NPC combat movement through the navigation boundary without changing enemy damage, weapon context, cadence, aggro, patrol, pet, or return-to-spawn behavior.
-- Added deterministic shared-architecture and PF127 representative Vergil route/follower coverage. PF127 is same-elevation only until authoritative floor/connectivity data exists.
-- Reproduced the reported open-doorway failure against the promoted geometry: the raw ground-level ray hit a roughly `0.10`-unit threshold while the wider movement corridor clipped the doorway frame.
-- Separated attack line-of-fire from movement clearance. PF127 attacks now use the captured `+1.0 Y` center ray, while chase planning and route validation retain the six-probe body-width movement corridor.
-- Added a shared PF127 combat leash. NPC homes register at activation; non-player-owned hostile NPCs disengage beyond `100` horizontal units from home, send `StopFight`, suppress aggro while returning, and use the same collision-aware route service to move home without teleporting.
-- Leash reset clears Vergil healing state and cancels/despawns Abmouth's active combat-only Infector summons. Player-controlled pets are excluded.
-- AORebirth.Core and ZoneEngine Debug builds pass. Navigation `36/36`, PF127 collision/LOS `17/17`, and Abmouth/Vergil `20/20` pass; lifecycle remains at the same six unrelated baseline guardrail failures.
-- Mike live-validated the final behavior: Vergil fires through the open doorway, remains blocked by real walls, and the leash behaves as intended.
+- Capture survey `20260709-222339` proves two ordinary Bloodcreeper spawns: level 25 with `724 HP`, and level 24 with `691 HP` plus its captured patrol path.
+- Fight captures `20260716-033326` and `20260716-034104` prove proactive aggro, chase/retarget behavior, and independent Skinspider Bite (`SKW1`) and Skinspider Spit (`SKW2`) attack streams.
+- The shared captured combat contract now rolls Bite damage `21..35` and Spit damage `21..41`, with their captured initial delays, roughly `7.4`-second independent cadence, exact special-attack templates, slots, and weapon-instance tags.
+- Bloodcreeper was removed from the named-boss exclusion and regenerated as an ordinary captured-direct archetype with both exact spawn rows.
+- A bounded private-server automatic-aggro radius of `7` units is enabled from the observed acquisition at about `6.25` units.
+- The exact corpse CATMesh `26978` is mapped for MonsterData `30379`. Both level-24 fights prove `150` corpse credits; unobserved levels and item loot remain unresolved.
+- Bloodcreeper uses the explicit private regular-enemy respawn policy of four minutes. This is a close-enough gameplay policy, not a claim of exact official-live timing.
+- The combat evidence analyzer now retains the two new captures and reports both Bloodcreeper attack shapes instead of collapsing them into the older single-slot sample.
+- The generated ordinary-content equivalence check, focused Subway tests, AORebirth.Core/ZoneEngine Debug build, and engine restart pass.
 
 ## Remaining
 
-1. This doorway/LOS/leash slice is complete.
-2. Continue with the next user-selected Subway gameplay issue.
+1. Private-client validate both Bloodcreeper spawns, proactive acquisition/chase, varied incoming damage, corpse visual, `150` level-24 credits, and four-minute respawn.
+2. Keep Bloodcreeper outside the accepted whole-enemy gate until private validation succeeds and unresolved item-loot handling is explicitly accepted or extended from a larger kill sample.
 3. Do not auto-attach or launch AO/capture tooling. Mike runs gameplay and supplies completed captures when requested.
 
 ## Constraints
 
-- The chase architecture is global, but PF127/resource `127` is the only enabled provider for this gameplay slice.
-- The promoted collision asset and LOS gate fail closed when evidence or geometry is missing/invalid.
-- The `100`-unit PF127 leash is the accepted private-server gameplay policy for this slice. Exact official-live leash or pathfinding parity is not required.
-- Existing working Subway combat, loot, corpse, respawn, and population behavior must remain unchanged.
+- Bloodcreeper is ordinary content, not a unique boss or scripted encounter.
+- Do not turn two observed empty item snapshots into proof of an empty item pool.
+- The official-live respawn delay remains unresolved; the four-minute value is an explicit private-server regular-enemy policy.
+- Existing working Subway combat, loot, corpse, respawn, navigation, and population behavior must remain unchanged.

@@ -16,10 +16,25 @@ namespace AORebirth.Core.Playfields
 
         private const string QuarantinedOrdinaryCapture = "20260710-202132";
 
+        private const int BloodcreeperMonsterData =
+            NpcCombatAttackRules.CapturedSubwayBloodcreeperMonsterData;
+
+        private const double BloodcreeperAutomaticAggroRadius = 7.0;
+
+        private const double BloodcreeperPrivateRespawnSeconds = 240.0;
+
         private static readonly OrdinaryEnemyAggressionProfile RetaliateChasingAggression =
             new OrdinaryEnemyAggressionProfile(
                 OrdinaryEnemyAggressionMode.Retaliate,
                 null,
+                true,
+                false,
+                OrdinaryEnemyEvidenceState.Observed);
+
+        private static readonly OrdinaryEnemyAggressionProfile BloodcreeperAutomaticAggression =
+            new OrdinaryEnemyAggressionProfile(
+                OrdinaryEnemyAggressionMode.Auto,
+                BloodcreeperAutomaticAggroRadius,
                 true,
                 false,
                 OrdinaryEnemyEvidenceState.Observed);
@@ -302,16 +317,9 @@ namespace AORebirth.Core.Playfields
                                         value.Layer))
                                 .ToArray(),
                             OrdinaryEnemyScfuProfile.CapturedExact),
-                        RetaliateAggression(),
+                        AggressionFor(archetype.MonsterData),
                         BuildCombatProfile(contract, archetype.MonsterData),
-                        new OrdinaryEnemyLootProfile(
-                            lootEntries.Length > 0
-                                ? OrdinaryEnemyLootEvidence.ObservedAvailableLoot
-                                : OrdinaryEnemyLootEvidence.Unresolved,
-                            lootEntries,
-                            OrdinaryEnemyEvidenceState.Unresolved,
-                            null,
-                            null),
+                        BuildLootProfile(archetype.MonsterData, lootEntries),
                         StandardCorpseProfile(archetype.MonsterData),
                         archetype.EvidenceCaptures,
                         false,
@@ -352,8 +360,18 @@ namespace AORebirth.Core.Playfields
                         source.CapturedFlags2,
                         source.Unknown1,
                         source.Unknown2,
-                        OrdinaryEnemyEvidenceState.Unresolved,
-                        null,
+                        string.Equals(
+                            source.ArchetypeKey,
+                            "bloodcreeper",
+                            StringComparison.Ordinal)
+                            ? OrdinaryEnemyEvidenceState.Policy
+                            : OrdinaryEnemyEvidenceState.Unresolved,
+                        string.Equals(
+                            source.ArchetypeKey,
+                            "bloodcreeper",
+                            StringComparison.Ordinal)
+                            ? (double?)BloodcreeperPrivateRespawnSeconds
+                            : null,
                         string.Equals(
                             source.EvidenceCapture,
                             QuarantinedOrdinaryCapture,
@@ -444,6 +462,13 @@ namespace AORebirth.Core.Playfields
             return RetaliateChasingAggression;
         }
 
+        private static OrdinaryEnemyAggressionProfile AggressionFor(int monsterData)
+        {
+            return monsterData == BloodcreeperMonsterData
+                       ? BloodcreeperAutomaticAggression
+                       : RetaliateAggression();
+        }
+
         private static OrdinaryEnemyCombatProfile BuildCombatProfile(
             CapturedEnemyCombatContract contract,
             int monsterData)
@@ -518,6 +543,27 @@ namespace AORebirth.Core.Playfields
                             new OrdinaryEnemyLevelCreditRule(8, 10, 10, 4, "20260708-143600,20260709-205921,20260713-033511"),
                             new OrdinaryEnemyLevelCreditRule(9, 11, 11, 3, "20260709-220439,20260712-160257,20260713-014714"),
                             new OrdinaryEnemyLevelCreditRule(10, 12, 12, 2, "20260709-220439")
+                        });
+            }
+
+            if (monsterData == BloodcreeperMonsterData)
+            {
+                // Both completed level-24 official-live fights carried 150 credits.
+                // Keep other Bloodcreeper levels unresolved until identity-correlated evidence exists.
+                return new OrdinaryEnemyLootProfile(
+                    evidence,
+                    entries,
+                    OrdinaryEnemyEvidenceState.Observed,
+                    null,
+                    null,
+                    new[]
+                        {
+                            new OrdinaryEnemyLevelCreditRule(
+                                24,
+                                150,
+                                150,
+                                2,
+                                "20260716-033326,20260716-034104")
                         });
             }
 

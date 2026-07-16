@@ -1930,12 +1930,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
             string catalogText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
+            string profileText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyProfile.cs"));
+            string populationText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\WorldPopulationController.cs"));
             string orchestratorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
             string runtimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
             string combatContractText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
+            string combatAttackRulesText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs"));
+            string corpseRulesText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
             string playfieldText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string globalLootText = File.ReadAllText(
@@ -1946,13 +1954,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
             Assert.AreEqual(
-                11,
+                12,
                 CountOccurrences(providerText, "            new CapturedSubwayOrdinaryArchetypeDefinition("),
-                "The ten ordinary families must retain eleven captured visual/template variants because Workman and Architect Striker differ.");
+                "The eleven ordinary families must retain twelve captured visual/template variants because Workman and Architect Striker differ.");
             Assert.AreEqual(
-                135,
+                137,
                 CountOccurrences(providerText, "            new CapturedSubwayOrdinarySpawnDefinition("),
-                "The completed capture survey must register all 135 spatially deduplicated ordinary spawn positions.");
+                "The completed capture survey must register all 137 spatially deduplicated ordinary spawn positions.");
 
             string[] restoredOrdinarySourceInstances =
                 {
@@ -1982,6 +1990,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Infector",
                     "Lost Thought",
                     "Neural Burnout",
+                    "Bloodcreeper",
                     "Deranged Shopper"
                 };
             for (int i = 0; i < capturedNames.Length; i++)
@@ -1989,7 +1998,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Assert.IsTrue(providerText.Contains("\"" + capturedNames[i] + "\""), "Missing " + capturedNames[i] + ".");
             }
 
-            int[] capturedMonsterData = { 30464, 203739, 203854, 203743, 96056, 55648, 203745, 31909, 96193, 203730, 203736 };
+            int[] capturedMonsterData = { 30464, 203739, 203854, 203743, 96056, 55648, 203745, 31909, 96193, 203730, 30379, 203736 };
             for (int i = 0; i < capturedMonsterData.Length; i++)
             {
                 Assert.IsTrue(
@@ -2082,9 +2091,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             {
                 Assert.IsFalse(
                     providerText.Contains(excludedNamedOrOwnedMobs[i]),
-                    "Named, boss, personal-pet, and boss-owned summon evidence is outside this ordinary slice: "
+                "Named, boss, personal-pet, and boss-owned summon evidence is outside this ordinary slice: "
                     + excludedNamedOrOwnedMobs[i]);
             }
+
+            Assert.IsTrue(
+                providerText.Contains("0x795450A1")
+                && providerText.Contains("0x795451C5")
+                && catalogText.Contains("BloodcreeperAutomaticAggroRadius = 7.0")
+                && catalogText.Contains("BloodcreeperPrivateRespawnSeconds = 240.0")
+                && catalogText.Contains("OrdinaryEnemyEvidenceState.Policy")
+                && profileText.Contains("this.RespawnEvidence == OrdinaryEnemyEvidenceState.Policy")
+                && populationText.Contains("row.HasRespawnDelay ? WorldRespawnMode.FixedDelay : WorldRespawnMode.None")
+                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(")
+                && catalogText.Contains("\"20260716-033326,20260716-034104\"")
+                && combatContractText.Contains("CapturedSubwayBloodcreeperSpitInitialSeconds")
+                && combatContractText.Contains("CapturedSubwayBloodcreeperBiteInitialSeconds")
+                && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperBiteMinimumDamage = 21")
+                && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperBiteMaximumDamage = 35")
+                && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperSpitMinimumDamage = 21")
+                && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperSpitMaximumDamage = 41")
+                && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperBiteLowTemplate = 121091")
+                && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperSpitLowTemplate = 121094")
+                && corpseRulesText.Contains("{ 30379, 26978 }"),
+                "Bloodcreeper must retain its two captured spawns, proactive aggro, dual rolled natural attacks, exact corpse visual, and level-24 credit evidence.");
         }
 
         [TestMethod]
