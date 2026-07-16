@@ -12,6 +12,7 @@ namespace AORebirth.Core.Playfields
     using AORebirth.Interfaces;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using Utility;
 
@@ -103,6 +104,7 @@ namespace AORebirth.Core.Playfields
         internal void ActivateNpc(ICharacter character)
         {
             this.dynelRegistry.Register(character);
+            this.RegisterNpcHome(character);
         }
 
         internal void ClearRuntimeState()
@@ -284,6 +286,11 @@ namespace AORebirth.Core.Playfields
 
         internal void ProcessCombatTick(ICharacter attacker)
         {
+            if (this.TryBeginLeashReturn(attacker))
+            {
+                return;
+            }
+
             if (this.capturedSubwayEncounters.IsCapturedNanoCastInProgress(attacker))
             {
                 return;
@@ -327,6 +334,35 @@ namespace AORebirth.Core.Playfields
             if (npcController == null)
             {
                 return;
+            }
+
+            NpcHomeState home;
+            if (this.npcHomeStates.TryGetValue(target.Identity.Instance, out home))
+            {
+                if (home.ReturningHome)
+                {
+                    return;
+                }
+
+                bool playerControlledPet = this.IsPlayerControlledPet(target);
+                ChaseNavigationPoint homePoint = ToNavigationPoint(home.Coordinates.coordinate);
+                ChaseNavigationPoint npcPoint = ToNavigationPoint(target.Coordinates().coordinate);
+                ChaseNavigationPoint attackerPoint = ToNavigationPoint(attacker.Coordinates().coordinate);
+                if (NpcCombatLeashPolicy.ShouldResetCombat(
+                    this.playfield.Identity.Instance,
+                    playerControlledPet,
+                    homePoint,
+                    npcPoint,
+                    attackerPoint))
+                {
+                    if (homePoint.Distance2D(npcPoint)
+                        > NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome)
+                    {
+                        this.BeginLeashReturn(target, home);
+                    }
+
+                    return;
+                }
             }
 
             CapturedEnemyCombatContract capturedContract;
@@ -379,6 +415,18 @@ namespace AORebirth.Core.Playfields
             }
 
             PetCommandService.ProcessPetHealTick(character);
+
+            DateTime utcNow = DateTime.UtcNow;
+            if (this.TryBeginLeashReturn(character))
+            {
+                this.TryProcessLeashReturn(character, utcNow);
+                return;
+            }
+
+            if (this.TryProcessLeashReturn(character, utcNow))
+            {
+                return;
+            }
 
             ICharacter automaticTarget = this.capturedSubwayEncounters.FindAutomaticAggroTarget(character)
                                          ?? this.ordinaryEnemies.FindAutomaticAggroTarget(character);
@@ -466,6 +514,161 @@ namespace AORebirth.Core.Playfields
                     target.Identity.ToString(true)));
         }
 
+        private bool TryBeginLeashReturn(ICharacter npc)
+        {
+            if (npc == null
+                || npc.FightingTarget.Instance == 0
+                || this.IsPlayerControlledPet(npc))
+            {
+                return false;
+            }
+
+            NpcHomeState home;
+            if (!this.npcHomeStates.TryGetValue(npc.Identity.Instance, out home))
+            {
+                return false;
+            }
+
+            ICharacter target = this.dynelRegistry.FindByIdentity<ICharacter>(npc.FightingTarget);
+            if (target == null
+                || !NpcCombatLeashPolicy.ShouldResetCombat(
+                    this.playfield.Identity.Instance,
+                    false,
+                    ToNavigationPoint(home.Coordinates.coordinate),
+                    ToNavigationPoint(npc.Coordinates().coordinate),
+                    ToNavigationPoint(target.Coordinates().coordinate)))
+            {
+                return false;
+            }
+
+            this.BeginLeashReturn(npc, home);
+            return true;
+        }
+
+        private void BeginLeashReturn(ICharacter npc, NpcHomeState home)
+        {
+            bool wasFighting = npc.FightingTarget.Instance != 0;
+            home.ReturningHome = true;
+            npc.SetTarget(Identity.None);
+            npc.SetFightingTarget(Identity.None);
+            this.ClearCombatTracking(
+                npc.Identity,
+                NpcChaseInvalidationReason.LeashReset);
+
+            NPCController controller = npc.Controller as NPCController;
+            if (controller != null)
+            {
+                home.ControllerStateBeforeReturn = controller.State;
+                controller.State = CharacterState.Idle;
+                controller.SnapshotCurrentMotionPosition();
+                controller.StopFollow();
+            }
+
+            if (wasFighting)
+            {
+                this.playfield.Announce(
+                    new StopFightMessage
+                    {
+                        Identity = npc.Identity,
+                        Unknown1 = 1
+                    });
+            }
+
+            foreach (ICharacter summon in this.capturedSubwayEncounters.NotifyCombatReset(npc))
+            {
+                this.playfield.DespawnNpcImmediately(summon);
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "NPC leash reset npc={0} home={1} position={2} maxDistance={3}",
+                    npc.Identity,
+                    home.Coordinates.coordinate,
+                    npc.Coordinates().coordinate,
+                    NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome));
+        }
+
+        private bool TryProcessLeashReturn(ICharacter npc, DateTime utcNow)
+        {
+            NpcHomeState home;
+            if (npc == null
+                || !this.npcHomeStates.TryGetValue(npc.Identity.Instance, out home)
+                || !home.ReturningHome)
+            {
+                return false;
+            }
+
+            NPCController controller = npc.Controller as NPCController;
+            if (controller == null)
+            {
+                return true;
+            }
+
+            if (controller.IsFollowing())
+            {
+                controller.DoFollow();
+            }
+
+            ChaseNavigationPoint homePoint = ToNavigationPoint(home.Coordinates.coordinate);
+            ChaseNavigationPoint currentPoint = ToNavigationPoint(npc.Coordinates().coordinate);
+            if (NpcCombatLeashPolicy.HasReturnedHome(homePoint, currentPoint))
+            {
+                home.ReturningHome = false;
+                this.chaseNavigation.Clear(
+                    npc.Identity.Instance,
+                    NpcChaseInvalidationReason.LeashReset);
+                controller.SnapshotCurrentMotionPosition();
+                controller.StopFollow();
+                controller.State = home.ControllerStateBeforeReturn;
+                return false;
+            }
+
+            NpcChaseUpdateResult result = this.chaseNavigation.UpdateReturnToHome(
+                npc.Identity.Instance,
+                currentPoint,
+                homePoint,
+                NpcCombatLeashPolicy.ReturnNavigationStopDistance,
+                utcNow);
+            if (result.HasDestination
+                && (result.ShouldIssueMovement || !controller.IsFollowing()))
+            {
+                controller.MoveTo(
+                    new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                    {
+                        X = (float)result.Destination.X,
+                        Y = (float)result.Destination.Y,
+                        Z = (float)result.Destination.Z
+                    });
+            }
+            else if (result.Kind == NpcChaseMovementKind.Unavailable
+                     || (result.Kind == NpcChaseMovementKind.Hold
+                         && !this.chaseNavigation.HasActivePursuit(npc.Identity.Instance)))
+            {
+                controller.SnapshotCurrentMotionPosition();
+                controller.StopFollow();
+            }
+
+            return true;
+        }
+
+        private bool IsPlayerControlledPet(ICharacter npc)
+        {
+            if (!PetCombatRules.IsPlayerOwnedPet(npc))
+            {
+                return false;
+            }
+
+            ICharacter owner = PetCombatRules.ResolvePetOwner(npc);
+            return owner == null || owner.Controller is PlayerController;
+        }
+
+        private static ChaseNavigationPoint ToNavigationPoint(
+            AORebirth.Core.Vector.Vector3 point)
+        {
+            return new ChaseNavigationPoint(point.x, point.y, point.z);
+        }
+
         private void ScheduleNpcDeathCorpseSpawn(ICharacter target, Identity corpseIdentity)
         {
             if (corpseIdentity != Identity.None)
@@ -492,6 +695,10 @@ namespace AORebirth.Core.Playfields
         private class NpcHomeState
         {
             public Coordinate Coordinates { get; set; }
+
+            public bool ReturningHome { get; set; }
+
+            public CharacterState ControllerStateBeforeReturn { get; set; }
         }
     }
 }

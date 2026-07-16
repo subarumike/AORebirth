@@ -322,6 +322,70 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void SubwayLeashResetsWhenNpcOrTargetLeavesHomeBoundary()
+        {
+            ChaseNavigationPoint home = Point(0, 0);
+
+            Assert.IsTrue(
+                NpcCombatLeashPolicy.ShouldResetCombat(
+                    127,
+                    false,
+                    home,
+                    Point(NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome + 0.01, 0),
+                    Point(0, 0)));
+            Assert.IsTrue(
+                NpcCombatLeashPolicy.ShouldResetCombat(
+                    127,
+                    false,
+                    home,
+                    Point(0, 0),
+                    Point(NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome + 0.01, 0)));
+            Assert.IsFalse(
+                NpcCombatLeashPolicy.ShouldResetCombat(
+                    127,
+                    false,
+                    home,
+                    Point(NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome, 0),
+                    Point(NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome, 0)));
+
+            Assert.IsFalse(
+                NpcCombatLeashPolicy.ShouldResetCombat(
+                    127,
+                    false,
+                    new ChaseNavigationPoint(278.045074, 73.01795, 98.80104),
+                    new ChaseNavigationPoint(278.045074, 73.01795, 98.80104),
+                    new ChaseNavigationPoint(188.2448, 73.01637, 98.84238)));
+        }
+
+        [TestMethod]
+        public void SubwayLeashExcludesPlayerPetsAndUnsupportedPlayfields()
+        {
+            ChaseNavigationPoint home = Point(0, 0);
+            ChaseNavigationPoint farAway =
+                Point(NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome + 1.0, 0);
+
+            Assert.IsFalse(
+                NpcCombatLeashPolicy.ShouldResetCombat(127, true, home, farAway, farAway));
+            Assert.IsFalse(
+                NpcCombatLeashPolicy.ShouldResetCombat(6553, false, home, farAway, farAway));
+        }
+
+        [TestMethod]
+        public void SubwayLeashReturnCompletesOnlyNearHome()
+        {
+            ChaseNavigationPoint home = Point(0, 0);
+
+            Assert.IsTrue(
+                NpcCombatLeashPolicy.HasReturnedHome(
+                    home,
+                    Point(NpcCombatLeashPolicy.ReturnCompletionDistance, 0)));
+            Assert.IsFalse(
+                NpcCombatLeashPolicy.HasReturnedHome(
+                    home,
+                    Point(NpcCombatLeashPolicy.ReturnCompletionDistance + 0.01, 0)));
+        }
+
+        [TestMethod]
         public void PlayfieldResetAndRuntimeDisposalClearAllRoutes()
         {
             var service = Service(TestNavigationProvider.WithWall(4, 6, -2, 2));
@@ -434,6 +498,54 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void Pf127OpenDoorwayAllowsAttackLineWhileMovementCorridorRemainsBlocked()
+        {
+            Pf127ChaseNavigationProvider provider = LoadPf127Provider();
+            var vergil = new ChaseNavigationPoint(278.045074, 73.01795, 98.80104);
+            var playerAtOpenDoorway = new ChaseNavigationPoint(246.9, 73.0, 95.5);
+
+            Assert.IsTrue(provider.IsAttackLineTraversable(vergil, playerAtOpenDoorway));
+            Assert.IsFalse(provider.IsSegmentTraversable(vergil, playerAtOpenDoorway));
+        }
+
+        [TestMethod]
+        public void Pf127CapturedWallBlocksAttackLine()
+        {
+            Pf127ChaseNavigationProvider provider = LoadPf127Provider();
+
+            Assert.IsFalse(
+                provider.IsAttackLineTraversable(
+                    new ChaseNavigationPoint(121.809868, 73.01637, 98.90472),
+                    new ChaseNavigationPoint(187.0416, 73.3830261, 88.03114)));
+        }
+
+        [TestMethod]
+        public void Pf127AttackLineDoesNotTreatVerticalSegmentsAsZeroLength()
+        {
+            var blockingSurface = new CollisionTriangle(
+                1,
+                new CollisionPoint3(-1.0, 1.5, -1.0),
+                new CollisionPoint3(1.0, 1.5, -1.0),
+                new CollisionPoint3(0.0, 1.5, 1.0));
+            var geometry = new PlayfieldCollisionGeometry(
+                1,
+                127,
+                "test",
+                string.Empty,
+                0.0,
+                "vertical-attack-test",
+                new[] { blockingSurface });
+            var provider = new Pf127ChaseNavigationProvider(
+                127,
+                PlayfieldCollisionGeometryLoadResult.Loaded(geometry));
+
+            Assert.IsFalse(
+                provider.IsAttackLineTraversable(
+                    new ChaseNavigationPoint(0.0, 0.0, 0.0),
+                    new ChaseNavigationPoint(0.0, 1.0, 0.0)));
+        }
+
+        [TestMethod]
         public void Pf127PlansCollisionValidRouteAroundRepresentativeVergilWall()
         {
             Pf127ChaseNavigationProvider provider = LoadPf127Provider();
@@ -503,6 +615,44 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(directRestored, "The route never returned control to direct pursuit.");
             Assert.IsTrue(service.IsAttackPathTraversable(current, goal));
             Assert.IsTrue(current.Distance2D(goal) <= 3.3);
+        }
+
+        [TestMethod]
+        public void Pf127ReturnToHomeUsesSharedCollisionValidRouting()
+        {
+            Pf127ChaseNavigationProvider provider = LoadPf127Provider();
+            var service = new NpcChaseNavigationRuntimeService(provider);
+            var current = new ChaseNavigationPoint(188.2448, 73.01637, 98.84238);
+            var home = new ChaseNavigationPoint(278.045074, 73.01795, 98.80104);
+            DateTime now = Epoch;
+            bool routed = false;
+
+            for (int step = 0; step < 128; step++)
+            {
+                NpcChaseUpdateResult result = service.UpdateReturnToHome(
+                    203748,
+                    current,
+                    home,
+                    NpcCombatLeashPolicy.ReturnNavigationStopDistance,
+                    now);
+                routed |= result.Kind == NpcChaseMovementKind.Route;
+                if (result.HasDestination)
+                {
+                    Assert.IsTrue(provider.IsSegmentTraversable(current, result.Destination));
+                    current = result.Destination;
+                }
+
+                if (current.Distance2D(home) <= NpcCombatLeashPolicy.ReturnCompletionDistance)
+                {
+                    break;
+                }
+
+                now += TimeSpan.FromMilliseconds(150);
+            }
+
+            Assert.IsTrue(routed);
+            Assert.IsTrue(
+                current.Distance2D(home) <= NpcCombatLeashPolicy.ReturnCompletionDistance);
         }
 
         [TestMethod]
@@ -602,6 +752,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(source, "NpcChaseInvalidationReason.LeashReset");
             StringAssert.Contains(source, "NpcChaseInvalidationReason.EncounterReset");
             StringAssert.Contains(source, "NpcChaseInvalidationReason.PlayfieldReset");
+            StringAssert.Contains(source, "this.RegisterNpcHome(character);");
+            StringAssert.Contains(source, "this.TryBeginLeashReturn(attacker)");
+            StringAssert.Contains(source, "home.ReturningHome");
+            StringAssert.Contains(source, "this.chaseNavigation.UpdateReturnToHome(");
+            StringAssert.Contains(source, "new StopFightMessage");
+            StringAssert.Contains(source, "this.capturedSubwayEncounters.NotifyCombatReset(npc)");
+            StringAssert.Contains(source, "owner.Controller is PlayerController");
+            StringAssert.Contains(source, "controller.State = CharacterState.Idle;");
+            StringAssert.Contains(source, "controller.State = home.ControllerStateBeforeReturn;");
 
             string systemsSource = File.ReadAllText(
                 Path.Combine(
@@ -792,6 +951,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                            this.maximumX,
                            this.minimumZ,
                            this.maximumZ);
+            }
+
+            public bool IsAttackLineTraversable(ChaseNavigationPoint start, ChaseNavigationPoint end)
+            {
+                return this.IsSegmentTraversable(start, end);
             }
 
             public ChaseRoutePlan RequestRoute(

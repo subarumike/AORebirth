@@ -166,6 +166,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\ChaseNavigationContracts.cs">
       <Link>ChaseNavigationContracts.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\NpcCombatLeashPolicy.cs">
+      <Link>NpcCombatLeashPolicy.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\NpcChaseNavigationRuntimeService.cs">
       <Link>NpcChaseNavigationRuntimeService.cs</Link>
     </Compile>

@@ -25,6 +25,8 @@ namespace ZoneEngine.Core.Navigation
 
         internal const double UpperCollisionProbeHeight = 1.20;
 
+        internal const double AttackLineProbeHeight = 1.0;
+
         internal const double MaximumPlanElevationDifference = 1.50;
 
         private const double MinimumSegmentLength = 0.01;
@@ -126,6 +128,23 @@ namespace ZoneEngine.Core.Navigation
                    && this.IsProbeSegmentClear(start, end, 0.0, 0.0, UpperCollisionProbeHeight)
                    && this.IsProbeSegmentClear(start, end, offsetX, offsetZ, UpperCollisionProbeHeight)
                    && this.IsProbeSegmentClear(start, end, -offsetX, -offsetZ, UpperCollisionProbeHeight);
+        }
+
+        public bool IsAttackLineTraversable(ChaseNavigationPoint start, ChaseNavigationPoint end)
+        {
+            if (this.Capability != ChaseNavigationCapability.Supported
+                || !start.IsFinite
+                || !end.IsFinite)
+            {
+                return false;
+            }
+
+            double deltaX = end.X - start.X;
+            double deltaY = end.Y - start.Y;
+            double deltaZ = end.Z - start.Z;
+            return (deltaX * deltaX) + (deltaY * deltaY) + (deltaZ * deltaZ)
+                       < MinimumSegmentLength * MinimumSegmentLength
+                   || this.IsProbeSegmentClear(start, end, 0.0, 0.0, AttackLineProbeHeight);
         }
 
         public ChaseRoutePlan RequestRoute(

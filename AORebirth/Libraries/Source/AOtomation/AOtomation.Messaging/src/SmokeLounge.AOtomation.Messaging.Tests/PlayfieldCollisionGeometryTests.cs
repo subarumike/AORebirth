@@ -442,6 +442,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     new CollisionPoint3(188.2448, 73.01637, 98.84238),
                     new CollisionPoint3(278.045074, 73.01795, 98.80104),
                     out hit));
+            Assert.AreEqual(
+                NpcDamageLineOfSightDecision.AllowedClear,
+                service.EvaluateAttackLine(
+                    true,
+                    new CollisionPoint3(278.045074, 73.01795, 98.80104),
+                    new CollisionPoint3(246.9, 73.0, 95.5),
+                    out hit));
+            Assert.AreEqual(
+                NpcDamageLineOfSightDecision.DeniedBlocked,
+                service.EvaluateAttackLine(
+                    true,
+                    new CollisionPoint3(121.809868, 73.01637, 98.90472),
+                    new CollisionPoint3(187.0416, 73.3830261, 88.03114),
+                    out hit));
         }
 
         [TestMethod]
@@ -589,6 +603,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(gate.Contains("IsDamageLineOfSightRequired"));
             Assert.IsTrue(gate.Contains("Pf127DamageLineOfSightActivated"));
             Assert.IsTrue(gate.Contains("attacker.Stats[StatIds.monsterdata].Value"));
+            Assert.IsTrue(gate.Contains("EvaluateAttackLine"));
             Assert.IsFalse(gate.Contains("hasCapturedContract"));
             Assert.IsTrue(
                 lineOfSight.Contains("const bool Pf127DamageLineOfSightActivated = true"));
@@ -599,6 +614,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 @"<Content Include=""Content\Captured\Subway\pf127-geometry.json"">");
             Assert.IsTrue(
                 lineOfSight.Contains("Geometry.DamageLineOfSightProbeHeight")
+                && lineOfSight.Contains("Pf127ChaseNavigationProvider.AttackLineProbeHeight")
                 && lineOfSight.Contains("start.Y + probeHeight")
                 && lineOfSight.Contains("end.Y + probeHeight"));
             Assert.IsTrue(normalDamage > 0);

@@ -218,6 +218,53 @@ namespace AORebirth.Core.Playfields
             this.infectorSlots[1].SpawnDueAtUtc = utcNow.AddSeconds(SecondInfectorDelaySeconds);
         }
 
+        internal ICharacter[] NotifyCombatReset(ICharacter npc)
+        {
+            CapturedEncounterRuntimeDefinition definition;
+            if (npc == null
+                || !CapturedEncounterRuntimeRegistry.TryGet(npc.Identity.Instance, out definition))
+            {
+                return new ICharacter[0];
+            }
+
+            if (string.Equals(
+                definition.ProfileKey,
+                VergilAeneidProfileKey,
+                StringComparison.Ordinal))
+            {
+                this.ClearVergilCombatState();
+                return new ICharacter[0];
+            }
+
+            if (!string.Equals(
+                definition.ProfileKey,
+                AbmouthProfileKey,
+                StringComparison.Ordinal))
+            {
+                return new ICharacter[0];
+            }
+
+            this.combatActive = false;
+            this.abmouthDead = false;
+            this.refillDelayIndex = 0;
+            var activeSummons = new List<ICharacter>();
+            foreach (InfectorSlotState slot in this.infectorSlots)
+            {
+                slot.SpawnDueAtUtc = null;
+                ICharacter summon = slot.ActiveIdentity.Instance == 0
+                                        ? null
+                                        : this.playfield.FindByIdentity<ICharacter>(slot.ActiveIdentity);
+                slot.ActiveIdentity = Identity.None;
+                slot.Generation = 0;
+                if (summon != null && summon.Stats[StatIds.health].Value > 0)
+                {
+                    activeSummons.Add(summon);
+                }
+            }
+
+            return activeSummons.ToArray();
+        }
+
         internal void ProcessDue(DateTime utcNow, Action<ICharacter, ICharacter> acquireAggro)
         {
             this.ProcessVergilHealing(utcNow);

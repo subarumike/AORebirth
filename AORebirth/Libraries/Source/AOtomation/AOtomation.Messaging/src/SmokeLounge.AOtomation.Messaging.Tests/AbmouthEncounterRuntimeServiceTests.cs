@@ -128,6 +128,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void LeashResetCancelsBossEncounterStateAndLivingSummons()
+        {
+            string root = FindRepositoryRoot();
+            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
+            string npcRuntime = ReadPlayfieldSource(root, "NPCRuntimeService.cs");
+
+            Assert.IsTrue(
+                encounter.Contains("internal ICharacter[] NotifyCombatReset(ICharacter npc)")
+                && encounter.Contains("this.ClearVergilCombatState();")
+                && encounter.Contains("this.combatActive = false;")
+                && encounter.Contains("this.refillDelayIndex = 0;")
+                && encounter.Contains("slot.SpawnDueAtUtc = null;")
+                && encounter.Contains("slot.ActiveIdentity = Identity.None;")
+                && encounter.Contains("slot.Generation = 0;")
+                && encounter.Contains("return activeSummons.ToArray();"),
+                "Leashing a captured boss must cancel pending combat-only encounter state.");
+            Assert.IsTrue(
+                npcRuntime.Contains("this.capturedSubwayEncounters.NotifyCombatReset(npc)")
+                && npcRuntime.Contains("this.playfield.DespawnNpcImmediately(summon);"),
+                "The shared NPC leash must immediately remove Abmouth's living encounter summons.");
+        }
+
+        [TestMethod]
         public void AbmouthUsesIndependentXopzAndDenwStreamsWhileSummonsUseDmxf()
         {
             string root = FindRepositoryRoot();

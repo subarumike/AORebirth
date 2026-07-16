@@ -85,7 +85,7 @@ namespace ZoneEngine.Core.Navigation
             }
 
             return this.provider.Capability == ChaseNavigationCapability.Supported
-                   && this.provider.IsSegmentTraversable(start, target);
+                   && this.provider.IsAttackLineTraversable(start, target);
         }
 
         internal NpcChaseUpdateResult UpdatePursuit(
@@ -270,6 +270,22 @@ namespace ZoneEngine.Core.Navigation
                 issueFirstMovement,
                 true,
                 invalidationReason);
+        }
+
+        internal NpcChaseUpdateResult UpdateReturnToHome(
+            int npcInstance,
+            ChaseNavigationPoint current,
+            ChaseNavigationPoint home,
+            double stopDistance,
+            DateTime utcNow)
+        {
+            return this.UpdatePursuit(
+                npcInstance,
+                npcInstance,
+                current,
+                home,
+                stopDistance,
+                utcNow);
         }
 
         internal void Clear(int npcInstance, NpcChaseInvalidationReason reason)
