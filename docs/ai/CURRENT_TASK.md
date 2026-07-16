@@ -33,5 +33,5 @@ The corrected PF127 doorway attack line and combat leash are live-validated in t
 
 - The chase architecture is global, but PF127/resource `127` is the only enabled provider for this gameplay slice.
 - The promoted collision asset and LOS gate fail closed when evidence or geometry is missing/invalid.
-- The `100`-unit PF127 leash is a bounded private-server gameplay policy derived from the observed full-playfield chase; it is not claimed as an official-live maximum.
+- The `100`-unit PF127 leash is the accepted private-server gameplay policy for this slice. Exact official-live leash or pathfinding parity is not required.
 - Existing working Subway combat, loot, corpse, respawn, and population behavior must remain unchanged.
