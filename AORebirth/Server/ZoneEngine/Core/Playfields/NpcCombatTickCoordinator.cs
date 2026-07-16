@@ -414,7 +414,7 @@ namespace AORebirth.Core.Playfields
                     target.RawCoordinates.Y,
                     target.RawCoordinates.Z);
                 SegmentTriangleHit hit;
-                NpcDamageLineOfSightDecision decision = this.damageLineOfSight.Evaluate(
+                NpcDamageLineOfSightDecision decision = this.damageLineOfSight.EvaluateAttackLine(
                     true,
                     start,
                     end,

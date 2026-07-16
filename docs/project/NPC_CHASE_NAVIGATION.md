@@ -19,7 +19,9 @@ This implementation is not a claim of official AO pathfinding parity or a game-w
 | Per-NPC route, target, geometry version, failure, retry, and invalidation state | `NpcChaseNavigationRuntimeService` |
 | Speed, movement cadence, orientation, visibility, and client synchronization | Existing `NPCController.MoveTo`/`DoFollow` pipeline |
 
-The combat coordinator asks the shared movement service to pursue. The navigation runtime first checks the direct segment. A clear segment uses the normal direct movement path without running A*. A blocked segment requests a route through the playfield provider. The route follower supplies only a currently collision-valid next destination to the existing controller. Damage remains gated until the established range and LOS/obstruction checks pass.
+The combat coordinator asks the shared movement service to pursue. The navigation runtime first checks the direct movement segment. A clear segment uses the normal direct movement path without running A*. A blocked segment requests a route through the playfield provider. The route follower supplies only a currently collision-valid next destination to the existing controller.
+
+Attack line-of-fire is deliberately separate from movement clearance. PF127 damage uses one center ray at `+1.0 Y`, matching the captured body-height variant and the private-client open-doorway repro. Chase and route validation continue using the wider movement corridor. This prevents a low doorway threshold or narrow frame from suppressing a valid shot without allowing attacks through geometry that blocks the center body-height ray.
 
 Patrol replay, DB-authored patrol waypoints, pet commands, and ordinary return-to-spawn behavior remain separate existing movement modes. The captured Cleaning Robot stop-distance rule remains a combat-policy exception, but its PF127 obstruction handling goes through the same navigation runtime.
 
@@ -27,7 +29,24 @@ Patrol replay, DB-authored patrol waypoints, pet commands, and ordinary return-t
 
 `Pf127ChaseNavigationProvider` consumes the promoted, fail-closed `pf127-geometry.json` collision asset and its source SHA-256 geometry version. It does not build or maintain a competing collision model.
 
-PF127 collision evidence proves blocking surfaces but does not currently provide a reliable walkable-floor projection. The first provider therefore derives a bounded same-elevation X/Z search slice from the NPC's authoritative live Y and validates every candidate edge against the promoted triangle geometry. Six collision probes are used for each movement segment: center and both `0.35`-unit radius offsets at `0.15` and `1.20` units above the live elevation. Plans whose endpoints differ by more than `1.50` Y units fail as unreachable. Cross-elevation, stairs, drops, and floor-connectivity routing remain unsupported until authoritative floor or navigation evidence is promoted.
+PF127 collision evidence proves blocking surfaces but does not currently provide a reliable walkable-floor projection. The first provider therefore derives a bounded same-elevation X/Z search slice from the NPC's authoritative live Y and validates every candidate edge against the promoted triangle geometry. Six collision probes are used for each movement segment: center and both `0.35`-unit radius offsets at `0.15` and `1.20` units above the live elevation. The distinct attack query uses only the center ray at `1.0` unit above live elevation. Plans whose endpoints differ by more than `1.50` Y units fail as unreachable. Cross-elevation, stairs, drops, and floor-connectivity routing remain unsupported until authoritative floor or navigation evidence is promoted.
+
+The promoted asset retains its original raw-ray evidence metadata and source hash. The body-height attack query is a runtime combat policy selected after the pictured private-client doorway repro showed that the raw ground ray struck triangle `185436`, a roughly `0.10`-unit threshold, while the captured `+1.0 Y` variant was clear.
+
+## PF127 combat leash
+
+PF127 now has a reusable home-based hostile-NPC leash:
+
+- every activated NPC records its initial home coordinate;
+- player-controlled pets are excluded, while NPC-owned encounter summons remain eligible;
+- combat resets when either the NPC or its target is more than `100.0` horizontal units from the NPC's home;
+- reset clears target/combat/route state, sends `StopFight`, stops the active follow segment, and suppresses new aggro while the NPC is returning;
+- return movement calls the same collision-aware navigation runtime, with no teleport or wall-crossing fallback;
+- arrival within `0.75` units clears return state and restores normal patrol/aggro eligibility;
+- Vergil leash reset cancels pending healing state;
+- Abmouth leash reset cancels pending Infector timers and immediately despawns active combat-only summons.
+
+The `100.0`-unit boundary preserves the established roughly `89.8`-unit representative Vergil route case while stopping the observed greater-than-`100`-unit full-playfield chase. It is a provisional private-server gameplay boundary, not a claim of the official-live leash maximum.
 
 ## Search and following limits
 
@@ -64,9 +83,9 @@ The shared lifecycle owner clears route state on target loss/replacement, combat
 
 ## Validation coverage
 
-The focused navigation suite passes `29/29`. It covers direct and obstructed pursuit, provider capability states, collision-valid route emission, existing movement-pipeline use, target and geometry invalidation, deviation/stuck recovery, stable unreachable behavior, retry suppression, lifecycle cleanup, respawn isolation, large-step tunneling prevention, direct-path restoration, search bounds, and unchanged combat damage ownership.
+The focused navigation suite passes `36/36`. It covers direct and obstructed pursuit, distinct attack/movement clearance, the pictured open-doorway regression, a captured body-height blocked wall ray, vertical attack-segment validation, provider capability states, collision-valid route emission and return-to-home routing, PF127 leash boundaries and pet exclusion, existing movement-pipeline use, target and geometry invalidation, deviation/stuck recovery, stable unreachable behavior, retry suppression, lifecycle cleanup, respawn isolation, large-step tunneling prevention, direct-path restoration, search bounds, and unchanged combat damage ownership.
 
-PF127 tests load the promoted geometry through the generic provider, prove the representative Vergil wall blocks direct pursuit, calculate a bounded collision-valid route, follow it through the shared state machine, and restore a clear direct combat path. Independent regressions pass: PF127 collision/LOS `17/17`, Abmouth/Vergil `19/19`, PF127 geometry-only safe mode `9/9`, and capture runtime safety `6/6`. The lifecycle assembly remains at its established `52/58` baseline with the same six unrelated session/packet ownership guardrail failures. AORebirth.Core and ZoneEngine Debug builds pass, as do the capture plugin/analyzer builds and analyzer/lifecycle-decoder self-tests. Private live validation is still required before claiming client-visible chase parity.
+PF127 tests load the promoted geometry through the generic provider, prove the representative Vergil wall blocks direct pursuit, calculate a bounded collision-valid route, follow it through the shared state machine, restore a clear direct combat path, allow the pictured body-height doorway shot while retaining movement-frame obstruction, and route a leashed NPC home through collision-valid segments. Independent regressions pass: PF127 collision/LOS `17/17` and Abmouth/Vergil `20/20`. The lifecycle assembly remains at its established `52/58` baseline with the same six unrelated session/packet ownership guardrail failures. AORebirth.Core and ZoneEngine Debug builds pass. Private live validation is still required before claiming client-visible doorway and leash behavior.
 
 ## Enabling another playfield
 

@@ -243,6 +243,8 @@ namespace ZoneEngine.Core.Navigation
 
         bool IsSegmentTraversable(ChaseNavigationPoint start, ChaseNavigationPoint end);
 
+        bool IsAttackLineTraversable(ChaseNavigationPoint start, ChaseNavigationPoint end);
+
         ChaseRoutePlan RequestRoute(
             ChaseNavigationPoint start,
             ChaseNavigationPoint goal,
@@ -286,6 +288,11 @@ namespace ZoneEngine.Core.Navigation
         }
 
         public bool IsSegmentTraversable(ChaseNavigationPoint start, ChaseNavigationPoint end)
+        {
+            return false;
+        }
+
+        public bool IsAttackLineTraversable(ChaseNavigationPoint start, ChaseNavigationPoint end)
         {
             return false;
         }

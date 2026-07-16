@@ -307,6 +307,7 @@
     <Compile Include="Core\MessageHandlers\ZoneLoginMessageHandler.cs" />
     <Compile Include="Core\Navigation\BoundedGridChaseRoutePlanner.cs" />
     <Compile Include="Core\Navigation\ChaseNavigationContracts.cs" />
+    <Compile Include="Core\Navigation\NpcCombatLeashPolicy.cs" />
     <Compile Include="Core\Navigation\NpcChaseNavigationRuntimeService.cs" />
     <Compile Include="Core\Navigation\NpcChaseRouteFollower.cs" />
     <Compile Include="Core\Navigation\NpcChaseRouteState.cs" />

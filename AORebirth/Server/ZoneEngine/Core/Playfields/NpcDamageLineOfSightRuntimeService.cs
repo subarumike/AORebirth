@@ -2,6 +2,8 @@ namespace ZoneEngine.Core.Playfields
 {
     using System;
 
+    using ZoneEngine.Core.Navigation;
+
     internal enum NpcDamageLineOfSightDecision
     {
         AllowedNotRequired = 0,
@@ -72,6 +74,38 @@ namespace ZoneEngine.Core.Playfields
             CollisionPoint3 end,
             out SegmentTriangleHit hit)
         {
+            double probeHeight = this.geometryLoadResult.IsLoaded
+                                     ? this.geometryLoadResult.Geometry.DamageLineOfSightProbeHeight
+                                     : 0.0;
+            return this.EvaluateAtProbeHeight(
+                requiresDamageLineOfSight,
+                start,
+                end,
+                probeHeight,
+                out hit);
+        }
+
+        internal NpcDamageLineOfSightDecision EvaluateAttackLine(
+            bool requiresDamageLineOfSight,
+            CollisionPoint3 start,
+            CollisionPoint3 end,
+            out SegmentTriangleHit hit)
+        {
+            return this.EvaluateAtProbeHeight(
+                requiresDamageLineOfSight,
+                start,
+                end,
+                Pf127ChaseNavigationProvider.AttackLineProbeHeight,
+                out hit);
+        }
+
+        private NpcDamageLineOfSightDecision EvaluateAtProbeHeight(
+            bool requiresDamageLineOfSight,
+            CollisionPoint3 start,
+            CollisionPoint3 end,
+            double probeHeight,
+            out SegmentTriangleHit hit)
+        {
             hit = default(SegmentTriangleHit);
             if (!requiresDamageLineOfSight)
             {
@@ -91,7 +125,6 @@ namespace ZoneEngine.Core.Playfields
                 return NpcDamageLineOfSightDecision.DeniedInvalidSegment;
             }
 
-            double probeHeight = this.geometryLoadResult.Geometry.DamageLineOfSightProbeHeight;
             var adjustedStart = new CollisionPoint3(
                 start.X,
                 start.Y + probeHeight,
