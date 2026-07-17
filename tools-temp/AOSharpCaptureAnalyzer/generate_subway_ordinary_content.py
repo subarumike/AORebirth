@@ -26,6 +26,7 @@ CAPTURES = (
     "20260716-033326",
     "20260716-034104",
     "20260716-034559",
+    "20260716-034656",
     "20260716-221358",
     "20260716-222201",
 )
@@ -38,6 +39,7 @@ SPAWN_CAPTURES = (
 CAPTURE_ARCHETYPE_FILTERS = {
     "20260710-202132": frozenset(("Looter", "Stim Fiend", "Deranged Shopper")),
     "20260716-034559": frozenset(("Melded Patterns",)),
+    "20260716-034656": frozenset(("Slum Runner",)),
     "20260716-221358": frozenset(("Molested Molecules", "Neural Burnout")),
     "20260716-222201": frozenset(
         (
@@ -50,6 +52,9 @@ CAPTURE_ARCHETYPE_FILTERS = {
             "Slum Runner",
         )
     ),
+}
+CAPTURE_CORPSE_EVIDENCE_FILTERS = {
+    "20260716-034656": frozenset(("Slum Runner",)),
 }
 ARCHETYPE_CAPTURE_FILTERS = {
     "Deranged Shopper": frozenset(("20260710-202132",)),
@@ -537,6 +542,52 @@ def loot_profiles() -> dict[str, list[dict[str, int]]]:
     return mapped
 
 
+def corpse_profiles() -> dict[str, list[dict[str, object]]]:
+    mapped = defaultdict(list)
+    for capture, allowed_names in CAPTURE_CORPSE_EVIDENCE_FILTERS.items():
+        for row in read_csv(CAPTURE_ROOT / capture / "corpse-full-updates.csv"):
+            name = row.get("DeadNpcName", "")
+            if name not in allowed_names or name not in ARCHETYPES:
+                continue
+            dead_identity = row.get("DeadNpcIdentity", "")
+            if dead_identity.startswith("SimpleChar:"):
+                dead_identity = f"({dead_identity})"
+            corpse_identity = row.get("CorpseIdentity", "")
+            if corpse_identity.startswith("Corpse:"):
+                corpse_identity = f"({corpse_identity})"
+            if not dead_identity or not corpse_identity:
+                continue
+            try:
+                monster_data = int(row.get("CorpseMonsterData", ""))
+                cat_mesh = int(row.get("CorpseCatMesh", ""))
+                credits = int(row.get("CorpseCredits", ""))
+            except ValueError:
+                continue
+            if monster_data <= 0 or cat_mesh <= 0 or credits < 0:
+                continue
+            mapped[name].append(
+                {
+                    "capture": capture,
+                    "capturedUtc": row.get("CapturedUtc", ""),
+                    "corpseIdentity": corpse_identity,
+                    "deadNpcIdentity": dead_identity,
+                    "monsterData": monster_data,
+                    "catMesh": cat_mesh,
+                    "credits": credits,
+                }
+            )
+
+    for records in mapped.values():
+        records.sort(
+            key=lambda value: (
+                value["capturedUtc"],
+                value["corpseIdentity"],
+                value["deadNpcIdentity"],
+            )
+        )
+    return mapped
+
+
 def cs_string(value: str) -> str:
     return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
@@ -571,6 +622,7 @@ def validate_content(
     spawns: list[dict[str, str]],
     profiles: dict[str, dict[str, str]],
     combat: dict[str, dict[str, object]],
+    corpses: dict[str, list[dict[str, object]]],
 ) -> None:
     profile_keys = [key for key, _ in ARCHETYPES.values()]
     duplicate_profile_keys = sorted(
@@ -640,18 +692,42 @@ def validate_content(
         ):
             raise ValueError("unobserved combat contains invented values: " + name)
 
+    slum_runner_corpses = corpses.get("Slum Runner", [])
+    if len(slum_runner_corpses) != 6:
+        raise ValueError(
+            "finalized Slum Runner capture must preserve six exact corpse records"
+        )
+    if {row["capture"] for row in slum_runner_corpses} != {"20260716-034656"}:
+        raise ValueError("Slum Runner corpse evidence provenance drifted")
+    if {row["monsterData"] for row in slum_runner_corpses} != {55648}:
+        raise ValueError("Slum Runner corpse MonsterData drifted")
+    if {row["catMesh"] for row in slum_runner_corpses} != {31774}:
+        raise ValueError("Slum Runner corpse CATMesh drifted")
+    if Counter(row["credits"] for row in slum_runner_corpses) != Counter(
+        {131: 2, 137: 1, 144: 3}
+    ):
+        raise ValueError("Slum Runner atomic credit outcomes drifted")
+    if len({row["corpseIdentity"] for row in slum_runner_corpses}) != 6:
+        raise ValueError("Slum Runner corpse identities are not unique")
+    if len({row["deadNpcIdentity"] for row in slum_runner_corpses}) != 6:
+        raise ValueError("Slum Runner dead NPC identities are not unique")
+
 
 def generate() -> str:
     spawns = select_spawns()
     profiles = select_archetype_profiles(spawns)
     combat = combat_profiles()
     loot = loot_profiles()
-    validate_content(spawns, profiles, combat)
+    corpses = corpse_profiles()
+    validate_content(spawns, profiles, combat, corpses)
     evidence_captures = defaultdict(set)
     for capture in CAPTURES:
         for name in set(capture_identity_names(capture).values()):
             if name in ARCHETYPES and capture_allows_archetype(capture, name):
                 evidence_captures[name].add(capture)
+    for name, records in corpses.items():
+        for record in records:
+            evidence_captures[name].add(str(record["capture"]))
     lines = [
         "// <auto-generated>",
         "// Generated only from completed AOSharp Subway captures by generate_subway_ordinary_content.py.",
@@ -691,6 +767,15 @@ def generate() -> str:
             "new CapturedSubwayLootEvidenceDefinition("
             f"{item['low']}, {item['high']}, {item['quality']}, {item['count']}, {item['corpses']}, {item['basis']})"
             for item in loot.get(name, [])
+        ]
+        corpse_lines = [
+            "new CapturedSubwayCorpseEvidenceDefinition("
+            f"{cs_string(str(item['capture']))}, "
+            f"{cs_string(str(item['capturedUtc']))}, "
+            f"{cs_string(str(item['corpseIdentity']))}, "
+            f"{cs_string(str(item['deadNpcIdentity']))}, "
+            f"{int(item['monsterData'])}, {int(item['catMesh'])}, {int(item['credits'])})"
+            for item in corpses.get(name, [])
         ]
         lines.extend(
             [
@@ -735,6 +820,15 @@ def generate() -> str:
         )
         for index, item in enumerate(loot_lines):
             lines.append("                    " + item + ("," if index < len(loot_lines) - 1 else ""))
+        lines.extend(
+            [
+                "                },",
+                "                new CapturedSubwayCorpseEvidenceDefinition[]",
+                "                {",
+            ]
+        )
+        for index, item in enumerate(corpse_lines):
+            lines.append("                    " + item + ("," if index < len(corpse_lines) - 1 else ""))
         lines.extend(
             [
                 "                },",
@@ -859,11 +953,11 @@ def generate() -> str:
             "",
             "    internal sealed class CapturedSubwayOrdinaryArchetypeDefinition",
             "    {",
-            "        public CapturedSubwayOrdinaryArchetypeDefinition(string key, string familyKey, string name, int monsterData, int npcFamily, int npcLosHeight, int characterFlags, int accountFlags, int expansions, int visualFlags, int visibleTitle, uint appearanceValue, int headMesh, CapturedSubwayTextureDefinition[] textures, CapturedSubwayMeshDefinition[] meshes, CapturedSubwayCombatEvidenceDefinition combat, CapturedSubwayLootEvidenceDefinition[] lootEvidence, string[] evidenceCaptures)",
+            "        public CapturedSubwayOrdinaryArchetypeDefinition(string key, string familyKey, string name, int monsterData, int npcFamily, int npcLosHeight, int characterFlags, int accountFlags, int expansions, int visualFlags, int visibleTitle, uint appearanceValue, int headMesh, CapturedSubwayTextureDefinition[] textures, CapturedSubwayMeshDefinition[] meshes, CapturedSubwayCombatEvidenceDefinition combat, CapturedSubwayLootEvidenceDefinition[] lootEvidence, CapturedSubwayCorpseEvidenceDefinition[] corpseEvidence, string[] evidenceCaptures)",
             "        {",
-            "            this.Key = key; this.FamilyKey = familyKey; this.Name = name; this.MonsterData = monsterData; this.NpcFamily = npcFamily; this.NpcLosHeight = npcLosHeight; this.CharacterFlags = characterFlags; this.AccountFlags = accountFlags; this.Expansions = expansions; this.VisualFlags = visualFlags; this.VisibleTitle = visibleTitle; this.AppearanceValue = appearanceValue; this.HeadMesh = headMesh; this.Textures = textures ?? new CapturedSubwayTextureDefinition[0]; this.Meshes = meshes ?? new CapturedSubwayMeshDefinition[0]; this.Combat = combat; this.LootEvidence = lootEvidence ?? new CapturedSubwayLootEvidenceDefinition[0]; this.EvidenceCaptures = evidenceCaptures ?? new string[0];",
+            "            this.Key = key; this.FamilyKey = familyKey; this.Name = name; this.MonsterData = monsterData; this.NpcFamily = npcFamily; this.NpcLosHeight = npcLosHeight; this.CharacterFlags = characterFlags; this.AccountFlags = accountFlags; this.Expansions = expansions; this.VisualFlags = visualFlags; this.VisibleTitle = visibleTitle; this.AppearanceValue = appearanceValue; this.HeadMesh = headMesh; this.Textures = textures ?? new CapturedSubwayTextureDefinition[0]; this.Meshes = meshes ?? new CapturedSubwayMeshDefinition[0]; this.Combat = combat; this.LootEvidence = lootEvidence ?? new CapturedSubwayLootEvidenceDefinition[0]; this.CorpseEvidence = corpseEvidence ?? new CapturedSubwayCorpseEvidenceDefinition[0]; this.EvidenceCaptures = evidenceCaptures ?? new string[0];",
             "        }",
-            "        public string Key { get; private set; } public string FamilyKey { get; private set; } public string Name { get; private set; } public int MonsterData { get; private set; } public int NpcFamily { get; private set; } public int NpcLosHeight { get; private set; } public int CharacterFlags { get; private set; } public int AccountFlags { get; private set; } public int Expansions { get; private set; } public int VisualFlags { get; private set; } public int VisibleTitle { get; private set; } public uint AppearanceValue { get; private set; } public int HeadMesh { get; private set; } public CapturedSubwayTextureDefinition[] Textures { get; private set; } public CapturedSubwayMeshDefinition[] Meshes { get; private set; } public CapturedSubwayCombatEvidenceDefinition Combat { get; private set; } public CapturedSubwayLootEvidenceDefinition[] LootEvidence { get; private set; } public string[] EvidenceCaptures { get; private set; }",
+            "        public string Key { get; private set; } public string FamilyKey { get; private set; } public string Name { get; private set; } public int MonsterData { get; private set; } public int NpcFamily { get; private set; } public int NpcLosHeight { get; private set; } public int CharacterFlags { get; private set; } public int AccountFlags { get; private set; } public int Expansions { get; private set; } public int VisualFlags { get; private set; } public int VisibleTitle { get; private set; } public uint AppearanceValue { get; private set; } public int HeadMesh { get; private set; } public CapturedSubwayTextureDefinition[] Textures { get; private set; } public CapturedSubwayMeshDefinition[] Meshes { get; private set; } public CapturedSubwayCombatEvidenceDefinition Combat { get; private set; } public CapturedSubwayLootEvidenceDefinition[] LootEvidence { get; private set; } public CapturedSubwayCorpseEvidenceDefinition[] CorpseEvidence { get; private set; } public string[] EvidenceCaptures { get; private set; }",
             "    }",
             "",
             "    internal sealed class CapturedSubwayOrdinarySpawnDefinition",
@@ -881,6 +975,7 @@ def generate() -> str:
             "    internal sealed class CapturedSubwayWaypointDefinition { public CapturedSubwayWaypointDefinition(float x, float y, float z) { this.X = x; this.Y = y; this.Z = z; } public float X { get; private set; } public float Y { get; private set; } public float Z { get; private set; } }",
             "    internal sealed class CapturedSubwayCombatEvidenceDefinition { public CapturedSubwayCombatEvidenceDefinition(bool observed, int minDamage, int maxDamage, double rechargeSeconds, int weaponSlot, int attackInfoUnknown, int weaponInstance, int observedRows) { this.Observed = observed; this.MinDamage = minDamage; this.MaxDamage = maxDamage; this.RechargeSeconds = rechargeSeconds; this.WeaponSlot = weaponSlot; this.AttackInfoUnknown = attackInfoUnknown; this.WeaponInstance = weaponInstance; this.ObservedRows = observedRows; } public bool Observed { get; private set; } public int MinDamage { get; private set; } public int MaxDamage { get; private set; } public double RechargeSeconds { get; private set; } public int WeaponSlot { get; private set; } public int AttackInfoUnknown { get; private set; } public int WeaponInstance { get; private set; } public int ObservedRows { get; private set; } }",
             "    internal sealed class CapturedSubwayLootEvidenceDefinition { public CapturedSubwayLootEvidenceDefinition(int lowId, int highId, int quality, int observedCount, int observedCorpses, int observedBasisPoints) { this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.ObservedCount = observedCount; this.ObservedCorpses = observedCorpses; this.ObservedBasisPoints = observedBasisPoints; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public int ObservedCount { get; private set; } public int ObservedCorpses { get; private set; } public int ObservedBasisPoints { get; private set; } }",
+            "    internal sealed class CapturedSubwayCorpseEvidenceDefinition { public CapturedSubwayCorpseEvidenceDefinition(string capture, string capturedUtc, string corpseIdentity, string deadNpcIdentity, int monsterData, int catMesh, int credits) { this.Capture = capture; this.CapturedUtc = capturedUtc; this.CorpseIdentity = corpseIdentity; this.DeadNpcIdentity = deadNpcIdentity; this.MonsterData = monsterData; this.CatMesh = catMesh; this.Credits = credits; } public string Capture { get; private set; } public string CapturedUtc { get; private set; } public string CorpseIdentity { get; private set; } public string DeadNpcIdentity { get; private set; } public int MonsterData { get; private set; } public int CatMesh { get; private set; } public int Credits { get; private set; } }",
             "}",
             "",
         ]

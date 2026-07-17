@@ -368,6 +368,7 @@ namespace AORebirth.Core.Playfields
                 case CreditsPolicyMode.Fixed: result.Credits = policy.MinimumCredits; result.CreditsUnresolved = false; break;
                 case CreditsPolicyMode.Range: result.Credits = NextInclusive(random, policy.MinimumCredits, policy.MaximumCredits); result.CreditsUnresolved = false; break;
                 case CreditsPolicyMode.ObservedSet:
+                case CreditsPolicyMode.ObservedSamples:
                 {
                     int[] observed = policy.ObservedCredits ?? new int[0];
                     result.Credits = observed.Length == 0 ? 0 : observed[random.Next(observed.Length)];

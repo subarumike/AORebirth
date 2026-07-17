@@ -218,6 +218,13 @@ empty snapshots, when calculating observed item frequencies. It does not infer
 guaranteed loot from a successful roll. The catalog now contains 321 represented
 rows, 283 active rows, and 38 quarantined rows.
 
+Finalized Slum Runner capture `20260716-034656` contributes six exact corpse
+generations. All six use CATMesh `31774`; their atomic credit observations are
+`144/144/144/131/137/131`. The profile retains those duplicate observations as
+capture evidence, while the loot system labels their runtime replay explicitly
+as `ObservedSamples` rather than changing the unique-value `ObservedSet`
+contract. Item loot and credit-to-level correlation remain unresolved.
+
 ## Ordinary respawn policy
 
 PF127 eligible ordinary enemies inherit a 240-second post-NPC-despawn default.

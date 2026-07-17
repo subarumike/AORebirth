@@ -148,6 +148,42 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayVergilSpecialAttackWeaponLastValue = 0;
 
+        public const int CapturedSubwayEumenidesMonsterData = 203726;
+
+        public const int CapturedSubwayEumenidesWeaponLowTemplate = 123267;
+
+        public const int CapturedSubwayEumenidesWeaponHighTemplate = 123268;
+
+        public const int CapturedSubwayEumenidesWeaponQuality = 20;
+
+        // The two observed 39/45 hits are evidence, not a captured weapon roll
+        // envelope. Damage and recharge remain owned by the equipped item.
+        public const int CapturedSubwayEumenidesWeaponDamageMinimumOverride = 0;
+
+        public const int CapturedSubwayEumenidesWeaponDamageMaximumOverride = 0;
+
+        public const double CapturedSubwayEumenidesRechargeOverrideSeconds = 0.0;
+
+        public const double CapturedSubwayEumenidesAttackStartDelaySeconds = 0.001000;
+
+        public const double CapturedSubwayEumenidesMovementTransitionDelaySeconds = 0.233124;
+
+        public const double CapturedSubwayEumenidesFirstHitDelaySeconds = 5.199992;
+
+        public const int CapturedSubwayEumenidesInitialAttackInfoAmmoCount = 19;
+
+        public const int CapturedSubwayEumenidesAttackInfoUnknown = 0;
+
+        public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown1 = 143;
+
+        public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown2 = 171;
+
+        public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown3 = 143;
+
+        public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown4 = 143;
+
+        public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown5 = 0;
+
         public const int CapturedSubwayAbmouthMonsterData = 155962;
 
         public const int CapturedSubwayAbmouthXopzMinimumDamage = 74;

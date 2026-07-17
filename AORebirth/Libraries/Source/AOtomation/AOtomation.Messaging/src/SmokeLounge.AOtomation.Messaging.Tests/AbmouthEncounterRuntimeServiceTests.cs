@@ -387,6 +387,140 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void EumenidesPreservesAtomicScfuAndDedicatedNamedEnemyLifecyclePolicy()
+        {
+            string root = FindRepositoryRoot();
+            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
+            string ordinary = ReadPlayfieldSource(root, "CapturedSubwayOrdinaryContentProvider.cs");
+
+            Assert.IsTrue(
+                encounter.Contains("EumenidesMonsterData = 203726")
+                && encounter.Contains("EumenidesProfileKey = \"subway.127.named.eumenides\"")
+                && encounter.Contains("EumenidesEncounterKey = \"subway.127.encounter.eumenides\"")
+                && encounter.Contains("CapturedEumenidesAggroRadius = 15.609f")
+                && encounter.Contains("EumenidesPrivateRespawnDelay = TimeSpan.FromMinutes(10)")
+                && encounter.Contains("this.eumenidesRespawnDueAtUtc = diedAtUtc.Add(EumenidesPrivateRespawnDelay)")
+                && encounter.Contains("this.ProcessEumenidesRespawn(utcNow);")
+                && encounter.Contains("maximumNpcLeashDistanceFromHome: 100.0"),
+                "Eumenides must use its own named profile, bounded observed acquisition radius, and explicit private lifecycle policy.");
+            Assert.IsTrue(
+                encounter.Contains("EumenidesProfileKey,\n                \"subway.127.named.eumenides.spawn\",\n                EumenidesEncounterKey,\n                \"Eumenides\",\n                EumenidesMonsterData,\n                false,\n                false,")
+                && encounter.Contains("20,\n                2792,\n                130,\n                76,\n                76,")
+                && encounter.Contains("241.105133f,\n                73.0453949f,\n                44.0469055f,")
+                && encounter.Contains("0.250876963f")
+                && encounter.Contains("-0.96801883f")
+                && encounter.Contains("1643u,\n                unchecked((int)0x020A4ACB)")
+                && encounter.Contains("HexToBytes(\"80000000000000000000000002010001000100010001000000020000\")")
+                && encounter.Contains("17905,\n                1800.0,\n                3.0,")
+                && encounter.Contains("npcFamily: 148")
+                && encounter.Contains("breed: 3")
+                && encounter.Contains("sex: 2")
+                && encounter.Contains("headMesh: 29708")
+                && encounter.Contains("new CapturedSubwayTextureDefinition(0, 9620, 0)")
+                && encounter.Contains("new CapturedSubwayTextureDefinition(4, 9625, 0)")
+                && encounter.Contains("new CapturedSubwayMeshDefinition(0, 29708u, 0, 4)")
+                && encounter.Contains("new CapturedSubwayMeshDefinition(1, 35564u, 0, 2)"),
+                "Eumenides must preserve one atomic 20260716-034559 SCFU plus the captured corpse CATMesh and private corpse timings.");
+            Assert.IsFalse(
+                ordinary.Contains("Eumenides") || ordinary.Contains("203726"),
+                "Eumenides must remain outside ordinary population generation.");
+            Assert.IsTrue(
+                encounter.Contains("active nano refresh unresolved and omitted"),
+                "The two observed active nanos must remain explicitly omitted until refresh semantics are known.");
+        }
+
+        [TestMethod]
+        public void EumenidesUsesCapturedWeaponContextButLeavesDamageAndRechargeItemOwned()
+        {
+            string root = FindRepositoryRoot();
+            string rules = ReadPlayfieldSource(root, "NpcCombatAttackRules.cs");
+            string contracts = ReadPlayfieldSource(root, "CapturedEnemyCombatContract.cs");
+            string generated = File.ReadAllText(
+                    Path.Combine(root, @"docs\generated\subway_enemy_combat_contracts.json"))
+                .Replace("\r\n", "\n");
+            int eumenidesStart = generated.IndexOf("\"Eumenides\": {", StringComparison.Ordinal);
+            int nextContract = generated.IndexOf("\n  \"", eumenidesStart + 16, StringComparison.Ordinal);
+            string eumenides = nextContract < 0
+                ? generated.Substring(eumenidesStart)
+                : generated.Substring(eumenidesStart, nextContract - eumenidesStart);
+
+            Assert.IsTrue(eumenidesStart >= 0, "The generated Eumenides evidence contract must exist.");
+            Assert.IsTrue(
+                rules.Contains("CapturedSubwayEumenidesWeaponLowTemplate = 123267")
+                && rules.Contains("CapturedSubwayEumenidesWeaponHighTemplate = 123268")
+                && rules.Contains("CapturedSubwayEumenidesWeaponQuality = 20")
+                && rules.Contains("CapturedSubwayEumenidesWeaponDamageMinimumOverride = 0")
+                && rules.Contains("CapturedSubwayEumenidesWeaponDamageMaximumOverride = 0")
+                && rules.Contains("CapturedSubwayEumenidesRechargeOverrideSeconds = 0.0")
+                && rules.Contains("CapturedSubwayEumenidesAttackStartDelaySeconds = 0.001000")
+                && rules.Contains("CapturedSubwayEumenidesMovementTransitionDelaySeconds = 0.233124")
+                && rules.Contains("CapturedSubwayEumenidesFirstHitDelaySeconds = 5.199992")
+                && rules.Contains("CapturedSubwayEumenidesSpecialAttackWeaponUnknown1 = 143")
+                && rules.Contains("CapturedSubwayEumenidesSpecialAttackWeaponUnknown2 = 171"),
+                "Eumenides must retain the captured QL20 weapon, SIW shape, and opening timing without hard-coded runtime rolls.");
+            Assert.IsTrue(
+                contracts.Contains("case 203726:")
+                && contracts.Contains("NpcCombatAttackRules.CapturedSubwayEumenidesWeaponLowTemplate")
+                && contracts.Contains("NpcCombatAttackRules.CapturedSubwayEumenidesWeaponHighTemplate")
+                && contracts.Contains("NpcCombatAttackRules.CapturedSubwayEumenidesRechargeOverrideSeconds")
+                && contracts.Contains("requiresDamageLineOfSight: true")
+                && contracts.Contains("two observed normal player hits 39/45")
+                && contracts.Contains("one observed 9.749082-second interval"),
+                "The runtime contract must equip the weapon, preserve observed evidence, and require PF127 damage LOS.");
+            Assert.IsTrue(
+                eumenides.Contains("\"normalAttackInfoRows\": 2")
+                && eumenides.Contains("\"normalMinDamage\": 39")
+                && eumenides.Contains("\"normalMaxDamage\": 45")
+                && eumenides.Contains("\"medianRechargeSeconds\": 9.749082")
+                && eumenides.Contains("\"equippedWeaponTemplateId\": 123267")
+                && eumenides.Contains("\"equippedWeaponQuality\": 20"),
+                "Observed Eumenides hits and cadence must remain evidence only and separate from the zero runtime overrides.");
+        }
+
+        [TestMethod]
+        public void EumenidesCorpseEvidenceReplaysExactCapturedShapeWithoutInventingItemLoot()
+        {
+            string root = FindRepositoryRoot();
+            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
+            string corpse = ReadPacketSource(root, "CorpseFullUpdate.cs");
+            string loot = ReadPlayfieldSource(root, "GlobalLootRuntimeService.cs");
+            string captured = File.ReadAllText(
+                Path.Combine(
+                    root,
+                    @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260716-222007\corpse-full-updates.csv"));
+
+            Assert.IsTrue(
+                captured.Contains("Remains of Eumenides")
+                && captured.Contains(",130,2,3,1,")
+                && captured.Contains(",17905,186,203726,")
+                && captured.Contains(",416,\""),
+                "The preserved official-live corpse row must retain packet length, scale, sex, breed, race, CATMesh, credits, and MonsterData.");
+            Assert.IsTrue(
+                encounter.Contains("17905,\n                1800.0,\n                3.0,")
+                && corpse.Contains("CapturedSubwayEumenidesPacketLength = 416")
+                && corpse.Contains("CapturedSubwayEumenidesMonsterDataOffset = 332")
+                && corpse.Contains("CapturedSubwayEumenidesTailDeadNpcInstanceOffset = 344")
+                && corpse.Contains("CapturedSubwayEumenidesTemplate")
+                && corpse.Contains("BuildCapturedSubwayEumenides(")
+                && corpse.Contains("WriteInt32(buffer, MonsterScaleOffset, deadNpc.Stats[StatIds.monsterscale].Value);")
+                && corpse.Contains("WriteInt32(buffer, CorpseCatMeshOffset, corpseCatMesh);")
+                && corpse.Contains("WriteInt32(buffer, CorpseCashValueOffset, Math.Max(0, corpseCredits));")
+                && corpse.Contains("WriteInt32(buffer, CapturedSubwayEumenidesMonsterDataOffset, corpseMonsterData);")
+                && corpse.Contains("CapturedSubwayEumenidesTailDeadNpcInstanceOffset"),
+                "Eumenides must replay the captured 416-byte corpse visual while patching only runtime state fields.");
+            Assert.IsTrue(
+                encounter.Contains("private named-enemy policy: 10-minute respawn, 30-minute loot-bearing corpse")
+                && encounter.Contains("active nano refresh unresolved and omitted"),
+                "Private timing substitutions and unresolved capture fields must remain explicit rather than presented as official-live facts.");
+            Assert.IsTrue(
+                loot.Contains("CapturedEumenidesCredits = 186")
+                && loot.Contains("CapturedSubwayEncounterRuntimeService.EumenidesProfileKey")
+                && loot.Contains("isEumenides ? CapturedEumenidesCredits : CapturedInfectorCredits")
+                && loot.Contains("20260716-222007 fixed 186 corpse credits; item pool unresolved"),
+                "Eumenides must award the fixed captured 186 credits while leaving its item pool unresolved.");
+        }
+
+        [TestMethod]
         public void VergilUsesCapturedWeaponTimingCorpseAndThreeAtomicLootSnapshots()
         {
             string root = FindRepositoryRoot();

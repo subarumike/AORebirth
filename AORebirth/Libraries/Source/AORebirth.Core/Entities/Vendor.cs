@@ -61,6 +61,8 @@ namespace AORebirth.Core.Entities
 
         public Identity OriginalIdentity = Identity.None;
 
+        public Identity NpcIdentity = Identity.None;
+
         public Vendor(Identity parent, Identity id, string templateHash)
             : base(parent, id)
         {

@@ -15,6 +15,9 @@ that were incorrectly excluded as named bosses.
   `222` are elsewhere.
 - `4` folders are unresolved because they contain no gameplay packets or
   location snapshots; they are empty startup remnants, not missing evidence.
+- After the Eumenides, merchant, and Slum Runner integrations, `31` Subway or
+  mixed folders still have no generated/runtime reference. That count is an
+  audit queue, not proof that each folder contains independently usable content.
 - Names, character names, capture dates, and repository references do not
   determine location.
 - The complete per-folder result is generated at
@@ -52,16 +55,34 @@ that were incorrectly excluded as named bosses.
 - The diagnostic quarantine selector now changes spawn eligibility in the
   world-population owner when explicitly selected. The selector is disabled in
   the normal runtime; all `38` rows remain quarantined.
+- Eumenides is now a dedicated named PF127 encounter from atomic capture
+  `20260716-034559`: exact L20/2792 HP appearance, QL20 weapon context,
+  capture-bounded proactive acquisition, shared LOS/chase/leash behavior, exact
+  416-byte CATMesh `17905` corpse, and fixed observed `186` credits. Weapon
+  damage and recharge remain item-owned; item loot and active-nano refresh
+  semantics remain unresolved. The private named-enemy policy is ten-minute
+  respawn, 30-minute loot-bearing corpse, and three-second empty cleanup.
+- Capture `20260709-212115` now supplies six exact Subway merchant appearances.
+  Tailor, Weaponsdealer, Armorer, Pharmacist, and Tools expose their five atomic
+  captured shop snapshots with all `140` stock rows in captured slot order.
+  Container Supplier is visible but has no invented shop endpoint because its
+  stock was not captured.
+- Finalized Slum Runner capture `20260716-034656` now supplies six exact corpse
+  observations with CATMesh `31774` and credits
+  `144/144/144/131/137/131`. The six samples remain intact as explicit observed
+  samples; no item loot or level correlation was invented.
 
 ## Validation
 
 - Ordinary provider generator content-equivalence check: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
 - World population foundation: `25/25` PASS.
-- Subway loot evidence: `11/11` PASS.
+- Subway loot evidence: `12/12` PASS.
+- Subway merchant content: `4/4` PASS.
 - Visibility interest/catalog: `12/12` PASS.
 - Quarantine/spatial-selection guardrail: PASS.
-- Named encounter/capture contract suite: `22/22` PASS.
+- Named encounter/capture contract suite: `25/25` PASS.
+- Runtime-coordinator ownership guard: PASS.
 - Approved AORebirth Debug build: PASS.
 - Chat, Login, and Zone restart: PASS; ports `6996`, `7012`, `7500`, and `7501`
   listening.
@@ -72,26 +93,24 @@ that were incorrectly excluded as named bosses.
 
 ## Next Runtime Check
 
-Log into the private server, enter PF127, and traverse through the deep rooms.
-Confirm the dungeon loads without a client crash and that the restored enemy
-families are present, retaliate, chase, die, leave reopenable loot corpses, and
-respawn under the existing ordinary policy. Do not enable `ALL_38` for this
-check.
+Log into the private server and traverse PF127 with the normal quarantine
+selector. Confirm the restored deep families remain stable; Eumenides appears,
+aggros, shoots only with LOS, chases, leashes, dies, exposes `186` credits, and
+respawns; all six merchants appear, the first five shops open, and Container
+Supplier does not; and Slum Runner corpses use the captured visual/credit pool.
+Do not enable `ALL_38` for this check.
 
 ## Remaining Capture-Backed Work
 
-1. Eumenides has sufficient existing appearance and combat evidence for a
-   dedicated named-enemy slice: L20, 2792 HP, MD `203726`, scale 130, RunSpeed
-   76, weapon `123267` QL20, and player damage `39..45`. Loot remains unresolved.
-2. Strike Foreman has a complete captured population profile but no indexed
+1. Strike Foreman has a complete captured population profile but no indexed
    outgoing combat or loot. Keep those subsystems unresolved rather than
    guessing.
-3. Bitaxel has exact appearance evidence but no player-facing combat and an
+2. Bitaxel has exact appearance evidence but no player-facing combat and an
    unresolved MonsterData value. Do not activate it yet.
-4. Six Subway merchants have exact appearance and owner-linked vending-machine
-   identities. Five have atomic captured stock snapshots; Container Supplier's
-   inventory was not opened. Implement merchants as a separate slice after the
-   restored-population smoke.
+3. Container Supplier stock and dialogue remain unresolved. Keep the captured
+   appearance visible without synthesizing an inventory or interaction.
+4. The `38` diagnostic population rows remain quarantined until bounded private
+   login/traversal validation proves that their activation is stable.
 5. Existing PF127 door evidence describes working interior doors, not exits.
    Do not remove them. The corpus does not yet provide identity-complete world
    static/container placements.

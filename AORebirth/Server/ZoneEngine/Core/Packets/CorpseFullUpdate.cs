@@ -56,6 +56,10 @@ namespace ZoneEngine.Core.Packets
         private const int CapturedSubwayVergilMonsterDataOffset = 336;
         private const int CapturedSubwayVergilTailDeadNpcInstanceOffset = 348;
 
+        private const int CapturedSubwayEumenidesPacketLength = 416;
+        private const int CapturedSubwayEumenidesMonsterDataOffset = 332;
+        private const int CapturedSubwayEumenidesTailDeadNpcInstanceOffset = 344;
+
         private static readonly byte[] Template = HexToBytes(
             "0000000a0001019e000000003cac6f144f474e050000c76a00f0f00100000000080000000b00000000000000004504a4df41c5ea1244cb530d000000003e8fb30a000000003f75b5e0000002350000000000000000006f000046f200000000001818050000001700000000000002bd00000000000002be00000000000002bf000000000000019c000000010000016800000062000000df000000000000003b00000003000000040000000700000059000000010000019f0000c350000001a0776b95780000002a0000797e0000003d000000000000000800004650000000220000003c0000001b52656d61696e73206f66205268696e6f6d616e204d6f74686572000000000200000032000003f100000003000007e20000cf2738f46cbe0000000400000000000000010000000000000000000000000000000000000000000001f700000001000000040000798a000000000000c350776b9578000017a600000000000000000000000000000001000000000000000000000002000000000000000000000003000000000000000000000004000000000000000000000000");
 
@@ -109,6 +113,18 @@ namespace ZoneEngine.Core.Packets
             + "000000010000000000000000000000000000000000000000000001F4000000010000000400031BE4000000000000C35079607AE5000017A600000000"
             + "0001CB9500000000000000010000258900000000000000020000258F0000000000000003000025870000000000000004000025960000000000000000");
 
+        // Official live Subway capture 20260716-222007, CorpseFullUpdate packet #198.
+        // Preserve Eumenides' exact 416-byte body, CATMesh 17905, MonsterData,
+        // scale, breed/sex/race fields, and visual tail while patching runtime state.
+        private static readonly byte[] CapturedSubwayEumenidesTemplate = HexToBytes(
+            "03FA000A000101A000000DAD7944C0654F474E050000C76A00F6900600000000080000000B000000000000000043687A414291A1FB42358691000000"
+            + "00BF24B2D5800000003F43FC550015781E0000000000000000006F00004AE300000000001818050000001700000000000002BD00000000000002BE00"
+            + "000000000002BF000000000000019C000000010000016800000082000000DF000000010000003B000000020000000400000003000000590000000100"
+            + "00019F0000C350000001A0797022340000002A000045F10000003D000000BA0000000800007210000000220000003C000000400000740C0000001552"
+            + "656D61696E73206F662045756D656E69646573000000000200000032000003F100000003000007E20000CF273983C39B000000040000000000000001"
+            + "0000000000000000000000000000000000000000000001F6000000010000000400031BCE000000000000C35079702234000017A60000000000002594"
+            + "00000000000000010000258C0000000000000002000025920000000000000003000185C30000000000000004000025990000000000000000");
+
         public static byte[] Build(
             ICharacter deadNpc,
             Identity corpseIdentity,
@@ -122,6 +138,19 @@ namespace ZoneEngine.Core.Packets
                 && corpseMonsterData == NpcCombatAttackRules.CapturedSubwayVergilMonsterData)
             {
                 return BuildCapturedSubwayVergil(
+                    deadNpc,
+                    corpseIdentity,
+                    receiver,
+                    serverId,
+                    corpseCatMesh,
+                    corpseMonsterData,
+                    corpseCredits);
+            }
+
+            if (deadNpc != null
+                && corpseMonsterData == NpcCombatAttackRules.CapturedSubwayEumenidesMonsterData)
+            {
+                return BuildCapturedSubwayEumenides(
                     deadNpc,
                     corpseIdentity,
                     receiver,
@@ -258,6 +287,45 @@ namespace ZoneEngine.Core.Packets
             WriteInt32(
                 buffer,
                 CapturedSubwayVergilTailDeadNpcInstanceOffset,
+                deadNpc.Identity.Instance);
+
+            return buffer;
+        }
+
+        private static byte[] BuildCapturedSubwayEumenides(
+            ICharacter deadNpc,
+            Identity corpseIdentity,
+            Identity receiver,
+            int serverId,
+            int corpseCatMesh,
+            int corpseMonsterData,
+            int corpseCredits)
+        {
+            byte[] buffer = (byte[])CapturedSubwayEumenidesTemplate.Clone();
+            if (buffer.Length != CapturedSubwayEumenidesPacketLength)
+            {
+                throw new InvalidOperationException("Captured Subway Eumenides corpse template length changed.");
+            }
+
+            WritePacketLength(buffer, buffer.Length);
+            WriteInt32(buffer, ServerIdOffset, serverId);
+            WriteInt32(buffer, ReceiverInstanceOffset, receiver.Instance);
+            WriteInt32(buffer, CorpseInstanceOffset, corpseIdentity.Instance);
+            WriteSingle(buffer, PositionXOffset, deadNpc.RawCoordinates.X);
+            WriteSingle(buffer, PositionYOffset, deadNpc.RawCoordinates.Y);
+            WriteSingle(buffer, PositionZOffset, deadNpc.RawCoordinates.Z);
+            WriteInt32(buffer, PlayfieldIdOffset, deadNpc.Playfield.Identity.Instance);
+            WriteInt32(buffer, MonsterScaleOffset, deadNpc.Stats[StatIds.monsterscale].Value);
+            WriteInt32(buffer, SexOffset, deadNpc.Stats[StatIds.sex].Value);
+            WriteInt32(buffer, BreedOffset, deadNpc.Stats[StatIds.breed].Value);
+            WriteInt32(buffer, RaceOffset, deadNpc.Stats[StatIds.race].Value);
+            WriteInt32(buffer, DeadNpcInstanceOffset, deadNpc.Identity.Instance);
+            WriteInt32(buffer, CorpseCatMeshOffset, corpseCatMesh);
+            WriteInt32(buffer, CorpseCashValueOffset, Math.Max(0, corpseCredits));
+            WriteInt32(buffer, CapturedSubwayEumenidesMonsterDataOffset, corpseMonsterData);
+            WriteInt32(
+                buffer,
+                CapturedSubwayEumenidesTailDeadNpcInstanceOffset,
                 deadNpc.Identity.Instance);
 
             return buffer;

@@ -209,10 +209,16 @@ namespace ZoneEngine.Core.Playfields
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
         {
             this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);
+            this.vendors.SpawnCapturedSubwayVendors(
+                this.playfield,
+                playfieldIdentity,
+                this.dynelRegistry,
+                this.RegisterDynel);
         }
 
         internal void ClearNpcRuntimeState()
         {
+            this.vendors.ClearCapturedSubwayVendors(this.playfield.Identity, this.dynelRegistry);
             this.npcRuntime.ClearRuntimeState();
             this.npcChaseNavigation.Dispose();
             this.visibilityInterest.Clear();

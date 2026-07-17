@@ -642,6 +642,28 @@ namespace AORebirth.Core.Playfields
         {
             switch (monsterData)
             {
+                case 203726:
+                    return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
+                        "20260709-222339: Eumenides QL20 weapon 123267/123268, empty-special context 143/171/143/143/0, immediate attack start, 0.233124-second movement transition, 5.199992-second first hit, two observed normal player hits 39/45, and one observed 9.749082-second interval; weapon owns runtime damage and recharge",
+                        NpcCombatAttackRules.CapturedSubwayEumenidesWeaponLowTemplate,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesWeaponHighTemplate,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesWeaponQuality,
+                        (int)WeaponSlots.Righthand,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesWeaponDamageMinimumOverride,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesWeaponDamageMaximumOverride,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesAttackStartDelaySeconds,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesMovementTransitionDelaySeconds,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesFirstHitDelaySeconds,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesRechargeOverrideSeconds,
+                        false,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesInitialAttackInfoAmmoCount,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesAttackInfoUnknown,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown1,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown2,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown3,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown4,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown5,
+                        requiresDamageLineOfSight: true);
                 case 203748:
                     return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
                         "20260712-232711/234401: Vergil Aeneid QL23 Cast-Off E-Beamer 122123; 23-25 player damage, 23-34 all-target damage, captured attack-start/first-hit timing, and weapon-owned roll/cadence",
