@@ -1537,22 +1537,66 @@
       203748
     ],
     "captures": [
-      "20260709-222339"
+      "20260709-222339",
+      "20260716-034433"
     ],
     "identities": [
-      "(SimpleChar:795451E3)"
+      "(SimpleChar:795451E3)",
+      "(SimpleChar:796CD762)"
     ],
     "retaliationObserved": true,
-    "retaliationRows": 1,
-    "attackInfoObserved": false,
-    "attackInfoRows": 0,
-    "minDamage": 0,
-    "maxDamage": 0,
+    "retaliationRows": 4,
+    "attackInfoObserved": true,
+    "attackInfoRows": 5,
+    "minDamage": 22,
+    "maxDamage": 23,
     "medianRechargeSeconds": 0.0,
-    "weaponSlot": 0,
+    "weaponSlot": 6,
     "attackInfoUnknown": 0,
     "attackInfoWeaponInstance": 0,
-    "attackShapes": [],
+    "attackShapes": [
+      {
+        "weaponSlot": 6,
+        "attackInfoUnknown": 0,
+        "weaponInstance": 0,
+        "rows": 5,
+        "captures": [
+          "20260716-034433"
+        ],
+        "minDamage": 22,
+        "maxDamage": 23,
+        "intervalRows": 0,
+        "minIntervalSeconds": null,
+        "medianIntervalSeconds": null,
+        "maxIntervalSeconds": null
+      }
+    ],
+    "targetRoleEvidence": {
+      "localPlayer": {
+        "captures": [
+          "20260709-222339",
+          "20260716-034433"
+        ],
+        "targetIdentities": [],
+        "retaliationRows": 4,
+        "attackInfoRows": 5,
+        "minDamage": 22,
+        "maxDamage": 23
+      },
+      "playerOwnedPet": {
+        "captures": [
+          "20260716-034433"
+        ],
+        "targetIdentities": [
+          "(SimpleChar:796D400B)"
+        ],
+        "retaliationRows": 3,
+        "attackInfoRows": 3,
+        "minDamage": 23,
+        "maxDamage": 28
+      }
+    },
+    "cadenceStatus": "unresolved-mixed-target-fight",
     "equippedWeaponObserved": true,
     "equippedWeaponTemplateId": 122123,
     "equippedWeaponQuality": 23

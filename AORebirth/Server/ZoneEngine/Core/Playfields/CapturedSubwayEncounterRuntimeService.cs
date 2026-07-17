@@ -58,12 +58,22 @@ namespace AORebirth.Core.Playfields
         private static readonly CapturedEncounterLevelHealthVariant[] VergilAeneidVariants =
         {
             new CapturedEncounterLevelHealthVariant(
+                29,
+                6796,
+                131,
+                131,
+                "20260716-034433 fight/corpse"),
+            new CapturedEncounterLevelHealthVariant(
                 30,
                 7227,
+                132,
+                135,
                 "20260709-222339 SCFU #5445; 20260712-234401 fight"),
             new CapturedEncounterLevelHealthVariant(
                 31,
                 7659,
+                132,
+                140,
                 "20260712-232711 fight")
         };
 
@@ -441,7 +451,7 @@ namespace AORebirth.Core.Playfields
             }
 
             int level = vergil.Stats[StatIds.level].Value;
-            if (level >= 31)
+            if (level == 31)
             {
                 ICharacter target = this.FindVergilDirectHealTarget(vergil);
                 if (target == null)
@@ -458,6 +468,11 @@ namespace AORebirth.Core.Playfields
                     0,
                     utcNow);
                 this.vergilNextHealAtUtc = utcNow.AddSeconds(VergilDirectHealCooldownSeconds);
+                return;
+            }
+
+            if (level != 30)
+            {
                 return;
             }
 
@@ -813,8 +828,10 @@ namespace AORebirth.Core.Playfields
                 false,
                 variant.Level,
                 variant.Health,
-                132,
-                135,
+                variant.MonsterScale,
+                variant.RunSpeed,
+                // The exact PF127 appearance template retains the captured L30
+                // SCFU RunSpeedBase because no alive L29/L31 SCFU base is available.
                 134,
                 0,
                 3,
@@ -959,15 +976,24 @@ namespace AORebirth.Core.Playfields
 
         private sealed class CapturedEncounterLevelHealthVariant
         {
-            internal CapturedEncounterLevelHealthVariant(int level, int health, string evidence)
+            internal CapturedEncounterLevelHealthVariant(
+                int level,
+                int health,
+                int monsterScale,
+                int runSpeed,
+                string evidence)
             {
                 this.Level = level;
                 this.Health = health;
+                this.MonsterScale = monsterScale;
+                this.RunSpeed = runSpeed;
                 this.Evidence = evidence;
             }
 
             internal int Level { get; private set; }
             internal int Health { get; private set; }
+            internal int MonsterScale { get; private set; }
+            internal int RunSpeed { get; private set; }
             internal string Evidence { get; private set; }
         }
 

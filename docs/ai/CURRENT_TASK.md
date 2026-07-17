@@ -2,10 +2,11 @@
 
 ## Current Focus
 
-The complete existing Bloodcreeper and Disobedient Bot corpse-loot corpus has
-been audited and every strictly supported item behavior is implemented. The
+Vergil follow-up capture `20260716-034433` is integrated without merging
+player-owned-pet damage into player-facing damage. The complete existing
+Bloodcreeper and Disobedient Bot corpse-loot corpus remains implemented. The
 next active boundary is the bounded private Bloodcreeper smoke; no new capture
-is requested by this completed offline slice. After that smoke, continue the
+is requested by either completed offline slice. After that smoke, continue the
 next Subway enemy from the existing corpus through the shared ordinary runtime.
 
 ## Done in this slice
@@ -64,6 +65,17 @@ next Subway enemy from the existing corpus through the shared ordinary runtime.
   evidence. Player-target rows now establish four captured hits at `21..34`;
   Healer-pet hits are excluded, repeat cadence remains unresolved, and this
   evidence report does not activate a Melded Patterns runtime contract.
+- Finalized capture `20260716-034433` is indexed only for Vergil Aeneid. It adds
+  exact L29/6796 HP/scale 131/RunSpeed 131 runtime data, exact-level fail-closed
+  healing, the captured 420-byte corpse scale field, and a complete `563`-credit
+  five-item corpse snapshot including 100 QL1 bullets.
+- Vergil's three observed corpses now replay as indivisible item-plus-credit
+  snapshots. No generated corpse can mix items or credits from different
+  captures; wider pool membership and official selection probabilities remain
+  unresolved.
+- Vergil combat evidence now keeps five local-player hits at `22..23` separate
+  from three Killer-pet hits at `23..28`. Retarget-heavy cadence remains
+  unresolved, and weapon damage/recharge remains equipped-weapon-owned.
 - No quarantined population rows were activated; the population remains 260
   catalog rows, 222 active rows, and 38 quarantined rows.
 
@@ -81,6 +93,9 @@ next Subway enemy from the existing corpus through the shared ordinary runtime.
    fixed-level rows fixed until capture evidence or an approved design decision
    establishes a range.
 
+No repeat Vergil capture is needed for the data promoted from
+`20260716-034433`. Its short post-death window does not establish respawn.
+
 ## Constraints
 
 - The 240-second ordinary default is a private-project policy, not a claim that
@@ -92,6 +107,10 @@ next Subway enemy from the existing corpus through the shared ordinary runtime.
   complete pool, and do not activate `234876/234876` without a strict corpse
   identity chain.
 - Do not activate the 38 quarantined rows or populate unresolved loot pools.
+- Do not merge player-owned-pet damage into player-facing enemy damage or infer
+  Vergil cadence from a mixed-target fight.
+- Keep Vergil loot snapshots atomic; independent item-slot or credit rolls would
+  create corpse combinations that were never observed.
 - Existing encounter, pet, vendor, static, quest, navigation, LOS, leash, corpse,
   loot, and combat ownership remains unchanged.
 - Do not auto-attach or launch AO/capture tooling. Mike runs gameplay and supplies

@@ -333,7 +333,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void VergilPreservesExactPf127SpawnAppearanceAndObservedLevelHealthPair()
+        public void VergilPreservesExactPf127SpawnAppearanceAndObservedLevelHealthVariants()
         {
             string encounter = ReadPlayfieldSource(
                 FindRepositoryRoot(),
@@ -341,11 +341,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsTrue(
                 encounter.Contains("internal const int SubwayPlayfieldId = 127;")
-                && encounter.Contains("new CapturedEncounterLevelHealthVariant(\n                30,\n                7227,")
-                && encounter.Contains("new CapturedEncounterLevelHealthVariant(\n                31,\n                7659,")
+                && encounter.Contains("new CapturedEncounterLevelHealthVariant(\n                29,\n                6796,\n                131,\n                131,")
+                && encounter.Contains("new CapturedEncounterLevelHealthVariant(\n                30,\n                7227,\n                132,\n                135,")
+                && encounter.Contains("new CapturedEncounterLevelHealthVariant(\n                31,\n                7659,\n                132,\n                140,")
                 && encounter.Contains("variant = VergilAeneidVariants[this.spawnRandom.Next(VergilAeneidVariants.Length)]")
-                && encounter.Contains("variant.Level,\n                variant.Health,"),
-                "Vergil must select only the two captured level/health pairs in PF127.");
+                && encounter.Contains("variant.Level,\n                variant.Health,\n                variant.MonsterScale,\n                variant.RunSpeed,"),
+                "Vergil must select only the three captured level, health, scale, and RunSpeed variants in PF127.");
             Assert.IsTrue(
                 encounter.Contains("278.045074f,\n                73.01795f,\n                98.80104f,")
                 && encounter.Contains("-0.7096085f")
@@ -365,7 +366,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void VergilUsesCapturedWeaponTimingCorpseAndTwoLootAlternatives()
+        public void VergilUsesCapturedWeaponTimingCorpseAndThreeAtomicLootSnapshots()
         {
             string root = FindRepositoryRoot();
             string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
@@ -394,20 +395,70 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpse.Contains("CapturedSubwayVergilPacketLength = 420")
                 && corpse.Contains("CapturedSubwayVergilTemplate")
                 && corpse.Contains("BuildCapturedSubwayVergil(")
-                && corpse.Contains("corpseMonsterData == NpcCombatAttackRules.CapturedSubwayVergilMonsterData"),
+                && corpse.Contains("corpseMonsterData == NpcCombatAttackRules.CapturedSubwayVergilMonsterData")
+                && corpse.Contains("WriteInt32(buffer, MonsterScaleOffset, deadNpc.Stats[StatIds.monsterscale].Value);"),
                 "Vergil must retain the exact 420-byte corpse template and CATMesh 5921.");
             Assert.IsTrue(
-                globalLoot.Contains("CapturedVergilCreditOutcomes = { 587, 610 }")
-                && globalLoot.Contains("ObservedAlternativeGroup(\n                        0,")
-                && globalLoot.Contains("\"capture.20260712-232711\",\n                            301713,\n                            301713,\n                            1,")
-                && globalLoot.Contains("\"capture.20260712-234401\",\n                            301714,\n                            301714,\n                            1,")
-                && globalLoot.Contains("ObservedAlternativeGroup(\n                        1,")
-                && globalLoot.Contains("\"capture.20260712-232711\",\n                            202743,\n                            202744,\n                            32,")
-                && globalLoot.Contains("\"capture.20260712-234401\",\n                            123571,\n                            123572,\n                            23,")
-                && globalLoot.Contains("ObservedSnapshotGroup(\n                        2,\n                        287146,\n                        287146,\n                        200,")
-                && globalLoot.Contains("CreditsPolicy = CreditsObservedSet(CapturedVergilCreditOutcomes)")
+                globalLoot.Contains("ObservedCorpseSnapshots = new[]")
+                && globalLoot.Contains("\"capture.20260712-232711\",\n                        610,")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260712-232711\", 301713, 301713, 1, 1)")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260712-232711\", 202743, 202744, 32, 1)")
+                && globalLoot.Contains("\"capture.20260712-234401\",\n                        587,")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260712-234401\", 301714, 301714, 1, 1)")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260712-234401\", 123571, 123572, 23, 1)")
+                && globalLoot.Contains("\"capture.20260716-034433\",\n                        563,")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 202734, 202735, 33, 1)")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 301715, 301715, 1, 1)")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 160051, 160050, 24, 1)")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 21605, 21605, 1, 100)")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 287146, 287146, 200, 1)")
+                && globalLoot.Contains("Mode = CreditsPolicyMode.Unresolved")
                 && globalLoot.Contains("ItemPoolUnresolved = true"),
-                "Vergil loot must select the two observed slot alternatives, fixed third item, and captured 587/610 credit set only.");
+                "Vergil loot must replay only the three exact item-plus-credit corpse snapshots, including QL1 bullets quantity 100.");
+        }
+
+        [TestMethod]
+        public void VergilFollowupCombatEvidenceSeparatesLocalPlayerAndKillerPet()
+        {
+            string root = FindRepositoryRoot();
+            string analyzer = File.ReadAllText(
+                    Path.Combine(root, @"tools-temp\AOSharpCaptureAnalyzer\analyze_subway_enemy_combat_contracts.py"))
+                .Replace("\r\n", "\n");
+            string generated = File.ReadAllText(
+                    Path.Combine(root, @"docs\generated\subway_enemy_combat_contracts.json"))
+                .Replace("\r\n", "\n");
+            int vergilStart = generated.IndexOf("\"Vergil Aeneid\": {", StringComparison.Ordinal);
+            Assert.IsTrue(vergilStart >= 0, "The generated Vergil combat contract must exist.");
+            int nextContract = generated.IndexOf("\n  \"", vergilStart + 20, StringComparison.Ordinal);
+            string vergil = nextContract < 0
+                ? generated.Substring(vergilStart)
+                : generated.Substring(vergilStart, nextContract - vergilStart);
+            int petStart = vergil.IndexOf("\"playerOwnedPet\": {", StringComparison.Ordinal);
+
+            Assert.IsTrue(
+                analyzer.Contains("\"20260716-034433\": frozenset({\"Vergil Aeneid\"})")
+                && analyzer.Contains("\"20260716-034433\": frozenset({\"(SimpleChar:796D400B)\"})")
+                && analyzer.Contains("CADENCE_UNRESOLVED_ENEMIES = frozenset({\"Vergil Aeneid\"})"),
+                "Capture 034433 must stay Vergil-only, explicitly classify Killer as a player-owned pet, and leave cadence unresolved.");
+            Assert.IsTrue(
+                vergil.Contains("\"20260716-034433\"")
+                && vergil.Contains("\"retaliationRows\": 4")
+                && vergil.Contains("\"attackInfoRows\": 5")
+                && vergil.Contains("\"minDamage\": 22")
+                && vergil.Contains("\"maxDamage\": 23")
+                && vergil.Contains("\"intervalRows\": 0")
+                && vergil.Contains("\"cadenceStatus\": \"unresolved-mixed-target-fight\"")
+                && vergil.Contains("\"equippedWeaponTemplateId\": 122123")
+                && vergil.Contains("\"equippedWeaponQuality\": 23"),
+                "Top-level Vergil combat evidence must remain local-player-facing and retain the existing weapon proof.");
+            Assert.IsTrue(
+                petStart >= 0
+                && vergil.Substring(petStart).Contains("\"(SimpleChar:796D400B)\"")
+                && vergil.Substring(petStart).Contains("\"retaliationRows\": 3")
+                && vergil.Substring(petStart).Contains("\"attackInfoRows\": 3")
+                && vergil.Substring(petStart).Contains("\"minDamage\": 23")
+                && vergil.Substring(petStart).Contains("\"maxDamage\": 28"),
+                "Killer's three captured hits must remain in the separate player-owned-pet sidecar.");
         }
 
         [TestMethod]
@@ -422,7 +473,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && encounter.Contains("VergilDirectHealAmount = 187")
                 && encounter.Contains("VergilDirectHealCastSeconds = 1.480007")
                 && encounter.Contains("VergilDirectHealCooldownSeconds = 30.654")
-                && encounter.Contains("if (level >= 31)")
+                && encounter.Contains("if (level == 31)")
                 && encounter.Contains("VergilDirectHealNanoId,\n                    VergilDirectHealAmount,\n                    VergilDirectHealCastSeconds,")
                 && encounter.Contains("utcNow.AddSeconds(VergilDirectHealCooldownSeconds)"),
                 "Level-31 Vergil must retain captured nano 43827, 187 healing, 1.480007-second cast, and 30.654-second cooldown.");
@@ -431,9 +482,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && encounter.Contains("VergilSelfHealAmount = 34")
                 && encounter.Contains("VergilSelfHealDurationMilliseconds = 14000")
                 && encounter.Contains("VergilSelfHealCastSeconds = 1.763334")
+                && encounter.Contains("if (level != 30)\n            {\n                return;\n            }")
                 && encounter.Contains("VergilSelfHealNanoId,\n                VergilSelfHealAmount,\n                VergilSelfHealCastSeconds,\n                VergilSelfHealDurationMilliseconds,")
                 && encounter.Contains("this.vergilNextHealAtUtc = DateTime.MaxValue;"),
-                "Level-30 Vergil must retain captured nano 43880, 34 healing, 14-second duration, and 1.763334-second cast without invented repetition.");
+                "Level-30 Vergil must retain captured nano 43880 without repetition, while level 29 fails closed instead of inheriting an unobserved heal.");
             Assert.IsTrue(
                 encounter.Contains("internal bool IsCapturedNanoCastInProgress(ICharacter character)")
                 && encounter.Contains("this.vergilPendingHeal != null")

@@ -63,6 +63,121 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void VergilObservedCorpseSnapshotsGenerateOnlyExactLinkedBundles()
+        {
+            LootTableDefinition table = BuildVergilObservedSnapshotTableForTest();
+            Assert.AreEqual(0, table.RollGroups.Length);
+            Assert.AreEqual(3, table.ObservedCorpseSnapshots.Length);
+            Assert.IsTrue(table.ItemPoolUnresolved);
+            Assert.AreEqual(CreditsPolicyMode.Unresolved, table.CreditsPolicy.Mode);
+            Assert.AreEqual(LootEvidenceConfidence.Unresolved, table.CreditsPolicy.Evidence);
+            Assert.IsTrue(table.ObservedCorpseSnapshots.All(
+                value => value.SelectionProbabilityEvidence == LootEvidenceConfidence.Unresolved));
+
+            var registry = new LootTableRegistry(value => value > 0);
+            registry.RegisterTable(table);
+            registry.RegisterAssignment(new LootAssignmentDefinition
+            {
+                AssignmentKey = "test.vergil.snapshots",
+                TargetType = LootAssignmentTargetType.Boss,
+                TargetKey = "test.vergil",
+                LootTableKey = table.LootTableKey,
+                PlayfieldId = 127,
+                Priority = 0,
+                Conditions = new string[0],
+                Evidence = "test:vergil-observed-corpse-snapshots",
+                Confidence = LootEvidenceConfidence.ProvenCapture,
+                Enabled = true
+            });
+            var service = Service(registry);
+            var context = new LootGenerationContext
+            {
+                EnemyProfileKey = "test.vergil",
+                MonsterData = 203748,
+                Level = 29,
+                PlayfieldId = 127,
+                IsBoss = true
+            };
+            string[][] expectedItems =
+            {
+                new[] { "301713:301713:1:1", "202743:202744:32:1", "287146:287146:200:1" },
+                new[] { "301714:301714:1:1", "123571:123572:23:1", "287146:287146:200:1" },
+                new[]
+                {
+                    "202734:202735:33:1",
+                    "301715:301715:1:1",
+                    "160051:160050:24:1",
+                    "21605:21605:1:100",
+                    "287146:287146:200:1"
+                }
+            };
+            int[] expectedCredits = { 610, 587, 563 };
+
+            for (int snapshotIndex = 0; snapshotIndex < expectedItems.Length; snapshotIndex++)
+            {
+                var random = new FixedIndexLootRandomSource(snapshotIndex);
+                LootGenerationResult result = service.Generate(context, random);
+
+                CollectionAssert.AreEqual(
+                    expectedItems[snapshotIndex],
+                    result.Items.Select(ItemSignature).ToArray(),
+                    "A generated corpse must match one captured snapshot without cross-snapshot items.");
+                Assert.AreEqual(expectedCredits[snapshotIndex], result.Credits);
+                Assert.IsTrue(result.LootUnresolved);
+                Assert.IsTrue(result.CreditsUnresolved);
+                Assert.AreEqual(1, random.CallCount);
+                Assert.AreEqual(3, random.RequestedMaximum);
+                Assert.AreEqual(
+                    1,
+                    result.RollEvidence.Count(value => value.EntryTemplateId == 0
+                        && value.Outcome.Contains("snapshot-selected:")));
+            }
+
+            LootGenerationResult capturedFiveItemSnapshot = service.Generate(
+                context,
+                new FixedIndexLootRandomSource(2));
+            Assert.AreEqual(
+                100,
+                capturedFiveItemSnapshot.Items.Single(value => value.ItemTemplateId == 21605).Quantity);
+
+            string root = FindRepositoryRoot();
+            string globalLoot = File.ReadAllText(Path.Combine(
+                root,
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
+            Assert.IsTrue(
+                globalLoot.Contains("ObservedCorpseSnapshot(\n                        \"capture.20260712-232711\",\n                        610,")
+                && globalLoot.Contains("ObservedCorpseSnapshot(\n                        \"capture.20260712-234401\",\n                        587,")
+                && globalLoot.Contains("ObservedCorpseSnapshot(\n                        \"capture.20260716-034433\",\n                        563,")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 202734, 202735, 33, 1)")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 301715, 301715, 1, 1)")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 160051, 160050, 24, 1)")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 21605, 21605, 1, 100)")
+                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 287146, 287146, 200, 1)"),
+                "Vergil runtime loot must retain all three exact linked observed corpse snapshots.");
+        }
+
+        [TestMethod]
+        public void ObservedCorpseSnapshotsRejectIndependentProbabilityDefinitions()
+        {
+            LootTableDefinition weightedEntry = BuildVergilObservedSnapshotTableForTest();
+            weightedEntry.ObservedCorpseSnapshots[0].Entries[0].Weight = 1;
+            AssertThrows<LootDefinitionValidationException>(() =>
+                new LootTableRegistry(value => value > 0).RegisterTable(weightedEntry));
+
+            LootTableDefinition independentCredits = BuildVergilObservedSnapshotTableForTest();
+            independentCredits.CreditsPolicy = new CreditsPolicyDefinition
+            {
+                Mode = CreditsPolicyMode.ObservedSet,
+                MinimumCredits = 563,
+                MaximumCredits = 610,
+                ObservedCredits = new[] { 563, 587, 610 },
+                Evidence = LootEvidenceConfidence.ObservedAvailableLoot
+            };
+            AssertThrows<LootDefinitionValidationException>(() =>
+                new LootTableRegistry(value => value > 0).RegisterTable(independentCredits));
+        }
+
+        [TestMethod]
         public void AssignmentPrecedenceAccumulatesStableGlobalFamilyEnemyDynaBossAndEncounterLayers()
         {
             LootTableRegistry registry = Registry();
@@ -170,6 +285,98 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static LootEntryDefinition Unique(int id, int weight) { LootEntryDefinition value = Weighted(id, weight); value.UniquePerCorpse = true; return value; }
         private static LootAssignmentDefinition Assignment(string key, string table, LootAssignmentTargetType type, string target, int priority) { return new LootAssignmentDefinition { AssignmentKey = key, LootTableKey = table, TargetType = type, TargetKey = target, Priority = priority, Enabled = true, Evidence = "test", Confidence = LootEvidenceConfidence.ProvenRepository, Conditions = new string[0] }; }
 
+        private static LootTableDefinition BuildVergilObservedSnapshotTableForTest()
+        {
+            return new LootTableDefinition
+            {
+                LootTableKey = "test.vergil.observed-corpse-snapshots",
+                DisplayName = "Vergil observed corpse snapshots test",
+                TableType = LootTableType.Boss,
+                RollGroups = new LootGroupDefinition[0],
+                ObservedCorpseSnapshots = new[]
+                {
+                    Snapshot(
+                        "capture.20260712-232711",
+                        610,
+                        SnapshotEntry("capture.20260712-232711", 301713, 301713, 1, 1),
+                        SnapshotEntry("capture.20260712-232711", 202743, 202744, 32, 1),
+                        SnapshotEntry("capture.20260712-232711", 287146, 287146, 200, 1)),
+                    Snapshot(
+                        "capture.20260712-234401",
+                        587,
+                        SnapshotEntry("capture.20260712-234401", 301714, 301714, 1, 1),
+                        SnapshotEntry("capture.20260712-234401", 123571, 123572, 23, 1),
+                        SnapshotEntry("capture.20260712-234401", 287146, 287146, 200, 1)),
+                    Snapshot(
+                        "capture.20260716-034433",
+                        563,
+                        SnapshotEntry("capture.20260716-034433", 202734, 202735, 33, 1),
+                        SnapshotEntry("capture.20260716-034433", 301715, 301715, 1, 1),
+                        SnapshotEntry("capture.20260716-034433", 160051, 160050, 24, 1),
+                        SnapshotEntry("capture.20260716-034433", 21605, 21605, 1, 100),
+                        SnapshotEntry("capture.20260716-034433", 287146, 287146, 200, 1))
+                },
+                CreditsPolicy = new CreditsPolicyDefinition
+                {
+                    Mode = CreditsPolicyMode.Unresolved,
+                    Evidence = LootEvidenceConfidence.Unresolved
+                },
+                QualityPolicy = "captured-observed-corpse-snapshots",
+                Evidence = "test:vergil-observed-corpse-snapshots",
+                Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                ItemPoolUnresolved = true,
+                Enabled = true
+            };
+        }
+
+        private static ObservedCorpseSnapshotDefinition Snapshot(
+            string snapshotKey,
+            int credits,
+            params LootEntryDefinition[] entries)
+        {
+            return new ObservedCorpseSnapshotDefinition
+            {
+                SnapshotKey = snapshotKey,
+                Credits = credits,
+                Entries = entries,
+                Evidence = LootEvidenceConfidence.ProvenCapture,
+                SelectionProbabilityEvidence = LootEvidenceConfidence.Unresolved,
+                EvidenceReference = "test:" + snapshotKey
+            };
+        }
+
+        private static LootEntryDefinition SnapshotEntry(
+            string snapshotKey,
+            int itemTemplateId,
+            int highItemTemplateId,
+            int quality,
+            int quantity)
+        {
+            return new LootEntryDefinition
+            {
+                SelectionKey = snapshotKey,
+                ItemTemplateId = itemTemplateId,
+                HighItemTemplateId = highItemTemplateId,
+                FixedQuality = quality,
+                MinimumQuality = quality,
+                MaximumQuality = quality,
+                MinimumQuantity = quantity,
+                MaximumQuantity = quantity,
+                Weight = 0,
+                DropChanceBasisPoints = 0,
+                UniquePerCorpse = true,
+                Semantics = LootSemantics.ObservedAvailable,
+                Evidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                EvidenceReference = "test:" + snapshotKey,
+                ProbabilityEvidence = "unresolved"
+            };
+        }
+
+        private static string ItemSignature(GeneratedLootItem item)
+        {
+            return item.ItemTemplateId + ":" + item.HighItemTemplateId + ":" + item.Quality + ":" + item.Quantity;
+        }
+
         private static LootGenerationResult GenerateCredits(CreditsPolicyMode mode, int min, int max)
         {
             LootTableRegistry registry = Registry();
@@ -207,6 +414,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 return;
             }
             Assert.Fail("Expected exception " + typeof(TException).Name + ".");
+        }
+
+        private sealed class FixedIndexLootRandomSource : ILootRandomSource
+        {
+            private readonly int index;
+
+            internal FixedIndexLootRandomSource(int index)
+            {
+                this.index = index;
+            }
+
+            internal int CallCount { get; private set; }
+            internal int RequestedMaximum { get; private set; }
+
+            public int Next(int maximumExclusive)
+            {
+                this.CallCount++;
+                this.RequestedMaximum = maximumExclusive;
+                if (this.index < 0 || this.index >= maximumExclusive)
+                {
+                    throw new ArgumentOutOfRangeException("maximumExclusive");
+                }
+                return this.index;
+            }
         }
     }
 }

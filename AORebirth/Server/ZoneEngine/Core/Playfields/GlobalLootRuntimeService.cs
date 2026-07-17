@@ -26,8 +26,7 @@ namespace AORebirth.Core.Playfields
         private const string CapturedAbmouthLootEvidence =
             "official-live-capture-20260712-232137 corpse F6C002; one observed corpse, probabilities unresolved";
         private const string CapturedVergilLootEvidence =
-            "official-live-captures 20260712-232711/234401; two observed three-item corpses and exact credit outcomes 610/587; probabilities and wider pool unresolved";
-        private static readonly int[] CapturedVergilCreditOutcomes = { 587, 610 };
+            "official-live-captures 20260712-232711/234401/20260716-034433; three exact observed corpse snapshots with linked credits 610/587/563; 20260716-034433 inventory linked by normalized corpse identity F69001; snapshot probabilities and wider pool unresolved";
         private readonly object sync = new object();
         private readonly object productionRandomSync = new object();
         private readonly Random productionRandom = new Random();
@@ -223,55 +222,7 @@ namespace AORebirth.Core.Playfields
             string tableKey = "captured." + CapturedVergilProfileKey;
             if (this.registry.ContainsTable(tableKey)) return;
 
-            this.registry.RegisterTable(new LootTableDefinition
-            {
-                LootTableKey = tableKey,
-                DisplayName = "Vergil Aeneid captured corpse alternatives",
-                TableType = LootTableType.Boss,
-                RollGroups = new[]
-                {
-                    ObservedAlternativeGroup(
-                        0,
-                        ObservedAlternativeEntry(
-                            "capture.20260712-232711",
-                            301713,
-                            301713,
-                            1,
-                            CapturedVergilLootEvidence),
-                        ObservedAlternativeEntry(
-                            "capture.20260712-234401",
-                            301714,
-                            301714,
-                            1,
-                            CapturedVergilLootEvidence)),
-                    ObservedAlternativeGroup(
-                        1,
-                        ObservedAlternativeEntry(
-                            "capture.20260712-232711",
-                            202743,
-                            202744,
-                            32,
-                            CapturedVergilLootEvidence),
-                        ObservedAlternativeEntry(
-                            "capture.20260712-234401",
-                            123571,
-                            123572,
-                            23,
-                            CapturedVergilLootEvidence)),
-                    ObservedSnapshotGroup(
-                        2,
-                        287146,
-                        287146,
-                        200,
-                        CapturedVergilLootEvidence)
-                },
-                CreditsPolicy = CreditsObservedSet(CapturedVergilCreditOutcomes),
-                QualityPolicy = "captured-observed-alternatives",
-                Evidence = CapturedVergilLootEvidence,
-                Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                ItemPoolUnresolved = true,
-                Enabled = true
-            });
+            this.registry.RegisterTable(BuildCapturedVergilLootTable());
             this.registry.RegisterAssignment(new LootAssignmentDefinition
             {
                 AssignmentKey = tableKey,
@@ -287,45 +238,91 @@ namespace AORebirth.Core.Playfields
             });
         }
 
-        private static LootGroupDefinition ObservedAlternativeGroup(
-            int slot,
-            params LootEntryDefinition[] entries)
+        internal static LootTableDefinition BuildCapturedVergilLootTable()
         {
-            return new LootGroupDefinition
+            string tableKey = "captured." + CapturedVergilProfileKey;
+            return new LootTableDefinition
             {
-                LootGroupKey = "observed.slot." + slot.ToString(CultureInfo.InvariantCulture),
-                RollMode = LootRollMode.WeightedOne,
-                RollCount = 1,
-                EmptyWeight = 0,
-                DropChanceBasisPoints = 0,
-                Entries = entries ?? new LootEntryDefinition[0],
-                Conditions = new string[0]
+                LootTableKey = tableKey,
+                DisplayName = "Vergil Aeneid captured corpse snapshots",
+                TableType = LootTableType.Boss,
+                RollGroups = new LootGroupDefinition[0],
+                ObservedCorpseSnapshots = new[]
+                {
+                    ObservedCorpseSnapshot(
+                        "capture.20260712-232711",
+                        610,
+                        ObservedCorpseSnapshotEntry("capture.20260712-232711", 301713, 301713, 1, 1),
+                        ObservedCorpseSnapshotEntry("capture.20260712-232711", 202743, 202744, 32, 1),
+                        ObservedCorpseSnapshotEntry("capture.20260712-232711", 287146, 287146, 200, 1)),
+                    ObservedCorpseSnapshot(
+                        "capture.20260712-234401",
+                        587,
+                        ObservedCorpseSnapshotEntry("capture.20260712-234401", 301714, 301714, 1, 1),
+                        ObservedCorpseSnapshotEntry("capture.20260712-234401", 123571, 123572, 23, 1),
+                        ObservedCorpseSnapshotEntry("capture.20260712-234401", 287146, 287146, 200, 1)),
+                    ObservedCorpseSnapshot(
+                        "capture.20260716-034433",
+                        563,
+                        ObservedCorpseSnapshotEntry("capture.20260716-034433", 202734, 202735, 33, 1),
+                        ObservedCorpseSnapshotEntry("capture.20260716-034433", 301715, 301715, 1, 1),
+                        ObservedCorpseSnapshotEntry("capture.20260716-034433", 160051, 160050, 24, 1),
+                        ObservedCorpseSnapshotEntry("capture.20260716-034433", 21605, 21605, 1, 100),
+                        ObservedCorpseSnapshotEntry("capture.20260716-034433", 287146, 287146, 200, 1))
+                },
+                CreditsPolicy = new CreditsPolicyDefinition
+                {
+                    Mode = CreditsPolicyMode.Unresolved,
+                    Evidence = LootEvidenceConfidence.Unresolved
+                },
+                QualityPolicy = "captured-observed-corpse-snapshots",
+                Evidence = CapturedVergilLootEvidence,
+                Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                ItemPoolUnresolved = true,
+                Enabled = true
             };
         }
 
-        private static LootEntryDefinition ObservedAlternativeEntry(
-            string selectionKey,
+        private static ObservedCorpseSnapshotDefinition ObservedCorpseSnapshot(
+            string snapshotKey,
+            int credits,
+            params LootEntryDefinition[] entries)
+        {
+            return new ObservedCorpseSnapshotDefinition
+            {
+                SnapshotKey = snapshotKey,
+                Credits = credits,
+                Entries = entries ?? new LootEntryDefinition[0],
+                Evidence = LootEvidenceConfidence.ProvenCapture,
+                SelectionProbabilityEvidence = LootEvidenceConfidence.Unresolved,
+                EvidenceReference = CapturedVergilLootEvidence + "; " + snapshotKey
+            };
+        }
+
+        private static LootEntryDefinition ObservedCorpseSnapshotEntry(
+            string snapshotKey,
             int itemTemplateId,
             int highItemTemplateId,
             int quality,
-            string evidence)
+            int quantity)
         {
             return new LootEntryDefinition
             {
-                SelectionKey = selectionKey,
+                SelectionKey = snapshotKey,
                 ItemTemplateId = itemTemplateId,
                 HighItemTemplateId = highItemTemplateId,
                 FixedQuality = quality,
                 MinimumQuality = quality,
                 MaximumQuality = quality,
-                MinimumQuantity = 1,
-                MaximumQuantity = 1,
-                Weight = 1,
+                MinimumQuantity = quantity,
+                MaximumQuantity = quantity,
+                Weight = 0,
                 DropChanceBasisPoints = 0,
                 UniquePerCorpse = true,
                 Semantics = LootSemantics.ObservedAvailable,
                 Evidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                EvidenceReference = evidence + "; " + selectionKey
+                EvidenceReference = CapturedVergilLootEvidence + "; " + snapshotKey,
+                ProbabilityEvidence = "unresolved"
             };
         }
 

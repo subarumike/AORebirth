@@ -68,12 +68,23 @@ namespace AORebirth.Core.Playfields
         internal string[] Conditions { get; set; }
     }
 
+    internal sealed class ObservedCorpseSnapshotDefinition
+    {
+        internal string SnapshotKey { get; set; }
+        internal int Credits { get; set; }
+        internal LootEntryDefinition[] Entries { get; set; }
+        internal LootEvidenceConfidence Evidence { get; set; }
+        internal LootEvidenceConfidence SelectionProbabilityEvidence { get; set; }
+        internal string EvidenceReference { get; set; }
+    }
+
     internal sealed class LootTableDefinition
     {
         internal string LootTableKey { get; set; }
         internal string DisplayName { get; set; }
         internal LootTableType TableType { get; set; }
         internal LootGroupDefinition[] RollGroups { get; set; }
+        internal ObservedCorpseSnapshotDefinition[] ObservedCorpseSnapshots { get; set; }
         internal CreditsPolicyDefinition CreditsPolicy { get; set; }
         internal string QualityPolicy { get; set; }
         internal string Evidence { get; set; }
@@ -207,11 +218,16 @@ namespace AORebirth.Core.Playfields
                 throw new LootDefinitionValidationException("Loot table key is required.");
             }
             if (table.RollGroups == null) table.RollGroups = new LootGroupDefinition[0];
+            if (table.ObservedCorpseSnapshots == null)
+            {
+                table.ObservedCorpseSnapshots = new ObservedCorpseSnapshotDefinition[0];
+            }
             if (table.CreditsPolicy == null)
             {
                 throw new LootDefinitionValidationException("Credits policy is required for " + table.LootTableKey);
             }
             ValidateCredits(table.CreditsPolicy, table.LootTableKey);
+            ValidateObservedCorpseSnapshots(table);
             var groupKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (LootGroupDefinition group in table.RollGroups)
             {
@@ -225,6 +241,73 @@ namespace AORebirth.Core.Playfields
                     throw new LootDefinitionValidationException("Invalid roll count or entries in " + group.LootGroupKey);
                 }
                 foreach (LootEntryDefinition entry in group.Entries) ValidateEntry(entry, group.LootGroupKey, table.Enabled);
+            }
+        }
+
+        private void ValidateObservedCorpseSnapshots(LootTableDefinition table)
+        {
+            if (table.ObservedCorpseSnapshots.Length == 0)
+            {
+                return;
+            }
+
+            if (table.RollGroups.Length != 0)
+            {
+                throw new LootDefinitionValidationException(
+                    "Observed corpse snapshots cannot be combined with independent roll groups in "
+                    + table.LootTableKey);
+            }
+            if (!table.ItemPoolUnresolved)
+            {
+                throw new LootDefinitionValidationException(
+                    "Observed corpse snapshots require an unresolved wider item pool in "
+                    + table.LootTableKey);
+            }
+            if (table.CreditsPolicy.Mode != CreditsPolicyMode.Unresolved
+                || table.CreditsPolicy.Evidence != LootEvidenceConfidence.Unresolved)
+            {
+                throw new LootDefinitionValidationException(
+                    "Observed corpse snapshots require unresolved independent credit probability in "
+                    + table.LootTableKey);
+            }
+
+            var snapshotKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (ObservedCorpseSnapshotDefinition snapshot in table.ObservedCorpseSnapshots)
+            {
+                if (snapshot == null
+                    || string.IsNullOrWhiteSpace(snapshot.SnapshotKey)
+                    || !snapshotKeys.Add(snapshot.SnapshotKey))
+                {
+                    throw new LootDefinitionValidationException(
+                        "Invalid or duplicate observed corpse snapshot in " + table.LootTableKey);
+                }
+                if (snapshot.Credits < 0
+                    || snapshot.Entries == null
+                    || snapshot.Entries.Length == 0
+                    || snapshot.Evidence == LootEvidenceConfidence.Unresolved
+                    || snapshot.SelectionProbabilityEvidence != LootEvidenceConfidence.Unresolved
+                    || string.IsNullOrWhiteSpace(snapshot.EvidenceReference))
+                {
+                    throw new LootDefinitionValidationException(
+                        "Observed corpse snapshot evidence is incomplete in " + snapshot.SnapshotKey);
+                }
+
+                foreach (LootEntryDefinition entry in snapshot.Entries)
+                {
+                    ValidateEntry(entry, snapshot.SnapshotKey, table.Enabled);
+                    if (!entry.FixedQuality.HasValue
+                        || entry.MinimumQuality != entry.FixedQuality.Value
+                        || entry.MaximumQuality != entry.FixedQuality.Value
+                        || entry.MinimumQuantity != entry.MaximumQuantity
+                        || entry.Weight != 0
+                        || entry.DropChanceBasisPoints != 0
+                        || entry.Semantics != LootSemantics.ObservedAvailable)
+                    {
+                        throw new LootDefinitionValidationException(
+                            "Observed corpse snapshot entries must preserve exact non-probabilistic values in "
+                            + snapshot.SnapshotKey);
+                    }
+                }
             }
         }
 
