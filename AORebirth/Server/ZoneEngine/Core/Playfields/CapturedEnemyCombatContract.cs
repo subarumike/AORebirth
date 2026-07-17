@@ -782,12 +782,12 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayAbmouthInfectorSpecialAttackWeaponLastValue));
                 case 17657:
                     return CapturedEnemyCombatContract.CapturedSpecialSequence(
-                        "20260709-193914: Filth Flea poison opener and melee cycle",
+                        "20260708-004038 and 20260709-193914: Filth Flea normal slot rolls with criticals excluded",
                         new CapturedEnemySpecialAttackSequenceDefinition(
                             NpcCombatAttackRules.CapturedSubwayFilthFleaInitialAttackSeconds,
                             new CapturedEnemyCombatAttackDefinition(
-                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonDamage,
-                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonDamage,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonMinimumDamage,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonMaximumDamage,
                                 0,
                                 NpcCombatAttackRules.MaxMeleeCombatDistance,
                                 NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonRechargeSeconds,
@@ -799,8 +799,8 @@ namespace AORebirth.Core.Playfields
                                 NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
                                 true),
                             new CapturedEnemyCombatAttackDefinition(
-                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeDamage,
-                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeDamage,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeMinimumDamage,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeMaximumDamage,
                                 0,
                                 NpcCombatAttackRules.MaxMeleeCombatDistance,
                                 NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeRechargeSeconds,

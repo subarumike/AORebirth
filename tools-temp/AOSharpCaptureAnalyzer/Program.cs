@@ -227,13 +227,15 @@ namespace AOSharpCaptureAnalyzer
             Console.WriteLine(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "{0}: SCFU rows={1} failures={2} incomplete={3} packetLog={4} rawFallback={5}",
+                    "{0}: SCFU rows={1} failures={2} incomplete={3} packetLog={4} rawFallback={5} outsideWindowPacketLog={6} outsideWindowRawIndex={7}",
                     Path.GetFileName(captureFolder),
                     rows,
                     failures,
                     incomplete,
                     packetSet.PacketLogRows,
-                    packetSet.RawFallbackRows));
+                    packetSet.RawFallbackRows,
+                    packetSet.PacketLogRowsOutsideCaptureWindow,
+                    packetSet.RawIndexRowsOutsideCaptureWindow));
             return result;
         }
 
@@ -268,12 +270,14 @@ namespace AOSharpCaptureAnalyzer
             }
 
             CaptureExpectations expectations = ReadCaptureExpectations(captureFolder);
-            PacketSourceReport packetLog = ReadPacketLog(packetPath);
-            PacketSourceReport rawIndex = ReadRawPacketIndex(rawPacketPath);
+            PacketSourceReport packetLog = ReadPacketLog(packetPath, expectations);
+            PacketSourceReport rawIndex = ReadRawPacketIndex(rawPacketPath, expectations);
             return ReconcileSources(packetLog, rawIndex, expectations);
         }
 
-        private static PacketSourceReport ReadPacketLog(string path)
+        private static PacketSourceReport ReadPacketLog(
+            string path,
+            CaptureExpectations expectations)
         {
             var report = new PacketSourceReport("packets.hex.log", File.Exists(path));
             if (!report.Exists)
@@ -288,7 +292,6 @@ namespace AOSharpCaptureAnalyzer
                     continue;
                 }
 
-                report.RawRowCount++;
                 int markerIndex = line.IndexOf(HexMarker, StringComparison.Ordinal);
                 string[] prefix = markerIndex < 0
                                       ? line.Split((char[])null, StringSplitOptions.RemoveEmptyEntries)
@@ -300,6 +303,14 @@ namespace AOSharpCaptureAnalyzer
                     Direction = prefix.Length > 1 ? prefix[1] : string.Empty,
                     Sequence = prefix.Length > 2 ? prefix[2].TrimStart('#') : string.Empty
                 };
+
+                if (!IsInsideCaptureWindow(metadata.CapturedUtc, expectations))
+                {
+                    report.RowsOutsideCaptureWindow++;
+                    continue;
+                }
+
+                report.RawRowCount++;
 
                 int declaredLength = 0;
                 string error = markerIndex < 0
@@ -326,7 +337,9 @@ namespace AOSharpCaptureAnalyzer
             return report;
         }
 
-        private static PacketSourceReport ReadRawPacketIndex(string path)
+        private static PacketSourceReport ReadRawPacketIndex(
+            string path,
+            CaptureExpectations expectations)
         {
             var report = new PacketSourceReport("raw-packets.csv", File.Exists(path));
             if (!report.Exists)
@@ -375,7 +388,6 @@ namespace AOSharpCaptureAnalyzer
                         continue;
                     }
 
-                    report.RawRowCount++;
                     List<string> values = ParseCsvLine(lines.Current);
                     var metadata = new RawScfuCaptureMetadata
                     {
@@ -385,6 +397,14 @@ namespace AOSharpCaptureAnalyzer
                         GlobalOrdinal = CsvValue(values, headerIndexes, "GlobalOrdinal"),
                         Sequence = CsvValue(values, headerIndexes, "Sequence")
                     };
+
+                    if (!IsInsideCaptureWindow(metadata.CapturedUtc, expectations))
+                    {
+                        report.RowsOutsideCaptureWindow++;
+                        continue;
+                    }
+
+                    report.RawRowCount++;
                     int declaredLength;
                     string declaredLengthText = CsvValue(values, headerIndexes, "PacketLength");
                     string rawPacketHex = CsvValue(values, headerIndexes, "RawHex");
@@ -507,7 +527,9 @@ namespace AOSharpCaptureAnalyzer
         {
             var result = new CapturePacketSet
             {
-                PacketLogRows = packetLog.ValidScfuRowCount
+                PacketLogRows = packetLog.ValidScfuRowCount,
+                PacketLogRowsOutsideCaptureWindow = packetLog.RowsOutsideCaptureWindow,
+                RawIndexRowsOutsideCaptureWindow = rawIndex.RowsOutsideCaptureWindow
             };
             bool packetLogComplete = IsSourceComplete(packetLog, expectations.ExpectedRawPackets);
             bool rawIndexComplete = IsSourceComplete(rawIndex, expectations.ExpectedRawPackets);
@@ -740,18 +762,34 @@ namespace AOSharpCaptureAnalyzer
             }
 
             string json = File.ReadAllText(path);
-            int inbound;
-            int outbound;
-            if (TryReadJsonInt(json, "inboundRaw", out inbound)
-                && TryReadJsonInt(json, "outboundRaw", out outbound))
+            DateTime captureStartUtc;
+            if (TryReadJsonDateTime(json, "captureStartUtc", out captureStartUtc))
             {
-                result.ExpectedRawPackets = checked(inbound + outbound);
+                result.CaptureStartUtc = captureStartUtc;
             }
 
-            int scfu;
-            if (TryReadJsonInt(json, "rawSimpleCharFullUpdatePackets", out scfu))
+            DateTime captureEndUtc;
+            if (TryReadJsonDateTime(json, "captureFinalizedUtc", out captureEndUtc)
+                || TryReadJsonDateTime(json, "captureEndUtc", out captureEndUtc))
             {
-                result.ExpectedScfuPackets = scfu;
+                result.CaptureEndUtc = captureEndUtc;
+            }
+
+            if (result.CaptureEndUtc.HasValue)
+            {
+                int inbound;
+                int outbound;
+                if (TryReadJsonInt(json, "inboundRaw", out inbound)
+                    && TryReadJsonInt(json, "outboundRaw", out outbound))
+                {
+                    result.ExpectedRawPackets = checked(inbound + outbound);
+                }
+
+                int scfu;
+                if (TryReadJsonInt(json, "rawSimpleCharFullUpdatePackets", out scfu))
+                {
+                    result.ExpectedScfuPackets = scfu;
+                }
             }
 
             bool recaptureRequired;
@@ -786,6 +824,51 @@ namespace AOSharpCaptureAnalyzer
                 "\\\"" + Regex.Escape(propertyName) + "\\\"\\s*:\\s*(?<value>true|false)",
                 RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
             return match.Success && bool.TryParse(match.Groups["value"].Value, out value);
+        }
+
+        private static bool TryReadJsonDateTime(
+            string json,
+            string propertyName,
+            out DateTime value)
+        {
+            value = default(DateTime);
+            Match match = Regex.Match(
+                json ?? string.Empty,
+                "\\\"" + Regex.Escape(propertyName) + "\\\"\\s*:\\s*\\\"(?<value>[^\\\"]+)\\\"",
+                RegexOptions.CultureInvariant);
+            return match.Success
+                   && DateTime.TryParse(
+                       match.Groups["value"].Value,
+                       CultureInfo.InvariantCulture,
+                       DateTimeStyles.RoundtripKind,
+                       out value);
+        }
+
+        private static bool IsInsideCaptureWindow(
+            string capturedUtc,
+            CaptureExpectations expectations)
+        {
+            if (expectations == null
+                || (!expectations.CaptureStartUtc.HasValue
+                    && !expectations.CaptureEndUtc.HasValue))
+            {
+                return true;
+            }
+
+            DateTime timestamp;
+            if (!DateTime.TryParse(
+                    capturedUtc ?? string.Empty,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.RoundtripKind,
+                    out timestamp))
+            {
+                return true;
+            }
+
+            return (!expectations.CaptureStartUtc.HasValue
+                    || timestamp >= expectations.CaptureStartUtc.Value)
+                   && (!expectations.CaptureEndUtc.HasValue
+                       || timestamp <= expectations.CaptureEndUtc.Value);
         }
 
         private static bool TryReadLengthToken(string[] prefix, out int value)
@@ -1176,6 +1259,28 @@ namespace AOSharpCaptureAnalyzer
                     new PacketSourceReport("raw-packets.csv", true),
                     SelfTestExpectations(1, 1));
                 Assert(emptyResult.SourceFailures > 0, "Incomplete empty sources rejected");
+
+                var boundedExpectations = new CaptureExpectations
+                {
+                    CaptureStartUtc = DateTime.Parse(
+                        "2026-07-08T05:40:38.3778958Z",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.RoundtripKind),
+                    CaptureEndUtc = DateTime.Parse(
+                        "2026-07-08T05:45:36.9142909Z",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.RoundtripKind)
+                };
+                Assert(
+                    IsInsideCaptureWindow(
+                        "2026-07-08T05:45:36.9000000Z",
+                        boundedExpectations),
+                    "Packet within capture boundary retained");
+                Assert(
+                    !IsInsideCaptureWindow(
+                        "2026-07-08T06:06:07.9373411Z",
+                        boundedExpectations),
+                    "Trailing packet after finalized legacy capture excluded");
                 Console.WriteLine("SCFU decoder self-test PASS");
                 return 0;
             }
@@ -1308,6 +1413,8 @@ namespace AOSharpCaptureAnalyzer
             internal int RawFallbackRows { get; set; }
             internal int SourceFailures { get; set; }
             internal int ResolvedRawPacketCount { get; set; }
+            internal int PacketLogRowsOutsideCaptureWindow { get; set; }
+            internal int RawIndexRowsOutsideCaptureWindow { get; set; }
 
             internal void AddFailure(string message)
             {
@@ -1321,6 +1428,8 @@ namespace AOSharpCaptureAnalyzer
             internal int? ExpectedRawPackets { get; set; }
             internal int? ExpectedScfuPackets { get; set; }
             internal bool? RecaptureRequired { get; set; }
+            internal DateTime? CaptureStartUtc { get; set; }
+            internal DateTime? CaptureEndUtc { get; set; }
         }
 
         private sealed class PacketSourceReport
@@ -1342,6 +1451,7 @@ namespace AOSharpCaptureAnalyzer
             internal int ValidRowCount { get; set; }
             internal int InvalidRowCount { get; set; }
             internal int ValidScfuRowCount { get; set; }
+            internal int RowsOutsideCaptureWindow { get; set; }
             internal List<SourcePacketRecord> Records { get; private set; }
             internal Dictionary<string, SourcePacketRecord> RecordByEvent { get; private set; }
             internal List<string> Errors { get; private set; }

@@ -83,7 +83,7 @@ namespace AORebirth.Core.Playfields
 
             var profileRows = new List<OrdinaryEnemyProfile>();
             var spawnRows = new List<OrdinaryEnemySpawnDefinition>();
-            BuildSupportedRows(supportedContent, profileRows, spawnRows);
+            BuildSupportedRows(supportedContent, ordinaryContent, profileRows, spawnRows);
             BuildCapturedOrdinaryRows(ordinaryContent, profileRows, spawnRows);
 
             this.profiles = profileRows
@@ -164,6 +164,7 @@ namespace AORebirth.Core.Playfields
 
         private static void BuildSupportedRows(
             CapturedSubwayContentProvider content,
+            CapturedSubwayOrdinaryContentProvider ordinaryContent,
             ICollection<OrdinaryEnemyProfile> profiles,
             ICollection<OrdinaryEnemySpawnDefinition> spawns)
         {
@@ -196,6 +197,8 @@ namespace AORebirth.Core.Playfields
                                 value.EvidenceReference))
                     .ToArray();
                 CapturedEnemyCombatContract contract = first.Combat;
+                CapturedSubwayCorpseEvidenceDefinition[] corpseEvidence =
+                    ordinaryContent.GetCorpseEvidence(first.MonsterData);
                 profiles.Add(
                     new OrdinaryEnemyProfile(
                         SupportedProfileKey(first),
@@ -207,8 +210,8 @@ namespace AORebirth.Core.Playfields
                         BuildSupportedAppearance(first),
                         RetaliateAggression(),
                         BuildCombatProfile(contract, first.MonsterData),
-                        BuildLootProfile(first.MonsterData, lootEntries),
-                        StandardCorpseProfile(first.MonsterData),
+                        BuildLootProfile(first.MonsterData, lootEntries, corpseEvidence),
+                        StandardCorpseProfile(first.MonsterData, corpseEvidence),
                         group.Select(value => value.ContentSection)
                             .Distinct(StringComparer.Ordinal)
                             .OrderBy(value => value, StringComparer.Ordinal)
@@ -608,6 +611,7 @@ namespace AORebirth.Core.Playfields
                 .Select(value => value.ObservedCorpses)
                 .DefaultIfEmpty(0)
                 .Max();
+            int observedEmptyInventories = monsterData == 17657 ? 5 : 0;
             string itemEvidenceReference = string.Join(
                 ",",
                 entries
@@ -616,18 +620,30 @@ namespace AORebirth.Core.Playfields
                     .Distinct(StringComparer.Ordinal));
             if (corpseEvidence.Length > 0)
             {
-                int[] observedCredits = corpseEvidence
-                    .Select(value => value.Credits)
+                OrdinaryEnemyLevelCreditRule[] levelCreditRules = corpseEvidence
+                    .GroupBy(value => value.EnemyLevel)
+                    .OrderBy(value => value.Key)
+                    .Select(
+                        group =>
+                            new OrdinaryEnemyLevelCreditRule(
+                                group.Key,
+                                group.Min(value => value.Credits),
+                                group.Max(value => value.Credits),
+                                group.Count(),
+                                string.Join(
+                                    ",",
+                                    group.Select(
+                                        value => string.Format(
+                                            CultureInfo.InvariantCulture,
+                                            "{0}:{1}>{2}",
+                                            value.Capture,
+                                            value.DeadNpcIdentity,
+                                            value.CorpseIdentity)))))
                     .ToArray();
-                string creditEvidenceReference = string.Join(
-                    ",",
-                    corpseEvidence.Select(
-                        value => string.Format(
-                            CultureInfo.InvariantCulture,
-                            "{0}:{1}>{2}",
-                            value.Capture,
-                            value.DeadNpcIdentity,
-                            value.CorpseIdentity)));
+                // Exact L4/L5 rules win first. Other captured Flea spawn levels retain
+                // the previously accepted observed-outcome range as private policy;
+                // the new 23-credit outcome expands its lower bound.
+                bool preserveFilthFleaFallback = monsterData == 17657;
                 return new OrdinaryEnemyLootProfile(
                     evidence,
                     entries,
@@ -635,14 +651,14 @@ namespace AORebirth.Core.Playfields
                     0,
                     entries.Length > 0,
                     observedCompleteInventories,
-                    0,
+                    observedEmptyInventories,
                     itemEvidenceReference,
-                    OrdinaryEnemyEvidenceState.Observed,
-                    observedCredits.Min(),
-                    observedCredits.Max(),
-                    new OrdinaryEnemyLevelCreditRule[0],
-                    observedCredits,
-                    creditEvidenceReference);
+                    preserveFilthFleaFallback
+                        ? OrdinaryEnemyEvidenceState.Policy
+                        : OrdinaryEnemyEvidenceState.Observed,
+                    preserveFilthFleaFallback ? 23 : (int?)null,
+                    preserveFilthFleaFallback ? 79 : (int?)null,
+                    levelCreditRules);
             }
 
             if (monsterData == 17657)
@@ -745,6 +761,11 @@ namespace AORebirth.Core.Playfields
             corpseEvidence = corpseEvidence ?? new CapturedSubwayCorpseEvidenceDefinition[0];
             if (corpseEvidence.Length > 0)
             {
+                OrdinaryEnemyCorpsePacketProfile packetProfile = monsterData == 26092
+                    ? OrdinaryEnemyCorpsePacketProfile.CapturedThief
+                    : monsterData == 17657
+                        ? OrdinaryEnemyCorpsePacketProfile.CapturedFilthFlea
+                        : OrdinaryEnemyCorpsePacketProfile.Generic;
                 int[] catMeshes = corpseEvidence
                     .Select(value => value.CatMesh)
                     .Distinct()
@@ -757,7 +778,7 @@ namespace AORebirth.Core.Playfields
                 }
 
                 return new OrdinaryEnemyCorpseProfile(
-                    OrdinaryEnemyCorpsePacketProfile.Generic,
+                    packetProfile,
                     3.0,
                     240.0,
                     3.0,

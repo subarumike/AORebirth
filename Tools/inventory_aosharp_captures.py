@@ -216,6 +216,8 @@ def collect_repository_references(repo_root: Path) -> tuple[dict[str, set[str]],
             if path.name in {
                 "aosharp_capture_inventory.csv",
                 "aosharp_capture_inventory.md",
+                "aosharp_subway_capture_content.csv",
+                "aosharp_subway_capture_content.md",
             }:
                 continue
             try:

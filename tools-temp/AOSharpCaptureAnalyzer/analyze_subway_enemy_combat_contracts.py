@@ -14,6 +14,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 CAPTURE_ROOT = REPO / "tools-temp" / "AOSharpLiveCapture" / "bin" / "Debug" / "captures"
 CAPTURES = (
+    "20260708-004038",
     "20260709-193914",
     "20260709-205921",
     "20260709-210452",
@@ -34,10 +35,14 @@ CAPTURES = (
     "20260716-222201",
 )
 CAPTURE_ENEMY_FILTERS = {
+    "20260708-004038": frozenset({"Filth Flea"}),
     "20260716-034433": frozenset({"Vergil Aeneid"}),
     "20260716-034559": frozenset({"Melded Patterns"}),
     "20260716-034656": frozenset({"Slum Runner"}),
     "20260716-220400": frozenset({"Abmouth Supremus"}),
+}
+ENEMY_ATTACK_CAPTURE_FILTERS = {
+    "Filth Flea": frozenset({"20260708-004038", "20260709-193914"}),
 }
 # Melded Patterns, Vergil, and Abmouth captures include hits against player-owned pets.
 # Keep player-facing retaliation and damage restricted to the local player.
@@ -202,6 +207,10 @@ def main():
             parsed_attack = (
                 attack_evidence(row, capture_name, source)
                 if message_type == "AttackInfo"
+                and capture_name
+                in ENEMY_ATTACK_CAPTURE_FILTERS.get(
+                    enemy["name"], frozenset({capture_name})
+                )
                 else None
             )
             if (
@@ -258,10 +267,11 @@ def main():
         attacks = group["attacks"]
         normal_attacks = [row for row in attacks if row["hitType"] == "Normal"]
         critical_attacks = [row for row in attacks if row["hitType"] == "Critical"]
+        shape_attacks = normal_attacks if name == "Filth Flea" else attacks
         intervals = []
         by_identity_shape = defaultdict(list)
         if name not in CADENCE_UNRESOLVED_ENEMIES:
-            for attack in attacks:
+            for attack in shape_attacks:
                 by_identity_shape[
                     (
                         attack["capture"],
@@ -280,7 +290,11 @@ def main():
         intervals.sort()
         attack_shapes = Counter(
             (row["weaponSlot"], row["attackInfoUnknown"], row["weaponInstance"])
-            for row in attacks
+            for row in shape_attacks
+        )
+        critical_shapes = Counter(
+            (row["weaponSlot"], row["attackInfoUnknown"], row["weaponInstance"])
+            for row in critical_attacks
         )
         weapon_shapes = Counter(
             (row["templateId"], row["quality"])
@@ -293,7 +307,7 @@ def main():
         ):
             matching = [
                 row
-                for row in attacks
+                for row in shape_attacks
                 if (
                     row["weaponSlot"],
                     row["attackInfoUnknown"],
@@ -335,6 +349,32 @@ def main():
                 }
             )
         slot, unknown, instance = attack_shapes.most_common(1)[0][0] if attack_shapes else (0, 0, 0)
+        critical_shape_evidence = []
+        for (shape_slot, shape_unknown, shape_instance), rows in sorted(
+            critical_shapes.items(),
+            key=lambda item: (-item[1], item[0]),
+        ):
+            matching = [
+                row
+                for row in critical_attacks
+                if (
+                    row["weaponSlot"],
+                    row["attackInfoUnknown"],
+                    row["weaponInstance"],
+                )
+                == (shape_slot, shape_unknown, shape_instance)
+            ]
+            critical_shape_evidence.append(
+                {
+                    "weaponSlot": shape_slot,
+                    "attackInfoUnknown": shape_unknown,
+                    "weaponInstance": shape_instance,
+                    "rows": rows,
+                    "captures": sorted({row["capture"] for row in matching}),
+                    "minDamage": min(row["amount"] for row in matching),
+                    "maxDamage": max(row["amount"] for row in matching),
+                }
+            )
         template_id, quality = weapon_shapes.most_common(1)[0][0] if weapon_shapes else (0, 0)
         report_entry = {
             "monsterData": sorted(group["monsterData"]),
@@ -358,6 +398,8 @@ def main():
             "attackInfoWeaponInstance": instance,
             "attackShapes": attack_shape_evidence,
         }
+        if name == "Filth Flea":
+            report_entry["criticalAttackShapes"] = critical_shape_evidence
         if name in TARGET_ROLE_EVIDENCE_ENEMIES:
             target_role_evidence = {}
             for evidence_role in ("localPlayer", "playerOwnedPet"):

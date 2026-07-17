@@ -127,6 +127,8 @@ def load_capture_info(capture):
     result = {
         "available": False,
         "finalized": False,
+        "captureStartUtc": "",
+        "captureEndUtc": "",
         "observedPackets": None,
         "validationStatus": "",
         "validationRecaptureRequired": False,
@@ -145,6 +147,10 @@ def load_capture_info(capture):
     validation = payload.get("validation") or {}
     status = str(validation.get("status") or "").strip().lower()
     result["validationStatus"] = status
+    result["captureStartUtc"] = str(payload.get("captureStartUtc") or "")
+    result["captureEndUtc"] = str(
+        payload.get("captureFinalizedUtc") or payload.get("captureEndUtc") or ""
+    )
     result["finalized"] = bool(
         payload.get("captureEndUtc")
         or payload.get("captureFinalizedUtc")
@@ -174,6 +180,7 @@ def new_source_state(path):
         "invalidRows": 0,
         "duplicateRows": 0,
         "internalConflictCount": 0,
+        "outsideCaptureWindowRows": 0,
         "issues": [],
     }
 
@@ -198,7 +205,24 @@ def add_source_record(state, record, row_number):
     )
 
 
-def load_packet_log_source(path):
+def inside_capture_window(timestamp, capture_info):
+    if not capture_info:
+        return True
+    observed = parse_timestamp(timestamp)
+    start = parse_timestamp(capture_info.get("captureStartUtc"))
+    end = parse_timestamp(capture_info.get("captureEndUtc"))
+    if observed is None or (start is None and end is None):
+        return True
+    if observed.tzinfo is None:
+        observed = observed.replace(tzinfo=dt.timezone.utc)
+    if start is not None and start.tzinfo is None:
+        start = start.replace(tzinfo=dt.timezone.utc)
+    if end is not None and end.tzinfo is None:
+        end = end.replace(tzinfo=dt.timezone.utc)
+    return (start is None or observed >= start) and (end is None or observed <= end)
+
+
+def load_packet_log_source(path, capture_info=None):
     state = new_source_state(path)
     if not state["exists"]:
         return state
@@ -209,6 +233,9 @@ def load_packet_log_source(path):
         if not match:
             state["invalidRows"] += 1
             state["issues"].append(f"row {row_number}: malformed packet log row")
+            continue
+        if not inside_capture_window(match.group("timestamp"), capture_info):
+            state["outsideCaptureWindowRows"] += 1
             continue
         try:
             record = parse_packet_record(
@@ -227,12 +254,15 @@ def load_packet_log_source(path):
     return state
 
 
-def load_raw_index_source(path):
+def load_raw_index_source(path, capture_info=None):
     state = new_source_state(path)
     if not state["exists"]:
         return state
     with path.open("r", encoding="utf-8-sig", errors="replace", newline="") as handle:
         for row_number, row in enumerate(csv.DictReader(handle), 2):
+            if not inside_capture_window(row.get("CapturedUtc"), capture_info):
+                state["outsideCaptureWindowRows"] += 1
+                continue
             preservation = (row.get("PreservationStatus") or "").strip().lower()
             if preservation != "raw_complete":
                 state["invalidRows"] += 1
@@ -275,6 +305,7 @@ def public_source_summary(state, complete):
         "invalidRows": state["invalidRows"],
         "duplicateRows": state["duplicateRows"],
         "internalConflictCount": state["internalConflictCount"],
+        "outsideCaptureWindowRows": state["outsideCaptureWindowRows"],
         "complete": complete,
         "issues": state["issues"],
     }
@@ -301,10 +332,12 @@ def normalized_packet_line(record):
 
 def load_packet_lines(capture):
     """Reconcile both durable raw sinks into one validated chronological stream."""
-    packet_log = load_packet_log_source(capture / "packets.hex.log")
-    raw_index = load_raw_index_source(capture / RAW_PACKET_INDEX_NAME)
-    sources = [packet_log, raw_index]
     capture_info = load_capture_info(capture)
+    packet_log = load_packet_log_source(capture / "packets.hex.log", capture_info)
+    raw_index = load_raw_index_source(
+        capture / RAW_PACKET_INDEX_NAME, capture_info
+    )
+    sources = [packet_log, raw_index]
     observed = capture_info["observedPackets"]
     legacy_inference = not capture_info["available"]
 
@@ -1289,6 +1322,56 @@ def run_self_tests():
             "canonical union ordering and deduplication",
         )
         tests.append("union-order-dedupe")
+
+        finalized_window = root / "finalized-window"
+        finalized_window.mkdir()
+        window_packets = [
+            make_raw_packet(SIMPLE_CHAR_FULL_UPDATE, marker)
+            for marker in (31, 32, 33)
+        ]
+        (finalized_window / "capture_info.json").write_text(
+            json.dumps(
+                {
+                    "captureStartUtc": "2026-01-01T00:00:01Z",
+                    "captureEndUtc": "2026-01-01T00:00:02Z",
+                    "packetCounts": {"inboundRaw": 2, "outboundRaw": 0},
+                    "validation": {"status": "complete"},
+                }
+            ),
+            encoding="utf-8",
+        )
+        (finalized_window / "packets.hex.log").write_text(
+            "".join(
+                f"2026-01-01T00:00:0{index}Z IN #{30 + index} "
+                f"len=24 n3=Wrong hex={packet.hex()}\n"
+                for index, packet in enumerate(window_packets, 1)
+            ),
+            encoding="utf-8",
+        )
+        write_raw_index(
+            finalized_window / RAW_PACKET_INDEX_NAME,
+            [
+                {
+                    "CapturedUtc": f"2026-01-01T00:00:0{index}Z",
+                    "Direction": "IN",
+                    "GlobalOrdinal": index,
+                    "Sequence": 30 + index,
+                    "PacketLength": len(packet),
+                    "PreservationStatus": "raw_complete",
+                    "RawHex": packet.hex(),
+                }
+                for index, packet in enumerate(window_packets, 1)
+            ],
+        )
+        lines, source = load_packet_lines(finalized_window)
+        self_test_check(
+            source["canonicalValid"]
+            and len(lines) == 2
+            and source["packetLog"]["outsideCaptureWindowRows"] == 1
+            and source["rawPacketIndex"]["outsideCaptureWindowRows"] == 1,
+            "trailing rows after a finalized legacy capture must be excluded",
+        )
+        tests.append("finalized-window")
 
         projection_incomplete = root / "projection-incomplete"
         projection_incomplete.mkdir()

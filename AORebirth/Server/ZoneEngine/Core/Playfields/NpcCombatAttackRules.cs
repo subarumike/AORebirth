@@ -270,9 +270,13 @@ namespace ZoneEngine.Core.Playfields
 
         public const double CapturedSubwayFilthFleaMeleeRechargeSeconds = 2.8;
 
-        public const int CapturedSubwayFilthFleaPoisonDamage = 15;
+        public const int CapturedSubwayFilthFleaPoisonMinimumDamage = 14;
 
-        public const int CapturedSubwayFilthFleaMeleeDamage = 3;
+        public const int CapturedSubwayFilthFleaPoisonMaximumDamage = 24;
+
+        public const int CapturedSubwayFilthFleaMeleeMinimumDamage = 3;
+
+        public const int CapturedSubwayFilthFleaMeleeMaximumDamage = 10;
 
         public const int CapturedSubwayFilthFleaPoisonWeaponSlot = 1;
 

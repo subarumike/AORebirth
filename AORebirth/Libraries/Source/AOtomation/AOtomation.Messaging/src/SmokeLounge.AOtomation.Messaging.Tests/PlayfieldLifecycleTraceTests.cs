@@ -471,8 +471,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void SubwayFilthFleaCombatUsesCapturedPoisonAndMeleeAttackContext()
         {
             Assert.AreEqual(17657, NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData);
-            Assert.AreEqual(15, NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonDamage);
-            Assert.AreEqual(3, NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeDamage);
+            Assert.AreEqual(14, NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonMinimumDamage);
+            Assert.AreEqual(24, NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonMaximumDamage);
+            Assert.AreEqual(3, NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeMinimumDamage);
+            Assert.AreEqual(10, NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeMaximumDamage);
             Assert.AreEqual(1, NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonWeaponSlot);
             Assert.AreEqual(0, NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeWeaponSlot);
             Assert.AreEqual(0x45504148, NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag);
@@ -517,7 +519,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(poisonContextIndex >= 0, "Flea combat must expose captured natural attack templates.");
             Assert.IsTrue(attackInfoIndex > contextIndex, "Flea context must be established before AttackInfo damage.");
             Assert.IsTrue(
-                providerText.Contains("20260709-210452 and 20260709-220439, inventory-updates.csv")
+                providerText.Contains("Filth Flea: 18 complete official-live corpse opens")
+                && providerText.Contains("20260708-004038")
+                && providerText.Contains("20260712-161506")
                 && providerText.Contains("\"Filth Flea\"")
                 && providerText.Contains("17657")
                 && providerText.Contains("234874")
@@ -537,11 +541,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 filthFleaFactory.Contains("respawnDelaySeconds: 240.0"),
                 "Filth Flea must retain the captured four-minute post-despawn respawn schedule.");
             Assert.IsTrue(
-                catalogText.Contains("if (monsterData == 17657)")
-                && catalogText.Contains("OrdinaryEnemyEvidenceState.Observed")
-                && catalogText.Contains("29,")
-                && catalogText.Contains("79,")
-                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule[0]"),
+                catalogText.Contains("bool preserveFilthFleaFallback = monsterData == 17657;")
+                && catalogText.Contains("preserveFilthFleaFallback ? 23 : (int?)null")
+                && catalogText.Contains("preserveFilthFleaFallback ? 79 : (int?)null"),
                 "Filth Flea must retain captured Subway corpse credit evidence from completed corpse full-update captures.");
         }
 
@@ -2431,7 +2433,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 providerText.Contains("private static CapturedSubwaySpawnDefinition FilthFlea(")
                 && providerText.Contains("respawnDelaySeconds: 240.0")
-                && providerText.Contains("20260709-210452 and 20260709-220439, inventory-updates.csv")
+                && providerText.Contains("Filth Flea: 18 complete official-live corpse opens")
                 && combatContractText.Contains("case 17657:")
                 && combatContractText.Contains("CapturedEnemyCombatContract.CapturedSpecialSequence(")
                 && attackRulesText.Contains("CapturedSubwayFilthFleaMonsterData = 17657")
@@ -2444,10 +2446,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && scfuPacketText.Contains("CapturedSubwayFilthFleaExtendedTextureOverrideData")
                 && corpsePacketText.Contains("CapturedSubwayFilthFleaPacketLength = 457")
                 && corpsePacketText.Contains("BuildCapturedSubwayFilthFlea(")
-                && catalogText.Contains("if (monsterData == 17657)")
-                && catalogText.Contains("OrdinaryEnemyEvidenceState.Observed")
-                && catalogText.Contains("29,")
-                && catalogText.Contains("79,"),
+                && catalogText.Contains("bool preserveFilthFleaFallback = monsterData == 17657;")
+                && catalogText.Contains("preserveFilthFleaFallback ? 23 : (int?)null")
+                && catalogText.Contains("preserveFilthFleaFallback ? 79 : (int?)null"),
                 "Accepted Subway Filth Flea must keep spawn, movement/chase, combat, appearance, corpse visual, loot, credits, and four-minute respawn coverage together.");
 
             Assert.IsTrue(
@@ -5484,9 +5485,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void SubwayProxyExitLandingClearsEntryTriggerRadius()
+        public void SubwayProxyExitUsesOfficialLandingAndSuppressesDelayedEntryBounce()
         {
             string repositoryRoot = FindRepositoryRoot();
+            string rulesText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs"));
             string exitProxyText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -5498,12 +5503,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsTrue(
                 statelTransitionText.Contains("private const float CapturedSubwayEntryRadius = 4.0f;")
-                && exitProxyText.Contains("private const float CapturedSubwayExitDoorOffset = 6.0f;")
-                && exitProxyText.Contains("externalPlayfieldId == CapturedSubwayEntrySourcePlayfieldId")
-                && exitProxyText.Contains("externalDoorInstance == CapturedSubwayEntrySourceDoorInstance")
-                && exitProxyText.Contains("? CapturedSubwayExitDoorOffset")
-                && exitProxyText.Contains(": DefaultExitDoorOffset;"),
-                "The Subway exit must land beyond the PF655 proxy-entry radius without changing other proxy exits.");
+                && statelTransitionText.Contains("private static readonly TimeSpan PostZoneCollisionGrace = TimeSpan.FromSeconds(3);")
+                && statelTransitionText.Contains("private readonly HashSet<int> capturedSubwayEntryContacts")
+                && statelTransitionText.Contains("this.capturedSubwayEntryContacts.Contains(dynelId)")
+                && statelTransitionText.Contains("this.capturedSubwayEntryContacts.Remove(dynelId)")
+                && rulesText.Contains("public const float CapturedMainExitLandingX = 3304.028f;")
+                && rulesText.Contains("public const float CapturedMainExitLandingY = 35.11f;")
+                && rulesText.Contains("public const float CapturedMainExitLandingZ = 837.9951f;")
+                && rulesText.Contains("public const float CapturedMainExitHeadingY = -0.4771534f;")
+                && rulesText.Contains("public const float CapturedMainExitHeadingW = 0.87882f;")
+                && exitProxyText.Contains("SubwayTeleportProxyDestinationRules.TryResolveMainExitOverride("),
+                "The Subway main exit must use the official-live landing while preserving post-zone grace and contact-edge suppression against a delayed bounce.");
         }
 
         [TestMethod]
