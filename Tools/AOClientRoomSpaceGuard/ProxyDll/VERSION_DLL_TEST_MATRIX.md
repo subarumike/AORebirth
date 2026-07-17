@@ -119,7 +119,15 @@ file I/O, `VirtualQuery`, module enumeration, or unbounded geometry scans.
 
 - one test per exact RVA and one near-miss register/address case;
 - verify expected neutral black/missing sample or one-entry skip;
-- ensure report image RVA `+0x25118` still fails closed;
+- for `+0x25118`, require the exact PE32/i386 image fingerprint, access address
+  equal to EDI, pushed class `0x0A`, readable vector fields, writable frame
+  locals, `offset == index * 16`, `vectorBegin + offset == EDI`, and coherent
+  bounds for the independent next 20-byte vector entered at the resume point;
+- verify `+0x25118` recovery performs `ESP += 4`, clears EAX, resumes at
+  `+0x25147`, and leaves all unrelated registers and loop locals unchanged;
+- exercise one-field near misses for RVA, image bytes, access address, state
+  class, vector/frame readability, offset/index, and computed entry pointer;
+- retain separate `+0x2511A -> +0x2512F` positive and near-miss tests;
 - inspect texture/material artifacts after a hit.
 
 ### NVIDIA draw and deferred flush

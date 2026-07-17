@@ -43,15 +43,17 @@ readable rectangle and point data continue through the original function
 unchanged.
 
 The old live renderer repair verifies the exact `randy31.dll +0x21A94`
-draw-resource pointer read, `randy31.dll +0x2511A` render-state lookup,
-`randy31.dll +0x6C3A1` byte-color read, `randy31.dll +0x6C476` indirect
-color-sample read, and `randy31.dll +0x6C51D` packed-color read. If the draw
-wrapper receives an invalid low resource pointer, the process-level guard
-returns from that one draw call without submitting it. If a render-state entry
-contains an impossible state id, the guard skips that one state entry and
-continues the state-application loop. Invalid low color pointers use the
-verified helper's existing missing-sample path or substitute black components
-before resuming after the unsafe read.
+draw-resource pointer read, the `randy31.dll +0x25118/+0x2511A` render-state
+sequence, `randy31.dll +0x6C3A1` byte-color read, `randy31.dll +0x6C476`
+indirect color-sample read, and `randy31.dll +0x6C51D` packed-color read. If the
+draw wrapper receives an invalid low resource pointer, the process-level guard
+returns from that one draw call without submitting it. The `+0x25118` recovery
+requires the exact old-client image bytes and native 16-byte-vector loop state;
+it skips that whole corrupt vector and enters the independent next-vector path.
+The separate `+0x2511A` recovery still skips only one entry containing an
+impossible state id. Invalid low color pointers use the verified helper's
+existing missing-sample path or substitute black components before resuming
+after the unsafe read.
 
 The repair also byte-verifies the old renderer's single
 `DrawIndexedPrimitiveVB` dispatch at `randy31.dll +0x219B4`. The fallback is

@@ -43,12 +43,13 @@ starts a detached worker; a `CreateThread` failure is silent.  Outside loader
 lock, the worker performs:
 
 1. initialize the file logger;
-2. install the unhandled-exception dump filter;
-3. wait up to 30 seconds for `N3.dll` only;
-4. identify the N3 profile by exact SHA-256;
-5. install RoomSpace on all profiles;
-6. for C/new: install the two-site new-client GUI draw wrapper;
-7. for D/old: install the Utils rectangle VEH, then the combined randy draw/
+2. arm the dedicated exception-only `randy+0x25118` vector guard;
+3. install the unhandled-exception dump filter;
+4. wait up to 30 seconds for `N3.dll` only;
+5. identify the N3 profile by exact SHA-256;
+6. install RoomSpace on all profiles;
+7. for C/new: install the two-site new-client GUI draw wrapper;
+8. for D/old: install the Utils rectangle VEH, then the combined randy draw/
    batch/tree transaction.
 
 GUI, Utils, randy31, D3DIM700, DDRAW, and NVIDIA are not waited for.  Their
@@ -80,7 +81,8 @@ address; source does not verify NVIDIA's file path/hash/version resource.
 | H6 | GUI render batch | GUI `+0x152E49` | call -> whole-batch wrapper | exact but experimental L4 cleanup |
 | H7 | GUI tree find | GUI `+0x4F2EF` | prologue -> JMP/thunk/trampoline | strong narrow L1 prevention |
 | H8 | randy draw resource | randy `+0x21A94` | VEH context unwind | strong exact L1 recovery |
-| H9 | randy render state | randy `+0x2511A` | VEH resume | strong exact L1 recovery; `+0x25118` uncovered |
+| H9a | randy corrupt state vector | randy `+0x25118` | early process-lifetime VEH; resume `+0x25147` | strong exact L1 whole-vector recovery |
+| H9b | randy impossible state id | randy `+0x2511A` | old-profile VEH; resume `+0x2512F` | strong exact L1 one-entry recovery |
 | H10 | randy byte color | randy `+0x6C3A1` | VEH resume | strong exact L1 fallback |
 | H11 | randy indirect color | randy `+0x6C476` | VEH resume | strong exact L1 missing-sample path |
 | H12 | randy dword color | randy `+0x6C51D` | VEH resume | strong exact L1 fallback |
@@ -251,24 +253,30 @@ experimental recovery until subsequent-frame/device integrity is proven.
 
 ### H8–H12 — exact randy VEH recoveries
 
-One priority-first VEH is registered before old code patches.  It handles read
-AVs only and then applies the following exact predicates.  The VEH is removed if
-the combined randy patch transaction fails; its handle is discarded after
-success, so no detach removal is possible.
+A dedicated priority-first VEH is armed before dump setup, N3 hashing, profile
+selection, and old-client patch installation. It handles only the exact
+`randy+0x25118` read AV after dynamically verifying a committed MEM_IMAGE,
+PE32/i386 headers, the fault RVA, bytes through the `+0x25147` resume boundary,
+and native vector-loop provenance. It remains registered for process lifetime.
+The later general randy VEH handles H8/H9b/H10-H12 and is removed if the combined
+randy patch transaction fails; its handle is discarded after success, so no
+detach removal is possible.
 
 | Hook | Exact fault and verified boundary | Predicate | Context/action | Matching family | State/risk |
 |---|---|---|---|---|---|
 | H8 draw resource | `randy+0x21A94` | EAX `<0x10000`, access==EAX, readable EBP frame/return | EAX=0; EIP=caller return; ESP=EBP+0x20; EBP=prior; skip whole six-arg callee | F03 | exact bytes prove no preceding nonvolatile/FPU/SSE mutation; manual context unwind is safe only for this profile |
-| H9 render state | `randy+0x2511A`, resume `+0x2512F` | EAX>`0x400`, observed stack DWORD/argument `0x0A` | pop one pushed DWORD; EAX=0; resume native loop | F04 `+0x2511A` | integer path; the `0x400` value is an exact crash predicate, not a proven general table-size contract; `+0x25118` remains uncovered |
+| H9a corrupt state vector | `randy+0x25118`, resume `+0x25147` | read access==EDI, `[ESP]=0x0A`, writable frame locals, readable ESI vector fields, `[EBP-8]=[EBP-4]*16`, `[ESI+0x14]+offset=EDI`, coherent next 20-byte-vector bounds | pop one pushed DWORD; EAX=0; skip the entire first 16-byte vector | F04 `+0x25118` | exception-only dynamic PE/fingerprint lookup; exact report proves offset `0x20`, index `2`, and access==EDI; upstream lifetime producer remains unresolved |
+| H9b impossible state id | `randy+0x2511A`, resume `+0x2512F` | EAX>`0x400`, observed stack DWORD/argument `0x0A` | pop one pushed DWORD; EAX=0; resume native loop after one entry | F04 `+0x2511A` | integer path; the `0x400` value is an exact crash predicate, not a proven general table-size contract |
 | H10 byte color | `randy+0x6C3A1`, resume `+0x6C3AC` | low EAX | EAX=EBX=EDI=0; resume after byte sample sequence | F02 | integer only; access-address equality not checked |
 | H11 indirect color | `randy+0x6C476`, resume `+0x6C478` | nonzero low ECX, access==ECX, EDI nonzero power of two | ECX=0; enter native missing-sample branch | F02 | narrow and root-like for known sample state |
 | H12 dword color | `randy+0x6C51D`, resume `+0x6C51F` | low ESI | ESI=0; resume before native alpha OR | F02 | integer only; access-address equality not checked |
 
 Flags are not restored, but each resume address was selected around the exact
 verified integer sequence.  No x87/SSE repair is required by those verified
-instructions.  As process-wide first-chance handlers, the rectangle and randy
-VEHs still inspect every AV; any logging or secondary memory fault from inside a
-handler can recurse.
+instructions. The early H9a lookup and byte checks run only after an AV, never
+on the normal frame path. As process-wide first-chance handlers, the rectangle
+and randy VEHs still inspect every AV; any logging or secondary memory fault
+from inside a handler can recurse.
 
 ### H13 — diagnostic unhandled-exception filter
 
@@ -389,7 +397,8 @@ attempts the profile's serial install path.
 
 - H3 rectangle empty-result recovery, including its x87-specific epilogue.
 - H8 whole randy draw-resource rejection before nested mutation.
-- H9 exact state-loop skip at `+0x2511A`, without generalizing its `0x400`
+- H9a exact whole-vector skip at `+0x25118` and H9b exact one-entry skip at
+  `+0x2511A`, without sharing resume contracts or generalizing H9b's `0x400`
   predicate into an invented table cap.
 - H10–H12 exact low color/sample fallbacks.
 - H7 low-key native not-found path, after its documentation is corrected.
@@ -407,7 +416,6 @@ attempts the profile's serial install path.
 
 ### Uncovered or too narrow
 
-- randy actual `+0x25118`.
 - NV-B `+0x154314F`, generic NVIDIA RVAs, and auxiliary NV-A `+0x170C4C6`.
 - D/old `0x420C70A4` and generic invalid EIP 0/2/5/8.
 - GUI `+0x4ED00` except the observed low-key producer path.

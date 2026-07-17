@@ -44,9 +44,11 @@ READY RoomSpace, GUI rectangle, and renderer repairs active
 The old-client renderer repair skips one bad randy31 draw-resource call when
 the client passes a low integer instead of a resource pointer. Color-pointer
 guards remain limited to the verified randy31 color-read callsites, including
-the indirect color-sample helper's existing missing-sample path. It also skips
-impossible randy31 render-state entries, such as corrupted state ids that would
-index outside the renderer's saved-state table.
+the indirect color-sample helper's existing missing-sample path. At the exact
+randy31 +0x25118 entry-pointer fault, the early exception-only guard verifies
+the old-client image and native loop state, then skips the corrupt 16-byte
+render-state vector. The separate +0x2511A guard skips only one entry whose
+state id is impossible.
 
 The repair also guards the one verified old-client DrawIndexedPrimitiveVB call
 that produced the repeated NVIDIA crashes. The fallback accepts only NVIDIA

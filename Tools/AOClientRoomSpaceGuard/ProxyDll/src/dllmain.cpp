@@ -42,6 +42,10 @@ namespace
     {
         aorf::LogInit();
         aorf::Log("START version=1 pid=%lu", GetCurrentProcessId());
+        if (!aorf::InstallEarlyRandyExceptionGuard())
+        {
+            aorf::Log("ERROR early randy31 exception guard was not installed");
+        }
         aorf::InstallCrashDumpHandler();
 
         HMODULE n3 = nullptr;

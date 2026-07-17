@@ -90,7 +90,7 @@ Observed report logical offsets and image RVAs:
 | Report offset | Image RVA | Observed failure | Interpretation |
 | --- | --- | --- | --- |
 | `+0x20A94` | `+0x21A94` | read `0x144` | low draw-resource object |
-| `+0x24118` | `+0x25118` | wild read | unresolved predecessor to the guarded state instruction |
+| `+0x24118` | `+0x25118` | `mov eax,[edi]`, attempted address equals EDI | corrupt 16-byte-vector entry pointer |
 | `+0x2411A` | `+0x2511A` | wild read | impossible render-state entry |
 | `+0x6B3A1` | `+0x6C3A1` | read `0x202` | low byte-color source |
 | `+0x6B476` | `+0x6C476` | read `0x100` | low indirect color sample |
@@ -102,8 +102,14 @@ to null or tiny bases, not legitimate resources. The exact fault consumers are
 **proven**. Object allocation, release, and ownership history are not captured,
 so the upstream lifetime producer remains **unresolved**.
 
-The `+0x25118` event must not be assumed identical to `+0x2511A`; it is two
-bytes earlier and is not covered by the current exact predicate.
+The two render-state events require different recovery contracts. At
+`+0x25118`, the current report proves `[ESP]=0x0A`, `[EBP-8]=0x20`, and
+`[EBP-4]=2`, so the native loop was reading entry 2 at byte offset 32 when its
+computed EDI pointer was wild. Resuming inside that entry would later write
+through the same bad pointer, so the exact recovery pops the pushed state class
+and resumes at `+0x25147`, skipping the entire first 16-byte vector. At
+`+0x2511A`, EDI is valid but the loaded state id is impossible; that separate
+guard skips only the current entry and resumes at `+0x2512F`.
 
 ### D3D7/NVIDIA submission
 
