@@ -24,7 +24,7 @@ namespace AORebirth.Core.Playfields
         private const string CapturedVergilProfileKey = "subway.127.boss.vergil-aeneid";
         private const int CapturedVergilMonsterData = 203748;
         private const string CapturedAbmouthLootEvidence =
-            "official-live-capture-20260712-232137 corpse F6C002; one observed corpse, probabilities unresolved";
+            "official-live-captures 20260712-232137/20260716-220400; two exact Abmouth corpse snapshots with linked 587 credits; 20260716-220400 inventory generation rebound after corpse identity F69001 reuse; snapshot probabilities and wider pool unresolved";
         private const string CapturedVergilLootEvidence =
             "official-live-captures 20260712-232711/234401/20260716-034433; three exact observed corpse snapshots with linked credits 610/587/563; 20260716-034433 inventory linked by normalized corpse identity F69001; snapshot probabilities and wider pool unresolved";
         private readonly object sync = new object();
@@ -170,27 +170,48 @@ namespace AORebirth.Core.Playfields
                 StringComparison.Ordinal);
             if (!isAbmouth && !isInfector) return;
 
-            LootGroupDefinition[] groups = isAbmouth
+            ObservedCorpseSnapshotDefinition[] snapshots = isAbmouth
                 ? new[]
                 {
-                    ObservedSnapshotGroup(0, 136622, 136623, 30),
-                    ObservedSnapshotGroup(1, 202717, 202718, 28),
-                    ObservedSnapshotGroup(2, 107933, 107934, 23),
-                    ObservedSnapshotGroup(3, 85693, 27389, 30),
-                    ObservedSnapshotGroup(4, 287146, 287146, 200)
+                    ObservedCorpseSnapshot(
+                        CapturedAbmouthLootEvidence,
+                        "capture.20260712-232137",
+                        CapturedAbmouthCredits,
+                        ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, "capture.20260712-232137", 136622, 136623, 30, 1),
+                        ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, "capture.20260712-232137", 202717, 202718, 28, 1),
+                        ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, "capture.20260712-232137", 107933, 107934, 23, 1),
+                        ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, "capture.20260712-232137", 85693, 27389, 30, 1),
+                        ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, "capture.20260712-232137", 287146, 287146, 200, 1)),
+                    ObservedCorpseSnapshot(
+                        CapturedAbmouthLootEvidence,
+                        "capture.20260716-220400",
+                        CapturedAbmouthCredits,
+                        ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, "capture.20260716-220400", 202741, 202742, 32, 1),
+                        ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, "capture.20260716-220400", 202734, 202735, 32, 1),
+                        ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, "capture.20260716-220400", 202717, 202718, 32, 1),
+                        ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, "capture.20260716-220400", 85723, 85722, 32, 1),
+                        ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, "capture.20260716-220400", 123968, 123970, 25, 1),
+                        ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, "capture.20260716-220400", 287146, 287146, 200, 1))
                 }
-                : new LootGroupDefinition[0];
+                : new ObservedCorpseSnapshotDefinition[0];
             var table = new LootTableDefinition
             {
                 LootTableKey = tableKey,
                 DisplayName = encounter.DisplayName + " captured corpse",
                 TableType = isAbmouth ? LootTableType.Boss : LootTableType.EnemyType,
-                RollGroups = groups,
-                CreditsPolicy = CreditsRange(
-                    isAbmouth ? CapturedAbmouthCredits : CapturedInfectorCredits,
-                    isAbmouth ? CapturedAbmouthCredits : CapturedInfectorCredits,
-                    LootEvidenceConfidence.ProvenCapture),
-                QualityPolicy = isAbmouth ? "captured-observed-snapshot" : "unresolved",
+                RollGroups = new LootGroupDefinition[0],
+                ObservedCorpseSnapshots = snapshots,
+                CreditsPolicy = isAbmouth
+                    ? new CreditsPolicyDefinition
+                    {
+                        Mode = CreditsPolicyMode.Unresolved,
+                        Evidence = LootEvidenceConfidence.Unresolved
+                    }
+                    : CreditsRange(
+                        CapturedInfectorCredits,
+                        CapturedInfectorCredits,
+                        LootEvidenceConfidence.ProvenCapture),
+                QualityPolicy = isAbmouth ? "captured-observed-corpse-snapshots" : "unresolved",
                 Evidence = isAbmouth ? CapturedAbmouthLootEvidence : encounter.Evidence + "; item pool unresolved",
                 Confidence = isAbmouth
                     ? LootEvidenceConfidence.ObservedAvailableLoot
@@ -288,6 +309,19 @@ namespace AORebirth.Core.Playfields
             int credits,
             params LootEntryDefinition[] entries)
         {
+            return ObservedCorpseSnapshot(
+                CapturedVergilLootEvidence,
+                snapshotKey,
+                credits,
+                entries);
+        }
+
+        private static ObservedCorpseSnapshotDefinition ObservedCorpseSnapshot(
+            string evidence,
+            string snapshotKey,
+            int credits,
+            params LootEntryDefinition[] entries)
+        {
             return new ObservedCorpseSnapshotDefinition
             {
                 SnapshotKey = snapshotKey,
@@ -295,11 +329,28 @@ namespace AORebirth.Core.Playfields
                 Entries = entries ?? new LootEntryDefinition[0],
                 Evidence = LootEvidenceConfidence.ProvenCapture,
                 SelectionProbabilityEvidence = LootEvidenceConfidence.Unresolved,
-                EvidenceReference = CapturedVergilLootEvidence + "; " + snapshotKey
+                EvidenceReference = evidence + "; " + snapshotKey
             };
         }
 
         private static LootEntryDefinition ObservedCorpseSnapshotEntry(
+            string snapshotKey,
+            int itemTemplateId,
+            int highItemTemplateId,
+            int quality,
+            int quantity)
+        {
+            return ObservedCorpseSnapshotEntry(
+                CapturedVergilLootEvidence,
+                snapshotKey,
+                itemTemplateId,
+                highItemTemplateId,
+                quality,
+                quantity);
+        }
+
+        private static LootEntryDefinition ObservedCorpseSnapshotEntry(
+            string evidence,
             string snapshotKey,
             int itemTemplateId,
             int highItemTemplateId,
@@ -321,60 +372,8 @@ namespace AORebirth.Core.Playfields
                 UniquePerCorpse = true,
                 Semantics = LootSemantics.ObservedAvailable,
                 Evidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                EvidenceReference = CapturedVergilLootEvidence + "; " + snapshotKey,
+                EvidenceReference = evidence + "; " + snapshotKey,
                 ProbabilityEvidence = "unresolved"
-            };
-        }
-
-        private static LootGroupDefinition ObservedSnapshotGroup(
-            int slot,
-            int itemTemplateId,
-            int highItemTemplateId,
-            int quality)
-        {
-            return ObservedSnapshotGroup(
-                slot,
-                itemTemplateId,
-                highItemTemplateId,
-                quality,
-                CapturedAbmouthLootEvidence);
-        }
-
-        private static LootGroupDefinition ObservedSnapshotGroup(
-            int slot,
-            int itemTemplateId,
-            int highItemTemplateId,
-            int quality,
-            string evidence)
-        {
-            string slotKey = "observed.slot." + slot.ToString(CultureInfo.InvariantCulture);
-            return new LootGroupDefinition
-            {
-                LootGroupKey = slotKey,
-                RollMode = LootRollMode.ObservedSnapshot,
-                RollCount = 1,
-                DropChanceBasisPoints = 0,
-                Entries = new[]
-                {
-                    new LootEntryDefinition
-                    {
-                        SelectionKey = slotKey,
-                        ItemTemplateId = itemTemplateId,
-                        HighItemTemplateId = highItemTemplateId,
-                        FixedQuality = quality,
-                        MinimumQuality = quality,
-                        MaximumQuality = quality,
-                        MinimumQuantity = 1,
-                        MaximumQuantity = 1,
-                        Weight = 0,
-                        DropChanceBasisPoints = 0,
-                        UniquePerCorpse = true,
-                        Semantics = LootSemantics.ObservedAvailable,
-                        Evidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                        EvidenceReference = evidence + "; " + slotKey
-                    }
-                },
-                Conditions = new string[0]
             };
         }
 

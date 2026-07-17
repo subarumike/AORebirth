@@ -45,6 +45,8 @@ namespace AOSharpLiveCapture
         private readonly Dictionary<string, List<EnemyStateEvent>> enemyStateTimeline = new Dictionary<string, List<EnemyStateEvent>>();
         private readonly Dictionary<string, CorpseLifecycleEvidence> corpseEvidenceByDeadNpc =
             new Dictionary<string, CorpseLifecycleEvidence>();
+        private readonly Dictionary<string, CorpseLifecycleEvidence> activeCorpseEvidenceByCorpse =
+            new Dictionary<string, CorpseLifecycleEvidence>();
         private readonly Dictionary<string, int> corpseInventorySnapshotCounts =
             new Dictionary<string, int>();
         private readonly HashSet<string> corpseLootInitialEnemyKeys = new HashSet<string>();
@@ -1713,6 +1715,7 @@ namespace AOSharpLiveCapture
                 foreach (string removed in this.knownCorpses.Except(currentCorpses).ToArray())
                 {
                     DateTime goneUtc = DateTime.UtcNow;
+                    string normalizedCorpseIdentity = NormalizeIdentityKey(removed);
                     this.corpseGoneEventCount++;
                     this.LogEvent("CORPSE-GONE", removed);
                     this.LogNpcLifecycleRow(
@@ -1724,13 +1727,18 @@ namespace AOSharpLiveCapture
                         string.Empty,
                         string.Empty,
                         string.Empty);
-                    foreach (CorpseLifecycleEvidence evidence in this.corpseEvidenceByDeadNpc.Values)
+                    lock (this.syncRoot)
                     {
-                        if (!evidence.CorpseGoneUtc.HasValue
-                            && NormalizeIdentityKey(evidence.CorpseIdentity) == NormalizeIdentityKey(removed))
+                        foreach (CorpseLifecycleEvidence evidence in this.corpseEvidenceByDeadNpc.Values)
                         {
-                            evidence.CorpseGoneUtc = goneUtc;
+                            if (!evidence.CorpseGoneUtc.HasValue
+                                && NormalizeIdentityKey(evidence.CorpseIdentity) == normalizedCorpseIdentity)
+                            {
+                                evidence.CorpseGoneUtc = goneUtc;
+                            }
                         }
+                        this.activeCorpseEvidenceByCorpse.Remove(normalizedCorpseIdentity);
+                        this.corpseInventorySnapshotCounts.Remove(normalizedCorpseIdentity);
                     }
                     this.knownCorpses.Remove(removed);
                 }
@@ -2157,7 +2165,27 @@ namespace AOSharpLiveCapture
 
                 lock (this.syncRoot)
                 {
-                    this.corpseEvidenceByDeadNpc[NormalizeIdentityKey(deadNpcIdentity)] = new CorpseLifecycleEvidence
+                    string normalizedCorpseIdentity = NormalizeIdentityKey(corpseIdentity);
+                    string normalizedDeadNpcIdentity = NormalizeIdentityKey(deadNpcIdentity);
+                    CorpseLifecycleEvidence priorGeneration;
+                    bool isNewGeneration = !this.activeCorpseEvidenceByCorpse.TryGetValue(
+                                               normalizedCorpseIdentity,
+                                               out priorGeneration)
+                                           || !string.Equals(
+                                               NormalizeIdentityKey(priorGeneration.DeadNpcIdentity),
+                                               normalizedDeadNpcIdentity,
+                                               StringComparison.OrdinalIgnoreCase);
+                    if (isNewGeneration)
+                    {
+                        if (priorGeneration != null && !priorGeneration.CorpseGoneUtc.HasValue)
+                        {
+                            priorGeneration.CorpseGoneUtc = capturedUtc;
+                        }
+
+                        this.corpseInventorySnapshotCounts.Remove(normalizedCorpseIdentity);
+                    }
+
+                    var corpseEvidence = new CorpseLifecycleEvidence
                     {
                         DeadNpcIdentity = deadNpcIdentity,
                         CorpseIdentity = corpseIdentity,
@@ -2166,6 +2194,8 @@ namespace AOSharpLiveCapture
                         CorpseCredits = ReadInt32BigEndian(packet, 207),
                         CorpseMonsterData = ReadInt32BigEndian(packet, monsterDataOffset)
                     };
+                    this.corpseEvidenceByDeadNpc[normalizedDeadNpcIdentity] = corpseEvidence;
+                    this.activeCorpseEvidenceByCorpse[normalizedCorpseIdentity] = corpseEvidence;
                     this.corpseFullUpdateRowCount++;
                     this.corpseFullUpdatesLog.WriteLine(
                         string.Join(
@@ -3287,11 +3317,10 @@ namespace AOSharpLiveCapture
                         this.corpseLootInitialSnapshotCount++;
                     }
 
-                    CorpseLifecycleEvidence corpse = this.corpseEvidenceByDeadNpc.Values.FirstOrDefault(
-                        value => string.Equals(
-                            NormalizeIdentityKey(value.CorpseIdentity),
-                            normalizedCorpseIdentity,
-                            StringComparison.OrdinalIgnoreCase));
+                    CorpseLifecycleEvidence corpse;
+                    this.activeCorpseEvidenceByCorpse.TryGetValue(
+                        normalizedCorpseIdentity,
+                        out corpse);
                     EnemyEntityState enemy = corpse == null
                         ? null
                         : this.enemyStates.Values.FirstOrDefault(
@@ -7386,6 +7415,7 @@ namespace AOSharpLiveCapture
             this.enemyStates.Clear();
             this.enemyStateTimeline.Clear();
             this.corpseEvidenceByDeadNpc.Clear();
+            this.activeCorpseEvidenceByCorpse.Clear();
             this.corpseInventorySnapshotCounts.Clear();
             this.corpseLootInitialEnemyKeys.Clear();
 

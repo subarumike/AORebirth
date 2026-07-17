@@ -4,22 +4,81 @@
       155962
     ],
     "captures": [
-      "20260709-222339"
+      "20260709-222339",
+      "20260716-220400"
     ],
     "identities": [
-      "(SimpleChar:79545116)"
+      "(SimpleChar:79545116)",
+      "(SimpleChar:7970254F)"
     ],
     "retaliationObserved": true,
-    "retaliationRows": 1,
-    "attackInfoObserved": false,
-    "attackInfoRows": 0,
-    "minDamage": 0,
-    "maxDamage": 0,
-    "medianRechargeSeconds": 0.0,
+    "retaliationRows": 2,
+    "attackInfoObserved": true,
+    "attackInfoRows": 4,
+    "minDamage": 74,
+    "maxDamage": 125,
+    "medianRechargeSeconds": 4.308803,
     "weaponSlot": 0,
     "attackInfoUnknown": 0,
-    "attackInfoWeaponInstance": 0,
-    "attackShapes": [],
+    "attackInfoWeaponInstance": 1145392727,
+    "attackShapes": [
+      {
+        "weaponSlot": 0,
+        "attackInfoUnknown": 0,
+        "weaponInstance": 1145392727,
+        "rows": 2,
+        "captures": [
+          "20260716-220400"
+        ],
+        "minDamage": 123,
+        "maxDamage": 125,
+        "intervalRows": 1,
+        "minIntervalSeconds": 4.948738,
+        "medianIntervalSeconds": 4.948738,
+        "maxIntervalSeconds": 4.948738
+      },
+      {
+        "weaponSlot": 1,
+        "attackInfoUnknown": 0,
+        "weaponInstance": 1481592922,
+        "rows": 2,
+        "captures": [
+          "20260716-220400"
+        ],
+        "minDamage": 74,
+        "maxDamage": 95,
+        "intervalRows": 1,
+        "minIntervalSeconds": 4.308803,
+        "medianIntervalSeconds": 4.308803,
+        "maxIntervalSeconds": 4.308803
+      }
+    ],
+    "targetRoleEvidence": {
+      "localPlayer": {
+        "captures": [
+          "20260709-222339",
+          "20260716-220400"
+        ],
+        "targetIdentities": [],
+        "retaliationRows": 2,
+        "attackInfoRows": 4,
+        "minDamage": 74,
+        "maxDamage": 125
+      },
+      "playerOwnedPet": {
+        "captures": [
+          "20260716-220400"
+        ],
+        "targetIdentities": [
+          "(SimpleChar:7970253A)",
+          "(SimpleChar:7970253C)"
+        ],
+        "retaliationRows": 3,
+        "attackInfoRows": 10,
+        "minDamage": 77,
+        "maxDamage": 138
+      }
+    },
     "equippedWeaponObserved": false,
     "equippedWeaponTemplateId": 0,
     "equippedWeaponQuality": 0
