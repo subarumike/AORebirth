@@ -149,10 +149,12 @@ def load_capture_info(capture):
         or payload.get("captureFinalizedUtc")
         or status in {"complete", "incomplete", "failed", "invalid"}
     )
-    result["validationRecaptureRequired"] = bool(
-        validation.get("recaptureRequired")
-        or status in {"incomplete", "failed", "invalid"}
-    )
+    if "recaptureRequired" in validation:
+        result["validationRecaptureRequired"] = bool(
+            validation.get("recaptureRequired")
+        )
+    else:
+        result["validationRecaptureRequired"] = status in {"failed", "invalid"}
     if result["finalized"]:
         packet_counts = payload.get("packetCounts") or {}
         inbound = packet_counts.get("inboundRaw")
@@ -1087,6 +1089,45 @@ def run_self_tests():
             "canonical union ordering and deduplication",
         )
         tests.append("union-order-dedupe")
+
+        projection_incomplete = root / "projection-incomplete"
+        projection_incomplete.mkdir()
+        (projection_incomplete / "capture_info.json").write_text(
+            json.dumps(
+                {
+                    "captureEndUtc": "2026-01-01T00:00:03Z",
+                    "packetCounts": {"inboundRaw": 1, "outboundRaw": 0},
+                    "validation": {
+                        "status": "incomplete",
+                        "recaptureRequired": False,
+                        "offlineDecodeRequired": True,
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        (projection_incomplete / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #23 len=24 n3=Wrong hex="
+            + packet_one.hex()
+            + "\n",
+            encoding="utf-8",
+        )
+        write_raw_index(
+            projection_incomplete / RAW_PACKET_INDEX_NAME,
+            [{
+                "CapturedUtc": "2026-01-01T00:00:01Z", "Direction": "IN",
+                "GlobalOrdinal": 1, "Sequence": 23, "PacketLength": len(packet_one),
+                "PreservationStatus": "raw_complete", "RawHex": packet_one.hex(),
+            }],
+        )
+        lines, source = load_packet_lines(projection_incomplete)
+        self_test_check(
+            source["canonicalValid"]
+            and not source["recaptureRequired"]
+            and len(lines) == 1,
+            "projection-only incomplete capture must remain offline-decodable",
+        )
+        tests.append("projection-incomplete-offline-decode")
 
         conflict = root / "conflict"
         conflict.mkdir()

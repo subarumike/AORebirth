@@ -158,12 +158,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
         private static LootEntryDefinition Guaranteed(int id)
         {
-            return new LootEntryDefinition { ItemTemplateId = id, HighItemTemplateId = id, FixedQuality = 1, MinimumQuality = 1, MaximumQuality = 1, MinimumQuantity = 1, MaximumQuantity = 1, Weight = 1, DropChanceBasisPoints = 10000, UniquePerCorpse = false, Semantics = LootSemantics.GuaranteedProven, Evidence = LootEvidenceConfidence.ProvenCapture };
+            return new LootEntryDefinition { ItemTemplateId = id, HighItemTemplateId = id, FixedQuality = 1, MinimumQuality = 1, MaximumQuality = 1, MinimumQuantity = 1, MaximumQuantity = 1, Weight = 1, DropChanceBasisPoints = 10000, UniquePerCorpse = false, Semantics = LootSemantics.GuaranteedProven, Evidence = LootEvidenceConfidence.ProvenCapture, EvidenceReference = "test:guaranteed" };
         }
 
         private static LootEntryDefinition Ranged(int id, int minQl, int maxQl, int minQty, int maxQty, int chance)
         {
-            return new LootEntryDefinition { ItemTemplateId = id, HighItemTemplateId = id, MinimumQuality = minQl, MaximumQuality = maxQl, MinimumQuantity = minQty, MaximumQuantity = maxQty, Weight = 1, DropChanceBasisPoints = chance, Semantics = LootSemantics.WeightedDocumented, Evidence = LootEvidenceConfidence.ProvenRepository };
+            return new LootEntryDefinition { ItemTemplateId = id, HighItemTemplateId = id, MinimumQuality = minQl, MaximumQuality = maxQl, MinimumQuantity = minQty, MaximumQuantity = maxQty, Weight = 1, DropChanceBasisPoints = chance, Semantics = LootSemantics.WeightedDocumented, Evidence = LootEvidenceConfidence.ProvenRepository, EvidenceReference = "test:weighted" };
         }
 
         private static LootEntryDefinition Weighted(int id, int weight) { LootEntryDefinition value = Guaranteed(id); value.Weight = weight; value.Semantics = LootSemantics.WeightedDocumented; return value; }

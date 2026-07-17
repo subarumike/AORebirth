@@ -127,6 +127,11 @@ namespace AORebirth.Core.Playfields
             var result = new List<CombatLootTableEntry>();
             foreach (OrdinaryEnemyProfile profile in this.profiles)
             {
+                if (profile.Loot.PoolMode != OrdinaryEnemyLootPoolMode.IndependentEntries)
+                {
+                    continue;
+                }
+
                 foreach (OrdinaryEnemyLootEntry loot in profile.Loot.Entries)
                 {
                     result.Add(
@@ -170,19 +175,25 @@ namespace AORebirth.Core.Playfields
             {
                 CapturedSubwaySpawnDefinition first = group.First();
                 OrdinaryEnemyLootEntry[] lootEntries = sourceLoot
-                    .Select((value, index) => new { Value = value, Slot = index })
-                    .Where(value => value.Value.MonsterData == first.MonsterData)
+                    .Where(value => value.MonsterData == first.MonsterData)
                     .Select(
                         value =>
                             new OrdinaryEnemyLootEntry(
-                                value.Value.LowId,
-                                value.Value.HighId,
-                                value.Value.Quality,
+                                value.LowId,
+                                value.HighId,
+                                value.Quality,
                                 value.Slot,
-                                value.Value.ObservedBasisPoints,
-                                value.Value.ObservedBasisPoints == 10000
+                                value.Quantity,
+                                value.RuntimeWeight,
+                                value.ObservedBasisPoints,
+                                value.ObservedBasisPoints == 10000
                                     ? OrdinaryEnemyLootEvidence.GuaranteedProven
-                                    : OrdinaryEnemyLootEvidence.ObservedAvailableLoot))
+                                    : OrdinaryEnemyLootEvidence.ObservedAvailableLoot,
+                                value.LinkageEvidence,
+                                value.ProbabilityEvidence,
+                                value.ObservedCount,
+                                value.ObservedCorpses,
+                                value.EvidenceReference))
                     .ToArray();
                 CapturedEnemyCombatContract contract = first.Combat;
                 profiles.Add(
@@ -278,8 +289,15 @@ namespace AORebirth.Core.Playfields
                                 value.HighId,
                                 value.Quality,
                                 index,
+                                1,
+                                0,
                                 value.ObservedBasisPoints,
-                                OrdinaryEnemyLootEvidence.ObservedAvailableLoot))
+                                OrdinaryEnemyLootEvidence.ObservedAvailableLoot,
+                                OrdinaryEnemyLootLinkageEvidence.ImportedCaptureEvidence,
+                                OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                                value.ObservedCount,
+                                value.ObservedCorpses,
+                                string.Join(",", archetype.EvidenceCaptures)))
                     .ToArray();
                 profiles.Add(
                     new OrdinaryEnemyProfile(
@@ -566,14 +584,31 @@ namespace AORebirth.Core.Playfields
                 : entries.All(value => value.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven)
                     ? OrdinaryEnemyLootEvidence.GuaranteedProven
                     : OrdinaryEnemyLootEvidence.ObservedAvailableLoot;
+            int observedCompleteInventories = entries
+                .Select(value => value.ObservedCorpses)
+                .DefaultIfEmpty(0)
+                .Max();
+            string itemEvidenceReference = string.Join(
+                ",",
+                entries
+                    .Select(value => value.EvidenceReference)
+                    .Where(value => !string.IsNullOrWhiteSpace(value))
+                    .Distinct(StringComparer.Ordinal));
             if (monsterData == 17657)
             {
                 return new OrdinaryEnemyLootProfile(
                     evidence,
                     entries,
+                    OrdinaryEnemyLootPoolMode.IndependentEntries,
+                    0,
+                    true,
+                    Math.Max(8, observedCompleteInventories),
+                    0,
+                    itemEvidenceReference,
                     OrdinaryEnemyEvidenceState.Observed,
                     29,
-                    79);
+                    79,
+                    new OrdinaryEnemyLevelCreditRule[0]);
             }
 
             if (monsterData == 17649)
@@ -583,6 +618,12 @@ namespace AORebirth.Core.Playfields
                 return new OrdinaryEnemyLootProfile(
                     evidence,
                     entries,
+                    OrdinaryEnemyLootPoolMode.WeightedOne,
+                    5,
+                    false,
+                    7,
+                    5,
+                    itemEvidenceReference,
                     OrdinaryEnemyEvidenceState.Observed,
                     null,
                     null,
@@ -604,6 +645,12 @@ namespace AORebirth.Core.Playfields
                 return new OrdinaryEnemyLootProfile(
                     evidence,
                     entries,
+                    OrdinaryEnemyLootPoolMode.IndependentEntries,
+                    0,
+                    false,
+                    2,
+                    2,
+                    "20260716-033326:Corpse:F69003,20260716-034104:Corpse:F69004",
                     OrdinaryEnemyEvidenceState.Policy,
                     150,
                     150,
@@ -621,9 +668,16 @@ namespace AORebirth.Core.Playfields
             return new OrdinaryEnemyLootProfile(
                 evidence,
                 entries,
+                OrdinaryEnemyLootPoolMode.IndependentEntries,
+                0,
+                entries.Length > 0,
+                observedCompleteInventories,
+                0,
+                itemEvidenceReference,
                 OrdinaryEnemyEvidenceState.Unresolved,
                 null,
-                null);
+                null,
+                new OrdinaryEnemyLevelCreditRule[0]);
         }
 
         private static OrdinaryEnemyCorpseProfile StandardCorpseProfile(int monsterData)

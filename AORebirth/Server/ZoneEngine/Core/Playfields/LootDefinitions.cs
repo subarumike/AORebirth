@@ -53,6 +53,8 @@ namespace AORebirth.Core.Playfields
         internal LootSemantics Semantics { get; set; }
         internal LootEvidenceConfidence Evidence { get; set; }
         internal string EvidenceReference { get; set; }
+        internal string LinkageEvidence { get; set; }
+        internal string ProbabilityEvidence { get; set; }
     }
 
     internal sealed class LootGroupDefinition
@@ -158,6 +160,37 @@ namespace AORebirth.Core.Playfields
             {
                 throw new LootDefinitionValidationException("Assignment references missing table: " + assignment.LootTableKey);
             }
+            this.ValidateActiveAssignmentOwner(assignment);
+            this.assignments.Add(assignment.AssignmentKey, assignment);
+            this.RefreshVersion();
+        }
+
+        internal void RegisterTableAndAssignment(
+            LootTableDefinition table,
+            LootAssignmentDefinition assignment)
+        {
+            ValidateTable(table);
+            ValidateAssignment(assignment);
+            if (this.tables.ContainsKey(table.LootTableKey))
+            {
+                throw new LootDefinitionValidationException("Duplicate loot table key: " + table.LootTableKey);
+            }
+            if (this.assignments.ContainsKey(assignment.AssignmentKey))
+            {
+                throw new LootDefinitionValidationException("Duplicate loot assignment key: " + assignment.AssignmentKey);
+            }
+            if (!string.Equals(
+                table.LootTableKey,
+                assignment.LootTableKey,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                throw new LootDefinitionValidationException(
+                    "Atomic loot registration requires the assignment to reference its table: "
+                    + assignment.AssignmentKey);
+            }
+
+            this.ValidateActiveAssignmentOwner(assignment);
+            this.tables.Add(table.LootTableKey, table);
             this.assignments.Add(assignment.AssignmentKey, assignment);
             this.RefreshVersion();
         }
@@ -240,10 +273,20 @@ namespace AORebirth.Core.Playfields
                 throw new LootDefinitionValidationException("Invalid fixed quality in " + groupKey);
             if (entry.MinimumQuality < 1 || entry.MaximumQuality < entry.MinimumQuality)
                 throw new LootDefinitionValidationException("Invalid quality range in " + groupKey);
+            if (entry.FixedQuality.HasValue
+                && (entry.FixedQuality.Value < entry.MinimumQuality
+                    || entry.FixedQuality.Value > entry.MaximumQuality))
+                throw new LootDefinitionValidationException("Fixed quality is outside the declared range in " + groupKey);
             if (entry.MinimumQuantity < 1 || entry.MaximumQuantity < entry.MinimumQuantity)
                 throw new LootDefinitionValidationException("Invalid quantity range in " + groupKey);
             if (entry.Weight < 0 || entry.DropChanceBasisPoints < 0 || entry.DropChanceBasisPoints > 10000)
                 throw new LootDefinitionValidationException("Invalid weight or probability in " + groupKey);
+            bool rollable = entry.Semantics != LootSemantics.Unresolved
+                && entry.Semantics != LootSemantics.NoneProven;
+            if (active && rollable && entry.Evidence == LootEvidenceConfidence.Unresolved)
+                throw new LootDefinitionValidationException("Rollable active loot requires resolved evidence in " + groupKey);
+            if (active && rollable && string.IsNullOrWhiteSpace(entry.EvidenceReference))
+                throw new LootDefinitionValidationException("Rollable active loot requires an evidence reference in " + groupKey);
             if (entry.Semantics == LootSemantics.GuaranteedProven
                 && entry.Evidence == LootEvidenceConfidence.Unresolved)
                 throw new LootDefinitionValidationException("Unresolved item cannot be guaranteed in " + groupKey);
@@ -263,6 +306,59 @@ namespace AORebirth.Core.Playfields
             if (assignment.TargetType != LootAssignmentTargetType.Global
                 && string.IsNullOrWhiteSpace(assignment.TargetKey))
                 throw new LootDefinitionValidationException("Assignment target key is required: " + assignment.AssignmentKey);
+        }
+
+        private void ValidateActiveAssignmentOwner(LootAssignmentDefinition candidate)
+        {
+            if (!candidate.Enabled)
+            {
+                return;
+            }
+
+            LootAssignmentDefinition collision = this.assignments.Values.FirstOrDefault(
+                existing => existing.Enabled
+                    && existing.TargetType == candidate.TargetType
+                    && SameTarget(existing.TargetKey, candidate.TargetKey)
+                    && ScopesOverlap(existing.PlayfieldId, candidate.PlayfieldId)
+                    && RangesOverlap(
+                        existing.MinimumLevel,
+                        existing.MaximumLevel,
+                        candidate.MinimumLevel,
+                        candidate.MaximumLevel));
+            if (collision != null)
+            {
+                throw new LootDefinitionValidationException(
+                    "Duplicate overlapping active loot assignment owner: "
+                    + collision.AssignmentKey
+                    + " / "
+                    + candidate.AssignmentKey);
+            }
+        }
+
+        private static bool SameTarget(string left, string right)
+        {
+            return string.Equals(
+                left ?? string.Empty,
+                right ?? string.Empty,
+                StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool ScopesOverlap(int? left, int? right)
+        {
+            return !left.HasValue || !right.HasValue || left.Value == right.Value;
+        }
+
+        private static bool RangesOverlap(
+            int? leftMinimum,
+            int? leftMaximum,
+            int? rightMinimum,
+            int? rightMaximum)
+        {
+            int leftLow = leftMinimum ?? int.MinValue;
+            int leftHigh = leftMaximum ?? int.MaxValue;
+            int rightLow = rightMinimum ?? int.MinValue;
+            int rightHigh = rightMaximum ?? int.MaxValue;
+            return leftLow <= rightHigh && rightLow <= leftHigh;
         }
 
         private void RefreshVersion()
