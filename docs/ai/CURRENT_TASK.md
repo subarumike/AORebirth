@@ -2,16 +2,28 @@
 
 ## Current Focus
 
-Finalized Vergil capture `20260716-222007` is integrated as a boss-only
-`40`-unit NPC travel leash while the shared PF127 and target-distance safety
-boundaries remain `100`. Mike's `2026-07-17` private-client validation confirms
-the corrected Vergil fight, leash reset, and return behavior. The next active
-boundary is offline indexing of finalized captures `20260716-221358` and
-`20260716-222201`, followed by the bounded Bloodcreeper smoke and the next
-Subway enemy from the existing corpus through the shared ordinary runtime.
+Finalized Thief capture `20260717-012651` is integrated as a bounded correction
+to the accepted first-room enemy. The runtime now represents maximum/current
+health as `146/115`, applies the observed one-point-per-second recovery including
+during combat, and uses the captured 0.44-second corpse despawn after closing
+with the handbag still present. The next action is one private Thief smoke before
+returning to the already-planned capture indexing and Bloodcreeper work.
 
 ## Done in this slice
 
+- Finalized capture `20260717-012651` is decoded and usable without recapture.
+  It proves maximum/current Thief health `146/115`, one-point-per-second passive
+  recovery, and two live misses without establishing a miss probability.
+- The same capture explicitly records the unlooted Stolen Handbag remaining in
+  the inventory snapshot, the loot-window close acknowledgement, and corpse
+  despawn 0.44 seconds later. That close rule is Thief-only profile data; the
+  shared five-minute regular-enemy policy is unchanged.
+- Retaliation mode, QL1 Solar-Powered Pistol `121567`, captured attack envelope,
+  and 1.41-second attack-start timing still match. No damage-roll or cadence
+  change was made because the Thief landed no hit in this capture.
+- The capture proves that the live chase crossed the current shared 100-unit
+  leash lower bound and an eight-unit elevation change, but it does not reveal
+  an exact reset threshold. No speculative leash or navigation value was added.
 - All 260 represented Subway population rows now carry a non-null generic level
   definition. The same 222 rows remain active and the same 38 remain
   quarantined.
@@ -100,19 +112,22 @@ Subway enemy from the existing corpus through the shared ordinary runtime.
 
 ## Remaining
 
-1. Index finalized captures `20260716-221358` and `20260716-222201` before
+1. Run one private Thief smoke: allow the initial `115/146` health state to
+   recover, fight normally, open the handbag corpse, leave the item, close the
+   loot window, and confirm the corpse disappears immediately afterward.
+2. Index finalized captures `20260716-221358` and `20260716-222201` before
    requesting any new gameplay capture. Preserve each identity-linked combat,
    death, corpse, loot, and movement observation without generalizing it to an
    unsupported enemy type.
-2. Run the bounded private Bloodcreeper smoke: level `15..25`, Bite, Spit,
+3. Run the bounded private Bloodcreeper smoke: level `15..25`, Bite, Spit,
    chase, corpse, 150 credits, unresolved/empty item handling, close/reopen,
    cleanup, 240-second respawn, and no duplicate generation.
-3. If later loot evidence is required, collect only the remaining bounded
+4. If later loot evidence is required, collect only the remaining bounded
    samples: eight strict complete Bloodcreeper outcomes and three strict complete
    Disobedient Bot outcomes. No new live capture is requested in this task, and
    combat, geometry, LOS, navigation, chase, leash, and respawn do not need to be
    recaptured for this loot boundary.
-4. Continue the next whole-enemy slice from the existing corpus first. Keep
+5. Continue the next whole-enemy slice from the existing corpus first. Keep
    fixed-level rows fixed until capture evidence or an approved design decision
    establishes a range.
 

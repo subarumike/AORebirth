@@ -147,13 +147,22 @@ Named bosses and owned summons are not in the catalog.
 ## Thief parity
 
 Thief now uses the shared profile/runtime path while preserving the accepted
-captured values: source identity `0x7953AEA5`, template `A051`, level 5, health
-115, scale 93, run speed 20, exact position, captured appearance/SCFU bytes,
-retaliate aggression, captured patrol replay, QL1 Solar-Powered Pistol `121567`
-in the right hand, weapon-derived damage, captured attack timing/context,
-captured corpse packet/CATMesh, guaranteed QL1 Stolen Handbag `297055`, one-second
-fully-looted cleanup, five-minute unlooted lifetime, and 60-second post-despawn
-respawn.
+captured values: source identity `0x7953AEA5`, template `A051`, level 5, maximum
+health 146 with captured current health 115, scale 93, run speed 20, exact
+position, captured appearance/SCFU bytes, retaliate aggression, captured patrol
+replay, QL1 Solar-Powered Pistol `121567` in the right hand, weapon-derived
+damage, captured attack timing/context, captured corpse packet/CATMesh,
+guaranteed QL1 Stolen Handbag `297055`, three-second fully-looted cleanup,
+five-minute unlooted baseline lifetime, and 60-second post-despawn respawn.
+
+Finalized capture `20260717-012651` proves the 146 maximum independently: the
+Thief recovered from 115 to 146 at one health per second, then a 96-point hit
+left exactly 50 health. The Thief profile therefore owns a one-point,
+one-second passive recovery interval that remains active during combat. The same
+capture also proves an identity-specific corpse-close rule: closing the loot
+window with the handbag still present was acknowledged before the corpse
+despawned 0.44 seconds later. This exception is profile data and does not change
+the five-minute loot-bearing behavior of other regular enemies.
 
 ## Filth Flea parity
 
