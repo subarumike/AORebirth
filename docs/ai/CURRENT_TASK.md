@@ -60,6 +60,10 @@ next Subway enemy from the existing corpus through the shared ordinary runtime.
 - Capture tooling now canonicalizes padded and unpadded numeric corpse identities
   before joins and permits offline reconstruction when projection status is
   incomplete but `recaptureRequired=false`.
+- Finalized capture `20260716-034559` is indexed only for Melded Patterns combat
+  evidence. Player-target rows now establish four captured hits at `21..34`;
+  Healer-pet hits are excluded, repeat cadence remains unresolved, and this
+  evidence report does not activate a Melded Patterns runtime contract.
 - No quarantined population rows were activated; the population remains 260
   catalog rows, 222 active rows, and 38 quarantined rows.
 

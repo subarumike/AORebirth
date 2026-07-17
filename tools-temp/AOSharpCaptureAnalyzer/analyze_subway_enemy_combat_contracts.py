@@ -24,7 +24,14 @@ CAPTURES = (
     "20260710-205400",
     "20260716-033326",
     "20260716-034104",
+    "20260716-034559",
 )
+CAPTURE_ENEMY_FILTERS = {
+    "20260716-034559": frozenset({"Melded Patterns"}),
+}
+# Melded Patterns captures include hits against the player's Healer pet. Keep
+# player-facing retaliation and damage evidence restricted to the local player.
+LOCAL_PLAYER_TARGET_ONLY_ENEMIES = frozenset({"Melded Patterns"})
 OUTPUT = REPO / "docs" / "generated" / "subway_enemy_combat_contracts.json"
 
 ATTACK_DETAIL = re.compile(
@@ -96,6 +103,11 @@ def add_identity(identities: dict[str, dict[str, object]], row: dict[str, str]):
         }
 
 
+def capture_includes_enemy(capture_name: str, enemy_name: str) -> bool:
+    allowed_enemies = CAPTURE_ENEMY_FILTERS.get(capture_name)
+    return allowed_enemies is None or enemy_name in allowed_enemies
+
+
 def main():
     grouped = defaultdict(
         lambda: {
@@ -119,15 +131,26 @@ def main():
         for row in read_csv(folder / "enemy-combat.csv"):
             source = row.get("SourceIdentity", "")
             enemy = identities.get(source)
-            if not enemy or row.get("SourceRole") != "enemy":
+            if (
+                not enemy
+                or row.get("SourceRole") != "enemy"
+                or not capture_includes_enemy(capture_name, enemy["name"])
+            ):
+                continue
+            message_type = row.get("MessageType")
+            if (
+                enemy["name"] in LOCAL_PLAYER_TARGET_ONLY_ENEMIES
+                and message_type in {"Attack", "AttackInfo"}
+                and row.get("TargetRole") != "local-player"
+            ):
                 continue
             group = grouped[enemy["name"]]
             group["identities"].add(source)
             group["captures"].add(capture_name)
             group["monsterData"].add(enemy["monsterData"])
-            if row.get("MessageType") == "Attack":
+            if message_type == "Attack":
                 group["retaliationRows"] += 1
-            if row.get("MessageType") != "AttackInfo":
+            if message_type != "AttackInfo":
                 continue
             amount = int(row.get("Amount") or 0)
             detail = row.get("Detail", "")
@@ -153,7 +176,7 @@ def main():
                 if not match:
                     continue
                 enemy = identities.get(match.group("owner"))
-                if not enemy:
+                if not enemy or not capture_includes_enemy(capture_name, enemy["name"]):
                     continue
                 group = grouped[enemy["name"]]
                 group["identities"].add(match.group("owner"))

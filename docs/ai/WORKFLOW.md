@@ -257,6 +257,13 @@ cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py <
 
 Run the analyzer first to recover direct SCFU evidence from raw packets, then run the lifecycle decoder to rebuild correlated NPC lifecycle outputs.
 
+After adding a finalized capture to the Subway enemy combat-contract input list,
+regenerate the versioned evidence contract through the repository wrapper:
+
+```cmd
+cmd /d /c tools\generate_subway_enemy_combat_contracts.cmd
+```
+
 Before running the wrapper, do not run `rg`, `dir`, `tasklist`, recursive searches, process sweeps, source inspection, build-folder enumeration, or old-log scraping to rediscover how capture startup works. Use the wrapper directly.
 
 Do not inspect AOSharp capture source code, search for command names, enumerate build folders, or read old capture logs unless the wrapper fails or Mike explicitly asks for investigation.
