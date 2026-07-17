@@ -153,16 +153,16 @@ position, captured appearance/SCFU bytes, retaliate aggression, captured patrol
 replay, QL1 Solar-Powered Pistol `121567` in the right hand, weapon-derived
 damage, captured attack timing/context, captured corpse packet/CATMesh,
 guaranteed QL1 Stolen Handbag `297055`, three-second fully-looted cleanup,
-five-minute unlooted baseline lifetime, and 60-second post-despawn respawn.
+four-minute unlooted lifetime across close/reopen, and 60-second post-despawn
+respawn.
 
 Finalized capture `20260717-012651` proves the 146 maximum independently: the
 Thief recovered from 115 to 146 at one health per second, then a 96-point hit
 left exactly 50 health. The Thief profile therefore owns a one-point,
-one-second passive recovery interval that remains active during combat. The same
-capture also proves an identity-specific corpse-close rule: closing the loot
-window with the handbag still present was acknowledged before the corpse
-despawned 0.44 seconds later. This exception is profile data and does not change
-the five-minute loot-bearing behavior of other regular enemies.
+one-second passive recovery interval that remains active during combat. The
+observed corpse disappearance after closing with loot is not promoted as an
+identity-specific rule: all normal enemies retain loot-bearing corpses for four
+minutes, and closing or reopening the loot window does not shorten that timer.
 
 ## Filth Flea parity
 

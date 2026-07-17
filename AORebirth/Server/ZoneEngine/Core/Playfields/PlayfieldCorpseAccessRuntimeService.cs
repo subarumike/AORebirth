@@ -29,7 +29,6 @@ namespace AORebirth.Core.Playfields
             IDictionary<int, TCorpseState> corpses,
             TimeSpan itemLootLifetime,
             TimeSpan emptyCleanupDelay,
-            TimeSpan? closeWithLootCleanupDelay,
             Func<TCorpseState, Identity> deadNpcIdentity,
             Func<TCorpseState, DateTime> expiresAtUtc,
             Func<TCorpseState, bool> isEmpty,
@@ -87,16 +86,6 @@ namespace AORebirth.Core.Playfields
                 refreshCorpseInventoryHandle(corpse);
                 sendCorpseCloseAction(looter, corpse);
                 sendUseActionFinished(looter);
-
-                if (!isEmpty(corpse) && closeWithLootCleanupDelay.HasValue)
-                {
-                    // Official live capture 20260717-012651: the Thief corpse
-                    // despawns 0.44 seconds after closing with its handbag still present.
-                    scheduleCorpseDespawn(
-                        corpse,
-                        closeWithLootCleanupDelay.Value,
-                        "closed-with-loot-profile");
-                }
 
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,

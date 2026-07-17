@@ -455,21 +455,18 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemyCorpsePacketProfile packetProfile,
             double emptyLifetimeSeconds,
             double unlootedLifetimeSeconds,
-            double lootedCleanupSeconds,
-            double? closeWithLootCleanupSeconds)
+            double lootedCleanupSeconds)
         {
             this.PacketProfile = packetProfile;
             this.EmptyLifetimeSeconds = emptyLifetimeSeconds;
             this.UnlootedLifetimeSeconds = unlootedLifetimeSeconds;
             this.LootedCleanupSeconds = lootedCleanupSeconds;
-            this.CloseWithLootCleanupSeconds = closeWithLootCleanupSeconds;
         }
 
         internal OrdinaryEnemyCorpsePacketProfile PacketProfile { get; private set; }
         internal double EmptyLifetimeSeconds { get; private set; }
         internal double UnlootedLifetimeSeconds { get; private set; }
         internal double LootedCleanupSeconds { get; private set; }
-        internal double? CloseWithLootCleanupSeconds { get; private set; }
     }
 
     internal sealed class OrdinaryEnemyProfile
@@ -1067,9 +1064,7 @@ namespace AORebirth.Core.Playfields
                      && string.IsNullOrWhiteSpace(profile.TemplateHash))
                     || profile.Corpse.EmptyLifetimeSeconds <= 0.0
                     || profile.Corpse.UnlootedLifetimeSeconds <= 0.0
-                    || profile.Corpse.LootedCleanupSeconds <= 0.0
-                    || (profile.Corpse.CloseWithLootCleanupSeconds.HasValue
-                        && profile.Corpse.CloseWithLootCleanupSeconds.Value <= 0.0))
+                    || profile.Corpse.LootedCleanupSeconds <= 0.0)
                 {
                     throw new InvalidOperationException("Ordinary enemy construction or corpse lifecycle data is invalid: " + profile.ProfileKey);
                 }
