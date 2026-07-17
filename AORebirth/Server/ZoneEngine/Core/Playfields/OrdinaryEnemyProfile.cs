@@ -148,13 +148,19 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemyDamageSource damageSource,
             bool visibleWeapon,
             CapturedEnemyCombatContract contract,
-            OrdinaryEnemyEvidenceState evidenceState)
+            OrdinaryEnemyEvidenceState evidenceState,
+            double? healthRegenIntervalSeconds = null,
+            int? healthRegenDelta = null,
+            bool regenerateHealthWhileInCombat = false)
         {
             this.Mode = mode;
             this.DamageSource = damageSource;
             this.VisibleWeapon = visibleWeapon;
             this.Contract = contract;
             this.EvidenceState = evidenceState;
+            this.HealthRegenIntervalSeconds = healthRegenIntervalSeconds;
+            this.HealthRegenDelta = healthRegenDelta;
+            this.RegenerateHealthWhileInCombat = regenerateHealthWhileInCombat;
         }
 
         internal OrdinaryEnemyCombatMode Mode { get; private set; }
@@ -162,6 +168,9 @@ namespace AORebirth.Core.Playfields
         internal bool VisibleWeapon { get; private set; }
         internal CapturedEnemyCombatContract Contract { get; private set; }
         internal OrdinaryEnemyEvidenceState EvidenceState { get; private set; }
+        internal double? HealthRegenIntervalSeconds { get; private set; }
+        internal int? HealthRegenDelta { get; private set; }
+        internal bool RegenerateHealthWhileInCombat { get; private set; }
     }
 
     internal sealed class OrdinaryEnemyTextureProfile
@@ -446,18 +455,21 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemyCorpsePacketProfile packetProfile,
             double emptyLifetimeSeconds,
             double unlootedLifetimeSeconds,
-            double lootedCleanupSeconds)
+            double lootedCleanupSeconds,
+            double? closeWithLootCleanupSeconds)
         {
             this.PacketProfile = packetProfile;
             this.EmptyLifetimeSeconds = emptyLifetimeSeconds;
             this.UnlootedLifetimeSeconds = unlootedLifetimeSeconds;
             this.LootedCleanupSeconds = lootedCleanupSeconds;
+            this.CloseWithLootCleanupSeconds = closeWithLootCleanupSeconds;
         }
 
         internal OrdinaryEnemyCorpsePacketProfile PacketProfile { get; private set; }
         internal double EmptyLifetimeSeconds { get; private set; }
         internal double UnlootedLifetimeSeconds { get; private set; }
         internal double LootedCleanupSeconds { get; private set; }
+        internal double? CloseWithLootCleanupSeconds { get; private set; }
     }
 
     internal sealed class OrdinaryEnemyProfile
@@ -1055,7 +1067,9 @@ namespace AORebirth.Core.Playfields
                      && string.IsNullOrWhiteSpace(profile.TemplateHash))
                     || profile.Corpse.EmptyLifetimeSeconds <= 0.0
                     || profile.Corpse.UnlootedLifetimeSeconds <= 0.0
-                    || profile.Corpse.LootedCleanupSeconds <= 0.0)
+                    || profile.Corpse.LootedCleanupSeconds <= 0.0
+                    || (profile.Corpse.CloseWithLootCleanupSeconds.HasValue
+                        && profile.Corpse.CloseWithLootCleanupSeconds.Value <= 0.0))
                 {
                     throw new InvalidOperationException("Ordinary enemy construction or corpse lifecycle data is invalid: " + profile.ProfileKey);
                 }
@@ -1067,6 +1081,17 @@ namespace AORebirth.Core.Playfields
                         || profile.Aggression.AutomaticAggroRadius.Value <= 0.0))
                 {
                     throw new InvalidOperationException("Automatic aggression requires a positive captured radius: " + profile.ProfileKey);
+                }
+
+                bool hasHealthRegenInterval = profile.Combat.HealthRegenIntervalSeconds.HasValue;
+                bool hasHealthRegenDelta = profile.Combat.HealthRegenDelta.HasValue;
+                if (hasHealthRegenInterval != hasHealthRegenDelta
+                    || (hasHealthRegenInterval
+                        && (profile.Combat.HealthRegenIntervalSeconds.Value <= 0.0
+                            || profile.Combat.HealthRegenDelta.Value <= 0))
+                    || (profile.Combat.RegenerateHealthWhileInCombat && !hasHealthRegenInterval))
+                {
+                    throw new InvalidOperationException("Ordinary enemy health regeneration data is invalid: " + profile.ProfileKey);
                 }
 
                 if (profile.Aggression.Mode == OrdinaryEnemyAggressionMode.Scripted

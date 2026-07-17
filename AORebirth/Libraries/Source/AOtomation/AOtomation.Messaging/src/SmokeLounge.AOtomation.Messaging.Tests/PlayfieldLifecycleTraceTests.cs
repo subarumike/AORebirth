@@ -1734,8 +1734,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && thiefFactory.Contains("26092")
                 && thiefFactory.Contains("40694")
                 && thiefFactory.Contains("138")
-                && providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0))"),
-                "Captured Subway Thief must preserve live monsterData, scale, head mesh, run speed, NPC family, and current surveyed position.");
+                && providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 146, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0, healthDamage: 31))"),
+                "Captured Subway Thief must preserve live max/current health, monsterData, scale, head mesh, run speed, NPC family, and current surveyed position.");
             Assert.IsTrue(
                 catalogText.Contains("source.MonsterData == 26092")
                 && catalogText.Contains("new OrdinaryEnemyTextureProfile(0, 0x24CA, 0)")
@@ -2404,6 +2404,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
             string movementRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs"));
+            string heartbeatRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCharacterHeartbeatRuntimeService.cs"));
             string weaponPacketText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\WeaponItemFullUpdate.cs"));
             string scfuPacketText = File.ReadAllText(
@@ -2414,6 +2416,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string corpseRulesText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
+            string corpseAccessText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs"));
 
             string[] acceptedEnemyKeys =
                 {
@@ -2449,7 +2455,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Accepted Subway Filth Flea must keep spawn, movement/chase, combat, appearance, corpse visual, loot, credits, and four-minute respawn coverage together.");
 
             Assert.IsTrue(
-                providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0))")
+                providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 146, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0, healthDamage: 31))")
+                && providerText.Contains("this.HealthDamage = healthDamage;")
+                && catalogText.Contains("source.HealthDamage,")
+                && catalogText.Contains("monsterData == 26092 ? 1.0 : (double?)null")
+                && catalogText.Contains("monsterData == 26092 ? 1 : (int?)null")
+                && heartbeatRuntimeText.Contains("ordinaryDefinition.Profile.Combat.HealthRegenIntervalSeconds")
+                && heartbeatRuntimeText.Contains("ordinaryDefinition.Profile.Combat.RegenerateHealthWhileInCombat")
                 && providerText.Contains("new CapturedSubwayPatrolReplaySegment(4.548876")
                 && providerText.Contains("new CapturedSubwayLootDefinition(")
                 && providerText.Contains("\"Thief\"")
@@ -2457,7 +2469,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && providerText.Contains("138")
                 && providerText.Contains("297055")
                 && providerText.Contains("10000"),
-                "Accepted Subway Thief must have spawn, patrol start, respawn, guaranteed handbag loot, and identity-specific loot evidence together.");
+                "Accepted Subway Thief must have captured max/current health, patrol start, respawn, guaranteed handbag loot, and identity-specific loot evidence together.");
 
             Assert.IsTrue(
                 combatContractText.Contains("case 26092:")
@@ -2520,8 +2532,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(5)")
+                && catalogText.Contains("OrdinaryEnemyCorpsePacketProfile.CapturedThief")
+                && catalogText.Contains("0.44);")
+                && playfieldText.Contains("CloseWithLootCleanupDelay = closeWithLootCleanupDelay")
+                && corpseAccessText.Contains("!isEmpty(corpse) && closeWithLootCleanupDelay.HasValue")
+                && corpseAccessText.Contains("\"closed-with-loot-profile\"")
                 && CountOccurrences(catalogText, "3.0,\n                300.0,\n                3.0") == 3,
-                "Accepted Subway Thief must keep its captured corpse visual, five-minute loot-bearing lifetime, and universal three-second empty cleanup.");
+                "Accepted Subway Thief must keep its captured corpse visual, five-minute open lifetime, 0.44-second close-with-loot cleanup, and universal three-second empty cleanup.");
         }
 
         [TestMethod]
@@ -2547,8 +2564,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("ordinaryDefinition.Profile.Corpse.UnlootedLifetimeSeconds")
                 && playfieldText.Contains("ordinaryDefinition.Profile.Corpse.LootedCleanupSeconds")
+                && playfieldText.Contains("ordinaryDefinition.Profile.Corpse.CloseWithLootCleanupSeconds")
                 && playfieldText.Contains("selectedCorpse.ItemLootLifetime")
-                && playfieldText.Contains("selectedCorpse.EmptyCleanupDelay"),
+                && playfieldText.Contains("selectedCorpse.EmptyCleanupDelay")
+                && playfieldText.Contains("selectedCorpse.CloseWithLootCleanupDelay"),
                 "Corpse access and final-loot cleanup must consume the ordinary profile lifetime values.");
 
             Assert.IsTrue(
@@ -6645,7 +6664,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     OrdinaryEnemyCorpsePacketProfile.Generic,
                     30.0,
                     300.0,
-                    1.0),
+                    1.0,
+                    null),
                 new[] { "test-evidence" },
                 bossOrScripted,
                 ownedSummon);

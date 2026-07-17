@@ -2202,10 +2202,12 @@ namespace AORebirth.Core.Playfields
             CorpseState selectedCorpse;
             TimeSpan itemLootLifetime = CombatCorpseRules.RegularLootCorpseLifetime;
             TimeSpan emptyCleanupDelay = CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay;
+            TimeSpan? closeWithLootCleanupDelay = null;
             if (this.corpses.TryGetValue(corpseIdentity.Instance, out selectedCorpse))
             {
                 itemLootLifetime = selectedCorpse.ItemLootLifetime;
                 emptyCleanupDelay = selectedCorpse.EmptyCleanupDelay;
+                closeWithLootCleanupDelay = selectedCorpse.CloseWithLootCleanupDelay;
             }
 
             return this.runtimeSystems.TryUseCorpse(
@@ -2214,6 +2216,7 @@ namespace AORebirth.Core.Playfields
                 this.corpses,
                 itemLootLifetime,
                 emptyCleanupDelay,
+                closeWithLootCleanupDelay,
                 corpse => corpse.DeadNpcIdentity,
                 corpse => corpse.ExpiresAtUtc,
                 corpse => corpse.IsEmpty,
@@ -3038,6 +3041,7 @@ namespace AORebirth.Core.Playfields
             TimeSpan lifetime = CorpseLifetimeFor(target, lootClass);
             TimeSpan itemLootLifetime = CombatCorpseRules.RegularLootCorpseLifetime;
             TimeSpan emptyCleanupDelay = CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay;
+            TimeSpan? closeWithLootCleanupDelay = null;
             CapturedEncounterRuntimeDefinition encounterDefinition;
             if (CapturedEncounterRuntimeRegistry.TryGet(
                 target.Identity.Instance,
@@ -3057,6 +3061,11 @@ namespace AORebirth.Core.Playfields
                         ordinaryDefinition.Profile.Corpse.UnlootedLifetimeSeconds);
                     emptyCleanupDelay = TimeSpan.FromSeconds(
                         ordinaryDefinition.Profile.Corpse.LootedCleanupSeconds);
+                    if (ordinaryDefinition.Profile.Corpse.CloseWithLootCleanupSeconds.HasValue)
+                    {
+                        closeWithLootCleanupDelay = TimeSpan.FromSeconds(
+                            ordinaryDefinition.Profile.Corpse.CloseWithLootCleanupSeconds.Value);
+                    }
                 }
             }
 
@@ -3079,6 +3088,7 @@ namespace AORebirth.Core.Playfields
                 InventoryHandle = this.AllocateCorpseInventoryHandle(),
                 ItemLootLifetime = itemLootLifetime,
                 EmptyCleanupDelay = emptyCleanupDelay,
+                CloseWithLootCleanupDelay = closeWithLootCleanupDelay,
                 ExpiresAtUtc = expiresAtUtc
             };
 

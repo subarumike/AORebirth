@@ -45,21 +45,24 @@ namespace AORebirth.Core.Playfields
                 OrdinaryEnemyCorpsePacketProfile.Generic,
                 3.0,
                 300.0,
-                3.0);
+                3.0,
+                null);
 
         private static readonly OrdinaryEnemyCorpseProfile CapturedThiefCorpse =
             new OrdinaryEnemyCorpseProfile(
                 OrdinaryEnemyCorpsePacketProfile.CapturedThief,
                 3.0,
                 300.0,
-                3.0);
+                3.0,
+                0.44);
 
         private static readonly OrdinaryEnemyCorpseProfile CapturedFilthFleaCorpse =
             new OrdinaryEnemyCorpseProfile(
                 OrdinaryEnemyCorpsePacketProfile.CapturedFilthFlea,
                 3.0,
                 300.0,
-                3.0);
+                3.0,
+                null);
 
         private readonly Dictionary<string, OrdinaryEnemyProfile> profilesByKey;
 
@@ -240,7 +243,7 @@ namespace AORebirth.Core.Playfields
                         SubwayPlayfieldInstance,
                         source.Level,
                         source.Health,
-                        0,
+                        source.HealthDamage,
                         source.MonsterScale,
                         source.RunSpeed,
                         source.X,
@@ -572,7 +575,10 @@ namespace AORebirth.Core.Playfields
                 contract,
                 contract.IsCombatReady
                     ? OrdinaryEnemyEvidenceState.Observed
-                    : OrdinaryEnemyEvidenceState.Unresolved);
+                    : OrdinaryEnemyEvidenceState.Unresolved,
+                monsterData == 26092 ? 1.0 : (double?)null,
+                monsterData == 26092 ? 1 : (int?)null,
+                monsterData == 26092);
         }
 
         private static OrdinaryEnemyLootProfile BuildLootProfile(

@@ -14,6 +14,8 @@ namespace ZoneEngine.Core.Playfields
 
     using AORebirth.Core.Entities;
 
+    using AORebirth.Core.Playfields;
+
     using AORebirth.Enums;
 
     using AORebirth.ObjectManager;
@@ -206,7 +208,21 @@ namespace ZoneEngine.Core.Playfields
 
 
 
-            if (this.IsNpcRegenBlocked(npc))
+            double regenIntervalSeconds = PetCombatRules.NpcHealthRegenIntervalSeconds;
+            int maxHealth = npc.Stats[StatIds.life].Value;
+            int healDelta = PetCombatRules.ResolveNpcHealthRegenDelta(maxHealth);
+            bool regenerateHealthWhileInCombat = false;
+            OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
+            if (OrdinaryEnemyRuntimeRegistry.TryGet(npcInstance, out ordinaryDefinition)
+                && ordinaryDefinition.Profile.Combat.HealthRegenIntervalSeconds.HasValue
+                && ordinaryDefinition.Profile.Combat.HealthRegenDelta.HasValue)
+            {
+                regenIntervalSeconds = ordinaryDefinition.Profile.Combat.HealthRegenIntervalSeconds.Value;
+                healDelta = ordinaryDefinition.Profile.Combat.HealthRegenDelta.Value;
+                regenerateHealthWhileInCombat = ordinaryDefinition.Profile.Combat.RegenerateHealthWhileInCombat;
+            }
+
+            if (!regenerateHealthWhileInCombat && this.IsNpcRegenBlocked(npc))
 
             {
 
@@ -214,9 +230,13 @@ namespace ZoneEngine.Core.Playfields
 
             }
 
+            if (regenerateHealthWhileInCombat)
+            {
+                byte ignored;
+                this.npcRegenSuspendedForCombat.TryRemove(npcInstance, out ignored);
+            }
 
 
-            int maxHealth = npc.Stats[StatIds.life].Value;
 
             if (!PlayfieldCharacterHeartbeatHealthRules.CanRegenerateNpcHealth(
                 currentHealth,
@@ -243,13 +263,11 @@ namespace ZoneEngine.Core.Playfields
 
 
 
-            int healDelta = PetCombatRules.ResolveNpcHealthRegenDelta(maxHealth);
-
             npc.Stats[StatIds.health].Value = Math.Min(maxHealth, currentHealth + healDelta);
 
             this.nextNpcHealthRegenUtc[npcInstance] =
 
-                now.AddSeconds(PetCombatRules.NpcHealthRegenIntervalSeconds);
+                now.AddSeconds(regenIntervalSeconds);
 
             sendChangedStats(npc);
 

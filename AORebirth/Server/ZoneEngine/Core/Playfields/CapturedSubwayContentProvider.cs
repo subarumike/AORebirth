@@ -131,7 +131,9 @@ namespace ZoneEngine.Core.Playfields
             CapturedSurveySpawn(Mugger(0x7957E5C7, 8, 146, 153.4413f, 107.613258f, 297.974335f, 94, 30)),
             CapturedSurveySpawn(Mugger(0x7957E5C8, 8, 146, 145.386154f, 107.613258f, 289.6806f, 94, 30)),
             CapturedSurveySpawn(Mugger(0x7957E5CA, 10, 182, 267.640045f, 107.611687f, 287.824371f, 95, 36)),
-            CapturedSurveySpawn(Thief(0x7953AEA5, 5, 115, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0)),
+            // Capture 20260717-012651: current health regenerated from 115 to the
+            // confirmed full-health ceiling of 146 before the fight began.
+            CapturedSurveySpawn(Thief(0x7953AEA5, 5, 146, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0, healthDamage: 31)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AA4A, 10, 182, 198.0572f, 108.416405f, 191.596924f, 95, 27)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AD40, 6, 110, 148.6321f, 107.6164f, 189.491272f, 93, 18)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AD48, 7, 128, 190.403168f, 107.6164f, 164.9011f, 94, 20)),
@@ -638,7 +640,8 @@ namespace ZoneEngine.Core.Playfields
             float? patrolY = null,
             float? patrolZ = null,
             bool useSpawnAsPatrolStart = false,
-            double? respawnDelaySeconds = null)
+            double? respawnDelaySeconds = null,
+            int healthDamage = 0)
         {
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
@@ -661,7 +664,8 @@ namespace ZoneEngine.Core.Playfields
                 patrolY,
                 patrolZ,
                 useSpawnAsPatrolStart,
-                respawnDelaySeconds);
+                respawnDelaySeconds,
+                healthDamage);
         }
 
         private static CapturedSubwaySpawnDefinition ViolentVagabond(
@@ -717,7 +721,8 @@ namespace ZoneEngine.Core.Playfields
             float? patrolY = null,
             float? patrolZ = null,
             bool useSpawnAsPatrolStart = false,
-            double? respawnDelaySeconds = null)
+            double? respawnDelaySeconds = null,
+            int healthDamage = 0)
         {
             this.SourceInstance = sourceInstance;
             this.ContentSection = "CapturedPopulation";
@@ -726,6 +731,7 @@ namespace ZoneEngine.Core.Playfields
             this.MonsterData = monsterData;
             this.Level = level;
             this.Health = health;
+            this.HealthDamage = healthDamage;
             this.MonsterScale = monsterScale;
             this.HeadMesh = headMesh;
             this.RunSpeed = runSpeed;
@@ -757,6 +763,8 @@ namespace ZoneEngine.Core.Playfields
         public int Level { get; private set; }
 
         public int Health { get; private set; }
+
+        public int HealthDamage { get; private set; }
 
         public int MonsterScale { get; private set; }
 
