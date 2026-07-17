@@ -1,6 +1,6 @@
 # Generic Ordinary-Enemy Runtime
 
-Population ownership: profile-backed Subway rows are activated and respawned by `WorldPopulationController`. `OrdinaryEnemyRuntimeService` materializes requested rows only and does not enumerate population or own respawn timers. The catalog remains the capture-backed adapter with 260 rows, 222 active, and 38 quarantined.
+Population ownership: profile-backed Subway rows are activated and respawned by `WorldPopulationController`. `OrdinaryEnemyRuntimeService` materializes requested rows only and does not enumerate population or own respawn timers. The catalog remains the capture-backed adapter with 321 rows, 283 active, and 38 quarantined.
 
 ## Decision
 
@@ -129,15 +129,17 @@ services remain their established owners.
 ## Subway migration
 
 The catalog normalizes all existing supported-family and generated ordinary
-Subway evidence into 18 reusable type profiles and 260 exact spawn rows:
+Subway evidence into 26 reusable type profiles and 321 exact spawn rows:
 
 - supported profiles: Filth Flea, Discarded Pet, Disobedient Bot, Mugger, Thief,
   and Violent Vagabond;
 - generated ordinary profiles: Shadow, Stim Fiend, Workman Striker, Architect
-  Striker, Workman, Architect, Looter, Deranged Shopper, Infector, Striker, and
-  Lost Thought, and Bloodcreeper.
+  Striker, Workman, Architect, Looter, Deranged Shopper, Infector, Striker,
+  Lost Thought, Bloodcreeper, Empty Shell, Fragmented Soul, Incomplete Rebuild,
+  Melded Patterns, Molested Molecules, Premature Pattern, Redundant Scan, and
+  Uncontrollable Anger.
 
-The existing safe activation boundary remains 222 active rows. The 29
+The existing safe activation boundary is 283 active rows. The 29
 supported-family and 9 generated ordinary rows in the PF127 diagnostic slice
 remain present as data but quarantined by default. Profile or spawn existence
 does not enable a row.
@@ -211,8 +213,10 @@ does not establish an empty pool, so Bloodcreeper item loot remains explicitly
 unresolved and inactive; its proven 150-credit behavior is independent of the
 item-pool boundary.
 
-This loot slice does not activate population content. The catalog remains 260
-represented rows, 222 active rows, and 38 quarantined rows.
+The restored deep-population slice uses strict initial corpse snapshots, including
+empty snapshots, when calculating observed item frequencies. It does not infer
+guaranteed loot from a successful roll. The catalog now contains 321 represented
+rows, 283 active rows, and 38 quarantined rows.
 
 ## Ordinary respawn policy
 

@@ -21,12 +21,16 @@ CAPTURES = (
     "20260709-212336",
     "20260709-220439",
     "20260709-222339",
+    "20260709-225408",
     "20260710-205400",
+    "20260710-211430",
     "20260716-033326",
     "20260716-034104",
     "20260716-034433",
     "20260716-034559",
     "20260716-220400",
+    "20260716-221358",
+    "20260716-222201",
 )
 CAPTURE_ENEMY_FILTERS = {
     "20260716-034433": frozenset({"Vergil Aeneid"}),
@@ -49,7 +53,8 @@ CADENCE_UNRESOLVED_ENEMIES = frozenset({"Vergil Aeneid"})
 OUTPUT = REPO / "docs" / "generated" / "subway_enemy_combat_contracts.json"
 
 ATTACK_DETAIL = re.compile(
-    r"WeaponSlot=(?P<slot>-?\d+).*Unk1=(?P<unknown>-?\d+).*WeaponInstance=(?P<instance>-?\d+)"
+    r"WeaponSlot=(?P<slot>-?\d+).*Unk1=(?P<unknown>-?\d+).*"
+    r"HitType=(?P<hit_type>\w+).*WeaponInstance=(?P<instance>-?\d+)"
 )
 WEAPON_UPDATE = re.compile(
     r"type=WeaponItemFullUpdate identity=\(WeaponInstance:(?P<weapon>[0-9A-F]+)\).*"
@@ -135,6 +140,7 @@ def attack_evidence(row: dict[str, str], capture_name: str, source: str):
         "amount": amount,
         "weaponSlot": int(match.group("slot")),
         "attackInfoUnknown": int(match.group("unknown")),
+        "hitType": match.group("hit_type"),
         "weaponInstance": int(match.group("instance")),
     }
 
@@ -212,8 +218,7 @@ def main():
                     elif parsed_attack is not None:
                         role_evidence["attacks"].append(parsed_attack)
             if (
-                enemy["name"] in LOCAL_PLAYER_TARGET_ONLY_ENEMIES
-                and message_type in {"Attack", "AttackInfo"}
+                message_type in {"Attack", "AttackInfo"}
                 and row.get("TargetRole") != "local-player"
             ):
                 continue
@@ -249,6 +254,8 @@ def main():
     report = {}
     for name, group in sorted(grouped.items()):
         attacks = group["attacks"]
+        normal_attacks = [row for row in attacks if row["hitType"] == "Normal"]
+        critical_attacks = [row for row in attacks if row["hitType"] == "Critical"]
         intervals = []
         by_identity_shape = defaultdict(list)
         if name not in CADENCE_UNRESOLVED_ENEMIES:
@@ -337,6 +344,12 @@ def main():
             "attackInfoRows": len(attacks),
             "minDamage": min((row["amount"] for row in attacks), default=0),
             "maxDamage": max((row["amount"] for row in attacks), default=0),
+            "normalAttackInfoRows": len(normal_attacks),
+            "normalMinDamage": min((row["amount"] for row in normal_attacks), default=0),
+            "normalMaxDamage": max((row["amount"] for row in normal_attacks), default=0),
+            "criticalAttackInfoRows": len(critical_attacks),
+            "criticalMinDamage": min((row["amount"] for row in critical_attacks), default=0),
+            "criticalMaxDamage": max((row["amount"] for row in critical_attacks), default=0),
             "medianRechargeSeconds": intervals[(len(intervals) - 1) // 2] if intervals else 0.0,
             "weaponSlot": slot,
             "attackInfoUnknown": unknown,

@@ -101,6 +101,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void StrictDeepCorpseSnapshotsKeepEmptyOutcomesInLootDenominators()
+        {
+            OrdinaryEnemyLootEntry redundant = Profile("Redundant Scan").Loot.Entries
+                .Single(value => value.LowId == 27263);
+            Assert.AreEqual(1, redundant.ObservedCount);
+            Assert.AreEqual(2, redundant.ObservedCorpses);
+            Assert.AreEqual(5000, redundant.DropChanceBasisPoints);
+
+            OrdinaryEnemyLootEntry molested = Profile("Molested Molecules").Loot.Entries
+                .Single(value => value.LowId == 301713);
+            Assert.AreEqual(1, molested.ObservedCount);
+            Assert.AreEqual(8, molested.ObservedCorpses);
+            Assert.AreEqual(1250, molested.DropChanceBasisPoints);
+            Assert.IsTrue(molested.EvidenceReference.Contains("20260716-221358"));
+
+            OrdinaryEnemyLootEntry slumRunner = Profile("Slum Runner").Loot.Entries
+                .Single(value => value.LowId == 234876);
+            Assert.AreEqual(2, slumRunner.ObservedCount);
+            Assert.AreEqual(18, slumRunner.ObservedCorpses);
+            Assert.AreEqual(1111, slumRunner.DropChanceBasisPoints);
+        }
+
+        [TestMethod]
         public void AdapterPreservesCapturedItemIdentityAndEvidence()
         {
             OrdinaryEnemyProfile profile = Profile("Disobedient Bot");

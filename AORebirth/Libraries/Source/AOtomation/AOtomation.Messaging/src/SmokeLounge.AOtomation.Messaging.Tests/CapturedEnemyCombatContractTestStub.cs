@@ -13,6 +13,12 @@ namespace AORebirth.Core.Playfields
         internal CapturedEnemyAttackModel AttackModel { get; set; }
 
         internal bool IsCombatReady { get; set; }
+
+        internal string Evidence { get; set; }
+
+        internal int MinDamage { get; set; }
+
+        internal int MaxDamage { get; set; }
     }
 
     internal static class CapturedSubwayCombatCatalog
@@ -25,7 +31,21 @@ namespace AORebirth.Core.Playfields
         internal static CapturedEnemyCombatContract ForOrdinary(
             CapturedSubwayOrdinaryArchetypeDefinition archetype)
         {
-            return new CapturedEnemyCombatContract();
+            bool observed = archetype != null
+                            && archetype.Combat != null
+                            && archetype.Combat.Observed;
+            return new CapturedEnemyCombatContract
+            {
+                AttackModel = observed
+                    ? CapturedEnemyAttackModel.FixedAttackInfo
+                    : CapturedEnemyAttackModel.Unresolved,
+                IsCombatReady = observed,
+                Evidence = archetype == null
+                    ? string.Empty
+                    : string.Join(",", archetype.EvidenceCaptures),
+                MinDamage = observed ? archetype.Combat.MinDamage : 0,
+                MaxDamage = observed ? archetype.Combat.MaxDamage : 0
+            };
         }
     }
 }
