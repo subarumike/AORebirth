@@ -4,10 +4,13 @@ namespace ZoneEngine.Core.Navigation
     {
         internal const int SubwayPlayfieldResource = 127;
 
-        // This is the first bounded private-server PF127 leash. It keeps the
-        // observed open-door combat case inside the leash while preventing a
-        // hostile NPC from being dragged across the full Subway playfield.
-        internal const double SubwayMaximumDistanceFromHome = 100.0;
+        // PF127 keeps its accepted private-server default, while captured
+        // encounters may provide a narrower NPC travel limit. Target distance
+        // remains a separate safety boundary so a fleeing target does not make
+        // an encounter reset before the NPC reaches its captured travel limit.
+        internal const double SubwayDefaultMaximumNpcDistanceFromHome = 100.0;
+
+        internal const double SubwayMaximumTargetDistanceFromHome = 100.0;
 
         internal const double ReturnCompletionDistance = 0.75;
 
@@ -25,18 +28,40 @@ namespace ZoneEngine.Core.Navigation
             ChaseNavigationPoint npc,
             ChaseNavigationPoint target)
         {
+            return ShouldResetCombat(
+                playfieldResource,
+                isPlayerOwnedPet,
+                home,
+                npc,
+                target,
+                SubwayDefaultMaximumNpcDistanceFromHome);
+        }
+
+        internal static bool ShouldResetCombat(
+            int playfieldResource,
+            bool isPlayerOwnedPet,
+            ChaseNavigationPoint home,
+            ChaseNavigationPoint npc,
+            ChaseNavigationPoint target,
+            double maximumNpcDistanceFromHome)
+        {
             if (!Applies(playfieldResource, isPlayerOwnedPet))
             {
                 return false;
             }
 
-            if (!home.IsFinite || !npc.IsFinite || !target.IsFinite)
+            if (!home.IsFinite
+                || !npc.IsFinite
+                || !target.IsFinite
+                || double.IsNaN(maximumNpcDistanceFromHome)
+                || double.IsInfinity(maximumNpcDistanceFromHome)
+                || maximumNpcDistanceFromHome <= 0.0)
             {
                 return true;
             }
 
-            return home.Distance2D(npc) > SubwayMaximumDistanceFromHome
-                   || home.Distance2D(target) > SubwayMaximumDistanceFromHome;
+            return home.Distance2D(npc) > maximumNpcDistanceFromHome
+                   || home.Distance2D(target) > SubwayMaximumTargetDistanceFromHome;
         }
 
         internal static bool HasReturnedHome(

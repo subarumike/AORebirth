@@ -2,12 +2,12 @@
 
 ## Current Focus
 
-Named-boss lifecycle evidence and finalized Abmouth capture `20260716-220400`
-are integrated. Abmouth and Vergil now use a ten-minute post-death respawn, a
-30-minute loot-bearing corpse, and the universal three-second empty cleanup.
-The next active boundary remains the bounded private Bloodcreeper smoke. After
-that smoke, continue the next Subway enemy from the existing corpus through the
-shared ordinary runtime.
+Finalized Vergil capture `20260716-222007` is integrated as a boss-only
+`40`-unit NPC travel leash while the shared PF127 and target-distance safety
+boundaries remain `100`. The next active boundary is a bounded private Vergil
+leash smoke. After that smoke, return to the bounded Bloodcreeper smoke and then
+continue the next Subway enemy from the existing corpus through the shared
+ordinary runtime.
 
 ## Done in this slice
 
@@ -87,18 +87,27 @@ shared ordinary runtime.
   item-plus-`587`-credit snapshot without mixing its slots with the older corpse.
 - Abmouth capture evidence keeps four player-facing hits separate from ten hits
   against the player-owned Healer and Wrath Incarnation pets.
+- Vergil capture `20260716-222007` contains two reset cycles with `40.52` and
+  `40.30` unit homeward paths. Vergil now resets only after his own travel from
+  home exceeds `40`; his target may remain beyond `40` without prematurely
+  triggering that boss override, while the existing `100`-unit target safety
+  boundary remains intact. Other PF127 NPCs retain the shared `100`-unit
+  private policy.
 
 ## Remaining
 
-1. Run the bounded private Bloodcreeper smoke: level `15..25`, Bite, Spit,
+1. Run the bounded private Vergil leash smoke: draw him beyond `40` units from
+   his activation home while remaining within the shared `100`-unit target
+   boundary; confirm combat clears, he routes home, and healing state resets.
+2. Run the bounded private Bloodcreeper smoke: level `15..25`, Bite, Spit,
    chase, corpse, 150 credits, unresolved/empty item handling, close/reopen,
    cleanup, 240-second respawn, and no duplicate generation.
-2. If later loot evidence is required, collect only the remaining bounded
+3. If later loot evidence is required, collect only the remaining bounded
    samples: eight strict complete Bloodcreeper outcomes and three strict complete
    Disobedient Bot outcomes. No new live capture is requested in this task, and
    combat, geometry, LOS, navigation, chase, leash, and respawn do not need to be
    recaptured for this loot boundary.
-3. Continue the next whole-enemy slice from the existing corpus first. Keep
+4. Continue the next whole-enemy slice from the existing corpus first. Keep
    fixed-level rows fixed until capture evidence or an approved design decision
    establishes a range.
 
@@ -127,5 +136,8 @@ confirmation establishes that value.
 - Named-boss respawn starts at death and must not wait for a 30-minute corpse.
 - Existing encounter, pet, vendor, static, quest, navigation, LOS, leash, corpse,
   loot, and combat ownership remains unchanged.
+- Do not generalize Vergil's captured `40`-unit NPC travel limit to Abmouth,
+  Infectors, or ordinary PF127 enemies. Do not invent a dynamic home anchor from
+  a capture that began with Vergil already visible and fighting.
 - Do not auto-attach or launch AO/capture tooling. Mike runs gameplay and supplies
   completed captures when requested.

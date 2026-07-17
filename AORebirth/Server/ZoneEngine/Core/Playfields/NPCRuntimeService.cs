@@ -133,10 +133,23 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            double maximumNpcDistanceFromHome =
+                NpcCombatLeashPolicy.SubwayDefaultMaximumNpcDistanceFromHome;
+            CapturedEncounterRuntimeDefinition encounterDefinition;
+            if (CapturedEncounterRuntimeRegistry.TryGet(
+                    character.Identity.Instance,
+                    out encounterDefinition)
+                && encounterDefinition.MaximumNpcLeashDistanceFromHome.HasValue)
+            {
+                maximumNpcDistanceFromHome =
+                    encounterDefinition.MaximumNpcLeashDistanceFromHome.Value;
+            }
+
             this.npcHomeStates[character.Identity.Instance] =
                 new NpcHomeState
                 {
-                    Coordinates = new Coordinate(character.Coordinates())
+                    Coordinates = new Coordinate(character.Coordinates()),
+                    MaximumNpcDistanceFromHome = maximumNpcDistanceFromHome
                 };
         }
 
@@ -354,10 +367,11 @@ namespace AORebirth.Core.Playfields
                     playerControlledPet,
                     homePoint,
                     npcPoint,
-                    attackerPoint))
+                    attackerPoint,
+                    home.MaximumNpcDistanceFromHome))
                 {
                     if (homePoint.Distance2D(npcPoint)
-                        > NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome)
+                        > home.MaximumNpcDistanceFromHome)
                     {
                         this.BeginLeashReturn(target, home);
                     }
@@ -537,7 +551,8 @@ namespace AORebirth.Core.Playfields
                     false,
                     ToNavigationPoint(home.Coordinates.coordinate),
                     ToNavigationPoint(npc.Coordinates().coordinate),
-                    ToNavigationPoint(target.Coordinates().coordinate)))
+                    ToNavigationPoint(target.Coordinates().coordinate),
+                    home.MaximumNpcDistanceFromHome))
             {
                 return false;
             }
@@ -587,7 +602,7 @@ namespace AORebirth.Core.Playfields
                     npc.Identity,
                     home.Coordinates.coordinate,
                     npc.Coordinates().coordinate,
-                    NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome));
+                    home.MaximumNpcDistanceFromHome));
         }
 
         private bool TryProcessLeashReturn(ICharacter npc, DateTime utcNow)
@@ -696,6 +711,8 @@ namespace AORebirth.Core.Playfields
         private class NpcHomeState
         {
             public Coordinate Coordinates { get; set; }
+
+            public double MaximumNpcDistanceFromHome { get; set; }
 
             public bool ReturningHome { get; set; }
 
