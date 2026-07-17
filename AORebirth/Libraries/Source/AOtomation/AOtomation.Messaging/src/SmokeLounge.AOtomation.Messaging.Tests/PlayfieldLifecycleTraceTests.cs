@@ -5484,6 +5484,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void SubwayProxyExitLandingClearsEntryTriggerRadius()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string exitProxyText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\exitproxyplayfield.cs"));
+            string statelTransitionText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
+
+            Assert.IsTrue(
+                statelTransitionText.Contains("private const float CapturedSubwayEntryRadius = 4.0f;")
+                && exitProxyText.Contains("private const float CapturedSubwayExitDoorOffset = 6.0f;")
+                && exitProxyText.Contains("externalPlayfieldId == CapturedSubwayEntrySourcePlayfieldId")
+                && exitProxyText.Contains("externalDoorInstance == CapturedSubwayEntrySourceDoorInstance")
+                && exitProxyText.Contains("? CapturedSubwayExitDoorOffset")
+                && exitProxyText.Contains(": DefaultExitDoorOffset;"),
+                "The Subway exit must land beyond the PF655 proxy-entry radius without changing other proxy exits.");
+        }
+
+        [TestMethod]
         public void PacketSequencingCoordinatorFinalOwnershipGuardrailKeepsRuntimeMechanicsOut()
         {
             string repositoryRoot = FindRepositoryRoot();

@@ -2,16 +2,21 @@
 
 ## Current Focus
 
-Finalized Thief capture `20260717-012651` is integrated as a bounded correction
-to the accepted first-room enemy. The runtime now represents maximum/current
-health as `146/115`, applies the observed one-point-per-second recovery including
-during combat, and follows the global normal-enemy rule that loot-bearing corpses
-remain for four minutes across close/reopen. The next action is one private Thief
-smoke before returning to the already-planned capture indexing and Bloodcreeper
-work.
+The active regression is the Subway exit loop. Generic proxy exits land only
+`2.5` units beyond their external door, but the PF655 Subway proxy-entry trigger
+has a `4.0`-unit radius. The Subway-specific exit now lands `6.0` units beyond
+door `0xC01A028F`, outside the entry trigger, without changing other proxy exits.
+Private exit validation is next; the Thief loot-corpse smoke remains pending
+immediately afterward.
 
 ## Done in this slice
 
+- Git history confirms the corpse-lifecycle commits did not change Subway
+  zoning. The exit loop came from the older mismatch between the generic
+  `2.5`-unit external-door offset and the `4.0`-unit Subway entry radius.
+- PF655 door `0xC01A028F` now uses a Subway-only `6.0`-unit exit offset. Other
+  proxy exits retain the generic `2.5`-unit behavior. The Debug build and the
+  focused exit-radius guardrail test pass.
 - Finalized capture `20260717-012651` is decoded and usable without recapture.
   It proves maximum/current Thief health `146/115`, one-point-per-second passive
   recovery, and two live misses without establishing a miss probability.
@@ -113,23 +118,25 @@ work.
 
 ## Remaining
 
-1. Run one private Thief smoke: allow the initial `115/146` health state to
+1. Walk through the Subway exit once and confirm the character remains outside
+   PF127 instead of being pulled back into the entrance trigger.
+2. Run one private Thief smoke: allow the initial `115/146` health state to
    recover, fight normally, open the handbag corpse, leave the item, close the
    loot window, confirm the corpse remains and can be reopened, and confirm its
    four-minute loot-bearing lifetime is not shortened by either action.
-2. Index finalized captures `20260716-221358` and `20260716-222201` before
+3. Index finalized captures `20260716-221358` and `20260716-222201` before
    requesting any new gameplay capture. Preserve each identity-linked combat,
    death, corpse, loot, and movement observation without generalizing it to an
    unsupported enemy type.
-3. Run the bounded private Bloodcreeper smoke: level `15..25`, Bite, Spit,
+4. Run the bounded private Bloodcreeper smoke: level `15..25`, Bite, Spit,
    chase, corpse, 150 credits, unresolved/empty item handling, close/reopen,
    cleanup, 240-second respawn, and no duplicate generation.
-4. If later loot evidence is required, collect only the remaining bounded
+5. If later loot evidence is required, collect only the remaining bounded
    samples: eight strict complete Bloodcreeper outcomes and three strict complete
    Disobedient Bot outcomes. No new live capture is requested in this task, and
    combat, geometry, LOS, navigation, chase, leash, and respawn do not need to be
    recaptured for this loot boundary.
-5. Continue the next whole-enemy slice from the existing corpus first. Keep
+6. Continue the next whole-enemy slice from the existing corpus first. Keep
    fixed-level rows fixed until capture evidence or an approved design decision
    establishes a range.
 
