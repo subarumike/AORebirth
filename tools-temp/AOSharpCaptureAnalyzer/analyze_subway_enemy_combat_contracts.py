@@ -24,14 +24,21 @@ CAPTURES = (
     "20260710-205400",
     "20260716-033326",
     "20260716-034104",
+    "20260716-034433",
     "20260716-034559",
 )
 CAPTURE_ENEMY_FILTERS = {
+    "20260716-034433": frozenset({"Vergil Aeneid"}),
     "20260716-034559": frozenset({"Melded Patterns"}),
 }
-# Melded Patterns captures include hits against the player's Healer pet. Keep
-# player-facing retaliation and damage evidence restricted to the local player.
-LOCAL_PLAYER_TARGET_ONLY_ENEMIES = frozenset({"Melded Patterns"})
+# Melded Patterns and Vergil captures include hits against player-owned pets.
+# Keep player-facing retaliation and damage restricted to the local player.
+LOCAL_PLAYER_TARGET_ONLY_ENEMIES = frozenset({"Melded Patterns", "Vergil Aeneid"})
+TARGET_ROLE_EVIDENCE_ENEMIES = frozenset({"Vergil Aeneid"})
+PLAYER_OWNED_PET_TARGETS = {
+    "20260716-034433": frozenset({"(SimpleChar:796D400B)"}),
+}
+CADENCE_UNRESOLVED_ENEMIES = frozenset({"Vergil Aeneid"})
 OUTPUT = REPO / "docs" / "generated" / "subway_enemy_combat_contracts.json"
 
 ATTACK_DETAIL = re.compile(
@@ -108,6 +115,33 @@ def capture_includes_enemy(capture_name: str, enemy_name: str) -> bool:
     return allowed_enemies is None or enemy_name in allowed_enemies
 
 
+def attack_evidence(row: dict[str, str], capture_name: str, source: str):
+    amount = int(row.get("Amount") or 0)
+    detail = row.get("Detail", "")
+    match = ATTACK_DETAIL.search(detail)
+    if amount <= 0 or not match:
+        return None
+    return {
+        "capture": capture_name,
+        "identity": source,
+        "capturedUtc": row["CapturedUtc"],
+        "amount": amount,
+        "weaponSlot": int(match.group("slot")),
+        "attackInfoUnknown": int(match.group("unknown")),
+        "weaponInstance": int(match.group("instance")),
+    }
+
+
+def target_evidence_role(capture_name: str, row: dict[str, str]) -> str:
+    if row.get("TargetRole") == "local-player":
+        return "localPlayer"
+    if row.get("TargetIdentity") in PLAYER_OWNED_PET_TARGETS.get(
+        capture_name, frozenset()
+    ):
+        return "playerOwnedPet"
+    return ""
+
+
 def main():
     grouped = defaultdict(
         lambda: {
@@ -117,6 +151,14 @@ def main():
             "attacks": [],
             "weapons": [],
             "monsterData": set(),
+            "targetRoleEvidence": defaultdict(
+                lambda: {
+                    "captures": set(),
+                    "targetIdentities": set(),
+                    "retaliationRows": 0,
+                    "attacks": [],
+                }
+            ),
         }
     )
 
@@ -138,36 +180,43 @@ def main():
             ):
                 continue
             message_type = row.get("MessageType")
+            group = grouped[enemy["name"]]
+            group["identities"].add(source)
+            group["captures"].add(capture_name)
+            group["monsterData"].add(enemy["monsterData"])
+            parsed_attack = (
+                attack_evidence(row, capture_name, source)
+                if message_type == "AttackInfo"
+                else None
+            )
+            if (
+                enemy["name"] in TARGET_ROLE_EVIDENCE_ENEMIES
+                and message_type in {"Attack", "AttackInfo"}
+            ):
+                evidence_role = target_evidence_role(capture_name, row)
+                if evidence_role:
+                    role_evidence = group["targetRoleEvidence"][evidence_role]
+                    role_evidence["captures"].add(capture_name)
+                    target_identity = row.get("TargetIdentity", "")
+                    if target_identity:
+                        role_evidence["targetIdentities"].add(target_identity)
+                    if message_type == "Attack":
+                        role_evidence["retaliationRows"] += 1
+                    elif parsed_attack is not None:
+                        role_evidence["attacks"].append(parsed_attack)
             if (
                 enemy["name"] in LOCAL_PLAYER_TARGET_ONLY_ENEMIES
                 and message_type in {"Attack", "AttackInfo"}
                 and row.get("TargetRole") != "local-player"
             ):
                 continue
-            group = grouped[enemy["name"]]
-            group["identities"].add(source)
-            group["captures"].add(capture_name)
-            group["monsterData"].add(enemy["monsterData"])
             if message_type == "Attack":
                 group["retaliationRows"] += 1
             if message_type != "AttackInfo":
                 continue
-            amount = int(row.get("Amount") or 0)
-            detail = row.get("Detail", "")
-            match = ATTACK_DETAIL.search(detail)
-            if amount <= 0 or not match:
+            if parsed_attack is None:
                 continue
-            group["attacks"].append(
-                {
-                    "capture": capture_name,
-                    "identity": source,
-                    "capturedUtc": row["CapturedUtc"],
-                    "amount": amount,
-                    "weaponSlot": int(match.group("slot")),
-                    "attackInfoUnknown": int(match.group("unknown")),
-                    "weaponInstance": int(match.group("instance")),
-                }
-            )
+            group["attacks"].append(parsed_attack)
 
         events_path = folder / "events.log"
         if events_path.exists():
@@ -195,22 +244,23 @@ def main():
         attacks = group["attacks"]
         intervals = []
         by_identity_shape = defaultdict(list)
-        for attack in attacks:
-            by_identity_shape[
-                (
-                    attack["capture"],
-                    attack["identity"],
-                    attack["weaponSlot"],
-                    attack["attackInfoUnknown"],
-                    attack["weaponInstance"],
-                )
-            ].append(parse_time(attack["capturedUtc"]))
-        for times in by_identity_shape.values():
-            times.sort()
-            for previous, current in zip(times, times[1:]):
-                seconds = (current - previous).total_seconds()
-                if 0.5 <= seconds <= 10.0:
-                    intervals.append(seconds)
+        if name not in CADENCE_UNRESOLVED_ENEMIES:
+            for attack in attacks:
+                by_identity_shape[
+                    (
+                        attack["capture"],
+                        attack["identity"],
+                        attack["weaponSlot"],
+                        attack["attackInfoUnknown"],
+                        attack["weaponInstance"],
+                    )
+                ].append(parse_time(attack["capturedUtc"]))
+            for times in by_identity_shape.values():
+                times.sort()
+                for previous, current in zip(times, times[1:]):
+                    seconds = (current - previous).total_seconds()
+                    if 0.5 <= seconds <= 10.0:
+                        intervals.append(seconds)
         intervals.sort()
         attack_shapes = Counter(
             (row["weaponSlot"], row["attackInfoUnknown"], row["weaponInstance"])
@@ -236,17 +286,18 @@ def main():
                 == (shape_slot, shape_unknown, shape_instance)
             ]
             shape_intervals = []
-            matching_by_identity = defaultdict(list)
-            for row in matching:
-                matching_by_identity[(row["capture"], row["identity"])].append(
-                    parse_time(row["capturedUtc"])
-                )
-            for times in matching_by_identity.values():
-                times.sort()
-                for previous, current in zip(times, times[1:]):
-                    seconds = (current - previous).total_seconds()
-                    if 0.5 <= seconds <= 10.0:
-                        shape_intervals.append(seconds)
+            if name not in CADENCE_UNRESOLVED_ENEMIES:
+                matching_by_identity = defaultdict(list)
+                for row in matching:
+                    matching_by_identity[(row["capture"], row["identity"])].append(
+                        parse_time(row["capturedUtc"])
+                    )
+                for times in matching_by_identity.values():
+                    times.sort()
+                    for previous, current in zip(times, times[1:]):
+                        seconds = (current - previous).total_seconds()
+                        if 0.5 <= seconds <= 10.0:
+                            shape_intervals.append(seconds)
             shape_intervals.sort()
             attack_shape_evidence.append(
                 {
@@ -269,7 +320,7 @@ def main():
             )
         slot, unknown, instance = attack_shapes.most_common(1)[0][0] if attack_shapes else (0, 0, 0)
         template_id, quality = weapon_shapes.most_common(1)[0][0] if weapon_shapes else (0, 0)
-        report[name] = {
+        report_entry = {
             "monsterData": sorted(group["monsterData"]),
             "captures": sorted(group["captures"]),
             "identities": sorted(group["identities"]),
@@ -284,10 +335,35 @@ def main():
             "attackInfoUnknown": unknown,
             "attackInfoWeaponInstance": instance,
             "attackShapes": attack_shape_evidence,
-            "equippedWeaponObserved": bool(weapon_shapes),
-            "equippedWeaponTemplateId": template_id,
-            "equippedWeaponQuality": quality,
         }
+        if name in TARGET_ROLE_EVIDENCE_ENEMIES:
+            target_role_evidence = {}
+            for evidence_role in ("localPlayer", "playerOwnedPet"):
+                role_evidence = group["targetRoleEvidence"][evidence_role]
+                role_attacks = role_evidence["attacks"]
+                target_role_evidence[evidence_role] = {
+                    "captures": sorted(role_evidence["captures"]),
+                    "targetIdentities": sorted(role_evidence["targetIdentities"]),
+                    "retaliationRows": role_evidence["retaliationRows"],
+                    "attackInfoRows": len(role_attacks),
+                    "minDamage": min(
+                        (row["amount"] for row in role_attacks), default=0
+                    ),
+                    "maxDamage": max(
+                        (row["amount"] for row in role_attacks), default=0
+                    ),
+                }
+            report_entry["targetRoleEvidence"] = target_role_evidence
+        if name in CADENCE_UNRESOLVED_ENEMIES:
+            report_entry["cadenceStatus"] = "unresolved-mixed-target-fight"
+        report_entry.update(
+            {
+                "equippedWeaponObserved": bool(weapon_shapes),
+                "equippedWeaponTemplateId": template_id,
+                "equippedWeaponQuality": quality,
+            }
+        )
+        report[name] = report_entry
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
