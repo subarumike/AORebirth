@@ -2416,10 +2416,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string corpseRulesText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
-            string corpseAccessText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs"));
 
             string[] acceptedEnemyKeys =
                 {
@@ -2531,14 +2527,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.FromSeconds(3)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(5)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)")
                 && catalogText.Contains("OrdinaryEnemyCorpsePacketProfile.CapturedThief")
-                && catalogText.Contains("0.44);")
-                && playfieldText.Contains("CloseWithLootCleanupDelay = closeWithLootCleanupDelay")
-                && corpseAccessText.Contains("!isEmpty(corpse) && closeWithLootCleanupDelay.HasValue")
-                && corpseAccessText.Contains("\"closed-with-loot-profile\"")
-                && CountOccurrences(catalogText, "3.0,\n                300.0,\n                3.0") == 3,
-                "Accepted Subway Thief must keep its captured corpse visual, five-minute open lifetime, 0.44-second close-with-loot cleanup, and universal three-second empty cleanup.");
+                && CountOccurrences(catalogText, "3.0,\n                240.0,\n                3.0") == 3,
+                "Accepted Subway Thief must keep its captured corpse visual, four-minute loot-bearing lifetime across close/reopen, and universal three-second empty cleanup.");
         }
 
         [TestMethod]
@@ -2564,10 +2556,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("ordinaryDefinition.Profile.Corpse.UnlootedLifetimeSeconds")
                 && playfieldText.Contains("ordinaryDefinition.Profile.Corpse.LootedCleanupSeconds")
-                && playfieldText.Contains("ordinaryDefinition.Profile.Corpse.CloseWithLootCleanupSeconds")
                 && playfieldText.Contains("selectedCorpse.ItemLootLifetime")
-                && playfieldText.Contains("selectedCorpse.EmptyCleanupDelay")
-                && playfieldText.Contains("selectedCorpse.CloseWithLootCleanupDelay"),
+                && playfieldText.Contains("selectedCorpse.EmptyCleanupDelay"),
                 "Corpse access and final-loot cleanup must consume the ordinary profile lifetime values.");
 
             Assert.IsTrue(
@@ -4371,10 +4361,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
                 && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3);")
                 && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(3);")
-                && corpseRulesText.Contains("public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(5);")
+                && corpseRulesText.Contains("public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(4);")
                 && registerCorpse.Contains("CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);")
                 && corpseRulesText.Contains("unlootedItemCount <= 0 && unlootedCredits <= 0")
-                && CountOccurrences(ordinaryCatalogText, "3.0,\n                300.0,\n                3.0") == 3,
+                && CountOccurrences(ordinaryCatalogText, "3.0,\n                240.0,\n                3.0") == 3,
                 "Regular loot-bearing corpses must retain five minutes, while every born-empty or fully emptied corpse uses exactly three seconds.");
             AssertTextBefore(
                 registerCorpse,
@@ -6664,8 +6654,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     OrdinaryEnemyCorpsePacketProfile.Generic,
                     30.0,
                     300.0,
-                    1.0,
-                    null),
+                    1.0),
                 new[] { "test-evidence" },
                 bossOrScripted,
                 ownedSummon);

@@ -5,19 +5,20 @@
 Finalized Thief capture `20260717-012651` is integrated as a bounded correction
 to the accepted first-room enemy. The runtime now represents maximum/current
 health as `146/115`, applies the observed one-point-per-second recovery including
-during combat, and uses the captured 0.44-second corpse despawn after closing
-with the handbag still present. The next action is one private Thief smoke before
-returning to the already-planned capture indexing and Bloodcreeper work.
+during combat, and follows the global normal-enemy rule that loot-bearing corpses
+remain for four minutes across close/reopen. The next action is one private Thief
+smoke before returning to the already-planned capture indexing and Bloodcreeper
+work.
 
 ## Done in this slice
 
 - Finalized capture `20260717-012651` is decoded and usable without recapture.
   It proves maximum/current Thief health `146/115`, one-point-per-second passive
   recovery, and two live misses without establishing a miss probability.
-- The same capture explicitly records the unlooted Stolen Handbag remaining in
-  the inventory snapshot, the loot-window close acknowledgement, and corpse
-  despawn 0.44 seconds later. That close rule is Thief-only profile data; the
-  shared five-minute regular-enemy policy is unchanged.
+- The unlooted Stolen Handbag must remain available after the loot window is
+  closed. The reported disappearance is a bug symptom, not a Thief-specific
+  rule. All normal loot-bearing corpses now share a four-minute lifetime that is
+  unchanged by close/reopen.
 - Retaliation mode, QL1 Solar-Powered Pistol `121567`, captured attack envelope,
   and 1.41-second attack-start timing still match. No damage-roll or cadence
   change was made because the Thief landed no hit in this capture.
@@ -114,7 +115,8 @@ returning to the already-planned capture indexing and Bloodcreeper work.
 
 1. Run one private Thief smoke: allow the initial `115/146` health state to
    recover, fight normally, open the handbag corpse, leave the item, close the
-   loot window, and confirm the corpse disappears immediately afterward.
+   loot window, confirm the corpse remains and can be reopened, and confirm its
+   four-minute loot-bearing lifetime is not shortened by either action.
 2. Index finalized captures `20260716-221358` and `20260716-222201` before
    requesting any new gameplay capture. Preserve each identity-linked combat,
    death, corpse, loot, and movement observation without generalizing it to an

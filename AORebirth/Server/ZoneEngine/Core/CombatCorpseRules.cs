@@ -290,7 +290,7 @@ namespace ZoneEngine.Core
 
         public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(3);
 
-        public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(5);
+        public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(4);
 
         public static readonly TimeSpan MajorBossCorpseLifetime = TimeSpan.FromMinutes(30);
 

@@ -33,7 +33,6 @@ namespace AORebirth.Core.Playfields
         internal DateTime ExpiresAtUtc { get; set; }
         internal TimeSpan ItemLootLifetime { get; set; }
         internal TimeSpan EmptyCleanupDelay { get; set; }
-        internal TimeSpan? CloseWithLootCleanupDelay { get; set; }
         internal int InventoryHandle { get; set; }
         internal List<CorpseLootItem> LootItems { get; set; }
         internal int Credits { get; set; }

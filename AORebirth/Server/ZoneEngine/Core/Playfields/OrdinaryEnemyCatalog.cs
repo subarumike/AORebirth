@@ -44,25 +44,22 @@ namespace AORebirth.Core.Playfields
             new OrdinaryEnemyCorpseProfile(
                 OrdinaryEnemyCorpsePacketProfile.Generic,
                 3.0,
-                300.0,
-                3.0,
-                null);
+                240.0,
+                3.0);
 
         private static readonly OrdinaryEnemyCorpseProfile CapturedThiefCorpse =
             new OrdinaryEnemyCorpseProfile(
                 OrdinaryEnemyCorpsePacketProfile.CapturedThief,
                 3.0,
-                300.0,
-                3.0,
-                0.44);
+                240.0,
+                3.0);
 
         private static readonly OrdinaryEnemyCorpseProfile CapturedFilthFleaCorpse =
             new OrdinaryEnemyCorpseProfile(
                 OrdinaryEnemyCorpsePacketProfile.CapturedFilthFlea,
                 3.0,
-                300.0,
-                3.0,
-                null);
+                240.0,
+                3.0);
 
         private readonly Dictionary<string, OrdinaryEnemyProfile> profilesByKey;
 
