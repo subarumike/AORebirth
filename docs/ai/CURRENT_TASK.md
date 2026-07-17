@@ -4,10 +4,11 @@
 
 Finalized Vergil capture `20260716-222007` is integrated as a boss-only
 `40`-unit NPC travel leash while the shared PF127 and target-distance safety
-boundaries remain `100`. The next active boundary is a bounded private Vergil
-leash smoke. After that smoke, return to the bounded Bloodcreeper smoke and then
-continue the next Subway enemy from the existing corpus through the shared
-ordinary runtime.
+boundaries remain `100`. Mike's `2026-07-17` private-client validation confirms
+the corrected Vergil fight, leash reset, and return behavior. The next active
+boundary is offline indexing of finalized captures `20260716-221358` and
+`20260716-222201`, followed by the bounded Bloodcreeper smoke and the next
+Subway enemy from the existing corpus through the shared ordinary runtime.
 
 ## Done in this slice
 
@@ -93,12 +94,16 @@ ordinary runtime.
   triggering that boss override, while the existing `100`-unit target safety
   boundary remains intact. Other PF127 NPCs retain the shared `100`-unit
   private policy.
+- Mike's `2026-07-17` private-client smoke confirms Vergil's corrected fight,
+  `40`-unit leash reset, collision-aware return home, and re-engagement work as
+  intended. The Vergil leash smoke is complete.
 
 ## Remaining
 
-1. Run the bounded private Vergil leash smoke: draw him beyond `40` units from
-   his activation home while remaining within the shared `100`-unit target
-   boundary; confirm combat clears, he routes home, and healing state resets.
+1. Index finalized captures `20260716-221358` and `20260716-222201` before
+   requesting any new gameplay capture. Preserve each identity-linked combat,
+   death, corpse, loot, and movement observation without generalizing it to an
+   unsupported enemy type.
 2. Run the bounded private Bloodcreeper smoke: level `15..25`, Bite, Spit,
    chase, corpse, 150 credits, unresolved/empty item handling, close/reopen,
    cleanup, 240-second respawn, and no duplicate generation.
