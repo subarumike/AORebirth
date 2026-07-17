@@ -57,6 +57,17 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
     internal class exitproxyplayfield : FunctionPrototype
     {
+        private const int CapturedSubwayEntrySourcePlayfieldId = 655;
+
+        private const uint CapturedSubwayEntrySourceDoorInstance = 0xC01A028F;
+
+        private const float DefaultExitDoorOffset = 2.5f;
+
+        // The PF655 Subway proxy-entry trigger has a four-unit radius. The
+        // generic 2.5-unit exit offset lands inside it and sends the player
+        // straight back into PF127 after zoning grace expires.
+        private const float CapturedSubwayExitDoorOffset = 6.0f;
+
         public override FunctionType FunctionId
         {
             get
@@ -88,12 +99,17 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 Quaternion.Normalize(q);
                 Vector3 n = (Vector3)q.RotateVector3(Vector3.AxisZ);
 
-                v.x += n.x * 2.5;
-                v.z += n.z * 2.5;
+                float exitDoorOffset =
+                    externalPlayfieldId == CapturedSubwayEntrySourcePlayfieldId
+                    && externalDoorInstance == CapturedSubwayEntrySourceDoorInstance
+                        ? CapturedSubwayExitDoorOffset
+                        : DefaultExitDoorOffset;
+                v.x += n.x * exitDoorOffset;
+                v.z += n.z * exitDoorOffset;
                 LogUtil.Debug(
                     DebugInfoDetail.Zoning,
                     string.Format(
-                        "ExitProxyPlayfield caller={0} internal={1} currentPf={2} current=({3:F2},{4:F2},{5:F2}) externalDoor={6:X8} externalPf={7} dest=({8:F2},{9:F2},{10:F2})",
+                        "ExitProxyPlayfield caller={0} internal={1} currentPf={2} current=({3:F2},{4:F2},{5:F2}) externalDoor={6:X8} externalPf={7} dest=({8:F2},{9:F2},{10:F2}) offset={11:F2}",
                         caller.Identity.ToString(true),
                         self.Identity.ToString(true),
                         self.Playfield.Identity.Instance,
@@ -104,7 +120,8 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                         externalPlayfieldId,
                         v.x,
                         v.y,
-                        v.z));
+                        v.z,
+                        exitDoorOffset));
                 self.Playfield.Teleport(
                     (Dynel)self,
                     new Coordinate(v),
