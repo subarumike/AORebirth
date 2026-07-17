@@ -177,6 +177,34 @@ All other 259 rows remain explicit fixed-level definitions until evidence or an
 approved design decision establishes a range; the shared mechanism does not
 guess one.
 
+## Ordinary loot evidence boundary
+
+The canonical evidence record for the current Bloodcreeper and Disobedient Bot
+loot slice is
+`docs/evidence/SUBWAY_BLOODCREEPER_DISOBEDIENT_BOT_LOOT_AUDIT.md`. Corpse joins
+canonicalize padded and unpadded numeric identities, remain generation-scoped,
+and exclude names, proximity, database identity alone, or duplicate observations
+as substitutes for an exact identity chain.
+
+Disobedient Bot has fourteen exact corpse generations in the audited corpus and
+seven strict complete loot outcomes. Those strict outcomes contain one QL1 Small
+Power Supply (`234877/234877`), one QL10 Eye Implant: Pharma Tech, Bright
+(`104683/104684`), and five item-empty inventories. The runtime uses a
+provisional weighted-one policy with relative weights `1 + 1 + 5 empty`. The two
+memberships are capture-proven; the weighting is private-server policy, not an
+official probability claim, and the broader pool remains incomplete. Burnt Out
+Memory Chip (`234876/234876`) cannot roll because its corpse linkage is
+incomplete.
+
+Bloodcreeper has four exact corpse generations and two strict complete item
+inventories, both empty. No item identity or transfer is proven. That evidence
+does not establish an empty pool, so Bloodcreeper item loot remains explicitly
+unresolved and inactive; its proven 150-credit behavior is independent of the
+item-pool boundary.
+
+This loot slice does not activate population content. The catalog remains 260
+represented rows, 222 active rows, and 38 quarantined rows.
+
 ## Ordinary respawn policy
 
 PF127 eligible ordinary enemies inherit a 240-second post-NPC-despawn default.

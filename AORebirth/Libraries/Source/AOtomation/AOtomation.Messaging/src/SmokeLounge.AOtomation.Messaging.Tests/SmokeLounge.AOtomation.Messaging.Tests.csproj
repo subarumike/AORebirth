@@ -81,6 +81,7 @@
     <Compile Include="GlobalLootFoundationTests.cs" />
     <Compile Include="WorldPopulationFoundationTests.cs" />
     <Compile Include="SubwayLootPoolRulesTests.cs" />
+    <Compile Include="SubwayEnemyLootEvidenceTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestStateTests.cs" />
     <Compile Include="PlayfieldVisibilityLifecycleIntegrationTests.cs" />
@@ -146,6 +147,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyProfile.cs">
       <Link>OrdinaryEnemyProfile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyLootTableAdapter.cs">
+      <Link>OrdinaryEnemyLootTableAdapter.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\LootDefinitions.cs"><Link>LootDefinitions.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\LootGenerationService.cs"><Link>LootGenerationService.cs</Link></Compile>

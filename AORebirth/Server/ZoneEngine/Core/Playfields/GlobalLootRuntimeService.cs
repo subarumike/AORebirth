@@ -388,85 +388,12 @@ namespace AORebirth.Core.Playfields
             string tableKey = "ordinary." + profile.ProfileKey + levelSuffix;
             string assignmentKey = "ordinary." + profile.ProfileKey + levelSuffix;
             if (this.registry.ContainsTable(tableKey)) return;
-            LootGroupDefinition[] groups = profile.Loot.Entries.Select((entry, index) =>
-                new LootGroupDefinition
-                {
-                    LootGroupKey = "entry." + index.ToString(CultureInfo.InvariantCulture),
-                    RollMode = entry.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven
-                        ? LootRollMode.Guaranteed : LootRollMode.Independent,
-                    RollCount = 1,
-                    DropChanceBasisPoints = 10000,
-                    Entries = new[] { OrdinaryEntry(entry) },
-                    Conditions = new string[0]
-                }).ToArray();
-            var table = new LootTableDefinition
-            {
-                LootTableKey = tableKey,
-                DisplayName = profile.DisplayName,
-                TableType = LootTableType.EnemyType,
-                RollGroups = groups,
-                CreditsPolicy = OrdinaryCredits(profile.Loot, targetLevel),
-                QualityPolicy = "captured-fixed",
-                Evidence = profile.Loot.Evidence.ToString(),
-                Confidence = profile.Loot.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven
-                    ? LootEvidenceConfidence.ProvenCapture
-                    : profile.Loot.Evidence == OrdinaryEnemyLootEvidence.ObservedAvailableLoot
-                        ? LootEvidenceConfidence.ObservedAvailableLoot
-                        : LootEvidenceConfidence.Unresolved,
-                Enabled = true
-            };
-            this.registry.RegisterTable(table);
-            this.registry.RegisterAssignment(new LootAssignmentDefinition
-            {
-                AssignmentKey = assignmentKey,
-                TargetType = LootAssignmentTargetType.EnemyType,
-                TargetKey = profile.ProfileKey,
-                LootTableKey = tableKey,
-                MinimumLevel = levelSpecificCredits ? (int?)targetLevel : null,
-                MaximumLevel = levelSpecificCredits ? (int?)targetLevel : null,
-                Priority = 0,
-                Evidence = table.Evidence,
-                Confidence = table.Confidence,
-                Enabled = true,
-                Conditions = new string[0]
-            });
-        }
-
-        private static LootEntryDefinition OrdinaryEntry(OrdinaryEnemyLootEntry entry)
-        {
-            bool guaranteed = entry.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven;
-            return new LootEntryDefinition
-            {
-                ItemTemplateId = entry.LowId,
-                HighItemTemplateId = entry.HighId,
-                FixedQuality = entry.Quality,
-                MinimumQuality = entry.Quality,
-                MaximumQuality = entry.Quality,
-                MinimumQuantity = 1,
-                MaximumQuantity = 1,
-                Weight = 1,
-                DropChanceBasisPoints = guaranteed ? 10000 : entry.BasisPoints,
-                UniquePerCorpse = true,
-                Semantics = guaranteed ? LootSemantics.GuaranteedProven : LootSemantics.ObservedAvailable,
-                Evidence = guaranteed ? LootEvidenceConfidence.ProvenCapture : LootEvidenceConfidence.ObservedAvailableLoot,
-                EvidenceReference = entry.Evidence.ToString()
-            };
-        }
-
-        private static CreditsPolicyDefinition OrdinaryCredits(OrdinaryEnemyLootProfile loot, int targetLevel)
-        {
-            OrdinaryEnemyLevelCreditRule level = loot.LevelCreditRules.FirstOrDefault(x => x.EnemyLevel == targetLevel);
-            if (level != null) return CreditsRange(level.MinimumCredits, level.MaximumCredits, LootEvidenceConfidence.ProvenCapture);
-            if ((loot.CreditEvidence == OrdinaryEnemyEvidenceState.Observed
-                 || loot.CreditEvidence == OrdinaryEnemyEvidenceState.Policy)
-                && loot.MinimumCredits.HasValue && loot.MaximumCredits.HasValue)
-                return CreditsRange(
-                    loot.MinimumCredits.Value,
-                    loot.MaximumCredits.Value,
-                    loot.CreditEvidence == OrdinaryEnemyEvidenceState.Observed
-                        ? LootEvidenceConfidence.ProvenCapture
-                        : LootEvidenceConfidence.Inferred);
-            return new CreditsPolicyDefinition { Mode = CreditsPolicyMode.Unresolved, Evidence = LootEvidenceConfidence.Unresolved };
+            OrdinaryEnemyLootTableAdapterResult adapted = OrdinaryEnemyLootTableAdapter.Build(
+                profile,
+                targetLevel,
+                tableKey,
+                assignmentKey);
+            this.registry.RegisterTableAndAssignment(adapted.Table, adapted.Assignment);
         }
 
         private void EnsureCleaningRobot()

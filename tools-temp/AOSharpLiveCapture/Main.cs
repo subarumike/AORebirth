@@ -5607,7 +5607,28 @@ namespace AOSharpLiveCapture
                 return string.Empty;
             }
 
-            return identity.Trim().TrimStart('(').TrimEnd(')');
+            string trimmed = identity.Trim().TrimStart('(').TrimEnd(')');
+            int separator = trimmed.IndexOf(':');
+            if (separator <= 0 || separator == trimmed.Length - 1)
+            {
+                return trimmed;
+            }
+
+            uint instance;
+            if (!uint.TryParse(
+                    trimmed.Substring(separator + 1),
+                    NumberStyles.HexNumber,
+                    CultureInfo.InvariantCulture,
+                    out instance))
+            {
+                return trimmed;
+            }
+
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}:{1:X8}",
+                trimmed.Substring(0, separator),
+                instance);
         }
 
         private double? PositionDelta(EnemyStateEvent first, EnemyStateEvent second)

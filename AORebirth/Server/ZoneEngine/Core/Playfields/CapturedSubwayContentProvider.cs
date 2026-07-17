@@ -293,6 +293,11 @@ namespace ZoneEngine.Core.Playfields
             // contained one QL1 Stolen Handbag (297055/297055). Mission-state gating remains unknown.
             // Filth Flea: 20260709-210452 and 20260709-220439, inventory-updates.csv
             // correlated by enemy-combat.csv death sequence and enemy-dossier.json monsterData 17657.
+            // Disobedient Bot: the two active memberships below each have a complete
+            // enemy -> death -> corpse -> inventory -> transfer chain. The observed
+            // 1 + 1 item / 5 empty weighting is provisional project policy, not an
+            // asserted official probability. The incompletely linked 234876 candidate
+            // remains excluded.
             return new[]
             {
                 new CapturedSubwayLootDefinition(
@@ -302,7 +307,15 @@ namespace ZoneEngine.Core.Playfields
                     297055,
                     297055,
                     1,
-                    10000),
+                    0,
+                    1,
+                    0,
+                    10000,
+                    1,
+                    1,
+                    OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem,
+                    OrdinaryEnemyLootProbabilityEvidence.GuaranteedProven,
+                    "20260710-205400:inventory-updates.csv"),
                 new CapturedSubwayLootDefinition(
                     "Filth Flea",
                     17657,
@@ -310,7 +323,15 @@ namespace ZoneEngine.Core.Playfields
                     234874,
                     234874,
                     1,
-                    1250),
+                    0,
+                    1,
+                    0,
+                    1250,
+                    1,
+                    8,
+                    OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem,
+                    OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                    "20260709-210452,20260709-220439"),
                 new CapturedSubwayLootDefinition(
                     "Filth Flea",
                     17657,
@@ -318,7 +339,15 @@ namespace ZoneEngine.Core.Playfields
                     103110,
                     103111,
                     6,
-                    1250),
+                    1,
+                    1,
+                    0,
+                    1250,
+                    1,
+                    8,
+                    OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem,
+                    OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                    "20260709-210452,20260709-220439"),
                 new CapturedSubwayLootDefinition(
                     "Filth Flea",
                     17657,
@@ -326,7 +355,15 @@ namespace ZoneEngine.Core.Playfields
                     101581,
                     101582,
                     6,
-                    1250),
+                    2,
+                    1,
+                    0,
+                    1250,
+                    1,
+                    8,
+                    OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem,
+                    OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                    "20260709-210452,20260709-220439"),
                 new CapturedSubwayLootDefinition(
                     "Filth Flea",
                     17657,
@@ -334,7 +371,15 @@ namespace ZoneEngine.Core.Playfields
                     110874,
                     110875,
                     6,
-                    1250),
+                    3,
+                    1,
+                    0,
+                    1250,
+                    1,
+                    8,
+                    OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem,
+                    OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                    "20260709-210452,20260709-220439"),
                 new CapturedSubwayLootDefinition(
                     "Filth Flea",
                     17657,
@@ -342,7 +387,15 @@ namespace ZoneEngine.Core.Playfields
                     101507,
                     101508,
                     6,
-                    1250),
+                    4,
+                    1,
+                    0,
+                    1250,
+                    1,
+                    8,
+                    OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem,
+                    OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                    "20260709-210452,20260709-220439"),
                 new CapturedSubwayLootDefinition(
                     "Filth Flea",
                     17657,
@@ -350,7 +403,15 @@ namespace ZoneEngine.Core.Playfields
                     202719,
                     202720,
                     14,
-                    1250),
+                    5,
+                    1,
+                    0,
+                    1250,
+                    1,
+                    8,
+                    OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem,
+                    OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                    "20260709-210452,20260709-220439"),
                 new CapturedSubwayLootDefinition(
                     "Filth Flea",
                     17657,
@@ -358,7 +419,15 @@ namespace ZoneEngine.Core.Playfields
                     234876,
                     234876,
                     1,
-                    1250),
+                    6,
+                    1,
+                    0,
+                    1250,
+                    1,
+                    8,
+                    OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem,
+                    OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                    "20260709-210452,20260709-220439"),
                 new CapturedSubwayLootDefinition(
                     "Filth Flea",
                     17657,
@@ -366,7 +435,15 @@ namespace ZoneEngine.Core.Playfields
                     101761,
                     101762,
                     9,
-                    1250),
+                    7,
+                    1,
+                    0,
+                    1250,
+                    1,
+                    8,
+                    OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem,
+                    OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                    "20260709-210452,20260709-220439"),
                 new CapturedSubwayLootDefinition(
                     "Filth Flea",
                     17657,
@@ -374,7 +451,47 @@ namespace ZoneEngine.Core.Playfields
                     110192,
                     110193,
                     15,
-                    1250)
+                    8,
+                    1,
+                    0,
+                    1250,
+                    1,
+                    8,
+                    OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem,
+                    OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                    "20260709-210452,20260709-220439"),
+                new CapturedSubwayLootDefinition(
+                    "Disobedient Bot",
+                    17649,
+                    138,
+                    234877,
+                    234877,
+                    1,
+                    0,
+                    1,
+                    1,
+                    0,
+                    1,
+                    7,
+                    OrdinaryEnemyLootLinkageEvidence.ProvenTransferredEnemyCorpseItem,
+                    OrdinaryEnemyLootProbabilityEvidence.ProvisionalProjectPolicy,
+                    "20260709-210452:SimpleChar:794E807A>Corpse:F6E030>InventoryUpdate#3770>ContainerAddItem#3819"),
+                new CapturedSubwayLootDefinition(
+                    "Disobedient Bot",
+                    17649,
+                    138,
+                    104683,
+                    104684,
+                    10,
+                    0,
+                    1,
+                    1,
+                    0,
+                    1,
+                    7,
+                    OrdinaryEnemyLootLinkageEvidence.ProvenTransferredEnemyCorpseItem,
+                    OrdinaryEnemyLootProbabilityEvidence.ProvisionalProjectPolicy,
+                    "20260713-033511:SimpleChar:79607E2C>Corpse:F6C003>InventoryUpdate#1392>ContainerAddItem#1426")
             };
         }
 
@@ -699,7 +816,15 @@ namespace ZoneEngine.Core.Playfields
             int lowId,
             int highId,
             int quality,
-            int observedBasisPoints)
+            int slot,
+            int quantity,
+            int runtimeWeight,
+            int observedBasisPoints,
+            int observedCount,
+            int observedCorpses,
+            OrdinaryEnemyLootLinkageEvidence linkageEvidence,
+            OrdinaryEnemyLootProbabilityEvidence probabilityEvidence,
+            string evidenceReference)
         {
             this.ExactName = exactName;
             this.MonsterData = monsterData;
@@ -707,7 +832,15 @@ namespace ZoneEngine.Core.Playfields
             this.LowId = lowId;
             this.HighId = highId;
             this.Quality = quality;
+            this.Slot = slot;
+            this.Quantity = quantity;
+            this.RuntimeWeight = runtimeWeight;
             this.ObservedBasisPoints = observedBasisPoints;
+            this.ObservedCount = observedCount;
+            this.ObservedCorpses = observedCorpses;
+            this.LinkageEvidence = linkageEvidence;
+            this.ProbabilityEvidence = probabilityEvidence;
+            this.EvidenceReference = evidenceReference ?? string.Empty;
         }
 
         public string ExactName { get; private set; }
@@ -722,7 +855,23 @@ namespace ZoneEngine.Core.Playfields
 
         public int Quality { get; private set; }
 
+        public int Slot { get; private set; }
+
+        public int Quantity { get; private set; }
+
+        public int RuntimeWeight { get; private set; }
+
         public int ObservedBasisPoints { get; private set; }
+
+        public int ObservedCount { get; private set; }
+
+        public int ObservedCorpses { get; private set; }
+
+        public OrdinaryEnemyLootLinkageEvidence LinkageEvidence { get; private set; }
+
+        public OrdinaryEnemyLootProbabilityEvidence ProbabilityEvidence { get; private set; }
+
+        public string EvidenceReference { get; private set; }
     }
 
     internal sealed class CapturedSubwayPatrolReplaySegment

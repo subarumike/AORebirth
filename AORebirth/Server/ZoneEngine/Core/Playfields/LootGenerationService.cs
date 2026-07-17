@@ -310,7 +310,10 @@ namespace AORebirth.Core.Playfields
 
         private static bool CanRoll(LootEntryDefinition entry)
         {
-            return entry.Semantics != LootSemantics.Unresolved && entry.Semantics != LootSemantics.NoneProven;
+            return entry.Semantics != LootSemantics.Unresolved
+                && entry.Semantics != LootSemantics.NoneProven
+                && entry.Evidence != LootEvidenceConfidence.Unresolved
+                && !string.IsNullOrWhiteSpace(entry.EvidenceReference);
         }
 
         private static void ApplyCredits(LootGenerationResult result, CreditsPolicyDefinition policy, ILootRandomSource random)

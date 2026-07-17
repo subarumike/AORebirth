@@ -540,7 +540,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 catalogText.Contains("if (monsterData == 17657)")
                 && catalogText.Contains("OrdinaryEnemyEvidenceState.Observed")
                 && catalogText.Contains("29,")
-                && catalogText.Contains("79)"),
+                && catalogText.Contains("79,")
+                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule[0]"),
                 "Filth Flea must retain captured Subway corpse credit evidence from completed corpse full-update captures.");
         }
 
@@ -1185,7 +1186,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void SubwayDisobedientBotCorpseUsesCapturedCreditsWithoutConstantItemDrop()
+        public void SubwayDisobedientBotCorpseUsesCapturedCreditsAndEvidenceBackedPool()
         {
             string repositoryRoot = FindRepositoryRoot();
             string providerText = File.ReadAllText(
@@ -1223,14 +1224,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && lootProfile.Contains("OrdinaryEnemyEvidenceState.Observed")
                 && lootProfile.Contains("Keep unobserved levels unresolved"),
                 "Disobedient Bot credits must stay conditioned by identity-correlated enemy level instead of using a global range or guessed formula.");
-            Assert.IsFalse(
-                capturedLootDefinitions.Contains("\"Disobedient Bot\""),
-                "One observed Disobedient Bot outcome must not become a constant item drop instead of a pool roll.");
+            Assert.IsTrue(
+                capturedLootDefinitions.Contains("\"Disobedient Bot\"")
+                && capturedLootDefinitions.Contains("234877")
+                && capturedLootDefinitions.Contains("104683")
+                && capturedLootDefinitions.Contains("104684")
+                && capturedLootDefinitions.Contains("ProvenTransferredEnemyCorpseItem")
+                && capturedLootDefinitions.Contains("ProvisionalProjectPolicy"),
+                "Disobedient Bot must expose only the two fully linked transferred items and must keep the ambiguous 234876 candidate inactive.");
             string globalLootText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
+            string ordinaryLootAdapterText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyLootTableAdapter.cs"));
             Assert.IsTrue(
-                globalLootText.Contains("profile.Loot.LevelCreditRules")
-                && globalLootText.Contains("x.EnemyLevel == targetLevel"),
+                globalLootText.Contains("OrdinaryEnemyLootTableAdapter.Build(")
+                && ordinaryLootAdapterText.Contains("loot.LevelCreditRules.FirstOrDefault")
+                && ordinaryLootAdapterText.Contains("value.EnemyLevel == targetLevel")
+                && ordinaryLootAdapterText.Contains("LootRollMode.WeightedOne")
+                && ordinaryLootAdapterText.Contains("EmptyWeight = loot.EmptyWeight"),
                 "Runtime corpse credits must adapt the observed rule for the enemy's level into the global registry.");
             Assert.IsTrue(
                 corpseRegistration.Contains("GlobalLootRuntimeService.Generate(target, this.Identity.Instance)")
@@ -1948,6 +1959,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string globalLootText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
+            string ordinaryLootAdapterText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyLootTableAdapter.cs"));
             string scfuText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
             string projectText = File.ReadAllText(
@@ -2125,8 +2138,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && populationText.Contains("WorldRespawnPolicyResolver.Resolve(")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(")
                 && catalogText.Contains("\"20260716-033326,20260716-034104\"")
-                && globalLootText.Contains("loot.CreditEvidence == OrdinaryEnemyEvidenceState.Policy")
-                && globalLootText.Contains("LootEvidenceConfidence.Inferred")
+                && ordinaryLootAdapterText.Contains("loot.CreditEvidence == OrdinaryEnemyEvidenceState.Policy")
+                && ordinaryLootAdapterText.Contains("LootEvidenceConfidence.Inferred")
                 && combatContractText.Contains("CapturedSubwayBloodcreeperSpitInitialSeconds")
                 && combatContractText.Contains("CapturedSubwayBloodcreeperBiteInitialSeconds")
                 && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperBiteMinimumDamage = 21")
@@ -2416,7 +2429,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && catalogText.Contains("if (monsterData == 17657)")
                 && catalogText.Contains("OrdinaryEnemyEvidenceState.Observed")
                 && catalogText.Contains("29,")
-                && catalogText.Contains("79)"),
+                && catalogText.Contains("79,"),
                 "Accepted Subway Filth Flea must keep spawn, movement/chase, combat, appearance, corpse visual, loot, credits, and four-minute respawn coverage together.");
 
             Assert.IsTrue(

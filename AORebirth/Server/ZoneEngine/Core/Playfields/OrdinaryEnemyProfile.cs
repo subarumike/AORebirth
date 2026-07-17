@@ -61,6 +61,32 @@ namespace AORebirth.Core.Playfields
         Unresolved = 5
     }
 
+    internal enum OrdinaryEnemyLootPoolMode
+    {
+        Invalid = 0,
+        IndependentEntries = 1,
+        WeightedOne = 2
+    }
+
+    internal enum OrdinaryEnemyLootLinkageEvidence
+    {
+        Invalid = 0,
+        ProvenEnemyCorpseItem = 1,
+        ProvenTransferredEnemyCorpseItem = 2,
+        ImportedCaptureEvidence = 3,
+        Ambiguous = 4,
+        Unresolved = 5
+    }
+
+    internal enum OrdinaryEnemyLootProbabilityEvidence
+    {
+        Invalid = 0,
+        GuaranteedProven = 1,
+        ExistingCapturePolicy = 2,
+        ProvisionalProjectPolicy = 3,
+        Unresolved = 4
+    }
+
     internal enum OrdinaryEnemyEvidenceState
     {
         Invalid = 0,
@@ -238,25 +264,48 @@ namespace AORebirth.Core.Playfields
         internal OrdinaryEnemyLootEntry(
             int lowId,
             int highId,
-            int quality,
+            int qualityLevel,
             int slot,
-            int basisPoints,
-            OrdinaryEnemyLootEvidence evidence)
+            int quantity,
+            int weight,
+            int dropChanceBasisPoints,
+            OrdinaryEnemyLootEvidence evidence,
+            OrdinaryEnemyLootLinkageEvidence linkageEvidence,
+            OrdinaryEnemyLootProbabilityEvidence probabilityEvidence,
+            int observedCount,
+            int observedCorpses,
+            string evidenceReference)
         {
             this.LowId = lowId;
             this.HighId = highId;
-            this.Quality = quality;
+            this.QualityLevel = qualityLevel;
             this.Slot = slot;
-            this.BasisPoints = basisPoints;
+            this.Quantity = quantity;
+            this.Weight = weight;
+            this.DropChanceBasisPoints = dropChanceBasisPoints;
             this.Evidence = evidence;
+            this.LinkageEvidence = linkageEvidence;
+            this.ProbabilityEvidence = probabilityEvidence;
+            this.ObservedCount = observedCount;
+            this.ObservedCorpses = observedCorpses;
+            this.EvidenceReference = evidenceReference ?? string.Empty;
         }
 
         internal int LowId { get; private set; }
         internal int HighId { get; private set; }
-        internal int Quality { get; private set; }
+        internal int QualityLevel { get; private set; }
+        internal int Quality { get { return this.QualityLevel; } }
         internal int Slot { get; private set; }
-        internal int BasisPoints { get; private set; }
+        internal int Quantity { get; private set; }
+        internal int Weight { get; private set; }
+        internal int DropChanceBasisPoints { get; private set; }
+        internal int BasisPoints { get { return this.DropChanceBasisPoints; } }
         internal OrdinaryEnemyLootEvidence Evidence { get; private set; }
+        internal OrdinaryEnemyLootLinkageEvidence LinkageEvidence { get; private set; }
+        internal OrdinaryEnemyLootProbabilityEvidence ProbabilityEvidence { get; private set; }
+        internal int ObservedCount { get; private set; }
+        internal int ObservedCorpses { get; private set; }
+        internal string EvidenceReference { get; private set; }
     }
 
     internal sealed class OrdinaryEnemyLootProfile
@@ -270,6 +319,12 @@ namespace AORebirth.Core.Playfields
             : this(
                 evidence,
                 entries,
+                OrdinaryEnemyLootPoolMode.IndependentEntries,
+                0,
+                entries != null && entries.Length > 0,
+                0,
+                0,
+                string.Empty,
                 creditEvidence,
                 minimumCredits,
                 maximumCredits,
@@ -284,9 +339,44 @@ namespace AORebirth.Core.Playfields
             int? minimumCredits,
             int? maximumCredits,
             OrdinaryEnemyLevelCreditRule[] levelCreditRules)
+            : this(
+                evidence,
+                entries,
+                OrdinaryEnemyLootPoolMode.IndependentEntries,
+                0,
+                entries != null && entries.Length > 0,
+                0,
+                0,
+                string.Empty,
+                creditEvidence,
+                minimumCredits,
+                maximumCredits,
+                levelCreditRules)
+        {
+        }
+
+        internal OrdinaryEnemyLootProfile(
+            OrdinaryEnemyLootEvidence evidence,
+            OrdinaryEnemyLootEntry[] entries,
+            OrdinaryEnemyLootPoolMode poolMode,
+            int emptyWeight,
+            bool itemPoolComplete,
+            int observedCompleteInventories,
+            int observedEmptyInventories,
+            string itemEvidenceReference,
+            OrdinaryEnemyEvidenceState creditEvidence,
+            int? minimumCredits,
+            int? maximumCredits,
+            OrdinaryEnemyLevelCreditRule[] levelCreditRules)
         {
             this.Evidence = evidence;
             this.Entries = entries ?? new OrdinaryEnemyLootEntry[0];
+            this.PoolMode = poolMode;
+            this.EmptyWeight = emptyWeight;
+            this.ItemPoolComplete = itemPoolComplete;
+            this.ObservedCompleteInventories = observedCompleteInventories;
+            this.ObservedEmptyInventories = observedEmptyInventories;
+            this.ItemEvidenceReference = itemEvidenceReference ?? string.Empty;
             this.CreditEvidence = creditEvidence;
             this.MinimumCredits = minimumCredits;
             this.MaximumCredits = maximumCredits;
@@ -295,6 +385,12 @@ namespace AORebirth.Core.Playfields
 
         internal OrdinaryEnemyLootEvidence Evidence { get; private set; }
         internal OrdinaryEnemyLootEntry[] Entries { get; private set; }
+        internal OrdinaryEnemyLootPoolMode PoolMode { get; private set; }
+        internal int EmptyWeight { get; private set; }
+        internal bool ItemPoolComplete { get; private set; }
+        internal int ObservedCompleteInventories { get; private set; }
+        internal int ObservedEmptyInventories { get; private set; }
+        internal string ItemEvidenceReference { get; private set; }
         internal OrdinaryEnemyEvidenceState CreditEvidence { get; private set; }
         internal int? MinimumCredits { get; private set; }
         internal int? MaximumCredits { get; private set; }
@@ -964,23 +1060,7 @@ namespace AORebirth.Core.Playfields
                     throw new InvalidOperationException("Ordinary enemy construction or corpse lifecycle data is invalid: " + profile.ProfileKey);
                 }
 
-                if (profile.Loot.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven
-                    && (profile.Loot.Entries.Length == 0
-                        || profile.Loot.Entries.Any(
-                            value => value.Evidence != OrdinaryEnemyLootEvidence.GuaranteedProven)))
-                {
-                    throw new InvalidOperationException("Observed loot cannot be promoted to guaranteed loot: " + profile.ProfileKey);
-                }
-
-                if (profile.Loot.Entries.GroupBy(value => value.Slot).Any(value => value.Count() > 1)
-                    || profile.Loot.Entries.Any(
-                        value => value.Slot < 0
-                                 || value.BasisPoints <= 0
-                                 || value.BasisPoints > 10000
-                                 || value.Evidence == OrdinaryEnemyLootEvidence.Invalid))
-                {
-                    throw new InvalidOperationException("Ordinary enemy loot profile has invalid slots or evidence: " + profile.ProfileKey);
-                }
+                ValidateLootProfile(profile.ProfileKey, profile.Loot);
 
                 if (profile.Aggression.Mode == OrdinaryEnemyAggressionMode.Auto
                     && (!profile.Aggression.AutomaticAggroRadius.HasValue
@@ -1090,6 +1170,129 @@ namespace AORebirth.Core.Playfields
                     throw new InvalidOperationException(
                         "Ordinary enemy spawn respawn policy is invalid: " + spawn.SpawnKey);
                 }
+            }
+        }
+
+        internal static void ValidateLootProfile(
+            string profileKey,
+            OrdinaryEnemyLootProfile loot)
+        {
+            string key = string.IsNullOrWhiteSpace(profileKey) ? "<unknown>" : profileKey;
+            if (loot == null
+                || loot.Evidence == OrdinaryEnemyLootEvidence.Invalid
+                || loot.PoolMode == OrdinaryEnemyLootPoolMode.Invalid
+                || loot.EmptyWeight < 0
+                || loot.ObservedCompleteInventories < 0
+                || loot.ObservedEmptyInventories < 0
+                || loot.ObservedEmptyInventories > loot.ObservedCompleteInventories)
+            {
+                throw new InvalidOperationException("Ordinary enemy loot profile is invalid: " + key);
+            }
+
+            OrdinaryEnemyLootEntry[] entries = loot.Entries ?? new OrdinaryEnemyLootEntry[0];
+            if (entries.Length == 0)
+            {
+                if (loot.PoolMode != OrdinaryEnemyLootPoolMode.IndependentEntries
+                    || loot.EmptyWeight != 0
+                    || (loot.Evidence != OrdinaryEnemyLootEvidence.Unresolved
+                        && loot.Evidence != OrdinaryEnemyLootEvidence.NoneProven
+                        && loot.Evidence != OrdinaryEnemyLootEvidence.ProfileInherited)
+                    || (loot.ItemPoolComplete
+                        && loot.Evidence != OrdinaryEnemyLootEvidence.NoneProven))
+                {
+                    throw new InvalidOperationException("Empty ordinary enemy loot profile has active pool semantics: " + key);
+                }
+
+                if (loot.ObservedCompleteInventories > 0
+                    && string.IsNullOrWhiteSpace(loot.ItemEvidenceReference))
+                {
+                    throw new InvalidOperationException("Observed empty loot requires an evidence reference: " + key);
+                }
+
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(loot.ItemEvidenceReference)
+                || loot.ObservedCompleteInventories <= 0
+                || entries.Any(
+                    value => value == null
+                             || value.LowId <= 0
+                             || value.HighId <= 0
+                             || value.QualityLevel <= 0
+                             || value.Slot < 0
+                             || value.Quantity <= 0
+                             || value.ObservedCount <= 0
+                             || value.ObservedCorpses <= 0
+                             || value.ObservedCorpses > loot.ObservedCompleteInventories
+                             || string.IsNullOrWhiteSpace(value.EvidenceReference)
+                             || (value.Evidence != OrdinaryEnemyLootEvidence.GuaranteedProven
+                                 && value.Evidence != OrdinaryEnemyLootEvidence.ObservedAvailableLoot)
+                             || (value.LinkageEvidence
+                                     != OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem
+                                 && value.LinkageEvidence
+                                     != OrdinaryEnemyLootLinkageEvidence.ProvenTransferredEnemyCorpseItem
+                                 && value.LinkageEvidence
+                                     != OrdinaryEnemyLootLinkageEvidence.ImportedCaptureEvidence)
+                             || (value.ProbabilityEvidence
+                                     != OrdinaryEnemyLootProbabilityEvidence.GuaranteedProven
+                                 && value.ProbabilityEvidence
+                                     != OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy
+                                 && value.ProbabilityEvidence
+                                     != OrdinaryEnemyLootProbabilityEvidence.ProvisionalProjectPolicy)))
+            {
+                throw new InvalidOperationException("Ordinary enemy loot entry lacks proven evidence: " + key);
+            }
+
+            if (entries.GroupBy(
+                    value => string.Format(
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        "{0}:{1}:{2}",
+                        value.LowId,
+                        value.HighId,
+                        value.QualityLevel),
+                    StringComparer.Ordinal)
+                .Any(value => value.Count() > 1))
+            {
+                throw new InvalidOperationException("Duplicate ordinary enemy loot item identity: " + key);
+            }
+
+            if (loot.PoolMode == OrdinaryEnemyLootPoolMode.IndependentEntries)
+            {
+                if (loot.EmptyWeight != 0
+                    || entries.GroupBy(value => value.Slot).Any(value => value.Count() > 1)
+                    || entries.Any(
+                        value => value.Weight != 0
+                                 || value.DropChanceBasisPoints <= 0
+                                 || value.DropChanceBasisPoints > 10000))
+                {
+                    throw new InvalidOperationException("Independent ordinary enemy loot semantics are invalid: " + key);
+                }
+            }
+            else if (loot.PoolMode == OrdinaryEnemyLootPoolMode.WeightedOne)
+            {
+                int slot = entries[0].Slot;
+                if (entries.Any(
+                    value => value.Slot != slot
+                             || value.Weight <= 0
+                             || value.DropChanceBasisPoints != 0))
+                {
+                    throw new InvalidOperationException("Weighted ordinary enemy loot semantics are invalid: " + key);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Unsupported ordinary enemy loot pool mode: " + key);
+            }
+
+            if (loot.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven
+                && (loot.PoolMode != OrdinaryEnemyLootPoolMode.IndependentEntries
+                    || entries.Any(
+                        value => value.Evidence != OrdinaryEnemyLootEvidence.GuaranteedProven
+                                 || value.DropChanceBasisPoints != 10000
+                                 || value.ProbabilityEvidence
+                                     != OrdinaryEnemyLootProbabilityEvidence.GuaranteedProven)))
+            {
+                throw new InvalidOperationException("Observed loot cannot be promoted to guaranteed loot: " + key);
             }
         }
 

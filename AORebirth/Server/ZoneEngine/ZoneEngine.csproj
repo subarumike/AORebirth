@@ -338,6 +338,7 @@
     <Compile Include="Core\Playfields\CapturedSubwayEncounterRuntimeService.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyCatalog.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyProfile.cs" />
+    <Compile Include="Core\Playfields\OrdinaryEnemyLootTableAdapter.cs" />
     <Compile Include="Core\Playfields\LootDefinitions.cs" />
     <Compile Include="Core\Playfields\LootGenerationService.cs" />
     <Compile Include="Core\Playfields\WorldPopulationDefinitions.cs" />
