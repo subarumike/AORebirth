@@ -217,14 +217,16 @@ Sites:
 
 ```text
 randy31 +0x21A94
+randy31 +0x25118
 randy31 +0x2511A
 randy31 +0x6C3A1
 randy31 +0x6C476
 randy31 +0x6C51D
 ```
 
-Test every positive predicate and every one-field near miss. In particular,
-keep report `+0x24118` / image `+0x25118` outside the `+0x2511A` policy.
+Test every positive predicate and every one-field near miss. Keep report
+`+0x24118` / image `+0x25118` as a separate whole-vector policy from the
+one-entry `+0x2511A` policy; never share their resume address or context rewrite.
 
 #### P1.4 Old draw and GUI-batch wrapper tests
 

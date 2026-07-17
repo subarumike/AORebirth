@@ -30,12 +30,53 @@ namespace
     uintptr_t GuiStateBlobArrayAddress = 0;
     uintptr_t GuiStaticIndexBufferAddress = 0;
     uintptr_t GuiTreeFindResumeAddress = 0;
+    PVOID volatile EarlyRandyExceptionGuardHandle = nullptr;
+    LONG RenderStateVectorSkipCount = 0;
     LONG RenderStateSkipCount = 0;
     LONG IndirectColorSkipCount = 0;
     LONG DriverDrawInputSkipCount = 0;
     LONG DriverDrawExceptionSkipCount = 0;
     LONG GuiBatchExceptionSkipCount = 0;
     LONG GuiTreeInvalidKeySkipCount = 0;
+
+    constexpr uintptr_t RenderStateVectorStartRva = 0x25110;
+    constexpr uintptr_t RenderStateEntryFaultRva = 0x25118;
+    constexpr uintptr_t RenderStateVectorExitRva = 0x25139;
+    constexpr uintptr_t RenderStateEntryResumeRva = 0x25147;
+    constexpr uint8_t ExpectedRenderStateFaultSequence[] =
+    {
+        0x8B, 0x7E, 0x14,
+        0x03, 0x7D, 0xF8,
+        0x6A, 0x0A,
+        0x8B, 0x07,
+        0x8B, 0x8C, 0x83, 0xC8, 0x04, 0x00, 0x00,
+        0xFF, 0x77, 0x04,
+        0x89, 0x4F, 0x08,
+        0x50,
+        0x8B, 0xCB,
+        0xE8, 0x92, 0x6A, 0xFF, 0xFF,
+        0xFF, 0x45, 0xFC,
+        0x83, 0x45, 0xF8, 0x10,
+        0x88, 0x47, 0x0C
+    };
+    constexpr uint8_t ExpectedRenderStateVectorExitSequence[] =
+    {
+        0x8B, 0x46, 0x18,
+        0x2B, 0x46, 0x14,
+        0xC1, 0xF8, 0x04,
+        0x39, 0x45, 0xFC,
+        0x72, 0xC9,
+        0x8B, 0x46, 0x28,
+        0x2B, 0x46, 0x24,
+        0x6A, 0x14,
+        0x99,
+        0x59,
+        0xF7, 0xF9,
+        0x83, 0x65, 0xFC, 0x00,
+        0x85, 0xC0,
+        0x74, 0x49,
+        0x83, 0x65, 0xF8, 0x00
+    };
 
     using DrawIndexedPrimitiveVbFunction = HRESULT (WINAPI*)(
         void*,
@@ -279,6 +320,151 @@ namespace
         *begin = reinterpret_cast<uintptr_t>(base);
         *end = *begin + nt->OptionalHeader.SizeOfImage;
         return *end > *begin;
+    }
+
+    bool TryResolveEarlyRenderStateResume(
+        EXCEPTION_POINTERS* exception,
+        uintptr_t* resumeAddress)
+    {
+        MEMORY_BASIC_INFORMATION memory = {};
+        if (VirtualQuery(
+                exception->ExceptionRecord->ExceptionAddress,
+                &memory,
+                sizeof(memory)) != sizeof(memory) ||
+            memory.State != MEM_COMMIT ||
+            memory.Type != MEM_IMAGE ||
+            !memory.AllocationBase)
+        {
+            return false;
+        }
+
+        auto base = reinterpret_cast<const uint8_t*>(memory.AllocationBase);
+        uintptr_t imageBegin = reinterpret_cast<uintptr_t>(base);
+        IMAGE_DOS_HEADER dos = {};
+        if (!IsReadableRange(base, sizeof(dos)))
+        {
+            return false;
+        }
+        std::memcpy(&dos, base, sizeof(dos));
+        if (dos.e_magic != IMAGE_DOS_SIGNATURE ||
+            dos.e_lfanew <= 0 ||
+            static_cast<uint32_t>(dos.e_lfanew) > 0x100000 ||
+            imageBegin > UINTPTR_MAX - static_cast<uint32_t>(dos.e_lfanew))
+        {
+            return false;
+        }
+
+        auto ntAddress = reinterpret_cast<const uint8_t*>(
+            imageBegin + static_cast<uint32_t>(dos.e_lfanew));
+        IMAGE_NT_HEADERS32 nt = {};
+        if (!IsReadableRange(ntAddress, sizeof(nt)))
+        {
+            return false;
+        }
+        std::memcpy(&nt, ntAddress, sizeof(nt));
+        constexpr uintptr_t RequiredImageSize =
+            RenderStateVectorExitRva +
+                sizeof(ExpectedRenderStateVectorExitSequence);
+        if (nt.Signature != IMAGE_NT_SIGNATURE ||
+            nt.FileHeader.Machine != IMAGE_FILE_MACHINE_I386 ||
+            nt.OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR32_MAGIC ||
+            nt.OptionalHeader.SizeOfImage < RequiredImageSize ||
+            imageBegin > UINTPTR_MAX - nt.OptionalHeader.SizeOfImage ||
+            reinterpret_cast<uintptr_t>(
+                exception->ExceptionRecord->ExceptionAddress) !=
+                imageBegin + RenderStateEntryFaultRva)
+        {
+            return false;
+        }
+
+        if (!IsReadableRange(
+                base + RenderStateVectorStartRva,
+                sizeof(ExpectedRenderStateFaultSequence)) ||
+            !IsReadableRange(
+                base + RenderStateVectorExitRva,
+                sizeof(ExpectedRenderStateVectorExitSequence)) ||
+            std::memcmp(
+                base + RenderStateVectorStartRva,
+                ExpectedRenderStateFaultSequence,
+                sizeof(ExpectedRenderStateFaultSequence)) != 0 ||
+            std::memcmp(
+                base + RenderStateVectorExitRva,
+                ExpectedRenderStateVectorExitSequence,
+                sizeof(ExpectedRenderStateVectorExitSequence)) != 0)
+        {
+            return false;
+        }
+
+        *resumeAddress = imageBegin + RenderStateEntryResumeRva;
+        return true;
+    }
+
+    bool IsExactRenderStateVectorEntryFault(
+        EXCEPTION_POINTERS* exception,
+        uint32_t* vectorBegin,
+        uint32_t* byteOffset,
+        uint32_t* vectorIndex)
+    {
+        DWORD stack = exception->ContextRecord->Esp;
+        DWORD frame = exception->ContextRecord->Ebp;
+        DWORD vectors = exception->ContextRecord->Esi;
+        if (frame < 8 || vectors > 0xFFFFFFFFUL - 0x2C ||
+            exception->ExceptionRecord->ExceptionInformation[1] !=
+                exception->ContextRecord->Edi ||
+            !IsReadableRange(
+                reinterpret_cast<const void*>(stack),
+                sizeof(uint32_t)) ||
+            !IsWritableRange(
+                reinterpret_cast<void*>(frame - 8),
+                sizeof(uint32_t) * 2) ||
+            !IsReadableRange(
+                reinterpret_cast<const void*>(vectors + 0x14),
+                0x18))
+        {
+            return false;
+        }
+
+        uint32_t pushedStateClass = 0;
+        uint32_t nextVectorBegin = 0;
+        uint32_t nextVectorEnd = 0;
+        std::memcpy(
+            &pushedStateClass,
+            reinterpret_cast<const void*>(stack),
+            sizeof(pushedStateClass));
+        std::memcpy(
+            byteOffset,
+            reinterpret_cast<const void*>(frame - 8),
+            sizeof(*byteOffset));
+        std::memcpy(
+            vectorIndex,
+            reinterpret_cast<const void*>(frame - 4),
+            sizeof(*vectorIndex));
+        std::memcpy(
+            vectorBegin,
+            reinterpret_cast<const void*>(vectors + 0x14),
+            sizeof(*vectorBegin));
+        std::memcpy(
+            &nextVectorBegin,
+            reinterpret_cast<const void*>(vectors + 0x24),
+            sizeof(nextVectorBegin));
+        std::memcpy(
+            &nextVectorEnd,
+            reinterpret_cast<const void*>(vectors + 0x28),
+            sizeof(nextVectorEnd));
+
+        if (pushedStateClass != 0x0A ||
+            *vectorIndex > 0x0FFFFFFFUL ||
+            *byteOffset != *vectorIndex * 16 ||
+            nextVectorEnd < nextVectorBegin ||
+            (nextVectorEnd - nextVectorBegin) % 20 != 0)
+        {
+            return false;
+        }
+
+        uint64_t entryAddress =
+            static_cast<uint64_t>(*vectorBegin) + *byteOffset;
+        return entryAddress <= 0xFFFFFFFFULL &&
+            static_cast<uint32_t>(entryAddress) == exception->ContextRecord->Edi;
     }
 
     bool IsExecutableAddress(const void* pointer)
@@ -1410,6 +1596,50 @@ namespace
         return true;
     }
 
+    LONG CALLBACK EarlyRandyRenderStateExceptionGuard(EXCEPTION_POINTERS* exception)
+    {
+        if (!exception || !exception->ExceptionRecord || !exception->ContextRecord ||
+            exception->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION ||
+            exception->ExceptionRecord->NumberParameters < 2 ||
+            exception->ExceptionRecord->ExceptionInformation[0] != 0)
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        uintptr_t resumeAddress = 0;
+        uint32_t vectorBegin = 0;
+        uint32_t byteOffset = 0;
+        uint32_t vectorIndex = 0;
+        if (!TryResolveEarlyRenderStateResume(exception, &resumeAddress) ||
+            !IsExactRenderStateVectorEntryFault(
+                exception,
+                &vectorBegin,
+                &byteOffset,
+                &vectorIndex))
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        LONG count = InterlockedIncrement(&RenderStateVectorSkipCount);
+        if (count <= 16 || count % 100 == 0)
+        {
+            aorf::Log(
+                "PATCH HIT randy31 corrupt render-state vector skipped "
+                "vector=0x%08lX offset=0x%08lX index=%lu "
+                "entry=0x%08lX count=%ld",
+                static_cast<unsigned long>(vectorBegin),
+                static_cast<unsigned long>(byteOffset),
+                static_cast<unsigned long>(vectorIndex),
+                static_cast<unsigned long>(exception->ContextRecord->Edi),
+                static_cast<long>(count));
+        }
+
+        exception->ContextRecord->Esp += sizeof(uint32_t);
+        exception->ContextRecord->Eax = 0;
+        exception->ContextRecord->Eip = static_cast<DWORD>(resumeAddress);
+        return EXCEPTION_CONTINUE_EXECUTION;
+    }
+
     LONG CALLBACK RandyColorExceptionGuard(EXCEPTION_POINTERS* exception)
     {
         if (!exception || !exception->ExceptionRecord || !exception->ContextRecord ||
@@ -1544,8 +1774,49 @@ namespace
 
 namespace aorf
 {
+    bool InstallEarlyRandyExceptionGuard()
+    {
+        if (InterlockedCompareExchangePointer(
+                &EarlyRandyExceptionGuardHandle,
+                nullptr,
+                nullptr))
+        {
+            return true;
+        }
+
+        PVOID candidate = AddVectoredExceptionHandler(
+            1,
+            EarlyRandyRenderStateExceptionGuard);
+        if (!candidate)
+        {
+            Log("ERROR early randy31 render-state exception guard installation "
+                "failed code=%lu",
+                GetLastError());
+            return false;
+        }
+
+        PVOID existing = InterlockedCompareExchangePointer(
+            &EarlyRandyExceptionGuardHandle,
+            candidate,
+            nullptr);
+        if (existing)
+        {
+            RemoveVectoredExceptionHandler(candidate);
+            return true;
+        }
+
+        Log("PATCH PASS early randy31 render-state vector guard active "
+            "faultRva=0x25118 resumeRva=0x25147");
+        return true;
+    }
+
     bool InstallRandyColorFix()
     {
+        if (!InstallEarlyRandyExceptionGuard())
+        {
+            return false;
+        }
+
         HMODULE randy = GetModuleHandleW(L"randy31.dll");
         HMODULE gui = GetModuleHandleW(L"GUI.dll");
         if (!randy || !gui)
@@ -1576,22 +1847,6 @@ namespace aorf
             0xE8, 0xCB, 0xFE, 0xFF, 0xFF,
             0x5D,
             0xC2, 0x18, 0x00
-        };
-        constexpr uint8_t ExpectedRenderStateFaultSequence[] =
-        {
-            0x8B, 0x7E, 0x14,
-            0x03, 0x7D, 0xF8,
-            0x6A, 0x0A,
-            0x8B, 0x07,
-            0x8B, 0x8C, 0x83, 0xC8, 0x04, 0x00, 0x00,
-            0xFF, 0x77, 0x04,
-            0x89, 0x4F, 0x08,
-            0x50,
-            0x8B, 0xCB,
-            0xE8, 0x92, 0x6A, 0xFF, 0xFF,
-            0xFF, 0x45, 0xFC,
-            0x83, 0x45, 0xF8, 0x10,
-            0x88, 0x47, 0x0C
         };
         constexpr uint8_t ExpectedDwordFaultSequence[] =
         {
@@ -1728,9 +1983,13 @@ namespace aorf
                 ExpectedDrawResourceFaultSequence,
                 sizeof(ExpectedDrawResourceFaultSequence)) != 0 ||
             std::memcmp(
-                base + 0x25110,
+                base + RenderStateVectorStartRva,
                 ExpectedRenderStateFaultSequence,
                 sizeof(ExpectedRenderStateFaultSequence)) != 0 ||
+            std::memcmp(
+                base + RenderStateVectorExitRva,
+                ExpectedRenderStateVectorExitSequence,
+                sizeof(ExpectedRenderStateVectorExitSequence)) != 0 ||
             std::memcmp(
                 base + 0x6C51B,
                 ExpectedDwordFaultSequence,
@@ -2023,7 +2282,7 @@ namespace aorf
             "deviceSelector=preserved drawCallRva=0x219B4 "
             "guiBatchCallRva=0x152E49 guiNullDynamicVbRva=0x150F22 "
             "guiTreeFindRva=0x4F2EF "
-            "faultRvas=0x21A94,0x2511A,0x6C3A1,0x6C476,0x6C51D");
+            "faultRvas=0x21A94,0x25118,0x2511A,0x6C3A1,0x6C476,0x6C51D");
         return true;
     }
 }
