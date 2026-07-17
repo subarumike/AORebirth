@@ -39,14 +39,16 @@ PF127 now has a reusable home-based hostile-NPC leash:
 
 - every activated NPC records its initial home coordinate;
 - player-controlled pets are excluded, while NPC-owned encounter summons remain eligible;
-- combat resets when either the NPC or its target is more than `100.0` horizontal units from the NPC's home;
+- the shared PF127 default resets combat when either the NPC or its target is more than `100.0` horizontal units from the NPC's home;
+- a captured encounter may narrow only its NPC travel boundary without changing the separate `100.0` target safety boundary;
+- Vergil uses a `40.0`-unit NPC travel boundary from finalized official-live capture `20260716-222007`;
 - reset clears target/combat/route state, sends `StopFight`, stops the active follow segment, and suppresses new aggro while the NPC is returning;
 - return movement calls the same collision-aware navigation runtime, with no teleport or wall-crossing fallback;
 - arrival within `0.75` units clears return state and restores normal patrol/aggro eligibility;
 - Vergil leash reset cancels pending healing state;
 - Abmouth leash reset cancels pending Infector timers and immediately despawns active combat-only summons.
 
-The `100.0`-unit boundary preserves the established roughly `89.8`-unit representative Vergil route case while stopping the observed greater-than-`100`-unit full-playfield chase. Mike accepted this as the private-server gameplay boundary; exact official-live leash and pathfinding parity are not required for this slice.
+Capture `20260716-222007` contains two Vergil reset cycles with `40.52` and `40.30` unit homeward return paths. The target remained alive and only about `5..8` units from Vergil. Each cycle clears combat and target state, stops movement, and then routes Vergil home. The capture therefore supports a `40.0` NPC travel boundary while disproving use of that same value as the target boundary: the target was already about `46..48` units from home before Vergil reset. The capture does not establish a moving home anchor, so runtime retains the existing activation coordinate as home. Other PF127 NPCs retain the accepted private-server `100.0` default until their own evidence proves an override.
 
 ## Search and following limits
 
@@ -83,7 +85,7 @@ The shared lifecycle owner clears route state on target loss/replacement, combat
 
 ## Validation coverage
 
-The focused navigation suite passes `36/36`. It covers direct and obstructed pursuit, distinct attack/movement clearance, the pictured open-doorway regression, a captured body-height blocked wall ray, vertical attack-segment validation, provider capability states, collision-valid route emission and return-to-home routing, PF127 leash boundaries and pet exclusion, existing movement-pipeline use, target and geometry invalidation, deviation/stuck recovery, stable unreachable behavior, retry suppression, lifecycle cleanup, respawn isolation, large-step tunneling prevention, direct-path restoration, search bounds, and unchanged combat damage ownership.
+The focused navigation suite passes `37/37`. It covers direct and obstructed pursuit, distinct attack/movement clearance, the pictured open-doorway regression, a captured body-height blocked wall ray, vertical attack-segment validation, provider capability states, collision-valid route emission and return-to-home routing, PF127 default leash boundaries, Vergil's captured NPC-only override, pet exclusion, existing movement-pipeline use, target and geometry invalidation, deviation/stuck recovery, stable unreachable behavior, retry suppression, lifecycle cleanup, respawn isolation, large-step tunneling prevention, direct-path restoration, search bounds, and unchanged combat damage ownership.
 
 PF127 tests load the promoted geometry through the generic provider, prove the representative Vergil wall blocks direct pursuit, calculate a bounded collision-valid route, follow it through the shared state machine, restore a clear direct combat path, allow the pictured body-height doorway shot while retaining movement-frame obstruction, and route a leashed NPC home through collision-valid segments. Independent regressions pass: PF127 collision/LOS `17/17` and Abmouth/Vergil `20/20`. The lifecycle assembly remains at its established `52/58` baseline with the same six unrelated session/packet ownership guardrail failures. AORebirth.Core and ZoneEngine Debug builds pass. Mike live-validated the private-client result: open-doorway attacks, real-wall blocking, chase navigation, and leash behavior now work as intended.
 

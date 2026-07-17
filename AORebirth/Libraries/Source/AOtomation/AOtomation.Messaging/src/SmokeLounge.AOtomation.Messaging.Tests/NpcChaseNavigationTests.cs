@@ -326,12 +326,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             ChaseNavigationPoint home = Point(0, 0);
 
+            Assert.AreEqual(
+                100.0,
+                NpcCombatLeashPolicy.SubwayDefaultMaximumNpcDistanceFromHome);
+
             Assert.IsTrue(
                 NpcCombatLeashPolicy.ShouldResetCombat(
                     127,
                     false,
                     home,
-                    Point(NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome + 0.01, 0),
+                    Point(NpcCombatLeashPolicy.SubwayDefaultMaximumNpcDistanceFromHome + 0.01, 0),
                     Point(0, 0)));
             Assert.IsTrue(
                 NpcCombatLeashPolicy.ShouldResetCombat(
@@ -339,14 +343,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     false,
                     home,
                     Point(0, 0),
-                    Point(NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome + 0.01, 0)));
+                    Point(NpcCombatLeashPolicy.SubwayMaximumTargetDistanceFromHome + 0.01, 0)));
             Assert.IsFalse(
                 NpcCombatLeashPolicy.ShouldResetCombat(
                     127,
                     false,
                     home,
-                    Point(NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome, 0),
-                    Point(NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome, 0)));
+                    Point(NpcCombatLeashPolicy.SubwayDefaultMaximumNpcDistanceFromHome, 0),
+                    Point(NpcCombatLeashPolicy.SubwayMaximumTargetDistanceFromHome, 0)));
 
             Assert.IsFalse(
                 NpcCombatLeashPolicy.ShouldResetCombat(
@@ -358,11 +362,34 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void VergilCaptureUsesFortyUnitNpcTravelWithoutPrematureTargetReset()
+        {
+            ChaseNavigationPoint home = Point(0, 0);
+
+            Assert.IsFalse(
+                NpcCombatLeashPolicy.ShouldResetCombat(
+                    127,
+                    false,
+                    home,
+                    Point(40.0, 0),
+                    Point(47.0, 0),
+                    40.0));
+            Assert.IsTrue(
+                NpcCombatLeashPolicy.ShouldResetCombat(
+                    127,
+                    false,
+                    home,
+                    Point(40.01, 0),
+                    Point(47.0, 0),
+                    40.0));
+        }
+
+        [TestMethod]
         public void SubwayLeashExcludesPlayerPetsAndUnsupportedPlayfields()
         {
             ChaseNavigationPoint home = Point(0, 0);
             ChaseNavigationPoint farAway =
-                Point(NpcCombatLeashPolicy.SubwayMaximumDistanceFromHome + 1.0, 0);
+                Point(NpcCombatLeashPolicy.SubwayDefaultMaximumNpcDistanceFromHome + 1.0, 0);
 
             Assert.IsFalse(
                 NpcCombatLeashPolicy.ShouldResetCombat(127, true, home, farAway, farAway));
@@ -753,6 +780,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(source, "NpcChaseInvalidationReason.EncounterReset");
             StringAssert.Contains(source, "NpcChaseInvalidationReason.PlayfieldReset");
             StringAssert.Contains(source, "this.RegisterNpcHome(character);");
+            StringAssert.Contains(source, "home.MaximumNpcDistanceFromHome");
             StringAssert.Contains(source, "this.TryBeginLeashReturn(attacker)");
             StringAssert.Contains(source, "home.ReturningHome");
             StringAssert.Contains(source, "this.chaseNavigation.UpdateReturnToHome(");
@@ -761,6 +789,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(source, "owner.Controller is PlayerController");
             StringAssert.Contains(source, "controller.State = CharacterState.Idle;");
             StringAssert.Contains(source, "controller.State = home.ControllerStateBeforeReturn;");
+
+            string encounterSource = File.ReadAllText(
+                Path.Combine(
+                    root,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayEncounterRuntimeService.cs"));
+            StringAssert.Contains(encounterSource, "maximumNpcLeashDistanceFromHome: 40.0");
+            StringAssert.Contains(
+                encounterSource,
+                "20260716-222007 two approximately 40-unit leash resets");
 
             string systemsSource = File.ReadAllText(
                 Path.Combine(

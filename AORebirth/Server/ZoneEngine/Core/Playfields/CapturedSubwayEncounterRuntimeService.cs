@@ -900,7 +900,8 @@ namespace AORebirth.Core.Playfields
                 3.0,
                 variant.Evidence
                 + "; exact spawn/appearance 20260709-222339 SCFU #5445; "
-                + "Mike 20260716 30-minute loot corpse and 10-minute respawn",
+                + "Mike 20260716 30-minute loot corpse and 10-minute respawn; "
+                + "20260716-222007 two approximately 40-unit leash resets",
                 npcFamily: 138,
                 npcLosHeight: 0,
                 fatness: 1,
@@ -924,7 +925,8 @@ namespace AORebirth.Core.Playfields
                 waypoints: new[]
                 {
                     new CapturedSubwayWaypointDefinition(278.045074f, 73.01795f, 98.80104f)
-                });
+                },
+                maximumNpcLeashDistanceFromHome: 40.0);
         }
 
         private static CapturedEncounterRuntimeDefinition CreateFirstInfectorDefinition()
@@ -1123,7 +1125,8 @@ namespace AORebirth.Core.Playfields
             int headMesh = 0,
             CapturedSubwayTextureDefinition[] textures = null,
             CapturedSubwayMeshDefinition[] meshes = null,
-            CapturedSubwayWaypointDefinition[] waypoints = null)
+            CapturedSubwayWaypointDefinition[] waypoints = null,
+            double? maximumNpcLeashDistanceFromHome = null)
         {
             this.ProfileKey = profileKey;
             this.SpawnKey = spawnKey;
@@ -1165,6 +1168,7 @@ namespace AORebirth.Core.Playfields
             this.UnlootedCorpseLifetimeSeconds = unlootedCorpseLifetimeSeconds;
             this.LootedCleanupSeconds = lootedCleanupSeconds;
             this.Evidence = evidence;
+            this.MaximumNpcLeashDistanceFromHome = maximumNpcLeashDistanceFromHome;
         }
 
         internal string ProfileKey { get; private set; }
@@ -1207,6 +1211,7 @@ namespace AORebirth.Core.Playfields
         internal double UnlootedCorpseLifetimeSeconds { get; private set; }
         internal double LootedCleanupSeconds { get; private set; }
         internal string Evidence { get; private set; }
+        internal double? MaximumNpcLeashDistanceFromHome { get; private set; }
 
         private static CapturedSubwayTextureDefinition[] CreateDefaultTextures()
         {
