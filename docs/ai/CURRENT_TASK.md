@@ -2,12 +2,12 @@
 
 ## Current Focus
 
-Vergil follow-up capture `20260716-034433` is integrated without merging
-player-owned-pet damage into player-facing damage. The complete existing
-Bloodcreeper and Disobedient Bot corpse-loot corpus remains implemented. The
-next active boundary is the bounded private Bloodcreeper smoke; no new capture
-is requested by either completed offline slice. After that smoke, continue the
-next Subway enemy from the existing corpus through the shared ordinary runtime.
+Named-boss lifecycle evidence and finalized Abmouth capture `20260716-220400`
+are integrated. Abmouth and Vergil now use a ten-minute post-death respawn, a
+30-minute loot-bearing corpse, and the universal three-second empty cleanup.
+The next active boundary remains the bounded private Bloodcreeper smoke. After
+that smoke, continue the next Subway enemy from the existing corpus through the
+shared ordinary runtime.
 
 ## Done in this slice
 
@@ -78,6 +78,15 @@ next Subway enemy from the existing corpus through the shared ordinary runtime.
   unresolved, and weapon damage/recharge remains equipped-weapon-owned.
 - No quarantined population rows were activated; the population remains 260
   catalog rows, 222 active rows, and 38 quarantined rows.
+- Every born-empty or fully emptied corpse now starts cleanup at three seconds,
+  including credit-only corpses whose final credit award is delayed.
+- Abmouth and Vergil schedule a new generation exactly ten minutes from death,
+  independently of dead-NPC despawn and the older loot corpse.
+- Abmouth and Vergil loot-bearing corpses now retain their confirmed 30-minute
+  lifetime. Capture `20260716-220400` adds a second atomic Abmouth
+  item-plus-`587`-credit snapshot without mixing its slots with the older corpse.
+- Abmouth capture evidence keeps four player-facing hits separate from ten hits
+  against the player-owned Healer and Wrath Incarnation pets.
 
 ## Remaining
 
@@ -93,8 +102,9 @@ next Subway enemy from the existing corpus through the shared ordinary runtime.
    fixed-level rows fixed until capture evidence or an approved design decision
    establishes a range.
 
-No repeat Vergil capture is needed for the data promoted from
-`20260716-034433`. Its short post-death window does not establish respawn.
+No repeat named-boss capture is needed for the promoted data. The packet
+captures do not independently bracket ten minutes; Mike's direct live timing
+confirmation establishes that value.
 
 ## Constraints
 
@@ -111,6 +121,10 @@ No repeat Vergil capture is needed for the data promoted from
   Vergil cadence from a mixed-target fight.
 - Keep Vergil loot snapshots atomic; independent item-slot or credit rolls would
   create corpse combinations that were never observed.
+- Keep both Abmouth loot snapshots atomic. Capture `20260716-220400` reused
+  corpse identity `F69001`; generation-aware offline reconstruction now rebinds
+  the new six-item snapshot to Abmouth instead of the stale Vergil generation.
+- Named-boss respawn starts at death and must not wait for a 30-minute corpse.
 - Existing encounter, pet, vendor, static, quest, navigation, LOS, leash, corpse,
   loot, and combat ownership remains unchanged.
 - Do not auto-attach or launch AO/capture tooling. Mike runs gameplay and supplies

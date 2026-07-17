@@ -212,6 +212,7 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            DateTime diedAtUtc = DateTime.UtcNow;
             Identity corpseIdentity = Identity.None;
             if (this.playfield.CanBuildKnownCorpseVisual(target))
             {
@@ -227,9 +228,9 @@ namespace AORebirth.Core.Playfields
             this.playfield.SendNpcDeathAnimation(target);
             this.rewards.RunNpcDeathRewardHooks(attacker, target, this.playfield.AwardCombatXp);
             this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);
-            this.worldPopulation.NotifyDeath(target, corpseIdentity, DateTime.UtcNow);
+            this.worldPopulation.NotifyDeath(target, corpseIdentity, diedAtUtc);
 
-            foreach (ICharacter summon in this.capturedSubwayEncounters.NotifyDeath(target))
+            foreach (ICharacter summon in this.capturedSubwayEncounters.NotifyDeath(target, diedAtUtc))
             {
                 this.playfield.DespawnNpcImmediately(summon);
             }

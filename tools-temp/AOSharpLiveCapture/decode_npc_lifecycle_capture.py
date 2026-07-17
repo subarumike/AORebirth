@@ -2,6 +2,7 @@
 """Decode generic NPC corpse/lifecycle evidence from an AOSharpLiveCapture folder."""
 
 import argparse
+import collections
 import csv
 import datetime as dt
 import json
@@ -750,6 +751,7 @@ def load_enemy_profiles(path):
                 "Name": row.get("Name", ""),
                 "MonsterData": row.get("MonsterData", ""),
                 "NpcFamily": row.get("NPCFamily", "") or row.get("NpcFamily", ""),
+                "Level": row.get("Level", ""),
             }
     return profiles
 
@@ -777,6 +779,7 @@ def load_scfu_profiles_and_state(path):
                 "Name": row.get("Name", ""),
                 "MonsterData": row.get("MonsterData", ""),
                 "NpcFamily": row.get("NpcFamily", "") or row.get("NPCFamily", ""),
+                "Level": row.get("Level", ""),
             }
             if identity_value in seen_identities:
                 continue
@@ -819,6 +822,7 @@ def load_enemy_dossier_profiles(path):
             "Name": str(enemy.get("name", "")),
             "MonsterData": str(enemy.get("monsterData", "")),
             "NpcFamily": str(enemy.get("npcFamily", "")),
+            "Level": str(enemy.get("level", "")),
         }
     return profiles
 
@@ -836,7 +840,7 @@ def identity_key(value):
 
 
 def load_corpse_gone_times(path):
-    gone_times = {}
+    gone_times = collections.defaultdict(list)
     if not path.exists():
         return gone_times
 
@@ -845,8 +849,11 @@ def load_corpse_gone_times(path):
             if row.get("Phase") != "corpse-gone":
                 continue
             corpse_identity = identity_key(row.get("PrimaryIdentity", ""))
-            if corpse_identity:
-                gone_times[corpse_identity] = row.get("CapturedUtc", "")
+            captured_utc = row.get("CapturedUtc", "")
+            if corpse_identity and parse_timestamp(captured_utc) is not None:
+                gone_times[corpse_identity].append(captured_utc)
+    for values in gone_times.values():
+        values.sort(key=parse_timestamp)
     return gone_times
 
 
@@ -865,6 +872,189 @@ def load_corpse_by_dead_npc(path):
                 "CorpseSeenUtc": row.get("CapturedUtc", ""),
             }
     return corpses
+
+
+def rebind_corpse_loot_observations(
+    capture, corpse_csv, output_csv, scfu_csv=None
+):
+    source_csv = capture / "corpse-loot-observations.csv"
+    if not source_csv.exists():
+        return {
+            "available": False,
+            "rows": 0,
+            "linkedRows": 0,
+            "unlinkedRows": 0,
+            "ambiguousRows": 0,
+            "outputCsv": str(output_csv),
+        }
+
+    with source_csv.open("r", encoding="utf-8-sig", newline="") as handle:
+        reader = csv.DictReader(handle)
+        fieldnames = reader.fieldnames or []
+        observations = list(reader)
+
+    gone_times = load_corpse_gone_times(capture / "npc-lifecycle.csv")
+    generation_updates_by_corpse = collections.defaultdict(list)
+    if corpse_csv.exists():
+        with corpse_csv.open("r", encoding="utf-8-sig", newline="") as handle:
+            for row in csv.DictReader(handle):
+                seen_time = parse_timestamp(row.get("CapturedUtc", ""))
+                corpse_key = identity_key(row.get("CorpseIdentity", ""))
+                if seen_time is None or not corpse_key:
+                    continue
+                generation = dict(row)
+                generation["SeenTime"] = seen_time
+                generation_updates_by_corpse[corpse_key].append(generation)
+
+    generations_by_corpse = collections.defaultdict(list)
+    for corpse_key, updates in generation_updates_by_corpse.items():
+        updates.sort(key=lambda row: row["SeenTime"])
+        active_generation = None
+        for update in updates:
+            corpse_gone_times = [
+                parse_timestamp(value)
+                for value in gone_times.get(corpse_key, [])
+            ]
+            equal_time_boundary = any(
+                gone_time == update["SeenTime"]
+                for gone_time in corpse_gone_times
+            )
+            active_ended = active_generation is not None and any(
+                active_generation["SeenTime"] < gone_time <= update["SeenTime"]
+                for gone_time in corpse_gone_times
+            )
+            same_dead_npc = active_generation is not None and identity_key(
+                active_generation.get("DeadNpcIdentity", "")
+            ) == identity_key(update.get("DeadNpcIdentity", ""))
+            if active_generation is not None and same_dead_npc and not active_ended:
+                active_generation["Updates"].append(update)
+                continue
+
+            active_generation = dict(update)
+            active_generation["Updates"] = [update]
+            active_generation["AmbiguousStart"] = equal_time_boundary
+            generations_by_corpse[corpse_key].append(active_generation)
+
+    profiles = load_enemy_dossier_profiles(capture / "enemy-dossier.json")
+    for identity_value, profile in load_enemy_profiles(
+        capture / "enemy-full-updates.csv"
+    ).items():
+        existing = profiles.setdefault(identity_value, {})
+        existing.update({key: value for key, value in profile.items() if value})
+    scfu_profiles, _ = load_scfu_profiles_and_state(
+        scfu_csv or capture / SCFU_OUTPUT_NAME
+    )
+    for identity_value, profile in scfu_profiles.items():
+        existing = profiles.setdefault(identity_value, {})
+        existing.update({key: value for key, value in profile.items() if value})
+    profiles_by_key = {
+        identity_key(identity_value): profile
+        for identity_value, profile in profiles.items()
+    }
+    generation_open_counts = collections.defaultdict(int)
+    linked_rows = 0
+    unlinked_rows = 0
+    ambiguous_rows = 0
+
+    for observation in observations:
+        observed_time = parse_timestamp(observation.get("CapturedUtc", ""))
+        corpse_key = identity_key(observation.get("CorpseIdentity", ""))
+        generations = generations_by_corpse.get(corpse_key, [])
+        candidates = [
+            generation
+            for generation in generations
+            if observed_time is not None and generation["SeenTime"] <= observed_time
+        ]
+        generation = candidates[-1] if candidates else None
+        if generation is not None:
+            same_time = [
+                candidate
+                for candidate in candidates
+                if candidate["SeenTime"] == generation["SeenTime"]
+            ]
+            if len(same_time) > 1 or (
+                generation.get("AmbiguousStart", False)
+                and observed_time == generation["SeenTime"]
+            ):
+                generation = None
+                ambiguous_rows += 1
+
+        if generation is not None:
+            generation_index = generations.index(generation)
+            next_seen = (
+                generations[generation_index + 1]["SeenTime"]
+                if generation_index + 1 < len(generations)
+                else None
+            )
+            generation_gone_times = []
+            for value in gone_times.get(corpse_key, []):
+                gone_time = parse_timestamp(value)
+                starts_after_generation = (
+                    gone_time > generation["SeenTime"]
+                    if generation.get("AmbiguousStart", False)
+                    else gone_time >= generation["SeenTime"]
+                )
+                if starts_after_generation and (
+                    next_seen is None or gone_time < next_seen
+                ):
+                    generation_gone_times.append(gone_time)
+            first_gone = generation_gone_times[0] if generation_gone_times else None
+            if first_gone is not None:
+                if observed_time == first_gone:
+                    generation = None
+                    ambiguous_rows += 1
+                elif observed_time > first_gone:
+                    generation = None
+
+        if generation is None:
+            # A partial capture may contain a valid live-linked loot row without
+            # the corpse full update needed to reconstruct its generation
+            # offline. Preserve that evidence verbatim instead of replacing it
+            # with blank metadata. Rows that arrived without any correlation
+            # status remain explicitly unresolved.
+            if not observation.get("CorrelationStatus", "").strip():
+                observation["CorrelationStatus"] = "unlinked-offline-generation"
+            unlinked_rows += 1
+            continue
+
+        generation_key = (corpse_key, generation["CapturedUtc"])
+        generation_open_counts[generation_key] += 1
+        open_ordinal = generation_open_counts[generation_key]
+        generation_update = [
+            update
+            for update in generation.get("Updates", [generation])
+            if update["SeenTime"] <= observed_time
+        ][-1]
+        dead_npc_identity = generation_update.get("DeadNpcIdentity", "")
+        profile = profiles_by_key.get(identity_key(dead_npc_identity), {})
+        observation.update(
+            {
+                "OpenOrdinal": str(open_ordinal),
+                "InitialSnapshot": "true" if open_ordinal == 1 else "false",
+                "DeadNpcIdentity": dead_npc_identity,
+                "EnemyName": profile.get("Name", ""),
+                "MonsterData": generation_update.get("CorpseMonsterData", ""),
+                "EnemyLevel": profile.get("Level", ""),
+                "CorpseCredits": generation_update.get("CorpseCredits", ""),
+                "PlayfieldId": generation_update.get("PlayfieldId", ""),
+                "CorrelationStatus": "linked-offline-generation",
+            }
+        )
+        linked_rows += 1
+
+    with output_csv.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(observations)
+
+    return {
+        "available": True,
+        "rows": len(observations),
+        "linkedRows": linked_rows,
+        "unlinkedRows": unlinked_rows,
+        "ambiguousRows": ambiguous_rows,
+        "outputCsv": str(output_csv),
+    }
 
 
 def same_profile(dead_profile, candidate_profile):
@@ -941,7 +1131,17 @@ def build_enemy_respawns(capture, corpse_csv, output_csv=None, scfu_csv=None):
             status = "ambiguous"
 
         corpse = corpses.get(dead_identity, {})
-        corpse_gone_utc = corpse_gone_times.get(identity_key(corpse.get("CorpseIdentity", "")), "")
+        corpse_seen_time = parse_timestamp(corpse.get("CorpseSeenUtc", ""))
+        corpse_gone_utc = next(
+            (
+                value
+                for value in corpse_gone_times.get(
+                    identity_key(corpse.get("CorpseIdentity", "")), []
+                )
+                if corpse_seen_time is None or parse_timestamp(value) >= corpse_seen_time
+            ),
+            "",
+        )
         corpse_gone_time = parse_timestamp(corpse_gone_utc)
         selected_time = selected[0] if selected else None
         selected_delta = selected[1] if selected else None
@@ -1190,6 +1390,190 @@ def run_self_tests():
         )
         tests.append("frame-length-mismatch")
 
+        reused_corpse = root / "reused-corpse-generation"
+        reused_corpse.mkdir()
+        corpse_csv = reused_corpse / "corpse-full-updates.csv"
+        with corpse_csv.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(
+                handle,
+                fieldnames=[
+                    "CapturedUtc", "CorpseIdentity", "DeadNpcIdentity",
+                    "CorpseMonsterData", "CorpseCredits", "PlayfieldId",
+                ],
+            )
+            writer.writeheader()
+            writer.writerows(
+                [
+                    {
+                        "CapturedUtc": "2026-01-01T00:00:01Z",
+                        "CorpseIdentity": "Corpse:00F69001",
+                        "DeadNpcIdentity": "SimpleChar:00000011",
+                        "CorpseMonsterData": "111",
+                        "CorpseCredits": "11",
+                        "PlayfieldId": "127",
+                    },
+                    {
+                        "CapturedUtc": "2026-01-01T00:00:01.500Z",
+                        "CorpseIdentity": "Corpse:00F69001",
+                        "DeadNpcIdentity": "SimpleChar:00000011",
+                        "CorpseMonsterData": "111",
+                        "CorpseCredits": "12",
+                        "PlayfieldId": "127",
+                    },
+                    {
+                        "CapturedUtc": "2026-01-01T00:00:03Z",
+                        "CorpseIdentity": "Corpse:00F69001",
+                        "DeadNpcIdentity": "SimpleChar:00000011",
+                        "CorpseMonsterData": "111",
+                        "CorpseCredits": "13",
+                        "PlayfieldId": "127",
+                    },
+                    {
+                        "CapturedUtc": "2026-01-01T00:00:05Z",
+                        "CorpseIdentity": "Corpse:00F69001",
+                        "DeadNpcIdentity": "SimpleChar:00000022",
+                        "CorpseMonsterData": "222",
+                        "CorpseCredits": "22",
+                        "PlayfieldId": "127",
+                    },
+                ]
+            )
+        loot_csv = reused_corpse / "corpse-loot-observations.csv"
+        loot_fields = [
+            "CapturedUtc", "CorpseIdentity", "OpenOrdinal", "InitialSnapshot",
+            "DeadNpcIdentity", "EnemyName", "MonsterData", "EnemyLevel",
+            "CorpseCredits", "PlayfieldId", "CorrelationStatus",
+        ]
+        with loot_csv.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=loot_fields)
+            writer.writeheader()
+            writer.writerows(
+                [
+                    {
+                        "CapturedUtc": "2026-01-01T00:00:01.250Z",
+                        "CorpseIdentity": "(Corpse:F69001)",
+                    },
+                    {
+                        "CapturedUtc": "2026-01-01T00:00:02Z",
+                        "CorpseIdentity": "(Corpse:F69001)",
+                        "OpenOrdinal": "2",
+                        "InitialSnapshot": "false",
+                        "DeadNpcIdentity": "SimpleChar:00000011",
+                    },
+                    {
+                        "CapturedUtc": "2026-01-01T00:00:03Z",
+                        "CorpseIdentity": "(Corpse:F69001)",
+                        "OpenOrdinal": "3",
+                        "InitialSnapshot": "false",
+                        "DeadNpcIdentity": "SimpleChar:00000011",
+                        "EnemyName": "Boundary Evidence",
+                        "CorrelationStatus": "linked-live-generation",
+                    },
+                    {
+                        "CapturedUtc": "2026-01-01T00:00:04Z",
+                        "CorpseIdentity": "(Corpse:F69001)",
+                        "OpenOrdinal": "4",
+                        "InitialSnapshot": "false",
+                        "DeadNpcIdentity": "SimpleChar:00000011",
+                    },
+                    {
+                        "CapturedUtc": "2026-01-01T00:00:06Z",
+                        "CorpseIdentity": "(Corpse:F69001)",
+                        "OpenOrdinal": "3",
+                        "InitialSnapshot": "false",
+                        "DeadNpcIdentity": "SimpleChar:00000011",
+                    },
+                    {
+                        "CapturedUtc": "2026-01-01T00:00:07Z",
+                        "CorpseIdentity": "(Corpse:F69002)",
+                        "OpenOrdinal": "4",
+                        "InitialSnapshot": "false",
+                        "DeadNpcIdentity": "SimpleChar:00000033",
+                        "EnemyName": "Preserved Enemy",
+                        "MonsterData": "333",
+                        "EnemyLevel": "33",
+                        "CorpseCredits": "33",
+                        "PlayfieldId": "127",
+                        "CorrelationStatus": "linked-live-generation",
+                    },
+                ]
+            )
+        with (reused_corpse / "npc-lifecycle.csv").open(
+            "w", encoding="utf-8", newline=""
+        ) as handle:
+            writer = csv.DictWriter(
+                handle, fieldnames=["CapturedUtc", "Phase", "PrimaryIdentity"]
+            )
+            writer.writeheader()
+            writer.writerows(
+                [
+                    {
+                        "CapturedUtc": "2026-01-01T00:00:03Z",
+                        "Phase": "corpse-gone",
+                        "PrimaryIdentity": "(Corpse:F69001)",
+                    },
+                    {
+                        "CapturedUtc": "",
+                        "Phase": "corpse-gone",
+                        "PrimaryIdentity": "(Corpse:F69001)",
+                    },
+                ]
+            )
+        (reused_corpse / "enemy-dossier.json").write_text(
+            json.dumps(
+                {
+                    "enemies": [
+                        {
+                            "identity": "(SimpleChar:00000011)",
+                            "name": "First Enemy",
+                            "monsterData": "111",
+                            "level": 11,
+                        },
+                        {
+                            "identity": "(SimpleChar:00000022)",
+                            "name": "Second Enemy",
+                            "monsterData": "222",
+                            "level": 22,
+                        },
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        rebound_csv = reused_corpse / "corpse-loot-observations.pending.csv"
+        rebound = rebind_corpse_loot_observations(
+            reused_corpse, corpse_csv, rebound_csv
+        )
+        with rebound_csv.open("r", encoding="utf-8", newline="") as handle:
+            rebound_rows = list(csv.DictReader(handle))
+        self_test_check(
+            rebound["linkedRows"] == 4
+            and rebound["unlinkedRows"] == 2
+            and rebound["ambiguousRows"] == 1
+            and [rebound_rows[index]["OpenOrdinal"] for index in (0, 1, 3, 4)]
+            == ["1", "2", "1", "1"]
+            and [rebound_rows[index]["InitialSnapshot"] for index in (0, 1, 3, 4)]
+            == ["true", "false", "true", "true"]
+            and [rebound_rows[index]["EnemyName"] for index in (0, 1, 3, 4)]
+            == ["First Enemy", "First Enemy", "First Enemy", "Second Enemy"]
+            and [rebound_rows[index]["CorpseCredits"] for index in (0, 1, 3, 4)]
+            == ["11", "12", "13", "22"]
+            and rebound_rows[2]["EnemyName"] == "Boundary Evidence"
+            and rebound_rows[5]["EnemyName"] == "Preserved Enemy"
+            and rebound_rows[5]["CorpseCredits"] == "33"
+            and rebound_rows[5]["CorrelationStatus"] == "linked-live-generation",
+            "reused corpse identities must bind separate loot generations",
+        )
+        tests.append("equal-time-generation-boundary-fails-closed")
+        tests.append("repeated-cfu-same-generation")
+        tests.append("unmatched-live-correlation-preservation")
+        gone = load_corpse_gone_times(reused_corpse / "npc-lifecycle.csv")
+        self_test_check(
+            len(gone["CORPSE:00F69001"]) == 1,
+            "gone events must remain generation-selectable",
+        )
+        tests.append("reused-corpse-generation")
+
         preservation = root / "preservation"
         preservation.mkdir()
         final = preservation / "derived.csv"
@@ -1286,6 +1670,14 @@ def main():
         output_csv=pending_respawn_csv,
         scfu_csv=Path(scfu_summary["pendingOutputCsv"]),
     )
+    loot_observations_csv = capture / "corpse-loot-observations.csv"
+    pending_loot_observations_csv = pending_path(loot_observations_csv)
+    loot_rebind_summary = rebind_corpse_loot_observations(
+        capture,
+        pending_output_csv,
+        pending_loot_observations_csv,
+        scfu_csv=Path(scfu_summary["pendingOutputCsv"]),
+    )
     corpse_evidence_observed = bool(
         rows
         or event_counts["corpseSeen"]
@@ -1298,6 +1690,7 @@ def main():
     processing_allowed = bool(
         raw_source_valid
         and corpse_processing_allowed
+        and loot_rebind_summary["ambiguousRows"] == 0
         and not scfu_summary["offlineDecodeRequired"]
     )
     if source_summary["recaptureRequired"]:
@@ -1313,6 +1706,10 @@ def main():
         (pending_output_csv, output_csv),
         (pending_respawn_csv, respawn_csv),
     ]
+    if loot_rebind_summary["available"]:
+        promotion_pairs.append(
+            (pending_loot_observations_csv, loot_observations_csv)
+        )
     scfu_pending_pairs = [
         (Path(scfu_summary["pendingOutputCsv"]), Path(scfu_summary["outputCsv"])),
         (Path(scfu_summary["pendingErrorCsv"]), Path(scfu_summary["errorCsv"])),
@@ -1330,6 +1727,7 @@ def main():
         "enemyRespawnAmbiguousRows": respawn_summary["ambiguousRows"],
         "enemyRespawnIncompleteRows": respawn_summary["incompleteRows"],
         "enemyStateSkippedRows": respawn_summary["skippedStateRows"],
+        "corpseLootRebind": loot_rebind_summary,
         "lifecycleCounts": event_counts,
         "rawSimpleCharFullUpdatePackets": scfu_summary["rawPackets"],
         "simpleCharFullUpdateOutputRows": scfu_summary["outputRows"],
@@ -1352,6 +1750,8 @@ def main():
             "pendingCorpseFullUpdatesCsv": str(pending_output_csv),
             "enemyRespawnsCsv": str(respawn_csv),
             "pendingEnemyRespawnsCsv": str(pending_respawn_csv),
+            "corpseLootObservationsCsv": str(loot_observations_csv),
+            "pendingCorpseLootObservationsCsv": str(pending_loot_observations_csv),
             "simpleCharFullUpdatesCsv": scfu_summary["outputCsv"],
             "pendingSimpleCharFullUpdatesCsv": scfu_summary["pendingOutputCsv"],
             "simpleCharFullUpdateErrorsCsv": scfu_summary["errorCsv"],
@@ -1384,6 +1784,13 @@ def main():
         f"capabilityStatus={capability_status} "
         f"recaptureRequired={str(source_summary['recaptureRequired']).lower()} "
         f"offlineDecodeRequired={str(summary['offlineDecodeRequired']).lower()}"
+    )
+    print(
+        "corpseLootRebindRows="
+        f"{loot_rebind_summary['rows']} "
+        f"linked={loot_rebind_summary['linkedRows']} "
+        f"unlinked={loot_rebind_summary['unlinkedRows']} "
+        f"ambiguous={loot_rebind_summary['ambiguousRows']}"
     )
     print(f"processingAllowed={str(processing_allowed).lower()}")
     print(output_csv if processing_allowed else pending_output_csv)

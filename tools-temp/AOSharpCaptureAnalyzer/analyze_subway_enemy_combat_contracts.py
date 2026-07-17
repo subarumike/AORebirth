@@ -26,17 +26,24 @@ CAPTURES = (
     "20260716-034104",
     "20260716-034433",
     "20260716-034559",
+    "20260716-220400",
 )
 CAPTURE_ENEMY_FILTERS = {
     "20260716-034433": frozenset({"Vergil Aeneid"}),
     "20260716-034559": frozenset({"Melded Patterns"}),
+    "20260716-220400": frozenset({"Abmouth Supremus"}),
 }
-# Melded Patterns and Vergil captures include hits against player-owned pets.
+# Melded Patterns, Vergil, and Abmouth captures include hits against player-owned pets.
 # Keep player-facing retaliation and damage restricted to the local player.
-LOCAL_PLAYER_TARGET_ONLY_ENEMIES = frozenset({"Melded Patterns", "Vergil Aeneid"})
-TARGET_ROLE_EVIDENCE_ENEMIES = frozenset({"Vergil Aeneid"})
+LOCAL_PLAYER_TARGET_ONLY_ENEMIES = frozenset(
+    {"Abmouth Supremus", "Melded Patterns", "Vergil Aeneid"}
+)
+TARGET_ROLE_EVIDENCE_ENEMIES = frozenset({"Abmouth Supremus", "Vergil Aeneid"})
 PLAYER_OWNED_PET_TARGETS = {
     "20260716-034433": frozenset({"(SimpleChar:796D400B)"}),
+    "20260716-220400": frozenset(
+        {"(SimpleChar:7970253A)", "(SimpleChar:7970253C)"}
+    ),
 }
 CADENCE_UNRESOLVED_ENEMIES = frozenset({"Vergil Aeneid"})
 OUTPUT = REPO / "docs" / "generated" / "subway_enemy_combat_contracts.json"

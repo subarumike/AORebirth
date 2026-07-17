@@ -846,6 +846,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"tools-temp\AOSharpLiveCapture\Main.cs"));
             string captureLauncherText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"tools-temp\start-aosharp-live-capture.cmd"));
+            string lifecycleDecoderText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py"));
             string inboundHandler = ExtractMethodBlock(
                 captureText,
                 "private void OnN3MessageReceived(object sender, N3Message message)");
@@ -904,6 +906,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && captureText.Contains("this.corpseLootInitialSnapshotCount < 10")
                 && captureText.Contains("this.corpseLootInitialEnemyKeys.Count != 1"),
                 "A marked ten-kill loot capture must preserve empty outcomes, credits, enemy/player context, and one-enemy completeness in one pass.");
+            Assert.IsTrue(
+                captureText.Contains("activeCorpseEvidenceByCorpse")
+                && captureText.Contains("bool isNewGeneration")
+                && captureText.Contains("this.corpseInventorySnapshotCounts.Remove(normalizedCorpseIdentity);")
+                && captureText.Contains("this.activeCorpseEvidenceByCorpse.TryGetValue(")
+                && captureText.Contains("this.activeCorpseEvidenceByCorpse.Remove(normalizedCorpseIdentity);"),
+                "Live loot correlation must bind the active corpse generation and reset its open ordinal when the client reuses a corpse identity.");
+            Assert.IsTrue(
+                lifecycleDecoderText.Contains("def rebind_corpse_loot_observations(")
+                && lifecycleDecoderText.Contains("generations_by_corpse = collections.defaultdict(list)")
+                && lifecycleDecoderText.Contains("generation[\"SeenTime\"] <= observed_time")
+                && lifecycleDecoderText.Contains("\"CorrelationStatus\": \"linked-offline-generation\"")
+                && lifecycleDecoderText.Contains("reused corpse identities must bind separate loot generations"),
+                "Offline reconstruction must repair identity-reused loot rows from CFU generation boundaries without another gameplay capture.");
             Assert.IsTrue(
                 captureLauncherText.Contains("--loot-10")
                 && captureLauncherText.Contains("LOOT_CAPTURE_REQUEST")
@@ -2501,10 +2517,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playfieldText.Contains("OrdinaryEnemyRuntimeRegistry.TryGet")
                 && !registerCorpse.Contains("if (!state.HasUnlootedItems)")
                 && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(1)")
-                && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(5)"),
-                "Accepted Subway Thief must keep captured corpse visual selection and the generic five-minute loot-bearing corpse lifetime.");
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(5)")
+                && CountOccurrences(catalogText, "3.0,\n                300.0,\n                3.0") == 3,
+                "Accepted Subway Thief must keep its captured corpse visual, five-minute loot-bearing lifetime, and universal three-second empty cleanup.");
         }
 
         [TestMethod]
@@ -4270,6 +4287,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs"));
             string corpseRulesText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
+            string ordinaryCatalogText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
 
             string playfieldUseCorpse = ExtractMethodBlock(playfieldText, "public bool TryUseCorpse");
             string playfieldLootCorpseItem = ExtractMethodBlock(playfieldText, "public bool TryLootCorpseItem");
@@ -4292,11 +4311,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldUseCorpse.Contains("this.runtimeSystems.TryUseCorpse(")
                 && playfieldUseCorpse.Contains("this.SendCorpseInventoryUpdate")
                 && playfieldUseCorpse.Contains("corpse.InventoryHandle = this.AllocateCorpseInventoryHandle();")
-                && playfieldUseCorpse.Contains("this.ScheduleCorpseCreditAward"),
+                && playfieldUseCorpse.Contains("this.ScheduleCorpseCreditAward")
+                && playfieldUseCorpse.Contains("corpse => corpse.IsEmpty"),
                 "Playfield must delegate corpse access sequencing while retaining packet and credit callbacks.");
             Assert.IsTrue(
                 corpseUse.Contains("this.SendCorpseInventoryUpdateAndCredits(")
-                && corpseUse.Contains("if (hasUnlootedItems(corpse))")
+                && corpseUse.Contains("if (!isEmpty(corpse))")
+                && corpseUse.Contains("if (isEmpty(corpse))")
                 && corpseUse.Contains("if (opened(corpse))")
                 && corpseUse.Contains("setOpened(corpse, false);")
                 && corpseUse.Contains("refreshCorpseInventoryHandle(corpse);")
@@ -4329,12 +4350,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 !registerCorpse.Contains("if (!state.HasUnlootedItems)")
                 && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
-                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(1);")
-                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(30);")
+                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3);")
+                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(3);")
                 && corpseRulesText.Contains("public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(5);")
                 && registerCorpse.Contains("CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);")
-                && corpseRulesText.Contains("unlootedItemCount > 0 || unlootedCredits > 0"),
-                "Regular loot-bearing corpses must receive a five-minute initial lifetime; empty corpses must use the captured near-immediate cleanup window.");
+                && corpseRulesText.Contains("unlootedItemCount <= 0 && unlootedCredits <= 0")
+                && CountOccurrences(ordinaryCatalogText, "3.0,\n                300.0,\n                3.0") == 3,
+                "Regular loot-bearing corpses must retain five minutes, while every born-empty or fully emptied corpse uses exactly three seconds.");
             AssertTextBefore(
                 registerCorpse,
                 "this.corpseInventoryService.Create(state);",
@@ -4344,7 +4366,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldLootCorpseItem.Contains("this.runtimeSystems.TryLootCorpseItem(")
                 && playfieldLootCorpseItem.Contains("this.runtimeSystems.CharacterHasUniqueItemAlready")
                 && playfieldLootCorpseItem.Contains("this.runtimeSystems.TryAddCorpseLootItem")
-                && playfieldLootCorpseItem.Contains("this.SendCorpseContainerAddItem"),
+                && playfieldLootCorpseItem.Contains("this.SendCorpseContainerAddItem")
+                && playfieldLootCorpseItem.Contains("corpse => corpse.IsEmpty")
+                && corpseLoot.Contains("if (isEmpty(corpse))"),
                 "Playfield must delegate corpse item transfer sequencing while retaining packet callbacks.");
             AssertTextBefore(
                 corpseLoot,
@@ -4395,8 +4419,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && awardCorpseCredits.Contains("looter.Stats[StatIds.cash].Set((uint)cashAfter);")
                 && awardCorpseCredits.Contains("this.runtimeSystems.SendChangedStatsIfClient(")
                 && sendStatChangedMessage.Contains("StatMessageHandler.Default.SendChanged(character);")
-                && awardCorpseCredits.Contains("looter.Stats.Write();"),
-                "Playfield must keep corpse credit mutation, stat packet callback, and persistence ownership.");
+                && awardCorpseCredits.Contains("looter.Stats.Write();")
+                && awardCorpseCredits.Contains("if (corpse.IsEmpty)")
+                && awardCorpseCredits.Contains("this.ScheduleCorpseDespawn(corpse, corpse.EmptyCleanupDelay, \"credits-empty\");"),
+                "Playfield must keep corpse credit mutation, stat packet callback, persistence ownership, and start cleanup only after credits actually empty the corpse.");
             Assert.IsFalse(
                 awardCorpseCredits.Contains("FormatFeedbackMessage")
                 || awardCorpseCredits.Contains("ChatTextMessageHandler")
