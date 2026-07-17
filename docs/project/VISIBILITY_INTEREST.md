@@ -72,7 +72,7 @@ That makes movement reconciliation and source removal bounded and prevents a des
 | Corpse appearance | `CorpseFullUpdate` goes to recipients that could see the dead character. Later recipient movement uses the same enter/leave radii, with a corpse-specific recipient set. |
 | Corpse removal | The proven `DespawnMessage` is sent only to the corpse's tracked recipients, then corpse visibility state is cleared. Timed and loot-complete cleanup share this path. |
 | Character despawn | Known characters send `DespawnMessage` to tracked recipients before index and bidirectional state cleanup. Unknown/non-character identities retain the legacy fallback path. |
-| Respawn | A respawn is a new shared spawn-entry transition; it does not revive old recipient state. Ordinary-enemy respawn timing and profile data are unchanged. |
+| Respawn | A respawn is a new shared spawn-entry transition; it does not revive old recipient state. The ordinary runtime selects a level once for the new population generation. Visibility loss/re-entry within one generation reuses that selected level and cannot reroll it. |
 | Zoning | The old playfield sends tracked removal before transfer state changes. Same-playfield teleports refresh visibility after coordinates change. |
 | Disconnect | Recipient state is forgotten and dynel/index state is unregistered through the existing disconnect lifecycle. Playfield runtime reset clears the complete interest index and relationship maps. |
 | Static dynels and vendors | Unchanged. Static dynels remain on the established `SimpleItemFullUpdate` CharInPlay snapshot path. Vendor/static materialization and interaction routing are outside character interest selection. |
@@ -93,9 +93,12 @@ The visibility diagnostics retain exact SCFU, weapon-definition, and CharInPlay 
 
 The diagnostic `NONE`, `SUPPORTED_29`, `ORDINARY_9`, `ALL_38`, ordinal, identity, and family selectors still control spawn eligibility only. They cannot bypass `SelectInitialCharacters` or per-recipient spatial reconciliation.
 
-## Validation And Rollout Boundary
+## Historical Visibility Validation And Current Rollout Boundary
 
-Repository validation currently proves:
+The following is the recorded visibility-rollout validation snapshot from before
+the Bloodcreeper/generic ordinary-enemy foundation. It is retained as historical
+visibility evidence; current cross-repository validation is recorded in
+`docs/ai/CURRENT_TASK.md`.
 
 - ZoneEngine/AORebirth Debug build: PASS after stopping locked engines.
 - visibility policy/index/catalog/performance suite: PASS, 12/12;
@@ -104,8 +107,8 @@ Repository validation currently proves:
 - spatial metrics and exact JSON-field suite: PASS, 4/4;
 - Python visibility diagnostics: PASS, 9/9;
 - exact SCFU/weapon/CharInPlay packet measurement suite: PASS, 4/4;
-- deterministic PF127-sized index case: 259 total, 56 inspected candidates, 37 selected, and 74 fixed packet preparations initially; 249 active after churn, with 71 inspected candidates and 54 selected. Separate query and visibility-diff tick metrics are emitted without timing thresholds.
+- recorded pre-Bloodcreeper deterministic PF127-sized index fixture: 259 total, 56 inspected candidates, 37 selected, and 74 fixed packet preparations initially; 249 active after churn, with 71 inspected candidates and 54 selected. Separate query and visibility-diff tick metrics are emitted without timing thresholds. These measured fixture values were not rewritten as though the 260-row catalog had been rerun.
 
 The aggregate wrapper completed with 203 tests: 194 passed and the same nine established baseline failures remained (three damage-evidence tests, one inventory-ownership guardrail, and five session/zoning source guardrails). Every visibility-task test passed. These results are not live AO client validation.
 
-The safe PF127 production disposition remains 221 active rows: 95 supported-family plus 126 ordinary rows. The complete catalog still represents 259 rows and 17 profiles. The remaining 29 supported-family plus 9 ordinary rows must stay quarantined until Mike confirms repeated login, traversal across interest boundaries, NPC movement/combat/death, corpse enter/leave/loot/despawn, respawn, zoning/relog, and static/vendor visibility during bounded rollout. RoomSpace guard success does not authorize activating those rows.
+The safe PF127 production disposition is 222 active rows: 95 supported-family plus 127 ordinary rows. The complete catalog represents 260 rows and 18 profiles. The remaining 29 supported-family plus 9 ordinary rows stay quarantined. Generic level selection and ordinary respawn inheritance do not authorize those 38 rows or change the visibility rollout boundary.

@@ -80,6 +80,48 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayDisobedientBotSpecialAttackWeaponLastValue = 0;
 
+        public const int CapturedSubwayBloodcreeperMonsterData = 30379;
+
+        public const int CapturedSubwayBloodcreeperBiteMinimumDamage = 21;
+
+        public const int CapturedSubwayBloodcreeperBiteMaximumDamage = 35;
+
+        public const double CapturedSubwayBloodcreeperBiteInitialSeconds = 6.088742;
+
+        public const double CapturedSubwayBloodcreeperBiteRechargeSeconds = 7.509840;
+
+        public const int CapturedSubwayBloodcreeperBiteWeaponSlot = 0;
+
+        public const int CapturedSubwayBloodcreeperBiteLowTemplate = 121091;
+
+        public const int CapturedSubwayBloodcreeperBiteHighTemplate = 121092;
+
+        public const int CapturedSubwayBloodcreeperBiteTag = 0x534B5731;
+
+        public const string CapturedSubwayBloodcreeperBiteName = "SKW1";
+
+        public const int CapturedSubwayBloodcreeperSpitMinimumDamage = 21;
+
+        public const int CapturedSubwayBloodcreeperSpitMaximumDamage = 41;
+
+        public const double CapturedSubwayBloodcreeperSpitInitialSeconds = 3.057708;
+
+        public const double CapturedSubwayBloodcreeperSpitRechargeSeconds = 7.389908;
+
+        public const int CapturedSubwayBloodcreeperSpitWeaponSlot = 1;
+
+        public const int CapturedSubwayBloodcreeperSpitLowTemplate = 121094;
+
+        public const int CapturedSubwayBloodcreeperSpitHighTemplate = 121095;
+
+        public const int CapturedSubwayBloodcreeperSpitTag = 0x534B5732;
+
+        public const string CapturedSubwayBloodcreeperSpitName = "SKW2";
+
+        public const int CapturedSubwayBloodcreeperSpecialAttackWeaponValue = 131;
+
+        public const int CapturedSubwayBloodcreeperSpecialAttackWeaponLastValue = 37;
+
         public const int CapturedSubwayVergilMonsterData = 203748;
 
         public const int CapturedSubwayVergilWeaponTemplate = 122123;

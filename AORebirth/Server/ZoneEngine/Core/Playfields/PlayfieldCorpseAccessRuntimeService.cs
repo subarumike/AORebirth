@@ -31,7 +31,7 @@ namespace AORebirth.Core.Playfields
             TimeSpan emptyCleanupDelay,
             Func<TCorpseState, Identity> deadNpcIdentity,
             Func<TCorpseState, DateTime> expiresAtUtc,
-            Func<TCorpseState, bool> hasUnlootedItems,
+            Func<TCorpseState, bool> isEmpty,
             Func<TCorpseState, bool> opened,
             Action<TCorpseState, bool> setOpened,
             Func<TCorpseState, object> lootClass,
@@ -101,7 +101,7 @@ namespace AORebirth.Core.Playfields
 
             setOpened(corpse, true);
 
-            if (hasUnlootedItems(corpse))
+            if (!isEmpty(corpse))
             {
                 extendCorpseLifetime(corpse, itemLootLifetime, "corpse-use");
                 this.SendCorpseInventoryUpdateAndCredits(
@@ -120,7 +120,7 @@ namespace AORebirth.Core.Playfields
                     scheduleCorpseCreditAward);
             }
 
-            if (!hasUnlootedItems(corpse))
+            if (isEmpty(corpse))
             {
                 scheduleCorpseDespawn(corpse, emptyCleanupDelay, "opened-empty");
             }
@@ -203,7 +203,7 @@ namespace AORebirth.Core.Playfields
             Func<TCorpseState, int> corpseInventoryHandle,
             Func<TCorpseState, Identity> corpseIdentity,
             Func<TCorpseState, DateTime> expiresAtUtc,
-            Func<TCorpseState, bool> hasUnlootedItems,
+            Func<TCorpseState, bool> isEmpty,
             Func<TCorpseState, int> remainingUnlootedItems,
             Func<TCorpseState, TCorpseLootItem> findCorpseLootItem,
             Func<TCorpseLootItem, Item> lootItem,
@@ -348,7 +348,7 @@ namespace AORebirth.Core.Playfields
                     "You looted {0}.",
                     ResolveLootItemDisplayName(item)));
 
-            if (!hasUnlootedItems(corpse))
+            if (isEmpty(corpse))
             {
                 scheduleCorpseDespawn(corpse, emptyCleanupDelay, "looted-empty");
             }

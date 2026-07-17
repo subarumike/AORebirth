@@ -788,6 +788,7 @@ namespace ZoneEngine.Core.Controllers
             Vector3 dest = destination;
             Vector3 start = this.Character.Coordinates().coordinate;
             DateTime now = DateTime.UtcNow;
+            this.followIdentity = Identity.None;
             if (start.Distance2D(dest) < 0.3f)
             {
                 this.StopMovement();
@@ -926,7 +927,9 @@ namespace ZoneEngine.Core.Controllers
             this.ResetFollowPosition();
         }
 
-        public void StopFollowForCapturedCombatRange(Vector3 targetPosition)
+        public void StopFollowForCapturedCombatRange(
+            Vector3 targetPosition,
+            Vector3 movementDestination)
         {
             Vector3 current = this.UpdateMotionSegmentPosition(DateTime.UtcNow);
 
@@ -980,12 +983,17 @@ namespace ZoneEngine.Core.Controllers
             lock (this.followCoordinates)
             {
                 this.followCoordinates = new Vector3(
-                    targetPosition.xf,
-                    targetPosition.yf + 0.5f,
-                    targetPosition.zf);
+                    movementDestination.xf,
+                    movementDestination.yf + 0.5f,
+                    movementDestination.zf);
             }
 
             this.ResetFollowPosition();
+            if (current.Distance2D(movementDestination) < 0.01)
+            {
+                return;
+            }
+
             this.Run();
             this.AnnounceCapturedCombatMessage(
                 new FollowTargetMessage
@@ -1023,6 +1031,11 @@ namespace ZoneEngine.Core.Controllers
                 {
                     Body = body
                 });
+        }
+
+        public void StopFollowForCapturedCombatRange(Vector3 targetPosition)
+        {
+            this.StopFollowForCapturedCombatRange(targetPosition, targetPosition);
         }
 
         public void Run()

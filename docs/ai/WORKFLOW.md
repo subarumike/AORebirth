@@ -120,7 +120,7 @@ Build:
 cmd /d /c tools\build_aorebirth_debug.cmd
 ```
 
-Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper kills stale `MSBuild.exe`, `dotnet.exe`, `VBCSCompiler.exe`, and `NuGet.exe` processes, verifies required packages under `AORebirth\packages`, restores packages explicitly before build only when required package folders are missing, builds `AORebirth.Core` first, then builds `ZoneEngine`, using:
+Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper resolves `MSBuild.exe` from the latest installed Visual Studio through `vswhere.exe`, kills stale `MSBuild.exe`, `dotnet.exe`, `VBCSCompiler.exe`, and `NuGet.exe` processes, verifies required packages under `AORebirth\packages`, restores packages explicitly before build only when required package folders are missing, builds `AORebirth.Core` first, then builds `ZoneEngine`, using:
 
 ```cmd
 MSBuild.exe <project> /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
@@ -161,6 +161,38 @@ cmd /d /c tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifi
 ```
 
 The wrapper builds the test project with the repository's single-node MSBuild settings, locates `vstest.console.exe` through Visual Studio Installer's `vswhere.exe`, and then runs the generated .NET Framework 4.8 test assembly. Do not substitute `dotnet test` for this legacy project.
+
+### Ordinary Enemy Level And Respawn Foundation
+
+Run the deterministic shared-model, policy-resolution, scheduler, generation,
+exception, exclusion, and population-boundary suite with:
+
+```cmd
+cmd /d /c tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifiedName~SmokeLounge.AOtomation.Messaging.Tests.WorldPopulationFoundationTests"
+```
+
+Then run the affected ordinary lifecycle tests with individual focused filters
+before the established broader regression suites. Do not combine multiple
+filters with an unescaped command-shell pipe.
+
+Eligible PF127 ordinary rows inherit the documented 240-second private-project
+policy unless explicit spawn/archetype or group data overrides it. Thief remains
+60 seconds; Filth Flea and Bloodcreeper remain explicit 240-second policies.
+Future live respawn captures identify exceptions or disputed timing; they are
+not required once per ordinary enemy to re-prove the project default. Named,
+boss, scripted, summon, pet, temporary-add, vendor, static, container, and
+quest-owned content must stay with their explicit owners and cannot inherit the
+ordinary policy.
+
+### NPC Chase Navigation Validation
+
+Run the focused shared/PF127 navigation suite first:
+
+```cmd
+cmd /d /c tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifiedName~SmokeLounge.AOtomation.Messaging.Tests.NpcChaseNavigationTests"
+```
+
+The global owner is `ZoneEngine.Core.Navigation`. PF127 is the first enabled provider and Vergil is its representative end-to-end case; no capture launcher or client injection is part of this deterministic validation. To enable another playfield, first promote authoritative versioned collision/navigation input, add an `IPlayfieldChaseNavigationProvider`, register it in `PlayfieldChaseNavigationProviderFactory`, add representative collision/route/failure/combat tests, and then perform private-client validation. Do not add enemy-specific pathfinding or reuse PF127 assumptions in another playfield.
 
 ## Database
 
@@ -207,9 +239,11 @@ Build the capture plugin after capture-tool source changes with:
 cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.csproj /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 ```
 
-The default capture always records the comprehensive raw packet superset in independently auto-flushed `packets.hex.log` and `raw-packets.csv`; it never narrows recording by focus, enemy type, marker, or validation mode. Either raw sink, or their complete union, is sufficient for offline recovery. It also directly decodes raw `SimpleCharFullUpdate` packets into reusable SCFU evidence and promotes NPC evidence into `enemy-full-updates.csv`, `enemy-state.csv`, `enemy-dossier.json`, `enemy-movement.csv`, `movement-packets.csv`, `enemy-combat.csv`, `enemy-stat-updates.csv`, `npc-lifecycle.csv`, `corpse-full-updates.csv`, `enemy-respawns.csv`, `inventory-updates.csv`, and `corpse-loot-observations.csv`. `enemy-state.csv` rows include source direction, packet sequence, message type, and evidence source. Markers and modes such as `/aocap mark respawn-start` and `--loot-10` only label the session or add acceptance requirements; they must never filter, suppress, or narrow captured evidence. A marked respawn capture validates incomplete unless the required respawn is correlated. A `--loot-10` capture validates incomplete if fewer than ten initial corpse snapshots or more than one enemy type is present, while still recording the same comprehensive superset. Final capture validation must report incomplete when corpse presence or inventory was observed without a successfully decoded identity-linked `CorpseFullUpdate`.
+The default capture always records the comprehensive raw packet superset in independently auto-flushed `packets.hex.log` and `raw-packets.csv`; it never narrows recording by focus, enemy type, marker, or validation mode. Either raw sink, or their complete union, is sufficient for offline recovery. It also directly decodes raw `SimpleCharFullUpdate` packets into reusable SCFU evidence and promotes NPC evidence into `enemy-full-updates.csv`, `enemy-state.csv`, `enemy-dossier.json`, `enemy-movement.csv`, `movement-packets.csv`, `enemy-combat.csv`, `enemy-stat-updates.csv`, `npc-lifecycle.csv`, `corpse-full-updates.csv`, `enemy-respawns.csv`, `inventory-updates.csv`, and `corpse-loot-observations.csv`. `enemy-state.csv` rows include source direction, packet sequence, message type, and evidence source. Loot reconstruction canonicalizes padded and unpadded numeric corpse identities before joining inventory, transfer, lifecycle, and generation evidence. Markers and modes such as `/aocap mark respawn-start` and `--loot-10` only label the session or add acceptance requirements; they must never filter, suppress, or narrow captured evidence. A marked respawn capture validates incomplete unless the required respawn is correlated. A `--loot-10` capture validates incomplete if fewer than ten initial corpse snapshots or more than one enemy type is present, while still recording the same comprehensive superset. Final capture validation must report incomplete when corpse presence or inventory was observed without a successfully decoded identity-linked `CorpseFullUpdate`.
 
-If either raw sink contains the raw packet but a decoder or promoted export fails, the gameplay capture remains intact. Treat that result as an offline-decoder task with `recaptureRequired=false`; repair and rerun the offline decoder instead of asking Mike to repeat the gameplay capture.
+If either raw sink contains the raw packet but a decoder, identity join, or promoted export fails, the gameplay capture remains intact. Treat an incomplete projection as an offline-reconstruction task whenever `recaptureRequired=false`, including when `processingAllowed=false` or `offlineDecodeRequired=true`; repair and rerun the offline decoder instead of asking Mike to repeat gameplay. Recapture only when the raw evidence itself is missing or incomplete, including an undrained teardown boundary.
+
+For the current Subway loot boundary, no new capture is requested. If later sampling is approved, the remaining corpus-wide minimum is eight strict complete Bloodcreeper loot outcomes and three strict complete Disobedient Bot loot outcomes. Open every corpse, retain every item transfer and complete empty inventory, and keep the capture loot-only: do not repeat combat, geometry, LOS, navigation, chase, leash, or respawn evidence. A session-local `--loot-10` target exceeds these corpus-wide minimums unless a separately bounded target requires it.
 
 Existing capture folders can be retro-decoded without repeating gameplay:
 
@@ -222,6 +256,13 @@ cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py <
 ```
 
 Run the analyzer first to recover direct SCFU evidence from raw packets, then run the lifecycle decoder to rebuild correlated NPC lifecycle outputs.
+
+After adding a finalized capture to the Subway enemy combat-contract input list,
+regenerate the versioned evidence contract through the repository wrapper:
+
+```cmd
+cmd /d /c tools\generate_subway_enemy_combat_contracts.cmd
+```
 
 Before running the wrapper, do not run `rg`, `dir`, `tasklist`, recursive searches, process sweeps, source inspection, build-folder enumeration, or old-log scraping to rediscover how capture startup works. Use the wrapper directly.
 

@@ -45,9 +45,12 @@ namespace AOSharpLiveCapture
         private readonly Dictionary<string, List<EnemyStateEvent>> enemyStateTimeline = new Dictionary<string, List<EnemyStateEvent>>();
         private readonly Dictionary<string, CorpseLifecycleEvidence> corpseEvidenceByDeadNpc =
             new Dictionary<string, CorpseLifecycleEvidence>();
+        private readonly Dictionary<string, CorpseLifecycleEvidence> activeCorpseEvidenceByCorpse =
+            new Dictionary<string, CorpseLifecycleEvidence>();
         private readonly Dictionary<string, int> corpseInventorySnapshotCounts =
             new Dictionary<string, int>();
         private readonly HashSet<string> corpseLootInitialEnemyKeys = new HashSet<string>();
+        private readonly CaptureCallbackBoundary callbackBoundary = new CaptureCallbackBoundary();
 
         private const int CorpseFullUpdateDeadNpcTypeOffset = 183;
         private const int CorpseFullUpdateDeadNpcInstanceOffset = 191;
@@ -210,6 +213,16 @@ namespace AOSharpLiveCapture
         private string lastPlayfieldId = string.Empty;
         private string lastCapturePlayfieldIdentity = string.Empty;
         private CombatLootSmoke combatLootSmoke;
+        private Pf127GeometryCapture pf127GeometryCapture;
+        private int pf127CaptureRuntimeReady;
+        private int callbackDispatchEnabled;
+        private int pf127CollectionArmed;
+        private int pf127CollectionArmedBeforeTeleport;
+        private int teleportInProgress;
+        private long teleportGeneration;
+        private long playfieldInitGeneration = -1;
+        private bool minimalPf127CaptureMode;
+        private MinimalPf127Capture minimalPf127Capture;
         private bool initialized;
         private bool enemyFightCaptureEnabled;
         private bool enemyFightAutoCaptureEnabled = true;
@@ -219,43 +232,65 @@ namespace AOSharpLiveCapture
 
         public override void Run(string pluginDir)
         {
-            lock (LifecycleSyncRoot)
-            {
-                if (activeInstance != null)
+            bool initializationAttempted = false;
+            this.callbackBoundary.ConfigureFallback(GetCallbackErrorFallbackPath(pluginDir));
+            bool initializationSucceeded = this.callbackBoundary.Dispatch(
+                "Run.Initialization",
+                () =>
                 {
-                    return;
-                }
+                    lock (LifecycleSyncRoot)
+                    {
+                        if (activeInstance != null)
+                        {
+                            return;
+                        }
 
-                activeInstance = this;
-                this.initialized = true;
-            }
+                        activeInstance = this;
+                        initializationAttempted = true;
+                    }
 
-            try
+                    if (MinimalPf127Capture.ConsumeRequestNoThrow(pluginDir))
+                    {
+                        this.StartMinimalPf127CaptureNoThrow(pluginDir);
+                        return;
+                    }
+
+                    this.Initialize(pluginDir);
+                });
+
+            if (initializationAttempted && (!initializationSucceeded || !this.initialized))
             {
+                this.DisableAfterInitializationFailureNoThrow();
+            }
+        }
+
+        private void Initialize(string pluginDir)
+        {
             this.pluginDirectory = pluginDir;
+            Interlocked.Exchange(ref this.pf127CaptureRuntimeReady, 0);
+            Interlocked.Exchange(ref this.callbackDispatchEnabled, 0);
+            Interlocked.Exchange(ref this.pf127CollectionArmed, 0);
+            Interlocked.Exchange(ref this.teleportInProgress, 0);
             lock (this.syncRoot)
             {
                 this.OpenFreshCaptureSession(pluginDir, true, false);
-                Network.PacketReceived += this.OnPacketReceived;
-                Network.PacketSent += this.OnPacketSent;
+                Interlocked.Exchange(ref this.callbackDispatchEnabled, 1);
+                Network.PacketReceived += this.OnPacketReceivedBoundary;
+                Network.PacketSent += this.OnPacketSentBoundary;
                 this.ActivateCaptureSession();
             }
 
             this.combatLootSmoke = new CombatLootSmoke(pluginDir, this.LogSmokeEvent);
 
-            Network.N3MessageReceived += this.OnN3MessageReceived;
-            Network.N3MessageSent += this.OnN3MessageSent;
-            Network.ChatMessageReceived += this.OnChatMessageReceived;
-            DynelManager.DynelSpawned += this.OnDynelSpawned;
-            DynelManager.CharInPlay += this.OnCharInPlay;
-            Game.PlayfieldInit += this.OnPlayfieldInit;
-            Game.TeleportStarted += this.OnTeleportStarted;
-            Game.TeleportEnded += this.OnTeleportEnded;
-            Game.TeleportFailed += this.OnTeleportFailed;
-            Game.OnUpdate += this.OnUpdate;
-
-            Chat.RegisterCommand("aocap", this.OnCommand);
-            Chat.RegisterCommand("aosmoke", this.OnSmokeCommand);
+            Network.N3MessageReceived += this.OnN3MessageReceivedBoundary;
+            Network.N3MessageSent += this.OnN3MessageSentBoundary;
+            Network.ChatMessageReceived += this.OnChatMessageReceivedBoundary;
+            DynelManager.DynelSpawned += this.OnDynelSpawnedBoundary;
+            DynelManager.CharInPlay += this.OnCharInPlayBoundary;
+            Game.PlayfieldInit += this.OnPlayfieldInitBoundary;
+            Game.TeleportStarted += this.OnTeleportStartedBoundary;
+            Game.TeleportEnded += this.OnTeleportEndedBoundary;
+            Game.TeleportFailed += this.OnTeleportFailedBoundary;
 
             this.LogEvent("PLUGIN", "AOSharpLiveCapture loaded. session=" + this.sessionDirectory);
             this.LogEvent("PLUGIN", "Commands: /aocap start | stop | mark <text> | status | flush | snapshot | dynels [force] | fight start|stop|auto on|auto off|status");
@@ -276,70 +311,318 @@ namespace AOSharpLiveCapture
             this.LogEvent("PLUGIN", "Enemy fight events log: " + Path.Combine(this.sessionDirectory, "enemy-fight-events.log"));
             this.LogEvent("PLUGIN", "Enemy dossier JSON: " + Path.Combine(this.sessionDirectory, "enemy-dossier.json"));
             this.LogEvent("PLUGIN", "Enemy state JSON: " + Path.Combine(this.sessionDirectory, "enemy-state.json"));
+            this.LogEvent("PLUGIN", "PF127 geometry JSON: " + Path.Combine(this.sessionDirectory, "pf127-geometry.json"));
+            this.LogEvent("PLUGIN", "PF127 line-of-sight CSV: " + Path.Combine(this.sessionDirectory, "pf127-line-of-sight.csv"));
+            this.LogEvent("PLUGIN", "PF127 door-state CSV: " + Path.Combine(this.sessionDirectory, "pf127-door-state.csv"));
+            this.LogEvent("PLUGIN", "PF127 capture errors: " + Path.Combine(this.sessionDirectory, "pf127-capture-errors.log"));
+            this.LogEvent("PLUGIN", "Capture callback errors: " + Path.Combine(this.sessionDirectory, "capture-callback-errors.log"));
             this.LogEvent("PLUGIN", "Capture info: " + Path.Combine(this.sessionDirectory, "capture_info.json"));
             this.LogEvent("PLUGIN", "Capture session metadata: " + Path.Combine(this.sessionDirectory, "capture-session.json"));
             this.LogSnapshot("initial");
             Chat.WriteLine("AOSharpLiveCapture logging to " + this.sessionDirectory, ChatColor.Gold);
-            }
-            catch
-            {
-                lock (LifecycleSyncRoot)
-                {
-                    if (ReferenceEquals(activeInstance, this))
-                    {
-                        activeInstance = null;
-                    }
-                }
+            Interlocked.Exchange(ref this.pf127CaptureRuntimeReady, 1);
+            Game.OnUpdate += this.OnUpdateBoundary;
 
-                this.initialized = false;
-                throw;
-            }
+            // AOSharp has no command-unregister API. Register commands only after
+            // the capture and every event callback are ready; the common boundary
+            // makes these retained delegates inert as soon as the plugin is disabled.
+            Chat.RegisterCommand("aocap", this.OnCommandBoundary);
+            Chat.RegisterCommand("aosmoke", this.OnSmokeCommandBoundary);
+            this.initialized = true;
         }
 
         public override void Teardown()
         {
-            if (!this.initialized)
+            this.callbackBoundary.Dispatch("Plugin.Teardown", this.TeardownCore);
+        }
+
+        private void TeardownCore()
+        {
+            Interlocked.Exchange(ref this.pf127CaptureRuntimeReady, 0);
+            Interlocked.Exchange(ref this.callbackDispatchEnabled, 0);
+            if (this.minimalPf127CaptureMode)
             {
+                this.TeardownMinimalPf127CaptureNoThrow();
+                this.ClearActiveInstanceNoThrow();
+                this.initialized = false;
                 return;
             }
 
-            lock (LifecycleSyncRoot)
-            {
-                if (!ReferenceEquals(activeInstance, this))
+            this.UnsubscribeCallbacksNoThrow();
+            this.callbackBoundary.Dispatch(
+                "Teardown.CombatLootSmoke",
+                () => this.combatLootSmoke?.Teardown());
+            this.callbackBoundary.Dispatch(
+                "Teardown.FinalizeCapture",
+                () =>
                 {
-                    return;
-                }
-            }
-
-            Network.PacketReceived -= this.OnPacketReceived;
-            Network.PacketSent -= this.OnPacketSent;
-            Network.N3MessageReceived -= this.OnN3MessageReceived;
-            Network.N3MessageSent -= this.OnN3MessageSent;
-            Network.ChatMessageReceived -= this.OnChatMessageReceived;
-            DynelManager.DynelSpawned -= this.OnDynelSpawned;
-            DynelManager.CharInPlay -= this.OnCharInPlay;
-            Game.PlayfieldInit -= this.OnPlayfieldInit;
-            Game.TeleportStarted -= this.OnTeleportStarted;
-            Game.TeleportEnded -= this.OnTeleportEnded;
-            Game.TeleportFailed -= this.OnTeleportFailed;
-            Game.OnUpdate -= this.OnUpdate;
-            this.combatLootSmoke?.Teardown();
-
-            if (!this.captureFinalized)
-            {
-                this.LogEvent("PLUGIN", "AOSharpLiveCapture teardown.");
-                this.FinalizeCapture();
-            }
-
-            lock (LifecycleSyncRoot)
-            {
-                if (ReferenceEquals(activeInstance, this))
-                {
-                    activeInstance = null;
-                }
-            }
-
+                    if (!this.captureFinalized && !string.IsNullOrWhiteSpace(this.sessionDirectory))
+                    {
+                        this.TryLogEvent("PLUGIN", "AOSharpLiveCapture teardown.");
+                        this.FinalizeCapture();
+                    }
+                });
+            this.callbackBoundary.Dispatch("Teardown.FlushAndClose", this.FlushAndClose);
+            this.ClearActiveInstanceNoThrow();
             this.initialized = false;
+        }
+
+        private void StartMinimalPf127CaptureNoThrow(string pluginDir)
+        {
+            this.minimalPf127CaptureMode = true;
+            MinimalPf127Capture capture;
+            string error;
+            if (!MinimalPf127Capture.TryCreate(pluginDir, out capture, out error))
+            {
+                CaptureRuntimeSafety.InvokeFailSafe(
+                    () => File.AppendAllText(
+                        Path.Combine(pluginDir, "pf127-geometry-only-startup-error.log"),
+                        DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)
+                        + " "
+                        + error
+                        + Environment.NewLine));
+                this.initialized = true;
+                return;
+            }
+
+            this.minimalPf127Capture = capture;
+            this.callbackBoundary.BeginSession(
+                Path.Combine(capture.SessionDirectory, "capture-callback-errors.log"),
+                GetCallbackErrorFallbackPath(pluginDir));
+            Interlocked.Exchange(ref this.callbackDispatchEnabled, 1);
+            Game.OnUpdate += this.OnMinimalPf127CaptureUpdateBoundary;
+            Chat.WriteLine(
+                "AOSharpLiveCapture PF127 geometry-only safe mode logging to " + capture.SessionDirectory,
+                ChatColor.Gold);
+            this.initialized = true;
+        }
+
+        private void OnMinimalPf127CaptureUpdateBoundary(object sender, float deltaTime)
+        {
+            this.DispatchCallback(
+                "Game.OnUpdate.MinimalPf127Capture",
+                () => this.OnMinimalPf127CaptureUpdate(sender, deltaTime));
+        }
+
+        private void OnMinimalPf127CaptureUpdate(object sender, float deltaTime)
+        {
+            this.minimalPf127Capture?.UpdateNoThrow(DateTime.UtcNow);
+        }
+
+        private void TeardownMinimalPf127CaptureNoThrow()
+        {
+            this.callbackBoundary.Dispatch(
+                "Unsubscribe.Game.OnUpdate.MinimalPf127Capture",
+                () => Game.OnUpdate -= this.OnMinimalPf127CaptureUpdateBoundary);
+            MinimalPf127Capture capture = this.minimalPf127Capture;
+            this.minimalPf127Capture = null;
+            this.callbackBoundary.Dispatch(
+                "Teardown.MinimalPf127Capture",
+                () => capture?.DisposeNoThrow());
+        }
+
+        private void DisableAfterInitializationFailureNoThrow()
+        {
+            Interlocked.Exchange(ref this.pf127CaptureRuntimeReady, 0);
+            Interlocked.Exchange(ref this.callbackDispatchEnabled, 0);
+            this.initialized = false;
+            if (this.minimalPf127CaptureMode)
+            {
+                this.TeardownMinimalPf127CaptureNoThrow();
+                this.ClearActiveInstanceNoThrow();
+                return;
+            }
+
+            this.UnsubscribeCallbacksNoThrow();
+            this.callbackBoundary.Dispatch(
+                "Run.InitializationFailure.CombatLootSmoke",
+                () => this.combatLootSmoke?.Teardown());
+            this.callbackBoundary.Dispatch(
+                "Run.InitializationFailure.FinalizeCapture",
+                () =>
+                {
+                    if (!this.captureFinalized && !string.IsNullOrWhiteSpace(this.sessionDirectory))
+                    {
+                        this.FinalizeCapture();
+                    }
+                });
+            this.callbackBoundary.Dispatch(
+                "Run.InitializationFailure.FlushAndClose",
+                this.FlushAndClose);
+            this.ClearActiveInstanceNoThrow();
+        }
+
+        private void UnsubscribeCallbacksNoThrow()
+        {
+            this.callbackBoundary.Dispatch(
+                "Unsubscribe.Network.PacketReceived",
+                () => Network.PacketReceived -= this.OnPacketReceivedBoundary);
+            this.callbackBoundary.Dispatch(
+                "Unsubscribe.Network.PacketSent",
+                () => Network.PacketSent -= this.OnPacketSentBoundary);
+            this.callbackBoundary.Dispatch(
+                "Unsubscribe.Network.N3MessageReceived",
+                () => Network.N3MessageReceived -= this.OnN3MessageReceivedBoundary);
+            this.callbackBoundary.Dispatch(
+                "Unsubscribe.Network.N3MessageSent",
+                () => Network.N3MessageSent -= this.OnN3MessageSentBoundary);
+            this.callbackBoundary.Dispatch(
+                "Unsubscribe.Network.ChatMessageReceived",
+                () => Network.ChatMessageReceived -= this.OnChatMessageReceivedBoundary);
+            this.callbackBoundary.Dispatch(
+                "Unsubscribe.DynelManager.DynelSpawned",
+                () => DynelManager.DynelSpawned -= this.OnDynelSpawnedBoundary);
+            this.callbackBoundary.Dispatch(
+                "Unsubscribe.DynelManager.CharInPlay",
+                () => DynelManager.CharInPlay -= this.OnCharInPlayBoundary);
+            this.callbackBoundary.Dispatch(
+                "Unsubscribe.Game.PlayfieldInit",
+                () => Game.PlayfieldInit -= this.OnPlayfieldInitBoundary);
+            this.callbackBoundary.Dispatch(
+                "Unsubscribe.Game.TeleportStarted",
+                () => Game.TeleportStarted -= this.OnTeleportStartedBoundary);
+            this.callbackBoundary.Dispatch(
+                "Unsubscribe.Game.TeleportEnded",
+                () => Game.TeleportEnded -= this.OnTeleportEndedBoundary);
+            this.callbackBoundary.Dispatch(
+                "Unsubscribe.Game.TeleportFailed",
+                () => Game.TeleportFailed -= this.OnTeleportFailedBoundary);
+            this.callbackBoundary.Dispatch(
+                "Unsubscribe.Game.OnUpdate",
+                () => Game.OnUpdate -= this.OnUpdateBoundary);
+        }
+
+        private void ClearActiveInstanceNoThrow()
+        {
+            this.callbackBoundary.Dispatch(
+                "Lifecycle.ClearActiveInstance",
+                () =>
+                {
+                    lock (LifecycleSyncRoot)
+                    {
+                        if (ReferenceEquals(activeInstance, this))
+                        {
+                            activeInstance = null;
+                        }
+                    }
+                });
+        }
+
+        private static string GetCallbackErrorFallbackPath(string pluginDir)
+        {
+            try
+            {
+                return string.IsNullOrWhiteSpace(pluginDir)
+                    ? "capture-callback-errors.log"
+                    : Path.Combine(pluginDir, "capture-callback-errors.log");
+            }
+            catch
+            {
+                return "capture-callback-errors.log";
+            }
+        }
+
+        private void DispatchCallback(string callbackName, Action callback)
+        {
+            this.callbackBoundary.Dispatch(
+                callbackName,
+                () =>
+                {
+                    if (Volatile.Read(ref this.callbackDispatchEnabled) == 0)
+                    {
+                        return;
+                    }
+
+                    callback();
+                });
+        }
+
+        private void OnCommandBoundary(string command, string[] args, ChatWindow chatWindow)
+        {
+            this.DispatchCallback("Chat.Command.aocap", () => this.OnCommand(command, args, chatWindow));
+        }
+
+        private void OnSmokeCommandBoundary(string command, string[] args, ChatWindow chatWindow)
+        {
+            this.DispatchCallback("Chat.Command.aosmoke", () => this.OnSmokeCommand(command, args, chatWindow));
+        }
+
+        private void OnPacketReceivedBoundary(object sender, byte[] packet)
+        {
+            this.DispatchCallback("Network.PacketReceived", () => this.OnPacketReceived(sender, packet));
+        }
+
+        private void OnPacketSentBoundary(object sender, byte[] packet)
+        {
+            this.DispatchCallback("Network.PacketSent", () => this.OnPacketSent(sender, packet));
+        }
+
+        private void OnN3MessageReceivedBoundary(object sender, N3Message message)
+        {
+            this.DispatchCallback(
+                "Network.N3MessageReceived",
+                () => this.OnN3MessageReceived(sender, message));
+        }
+
+        private void OnN3MessageSentBoundary(object sender, N3Message message)
+        {
+            this.DispatchCallback(
+                "Network.N3MessageSent",
+                () => this.OnN3MessageSent(sender, message));
+        }
+
+        private void OnChatMessageReceivedBoundary(object sender, ChatMessageBody message)
+        {
+            this.DispatchCallback(
+                "Network.ChatMessageReceived",
+                () => this.OnChatMessageReceived(sender, message));
+        }
+
+        private void OnDynelSpawnedBoundary(object sender, Dynel dynel)
+        {
+            this.DispatchCallback(
+                "DynelManager.DynelSpawned",
+                () => this.OnDynelSpawned(sender, dynel));
+        }
+
+        private void OnCharInPlayBoundary(object sender, SimpleChar character)
+        {
+            this.DispatchCallback(
+                "DynelManager.CharInPlay",
+                () => this.OnCharInPlay(sender, character));
+        }
+
+        private void OnPlayfieldInitBoundary(object sender, uint playfieldId)
+        {
+            this.DispatchCallback(
+                "Game.PlayfieldInit",
+                () => this.OnPlayfieldInit(sender, playfieldId));
+        }
+
+        private void OnTeleportStartedBoundary(object sender, EventArgs e)
+        {
+            this.DispatchCallback(
+                "Game.TeleportStarted",
+                () => this.OnTeleportStarted(sender, e));
+        }
+
+        private void OnTeleportEndedBoundary(object sender, EventArgs e)
+        {
+            this.DispatchCallback(
+                "Game.TeleportEnded",
+                () => this.OnTeleportEnded(sender, e));
+        }
+
+        private void OnTeleportFailedBoundary(object sender, EventArgs e)
+        {
+            this.DispatchCallback(
+                "Game.TeleportFailed",
+                () => this.OnTeleportFailed(sender, e));
+        }
+
+        private void OnUpdateBoundary(object sender, float deltaTime)
+        {
+            this.DispatchCallback("Game.OnUpdate", () => this.OnUpdate(sender, deltaTime));
         }
 
         private void OnCommand(string command, string[] args, ChatWindow chatWindow)
@@ -978,17 +1261,10 @@ namespace AOSharpLiveCapture
                     this.LogPacket(direction, sequence, packet);
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 Interlocked.Increment(ref this.rawPacketWriteErrorCount);
-                this.LogEvent(
-                    "RAW-PACKET-CALLBACK-ERROR",
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "direction={0} error={1}: {2}",
-                        direction,
-                        ex.GetType().Name,
-                        ex.Message));
+                throw;
             }
             finally
             {
@@ -1009,93 +1285,69 @@ namespace AOSharpLiveCapture
 
         private void OnN3MessageReceived(object sender, N3Message message)
         {
-            try
+            lock (this.syncRoot)
             {
-                lock (this.syncRoot)
+                if (!this.enabled || message == null)
                 {
-                    if (!this.enabled || message == null)
-                    {
-                        return;
-                    }
-
-                    this.decodedInboundCount++;
-                    this.lastPacketUtc = DateTime.UtcNow;
-                    int sequence = this.decodedInboundCount;
-                    this.RunN3CaptureStage(
-                        "IN-N3",
-                        sequence,
-                        message,
-                        "combat-loot-smoke",
-                        () => this.combatLootSmoke?.OnN3MessageReceived(message));
-                    this.RunN3CaptureStage(
-                        "IN-N3",
-                        sequence,
-                        message,
-                        "decoded-message-pipeline",
-                        () => this.LogN3Message("IN-N3", sequence, message));
+                    return;
                 }
-            }
-            catch (Exception ex)
-            {
-                this.n3CaptureStageErrorCount++;
-                this.LogEvent("IN-N3-CALLBACK-ERROR", ex.GetType().Name + ": " + ex.Message);
+
+                this.decodedInboundCount++;
+                this.lastPacketUtc = DateTime.UtcNow;
+                int sequence = this.decodedInboundCount;
+                this.RunN3CaptureStage(
+                    "IN-N3",
+                    sequence,
+                    message,
+                    "combat-loot-smoke",
+                    () => this.combatLootSmoke?.OnN3MessageReceived(message));
+                this.RunN3CaptureStage(
+                    "IN-N3",
+                    sequence,
+                    message,
+                    "decoded-message-pipeline",
+                    () => this.LogN3Message("IN-N3", sequence, message));
             }
         }
 
         private void OnN3MessageSent(object sender, N3Message message)
         {
-            try
+            lock (this.syncRoot)
             {
-                lock (this.syncRoot)
+                if (!this.enabled || message == null)
                 {
-                    if (!this.enabled || message == null)
-                    {
-                        return;
-                    }
-
-                    this.decodedOutboundCount++;
-                    this.lastPacketUtc = DateTime.UtcNow;
-                    int sequence = this.decodedOutboundCount;
-                    this.RunN3CaptureStage(
-                        "OUT-N3",
-                        sequence,
-                        message,
-                        "combat-loot-smoke",
-                        () => this.combatLootSmoke?.OnN3MessageSent(message));
-                    this.RunN3CaptureStage(
-                        "OUT-N3",
-                        sequence,
-                        message,
-                        "decoded-message-pipeline",
-                        () => this.LogN3Message("OUT-N3", sequence, message));
+                    return;
                 }
-            }
-            catch (Exception ex)
-            {
-                this.n3CaptureStageErrorCount++;
-                this.LogEvent("OUT-N3-CALLBACK-ERROR", ex.GetType().Name + ": " + ex.Message);
+
+                this.decodedOutboundCount++;
+                this.lastPacketUtc = DateTime.UtcNow;
+                int sequence = this.decodedOutboundCount;
+                this.RunN3CaptureStage(
+                    "OUT-N3",
+                    sequence,
+                    message,
+                    "combat-loot-smoke",
+                    () => this.combatLootSmoke?.OnN3MessageSent(message));
+                this.RunN3CaptureStage(
+                    "OUT-N3",
+                    sequence,
+                    message,
+                    "decoded-message-pipeline",
+                    () => this.LogN3Message("OUT-N3", sequence, message));
             }
         }
 
         private void OnChatMessageReceived(object sender, ChatMessageBody message)
         {
-            try
+            lock (this.syncRoot)
             {
-                lock (this.syncRoot)
+                if (!this.enabled || message == null)
                 {
-                    if (!this.enabled || message == null)
-                    {
-                        return;
-                    }
-
-                    this.LogEvent("CHAT", this.DescribeObject(message));
-                    this.LogChatDialogue("CHAT", 0, message.PacketType.ToString(), "chat-protocol", this.DescribeObject(message));
+                    return;
                 }
-            }
-            catch (Exception ex)
-            {
-                this.rawPacketProjectionErrorCount++;
-                this.LogEvent("CHAT-CALLBACK-ERROR", ex.GetType().Name + ": " + ex.Message);
+
+                this.LogEvent("CHAT", this.DescribeObject(message));
+                this.LogChatDialogue("CHAT", 0, message.PacketType.ToString(), "chat-protocol", this.DescribeObject(message));
             }
         }
 
@@ -1129,11 +1381,14 @@ namespace AOSharpLiveCapture
             }
 
             this.lastPlayfieldId = playfieldId.ToString(CultureInfo.InvariantCulture);
-            this.lastCapturePlayfieldIdentity = Safe(() => Playfield.Identity.ToString());
+            Interlocked.Exchange(
+                ref this.playfieldInitGeneration,
+                Interlocked.Read(ref this.teleportGeneration));
+            Interlocked.Exchange(ref this.pf127CollectionArmed, 0);
+            this.pf127GeometryCapture?.NotifyPlayfieldChanged(false);
             this.LogEvent("PLAYFIELD-INIT", this.lastPlayfieldId);
             this.knownCharacters.Clear();
             this.knownCorpses.Clear();
-            this.LogSnapshot("playfield-init");
         }
 
         private void OnTeleportStarted(object sender, EventArgs e)
@@ -1143,6 +1398,13 @@ namespace AOSharpLiveCapture
                 return;
             }
 
+            Interlocked.Exchange(
+                ref this.pf127CollectionArmedBeforeTeleport,
+                Volatile.Read(ref this.pf127CollectionArmed));
+            Interlocked.Increment(ref this.teleportGeneration);
+            Interlocked.Exchange(ref this.teleportInProgress, 1);
+            Interlocked.Exchange(ref this.pf127CollectionArmed, 0);
+            this.pf127GeometryCapture?.NotifyPlayfieldChanged(false);
             this.LogEvent("TELEPORT", "started");
         }
 
@@ -1153,7 +1415,15 @@ namespace AOSharpLiveCapture
                 return;
             }
 
+            long generation = Interlocked.Read(ref this.teleportGeneration);
+            bool matchingPlayfieldInit = Interlocked.Read(ref this.playfieldInitGeneration) == generation;
+            bool isPf127 = matchingPlayfieldInit
+                           && string.Equals(this.lastPlayfieldId, "127", StringComparison.Ordinal);
+            Interlocked.Exchange(ref this.teleportInProgress, 0);
+            Interlocked.Exchange(ref this.pf127CollectionArmed, isPf127 ? 1 : 0);
             this.LogEvent("TELEPORT", "ended");
+            this.pf127GeometryCapture?.NotifyPlayfieldChanged(isPf127);
+            this.pf127GeometryCapture?.RequestImmediateUpdate();
             this.LogSnapshot("teleport-ended");
         }
 
@@ -1162,6 +1432,15 @@ namespace AOSharpLiveCapture
             if (!this.enabled)
             {
                 return;
+            }
+
+            bool restorePf127 = Volatile.Read(ref this.pf127CollectionArmedBeforeTeleport) != 0;
+            Interlocked.Exchange(ref this.teleportInProgress, 0);
+            Interlocked.Exchange(ref this.pf127CollectionArmed, restorePf127 ? 1 : 0);
+            this.pf127GeometryCapture?.NotifyPlayfieldChanged(restorePf127);
+            if (restorePf127)
+            {
+                this.pf127GeometryCapture?.RequestImmediateUpdate();
             }
 
             this.LogEvent("TELEPORT", "failed");
@@ -1177,6 +1456,17 @@ namespace AOSharpLiveCapture
             this.combatLootSmoke?.Update(deltaTime);
 
             DateTime now = DateTime.UtcNow;
+            Pf127GeometryCapture geometryCapture = this.pf127GeometryCapture;
+            if (geometryCapture != null
+                && Volatile.Read(ref this.pf127CaptureRuntimeReady) != 0
+                && Volatile.Read(ref this.teleportInProgress) == 0
+                && Volatile.Read(ref this.pf127CollectionArmed) != 0)
+            {
+                geometryCapture.ExecuteUpdateBoundary(
+                    now,
+                    () => this.IsDetectedResourcePlayfield127(),
+                    () => this.GetDetectedPlayfieldId());
+            }
             if (now >= this.nextSnapshotUtc)
             {
                 this.nextSnapshotUtc = now.AddSeconds(1);
@@ -1293,7 +1583,7 @@ namespace AOSharpLiveCapture
                 catch (Exception ex)
                 {
                     this.rawPacketProjectionErrorCount++;
-                    bool recaptureRequired = this.IsRawRecaptureRequired();
+                    bool recaptureRequired = this.IsCaptureRecaptureRequired();
                     validation = new CaptureValidation(
                         "incomplete",
                         false,
@@ -1425,6 +1715,7 @@ namespace AOSharpLiveCapture
                 foreach (string removed in this.knownCorpses.Except(currentCorpses).ToArray())
                 {
                     DateTime goneUtc = DateTime.UtcNow;
+                    string normalizedCorpseIdentity = NormalizeIdentityKey(removed);
                     this.corpseGoneEventCount++;
                     this.LogEvent("CORPSE-GONE", removed);
                     this.LogNpcLifecycleRow(
@@ -1436,13 +1727,18 @@ namespace AOSharpLiveCapture
                         string.Empty,
                         string.Empty,
                         string.Empty);
-                    foreach (CorpseLifecycleEvidence evidence in this.corpseEvidenceByDeadNpc.Values)
+                    lock (this.syncRoot)
                     {
-                        if (!evidence.CorpseGoneUtc.HasValue
-                            && NormalizeIdentityKey(evidence.CorpseIdentity) == NormalizeIdentityKey(removed))
+                        foreach (CorpseLifecycleEvidence evidence in this.corpseEvidenceByDeadNpc.Values)
                         {
-                            evidence.CorpseGoneUtc = goneUtc;
+                            if (!evidence.CorpseGoneUtc.HasValue
+                                && NormalizeIdentityKey(evidence.CorpseIdentity) == normalizedCorpseIdentity)
+                            {
+                                evidence.CorpseGoneUtc = goneUtc;
+                            }
                         }
+                        this.activeCorpseEvidenceByCorpse.Remove(normalizedCorpseIdentity);
+                        this.corpseInventorySnapshotCounts.Remove(normalizedCorpseIdentity);
                     }
                     this.knownCorpses.Remove(removed);
                 }
@@ -1511,6 +1807,7 @@ namespace AOSharpLiveCapture
             if (IsRawCombatEvidencePacket(packet))
             {
                 this.rawCombatPacketCount++;
+                this.pf127GeometryCapture?.RequestCombatSample();
             }
 
             if (packet != null
@@ -1868,7 +2165,27 @@ namespace AOSharpLiveCapture
 
                 lock (this.syncRoot)
                 {
-                    this.corpseEvidenceByDeadNpc[NormalizeIdentityKey(deadNpcIdentity)] = new CorpseLifecycleEvidence
+                    string normalizedCorpseIdentity = NormalizeIdentityKey(corpseIdentity);
+                    string normalizedDeadNpcIdentity = NormalizeIdentityKey(deadNpcIdentity);
+                    CorpseLifecycleEvidence priorGeneration;
+                    bool isNewGeneration = !this.activeCorpseEvidenceByCorpse.TryGetValue(
+                                               normalizedCorpseIdentity,
+                                               out priorGeneration)
+                                           || !string.Equals(
+                                               NormalizeIdentityKey(priorGeneration.DeadNpcIdentity),
+                                               normalizedDeadNpcIdentity,
+                                               StringComparison.OrdinalIgnoreCase);
+                    if (isNewGeneration)
+                    {
+                        if (priorGeneration != null && !priorGeneration.CorpseGoneUtc.HasValue)
+                        {
+                            priorGeneration.CorpseGoneUtc = capturedUtc;
+                        }
+
+                        this.corpseInventorySnapshotCounts.Remove(normalizedCorpseIdentity);
+                    }
+
+                    var corpseEvidence = new CorpseLifecycleEvidence
                     {
                         DeadNpcIdentity = deadNpcIdentity,
                         CorpseIdentity = corpseIdentity,
@@ -1877,6 +2194,8 @@ namespace AOSharpLiveCapture
                         CorpseCredits = ReadInt32BigEndian(packet, 207),
                         CorpseMonsterData = ReadInt32BigEndian(packet, monsterDataOffset)
                     };
+                    this.corpseEvidenceByDeadNpc[normalizedDeadNpcIdentity] = corpseEvidence;
+                    this.activeCorpseEvidenceByCorpse[normalizedCorpseIdentity] = corpseEvidence;
                     this.corpseFullUpdateRowCount++;
                     this.corpseFullUpdatesLog.WriteLine(
                         string.Join(
@@ -2998,11 +3317,10 @@ namespace AOSharpLiveCapture
                         this.corpseLootInitialSnapshotCount++;
                     }
 
-                    CorpseLifecycleEvidence corpse = this.corpseEvidenceByDeadNpc.Values.FirstOrDefault(
-                        value => string.Equals(
-                            NormalizeIdentityKey(value.CorpseIdentity),
-                            normalizedCorpseIdentity,
-                            StringComparison.OrdinalIgnoreCase));
+                    CorpseLifecycleEvidence corpse;
+                    this.activeCorpseEvidenceByCorpse.TryGetValue(
+                        normalizedCorpseIdentity,
+                        out corpse);
                     EnemyEntityState enemy = corpse == null
                         ? null
                         : this.enemyStates.Values.FirstOrDefault(
@@ -4695,10 +5013,29 @@ namespace AOSharpLiveCapture
         {
             List<string> issues = new List<string>();
             List<string> notes = new List<string>();
+            CaptureCallbackBoundarySnapshot callbackHealth = this.callbackBoundary.Snapshot();
             List<EnemyRespawnObservation> respawns = this.BuildEnemyRespawnObservations(DateTime.UtcNow);
             int completeRespawns = respawns.Count(x => x.Status == "complete");
             int ambiguousRespawns = respawns.Count(x => x.Status == "ambiguous");
             int incompleteRespawns = respawns.Count(x => x.Status == "incomplete");
+
+            if (callbackHealth.TotalErrorCount > 0)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Capture callbacks failed {0} time(s); inspect capture-callback-errors.log and callbackHealth counters.",
+                        callbackHealth.TotalErrorCount));
+            }
+
+            if (callbackHealth.ErrorLogWriteFailureCount > 0)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Capture callback error evidence could not be durably appended {0} time(s).",
+                        callbackHealth.ErrorLogWriteFailureCount));
+            }
 
             if (this.GetSessionFileLength("events.log") <= 0)
             {
@@ -4725,7 +5062,7 @@ namespace AOSharpLiveCapture
             }
 
             int observedRawPackets = this.inboundPacketCount + this.outboundPacketCount;
-            bool recaptureRequired = this.IsRawRecaptureRequired();
+            bool recaptureRequired = this.IsCaptureRecaptureRequired();
             bool rawSinkIncomplete = this.rawPacketLogRowCount != observedRawPackets
                                      && this.rawPacketIndexRowCount != observedRawPackets
                                      && this.rawPacketPreservedCount != observedRawPackets;
@@ -5033,6 +5370,8 @@ namespace AOSharpLiveCapture
                 issues.Add("Respawn capture produced ambiguous same-position candidates; inspect enemy-respawns.csv before accepting timing.");
             }
 
+            this.pf127GeometryCapture?.AppendValidation(issues, notes);
+
             bool offlineDecodeRequired = !recaptureRequired && this.HasOfflineDecodeWork(observedRawPackets);
             if (offlineDecodeRequired && issues.Count == 0)
             {
@@ -5059,6 +5398,16 @@ namespace AOSharpLiveCapture
                     && this.rawPacketIndexRowCount != observedRawPackets
                     && this.rawPacketPreservedCount != observedRawPackets)
                    || this.rawPacketCallbackDrainTimeoutCount > 0;
+        }
+
+        private bool IsCaptureRecaptureRequired()
+        {
+            CaptureCallbackBoundarySnapshot callbackHealth = this.callbackBoundary.Snapshot();
+            return this.IsRawRecaptureRequired()
+                   || callbackHealth.TotalErrorCount > 0
+                   || callbackHealth.ErrorLogWriteFailureCount > 0
+                   || (this.pf127GeometryCapture != null
+                       && this.pf127GeometryCapture.RecaptureRequired);
         }
 
         private bool HasOfflineDecodeWork(int observedRawPackets)
@@ -5287,7 +5636,28 @@ namespace AOSharpLiveCapture
                 return string.Empty;
             }
 
-            return identity.Trim().TrimStart('(').TrimEnd(')');
+            string trimmed = identity.Trim().TrimStart('(').TrimEnd(')');
+            int separator = trimmed.IndexOf(':');
+            if (separator <= 0 || separator == trimmed.Length - 1)
+            {
+                return trimmed;
+            }
+
+            uint instance;
+            if (!uint.TryParse(
+                    trimmed.Substring(separator + 1),
+                    NumberStyles.HexNumber,
+                    CultureInfo.InvariantCulture,
+                    out instance))
+            {
+                return trimmed;
+            }
+
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}:{1:X8}",
+                trimmed.Substring(0, separator),
+                instance);
         }
 
         private double? PositionDelta(EnemyStateEvent first, EnemyStateEvent second)
@@ -5536,6 +5906,14 @@ namespace AOSharpLiveCapture
                 json.Append("  \"timestampUtc\": ");
                 json.Append(Json(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)));
                 json.AppendLine(",");
+                this.AppendCallbackHealthJson(json, "  ");
+                json.AppendLine(",");
+                if (this.pf127GeometryCapture != null)
+                {
+                    this.pf127GeometryCapture.AppendHealthJson(json, "  ");
+                    json.AppendLine(",");
+                }
+
                 this.AppendValidationJson(json, validation, "  ");
                 json.AppendLine();
                 json.AppendLine("}");
@@ -5861,6 +6239,14 @@ namespace AOSharpLiveCapture
                 json.Append("  \"focusedEnemyIdentities\": ");
                 AppendJsonStringArray(json, this.focusedEnemyIdentities.OrderBy(value => value).ToArray());
                 json.AppendLine(",");
+                this.AppendCallbackHealthJson(json, "  ");
+                json.AppendLine(",");
+                if (this.pf127GeometryCapture != null)
+                {
+                    this.pf127GeometryCapture.AppendHealthJson(json, "  ");
+                    json.AppendLine(",");
+                }
+
                 this.AppendValidationJson(json, validation, "  ");
                 json.AppendLine();
                 json.AppendLine("}");
@@ -5871,6 +6257,49 @@ namespace AOSharpLiveCapture
             {
                 this.LogEvent("CAPTURE-INFO-ERROR", ex.ToString());
             }
+        }
+
+        private void AppendCallbackHealthJson(StringBuilder json, string indent)
+        {
+            CaptureCallbackBoundarySnapshot snapshot = this.callbackBoundary.Snapshot();
+            json.Append(indent);
+            json.AppendLine("\"callbackHealth\": {");
+            json.Append(indent);
+            json.Append("  \"errorLogPath\": ");
+            json.Append(Json(snapshot.ErrorLogPath));
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"totalInvocations\": ");
+            json.Append(snapshot.TotalInvocationCount.ToString(CultureInfo.InvariantCulture));
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"totalErrors\": ");
+            json.Append(snapshot.TotalErrorCount.ToString(CultureInfo.InvariantCulture));
+            json.AppendLine(",");
+            json.Append(indent);
+            json.Append("  \"errorLogWriteFailures\": ");
+            json.Append(snapshot.ErrorLogWriteFailureCount.ToString(CultureInfo.InvariantCulture));
+            json.AppendLine(",");
+            json.Append(indent);
+            json.AppendLine("  \"callbacks\": [");
+            for (int index = 0; index < snapshot.Counters.Length; index++)
+            {
+                CaptureCallbackCounterSnapshot counter = snapshot.Counters[index];
+                json.Append(indent);
+                json.Append("    { \"name\": ");
+                json.Append(Json(counter.CallbackName));
+                json.Append(", \"invocations\": ");
+                json.Append(counter.InvocationCount.ToString(CultureInfo.InvariantCulture));
+                json.Append(", \"errors\": ");
+                json.Append(counter.ErrorCount.ToString(CultureInfo.InvariantCulture));
+                json.Append(" }");
+                json.AppendLine(index + 1 < snapshot.Counters.Length ? "," : string.Empty);
+            }
+
+            json.Append(indent);
+            json.AppendLine("  ]");
+            json.Append(indent);
+            json.Append("}");
         }
 
         private void AppendValidationJson(StringBuilder json, CaptureValidation validation, string indent)
@@ -5956,6 +6385,11 @@ namespace AOSharpLiveCapture
 
         private string GetDetectedResourcePlayfieldId()
         {
+            if (SafeBool(() => Playfield.ModelIdentity.Instance == 127))
+            {
+                return "127";
+            }
+
             string capturePlayfieldObjectId = this.GetCapturePlayfieldObjectId();
             if (string.Equals(capturePlayfieldObjectId, "122002", StringComparison.Ordinal))
             {
@@ -5963,6 +6397,14 @@ namespace AOSharpLiveCapture
             }
 
             return string.Empty;
+        }
+
+        private bool IsDetectedResourcePlayfield127()
+        {
+            return string.Equals(
+                this.GetDetectedResourcePlayfieldId(),
+                "127",
+                StringComparison.Ordinal);
         }
 
         private sealed class CaptureValidation
@@ -6890,6 +7332,9 @@ namespace AOSharpLiveCapture
             this.ApplyExternalCaptureRequest(pluginDir);
 
             this.sessionDirectory = CreateSessionDirectory(pluginDir);
+            this.callbackBoundary.BeginSession(
+                Path.Combine(this.sessionDirectory, "capture-callback-errors.log"),
+                GetCallbackErrorFallbackPath(pluginDir));
             this.eventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "events.log"));
             this.packetsLog = CreateWriter(Path.Combine(this.sessionDirectory, "packets.hex.log"), true);
             this.rawPacketsCsvLog = CreateWriter(Path.Combine(this.sessionDirectory, "raw-packets.csv"), true);
@@ -6924,6 +7369,7 @@ namespace AOSharpLiveCapture
             this.corpseFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,ReceiverInstance,CorpseType,CorpseInstance,CorpseIdentity,CorpseName,PlayfieldId,PositionX,PositionY,PositionZ,MonsterScale,Sex,Breed,Race,DeadNpcType,DeadNpcInstance,DeadNpcIdentity,DeadNpcName,CorpseCatMesh,CorpseCredits,CorpseMonsterData,TailDeadNpcType,TailDeadNpcInstance,TailDeadNpcIdentity,PacketLength,RawHex");
             this.npcLifecycleLog = CreateWriter(Path.Combine(this.sessionDirectory, "npc-lifecycle.csv"));
             this.npcLifecycleLog.WriteLine("CapturedUtc,Direction,Sequence,Phase,MessageType,PrimaryIdentity,RelatedIdentity,Name,Detail");
+            this.pf127GeometryCapture = new Pf127GeometryCapture(this.sessionDirectory, this.LogEvent);
             this.WriteEnemyStateJson();
             this.WriteEnemyDossierJson();
             this.WriteMovementSummaryJson();
@@ -6969,6 +7415,7 @@ namespace AOSharpLiveCapture
             this.enemyStates.Clear();
             this.enemyStateTimeline.Clear();
             this.corpseEvidenceByDeadNpc.Clear();
+            this.activeCorpseEvidenceByCorpse.Clear();
             this.corpseInventorySnapshotCounts.Clear();
             this.corpseLootInitialEnemyKeys.Clear();
 
@@ -7074,6 +7521,11 @@ namespace AOSharpLiveCapture
 
         private void Flush()
         {
+            this.callbackBoundary.Dispatch("Capture.Flush", this.FlushCore);
+        }
+
+        private void FlushCore()
+        {
             lock (this.syncRoot)
             {
                 this.FlushWriterNoThrow(this.packetsLog, true);
@@ -7096,6 +7548,7 @@ namespace AOSharpLiveCapture
                 this.FlushWriterNoThrow(this.enemyFightEventsLog, false);
                 this.FlushWriterNoThrow(this.corpseFullUpdatesLog, false);
                 this.FlushWriterNoThrow(this.npcLifecycleLog, false);
+                this.pf127GeometryCapture?.Flush();
             }
         }
 
@@ -7106,6 +7559,11 @@ namespace AOSharpLiveCapture
         }
 
         private void FlushAndClose()
+        {
+            this.callbackBoundary.Dispatch("Capture.FlushAndClose", this.FlushAndCloseCore);
+        }
+
+        private void FlushAndCloseCore()
         {
             lock (this.syncRoot)
             {
@@ -7128,6 +7586,8 @@ namespace AOSharpLiveCapture
                 this.enemyFightEventsLog = this.CloseWriterNoThrow(this.enemyFightEventsLog, false);
                 this.corpseFullUpdatesLog = this.CloseWriterNoThrow(this.corpseFullUpdatesLog, false);
                 this.npcLifecycleLog = this.CloseWriterNoThrow(this.npcLifecycleLog, false);
+                this.pf127GeometryCapture?.Dispose();
+                this.pf127GeometryCapture = null;
             }
         }
 

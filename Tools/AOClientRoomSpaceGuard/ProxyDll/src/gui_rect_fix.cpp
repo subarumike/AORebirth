@@ -39,6 +39,31 @@ namespace
         return regionEnd >= address && regionEnd - address >= size;
     }
 
+    bool IsWritableRange(void* pointer, size_t size)
+    {
+        MEMORY_BASIC_INFORMATION memory = {};
+        if (!pointer || VirtualQuery(pointer, &memory, sizeof(memory)) != sizeof(memory) ||
+            memory.State != MEM_COMMIT ||
+            (memory.Protect & (PAGE_GUARD | PAGE_NOACCESS)) != 0)
+        {
+            return false;
+        }
+
+        DWORD writable = memory.Protect & 0xFF;
+        if (writable != PAGE_READWRITE &&
+            writable != PAGE_WRITECOPY &&
+            writable != PAGE_EXECUTE_READWRITE &&
+            writable != PAGE_EXECUTE_WRITECOPY)
+        {
+            return false;
+        }
+
+        uintptr_t address = reinterpret_cast<uintptr_t>(pointer);
+        uintptr_t regionEnd = reinterpret_cast<uintptr_t>(memory.BaseAddress) +
+            memory.RegionSize;
+        return regionEnd >= address && regionEnd - address >= size;
+    }
+
     bool IsSaneFloat(float value)
     {
         uint32_t bits = 0;
@@ -200,18 +225,44 @@ namespace
         std::memcpy(bytes + 1, &displacement, sizeof(displacement));
     }
 
+    __declspec(naked) void RectAddRecoverBeforeFpuLoad()
+    {
+        __asm
+        {
+            mov eax, dword ptr [ebp + 8]
+            mov esp, ebp
+            pop ebp
+            ret 8
+        }
+    }
+
+    __declspec(naked) void RectAddRecoverAfterFpuLoad()
+    {
+        __asm
+        {
+            fstp st(0)
+            mov eax, dword ptr [ebp + 8]
+            mov esp, ebp
+            pop ebp
+            ret 8
+        }
+    }
+
     LONG CALLBACK RectAddExceptionGuard(EXCEPTION_POINTERS* exception)
     {
         if (!exception || !exception->ExceptionRecord || !exception->ContextRecord ||
             exception->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION ||
-            exception->ExceptionRecord->NumberParameters < 2)
+            exception->ExceptionRecord->NumberParameters < 2 ||
+            exception->ExceptionRecord->ExceptionInformation[0] != 0)
         {
             return EXCEPTION_CONTINUE_SEARCH;
         }
 
         uintptr_t fault = reinterpret_cast<uintptr_t>(
             exception->ExceptionRecord->ExceptionAddress);
-        if (fault < RectAddStartAddress || fault >= RectAddEndAddress)
+        bool faultBeforeFpuLoad = fault == RectAddStartAddress + 0x06;
+        bool faultAfterFpuLoad = fault == RectAddStartAddress + 0x0B;
+        if (!faultBeforeFpuLoad && !faultAfterFpuLoad)
         {
             return EXCEPTION_CONTINUE_SEARCH;
         }
@@ -222,22 +273,18 @@ namespace
             return EXCEPTION_CONTINUE_SEARCH;
         }
 
-        DWORD previousFrame = 0;
-        DWORD returnAddress = 0;
         DWORD resultPointer = 0;
-        std::memcpy(&previousFrame, reinterpret_cast<const void*>(frame), sizeof(previousFrame));
-        std::memcpy(&returnAddress, reinterpret_cast<const void*>(frame + 4), sizeof(returnAddress));
         std::memcpy(&resultPointer, reinterpret_cast<const void*>(frame + 8), sizeof(resultPointer));
-        if (!IsReadableRange(reinterpret_cast<const void*>(resultPointer), 16))
+        if (!IsWritableRange(reinterpret_cast<void*>(resultPointer), 16))
         {
             return EXCEPTION_CONTINUE_SEARCH;
         }
 
         WriteEmptyRect(reinterpret_cast<void*>(resultPointer));
-        exception->ContextRecord->Eax = resultPointer;
-        exception->ContextRecord->Eip = returnAddress;
-        exception->ContextRecord->Esp = frame + 16;
-        exception->ContextRecord->Ebp = previousFrame;
+        exception->ContextRecord->Eip = reinterpret_cast<DWORD>(
+            faultAfterFpuLoad ?
+                &RectAddRecoverAfterFpuLoad :
+                &RectAddRecoverBeforeFpuLoad);
         return EXCEPTION_CONTINUE_EXECUTION;
     }
 
@@ -327,25 +374,8 @@ namespace aorf
             return false;
         }
 
-        DWORD oldProtection = 0;
-        if (!VirtualProtect(importSlot, sizeof(*importSlot), PAGE_READWRITE, &oldProtection))
-        {
-            Log("ERROR GUI rectangle import protection failed code=%lu", GetLastError());
-            return false;
-        }
-
-        InterlockedExchangePointer(importSlot, reinterpret_cast<void*>(&GuiRectAddGuard));
-        DWORD ignored = 0;
-        bool restored = VirtualProtect(importSlot, sizeof(*importSlot), oldProtection, &ignored) != FALSE;
-        bool installed = *importSlot == reinterpret_cast<void*>(&GuiRectAddGuard);
-        if (!restored || !installed)
-        {
-            Log("ERROR GUI rectangle repair transaction failed restored=%s installed=%s",
-                restored ? "true" : "false", installed ? "true" : "false");
-            return false;
-        }
-
-        Log("PATCH PASS GUI rectangle data guard callsite=GUI+0x14C4A9 target=Utils+0x82E6");
+        Log("PATCH PASS GUI rectangle exception-only guard "
+            "callsite=GUI+0x14C4A9 target=Utils+0x82E6 normalPathQueries=0");
         return true;
     }
 

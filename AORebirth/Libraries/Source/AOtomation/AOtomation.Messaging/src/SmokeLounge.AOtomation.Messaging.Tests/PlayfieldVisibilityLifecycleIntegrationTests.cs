@@ -297,15 +297,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "The supported-family quarantine must remain 29 rows.");
             Assert.AreEqual(6, supported.Select(row => row.MonsterData).Distinct().Count());
             Assert.AreEqual(
-                135,
+                136,
                 CountOccurrences(ordinaryText, "new CapturedSubwayOrdinarySpawnDefinition("),
-                "Ordinary captured spawn data must remain 135 rows.");
+                "Ordinary captured spawn data must remain 136 rows.");
             Assert.AreEqual(
-                11,
+                12,
                 CountOccurrences(ordinaryText, "new CapturedSubwayOrdinaryArchetypeDefinition("),
-                "Ordinary profile data must remain 11 archetypes.");
-            Assert.AreEqual(259, supported.Length + 135, "The normalized catalog must remain 259 spawn rows.");
-            Assert.AreEqual(17, 6 + 11, "The normalized catalog must remain 17 profiles.");
+                "Ordinary profile data must remain 12 archetypes.");
+            Assert.AreEqual(260, supported.Length + 136, "The normalized catalog must remain 260 spawn rows.");
+            Assert.AreEqual(18, 6 + 12, "The normalized catalog must remain 18 profiles.");
             Assert.AreEqual(107, manifestRows.Length);
             Assert.AreEqual(
                 29,

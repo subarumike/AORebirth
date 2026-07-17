@@ -1,7 +1,8 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
 
-set MSBUILD=C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe
+set "VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+set "MSBUILD="
 set RESTORE_LOG=build_package_restore.log
 set RESTORE_CMD=%TEMP%\aorebirth_package_restore_%RANDOM%.cmd
 set RESTORE_DONE=%TEMP%\aorebirth_package_restore_done_%RANDOM%.tmp
@@ -16,8 +17,18 @@ if errorlevel 1 (
     exit /b 1
 )
 
-if not exist "%MSBUILD%" (
-    echo [AORebirth Build] MSBuild.exe not found: %MSBUILD%
+if not exist "%VSWHERE%" (
+    echo [AORebirth Build] Visual Studio Installer vswhere.exe was not found.
+    popd
+    exit /b 1
+)
+
+for /f "usebackq delims=" %%I in (`"%VSWHERE%" -latest -products * -find MSBuild\Current\Bin\MSBuild.exe`) do (
+    if not defined MSBUILD set "MSBUILD=%%I"
+)
+
+if not defined MSBUILD (
+    echo [AORebirth Build] MSBuild.exe was not found in the latest Visual Studio installation.
     popd
     exit /b 1
 )

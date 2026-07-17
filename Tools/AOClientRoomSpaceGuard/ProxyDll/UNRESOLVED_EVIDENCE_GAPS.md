@@ -306,21 +306,27 @@ and `ret 4`. `+0x1B1D` initializes that output to zero before the stream read.
 Four dumps prove ESI equals the attempted caller output. The top fault is not a
 BinaryStream capacity/growth store.
 
-### S02 — Malformed-count producer and object/message identity
+### S02 — Malformed-count producer
 
-Known: Gamecode deserializer `+0x7A41E..+0x7AAEE` reads count at `+0x7A913`,
-loops over three-float/12-byte entries, and checks limit 30 only at `+0x7A962`
-after the unsafe loop.
+Resolved structure: the object is `SimpleCharFullUpdateIIR_t`, flag
+`HasWaypoints`; the signed int32 count precedes three fixed floats per waypoint.
+The C and D functions, object offsets, 30-entry capacity, adjacent fields, and
+N3 network-buffer owner are proven in `GAMECODE_FIXED_ARRAY_OVERFLOW_ANALYSIS.md`.
 
-Needed: enclosing object/message identity, where counts such as `0x5A000000`
-and `0x1CB95` originate, byte-order/validation path, and caller ownership.
+Still needed: the producer/cursor history that made `0x5A000000` or `0x1CB95`
+appear at the count position. A previous-field version mismatch, cursor
+desynchronization, byte-order mismatch, or malformed source remains possible.
 
 ### S03 — Whole-object rejection and stream synchronization
 
-Needed: immediate post-count/pre-loop branch ABI; native failure result; how the
-remaining malformed object's bytes are consumed or discarded; proof that no
-partial object/cache state is published; and exact one-time release. Clamping
-to 30 and continuing is forbidden because it can desynchronize later reads.
+Resolved for the observed C/D N3 path: deserializer failure `1` deletes the
+partial object, makes Construct return null, destroys the temporary stream, and
+abandons the remaining network buffer before publication. Strategy D is the
+proven repair contract; clamping remains forbidden.
+
+Still needed: exact emitted-thunk and patch-transaction tests, caller-return
+gating for unenumerated external Construct callers, deferred diagnostics, and
+live rejection/publication/retry/performance validation.
 
 ### S04 — Paired crash provenance
 
@@ -334,14 +340,16 @@ pair.
 
 ### S05 — Heap secondary-victim validation
 
-Known: in E24/E25, overwrite interval `0x26D6AAD0..0x26ED3000` contains
+Known: in E24/E25, the out-of-bounds interval
+`0x26D6AC38..0x26ED3000` contains
 allocator value `0x26E90214`. Needed: paired PID confirmation and an upstream-
 repair run proving the allocator event disappears. Never catch allocator
 exceptions.
 
 ### S06 — ResourceManager secondary-victim and standalone lifetime
 
-Known: in E29/E30, overwrite interval `0x25AE50C8..0x25B2A000` contains
+Known: in E29/E30, the out-of-bounds interval
+`0x25AE5230..0x25B2A000` contains
 request `0x25B287B0`; its sentinel is zero at notifier
 `ResourceManager+0x3D84`. Static proof identifies notifier
 `+0x3D7B..+0x3DB4` and worker call `+0x40F6` after unlock and
@@ -359,6 +367,16 @@ No observed crash in this corpus currently proves a stream-capacity failure.
 Cursor, capacity, growth, terminator/alignment, allocator, and old-pointer
 retention work is authorized only if a separate exact failure demonstrates that
 boundary; it is not part of the F13 repair.
+
+### S08 — Gamecode guard implementation and runtime promotion
+
+Known: exact C/D sites, bytes, native failure tails, object-abort contract, and
+caller return addresses are documented in the four Gamecode deliverables.
+
+Needed: all emitted-code, ABI, transaction rollback, near-miss, diagnostics,
+count/malformed-stream, C/D runtime, no-publication, retry, performance, and
+soak gates in `GAMECODE_OVERFLOW_VALIDATION.md`. Until they pass, Outcome B
+remains in force and no production hook is authorized.
 
 ## N3, Vehicle, and C++ exceptions
 

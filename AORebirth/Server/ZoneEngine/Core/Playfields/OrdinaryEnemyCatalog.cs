@@ -16,6 +16,14 @@ namespace AORebirth.Core.Playfields
 
         private const string QuarantinedOrdinaryCapture = "20260710-202132";
 
+        private const int BloodcreeperMonsterData =
+            NpcCombatAttackRules.CapturedSubwayBloodcreeperMonsterData;
+
+        private const double BloodcreeperAutomaticAggroRadius = 7.0;
+
+        private static readonly Dictionary<string, OrdinaryEnemySpawnPolicyConfiguration>
+            CapturedOrdinarySpawnPolicies = BuildCapturedOrdinarySpawnPolicies();
+
         private static readonly OrdinaryEnemyAggressionProfile RetaliateChasingAggression =
             new OrdinaryEnemyAggressionProfile(
                 OrdinaryEnemyAggressionMode.Retaliate,
@@ -24,26 +32,34 @@ namespace AORebirth.Core.Playfields
                 false,
                 OrdinaryEnemyEvidenceState.Observed);
 
+        private static readonly OrdinaryEnemyAggressionProfile BloodcreeperAutomaticAggression =
+            new OrdinaryEnemyAggressionProfile(
+                OrdinaryEnemyAggressionMode.Auto,
+                BloodcreeperAutomaticAggroRadius,
+                true,
+                false,
+                OrdinaryEnemyEvidenceState.Observed);
+
         private static readonly OrdinaryEnemyCorpseProfile StandardGenericCorpse =
             new OrdinaryEnemyCorpseProfile(
                 OrdinaryEnemyCorpsePacketProfile.Generic,
-                30.0,
-                300.0,
-                1.0);
+                3.0,
+                240.0,
+                3.0);
 
         private static readonly OrdinaryEnemyCorpseProfile CapturedThiefCorpse =
             new OrdinaryEnemyCorpseProfile(
                 OrdinaryEnemyCorpsePacketProfile.CapturedThief,
-                30.0,
-                300.0,
-                1.0);
+                3.0,
+                240.0,
+                3.0);
 
         private static readonly OrdinaryEnemyCorpseProfile CapturedFilthFleaCorpse =
             new OrdinaryEnemyCorpseProfile(
                 OrdinaryEnemyCorpsePacketProfile.CapturedFilthFlea,
-                30.0,
-                300.0,
-                1.0);
+                3.0,
+                240.0,
+                3.0);
 
         private readonly Dictionary<string, OrdinaryEnemyProfile> profilesByKey;
 
@@ -111,6 +127,11 @@ namespace AORebirth.Core.Playfields
             var result = new List<CombatLootTableEntry>();
             foreach (OrdinaryEnemyProfile profile in this.profiles)
             {
+                if (profile.Loot.PoolMode != OrdinaryEnemyLootPoolMode.IndependentEntries)
+                {
+                    continue;
+                }
+
                 foreach (OrdinaryEnemyLootEntry loot in profile.Loot.Entries)
                 {
                     result.Add(
@@ -154,19 +175,25 @@ namespace AORebirth.Core.Playfields
             {
                 CapturedSubwaySpawnDefinition first = group.First();
                 OrdinaryEnemyLootEntry[] lootEntries = sourceLoot
-                    .Select((value, index) => new { Value = value, Slot = index })
-                    .Where(value => value.Value.MonsterData == first.MonsterData)
+                    .Where(value => value.MonsterData == first.MonsterData)
                     .Select(
                         value =>
                             new OrdinaryEnemyLootEntry(
-                                value.Value.LowId,
-                                value.Value.HighId,
-                                value.Value.Quality,
+                                value.LowId,
+                                value.HighId,
+                                value.Quality,
                                 value.Slot,
-                                value.Value.ObservedBasisPoints,
-                                value.Value.ObservedBasisPoints == 10000
+                                value.Quantity,
+                                value.RuntimeWeight,
+                                value.ObservedBasisPoints,
+                                value.ObservedBasisPoints == 10000
                                     ? OrdinaryEnemyLootEvidence.GuaranteedProven
-                                    : OrdinaryEnemyLootEvidence.ObservedAvailableLoot))
+                                    : OrdinaryEnemyLootEvidence.ObservedAvailableLoot,
+                                value.LinkageEvidence,
+                                value.ProbabilityEvidence,
+                                value.ObservedCount,
+                                value.ObservedCorpses,
+                                value.EvidenceReference))
                     .ToArray();
                 CapturedEnemyCombatContract contract = first.Combat;
                 profiles.Add(
@@ -213,7 +240,7 @@ namespace AORebirth.Core.Playfields
                         SubwayPlayfieldInstance,
                         source.Level,
                         source.Health,
-                        0,
+                        source.HealthDamage,
                         source.MonsterScale,
                         source.RunSpeed,
                         source.X,
@@ -262,8 +289,15 @@ namespace AORebirth.Core.Playfields
                                 value.HighId,
                                 value.Quality,
                                 index,
+                                1,
+                                0,
                                 value.ObservedBasisPoints,
-                                OrdinaryEnemyLootEvidence.ObservedAvailableLoot))
+                                OrdinaryEnemyLootEvidence.ObservedAvailableLoot,
+                                OrdinaryEnemyLootLinkageEvidence.ImportedCaptureEvidence,
+                                OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                                value.ObservedCount,
+                                value.ObservedCorpses,
+                                string.Join(",", archetype.EvidenceCaptures)))
                     .ToArray();
                 profiles.Add(
                     new OrdinaryEnemyProfile(
@@ -302,16 +336,9 @@ namespace AORebirth.Core.Playfields
                                         value.Layer))
                                 .ToArray(),
                             OrdinaryEnemyScfuProfile.CapturedExact),
-                        RetaliateAggression(),
+                        AggressionFor(archetype.MonsterData),
                         BuildCombatProfile(contract, archetype.MonsterData),
-                        new OrdinaryEnemyLootProfile(
-                            lootEntries.Length > 0
-                                ? OrdinaryEnemyLootEvidence.ObservedAvailableLoot
-                                : OrdinaryEnemyLootEvidence.Unresolved,
-                            lootEntries,
-                            OrdinaryEnemyEvidenceState.Unresolved,
-                            null,
-                            null),
+                        BuildLootProfile(archetype.MonsterData, lootEntries),
                         StandardCorpseProfile(archetype.MonsterData),
                         archetype.EvidenceCaptures,
                         false,
@@ -320,6 +347,10 @@ namespace AORebirth.Core.Playfields
 
             foreach (CapturedSubwayOrdinarySpawnDefinition source in content.GetAllSpawns())
             {
+                OrdinaryEnemySpawnPolicyConfiguration policyConfiguration;
+                CapturedOrdinarySpawnPolicies.TryGetValue(
+                    source.ArchetypeKey,
+                    out policyConfiguration);
                 OrdinaryEnemyWaypoint[] waypoints = source.Waypoints
                     .Select(value => new OrdinaryEnemyWaypoint(value.X, value.Y, value.Z))
                     .ToArray();
@@ -352,8 +383,15 @@ namespace AORebirth.Core.Playfields
                         source.CapturedFlags2,
                         source.Unknown1,
                         source.Unknown2,
-                        OrdinaryEnemyEvidenceState.Unresolved,
-                        null,
+                        policyConfiguration != null
+                        && policyConfiguration.RespawnPolicy.Mode
+                           == WorldRespawnPolicyAssignmentMode.Explicit
+                            ? OrdinaryEnemyEvidenceState.Policy
+                            : OrdinaryEnemyEvidenceState.Unresolved,
+                        policyConfiguration != null
+                        && policyConfiguration.RespawnPolicy.ExplicitPolicy != null
+                            ? policyConfiguration.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds
+                            : null,
                         string.Equals(
                             source.EvidenceCapture,
                             QuarantinedOrdinaryCapture,
@@ -362,8 +400,56 @@ namespace AORebirth.Core.Playfields
                             : OrdinaryEnemyRuntimeDisposition.Active,
                         source.SourceOwnerIdentity,
                         source.EvidenceCapture,
-                        source.EvidenceTimestamp));
+                        source.EvidenceTimestamp,
+                        policyConfiguration == null
+                            ? null
+                            : policyConfiguration.LevelDefinition,
+                        policyConfiguration == null
+                            ? null
+                            : policyConfiguration.RespawnPolicy));
             }
+        }
+
+        private static Dictionary<string, OrdinaryEnemySpawnPolicyConfiguration>
+            BuildCapturedOrdinarySpawnPolicies()
+        {
+            var result = new Dictionary<string, OrdinaryEnemySpawnPolicyConfiguration>(
+                StringComparer.Ordinal);
+            result.Add(
+                "bloodcreeper",
+                new OrdinaryEnemySpawnPolicyConfiguration(
+                    new OrdinaryEnemySpawnLevelDefinition(
+                        OrdinaryEnemySpawnLevelMode.InclusiveRange,
+                        15,
+                        25,
+                        24,
+                        691,
+                        33,
+                        0,
+                        70,
+                        83,
+                        3,
+                        OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration,
+                        OrdinaryEnemyEvidenceState.Policy,
+                        "community-range:docs/generated/enemy_catalog/enemy_catalog.csv;"
+                        + "captured-anchor:20260709-222339;"
+                        + "focused-combat:20260716-033326,20260716-034104"),
+                    WorldRespawnPolicyAssignment.Explicit(
+                        new RespawnPolicyDefinition
+                        {
+                            RespawnPolicyKey = "ordinary.bloodcreeper.240",
+                            Mode = WorldRespawnMode.FixedDelay,
+                            FixedDelaySeconds = 240.0,
+                            RespawnAtOriginalPosition = true,
+                            ResetHealth = true,
+                            ResetMovementState = true,
+                            ResetAggressionState = true,
+                            DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
+                            Evidence = "private-regular-enemy-policy;20260716-033326;20260716-034104",
+                            Confidence = "POLICY",
+                            Enabled = true
+                        })));
+            return result;
         }
 
         private static OrdinaryEnemyAppearanceProfile BuildSupportedAppearance(
@@ -444,6 +530,13 @@ namespace AORebirth.Core.Playfields
             return RetaliateChasingAggression;
         }
 
+        private static OrdinaryEnemyAggressionProfile AggressionFor(int monsterData)
+        {
+            return monsterData == BloodcreeperMonsterData
+                       ? BloodcreeperAutomaticAggression
+                       : RetaliateAggression();
+        }
+
         private static OrdinaryEnemyCombatProfile BuildCombatProfile(
             CapturedEnemyCombatContract contract,
             int monsterData)
@@ -479,7 +572,10 @@ namespace AORebirth.Core.Playfields
                 contract,
                 contract.IsCombatReady
                     ? OrdinaryEnemyEvidenceState.Observed
-                    : OrdinaryEnemyEvidenceState.Unresolved);
+                    : OrdinaryEnemyEvidenceState.Unresolved,
+                monsterData == 26092 ? 1.0 : (double?)null,
+                monsterData == 26092 ? 1 : (int?)null,
+                monsterData == 26092);
         }
 
         private static OrdinaryEnemyLootProfile BuildLootProfile(
@@ -491,14 +587,31 @@ namespace AORebirth.Core.Playfields
                 : entries.All(value => value.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven)
                     ? OrdinaryEnemyLootEvidence.GuaranteedProven
                     : OrdinaryEnemyLootEvidence.ObservedAvailableLoot;
+            int observedCompleteInventories = entries
+                .Select(value => value.ObservedCorpses)
+                .DefaultIfEmpty(0)
+                .Max();
+            string itemEvidenceReference = string.Join(
+                ",",
+                entries
+                    .Select(value => value.EvidenceReference)
+                    .Where(value => !string.IsNullOrWhiteSpace(value))
+                    .Distinct(StringComparer.Ordinal));
             if (monsterData == 17657)
             {
                 return new OrdinaryEnemyLootProfile(
                     evidence,
                     entries,
+                    OrdinaryEnemyLootPoolMode.IndependentEntries,
+                    0,
+                    true,
+                    Math.Max(8, observedCompleteInventories),
+                    0,
+                    itemEvidenceReference,
                     OrdinaryEnemyEvidenceState.Observed,
                     29,
-                    79);
+                    79,
+                    new OrdinaryEnemyLevelCreditRule[0]);
             }
 
             if (monsterData == 17649)
@@ -508,6 +621,12 @@ namespace AORebirth.Core.Playfields
                 return new OrdinaryEnemyLootProfile(
                     evidence,
                     entries,
+                    OrdinaryEnemyLootPoolMode.WeightedOne,
+                    5,
+                    false,
+                    7,
+                    5,
+                    itemEvidenceReference,
                     OrdinaryEnemyEvidenceState.Observed,
                     null,
                     null,
@@ -521,12 +640,47 @@ namespace AORebirth.Core.Playfields
                         });
             }
 
+            if (monsterData == BloodcreeperMonsterData)
+            {
+                // Both completed level-24 official-live fights carried 150 credits.
+                // Preserve that value across the configured private level range as policy;
+                // level 24 retains its exact observed rule and evidence.
+                return new OrdinaryEnemyLootProfile(
+                    evidence,
+                    entries,
+                    OrdinaryEnemyLootPoolMode.IndependentEntries,
+                    0,
+                    false,
+                    2,
+                    2,
+                    "20260716-033326:Corpse:F69003,20260716-034104:Corpse:F69004",
+                    OrdinaryEnemyEvidenceState.Policy,
+                    150,
+                    150,
+                    new[]
+                        {
+                            new OrdinaryEnemyLevelCreditRule(
+                                24,
+                                150,
+                                150,
+                                2,
+                                "20260716-033326,20260716-034104")
+                        });
+            }
+
             return new OrdinaryEnemyLootProfile(
                 evidence,
                 entries,
+                OrdinaryEnemyLootPoolMode.IndependentEntries,
+                0,
+                entries.Length > 0,
+                observedCompleteInventories,
+                0,
+                itemEvidenceReference,
                 OrdinaryEnemyEvidenceState.Unresolved,
                 null,
-                null);
+                null,
+                new OrdinaryEnemyLevelCreditRule[0]);
         }
 
         private static OrdinaryEnemyCorpseProfile StandardCorpseProfile(int monsterData)
@@ -560,6 +714,20 @@ namespace AORebirth.Core.Playfields
         private static string SpawnKey(int sourceIdentity)
         {
             return string.Format(CultureInfo.InvariantCulture, "subway.{0:X8}", sourceIdentity);
+        }
+
+        private sealed class OrdinaryEnemySpawnPolicyConfiguration
+        {
+            internal OrdinaryEnemySpawnPolicyConfiguration(
+                OrdinaryEnemySpawnLevelDefinition levelDefinition,
+                WorldRespawnPolicyAssignment respawnPolicy)
+            {
+                this.LevelDefinition = levelDefinition;
+                this.RespawnPolicy = respawnPolicy;
+            }
+
+            internal OrdinaryEnemySpawnLevelDefinition LevelDefinition { get; private set; }
+            internal WorldRespawnPolicyAssignment RespawnPolicy { get; private set; }
         }
     }
 }

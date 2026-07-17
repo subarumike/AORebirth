@@ -167,13 +167,57 @@ namespace AORebirth.Core.Playfields
                 result.AppliedAssignmentKeys.Add(resolvedAssignment.Assignment.AssignmentKey);
                 result.AppliedTableKeys.Add(table.LootTableKey);
                 result.LootUnresolved |= table.ItemPoolUnresolved;
-                foreach (LootGroupDefinition group in table.RollGroups.OrderBy(x => x.LootGroupKey, StringComparer.Ordinal))
+                if (table.ObservedCorpseSnapshots.Length > 0)
                 {
-                    this.RollGroup(result, table, group, context, random);
+                    this.RollObservedCorpseSnapshot(result, table, context, random);
                 }
-                ApplyCredits(result, table.CreditsPolicy, random);
+                else
+                {
+                    foreach (LootGroupDefinition group in table.RollGroups.OrderBy(x => x.LootGroupKey, StringComparer.Ordinal))
+                    {
+                        this.RollGroup(result, table, group, context, random);
+                    }
+                    ApplyCredits(result, table.CreditsPolicy, random);
+                }
             }
             return result;
+        }
+
+        private void RollObservedCorpseSnapshot(
+            LootGenerationResult result,
+            LootTableDefinition table,
+            LootGenerationContext context,
+            ILootRandomSource random)
+        {
+            ObservedCorpseSnapshotDefinition snapshot = table.ObservedCorpseSnapshots[
+                random.Next(table.ObservedCorpseSnapshots.Length)];
+            string groupKey = "observed.corpse.snapshot." + snapshot.SnapshotKey;
+            var group = new LootGroupDefinition
+            {
+                LootGroupKey = groupKey,
+                RollMode = LootRollMode.ObservedSnapshot,
+                RollCount = 1,
+                EmptyWeight = 0,
+                DropChanceBasisPoints = 0,
+                Entries = snapshot.Entries,
+                Conditions = new string[0]
+            };
+
+            result.LootUnresolved = true;
+            result.Credits = snapshot.Credits;
+            result.CreditsUnresolved = true;
+            result.RollEvidence.Add(new LootRollEvidence
+            {
+                TableKey = table.LootTableKey,
+                GroupKey = groupKey,
+                EntryTemplateId = 0,
+                Outcome = "snapshot-selected:" + snapshot.SnapshotKey + "; probability-unresolved"
+            });
+
+            foreach (LootEntryDefinition entry in snapshot.Entries)
+            {
+                this.TryGenerate(result, table, group, entry, context, random, true);
+            }
         }
 
         private void RollGroup(
@@ -310,7 +354,10 @@ namespace AORebirth.Core.Playfields
 
         private static bool CanRoll(LootEntryDefinition entry)
         {
-            return entry.Semantics != LootSemantics.Unresolved && entry.Semantics != LootSemantics.NoneProven;
+            return entry.Semantics != LootSemantics.Unresolved
+                && entry.Semantics != LootSemantics.NoneProven
+                && entry.Evidence != LootEvidenceConfidence.Unresolved
+                && !string.IsNullOrWhiteSpace(entry.EvidenceReference);
         }
 
         private static void ApplyCredits(LootGenerationResult result, CreditsPolicyDefinition policy, ILootRandomSource random)

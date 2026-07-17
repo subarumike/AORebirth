@@ -32,7 +32,7 @@ whether a mitigation actually fired.
 | --- | --- |
 | client | C/new graphics; D/old graphics |
 | policy | forward-only; diagnostic-only; exact guards; each candidate feature alone; intended combined policy |
-| renderer selector | AO original selection; plain HAL normalization, independently |
+| renderer selector | AO original selection preserved; test plain HAL only when selected in AO's launcher |
 | proxy | absent baseline; installed diagnostic; installed mitigation |
 | session | clean launch; relaunch; zone transition; long soak |
 
@@ -119,7 +119,15 @@ file I/O, `VirtualQuery`, module enumeration, or unbounded geometry scans.
 
 - one test per exact RVA and one near-miss register/address case;
 - verify expected neutral black/missing sample or one-entry skip;
-- ensure report image RVA `+0x25118` still fails closed;
+- for `+0x25118`, require the exact PE32/i386 image fingerprint, access address
+  equal to EDI, pushed class `0x0A`, readable vector fields, writable frame
+  locals, `offset == index * 16`, `vectorBegin + offset == EDI`, and coherent
+  bounds for the independent next 20-byte vector entered at the resume point;
+- verify `+0x25118` recovery performs `ESP += 4`, clears EAX, resumes at
+  `+0x25147`, and leaves all unrelated registers and loop locals unchanged;
+- exercise one-field near misses for RVA, image bytes, access address, state
+  class, vector/frame readability, offset/index, and computed entry pointer;
+- retain separate `+0x2511A -> +0x2512F` positive and near-miss tests;
 - inspect texture/material artifacts after a hit.
 
 ### NVIDIA draw and deferred flush
@@ -194,18 +202,20 @@ Diagnostic phase only:
 - verify the four known dumps reproduce ESI as the caller output address at
   `BinaryStream+0x1B1D`;
 - record Gamecode object, stream, decoded count, destination range, loop index,
-  enclosing caller/message, and thread at `Gamecode+0x7A919`;
+  enclosing caller/message, and thread at C `Gamecode+0x7A919` or D
+  `Gamecode+0x79647`;
 - test valid counts 0, 1, and 30 plus 31, truncated payload, byte-order-wrong,
   and very large counts;
 - prove the diagnostic does not change parsing or publication;
 - confirm whether paired E24/E25 and E29/E30 share PID/time identity.
 
-Behavioral tests begin only after whole-object failure semantics are proven.
-Verify rejection occurs before the first entry write, consumes/discards the
-entire malformed object without desynchronizing the next decode, publishes no
-partial state, and releases ownership exactly once. Never validate a clamp-and-
-continue repair. BinaryStream capacity/growth tests are out of scope for this
-family.
+Whole-object failure semantics are proven for the exact observed C/D N3 caller.
+Behavioral tests begin only after emitted-code, ABI, caller-return, and patch-
+transaction readiness pass. Verify rejection occurs before the first entry
+write, discards the enclosing message without a subsequent decode at the unread
+payload, publishes no partial state, and releases ownership exactly once.
+Never validate a clamp-and-continue repair. BinaryStream capacity/growth tests
+are out of scope for this family.
 
 ### ResourceManager worker
 
@@ -288,8 +298,9 @@ Documentation/log-format-only changes do not reset hardware soak evidence.
   unwind, and mandatory Commit-tail preservation pass;
 - no poisoned-device continuation until reset/recreate/rebind and first/subsequent
   Present pass; otherwise restart is required;
-- no Gamecode behavioral repair until whole-object reject/consume/ref semantics
-  pass without stream desynchronization;
+- no Gamecode behavioral repair until the proven Strategy D design also passes
+  emitted ABI, transactional rollback, exact-caller, malformed-stream,
+  no-publication, retry, C/D runtime, performance, and soak gates;
 - official live and AORebirth/private results remain separate evidence lanes;
 - single-client and multi-client runs pass with AOSharp absent; any AOSharp
   compatibility run is labeled separately;

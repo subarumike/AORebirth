@@ -21,15 +21,59 @@ namespace AOSharpCaptureAnalyzer
 
         private static int Main(string[] args)
         {
+            Console.WriteLine(
+                "AOSharpCaptureAnalyzer process bitness: "
+                + (Environment.Is64BitProcess ? "64-bit" : "32-bit"));
+
             if (args.Length == 1 && string.Equals(args[0], "--self-test", StringComparison.Ordinal))
             {
                 return RunSelfTest();
+            }
+
+            if (args.Length == 1
+                && string.Equals(
+                    args[0],
+                    "--self-test-pf127-los-promotion",
+                    StringComparison.Ordinal))
+            {
+                return Pf127LineOfSightPromotionValidator.RunSelfTest();
+            }
+
+            if (args.Length == 1
+                && string.Equals(
+                    args[0],
+                    "--self-test-pf127-capture-snapshot",
+                    StringComparison.Ordinal))
+            {
+                return Pf127CaptureSnapshot.RunSelfTest();
+            }
+
+            if (args.Length == 3
+                && string.Equals(
+                    args[0],
+                    "--snapshot-pf127-capture",
+                    StringComparison.Ordinal))
+            {
+                return SnapshotPf127Capture(args[1], args[2]);
+            }
+
+            if (args.Length >= 2
+                && args.Length <= 3
+                && string.Equals(args[0], "--promote-pf127-los", StringComparison.Ordinal))
+            {
+                return PromotePf127LineOfSight(
+                    args[1],
+                    args.Length == 3 ? args[2] : null);
             }
 
             if (args.Length == 0)
             {
                 Console.Error.WriteLine("Usage: AOSharpCaptureAnalyzer <capture-folder> [capture-folder ...]");
                 Console.Error.WriteLine("       AOSharpCaptureAnalyzer --self-test");
+                Console.Error.WriteLine("       AOSharpCaptureAnalyzer --self-test-pf127-los-promotion");
+                Console.Error.WriteLine("       AOSharpCaptureAnalyzer --self-test-pf127-capture-snapshot");
+                Console.Error.WriteLine("       AOSharpCaptureAnalyzer --snapshot-pf127-capture <live-capture-folder> <new-snapshot-folder>");
+                Console.Error.WriteLine("       AOSharpCaptureAnalyzer --promote-pf127-los <capture-folder> [reviewed-json-output]");
                 return 2;
             }
 
@@ -40,6 +84,62 @@ namespace AOSharpCaptureAnalyzer
             }
 
             return failures == 0 ? 0 : 1;
+        }
+
+        private static int SnapshotPf127Capture(string sourceDirectory, string outputDirectory)
+        {
+            try
+            {
+                Pf127CaptureSnapshotResult result = Pf127CaptureSnapshot.Create(
+                    sourceDirectory,
+                    outputDirectory);
+                Console.WriteLine(
+                    "PF127 capture snapshot PASS output="
+                    + result.OutputDirectory
+                    + " manifest="
+                    + result.ManifestPath);
+                return 0;
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine("PF127 capture snapshot FAIL: " + exception.Message);
+                return 1;
+            }
+        }
+
+        private static int PromotePf127LineOfSight(string captureFolder, string outputPath)
+        {
+            if (!Environment.Is64BitProcess)
+            {
+                Console.Error.WriteLine(
+                    "PF127 LOS promotion requires a 64-bit AOSharpCaptureAnalyzer process. Rebuild and run the analyzer as AnyCPU with Prefer32Bit=false or as x64; the full PF127 geometry is not supported in a 32-bit process.");
+                return 1;
+            }
+
+            try
+            {
+                Pf127LineOfSightPromotionResult result =
+                    Pf127LineOfSightPromotionValidator.Promote(captureFolder, outputPath);
+                Console.WriteLine(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "PF127 LOS promotion PASS variant={0} height={1:R} pairs={2} clear={3} blocked={4} nativeRejected={5} sourceSha256={6} outputSha256={7} output={8}",
+                        result.ProbeVariant,
+                        result.ProbeHeight,
+                        result.PairCount,
+                        result.ClearPairCount,
+                        result.BlockedPairCount,
+                        result.NativeDisagreementPairCount,
+                        result.SourceSha256,
+                        result.OutputSha256,
+                        result.OutputPath));
+                return 0;
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine("PF127 LOS promotion FAIL: " + exception.Message);
+                return 1;
+            }
         }
 
         private static int ExportCapture(string captureFolder)

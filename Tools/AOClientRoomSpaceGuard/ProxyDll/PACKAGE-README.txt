@@ -44,9 +44,11 @@ READY RoomSpace, GUI rectangle, and renderer repairs active
 The old-client renderer repair skips one bad randy31 draw-resource call when
 the client passes a low integer instead of a resource pointer. Color-pointer
 guards remain limited to the verified randy31 color-read callsites, including
-the indirect color-sample helper's existing missing-sample path. It also skips
-impossible randy31 render-state entries, such as corrupted state ids that would
-index outside the renderer's saved-state table.
+the indirect color-sample helper's existing missing-sample path. At the exact
+randy31 +0x25118 entry-pointer fault, the early exception-only guard verifies
+the old-client image and native loop state, then skips the corrupt 16-byte
+render-state vector. The separate +0x2511A guard skips only one entry whose
+state id is impossible.
 
 The repair also guards the one verified old-client DrawIndexedPrimitiveVB call
 that produced the repeated NVIDIA crashes. The fallback accepts only NVIDIA
@@ -54,26 +56,38 @@ driver 32.0.15.9186 and the two exact null-read instructions observed in the
 dumps. During that exact triangle draw, a matching call is unwound and only
 that bad draw is skipped. Other driver versions, instructions, calls, and
 exceptions remain untouched. Because the driver already faulted, continued
-driver operation cannot be guaranteed; the plain-HAL selection is the
-pre-fault repair.
+driver operation cannot be guaranteed; this guard contains only the verified
+failure and leaves AO's renderer selection unchanged.
 
-One separate NVIDIA failure can surface later while AO locks its next GUI
-vertex buffer. AO does not check a failed/null Lock result, so the repair does
-not replace that crash with an unsafe null pointer. Instead it wraps the whole
-verified void GUI batch and skips that batch only for the exact NVIDIA
-32.0.15.9186 read-from-0x14 instruction. The plain-HAL selection is the
-preventive repair for that deferred-flush path.
+Separate failures can surface while AO locks or fills its next GUI vertex
+buffer. AO does not check a failed/null Lock result. The repair wraps the whole
+verified void GUI batch and skips it for the exact NVIDIA 32.0.15.9186
+read-from-0x14 failure. It also recognizes the verified GUI rep-movsd failure
+where randy converted a null Lock base into a low destination. Both paths run
+AO's conditional vertex-buffer unlock, material reset, and state reset; the
+null-destination path also releases a heap index buffer when needed. These
+scoped guards do not replace AO's selected renderer.
+
+The proxy does not blindly continue every exception. Unknown faults still use
+the normal crash/dump path because resuming without the matching lock and state
+cleanup can corrupt the renderer. Containment requires the exact instruction,
+register, helper-local, batch, viewport, and state-blob evidence.
+
+Normal old-client draws and rectangle operations do not run Windows
+virtual-memory queries. Draw inputs use checked arithmetic and direct endpoint
+probes inside the existing exception boundary, while AO's rectangle call stays
+directly connected to its original Utils helper. Expensive verification runs
+only if one of those operations actually faults.
 
 The old GUI repair also contains the verified tree-lookup crash where GUI was
 given pointer 0x8 instead of a four-byte key. Invalid or unreadable key pointers
 use GUI's existing not-found result; valid keys use the original lookup.
 
-For the verified old-client build, the repair automatically maps AO's existing
-T&L HAL selection to its existing plain Direct3D HAL selection before creating
-the persistent renderer device. This keeps GPU rasterization while the legacy
-Direct3D runtime performs transform and lighting on the CPU. The exact selector
-and both existing device GUIDs are verified first; this is not a new cap or
-gameplay limit.
+For the verified old-client build, the repair preserves AO's renderer selection.
+Direct3D T&L HAL remains T&L HAL, so hardware transformation and lighting are not
+silently moved into the legacy Direct3D software pipeline. The scoped draw guard
+continues to contain the verified NVIDIA faults without changing the renderer
+chosen in AO's launcher.
 
 The dump handler does not suppress arbitrary access violations, C++
 exceptions, arbitrary driver faults, stack corruption, or unknown callsite failures.
