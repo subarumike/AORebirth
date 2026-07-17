@@ -124,6 +124,71 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void FinalizedSlumRunnerCapturePreservesCorpseVisualAndAtomicCreditOutcomes()
+        {
+            CapturedSubwayOrdinaryArchetypeDefinition source =
+                new CapturedSubwayOrdinaryContentProvider()
+                    .GetArchetypes()
+                    .Single(value => value.Name == "Slum Runner");
+            Assert.AreEqual(6, source.CorpseEvidence.Length);
+            Assert.IsTrue(source.CorpseEvidence.All(value => value.Capture == "20260716-034656"));
+            Assert.IsTrue(source.CorpseEvidence.All(value => value.MonsterData == 55648));
+            Assert.IsTrue(source.CorpseEvidence.All(value => value.CatMesh == 31774));
+            CollectionAssert.AreEqual(
+                new[]
+                    {
+                        "(SimpleChar:796D4080)>(Corpse:00F69005)",
+                        "(SimpleChar:796D407E)>(Corpse:00F69007)",
+                        "(SimpleChar:796D4078)>(Corpse:00F69008)",
+                        "(SimpleChar:796D4083)>(Corpse:00F69009)",
+                        "(SimpleChar:796D407A)>(Corpse:00F6900A)",
+                        "(SimpleChar:796D407C)>(Corpse:00F6900B)"
+                    },
+                source.CorpseEvidence
+                    .Select(value => value.DeadNpcIdentity + ">" + value.CorpseIdentity)
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[] { 144, 144, 144, 131, 137, 131 },
+                source.CorpseEvidence.Select(value => value.Credits).ToArray());
+
+            OrdinaryEnemyProfile profile = Profile("Slum Runner");
+            Assert.IsTrue(profile.Corpse.CapturedCatMesh.HasValue);
+            Assert.AreEqual(31774, profile.Corpse.CapturedCatMesh.Value);
+            StringAssert.Contains(profile.Corpse.VisualEvidence, "20260716-034656");
+            CollectionAssert.AreEqual(
+                new[] { 144, 144, 144, 131, 137, 131 },
+                profile.Loot.ObservedCreditOutcomes);
+            Assert.AreEqual(0, profile.Loot.LevelCreditRules.Length);
+            StringAssert.Contains(profile.Loot.CreditEvidenceReference, "20260716-034656");
+
+            OrdinaryEnemyLootTableAdapterResult adapted = OrdinaryEnemyLootTableAdapter.Build(
+                profile,
+                "subway.test.slum-runner",
+                "subway.test.slum-runner.assignment");
+            Assert.AreEqual(CreditsPolicyMode.ObservedSamples, adapted.Table.CreditsPolicy.Mode);
+            CollectionAssert.AreEqual(
+                new[] { 144, 144, 144, 131, 137, 131 },
+                adapted.Table.CreditsPolicy.ObservedCredits);
+
+            var registry = new LootTableRegistry(value => value > 0);
+            registry.RegisterTableAndAssignment(adapted.Table, adapted.Assignment);
+            CollectionAssert.AreEqual(
+                new[] { 131, 131, 137, 144, 144, 144 },
+                adapted.Table.CreditsPolicy.ObservedCredits);
+            var service = new LootGenerationService(registry, new LootAssignmentResolver());
+            var context = new LootGenerationContext
+            {
+                EnemyProfileKey = profile.ProfileKey,
+                FamilyKey = profile.FamilyKey,
+                MonsterData = profile.MonsterData,
+                Level = 15,
+                PlayfieldId = OrdinaryEnemyCatalog.SubwayPlayfieldInstance
+            };
+            Assert.AreEqual(131, service.Generate(context, new FixedLootRandomSource(0)).Credits);
+            Assert.AreEqual(144, service.Generate(context, new FixedLootRandomSource(5)).Credits);
+        }
+
+        [TestMethod]
         public void AdapterPreservesCapturedItemIdentityAndEvidence()
         {
             OrdinaryEnemyProfile profile = Profile("Disobedient Bot");

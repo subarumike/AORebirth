@@ -25,7 +25,7 @@ namespace AORebirth.Core.Playfields
         Global, Family, EnemyType, Spawn, Boss, DynaGlobal, DynaLevelBand,
         DynaFamily, Encounter, Mission, Dungeon, Event, Quest
     }
-    internal enum CreditsPolicyMode { None, Fixed, Range, ObservedSet, Unresolved }
+    internal enum CreditsPolicyMode { None, Fixed, Range, ObservedSet, ObservedSamples, Unresolved }
     internal enum CorpseLootRightsPolicy { Public, OwnerOnly, Team, Personal, Scripted, Unresolved }
 
     internal sealed class CreditsPolicyDefinition
@@ -321,10 +321,16 @@ namespace AORebirth.Core.Playfields
             {
                 throw new LootDefinitionValidationException("Fixed credits require equal bounds in " + tableKey);
             }
-            if (policy.Mode == CreditsPolicyMode.ObservedSet)
+            if (policy.Mode == CreditsPolicyMode.ObservedSet
+                || policy.Mode == CreditsPolicyMode.ObservedSamples)
             {
-                int[] outcomes = (policy.ObservedCredits ?? new int[0])
-                    .Distinct()
+                IEnumerable<int> normalized = policy.ObservedCredits ?? new int[0];
+                if (policy.Mode == CreditsPolicyMode.ObservedSet)
+                {
+                    normalized = normalized.Distinct();
+                }
+
+                int[] outcomes = normalized
                     .OrderBy(value => value)
                     .ToArray();
                 if (outcomes.Length == 0 || outcomes.Any(value => value < 0))

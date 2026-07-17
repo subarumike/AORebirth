@@ -21,6 +21,7 @@ namespace AORebirth.Core.Playfields
         private const int CleaningRobotCredits = 5;
         private const int CapturedAbmouthCredits = 587;
         private const int CapturedInfectorCredits = 150;
+        private const int CapturedEumenidesCredits = 186;
         private const string CapturedVergilProfileKey = "subway.127.boss.vergil-aeneid";
         private const int CapturedVergilMonsterData = 203748;
         private const string CapturedAbmouthLootEvidence =
@@ -168,7 +169,11 @@ namespace AORebirth.Core.Playfields
                 encounter.ProfileKey,
                 AbmouthEncounterRuntimeService.InfectorProfileKey,
                 StringComparison.Ordinal);
-            if (!isAbmouth && !isInfector) return;
+            bool isEumenides = string.Equals(
+                encounter.ProfileKey,
+                CapturedSubwayEncounterRuntimeService.EumenidesProfileKey,
+                StringComparison.Ordinal);
+            if (!isAbmouth && !isInfector && !isEumenides) return;
 
             ObservedCorpseSnapshotDefinition[] snapshots = isAbmouth
                 ? new[]
@@ -208,11 +213,16 @@ namespace AORebirth.Core.Playfields
                         Evidence = LootEvidenceConfidence.Unresolved
                     }
                     : CreditsRange(
-                        CapturedInfectorCredits,
-                        CapturedInfectorCredits,
+                        isEumenides ? CapturedEumenidesCredits : CapturedInfectorCredits,
+                        isEumenides ? CapturedEumenidesCredits : CapturedInfectorCredits,
                         LootEvidenceConfidence.ProvenCapture),
                 QualityPolicy = isAbmouth ? "captured-observed-corpse-snapshots" : "unresolved",
-                Evidence = isAbmouth ? CapturedAbmouthLootEvidence : encounter.Evidence + "; item pool unresolved",
+                Evidence = isAbmouth
+                    ? CapturedAbmouthLootEvidence
+                    : encounter.Evidence
+                      + (isEumenides
+                             ? "; 20260716-222007 fixed 186 corpse credits; item pool unresolved"
+                             : "; item pool unresolved"),
                 Confidence = isAbmouth
                     ? LootEvidenceConfidence.ObservedAvailableLoot
                     : LootEvidenceConfidence.Unresolved,

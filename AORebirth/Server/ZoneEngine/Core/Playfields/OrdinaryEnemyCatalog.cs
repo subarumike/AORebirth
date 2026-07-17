@@ -338,8 +338,13 @@ namespace AORebirth.Core.Playfields
                             OrdinaryEnemyScfuProfile.CapturedExact),
                         AggressionFor(archetype.MonsterData),
                         BuildCombatProfile(contract, archetype.MonsterData),
-                        BuildLootProfile(archetype.MonsterData, lootEntries),
-                        StandardCorpseProfile(archetype.MonsterData),
+                        BuildLootProfile(
+                            archetype.MonsterData,
+                            lootEntries,
+                            archetype.CorpseEvidence),
+                        StandardCorpseProfile(
+                            archetype.MonsterData,
+                            archetype.CorpseEvidence),
                         archetype.EvidenceCaptures,
                         false,
                         false));
@@ -582,6 +587,18 @@ namespace AORebirth.Core.Playfields
             int monsterData,
             OrdinaryEnemyLootEntry[] entries)
         {
+            return BuildLootProfile(
+                monsterData,
+                entries,
+                new CapturedSubwayCorpseEvidenceDefinition[0]);
+        }
+
+        private static OrdinaryEnemyLootProfile BuildLootProfile(
+            int monsterData,
+            OrdinaryEnemyLootEntry[] entries,
+            CapturedSubwayCorpseEvidenceDefinition[] corpseEvidence)
+        {
+            corpseEvidence = corpseEvidence ?? new CapturedSubwayCorpseEvidenceDefinition[0];
             OrdinaryEnemyLootEvidence evidence = entries.Length == 0
                 ? OrdinaryEnemyLootEvidence.Unresolved
                 : entries.All(value => value.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven)
@@ -597,6 +614,37 @@ namespace AORebirth.Core.Playfields
                     .Select(value => value.EvidenceReference)
                     .Where(value => !string.IsNullOrWhiteSpace(value))
                     .Distinct(StringComparer.Ordinal));
+            if (corpseEvidence.Length > 0)
+            {
+                int[] observedCredits = corpseEvidence
+                    .Select(value => value.Credits)
+                    .ToArray();
+                string creditEvidenceReference = string.Join(
+                    ",",
+                    corpseEvidence.Select(
+                        value => string.Format(
+                            CultureInfo.InvariantCulture,
+                            "{0}:{1}>{2}",
+                            value.Capture,
+                            value.DeadNpcIdentity,
+                            value.CorpseIdentity)));
+                return new OrdinaryEnemyLootProfile(
+                    evidence,
+                    entries,
+                    OrdinaryEnemyLootPoolMode.IndependentEntries,
+                    0,
+                    entries.Length > 0,
+                    observedCompleteInventories,
+                    0,
+                    itemEvidenceReference,
+                    OrdinaryEnemyEvidenceState.Observed,
+                    observedCredits.Min(),
+                    observedCredits.Max(),
+                    new OrdinaryEnemyLevelCreditRule[0],
+                    observedCredits,
+                    creditEvidenceReference);
+            }
+
             if (monsterData == 17657)
             {
                 return new OrdinaryEnemyLootProfile(
@@ -685,6 +733,46 @@ namespace AORebirth.Core.Playfields
 
         private static OrdinaryEnemyCorpseProfile StandardCorpseProfile(int monsterData)
         {
+            return StandardCorpseProfile(
+                monsterData,
+                new CapturedSubwayCorpseEvidenceDefinition[0]);
+        }
+
+        private static OrdinaryEnemyCorpseProfile StandardCorpseProfile(
+            int monsterData,
+            CapturedSubwayCorpseEvidenceDefinition[] corpseEvidence)
+        {
+            corpseEvidence = corpseEvidence ?? new CapturedSubwayCorpseEvidenceDefinition[0];
+            if (corpseEvidence.Length > 0)
+            {
+                int[] catMeshes = corpseEvidence
+                    .Select(value => value.CatMesh)
+                    .Distinct()
+                    .ToArray();
+                if (catMeshes.Length != 1)
+                {
+                    throw new InvalidOperationException(
+                        "Captured ordinary corpse evidence has conflicting CATMesh values: "
+                        + monsterData.ToString(CultureInfo.InvariantCulture));
+                }
+
+                return new OrdinaryEnemyCorpseProfile(
+                    OrdinaryEnemyCorpsePacketProfile.Generic,
+                    3.0,
+                    240.0,
+                    3.0,
+                    catMeshes[0],
+                    string.Join(
+                        ",",
+                        corpseEvidence.Select(
+                            value => string.Format(
+                                CultureInfo.InvariantCulture,
+                                "{0}:{1}>{2}",
+                                value.Capture,
+                                value.DeadNpcIdentity,
+                                value.CorpseIdentity))));
+            }
+
             if (monsterData == 26092)
             {
                 return CapturedThiefCorpse;

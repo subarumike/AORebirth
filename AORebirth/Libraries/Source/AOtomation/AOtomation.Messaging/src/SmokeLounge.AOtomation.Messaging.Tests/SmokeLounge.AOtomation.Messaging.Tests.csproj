@@ -82,6 +82,7 @@
     <Compile Include="WorldPopulationFoundationTests.cs" />
     <Compile Include="SubwayLootPoolRulesTests.cs" />
     <Compile Include="SubwayEnemyLootEvidenceTests.cs" />
+    <Compile Include="SubwayVendorContentTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestStateTests.cs" />
     <Compile Include="PlayfieldVisibilityLifecycleIntegrationTests.cs" />
@@ -126,6 +127,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\StatelInteractionRules.cs">
       <Link>StatelInteractionRules.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayVendorContentProvider.cs">
+      <Link>CapturedSubwayVendorContentProvider.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\UseItemOnItemInteractionRules.cs">
       <Link>UseItemOnItemInteractionRules.cs</Link>

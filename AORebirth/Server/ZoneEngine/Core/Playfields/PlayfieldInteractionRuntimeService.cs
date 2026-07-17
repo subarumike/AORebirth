@@ -55,6 +55,11 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
+            if (CapturedSubwayVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
             if (StaticDynelInteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;

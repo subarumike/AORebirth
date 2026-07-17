@@ -28,6 +28,7 @@ CAPTURES = (
     "20260716-034104",
     "20260716-034433",
     "20260716-034559",
+    "20260716-034656",
     "20260716-220400",
     "20260716-221358",
     "20260716-222201",
@@ -35,6 +36,7 @@ CAPTURES = (
 CAPTURE_ENEMY_FILTERS = {
     "20260716-034433": frozenset({"Vergil Aeneid"}),
     "20260716-034559": frozenset({"Melded Patterns"}),
+    "20260716-034656": frozenset({"Slum Runner"}),
     "20260716-220400": frozenset({"Abmouth Supremus"}),
 }
 # Melded Patterns, Vergil, and Abmouth captures include hits against player-owned pets.

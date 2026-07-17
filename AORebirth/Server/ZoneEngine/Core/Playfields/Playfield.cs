@@ -3212,11 +3212,19 @@ namespace AORebirth.Core.Playfields
         internal bool CanBuildKnownCorpseVisual(ICharacter target)
         {
             CapturedEncounterRuntimeDefinition encounterDefinition;
+            OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
             return (target != null
                     && CapturedEncounterRuntimeRegistry.TryGet(
                         target.Identity.Instance,
                         out encounterDefinition)
                     && CombatCorpseVisuals.IsUsableVisualId(encounterDefinition.CorpseCatMesh))
+                   || (target != null
+                       && OrdinaryEnemyRuntimeRegistry.TryGet(
+                           target.Identity.Instance,
+                           out ordinaryDefinition)
+                       && ordinaryDefinition.Profile.Corpse.CapturedCatMesh.HasValue
+                       && CombatCorpseVisuals.IsUsableVisualId(
+                           ordinaryDefinition.Profile.Corpse.CapturedCatMesh.Value))
                    || IsCapturedCleaningRobot(target)
                    || UsesCapturedThiefCorpseProfile(target)
                    || CombatCorpseVisuals.IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
@@ -3232,6 +3240,16 @@ namespace AORebirth.Core.Playfields
                     out encounterDefinition))
             {
                 return encounterDefinition.CorpseCatMesh;
+            }
+
+            OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
+            if (target != null
+                && OrdinaryEnemyRuntimeRegistry.TryGet(
+                    target.Identity.Instance,
+                    out ordinaryDefinition)
+                && ordinaryDefinition.Profile.Corpse.CapturedCatMesh.HasValue)
+            {
+                return ordinaryDefinition.Profile.Corpse.CapturedCatMesh.Value;
             }
 
             if (IsCapturedCleaningRobot(target))

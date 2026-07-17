@@ -284,6 +284,7 @@
     <Compile Include="Core\MessageHandlers\ResearchUpdateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\RexB18DInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\RexB18DInteractionRules.cs" />
+    <Compile Include="Core\MessageHandlers\CapturedSubwayVendorInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\ShopUpdateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\SimpleItemFullUpdateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\SkillMessageHandler.cs" />
@@ -384,6 +385,9 @@
     <Compile Include="Core\Playfields\PlayfieldStaticDynelRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldTransferRuntimeService.cs" />
+    <Compile Include="Core\Playfields\CapturedSubwayVendorContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedSubwayVendorRuntimeRegistry.cs" />
+    <Compile Include="Core\Playfields\CapturedSubwayVendorRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVendorRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityInterestPolicy.cs" />
