@@ -47,12 +47,12 @@ namespace AORebirth.Core.Playfields
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
                     11,
-                    44,
-                    5.299939,
+                    39,
+                    5.317136,
                     0,
                     0,
                     1145919558,
-                    119),
+                    111),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
                     new CapturedSubwayLootEvidenceDefinition(27199, 27199, 10, 2, 10, 2000),
@@ -70,7 +70,10 @@ namespace AORebirth.Core.Playfields
                     "20260709-212115",
                     "20260709-212336",
                     "20260709-220439",
-                    "20260709-222339"
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260716-033326",
+                    "20260716-034104"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "stim_fiend",
@@ -101,12 +104,12 @@ namespace AORebirth.Core.Playfields
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
                     10,
-                    47,
-                    5.399389,
+                    16,
+                    5.213425,
                     0,
                     0,
                     1397315377,
-                    23),
+                    15),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
                     new CapturedSubwayLootEvidenceDefinition(85531, 22289, 8, 1, 8, 1250),
@@ -135,6 +138,7 @@ namespace AORebirth.Core.Playfields
                     "20260709-212336",
                     "20260709-220439",
                     "20260709-222339",
+                    "20260709-225408",
                     "20260710-202132"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
@@ -167,13 +171,13 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
-                    12,
-                    42,
-                    5.029176,
+                    14,
+                    23,
+                    5.139163,
                     6,
                     0,
                     0,
-                    104),
+                    70),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
                     new CapturedSubwayLootEvidenceDefinition(85562, 85561, 14, 1, 10, 1000),
@@ -193,7 +197,10 @@ namespace AORebirth.Core.Playfields
                     "20260709-212115",
                     "20260709-212336",
                     "20260709-220439",
-                    "20260709-222339"
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260716-033326",
+                    "20260716-034104"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "architect_striker",
@@ -224,12 +231,12 @@ namespace AORebirth.Core.Playfields
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
                     13,
-                    38,
-                    5.350104,
+                    17,
+                    5.466013,
                     0,
                     0,
                     1397315377,
-                    34),
+                    26),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
                     new CapturedSubwayLootEvidenceDefinition(122482, 122483, 14, 1, 3, 3333),
@@ -242,7 +249,8 @@ namespace AORebirth.Core.Playfields
                     "20260709-212115",
                     "20260709-212336",
                     "20260709-220439",
-                    "20260709-222339"
+                    "20260709-222339",
+                    "20260709-225408"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "infected_attendant",
@@ -280,16 +288,21 @@ namespace AORebirth.Core.Playfields
                     1),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
-                    new CapturedSubwayLootEvidenceDefinition(109194, 109195, 12, 1, 2, 5000),
-                    new CapturedSubwayLootEvidenceDefinition(112823, 112824, 17, 1, 2, 5000),
-                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 12, 1, 2, 5000)
+                    new CapturedSubwayLootEvidenceDefinition(101695, 101696, 24, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(109194, 109195, 12, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(112823, 112824, 17, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(234875, 234875, 1, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 12, 1, 3, 3333)
                 },
                 new string[]
                 {
                     "20260709-212115",
                     "20260709-212336",
                     "20260709-220439",
-                    "20260709-222339"
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260716-033326",
+                    "20260716-034104"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "slum_runner",
@@ -320,23 +333,42 @@ namespace AORebirth.Core.Playfields
                     true,
                     5,
                     11,
-                    4.033397,
+                    4.167738,
                     0,
                     0,
                     1145196631,
-                    25),
+                    76),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
-                    new CapturedSubwayLootEvidenceDefinition(101513, 101514, 15, 1, 3, 3333),
-                    new CapturedSubwayLootEvidenceDefinition(103624, 103625, 14, 1, 3, 3333),
-                    new CapturedSubwayLootEvidenceDefinition(109938, 109939, 12, 1, 3, 3333)
+                    new CapturedSubwayLootEvidenceDefinition(101513, 101514, 15, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(103002, 103003, 20, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(103624, 103625, 14, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(104218, 104219, 25, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(105305, 105306, 26, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(105737, 105738, 12, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(108942, 108943, 26, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(109086, 109087, 15, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(109301, 109302, 14, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(109386, 109387, 25, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(109450, 109451, 22, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(109938, 109939, 12, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(110438, 110439, 26, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(111337, 111338, 17, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(234875, 234875, 1, 1, 18, 556),
+                    new CapturedSubwayLootEvidenceDefinition(234876, 234876, 1, 2, 18, 1111),
+                    new CapturedSubwayLootEvidenceDefinition(234877, 234877, 1, 1, 18, 556)
                 },
                 new string[]
                 {
                     "20260709-212115",
                     "20260709-212336",
                     "20260709-220439",
-                    "20260709-222339"
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260710-211430",
+                    "20260716-033326",
+                    "20260716-034104",
+                    "20260716-222201"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "looter",
@@ -368,12 +400,12 @@ namespace AORebirth.Core.Playfields
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
                     11,
-                    25,
-                    5.282358,
+                    11,
+                    5.267253,
                     6,
                     0,
                     0,
-                    16),
+                    15),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
                     new CapturedSubwayLootEvidenceDefinition(21605, 21605, 1, 1, 3, 3333),
@@ -415,21 +447,28 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
-                    13,
-                    75,
-                    5.065262,
+                    16,
+                    36,
+                    5.023192,
                     0,
                     0,
                     1145919558,
-                    39),
+                    35),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
-                    new CapturedSubwayLootEvidenceDefinition(101735, 101736, 21, 1, 1, 10000)
+                    new CapturedSubwayLootEvidenceDefinition(101507, 101508, 20, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(101735, 101736, 21, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(107491, 107492, 15, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(234875, 234875, 1, 1, 3, 3333)
                 },
                 new string[]
                 {
                     "20260709-220439",
-                    "20260709-222339"
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260710-211430",
+                    "20260716-033326",
+                    "20260716-034104"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "lost_thought",
@@ -467,11 +506,14 @@ namespace AORebirth.Core.Playfields
                     0),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
+                    new CapturedSubwayLootEvidenceDefinition(101675, 101676, 25, 1, 1, 10000)
                 },
                 new string[]
                 {
                     "20260709-220439",
-                    "20260709-222339"
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260716-034104"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "neural_burnout",
@@ -501,20 +543,29 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
-                    14,
-                    33,
+                    16,
+                    22,
                     0.000000,
                     0,
                     0,
                     1397315377,
-                    2),
+                    5),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
+                    new CapturedSubwayLootEvidenceDefinition(26471, 26471, 14, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(123021, 123021, 21, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(124560, 124561, 16, 1, 3, 3333)
                 },
                 new string[]
                 {
                     "20260709-220439",
-                    "20260709-222339"
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260710-211430",
+                    "20260716-033326",
+                    "20260716-034104",
+                    "20260716-221358",
+                    "20260716-222201"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "bloodcreeper",
@@ -545,17 +596,20 @@ namespace AORebirth.Core.Playfields
                     true,
                     21,
                     41,
-                    6.499240,
+                    4.999308,
                     1,
                     0,
                     1397446450,
-                    6),
+                    16),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
                 },
                 new string[]
                 {
-                    "20260709-222339"
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260716-033326",
+                    "20260716-034104"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "deranged_shopper",
@@ -599,6 +653,414 @@ namespace AORebirth.Core.Playfields
                 new string[]
                 {
                     "20260710-202132"
+                }),
+            new CapturedSubwayOrdinaryArchetypeDefinition(
+                "empty_shell",
+                "empty_shell",
+                "Empty Shell",
+                203731,
+                148,
+                0,
+                268964353,
+                0,
+                0,
+                31,
+                0,
+                1899u,
+                29696,
+                new CapturedSubwayTextureDefinition[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 9402, 0),
+                    new CapturedSubwayTextureDefinition(1, 9406, 0),
+                    new CapturedSubwayTextureDefinition(2, 9407, 0),
+                    new CapturedSubwayTextureDefinition(3, 9405, 0),
+                    new CapturedSubwayTextureDefinition(4, 9414, 0)
+                },
+                new CapturedSubwayMeshDefinition[]
+                {
+                    new CapturedSubwayMeshDefinition(0, 29696u, 0, 4)
+                },
+                new CapturedSubwayCombatEvidenceDefinition(
+                    true,
+                    15,
+                    15,
+                    0.000000,
+                    0,
+                    0,
+                    1397315377,
+                    1),
+                new CapturedSubwayLootEvidenceDefinition[]
+                {
+                },
+                new string[]
+                {
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260716-033326",
+                    "20260716-034104"
+                }),
+            new CapturedSubwayOrdinaryArchetypeDefinition(
+                "fragmented_soul",
+                "fragmented_soul",
+                "Fragmented Soul",
+                203729,
+                148,
+                0,
+                268964353,
+                0,
+                0,
+                31,
+                0,
+                1643u,
+                29706,
+                new CapturedSubwayTextureDefinition[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 9402, 0),
+                    new CapturedSubwayTextureDefinition(1, 9404, 0),
+                    new CapturedSubwayTextureDefinition(2, 9407, 0),
+                    new CapturedSubwayTextureDefinition(3, 9405, 0),
+                    new CapturedSubwayTextureDefinition(4, 9401, 0)
+                },
+                new CapturedSubwayMeshDefinition[]
+                {
+                    new CapturedSubwayMeshDefinition(0, 29706u, 0, 4),
+                    new CapturedSubwayMeshDefinition(1, 7834u, 0, 2)
+                },
+                new CapturedSubwayCombatEvidenceDefinition(
+                    true,
+                    18,
+                    23,
+                    0.000000,
+                    6,
+                    0,
+                    0,
+                    2),
+                new CapturedSubwayLootEvidenceDefinition[]
+                {
+                    new CapturedSubwayLootEvidenceDefinition(26471, 26471, 14, 3, 4, 7500),
+                    new CapturedSubwayLootEvidenceDefinition(85691, 22004, 18, 1, 4, 2500),
+                    new CapturedSubwayLootEvidenceDefinition(85732, 21963, 17, 1, 4, 2500),
+                    new CapturedSubwayLootEvidenceDefinition(124304, 124305, 17, 1, 4, 2500),
+                    new CapturedSubwayLootEvidenceDefinition(234877, 234877, 1, 2, 4, 5000),
+                    new CapturedSubwayLootEvidenceDefinition(301712, 301712, 1, 1, 4, 2500)
+                },
+                new string[]
+                {
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260710-211430",
+                    "20260716-033326",
+                    "20260716-034104"
+                }),
+            new CapturedSubwayOrdinaryArchetypeDefinition(
+                "incomplete_rebuild",
+                "incomplete_rebuild",
+                "Incomplete Rebuild",
+                203728,
+                148,
+                0,
+                268964353,
+                0,
+                0,
+                31,
+                0,
+                1643u,
+                29694,
+                new CapturedSubwayTextureDefinition[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 9402, 0),
+                    new CapturedSubwayTextureDefinition(1, 9404, 0),
+                    new CapturedSubwayTextureDefinition(2, 9407, 0),
+                    new CapturedSubwayTextureDefinition(3, 9405, 0),
+                    new CapturedSubwayTextureDefinition(4, 9401, 0)
+                },
+                new CapturedSubwayMeshDefinition[]
+                {
+                    new CapturedSubwayMeshDefinition(0, 29694u, 0, 4),
+                    new CapturedSubwayMeshDefinition(1, 7830u, 0, 2)
+                },
+                new CapturedSubwayCombatEvidenceDefinition(
+                    true,
+                    17,
+                    35,
+                    0.000000,
+                    6,
+                    0,
+                    0,
+                    2),
+                new CapturedSubwayLootEvidenceDefinition[]
+                {
+                    new CapturedSubwayLootEvidenceDefinition(26503, 26503, 14, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(112526, 112527, 16, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(142817, 142818, 16, 1, 3, 3333)
+                },
+                new string[]
+                {
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260710-211430",
+                    "20260716-033326",
+                    "20260716-034104",
+                    "20260716-222201"
+                }),
+            new CapturedSubwayOrdinaryArchetypeDefinition(
+                "melded_patterns",
+                "melded_patterns",
+                "Melded Patterns",
+                203747,
+                148,
+                0,
+                268964353,
+                0,
+                0,
+                31,
+                0,
+                1899u,
+                29701,
+                new CapturedSubwayTextureDefinition[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 0, 0),
+                    new CapturedSubwayTextureDefinition(1, 9406, 0),
+                    new CapturedSubwayTextureDefinition(2, 9407, 0),
+                    new CapturedSubwayTextureDefinition(3, 9405, 0),
+                    new CapturedSubwayTextureDefinition(4, 9401, 0)
+                },
+                new CapturedSubwayMeshDefinition[]
+                {
+                    new CapturedSubwayMeshDefinition(0, 29701u, 0, 4),
+                    new CapturedSubwayMeshDefinition(1, 7789u, 0, 2)
+                },
+                new CapturedSubwayCombatEvidenceDefinition(
+                    true,
+                    21,
+                    34,
+                    4.466488,
+                    6,
+                    0,
+                    0,
+                    7),
+                new CapturedSubwayLootEvidenceDefinition[]
+                {
+                    new CapturedSubwayLootEvidenceDefinition(122672, 122673, 15, 1, 2, 5000),
+                    new CapturedSubwayLootEvidenceDefinition(152328, 152329, 24, 1, 2, 5000),
+                    new CapturedSubwayLootEvidenceDefinition(234874, 234874, 1, 1, 2, 5000)
+                },
+                new string[]
+                {
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260716-033326",
+                    "20260716-034104",
+                    "20260716-034559",
+                    "20260716-222201"
+                }),
+            new CapturedSubwayOrdinaryArchetypeDefinition(
+                "molested_molecules",
+                "molested_molecules",
+                "Molested Molecules",
+                203746,
+                148,
+                0,
+                268964353,
+                0,
+                0,
+                31,
+                0,
+                1643u,
+                29704,
+                new CapturedSubwayTextureDefinition[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 9402, 0),
+                    new CapturedSubwayTextureDefinition(1, 9404, 0),
+                    new CapturedSubwayTextureDefinition(2, 9407, 0),
+                    new CapturedSubwayTextureDefinition(3, 9405, 0),
+                    new CapturedSubwayTextureDefinition(4, 9401, 0)
+                },
+                new CapturedSubwayMeshDefinition[]
+                {
+                    new CapturedSubwayMeshDefinition(0, 29704u, 0, 4),
+                    new CapturedSubwayMeshDefinition(1, 35547u, 0, 2)
+                },
+                new CapturedSubwayCombatEvidenceDefinition(
+                    true,
+                    16,
+                    42,
+                    4.763456,
+                    6,
+                    0,
+                    0,
+                    20),
+                new CapturedSubwayLootEvidenceDefinition[]
+                {
+                    new CapturedSubwayLootEvidenceDefinition(26471, 26471, 14, 2, 8, 2500),
+                    new CapturedSubwayLootEvidenceDefinition(26503, 26503, 14, 1, 8, 1250),
+                    new CapturedSubwayLootEvidenceDefinition(26541, 26541, 10, 1, 8, 1250),
+                    new CapturedSubwayLootEvidenceDefinition(27199, 27199, 10, 1, 8, 1250),
+                    new CapturedSubwayLootEvidenceDefinition(27263, 27263, 10, 1, 8, 1250),
+                    new CapturedSubwayLootEvidenceDefinition(121743, 121744, 25, 1, 8, 1250),
+                    new CapturedSubwayLootEvidenceDefinition(122028, 122029, 25, 1, 8, 1250),
+                    new CapturedSubwayLootEvidenceDefinition(123552, 123552, 15, 1, 8, 1250),
+                    new CapturedSubwayLootEvidenceDefinition(128734, 128735, 19, 1, 8, 1250),
+                    new CapturedSubwayLootEvidenceDefinition(234877, 234877, 1, 1, 8, 1250),
+                    new CapturedSubwayLootEvidenceDefinition(301712, 301712, 1, 1, 8, 1250),
+                    new CapturedSubwayLootEvidenceDefinition(301713, 301713, 1, 1, 8, 1250)
+                },
+                new string[]
+                {
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260716-033326",
+                    "20260716-034104",
+                    "20260716-221358",
+                    "20260716-222201"
+                }),
+            new CapturedSubwayOrdinaryArchetypeDefinition(
+                "premature_pattern",
+                "premature_pattern",
+                "Premature Pattern",
+                203727,
+                148,
+                0,
+                268964353,
+                0,
+                0,
+                31,
+                0,
+                1899u,
+                29699,
+                new CapturedSubwayTextureDefinition[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 9402, 0),
+                    new CapturedSubwayTextureDefinition(1, 9406, 0),
+                    new CapturedSubwayTextureDefinition(2, 9407, 0),
+                    new CapturedSubwayTextureDefinition(3, 9405, 0),
+                    new CapturedSubwayTextureDefinition(4, 9401, 0)
+                },
+                new CapturedSubwayMeshDefinition[]
+                {
+                    new CapturedSubwayMeshDefinition(0, 29699u, 0, 4)
+                },
+                new CapturedSubwayCombatEvidenceDefinition(
+                    true,
+                    22,
+                    22,
+                    0.000000,
+                    0,
+                    0,
+                    1397315377,
+                    1),
+                new CapturedSubwayLootEvidenceDefinition[]
+                {
+                },
+                new string[]
+                {
+                    "20260709-220439",
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260710-211430",
+                    "20260716-033326",
+                    "20260716-034104"
+                }),
+            new CapturedSubwayOrdinaryArchetypeDefinition(
+                "redundant_scan",
+                "redundant_scan",
+                "Redundant Scan",
+                204178,
+                148,
+                0,
+                268964353,
+                0,
+                0,
+                31,
+                0,
+                1899u,
+                40660,
+                new CapturedSubwayTextureDefinition[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 9402, 0),
+                    new CapturedSubwayTextureDefinition(1, 9406, 0),
+                    new CapturedSubwayTextureDefinition(2, 9407, 0),
+                    new CapturedSubwayTextureDefinition(3, 0, 0),
+                    new CapturedSubwayTextureDefinition(4, 9414, 0)
+                },
+                new CapturedSubwayMeshDefinition[]
+                {
+                    new CapturedSubwayMeshDefinition(0, 40660u, 0, 4),
+                    new CapturedSubwayMeshDefinition(1, 7817u, 0, 2)
+                },
+                new CapturedSubwayCombatEvidenceDefinition(
+                    true,
+                    19,
+                    19,
+                    0.000000,
+                    6,
+                    0,
+                    0,
+                    1),
+                new CapturedSubwayLootEvidenceDefinition[]
+                {
+                    new CapturedSubwayLootEvidenceDefinition(27263, 27263, 10, 1, 2, 5000)
+                },
+                new string[]
+                {
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260716-033326",
+                    "20260716-034104",
+                    "20260716-222201"
+                }),
+            new CapturedSubwayOrdinaryArchetypeDefinition(
+                "uncontrollable_anger",
+                "uncontrollable_anger",
+                "Uncontrollable Anger",
+                96195,
+                138,
+                0,
+                268964353,
+                0,
+                0,
+                31,
+                0,
+                1227u,
+                0,
+                new CapturedSubwayTextureDefinition[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 0, 0),
+                    new CapturedSubwayTextureDefinition(1, 0, 0),
+                    new CapturedSubwayTextureDefinition(2, 0, 0),
+                    new CapturedSubwayTextureDefinition(3, 0, 0),
+                    new CapturedSubwayTextureDefinition(4, 0, 0)
+                },
+                new CapturedSubwayMeshDefinition[]
+                {
+                },
+                new CapturedSubwayCombatEvidenceDefinition(
+                    true,
+                    11,
+                    18,
+                    0.000000,
+                    0,
+                    0,
+                    1397315377,
+                    2),
+                new CapturedSubwayLootEvidenceDefinition[]
+                {
+                    new CapturedSubwayLootEvidenceDefinition(101809, 101810, 24, 1, 2, 5000),
+                    new CapturedSubwayLootEvidenceDefinition(109366, 109367, 9, 1, 2, 5000),
+                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 19, 1, 2, 5000)
+                },
+                new string[]
+                {
+                    "20260709-205921",
+                    "20260709-210452",
+                    "20260709-212115",
+                    "20260709-212336",
+                    "20260709-220439",
+                    "20260709-222339",
+                    "20260709-225408",
+                    "20260710-211430",
+                    "20260716-033326",
+                    "20260716-034104"
                 }),
         };
 
@@ -792,6 +1254,508 @@ namespace AORebirth.Core.Playfields
                 "",
                 "20260710-202132",
                 "2026-07-11T01:23:01.1556318Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545175,
+                "empty_shell",
+                21,
+                474,
+                0,
+                99,
+                80,
+                171.544617f, 81.21325f, 65.0374756f,
+                0.0f, 0.241175786f, 0.0f, 0.970481455f,
+                (SimpleCharFullUpdateFlags)0x022B4ACB,
+                0,
+                "00000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(171.544617f, 81.21325f, 65.0374756f)
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:26.9002087Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545178,
+                "empty_shell",
+                18,
+                394,
+                0,
+                98,
+                68,
+                219.29808f, 80.615f, 43.026474f,
+                0.0f, -0.5330386f, 0.0f, 0.8460909f,
+                (SimpleCharFullUpdateFlags)0x022A4ACB,
+                0,
+                "80000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7520735Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545179,
+                "empty_shell",
+                19,
+                421,
+                0,
+                98,
+                72,
+                151.368256f, 77.21325f, 79.12771f,
+                0.0f, 0.5719257f, 0.0f, 0.8203054f,
+                (SimpleCharFullUpdateFlags)0x022A4ACB,
+                0,
+                "00000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:26.9002087Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545182,
+                "empty_shell",
+                18,
+                394,
+                0,
+                98,
+                68,
+                188.7712f, 80.615f, 43.44335f,
+                0.0f, 0.9989379f, 0.0f, -0.0460724831f,
+                (SimpleCharFullUpdateFlags)0x022A4ACB,
+                0,
+                "80000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7520735Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7954519B,
+                "empty_shell",
+                21,
+                474,
+                0,
+                99,
+                80,
+                161.4158f, 81.21325f, 80.84464f,
+                0.0f, 0.999988258f, 0.0f, 0.004858345f,
+                (SimpleCharFullUpdateFlags)0x022A4ACB,
+                0,
+                "00000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:26.9002087Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7954516A,
+                "fragmented_soul",
+                17,
+                368,
+                0,
+                98,
+                59,
+                247.8775f, 80.815f, 89.73535f,
+                0.0f, -0.998046935f, 0.0f, 0.0624750331f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:28:28.9690500Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7954516F,
+                "fragmented_soul",
+                17,
+                368,
+                0,
+                98,
+                59,
+                246.1502f, 80.8362f, 70.1700058f,
+                0.0f, 0.7085661f, 0.0f, 0.705644369f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7195387Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7954517A,
+                "fragmented_soul",
+                19,
+                421,
+                0,
+                98,
+                66,
+                221.325745f, 80.615f, 42.6944275f,
+                0.0f, -0.6474544f, 0.0f, 0.7621042f,
+                (SimpleCharFullUpdateFlags)0x020B4ACB,
+                0,
+                "80000000000000000000000003010001000100010001000000030000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(221.325745f, 80.615f, 42.6944275f)
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7520735Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7954518A,
+                "fragmented_soul",
+                20,
+                447,
+                0,
+                99,
+                69,
+                160.862473f, 81.2148056f, 40.865f,
+                0.0f, -0.14733842f, 0.0f, 0.9890862f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:24.8995230Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7954518B,
+                "fragmented_soul",
+                18,
+                394,
+                0,
+                98,
+                62,
+                159.6953f, 81.2148056f, 44.6957054f,
+                0.0f, 0.9890861f, 0.0f, 0.1473384f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:24.8995230Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7954518E,
+                "fragmented_soul",
+                18,
+                394,
+                0,
+                98,
+                62,
+                165.448761f, 81.265f, 50.18951f,
+                0.0f, -0.921040833f, 0.0f, 0.389466f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:26.9002087Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451AA,
+                "fragmented_soul",
+                21,
+                474,
+                0,
+                99,
+                73,
+                112.675888f, 77.015f, 125.60569f,
+                0.0f, 0.00299461442f, 0.0f, 0.99999547f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:30:11.4330927Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451AE,
+                "fragmented_soul",
+                21,
+                474,
+                0,
+                99,
+                73,
+                112.691681f, 77.015f, 128.361954f,
+                0.0f, 0.999995947f, 0.0f, -0.0028648607f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000008000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:30:11.4340964Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545248,
+                "fragmented_soul",
+                18,
+                394,
+                0,
+                98,
+                62,
+                246.946075f, 81.01639f, 117.827888f,
+                0.0f, -0.0252760276f, 0.0f, 0.9996805f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:27:00.1252907Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545367,
+                "fragmented_soul",
+                18,
+                394,
+                0,
+                98,
+                62,
+                247.511841f, 81.60795f, 104.4165f,
+                0.0f, -0.3797401f, 0.0f, 0.925093234f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-225408",
+                "2026-07-10T04:04:16.7745570Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545170,
+                "incomplete_rebuild",
+                17,
+                368,
+                0,
+                98,
+                59,
+                247.283875f, 80.83573f, 70.16532f,
+                0.0f, -0.705644369f, 0.0f, 0.7085662f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7195387Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545172,
+                "incomplete_rebuild",
+                18,
+                394,
+                0,
+                98,
+                62,
+                246.541962f, 80.615f, 45.10734f,
+                0.0f, 0.9153552f, 0.0f, 0.402647465f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000008000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7205382Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545177,
+                "incomplete_rebuild",
+                19,
+                421,
+                0,
+                98,
+                66,
+                223.133667f, 80.615f, 44.1456757f,
+                0.0f, 0.732408643f, 0.0f, -0.6808652f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000008000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7520735Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545181,
+                "incomplete_rebuild",
+                19,
+                421,
+                0,
+                98,
+                66,
+                189.383179f, 80.615f, 42.7584076f,
+                0.0f, -0.918875158f, 0.0f, 0.394548178f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000008000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7520735Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545188,
+                "incomplete_rebuild",
+                19,
+                421,
+                0,
+                98,
+                66,
+                164.626633f, 81.2148056f, 40.4079f,
+                0.0f, -0.4146376f, 0.0f, 0.909986556f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:24.8995230Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451BC,
+                "incomplete_rebuild",
+                21,
+                474,
+                0,
+                99,
+                73,
+                101.693535f, 73.01481f, 105.672119f,
+                0.0f, -0.6549027f, 0.0f, 0.7557133f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:30:11.4340964Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451C1,
+                "incomplete_rebuild",
+                19,
+                421,
+                0,
+                98,
+                66,
+                97.24542f, 73.01481f, 106.311157f,
+                0.0f, 0.49283585f, 0.0f, 0.8701224f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:30:11.4340964Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451CB,
+                "incomplete_rebuild",
+                21,
+                474,
+                0,
+                99,
+                73,
+                137.064346f, 73.01637f, 93.5459747f,
+                0.0f, -0.790990531f, 0.0f, 0.611828446f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000008000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.8121828Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451FD,
+                "incomplete_rebuild",
+                19,
+                421,
+                0,
+                98,
+                66,
+                137.193512f, 73.01637f, 104.502068f,
+                0.0f, -0.437220156f, 0.0f, 0.8993544f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.8121828Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545241,
+                "incomplete_rebuild",
+                17,
+                368,
+                0,
+                98,
+                59,
+                247.01f, 81.01639f, 117.9f,
+                0.0f, 0.861112833f, 0.0f, 0.5084138f,
+                (SimpleCharFullUpdateFlags)0x020A4ECB,
+                0,
+                "00000000000000008000000003010001000100010001000000030000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:25:38.4105867Z"),
             new CapturedSubwayOrdinarySpawnDefinition(
                 0x7953AA1A,
                 "infected_attendant",
@@ -1390,6 +2354,392 @@ namespace AORebirth.Core.Playfields
                 "20260709-222339",
                 "2026-07-10T03:30:11.4340964Z"),
             new CapturedSubwayOrdinarySpawnDefinition(
+                0x7954508E,
+                "melded_patterns",
+                23,
+                658,
+                0,
+                130,
+                80,
+                202.298019f, 69.01637f, 87.2686157f,
+                0.0f, -0.0389615819f, 0.0f, 0.9992407f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:28:28.9690500Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7954517C,
+                "melded_patterns",
+                18,
+                493,
+                0,
+                130,
+                62,
+                137.019348f, 77.21325f, 73.5426f,
+                0.0f, 0.703612566f, 0.0f, 0.7105838f,
+                (SimpleCharFullUpdateFlags)0x020B4ACB,
+                0,
+                "00000000000000000000000003010001000100010001000000030000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(137.019348f, 77.21325f, 73.5426f)
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:26.9002087Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545185,
+                "melded_patterns",
+                19,
+                526,
+                0,
+                130,
+                66,
+                172.952621f, 81.21325f, 63.4964027f,
+                0.0f, -0.361758471f, 0.0f, 0.932271838f,
+                (SimpleCharFullUpdateFlags)0x020B4ACB,
+                0,
+                "80000000000000000000000003010001000100010001000000030000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(172.952621f, 81.21325f, 63.4964027f)
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:26.9002087Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545187,
+                "melded_patterns",
+                21,
+                592,
+                0,
+                130,
+                73,
+                131.020782f, 77.0132446f, 74.9873047f,
+                0.0f, -0.414144546f, 0.0f, 0.910211146f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:47.0160225Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545190,
+                "melded_patterns",
+                18,
+                493,
+                0,
+                130,
+                62,
+                125.1441f, 77.0585251f, 80.108284f,
+                0.0f, 0.910211146f, 0.0f, 0.414144516f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000008000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:47.0160225Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545196,
+                "melded_patterns",
+                20,
+                559,
+                0,
+                130,
+                69,
+                122.976707f, 77.01481f, 117.59314f,
+                0.0f, -0.285476744f, 0.0f, 0.958385766f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:30:07.5655221Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545198,
+                "melded_patterns",
+                21,
+                592,
+                0,
+                130,
+                73,
+                116.742966f, 77.01481f, 127.128487f,
+                0.0f, 0.958385646f, 0.0f, 0.285476744f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000008000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:30:07.5655221Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451BA,
+                "melded_patterns",
+                22,
+                625,
+                0,
+                130,
+                76,
+                122.840561f, 73.01637f, 105.316521f,
+                0.0f, 0.8571372f, 0.0f, 0.515088141f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7520735Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451D8,
+                "melded_patterns",
+                25,
+                724,
+                0,
+                130,
+                86,
+                279.647552f, 73.01795f, 101.036232f,
+                0.0f, -0.681596756f, 0.0f, 0.731727958f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:11.9700514Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451DD,
+                "melded_patterns",
+                25,
+                724,
+                0,
+                130,
+                86,
+                279.726044f, 73.01795f, 97.10406f,
+                0.0f, -0.70248425f, 0.0f, 0.7116994f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:11.9700514Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795450E5,
+                "molested_molecules",
+                20,
+                447,
+                0,
+                130,
+                69,
+                113.34185f, 73.01637f, 104.944992f,
+                0.0f, 0.760416448f, 0.0f, 0.649435937f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7520735Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545139,
+                "molested_molecules",
+                23,
+                527,
+                0,
+                130,
+                80,
+                201.964264f, 69.01637f, 119.0757f,
+                0.0f, -0.978115559f, 0.0f, 0.2080623f,
+                (SimpleCharFullUpdateFlags)0x020B4ACB,
+                0,
+                "BF1C33E8BB7A85C9BFAF45F302020101000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(201.964264f, 69.01637f, 119.0757f),
+                    new CapturedSubwayWaypointDefinition(200.700012f, 69.00795f, 116.300018f)
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:28:28.9690500Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545174,
+                "molested_molecules",
+                18,
+                394,
+                0,
+                130,
+                62,
+                248.044479f, 80.615f, 43.72994f,
+                0.0f, -0.402647436f, 0.0f, 0.9153551f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7520735Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7954517B,
+                "molested_molecules",
+                17,
+                368,
+                0,
+                130,
+                59,
+                217.777191f, 80.615f, 43.7544441f,
+                0.0f, 0.8460908f, 0.0f, 0.5330388f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7520735Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451B5,
+                "molested_molecules",
+                20,
+                447,
+                0,
+                130,
+                69,
+                98.74091f, 73.01481f, 135.153f,
+                0.0f, 0.2410718f, 0.0f, 0.970507264f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:30:11.4340964Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451C2,
+                "molested_molecules",
+                21,
+                474,
+                0,
+                130,
+                73,
+                134.222748f, 73.01637f, 83.59113f,
+                0.0f, 0.858564854f, 0.0f, 0.512704968f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7520735Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451C7,
+                "molested_molecules",
+                19,
+                421,
+                0,
+                130,
+                66,
+                134.01f, 73.01637f, 114.808975f,
+                0.0f, 0.998199165f, 0.0f, -0.0599859022f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7520735Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451D2,
+                "molested_molecules",
+                24,
+                553,
+                0,
+                130,
+                83,
+                237.203491f, 73.01637f, 94.18351f,
+                0.0f, 0.996862531f, 0.0f, 0.0791522041f,
+                (SimpleCharFullUpdateFlags)0x020B4ACB,
+                0,
+                "3E7260B8BB90FCDEBFBD951F02020101000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(237.203491f, 73.01637f, 94.18351f),
+                    new CapturedSubwayWaypointDefinition(237.6f, 73.00795f, 91.70001f)
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:28:28.9690500Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451D7,
+                "molested_molecules",
+                24,
+                553,
+                0,
+                130,
+                83,
+                246.852737f, 73.01637f, 88.14026f,
+                0.0f, -0.5666547f, 0.0f, 0.8239553f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:28:28.9690500Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
                 0x795451D1,
                 "neural_burnout",
                 22,
@@ -1533,6 +2883,233 @@ namespace AORebirth.Core.Playfields
                 "",
                 "20260709-222339",
                 "2026-07-10T03:27:55.8549722Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545169,
+                "premature_pattern",
+                19,
+                421,
+                0,
+                98,
+                72,
+                246.328186f, 80.815f, 90.98379f,
+                0.0f, 0.9915708f, 0.0f, 0.129566535f,
+                (SimpleCharFullUpdateFlags)0x022A4ACB,
+                0,
+                "00000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:28:28.9690500Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7954516B,
+                "premature_pattern",
+                16,
+                341,
+                0,
+                97,
+                61,
+                244.365921f, 81.01637f, 83.45188f,
+                0.0f, 0.926427841f, 0.0f, 0.376472384f,
+                (SimpleCharFullUpdateFlags)0x022A4ACB,
+                0,
+                "00000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:11.9195060Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7954516C,
+                "premature_pattern",
+                18,
+                394,
+                0,
+                98,
+                68,
+                249.661728f, 81.01637f, 78.69549f,
+                0.0f, 0.408737272f, 0.0f, 0.912652135f,
+                (SimpleCharFullUpdateFlags)0x022A4ACB,
+                0,
+                "00000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:11.9195060Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451CF,
+                "premature_pattern",
+                22,
+                500,
+                0,
+                99,
+                84,
+                206.586563f, 73.01637f, 132.438263f,
+                0.0f, -0.915042758f, 0.0f, 0.4033569f,
+                (SimpleCharFullUpdateFlags)0x022B4ACB,
+                0,
+                "80000000000000008000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(206.586563f, 73.01637f, 132.438263f)
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:28:28.9690500Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545265,
+                "premature_pattern",
+                17,
+                368,
+                0,
+                98,
+                65,
+                235.905838f, 80.81796f, 175.167633f,
+                0.0f, -0.777260959f, 0.0f, 0.629178345f,
+                (SimpleCharFullUpdateFlags)0x022B4ACB,
+                0,
+                "BFBA0303BD45D3BDBE9E6FB302020101000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(235.905838f, 80.81796f, 175.167633f),
+                    new CapturedSubwayWaypointDefinition(234.800049f, 80.7999954f, 174.8f)
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:30:53.8633703Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545278,
+                "premature_pattern",
+                18,
+                394,
+                0,
+                98,
+                68,
+                246.109573f, 81.6079559f, 106.615891f,
+                0.0f, -0.995765f, 0.0f, 0.09193572f,
+                (SimpleCharFullUpdateFlags)0x022A4ACB,
+                0,
+                "80000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:31:54.0130240Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545356,
+                "premature_pattern",
+                18,
+                394,
+                0,
+                98,
+                68,
+                246.99f, 81.01639f, 116.977585f,
+                0.0f, 0.999957f, 0.0f, 0.009270155f,
+                (SimpleCharFullUpdateFlags)0x022B4ACB,
+                0,
+                "3CE3D003BB87C3E1BFBFF75702020101000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(246.99f, 81.01639f, 116.977585f),
+                    new CapturedSubwayWaypointDefinition(247.100052f, 80.99999f, 111.4f)
+                },
+                "",
+                "20260709-225408",
+                "2026-07-10T04:04:42.0809910Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7953AF85,
+                "redundant_scan",
+                20,
+                782,
+                0,
+                99,
+                69,
+                123.942719f, 73.01637f, 92.9736938f,
+                0.0f, -0.7290873f, 0.0f, 0.684420764f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000008000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7520735Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451BF,
+                "redundant_scan",
+                19,
+                736,
+                0,
+                98,
+                66,
+                87.7433548f, 73.01481f, 136.224213f,
+                0.0f, 0.699579656f, 0.0f, 0.7145546f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "00000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:30:11.4340964Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451C4,
+                "redundant_scan",
+                21,
+                829,
+                0,
+                99,
+                73,
+                130.325943f, 73.5004f, 109.9726f,
+                0.0f, 0.6967455f, 0.0f, 0.7173184f,
+                (SimpleCharFullUpdateFlags)0x020B4ACB,
+                0,
+                "3FBED60ABE228D9F3D31BAB202020101000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(130.325943f, 73.5004f, 109.9726f),
+                    new CapturedSubwayWaypointDefinition(134.700012f, 73.00637f, 110.100006f)
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:29:20.7520735Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451D3,
+                "redundant_scan",
+                19,
+                736,
+                0,
+                98,
+                66,
+                214.692749f, 73.01637f, 87.13444f,
+                0.0f, -0.00425591f, 0.0f, 0.99999094f,
+                (SimpleCharFullUpdateFlags)0x020A4ACB,
+                0,
+                "80000000000000000000000002010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:28:28.9690500Z"),
             new CapturedSubwayOrdinarySpawnDefinition(
                 0x7952880B,
                 "shadow",
@@ -2970,6 +4547,130 @@ namespace AORebirth.Core.Playfields
                 "",
                 "20260710-202132",
                 "2026-07-11T01:23:43.2339955Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x7953AD65,
+                "uncontrollable_anger",
+                13,
+                327,
+                0,
+                96,
+                45,
+                275.906952f, 102.8164f, 165.011917f,
+                0.0f, -0.709432244f, 0.0f, 0.704773664f,
+                (SimpleCharFullUpdateFlags)0x022B4A43,
+                0,
+                "BFBFFD77BC3C5FD7BC21E84F02020101000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(275.906952f, 102.8164f, 165.011917f),
+                    new CapturedSubwayWaypointDefinition(274.1f, 102.8f, 165.0f)
+                },
+                "",
+                "20260709-212336",
+                "2026-07-10T02:25:40.9833693Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451B9,
+                "uncontrollable_anger",
+                20,
+                559,
+                0,
+                99,
+                69,
+                94.01f, 73.01481f, 113.521805f,
+                0.0f, 0.9778458f, 0.0f, 0.209326655f,
+                (SimpleCharFullUpdateFlags)0x022A4A43,
+                0,
+                "00000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:30:11.4340964Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451CD,
+                "uncontrollable_anger",
+                23,
+                658,
+                0,
+                100,
+                80,
+                171.617188f, 73.01637f, 95.93813f,
+                0.0f, 0.415802836f, 0.0f, 0.9094548f,
+                (SimpleCharFullUpdateFlags)0x022A4A43,
+                0,
+                "00000000000000000000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:28:28.9690500Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x795451CE,
+                "uncontrollable_anger",
+                23,
+                658,
+                0,
+                100,
+                80,
+                171.551132f, 73.01637f, 102.018234f,
+                0.0f, -0.913844f, 0.0f, -0.4060654f,
+                (SimpleCharFullUpdateFlags)0x022A4A43,
+                0,
+                "00000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:28:28.9690500Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545202,
+                "uncontrollable_anger",
+                19,
+                526,
+                0,
+                98,
+                66,
+                241.536926f, 79.01797f, 196.737274f,
+                0.0f, 0.8662456f, 0.0f, -0.49961853f,
+                (SimpleCharFullUpdateFlags)0x022A4A43,
+                0,
+                "80000000000000008000000003010001000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:24:04.2684007Z"),
+            new CapturedSubwayOrdinarySpawnDefinition(
+                0x79545212,
+                "uncontrollable_anger",
+                13,
+                327,
+                0,
+                96,
+                45,
+                313.01f, 102.814827f, 177.43071f,
+                0.0f, 0.999899566f, 0.0f, -0.0141743487f,
+                (SimpleCharFullUpdateFlags)0x022B4A43,
+                0,
+                "BD2E27BCBBBBBAE2BFBFEBC602020101000100010001000000020000",
+                0,
+                new CapturedSubwayWaypointDefinition[]
+                {
+                    new CapturedSubwayWaypointDefinition(313.01f, 102.814827f, 177.43071f),
+                    new CapturedSubwayWaypointDefinition(312.9f, 102.8f, 173.900009f)
+                },
+                "",
+                "20260709-222339",
+                "2026-07-10T03:24:00.0648983Z"),
             new CapturedSubwayOrdinarySpawnDefinition(
                 0x7953A84F,
                 "workman_striker",

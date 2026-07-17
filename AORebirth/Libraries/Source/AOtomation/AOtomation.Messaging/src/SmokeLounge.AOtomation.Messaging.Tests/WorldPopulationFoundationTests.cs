@@ -301,8 +301,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new CapturedSubwayOrdinaryContentProvider());
             OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns();
             OrdinaryEnemyProfile[] profiles = catalog.GetProfiles();
-            Assert.AreEqual(260, spawns.Length);
-            Assert.AreEqual(222, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(321, spawns.Length);
+            Assert.AreEqual(283, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
             Assert.AreEqual(38, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
             Assert.IsTrue(spawns.All(value => value.LevelDefinition.IsValid));
             Assert.IsTrue(
@@ -319,6 +319,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertExplicitDelay(bloodcreeper, 240);
             Assert.AreEqual(OrdinaryEnemySpawnLevelMode.InclusiveRange, bloodcreeper.LevelDefinition.Mode);
             Assert.AreEqual(OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration, bloodcreeper.LevelDefinition.RerollPolicy);
+
+            var profilesByKey = profiles.ToDictionary(value => value.ProfileKey, StringComparer.Ordinal);
+            Assert.AreEqual(5, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Empty Shell"));
+            Assert.AreEqual(10, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Fragmented Soul"));
+            Assert.AreEqual(10, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Incomplete Rebuild"));
+            Assert.AreEqual(10, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Melded Patterns"));
+            Assert.AreEqual(9, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Molested Molecules"));
+            Assert.AreEqual(7, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Premature Pattern"));
+            Assert.AreEqual(4, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Redundant Scan"));
+            Assert.AreEqual(6, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Uncontrollable Anger"));
+        }
+
+        [TestMethod]
+        public void DeepSubwayOrdinaryCombatUsesLocalPlayerNormalHitEvidence()
+        {
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider());
+
+            AssertCapturedDamage(catalog, "Incomplete Rebuild", 17, 35);
+            AssertCapturedDamage(catalog, "Melded Patterns", 21, 34);
+            AssertCapturedDamage(catalog, "Molested Molecules", 16, 42);
+            AssertCapturedDamage(catalog, "Neural Burnout", 16, 22);
+            AssertCapturedDamage(catalog, "Redundant Scan", 19, 19);
+            AssertCapturedDamage(catalog, "Uncontrollable Anger", 11, 18);
+
+            OrdinaryEnemyProfile molested = catalog.GetProfiles()
+                .Single(value => value.DisplayName == "Molested Molecules");
+            Assert.IsTrue(molested.Combat.Contract.Evidence.Contains("20260716-221358"));
         }
 
         [TestMethod]
@@ -504,6 +533,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(controller.Contains("WorldRespawnPolicyResolver.ApplyGroupConfiguration"));
         }
 
+        private static void AssertCapturedDamage(OrdinaryEnemyCatalog catalog, string displayName, int minimumDamage, int maximumDamage) { OrdinaryEnemyProfile profile = catalog.GetProfiles().Single(value => value.DisplayName == displayName); Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, profile.Combat.EvidenceState); Assert.AreEqual(minimumDamage, profile.Combat.Contract.MinDamage); Assert.AreEqual(maximumDamage, profile.Combat.Contract.MaxDamage); }
         private static void Validate(WorldSpawnDefinition[] spawns) { WorldPopulationDefinitionValidator.Validate(spawns, new[] { Group("g", spawns.Select(x => x.SpawnKey).ToArray()) }, new[] { Fixed("p", 60) }, new[] { "profile" }); }
         private static WorldSpawnDefinition Spawn(string key, int id) { return new WorldSpawnDefinition { SpawnKey = key, EnemyProfileKey = "profile", ConfiguredIdentity = new Identity { Type = IdentityType.CanbeAffected, Instance = id }, PlayfieldId = 127, X = 1, Y = 2, Z = 3, OrientationW = 1, SpawnGroupKey = "g", RespawnPolicyKey = "p", ActivationPolicy = WorldSpawnActivationPolicy.PlayfieldStart, Classification = WorldPopulationClassification.OrdinaryEnemy, Enabled = true }; }
         private static SpawnGroupDefinition Group(string key, params string[] spawns) { return new SpawnGroupDefinition { SpawnGroupKey = key, PlayfieldId = 127, SpawnKeys = spawns, ActivationPolicy = WorldSpawnActivationPolicy.PlayfieldStart, MinimumAlive = 0, MaximumAlive = spawns.Length, Enabled = true }; }

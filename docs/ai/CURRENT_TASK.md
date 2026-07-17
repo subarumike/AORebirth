@@ -2,171 +2,109 @@
 
 ## Current Focus
 
-The active regression is the Subway exit loop. Generic proxy exits land only
-`2.5` units beyond their external door, but the PF655 Subway proxy-entry trigger
-has a `4.0`-unit radius. The Subway-specific exit now lands `6.0` units beyond
-door `0xC01A028F`, outside the entry trigger, without changing other proxy exits.
-Private exit validation is next; the Thief loot-corpse smoke remains pending
-immediately afterward.
+Complete the Subway dungeon from the existing capture corpus before requesting
+more gameplay evidence. The full capture inventory is complete, and the first
+high-confidence implementation slice restores the deep ordinary enemy families
+that were incorrectly excluded as named bosses.
 
-## Done in this slice
+## Corpus Inventory
 
-- Git history confirms the corpse-lifecycle commits did not change Subway
-  zoning. The exit loop came from the older mismatch between the generic
-  `2.5`-unit external-door offset and the `4.0`-unit Subway entry radius.
-- PF655 door `0xC01A028F` now uses a Subway-only `6.0`-unit exit offset. Other
-  proxy exits retain the generic `2.5`-unit behavior. The Debug build and the
-  focused exit-radius guardrail test pass.
-- Finalized capture `20260717-012651` is decoded and usable without recapture.
-  It proves maximum/current Thief health `146/115`, one-point-per-second passive
-  recovery, and two live misses without establishing a miss probability.
-- The unlooted Stolen Handbag must remain available after the loot window is
-  closed. The reported disappearance is a bug symptom, not a Thief-specific
-  rule. All normal loot-bearing corpses now share a four-minute lifetime that is
-  unchanged by close/reopen.
-- Retaliation mode, QL1 Solar-Powered Pistol `121567`, captured attack envelope,
-  and 1.41-second attack-start timing still match. No damage-roll or cadence
-  change was made because the Thief landed no hit in this capture.
-- The capture proves that the live chase crossed the current shared 100-unit
-  leash lower bound and an eight-unit elevation change, but it does not reveal
-  an exact reset threshold. No speculative leash or navigation value was added.
-- All 260 represented Subway population rows now carry a non-null generic level
-  definition. The same 222 rows remain active and the same 38 remain
-  quarantined.
-- Fixed captured rows stay fixed across respawns. Bloodcreeper is the only
-  current inclusive range (`L15..L25`) and selects once per new population
-  generation through the generic data path.
-- Level selection is injectable for deterministic tests. The selected variant
-  and generation are stored in the ordinary runtime definition and are resolved
-  before level-dependent stats and combat preparation.
-- Visibility loss/re-entry, combat reset, corpse transitions, runtime ticks, and
-  navigation cannot reroll a level. Failed materialization retries reuse the
-  selection for the same generation; stale generations fail closed.
-- Eligible ordinary enemies now inherit the centralized 240-second PF127
-  post-NPC-despawn policy unless explicit data overrides it.
-- Explicit policies retain precedence: Thief remains 60 seconds; Filth Flea and
-  Bloodcreeper remain 240 seconds.
-- Named enemies, bosses, scripted encounters, summons, pets, temporary encounter
-  adds, vendors, static objects, containers, quest-owned entities, explicit
-  no-respawn rows, and unsupported classifications cannot inherit the ordinary
-  default.
-- The existing `WorldPopulationController` and `WorldRespawnScheduler` retain
-  generation and scheduling ownership; no second scheduler was added.
-- Deterministic level, respawn-resolution, exclusion, validation, scheduler,
-  population-count, Bloodcreeper, and ordinary-profile tests pass.
-- The generic foundation suite passes `24/24`. The focused loot-evidence suite
-  passes `10/10`, and the full supported test assembly passes `332/345`; its 13
-  failures are the established unrelated baseline:
-  three damage-evidence checks, one inventory-ownership guardrail, six
-  session/lifecycle source guardrails, and three visibility-integration source
-  guardrails. The focused lifecycle class remains `53/59` with exactly those six
-  established session/lifecycle failures.
-- The approved Debug build compiles AORebirth.Core and ZoneEngine source. Final
-  ZoneEngine output copy remains blocked only because the running private server
-  holds `Built\Debug\ZoneEngine.exe`; the engine was not stopped for this task.
-- The completed corpus audit is recorded in
-  `docs/evidence/SUBWAY_BLOODCREEPER_DISOBEDIENT_BOT_LOOT_AUDIT.md`.
-- Disobedient Bot has seven strict complete loot outcomes: one QL1 Small Power
-  Supply (`234877/234877`), one QL10 Eye Implant: Pharma Tech, Bright
-  (`104683/104684`), and five item-empty inventories. Runtime item selection uses
-  a provisional weighted-one policy with relative weights `1 + 1 + 5 empty`.
-  The two memberships are capture-proven, but the weights are private-server
-  policy and the broader pool remains incomplete. Burnt Out Memory Chip
-  (`234876/234876`) remains inactive because its corpse linkage is incomplete.
-- Bloodcreeper has four exact corpse generations and two complete item
-  inventories, both empty. This does not prove an empty item pool; Bloodcreeper
-  item loot remains explicitly unresolved and inactive while its proven corpse,
-  150-credit, level, combat, and 240-second respawn behavior remains in scope.
-- Capture tooling now canonicalizes padded and unpadded numeric corpse identities
-  before joins and permits offline reconstruction when projection status is
-  incomplete but `recaptureRequired=false`.
-- Finalized capture `20260716-034559` is indexed only for Melded Patterns combat
-  evidence. Player-target rows now establish four captured hits at `21..34`;
-  Healer-pet hits are excluded, repeat cadence remains unresolved, and this
-  evidence report does not activate a Melded Patterns runtime contract.
-- Finalized capture `20260716-034433` is indexed only for Vergil Aeneid. It adds
-  exact L29/6796 HP/scale 131/RunSpeed 131 runtime data, exact-level fail-closed
-  healing, the captured 420-byte corpse scale field, and a complete `563`-credit
-  five-item corpse snapshot including 100 QL1 bullets.
-- Vergil's three observed corpses now replay as indivisible item-plus-credit
-  snapshots. No generated corpse can mix items or credits from different
-  captures; wider pool membership and official selection probabilities remain
-  unresolved.
-- Vergil combat evidence now keeps five local-player hits at `22..23` separate
-  from three Killer-pet hits at `23..28`. Retarget-heavy cadence remains
-  unresolved, and weapon damage/recharge remains equipped-weapon-owned.
-- No quarantined population rows were activated; the population remains 260
-  catalog rows, 222 active rows, and 38 quarantined rows.
-- Every born-empty or fully emptied corpse now starts cleanup at three seconds,
-  including credit-only corpses whose final credit award is delayed.
-- Abmouth and Vergil schedule a new generation exactly ten minutes from death,
-  independently of dead-NPC despawn and the older loot corpse.
-- Abmouth and Vergil loot-bearing corpses now retain their confirmed 30-minute
-  lifetime. Capture `20260716-220400` adds a second atomic Abmouth
-  item-plus-`587`-credit snapshot without mixing its slots with the older corpse.
-- Abmouth capture evidence keeps four player-facing hits separate from ten hits
-  against the player-owned Healer and Wrath Incarnation pets.
-- Vergil capture `20260716-222007` contains two reset cycles with `40.52` and
-  `40.30` unit homeward paths. Vergil now resets only after his own travel from
-  home exceeds `40`; his target may remain beyond `40` without prematurely
-  triggering that boss override, while the existing `100`-unit target safety
-  boundary remains intact. Other PF127 NPCs retain the shared `100`-unit
-  private policy.
-- Mike's `2026-07-17` private-client smoke confirms Vergil's corrected fight,
-  `40`-unit leash reset, collision-aware return home, and re-engagement work as
-  intended. The Vergil leash smoke is complete.
+- `294` timestamped AOSharp capture folders were classified using exact
+  playfield evidence only.
+- `37` are Subway-only, `31` are mixed Subway/outside zoning sessions, and
+  `222` are elsewhere.
+- `4` folders are unresolved because they contain no gameplay packets or
+  location snapshots; they are empty startup remnants, not missing evidence.
+- Names, character names, capture dates, and repository references do not
+  determine location.
+- The complete per-folder result is generated at
+  `docs/generated/aosharp_capture_inventory.csv` and
+  `docs/generated/aosharp_capture_inventory.md` by
+  `Tools/inventory_aosharp_captures.py`.
 
-## Remaining
+## Implemented In This Slice
 
-1. Walk through the Subway exit once and confirm the character remains outside
-   PF127 instead of being pulled back into the entrance trigger.
-2. Run one private Thief smoke: allow the initial `115/146` health state to
-   recover, fight normally, open the handbag corpse, leave the item, close the
-   loot window, confirm the corpse remains and can be reopened, and confirm its
-   four-minute loot-bearing lifetime is not shortened by either action.
-3. Index finalized captures `20260716-221358` and `20260716-222201` before
-   requesting any new gameplay capture. Preserve each identity-linked combat,
-   death, corpse, loot, and movement observation without generalizing it to an
-   unsupported enemy type.
-4. Run the bounded private Bloodcreeper smoke: level `15..25`, Bite, Spit,
-   chase, corpse, 150 credits, unresolved/empty item handling, close/reopen,
-   cleanup, 240-second respawn, and no duplicate generation.
-5. If later loot evidence is required, collect only the remaining bounded
-   samples: eight strict complete Bloodcreeper outcomes and three strict complete
-   Disobedient Bot outcomes. No new live capture is requested in this task, and
-   combat, geometry, LOS, navigation, chase, leash, and respawn do not need to be
-   recaptured for this loot boundary.
-6. Continue the next whole-enemy slice from the existing corpus first. Keep
-   fixed-level rows fixed until capture evidence or an approved design decision
-   establishes a range.
+- Restored `61` capture-backed spawn rows for eight recurring deep enemy
+  families: Empty Shell, Fragmented Soul, Incomplete Rebuild, Melded Patterns,
+  Molested Molecules, Premature Pattern, Redundant Scan, and Uncontrollable
+  Anger.
+- Two of those rows come from fully decoded SCFUs in the flushed
+  `20260709-225408` packet log: Fragmented Soul `79545367` and Premature Pattern
+  `79545356`. The stale start-time metadata and unrelated incomplete SCFUs do
+  not invalidate those two `decoded_complete` rows.
+- The normalized PF127 catalog is now `321` rows: `283` active and the same
+  `38` quarantined diagnostic rows. It contains `26` profiles.
+- Deep ordinary combat now uses capture-scoped identity mapping and only normal
+  hits against the local player for runtime ranges. Critical hits and
+  player-owned-pet hits remain separate evidence.
+- Current runtime normal-hit ranges include Incomplete Rebuild `17..35`, Melded
+  Patterns `21..34`, Molested Molecules `16..42`, Neural Burnout `16..22`,
+  Redundant Scan `19`, and Uncontrollable Anger `11..18`.
+- Strict `corpse-loot-observations.csv` snapshots now contribute empty corpses
+  to loot denominators. Redundant Scan's observed item is `1/2`, Molested
+  Molecules item `301713` is `1/8`, and the twelve strict Slum Runner outcomes
+  from `20260716-222201` are included without treating every observed item as
+  guaranteed.
+- Combat evidence indexing now includes `20260709-225408`,
+  `20260710-211430`, `20260716-221358`, and `20260716-222201`, with normal and
+  critical hit summaries separated in
+  `docs/generated/subway_enemy_combat_contracts.json`.
+- The diagnostic quarantine selector now changes spawn eligibility in the
+  world-population owner when explicitly selected. The selector is disabled in
+  the normal runtime; all `38` rows remain quarantined.
 
-No repeat named-boss capture is needed for the promoted data. The packet
-captures do not independently bracket ten minutes; Mike's direct live timing
-confirmation establishes that value.
+## Validation
+
+- Ordinary provider generator content-equivalence check: PASS.
+- Capture inventory classifier and reviewed-corpus drift check: PASS.
+- World population foundation: `25/25` PASS.
+- Subway loot evidence: `11/11` PASS.
+- Visibility interest/catalog: `12/12` PASS.
+- Quarantine/spatial-selection guardrail: PASS.
+- Named encounter/capture contract suite: `22/22` PASS.
+- Approved AORebirth Debug build: PASS.
+- Chat, Login, and Zone restart: PASS; ports `6996`, `7012`, `7500`, and `7501`
+  listening.
+- The broader visibility lifecycle class still exposes its pre-existing pet
+  observer source-guardrail failure because `PetRuntimeService` contains both
+  the shared visibility hook and the older `AnnounceOthers` call. It is outside
+  this Subway population slice and was not changed.
+
+## Next Runtime Check
+
+Log into the private server, enter PF127, and traverse through the deep rooms.
+Confirm the dungeon loads without a client crash and that the restored enemy
+families are present, retaliate, chase, die, leave reopenable loot corpses, and
+respawn under the existing ordinary policy. Do not enable `ALL_38` for this
+check.
+
+## Remaining Capture-Backed Work
+
+1. Eumenides has sufficient existing appearance and combat evidence for a
+   dedicated named-enemy slice: L20, 2792 HP, MD `203726`, scale 130, RunSpeed
+   76, weapon `123267` QL20, and player damage `39..45`. Loot remains unresolved.
+2. Strike Foreman has a complete captured population profile but no indexed
+   outgoing combat or loot. Keep those subsystems unresolved rather than
+   guessing.
+3. Bitaxel has exact appearance evidence but no player-facing combat and an
+   unresolved MonsterData value. Do not activate it yet.
+4. Six Subway merchants have exact appearance and owner-linked vending-machine
+   identities. Five have atomic captured stock snapshots; Container Supplier's
+   inventory was not opened. Implement merchants as a separate slice after the
+   restored-population smoke.
+5. Existing PF127 door evidence describes working interior doors, not exits.
+   Do not remove them. The corpus does not yet provide identity-complete world
+   static/container placements.
 
 ## Constraints
 
-- The 240-second ordinary default is a private-project policy, not a claim that
-  every official AO Subway enemy uses the same exact timer.
-- Bloodcreeper is ordinary content, not a unique boss or scripted encounter.
-- Do not turn two observed empty Bloodcreeper item snapshots into proof of an
-  empty item pool.
-- Do not describe the Bot `1 + 1 + 5 empty` policy as official weighting or a
-  complete pool, and do not activate `234876/234876` without a strict corpse
-  identity chain.
-- Do not activate the 38 quarantined rows or populate unresolved loot pools.
-- Do not merge player-owned-pet damage into player-facing enemy damage or infer
-  Vergil cadence from a mixed-target fight.
-- Keep Vergil loot snapshots atomic; independent item-slot or credit rolls would
-  create corpse combinations that were never observed.
-- Keep both Abmouth loot snapshots atomic. Capture `20260716-220400` reused
-  corpse identity `F69001`; generation-aware offline reconstruction now rebinds
-  the new six-item snapshot to Abmouth instead of the stale Vergil generation.
-- Named-boss respawn starts at death and must not wait for a 30-minute corpse.
-- Existing encounter, pet, vendor, static, quest, navigation, LOS, leash, corpse,
-  loot, and combat ownership remains unchanged.
-- Do not generalize Vergil's captured `40`-unit NPC travel limit to Abmouth,
-  Infectors, or ordinary PF127 enemies. Do not invent a dynamic home anchor from
-  a capture that began with Vergil already visible and fighting.
-- Do not auto-attach or launch AO/capture tooling. Mike runs gameplay and supplies
-  completed captures when requested.
+- Audit the existing corpus before any new capture request. No new capture is
+  currently required.
+- Mixed captures may contribute only exact PF127 identity rows.
+- Keep Abmouth, Vergil, Eumenides, Strike Foreman, and Bitaxel out of the
+  ordinary recurring-enemy generator.
+- Keep normal, critical, local-player, and player-owned-pet damage evidence
+  separate.
+- Loot observations prove membership and observed outcomes, not a complete
+  official probability distribution.
+- Do not auto-attach, inject, launch the AO client, or start live capture.

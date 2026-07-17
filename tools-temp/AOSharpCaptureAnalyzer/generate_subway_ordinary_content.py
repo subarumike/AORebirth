@@ -20,17 +20,47 @@ CAPTURES = (
     "20260709-212336",
     "20260709-220439",
     "20260709-222339",
+    "20260709-225408",
+    "20260710-202132",
+    "20260710-211430",
+    "20260716-033326",
+    "20260716-034104",
+    "20260716-034559",
+    "20260716-221358",
+    "20260716-222201",
+)
+SPAWN_CAPTURES = (
+    "20260709-212336",
+    "20260709-222339",
+    "20260709-225408",
     "20260710-202132",
 )
-SPAWN_CAPTURES = ("20260709-212336", "20260709-222339", "20260710-202132")
 CAPTURE_ARCHETYPE_FILTERS = {
     "20260710-202132": frozenset(("Looter", "Stim Fiend", "Deranged Shopper")),
+    "20260716-034559": frozenset(("Melded Patterns",)),
+    "20260716-221358": frozenset(("Molested Molecules", "Neural Burnout")),
+    "20260716-222201": frozenset(
+        (
+            "Fragmented Soul",
+            "Incomplete Rebuild",
+            "Melded Patterns",
+            "Molested Molecules",
+            "Neural Burnout",
+            "Redundant Scan",
+            "Slum Runner",
+        )
+    ),
 }
 ARCHETYPE_CAPTURE_FILTERS = {
     "Deranged Shopper": frozenset(("20260710-202132",)),
 }
 ARCHETYPE_SPAWN_IDENTITY_FILTERS = {
     "Bloodcreeper": frozenset(("(SimpleChar:795451C5)",)),
+}
+CAPTURE_SPAWN_IDENTITY_FILTERS = {
+    "20260709-225408": frozenset(
+        ("(SimpleChar:79545356)", "(SimpleChar:79545367)")
+    ),
 }
 OUTPUT = (
     REPO
@@ -55,20 +85,21 @@ ARCHETYPES = {
     "Neural Burnout": ("neural_burnout", "neural_burnout"),
     "Bloodcreeper": ("bloodcreeper", "bloodcreeper"),
     "Deranged Shopper": ("deranged_shopper", "deranged_shopper"),
+    "Empty Shell": ("empty_shell", "empty_shell"),
+    "Fragmented Soul": ("fragmented_soul", "fragmented_soul"),
+    "Incomplete Rebuild": ("incomplete_rebuild", "incomplete_rebuild"),
+    "Melded Patterns": ("melded_patterns", "melded_patterns"),
+    "Molested Molecules": ("molested_molecules", "molested_molecules"),
+    "Premature Pattern": ("premature_pattern", "premature_pattern"),
+    "Redundant Scan": ("redundant_scan", "redundant_scan"),
+    "Uncontrollable Anger": ("uncontrollable_anger", "uncontrollable_anger"),
 }
 
 NAMED_BOSSES = frozenset(
     (
         "Abmouth Supremus",
         "Bitaxel",
-        "Empty Shell",
         "Eumenides",
-        "Fragmented Soul",
-        "Incomplete Rebuild",
-        "Melded Patterns",
-        "Molested Molecules",
-        "Premature Pattern",
-        "Redundant Scan",
         "Strike Foreman",
         "Vergil Aeneid",
     )
@@ -181,14 +212,51 @@ def capture_allows_archetype(capture: str, name: str) -> bool:
 def load_raw_scfu_rows(captures: tuple[str, ...]) -> list[dict[str, str]]:
     rows = []
     for capture in captures:
+        path = CAPTURE_ROOT / capture / "scfu-appearance.csv"
+        if not path.exists():
+            path = CAPTURE_ROOT / capture / "scfu-appearance.pending.csv"
+        if not path.exists():
+            continue
         for row_index, row in enumerate(
-            read_csv(CAPTURE_ROOT / capture / "scfu-appearance.csv")
+            read_csv(path)
         ):
+            if path.name.endswith(".pending.csv") and (
+                row.get("DecodeStatus") != "decoded_complete"
+                or row.get("DecodeFullyConsumed", "").lower() != "true"
+            ):
+                continue
             row = dict(row)
+            row.setdefault("RunSpeed", row.get("RunSpeedBase", ""))
+            row.setdefault("ScfuFlags", row.get("Flags", ""))
+            row.setdefault("ScfuFlags2", row.get("Flags2Numeric", ""))
             row["EvidenceCapture"] = capture
             row["EvidenceRowIndex"] = str(row_index)
             rows.append(row)
     return rows
+
+
+def capture_identity_names(capture: str) -> dict[str, str]:
+    identities: dict[str, str] = {}
+    for row in load_raw_scfu_rows((capture,)):
+        identity = row.get("Identity", "")
+        name = row.get("Name", "")
+        if identity and name:
+            identities[identity] = name
+    full_updates_path = CAPTURE_ROOT / capture / "enemy-full-updates.csv"
+    if full_updates_path.exists():
+        for row in read_csv(full_updates_path):
+            identity = row.get("Identity", "")
+            name = row.get("Name", "")
+            if identity and name:
+                identities[identity] = name
+    lifecycle_path = CAPTURE_ROOT / capture / "npc-lifecycle.csv"
+    if lifecycle_path.exists():
+        for row in read_csv(lifecycle_path):
+            identity = row.get("PrimaryIdentity", "")
+            name = row.get("Name", "")
+            if identity and name and not name.startswith("Remains of "):
+                identities[identity] = name
+    return identities
 
 
 def classify_spawn_candidate(row: dict[str, str]) -> str:
@@ -204,6 +272,14 @@ def classify_spawn_candidate(row: dict[str, str]) -> str:
         return CANDIDATE_UNSUPPORTED
     allowed_identities = ARCHETYPE_SPAWN_IDENTITY_FILTERS.get(row["Name"])
     if allowed_identities is not None and row["Identity"] not in allowed_identities:
+        return CANDIDATE_UNSUPPORTED
+    allowed_capture_identities = CAPTURE_SPAWN_IDENTITY_FILTERS.get(
+        row["EvidenceCapture"]
+    )
+    if (
+        allowed_capture_identities is not None
+        and row["Identity"] not in allowed_capture_identities
+    ):
         return CANDIDATE_UNSUPPORTED
     return CANDIDATE_ACCEPTED
 
@@ -299,28 +375,35 @@ def select_archetype_profiles(spawns: list[dict[str, str]]) -> dict[str, dict[st
 
 
 def combat_profiles() -> dict[str, dict[str, object]]:
-    name_by_identity = {}
-    for row in load_scfu_rows(CAPTURES):
-        name_by_identity[row["Identity"]] = row["Name"]
-
     attacks = defaultdict(list)
     detail_pattern = re.compile(
         r"WeaponSlot=(?P<slot>-?\d+).*Unk1=(?P<unknown>-?\d+).*WeaponInstance=(?P<instance>-?\d+)"
     )
     for capture_index, capture in enumerate(CAPTURES):
+        name_by_identity = capture_identity_names(capture)
         for row_index, row in enumerate(
             read_csv(CAPTURE_ROOT / capture / "enemy-combat.csv")
         ):
-            if row["MessageType"] != "AttackInfo" or row["SourceIdentity"] not in name_by_identity:
+            source_identity = row["SourceIdentity"]
+            name = name_by_identity.get(source_identity, "")
+            if (
+                row["MessageType"] != "AttackInfo"
+                or row.get("SourceRole") != "enemy"
+                or row.get("TargetRole") != "local-player"
+                or name not in ARCHETYPES
+                or not capture_allows_archetype(capture, name)
+                or "HitType=Normal" not in row.get("Detail", "")
+            ):
                 continue
             if not row["Amount"].isdigit() or int(row["Amount"]) <= 0:
                 continue
             match = detail_pattern.search(row["Detail"])
             if not match:
                 continue
-            attacks[name_by_identity[row["SourceIdentity"]]].append(
+            attacks[name].append(
                 {
-                    "identity": row["SourceIdentity"],
+                    "capture": capture,
+                    "identity": source_identity,
                     "time": parse_time(row["CapturedUtc"]),
                     "amount": int(row["Amount"]),
                     "slot": int(match.group("slot")),
@@ -336,7 +419,7 @@ def combat_profiles() -> dict[str, dict[str, object]]:
         intervals = []
         by_identity = defaultdict(list)
         for row in rows:
-            by_identity[row["identity"]].append(row)
+            by_identity[(row["capture"], row["identity"])].append(row)
         for identity_rows in by_identity.values():
             times = sorted(row["time"] for row in identity_rows)
             for previous, current in zip(times, times[1:]):
@@ -381,6 +464,29 @@ def loot_profiles() -> dict[str, list[dict[str, int]]]:
         r"name=Remains of (?P<name>.+?) pos="
     )
     for capture in CAPTURES:
+        strict_observations_path = CAPTURE_ROOT / capture / "corpse-loot-observations.csv"
+        strict_observations_used = False
+        if strict_observations_path.exists():
+            for row in read_csv(strict_observations_path):
+                name = row.get("EnemyName", "")
+                if (
+                    row.get("InitialSnapshot", "").lower() != "true"
+                    or not row.get("CorrelationStatus", "").startswith("linked-")
+                    or name not in ARCHETYPES
+                    or not capture_allows_archetype(capture, name)
+                ):
+                    continue
+                items = []
+                for item in row.get("Items", "").split(";"):
+                    if not item:
+                        continue
+                    low, high, quality, count = (int(value) for value in item.split(":"))
+                    items.extend([(low, high, quality)] * count)
+                opened_by_name[name].append(items)
+                strict_observations_used = True
+        if strict_observations_used:
+            continue
+
         corpses = []
         with (CAPTURE_ROOT / capture / "events.log").open(encoding="utf-8-sig") as handle:
             for line in handle:
@@ -542,8 +648,10 @@ def generate() -> str:
     loot = loot_profiles()
     validate_content(spawns, profiles, combat)
     evidence_captures = defaultdict(set)
-    for evidence_row in load_scfu_rows(CAPTURES):
-        evidence_captures[evidence_row["Name"]].add(evidence_row["EvidenceCapture"])
+    for capture in CAPTURES:
+        for name in set(capture_identity_names(capture).values()):
+            if name in ARCHETYPES and capture_allows_archetype(capture, name):
+                evidence_captures[name].add(capture)
     lines = [
         "// <auto-generated>",
         "// Generated only from completed AOSharp Subway captures by generate_subway_ordinary_content.py.",
