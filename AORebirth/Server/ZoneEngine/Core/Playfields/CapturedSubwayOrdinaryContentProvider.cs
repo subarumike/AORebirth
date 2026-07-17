@@ -17,6 +17,15 @@ namespace AORebirth.Core.Playfields
     {
         public const int SubwayPlayfieldInstance = 127;
 
+        private static readonly CapturedSubwayCorpseEvidenceDefinition[] SupportedCorpseEvidence =
+        {
+            new CapturedSubwayCorpseEvidenceDefinition("20260712-155528", "2026-07-12T20:55:48.0982051Z", "(Corpse:00F6C003)", "(SimpleChar:795F91B9)", 5, 17657, 15231, 29),
+            new CapturedSubwayCorpseEvidenceDefinition("20260712-161506", "2026-07-12T21:15:15.9221075Z", "(Corpse:00F6C00B)", "(SimpleChar:795F924E)", 4, 17657, 15231, 23),
+            new CapturedSubwayCorpseEvidenceDefinition("20260712-161506", "2026-07-12T21:16:42.1576861Z", "(Corpse:00F6C012)", "(SimpleChar:795F91CA)", 5, 26092, 5907, 29),
+            new CapturedSubwayCorpseEvidenceDefinition("20260713-013906", "2026-07-13T06:39:26.9937677Z", "(Corpse:00F6C004)", "(SimpleChar:79607CCB)", 5, 203734, 17534, 44),
+            new CapturedSubwayCorpseEvidenceDefinition("20260713-013906", "2026-07-13T06:40:19.7027857Z", "(Corpse:00F6C001)", "(SimpleChar:79607B30)", 9, 17720, 15929, 32)
+        };
+
         private static readonly CapturedSubwayOrdinaryArchetypeDefinition[] Archetypes =
         {
             new CapturedSubwayOrdinaryArchetypeDefinition(
@@ -65,6 +74,11 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCorpseEvidenceDefinition[]
                 {
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-223719", "2026-07-13T03:38:49.5373589Z", "(Corpse:00F6C004)", "(SimpleChar:79607875)", 23, 30464, 30434, 144),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-223719", "2026-07-13T03:39:03.3427964Z", "(Corpse:00F6C011)", "(SimpleChar:79607876)", 22, 30464, 30434, 137),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-223719", "2026-07-13T03:39:06.9526642Z", "(Corpse:00F6C012)", "(SimpleChar:79607877)", 22, 30464, 30434, 137),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-223719", "2026-07-13T03:39:33.0802477Z", "(Corpse:00F6C007)", "(SimpleChar:79607838)", 23, 30464, 30434, 144),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260716-215947", "2026-07-17T03:00:52.4977971Z", "(Corpse:00F69001)", "(SimpleChar:79702492)", 23, 30464, 30434, 144)
                 },
                 new string[]
                 {
@@ -75,8 +89,10 @@ namespace AORebirth.Core.Playfields
                     "20260709-220439",
                     "20260709-222339",
                     "20260709-225408",
+                    "20260712-223719",
                     "20260716-033326",
-                    "20260716-034104"
+                    "20260716-034104",
+                    "20260716-215947"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "stim_fiend",
@@ -375,12 +391,13 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCorpseEvidenceDefinition[]
                 {
-                    new CapturedSubwayCorpseEvidenceDefinition("20260716-034656", "2026-07-16T08:47:13.2700424Z", "(Corpse:00F69005)", "(SimpleChar:796D4080)", 55648, 31774, 144),
-                    new CapturedSubwayCorpseEvidenceDefinition("20260716-034656", "2026-07-16T08:47:18.6298994Z", "(Corpse:00F69007)", "(SimpleChar:796D407E)", 55648, 31774, 144),
-                    new CapturedSubwayCorpseEvidenceDefinition("20260716-034656", "2026-07-16T08:47:26.3602996Z", "(Corpse:00F69008)", "(SimpleChar:796D4078)", 55648, 31774, 144),
-                    new CapturedSubwayCorpseEvidenceDefinition("20260716-034656", "2026-07-16T08:47:30.0103766Z", "(Corpse:00F69009)", "(SimpleChar:796D4083)", 55648, 31774, 131),
-                    new CapturedSubwayCorpseEvidenceDefinition("20260716-034656", "2026-07-16T08:47:33.0305642Z", "(Corpse:00F6900A)", "(SimpleChar:796D407A)", 55648, 31774, 137),
-                    new CapturedSubwayCorpseEvidenceDefinition("20260716-034656", "2026-07-16T08:47:39.0605673Z", "(Corpse:00F6900B)", "(SimpleChar:796D407C)", 55648, 31774, 131)
+                    new CapturedSubwayCorpseEvidenceDefinition("20260716-034656", "2026-07-16T08:47:13.2700424Z", "(Corpse:00F69005)", "(SimpleChar:796D4080)", 23, 55648, 31774, 144),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260716-034656", "2026-07-16T08:47:18.6298994Z", "(Corpse:00F69007)", "(SimpleChar:796D407E)", 23, 55648, 31774, 144),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260716-034656", "2026-07-16T08:47:26.3602996Z", "(Corpse:00F69008)", "(SimpleChar:796D4078)", 23, 55648, 31774, 144),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260716-034656", "2026-07-16T08:47:30.0103766Z", "(Corpse:00F69009)", "(SimpleChar:796D4083)", 21, 55648, 31774, 131),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260716-034656", "2026-07-16T08:47:33.0305642Z", "(Corpse:00F6900A)", "(SimpleChar:796D407A)", 22, 55648, 31774, 137),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260716-034656", "2026-07-16T08:47:39.0605673Z", "(Corpse:00F6900B)", "(SimpleChar:796D407C)", 21, 55648, 31774, 131),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260716-215947", "2026-07-17T03:01:06.4375298Z", "(Corpse:00F69002)", "(SimpleChar:797024AE)", 22, 55648, 31774, 137)
                 },
                 new string[]
                 {
@@ -393,6 +410,7 @@ namespace AORebirth.Core.Playfields
                     "20260716-033326",
                     "20260716-034104",
                     "20260716-034656",
+                    "20260716-215947",
                     "20260716-222201"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
@@ -491,6 +509,8 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCorpseEvidenceDefinition[]
                 {
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-223719", "2026-07-13T03:40:39.3862482Z", "(Corpse:00F6C006)", "(SimpleChar:7960787E)", 25, 31909, 31868, 156),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-223719", "2026-07-13T03:41:51.1696455Z", "(Corpse:00F6C001)", "(SimpleChar:7960787F)", 25, 31909, 31868, 156)
                 },
                 new string[]
                 {
@@ -498,6 +518,7 @@ namespace AORebirth.Core.Playfields
                     "20260709-222339",
                     "20260709-225408",
                     "20260710-211430",
+                    "20260712-223719",
                     "20260716-033326",
                     "20260716-034104"
                 }),
@@ -592,6 +613,8 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCorpseEvidenceDefinition[]
                 {
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-223719", "2026-07-13T03:38:31.2303542Z", "(Corpse:00F6C009)", "(SimpleChar:79607873)", 23, 203730, 5941, 144),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260716-221748", "2026-07-17T03:17:51.7135569Z", "(Corpse:00F69002)", "(SimpleChar:79702427)", 18, 203730, 5941, 111)
                 },
                 new string[]
                 {
@@ -599,9 +622,11 @@ namespace AORebirth.Core.Playfields
                     "20260709-222339",
                     "20260709-225408",
                     "20260710-211430",
+                    "20260712-223719",
                     "20260716-033326",
                     "20260716-034104",
                     "20260716-221358",
+                    "20260716-221748",
                     "20260716-222201"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
@@ -792,12 +817,14 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCorpseEvidenceDefinition[]
                 {
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-224608", "2026-07-13T03:46:40.0868425Z", "(Corpse:00F6C002)", "(SimpleChar:796079C4)", 18, 203729, 5921, 111)
                 },
                 new string[]
                 {
                     "20260709-222339",
                     "20260709-225408",
                     "20260710-211430",
+                    "20260712-224608",
                     "20260716-033326",
                     "20260716-034104"
                 }),
@@ -899,14 +926,19 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCorpseEvidenceDefinition[]
                 {
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-223719", "2026-07-13T03:39:17.3969861Z", "(Corpse:00F6C014)", "(SimpleChar:79607872)", 25, 203747, 23368, 156),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-223719", "2026-07-13T03:39:21.8903988Z", "(Corpse:00F6C006)", "(SimpleChar:79607878)", 24, 203747, 23368, 150),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260716-215947", "2026-07-17T03:01:29.8595413Z", "(Corpse:00F69005)", "(SimpleChar:79702235)", 21, 203747, 23368, 131)
                 },
                 new string[]
                 {
                     "20260709-222339",
                     "20260709-225408",
+                    "20260712-223719",
                     "20260716-033326",
                     "20260716-034104",
                     "20260716-034559",
+                    "20260716-215947",
                     "20260716-222201"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
@@ -962,13 +994,18 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCorpseEvidenceDefinition[]
                 {
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-223719", "2026-07-13T03:37:53.5689640Z", "(Corpse:00F6C003)", "(SimpleChar:795F951A)", 22, 203746, 5921, 137),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-223719", "2026-07-13T03:38:36.1067870Z", "(Corpse:00F6C00E)", "(SimpleChar:79607874)", 24, 203746, 5921, 150),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260716-215947", "2026-07-17T03:01:25.9795236Z", "(Corpse:00F69004)", "(SimpleChar:7970223C)", 23, 203746, 5921, 144)
                 },
                 new string[]
                 {
                     "20260709-222339",
                     "20260709-225408",
+                    "20260712-223719",
                     "20260716-033326",
                     "20260716-034104",
+                    "20260716-215947",
                     "20260716-221358",
                     "20260716-222201"
                 }),
@@ -1012,6 +1049,9 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCorpseEvidenceDefinition[]
                 {
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-223719", "2026-07-13T03:37:53.5679637Z", "(Corpse:00F6C001)", "(SimpleChar:795F9516)", 23, 203727, 5941, 144),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260712-224608", "2026-07-13T03:47:23.8937503Z", "(Corpse:00F6C004)", "(SimpleChar:796079C3)", 18, 203727, 5941, 111),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260716-215947", "2026-07-17T03:01:36.7896724Z", "(Corpse:00F69009)", "(SimpleChar:79702236)", 23, 203727, 5941, 144)
                 },
                 new string[]
                 {
@@ -1019,8 +1059,11 @@ namespace AORebirth.Core.Playfields
                     "20260709-222339",
                     "20260709-225408",
                     "20260710-211430",
+                    "20260712-223719",
+                    "20260712-224608",
                     "20260716-033326",
-                    "20260716-034104"
+                    "20260716-034104",
+                    "20260716-215947"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "redundant_scan",
@@ -5179,6 +5222,14 @@ namespace AORebirth.Core.Playfields
             return Archetypes.ToArray();
         }
 
+        public CapturedSubwayCorpseEvidenceDefinition[] GetCorpseEvidence(int monsterData)
+        {
+            return SupportedCorpseEvidence
+                .Concat(Archetypes.SelectMany(value => value.CorpseEvidence))
+                .Where(value => value.MonsterData == monsterData)
+                .ToArray();
+        }
+
         public CapturedSubwayOrdinarySpawnDefinition[] GetSpawns()
         {
             return Spawns
@@ -5259,5 +5310,5 @@ namespace AORebirth.Core.Playfields
     internal sealed class CapturedSubwayWaypointDefinition { public CapturedSubwayWaypointDefinition(float x, float y, float z) { this.X = x; this.Y = y; this.Z = z; } public float X { get; private set; } public float Y { get; private set; } public float Z { get; private set; } }
     internal sealed class CapturedSubwayCombatEvidenceDefinition { public CapturedSubwayCombatEvidenceDefinition(bool observed, int minDamage, int maxDamage, double rechargeSeconds, int weaponSlot, int attackInfoUnknown, int weaponInstance, int observedRows) { this.Observed = observed; this.MinDamage = minDamage; this.MaxDamage = maxDamage; this.RechargeSeconds = rechargeSeconds; this.WeaponSlot = weaponSlot; this.AttackInfoUnknown = attackInfoUnknown; this.WeaponInstance = weaponInstance; this.ObservedRows = observedRows; } public bool Observed { get; private set; } public int MinDamage { get; private set; } public int MaxDamage { get; private set; } public double RechargeSeconds { get; private set; } public int WeaponSlot { get; private set; } public int AttackInfoUnknown { get; private set; } public int WeaponInstance { get; private set; } public int ObservedRows { get; private set; } }
     internal sealed class CapturedSubwayLootEvidenceDefinition { public CapturedSubwayLootEvidenceDefinition(int lowId, int highId, int quality, int observedCount, int observedCorpses, int observedBasisPoints) { this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.ObservedCount = observedCount; this.ObservedCorpses = observedCorpses; this.ObservedBasisPoints = observedBasisPoints; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public int ObservedCount { get; private set; } public int ObservedCorpses { get; private set; } public int ObservedBasisPoints { get; private set; } }
-    internal sealed class CapturedSubwayCorpseEvidenceDefinition { public CapturedSubwayCorpseEvidenceDefinition(string capture, string capturedUtc, string corpseIdentity, string deadNpcIdentity, int monsterData, int catMesh, int credits) { this.Capture = capture; this.CapturedUtc = capturedUtc; this.CorpseIdentity = corpseIdentity; this.DeadNpcIdentity = deadNpcIdentity; this.MonsterData = monsterData; this.CatMesh = catMesh; this.Credits = credits; } public string Capture { get; private set; } public string CapturedUtc { get; private set; } public string CorpseIdentity { get; private set; } public string DeadNpcIdentity { get; private set; } public int MonsterData { get; private set; } public int CatMesh { get; private set; } public int Credits { get; private set; } }
+    internal sealed class CapturedSubwayCorpseEvidenceDefinition { public CapturedSubwayCorpseEvidenceDefinition(string capture, string capturedUtc, string corpseIdentity, string deadNpcIdentity, int enemyLevel, int monsterData, int catMesh, int credits) { this.Capture = capture; this.CapturedUtc = capturedUtc; this.CorpseIdentity = corpseIdentity; this.DeadNpcIdentity = deadNpcIdentity; this.EnemyLevel = enemyLevel; this.MonsterData = monsterData; this.CatMesh = catMesh; this.Credits = credits; } public string Capture { get; private set; } public string CapturedUtc { get; private set; } public string CorpseIdentity { get; private set; } public string DeadNpcIdentity { get; private set; } public int EnemyLevel { get; private set; } public int MonsterData { get; private set; } public int CatMesh { get; private set; } public int Credits { get; private set; } }
 }

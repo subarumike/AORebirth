@@ -3,9 +3,10 @@
 ## Current Focus
 
 Complete the Subway dungeon from the existing capture corpus before requesting
-more gameplay evidence. The full capture inventory is complete, and the first
-high-confidence implementation slice restores the deep ordinary enemy families
-that were incorrectly excluded as named bosses.
+more gameplay evidence. The full location inventory and the content-level
+Subway ledger are complete. Previously unindexed official-live combat, loot,
+corpse, credits, and teleport evidence is now integrated; the remaining
+unreferenced folders do not currently prove another safe implementation slice.
 
 ## Corpus Inventory
 
@@ -15,17 +16,49 @@ that were incorrectly excluded as named bosses.
   `222` are elsewhere.
 - `4` folders are unresolved because they contain no gameplay packets or
   location snapshots; they are empty startup remnants, not missing evidence.
-- After the Eumenides, merchant, and Slum Runner integrations, `31` Subway or
-  mixed folders still have no generated/runtime reference. That count is an
-  audit queue, not proof that each folder contains independently usable content.
+- After the current integrations, `15` Subway or mixed folders have no
+  generated/runtime reference in the location inventory. The content ledger
+  narrows that to only three official-live Subway-only sessions without a
+  runtime-source reference: `20260709-213711`, `20260712-232848`, and
+  `20260716-220255`. They contain partial/ambient evidence, not a new complete
+  runtime slice.
 - Names, character names, capture dates, and repository references do not
   determine location.
 - The complete per-folder result is generated at
   `docs/generated/aosharp_capture_inventory.csv` and
   `docs/generated/aosharp_capture_inventory.md` by
   `Tools/inventory_aosharp_captures.py`.
+- The content-level ledger covers all `68` Subway-bearing sessions with `21,557`
+  aggregated evidence rows: `55` official-live and `13` AORebirth-private.
+  It records identities, related identities, evidence kinds, source artifacts,
+  row scope, realm, and reference category in
+  `docs/generated/aosharp_subway_capture_content.csv` and `.md`.
 
 ## Implemented In This Slice
+
+- Legacy finalized capture folders whose packet log continued after capture
+  shutdown now decode only rows within `captureStartUtc..captureEndUtc`.
+  Capture `20260708-004038` is recovered without recapture: `329` SCFUs,
+  `15` corpse rows, and `9` respawn rows decode with zero errors while `13,247`
+  trailing packet-log rows are explicitly excluded.
+- Filth Flea normal player-facing damage now uses the merged official-live
+  slot ranges: melee slot `0` rolls `3..10`, poison slot `1` rolls `14..24`.
+  Critical `13` and `47` outcomes remain separate evidence and cannot widen
+  normal runtime rolls.
+- Filth Flea loot now preserves `18` complete official-live corpse outcomes:
+  `15` proven item memberships and `5` empty inventories. Exact L4=`23` and
+  L5=`29` credit rules are active; other captured spawn levels retain the
+  accepted private `23..79` fallback policy instead of becoming unresolved.
+- Thirty-one identity-matched, death-linked official-live corpse observations
+  now supply exact CATMesh and per-level credit rules for Filth Flea, Thief,
+  Mugger, Discarded Pet, Shadow, Slum Runner, Infector, Neural Burnout,
+  Fragmented Soul, Melded Patterns, Molested Molecules, and Premature Pattern.
+  Pre-existing and zero-credit unlinked corpses remain excluded.
+- Official-live Subway zoning is restored exactly: PF127 entry landing
+  `(65.80835,115.6148,318.9879)`, PF655 main-exit landing
+  `(3304.028,35.11,837.9951)`, and their captured headings. The main exit keeps
+  the post-zone grace and contact-edge latch so its in-radius official landing
+  cannot bounce the character back into PF127. The second exit remains disabled.
 
 - Restored `61` capture-backed spawn rows for eight recurring deep enemy
   families: Empty Shell, Fragmented Soul, Incomplete Rebuild, Melded Patterns,
@@ -67,17 +100,24 @@ that were incorrectly excluded as named bosses.
   captured shop snapshots with all `140` stock rows in captured slot order.
   Container Supplier is visible but has no invented shop endpoint because its
   stock was not captured.
-- Finalized Slum Runner capture `20260716-034656` now supplies six exact corpse
-  observations with CATMesh `31774` and credits
-  `144/144/144/131/137/131`. The six samples remain intact as explicit observed
-  samples; no item loot or level correlation was invented.
+- Slum Runner now uses seven death-linked corpse observations across
+  `20260716-034656` and `20260716-215947`, CATMesh `31774`, and exact captured
+  level rules L21=`131`, L22=`137`, and L23=`144`. Item loot remains a separate
+  observed pool and no credit rule is invented for unobserved levels.
 
 ## Validation
 
 - Ordinary provider generator content-equivalence check: PASS.
+- AOSharp analyzer build and SCFU self-test: PASS.
+- NPC lifecycle decoder self-test, including finalized-window filtering: PASS.
+- Real offline recovery of `20260708-004038`: PASS.
+- Subway content inventory tests: `10/10` PASS; full `294`/`68` corpus
+  regeneration: PASS.
+- Subway loot evidence: `13/13` PASS.
+- Flea combat and whole-enemy acceptance guardrails: PASS.
+- Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
 - World population foundation: `25/25` PASS.
-- Subway loot evidence: `12/12` PASS.
 - Subway merchant content: `4/4` PASS.
 - Visibility interest/catalog: `12/12` PASS.
 - Quarantine/spatial-selection guardrail: PASS.
@@ -93,25 +133,30 @@ that were incorrectly excluded as named bosses.
 
 ## Next Runtime Check
 
-Log into the private server and traverse PF127 with the normal quarantine
-selector. Confirm the restored deep families remain stable; Eumenides appears,
-aggros, shoots only with LOS, chases, leashes, dies, exposes `186` credits, and
-respawns; all six merchants appear, the first five shops open, and Container
-Supplier does not; and Slum Runner corpses use the captured visual/credit pool.
-Do not enable `ALL_38` for this check.
+Log into the private server with the normal quarantine selector. Confirm the
+official PF655 entrance lands at the PF127 stairs, the single main exit lands at
+the official PF655 position without bouncing back, and the second exit remains
+inactive. Kill several Fleas to confirm variable `3..10` melee and `14..24`
+poison rolls, normal corpse reopen/cleanup, the expanded item pool, and credits.
+Spot-check one deep corpse visual/credit rule. Do not enable `ALL_38`.
 
 ## Remaining Capture-Backed Work
 
-1. Strike Foreman has a complete captured population profile but no indexed
+1. The three official-live Subway-only sessions without runtime references are
+   audited: `20260709-213711` is unfinalized partial SCFU evidence,
+   `20260712-232848` contains no Abmouth/Vergil identity row, and
+   `20260716-220255` is ambient bridge evidence. None proves a missing safe
+   content slice.
+2. Strike Foreman has a complete captured population profile but no indexed
    outgoing combat or loot. Keep those subsystems unresolved rather than
    guessing.
-2. Bitaxel has exact appearance evidence but no player-facing combat and an
+3. Bitaxel has exact appearance evidence but no player-facing combat and an
    unresolved MonsterData value. Do not activate it yet.
-3. Container Supplier stock and dialogue remain unresolved. Keep the captured
+4. Container Supplier stock and dialogue remain unresolved. Keep the captured
    appearance visible without synthesizing an inventory or interaction.
-4. The `38` diagnostic population rows remain quarantined until bounded private
+5. The `38` diagnostic population rows remain quarantined until bounded private
    login/traversal validation proves that their activation is stable.
-5. Existing PF127 door evidence describes working interior doors, not exits.
+6. Existing PF127 door evidence describes working interior doors, not exits.
    Do not remove them. The corpus does not yet provide identity-complete world
    static/container placements.
 

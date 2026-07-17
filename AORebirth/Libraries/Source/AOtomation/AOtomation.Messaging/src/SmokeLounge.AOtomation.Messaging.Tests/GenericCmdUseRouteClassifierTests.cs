@@ -200,7 +200,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void SubwayTeleportProxyOverridePreservesCapturedEntranceStairsLanding()
+        public void SubwayTeleportProxyOverridesPreserveOfficialEntryAndMainExitLandings()
         {
             string rules =
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs");
@@ -208,6 +208,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string teleportProxy2 = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\teleportproxy2.cs");
             string statelTransitions =
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs");
+            string exitProxy =
+                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\exitproxyplayfield.cs");
             string playfield = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
             string playfieldLoader =
                 ReadRepositoryFile(@"AORebirth\Libraries\Source\PlayfieldLoader\PlayfieldLoader.cs");
@@ -215,18 +217,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             AssertContains(rules, "public const int CapturedSubwayPlayfieldId = 127;");
             AssertContains(rules, "public const int CapturedEntranceDoorInstance = unchecked((int)0xC006007F);");
-            AssertContains(rules, "public const float CapturedEntranceLandingX = 71.4f;");
-            AssertContains(rules, "public const float CapturedEntranceLandingY = 115.6f;");
-            AssertContains(rules, "public const float CapturedEntranceLandingZ = 319.0f;");
-            AssertContains(rules, "public const float CapturedEntranceHeadingX = 0.707102f;");
-            AssertContains(rules, "public const float CapturedEntranceHeadingZ = 0.707112f;");
+            AssertContains(rules, "public const float CapturedEntranceLandingX = 65.80835f;");
+            AssertContains(rules, "public const float CapturedEntranceLandingY = 115.6148f;");
+            AssertContains(rules, "public const float CapturedEntranceLandingZ = 318.9879f;");
+            AssertContains(rules, "public const float CapturedEntranceHeadingX = 0.0f;");
+            AssertContains(rules, "public const float CapturedEntranceHeadingY = 0.7071124f;");
+            AssertContains(rules, "public const float CapturedEntranceHeadingZ = 0.0f;");
+            AssertContains(rules, "public const float CapturedEntranceHeadingW = 0.7071012f;");
+            AssertContains(rules, "public const float CapturedMainExitLandingX = 3304.028f;");
+            AssertContains(rules, "public const float CapturedMainExitLandingY = 35.11f;");
+            AssertContains(rules, "public const float CapturedMainExitLandingZ = 837.9951f;");
+            AssertContains(rules, "public const float CapturedMainExitHeadingY = -0.4771534f;");
+            AssertContains(rules, "public const float CapturedMainExitHeadingW = 0.87882f;");
             AssertContains(rules, "public static bool TryResolveDestinationOverride(");
+            AssertContains(rules, "public static bool TryResolveMainExitOverride(");
             AssertContains(teleportProxy, "SubwayTeleportProxyDestinationRules.TryResolveDestinationOverride");
             AssertContains(teleportProxy2, "SubwayTeleportProxyDestinationRules.TryResolveDestinationOverride");
+            AssertContains(exitProxy, "SubwayTeleportProxyDestinationRules.TryResolveMainExitOverride(");
             AssertContains(statelTransitions, "private const int CapturedSubwayPlayfieldId = 127;");
             AssertContains(statelTransitions, "private const int CapturedSubwayEntrySourcePlayfieldId = 655;");
             AssertContains(statelTransitions, "private const uint CapturedSubwayEntrySourceDoorInstance = 0xC01A028F;");
-            AssertContains(statelTransitions, "private const float CapturedSubwayEntranceLandingX = 71.4f;");
+            AssertContains(statelTransitions, "private const float CapturedSubwayEntranceLandingX = 65.80835f;");
+            AssertContains(statelTransitions, "private const float CapturedSubwayEntranceHeadingY = 0.7071124f;");
+            AssertContains(statelTransitions, "private const float CapturedSubwayEntranceHeadingW = 0.7071012f;");
             AssertContains(statelTransitions, "TryHandleCapturedSubwayProxyEntry");
             Assert.IsFalse(
                 statelTransitions.Contains("TryHandleCapturedSubwayProxyExit")

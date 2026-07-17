@@ -57,16 +57,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
     internal class exitproxyplayfield : FunctionPrototype
     {
-        private const int CapturedSubwayEntrySourcePlayfieldId = 655;
-
-        private const uint CapturedSubwayEntrySourceDoorInstance = 0xC01A028F;
-
         private const float DefaultExitDoorOffset = 2.5f;
-
-        // The PF655 Subway proxy-entry trigger has a four-unit radius. The
-        // generic 2.5-unit exit offset lands inside it and sends the player
-        // straight back into PF127 after zoning grace expires.
-        private const float CapturedSubwayExitDoorOffset = 6.0f;
 
         public override FunctionType FunctionId
         {
@@ -92,6 +83,37 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                         && (x.Identity.Type == IdentityType.Door /*|| x.Identity.Type==IdentityType.MissionEntrance*/));
             if (door != null)
             {
+                Coordinate overrideDestination;
+                Quaternion overrideHeading;
+                if (SubwayTeleportProxyDestinationRules.TryResolveMainExitOverride(
+                    externalPlayfieldId,
+                    externalDoorInstance,
+                    out overrideDestination,
+                    out overrideHeading))
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Zoning,
+                        string.Format(
+                            "ExitProxyPlayfield caller={0} internal={1} currentPf={2} current=({3:F2},{4:F2},{5:F2}) externalDoor={6:X8} externalPf={7} dest=({8:F3},{9:F3},{10:F3}) evidence=official_live_subway_main_exit",
+                            caller.Identity.ToString(true),
+                            self.Identity.ToString(true),
+                            self.Playfield.Identity.Instance,
+                            ((Dynel)self).RawCoordinates.X,
+                            ((Dynel)self).RawCoordinates.Y,
+                            ((Dynel)self).RawCoordinates.Z,
+                            externalDoorInstance,
+                            externalPlayfieldId,
+                            overrideDestination.x,
+                            overrideDestination.y,
+                            overrideDestination.z));
+                    self.Playfield.Teleport(
+                        (Dynel)self,
+                        overrideDestination,
+                        overrideHeading,
+                        new Identity() { Type = IdentityType.Playfield, Instance = externalPlayfieldId });
+                    return true;
+                }
+
                 Vector3 v = new Vector3(door.X, door.Y, door.Z);
 
                 Quaternion q = new Quaternion(door.HeadingX, door.HeadingY, door.HeadingZ, door.HeadingW);
@@ -99,11 +121,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 Quaternion.Normalize(q);
                 Vector3 n = (Vector3)q.RotateVector3(Vector3.AxisZ);
 
-                float exitDoorOffset =
-                    externalPlayfieldId == CapturedSubwayEntrySourcePlayfieldId
-                    && externalDoorInstance == CapturedSubwayEntrySourceDoorInstance
-                        ? CapturedSubwayExitDoorOffset
-                        : DefaultExitDoorOffset;
+                float exitDoorOffset = DefaultExitDoorOffset;
                 v.x += n.x * exitDoorOffset;
                 v.z += n.z * exitDoorOffset;
                 LogUtil.Debug(
