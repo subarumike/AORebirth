@@ -250,6 +250,7 @@ namespace ZoneEngine.Core.Packets
             WriteSingle(buffer, PositionYOffset, deadNpc.RawCoordinates.Y);
             WriteSingle(buffer, PositionZOffset, deadNpc.RawCoordinates.Z);
             WriteInt32(buffer, PlayfieldIdOffset, deadNpc.Playfield.Identity.Instance);
+            WriteInt32(buffer, MonsterScaleOffset, deadNpc.Stats[StatIds.monsterscale].Value);
             WriteInt32(buffer, DeadNpcInstanceOffset, deadNpc.Identity.Instance);
             WriteInt32(buffer, CorpseCatMeshOffset, corpseCatMesh);
             WriteInt32(buffer, CorpseCashValueOffset, Math.Max(0, corpseCredits));

@@ -32,10 +32,9 @@ normally reports `actual RVA - 0x1000`.
    every emitted line.  Calling it from fault recovery can stall the renderer or
    deadlock during heap/loader corruption.
 8. Current optimized source removed normal-path `VirtualQuery` calls from the
-   old draw/rectangle hot paths, but it is not zero overhead. The earlier
-   hot-query artifact and the renderer selector's TnL HAL `2` to HAL `1`
-   behavior are unisolated candidates for the reported 100-to-20 FPS change.
-   Per-feature A/B attribution is unresolved.
+   old draw/rectangle hot paths and removed the TnL HAL `2` to HAL `1` selector
+   rewrite entirely. The remaining draw wrapper is not zero overhead, so live
+   same-scene A/B attribution is still required.
 
 ## Entry, timing, and installation order
 
@@ -44,13 +43,14 @@ starts a detached worker; a `CreateThread` failure is silent.  Outside loader
 lock, the worker performs:
 
 1. initialize the file logger;
-2. install the unhandled-exception dump filter;
-3. wait up to 30 seconds for `N3.dll` only;
-4. identify the N3 profile by exact SHA-256;
-5. install RoomSpace on all profiles;
-6. for C/new: install the two-site new-client GUI draw wrapper;
-7. for D/old: install the Utils rectangle VEH, then the combined randy/selector/
-   draw/batch/tree transaction.
+2. arm the dedicated exception-only `randy+0x25118` vector guard;
+3. install the unhandled-exception dump filter;
+4. wait up to 30 seconds for `N3.dll` only;
+5. identify the N3 profile by exact SHA-256;
+6. install RoomSpace on all profiles;
+7. for C/new: install the two-site new-client GUI draw wrapper;
+8. for D/old: install the Utils rectangle VEH, then the combined randy draw/
+   batch/tree transaction.
 
 GUI, Utils, randy31, D3DIM700, DDRAW, and NVIDIA are not waited for.  Their
 presence at the instant their installer runs is an assumption.  A late module
@@ -76,12 +76,13 @@ address; source does not verify NVIDIA's file path/hash/version resource.
 | H1 | RoomSpace collision | N3, five profile RVAs | five `E8` replacements to generated RX wrapper | proactive mitigation; independent/suspect for F16 |
 | H2 | new GUI draw helper | GUI `+0x14CC5F`, `+0x157234` | two `E8` replacements | broad containment; unsafe cleanup/rollback |
 | H3 | rectangle add | Utils `+0x82EC/+0x82F1` | priority-first VEH, no normal-path patch | strong exact L1 recovery |
-| H4 | renderer selector | randy `+0x43B99` | `mov eax,[selector]` -> call | behavioral compatibility change |
+| H4 | renderer selector | removed | AO's original selector load remains untouched | retired FPS regression |
 | H5 | DrawIndexedPrimitiveVB | randy `+0x219B4` | indirect call -> wrapper | L2 preflight; L4 driver containment |
 | H6 | GUI render batch | GUI `+0x152E49` | call -> whole-batch wrapper | exact but experimental L4 cleanup |
 | H7 | GUI tree find | GUI `+0x4F2EF` | prologue -> JMP/thunk/trampoline | strong narrow L1 prevention |
 | H8 | randy draw resource | randy `+0x21A94` | VEH context unwind | strong exact L1 recovery |
-| H9 | randy render state | randy `+0x2511A` | VEH resume | strong exact L1 recovery; `+0x25118` uncovered |
+| H9a | randy corrupt state vector | randy `+0x25118` | early process-lifetime VEH; resume `+0x25147` | strong exact L1 whole-vector recovery |
+| H9b | randy impossible state id | randy `+0x2511A` | old-profile VEH; resume `+0x2512F` | strong exact L1 one-entry recovery |
 | H10 | randy byte color | randy `+0x6C3A1` | VEH resume | strong exact L1 fallback |
 | H11 | randy indirect color | randy `+0x6C476` | VEH resume | strong exact L1 missing-sample path |
 | H12 | randy dword color | randy `+0x6C51D` | VEH resume | strong exact L1 fallback |
@@ -100,7 +101,7 @@ the inspected artifact; H1's generated wrapper address is chosen by
 | H1 | runtime 86-byte RX wrapper; no original trampoline because complete calls are redirected |
 | H2 | compiled `NewClientGuiDrawHelperGuard`; original helper is invoked by the guarded body on its normal path; no relocated callsite trampoline |
 | H3 | N/A, VEH redirects only an exact exception context to compiled recovery epilogues |
-| H4 | compiled `NormalizeRendererDeviceSelector`; no original trampoline, because the five-byte load is semantically reproduced |
+| H4 | removed; no proxy target or trampoline remains |
 | H5 | compiled `GuardedDrawIndexedPrimitiveVb`; original target resolved from device vtable slot 0x20 |
 | H6 | compiled `GuardedGuiRenderBatchThunk`; guarded body calls the verified original GUI target |
 | H7 | compiled entry thunk plus `GuiTreeFindTrampoline`, which replays five overwritten bytes then jumps `GUI+0x4F2F4` |
@@ -180,21 +181,21 @@ the D/old `0x420C70A4` event shares this site.
 This is the best current example of a narrow recovery with an explicit neutral
 value and correct x87 balance.
 
-### H4 — old renderer selector normalization
+### H4 — old renderer selector normalization (removed)
 
 | Field | Audit |
 |---|---|
-| Site/function | randy `+0x43B99`, renderer-device selection before device creation |
-| Original bytes | complete five-byte `A1 <randy+0xB772C>` (`mov eax,[selector]`); adjacent output and compare blocks plus HAL GUIDs are verified |
-| Replacement | five-byte `E8 rel32` to naked selector thunk |
-| ABI/state | not an original call boundary; thunk saves/restores ECX and EDX, C helper atomically changes selector 2 to 1, returns selector in EAX; nonvolatiles preserved; flags not preserved but the following compare overwrites them; no x87/SSE |
-| Predicate | renderer output at `randy+0x17D318` must still be null; exact supported bytes; no suspended thread in protected renderer/driver ranges |
-| Action | TnL HAL selector 2 becomes plain HAL selector 1 globally |
-| Transaction | first patch in combined old-renderer transaction; reversed if a later patch fails |
-| Risk | changes renderer mode and performance/visual behavior for the whole process; not an exception guard; no runtime reversal |
+| Site/function | former randy `+0x43B99` selector load |
+| Original bytes | left untouched |
+| Replacement | none |
+| ABI/state | not applicable |
+| Predicate | not applicable |
+| Action | AO uses the renderer selected in its launcher |
+| Transaction | absent from the old-renderer transaction |
+| Risk | no proxy selector overhead or global renderer-mode change |
 
-It must have its own feature flag.  No FPS cap should be introduced; the proxy
-must be measured against the same-scene no-proxy 100-FPS baseline.
+The mutating selector path and its dormant helper code were deleted. A
+same-scene no-proxy FPS baseline is still required for the remaining hooks.
 
 ### H5 — old DrawIndexedPrimitiveVB wrapper
 
@@ -252,24 +253,30 @@ experimental recovery until subsequent-frame/device integrity is proven.
 
 ### H8–H12 — exact randy VEH recoveries
 
-One priority-first VEH is registered before old code patches.  It handles read
-AVs only and then applies the following exact predicates.  The VEH is removed if
-the combined randy patch transaction fails; its handle is discarded after
-success, so no detach removal is possible.
+A dedicated priority-first VEH is armed before dump setup, N3 hashing, profile
+selection, and old-client patch installation. It handles only the exact
+`randy+0x25118` read AV after dynamically verifying a committed MEM_IMAGE,
+PE32/i386 headers, the fault RVA, bytes through the `+0x25147` resume boundary,
+and native vector-loop provenance. It remains registered for process lifetime.
+The later general randy VEH handles H8/H9b/H10-H12 and is removed if the combined
+randy patch transaction fails; its handle is discarded after success, so no
+detach removal is possible.
 
 | Hook | Exact fault and verified boundary | Predicate | Context/action | Matching family | State/risk |
 |---|---|---|---|---|---|
 | H8 draw resource | `randy+0x21A94` | EAX `<0x10000`, access==EAX, readable EBP frame/return | EAX=0; EIP=caller return; ESP=EBP+0x20; EBP=prior; skip whole six-arg callee | F03 | exact bytes prove no preceding nonvolatile/FPU/SSE mutation; manual context unwind is safe only for this profile |
-| H9 render state | `randy+0x2511A`, resume `+0x2512F` | EAX>`0x400`, observed stack DWORD/argument `0x0A` | pop one pushed DWORD; EAX=0; resume native loop | F04 `+0x2511A` | integer path; the `0x400` value is an exact crash predicate, not a proven general table-size contract; `+0x25118` remains uncovered |
+| H9a corrupt state vector | `randy+0x25118`, resume `+0x25147` | read access==EDI, `[ESP]=0x0A`, writable frame locals, readable ESI vector fields, `[EBP-8]=[EBP-4]*16`, `[ESI+0x14]+offset=EDI`, coherent next 20-byte-vector bounds | pop one pushed DWORD; EAX=0; skip the entire first 16-byte vector | F04 `+0x25118` | exception-only dynamic PE/fingerprint lookup; exact report proves offset `0x20`, index `2`, and access==EDI; upstream lifetime producer remains unresolved |
+| H9b impossible state id | `randy+0x2511A`, resume `+0x2512F` | EAX>`0x400`, observed stack DWORD/argument `0x0A` | pop one pushed DWORD; EAX=0; resume native loop after one entry | F04 `+0x2511A` | integer path; the `0x400` value is an exact crash predicate, not a proven general table-size contract |
 | H10 byte color | `randy+0x6C3A1`, resume `+0x6C3AC` | low EAX | EAX=EBX=EDI=0; resume after byte sample sequence | F02 | integer only; access-address equality not checked |
 | H11 indirect color | `randy+0x6C476`, resume `+0x6C478` | nonzero low ECX, access==ECX, EDI nonzero power of two | ECX=0; enter native missing-sample branch | F02 | narrow and root-like for known sample state |
 | H12 dword color | `randy+0x6C51D`, resume `+0x6C51F` | low ESI | ESI=0; resume before native alpha OR | F02 | integer only; access-address equality not checked |
 
 Flags are not restored, but each resume address was selected around the exact
 verified integer sequence.  No x87/SSE repair is required by those verified
-instructions.  As process-wide first-chance handlers, the rectangle and randy
-VEHs still inspect every AV; any logging or secondary memory fault from inside a
-handler can recurse.
+instructions. The early H9a lookup and byte checks run only after an AV, never
+on the normal frame path. As process-wide first-chance handlers, the rectangle
+and randy VEHs still inspect every AV; any logging or secondary memory fault
+from inside a handler can recurse.
 
 ### H13 — diagnostic unhandled-exception filter
 
@@ -286,9 +293,9 @@ handler can recurse.
 
 The randy installer registers its VEH and then makes one snapshot of other
 threads.  It requests `CONTEXT_CONTROL` and refuses to patch if a suspended EIP
-is in the selector, randy draw, GUI batch/tree, D3DIM, DDRAW, or NVIDIA ranges.
-Patch order is selector -> DrawIndexed -> GUI batch -> GUI tree; rollback is the
-reverse order.  If exact restoration cannot be proven, the code fails fast
+is in renderer initialization, randy draw, GUI batch/tree, D3DIM, DDRAW, or
+NVIDIA ranges. Patch order is DrawIndexed -> GUI batch -> GUI tree; rollback is
+the reverse order.  If exact restoration cannot be proven, the code fails fast
 rather than continuing with unknown bytes.
 
 This transaction is materially stronger than the new GUI installer but weaker
@@ -301,9 +308,9 @@ transaction and survive a randy failure.
 | State/property | Finding |
 |---|---|
 | ESP / return addresses | No code patch splits an instruction.  H8 deliberately reconstructs ESP/EIP from a verified frame.  H2 can return after swallowing a deep helper fault without proving native unwind/cleanup; this is the largest stack-consistency risk. |
-| ECX / `this` | RoomSpace copies ECX to saved ESI; new GUI and tree thunks explicitly forward ECX; selector saves/restores ECX.  Their ABIs are inferred from exact callsites but lack automated ABI tests. |
+| ECX / `this` | RoomSpace copies ECX to saved ESI; new GUI and tree thunks explicitly forward ECX. Their ABIs are inferred from exact callsites but lack automated ABI tests. |
 | Callee-saved registers | Generated/naked code has been manually disassembled and appears correct.  Compiler wrappers rely on x86 ABI.  Automated disassembly assertions are missing. |
-| Flags | Selector relies on a following compare; VEH resumes are selected at exact integer boundaries.  Broad H2 and post-driver H5/H6 do not reconstruct flags from the interrupted native path. |
+| Flags | VEH resumes are selected at exact integer boundaries. Broad H2 and post-driver H5/H6 do not reconstruct flags from the interrupted native path. |
 | x87 | H3 explicitly pops the value loaded before the `+0x82F1` fault.  Exact randy VEH sites are integer-only.  H2/H5/H6 cannot prove driver/helper x87 state after a contained fault. |
 | SSE | No guard explicitly saves/restores SIMD state.  This is acceptable before mutation at exact integer sites, but unproven after helper/driver faults. |
 | Exception context | Exact VEHs mutate only named registers/EIP/ESP.  Broad helper SEH skips unknown work; driver SEH returns success after unknown internal mutations. |
@@ -345,7 +352,7 @@ Normal-path costs are:
 |---|---|
 | Rect VEH | none until an exception |
 | RoomSpace | wrapper at five collision calls |
-| Renderer selector | one-time hook execution, then a global renderer-mode change |
+| Renderer selector | none; AO's original selection is preserved |
 | DrawIndexed | wrapper, SEH, integer checks, pointer/index probes, and vtable resolution for every draw |
 | GUI batch | wrapper and SEH for every batch |
 | GUI tree | JMP, thunk, C++ guard, and trampoline for every normal lookup |
@@ -355,8 +362,8 @@ Normal-path costs are:
 The current source has removed the earlier normal-path `VirtualQuery`/logging
 burden from key old-client paths, but performance has not been measured on the
 installed artifact after the optimization.  A 100-FPS no-proxy baseline versus
-20 FPS with proxy is a real symptom, not permission to invent a cap.  The
-selector normalization and each module must be measured independently.
+20 FPS with proxy is a real symptom, not permission to invent a cap. Each
+remaining module must be measured independently.
 
 ## Artifact and build-system audit
 
@@ -390,7 +397,8 @@ attempts the profile's serial install path.
 
 - H3 rectangle empty-result recovery, including its x87-specific epilogue.
 - H8 whole randy draw-resource rejection before nested mutation.
-- H9 exact state-loop skip at `+0x2511A`, without generalizing its `0x400`
+- H9a exact whole-vector skip at `+0x25118` and H9b exact one-entry skip at
+  `+0x2511A`, without sharing resume contracts or generalizing H9b's `0x400`
   predicate into an invented table cap.
 - H10–H12 exact low color/sample fallbacks.
 - H7 low-key native not-found path, after its documentation is corrected.
@@ -400,7 +408,7 @@ attempts the profile's serial install path.
 ### Separate or disable pending proof
 
 - H1 RoomSpace: independent proactive feature; default off for F16 A/B.
-- H4 selector: separate behavioral compatibility option; likely FPS-sensitive.
+- H4 selector: removed; keep absent.
 - H2 new GUI outer catch: off by default until exact inner dispatch and cleanup
   are proven.
 - H5 exact NVIDIA post-fault `S_OK`: experimental, driver-fragile, no cleanup.
@@ -408,7 +416,6 @@ attempts the profile's serial install path.
 
 ### Uncovered or too narrow
 
-- randy actual `+0x25118`.
 - NV-B `+0x154314F`, generic NVIDIA RVAs, and auxiliary NV-A `+0x170C4C6`.
 - D/old `0x420C70A4` and generic invalid EIP 0/2/5/8.
 - GUI `+0x4ED00` except the observed low-key producer path.

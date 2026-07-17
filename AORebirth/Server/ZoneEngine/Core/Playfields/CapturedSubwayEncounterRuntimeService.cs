@@ -53,17 +53,28 @@ namespace AORebirth.Core.Playfields
         private const double VergilDirectHealCooldownSeconds = 30.654;
         private const int VergilSelfHealTriggerPermille = 180;
         private const float VergilDirectHealRange = 13.0f;
+        private static readonly TimeSpan CapturedNamedBossRespawnDelay = TimeSpan.FromMinutes(10);
 
         private static readonly double[] CapturedRefillDelays = { 0.830, 0.380, 3.322, 3.490 };
         private static readonly CapturedEncounterLevelHealthVariant[] VergilAeneidVariants =
         {
             new CapturedEncounterLevelHealthVariant(
+                29,
+                6796,
+                131,
+                131,
+                "20260716-034433 fight/corpse"),
+            new CapturedEncounterLevelHealthVariant(
                 30,
                 7227,
+                132,
+                135,
                 "20260709-222339 SCFU #5445; 20260712-234401 fight"),
             new CapturedEncounterLevelHealthVariant(
                 31,
                 7659,
+                132,
+                140,
                 "20260712-232711 fight")
         };
 
@@ -82,8 +93,10 @@ namespace AORebirth.Core.Playfields
         private Identity vergilAeneidIdentity = Identity.None;
         private bool combatActive;
         private bool abmouthDead;
+        private DateTime? abmouthRespawnDueAtUtc;
         private bool vergilCombatActive;
         private bool vergilDead;
+        private DateTime? vergilRespawnDueAtUtc;
         private DateTime vergilNextHealAtUtc;
         private PendingVergilHeal vergilPendingHeal;
         private int refillDelayIndex;
@@ -105,7 +118,7 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            if (this.abmouthIdentity.Instance == 0)
+            if (this.abmouthIdentity.Instance == 0 && !this.abmouthRespawnDueAtUtc.HasValue)
             {
                 CapturedEncounterRuntimeDefinition definition = CreateBossDefinition();
                 Character boss = this.SpawnCharacter(definition, Identity.None);
@@ -116,7 +129,7 @@ namespace AORebirth.Core.Playfields
                 }
             }
 
-            if (this.vergilAeneidIdentity.Instance == 0)
+            if (this.vergilAeneidIdentity.Instance == 0 && !this.vergilRespawnDueAtUtc.HasValue)
             {
                 Character vergil = this.SpawnCharacter(
                     this.CreateVergilAeneidDefinition(),
@@ -135,7 +148,9 @@ namespace AORebirth.Core.Playfields
             this.vergilAeneidIdentity = Identity.None;
             this.combatActive = false;
             this.abmouthDead = false;
+            this.abmouthRespawnDueAtUtc = null;
             this.ClearVergilCombatState();
+            this.vergilRespawnDueAtUtc = null;
             this.refillDelayIndex = 0;
             foreach (InfectorSlotState slot in this.infectorSlots)
             {
@@ -218,8 +233,56 @@ namespace AORebirth.Core.Playfields
             this.infectorSlots[1].SpawnDueAtUtc = utcNow.AddSeconds(SecondInfectorDelaySeconds);
         }
 
+        internal ICharacter[] NotifyCombatReset(ICharacter npc)
+        {
+            CapturedEncounterRuntimeDefinition definition;
+            if (npc == null
+                || !CapturedEncounterRuntimeRegistry.TryGet(npc.Identity.Instance, out definition))
+            {
+                return new ICharacter[0];
+            }
+
+            if (string.Equals(
+                definition.ProfileKey,
+                VergilAeneidProfileKey,
+                StringComparison.Ordinal))
+            {
+                this.ClearVergilCombatState();
+                return new ICharacter[0];
+            }
+
+            if (!string.Equals(
+                definition.ProfileKey,
+                AbmouthProfileKey,
+                StringComparison.Ordinal))
+            {
+                return new ICharacter[0];
+            }
+
+            this.combatActive = false;
+            this.abmouthDead = false;
+            this.refillDelayIndex = 0;
+            var activeSummons = new List<ICharacter>();
+            foreach (InfectorSlotState slot in this.infectorSlots)
+            {
+                slot.SpawnDueAtUtc = null;
+                ICharacter summon = slot.ActiveIdentity.Instance == 0
+                                        ? null
+                                        : this.playfield.FindByIdentity<ICharacter>(slot.ActiveIdentity);
+                slot.ActiveIdentity = Identity.None;
+                slot.Generation = 0;
+                if (summon != null && summon.Stats[StatIds.health].Value > 0)
+                {
+                    activeSummons.Add(summon);
+                }
+            }
+
+            return activeSummons.ToArray();
+        }
+
         internal void ProcessDue(DateTime utcNow, Action<ICharacter, ICharacter> acquireAggro)
         {
+            this.ProcessNamedBossRespawns(utcNow);
             this.ProcessVergilHealing(utcNow);
 
             if (!this.combatActive || this.abmouthDead || this.abmouthIdentity.Instance == 0)
@@ -257,10 +320,9 @@ namespace AORebirth.Core.Playfields
                     acquireAggro(target, infector);
                 }
             }
-
         }
 
-        internal ICharacter[] NotifyDeath(ICharacter target)
+        internal ICharacter[] NotifyDeath(ICharacter target, DateTime diedAtUtc)
         {
             CapturedEncounterRuntimeDefinition definition;
             if (target == null
@@ -276,6 +338,7 @@ namespace AORebirth.Core.Playfields
             {
                 this.ClearVergilCombatState();
                 this.vergilDead = true;
+                this.vergilRespawnDueAtUtc = diedAtUtc.Add(CapturedNamedBossRespawnDelay);
                 return new ICharacter[0];
             }
 
@@ -289,6 +352,7 @@ namespace AORebirth.Core.Playfields
 
             this.abmouthDead = true;
             this.combatActive = false;
+            this.abmouthRespawnDueAtUtc = diedAtUtc.Add(CapturedNamedBossRespawnDelay);
             var livingSummons = new List<ICharacter>();
             foreach (InfectorSlotState slot in this.infectorSlots)
             {
@@ -307,6 +371,46 @@ namespace AORebirth.Core.Playfields
             }
 
             return livingSummons.ToArray();
+        }
+
+        private void ProcessNamedBossRespawns(DateTime utcNow)
+        {
+            if (this.abmouthRespawnDueAtUtc.HasValue
+                && this.abmouthRespawnDueAtUtc.Value <= utcNow
+                && this.abmouthIdentity.Instance == 0)
+            {
+                Character boss = this.SpawnCharacter(CreateBossDefinition(), Identity.None);
+                if (boss != null)
+                {
+                    this.abmouthIdentity = boss.Identity;
+                    this.abmouthDead = false;
+                    this.combatActive = false;
+                    this.refillDelayIndex = 0;
+                    foreach (InfectorSlotState slot in this.infectorSlots)
+                    {
+                        slot.ActiveIdentity = Identity.None;
+                        slot.SpawnDueAtUtc = null;
+                        slot.Generation = 0;
+                    }
+
+                    this.abmouthRespawnDueAtUtc = null;
+                }
+            }
+
+            if (this.vergilRespawnDueAtUtc.HasValue
+                && this.vergilRespawnDueAtUtc.Value <= utcNow
+                && this.vergilAeneidIdentity.Instance == 0)
+            {
+                Character vergil = this.SpawnCharacter(
+                    this.CreateVergilAeneidDefinition(),
+                    Identity.None);
+                if (vergil != null)
+                {
+                    this.vergilAeneidIdentity = vergil.Identity;
+                    this.ClearVergilCombatState();
+                    this.vergilRespawnDueAtUtc = null;
+                }
+            }
         }
 
         internal void NotifyNpcDespawn(ICharacter target, DateTime utcNow)
@@ -394,7 +498,7 @@ namespace AORebirth.Core.Playfields
             }
 
             int level = vergil.Stats[StatIds.level].Value;
-            if (level >= 31)
+            if (level == 31)
             {
                 ICharacter target = this.FindVergilDirectHealTarget(vergil);
                 if (target == null)
@@ -411,6 +515,11 @@ namespace AORebirth.Core.Playfields
                     0,
                     utcNow);
                 this.vergilNextHealAtUtc = utcNow.AddSeconds(VergilDirectHealCooldownSeconds);
+                return;
+            }
+
+            if (level != 30)
+            {
                 return;
             }
 
@@ -743,9 +852,10 @@ namespace AORebirth.Core.Playfields
                 HexToBytes("80000000000000008000000003010001000100010001000000020000"),
                 0,
                 155548,
-                300.0,
+                1800.0,
                 3.0,
-                "20260712-224840 SCFU #1808; 20260712-232137 fight/corpse/loot");
+                "20260712-224840 SCFU #1808; 20260712-232137 fight/corpse/loot; "
+                + "20260716-220400 spawn/fight/death/corpse");
         }
 
         private CapturedEncounterRuntimeDefinition CreateVergilAeneidDefinition()
@@ -766,8 +876,10 @@ namespace AORebirth.Core.Playfields
                 false,
                 variant.Level,
                 variant.Health,
-                132,
-                135,
+                variant.MonsterScale,
+                variant.RunSpeed,
+                // The exact PF127 appearance template retains the captured L30
+                // SCFU RunSpeedBase because no alive L29/L31 SCFU base is available.
                 134,
                 0,
                 3,
@@ -784,10 +896,12 @@ namespace AORebirth.Core.Playfields
                 HexToBytes("00000000000000000000000002010001000100010001000000020000"),
                 0,
                 5921,
-                300.0,
+                1800.0,
                 3.0,
                 variant.Evidence
-                + "; exact spawn/appearance 20260709-222339 SCFU #5445",
+                + "; exact spawn/appearance 20260709-222339 SCFU #5445; "
+                + "Mike 20260716 30-minute loot corpse and 10-minute respawn; "
+                + "20260716-222007 two approximately 40-unit leash resets",
                 npcFamily: 138,
                 npcLosHeight: 0,
                 fatness: 1,
@@ -811,7 +925,8 @@ namespace AORebirth.Core.Playfields
                 waypoints: new[]
                 {
                     new CapturedSubwayWaypointDefinition(278.045074f, 73.01795f, 98.80104f)
-                });
+                },
+                maximumNpcLeashDistanceFromHome: 40.0);
         }
 
         private static CapturedEncounterRuntimeDefinition CreateFirstInfectorDefinition()
@@ -912,15 +1027,24 @@ namespace AORebirth.Core.Playfields
 
         private sealed class CapturedEncounterLevelHealthVariant
         {
-            internal CapturedEncounterLevelHealthVariant(int level, int health, string evidence)
+            internal CapturedEncounterLevelHealthVariant(
+                int level,
+                int health,
+                int monsterScale,
+                int runSpeed,
+                string evidence)
             {
                 this.Level = level;
                 this.Health = health;
+                this.MonsterScale = monsterScale;
+                this.RunSpeed = runSpeed;
                 this.Evidence = evidence;
             }
 
             internal int Level { get; private set; }
             internal int Health { get; private set; }
+            internal int MonsterScale { get; private set; }
+            internal int RunSpeed { get; private set; }
             internal string Evidence { get; private set; }
         }
 
@@ -1001,7 +1125,8 @@ namespace AORebirth.Core.Playfields
             int headMesh = 0,
             CapturedSubwayTextureDefinition[] textures = null,
             CapturedSubwayMeshDefinition[] meshes = null,
-            CapturedSubwayWaypointDefinition[] waypoints = null)
+            CapturedSubwayWaypointDefinition[] waypoints = null,
+            double? maximumNpcLeashDistanceFromHome = null)
         {
             this.ProfileKey = profileKey;
             this.SpawnKey = spawnKey;
@@ -1043,6 +1168,7 @@ namespace AORebirth.Core.Playfields
             this.UnlootedCorpseLifetimeSeconds = unlootedCorpseLifetimeSeconds;
             this.LootedCleanupSeconds = lootedCleanupSeconds;
             this.Evidence = evidence;
+            this.MaximumNpcLeashDistanceFromHome = maximumNpcLeashDistanceFromHome;
         }
 
         internal string ProfileKey { get; private set; }
@@ -1085,6 +1211,7 @@ namespace AORebirth.Core.Playfields
         internal double UnlootedCorpseLifetimeSeconds { get; private set; }
         internal double LootedCleanupSeconds { get; private set; }
         internal string Evidence { get; private set; }
+        internal double? MaximumNpcLeashDistanceFromHome { get; private set; }
 
         private static CapturedSubwayTextureDefinition[] CreateDefaultTextures()
         {

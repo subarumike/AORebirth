@@ -30,6 +30,13 @@ namespace AORebirth.Core.Playfields
 
         private readonly Action<ICharacter> activateNpc;
 
+        private readonly Random spawnRandom;
+
+        private readonly Func<int, int> levelSelector;
+
+        private readonly Dictionary<int, OrdinaryEnemyLevelSelectionState> levelSelectionBySource =
+            new Dictionary<int, OrdinaryEnemyLevelSelectionState>();
+
         private readonly Dictionary<int, OrdinaryEnemyRuntimeDefinition> activeByRuntimeIdentity =
             new Dictionary<int, OrdinaryEnemyRuntimeDefinition>();
 
@@ -40,21 +47,34 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemyCatalog catalog,
             NpcPatrolReplayCoordinator patrolReplay,
             PlayfieldDynelRegistry dynelRegistry,
-            Action<ICharacter> activateNpc)
+            Action<ICharacter> activateNpc,
+            Func<int, int> levelSelector = null)
         {
             this.catalog = catalog;
             this.patrolReplay = patrolReplay;
             this.dynelRegistry = dynelRegistry;
             this.activateNpc = activateNpc;
+            if (levelSelector == null)
+            {
+                this.spawnRandom = new Random();
+                this.levelSelector = this.spawnRandom.Next;
+            }
+            else
+            {
+                this.levelSelector = levelSelector;
+            }
         }
 
         internal bool SpawnFromPopulation(
             Playfield playfield,
             Identity playfieldIdentity,
             OrdinaryEnemySpawnDefinition spawn,
-            out Identity runtimeIdentity)
+            int generation,
+            out Identity runtimeIdentity,
+            out OrdinaryEnemySpawnGeneration selectedGeneration)
         {
             runtimeIdentity = Identity.None;
+            selectedGeneration = null;
             if (spawn == null || this.activeRuntimeIdentityBySource.ContainsKey(spawn.SourceIdentity))
             {
                 return false;
@@ -62,7 +82,30 @@ namespace AORebirth.Core.Playfields
 
             OrdinaryEnemyProfile profile;
             if (!this.catalog.TryGetProfile(spawn.ProfileKey, out profile)) return false;
-            return this.Spawn(playfield, playfieldIdentity, spawn, profile, out runtimeIdentity);
+            OrdinaryEnemyLevelSelectionState selectionState;
+            if (!this.levelSelectionBySource.TryGetValue(spawn.SourceIdentity, out selectionState))
+            {
+                selectionState = new OrdinaryEnemyLevelSelectionState();
+                this.levelSelectionBySource.Add(spawn.SourceIdentity, selectionState);
+            }
+
+            OrdinaryEnemySpawnGeneration spawnGeneration = selectionState.ResolveForGeneration(
+                spawn.LevelDefinition,
+                generation,
+                this.levelSelector);
+            bool spawned = this.Spawn(
+                playfield,
+                playfieldIdentity,
+                spawn,
+                profile,
+                spawnGeneration,
+                out runtimeIdentity);
+            if (spawned)
+            {
+                selectedGeneration = spawnGeneration;
+            }
+
+            return spawned;
         }
 
         internal void ClearRuntimeState(int playfieldInstance)
@@ -76,6 +119,7 @@ namespace AORebirth.Core.Playfields
 
             this.activeByRuntimeIdentity.Clear();
             this.activeRuntimeIdentityBySource.Clear();
+            this.levelSelectionBySource.Clear();
             OrdinaryEnemyRuntimeRegistry.RemoveForPlayfield(playfieldInstance);
         }
 
@@ -153,14 +197,17 @@ namespace AORebirth.Core.Playfields
             Identity playfieldIdentity,
             OrdinaryEnemySpawnDefinition spawn,
             OrdinaryEnemyProfile profile,
+            OrdinaryEnemySpawnGeneration spawnGeneration,
             out Identity runtimeIdentity)
         {
             runtimeIdentity = Identity.None;
             var controller = new NPCController();
+            OrdinaryEnemySpawnVariant variant = spawnGeneration.SelectedVariant;
             Character character = this.ConstructCharacter(
                 playfield,
                 playfieldIdentity,
                 spawn,
+                variant,
                 profile,
                 controller);
             if (character == null)
@@ -171,7 +218,7 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            ApplyStats(character, spawn, profile);
+            ApplyStats(character, variant, profile);
             ApplyAppearance(character, profile);
             this.ApplyMovement(character, controller, spawn);
 
@@ -194,7 +241,10 @@ namespace AORebirth.Core.Playfields
             }
 
             character.DoNotDoTimers = false;
-            var runtimeDefinition = new OrdinaryEnemyRuntimeDefinition(spawn, profile);
+            var runtimeDefinition = new OrdinaryEnemyRuntimeDefinition(
+                spawn,
+                profile,
+                spawnGeneration);
             OrdinaryEnemyRuntimeRegistry.Register(character.Identity.Instance, runtimeDefinition);
             this.activateNpc(character);
             this.activeByRuntimeIdentity[character.Identity.Instance] = runtimeDefinition;
@@ -209,12 +259,13 @@ namespace AORebirth.Core.Playfields
                 DebugInfoDetail.Engine,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Ordinary enemy spawned sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} profile={2} name={3} monsterData={4} position=({5},{6},{7}) combatModel={8} combatReady={9}",
+                    "Ordinary enemy spawned sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} profile={2} name={3} monsterData={4} level={5} position=({6},{7},{8}) combatModel={9} combatReady={10}",
                     spawn.SourceIdentity,
                     character.Identity,
                     profile.ProfileKey,
                     profile.DisplayName,
                     profile.MonsterData,
+                    variant.Level,
                     spawn.X,
                     spawn.Y,
                     spawn.Z,
@@ -227,6 +278,7 @@ namespace AORebirth.Core.Playfields
             Playfield playfield,
             Identity playfieldIdentity,
             OrdinaryEnemySpawnDefinition spawn,
+            OrdinaryEnemySpawnVariant variant,
             OrdinaryEnemyProfile profile,
             NPCController controller)
         {
@@ -239,7 +291,7 @@ namespace AORebirth.Core.Playfields
                     new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z },
                     new AORebirth.Core.Vector.Quaternion(0, 0, 0, 1),
                     controller,
-                    spawn.Level);
+                    variant.Level);
             }
             else
             {
@@ -326,7 +378,7 @@ namespace AORebirth.Core.Playfields
 
         private static void ApplyStats(
             Character character,
-            OrdinaryEnemySpawnDefinition spawn,
+            OrdinaryEnemySpawnVariant variant,
             OrdinaryEnemyProfile profile)
         {
             OrdinaryEnemyAppearanceProfile appearance = profile.Appearance;
@@ -341,19 +393,19 @@ namespace AORebirth.Core.Playfields
             SetMobStat(character, StatIds.npcfamily, appearance.NpcFamily, profile.ConstructionMode);
             SetMobStat(character, StatIds.losheight, appearance.NpcLosHeight, profile.ConstructionMode);
             SetMobStat(character, StatIds.monsterdata, profile.MonsterData, profile.ConstructionMode);
-            SetMobStat(character, StatIds.monsterscale, spawn.MonsterScale, profile.ConstructionMode);
+            SetMobStat(character, StatIds.monsterscale, variant.MonsterScale, profile.ConstructionMode);
             SetMobStat(character, StatIds.visualflags, appearance.VisualFlags, profile.ConstructionMode);
             SetMobStat(character, StatIds.currentmovementmode, (int)MoveModes.Run, profile.ConstructionMode);
             SetMobStat(character, StatIds.prevmovementmode, (int)MoveModes.Run, profile.ConstructionMode);
-            SetMobStat(character, StatIds.runspeed, spawn.RunSpeed, profile.ConstructionMode);
+            SetMobStat(character, StatIds.runspeed, variant.RunSpeed, profile.ConstructionMode);
             SetMobStat(character, StatIds.profession, 1, profile.ConstructionMode);
             SetMobStat(character, StatIds.titlelevel, 1, profile.ConstructionMode);
-            SetMobStat(character, StatIds.level, spawn.Level, profile.ConstructionMode);
-            SetMobStat(character, StatIds.life, spawn.Health, profile.ConstructionMode);
+            SetMobStat(character, StatIds.level, variant.Level, profile.ConstructionMode);
+            SetMobStat(character, StatIds.life, variant.Health, profile.ConstructionMode);
             SetMobStat(
                 character,
                 StatIds.health,
-                Math.Max(0, spawn.Health - spawn.HealthDamage),
+                Math.Max(0, variant.Health - variant.HealthDamage),
                 profile.ConstructionMode);
             if (profile.ConstructionMode == OrdinaryEnemyConstructionMode.CapturedDirect)
             {
@@ -435,14 +487,17 @@ namespace AORebirth.Core.Playfields
     {
         internal OrdinaryEnemyRuntimeDefinition(
             OrdinaryEnemySpawnDefinition spawn,
-            OrdinaryEnemyProfile profile)
+            OrdinaryEnemyProfile profile,
+            OrdinaryEnemySpawnGeneration spawnGeneration)
         {
             this.Spawn = spawn;
             this.Profile = profile;
+            this.SpawnGeneration = spawnGeneration;
         }
 
         internal OrdinaryEnemySpawnDefinition Spawn { get; private set; }
         internal OrdinaryEnemyProfile Profile { get; private set; }
+        internal OrdinaryEnemySpawnGeneration SpawnGeneration { get; private set; }
     }
 
     internal static class OrdinaryEnemyRuntimeRegistry

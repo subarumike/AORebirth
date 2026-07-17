@@ -155,6 +155,16 @@ Alternatives considered: Keep iterating in live playtest loops.
 
 Consequences: Next movement work needs a replay contract and local packet comparison.
 
+## Hostile NPC Chase Navigation Is Global and Provider-Gated
+
+Decision: Geometry-aware hostile-NPC pursuit is owned by `ZoneEngine.Core.Navigation` and consumed through the shared NPC combat/movement boundary. Playfields opt in only by supplying authoritative, versioned navigation input through `IPlayfieldChaseNavigationProvider`. PF127/resource `127` is the first provider and Vergil is the first representative end-to-end case; unsupported playfields preserve legacy direct chase.
+
+Reason: Damage LOS proved the PF127 obstruction but left Vergil stationary. A shared bounded planner and route follower fixes that ownership gap without copying path state into individual enemies or pretending that unproven playfields are navigation-ready.
+
+Alternatives considered: Vergil-specific waypoints, PF127 coordinates in boss logic, unconditional game-wide grid assumptions, or weakening LOS so the attack could continue through the wall.
+
+Consequences: Every hostile NPC using the shared PF127 combat path inherits collision-aware chase. Route failure holds safely and retries with bounded work. Other playfields require authoritative geometry/provider tests before activation. PF127 remains same-elevation only, private live route validation is required, and no official AO pathfinding parity is claimed. See `docs/project/NPC_CHASE_NAVIGATION.md`.
+
 ## Trade/Inventory Fixes Must Stay Narrow
 
 Decision: Player trade, corpse loot, and inventory acks must be fixed by packet path and source evidence, not by global item/credit clamps.

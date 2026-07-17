@@ -7,6 +7,7 @@ Do not grow new mail/pets/bank/quest logic inside `Playfields/Playfield.cs`.
 
 ```
 ZoneEngine/Core/
+  Navigation/    - Global NPC chase planning/following and playfield providers
   Mail/          ← Mail Terminal ecosystem (active)
   Arete/         ← Arete dialogue/quests (existing pattern)
   Playfields/    ← World space / visibility / population only

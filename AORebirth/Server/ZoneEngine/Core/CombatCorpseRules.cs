@@ -286,24 +286,24 @@ namespace ZoneEngine.Core
             return true;
         }
 
-        public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(1);
+        public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3);
 
-        public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(30);
+        public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(3);
 
-        public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(5);
+        public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(4);
 
         public static readonly TimeSpan MajorBossCorpseLifetime = TimeSpan.FromMinutes(30);
 
         public static CombatCorpseLootClass LootClassFor(int unlootedItemCount, int unlootedCredits, bool isMajorBoss)
         {
-            if (isMajorBoss)
+            if (unlootedItemCount <= 0 && unlootedCredits <= 0)
             {
-                return CombatCorpseLootClass.MajorBoss;
+                return CombatCorpseLootClass.Empty;
             }
 
-            return unlootedItemCount > 0 || unlootedCredits > 0
-                       ? CombatCorpseLootClass.RegularLoot
-                       : CombatCorpseLootClass.Empty;
+            return isMajorBoss
+                       ? CombatCorpseLootClass.MajorBoss
+                       : CombatCorpseLootClass.RegularLoot;
         }
 
         public static TimeSpan LifetimeFor(CombatCorpseLootClass lootClass)
@@ -483,6 +483,7 @@ namespace ZoneEngine.Core
                 { 247832, 247821 },
                 { 31114, 31102 },
                 { 17649, 15215 },
+                { 30379, 26978 },
                 { 203748, 5921 }
             };
 

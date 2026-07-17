@@ -21,15 +21,62 @@ namespace
     uintptr_t DwordColorFaultAddress = 0;
     uintptr_t DwordColorResumeAddress = 0;
     uintptr_t GuiRenderBatchAddress = 0;
+    uintptr_t GuiNullDynamicVbFaultAddress = 0;
+    uintptr_t GuiDynamicVbGetAddress = 0;
+    uintptr_t GuiDynamicVbGetVbAddress = 0;
+    uintptr_t GuiResetMaterialAddress = 0;
+    uintptr_t GuiStateBlobResetAddress = 0;
+    uintptr_t GuiFreeIndexBufferAddress = 0;
+    uintptr_t GuiStateBlobArrayAddress = 0;
+    uintptr_t GuiStaticIndexBufferAddress = 0;
     uintptr_t GuiTreeFindResumeAddress = 0;
-    volatile LONG* RendererDeviceSelectorAddress = nullptr;
+    PVOID volatile EarlyRandyExceptionGuardHandle = nullptr;
+    LONG RenderStateVectorSkipCount = 0;
     LONG RenderStateSkipCount = 0;
     LONG IndirectColorSkipCount = 0;
-    LONG RendererDeviceSelectorSwitchCount = 0;
     LONG DriverDrawInputSkipCount = 0;
     LONG DriverDrawExceptionSkipCount = 0;
     LONG GuiBatchExceptionSkipCount = 0;
     LONG GuiTreeInvalidKeySkipCount = 0;
+
+    constexpr uintptr_t RenderStateVectorStartRva = 0x25110;
+    constexpr uintptr_t RenderStateEntryFaultRva = 0x25118;
+    constexpr uintptr_t RenderStateVectorExitRva = 0x25139;
+    constexpr uintptr_t RenderStateEntryResumeRva = 0x25147;
+    constexpr uint8_t ExpectedRenderStateFaultSequence[] =
+    {
+        0x8B, 0x7E, 0x14,
+        0x03, 0x7D, 0xF8,
+        0x6A, 0x0A,
+        0x8B, 0x07,
+        0x8B, 0x8C, 0x83, 0xC8, 0x04, 0x00, 0x00,
+        0xFF, 0x77, 0x04,
+        0x89, 0x4F, 0x08,
+        0x50,
+        0x8B, 0xCB,
+        0xE8, 0x92, 0x6A, 0xFF, 0xFF,
+        0xFF, 0x45, 0xFC,
+        0x83, 0x45, 0xF8, 0x10,
+        0x88, 0x47, 0x0C
+    };
+    constexpr uint8_t ExpectedRenderStateVectorExitSequence[] =
+    {
+        0x8B, 0x46, 0x18,
+        0x2B, 0x46, 0x14,
+        0xC1, 0xF8, 0x04,
+        0x39, 0x45, 0xFC,
+        0x72, 0xC9,
+        0x8B, 0x46, 0x28,
+        0x2B, 0x46, 0x24,
+        0x6A, 0x14,
+        0x99,
+        0x59,
+        0xF7, 0xF9,
+        0x83, 0x65, 0xFC, 0x00,
+        0x85, 0xC0,
+        0x74, 0x49,
+        0x83, 0x65, 0xF8, 0x00
+    };
 
     using DrawIndexedPrimitiveVbFunction = HRESULT (WINAPI*)(
         void*,
@@ -40,6 +87,35 @@ namespace
         WORD*,
         DWORD,
         DWORD);
+
+    using GuiDynamicVbGetFunction = void* (__cdecl*)();
+    using GuiDynamicVbGetVbFunction = void* (__thiscall*)(void*, DWORD);
+    using GuiThiscallVoidFunction = void (__thiscall*)(void*);
+    using GuiFreeFunction = void (__cdecl*)(void*);
+
+    enum class GuiBatchExceptionKind : DWORD
+    {
+        None = 0,
+        NvidiaDeferredFlush = 1,
+        NullDynamicVbDestination = 2
+    };
+
+    enum class GuardedDrawPhase : LONG
+    {
+        None = 0,
+        InputProbe = 1,
+        Resolve = 2,
+        DriverCall = 3
+    };
+
+    enum class GuardedDrawExceptionKind : DWORD
+    {
+        None = 0,
+        InputProbe = 1,
+        Resolve = 2,
+        InvalidInitialTarget = 3,
+        NvidiaDriver = 4
+    };
 
     __declspec(noreturn) void FailFastPatchRollback(const char* patchName);
 
@@ -246,6 +322,151 @@ namespace
         return *end > *begin;
     }
 
+    bool TryResolveEarlyRenderStateResume(
+        EXCEPTION_POINTERS* exception,
+        uintptr_t* resumeAddress)
+    {
+        MEMORY_BASIC_INFORMATION memory = {};
+        if (VirtualQuery(
+                exception->ExceptionRecord->ExceptionAddress,
+                &memory,
+                sizeof(memory)) != sizeof(memory) ||
+            memory.State != MEM_COMMIT ||
+            memory.Type != MEM_IMAGE ||
+            !memory.AllocationBase)
+        {
+            return false;
+        }
+
+        auto base = reinterpret_cast<const uint8_t*>(memory.AllocationBase);
+        uintptr_t imageBegin = reinterpret_cast<uintptr_t>(base);
+        IMAGE_DOS_HEADER dos = {};
+        if (!IsReadableRange(base, sizeof(dos)))
+        {
+            return false;
+        }
+        std::memcpy(&dos, base, sizeof(dos));
+        if (dos.e_magic != IMAGE_DOS_SIGNATURE ||
+            dos.e_lfanew <= 0 ||
+            static_cast<uint32_t>(dos.e_lfanew) > 0x100000 ||
+            imageBegin > UINTPTR_MAX - static_cast<uint32_t>(dos.e_lfanew))
+        {
+            return false;
+        }
+
+        auto ntAddress = reinterpret_cast<const uint8_t*>(
+            imageBegin + static_cast<uint32_t>(dos.e_lfanew));
+        IMAGE_NT_HEADERS32 nt = {};
+        if (!IsReadableRange(ntAddress, sizeof(nt)))
+        {
+            return false;
+        }
+        std::memcpy(&nt, ntAddress, sizeof(nt));
+        constexpr uintptr_t RequiredImageSize =
+            RenderStateVectorExitRva +
+                sizeof(ExpectedRenderStateVectorExitSequence);
+        if (nt.Signature != IMAGE_NT_SIGNATURE ||
+            nt.FileHeader.Machine != IMAGE_FILE_MACHINE_I386 ||
+            nt.OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR32_MAGIC ||
+            nt.OptionalHeader.SizeOfImage < RequiredImageSize ||
+            imageBegin > UINTPTR_MAX - nt.OptionalHeader.SizeOfImage ||
+            reinterpret_cast<uintptr_t>(
+                exception->ExceptionRecord->ExceptionAddress) !=
+                imageBegin + RenderStateEntryFaultRva)
+        {
+            return false;
+        }
+
+        if (!IsReadableRange(
+                base + RenderStateVectorStartRva,
+                sizeof(ExpectedRenderStateFaultSequence)) ||
+            !IsReadableRange(
+                base + RenderStateVectorExitRva,
+                sizeof(ExpectedRenderStateVectorExitSequence)) ||
+            std::memcmp(
+                base + RenderStateVectorStartRva,
+                ExpectedRenderStateFaultSequence,
+                sizeof(ExpectedRenderStateFaultSequence)) != 0 ||
+            std::memcmp(
+                base + RenderStateVectorExitRva,
+                ExpectedRenderStateVectorExitSequence,
+                sizeof(ExpectedRenderStateVectorExitSequence)) != 0)
+        {
+            return false;
+        }
+
+        *resumeAddress = imageBegin + RenderStateEntryResumeRva;
+        return true;
+    }
+
+    bool IsExactRenderStateVectorEntryFault(
+        EXCEPTION_POINTERS* exception,
+        uint32_t* vectorBegin,
+        uint32_t* byteOffset,
+        uint32_t* vectorIndex)
+    {
+        DWORD stack = exception->ContextRecord->Esp;
+        DWORD frame = exception->ContextRecord->Ebp;
+        DWORD vectors = exception->ContextRecord->Esi;
+        if (frame < 8 || vectors > 0xFFFFFFFFUL - 0x2C ||
+            exception->ExceptionRecord->ExceptionInformation[1] !=
+                exception->ContextRecord->Edi ||
+            !IsReadableRange(
+                reinterpret_cast<const void*>(stack),
+                sizeof(uint32_t)) ||
+            !IsWritableRange(
+                reinterpret_cast<void*>(frame - 8),
+                sizeof(uint32_t) * 2) ||
+            !IsReadableRange(
+                reinterpret_cast<const void*>(vectors + 0x14),
+                0x18))
+        {
+            return false;
+        }
+
+        uint32_t pushedStateClass = 0;
+        uint32_t nextVectorBegin = 0;
+        uint32_t nextVectorEnd = 0;
+        std::memcpy(
+            &pushedStateClass,
+            reinterpret_cast<const void*>(stack),
+            sizeof(pushedStateClass));
+        std::memcpy(
+            byteOffset,
+            reinterpret_cast<const void*>(frame - 8),
+            sizeof(*byteOffset));
+        std::memcpy(
+            vectorIndex,
+            reinterpret_cast<const void*>(frame - 4),
+            sizeof(*vectorIndex));
+        std::memcpy(
+            vectorBegin,
+            reinterpret_cast<const void*>(vectors + 0x14),
+            sizeof(*vectorBegin));
+        std::memcpy(
+            &nextVectorBegin,
+            reinterpret_cast<const void*>(vectors + 0x24),
+            sizeof(nextVectorBegin));
+        std::memcpy(
+            &nextVectorEnd,
+            reinterpret_cast<const void*>(vectors + 0x28),
+            sizeof(nextVectorEnd));
+
+        if (pushedStateClass != 0x0A ||
+            *vectorIndex > 0x0FFFFFFFUL ||
+            *byteOffset != *vectorIndex * 16 ||
+            nextVectorEnd < nextVectorBegin ||
+            (nextVectorEnd - nextVectorBegin) % 20 != 0)
+        {
+            return false;
+        }
+
+        uint64_t entryAddress =
+            static_cast<uint64_t>(*vectorBegin) + *byteOffset;
+        return entryAddress <= 0xFFFFFFFFULL &&
+            static_cast<uint32_t>(entryAddress) == exception->ContextRecord->Edi;
+    }
+
     bool IsExecutableAddress(const void* pointer)
     {
         MEMORY_BASIC_INFORMATION memory = {};
@@ -301,176 +522,6 @@ namespace
         if (!flushed || !verified || !restored)
         {
             FailFastPatchRollback(patchName);
-        }
-    }
-
-    DWORD __cdecl NormalizeRendererDeviceSelectorImpl()
-    {
-        volatile LONG* selector = RendererDeviceSelectorAddress;
-        if (!selector)
-        {
-            return 0;
-        }
-
-        LONG selected = InterlockedCompareExchange(selector, 1, 2);
-        if (selected == 2)
-        {
-            LONG count = InterlockedIncrement(&RendererDeviceSelectorSwitchCount);
-            if (count <= 16 || count % 100 == 0)
-            {
-                aorf::Log(
-                    "PATCH HIT randy31 renderer device normalized "
-                    "TnLHAL=2 HAL=1 count=%ld",
-                    static_cast<long>(count));
-            }
-            return 1;
-        }
-
-        return static_cast<DWORD>(selected);
-    }
-
-    __declspec(naked) DWORD NormalizeRendererDeviceSelector()
-    {
-        __asm
-        {
-            push ecx
-            push edx
-            call NormalizeRendererDeviceSelectorImpl
-            pop edx
-            pop ecx
-            ret
-        }
-    }
-
-    bool PatchRendererDeviceSelectorLoad(
-        uint8_t* callsite,
-        volatile LONG* selector,
-        const void* rendererDeviceOutput)
-    {
-        constexpr uint8_t ExpectedCompare[] =
-        {
-            0x83, 0xF8, 0x01,
-            0x75, 0x1A
-        };
-        uintptr_t encodedSelector = 0;
-        uintptr_t encodedRendererDeviceOutput = 0;
-        if (callsite[0] != 0xA1 ||
-            callsite[5] != 0xBE ||
-            std::memcmp(
-                callsite + 10,
-                ExpectedCompare,
-                sizeof(ExpectedCompare)) != 0)
-        {
-            return false;
-        }
-
-        std::memcpy(&encodedSelector, callsite + 1, sizeof(uint32_t));
-        std::memcpy(
-            &encodedRendererDeviceOutput,
-            callsite + 6,
-            sizeof(uint32_t));
-        if (encodedSelector != reinterpret_cast<uintptr_t>(selector) ||
-            encodedRendererDeviceOutput !=
-                reinterpret_cast<uintptr_t>(rendererDeviceOutput))
-        {
-            return false;
-        }
-
-        uint8_t original[5] = {};
-        std::memcpy(original, callsite, sizeof(original));
-        uint8_t patchedCall[sizeof(original)] = { 0xE8, 0, 0, 0, 0 };
-        uint32_t nextInstruction =
-            static_cast<uint32_t>(reinterpret_cast<uintptr_t>(callsite + 5));
-        uint32_t destination = static_cast<uint32_t>(
-            reinterpret_cast<uintptr_t>(&NormalizeRendererDeviceSelector));
-        int32_t displacement = static_cast<int32_t>(destination - nextInstruction);
-        std::memcpy(patchedCall + 1, &displacement, sizeof(displacement));
-
-        DWORD oldProtection = 0;
-        if (!VirtualProtect(
-                callsite,
-                sizeof(patchedCall),
-                PAGE_EXECUTE_READWRITE,
-                &oldProtection))
-        {
-            return false;
-        }
-
-        std::memcpy(callsite, patchedCall, sizeof(patchedCall));
-        bool flushed = FlushInstructionCache(
-            GetCurrentProcess(),
-            callsite,
-            sizeof(patchedCall)) != FALSE;
-        bool verified = std::memcmp(
-            callsite,
-            patchedCall,
-            sizeof(patchedCall)) == 0;
-        if (!flushed || !verified)
-        {
-            RestorePatchedBytesOrTerminate(
-                callsite,
-                original,
-                sizeof(original),
-                oldProtection,
-                "randy31 renderer-selector patch");
-            return false;
-        }
-
-        DWORD ignored = 0;
-        if (!VirtualProtect(
-                callsite,
-                sizeof(patchedCall),
-                oldProtection,
-                &ignored))
-        {
-            RestorePatchedBytesOrTerminate(
-                callsite,
-                original,
-                sizeof(original),
-                oldProtection,
-                "randy31 renderer-selector patch");
-            return false;
-        }
-        return true;
-    }
-
-    void RestoreRendererDeviceSelectorLoad(
-        uint8_t* callsite,
-        volatile LONG* selector)
-    {
-        uint8_t original[5] = { 0xA1, 0, 0, 0, 0 };
-        uint32_t selectorAddress = static_cast<uint32_t>(
-            reinterpret_cast<uintptr_t>(selector));
-        std::memcpy(original + 1, &selectorAddress, sizeof(selectorAddress));
-
-        DWORD oldProtection = 0;
-        if (!VirtualProtect(
-                callsite,
-                sizeof(original),
-                PAGE_EXECUTE_READWRITE,
-                &oldProtection))
-        {
-            FailFastPatchRollback("randy31 renderer-selector patch");
-        }
-
-        std::memcpy(callsite, original, sizeof(original));
-        bool flushed = FlushInstructionCache(
-            GetCurrentProcess(),
-            callsite,
-            sizeof(original)) != FALSE;
-        bool verified = std::memcmp(
-            callsite,
-            original,
-            sizeof(original)) == 0;
-        DWORD ignored = 0;
-        bool restored = VirtualProtect(
-            callsite,
-            sizeof(original),
-            oldProtection,
-            &ignored) != FALSE;
-        if (!flushed || !verified || !restored)
-        {
-            FailFastPatchRollback("randy31 renderer-selector patch");
         }
     }
 
@@ -568,34 +619,334 @@ namespace
         return EXCEPTION_EXECUTE_HANDLER;
     }
 
-    int CaptureNvidiaGuiBatchException(
+    int CaptureGuardedDrawException(
         EXCEPTION_POINTERS* exception,
+        LONG phaseValue,
+        DrawIndexedPrimitiveVbFunction draw,
+        GuardedDrawExceptionKind* exceptionKind,
         uintptr_t* faultAddress,
         ULONG_PTR* accessAddress)
     {
-        uint8_t* base = nullptr;
-        uintptr_t driverRva = 0;
-        constexpr uint8_t ExpectedFault170C490[] =
-        {
-            0x8B, 0x80, 0x10, 0x00, 0x00, 0x00
-        };
-        if (!TryGetVerifiedNvidiaFault(exception, &base, &driverRva) ||
-            driverRva != 0x0170C490 ||
-            !exception->ContextRecord ||
-            exception->ContextRecord->Eax != 0x04 ||
-            exception->ExceptionRecord->ExceptionInformation[1] != 0x14 ||
-            std::memcmp(
-                base + driverRva,
-                ExpectedFault170C490,
-                sizeof(ExpectedFault170C490)) != 0)
+        if (!exception || !exception->ExceptionRecord ||
+            exception->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION ||
+            exception->ExceptionRecord->NumberParameters < 2)
         {
             return EXCEPTION_CONTINUE_SEARCH;
         }
 
+        GuardedDrawPhase phase = static_cast<GuardedDrawPhase>(phaseValue);
+        if (phase == GuardedDrawPhase::InputProbe ||
+            phase == GuardedDrawPhase::Resolve)
+        {
+            *exceptionKind = phase == GuardedDrawPhase::InputProbe ?
+                GuardedDrawExceptionKind::InputProbe :
+                GuardedDrawExceptionKind::Resolve;
+            *faultAddress = reinterpret_cast<uintptr_t>(
+                exception->ExceptionRecord->ExceptionAddress);
+            *accessAddress = exception->ExceptionRecord->ExceptionInformation[1];
+            return EXCEPTION_EXECUTE_HANDLER;
+        }
+
+        if (phase != GuardedDrawPhase::DriverCall)
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        ULONG_PTR drawAddress = reinterpret_cast<ULONG_PTR>(draw);
+        if (exception->ExceptionRecord->ExceptionInformation[0] == 8 &&
+            exception->ExceptionRecord->ExceptionInformation[1] == drawAddress &&
+            reinterpret_cast<ULONG_PTR>(
+                exception->ExceptionRecord->ExceptionAddress) == drawAddress)
+        {
+            *exceptionKind = GuardedDrawExceptionKind::InvalidInitialTarget;
+            *faultAddress = static_cast<uintptr_t>(drawAddress);
+            *accessAddress = drawAddress;
+            return EXCEPTION_EXECUTE_HANDLER;
+        }
+
+        if (CaptureNvidiaDrawException(
+                exception,
+                faultAddress,
+                accessAddress) != EXCEPTION_EXECUTE_HANDLER)
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        *exceptionKind = GuardedDrawExceptionKind::NvidiaDriver;
+        return EXCEPTION_EXECUTE_HANDLER;
+    }
+
+    bool TryGetGuiBatchRecoveryState(
+        void* batchObject,
+        DWORD stackArgument,
+        void** stateBlob)
+    {
+        if (!IsReadableRange(batchObject, 12) ||
+            !IsWritableRange(reinterpret_cast<void*>(stackArgument), 0x14) ||
+            !IsExecutableAddress(
+                reinterpret_cast<const void*>(GuiDynamicVbGetAddress)) ||
+            !IsExecutableAddress(
+                reinterpret_cast<const void*>(GuiDynamicVbGetVbAddress)) ||
+            !IsExecutableAddress(
+                reinterpret_cast<const void*>(GuiResetMaterialAddress)) ||
+            !IsExecutableAddress(
+                reinterpret_cast<const void*>(GuiStateBlobResetAddress)))
+        {
+            return false;
+        }
+
+        DWORD stateIndex = 0;
+        std::memcpy(
+            &stateIndex,
+            reinterpret_cast<const uint8_t*>(batchObject) + 8,
+            sizeof(stateIndex));
+        if (stateIndex >= 3)
+        {
+            return false;
+        }
+
+        uintptr_t selectedStateBlob =
+            GuiStateBlobArrayAddress + static_cast<uintptr_t>(stateIndex) * 0x84;
+        if (!IsWritableRange(reinterpret_cast<void*>(selectedStateBlob), 0x84))
+        {
+            return false;
+        }
+        *stateBlob = reinterpret_cast<void*>(selectedStateBlob);
+        return true;
+    }
+
+    int CaptureGuiRenderBatchException(
+        EXCEPTION_POINTERS* exception,
+        void* batchObject,
+        DWORD batchSpan,
+        DWORD stackArgument,
+        GuiBatchExceptionKind* exceptionKind,
+        uintptr_t* faultAddress,
+        ULONG_PTR* accessAddress,
+        DWORD* accessType,
+        void** stateBlob,
+        void** indexBuffer)
+    {
+        uint8_t* nvidiaBase = nullptr;
+        uintptr_t nvidiaRva = 0;
+        constexpr uint8_t ExpectedNvidiaFault[] =
+        {
+            0x8B, 0x80, 0x10, 0x00, 0x00, 0x00
+        };
+        if (TryGetVerifiedNvidiaFault(exception, &nvidiaBase, &nvidiaRva) &&
+            nvidiaRva == 0x0170C490 &&
+            exception->ContextRecord &&
+            exception->ContextRecord->Eax == 0x04 &&
+            exception->ExceptionRecord->ExceptionInformation[1] == 0x14 &&
+            std::memcmp(
+                nvidiaBase + nvidiaRva,
+                ExpectedNvidiaFault,
+                sizeof(ExpectedNvidiaFault)) == 0 &&
+            TryGetGuiBatchRecoveryState(
+                batchObject,
+                stackArgument,
+                stateBlob))
+        {
+            *exceptionKind = GuiBatchExceptionKind::NvidiaDeferredFlush;
+            *faultAddress = reinterpret_cast<uintptr_t>(
+                exception->ExceptionRecord->ExceptionAddress);
+            *accessAddress = exception->ExceptionRecord->ExceptionInformation[1];
+            *accessType = static_cast<DWORD>(
+                exception->ExceptionRecord->ExceptionInformation[0]);
+            return EXCEPTION_EXECUTE_HANDLER;
+        }
+
+        if (!exception || !exception->ExceptionRecord ||
+            !exception->ContextRecord ||
+            exception->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION ||
+            exception->ExceptionRecord->NumberParameters < 2 ||
+            exception->ExceptionRecord->ExceptionInformation[0] != 1 ||
+            reinterpret_cast<uintptr_t>(
+                exception->ExceptionRecord->ExceptionAddress) !=
+                GuiNullDynamicVbFaultAddress ||
+            exception->ExceptionRecord->ExceptionInformation[1] !=
+                exception->ContextRecord->Edi ||
+            exception->ContextRecord->Ecx != 0x1C ||
+            exception->ContextRecord->Edx != 0 ||
+            exception->ContextRecord->Eax !=
+                reinterpret_cast<uintptr_t>(batchObject) ||
+            exception->ContextRecord->Ebx != batchSpan ||
+            static_cast<LONG>(batchSpan) <= 0 ||
+            !IsReadableRange(
+                reinterpret_cast<const void*>(exception->ContextRecord->Esi),
+                0x70) ||
+            !TryGetGuiBatchRecoveryState(
+                batchObject,
+                stackArgument,
+                stateBlob) ||
+            !IsExecutableAddress(
+                reinterpret_cast<const void*>(GuiFreeIndexBufferAddress)))
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        constexpr uint8_t ExpectedFaultInstruction[] = { 0xF3, 0xA5 };
+        if (std::memcmp(
+                reinterpret_cast<const void*>(GuiNullDynamicVbFaultAddress),
+                ExpectedFaultInstruction,
+                sizeof(ExpectedFaultInstruction)) != 0)
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        uintptr_t frame = exception->ContextRecord->Ebp;
+        if (frame < 0x24 ||
+            !IsReadableRange(reinterpret_cast<const void*>(frame - 0x24), 0x30))
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        DWORD destinationBase = 0;
+        DWORD baseVertex = 0;
+        DWORD requestedVertexBytes = 0;
+        DWORD currentQuad = 0;
+        DWORD currentIndex = 0;
+        DWORD indexCursor = 0;
+        DWORD batchSource = 0;
+        DWORD frameStateBlob = 0;
+        DWORD frameIndexBuffer = 0;
+        DWORD frameViewport = 0;
+        std::memcpy(
+            &destinationBase,
+            reinterpret_cast<const void*>(frame - 0x10),
+            sizeof(destinationBase));
+        std::memcpy(
+            &baseVertex,
+            reinterpret_cast<const void*>(frame - 0x1C),
+            sizeof(baseVertex));
+        std::memcpy(
+            &requestedVertexBytes,
+            reinterpret_cast<const void*>(frame - 0x18),
+            sizeof(requestedVertexBytes));
+        std::memcpy(
+            &currentQuad,
+            reinterpret_cast<const void*>(frame - 0x0C),
+            sizeof(currentQuad));
+        std::memcpy(
+            &currentIndex,
+            reinterpret_cast<const void*>(frame - 0x08),
+            sizeof(currentIndex));
+        std::memcpy(
+            &indexCursor,
+            reinterpret_cast<const void*>(frame - 0x14),
+            sizeof(indexCursor));
+        std::memcpy(&batchSource, batchObject, sizeof(batchSource));
+        std::memcpy(
+            &frameStateBlob,
+            reinterpret_cast<const void*>(frame - 0x24),
+            sizeof(frameStateBlob));
+        std::memcpy(
+            &frameIndexBuffer,
+            reinterpret_cast<const void*>(frame - 0x04),
+            sizeof(frameIndexBuffer));
+        std::memcpy(
+            &frameViewport,
+            reinterpret_cast<const void*>(frame + 0x08),
+            sizeof(frameViewport));
+        uint64_t nullBaseOffset = static_cast<uint64_t>(baseVertex) * 0x1C;
+        uint64_t currentDestination =
+            static_cast<uint64_t>(destinationBase) + exception->ContextRecord->Edx;
+        uint64_t requestedVertexBytes64 =
+            static_cast<uint64_t>(batchSpan) * 4;
+        uint64_t requestedIndexBytes64 =
+            static_cast<uint64_t>(batchSpan) * 12;
+        if (nullBaseOffset > 0xFFFFFFFFull ||
+            destinationBase != static_cast<DWORD>(nullBaseOffset) ||
+            currentDestination > 0xFFFFFFFFull ||
+            static_cast<DWORD>(currentDestination) !=
+                exception->ExceptionRecord->ExceptionInformation[1] ||
+            requestedVertexBytes64 > 0xFFFFFFFFull ||
+            requestedVertexBytes != static_cast<DWORD>(requestedVertexBytes64) ||
+            requestedIndexBytes64 > 0xFFFFFFFFull ||
+            currentQuad != 0 ||
+            currentIndex != 0 ||
+            batchSource != exception->ContextRecord->Esi ||
+            frameViewport != stackArgument)
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        uintptr_t selectedStateBlob = reinterpret_cast<uintptr_t>(*stateBlob);
+        bool validIndexBuffer = false;
+        if (batchSpan < 0x100)
+        {
+            validIndexBuffer = frameIndexBuffer == GuiStaticIndexBufferAddress;
+        }
+        else
+        {
+            validIndexBuffer =
+                frameIndexBuffer != 0 &&
+                frameIndexBuffer != GuiStaticIndexBufferAddress &&
+                IsWritableRange(
+                    reinterpret_cast<void*>(frameIndexBuffer),
+                    static_cast<size_t>(requestedIndexBytes64));
+        }
+        if (frameStateBlob != selectedStateBlob ||
+            indexCursor != frameIndexBuffer ||
+            !validIndexBuffer)
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        *exceptionKind = GuiBatchExceptionKind::NullDynamicVbDestination;
         *faultAddress = reinterpret_cast<uintptr_t>(
             exception->ExceptionRecord->ExceptionAddress);
         *accessAddress = exception->ExceptionRecord->ExceptionInformation[1];
+        *accessType = 1;
+        *stateBlob = reinterpret_cast<void*>(selectedStateBlob);
+        *indexBuffer = reinterpret_cast<void*>(frameIndexBuffer);
         return EXCEPTION_EXECUTE_HANDLER;
+    }
+
+    DWORD RecoverGuiRenderBatch(
+        void* viewport,
+        void* stateBlob,
+        void* indexBuffer,
+        bool releaseIndexBuffer)
+    {
+        GuiDynamicVbGetFunction getDynamicVb =
+            reinterpret_cast<GuiDynamicVbGetFunction>(GuiDynamicVbGetAddress);
+        GuiDynamicVbGetVbFunction getVertexBuffer =
+            reinterpret_cast<GuiDynamicVbGetVbFunction>(GuiDynamicVbGetVbAddress);
+        void* dynamicVb = getDynamicVb();
+        void* vertexBuffer = getVertexBuffer(dynamicVb, 0x144);
+        if (!vertexBuffer)
+        {
+            RaiseException(
+                EXCEPTION_ACCESS_VIOLATION,
+                EXCEPTION_NONCONTINUABLE,
+                0,
+                nullptr);
+            return 0;
+        }
+
+        DWORD recoveryMask = 0x1;
+        if (releaseIndexBuffer)
+        {
+            if (indexBuffer != reinterpret_cast<void*>(GuiStaticIndexBufferAddress))
+            {
+                GuiFreeFunction freeIndexBuffer =
+                    reinterpret_cast<GuiFreeFunction>(GuiFreeIndexBufferAddress);
+                freeIndexBuffer(indexBuffer);
+            }
+            recoveryMask |= 0x2;
+        }
+
+        GuiThiscallVoidFunction resetMaterial =
+            reinterpret_cast<GuiThiscallVoidFunction>(GuiResetMaterialAddress);
+        resetMaterial(viewport);
+        recoveryMask |= 0x4;
+
+        GuiThiscallVoidFunction resetStateBlob =
+            reinterpret_cast<GuiThiscallVoidFunction>(GuiStateBlobResetAddress);
+        resetStateBlob(stateBlob);
+        recoveryMask |= 0x8;
+        return recoveryMask;
     }
 
     void InvokeGuiRenderBatch(
@@ -620,28 +971,54 @@ namespace
     {
         uintptr_t faultAddress = 0;
         ULONG_PTR accessAddress = 0;
+        DWORD accessType = 0xFFFFFFFFu;
+        GuiBatchExceptionKind exceptionKind = GuiBatchExceptionKind::None;
+        void* stateBlob = nullptr;
+        void* indexBuffer = nullptr;
         __try
         {
             InvokeGuiRenderBatch(batchObject, batchSpan, stackArgument);
         }
-        __except (CaptureNvidiaGuiBatchException(
+        __except (CaptureGuiRenderBatchException(
             GetExceptionInformation(),
+            batchObject,
+            batchSpan,
+            stackArgument,
+            &exceptionKind,
             &faultAddress,
-            &accessAddress))
+            &accessAddress,
+            &accessType,
+            &stateBlob,
+            &indexBuffer))
         {
+            bool releaseIndexBuffer =
+                exceptionKind == GuiBatchExceptionKind::NullDynamicVbDestination;
+            DWORD recoveryMask = RecoverGuiRenderBatch(
+                reinterpret_cast<void*>(stackArgument),
+                stateBlob,
+                indexBuffer,
+                releaseIndexBuffer);
+            const char* kindName =
+                exceptionKind == GuiBatchExceptionKind::NullDynamicVbDestination ?
+                "null-dynamic-vb-destination" :
+                "nvidia-deferred-flush";
             LONG count = InterlockedIncrement(&GuiBatchExceptionSkipCount);
             if (count <= 16 || count % 100 == 0)
             {
                 aorf::Log(
-                    "PATCH HIT GUI render batch NVIDIA deferred-flush AV skipped "
-                    "fault=0x%08lX accessAddress=0x%08lX batch=0x%08lX "
-                    "span=0x%08lX argument=0x%08lX count=%ld",
+                    "PATCH HIT GUI render batch AV contained "
+                    "kind=%s fault=0x%08lX accessType=%lu "
+                    "accessAddress=0x%08lX batch=0x%08lX span=0x%08lX "
+                    "argument=0x%08lX cleanupMask=0x%lX count=%ld",
+                    kindName,
                     static_cast<unsigned long>(faultAddress),
+                    static_cast<unsigned long>(accessType),
                     static_cast<unsigned long>(accessAddress),
                     static_cast<unsigned long>(
                         reinterpret_cast<uintptr_t>(batchObject)),
                     static_cast<unsigned long>(batchSpan),
                     static_cast<unsigned long>(stackArgument),
+                    static_cast<unsigned long>(recoveryMask),
                     static_cast<long>(count));
             }
         }
@@ -756,20 +1133,45 @@ namespace
         DWORD indexCount,
         DWORD flags)
     {
-        if (!IsReadableRange(device, sizeof(void*)) ||
-            !IsReadableRange(vertexBuffer, sizeof(void*)) ||
-            (indexCount != 0 &&
-                (indexCount > UINT32_MAX / sizeof(WORD) ||
-                 !IsReadableRange(indices, indexCount * sizeof(WORD)))))
+        uintptr_t deviceAddress = reinterpret_cast<uintptr_t>(device);
+        uintptr_t vertexBufferAddress = reinterpret_cast<uintptr_t>(vertexBuffer);
+        uintptr_t indexAddress = reinterpret_cast<uintptr_t>(indices);
+        uintptr_t lastIndexAddress = indexAddress;
+        const char* invalidReason = nullptr;
+        if (deviceAddress < 0x10000u)
+        {
+            invalidReason = "low-device";
+        }
+        else if (vertexBufferAddress < 0x10000u)
+        {
+            invalidReason = "low-vertex-buffer";
+        }
+        else if (indexCount != 0)
+        {
+            uint64_t lastIndexAddress64 =
+                static_cast<uint64_t>(indexAddress) +
+                static_cast<uint64_t>(indexCount - 1) * sizeof(WORD);
+            if (indexAddress < 0x10000u || lastIndexAddress64 > 0xFFFFFFFEull)
+            {
+                invalidReason = "invalid-index-span";
+            }
+            else
+            {
+                lastIndexAddress = static_cast<uintptr_t>(lastIndexAddress64);
+            }
+        }
+
+        if (invalidReason)
         {
             LONG count = InterlockedIncrement(&DriverDrawInputSkipCount);
             if (count <= 16 || count % 100 == 0)
             {
                 aorf::Log(
                     "PATCH HIT randy31 invalid DrawIndexedPrimitiveVB input skipped "
-                    "device=0x%08lX primitive=%lu vertexBuffer=0x%08lX "
+                    "reason=%s device=0x%08lX primitive=%lu vertexBuffer=0x%08lX "
                     "start=%lu vertices=%lu indices=0x%08lX indexCount=%lu "
                     "flags=0x%08lX count=%ld",
+                    invalidReason,
                     static_cast<unsigned long>(reinterpret_cast<uintptr_t>(device)),
                     static_cast<unsigned long>(primitiveType),
                     static_cast<unsigned long>(reinterpret_cast<uintptr_t>(vertexBuffer)),
@@ -784,37 +1186,121 @@ namespace
         }
 
         void** vtable = nullptr;
-        std::memcpy(&vtable, device, sizeof(vtable));
-        if (!IsReadableRange(vtable, 0x84))
-        {
-            return S_OK;
-        }
-
-        DrawIndexedPrimitiveVbFunction draw =
-            reinterpret_cast<DrawIndexedPrimitiveVbFunction>(vtable[0x20]);
-        if (!IsExecutableAddress(reinterpret_cast<const void*>(draw)))
-        {
-            return S_OK;
-        }
-
+        DrawIndexedPrimitiveVbFunction draw = nullptr;
+        HRESULT result = S_OK;
+        bool completed = false;
+        volatile LONG phase = static_cast<LONG>(GuardedDrawPhase::None);
+        GuardedDrawExceptionKind exceptionKind = GuardedDrawExceptionKind::None;
         uintptr_t faultAddress = 0;
         ULONG_PTR accessAddress = 0;
         __try
         {
-            return draw(
-                device,
-                primitiveType,
-                vertexBuffer,
-                startVertex,
-                vertexCount,
-                indices,
-                indexCount,
-                flags);
+            phase = static_cast<LONG>(GuardedDrawPhase::InputProbe);
+            vtable = *reinterpret_cast<void***>(device);
+            volatile DWORD vertexBufferProbe =
+                *reinterpret_cast<volatile const DWORD*>(vertexBuffer);
+            if (indexCount != 0)
+            {
+                volatile WORD firstIndexProbe =
+                    *reinterpret_cast<volatile const WORD*>(indexAddress);
+                volatile WORD lastIndexProbe =
+                    *reinterpret_cast<volatile const WORD*>(lastIndexAddress);
+                vertexBufferProbe ^= firstIndexProbe;
+                vertexBufferProbe ^= lastIndexProbe;
+            }
+
+            phase = static_cast<LONG>(GuardedDrawPhase::Resolve);
+            if (reinterpret_cast<uintptr_t>(vtable) < 0x10000u)
+            {
+                invalidReason = "low-vtable";
+            }
+            else
+            {
+                draw = reinterpret_cast<DrawIndexedPrimitiveVbFunction>(
+                    vtable[0x20]);
+                if (reinterpret_cast<uintptr_t>(draw) < 0x10000u)
+                {
+                    invalidReason = "low-draw-target";
+                }
+            }
+
+            if (!invalidReason)
+            {
+                phase = static_cast<LONG>(GuardedDrawPhase::DriverCall);
+                result = draw(
+                    device,
+                    primitiveType,
+                    vertexBuffer,
+                    startVertex,
+                    vertexCount,
+                    indices,
+                    indexCount,
+                    flags);
+                completed = true;
+            }
         }
-        __except (CaptureNvidiaDrawException(
+        __except (CaptureGuardedDrawException(
             GetExceptionInformation(),
+            phase,
+            draw,
+            &exceptionKind,
             &faultAddress,
             &accessAddress))
+        {
+        }
+
+        if (completed)
+        {
+            return result;
+        }
+
+        if (exceptionKind != GuardedDrawExceptionKind::NvidiaDriver)
+        {
+            const char* reason = invalidReason;
+            if (!reason)
+            {
+                switch (exceptionKind)
+                {
+                case GuardedDrawExceptionKind::InputProbe:
+                    reason = "input-probe-av";
+                    break;
+                case GuardedDrawExceptionKind::Resolve:
+                    reason = "draw-resolve-av";
+                    break;
+                case GuardedDrawExceptionKind::InvalidInitialTarget:
+                    reason = "initial-target-execute-av";
+                    break;
+                default:
+                    reason = "invalid-draw-input";
+                    break;
+                }
+            }
+
+            LONG count = InterlockedIncrement(&DriverDrawInputSkipCount);
+            if (count <= 16 || count % 100 == 0)
+            {
+                aorf::Log(
+                    "PATCH HIT randy31 invalid DrawIndexedPrimitiveVB input skipped "
+                    "reason=%s fault=0x%08lX accessAddress=0x%08lX "
+                    "device=0x%08lX primitive=%lu vertexBuffer=0x%08lX "
+                    "start=%lu vertices=%lu indices=0x%08lX indexCount=%lu "
+                    "flags=0x%08lX count=%ld",
+                    reason,
+                    static_cast<unsigned long>(faultAddress),
+                    static_cast<unsigned long>(accessAddress),
+                    static_cast<unsigned long>(reinterpret_cast<uintptr_t>(device)),
+                    static_cast<unsigned long>(primitiveType),
+                    static_cast<unsigned long>(reinterpret_cast<uintptr_t>(vertexBuffer)),
+                    static_cast<unsigned long>(startVertex),
+                    static_cast<unsigned long>(vertexCount),
+                    static_cast<unsigned long>(reinterpret_cast<uintptr_t>(indices)),
+                    static_cast<unsigned long>(indexCount),
+                    static_cast<unsigned long>(flags),
+                    static_cast<long>(count));
+            }
+            return S_OK;
+        }
+
         {
             LONG count = InterlockedIncrement(&DriverDrawExceptionSkipCount);
             if (count <= 16 || count % 100 == 0)
@@ -1110,6 +1596,50 @@ namespace
         return true;
     }
 
+    LONG CALLBACK EarlyRandyRenderStateExceptionGuard(EXCEPTION_POINTERS* exception)
+    {
+        if (!exception || !exception->ExceptionRecord || !exception->ContextRecord ||
+            exception->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION ||
+            exception->ExceptionRecord->NumberParameters < 2 ||
+            exception->ExceptionRecord->ExceptionInformation[0] != 0)
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        uintptr_t resumeAddress = 0;
+        uint32_t vectorBegin = 0;
+        uint32_t byteOffset = 0;
+        uint32_t vectorIndex = 0;
+        if (!TryResolveEarlyRenderStateResume(exception, &resumeAddress) ||
+            !IsExactRenderStateVectorEntryFault(
+                exception,
+                &vectorBegin,
+                &byteOffset,
+                &vectorIndex))
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        LONG count = InterlockedIncrement(&RenderStateVectorSkipCount);
+        if (count <= 16 || count % 100 == 0)
+        {
+            aorf::Log(
+                "PATCH HIT randy31 corrupt render-state vector skipped "
+                "vector=0x%08lX offset=0x%08lX index=%lu "
+                "entry=0x%08lX count=%ld",
+                static_cast<unsigned long>(vectorBegin),
+                static_cast<unsigned long>(byteOffset),
+                static_cast<unsigned long>(vectorIndex),
+                static_cast<unsigned long>(exception->ContextRecord->Edi),
+                static_cast<long>(count));
+        }
+
+        exception->ContextRecord->Esp += sizeof(uint32_t);
+        exception->ContextRecord->Eax = 0;
+        exception->ContextRecord->Eip = static_cast<DWORD>(resumeAddress);
+        return EXCEPTION_CONTINUE_EXECUTION;
+    }
+
     LONG CALLBACK RandyColorExceptionGuard(EXCEPTION_POINTERS* exception)
     {
         if (!exception || !exception->ExceptionRecord || !exception->ContextRecord ||
@@ -1244,8 +1774,49 @@ namespace
 
 namespace aorf
 {
+    bool InstallEarlyRandyExceptionGuard()
+    {
+        if (InterlockedCompareExchangePointer(
+                &EarlyRandyExceptionGuardHandle,
+                nullptr,
+                nullptr))
+        {
+            return true;
+        }
+
+        PVOID candidate = AddVectoredExceptionHandler(
+            1,
+            EarlyRandyRenderStateExceptionGuard);
+        if (!candidate)
+        {
+            Log("ERROR early randy31 render-state exception guard installation "
+                "failed code=%lu",
+                GetLastError());
+            return false;
+        }
+
+        PVOID existing = InterlockedCompareExchangePointer(
+            &EarlyRandyExceptionGuardHandle,
+            candidate,
+            nullptr);
+        if (existing)
+        {
+            RemoveVectoredExceptionHandler(candidate);
+            return true;
+        }
+
+        Log("PATCH PASS early randy31 render-state vector guard active "
+            "faultRva=0x25118 resumeRva=0x25147");
+        return true;
+    }
+
     bool InstallRandyColorFix()
     {
+        if (!InstallEarlyRandyExceptionGuard())
+        {
+            return false;
+        }
+
         HMODULE randy = GetModuleHandleW(L"randy31.dll");
         HMODULE gui = GetModuleHandleW(L"GUI.dll");
         if (!randy || !gui)
@@ -1277,22 +1848,6 @@ namespace aorf
             0x5D,
             0xC2, 0x18, 0x00
         };
-        constexpr uint8_t ExpectedRenderStateFaultSequence[] =
-        {
-            0x8B, 0x7E, 0x14,
-            0x03, 0x7D, 0xF8,
-            0x6A, 0x0A,
-            0x8B, 0x07,
-            0x8B, 0x8C, 0x83, 0xC8, 0x04, 0x00, 0x00,
-            0xFF, 0x77, 0x04,
-            0x89, 0x4F, 0x08,
-            0x50,
-            0x8B, 0xCB,
-            0xE8, 0x92, 0x6A, 0xFF, 0xFF,
-            0xFF, 0x45, 0xFC,
-            0x83, 0x45, 0xF8, 0x10,
-            0x88, 0x47, 0x0C
-        };
         constexpr uint8_t ExpectedDwordFaultSequence[] =
         {
             0x8B, 0x36,
@@ -1308,70 +1863,6 @@ namespace aorf
             0x0B, 0xD7,
             0xEB, 0x03
         };
-        constexpr uint8_t ExpectedTnlHalGuid[] =
-        {
-            0x78, 0x9E, 0x04, 0xF5,
-            0x61, 0x48,
-            0xD2, 0x11,
-            0xA4, 0x07,
-            0x00, 0xA0, 0xC9, 0x06, 0x29, 0xA8
-        };
-        constexpr uint8_t ExpectedHalGuid[] =
-        {
-            0xE0, 0x3D, 0xE6, 0x84,
-            0xAA, 0x46,
-            0xCF, 0x11,
-            0x81, 0x6F,
-            0x00, 0x00, 0xC0, 0x20, 0x15, 0x6E
-        };
-        uint8_t ExpectedDeviceSelectionBranches[] =
-        {
-            0xA1, 0, 0, 0, 0,
-            0x39, 0x18,
-            0x74, 0x06,
-            0x8B, 0x00,
-            0x8B, 0x00,
-            0xEB, 0x02,
-            0x33, 0xC0,
-            0x56,
-            0x50,
-            0x68, 0, 0, 0, 0,
-            0xEB, 0x1D,
-            0x83, 0xF8, 0x02,
-            0x75, 0x23,
-            0xA1, 0, 0, 0, 0,
-            0x39, 0x18,
-            0x74, 0x06,
-            0x8B, 0x00,
-            0x8B, 0x00,
-            0xEB, 0x02,
-            0x33, 0xC0,
-            0x56,
-            0x50,
-            0x68, 0, 0, 0, 0,
-            0x8B, 0x0D, 0, 0, 0, 0
-        };
-        static_assert(
-            sizeof(ExpectedDeviceSelectionBranches) == 61,
-            "unexpected randy31 device-selection sequence size");
-        uint32_t surfaceSourceAddress = static_cast<uint32_t>(
-            reinterpret_cast<uintptr_t>(base + 0x17D2F8));
-        uint32_t halGuidAddress = static_cast<uint32_t>(
-            reinterpret_cast<uintptr_t>(base + 0x99718));
-        uint32_t tnlHalGuidAddress = static_cast<uint32_t>(
-            reinterpret_cast<uintptr_t>(base + 0x996E8));
-        uint32_t renderAddress = static_cast<uint32_t>(
-            reinterpret_cast<uintptr_t>(base + 0x16BED0));
-        std::memcpy(ExpectedDeviceSelectionBranches + 1,
-            &surfaceSourceAddress, sizeof(surfaceSourceAddress));
-        std::memcpy(ExpectedDeviceSelectionBranches + 20,
-            &halGuidAddress, sizeof(halGuidAddress));
-        std::memcpy(ExpectedDeviceSelectionBranches + 32,
-            &surfaceSourceAddress, sizeof(surfaceSourceAddress));
-        std::memcpy(ExpectedDeviceSelectionBranches + 51,
-            &tnlHalGuidAddress, sizeof(tnlHalGuidAddress));
-        std::memcpy(ExpectedDeviceSelectionBranches + 57,
-            &renderAddress, sizeof(renderAddress));
         constexpr uint8_t ExpectedSharedCreateDeviceCall[] =
         {
             0xE8, 0x5F, 0xD0, 0xFD, 0xFF
@@ -1400,6 +1891,68 @@ namespace aorf
             0x8B, 0x45, 0xFC,
             0x59
         };
+        constexpr uint8_t ExpectedGuiNullDynamicVbFaultSequence[] =
+        {
+            0x8B, 0x4D, 0xF0,
+            0x8B, 0x30,
+            0x83, 0x65, 0xF8, 0x00,
+            0x8D, 0x3C, 0x0A,
+            0x6A, 0x1C,
+            0x59,
+            0xF3, 0xA5
+        };
+        constexpr uint8_t ExpectedGuiFreeIndexBufferCall[] =
+        {
+            0xE8, 0x30, 0x2A, 0x02, 0x00
+        };
+        uint8_t expectedGuiDynamicVbGetCall[] = { 0xFF, 0x15, 0, 0, 0, 0 };
+        uint8_t expectedGuiDynamicVbGetVbCall[] = { 0xFF, 0x15, 0, 0, 0, 0 };
+        uint8_t expectedGuiResetMaterialCall[] = { 0xFF, 0x15, 0, 0, 0, 0 };
+        uint8_t expectedGuiStateBlobResetCall[] = { 0xFF, 0x15, 0, 0, 0, 0 };
+        uint32_t guiDynamicVbGetSlot = static_cast<uint32_t>(
+            reinterpret_cast<uintptr_t>(guiBase + 0x1A865C));
+        uint32_t guiDynamicVbGetVbSlot = static_cast<uint32_t>(
+            reinterpret_cast<uintptr_t>(guiBase + 0x1A8664));
+        uint32_t guiResetMaterialSlot = static_cast<uint32_t>(
+            reinterpret_cast<uintptr_t>(guiBase + 0x1A8638));
+        uint32_t guiStateBlobResetSlot = static_cast<uint32_t>(
+            reinterpret_cast<uintptr_t>(guiBase + 0x1A863C));
+        std::memcpy(
+            expectedGuiDynamicVbGetCall + 2,
+            &guiDynamicVbGetSlot,
+            sizeof(guiDynamicVbGetSlot));
+        std::memcpy(
+            expectedGuiDynamicVbGetVbCall + 2,
+            &guiDynamicVbGetVbSlot,
+            sizeof(guiDynamicVbGetVbSlot));
+        std::memcpy(
+            expectedGuiResetMaterialCall + 2,
+            &guiResetMaterialSlot,
+            sizeof(guiResetMaterialSlot));
+        std::memcpy(
+            expectedGuiStateBlobResetCall + 2,
+            &guiStateBlobResetSlot,
+            sizeof(guiStateBlobResetSlot));
+        uint32_t guiDynamicVbGetFunction = 0;
+        uint32_t guiDynamicVbGetVbFunction = 0;
+        uint32_t guiResetMaterialFunction = 0;
+        uint32_t guiStateBlobResetFunction = 0;
+        std::memcpy(
+            &guiDynamicVbGetFunction,
+            guiBase + 0x1A865C,
+            sizeof(guiDynamicVbGetFunction));
+        std::memcpy(
+            &guiDynamicVbGetVbFunction,
+            guiBase + 0x1A8664,
+            sizeof(guiDynamicVbGetVbFunction));
+        std::memcpy(
+            &guiResetMaterialFunction,
+            guiBase + 0x1A8638,
+            sizeof(guiResetMaterialFunction));
+        std::memcpy(
+            &guiStateBlobResetFunction,
+            guiBase + 0x1A863C,
+            sizeof(guiStateBlobResetFunction));
         constexpr uint8_t ExpectedGuiTreeFindResume[] =
         {
             0xFF, 0x75, 0x0C,
@@ -1430,9 +1983,13 @@ namespace aorf
                 ExpectedDrawResourceFaultSequence,
                 sizeof(ExpectedDrawResourceFaultSequence)) != 0 ||
             std::memcmp(
-                base + 0x25110,
+                base + RenderStateVectorStartRva,
                 ExpectedRenderStateFaultSequence,
                 sizeof(ExpectedRenderStateFaultSequence)) != 0 ||
+            std::memcmp(
+                base + RenderStateVectorExitRva,
+                ExpectedRenderStateVectorExitSequence,
+                sizeof(ExpectedRenderStateVectorExitSequence)) != 0 ||
             std::memcmp(
                 base + 0x6C51B,
                 ExpectedDwordFaultSequence,
@@ -1441,18 +1998,6 @@ namespace aorf
                 base + 0x6C474,
                 ExpectedIndirectFaultSequence,
                 sizeof(ExpectedIndirectFaultSequence)) != 0 ||
-            std::memcmp(
-                base + 0x996E8,
-                ExpectedTnlHalGuid,
-                sizeof(ExpectedTnlHalGuid)) != 0 ||
-            std::memcmp(
-                base + 0x99718,
-                ExpectedHalGuid,
-                sizeof(ExpectedHalGuid)) != 0 ||
-            std::memcmp(
-                base + 0x43BA8,
-                ExpectedDeviceSelectionBranches,
-                sizeof(ExpectedDeviceSelectionBranches)) != 0 ||
             std::memcmp(
                 base + 0x43BE5,
                 ExpectedSharedCreateDeviceCall,
@@ -1469,6 +2014,48 @@ namespace aorf
                 guiBase + 0x152E38,
                 ExpectedGuiBatchCaller,
                 sizeof(ExpectedGuiBatchCaller)) != 0 ||
+            std::memcmp(
+                guiBase + 0x150F13,
+                ExpectedGuiNullDynamicVbFaultSequence,
+                sizeof(ExpectedGuiNullDynamicVbFaultSequence)) != 0 ||
+            std::memcmp(
+                guiBase + 0x150E85,
+                expectedGuiDynamicVbGetCall,
+                sizeof(expectedGuiDynamicVbGetCall)) != 0 ||
+            std::memcmp(
+                guiBase + 0x150F76,
+                expectedGuiDynamicVbGetVbCall,
+                sizeof(expectedGuiDynamicVbGetVbCall)) != 0 ||
+            std::memcmp(
+                guiBase + 0x150F91,
+                ExpectedGuiFreeIndexBufferCall,
+                sizeof(ExpectedGuiFreeIndexBufferCall)) != 0 ||
+            std::memcmp(
+                guiBase + 0x150F9A,
+                expectedGuiResetMaterialCall,
+                sizeof(expectedGuiResetMaterialCall)) != 0 ||
+            std::memcmp(
+                guiBase + 0x150FA3,
+                expectedGuiStateBlobResetCall,
+                sizeof(expectedGuiStateBlobResetCall)) != 0 ||
+            guiDynamicVbGetFunction != static_cast<uint32_t>(
+                reinterpret_cast<uintptr_t>(base + 0x14275)) ||
+            guiDynamicVbGetVbFunction != static_cast<uint32_t>(
+                reinterpret_cast<uintptr_t>(base + 0x141C5)) ||
+            guiResetMaterialFunction != static_cast<uint32_t>(
+                reinterpret_cast<uintptr_t>(base + 0x4B724)) ||
+            guiStateBlobResetFunction != static_cast<uint32_t>(
+                reinterpret_cast<uintptr_t>(base + 0x24D1E)) ||
+            !IsExecutableAddress(reinterpret_cast<const void*>(
+                static_cast<uintptr_t>(guiDynamicVbGetFunction))) ||
+            !IsExecutableAddress(reinterpret_cast<const void*>(
+                static_cast<uintptr_t>(guiDynamicVbGetVbFunction))) ||
+            !IsExecutableAddress(reinterpret_cast<const void*>(
+                static_cast<uintptr_t>(guiResetMaterialFunction))) ||
+            !IsExecutableAddress(reinterpret_cast<const void*>(
+                static_cast<uintptr_t>(guiStateBlobResetFunction))) ||
+            !IsExecutableAddress(guiBase + 0x1739C6) ||
+            !IsWritableRange(guiBase + 0x2767C0, 0x18C) ||
             std::memcmp(
                 guiBase + 0x4F2F4,
                 ExpectedGuiTreeFindResume,
@@ -1492,9 +2079,19 @@ namespace aorf
         DwordColorFaultAddress = reinterpret_cast<uintptr_t>(base + 0x6C51D);
         DwordColorResumeAddress = reinterpret_cast<uintptr_t>(base + 0x6C51F);
         GuiRenderBatchAddress = reinterpret_cast<uintptr_t>(guiBase + 0x150E17);
+        GuiNullDynamicVbFaultAddress = reinterpret_cast<uintptr_t>(
+            guiBase + 0x150F22);
+        GuiDynamicVbGetAddress = guiDynamicVbGetFunction;
+        GuiDynamicVbGetVbAddress = guiDynamicVbGetVbFunction;
+        GuiResetMaterialAddress = guiResetMaterialFunction;
+        GuiStateBlobResetAddress = guiStateBlobResetFunction;
+        GuiFreeIndexBufferAddress = reinterpret_cast<uintptr_t>(
+            guiBase + 0x1739C6);
+        GuiStateBlobArrayAddress = reinterpret_cast<uintptr_t>(
+            guiBase + 0x2767C0);
+        GuiStaticIndexBufferAddress = reinterpret_cast<uintptr_t>(
+            guiBase + 0x276980);
         GuiTreeFindResumeAddress = reinterpret_cast<uintptr_t>(guiBase + 0x4F2F4);
-        RendererDeviceSelectorAddress = reinterpret_cast<volatile LONG*>(
-            base + 0xB772C);
         uintptr_t d3dimBegin = 0;
         uintptr_t d3dimEnd = 0;
         uintptr_t ddrawBegin = 0;
@@ -1631,35 +2228,19 @@ namespace aorf
                     {
                         patchFailure = "renderer device was already created";
                     }
-                    else if (!PatchRendererDeviceSelectorLoad(
-                            base + 0x43B99,
-                            RendererDeviceSelectorAddress,
-                            base + 0x17D318))
-                    {
-                        patchFailure = "HAL renderer selector patch failed";
-                    }
                     else if (!PatchDriverDrawCall(base + 0x219B4))
                     {
-                        RestoreRendererDeviceSelectorLoad(
-                            base + 0x43B99,
-                            RendererDeviceSelectorAddress);
                         patchFailure = "NVIDIA draw-call patch failed";
                     }
                     else if (!PatchGuiRenderBatchCall(guiBase + 0x152E49))
                     {
                         RestoreDriverDrawCall(base + 0x219B4);
-                        RestoreRendererDeviceSelectorLoad(
-                            base + 0x43B99,
-                            RendererDeviceSelectorAddress);
                         patchFailure = "GUI render-batch patch failed";
                     }
                     else if (!PatchGuiTreeFindEntry(guiBase + 0x4F2EF))
                     {
                         RestoreGuiRenderBatchCall(guiBase + 0x152E49);
                         RestoreDriverDrawCall(base + 0x219B4);
-                        RestoreRendererDeviceSelectorLoad(
-                            base + 0x43B99,
-                            RendererDeviceSelectorAddress);
                         patchFailure = "GUI tree-find patch failed";
                     }
                     else
@@ -1683,6 +2264,14 @@ namespace aorf
             DwordColorFaultAddress = 0;
             DwordColorResumeAddress = 0;
             GuiRenderBatchAddress = 0;
+            GuiNullDynamicVbFaultAddress = 0;
+            GuiDynamicVbGetAddress = 0;
+            GuiDynamicVbGetVbAddress = 0;
+            GuiResetMaterialAddress = 0;
+            GuiStateBlobResetAddress = 0;
+            GuiFreeIndexBufferAddress = 0;
+            GuiStateBlobArrayAddress = 0;
+            GuiStaticIndexBufferAddress = 0;
             GuiTreeFindResumeAddress = 0;
             Log("ERROR randy31 renderer patch transaction failed: %s",
                 patchFailure ? patchFailure : "unknown failure");
@@ -1690,9 +2279,10 @@ namespace aorf
         }
 
         Log("PATCH PASS randy31 renderer/color/driver guards "
-            "deviceSelectorRva=0x43B99 drawCallRva=0x219B4 "
-            "guiBatchCallRva=0x152E49 guiTreeFindRva=0x4F2EF "
-            "faultRvas=0x21A94,0x2511A,0x6C3A1,0x6C476,0x6C51D");
+            "deviceSelector=preserved drawCallRva=0x219B4 "
+            "guiBatchCallRva=0x152E49 guiNullDynamicVbRva=0x150F22 "
+            "guiTreeFindRva=0x4F2EF "
+            "faultRvas=0x21A94,0x25118,0x2511A,0x6C3A1,0x6C476,0x6C51D");
         return true;
     }
 }

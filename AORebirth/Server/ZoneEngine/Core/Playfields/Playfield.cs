@@ -2036,6 +2036,36 @@ namespace AORebirth.Core.Playfields
                 LogNpcBrain);
         }
 
+        internal bool HasActiveNpcChaseNavigation(ICharacter attacker)
+        {
+            return this.runtimeSystems.HasActiveNpcChaseNavigation(attacker);
+        }
+
+        internal bool IsNpcAttackPathTraversable(ICharacter attacker, ICharacter target)
+        {
+            return this.runtimeSystems.IsNpcAttackPathTraversable(attacker, target);
+        }
+
+        internal void HoldNpcAtCombatPosition(ICharacter attacker, ICharacter target)
+        {
+            this.runtimeSystems.HoldNpcAtCombatPosition(attacker, target);
+        }
+
+        internal bool TryResolveCapturedNpcMovementDestination(
+            ICharacter attacker,
+            ICharacter target,
+            double range,
+            DateTime utcNow,
+            out AORebirth.Core.Vector.Vector3 destination)
+        {
+            return this.runtimeSystems.TryResolveCapturedNpcMovementDestination(
+                attacker,
+                target,
+                range,
+                utcNow,
+                out destination);
+        }
+
         internal void TryMoveNpcIntoCombatRange(ICharacter attacker, ICharacter target, double range)
         {
             this.runtimeSystems.TryMoveNpcIntoCombatRange(
@@ -2186,7 +2216,7 @@ namespace AORebirth.Core.Playfields
                 emptyCleanupDelay,
                 corpse => corpse.DeadNpcIdentity,
                 corpse => corpse.ExpiresAtUtc,
-                corpse => corpse.HasUnlootedItems,
+                corpse => corpse.IsEmpty,
                 corpse => corpse.Opened,
                 (corpse, opened) => this.corpseInventoryService.MarkOpened(
                     corpse.CorpseIdentity, opened, DateTime.UtcNow),
@@ -2235,7 +2265,7 @@ namespace AORebirth.Core.Playfields
                 corpse => corpse.InventoryHandle,
                 corpse => corpse.CorpseIdentity,
                 corpse => corpse.ExpiresAtUtc,
-                corpse => corpse.HasUnlootedItems,
+                corpse => corpse.IsEmpty,
                 corpse => corpse.LootItems.Count(x => !x.Looted),
                 corpse => FindCorpseLootItem(corpse, requestedLootSlot),
                 lootItem => lootItem.Item,
@@ -3444,6 +3474,12 @@ namespace AORebirth.Core.Playfields
             {
                 return;
             }
+
+            if (corpse.IsEmpty)
+            {
+                this.ScheduleCorpseDespawn(corpse, corpse.EmptyCleanupDelay, "credits-empty");
+            }
+
             int cashAfter = CashStatRules.Clamp((long)cashBefore + corpse.Credits);
 
             looter.Stats[StatIds.cash].Set((uint)cashAfter);

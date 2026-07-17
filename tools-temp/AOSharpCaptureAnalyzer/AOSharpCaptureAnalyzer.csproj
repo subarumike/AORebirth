@@ -19,16 +19,26 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\AOSharpCaptureProtocol\RawSimpleCharFullUpdateDecoder.cs">
       <Link>RawSimpleCharFullUpdateDecoder.cs</Link>
     </Compile>
+    <Compile Include="..\..\AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCollisionGeometry.cs">
+      <Link>PlayfieldCollisionGeometry.cs</Link>
+    </Compile>
+    <Compile Include="..\..\AORebirth\Server\ZoneEngine\Core\Playfields\Pf127CollisionGeometryLoader.cs">
+      <Link>Pf127CollisionGeometryLoader.cs</Link>
+    </Compile>
+    <Compile Include="Pf127LineOfSightPromotionValidator.cs" />
+    <Compile Include="Pf127CaptureSnapshot.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
