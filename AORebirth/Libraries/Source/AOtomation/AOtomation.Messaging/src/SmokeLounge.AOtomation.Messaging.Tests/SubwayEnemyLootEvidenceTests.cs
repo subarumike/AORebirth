@@ -267,7 +267,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "22:137:137:1",
                 "23:144:144:1",
                 "24:150:150:1");
-            AssertCorpseAndLevelCredits("Mugger", 17534, "5:44:44:1");
+            AssertCorpseAndLevelCredits(
+                "Mugger",
+                17534,
+                "5:44:44:1",
+                "10:88:88:1");
             AssertCorpseAndLevelCredits(
                 "Neural Burnout",
                 5941,
@@ -283,6 +287,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 30434,
                 "22:137:137:2",
                 "23:144:144:3");
+        }
+
+        [TestMethod]
+        public void MuggerLevelTenUsesIdentityLinkedCorpseCreditsWithoutInventingItemOdds()
+        {
+            CapturedSubwayCorpseEvidenceDefinition[] source =
+                new CapturedSubwayOrdinaryContentProvider().GetCorpseEvidence(203734);
+            CapturedSubwayCorpseEvidenceDefinition levelTen = source.Single(
+                value => value.Capture == "20260710-202132");
+            Assert.AreEqual("(SimpleChar:7957E5CA)", levelTen.DeadNpcIdentity);
+            Assert.AreEqual("(Corpse:00F6C001)", levelTen.CorpseIdentity);
+            Assert.AreEqual(10, levelTen.EnemyLevel);
+            Assert.AreEqual(17534, levelTen.CatMesh);
+            Assert.AreEqual(88, levelTen.Credits);
+
+            OrdinaryEnemyProfile profile = Profile("Mugger");
+            Assert.AreEqual(0, profile.Loot.Entries.Length);
+            Assert.IsFalse(profile.Loot.ItemPoolComplete);
+
+            OrdinaryEnemyLootTableAdapterResult adapted = OrdinaryEnemyLootTableAdapter.Build(
+                profile,
+                10,
+                "subway.test.mugger.level10",
+                "subway.test.mugger.level10.assignment");
+            Assert.AreEqual(CreditsPolicyMode.Fixed, adapted.Table.CreditsPolicy.Mode);
+            Assert.AreEqual(88, adapted.Table.CreditsPolicy.MinimumCredits);
+            Assert.AreEqual(88, adapted.Table.CreditsPolicy.MaximumCredits);
+            Assert.AreEqual(0, adapted.Table.RollGroups.Length);
+            Assert.IsTrue(adapted.Table.ItemPoolUnresolved);
         }
 
         [TestMethod]

@@ -7,20 +7,25 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - The completed 294-folder location inventory identifies 37 Subway-only
   captures, 31 mixed Subway/outside captures, 222 elsewhere captures, and four
   empty startup remnants with no usable location evidence. A second
-  content-level ledger covers all 68 Subway-bearing sessions with 21,557 rows
+  content-level ledger covers all 68 Subway-bearing sessions with 21,559 rows
   while keeping 55 official-live sessions separate from 13 AORebirth-private
   validations. Only three official-live Subway-only sessions still lack a
   runtime-source reference, and their partial/ambient evidence does not prove a
   new implementation slice. See `docs/ai/CURRENT_TASK.md`,
   `docs/generated/aosharp_capture_inventory.md`, and
   `docs/generated/aosharp_subway_capture_content.md`.
-- Previously unindexed official-live corpse evidence now contributes 31 exact,
+- Previously unindexed official-live corpse evidence now contributes 32 exact,
   identity-matched death links across 12 ordinary enemy types. Runtime profiles
   preserve each proven CATMesh and only the observed level-credit rules;
   pre-existing/death-unlinked zero-credit corpses remain excluded. Filth Flea
   now has 18 complete corpse outcomes, 15 proven item memberships, five empty
   outcomes, exact L4=23/L5=29 credits, and normal damage streams of melee
   3..10 and poison 14..24 with critical 13/47 outcomes kept separate.
+- Raw offline recovery of capture `20260710-202132` adds an exact L10 Mugger
+  death link from `(SimpleChar:7957E5CA)` to `(Corpse:00F6C001)`, CATMesh
+  `17534`, and `88` credits. The same corpse's three item rows are indexed as a
+  single observed outcome but do not become guaranteed or independently rolled
+  runtime drops without probability evidence.
 - Official-live Subway zoning now uses the exact PF127 entry landing
   `(65.80835,115.6148,318.9879)` and PF655 main-exit landing
   `(3304.028,35.11,837.9951)` with captured headings. The existing post-zone

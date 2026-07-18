@@ -54,6 +54,7 @@ CAPTURE_ARCHETYPE_FILTERS = {
     ),
 }
 CAPTURE_CORPSE_EVIDENCE_FILTERS = {
+    "20260710-202132": frozenset(("Mugger",)),
     "20260712-155528": frozenset(("Filth Flea",)),
     "20260712-161506": frozenset(("Filth Flea", "Thief")),
     "20260713-013906": frozenset(("Discarded Pet", "Mugger")),
@@ -780,7 +781,7 @@ def validate_content(
         "Infector": Counter({(25, 156): 2}),
         "Melded Patterns": Counter({(21, 131): 1, (24, 150): 1, (25, 156): 1}),
         "Molested Molecules": Counter({(22, 137): 1, (23, 144): 1, (24, 150): 1}),
-        "Mugger": Counter({(5, 44): 1}),
+        "Mugger": Counter({(5, 44): 1, (10, 88): 1}),
         "Neural Burnout": Counter({(18, 111): 1, (23, 144): 1}),
         "Premature Pattern": Counter({(18, 111): 1, (23, 144): 2}),
         "Shadow": Counter({(22, 137): 2, (23, 144): 3}),
