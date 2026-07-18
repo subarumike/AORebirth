@@ -178,6 +178,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Assert.IsTrue(decoded.TailFullyDecoded);
             }
 
+            message.Health = 51008;
+            using (var memoryStream = new MemoryStream())
+            using (var streamWriter = new StreamWriter(memoryStream))
+            using (var streamReader = new StreamReader(memoryStream))
+            {
+                streamWriter.Position = 16;
+                new SimpleCharFullUpdateSerializer().Serialize(
+                    streamWriter,
+                    serializationContext,
+                    message);
+
+                Assert.AreEqual(compactLevelBodyLength, memoryStream.Length);
+                memoryStream.Position = 16;
+                var decoded =
+                    (SimpleCharFullUpdateMessage)new SimpleCharFullUpdateSerializer().Deserialize(
+                        streamReader,
+                        serializationContext);
+                Assert.AreEqual(51008, decoded.Health);
+                Assert.IsTrue(decoded.Flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallHealth));
+                Assert.IsTrue(decoded.TailFullyDecoded);
+            }
+
             message.Waypoints = new Vector3[0];
             message.RunSpeedBase = 134;
             message.FightingTarget =
