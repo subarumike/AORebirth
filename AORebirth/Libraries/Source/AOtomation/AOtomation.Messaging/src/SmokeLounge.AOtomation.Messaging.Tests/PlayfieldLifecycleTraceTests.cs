@@ -2534,11 +2534,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Bloodcreeper|30379|63",
                     "Stim Fiend|203739|138",
                     "Neural Burnout|203730|148",
-                    "Incomplete Rebuild|203728|148"
+                    "Incomplete Rebuild|203728|148",
+                    "Redundant Scan|204178|148"
                 };
 
             Assert.AreEqual(
-                17,
+                18,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
 
@@ -3296,6 +3297,76 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(3.0, incompleteRebuild.Corpse.EmptyLifetimeSeconds);
             Assert.AreEqual(240.0, incompleteRebuild.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(3.0, incompleteRebuild.Corpse.LootedCleanupSeconds);
+
+            OrdinaryEnemyProfile redundantScan = ordinaryProfiles.Single(
+                value => value.DisplayName == "Redundant Scan");
+            OrdinaryEnemySpawnDefinition[] redundantScanSpawns = ordinarySpawns
+                .Where(value => value.ProfileKey == redundantScan.ProfileKey)
+                .ToArray();
+            Assert.AreEqual(4, redundantScanSpawns.Length);
+            Assert.AreEqual(
+                4,
+                redundantScanSpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(
+                10,
+                redundantScanSpawns.Sum(
+                    value => value.LevelDefinition.GetExplicitVariants().Length));
+            Assert.AreEqual(
+                1,
+                redundantScanSpawns.Count(
+                    value => value.MovementMode == OrdinaryEnemyMovementMode.Patrol));
+            Assert.IsTrue(
+                redundantScanSpawns.All(
+                    spawn => spawn.LevelDefinition.Mode
+                             == OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants
+                             && spawn.RespawnPolicy.Mode
+                                == WorldRespawnPolicyAssignmentMode.Inherit
+                             && spawn.LevelDefinition.GetExplicitVariants().All(
+                                 variant => redundantScan.Combat.ResolveContract(
+                                                spawn.SourceIdentity,
+                                                variant)
+                                            .IsCombatReady)),
+                "Accepted Subway Redundant Scan must preserve four exact sources, ten atomic capture-reviewed generations, exact per-generation weapons, captured movement, and private inherited respawn together.");
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Auto, redundantScan.Aggression.Mode);
+            Assert.AreEqual(7.0, redundantScan.Aggression.AutomaticAggroRadius.Value);
+            Assert.IsTrue(redundantScan.Aggression.Chase);
+            Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, redundantScan.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, redundantScan.Combat.DamageSource);
+            Assert.IsTrue(redundantScan.Combat.VisibleWeapon);
+            Assert.IsNotNull(redundantScan.SupportNano);
+            Assert.AreEqual(121336, redundantScan.SupportNano.PrimaryNanoId);
+            Assert.AreEqual(121248, redundantScan.SupportNano.TriggeredSelfNanoId);
+            Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, redundantScan.Loot.PoolMode);
+            Assert.IsFalse(redundantScan.Loot.ItemPoolComplete);
+            Assert.AreEqual(2, redundantScan.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(1, redundantScan.Loot.ObservedEmptyInventories);
+            CollectionAssert.AreEqual(
+                new[] { "27263:27263:10:1:2" },
+                redundantScan.Loot.Entries
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}:{3}:{4}",
+                            value.LowId,
+                            value.HighId,
+                            value.QualityLevel,
+                            value.ObservedCount,
+                            value.ObservedCorpses))
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[] { "19:118", "20:124", "21:131", "22:137" },
+                redundantScan.Loot.LevelCreditRules
+                    .OrderBy(value => value.EnemyLevel)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}",
+                            value.EnemyLevel,
+                            value.MinimumCredits))
+                    .ToArray());
+            Assert.AreEqual(23370, redundantScan.Corpse.CapturedCatMesh);
+            Assert.AreEqual(3.0, redundantScan.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(240.0, redundantScan.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(3.0, redundantScan.Corpse.LootedCleanupSeconds);
 
             Assert.AreEqual(
                 12,

@@ -235,6 +235,34 @@ INCOMPLETE_REBUILD_GENERATION_EVIDENCE = {
     ),
 }
 
+# Reviewed complete SCFU + owner WeaponItemFullUpdate pairs for Redundant Scan.
+# Three stationary anchors are associated only by a unique <=1.5-unit source
+# position. Source 0x795451C4 is the sole captured Redundant Scan patrol anchor;
+# its later rows must retain the unique HasWaypoints shape. Rows without both a
+# complete SCFU and owner weapon update remain report-only.
+REDUNDANT_SCAN_GENERATION_EVIDENCE = {
+    0x7953AF85: (
+        ("20260709-222339", "(SimpleChar:7953AF85)"),
+        ("20260716-034559", "(SimpleChar:796CD6EF)"),
+        ("20260716-222007", "(SimpleChar:79702286)"),
+        ("20260717-214612", "(SimpleChar:7973F090)"),
+    ),
+    0x795451BF: (
+        ("20260709-222339", "(SimpleChar:795451BF)"),
+    ),
+    0x795451C4: (
+        ("20260709-222339", "(SimpleChar:795451C4)"),
+        ("20260716-034559", "(SimpleChar:796CD7D0)"),
+        ("20260716-222007", "(SimpleChar:797024B6)"),
+    ),
+    0x795451D3: (
+        ("20260709-222339", "(SimpleChar:795451D3)"),
+        ("20260716-220400", "(SimpleChar:7970250F)"),
+    ),
+}
+
+REDUNDANT_SCAN_PATROL_SOURCE = 0x795451C4
+
 # Audited complete-open denominator for Workman Striker.  The legacy capture
 # predates corpse-loot-observations.csv, so the item rows are recovered from
 # the identity-linked first inventory snapshots below.  The four canonical
@@ -1740,10 +1768,17 @@ def captured_weapon_tuples(capture: str, identity: str) -> set[tuple[int, int, i
     return captured_weapons
 
 
-def incomplete_rebuild_generation_variants() -> list[dict[str, object]]:
+def reviewed_atomic_generation_variants(
+    name: str,
+    monster_data: int,
+    evidence_by_source: dict[int, tuple[tuple[str, str], ...]],
+    expected_stats: dict[int, tuple[int, int, int, int]],
+    expected_count: int,
+    unique_patrol_source: int | None = None,
+) -> list[dict[str, object]]:
     scfu_by_evidence: dict[tuple[str, str], dict[str, str]] = {}
     for canonical_source, evidence_pairs in sorted(
-        INCOMPLETE_REBUILD_GENERATION_EVIDENCE.items()
+        evidence_by_source.items()
     ):
         for capture, identity in evidence_pairs:
             scfu_rows = [
@@ -1753,28 +1788,29 @@ def incomplete_rebuild_generation_variants() -> list[dict[str, object]]:
             ]
             if len(scfu_rows) != 1:
                 raise ValueError(
-                    "Incomplete Rebuild atomic variant SCFU drifted capture={0} identity={1} rows={2}".format(
-                        capture, identity, len(scfu_rows)
+                    "{0} atomic variant SCFU drifted capture={1} identity={2} rows={3}".format(
+                        name, capture, identity, len(scfu_rows)
                     )
                 )
             row = scfu_rows[0]
-            if row.get("Name") != "Incomplete Rebuild" or int(row["MonsterData"]) != 203728:
+            if row.get("Name") != name or int(row["MonsterData"]) != monster_data:
                 raise ValueError(
-                    "Incomplete Rebuild atomic variant identity changed capture={0} identity={1}".format(
-                        capture, identity
+                    "{0} atomic variant identity changed capture={1} identity={2}".format(
+                        name, capture, identity
                     )
                 )
             scfu_by_evidence[(capture, identity)] = row
 
     canonical_positions: dict[int, tuple[float, float, float]] = {}
+    canonical_patrol_sources = set()
     for canonical_source, evidence_pairs in sorted(
-        INCOMPLETE_REBUILD_GENERATION_EVIDENCE.items()
+        evidence_by_source.items()
     ):
         capture, identity = evidence_pairs[0]
         if identity != "(SimpleChar:{0:08X})".format(canonical_source):
             raise ValueError(
-                "Incomplete Rebuild canonical source row drifted source=0x{0:08X} identity={1}".format(
-                    canonical_source, identity
+                "{0} canonical source row drifted source=0x{1:08X} identity={2}".format(
+                    name, canonical_source, identity
                 )
             )
         row = scfu_by_evidence[(capture, identity)]
@@ -1783,9 +1819,22 @@ def incomplete_rebuild_generation_variants() -> list[dict[str, object]]:
             float(row["PositionY"]),
             float(row["PositionZ"]),
         )
+        if row.get("Waypoints", ""):
+            canonical_patrol_sources.add(canonical_source)
+
+    if unique_patrol_source is not None and canonical_patrol_sources != {
+        unique_patrol_source
+    }:
+        raise ValueError(
+            "{0} unique patrol source drifted expected=0x{1:08X} actual={2}".format(
+                name,
+                unique_patrol_source,
+                ["0x{0:08X}".format(value) for value in sorted(canonical_patrol_sources)],
+            )
+        )
 
     for canonical_source, evidence_pairs in sorted(
-        INCOMPLETE_REBUILD_GENERATION_EVIDENCE.items()
+        evidence_by_source.items()
     ):
         for capture, identity in evidence_pairs[1:]:
             row = scfu_by_evidence[(capture, identity)]
@@ -1814,11 +1863,23 @@ def incomplete_rebuild_generation_variants() -> list[dict[str, object]]:
             }
             ordered = sorted(distances.items(), key=lambda value: (value[1], value[0]))
             intended_distance = distances[canonical_source]
-            if (intended_distance > 1.5
-                or ordered[0][0] != canonical_source
-                or (len(ordered) > 1 and ordered[1][1] <= intended_distance + 0.05)):
+            unique_close_position = (
+                intended_distance <= 1.5
+                and ordered[0][0] == canonical_source
+                and (
+                    len(ordered) == 1
+                    or ordered[1][1] > intended_distance + 0.05
+                )
+            )
+            unique_patrol_shape = (
+                unique_patrol_source == canonical_source
+                and bool(row.get("Waypoints", ""))
+                and canonical_patrol_sources == {canonical_source}
+            )
+            if not unique_close_position and not unique_patrol_shape:
                 raise ValueError(
-                    "Incomplete Rebuild source-anchor association is not unique capture={0} identity={1} intended=0x{2:08X} distance={3:.6f} nearest={4}".format(
+                    "{0} source-anchor association is not unique capture={1} identity={2} intended=0x{3:08X} distance={4:.6f} nearest={5}".format(
+                        name,
                         capture,
                         identity,
                         canonical_source,
@@ -1829,7 +1890,7 @@ def incomplete_rebuild_generation_variants() -> list[dict[str, object]]:
 
     records = []
     for canonical_source, evidence_pairs in sorted(
-        INCOMPLETE_REBUILD_GENERATION_EVIDENCE.items()
+        evidence_by_source.items()
     ):
         by_signature: dict[tuple[int, ...], dict[str, object]] = {}
         for capture, identity in evidence_pairs:
@@ -1838,8 +1899,8 @@ def incomplete_rebuild_generation_variants() -> list[dict[str, object]]:
             captured_weapons = captured_weapon_tuples(capture, identity)
             if len(captured_weapons) != 1:
                 raise ValueError(
-                    "Incomplete Rebuild atomic variant weapon drifted capture={0} identity={1} tuples={2}".format(
-                        capture, identity, sorted(captured_weapons)
+                    "{0} atomic variant weapon drifted capture={1} identity={2} tuples={3}".format(
+                        name, capture, identity, sorted(captured_weapons)
                     )
                 )
             low, high, quality = next(iter(captured_weapons))
@@ -1856,6 +1917,7 @@ def incomplete_rebuild_generation_variants() -> list[dict[str, object]]:
             existing = by_signature.get(signature)
             if existing is None:
                 existing = {
+                    "monsterData": monster_data,
                     "source": canonical_source,
                     "level": signature[0],
                     "health": signature[1],
@@ -1882,24 +1944,16 @@ def incomplete_rebuild_generation_variants() -> list[dict[str, object]]:
             )
         )
 
-    expected_stats = {
-        17: (368, 0, 98, 59),
-        18: (394, 0, 98, 62),
-        19: (421, 0, 98, 66),
-        20: (447, 0, 99, 69),
-        21: (474, 0, 99, 73),
-        22: (500, 0, 99, 76),
-    }
-    if len(records) != 23:
+    if len(records) != expected_count:
         raise ValueError(
-            "Incomplete Rebuild atomic variant count drifted expected=23 actual={0}".format(
-                len(records)
+            "{0} atomic variant count drifted expected={1} actual={2}".format(
+                name, expected_count, len(records)
             )
         )
     if {int(value["source"]) for value in records} != set(
-        INCOMPLETE_REBUILD_GENERATION_EVIDENCE
+        evidence_by_source
     ):
-        raise ValueError("Incomplete Rebuild atomic variant source coverage drifted")
+        raise ValueError(name + " atomic variant source coverage drifted")
     for record in records:
         actual_stats = (
             int(record["health"]),
@@ -1909,11 +1963,44 @@ def incomplete_rebuild_generation_variants() -> list[dict[str, object]]:
         )
         if expected_stats.get(int(record["level"])) != actual_stats:
             raise ValueError(
-                "Incomplete Rebuild atomic variant stat progression drifted source=0x{0:08X} level={1}".format(
-                    int(record["source"]), int(record["level"])
+                "{0} atomic variant stat progression drifted source=0x{1:08X} level={2}".format(
+                    name, int(record["source"]), int(record["level"])
                 )
             )
     return records
+
+
+def incomplete_rebuild_generation_variants() -> list[dict[str, object]]:
+    return reviewed_atomic_generation_variants(
+        "Incomplete Rebuild",
+        203728,
+        INCOMPLETE_REBUILD_GENERATION_EVIDENCE,
+        {
+            17: (368, 0, 98, 59),
+            18: (394, 0, 98, 62),
+            19: (421, 0, 98, 66),
+            20: (447, 0, 99, 69),
+            21: (474, 0, 99, 73),
+            22: (500, 0, 99, 76),
+        },
+        23,
+    )
+
+
+def redundant_scan_generation_variants() -> list[dict[str, object]]:
+    return reviewed_atomic_generation_variants(
+        "Redundant Scan",
+        204178,
+        REDUNDANT_SCAN_GENERATION_EVIDENCE,
+        {
+            19: (736, 0, 98, 66),
+            20: (782, 0, 99, 69),
+            21: (829, 0, 99, 73),
+            22: (875, 0, 99, 76),
+        },
+        10,
+        REDUNDANT_SCAN_PATROL_SOURCE,
+    )
 
 
 def visual_profile(row: dict[str, str]) -> tuple:
@@ -3287,7 +3374,10 @@ def validate_content(
 def generate() -> str:
     spawns = select_spawns()
     source_weapons = source_weapon_evidence_profiles(spawns)
-    generation_variants = incomplete_rebuild_generation_variants()
+    generation_variants = (
+        incomplete_rebuild_generation_variants()
+        + redundant_scan_generation_variants()
+    )
     profiles = select_archetype_profiles(spawns)
     combat = combat_profiles()
     loot = loot_profiles()
@@ -3376,7 +3466,7 @@ def generate() -> str:
         )
     generation_variant_definition_lines = [
         "            new CapturedSubwayGenerationVariantDefinition("
-        f"203728, 0x{int(item['source']):08X}, {int(item['level'])}, "
+        f"{int(item['monsterData'])}, 0x{int(item['source']):08X}, {int(item['level'])}, "
         f"{int(item['health'])}, {int(item['healthDamage'])}, "
         f"{int(item['monsterScale'])}, {int(item['runSpeed'])}, "
         f"{int(item['low'])}, {int(item['high'])}, {int(item['quality'])}, "

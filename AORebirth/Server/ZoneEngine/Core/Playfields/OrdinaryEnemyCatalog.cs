@@ -348,7 +348,6 @@ namespace AORebirth.Core.Playfields
                     archetype.MonsterData == DerangedShopperMonsterData
                     || archetype.MonsterData == WorkmanStrikerMonsterData
                     || archetype.MonsterData == LooterMonsterData
-                    || archetype.MonsterData == RedundantScanMonsterData
                         ? new Func<int, int, CapturedEnemyCombatContract>(
                             (sourceIdentity, level) =>
                                 CapturedSubwayCombatCatalog.ForOrdinary(
@@ -358,6 +357,7 @@ namespace AORebirth.Core.Playfields
                 Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>
                     sourceVariantContractResolver =
                         archetype.MonsterData == IncompleteRebuildMonsterData
+                        || archetype.MonsterData == RedundantScanMonsterData
                             ? new Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>(
                                 (sourceIdentity, variant) =>
                                     CapturedSubwayCombatCatalog.ForOrdinary(
@@ -608,31 +608,38 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayOrdinarySpawnDefinition source,
             OrdinaryEnemySpawnLevelDefinition configuredDefinition)
         {
+            int expectedMonsterData = string.Equals(
+                source.ArchetypeKey,
+                "incomplete_rebuild",
+                StringComparison.Ordinal)
+                ? IncompleteRebuildMonsterData
+                : string.Equals(
+                    source.ArchetypeKey,
+                    "redundant_scan",
+                    StringComparison.Ordinal)
+                    ? RedundantScanMonsterData
+                    : 0;
             CapturedSubwayGenerationVariantDefinition[] capturedVariants =
-                content.GetGenerationVariants(IncompleteRebuildMonsterData, source.SourceInstance);
+                expectedMonsterData == 0
+                    ? new CapturedSubwayGenerationVariantDefinition[0]
+                    : content.GetGenerationVariants(expectedMonsterData, source.SourceInstance);
             if (capturedVariants.Length == 0)
             {
-                if (string.Equals(
-                    source.ArchetypeKey,
-                    "incomplete_rebuild",
-                    StringComparison.Ordinal))
+                if (expectedMonsterData != 0)
                 {
                     throw new InvalidOperationException(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "Incomplete Rebuild source 0x{0:X8} has no reviewed atomic generation variants.",
+                            "Captured atomic-generation source 0x{0:X8} has no reviewed variants.",
                             source.SourceInstance));
                 }
 
                 return configuredDefinition;
             }
 
-            if (!string.Equals(
-                source.ArchetypeKey,
-                "incomplete_rebuild",
-                StringComparison.Ordinal)
+            if (expectedMonsterData == 0
                 || capturedVariants.Any(
-                    value => value.MonsterData != IncompleteRebuildMonsterData
+                    value => value.MonsterData != expectedMonsterData
                              || value.SourceInstance != source.SourceInstance))
             {
                 throw new InvalidOperationException(

@@ -1368,39 +1368,126 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CapturedEnemyAttackModel.Unresolved,
                 redundantScan.Combat.ResolveContract(spawns[0].Level).AttackModel,
                 "A Redundant Scan contract without its source identity must fail closed.");
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.Unresolved,
+                redundantScan.Combat.ResolveContract(
+                    spawns[0].SourceIdentity,
+                    spawns[0].Level).AttackModel,
+                "A Redundant Scan source plus level without its atomic selected variant must fail closed.");
+
+            CollectionAssert.AreEqual(
+                new[]
+                    {
+                        "7953AF85:20:782:99:69:122027:122027:20",
+                        "7953AF85:21:829:99:73:122026:122027:19",
+                        "7953AF85:21:829:99:73:122028:122029:22",
+                        "7953AF85:21:829:99:73:122028:122029:25",
+                        "795451BF:19:736:98:66:122026:122027:14",
+                        "795451C4:20:782:99:69:122026:122027:16",
+                        "795451C4:20:782:99:69:122028:122029:23",
+                        "795451C4:21:829:99:73:122028:122029:25",
+                        "795451D3:19:736:98:66:122026:122027:16",
+                        "795451D3:22:875:99:76:122026:122027:19"
+                    },
+                spawns
+                    .SelectMany(
+                        spawn => ordinaryProvider.GetGenerationVariants(
+                            monsterData,
+                            spawn.SourceIdentity))
+                    .OrderBy(value => value.SourceInstance)
+                    .ThenBy(value => value.Level)
+                    .ThenBy(value => value.WeaponLowId)
+                    .ThenBy(value => value.WeaponHighId)
+                    .ThenBy(value => value.WeaponQuality)
+                    .Select(
+                        value => string.Format(
+                            "{0:X8}:{1}:{2}:{3}:{4}:{5}:{6}:{7}",
+                            value.SourceInstance,
+                            value.Level,
+                            value.Health,
+                            value.MonsterScale,
+                            value.RunSpeed,
+                            value.WeaponLowId,
+                            value.WeaponHighId,
+                            value.WeaponQuality))
+                    .ToArray());
 
             foreach (OrdinaryEnemySpawnDefinition spawn in spawns)
             {
-                CapturedSubwaySourceWeaponEvidenceDefinition expected = sourceEvidence
-                    .Single(value => value.SourceInstance == spawn.SourceIdentity);
-                CapturedEnemyCombatContract contract = redundantScan.Combat.ResolveContract(
-                    spawn.SourceIdentity,
-                    spawn.Level);
-                Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
-                Assert.IsTrue(contract.IsCombatReady);
-                Assert.AreEqual(expected.LowId, contract.WeaponLowId);
-                Assert.AreEqual(expected.HighId, contract.WeaponHighId);
-                Assert.AreEqual(expected.Quality, contract.WeaponQuality);
-                Assert.AreEqual(6, contract.WeaponInventorySlot);
-                Assert.AreEqual(0, contract.MinDamage);
-                Assert.AreEqual(0, contract.MaxDamage);
-                Assert.AreEqual(0.0, contract.RechargeSeconds);
-                Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
-                Assert.AreEqual(17, contract.AttackInfoAmmoCount);
-                Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
-                Assert.AreEqual(0, contract.AttackInfoUnknown);
-                Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
-                Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
-                Assert.IsFalse(contract.HasCapturedAttackStartContext);
-                Assert.IsFalse(contract.HasCapturedCombatStopSequence);
-                Assert.IsTrue(contract.Evidence.Contains("one normal local-player hit is 19"));
-                Assert.IsTrue(contract.Evidence.Contains("item owns runtime damage and recharge"));
-                Assert.IsTrue(contract.Evidence.Contains("ammo 17, slot 6, unknown 0"));
+                CapturedSubwayGenerationVariantDefinition[] capturedVariants =
+                    ordinaryProvider.GetGenerationVariants(monsterData, spawn.SourceIdentity);
+                OrdinaryEnemySpawnVariant[] variants =
+                    spawn.LevelDefinition.GetExplicitVariants();
+                Assert.AreEqual(
+                    OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants,
+                    spawn.LevelDefinition.Mode);
+                Assert.AreEqual(capturedVariants.Length, variants.Length);
+                foreach (OrdinaryEnemySpawnVariant variant in variants)
+                {
+                    Assert.IsTrue(
+                        capturedVariants.Any(
+                            value => value.Level == variant.Level
+                                     && value.Health == variant.Health
+                                     && value.HealthDamage == variant.HealthDamage
+                                     && value.MonsterScale == variant.MonsterScale
+                                     && value.RunSpeed == variant.RunSpeed
+                                     && value.WeaponLowId == variant.WeaponLoadout.LowId
+                                     && value.WeaponHighId == variant.WeaponLoadout.HighId
+                                     && value.WeaponQuality == variant.WeaponLoadout.Quality));
+                    CapturedEnemyCombatContract contract =
+                        redundantScan.Combat.ResolveContract(
+                            spawn.SourceIdentity,
+                            variant);
+                    Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
+                    Assert.IsTrue(contract.IsCombatReady);
+                    Assert.AreEqual(variant.WeaponLoadout.LowId, contract.WeaponLowId);
+                    Assert.AreEqual(variant.WeaponLoadout.HighId, contract.WeaponHighId);
+                    Assert.AreEqual(variant.WeaponLoadout.Quality, contract.WeaponQuality);
+                    Assert.AreEqual(6, contract.WeaponInventorySlot);
+                    Assert.AreEqual(0, contract.MinDamage);
+                    Assert.AreEqual(0, contract.MaxDamage);
+                    Assert.AreEqual(0.0, contract.RechargeSeconds);
+                    Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
+                    Assert.AreEqual(17, contract.AttackInfoAmmoCount);
+                    Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
+                    Assert.AreEqual(0, contract.AttackInfoUnknown);
+                    Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+                    Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
+                    Assert.IsFalse(contract.HasCapturedAttackStartContext);
+                    Assert.IsFalse(contract.HasCapturedCombatStopSequence);
+                    Assert.IsTrue(contract.Evidence.Contains("one normal local-player hit is 19"));
+                    Assert.IsTrue(contract.Evidence.Contains("item owns runtime damage and recharge"));
+                    Assert.IsTrue(contract.Evidence.Contains("ammo 17, slot 6, unknown 0"));
+                }
             }
 
+            OrdinaryEnemySpawnDefinition firstSpawn = spawns[0];
+            OrdinaryEnemySpawnVariant firstVariant =
+                firstSpawn.LevelDefinition.GetExplicitVariants()[0];
+            var forgedVariant = new OrdinaryEnemySpawnVariant(
+                firstVariant.Level,
+                firstVariant.Health,
+                firstVariant.HealthDamage,
+                firstVariant.MonsterScale,
+                firstVariant.RunSpeed,
+                "forged",
+                new OrdinaryEnemySpawnWeaponLoadout(
+                    firstVariant.WeaponLoadout.LowId,
+                    firstVariant.WeaponLoadout.HighId,
+                    firstVariant.WeaponLoadout.Quality + 1,
+                    "forged"));
             CapturedEnemyCombatContract unknown = redundantScan.Combat.ResolveContract(
                 0x7953FFFF,
-                spawns[0].Level);
+                firstVariant);
+            CapturedEnemyCombatContract forged = redundantScan.Combat.ResolveContract(
+                firstSpawn.SourceIdentity,
+                forgedVariant);
+            CapturedEnemyCombatContract missingGeneration =
+                CapturedSubwayCombatCatalog.ForOrdinary(
+                    BuildRedundantScanArchetype(sourceEvidence),
+                    firstSpawn.SourceIdentity,
+                    firstVariant,
+                    new CapturedSubwayGenerationVariantDefinition[0]);
             CapturedEnemyCombatContract missing = CapturedSubwayCombatCatalog.ForOrdinary(
                 BuildRedundantScanArchetype(sourceEvidence.Take(3).ToArray()),
                 expectedSources[0]);
@@ -1420,6 +1507,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 expectedSources[0]);
             Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, unknown.AttackModel);
             Assert.IsFalse(unknown.IsCombatReady);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, forged.AttackModel);
+            Assert.IsFalse(forged.IsCombatReady);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, missingGeneration.AttackModel);
+            Assert.IsFalse(missingGeneration.IsCombatReady);
             Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, missing.AttackModel);
             Assert.IsFalse(missing.IsCombatReady);
             Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, conflicting.AttackModel);
