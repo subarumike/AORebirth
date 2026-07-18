@@ -84,12 +84,13 @@ was allocated. The caller then advances normally. These scoped guards contain
 the verified deferred failures without changing AO's selected renderer.
 
 The old-client GUI path also byte-verifies and wraps the child-render call at
-`GUI.dll +0x14D6DA`. Repeated full dumps proved a direct self-cycle: the child
-`View` in `ECX` was the same pointer as the currently rendering parent in
-`EBX`, causing `View::_CallRender` to recurse until the thread's exception
-registration chain was corrupted. The wrapper preserves every non-self call
-unchanged and skips only exact `ECX == EBX` cycles, logging
-`PATCH HIT GUI self-render cycle skipped`.
+`GUI.dll +0x14D6DA`. Repeated full dumps proved unbounded child-render
+recursion, including an idle reproduction after the first direct-self check was
+deployed without firing. The wrapper preserves ordinary rendering through the
+original function and caps only a single thread's nested child-render depth at
+`128`, logging `PATCH HIT GUI render recursion depth capped`. This prevents the
+render chain from reaching the thread's exception-registration records while
+leaving unrelated access violations on the normal crash path.
 
 This is deliberately not a process-wide "continue every exception" handler.
 Unknown access violations retain the normal crash/dump path because an

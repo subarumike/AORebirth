@@ -38,8 +38,11 @@ namespace
     LONG DriverDrawInputSkipCount = 0;
     LONG DriverDrawExceptionSkipCount = 0;
     LONG GuiBatchExceptionSkipCount = 0;
-    LONG GuiCallRenderSelfCycleSkipCount = 0;
+    LONG GuiCallRenderDepthSkipCount = 0;
     LONG GuiTreeInvalidKeySkipCount = 0;
+
+    __declspec(thread) LONG GuiCallRenderDepth = 0;
+    constexpr LONG MaximumGuiCallRenderDepth = 128;
 
     constexpr uintptr_t RenderStateVectorStartRva = 0x25110;
     constexpr uintptr_t RenderStateEntryFaultRva = 0x25118;
@@ -1039,37 +1042,80 @@ namespace
         }
     }
 
-    void __cdecl RecordGuiCallRenderSelfCycle(void* view)
+    void InvokeGuiCallRenderChild(
+        void* childView,
+        DWORD argument1,
+        DWORD argument2,
+        DWORD argument3,
+        DWORD argument4,
+        DWORD argument5,
+        DWORD argument6)
     {
-        LONG count = InterlockedIncrement(&GuiCallRenderSelfCycleSkipCount);
-        if (count <= 16 || count % 100 == 0)
+        __asm
         {
-            aorf::Log(
-                "PATCH HIT GUI self-render cycle skipped view=0x%08lX count=%ld",
-                static_cast<unsigned long>(reinterpret_cast<uintptr_t>(view)),
-                static_cast<long>(count));
+            push argument6
+            push argument5
+            push argument4
+            push argument3
+            push argument2
+            push argument1
+            mov ecx, childView
+            call dword ptr [GuiCallRenderAddress]
         }
+    }
+
+    void __stdcall GuardedGuiCallRenderChild(
+        void* childView,
+        DWORD argument1,
+        DWORD argument2,
+        DWORD argument3,
+        DWORD argument4,
+        DWORD argument5,
+        DWORD argument6)
+    {
+        LONG depth = ++GuiCallRenderDepth;
+        if (depth > MaximumGuiCallRenderDepth)
+        {
+            --GuiCallRenderDepth;
+            LONG count = InterlockedIncrement(&GuiCallRenderDepthSkipCount);
+            if (count <= 16 || count % 100 == 0)
+            {
+                aorf::Log(
+                    "PATCH HIT GUI render recursion depth capped "
+                    "child=0x%08lX depth=%ld limit=%ld count=%ld",
+                    static_cast<unsigned long>(
+                        reinterpret_cast<uintptr_t>(childView)),
+                    static_cast<long>(depth),
+                    static_cast<long>(MaximumGuiCallRenderDepth),
+                    static_cast<long>(count));
+            }
+            return;
+        }
+
+        InvokeGuiCallRenderChild(
+            childView,
+            argument1,
+            argument2,
+            argument3,
+            argument4,
+            argument5,
+            argument6);
+        --GuiCallRenderDepth;
     }
 
     __declspec(naked) void GuardedGuiCallRenderChildThunk()
     {
         __asm
         {
-            // At GUI+0x14D6DA, ECX is the child View and EBX is the current
-            // View.  The captured failure repeats the same pointer in both
-            // roles until the exception-registration chain is exhausted.
-            cmp ecx, ebx
-            je selfCycle
-            jmp dword ptr [GuiCallRenderAddress]
-
-        selfCycle:
-            pushfd
-            pushad
+            mov edx, esp
+            push dword ptr [edx + 18h]
+            push dword ptr [edx + 14h]
+            push dword ptr [edx + 10h]
+            push dword ptr [edx + 0Ch]
+            push dword ptr [edx + 08h]
+            push dword ptr [edx + 04h]
             push ecx
-            call RecordGuiCallRenderSelfCycle
-            add esp, 4
-            popad
-            popfd
+            call GuardedGuiCallRenderChild
             ret 18h
         }
     }
@@ -1611,7 +1657,7 @@ namespace
                 ExpectedCall,
                 sizeof(ExpectedCall),
                 oldProtection,
-                "GUI self-render call patch");
+                "GUI render-depth call patch");
             return false;
         }
 
@@ -1627,7 +1673,7 @@ namespace
                 ExpectedCall,
                 sizeof(ExpectedCall),
                 oldProtection,
-                "GUI self-render call patch");
+                "GUI render-depth call patch");
             return false;
         }
         return true;
@@ -1646,7 +1692,7 @@ namespace
                 PAGE_EXECUTE_READWRITE,
                 &oldProtection))
         {
-            FailFastPatchRollback("GUI self-render call patch");
+            FailFastPatchRollback("GUI render-depth call patch");
         }
         std::memcpy(callsite, OriginalCall, sizeof(OriginalCall));
         bool flushed = FlushInstructionCache(
@@ -1665,7 +1711,7 @@ namespace
             &ignored) != FALSE;
         if (!flushed || !verified || !restored)
         {
-            FailFastPatchRollback("GUI self-render call patch");
+            FailFastPatchRollback("GUI render-depth call patch");
         }
     }
 
@@ -2391,7 +2437,7 @@ namespace aorf
                     {
                         RestoreGuiRenderBatchCall(guiBase + 0x152E49);
                         RestoreDriverDrawCall(base + 0x219B4);
-                        patchFailure = "GUI self-render call patch failed";
+                        patchFailure = "GUI render-depth call patch failed";
                     }
                     else if (!PatchGuiTreeFindEntry(guiBase + 0x4F2EF))
                     {
@@ -2438,7 +2484,7 @@ namespace aorf
 
         Log("PATCH PASS randy31 renderer/color/driver guards "
             "deviceSelector=preserved drawCallRva=0x219B4 "
-            "guiSelfRenderCallRva=0x14D6DA "
+            "guiRenderDepthCallRva=0x14D6DA guiRenderDepthLimit=128 "
             "guiBatchCallRva=0x152E49 guiNullDynamicVbRva=0x150F22 "
             "guiTreeFindRva=0x4F2EF "
             "faultRvas=0x21A94,0x25118,0x2511A,0x6C3A1,0x6C476,0x6C51D");
