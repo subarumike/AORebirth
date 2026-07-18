@@ -383,7 +383,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 }
             }
 
-            if (scfu.Level > sbyte.MaxValue)
+            if (scfu.Level > byte.MaxValue)
             {
                 flags |= SimpleCharFullUpdateFlags.HasExtendedLevel;
                 streamWriter.WriteInt16(scfu.Level);
@@ -546,6 +546,15 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             flags &= ~scfu.SuppressedFlags;
 
             // Structural header flags must agree with the fields already written above.
+            if (scfu.Level > byte.MaxValue)
+            {
+                flags |= SimpleCharFullUpdateFlags.HasExtendedLevel;
+            }
+            else
+            {
+                flags &= ~SimpleCharFullUpdateFlags.HasExtendedLevel;
+            }
+
             if (scfu.RunSpeedBase > byte.MaxValue)
             {
                 flags |= SimpleCharFullUpdateFlags.HasExtendedRunSpeed;
