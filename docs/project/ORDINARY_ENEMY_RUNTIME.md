@@ -315,6 +315,16 @@ Architect Striker retains its captured fixed contract without an invented
 weapon. Melded Patterns retains its exact QL20 `121817/121818` weapon-owned
 damage/recharge path without invented special-attack or critical context.
 
+The next gate definition adds Looter, Bloodcreeper, Stim Fiend, and Neural
+Burnout. Looter resolves all eight exact owner-linked `123038/123039` tuples by
+source identity and QL; its visible equipped item owns normal damage and
+recharge, while aggregate, missing, conflicting, or unknown source selection
+fails closed. The other three retain their specialized or fixed capture-backed
+combat, strict incomplete loot samples, exact observed credit rows, shared chase,
+ordinary corpse lifetimes, and private respawn policy. The ordinary generator and
+Debug build pass, as do the expanded fourteen-profile gate, WorldPopulation
+`29/29`, and Subway loot `22/22` suites.
+
 ## Ordinary respawn policy
 
 PF127 eligible ordinary enemies inherit a 240-second post-NPC-despawn default.

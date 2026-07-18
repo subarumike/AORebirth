@@ -598,6 +598,116 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void LooterResolvesEveryCapturedSourceWeaponAndFailsClosedWithoutOneExactTuple()
+        {
+            var expected = new Dictionary<int, int[]>
+            {
+                { 0x795312DC, new[] { 123038, 123039, 12 } },
+                { 0x795313CB, new[] { 123038, 123039, 9 } },
+                { 0x7954501B, new[] { 123038, 123039, 8 } },
+                { 0x79545029, new[] { 123038, 123039, 9 } },
+                { 0x79545034, new[] { 123038, 123039, 12 } },
+                { 0x7954503C, new[] { 123038, 123039, 11 } },
+                { 0x79557CB8, new[] { 123038, 123039, 8 } },
+                { 0x7957E5CD, new[] { 123038, 123039, 9 } }
+            };
+            var provider = new CapturedSubwayOrdinaryContentProvider();
+            CapturedSubwayOrdinaryArchetypeDefinition archetype;
+            Assert.IsTrue(provider.TryGetArchetype("looter", out archetype));
+            Assert.AreEqual(8, archetype.SourceWeaponEvidence.Length);
+            Assert.AreEqual(15, archetype.Combat.ObservedRows);
+            Assert.AreEqual(11, archetype.Combat.MinDamage);
+            Assert.AreEqual(11, archetype.Combat.MaxDamage);
+            Assert.AreEqual(5.282358, archetype.Combat.RechargeSeconds);
+            Assert.AreEqual(6, archetype.Combat.WeaponSlot);
+            CollectionAssert.AreEquivalent(
+                expected.Keys.ToArray(),
+                archetype.SourceWeaponEvidence.Select(value => value.SourceInstance).ToArray());
+
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                provider);
+            OrdinaryEnemyProfile looter = catalog.GetProfiles()
+                .Single(value => value.DisplayName == "Looter");
+            OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns()
+                .Where(value => value.ProfileKey == looter.ProfileKey)
+                .ToArray();
+
+            Assert.AreEqual(8, spawns.Length);
+            Assert.AreEqual(6, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(2, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            CollectionAssert.AreEquivalent(
+                new[] { 0x795312DC, 0x795313CB, 0x7954501B, 0x79545029, 0x79545034, 0x7954503C },
+                spawns
+                    .Where(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active)
+                    .Select(value => value.SourceIdentity)
+                    .ToArray());
+            CollectionAssert.AreEquivalent(
+                new[] { 0x79557CB8, 0x7957E5CD },
+                spawns
+                    .Where(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined)
+                    .Select(value => value.SourceIdentity)
+                    .ToArray());
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, looter.Combat.EvidenceState);
+            Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, looter.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, looter.Combat.DamageSource);
+            Assert.IsTrue(looter.Combat.VisibleWeapon);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, looter.Combat.Contract.AttackModel);
+            Assert.IsFalse(looter.Combat.Contract.IsCombatReady);
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.Unresolved,
+                looter.Combat.ResolveContract(spawns[0].Level).AttackModel,
+                "A Looter contract without its source identity must fail closed.");
+
+            foreach (OrdinaryEnemySpawnDefinition spawn in spawns)
+            {
+                int[] weapon = expected[spawn.SourceIdentity];
+                CapturedEnemyCombatContract contract = looter.Combat.ResolveContract(
+                    spawn.SourceIdentity,
+                    spawn.Level);
+                Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
+                Assert.IsTrue(contract.IsCombatReady);
+                Assert.AreEqual(weapon[0], contract.WeaponLowId);
+                Assert.AreEqual(weapon[1], contract.WeaponHighId);
+                Assert.AreEqual(weapon[2], contract.WeaponQuality);
+                Assert.AreEqual(6, contract.WeaponInventorySlot);
+                Assert.AreEqual(0, contract.MinDamage);
+                Assert.AreEqual(0, contract.MaxDamage);
+                Assert.AreEqual(0.0, contract.RechargeSeconds);
+                Assert.AreEqual(0, contract.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, contract.AttackInfoUnknown);
+                Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+                Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
+                Assert.IsFalse(contract.HasCapturedAttackStartContext);
+                Assert.IsFalse(contract.HasCapturedEquippedAttackInfo);
+                Assert.IsTrue(contract.Evidence.Contains("Looter source 0x" + spawn.SourceIdentity.ToString("X8")));
+                Assert.IsTrue(contract.Evidence.Contains("item owns normal damage and recharge"));
+            }
+
+            CapturedEnemyCombatContract unknown = looter.Combat.ResolveContract(
+                0x7953FFFF,
+                spawns[0].Level);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, unknown.AttackModel);
+            Assert.IsFalse(unknown.IsCombatReady);
+
+            CapturedEnemyCombatContract missing = CapturedSubwayCombatCatalog.ForOrdinary(
+                BuildLooterArchetype(new CapturedSubwaySourceWeaponEvidenceDefinition[0]),
+                0x795312DC);
+            CapturedEnemyCombatContract conflicting = CapturedSubwayCombatCatalog.ForOrdinary(
+                BuildLooterArchetype(
+                    new[]
+                    {
+                        new CapturedSubwaySourceWeaponEvidenceDefinition(0x795312DC, 123038, 123039, 12, "capture-a"),
+                        new CapturedSubwaySourceWeaponEvidenceDefinition(0x795312DC, 123038, 123039, 11, "capture-b")
+                    }),
+                0x795312DC);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, missing.AttackModel);
+            Assert.IsFalse(missing.IsCombatReady);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, conflicting.AttackModel);
+            Assert.IsFalse(conflicting.IsCombatReady);
+        }
+
+        [TestMethod]
         public void DistinctNoRespawnAssignmentsKeepStablePolicyKeysAndProvenance()
         {
             WorldRespawnPolicyResolution first = WorldRespawnPolicyResolver.Resolve(
@@ -789,6 +899,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static OrdinaryEnemySpawnLevelDefinition Range() { return new OrdinaryEnemySpawnLevelDefinition(OrdinaryEnemySpawnLevelMode.InclusiveRange, 15, 25, 24, 691, 33, 0, 70, 83, 3, OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration, OrdinaryEnemyEvidenceState.Policy, "range-policy"); }
         private static void AssertExplicitDelay(OrdinaryEnemySpawnDefinition spawn, double seconds) { Assert.AreEqual(WorldRespawnPolicyAssignmentMode.Explicit, spawn.RespawnPolicy.Mode); Assert.IsNotNull(spawn.RespawnPolicy.ExplicitPolicy); Assert.AreEqual(seconds, spawn.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds.Value); }
         private static CapturedSubwayOrdinaryArchetypeDefinition BuildMeldedPatternsArchetype(CapturedSubwayCombatEvidenceDefinition combat, params string[] captures) { return new CapturedSubwayOrdinaryArchetypeDefinition("melded_patterns_test", "melded_patterns", "Melded Patterns", NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData, 148, 0, 268964353, 0, 0, 31, 0, 1899u, 29701, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], combat, new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], captures); }
+        private static CapturedSubwayOrdinaryArchetypeDefinition BuildLooterArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("looter_test", "looter", "Looter", 203745, 138, 0, 268964353, 0, 0, 31, 1, 1579u, 40695, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 11, 11, 5.282358, 6, 0, 0, 15), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260709-212115" }, sourceWeaponEvidence); }
         private static void AssertThrows(Action action) { try { action(); Assert.Fail("Expected InvalidOperationException."); } catch (InvalidOperationException) { } }
         private static string Read(string root, string file) { return System.IO.File.ReadAllText(System.IO.Path.Combine(root, @"AORebirth\Server\ZoneEngine\Core\Playfields", file)); }
         private static string FindRepositoryRoot() { string current = AppDomain.CurrentDomain.BaseDirectory; while (!string.IsNullOrEmpty(current)) { if (System.IO.Directory.Exists(System.IO.Path.Combine(current, ".git"))) return current; System.IO.DirectoryInfo parent = System.IO.Directory.GetParent(current); current = parent == null ? null : parent.FullName; } throw new InvalidOperationException("Repository root not found."); }

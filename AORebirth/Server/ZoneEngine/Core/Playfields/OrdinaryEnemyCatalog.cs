@@ -19,6 +19,8 @@ namespace AORebirth.Core.Playfields
         private const int BloodcreeperMonsterData =
             NpcCombatAttackRules.CapturedSubwayBloodcreeperMonsterData;
 
+        private const int LooterMonsterData = 203745;
+
         private const int WorkmanStrikerMonsterData = 203854;
 
         private const double BloodcreeperAutomaticAggroRadius = 7.0;
@@ -301,6 +303,7 @@ namespace AORebirth.Core.Playfields
                 CapturedEnemyCombatContract contract = CapturedSubwayCombatCatalog.ForOrdinary(archetype);
                 Func<int, int, CapturedEnemyCombatContract> sourceContractResolver =
                     archetype.MonsterData == WorkmanStrikerMonsterData
+                    || archetype.MonsterData == LooterMonsterData
                         ? new Func<int, int, CapturedEnemyCombatContract>(
                             (sourceIdentity, level) =>
                                 CapturedSubwayCombatCatalog.ForOrdinary(

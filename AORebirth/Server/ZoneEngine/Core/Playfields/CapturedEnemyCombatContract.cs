@@ -638,6 +638,8 @@ namespace AORebirth.Core.Playfields
 
     internal static class CapturedSubwayCombatCatalog
     {
+        private const int LooterMonsterData = 203745;
+
         private const int WorkmanStrikerMonsterData = 203854;
 
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
@@ -1015,6 +1017,21 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayOrdinaryArchetypeDefinition archetype,
             int sourceInstance)
         {
+            return ForSourceSpecificWeaponArchetype(archetype, sourceInstance, "Workman Striker");
+        }
+
+        private static CapturedEnemyCombatContract ForLooter(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance)
+        {
+            return ForSourceSpecificWeaponArchetype(archetype, sourceInstance, "Looter");
+        }
+
+        private static CapturedEnemyCombatContract ForSourceSpecificWeaponArchetype(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            string displayName)
+        {
             CapturedSubwaySourceWeaponEvidenceDefinition matched = null;
             int matches = 0;
             foreach (CapturedSubwaySourceWeaponEvidenceDefinition evidence in
@@ -1033,7 +1050,8 @@ namespace AORebirth.Core.Playfields
             {
                 return CapturedEnemyCombatContract.Unresolved(
                     string.Format(
-                        "Workman Striker source 0x{0:X8} requires exactly one owner-linked captured weapon tuple; found {1}",
+                        "{0} source 0x{1:X8} requires exactly one owner-linked captured weapon tuple; found {2}",
+                        displayName,
                         sourceInstance,
                         matches),
                     archetype.Combat != null && archetype.Combat.Observed);
@@ -1041,8 +1059,9 @@ namespace AORebirth.Core.Playfields
 
             return CapturedEnemyCombatContract.EquippedWeapon(
                 string.Format(
-                    "{0}: Workman Striker source 0x{1:X8} owner-linked QL{2} weapon {3}/{4}; item owns normal damage and recharge; no fixed damage, special-attack, or captured AttackInfo context",
+                    "{0}: {1} source 0x{2:X8} owner-linked QL{3} weapon {4}/{5}; item owns normal damage and recharge; no fixed damage, special-attack, or captured AttackInfo context",
                     matched.EvidenceCaptures,
+                    displayName,
                     sourceInstance,
                     matched.Quality,
                     matched.LowId,
@@ -1086,10 +1105,13 @@ namespace AORebirth.Core.Playfields
         internal static CapturedEnemyCombatContract ForOrdinary(
             CapturedSubwayOrdinaryArchetypeDefinition archetype)
         {
-            if (archetype != null && archetype.MonsterData == WorkmanStrikerMonsterData)
+            if (archetype != null
+                && (archetype.MonsterData == WorkmanStrikerMonsterData
+                    || archetype.MonsterData == LooterMonsterData))
             {
                 return CapturedEnemyCombatContract.Unresolved(
-                    "Workman Striker combat requires an exact captured source identity; aggregate weapon fallback is forbidden",
+                    archetype.Name
+                    + " combat requires an exact captured source identity; aggregate weapon fallback is forbidden",
                     archetype.Combat != null && archetype.Combat.Observed);
             }
 
@@ -1131,6 +1153,11 @@ namespace AORebirth.Core.Playfields
             if (archetype != null && archetype.MonsterData == WorkmanStrikerMonsterData)
             {
                 return ForWorkmanStriker(archetype, sourceInstance);
+            }
+
+            if (archetype != null && archetype.MonsterData == LooterMonsterData)
+            {
+                return ForLooter(archetype, sourceInstance);
             }
 
             return ForOrdinary(archetype);

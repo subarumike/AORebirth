@@ -238,6 +238,12 @@ population in bounded runtime batches.
   Architect Striker keeps fixed captured combat without an invented weapon;
   Melded Patterns keeps exact weapon-owned damage/recharge without invented
   special-attack or critical context.
+- Looter now resolves all eight owner-linked `123038/123039` weapon tuples by
+  exact source identity and QL. Its visible equipped item owns normal damage and
+  recharge; aggregate, missing, conflicting, and unknown source selection fails
+  closed, and no special-attack body is invented. The whole-enemy gate definition
+  now also covers Looter, Bloodcreeper, Stim Fiend, and Neural Burnout, bringing
+  the accepted set to fourteen.
 - The Subway combat-contract analyzer now supplements legacy identity mapping
   from `enemy-dossier.json` and exact corpse dead-NPC links before consuming
   combat rows. Its regenerated Bot projection recovers nine decoded
@@ -286,15 +292,10 @@ population in bounded runtime batches.
   regeneration: PASS.
 - Current inventory/content-ledger regression suites: `27/27` PASS.
 - Subway loot/corpse evidence: `22/22` PASS.
-- Ten-entry whole-enemy acceptance gate (Thief, Filth Flea, Disobedient Bot,
-  Slum Runner, Molested Molecules, Shadow, ordinary Infector, Architect
-  Striker, Melded Patterns, Workman Striker): PASS. The newly accepted profiles
-  retain incomplete item pools, shared chase and corpse lifetimes, and the
-  private 240-second ordinary respawn policy. Shadow, Infector, Architect
-  Striker, and Workman Striker critical observations remain report-only.
-  Ordinary Infector remains isolated from Abmouth-owned combat; Melded Patterns
-  and every Workman source retain item-owned normal damage and recharge without
-  invented attack context.
+- Fourteen-entry whole-enemy gate definition now includes Looter, Bloodcreeper,
+  Stim Fiend, and Neural Burnout after the previously confirmed ten. Ordinary
+  generation check, Debug build, diff check, expanded gate, WorldPopulation
+  `29/29`, and Subway loot `22/22` all pass.
 - Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
 - World population foundation: `28/28` PASS.
