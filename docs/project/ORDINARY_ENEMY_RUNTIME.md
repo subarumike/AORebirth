@@ -230,7 +230,7 @@ probability distribution is claimed.
 
 Molested Molecules is the fourth accepted ordinary profile. Its nine exact
 spawns cover captured levels 17 through 24. Twenty normal local-player hits
-prove `16..42` damage with slot `6` and `4.763456`-second cadence. Three strict
+prove `16..42` damage with slot `6` and `4.749995`-second cadence. Three strict
 complete inventories prove four observed `1/3` item memberships and one empty
 outcome; seven positive-credit corpses preserve CATMesh `5921` and exact
 captured level-credit rules. Shared chase and ordinary three-second empty/four-
@@ -258,6 +258,42 @@ chase and ordinary three-second empty/four-minute loot-bearing corpse behavior
 apply. Two Bot rows remain in the existing operational quarantine; acceptance
 does not activate them. Proactive aggro radius and leash/reset distance remain
 unresolved.
+
+Workman Striker is not yet an accepted profile, but its existing corpus is now
+materially stronger. Declared overlap rules reduce simultaneous capture
+projections to 47 distinct normal local-player hits at `14..23`, six criticals
+at `36..42`, and a `5.092328`-second median attack interval; two Killer-pet hits
+stay in a separate target-role bucket. Twenty-one active exact spawns cover
+levels 13, 14, 15, 16, 17, and 25, and every one has an owner-linked captured
+weapon tuple. Ten complete first corpse opens prove eight positive and two empty
+loot outcomes; ten unopened corpse generations do not enter the denominator.
+The ten item/QL entries replay only their observed `1/10` or `2/10` frequencies,
+with wider pool completeness unresolved. Every active source now resolves its
+exact owner-linked captured low/high/QL weapon tuple; unknown, missing,
+conflicting, or aggregate resolution fails closed. Those equipped items own
+normal damage and recharge without a fixed-damage or captured-AttackInfo
+override. A non-invented shared weapon-critical formula remains required before
+whole-enemy acceptance.
+
+Melded Patterns no longer uses a fixed post-mitigation attack range as its
+runtime damage source. Focused capture `20260716-034559` proves the QL20
+Irreparable Sleekblaster Minor `121817/121818`; the ordinary combat profile now
+equips that item and lets its stats own damage and recharge. The exact-evidence
+gate fails closed if the focused capture or seven normal `21..34` hit boundary
+drifts. No special-attack context or critical behavior is inferred, and the
+profile remains outside the accepted gate pending a fresh whole-enemy coverage
+audit.
+
+Legacy first-open evidence now supplies strict item denominators for four more
+ordinary profiles through one reusable raw-generation validator. Shadow uses
+15 complete opens (eight positive/seven empty), ordinary Infector seven
+(three/four), Architect Striker four (three/one), and Melded Patterns four
+(three/one). Each reviewed row binds the exact corpse full-update time, corpse,
+dead NPC, first raw inventory packet, and reuse boundary. Simultaneous Shadow
+projections from `20260709-212115/212336` count once; unopened and snapshot-only
+corpses remain excluded. All four profiles use `IndependentEntries`, preserve
+their observed empty counts, and keep `ItemPoolComplete=false`; the replay
+weights are private observed-sample policy rather than official drop odds.
 
 ## Ordinary respawn policy
 

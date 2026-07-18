@@ -2485,7 +2485,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ordinaryProviderText.Contains("\"molested_molecules\"")
                 && ordinaryProviderText.Contains("\"Molested Molecules\"")
                 && ordinaryProviderText.Contains("203746")
-                && ordinaryProviderText.Contains("4.763456")
+                && ordinaryProviderText.Contains("4.749995")
                 && ordinaryProviderText.Contains("new CapturedSubwayCombatEvidenceDefinition(")
                 && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(27199, 27199, 10, 1, 3, 3333)")
                 && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(121743, 121744, 25, 1, 3, 3333)")
@@ -2538,7 +2538,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponLastValue") == 1
                 && catalogText.Contains("level => CapturedSubwayCombatCatalog.For(first.Name, first.MonsterData, level)")
                 && ordinaryProfileText.Contains("CapturedEnemyCombatContract ResolveContract(int level)")
-                && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(variant.Level)")
+                && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(spawn.SourceIdentity, variant.Level)")
                 && ordinaryRuntimeText.Contains("combatContract.AttackModel")
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue"),

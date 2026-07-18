@@ -19,6 +19,18 @@ namespace AORebirth.Core.Playfields
         private const int BloodcreeperMonsterData =
             NpcCombatAttackRules.CapturedSubwayBloodcreeperMonsterData;
 
+        private const int WorkmanStrikerMonsterData = 203854;
+
+        private static readonly Dictionary<int, int> ReviewedLegacyStrictLootEmptyCounts =
+            new Dictionary<int, int>
+            {
+                { 30464, 7 },
+                { 31909, 4 },
+                { 203743, 1 },
+                { 203747, 1 },
+                { WorkmanStrikerMonsterData, 2 }
+            };
+
         private const double BloodcreeperAutomaticAggroRadius = 7.0;
 
         private static readonly Dictionary<string, OrdinaryEnemySpawnPolicyConfiguration>
@@ -289,6 +301,14 @@ namespace AORebirth.Core.Playfields
             {
                 uint appearance = archetype.AppearanceValue;
                 CapturedEnemyCombatContract contract = CapturedSubwayCombatCatalog.ForOrdinary(archetype);
+                Func<int, int, CapturedEnemyCombatContract> sourceContractResolver =
+                    archetype.MonsterData == WorkmanStrikerMonsterData
+                        ? new Func<int, int, CapturedEnemyCombatContract>(
+                            (sourceIdentity, level) =>
+                                CapturedSubwayCombatCatalog.ForOrdinary(
+                                    archetype,
+                                    sourceIdentity))
+                        : null;
                 OrdinaryEnemyLootEntry[] lootEntries = archetype.LootEvidence
                     .Select(
                         (value, index) =>
@@ -345,7 +365,11 @@ namespace AORebirth.Core.Playfields
                                 .ToArray(),
                             OrdinaryEnemyScfuProfile.CapturedExact),
                         AggressionFor(archetype.MonsterData),
-                        BuildCombatProfile(contract, archetype.MonsterData),
+                        BuildCombatProfile(
+                            contract,
+                            archetype.MonsterData,
+                            null,
+                            sourceContractResolver),
                         BuildLootProfile(
                             archetype.MonsterData,
                             lootEntries,
@@ -575,30 +599,42 @@ namespace AORebirth.Core.Playfields
         private static OrdinaryEnemyCombatProfile BuildCombatProfile(
             CapturedEnemyCombatContract contract,
             int monsterData,
-            Func<int, CapturedEnemyCombatContract> contractResolver = null)
+            Func<int, CapturedEnemyCombatContract> contractResolver = null,
+            Func<int, int, CapturedEnemyCombatContract> sourceContractResolver = null)
         {
             OrdinaryEnemyCombatMode mode = OrdinaryEnemyCombatMode.Unresolved;
             OrdinaryEnemyDamageSource damageSource = OrdinaryEnemyDamageSource.Unresolved;
             bool visibleWeapon = false;
-            switch (contract.AttackModel)
+            if (sourceContractResolver != null)
             {
-                case CapturedEnemyAttackModel.FixedAttackInfo:
-                    mode = OrdinaryEnemyCombatMode.UnarmedMelee;
-                    damageSource = OrdinaryEnemyDamageSource.CapturedFixed;
-                    break;
+                mode = OrdinaryEnemyCombatMode.EquippedRanged;
+                damageSource = OrdinaryEnemyDamageSource.WeaponRoll;
+                visibleWeapon = true;
+            }
+            else
+            {
+                switch (contract.AttackModel)
+                {
+                    case CapturedEnemyAttackModel.FixedAttackInfo:
+                        mode = OrdinaryEnemyCombatMode.UnarmedMelee;
+                        damageSource = OrdinaryEnemyDamageSource.CapturedFixed;
+                        break;
 
-                case CapturedEnemyAttackModel.EquippedWeapon:
-                    mode = monsterData == 26092
-                        ? OrdinaryEnemyCombatMode.EquippedRanged
-                        : OrdinaryEnemyCombatMode.Unresolved;
-                    damageSource = OrdinaryEnemyDamageSource.WeaponRoll;
-                    visibleWeapon = true;
-                    break;
+                    case CapturedEnemyAttackModel.EquippedWeapon:
+                        mode = monsterData == 26092
+                               || monsterData
+                                  == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData
+                            ? OrdinaryEnemyCombatMode.EquippedRanged
+                            : OrdinaryEnemyCombatMode.Unresolved;
+                        damageSource = OrdinaryEnemyDamageSource.WeaponRoll;
+                        visibleWeapon = true;
+                        break;
 
-                case CapturedEnemyAttackModel.Specialized:
-                    mode = OrdinaryEnemyCombatMode.NaturalMelee;
-                    damageSource = OrdinaryEnemyDamageSource.NaturalAttack;
-                    break;
+                    case CapturedEnemyAttackModel.Specialized:
+                        mode = OrdinaryEnemyCombatMode.NaturalMelee;
+                        damageSource = OrdinaryEnemyDamageSource.NaturalAttack;
+                        break;
+                }
             }
 
             return new OrdinaryEnemyCombatProfile(
@@ -606,13 +642,14 @@ namespace AORebirth.Core.Playfields
                 damageSource,
                 visibleWeapon,
                 contract,
-                contract.IsCombatReady
+                contract.IsCombatReady || sourceContractResolver != null
                     ? OrdinaryEnemyEvidenceState.Observed
                     : OrdinaryEnemyEvidenceState.Unresolved,
                 monsterData == 26092 ? 1.0 : (double?)null,
                 monsterData == 26092 ? 1 : (int?)null,
                 monsterData == 26092,
-                contractResolver);
+                contractResolver,
+                sourceContractResolver);
         }
 
         private static OrdinaryEnemyLootProfile BuildLootProfile(
@@ -633,14 +670,26 @@ namespace AORebirth.Core.Playfields
             corpseEvidence = corpseEvidence ?? new CapturedSubwayCorpseEvidenceDefinition[0];
             OrdinaryEnemyLootEvidence evidence = entries.Length == 0
                 ? OrdinaryEnemyLootEvidence.Unresolved
-                : entries.All(value => value.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven)
-                    ? OrdinaryEnemyLootEvidence.GuaranteedProven
-                    : OrdinaryEnemyLootEvidence.ObservedAvailableLoot;
+                : ReviewedLegacyStrictLootEmptyCounts.ContainsKey(monsterData)
+                    ? OrdinaryEnemyLootEvidence.ObservedAvailableLoot
+                    : entries.All(value => value.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven)
+                        ? OrdinaryEnemyLootEvidence.GuaranteedProven
+                        : OrdinaryEnemyLootEvidence.ObservedAvailableLoot;
             int observedCompleteInventories = entries
                 .Select(value => value.ObservedCorpses)
                 .DefaultIfEmpty(0)
                 .Max();
-            int observedEmptyInventories = monsterData == 17657 ? 5 : 0;
+            int observedEmptyInventories;
+            if (monsterData == 17657)
+            {
+                observedEmptyInventories = 5;
+            }
+            else if (!ReviewedLegacyStrictLootEmptyCounts.TryGetValue(
+                monsterData,
+                out observedEmptyInventories))
+            {
+                observedEmptyInventories = 0;
+            }
             string itemEvidenceReference = string.Join(
                 ",",
                 entries
@@ -706,7 +755,8 @@ namespace AORebirth.Core.Playfields
                     entries,
                     OrdinaryEnemyLootPoolMode.IndependentEntries,
                     0,
-                    entries.Length > 0,
+                    entries.Length > 0
+                        && !ReviewedLegacyStrictLootEmptyCounts.ContainsKey(monsterData),
                     observedCompleteInventories,
                     observedEmptyInventories,
                     itemEvidenceReference,
@@ -768,9 +818,10 @@ namespace AORebirth.Core.Playfields
                 entries,
                 OrdinaryEnemyLootPoolMode.IndependentEntries,
                 0,
-                entries.Length > 0,
+                entries.Length > 0
+                    && !ReviewedLegacyStrictLootEmptyCounts.ContainsKey(monsterData),
                 observedCompleteInventories,
-                0,
+                observedEmptyInventories,
                 itemEvidenceReference,
                 OrdinaryEnemyEvidenceState.Unresolved,
                 null,

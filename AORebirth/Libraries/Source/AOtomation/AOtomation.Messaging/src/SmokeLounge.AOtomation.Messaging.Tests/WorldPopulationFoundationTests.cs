@@ -375,7 +375,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new CapturedSubwayOrdinaryContentProvider());
 
             AssertCapturedDamage(catalog, "Incomplete Rebuild", 17, 35);
-            AssertCapturedDamage(catalog, "Melded Patterns", 21, 34);
             AssertCapturedDamage(catalog, "Molested Molecules", 16, 42);
             AssertCapturedDamage(catalog, "Neural Burnout", 16, 22);
             AssertCapturedDamage(catalog, "Redundant Scan", 19, 19);
@@ -384,6 +383,218 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             OrdinaryEnemyProfile molested = catalog.GetProfiles()
                 .Single(value => value.DisplayName == "Molested Molecules");
             Assert.IsTrue(molested.Combat.Contract.Evidence.Contains("20260716-221358"));
+        }
+
+        [TestMethod]
+        public void MeldedPatternsUsesCapturedWeaponRollAndFailsClosedWithoutExactEvidence()
+        {
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider());
+            OrdinaryEnemyProfile melded = catalog.GetProfiles()
+                .Single(value => value.DisplayName == "Melded Patterns");
+            CapturedEnemyCombatContract contract = melded.Combat.Contract;
+
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, melded.Combat.EvidenceState);
+            Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, melded.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, melded.Combat.DamageSource);
+            Assert.IsTrue(melded.Combat.VisibleWeapon);
+            Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
+            Assert.IsTrue(contract.IsCombatReady);
+            Assert.AreEqual(121817, NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponLowTemplate);
+            Assert.AreEqual(121818, NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponHighTemplate);
+            Assert.AreEqual(20, NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponQuality);
+            Assert.AreEqual(121817, contract.WeaponLowId);
+            Assert.AreEqual(121818, contract.WeaponHighId);
+            Assert.AreEqual(20, contract.WeaponQuality);
+            Assert.AreEqual(6, contract.WeaponInventorySlot);
+            Assert.AreEqual(0, contract.MinDamage, "Observed post-mitigation hits must not become a weapon damage override.");
+            Assert.AreEqual(0, contract.MaxDamage, "Observed post-mitigation hits must not become a weapon damage override.");
+            Assert.AreEqual(0.0, contract.RechargeSeconds, "Observed timing must not replace item-owned recharge.");
+            Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext, "No special-attack context was promoted.");
+            Assert.IsFalse(contract.HasCapturedEquippedAttackInfo, "Generic item-owned AttackInfo must remain in control.");
+            Assert.IsTrue(contract.Evidence.Contains("20260716-034559"));
+            Assert.IsTrue(contract.Evidence.Contains("21..34"));
+            Assert.IsTrue(contract.Evidence.Contains("no observed critical"));
+
+            CapturedEnemyCombatContract missingFocusedCapture =
+                CapturedSubwayCombatCatalog.ForOrdinary(
+                    BuildMeldedPatternsArchetype(
+                        new CapturedSubwayCombatEvidenceDefinition(
+                            true,
+                            21,
+                            34,
+                            4.466488,
+                            6,
+                            0,
+                            0,
+                            7),
+                        "different-capture"));
+            CapturedEnemyCombatContract changedNormalHitBoundary =
+                CapturedSubwayCombatCatalog.ForOrdinary(
+                    BuildMeldedPatternsArchetype(
+                        new CapturedSubwayCombatEvidenceDefinition(
+                            true,
+                            21,
+                            35,
+                            4.466488,
+                            6,
+                            0,
+                            0,
+                            7),
+                        "20260716-034559"));
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, missingFocusedCapture.AttackModel);
+            Assert.IsFalse(missingFocusedCapture.IsCombatReady);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, changedNormalHitBoundary.AttackModel);
+            Assert.IsFalse(changedNormalHitBoundary.IsCombatReady);
+
+            OrdinaryEnemyProfile incomplete = catalog.GetProfiles()
+                .Single(value => value.DisplayName == "Incomplete Rebuild");
+            Assert.AreEqual(CapturedEnemyAttackModel.FixedAttackInfo, incomplete.Combat.Contract.AttackModel);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.CapturedFixed, incomplete.Combat.DamageSource);
+            Assert.IsFalse(incomplete.Combat.VisibleWeapon);
+
+            string source = Read(FindRepositoryRoot(), "CapturedEnemyCombatContract.cs");
+            int methodStart = source.IndexOf(
+                "private static CapturedEnemyCombatContract ForMeldedPatterns",
+                StringComparison.Ordinal);
+            int methodEnd = source.IndexOf(
+                "internal static CapturedEnemyCombatContract ForOrdinary",
+                methodStart,
+                StringComparison.Ordinal);
+            Assert.IsTrue(methodStart >= 0 && methodEnd > methodStart);
+            string implementation = source.Substring(methodStart, methodEnd - methodStart);
+            Assert.IsTrue(implementation.Contains("CapturedEnemyCombatContract.EquippedWeapon("));
+            Assert.IsFalse(implementation.Contains("EquippedWeaponWithEmptySpecialAttackContext"));
+            Assert.IsFalse(implementation.Contains("CapturedEnemyCombatContract.FixedAttack("));
+        }
+
+        [TestMethod]
+        public void WorkmanStrikerResolvesEveryCapturedSourceWeaponAndNeverUsesAggregateFallback()
+        {
+            var expected = new Dictionary<int, int[]>
+            {
+                { 0x7953A84F, new[] { 122905, 122906, 19 } },
+                { 0x7953A9F0, new[] { 122905, 122906, 17 } },
+                { 0x7953AA0D, new[] { 122905, 122906, 18 } },
+                { 0x7953AA16, new[] { 122905, 122906, 15 } },
+                { 0x7953AA77, new[] { 122905, 122906, 14 } },
+                { 0x7953AABE, new[] { 122905, 122906, 13 } },
+                { 0x7953AAE9, new[] { 122905, 122906, 14 } },
+                { 0x7953AB03, new[] { 122905, 122906, 16 } },
+                { 0x7953AF95, new[] { 122905, 122906, 12 } },
+                { 0x7953AFB8, new[] { 122905, 122906, 17 } },
+                { 0x7953AFBC, new[] { 122905, 122906, 19 } },
+                { 0x7953AFDD, new[] { 122905, 122906, 12 } },
+                { 0x7953AFF9, new[] { 122905, 122906, 16 } },
+                { 0x79545000, new[] { 122906, 122906, 20 } },
+                { 0x7954501A, new[] { 122905, 122906, 16 } },
+                { 0x79545108, new[] { 122905, 122906, 15 } },
+                { 0x795451CA, new[] { 122907, 122908, 27 } },
+                { 0x79545205, new[] { 122905, 122906, 11 } },
+                { 0x79545213, new[] { 122905, 122906, 14 } },
+                { 0x79545219, new[] { 122905, 122906, 19 } },
+                { 0x79545224, new[] { 122905, 122906, 14 } }
+            };
+            var provider = new CapturedSubwayOrdinaryContentProvider();
+            CapturedSubwayOrdinaryArchetypeDefinition archetype;
+            Assert.IsTrue(provider.TryGetArchetype("workman_striker", out archetype));
+            Assert.AreEqual(21, archetype.SourceWeaponEvidence.Length);
+            CollectionAssert.AreEquivalent(
+                expected.Keys.ToArray(),
+                archetype.SourceWeaponEvidence.Select(value => value.SourceInstance).ToArray());
+
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                provider);
+            OrdinaryEnemyProfile workman = catalog.GetProfiles()
+                .Single(value => value.DisplayName == "Workman Striker");
+            OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns()
+                .Where(value => value.ProfileKey == workman.ProfileKey)
+                .ToArray();
+
+            Assert.AreEqual(21, spawns.Length);
+            CollectionAssert.AreEquivalent(
+                expected.Keys.ToArray(),
+                spawns.Select(value => value.SourceIdentity).ToArray());
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, workman.Combat.EvidenceState);
+            Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, workman.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, workman.Combat.DamageSource);
+            Assert.IsTrue(workman.Combat.VisibleWeapon);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, workman.Combat.Contract.AttackModel);
+            Assert.IsFalse(workman.Combat.Contract.IsCombatReady);
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.Unresolved,
+                workman.Combat.ResolveContract(spawns[0].Level).AttackModel,
+                "A Workman contract without its source identity must fail closed.");
+
+            foreach (OrdinaryEnemySpawnDefinition spawn in spawns)
+            {
+                int[] weapon = expected[spawn.SourceIdentity];
+                CapturedEnemyCombatContract contract = workman.Combat.ResolveContract(
+                    spawn.SourceIdentity,
+                    spawn.Level);
+                Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
+                Assert.IsTrue(contract.IsCombatReady);
+                Assert.AreEqual(weapon[0], contract.WeaponLowId);
+                Assert.AreEqual(weapon[1], contract.WeaponHighId);
+                Assert.AreEqual(weapon[2], contract.WeaponQuality);
+                Assert.AreEqual(6, contract.WeaponInventorySlot);
+                Assert.AreEqual(0, contract.MinDamage);
+                Assert.AreEqual(0, contract.MaxDamage);
+                Assert.AreEqual(0.0, contract.RechargeSeconds);
+                Assert.AreEqual(0, contract.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, contract.AttackInfoUnknown);
+                Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+                Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
+                Assert.IsFalse(contract.HasCapturedAttackStartContext);
+                Assert.IsFalse(contract.HasCapturedEquippedAttackInfo);
+                Assert.IsTrue(
+                    contract.Evidence.Contains(
+                        "source 0x" + spawn.SourceIdentity.ToString("X8")));
+            }
+
+            CapturedEnemyCombatContract unknown = workman.Combat.ResolveContract(
+                0x7953FFFF,
+                spawns[0].Level);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, unknown.AttackModel);
+            Assert.IsFalse(unknown.IsCombatReady);
+
+            OrdinaryEnemyProfile melded = catalog.GetProfiles()
+                .Single(value => value.DisplayName == "Melded Patterns");
+            Assert.AreSame(
+                melded.Combat.Contract,
+                melded.Combat.ResolveContract(0x7953FFFF, 20),
+                "Profiles without a source resolver must preserve their base contract.");
+
+            var levelResolved = new CapturedEnemyCombatContract { Evidence = "level" };
+            var levelAware = new OrdinaryEnemyCombatProfile(
+                OrdinaryEnemyCombatMode.Unresolved,
+                OrdinaryEnemyDamageSource.Unresolved,
+                false,
+                new CapturedEnemyCombatContract { Evidence = "base" },
+                OrdinaryEnemyEvidenceState.Unresolved,
+                contractResolver: level => levelResolved);
+            Assert.AreSame(
+                levelResolved,
+                levelAware.ResolveContract(0x7953FFFF, 10),
+                "The source-aware overload must retain the existing level resolver fallback.");
+
+            string source = Read(FindRepositoryRoot(), "CapturedEnemyCombatContract.cs");
+            int methodStart = source.IndexOf(
+                "private static CapturedEnemyCombatContract ForWorkmanStriker",
+                StringComparison.Ordinal);
+            int methodEnd = source.IndexOf(
+                "private static CapturedEnemyCombatContract ForMeldedPatterns",
+                methodStart,
+                StringComparison.Ordinal);
+            Assert.IsTrue(methodStart >= 0 && methodEnd > methodStart);
+            string implementation = source.Substring(methodStart, methodEnd - methodStart);
+            Assert.IsTrue(implementation.Contains("CapturedEnemyCombatContract.EquippedWeapon("));
+            Assert.IsFalse(implementation.Contains("EquippedWeaponWithEmptySpecialAttackContext"));
+            Assert.IsFalse(implementation.Contains("CapturedEnemyCombatContract.FixedAttack("));
+            Assert.IsFalse(implementation.Contains("MinDamage"));
+            Assert.IsFalse(implementation.Contains("MaxDamage"));
         }
 
         [TestMethod]
@@ -577,6 +788,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static WorldRespawnSchedule Schedule(string key, int playfield, DateTime due) { return new WorldRespawnSchedule { SpawnKey = key, PlayfieldId = playfield, DueAtUtc = due, Generation = 1 }; }
         private static OrdinaryEnemySpawnLevelDefinition Range() { return new OrdinaryEnemySpawnLevelDefinition(OrdinaryEnemySpawnLevelMode.InclusiveRange, 15, 25, 24, 691, 33, 0, 70, 83, 3, OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration, OrdinaryEnemyEvidenceState.Policy, "range-policy"); }
         private static void AssertExplicitDelay(OrdinaryEnemySpawnDefinition spawn, double seconds) { Assert.AreEqual(WorldRespawnPolicyAssignmentMode.Explicit, spawn.RespawnPolicy.Mode); Assert.IsNotNull(spawn.RespawnPolicy.ExplicitPolicy); Assert.AreEqual(seconds, spawn.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds.Value); }
+        private static CapturedSubwayOrdinaryArchetypeDefinition BuildMeldedPatternsArchetype(CapturedSubwayCombatEvidenceDefinition combat, params string[] captures) { return new CapturedSubwayOrdinaryArchetypeDefinition("melded_patterns_test", "melded_patterns", "Melded Patterns", NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData, 148, 0, 268964353, 0, 0, 31, 0, 1899u, 29701, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], combat, new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], captures); }
         private static void AssertThrows(Action action) { try { action(); Assert.Fail("Expected InvalidOperationException."); } catch (InvalidOperationException) { } }
         private static string Read(string root, string file) { return System.IO.File.ReadAllText(System.IO.Path.Combine(root, @"AORebirth\Server\ZoneEngine\Core\Playfields", file)); }
         private static string FindRepositoryRoot() { string current = AppDomain.CurrentDomain.BaseDirectory; while (!string.IsNullOrEmpty(current)) { if (System.IO.Directory.Exists(System.IO.Path.Combine(current, ".git"))) return current; System.IO.DirectoryInfo parent = System.IO.Directory.GetParent(current); current = parent == null ? null : parent.FullName; } throw new InvalidOperationException("Repository root not found."); }

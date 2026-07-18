@@ -1,5 +1,9 @@
 namespace AORebirth.Core.Playfields
 {
+    using System;
+
+    using ZoneEngine.Core.Playfields;
+
     internal enum CapturedEnemyAttackModel
     {
         Unresolved = 0,
@@ -19,10 +23,34 @@ namespace AORebirth.Core.Playfields
         internal int MinDamage { get; set; }
 
         internal int MaxDamage { get; set; }
+
+        internal double RechargeSeconds { get; set; }
+
+        internal int AttackInfoWeaponSlot { get; set; }
+
+        internal int AttackInfoUnknown { get; set; }
+
+        internal int AttackInfoWeaponInstance { get; set; }
+
+        internal int WeaponLowId { get; set; }
+
+        internal int WeaponHighId { get; set; }
+
+        internal int WeaponQuality { get; set; }
+
+        internal int WeaponInventorySlot { get; set; }
+
+        internal bool HasEmptySpecialAttackWeaponContext { get; set; }
+
+        internal bool HasCapturedAttackStartContext { get; set; }
+
+        internal bool HasCapturedEquippedAttackInfo { get; set; }
     }
 
     internal static class CapturedSubwayCombatCatalog
     {
+        private const int WorkmanStrikerMonsterData = 203854;
+
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
         {
             return new CapturedEnemyCombatContract();
@@ -36,6 +64,53 @@ namespace AORebirth.Core.Playfields
         internal static CapturedEnemyCombatContract ForOrdinary(
             CapturedSubwayOrdinaryArchetypeDefinition archetype)
         {
+            if (archetype != null && archetype.MonsterData == WorkmanStrikerMonsterData)
+            {
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.Unresolved,
+                    IsCombatReady = false,
+                    Evidence = "Workman Striker requires exact source weapon evidence."
+                };
+            }
+
+            if (archetype != null
+                && archetype.MonsterData
+                   == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData)
+            {
+                CapturedSubwayCombatEvidenceDefinition meldedCombat = archetype.Combat;
+                bool hasFocusedWeaponCapture = archetype.EvidenceCaptures != null
+                                               && Array.IndexOf(
+                                                   archetype.EvidenceCaptures,
+                                                   "20260716-034559") >= 0;
+                bool hasExactNormalHitBoundary = meldedCombat != null
+                                                 && meldedCombat.Observed
+                                                 && meldedCombat.ObservedRows == 7
+                                                 && meldedCombat.MinDamage == 21
+                                                 && meldedCombat.MaxDamage == 34
+                                                 && meldedCombat.WeaponSlot == 6;
+                if (!hasFocusedWeaponCapture || !hasExactNormalHitBoundary)
+                {
+                    return new CapturedEnemyCombatContract
+                    {
+                        AttackModel = CapturedEnemyAttackModel.Unresolved,
+                        IsCombatReady = false,
+                        Evidence = "Melded Patterns captured weapon evidence is incomplete."
+                    };
+                }
+
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
+                    IsCombatReady = true,
+                    Evidence = "20260716-034559: seven normal local-player hits 21..34; no observed critical; weapon-owned damage and recharge",
+                    WeaponLowId = NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponLowTemplate,
+                    WeaponHighId = NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponHighTemplate,
+                    WeaponQuality = NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponQuality,
+                    WeaponInventorySlot = 6
+                };
+            }
+
             bool observed = archetype != null
                             && archetype.Combat != null
                             && archetype.Combat.Observed;
@@ -50,6 +125,57 @@ namespace AORebirth.Core.Playfields
                     : string.Join(",", archetype.EvidenceCaptures),
                 MinDamage = observed ? archetype.Combat.MinDamage : 0,
                 MaxDamage = observed ? archetype.Combat.MaxDamage : 0
+            };
+        }
+
+        internal static CapturedEnemyCombatContract ForOrdinary(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance)
+        {
+            if (archetype == null || archetype.MonsterData != WorkmanStrikerMonsterData)
+            {
+                return ForOrdinary(archetype);
+            }
+
+            CapturedSubwaySourceWeaponEvidenceDefinition matched = null;
+            int matches = 0;
+            foreach (CapturedSubwaySourceWeaponEvidenceDefinition evidence in
+                archetype.SourceWeaponEvidence)
+            {
+                if (evidence.SourceInstance != sourceInstance)
+                {
+                    continue;
+                }
+
+                matched = evidence;
+                matches++;
+            }
+
+            if (matches != 1 || matched == null)
+            {
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.Unresolved,
+                    IsCombatReady = false,
+                    Evidence = "Workman Striker source weapon evidence is missing or conflicting."
+                };
+            }
+
+            return new CapturedEnemyCombatContract
+            {
+                AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
+                IsCombatReady = true,
+                Evidence = string.Format(
+                    "{0}: source 0x{1:X8} QL{2} weapon {3}/{4}; item owns normal damage and recharge",
+                    matched.EvidenceCaptures,
+                    sourceInstance,
+                    matched.Quality,
+                    matched.LowId,
+                    matched.HighId),
+                WeaponLowId = matched.LowId,
+                WeaponHighId = matched.HighId,
+                WeaponQuality = matched.Quality,
+                WeaponInventorySlot = 6
             };
         }
     }

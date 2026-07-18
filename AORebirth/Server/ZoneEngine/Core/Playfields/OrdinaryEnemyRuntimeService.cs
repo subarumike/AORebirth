@@ -253,7 +253,8 @@ namespace AORebirth.Core.Playfields
             this.ApplyMovement(character, controller, spawn);
 
             string combatFailure;
-            CapturedEnemyCombatContract combatContract = profile.Combat.ResolveContract(variant.Level);
+            CapturedEnemyCombatContract combatContract =
+                profile.Combat.ResolveContract(spawn.SourceIdentity, variant.Level);
             bool combatReady = CapturedEnemyCombatRuntime.Prepare(
                 character,
                 controller,

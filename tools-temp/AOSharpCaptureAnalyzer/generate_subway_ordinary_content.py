@@ -18,6 +18,7 @@ CAPTURES = (
     "20260709-210452",
     "20260709-212115",
     "20260709-212336",
+    "20260709-213711",
     "20260709-220439",
     "20260709-222339",
     "20260709-225408",
@@ -37,6 +38,7 @@ SPAWN_CAPTURES = (
     "20260710-202132",
 )
 CAPTURE_ARCHETYPE_FILTERS = {
+    "20260709-213711": frozenset(("Architect Striker", "Workman Striker")),
     "20260710-202132": frozenset(("Looter", "Stim Fiend", "Deranged Shopper")),
     "20260716-034559": frozenset(("Melded Patterns",)),
     "20260716-034656": frozenset(("Slum Runner",)),
@@ -52,6 +54,248 @@ CAPTURE_ARCHETYPE_FILTERS = {
             "Slum Runner",
         )
     ),
+}
+CAPTURE_IDENTITY_NAME_OVERRIDES = {
+    # This combat-only capture has no matching SCFU/name row.  Its two slot-6
+    # sources are the observed Workman Strikers and its slot-0 source is the
+    # observed Architect Striker; the generated combat contract corpus carries
+    # the same identity ownership.
+    "20260709-213711": {
+        "(SimpleChar:7953AFBC)": "Workman Striker",
+        "(SimpleChar:7953AFDD)": "Workman Striker",
+        "(SimpleChar:7953AFDA)": "Architect Striker",
+    }
+}
+
+# These directories overlap one running official client.  The first tuple
+# member is retained as canonical provenance.  A 20 ms bound covers the
+# audited maximum 16.871 ms logger skew in 212336 and the 17 ms Workman
+# critical skew in 213711.  Every other capture pair remains ineligible.
+OVERLAPPING_COMBAT_CAPTURE_RULES = {
+    ("20260709-212115", "20260709-212336"): 0.020,
+    ("20260709-212115", "20260709-213711"): 0.020,
+}
+COMBAT_ATTACK_DETAIL = re.compile(
+    r"WeaponSlot=(?P<slot>-?\d+).*Unk1=(?P<unknown>-?\d+).*"
+    r"HitType=(?P<hit_type>\w+).*WeaponInstance=(?P<instance>-?\d+)"
+)
+COMBAT_TARGET_DETAIL = re.compile(
+    r"\bTarget=(?P<target>\(SimpleChar:[0-9A-F]+\))"
+)
+WEAPON_OWNER_DETAIL = re.compile(
+    r"\bOwner=\(SimpleChar:(?P<owner>[0-9A-F]+)\)"
+)
+WEAPON_QUALITY_DETAIL = re.compile(r"\bACGItemLevel=(?P<quality>\d+)")
+WEAPON_LOW_TEMPLATE_DETAIL = re.compile(
+    r"\bACGItemTemplateID=(?P<low>\d+)"
+)
+WEAPON_HIGH_TEMPLATE_DETAIL = re.compile(
+    r"\bACGItemTemplateID2=(?P<high>\d+)"
+)
+RAW_INVENTORY_UPDATE_LINE = re.compile(
+    r"^(?P<captured_utc>\S+) IN #(?P<sequence>\d+) len=(?P<length>\d+) "
+    r"n3=InventoryUpdate hex=(?P<hex>[0-9A-F]+)$"
+)
+
+# The two capture directories overlap one running AO process and project the
+# same first two item-bearing Workman corpse generations twice.  Keep the
+# later, complete directory as the canonical legacy-outcome source.
+WORKMAN_STRIKER_DUPLICATE_LOOT_CAPTURE = "20260709-212115"
+WORKMAN_STRIKER_CANONICAL_LOOT_CAPTURE = "20260709-212336"
+WORKMAN_STRIKER_DUPLICATE_LOOT_ROWS = 4
+
+# Every active Workman source has one exact owner-linked WeaponItemFullUpdate
+# tuple in the completed capture corpus.  Keep the expected review boundary
+# explicit so a missing, duplicate-conflicting, or silently changed tuple stops
+# generation instead of collapsing the family to one representative QL.
+EXPECTED_SOURCE_WEAPON_EVIDENCE = {
+    "Workman Striker": {
+        0x7953A84F: (122905, 122906, 19),
+        0x7953A9F0: (122905, 122906, 17),
+        0x7953AA0D: (122905, 122906, 18),
+        0x7953AA16: (122905, 122906, 15),
+        0x7953AA77: (122905, 122906, 14),
+        0x7953AABE: (122905, 122906, 13),
+        0x7953AAE9: (122905, 122906, 14),
+        0x7953AB03: (122905, 122906, 16),
+        0x7953AF95: (122905, 122906, 12),
+        0x7953AFB8: (122905, 122906, 17),
+        0x7953AFBC: (122905, 122906, 19),
+        0x7953AFDD: (122905, 122906, 12),
+        0x7953AFF9: (122905, 122906, 16),
+        0x79545000: (122906, 122906, 20),
+        0x7954501A: (122905, 122906, 16),
+        0x79545108: (122905, 122906, 15),
+        0x795451CA: (122907, 122908, 27),
+        0x79545205: (122905, 122906, 11),
+        0x79545213: (122905, 122906, 14),
+        0x79545219: (122905, 122906, 19),
+        0x79545224: (122905, 122906, 14),
+    }
+}
+
+# Audited complete-open denominator for Workman Striker.  The legacy capture
+# predates corpse-loot-observations.csv, so the item rows are recovered from
+# the identity-linked first inventory snapshots below.  The four canonical
+# 20260709-212336 generations contain two positive and two explicit empty
+# opens; 20260709-220439 contributes six further positive complete opens.
+WORKMAN_STRIKER_STRICT_LOOT_CAPTURES = frozenset(
+    ("20260709-212336", "20260709-220439")
+)
+WORKMAN_STRIKER_STRICT_OPENED_CORPSES = 10
+WORKMAN_STRIKER_STRICT_POSITIVE_CORPSES = 8
+WORKMAN_STRIKER_STRICT_EMPTY_CORPSES = 2
+WORKMAN_STRIKER_STRICT_ITEM_COUNTS = Counter(
+    {
+        (234877, 234877, 1): 1,
+        (130087, 130088, 16): 1,
+        (202719, 202720, 17): 1,
+        (124025, 124026, 12): 1,
+        (202719, 202720, 14): 2,
+        (234874, 234874, 1): 1,
+        (124263, 124264, 13): 1,
+        (301714, 301714, 1): 2,
+        (202719, 202720, 12): 1,
+        (85562, 85561, 14): 1,
+    }
+)
+WORKMAN_STRIKER_EMPTY_INVENTORY_GENERATIONS = (
+    (
+        "2026-07-10T02:30:03.3896799Z [SMOKE] IN InventoryUpdate "
+        "identity=(SimpleChar:7944C065) Unknown1=21 Unknown2=2 Items=count=0[] "
+        "InventoryIdentity=(Corpse:F6E002) Handle=168 Unknown3=1 "
+        "N3MessageType=InventoryUpdate Unknown=1 PacketType=N3Message",
+        "2026-07-10T02:29:58.0753630Z",
+        "(Corpse:00F6E002)",
+        "(SimpleChar:7953AA16)",
+    ),
+    (
+        "2026-07-10T02:36:21.5234655Z [SMOKE] IN InventoryUpdate "
+        "identity=(SimpleChar:7944C065) Unknown1=21 Unknown2=2 Items=count=0[] "
+        "InventoryIdentity=(Corpse:F6E005) Handle=181 Unknown3=1 "
+        "N3MessageType=InventoryUpdate Unknown=1 PacketType=N3Message",
+        "2026-07-10T02:36:15.8378611Z",
+        "(Corpse:00F6E005)",
+        "(SimpleChar:7953AABE)",
+    ),
+)
+
+# These older captures predate corpse-loot-observations.csv.  Each reviewed
+# generation is pinned to one exact CorpseFullUpdate identity and the first
+# raw corpse InventoryUpdate before that corpse identity is reused.  Empty
+# packets are first-class denominator evidence; unopened and snapshot-only
+# corpses never enter this table.  The resulting basis points are private
+# existing-capture policy, not an official-live probability claim.
+REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS = {
+    "Shadow": {
+        "monster_data": 30464,
+        "captures": ("20260709-212336", "20260712-223719"),
+        "opened": 15,
+        "positive": 8,
+        "empty": 7,
+        "overlap": ("20260709-212115", "20260709-212336", 8),
+        "item_counts": Counter(
+            {
+                (234875, 234875, 1): 2,
+                (21601, 21601, 1): 1,
+                (27199, 27199, 10): 1,
+                (121931, 121932, 15): 1,
+                (122007, 122008, 12): 1,
+                (123666, 123667, 9): 1,
+                (124364, 124365, 10): 1,
+                (124512, 124513, 28): 1,
+                (152279, 152280, 18): 1,
+                (234876, 234876, 1): 1,
+            }
+        ),
+        "generations": (
+            ("20260709-212336", "2026-07-10T02:28:25.7622393Z", "(Corpse:00F6E00C)", "(SimpleChar:79528829)", "2026-07-10T02:28:56.0412549Z", 7679, ()),
+            ("20260709-212336", "2026-07-10T02:28:36.4939023Z", "(Corpse:00F6E004)", "(SimpleChar:7952882A)", "2026-07-10T02:28:57.1917604Z", 7706, ()),
+            ("20260709-212336", "2026-07-10T02:28:53.4426925Z", "(Corpse:00F6E00F)", "(SimpleChar:79528828)", "2026-07-10T02:28:59.8077575Z", 7775, ((234875, 234875, 1), (124364, 124365, 10))),
+            ("20260709-212336", "2026-07-10T02:29:03.6073827Z", "(Corpse:00F6E005)", "(SimpleChar:79528817)", "2026-07-10T02:29:10.2412491Z", 8049, ((123666, 123667, 9),)),
+            ("20260709-212336", "2026-07-10T02:29:12.5751669Z", "(Corpse:00F6E006)", "(SimpleChar:7952880B)", "2026-07-10T02:29:20.9409728Z", 8298, ()),
+            ("20260709-212336", "2026-07-10T02:30:24.1547653Z", "(Corpse:00F6E002)", "(SimpleChar:7953AA55)", "2026-07-10T02:30:35.4252842Z", 10170, ()),
+            ("20260709-212336", "2026-07-10T02:30:39.5878831Z", "(Corpse:00F6E002)", "(SimpleChar:7953AA56)", "2026-07-10T02:30:42.4304304Z", 10353, ()),
+            ("20260709-212336", "2026-07-10T02:31:01.5684243Z", "(Corpse:00F6E00B)", "(SimpleChar:7953AA1C)", "2026-07-10T02:31:05.1351807Z", 10937, ()),
+            ("20260709-212336", "2026-07-10T02:31:18.8360694Z", "(Corpse:00F6E002)", "(SimpleChar:7953AA53)", "2026-07-10T02:31:21.7859328Z", 11368, ((122007, 122008, 12),)),
+            ("20260709-212336", "2026-07-10T02:32:30.6241496Z", "(Corpse:00F6E005)", "(SimpleChar:7953AA2B)", "2026-07-10T02:32:33.1666683Z", 12638, ()),
+            ("20260709-212336", "2026-07-10T02:33:04.8836498Z", "(Corpse:00F6E00F)", "(SimpleChar:7953AA33)", "2026-07-10T02:33:07.6113092Z", 13131, ((234875, 234875, 1), (27199, 27199, 10))),
+            ("20260709-212336", "2026-07-10T02:33:36.1981049Z", "(Corpse:00F6E010)", "(SimpleChar:7953AA2A)", "2026-07-10T02:33:37.8124962Z", 13538, ((234876, 234876, 1), (121931, 121932, 15))),
+            ("20260712-223719", "2026-07-13T03:39:03.3427964Z", "(Corpse:00F6C011)", "(SimpleChar:79607876)", "2026-07-13T03:39:35.6502502Z", 2914, ((152279, 152280, 18),)),
+            ("20260712-223719", "2026-07-13T03:38:49.5373589Z", "(Corpse:00F6C004)", "(SimpleChar:79607875)", "2026-07-13T03:39:37.0377259Z", 2941, ((124512, 124513, 28),)),
+            ("20260712-223719", "2026-07-13T03:39:33.0802477Z", "(Corpse:00F6C007)", "(SimpleChar:79607838)", "2026-07-13T03:39:52.8441413Z", 3180, ((21601, 21601, 1),)),
+        ),
+    },
+    "Infector": {
+        "monster_data": 31909,
+        "captures": ("20260709-222339", "20260709-225408", "20260710-211430"),
+        "opened": 7,
+        "positive": 3,
+        "empty": 4,
+        "overlap": None,
+        "item_counts": Counter(
+            {
+                (101507, 101508, 20): 1,
+                (101735, 101736, 21): 1,
+                (107491, 107492, 15): 1,
+                (234875, 234875, 1): 1,
+            }
+        ),
+        "generations": (
+            ("20260709-222339", "2026-07-10T03:26:18.6915380Z", "(Corpse:00F6E002)", "(SimpleChar:7954514F)", "2026-07-10T03:26:22.3934221Z", 2748, ((101735, 101736, 21),)),
+            ("20260709-222339", "2026-07-10T03:26:52.8902204Z", "(Corpse:00F6E015)", "(SimpleChar:79545150)", "2026-07-10T03:26:56.3893801Z", 3186, ()),
+            ("20260709-222339", "2026-07-10T03:27:38.3547556Z", "(Corpse:00F6E017)", "(SimpleChar:79545153)", "2026-07-10T03:27:42.4041111Z", 3799, ()),
+            ("20260709-222339", "2026-07-10T03:28:21.1703196Z", "(Corpse:00F6E00B)", "(SimpleChar:79545154)", "2026-07-10T03:28:24.6360935Z", 4382, ()),
+            ("20260709-225408", "2026-07-10T04:04:09.1808342Z", "(Corpse:00F6E011)", "(SimpleChar:795451C9)", "2026-07-10T04:04:34.3726986Z", 16067, ((101507, 101508, 20),)),
+            ("20260710-211430", "2026-07-11T02:16:47.3405240Z", "(Corpse:00F6C003)", "(SimpleChar:7957E648)", "2026-07-11T02:16:50.6906828Z", 4579, ()),
+            ("20260710-211430", "2026-07-11T02:17:17.8568258Z", "(Corpse:00F6C004)", "(SimpleChar:7957E658)", "2026-07-11T02:17:22.2251371Z", 5302, ((234875, 234875, 1), (107491, 107492, 15))),
+        ),
+    },
+    "Architect Striker": {
+        "monster_data": 203743,
+        "captures": ("20260709-212336", "20260709-220439"),
+        "opened": 4,
+        "positive": 3,
+        "empty": 1,
+        "overlap": None,
+        "item_counts": Counter(
+            {
+                (122482, 122483, 14): 1,
+                (124422, 124423, 13): 1,
+                (128890, 128891, 14): 1,
+                (234877, 234877, 1): 1,
+            }
+        ),
+        "generations": (
+            ("20260709-212336", "2026-07-10T02:34:59.2293267Z", "(Corpse:00F6E004)", "(SimpleChar:7953A9BD)", "2026-07-10T02:35:02.4566325Z", 14593, ()),
+            ("20260709-220439", "2026-07-10T03:12:42.4436898Z", "(Corpse:00F6E015)", "(SimpleChar:7953A9B6)", "2026-07-10T03:13:25.1256509Z", 13935, ((128890, 128891, 14),)),
+            ("20260709-220439", "2026-07-10T03:12:35.4312488Z", "(Corpse:00F6E004)", "(SimpleChar:7953A9B3)", "2026-07-10T03:13:27.1095766Z", 13977, ((124422, 124423, 13),)),
+            ("20260709-220439", "2026-07-10T03:12:45.3434043Z", "(Corpse:00F6E016)", "(SimpleChar:7953AAEB)", "2026-07-10T03:13:29.0253712Z", 14004, ((234877, 234877, 1), (122482, 122483, 14))),
+        ),
+    },
+    "Melded Patterns": {
+        "monster_data": 203747,
+        "captures": ("20260709-225408", "20260712-223719"),
+        "opened": 4,
+        "positive": 3,
+        "empty": 1,
+        "overlap": None,
+        "item_counts": Counter(
+            {
+                (122672, 122673, 15): 1,
+                (144067, 144068, 23): 1,
+                (152328, 152329, 24): 1,
+                (234874, 234874, 1): 1,
+                (301710, 301710, 1): 1,
+            }
+        ),
+        "generations": (
+            ("20260709-225408", "2026-07-10T04:00:25.3985330Z", "(Corpse:00F6E013)", "(SimpleChar:79545190)", "2026-07-10T04:00:32.9353828Z", 10086, ((234874, 234874, 1), (122672, 122673, 15))),
+            ("20260709-225408", "2026-07-10T04:00:47.0436246Z", "(Corpse:00F6E001)", "(SimpleChar:79545196)", "2026-07-10T04:00:52.9341347Z", 10944, ((152328, 152329, 24),)),
+            ("20260712-223719", "2026-07-13T03:39:17.3969861Z", "(Corpse:00F6C014)", "(SimpleChar:79607872)", "2026-07-13T03:39:40.2441054Z", 2997, ((144067, 144068, 23), (301710, 301710, 1))),
+            ("20260712-223719", "2026-07-13T03:39:21.8903988Z", "(Corpse:00F6C006)", "(SimpleChar:79607878)", "2026-07-13T03:39:50.5304202Z", 3148, ()),
+        ),
+    },
 }
 CAPTURE_CORPSE_EVIDENCE_FILTERS = {
     "20260708-004038": frozenset(("Filth Flea", "Thief")),
@@ -485,6 +729,146 @@ def parse_time(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
+def combat_event_fingerprint(row: dict[str, object]) -> tuple[object, ...]:
+    return (
+        row["identity"],
+        row["target"],
+        row["targetRole"],
+        row["messageType"],
+        row["amount"],
+        row["slot"],
+        row["unknown"],
+        row["hitType"],
+        row["instance"],
+    )
+
+
+def deduplicate_overlapping_combat_events(
+    rows: list[dict[str, object]],
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    capture_order = {capture: index for index, capture in enumerate(CAPTURES)}
+    for canonical, duplicate in OVERLAPPING_COMBAT_CAPTURE_RULES:
+        if capture_order[canonical] >= capture_order[duplicate]:
+            raise ValueError(
+                "combat overlap canonical capture order drifted: "
+                + canonical
+                + " -> "
+                + duplicate
+            )
+
+    kept = []
+    by_fingerprint = defaultdict(list)
+    exclusions = []
+    for row in sorted(rows, key=lambda value: value["order"]):
+        fingerprint = combat_event_fingerprint(row)
+        candidates = []
+        for canonical in by_fingerprint[fingerprint]:
+            tolerance = OVERLAPPING_COMBAT_CAPTURE_RULES.get(
+                (canonical["capture"], row["capture"])
+            )
+            if (
+                tolerance is None
+                or row["capture"] in canonical["provenanceCaptures"]
+            ):
+                continue
+            delta = abs((row["time"] - canonical["time"]).total_seconds())
+            if delta <= tolerance:
+                candidates.append((delta, canonical["order"], canonical))
+        if candidates:
+            _, _, canonical = min(candidates, key=lambda value: (value[0], value[1]))
+            canonical["provenanceCaptures"].add(row["capture"])
+            exclusions.append(
+                {
+                    "canonicalCapture": canonical["capture"],
+                    "duplicateCapture": row["capture"],
+                    "canonicalOrder": canonical["order"],
+                    "duplicateOrder": row["order"],
+                }
+            )
+            continue
+        kept.append(row)
+        by_fingerprint[fingerprint].append(row)
+    return kept, exclusions
+
+
+def combat_intervals(rows: list[dict[str, object]]) -> list[float]:
+    intervals = []
+    by_identity = defaultdict(list)
+    for row in rows:
+        by_identity[(row["capture"], row["identity"])].append(row["time"])
+    for times in by_identity.values():
+        times.sort()
+        for previous, current in zip(times, times[1:]):
+            seconds = (current - previous).total_seconds()
+            if 0.5 <= seconds <= 10.0:
+                intervals.append(seconds)
+    intervals.sort()
+    return intervals
+
+
+def validate_combat_overlap_dedup(
+    raw_rows: list[dict[str, object]],
+    rows: list[dict[str, object]],
+    exclusions: list[dict[str, object]],
+) -> None:
+    for exclusion in exclusions:
+        pair = (
+            exclusion["canonicalCapture"],
+            exclusion["duplicateCapture"],
+        )
+        if pair not in OVERLAPPING_COMBAT_CAPTURE_RULES:
+            raise ValueError(
+                "unreviewed capture pair reached ordinary combat dedup: "
+                + " -> ".join(pair)
+            )
+    duplicate_captures = {
+        duplicate for _, duplicate in OVERLAPPING_COMBAT_CAPTURE_RULES
+    }
+    for capture in CAPTURES:
+        if capture in duplicate_captures:
+            continue
+        raw_orders = [row["order"] for row in raw_rows if row["capture"] == capture]
+        kept_orders = [row["order"] for row in rows if row["capture"] == capture]
+        if raw_orders != kept_orders:
+            raise ValueError(
+                "non-overlapping combat rows changed for capture=" + capture
+            )
+
+    raw_workman = [row for row in raw_rows if row["name"] == "Workman Striker"]
+    workman = [row for row in rows if row["name"] == "Workman Striker"]
+    if Counter(row["hitType"] for row in raw_workman) != Counter(
+        {"normal": 80, "critical": 10}
+    ):
+        raise ValueError("Workman Striker raw combat evidence drifted")
+    if Counter(row["hitType"] for row in workman) != Counter(
+        {"normal": 47, "critical": 6}
+    ):
+        raise ValueError("Workman Striker distinct hit counts drifted")
+    intervals = combat_intervals(workman)
+    if (
+        len(intervals) != 41
+        or intervals[0] != 4.747813
+        or intervals[(len(intervals) - 1) // 2] != 5.092328
+        or intervals[-1] != 5.733061
+    ):
+        raise ValueError("Workman Striker distinct cadence evidence drifted")
+    canonical_critical = [
+        row
+        for row in workman
+        if row["capture"] == "20260709-212115"
+        and row["identity"] == "(SimpleChar:7953AFBC)"
+        and row["capturedUtc"] == "2026-07-10T02:37:39.1002433Z"
+        and row["hitType"] == "critical"
+        and row["amount"] == 42
+    ]
+    if (
+        len(canonical_critical) != 1
+        or canonical_critical[0]["provenanceCaptures"]
+        != {"20260709-212115", "20260709-213711"}
+    ):
+        raise ValueError("Workman Striker critical canonical provenance drifted")
+
+
 def stable_row_key(row: dict[str, str]) -> tuple:
     return (
         parse_time(row["CapturedUtc"]),
@@ -590,6 +974,7 @@ def capture_identity_names(capture: str) -> dict[str, str]:
             name = row.get("Name", "")
             if identity and name and not name.startswith("Remains of "):
                 identities[identity] = name
+    identities.update(CAPTURE_IDENTITY_NAME_OVERRIDES.get(capture, {}))
     return identities
 
 
@@ -659,6 +1044,117 @@ def select_spawns() -> list[dict[str, str]]:
     return sorted(selected, key=lambda value: (value["Name"], value["Identity"]))
 
 
+def source_weapon_evidence_profiles(
+    spawns: list[dict[str, str]],
+) -> dict[str, list[dict[str, object]]]:
+    active_sources_by_name = {
+        name: {
+            int(identity_hex(row["Identity"]), 16)
+            for row in spawns
+            if row["Name"] == name
+        }
+        for name in EXPECTED_SOURCE_WEAPON_EVIDENCE
+    }
+    observations: dict[
+        str, dict[int, dict[tuple[int, int, int], set[str]]]
+    ] = {
+        name: defaultdict(lambda: defaultdict(set))
+        for name in EXPECTED_SOURCE_WEAPON_EVIDENCE
+    }
+    source_to_name = {
+        source: name
+        for name, sources in active_sources_by_name.items()
+        for source in sources
+    }
+
+    for capture in CAPTURES:
+        events_path = CAPTURE_ROOT / capture / "events.log"
+        if not events_path.exists():
+            continue
+        with events_path.open("r", encoding="utf-8-sig", errors="replace") as stream:
+            for line in stream:
+                if "type=WeaponItemFullUpdate" not in line:
+                    continue
+                owner_match = WEAPON_OWNER_DETAIL.search(line)
+                if owner_match is None:
+                    continue
+                source = int(owner_match.group("owner"), 16)
+                name = source_to_name.get(source)
+                if name is None:
+                    continue
+                quality_match = WEAPON_QUALITY_DETAIL.search(line)
+                low_match = WEAPON_LOW_TEMPLATE_DETAIL.search(line)
+                high_match = WEAPON_HIGH_TEMPLATE_DETAIL.search(line)
+                if quality_match is None or low_match is None or high_match is None:
+                    raise ValueError(
+                        "source weapon evidence is incomplete for {0} 0x{1:08X} in {2}".format(
+                            name, source, capture
+                        )
+                    )
+                weapon = (
+                    int(low_match.group("low")),
+                    int(high_match.group("high")),
+                    int(quality_match.group("quality")),
+                )
+                observations[name][source][weapon].add(capture)
+
+    result: dict[str, list[dict[str, object]]] = {}
+    for name, expected in EXPECTED_SOURCE_WEAPON_EVIDENCE.items():
+        active_sources = active_sources_by_name[name]
+        if active_sources != set(expected):
+            missing = sorted(set(expected) - active_sources)
+            unexpected = sorted(active_sources - set(expected))
+            raise ValueError(
+                "{0} active source weapon coverage drifted; missing={1} unexpected={2}".format(
+                    name,
+                    ["0x{0:08X}".format(value) for value in missing],
+                    ["0x{0:08X}".format(value) for value in unexpected],
+                )
+            )
+        observed_sources = observations[name]
+        if set(observed_sources) != active_sources:
+            missing = sorted(active_sources - set(observed_sources))
+            unexpected = sorted(set(observed_sources) - active_sources)
+            raise ValueError(
+                "{0} captured source weapon coverage drifted; missing={1} unexpected={2}".format(
+                    name,
+                    ["0x{0:08X}".format(value) for value in missing],
+                    ["0x{0:08X}".format(value) for value in unexpected],
+                )
+            )
+
+        records: list[dict[str, object]] = []
+        for source in sorted(active_sources):
+            captured_weapons = observed_sources[source]
+            if len(captured_weapons) != 1:
+                raise ValueError(
+                    "{0} source 0x{1:08X} has {2} conflicting weapon tuples: {3}".format(
+                        name,
+                        source,
+                        len(captured_weapons),
+                        sorted(captured_weapons),
+                    )
+                )
+            weapon = next(iter(captured_weapons))
+            if weapon != expected[source]:
+                raise ValueError(
+                    "{0} source 0x{1:08X} weapon tuple drifted; expected={2} captured={3}".format(
+                        name, source, expected[source], weapon
+                    )
+                )
+            records.append(
+                {
+                    "source": source,
+                    "low": weapon[0],
+                    "high": weapon[1],
+                    "quality": weapon[2],
+                    "captures": sorted(captured_weapons[weapon]),
+                }
+            )
+        result[name] = records
+    return result
+
+
 def visual_profile(row: dict[str, str]) -> tuple:
     return (
         row["AppearanceValue"],
@@ -709,10 +1205,7 @@ def select_archetype_profiles(spawns: list[dict[str, str]]) -> dict[str, dict[st
 
 
 def combat_profiles() -> dict[str, dict[str, object]]:
-    attacks = defaultdict(list)
-    detail_pattern = re.compile(
-        r"WeaponSlot=(?P<slot>-?\d+).*Unk1=(?P<unknown>-?\d+).*WeaponInstance=(?P<instance>-?\d+)"
-    )
+    raw_attacks = []
     for capture_index, capture in enumerate(CAPTURES):
         name_by_identity = capture_identity_names(capture)
         for row_index, row in enumerate(
@@ -720,47 +1213,58 @@ def combat_profiles() -> dict[str, dict[str, object]]:
         ):
             source_identity = row["SourceIdentity"]
             name = name_by_identity.get(source_identity, "")
+            detail = row.get("Detail", "")
             if (
                 row["MessageType"] != "AttackInfo"
                 or row.get("SourceRole") != "enemy"
                 or row.get("TargetRole") != "local-player"
                 or name not in ARCHETYPES
                 or not capture_allows_archetype(capture, name)
-                or "HitType=Normal" not in row.get("Detail", "")
             ):
                 continue
             if not row["Amount"].isdigit() or int(row["Amount"]) <= 0:
                 continue
-            match = detail_pattern.search(row["Detail"])
+            match = COMBAT_ATTACK_DETAIL.search(detail)
             if not match:
                 continue
-            attacks[name].append(
+            hit_type = match.group("hit_type").lower()
+            if hit_type not in {"normal", "critical"}:
+                continue
+            target_identity = row.get("TargetIdentity", "")
+            if not target_identity:
+                target_match = COMBAT_TARGET_DETAIL.search(detail)
+                target_identity = target_match.group("target") if target_match else ""
+            raw_attacks.append(
                 {
+                    "name": name,
                     "capture": capture,
                     "identity": source_identity,
+                    "target": target_identity,
+                    "targetRole": row.get("TargetRole", ""),
+                    "messageType": row["MessageType"],
+                    "capturedUtc": row["CapturedUtc"],
                     "time": parse_time(row["CapturedUtc"]),
                     "amount": int(row["Amount"]),
                     "slot": int(match.group("slot")),
                     "unknown": int(match.group("unknown")),
                     "instance": int(match.group("instance")),
+                    "hitType": hit_type,
                     "order": (capture_index, row_index),
+                    "provenanceCaptures": {capture},
                 }
             )
+
+    distinct_attacks, exclusions = deduplicate_overlapping_combat_events(raw_attacks)
+    validate_combat_overlap_dedup(raw_attacks, distinct_attacks, exclusions)
+    attacks = defaultdict(list)
+    for row in distinct_attacks:
+        attacks[row["name"]].append(row)
 
     result = {}
     for name in ARCHETYPES:
         rows = attacks[name]
-        intervals = []
-        by_identity = defaultdict(list)
-        for row in rows:
-            by_identity[(row["capture"], row["identity"])].append(row)
-        for identity_rows in by_identity.values():
-            times = sorted(row["time"] for row in identity_rows)
-            for previous, current in zip(times, times[1:]):
-                seconds = (current - previous).total_seconds()
-                if 0.5 <= seconds <= 10.0:
-                    intervals.append(seconds)
-        intervals.sort()
+        normal_rows = [row for row in rows if row["hitType"] == "normal"]
+        intervals = combat_intervals(rows)
         attack_contexts = Counter(
             (row["slot"], row["unknown"], row["instance"]) for row in rows
         )
@@ -778,16 +1282,243 @@ def combat_profiles() -> dict[str, dict[str, object]]:
         else:
             slot, unknown, instance = (None, None, None)
         result[name] = {
-            "observed": bool(rows),
-            "min": min((row["amount"] for row in rows), default=None),
-            "max": max((row["amount"] for row in rows), default=None),
+            "observed": bool(normal_rows),
+            "min": min((row["amount"] for row in normal_rows), default=None),
+            "max": max((row["amount"] for row in normal_rows), default=None),
             "recharge": intervals[(len(intervals) - 1) // 2] if intervals else None,
             "slot": slot,
             "unknown": unknown,
             "instance": instance,
-            "rows": len(rows),
+            "rows": len(normal_rows),
         }
     return result
+
+
+def validate_workman_striker_empty_inventory_evidence() -> None:
+    if (
+        len(WORKMAN_STRIKER_EMPTY_INVENTORY_GENERATIONS)
+        != WORKMAN_STRIKER_STRICT_EMPTY_CORPSES
+    ):
+        raise ValueError("Workman Striker explicit empty evidence count drifted")
+    event_lines = Counter(
+        (
+            CAPTURE_ROOT
+            / WORKMAN_STRIKER_DUPLICATE_LOOT_CAPTURE
+            / "events.log"
+        ).read_text(encoding="utf-8").splitlines()
+    )
+    canonical_generations = read_csv(
+        CAPTURE_ROOT
+        / WORKMAN_STRIKER_CANONICAL_LOOT_CAPTURE
+        / "corpse-full-updates.csv"
+    )
+    for event_line, captured_utc, corpse_identity, dead_npc_identity in (
+        WORKMAN_STRIKER_EMPTY_INVENTORY_GENERATIONS
+    ):
+        if event_lines[event_line] != 1:
+            raise ValueError(
+                "Workman Striker explicit empty InventoryUpdate evidence drifted: "
+                + corpse_identity
+            )
+        matching_generations = [
+            row
+            for row in canonical_generations
+            if row.get("CapturedUtc") == captured_utc
+            and row.get("CorpseIdentity") == corpse_identity
+            and row.get("DeadNpcIdentity") == dead_npc_identity
+            and row.get("CorpseMonsterData") == "203854"
+        ]
+        if len(matching_generations) != 1:
+            raise ValueError(
+                "Workman Striker explicit empty corpse generation drifted: "
+                + dead_npc_identity
+            )
+
+
+def parse_reviewed_raw_inventory_update(line: str) -> dict[str, object] | None:
+    match = RAW_INVENTORY_UPDATE_LINE.fullmatch(line)
+    if match is None:
+        return None
+    packet = bytes.fromhex(match.group("hex"))
+    declared_length = int(match.group("length"))
+    if (
+        len(packet) != declared_length
+        or len(packet) < 57
+        or int.from_bytes(packet[6:8], "big") != declared_length
+        or packet[16:20] != bytes.fromhex("4E536976")
+    ):
+        raise ValueError(
+            "Reviewed raw InventoryUpdate framing drifted: #"
+            + match.group("sequence")
+        )
+    inventory_type = int.from_bytes(packet[-16:-12], "big")
+    if inventory_type != 0x0000C76A:
+        return None
+    if (
+        packet[28:37] != bytes.fromhex("010000001500000002")
+        or (len(packet) - 57) % 32 != 0
+        or int.from_bytes(packet[-4:], "big") != 1
+    ):
+        raise ValueError(
+            "Reviewed corpse InventoryUpdate structure drifted: #"
+            + match.group("sequence")
+        )
+    item_count = (len(packet) - 57) // 32
+    if int.from_bytes(packet[37:41], "big") != 1009 * (item_count + 1):
+        raise ValueError(
+            "Reviewed corpse InventoryUpdate array token drifted: #"
+            + match.group("sequence")
+        )
+    items = []
+    slots = []
+    for index in range(item_count):
+        offset = 41 + (index * 32)
+        placement = int.from_bytes(packet[offset : offset + 4], "big")
+        slots.append(placement)
+        items.append(
+            (
+                int.from_bytes(packet[offset + 16 : offset + 20], "big"),
+                int.from_bytes(packet[offset + 20 : offset + 24], "big"),
+                int.from_bytes(packet[offset + 24 : offset + 28], "big"),
+            )
+        )
+    return {
+        "capturedUtc": match.group("captured_utc"),
+        "time": parse_time(match.group("captured_utc")),
+        "sequence": int(match.group("sequence")),
+        "corpseIdentity": f"(Corpse:{int.from_bytes(packet[-12:-8], 'big'):08X})",
+        "items": tuple(items),
+        "slots": tuple(slots),
+    }
+
+
+def reviewed_legacy_strict_open_generations() -> dict[str, list[dict[str, object]]]:
+    reviewed = {}
+    for name, definition in REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.items():
+        observed = []
+        monster_data = int(definition["monster_data"])
+        for capture in definition["captures"]:
+            capture_path = CAPTURE_ROOT / capture
+            corpse_rows = []
+            for row in read_csv(capture_path / "corpse-full-updates.csv"):
+                captured_utc = row.get("CapturedUtc", "")
+                corpse_identity = normalize_identity(row.get("CorpseIdentity", ""))
+                dead_npc_identity = normalize_identity(row.get("DeadNpcIdentity", ""))
+                if not captured_utc or not corpse_identity or not dead_npc_identity:
+                    continue
+                corpse_rows.append(
+                    {
+                        "capturedUtc": captured_utc,
+                        "time": parse_time(captured_utc),
+                        "corpseIdentity": corpse_identity,
+                        "deadNpcIdentity": dead_npc_identity,
+                        "name": row.get("CorpseName", "").removeprefix("Remains of "),
+                        "monsterData": int(row.get("CorpseMonsterData", "0") or 0),
+                    }
+                )
+            corpse_rows_by_identity = defaultdict(list)
+            for row in corpse_rows:
+                corpse_rows_by_identity[row["corpseIdentity"]].append(row)
+            for rows in corpse_rows_by_identity.values():
+                rows.sort(key=lambda value: value["time"])
+
+            raw_updates = []
+            packet_path = capture_path / "packets.hex.log"
+            if not packet_path.exists():
+                raise ValueError(
+                    f"Reviewed legacy strict-open raw sink is missing: {capture}"
+                )
+            for line in packet_path.read_text(
+                encoding="utf-8-sig", errors="strict"
+            ).splitlines():
+                update = parse_reviewed_raw_inventory_update(line)
+                if update is not None:
+                    raw_updates.append(update)
+            raw_updates.sort(key=lambda value: (value["time"], value["sequence"]))
+
+            first_update_by_generation = {}
+            for update in raw_updates:
+                candidates = [
+                    row
+                    for row in corpse_rows_by_identity.get(
+                        update["corpseIdentity"], ()
+                    )
+                    if row["time"] <= update["time"]
+                ]
+                if not candidates:
+                    continue
+                generation = candidates[-1]
+                generation_key = (
+                    generation["capturedUtc"],
+                    generation["corpseIdentity"],
+                    generation["deadNpcIdentity"],
+                )
+                if generation_key in first_update_by_generation:
+                    continue
+                first_update_by_generation[generation_key] = update
+                if generation["name"] != name:
+                    continue
+                if generation["monsterData"] != monster_data:
+                    raise ValueError(
+                        f"Reviewed legacy strict-open monster data drifted: {name} {generation_key}"
+                    )
+                observed.append(
+                    {
+                        "capture": capture,
+                        "cfuCapturedUtc": generation["capturedUtc"],
+                        "corpseIdentity": generation["corpseIdentity"],
+                        "deadNpcIdentity": generation["deadNpcIdentity"],
+                        "capturedUtc": update["capturedUtc"],
+                        "sequence": update["sequence"],
+                        "monsterData": monster_data,
+                        "items": update["items"],
+                        "slots": update["slots"],
+                    }
+                )
+
+        actual_fingerprints = Counter(
+            (
+                row["capture"],
+                row["cfuCapturedUtc"],
+                row["corpseIdentity"],
+                row["deadNpcIdentity"],
+                row["capturedUtc"],
+                row["sequence"],
+                row["items"],
+            )
+            for row in observed
+        )
+        expected_fingerprints = Counter(definition["generations"])
+        if actual_fingerprints != expected_fingerprints:
+            raise ValueError(
+                f"Reviewed legacy strict-open generation evidence drifted: {name}"
+            )
+        positive = sum(bool(row["items"]) for row in observed)
+        empty = len(observed) - positive
+        if (
+            len(observed) != int(definition["opened"])
+            or positive != int(definition["positive"])
+            or empty != int(definition["empty"])
+        ):
+            raise ValueError(
+                f"Reviewed legacy strict-open denominator drifted: {name}"
+            )
+        item_counts = Counter(
+            item for row in observed for item in row["items"]
+        )
+        if item_counts != definition["item_counts"]:
+            raise ValueError(
+                f"Reviewed legacy strict-open item membership drifted: {name}"
+            )
+        reviewed[name] = sorted(
+            observed,
+            key=lambda value: (
+                value["capturedUtc"],
+                value["corpseIdentity"],
+                value["sequence"],
+            ),
+        )
+    return reviewed
 
 
 def loot_profiles() -> dict[str, list[dict[str, int]]]:
@@ -821,6 +1552,56 @@ def loot_profiles() -> dict[str, list[dict[str, int]]]:
                 low, high, quality, count = (int(value) for value in item.split(":"))
                 items.extend([(low, high, quality)] * count)
             opened_by_name[name].append(items)
+
+    reviewed_legacy = reviewed_legacy_strict_open_generations()
+    for name, generations in reviewed_legacy.items():
+        if opened_by_name.get(name):
+            raise ValueError(
+                f"{name} gained direct strict snapshots; reconcile them with the reviewed legacy denominator"
+            )
+        opened_by_name[name] = [list(row["items"]) for row in generations]
+
+    if opened_by_name.get("Workman Striker"):
+        raise ValueError(
+            "Workman Striker gained direct strict snapshots; reconcile them with the audited legacy denominator"
+        )
+    workman_outcomes = [
+        row
+        for row in loot_outcome_profiles().get("Workman Striker", [])
+        if row["capture"] in WORKMAN_STRIKER_STRICT_LOOT_CAPTURES
+    ]
+    workman_by_corpse = defaultdict(list)
+    for row in workman_outcomes:
+        workman_by_corpse[
+            (
+                row["capture"],
+                row["capturedUtc"],
+                row["corpseIdentity"],
+                row["deadNpcIdentity"],
+            )
+        ].append((row["low"], row["high"], row["quality"]))
+    if len(workman_by_corpse) != WORKMAN_STRIKER_STRICT_POSITIVE_CORPSES:
+        raise ValueError("Workman Striker positive complete-open count drifted")
+    if Counter(key[0] for key in workman_by_corpse) != Counter(
+        {"20260709-212336": 2, "20260709-220439": 6}
+    ):
+        raise ValueError("Workman Striker complete-open capture allocation drifted")
+    workman_item_counts = Counter(
+        item for items in workman_by_corpse.values() for item in items
+    )
+    if workman_item_counts != WORKMAN_STRIKER_STRICT_ITEM_COUNTS:
+        raise ValueError("Workman Striker strict item membership drifted")
+    if (
+        WORKMAN_STRIKER_STRICT_POSITIVE_CORPSES
+        + WORKMAN_STRIKER_STRICT_EMPTY_CORPSES
+        != WORKMAN_STRIKER_STRICT_OPENED_CORPSES
+    ):
+        raise ValueError("Workman Striker strict denominator is internally inconsistent")
+    validate_workman_striker_empty_inventory_evidence()
+    opened_by_name["Workman Striker"] = list(workman_by_corpse.values()) + [
+        [] for _ in range(WORKMAN_STRIKER_STRICT_EMPTY_CORPSES)
+    ]
+
     for name, corpse_items in opened_by_name.items():
         opened_corpses = len(corpse_items)
         counts = Counter(item for items in corpse_items for item in items)
@@ -866,6 +1647,18 @@ def corpse_row_name(row: dict[str, str]) -> str:
             if expected_monster_data == monster_data
         ),
         "",
+    )
+
+
+def loot_outcome_fingerprint(value: dict[str, object]) -> tuple:
+    return (
+        value["corpseIdentity"],
+        value["deadNpcIdentity"],
+        value["monsterData"],
+        value["slot"],
+        value["low"],
+        value["high"],
+        value["quality"],
     )
 
 
@@ -1009,6 +1802,103 @@ def loot_outcome_profiles() -> dict[str, list[dict[str, object]]]:
                         "quality": quality,
                     }
                 )
+
+    workman_records = mapped.get("Workman Striker", [])
+    canonical_fingerprints = {
+        loot_outcome_fingerprint(record)
+        for record in workman_records
+        if record["capture"] == WORKMAN_STRIKER_CANONICAL_LOOT_CAPTURE
+    }
+    duplicate_records = [
+        record
+        for record in workman_records
+        if record["capture"] == WORKMAN_STRIKER_DUPLICATE_LOOT_CAPTURE
+        and loot_outcome_fingerprint(record) in canonical_fingerprints
+    ]
+    if len(duplicate_records) != WORKMAN_STRIKER_DUPLICATE_LOOT_ROWS:
+        raise ValueError("Workman Striker overlapping legacy loot rows drifted")
+    duplicate_record_ids = {id(record) for record in duplicate_records}
+    mapped["Workman Striker"] = [
+        record for record in workman_records if id(record) not in duplicate_record_ids
+    ]
+
+    for name, definition in REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.items():
+        overlap = definition["overlap"]
+        if overlap is None:
+            continue
+        duplicate_capture, canonical_capture, expected_duplicate_rows = overlap
+        records = mapped.get(name, [])
+        canonical_fingerprints = {
+            loot_outcome_fingerprint(record)
+            for record in records
+            if record["capture"] == canonical_capture
+        }
+        duplicate_records = [
+            record
+            for record in records
+            if record["capture"] == duplicate_capture
+            and loot_outcome_fingerprint(record) in canonical_fingerprints
+        ]
+        if len(duplicate_records) != expected_duplicate_rows:
+            raise ValueError(
+                f"{name} overlapping legacy loot rows drifted"
+            )
+        duplicate_ids = {id(record) for record in duplicate_records}
+        mapped[name] = [
+            record for record in records if id(record) not in duplicate_ids
+        ]
+
+    reviewed_legacy = reviewed_legacy_strict_open_generations()
+    for name, generations in reviewed_legacy.items():
+        records = mapped[name]
+        semantic_keys = Counter(
+            (
+                record["capture"],
+                record["corpseIdentity"],
+                record["deadNpcIdentity"],
+                record["monsterData"],
+                record["slot"],
+                record["low"],
+                record["high"],
+                record["quality"],
+            )
+            for record in records
+        )
+        for generation in generations:
+            for slot, (low, high, quality) in zip(
+                generation["slots"], generation["items"]
+            ):
+                semantic_key = (
+                    generation["capture"],
+                    generation["corpseIdentity"],
+                    generation["deadNpcIdentity"],
+                    generation["monsterData"],
+                    slot,
+                    low,
+                    high,
+                    quality,
+                )
+                if semantic_keys[semantic_key] > 1:
+                    raise ValueError(
+                        f"{name} legacy loot outcome is duplicated: {semantic_key}"
+                    )
+                if semantic_keys[semantic_key] == 1:
+                    continue
+                records.append(
+                    {
+                        "capture": generation["capture"],
+                        "capturedUtc": generation["capturedUtc"],
+                        "corpseIdentity": generation["corpseIdentity"],
+                        "deadNpcIdentity": generation["deadNpcIdentity"],
+                        "monsterData": generation["monsterData"],
+                        "sequence": generation["sequence"],
+                        "slot": slot,
+                        "low": low,
+                        "high": high,
+                        "quality": quality,
+                    }
+                )
+                semantic_keys[semantic_key] += 1
 
     for records in mapped.values():
         records.sort(
@@ -1437,6 +2327,7 @@ def validate_content(
 
 def generate() -> str:
     spawns = select_spawns()
+    source_weapons = source_weapon_evidence_profiles(spawns)
     profiles = select_archetype_profiles(spawns)
     combat = combat_profiles()
     loot = loot_profiles()
@@ -1454,6 +2345,9 @@ def generate() -> str:
     for name, records in loot_outcomes.items():
         for record in records:
             evidence_captures[name].add(str(record["capture"]))
+    for name, records in source_weapons.items():
+        for record in records:
+            evidence_captures[name].update(record["captures"])
     supported_corpses = sorted(
         (
             record
@@ -1542,6 +2436,12 @@ def generate() -> str:
             loot_outcome_definition(item) for item in loot_outcomes.get(name, [])
         ]
         corpse_lines = [corpse_definition(item) for item in corpses.get(name, [])]
+        source_weapon_lines = [
+            "new CapturedSubwaySourceWeaponEvidenceDefinition("
+            f"0x{int(item['source']):08X}, {int(item['low'])}, {int(item['high'])}, "
+            f"{int(item['quality'])}, {cs_string(','.join(item['captures']))})"
+            for item in source_weapons.get(name, [])
+        ]
         lines.extend(
             [
                 "            new CapturedSubwayOrdinaryArchetypeDefinition(",
@@ -1617,9 +2517,23 @@ def generate() -> str:
                     + ("," if i < len(evidence_captures[name]) - 1 else "")
                     for i, capture in enumerate(sorted(evidence_captures[name]))
                 ],
-                "                }),",
+                "                }," if source_weapon_lines else "                }),",
             ]
         )
+        if source_weapon_lines:
+            lines.extend(
+                [
+                    "                new CapturedSubwaySourceWeaponEvidenceDefinition[]",
+                    "                {",
+                ]
+            )
+            for index, item in enumerate(source_weapon_lines):
+                lines.append(
+                    "                    "
+                    + item
+                    + ("," if index < len(source_weapon_lines) - 1 else "")
+                )
+            lines.append("                }),")
 
     lines.extend(["        };", "", "        private static readonly CapturedSubwayOrdinarySpawnDefinition[] Spawns =", "        {"])
     for row in spawns:
@@ -1747,11 +2661,11 @@ def generate() -> str:
             "",
             "    internal sealed class CapturedSubwayOrdinaryArchetypeDefinition",
             "    {",
-            "        public CapturedSubwayOrdinaryArchetypeDefinition(string key, string familyKey, string name, int monsterData, int npcFamily, int npcLosHeight, int characterFlags, int accountFlags, int expansions, int visualFlags, int visibleTitle, uint appearanceValue, int headMesh, CapturedSubwayTextureDefinition[] textures, CapturedSubwayMeshDefinition[] meshes, CapturedSubwayCombatEvidenceDefinition combat, CapturedSubwayLootEvidenceDefinition[] lootEvidence, CapturedSubwayLootOutcomeEvidenceDefinition[] lootOutcomeEvidence, CapturedSubwayCorpseEvidenceDefinition[] corpseEvidence, string[] evidenceCaptures)",
+            "        public CapturedSubwayOrdinaryArchetypeDefinition(string key, string familyKey, string name, int monsterData, int npcFamily, int npcLosHeight, int characterFlags, int accountFlags, int expansions, int visualFlags, int visibleTitle, uint appearanceValue, int headMesh, CapturedSubwayTextureDefinition[] textures, CapturedSubwayMeshDefinition[] meshes, CapturedSubwayCombatEvidenceDefinition combat, CapturedSubwayLootEvidenceDefinition[] lootEvidence, CapturedSubwayLootOutcomeEvidenceDefinition[] lootOutcomeEvidence, CapturedSubwayCorpseEvidenceDefinition[] corpseEvidence, string[] evidenceCaptures, CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence = null)",
             "        {",
-            "            this.Key = key; this.FamilyKey = familyKey; this.Name = name; this.MonsterData = monsterData; this.NpcFamily = npcFamily; this.NpcLosHeight = npcLosHeight; this.CharacterFlags = characterFlags; this.AccountFlags = accountFlags; this.Expansions = expansions; this.VisualFlags = visualFlags; this.VisibleTitle = visibleTitle; this.AppearanceValue = appearanceValue; this.HeadMesh = headMesh; this.Textures = textures ?? new CapturedSubwayTextureDefinition[0]; this.Meshes = meshes ?? new CapturedSubwayMeshDefinition[0]; this.Combat = combat; this.LootEvidence = lootEvidence ?? new CapturedSubwayLootEvidenceDefinition[0]; this.LootOutcomeEvidence = lootOutcomeEvidence ?? new CapturedSubwayLootOutcomeEvidenceDefinition[0]; this.CorpseEvidence = corpseEvidence ?? new CapturedSubwayCorpseEvidenceDefinition[0]; this.EvidenceCaptures = evidenceCaptures ?? new string[0];",
+            "            this.Key = key; this.FamilyKey = familyKey; this.Name = name; this.MonsterData = monsterData; this.NpcFamily = npcFamily; this.NpcLosHeight = npcLosHeight; this.CharacterFlags = characterFlags; this.AccountFlags = accountFlags; this.Expansions = expansions; this.VisualFlags = visualFlags; this.VisibleTitle = visibleTitle; this.AppearanceValue = appearanceValue; this.HeadMesh = headMesh; this.Textures = textures ?? new CapturedSubwayTextureDefinition[0]; this.Meshes = meshes ?? new CapturedSubwayMeshDefinition[0]; this.Combat = combat; this.LootEvidence = lootEvidence ?? new CapturedSubwayLootEvidenceDefinition[0]; this.LootOutcomeEvidence = lootOutcomeEvidence ?? new CapturedSubwayLootOutcomeEvidenceDefinition[0]; this.CorpseEvidence = corpseEvidence ?? new CapturedSubwayCorpseEvidenceDefinition[0]; this.EvidenceCaptures = evidenceCaptures ?? new string[0]; this.SourceWeaponEvidence = sourceWeaponEvidence ?? new CapturedSubwaySourceWeaponEvidenceDefinition[0];",
             "        }",
-            "        public string Key { get; private set; } public string FamilyKey { get; private set; } public string Name { get; private set; } public int MonsterData { get; private set; } public int NpcFamily { get; private set; } public int NpcLosHeight { get; private set; } public int CharacterFlags { get; private set; } public int AccountFlags { get; private set; } public int Expansions { get; private set; } public int VisualFlags { get; private set; } public int VisibleTitle { get; private set; } public uint AppearanceValue { get; private set; } public int HeadMesh { get; private set; } public CapturedSubwayTextureDefinition[] Textures { get; private set; } public CapturedSubwayMeshDefinition[] Meshes { get; private set; } public CapturedSubwayCombatEvidenceDefinition Combat { get; private set; } public CapturedSubwayLootEvidenceDefinition[] LootEvidence { get; private set; } public CapturedSubwayLootOutcomeEvidenceDefinition[] LootOutcomeEvidence { get; private set; } public CapturedSubwayCorpseEvidenceDefinition[] CorpseEvidence { get; private set; } public string[] EvidenceCaptures { get; private set; }",
+            "        public string Key { get; private set; } public string FamilyKey { get; private set; } public string Name { get; private set; } public int MonsterData { get; private set; } public int NpcFamily { get; private set; } public int NpcLosHeight { get; private set; } public int CharacterFlags { get; private set; } public int AccountFlags { get; private set; } public int Expansions { get; private set; } public int VisualFlags { get; private set; } public int VisibleTitle { get; private set; } public uint AppearanceValue { get; private set; } public int HeadMesh { get; private set; } public CapturedSubwayTextureDefinition[] Textures { get; private set; } public CapturedSubwayMeshDefinition[] Meshes { get; private set; } public CapturedSubwayCombatEvidenceDefinition Combat { get; private set; } public CapturedSubwayLootEvidenceDefinition[] LootEvidence { get; private set; } public CapturedSubwayLootOutcomeEvidenceDefinition[] LootOutcomeEvidence { get; private set; } public CapturedSubwayCorpseEvidenceDefinition[] CorpseEvidence { get; private set; } public string[] EvidenceCaptures { get; private set; } public CapturedSubwaySourceWeaponEvidenceDefinition[] SourceWeaponEvidence { get; private set; }",
             "    }",
             "",
             "    internal sealed class CapturedSubwayOrdinarySpawnDefinition",
@@ -1767,6 +2681,7 @@ def generate() -> str:
             "    internal sealed class CapturedSubwayTextureDefinition { public CapturedSubwayTextureDefinition(int place, int id, int unknown) { this.Place = place; this.Id = id; this.Unknown = unknown; } public int Place { get; private set; } public int Id { get; private set; } public int Unknown { get; private set; } }",
             "    internal sealed class CapturedSubwayMeshDefinition { public CapturedSubwayMeshDefinition(int position, uint id, int overrideTextureId, int layer) { this.Position = position; this.Id = id; this.OverrideTextureId = overrideTextureId; this.Layer = layer; } public int Position { get; private set; } public uint Id { get; private set; } public int OverrideTextureId { get; private set; } public int Layer { get; private set; } }",
             "    internal sealed class CapturedSubwayWaypointDefinition { public CapturedSubwayWaypointDefinition(float x, float y, float z) { this.X = x; this.Y = y; this.Z = z; } public float X { get; private set; } public float Y { get; private set; } public float Z { get; private set; } }",
+            "    internal sealed class CapturedSubwaySourceWeaponEvidenceDefinition { public CapturedSubwaySourceWeaponEvidenceDefinition(int sourceInstance, int lowId, int highId, int quality, string evidenceCaptures) { this.SourceInstance = sourceInstance; this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.EvidenceCaptures = evidenceCaptures; } public int SourceInstance { get; private set; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public string EvidenceCaptures { get; private set; } }",
             "    internal sealed class CapturedSubwayCombatEvidenceDefinition { public CapturedSubwayCombatEvidenceDefinition(bool observed, int minDamage, int maxDamage, double rechargeSeconds, int weaponSlot, int attackInfoUnknown, int weaponInstance, int observedRows) { this.Observed = observed; this.MinDamage = minDamage; this.MaxDamage = maxDamage; this.RechargeSeconds = rechargeSeconds; this.WeaponSlot = weaponSlot; this.AttackInfoUnknown = attackInfoUnknown; this.WeaponInstance = weaponInstance; this.ObservedRows = observedRows; } public bool Observed { get; private set; } public int MinDamage { get; private set; } public int MaxDamage { get; private set; } public double RechargeSeconds { get; private set; } public int WeaponSlot { get; private set; } public int AttackInfoUnknown { get; private set; } public int WeaponInstance { get; private set; } public int ObservedRows { get; private set; } }",
             "    internal sealed class CapturedSubwayLootEvidenceDefinition { public CapturedSubwayLootEvidenceDefinition(int lowId, int highId, int quality, int observedCount, int observedCorpses, int observedBasisPoints) { this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.ObservedCount = observedCount; this.ObservedCorpses = observedCorpses; this.ObservedBasisPoints = observedBasisPoints; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public int ObservedCount { get; private set; } public int ObservedCorpses { get; private set; } public int ObservedBasisPoints { get; private set; } }",
             "    internal sealed class CapturedSubwayLootOutcomeEvidenceDefinition { public CapturedSubwayLootOutcomeEvidenceDefinition(string capture, string capturedUtc, string corpseIdentity, string deadNpcIdentity, int monsterData, int sequence, int slot, int lowId, int highId, int quality) { this.Capture = capture; this.CapturedUtc = capturedUtc; this.CorpseIdentity = corpseIdentity; this.DeadNpcIdentity = deadNpcIdentity; this.MonsterData = monsterData; this.Sequence = sequence; this.Slot = slot; this.LowId = lowId; this.HighId = highId; this.Quality = quality; } public string Capture { get; private set; } public string CapturedUtc { get; private set; } public string CorpseIdentity { get; private set; } public string DeadNpcIdentity { get; private set; } public int MonsterData { get; private set; } public int Sequence { get; private set; } public int Slot { get; private set; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } }",
