@@ -325,6 +325,15 @@ ordinary corpse lifetimes, and private respawn policy. The ordinary generator an
 Debug build pass, as do the expanded fourteen-profile gate, WorldPopulation
 `29/29`, and Subway loot `22/22` suites.
 
+Mugger is the fifteenth accepted profile. Its nine exact current source
+identities each resolve a QL1 `121567/121567` weapon; aggregate, missing,
+conflicting, and unknown source selection fails closed. The item owns damage,
+damage bonus, and recharge, while only the captured AttackInfo ammo `-1`, slot
+`6`, unknown `0`, and weapon instance `0` are replayed. Thirty-eight normal
+`9..12` outcomes and three `21` criticals remain separate evidence, and the gate
+also binds the strict 17-open incomplete loot pool, exact CATMesh/level credits,
+shared chase, ordinary respawn, and corpse lifetimes.
+
 ## Ordinary respawn policy
 
 PF127 eligible ordinary enemies inherit a 240-second post-NPC-despawn default.
