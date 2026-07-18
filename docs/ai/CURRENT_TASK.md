@@ -28,7 +28,7 @@ unreferenced folders do not currently prove another safe implementation slice.
   `docs/generated/aosharp_capture_inventory.csv` and
   `docs/generated/aosharp_capture_inventory.md` by
   `Tools/inventory_aosharp_captures.py`.
-- The content-level ledger covers all `68` Subway-bearing sessions with `21,557`
+- The content-level ledger covers all `68` Subway-bearing sessions with `21,559`
   aggregated evidence rows: `55` official-live and `13` AORebirth-private.
   It records identities, related identities, evidence kinds, source artifacts,
   row scope, realm, and reference category in
@@ -49,11 +49,16 @@ unreferenced folders do not currently prove another safe implementation slice.
   `15` proven item memberships and `5` empty inventories. Exact L4=`23` and
   L5=`29` credit rules are active; other captured spawn levels retain the
   accepted private `23..79` fallback policy instead of becoming unresolved.
-- Thirty-one identity-matched, death-linked official-live corpse observations
+- Thirty-two identity-matched, death-linked official-live corpse observations
   now supply exact CATMesh and per-level credit rules for Filth Flea, Thief,
   Mugger, Discarded Pet, Shadow, Slum Runner, Infector, Neural Burnout,
   Fragmented Soul, Melded Patterns, Molested Molecules, and Premature Pattern.
   Pre-existing and zero-credit unlinked corpses remain excluded.
+- Offline recovery of raw capture `20260710-202132` now links L10 Mugger
+  `(SimpleChar:7957E5CA)` to `(Corpse:00F6C001)`, exact CATMesh `17534`, and
+  `88` credits. Its three-item inventory is indexed as one observed corpse
+  outcome, but remains outside runtime loot because one outcome proves item
+  membership, not independent odds or a guaranteed bundle.
 - Official-live Subway zoning is restored exactly: PF127 entry landing
   `(65.80835,115.6148,318.9879)`, PF655 main-exit landing
   `(3304.028,35.11,837.9951)`, and their captured headings. The main exit keeps
@@ -113,7 +118,7 @@ unreferenced folders do not currently prove another safe implementation slice.
 - Real offline recovery of `20260708-004038`: PASS.
 - Subway content inventory tests: `10/10` PASS; full `294`/`68` corpus
   regeneration: PASS.
-- Subway loot evidence: `13/13` PASS.
+- Subway loot evidence: `14/14` PASS.
 - Flea combat and whole-enemy acceptance guardrails: PASS.
 - Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
@@ -133,12 +138,13 @@ unreferenced folders do not currently prove another safe implementation slice.
 
 ## Next Runtime Check
 
-Log into the private server with the normal quarantine selector. Confirm the
-official PF655 entrance lands at the PF127 stairs, the single main exit lands at
-the official PF655 position without bouncing back, and the second exit remains
-inactive. Kill several Fleas to confirm variable `3..10` melee and `14..24`
-poison rolls, normal corpse reopen/cleanup, the expanded item pool, and credits.
-Spot-check one deep corpse visual/credit rule. Do not enable `ALL_38`.
+Diagnostic session `pf127-vis-one-bot-20260717` currently enables only captured
+Disobedient Bot source identity `79557C66`; all other quarantined rows remain
+disabled. Log into the private server, enter PF127, traverse into and out of the
+bot's interest range near `(151.409,107.615,271.044)`, then fight and kill it.
+Confirm the client remains stable, the bot behaves normally, and its corpse can
+be opened. This is the first bounded population rollout gate; do not enable
+`ALL_38`.
 
 ## Remaining Capture-Backed Work
 
@@ -154,8 +160,10 @@ Spot-check one deep corpse visual/credit rule. Do not enable `ALL_38`.
    unresolved MonsterData value. Do not activate it yet.
 4. Container Supplier stock and dialogue remain unresolved. Keep the captured
    appearance visible without synthesizing an inventory or interaction.
-5. The `38` diagnostic population rows remain quarantined until bounded private
-   login/traversal validation proves that their activation is stable.
+5. The `38` diagnostic population rows are all exact, non-duplicate official
+   PF127 rows. One Disobedient Bot row is staged behind the ignored diagnostic
+   selector; the remaining `37` stay quarantined until bounded private
+   login/traversal validation proves the first activation is stable.
 6. Existing PF127 door evidence describes working interior doors, not exits.
    Do not remove them. The corpus does not yet provide identity-complete world
    static/container placements.

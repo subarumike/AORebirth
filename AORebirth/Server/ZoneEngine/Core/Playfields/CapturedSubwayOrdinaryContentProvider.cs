@@ -19,6 +19,7 @@ namespace AORebirth.Core.Playfields
 
         private static readonly CapturedSubwayCorpseEvidenceDefinition[] SupportedCorpseEvidence =
         {
+            new CapturedSubwayCorpseEvidenceDefinition("20260710-202132", "2026-07-11T01:25:12.5774101Z", "(Corpse:00F6C001)", "(SimpleChar:7957E5CA)", 10, 203734, 17534, 88),
             new CapturedSubwayCorpseEvidenceDefinition("20260712-155528", "2026-07-12T20:55:48.0982051Z", "(Corpse:00F6C003)", "(SimpleChar:795F91B9)", 5, 17657, 15231, 29),
             new CapturedSubwayCorpseEvidenceDefinition("20260712-161506", "2026-07-12T21:15:15.9221075Z", "(Corpse:00F6C00B)", "(SimpleChar:795F924E)", 4, 17657, 15231, 23),
             new CapturedSubwayCorpseEvidenceDefinition("20260712-161506", "2026-07-12T21:16:42.1576861Z", "(Corpse:00F6C012)", "(SimpleChar:795F91CA)", 5, 26092, 5907, 29),
