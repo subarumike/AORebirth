@@ -83,6 +83,14 @@ The null-destination path additionally releases its heap index buffer when one
 was allocated. The caller then advances normally. These scoped guards contain
 the verified deferred failures without changing AO's selected renderer.
 
+The old-client GUI path also byte-verifies and wraps the child-render call at
+`GUI.dll +0x14D6DA`. Repeated full dumps proved a direct self-cycle: the child
+`View` in `ECX` was the same pointer as the currently rendering parent in
+`EBX`, causing `View::_CallRender` to recurse until the thread's exception
+registration chain was corrupted. The wrapper preserves every non-self call
+unchanged and skips only exact `ECX == EBX` cycles, logging
+`PATCH HIT GUI self-render cycle skipped`.
+
 This is deliberately not a process-wide "continue every exception" handler.
 Unknown access violations retain the normal crash/dump path because an
 arbitrary failure can occur while AO owns a lock, allocation, or partially
