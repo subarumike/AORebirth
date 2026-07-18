@@ -50,7 +50,7 @@ population in bounded runtime batches.
   `docs/generated/aosharp_capture_inventory.csv` and
   `docs/generated/aosharp_capture_inventory.md` by
   `Tools/inventory_aosharp_captures.py`.
-- The content-level ledger covers all `72` Subway-bearing sessions with `25,320`
+- The content-level ledger covers all `72` Subway-bearing sessions with `25,321`
   aggregated evidence rows: `59` official-live and `13` AORebirth-private.
   It records identities, related identities, evidence kinds, source artifacts,
   row scope, realm, and reference category in
@@ -77,11 +77,15 @@ population in bounded runtime batches.
 - Reused corpse identities now keep the exact name and dead-NPC relationship
   from their own generation instead of inheriting the union of every prior use
   of the same identity.
-- The generated ordinary provider now preserves `282` exact, death-linked,
+- The generated ordinary provider now preserves `298` exact, death-linked,
   positive-credit corpse observations across `26` capture-backed profiles.
   The recovered deep batches include all accepted observations from
   `20260709-220439`, `20260709-222339`, `20260709-225408`,
-  `20260712-153918`, `20260712-223719`, and `20260716-222007`.
+  `20260710-211430`, `20260712-153918`, `20260712-223719`,
+  `20260712-232137`, `20260716-034104`, `20260716-221358`,
+  `20260716-222007`, and `20260716-222201`. The latest recovery adds 16
+  identity-linked generations and 11 previously missing profile/level/credit
+  tuples without inferring cross-profile credit rules.
 - Legacy item snapshots are indexed as identity-linked evidence-only outcomes;
   they cannot become runtime drop odds. Runtime probability denominators come
   only from strict initial corpse snapshots, and reused loot-window opens count
@@ -95,8 +99,9 @@ population in bounded runtime batches.
   trailing packet-log rows are explicitly excluded.
 - Filth Flea normal player-facing damage now uses the merged official-live
   slot ranges: melee slot `0` rolls `3..10`, poison slot `1` rolls `14..24`.
-  Critical `13` and `47` outcomes remain separate evidence and cannot widen
-  normal runtime rolls.
+  Reviewed source `79531748` from `20260709-205921` adds one slot-1 normal `15`
+  and one slot-0 critical `7`; critical `7`, `13`, and `47` outcomes remain
+  separate evidence and cannot widen normal runtime rolls.
 - Filth Flea loot now preserves `18` complete official-live corpse outcomes:
   `15` proven item memberships and `5` empty inventories. Exact L4=`23` and
   L5=`29` credit rules remain active; the recovered corpus adds exact rules for
@@ -199,13 +204,17 @@ population in bounded runtime batches.
   resolve their exact owner-linked captured low/high/QL weapon tuple at runtime;
   missing, conflicting, unknown, or aggregate source selection fails closed.
   Weapon items own normal damage and recharge, with no fixed damage or synthetic
-  attack context. The shared weapon-critical formula is still not evidence-
-  backed, so Workman is not yet admitted by the whole-enemy gate.
+  attack context. The shared weapon-critical formula remains unproven, so the
+  six observed critical outcomes stay report-only and no formula is invented.
+  Workman is accepted by the whole-enemy gate with all 21 source weapons and
+  spawns, fail-closed source resolution, shared chase, strict incomplete-pool
+  loot, CATMesh/credits, private ordinary respawn, and corpse lifetimes guarded
+  together.
 - Melded Patterns now equips its capture-proven QL20 Irreparable Sleekblaster
   Minor `121817/121818`. Damage and recharge are item-owned through the shared
   equipped-weapon path; no special-attack context, fixed damage override,
-  critical policy, loot probability, respawn exception, or acceptance claim is
-  synthesized.
+  critical policy, loot probability, or respawn exception is synthesized. Its
+  exact weapon path and those exclusions now pass the whole-enemy gate.
 - One reusable reviewed legacy-open validator now promotes four more strict
   item tables from exact corpse-full-update/dead-NPC generations and their first
   raw `InventoryUpdate` before identity reuse. Shadow has 15 complete opens
@@ -215,6 +224,16 @@ population in bounded runtime batches.
   only corpses never enter a denominator. Runtime uses independent observed-
   sample entries with `ItemPoolComplete=false`; the basis values are private
   existing-capture policy, not claims about official probabilities.
+- Shadow, ordinary Infector, Architect Striker, and Melded Patterns are now the
+  sixth through ninth accepted ordinary profiles. Coverage binds their exact
+  spawns, appearance, capture-backed normal combat, shared chase, strict
+  incomplete-pool loot, corpse visuals/credits, private 240-second ordinary
+  respawn policy, and shared corpse lifetimes. Shadow's two, Infector's three,
+  and Architect Striker's one observed critical outcomes remain report-only.
+  Ordinary Infector remains isolated from Abmouth-owned specialization;
+  Architect Striker keeps fixed captured combat without an invented weapon;
+  Melded Patterns keeps exact weapon-owned damage/recharge without invented
+  special-attack or critical context.
 - The Subway combat-contract analyzer now supplements legacy identity mapping
   from `enemy-dossier.json` and exact corpse dead-NPC links before consuming
   combat rows. Its regenerated Bot projection recovers nine decoded
@@ -260,12 +279,19 @@ population in bounded runtime batches.
 - Full `298`-folder location inventory and `72`-session Subway ledger
   regeneration: PASS.
 - Current inventory/content-ledger regression suites: `27/27` PASS.
-- Subway loot/corpse evidence: `18/18` PASS.
-- Five-entry whole-enemy acceptance gate (Thief, Filth Flea, Disobedient Bot,
-  Slum Runner, Molested Molecules): PASS.
+- Subway loot/corpse evidence: `21/21` PASS.
+- Ten-entry whole-enemy acceptance gate (Thief, Filth Flea, Disobedient Bot,
+  Slum Runner, Molested Molecules, Shadow, ordinary Infector, Architect
+  Striker, Melded Patterns, Workman Striker): PASS. The newly accepted profiles
+  retain incomplete item pools, shared chase and corpse lifetimes, and the
+  private 240-second ordinary respawn policy. Shadow, Infector, Architect
+  Striker, and Workman Striker critical observations remain report-only.
+  Ordinary Infector remains isolated from Abmouth-owned combat; Melded Patterns
+  and every Workman source retain item-owned normal damage and recharge without
+  invented attack context.
 - Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
-- World population foundation: `26/26` PASS.
+- World population foundation: `28/28` PASS.
 - Subway merchant content: `4/4` PASS.
 - Visibility interest/catalog: `12/12` PASS.
 - Quarantine/spatial-selection guardrail: PASS.

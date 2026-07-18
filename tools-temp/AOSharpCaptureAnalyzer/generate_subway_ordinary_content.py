@@ -394,6 +394,15 @@ CAPTURE_CORPSE_EVIDENCE_FILTERS = {
         )
     ),
     "20260710-202132": frozenset(("Mugger",)),
+    "20260710-211430": frozenset(
+        (
+            "Infector",
+            "Neural Burnout",
+            "Premature Pattern",
+            "Slum Runner",
+            "Uncontrollable Anger",
+        )
+    ),
     "20260712-155528": frozenset(("Filth Flea",)),
     "20260712-160257": frozenset(("Disobedient Bot",)),
     "20260712-161506": frozenset(("Filth Flea", "Thief")),
@@ -412,6 +421,8 @@ CAPTURE_CORPSE_EVIDENCE_FILTERS = {
         )
     ),
     "20260712-224608": frozenset(("Fragmented Soul", "Premature Pattern")),
+    "20260712-232137": frozenset(("Infector",)),
+    "20260716-034104": frozenset(("Neural Burnout",)),
     "20260716-034656": frozenset(("Slum Runner",)),
     "20260716-215947": frozenset(
         (
@@ -423,9 +434,11 @@ CAPTURE_CORPSE_EVIDENCE_FILTERS = {
         )
     ),
     "20260716-221748": frozenset(("Neural Burnout",)),
+    "20260716-221358": frozenset(("Molested Molecules", "Neural Burnout")),
     "20260716-222007": frozenset(
         ("Fragmented Soul", "Incomplete Rebuild", "Molested Molecules")
     ),
+    "20260716-222201": frozenset(("Redundant Scan", "Slum Runner")),
 }
 CAPTURE_CORPSE_IDENTITY_FILTERS = {
     "20260709-205921": frozenset(("(SimpleChar:795310FB)",)),
@@ -578,12 +591,38 @@ CAPTURE_CORPSE_IDENTITY_FILTERS = {
     "20260712-160257": frozenset(("(SimpleChar:795EC78A)",)),
     "20260713-014714": frozenset(("(SimpleChar:79607CD0)",)),
     "20260713-033511": frozenset(("(SimpleChar:79607E2C)",)),
+    "20260710-211430": frozenset(
+        (
+            "(SimpleChar:7957E62C)",
+            "(SimpleChar:7957E630)",
+            "(SimpleChar:7957E648)",
+            "(SimpleChar:7957E653)",
+            "(SimpleChar:7957E656)",
+            "(SimpleChar:7957E65A)",
+        )
+    ),
+    "20260712-232137": frozenset(
+        (
+            "(SimpleChar:79607AC5)",
+            "(SimpleChar:79607AC6)",
+            "(SimpleChar:79607AD0)",
+            "(SimpleChar:79607AD1)",
+            "(SimpleChar:79607AD2)",
+        )
+    ),
+    "20260716-034104": frozenset(("(SimpleChar:796CD74A)",)),
+    "20260716-221358": frozenset(
+        ("(SimpleChar:79702517)", "(SimpleChar:7970251A)")
+    ),
     "20260716-222007": frozenset(
         (
             "(SimpleChar:79702459)",
             "(SimpleChar:7970245D)",
             "(SimpleChar:7970245E)",
         )
+    ),
+    "20260716-222201": frozenset(
+        ("(SimpleChar:797024DA)", "(SimpleChar:7970250F)")
     ),
 }
 CAPTURE_LIFECYCLE_DEATH_LEVEL_FILTERS = {
@@ -2229,7 +2268,14 @@ def validate_content(
             {(11, 14): 2, (12, 15): 2, (15, 19): 1, (23, 29): 1}
         ),
         "Infector": Counter(
-            {(16, 98): 2, (17, 105): 2, (19, 118): 3, (25, 156): 2}
+            {
+                (16, 98): 2,
+                (17, 105): 2,
+                (18, 111): 1,
+                (19, 118): 3,
+                (24, 150): 5,
+                (25, 156): 2,
+            }
         ),
         "Looter": Counter({(9, 53): 2, (10, 59): 9}),
         "Lost Thought": Counter(
@@ -2239,12 +2285,32 @@ def validate_content(
             {(18, 111): 2, (20, 124): 1, (21, 131): 3, (24, 150): 1, (25, 156): 3}
         ),
         "Molested Molecules": Counter(
-            {(19, 118): 1, (20, 124): 2, (21, 131): 1, (22, 137): 1, (23, 144): 1, (24, 150): 1}
+            {
+                (19, 118): 1,
+                (20, 124): 2,
+                (21, 131): 1,
+                (22, 137): 1,
+                (23, 144): 1,
+                (24, 150): 1,
+                (25, 156): 1,
+            }
         ),
         "Mugger": Counter({(5, 44): 6, (8, 71): 6, (9, 80): 6, (10, 88): 6}),
-        "Neural Burnout": Counter({(17, 105): 1, (18, 111): 2, (23, 144): 1}),
-        "Premature Pattern": Counter({(18, 111): 1, (23, 144): 2}),
-        "Redundant Scan": Counter({(19, 118): 1, (20, 124): 1, (21, 131): 1}),
+        "Neural Burnout": Counter(
+            {
+                (16, 98): 1,
+                (17, 105): 1,
+                (18, 111): 2,
+                (23, 144): 1,
+                (25, 156): 2,
+            }
+        ),
+        "Premature Pattern": Counter(
+            {(17, 105): 1, (18, 111): 1, (23, 144): 2}
+        ),
+        "Redundant Scan": Counter(
+            {(19, 118): 1, (20, 124): 1, (21, 131): 1, (22, 137): 1}
+        ),
         "Shadow": Counter(
             {
                 (9, 53): 3,
@@ -2259,13 +2325,32 @@ def validate_content(
             }
         ),
         "Slum Runner": Counter(
-            {(11, 66): 1, (12, 72): 3, (16, 98): 4, (17, 105): 3, (18, 111): 1, (21, 131): 2, (22, 137): 2, (23, 144): 3}
+            {
+                (11, 66): 1,
+                (12, 72): 3,
+                (15, 92): 1,
+                (16, 98): 4,
+                (17, 105): 3,
+                (18, 111): 1,
+                (20, 124): 1,
+                (21, 131): 2,
+                (22, 137): 2,
+                (23, 144): 3,
+            }
         ),
         "Stim Fiend": Counter(
             {(10, 59): 6, (11, 66): 2, (12, 72): 4, (13, 79): 2, (14, 85): 1}
         ),
         "Thief": Counter({(5, 29): 3}),
-        "Uncontrollable Anger": Counter({(11, 14): 1, (13, 16): 2, (20, 25): 1}),
+        "Uncontrollable Anger": Counter(
+            {
+                (11, 14): 1,
+                (12, 15): 1,
+                (13, 16): 2,
+                (20, 25): 1,
+                (21, 26): 1,
+            }
+        ),
         "Violent Vagabond": Counter({(6, 21): 9, (7, 25): 5, (10, 35): 3}),
         "Workman Striker": Counter(
             {(13, 79): 2, (14, 85): 7, (15, 92): 3, (16, 98): 4, (17, 105): 3, (25, 156): 1}

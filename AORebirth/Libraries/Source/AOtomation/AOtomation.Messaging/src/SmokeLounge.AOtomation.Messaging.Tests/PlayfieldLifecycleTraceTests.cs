@@ -2424,11 +2424,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string corpseRulesText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
+            string worldPopulationControllerText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\WorldPopulationController.cs"));
             string generatedCombatReportText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"docs\generated\subway_enemy_combat_contracts.json"));
             string disobedientBotDefinition = ExtractMethodBlock(
                 providerText,
                 "private static CapturedSubwaySpawnDefinition DisobedientBot(");
+            string ordinaryCombatContract = ExtractMethodBlock(
+                combatContractText,
+                "internal static CapturedEnemyCombatContract ForOrdinary(");
+            string workmanStrikerCombatContract = ExtractMethodBlock(
+                combatContractText,
+                "private static CapturedEnemyCombatContract ForWorkmanStriker(");
+            string meldedPatternsCombatContract = ExtractMethodBlock(
+                combatContractText,
+                "private static CapturedEnemyCombatContract ForMeldedPatterns(");
 
             string[] acceptedEnemyKeys =
                 {
@@ -2436,11 +2447,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Filth Flea|17657|138",
                     "Disobedient Bot|17649|138",
                     "Slum Runner|55648|151",
-                    "Molested Molecules|203746|148"
+                    "Molested Molecules|203746|148",
+                    "Shadow|30464|150",
+                    "Infector|31909|150",
+                    "Architect Striker|203743|149",
+                    "Melded Patterns|203747|148",
+                    "Workman Striker|203854|149"
                 };
 
             Assert.AreEqual(
-                5,
+                10,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
 
@@ -2499,6 +2515,151 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
                 "Accepted Subway Molested Molecules must keep its nine exact spawns, captured attack range/cadence, shared chase, three strict loot outcomes, CATMesh/credits, private four-minute respawn policy, and ordinary corpse lifetimes together.");
+
+            Assert.AreEqual(
+                33,
+                CountOccurrences(ordinaryProviderText, "\"shadow\""),
+                "Accepted Subway Shadow must preserve its profile keys and all 31 exact spawn rows.");
+            Assert.IsTrue(
+                ordinaryProviderText.Contains("\"Shadow\"")
+                && ordinaryProviderText.Contains("30464")
+                && ordinaryProviderText.Contains("5.299336")
+                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(234875, 234875, 1, 2, 15, 1333)")
+                && CountOccurrences(ordinaryProviderText, ", 30464, 30434,") == 20
+                && catalogText.Contains("{ 30464, 7 }")
+                && catalogText.Contains("&& !ReviewedLegacyStrictLootEmptyCounts.ContainsKey(monsterData)")
+                && ordinaryCombatContract.Contains("CapturedEnemyCombatContract.FixedAttack(")
+                && !ordinaryCombatContract.Contains("critical")
+                && generatedCombatReportText.Contains("\"Shadow\":")
+                && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 56")
+                && generatedCombatReportText.Contains("\"normalMinDamage\": 11")
+                && generatedCombatReportText.Contains("\"normalMaxDamage\": 39")
+                && generatedCombatReportText.Contains("\"criticalAttackInfoRows\": 2")
+                && generatedCombatReportText.Contains("\"criticalMinDamage\": 30")
+                && generatedCombatReportText.Contains("\"criticalMaxDamage\": 44")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue")
+                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
+                && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted Subway Shadow must keep 31 exact spawns, fixed normal-only combat, report-only criticals, shared chase, 15 strict incomplete-pool loot outcomes, CATMesh/credits, private four-minute respawn, and ordinary corpse lifetimes together.");
+
+            Assert.AreEqual(
+                14,
+                CountOccurrences(ordinaryProviderText, "\"infector\""),
+                "Accepted ordinary Subway Infector must preserve its profile keys and all 12 exact spawn rows.");
+            Assert.IsTrue(
+                ordinaryProviderText.Contains("\"Infector\"")
+                && ordinaryProviderText.Contains("31909")
+                && ordinaryProviderText.Contains("5.016862")
+                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(101735, 101736, 21, 1, 7, 1429)")
+                && CountOccurrences(ordinaryProviderText, ", 31909, 31868,") == 15
+                && catalogText.Contains("{ 31909, 4 }")
+                && ordinaryCombatContract.Contains("CapturedEnemyCombatContract.FixedAttack(")
+                && !ordinaryCombatContract.Contains("31909")
+                && combatContractText.Contains("case 31909:")
+                && generatedCombatReportText.Contains("\"Infector\":")
+                && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 35")
+                && generatedCombatReportText.Contains("\"normalMinDamage\": 16")
+                && generatedCombatReportText.Contains("\"normalMaxDamage\": 36")
+                && generatedCombatReportText.Contains("\"criticalAttackInfoRows\": 3")
+                && generatedCombatReportText.Contains("\"criticalMinDamage\": 52")
+                && generatedCombatReportText.Contains("\"criticalMaxDamage\": 75")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue")
+                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted ordinary Subway Infector must keep 12 exact spawns, 15 exact credit corpses, its generic fixed normal contract isolated from Abmouth-owned specialization, report-only criticals, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
+
+            Assert.AreEqual(
+                8,
+                CountOccurrences(ordinaryProviderText, "\"architect_striker\""),
+                "Accepted Subway Architect Striker must preserve its profile key and all seven exact spawn rows.");
+            Assert.IsTrue(
+                ordinaryProviderText.Contains("\"Architect Striker\"")
+                && ordinaryProviderText.Contains("203743")
+                && ordinaryProviderText.Contains("5.425420")
+                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(122482, 122483, 14, 1, 4, 2500)")
+                && CountOccurrences(ordinaryProviderText, ", 203743, 17870,") == 4
+                && catalogText.Contains("{ 203743, 1 }")
+                && ordinaryCombatContract.Contains("CapturedEnemyCombatContract.FixedAttack(")
+                && generatedCombatReportText.Contains("\"Architect Striker\":")
+                && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 15")
+                && generatedCombatReportText.Contains("\"normalMinDamage\": 13")
+                && generatedCombatReportText.Contains("\"normalMaxDamage\": 17")
+                && generatedCombatReportText.Contains("\"criticalAttackInfoRows\": 1")
+                && generatedCombatReportText.Contains("\"criticalMinDamage\": 38")
+                && generatedCombatReportText.Contains("\"criticalMaxDamage\": 38")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue")
+                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted Subway Architect Striker must keep seven exact spawns, its captured fixed normal contract without an invented weapon, report-only critical, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
+
+            Assert.AreEqual(
+                12,
+                CountOccurrences(ordinaryProviderText, "\"melded_patterns\""),
+                "Accepted Subway Melded Patterns must preserve its profile keys and all ten exact spawn rows.");
+            Assert.IsTrue(
+                ordinaryProviderText.Contains("\"Melded Patterns\"")
+                && ordinaryProviderText.Contains("203747")
+                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(122672, 122673, 15, 1, 4, 2500)")
+                && CountOccurrences(ordinaryProviderText, ", 203747, 23368,") == 10
+                && catalogText.Contains("{ 203747, 1 }")
+                && meldedPatternsCombatContract.Contains("20260716-034559")
+                && meldedPatternsCombatContract.Contains("combat.ObservedRows == 7")
+                && meldedPatternsCombatContract.Contains("combat.MinDamage == 21")
+                && meldedPatternsCombatContract.Contains("combat.MaxDamage == 34")
+                && meldedPatternsCombatContract.Contains("CapturedEnemyCombatContract.EquippedWeapon(")
+                && meldedPatternsCombatContract.Contains("CapturedSubwayMeldedPatternsWeaponLowTemplate")
+                && meldedPatternsCombatContract.Contains("CapturedSubwayMeldedPatternsWeaponHighTemplate")
+                && meldedPatternsCombatContract.Contains("CapturedSubwayMeldedPatternsWeaponQuality")
+                && !meldedPatternsCombatContract.Contains("FixedAttack(")
+                && !meldedPatternsCombatContract.Contains("EquippedWeaponWithEmptySpecialAttackContext(")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue")
+                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted Subway Melded Patterns must keep ten exact spawns, exact QL20 weapon-owned damage/recharge without invented attack context, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
+
+            Assert.AreEqual(
+                22,
+                CountOccurrences(ordinaryProviderText, "\"workman_striker\""),
+                "Accepted Subway Workman Striker must preserve its profile key and all 21 exact spawn rows.");
+            Assert.IsTrue(
+                ordinaryProviderText.Contains("\"Workman Striker\"")
+                && ordinaryProviderText.Contains("203854")
+                && ordinaryProviderText.Contains("5.092328")
+                && CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 21
+                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(202719, 202720, 14, 2, 10, 2000)")
+                && CountOccurrences(ordinaryProviderText, ", 203854, 17899,") == 20
+                && catalogText.Contains("{ WorkmanStrikerMonsterData, 2 }")
+                && catalogText.Contains("archetype.MonsterData == WorkmanStrikerMonsterData")
+                && catalogText.Contains("CapturedSubwayCombatCatalog.ForOrdinary(")
+                && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(spawn.SourceIdentity, variant.Level)")
+                && ordinaryCombatContract.Contains("aggregate weapon fallback is forbidden")
+                && workmanStrikerCombatContract.Contains("if (matches != 1 || matched == null)")
+                && workmanStrikerCombatContract.Contains("requires exactly one owner-linked captured weapon tuple")
+                && workmanStrikerCombatContract.Contains("CapturedEnemyCombatContract.EquippedWeapon(")
+                && workmanStrikerCombatContract.Contains("item owns normal damage and recharge")
+                && !workmanStrikerCombatContract.Contains("critical")
+                && generatedCombatReportText.Contains("\"Workman Striker\":")
+                && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 47")
+                && generatedCombatReportText.Contains("\"normalMinDamage\": 14")
+                && generatedCombatReportText.Contains("\"normalMaxDamage\": 23")
+                && generatedCombatReportText.Contains("\"criticalAttackInfoRows\": 6")
+                && generatedCombatReportText.Contains("\"criticalMinDamage\": 36")
+                && generatedCombatReportText.Contains("\"criticalMaxDamage\": 42")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue")
+                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted Subway Workman Striker must keep 21 exact source-specific weapons and spawns, fail-closed aggregate/unknown selection, item-owned normal damage/recharge, report-only criticals, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             Assert.AreEqual(
                 12,
