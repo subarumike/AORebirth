@@ -146,10 +146,24 @@
     <Compile Include="Core\Arete\Quests\ObjectivePlaybackModels.cs" />
     <Compile Include="Core\Arete\Quests\ObjectivePlaybackService.cs" />
     <Compile Include="Core\Arete\Quests\RexB18CObjectiveProgressTracker.cs" />
+    <Compile Include="Core\Arete\Quests\RexB18CFeedbackPolicy.cs" />
     <Compile Include="Core\Arete\Quests\RexB18DBoxProgressTracker.cs" />
     <Compile Include="Core\Arete\Quests\RexB18ECompletionHandler.cs" />
     <Compile Include="Core\Arete\Quests\RexQuestPreviewEmitter.cs" />
     <Compile Include="Core\Arete\Quests\SafeQuestFullUpdateSender.cs" />
+    <Compile Include="Core\Missions\IMissionRepository.cs" />
+    <Compile Include="Core\Missions\InMemoryMissionRepository.cs" />
+    <Compile Include="Core\Missions\MissionModels.cs" />
+    <Compile Include="Core\Missions\MissionDefinitionCatalog.cs" />
+    <Compile Include="Core\Missions\MissionRewardCoordinator.cs" />
+    <Compile Include="Core\Missions\MySqlMissionRepository.cs" />
+    <Compile Include="Core\Missions\PersistentMissionService.cs" />
+    <Compile Include="Core\Missions\MissionRuntime.cs" />
+    <Compile Include="Core\Subway\Quests\TotwGatewayInteractionHandler.cs" />
+    <Compile Include="Core\Subway\Quests\WindcallerKarrecInteractionRules.cs" />
+    <Compile Include="Core\Subway\Quests\WindcallerKarrecPacketSender.cs" />
+    <Compile Include="Core\Subway\Quests\WindcallerKarrecQuestRuntime.cs" />
+    <Compile Include="Core\Subway\Quests\WindcallerKarrecTradeAdapter.cs" />
     <Compile Include="Core\CombatCorpseRules.cs" />
     <Compile Include="Core\CombatDamageRules.cs" />
     <Compile Include="Core\DamageCalculation.cs" />
@@ -494,6 +508,30 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Captured\Subway\pf127-geometry.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\rex-larsson\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\rex-larsson\dialogue\rex-larsson.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\rex-larsson\quests\rex-larsson.quests.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\marcus-stone\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\marcus-stone\dialogue\marcus-stone.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Subway\windcaller-karrec\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Subway\windcaller-karrec\dialogue\windcaller-karrec.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Subway\windcaller-karrec\quests\windcaller-karrec.quests.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\dummy.txt">

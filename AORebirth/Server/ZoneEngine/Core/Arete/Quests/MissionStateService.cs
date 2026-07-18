@@ -39,35 +39,40 @@ namespace ZoneEngine.Core.Arete.Quests
             }
         }
 
-        public MissionStateResult GetMissionState(string questId)
+        public MissionStateResult GetMissionState(int characterId, string questId)
         {
             var validation = new AreteValidationResult();
+            ValidateCharacterId(characterId, validation);
             QuestDefinition quest = this.ResolveQuest(questId, validation);
             if (!validation.IsValid)
             {
                 return new MissionStateResult(null, Enumerable.Empty<AreteRecordedAction>(), validation);
             }
 
-            MissionStateRecord record = this.store.GetOrCreate(quest.QuestId);
+            MissionStateRecord record = this.store.GetOrCreate(characterId, quest.QuestId);
             return new MissionStateResult(record, Enumerable.Empty<AreteRecordedAction>(), validation);
         }
 
-        public MissionStateResult OfferMission(string questId)
+        public MissionStateResult OfferMission(int characterId, string questId)
         {
             var validation = new AreteValidationResult();
+            ValidateCharacterId(characterId, validation);
             QuestDefinition quest = this.ResolveQuest(questId, validation);
             if (!validation.IsValid)
             {
                 return new MissionStateResult(null, Enumerable.Empty<AreteRecordedAction>(), validation);
             }
 
-            this.ValidateChainPrerequisites(quest.QuestId, validation);
+            this.ValidateChainPrerequisites(characterId, quest.QuestId, validation);
             if (!validation.IsValid)
             {
-                return new MissionStateResult(this.store.GetOrCreate(quest.QuestId), Enumerable.Empty<AreteRecordedAction>(), validation);
+                return new MissionStateResult(
+                    this.store.GetOrCreate(characterId, quest.QuestId),
+                    Enumerable.Empty<AreteRecordedAction>(),
+                    validation);
             }
 
-            MissionStateRecord record = this.store.GetOrCreate(quest.QuestId);
+            MissionStateRecord record = this.store.GetOrCreate(characterId, quest.QuestId);
             if (record.State != AreteMissionState.NotStarted)
             {
                 validation.AddError(quest.QuestId, "mission cannot be offered from state '" + record.State + "'");
@@ -81,16 +86,17 @@ namespace ZoneEngine.Core.Arete.Quests
             return this.CreateResult(record, "offerMission", validation);
         }
 
-        public MissionStateResult AcceptMission(string questId)
+        public MissionStateResult AcceptMission(int characterId, string questId)
         {
             var validation = new AreteValidationResult();
+            ValidateCharacterId(characterId, validation);
             QuestDefinition quest = this.ResolveQuest(questId, validation);
             if (!validation.IsValid)
             {
                 return new MissionStateResult(null, Enumerable.Empty<AreteRecordedAction>(), validation);
             }
 
-            MissionStateRecord record = this.store.GetOrCreate(quest.QuestId);
+            MissionStateRecord record = this.store.GetOrCreate(characterId, quest.QuestId);
             if (record.State != AreteMissionState.Offered)
             {
                 validation.AddError(quest.QuestId, "mission is not offered");
@@ -104,16 +110,17 @@ namespace ZoneEngine.Core.Arete.Quests
             return this.CreateResult(record, "acceptMission", validation);
         }
 
-        public MissionStateResult CompleteMission(string questId)
+        public MissionStateResult CompleteMission(int characterId, string questId)
         {
             var validation = new AreteValidationResult();
+            ValidateCharacterId(characterId, validation);
             QuestDefinition quest = this.ResolveQuest(questId, validation);
             if (!validation.IsValid)
             {
                 return new MissionStateResult(null, Enumerable.Empty<AreteRecordedAction>(), validation);
             }
 
-            MissionStateRecord record = this.store.GetOrCreate(quest.QuestId);
+            MissionStateRecord record = this.store.GetOrCreate(characterId, quest.QuestId);
             if (record.State != AreteMissionState.Active)
             {
                 validation.AddError(quest.QuestId, "mission is not active");
@@ -126,29 +133,31 @@ namespace ZoneEngine.Core.Arete.Quests
             return this.CreateResult(record, "completeMission", validation);
         }
 
-        public MissionStateResult FailMission(string questId)
+        public MissionStateResult FailMission(int characterId, string questId)
         {
-            return this.SetTerminalState(questId, AreteMissionState.Failed, "failMission");
+            return this.SetTerminalState(characterId, questId, AreteMissionState.Failed, "failMission");
         }
 
-        public MissionStateResult AbandonMission(string questId)
+        public MissionStateResult AbandonMission(int characterId, string questId)
         {
-            return this.SetTerminalState(questId, AreteMissionState.Abandoned, "abandonMission");
+            return this.SetTerminalState(characterId, questId, AreteMissionState.Abandoned, "abandonMission");
         }
 
         private MissionStateResult SetTerminalState(
+            int characterId,
             string questId,
             AreteMissionState terminalState,
             string transitionName)
         {
             var validation = new AreteValidationResult();
+            ValidateCharacterId(characterId, validation);
             QuestDefinition quest = this.ResolveQuest(questId, validation);
             if (!validation.IsValid)
             {
                 return new MissionStateResult(null, Enumerable.Empty<AreteRecordedAction>(), validation);
             }
 
-            MissionStateRecord record = this.store.GetOrCreate(quest.QuestId);
+            MissionStateRecord record = this.store.GetOrCreate(characterId, quest.QuestId);
             if (record.State != AreteMissionState.Offered && record.State != AreteMissionState.Active)
             {
                 validation.AddError(quest.QuestId, "mission is not offered or active");
@@ -185,7 +194,10 @@ namespace ZoneEngine.Core.Arete.Quests
             return quest;
         }
 
-        private void ValidateChainPrerequisites(string questId, AreteValidationResult validation)
+        private void ValidateChainPrerequisites(
+            int characterId,
+            string questId,
+            AreteValidationResult validation)
         {
             foreach (QuestChainLinkMetadata link in this.registry.GetLinksTo(questId))
             {
@@ -194,13 +206,21 @@ namespace ZoneEngine.Core.Arete.Quests
                     continue;
                 }
 
-                MissionStateRecord prerequisite = this.store.GetOrCreate(link.FromQuestId);
+                MissionStateRecord prerequisite = this.store.GetOrCreate(characterId, link.FromQuestId);
                 if (prerequisite.State != AreteMissionState.Completed)
                 {
                     validation.AddError(
                         questId,
                         "mission prerequisite is not completed: '" + link.FromQuestId + "'");
                 }
+            }
+        }
+
+        private static void ValidateCharacterId(int characterId, AreteValidationResult validation)
+        {
+            if (characterId <= 0)
+            {
+                validation.AddError("missionState", "stable character identity must be positive");
             }
         }
 

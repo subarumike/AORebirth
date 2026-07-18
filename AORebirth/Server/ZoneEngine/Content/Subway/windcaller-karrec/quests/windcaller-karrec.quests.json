@@ -1,0 +1,71 @@
+{
+  "Identity": {
+    "Id": "subway-windcaller-karrec-quests-20260717-223626",
+    "Version": "capture-backed-1",
+    "Source": "docs/evidence/WINDCALLER_KARREC_SUBWAY_ENTRANCE_QUEST_20260717_223626.md"
+  },
+  "SourceCaptures": [
+    "20260717-223626",
+    "20260717-232249",
+    "AORebirth/Server/ZoneEngine/Content/Captured/Quests/windcaller_karrec_subway_entrance_20260717_223626.json"
+  ],
+  "Quests": [
+    {
+      "QuestId": "Mission:55579381",
+      "Title": "The Windcaller's requests",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:796360BB",
+      "InitialStepId": "deliver_offerings",
+      "Steps": [
+        {
+          "StepId": "deliver_offerings",
+          "Name": "Give Windcaller Karrec the captured offerings",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55579381_deliver_offerings",
+              "Type": "CapturedInventoryDeliveryObjective",
+              "Description": "Give Windcaller Karrec a Bronto Burger and Maddy's Credit Card.",
+              "TargetIdentity": "SimpleChar:796360BB",
+              "RequiredCount": 2,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": [
+            {
+              "Id": "mission_55579381_capture_contract",
+              "Type": "CapturedLifecycleEvidence",
+              "QuestId": "Mission:55579381",
+              "StepId": "deliver_offerings",
+              "TargetIdentity": "SimpleChar:796360BB",
+              "Parameters": {
+                "acceptanceModel": "dialogue-answer-index-0",
+                "burgerItemId": "297042",
+                "creditCardItemId": "297043",
+                "tradeSlotCount": "2",
+                "completionAction": "CharacterAction-59-then-Quest-Delete",
+                "sideTokenDelta": "2",
+                "gatewayIdentity": "Terminal:C004028F",
+                "gatewayDestinationPlayfield": "647",
+                "rewardXpEvidence": "user-observed-5000-personal-research-allocation-plus-PerkUpdate-unknown3-45000",
+                "evidence": "docs/evidence/WINDCALLER_KARREC_SUBWAY_ENTRANCE_QUEST_20260717_223626.md"
+              }
+            }
+          ]
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": [
+        "exactTotalXpAndResearchPersistenceSemantics",
+        "officialGatewayEligibilityFlagIdentity",
+        "gatewayDenialPacketBehavior",
+        "alternateDialogueOutcomes",
+        "repeatability",
+        "abandonAndFailureBehavior",
+        "nextMissionHandoff"
+      ]
+    }
+  ],
+  "Links": []
+}

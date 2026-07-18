@@ -59,7 +59,9 @@ namespace ZoneEngine
     using Utility.Config;
 
     using ZoneEngine.Core;
+    using ZoneEngine.Core.Arete;
     using ZoneEngine.Core.Functions;
+    using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Playfields;
     using ZoneEngine.Script;
 
@@ -399,6 +401,21 @@ namespace ZoneEngine
             {
                 Colouring.Push(ConsoleColor.Red);
                 Console.WriteLine(locales.ErrorInitializingDatabase);
+                Colouring.Pop();
+                Colouring.Pop();
+                return false;
+            }
+
+            try
+            {
+                AreteFrameworkRegistries contentRegistries =
+                    AreteFrameworkBootstrap.InitializeCheckedInContent();
+                MissionRuntime.Initialize(contentRegistries);
+            }
+            catch (Exception exception)
+            {
+                Colouring.Push(ConsoleColor.Red);
+                Console.WriteLine("Persistent mission initialization failed: " + exception.Message);
                 Colouring.Pop();
                 Colouring.Pop();
                 return false;

@@ -42,6 +42,8 @@ namespace ZoneEngine.Core.Arete.Quests
 
     public sealed class ObjectiveProgressRecord
     {
+        public int CharacterId { get; set; }
+
         public string MissionId { get; set; }
 
         public string ObjectiveId { get; set; }

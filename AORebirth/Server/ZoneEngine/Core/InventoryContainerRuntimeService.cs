@@ -2169,6 +2169,28 @@ namespace ZoneEngine.Core
                    && InventoryPageHasItem(page, itemId);
         }
 
+        public int CountCharacterItemInCarriedInventory(ICharacter source, int itemId)
+        {
+            if (source == null || source.BaseInventory == null)
+            {
+                return 0;
+            }
+
+            int count = 0;
+            IInventoryPage page;
+            if (source.BaseInventory.Pages.TryGetValue((int)IdentityType.Inventory, out page))
+            {
+                count += CountInventoryPageItems(page, itemId);
+            }
+
+            if (source.BaseInventory.Pages.TryGetValue((int)IdentityType.OverflowWindow, out page))
+            {
+                count += CountInventoryPageItems(page, itemId);
+            }
+
+            return count;
+        }
+
         public QuestRewardInventoryGrantResult TryGrantQuestRewardItem(ICharacter source, Item item)
         {
             InventoryError inventoryError = source.BaseInventory.TryAdd(item);
@@ -2182,15 +2204,32 @@ namespace ZoneEngine.Core
                 bool persisted = source.BaseInventory.Write();
                 if (!persisted)
                 {
+                    RollBackQuestRewardItem(source, item);
                     return QuestRewardInventoryGrantResult.PersistReturnedFalse();
                 }
             }
             catch (Exception e)
             {
+                RollBackQuestRewardItem(source, item);
                 return QuestRewardInventoryGrantResult.PersistFailed(e.Message);
             }
 
             return QuestRewardInventoryGrantResult.Succeeded();
+        }
+
+        private static void RollBackQuestRewardItem(ICharacter source, IItem item)
+        {
+            foreach (IInventoryPage page in source.BaseInventory.Pages.Values)
+            {
+                foreach (KeyValuePair<int, IItem> entry in page.List().ToList())
+                {
+                    if (object.ReferenceEquals(entry.Value, item))
+                    {
+                        page.Remove(entry.Key);
+                        return;
+                    }
+                }
+            }
         }
 
         public CorpseLootInventoryTransferResult TryAddCorpseLootItem(
@@ -2297,6 +2336,21 @@ namespace ZoneEngine.Core
             }
 
             return false;
+        }
+
+        private static int CountInventoryPageItems(IInventoryPage page, int itemId)
+        {
+            int count = 0;
+            foreach (KeyValuePair<int, IItem> itemEntry in page.List())
+            {
+                IItem item = itemEntry.Value;
+                if (item != null && (item.LowID == itemId || item.HighID == itemId))
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
 
         private static IItem CloneShopItem(IItem item)

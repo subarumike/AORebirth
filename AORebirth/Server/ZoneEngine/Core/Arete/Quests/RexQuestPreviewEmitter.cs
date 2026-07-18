@@ -3,8 +3,6 @@ namespace ZoneEngine.Core.Arete.Quests
     #region Usings ...
 
     using System;
-    using System.Collections.Generic;
-    using System.Globalization;
 
     using AORebirth.Core.Entities;
 
@@ -13,6 +11,7 @@ namespace ZoneEngine.Core.Arete.Quests
     using Utility;
 
     using ZoneEngine.Core.Arete;
+    using ZoneEngine.Core.Missions;
 
     #endregion
 
@@ -86,6 +85,30 @@ namespace ZoneEngine.Core.Arete.Quests
                     "B18C quest preview failed: source character is not in Arete Landing 6553.");
             }
 
+            if (!MissionRuntime.IsInitialized)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B18C quest preview failed: persistent mission runtime is not initialized.");
+            }
+
+            MissionOperationResult offer = MissionRuntime.Service.OfferMission(
+                source.Identity.Instance,
+                MissionRuntime.RexB18CQuestId);
+            if (IsPersistenceFailure(offer))
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B18C quest preview failed before packet projection: " + offer.Message);
+            }
+
+            MissionOperationResult accept = MissionRuntime.Service.AcceptMission(
+                source.Identity.Instance,
+                MissionRuntime.RexB18CQuestId);
+            if (IsPersistenceFailure(accept))
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B18C quest acceptance failed before packet projection: " + accept.Message);
+            }
+
             RexQuestPreviewEmissionResult result = SafeQuestFullUpdateSender.TrySendB18CPreview(source);
             RexB18CObjectiveProgressTracker.TryActivateFromPreview(source, result);
             return result;
@@ -95,6 +118,14 @@ namespace ZoneEngine.Core.Arete.Quests
         {
             return string.Equals(previousNodeId, B18CPreviewSourceNodeId, StringComparison.OrdinalIgnoreCase)
                    && answerIndex == B18CPreviewAnswerIndex;
+        }
+
+        private static bool IsPersistenceFailure(MissionOperationResult result)
+        {
+            return result == null
+                   || result.Status == MissionOperationStatus.Rejected
+                   || result.Status == MissionOperationStatus.NotFound
+                   || result.Status == MissionOperationStatus.Unresolved;
         }
 
         private static bool IsRexLarsson(Identity identity)
@@ -126,11 +157,6 @@ namespace ZoneEngine.Core.Arete.Quests
 
     public static class RexMissionChainStateStore
     {
-        private static readonly Dictionary<string, RexMissionChainState> StateByCharacter =
-            new Dictionary<string, RexMissionChainState>(StringComparer.OrdinalIgnoreCase);
-
-        private static readonly object SyncRoot = new object();
-
         public static RexMissionChainState GetState(ICharacter character)
         {
             if (character == null)
@@ -143,18 +169,51 @@ namespace ZoneEngine.Core.Arete.Quests
 
         public static RexMissionChainState GetState(Identity identity)
         {
-            if (identity.Type != IdentityType.CanbeAffected || identity.Instance == 0)
+            if (!MissionRuntime.IsInitialized
+                || identity.Type != IdentityType.CanbeAffected
+                || identity.Instance == 0)
             {
                 return RexMissionChainState.NoRexMission;
             }
 
-            RexMissionChainState state;
-            lock (SyncRoot)
+            int characterId = identity.Instance;
+            ZoneEngine.Core.Missions.MissionStateRecord b18f = MissionRuntime.Service.GetMission(characterId, MissionRuntime.RexB18FQuestId);
+            if (IsOfferedOrLater(b18f))
             {
-                if (StateByCharacter.TryGetValue(MakeCharacterKey(identity), out state))
-                {
-                    return state;
-                }
+                return RexMissionChainState.B18FPreviewed;
+            }
+
+            ZoneEngine.Core.Missions.MissionStateRecord b18e = MissionRuntime.Service.GetMission(characterId, MissionRuntime.RexB18EQuestId);
+            if (b18e != null && b18e.State == MissionLifecycleState.Completed)
+            {
+                return RexMissionChainState.B18ECompleted;
+            }
+
+            if (IsOfferedOrLater(b18e))
+            {
+                return RexMissionChainState.B18EPreviewed;
+            }
+
+            ZoneEngine.Core.Missions.MissionStateRecord b18d = MissionRuntime.Service.GetMission(characterId, MissionRuntime.RexB18DQuestId);
+            if (b18d != null && b18d.State == MissionLifecycleState.Completed)
+            {
+                return RexMissionChainState.B18DObjectiveComplete;
+            }
+
+            if (IsOfferedOrLater(b18d))
+            {
+                return RexMissionChainState.B18DPreviewed;
+            }
+
+            ZoneEngine.Core.Missions.MissionStateRecord b18c = MissionRuntime.Service.GetMission(characterId, MissionRuntime.RexB18CQuestId);
+            if (b18c != null && b18c.State == MissionLifecycleState.Completed)
+            {
+                return RexMissionChainState.B18CObjectiveComplete;
+            }
+
+            if (IsOfferedOrLater(b18c))
+            {
+                return RexMissionChainState.B18CPreviewed;
             }
 
             return RexMissionChainState.NoRexMission;
@@ -165,45 +224,87 @@ namespace ZoneEngine.Core.Arete.Quests
             RexMissionChainState targetState,
             string reason)
         {
-            if (character == null
+            if (!MissionRuntime.IsInitialized
+                || character == null
                 || character.Identity.Type != IdentityType.CanbeAffected
                 || character.Identity.Instance == 0)
             {
                 return;
             }
 
-            RexMissionChainState currentState;
-            RexMissionChainState nextState;
-            string characterText = character.Identity.ToString(true);
-            lock (SyncRoot)
-            {
-                string key = MakeCharacterKey(character.Identity);
-                if (!StateByCharacter.TryGetValue(key, out currentState))
-                {
-                    currentState = RexMissionChainState.NoRexMission;
-                }
+            int characterId = character.Identity.Instance;
+            RexMissionChainState currentState = GetState(character);
+            MissionOperationResult operation = null;
 
-                nextState = currentState < targetState ? targetState : currentState;
-                StateByCharacter[key] = nextState;
+            if (targetState >= RexMissionChainState.B18CPreviewed
+                && currentState < RexMissionChainState.B18CPreviewed)
+            {
+                operation = EnsureActive(characterId, MissionRuntime.RexB18CQuestId);
             }
 
-            if (nextState != currentState)
+            if (targetState >= RexMissionChainState.B18CObjectiveComplete)
+            {
+                operation = MissionRuntime.Service.CompleteMission(characterId, MissionRuntime.RexB18CQuestId);
+            }
+
+            if (targetState >= RexMissionChainState.B18DPreviewed)
+            {
+                operation = EnsureActive(characterId, MissionRuntime.RexB18DQuestId);
+            }
+
+            if (targetState >= RexMissionChainState.B18DObjectiveComplete)
+            {
+                operation = MissionRuntime.Service.CompleteMission(characterId, MissionRuntime.RexB18DQuestId);
+            }
+
+            if (targetState >= RexMissionChainState.B18EPreviewed)
+            {
+                operation = EnsureActive(characterId, MissionRuntime.RexB18EQuestId);
+            }
+
+            if (targetState >= RexMissionChainState.B18ECompleted)
+            {
+                operation = MissionRuntime.Service.CompleteMission(characterId, MissionRuntime.RexB18EQuestId);
+            }
+
+            if (targetState >= RexMissionChainState.B18FPreviewed)
+            {
+                operation = EnsureActive(characterId, MissionRuntime.RexB18FQuestId);
+            }
+
+            RexMissionChainState nextState = GetState(character);
+            if (nextState != currentState || (operation != null && operation.Status == MissionOperationStatus.Rejected))
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
-                    "ARETE_REX_CHAIN_STATE character=" + characterText
+                    "ARETE_REX_CHAIN_STATE character=" + character.Identity.ToString(true)
                     + " from=" + currentState
                     + " to=" + nextState
-                    + " reason=\"" + (reason ?? string.Empty) + "\""
-                    + " inMemoryOnly=true noPersistence=true noRewards=true noInventory=true noXpCredits=true");
+                    + " target=" + targetState
+                    + " status=" + (operation == null ? "none" : operation.Status.ToString())
+                    + " reason=\"" + (reason ?? string.Empty) + "\" persistent=true");
             }
         }
 
-        private static string MakeCharacterKey(Identity identity)
+        private static MissionOperationResult EnsureActive(int characterId, string questId)
         {
-            return ((int)identity.Type).ToString(CultureInfo.InvariantCulture)
-                   + ":"
-                   + identity.Instance.ToString("X8", CultureInfo.InvariantCulture);
+            MissionOperationResult offer = MissionRuntime.Service.OfferMission(characterId, questId);
+            if (offer.Status == MissionOperationStatus.Rejected
+                || offer.Status == MissionOperationStatus.Unresolved
+                || offer.Status == MissionOperationStatus.NotFound)
+            {
+                return offer;
+            }
+
+            return MissionRuntime.Service.AcceptMission(characterId, questId);
+        }
+
+        private static bool IsOfferedOrLater(ZoneEngine.Core.Missions.MissionStateRecord mission)
+        {
+            return mission != null
+                   && (mission.State == MissionLifecycleState.Offered
+                       || mission.State == MissionLifecycleState.Active
+                       || mission.State == MissionLifecycleState.Completed);
         }
     }
 

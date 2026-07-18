@@ -1,0 +1,8 @@
+{
+  "DialoguePacks": [
+    "dialogue/windcaller-karrec.dialogue.json"
+  ],
+  "QuestPacks": [
+    "quests/windcaller-karrec.quests.json"
+  ]
+}

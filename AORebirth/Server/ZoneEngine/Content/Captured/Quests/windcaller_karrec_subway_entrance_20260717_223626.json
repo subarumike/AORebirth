@@ -1,0 +1,310 @@
+{
+  "schemaVersion": 1,
+  "fixtureId": "windcaller-karrec-subway-entrance-20260717-223626",
+  "evidenceClass": "capture-observation",
+  "runtimeSpecification": false,
+  "sourceCaptures": [
+    {
+      "captureId": "20260717-223626",
+      "roles": ["acceptance", "objectives", "completion"],
+      "utcStart": "2026-07-18T03:36:26.0790608Z",
+      "utcEnd": "2026-07-18T03:41:48.7962050Z",
+      "playfieldId": 655,
+      "validation": {
+        "rawInbound": 3685,
+        "rawOutbound": 255,
+        "rawTotal": 3940,
+        "rawWriteErrors": 0,
+        "projectionErrors": 0,
+        "callbackErrors": 0,
+        "processingAllowed": true,
+        "recaptureRequired": false,
+        "scfuDecoded": 288,
+        "scfuFailures": 0,
+        "scfuIncomplete": 0
+      },
+      "provenance": {
+        "rawPacketsSha256": "14889e0bf5b06239f187b9dd134f8836b5c39b751feb0ce01c2d3fb82b519b0c",
+        "packetHexLogSha256": "12e765f3315835ab1f5a5e57693ff2fe5e68f32cd70dee2aa7e47318501037ab"
+      }
+    },
+    {
+      "captureId": "20260717-232249",
+      "roles": ["gateway-use", "teleport"],
+      "utcStart": "2026-07-18T04:22:49.8647701Z",
+      "utcEnd": "2026-07-18T04:23:02.5217167Z",
+      "sourcePlayfieldId": 655,
+      "destinationPlayfieldId": 647,
+      "validation": {
+        "rawInbound": 214,
+        "rawOutbound": 6,
+        "rawTotal": 220,
+        "rawWriteErrors": 0,
+        "projectionErrors": 0,
+        "callbackErrors": 0,
+        "processingAllowed": true,
+        "recaptureRequired": false,
+        "scfuDecoded": 17,
+        "scfuFailures": 0,
+        "scfuIncomplete": 0
+      }
+    }
+  ],
+  "identities": {
+    "localPlayer": {"type": 50000, "instance": 2034548837, "text": "(SimpleChar:7944C065)"},
+    "karrec": {"type": 50000, "instance": 2036555963, "text": "(SimpleChar:796360BB)"},
+    "annoyingDude": {"type": 50000, "instance": 2036555965, "text": "(SimpleChar:796360BD)"},
+    "maddyCardile": {"type": 50000, "instance": 2036555964, "text": "(SimpleChar:796360BC)"},
+    "mission": {"type": 56003, "instance": 1431802753, "text": "(Mission:55579381)"},
+    "gateway": {"text": "(Terminal:C004028F)"}
+  },
+  "npcs": [
+    {
+      "role": "karrec",
+      "name": "Windcaller Karrec",
+      "playfieldId": 655,
+      "position": [3212.37549, 35.975, 788.760132],
+      "heading": [0.0, 0.0, 0.0, 0.99999994],
+      "scfu": {
+        "version": 58,
+        "level": 200,
+        "health": 51008,
+        "monsterData": 40818,
+        "monsterScale": 121,
+        "npcFamily": 136,
+        "headMesh": 40696,
+        "runSpeedBase": 515,
+        "flags": 170552011,
+        "characterFlags": 277352961,
+        "accountFlags": 0,
+        "expansions": 0,
+        "appearance": 1576,
+        "visibleTitle": 1,
+        "side": "neutral",
+        "breed": "Solitus",
+        "gender": "male",
+        "textures": "0:0:0|1:161710:0|2:161715:0|3:161705:0|4:161725:0",
+        "meshes": "0:20108:161720:2|0:40696:0:4",
+        "activeNano": "(53019:3233F):0:29050327:29050327"
+      },
+      "provenance": {"captureId": "20260717-223626", "rawPacketRow": 3585, "globalOrdinal": 3584, "sequence": 3347, "decodedRow": "scfu-appearance.csv:272"}
+    },
+    {
+      "role": "annoyingDude",
+      "name": "Annoying Dude",
+      "playfieldId": 655,
+      "position": [3185.87134, 35.11, 963.378967],
+      "scfu": {"level": 45, "health": 1958, "monsterData": 26103, "monsterScale": 104, "npcFamily": 103, "headMesh": 40117, "runSpeedBase": 154},
+      "provenance": {"captureId": "20260717-223626", "decodedRow": "scfu-appearance.csv:91"}
+    },
+    {
+      "role": "maddyCardile",
+      "name": "Maddy Cardile",
+      "playfieldId": 655,
+      "positions": [[3332.37524, 35.11, 931.1814], [3342.10986, 35.11, 919.9939]],
+      "scfu": {"level": 200, "health": 365, "monsterData": 26090, "monsterScale": 121, "npcFamily": 103, "headMesh": 40647, "runSpeedBase": 515},
+      "provenance": {"captureId": "20260717-223626", "decodedRows": ["scfu-appearance.csv:175", "scfu-appearance.csv:262"]}
+    }
+  ],
+  "acceptance": {
+    "selectedAnswerIndex": 0,
+    "selectedAnswerText": "I'll do it...",
+    "answerPacket": {"direction": "outbound", "packet": "KnubotAnswer", "answer": 0, "timestampUtc": "2026-07-18T03:36:38.6516876Z", "rawPacketRow": 57},
+    "statePacket": {"direction": "inbound", "packet": "QuestFullUpdate", "timestampUtc": "2026-07-18T03:36:40.1495857Z", "rawPacketRow": 65, "globalOrdinal": 64, "sequence": 58, "byteLength": 733},
+    "genericOutboundQuestAcceptObserved": false
+  },
+  "questFullUpdate": {
+    "n3Type": 1180319841,
+    "identity": {"type": 50000, "instance": 2034548837},
+    "unknown1": 1,
+    "quests": [
+      {
+        "questId": {"type": 56003, "instance": 1431802753},
+        "unknown1": 15,
+        "unknown2": 0,
+        "unknown3": 0,
+        "unknown4": 2,
+        "shortInfo": "The Windcaller's requests",
+        "longInfo": "The Windcaller's requests<BR><BR>Windcaller Karrec told you to get him a hamburger from an annoying individual. He also told you to get a woman named Maddy Cardile to donate money to his temple.<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>Give Windcaller Karrec a Bronto Burger and Maddy's Credit Card.</font>",
+        "unknownId1": {"type": 50000, "instance": 2036555963},
+        "unknown5": 6,
+        "unknown6": 0,
+        "unknown7": 0,
+        "unknown8": 0,
+        "unknown9": 1009,
+        "unknown10": 1009,
+        "missionItemData": [{"lowId": 285612, "highId": 285612, "ql": 1, "unknown": 0}],
+        "unknown11": 1110716998,
+        "unknown12": 0,
+        "unknown13": 0,
+        "unknownHash1": "00000000",
+        "unknown14": 0,
+        "unknown15": 0,
+        "unknown16": 0,
+        "unknown17": 0,
+        "unknown18": 0,
+        "unknownId2": {"type": 50000, "instance": 2034548837},
+        "missionIconId": 244818,
+        "unknown20": 60,
+        "unknown21": 60,
+        "questActions": [
+          {
+            "version": 24,
+            "action": {"type": 0, "instance": 0},
+            "unknownId1": {"type": 0, "instance": 0},
+            "unknownId2": {"type": 70099, "instance": 105201},
+            "unknownId3": {"type": 0, "instance": 0},
+            "unknownId4": {"type": 0, "instance": 0},
+            "unknown1": 0.0,
+            "unknown2": 0.0,
+            "unknown3": 0.0,
+            "unknown4": 0.0,
+            "unknownId5": {"type": 0, "instance": 0},
+            "unknown5": 0.0,
+            "unknown6": 0.0,
+            "unknown7": 0.0,
+            "unknown8": 0.0,
+            "unknownId6": {"type": 0, "instance": 0},
+            "unknownHash1": "6A5B02D9",
+            "unknown9": 0,
+            "unknownId7": {"type": 54001, "instance": 1297226293},
+            "playfieldId": {"type": 0, "instance": 0},
+            "unknown10": 0,
+            "unknown11": 0,
+            "position": [0.0, 0.0, 0.0]
+          }
+        ],
+        "playerIds": [{"type": 50000, "instance": 2034548837}],
+        "unknownArray1": [89266741],
+        "unknownArray2": [],
+        "characterInfos": [],
+        "unknown22": 6,
+        "playerIds2": [{"type": 50000, "instance": 2034548837}],
+        "unknown23": 0,
+        "unknown24": 105201,
+        "unknownId3": {"type": 0, "instance": 0},
+        "unknown25": 0,
+        "unknown26": 0,
+        "questIdentities": [],
+        "unknown27": 7,
+        "factionInfos": [],
+        "unknown28": 1
+      }
+    ]
+  },
+  "dialoguePaths": {
+    "karrecAcceptance": [
+      {"text": "Greetings, traveller. My name is Karrec.\nWould you spare a moment of your precious time?", "options": ["You can have a moment, but no more.", "Goodbye"], "selected": 0},
+      {"text": "I am but a humble servant carrying out his duties. But even servants need food once in a while...", "options": ["So, you want food?", "A servant?", "Goodbye"], "selected": 0},
+      {"text": "Yes, and of course any spare change...", "options": ["What will I get out of this?", "Goodbye"], "selected": 0},
+      {"text": "I shall grant you access to the Temple of the Three Winds.", "options": ["Fine, tell me what to do.", "Goodbye"], "selected": 0},
+      {"text": "There is an annoying man that always eats his bronto burger in front of me.. You must find him and take his burger.\nSecondly, the rich old woman Maddy Cardile never donated any money to our cause. Force her to do so.", "options": ["I'll do it...", "You are a scum, I will never help you.", "Goodbye"], "selected": 0},
+      {"text": "Good, good. You know where to find me when you are done.", "options": ["Goodbye"], "selected": 0}
+    ],
+    "annoyingDude": [
+      {"text": "Yo!", "options": ["I'm here to make sure you don't bother Karrec again.", "Goodbye"], "selected": 0},
+      {"text": "I would never do such thing!", "options": ["Enough lies, hand me your burger.", "Goodbye"], "selected": 0},
+      {"text": "You are nuts, come on! I'm hungry.", "options": ["I will count to three...", "Goodbye"], "selected": 0},
+      {"text": "You will not have my burger!", "options": ["1...", "Goodbye"], "selected": 0},
+      {"text": "I'm sure we can arrange some sort of agreement?", "options": ["2...", "Goodbye"], "selected": 0},
+      {"text": "Come on, I'm skinny I need the calories...", "options": ["3!", "Goodbye"], "selected": 0},
+      {"text": "Ok, ok, ok! Take it, it didn't taste that good anyway. Just leave me alone!", "options": [], "selected": null}
+    ],
+    "maddyCardile": [
+      {"text": "Hello there, young one.", "options": ["I heard you have not donated any money to Karrec's cause.", "Goodbye"], "selected": 0},
+      {"text": "You should not mingle with people like him, child.", "options": ["I am here to collect your donation. Who I mingle with is not your business.", "Goodbye"], "selected": 0},
+      {"text": "Well, now. You are one of those. I don't have the time or patience to deal with you. Get lost before I tell one of the peacekeepers what you are up to.", "options": ["I kick peacekeeper butt for fun. Tell them and I will show you!", "Goodbye"], "selected": 0},
+      {"text": "I'm disappointed in you, child. I will give you my credit card if you leave me alone. Money is not worth risking anyone's life for. Not even yours.", "options": ["I knew you would come to your senses, old woman.", "Goodbye"], "selected": 0},
+      {"text": "Leave now, before I change my mind.", "options": [], "selected": null}
+    ],
+    "maddyAbortedOpen": {"text": "Hello there, young one.", "serverClosedBeforeOptions": true, "cause": null}
+  },
+  "objectiveItemGrants": [
+    {
+      "source": "annoyingDude",
+      "item": {"lowId": 297042, "highId": 297042, "ql": 1, "repositoryName": "Bronto Burger"},
+      "packets": [
+        {"packet": "TemplateAction", "rawPacketRow": 1581, "sourceContainer": "(OverflowWindow:0)"},
+        {"packet": "ContainerAddItem", "rawPacketRow": 1582, "target": "local-player-overflow", "slot": 111}
+      ]
+    },
+    {
+      "source": "maddyCardile",
+      "item": {"lowId": 297043, "highId": 297043, "ql": 1, "repositoryName": "Maddy's Credit Card"},
+      "packets": [
+        {"packet": "TemplateAction", "rawPacketRow": 2901, "sourceContainer": "(OverflowWindow:0)"},
+        {"packet": "ContainerAddItem", "rawPacketRow": 2902, "target": "local-player-overflow", "slot": 111}
+      ]
+    }
+  ],
+  "completion": {
+    "returnAnswer": {"text": "I have the bronto burger and a donation to your temple", "selected": 0, "rawPacketRows": [3883, 3885]},
+    "orderedEvents": [
+      {"order": 1, "kind": "dialogue", "text": "Give it to me!"},
+      {"order": 2, "packet": "KnuBotStartTrade", "target": "karrec", "itemSlots": 2, "message": "Move the items you want to give to Windcaller Karrec into the available slots in the Give Item Tab on the right side of this window and press \"Accept'.", "rawPacketRow": 3891},
+      {"order": 3, "packet": "KnubotTrade", "direction": "outbound", "container": "(Inventory:0042)", "sequence": 251, "rawPacketRow": 3896},
+      {"order": 4, "packet": "KnubotTrade", "direction": "outbound", "container": "(Inventory:0047)", "sequence": 252, "rawPacketRow": 3899},
+      {"order": 5, "packet": "FinishTrade", "direction": "outbound", "decline": 0, "amount": 0, "sequence": 253, "rawPacketRow": 3902},
+      {"order": 6, "packet": "RejectedItems", "items": [], "rawPacketRow": 3903},
+      {"order": 7, "kind": "dialogue", "unknown2": 1, "text": "Karrec hands you a note covered with strange words and symbols, none of which make any sense to you. You upload the information to your ncu and throw the paper away.", "rawPacketRow": 3905},
+      {"order": 8, "kind": "dialogue", "unknown2": 0, "textNormalized": "Your devotion to the Cult of Three Winds gains you passage to the sacred Temple {playerName}. You may now use the gateway.", "redaction": "capture-local player name", "rawPacketRow": 3906},
+      {"order": 9, "packet": "AnswerList", "options": ["Thank you, Karrec.", "Goodbye"], "rawPacketRow": 3907},
+      {"order": 10, "packet": "FormatFeedback", "unknown": 1, "unknown1": 1107296284, "encodedMessage": "~&!!!\":!)90Fi!!![g~", "unknown2": 0, "sequence": 3654, "rawPacketRow": 3908},
+      {"order": 11, "packet": "PerkUpdate", "unknown": 1, "unknown1": 2680, "unknown2": 2680, "unknown3": 45000, "sequence": 3655, "rawPacketRow": 3909},
+      {"order": 12, "packet": "Stat", "statId": 75, "value": 4026, "unknown": 0, "sequence": 3656, "rawPacketRow": 3910},
+      {"order": 13, "packet": "Stat", "statId": 75, "value": 4028, "sequence": 3657, "rawPacketRow": 3911},
+      {"order": 14, "packet": "FormatFeedback", "unknown1": 0, "literalMessage": "Side tokens collected: 4028.", "sequence": 3658, "rawPacketRow": 3912},
+      {"order": 15, "packet": "Feedback", "category": 110, "messageId": 108871108, "rawPacketRow": 3913},
+      {"order": 16, "packet": "CharacterAction", "action": 59, "target": {"type": 56003, "instance": 1431802753}, "parameter1": 56003, "parameter2": 1431802753, "rawPacketRow": 3914},
+      {"order": 17, "packet": "Quest", "action": "Delete", "quest": {"type": 56003, "instance": 1431802753}, "rawPacketRow": 3915},
+      {"order": 18, "packet": "Stat", "stat": "SocialStatus", "value": 0, "rawPacketRow": 3916}
+    ],
+    "userObservedUi": {"text": "5000 of your XP were allocated to your personal research.", "isPacketPlaintext": false},
+    "sideTokenDelta": 2,
+    "rewardMissionItem": {"lowId": 285612, "highId": 285612, "ql": 1, "repositoryName": "Daily Mission XP Reward"}
+  },
+  "gatewayCorroboration": {
+    "localProjection": {"identity": "(Terminal:C004028F)", "name": "Temple of Three Winds Gateway", "playfieldId": 655, "position": [3213.421, 37.57098, 787.9217]},
+    "use": {"captureId": "20260717-232249", "direction": "outbound", "packet": "GenericCmd", "timestampUtc": "2026-07-18T04:22:51.6724647Z", "temp1": 0, "count": 2, "action": "Use", "temp4": 1, "target": "(Terminal:C004028F)", "unknown": 1, "rawPacketRow": 14, "globalOrdinal": 13, "sequence": 1},
+    "ack": {"direction": "inbound", "packet": "GenericCmd", "timestampUtc": "2026-07-18T04:22:51.7714568Z", "temp1": 1, "count": 2, "action": "Use", "temp4": 1, "target": "(Terminal:C004028F)", "unknown": 0, "rawPacketRow": 15, "globalOrdinal": 14, "sequence": 13},
+    "teleport": {
+      "direction": "inbound",
+      "packet": "N3Teleport",
+      "timestampUtc": "2026-07-18T04:22:51.992489Z",
+      "rawPacketRow": 17,
+      "globalOrdinal": 16,
+      "sequence": 15,
+      "byteLength": 114,
+      "n3Type": 1125743906,
+      "identity": {"type": 50000, "instance": 2034548837},
+      "unknown": 0,
+      "destinationField": [3214.815185546875, 35.51499938964844, 791.053466796875],
+      "heading": [0.0, -0.9576424956321716, 0.0, 0.2879597544670105],
+      "unknown1": 97,
+      "playfield": {"type": 51100, "instance": 647},
+      "gameServerId": 0,
+      "sgId": 0,
+      "changePlayfield": {"type": 40016, "instance": 647},
+      "unknown4": 0,
+      "unknown5": 0,
+      "playfield2": {"type": 0, "instance": 0},
+      "payloadLength": 12,
+      "payloadBigEndianFloats": [1814.0, 29.0, 2699.0],
+      "observedPostInitPosition": [1814.0, 28.81, 2699.0]
+    },
+    "provesCompletedPlayerCanUseGateway": true,
+    "provesEligibilityStorage": false
+  },
+  "unresolvedExclusions": [
+    "No persistent account, character, or mission eligibility flag identity is captured; post-zone AccountFlags remains zero.",
+    "No access-denial packet for exact identity (Terminal:C004028F) was found in the searched corpus.",
+    "No exact Terminal full update or template ID was found.",
+    "The distinct identity (VendingMachine:C004028F) is excluded despite the matching instance suffix.",
+    "PerkUpdate fields 2680, 2680, and 45000 remain semantically unknown; 45000 is not asserted as total or base XP.",
+    "The 5000 personal-research allocation is user-observed UI evidence, not plaintext in the captured FormatFeedback packet.",
+    "Numeric stat ID 75 is retained without relying on a potentially stale derived enum label.",
+    "The two trade container identities are not mapped to specific objective items.",
+    "Failure branches, alternate dialogue, abandon recovery, reconnect persistence, repeated completion, and team sharing are not captured.",
+    "No follow-on mission or next-quest handoff is captured."
+  ]
+}
