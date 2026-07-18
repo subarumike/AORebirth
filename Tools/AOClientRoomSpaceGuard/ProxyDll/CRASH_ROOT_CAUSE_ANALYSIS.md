@@ -160,21 +160,23 @@ VB output is **proven**. Current containment verifies the exact batch object,
 frame locals, byte counts, state blob, viewport, index-buffer path, and native
 cleanup functions before discarding the batch.
 
-### GUI direct self-render cycle
+### GUI unbounded child-render recursion
 
 Repeated full dumps from `2026-07-17` and `2026-07-18` share failure bucket
 `INVALID_EXCEPTION_HANDLER_c00001a5_GUI.dll!View::_CallRender` at image RVA
-`GUI.dll +0x14D6DF`. The stacks contain consecutive `_CallRender` frames with
-the same `View` pointer, including idle reproductions with AOSharp absent. Static
-disassembly proves the recursive child call at `GUI.dll +0x14D6DA` loads the
-child into `ECX` while retaining the current parent in `EBX`; the instruction
-bytes are `E8 16 FE FF FF` and target `_CallRender` at `+0x14D4F5`.
+`GUI.dll +0x14D6DF`. The stacks contain consecutive `_CallRender` frames,
+including idle reproductions with AOSharp absent. Static disassembly proves the
+recursive child call at `GUI.dll +0x14D6DA` loads the child into `ECX`; the
+instruction bytes are `E8 16 FE FF FF` and target `_CallRender` at
+`+0x14D4F5`. A first direct-self comparison was deployed and the failure
+reproduced without a patch hit, disproving that narrower pointer-equality model.
 
-Containment patches only that verified callsite. Non-self child calls tail-jump
-to the original function unchanged. Exact direct cycles (`ECX == EBX`) return
-with the original callee's 24-byte stack cleanup and emit a bounded patch-hit
-log. Longer or structurally different cycles remain fail-closed on the normal
-crash path.
+Containment patches only that verified callsite and invokes the original
+function with its exact six-argument `thiscall` contract. A thread-local counter
+allows `128` nested child renders, then skips the next child with the original
+callee's 24-byte stack cleanup and emits a bounded patch-hit log. This bounds
+direct and longer cycles before they approach exception-registration memory;
+unrelated failures remain fail-closed on the normal crash path.
 
 ### GUI tree/object lookup
 
