@@ -1036,7 +1036,7 @@ namespace AORebirth.Core.Playfields
                 3.0,
                 "20260716-034559 atomic SCFU; 20260709-222339 plus 20260717-214612/214751/215250 weapon/combat/chase; "
                 + "20260716-222007 exact 416-byte corpse CATMesh 17905/MonsterData 203726/scale 130; "
-                + "20260717-214751 exact 186-credit item-plus-credit corpse snapshot; "
+                + "20260717-214751/215250 two exact 186-credit item-plus-credit corpse snapshots; "
                 + "20260717-220340-associated Mike observation (not packet-timestamp encoded): official-live exact 10-minute respawn and Temporary 30m loot-bearing corpse; "
                 + "confirmed 3-second empty cleanup and shared 100-unit leash; active nano refresh unresolved and omitted",
                 npcFamily: 148,

@@ -249,10 +249,12 @@ population in bounded runtime batches.
   416-byte CATMesh `17905` corpse, and fixed observed `186` credits. Weapon
   damage and recharge remain item-owned; the expanded three-capture fight set
   proves 21 normal local-player hits at `25..45` with a `4.311321`-second median
-  interval. Finalized `20260717-214751` adds one exact atomic corpse snapshot:
-  186 credits plus QL22 Living Cyber Armor Sleeves `163430/163431`, QL1 item
-  `301714`, and QL200 item `287146`. Wider loot-pool probabilities and active-
-  nano refresh semantics remain unresolved. Follow-up `20260717-220340` starts
+  interval. Finalized `20260717-214751` and `20260717-215250` add two exact
+  atomic 186-credit corpse snapshots. The first contains QL22 Living Cyber
+  Armor Sleeves `163430/163431`, QL1 item `301714`, and QL200 item `287146`;
+  the second contains QL1 item `301715`, QL16 item `160051/160050`, and QL200
+  item `287146`. Wider loot-pool probabilities and active-nano refresh semantics
+  remain unresolved. Follow-up `20260717-220340` starts
   after the corpses already exist, so its additional item rows remain membership
   evidence rather than a fabricated item-plus-credit outcome. Mike observed the
   live ten-minute respawn and 30-minute loot-bearing corpse timer during that
