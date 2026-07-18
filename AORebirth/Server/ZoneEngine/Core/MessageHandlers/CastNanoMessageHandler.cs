@@ -73,6 +73,28 @@ namespace ZoneEngine.Core.MessageHandlers
         }
 
         /// <summary>
+        /// Ordinary NPC casts use Identity=NPC and Caster=None.
+        /// </summary>
+        public void SendNpcCast(ICharacter npc, int nanoId, Identity target, bool announceToPlayfield = true)
+        {
+            this.Send(npc, this.PetCastFiller(npc, nanoId, target), announceToPlayfield);
+        }
+
+        /// <summary>
+        /// Captured triggered self-casts use Identity=Caster=Target and Unknown1=1.
+        /// </summary>
+        public void SendTriggeredSelfCast(
+            ICharacter character,
+            int nanoId,
+            bool announceToPlayfield = true)
+        {
+            this.Send(
+                character,
+                this.TriggeredSelfCastFiller(character, nanoId),
+                announceToPlayfield);
+        }
+
+        /// <summary>
         /// </summary>
         /// <param name="character">
         /// </param>
@@ -105,6 +127,19 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.NanoId = nanoId;
                 x.Unknown = 0;
                 x.Unknown1 = 0;
+            };
+        }
+
+        private MessageDataFiller TriggeredSelfCastFiller(ICharacter character, int nanoId)
+        {
+            return x =>
+            {
+                x.Identity = character.Identity;
+                x.Caster = character.Identity;
+                x.Target = character.Identity;
+                x.NanoId = nanoId;
+                x.Unknown = 0;
+                x.Unknown1 = 1;
             };
         }
 

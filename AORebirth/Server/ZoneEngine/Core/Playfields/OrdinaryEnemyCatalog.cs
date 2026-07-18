@@ -19,11 +19,21 @@ namespace AORebirth.Core.Playfields
         private const int BloodcreeperMonsterData =
             NpcCombatAttackRules.CapturedSubwayBloodcreeperMonsterData;
 
+        private const int DerangedShopperMonsterData = 203736;
+
         private const int LooterMonsterData = 203745;
+
+        private const int RedundantScanMonsterData = 204178;
+
+        private const int IncompleteRebuildMonsterData = 203728;
 
         private const int WorkmanStrikerMonsterData = 203854;
 
         private const double BloodcreeperAutomaticAggroRadius = 7.0;
+
+        private const double IncompleteRebuildAutomaticAggroRadius = 7.0;
+
+        private const double RedundantScanAutomaticAggroRadius = 7.0;
 
         private static readonly Dictionary<string, OrdinaryEnemySpawnPolicyConfiguration>
             CapturedOrdinarySpawnPolicies = BuildCapturedOrdinarySpawnPolicies();
@@ -43,6 +53,23 @@ namespace AORebirth.Core.Playfields
                 true,
                 false,
                 OrdinaryEnemyEvidenceState.Observed);
+
+        private static readonly OrdinaryEnemyAggressionProfile
+            IncompleteRebuildAutomaticAggression =
+                new OrdinaryEnemyAggressionProfile(
+                    OrdinaryEnemyAggressionMode.Auto,
+                    IncompleteRebuildAutomaticAggroRadius,
+                    true,
+                    true,
+                    OrdinaryEnemyEvidenceState.Policy);
+
+        private static readonly OrdinaryEnemyAggressionProfile RedundantScanAutomaticAggression =
+            new OrdinaryEnemyAggressionProfile(
+                OrdinaryEnemyAggressionMode.Auto,
+                RedundantScanAutomaticAggroRadius,
+                true,
+                false,
+                OrdinaryEnemyEvidenceState.Policy);
 
         private static readonly OrdinaryEnemyCorpseProfile StandardGenericCorpse =
             new OrdinaryEnemyCorpseProfile(
@@ -318,14 +345,29 @@ namespace AORebirth.Core.Playfields
                 uint appearance = archetype.AppearanceValue;
                 CapturedEnemyCombatContract contract = CapturedSubwayCombatCatalog.ForOrdinary(archetype);
                 Func<int, int, CapturedEnemyCombatContract> sourceContractResolver =
-                    archetype.MonsterData == WorkmanStrikerMonsterData
+                    archetype.MonsterData == DerangedShopperMonsterData
+                    || archetype.MonsterData == WorkmanStrikerMonsterData
                     || archetype.MonsterData == LooterMonsterData
+                    || archetype.MonsterData == RedundantScanMonsterData
                         ? new Func<int, int, CapturedEnemyCombatContract>(
                             (sourceIdentity, level) =>
                                 CapturedSubwayCombatCatalog.ForOrdinary(
                                     archetype,
                                     sourceIdentity))
                         : null;
+                Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>
+                    sourceVariantContractResolver =
+                        archetype.MonsterData == IncompleteRebuildMonsterData
+                            ? new Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>(
+                                (sourceIdentity, variant) =>
+                                    CapturedSubwayCombatCatalog.ForOrdinary(
+                                        archetype,
+                                        sourceIdentity,
+                                        variant,
+                                        content.GetGenerationVariants(
+                                            archetype.MonsterData,
+                                            sourceIdentity)))
+                            : null;
                 CapturedSubwayStrictLootProfileDefinition strictLootProfile =
                     content.GetStrictLootProfile(archetype.MonsterData);
                 OrdinaryEnemyLootEntry[] lootEntries = strictLootProfile == null
@@ -390,7 +432,8 @@ namespace AORebirth.Core.Playfields
                             contract,
                             archetype.MonsterData,
                             null,
-                            sourceContractResolver),
+                            sourceContractResolver,
+                            sourceVariantContractResolver),
                         BuildLootProfile(
                             archetype.MonsterData,
                             lootEntries,
@@ -401,7 +444,8 @@ namespace AORebirth.Core.Playfields
                             archetype.CorpseEvidence),
                         archetype.EvidenceCaptures,
                         false,
-                        false));
+                        false,
+                        SupportNanoFor(archetype.MonsterData)));
             }
 
             foreach (CapturedSubwayOrdinarySpawnDefinition source in content.GetAllSpawns())
@@ -413,6 +457,13 @@ namespace AORebirth.Core.Playfields
                 OrdinaryEnemyWaypoint[] waypoints = source.Waypoints
                     .Select(value => new OrdinaryEnemyWaypoint(value.X, value.Y, value.Z))
                     .ToArray();
+                OrdinaryEnemySpawnLevelDefinition levelDefinition =
+                    BuildCapturedLevelDefinition(
+                        content,
+                        source,
+                        policyConfiguration == null
+                            ? null
+                            : policyConfiguration.LevelDefinition);
                 spawns.Add(
                     new OrdinaryEnemySpawnDefinition(
                         SpawnKey(source.SourceInstance),
@@ -460,9 +511,7 @@ namespace AORebirth.Core.Playfields
                         source.SourceOwnerIdentity,
                         source.EvidenceCapture,
                         source.EvidenceTimestamp,
-                        policyConfiguration == null
-                            ? null
-                            : policyConfiguration.LevelDefinition,
+                        levelDefinition,
                         policyConfiguration == null
                             ? null
                             : policyConfiguration.RespawnPolicy));
@@ -509,6 +558,27 @@ namespace AORebirth.Core.Playfields
                             Enabled = true
                         })));
             result.Add(
+                "incomplete_rebuild",
+                new OrdinaryEnemySpawnPolicyConfiguration(
+                    null,
+                    WorldRespawnPolicyAssignment.Explicit(
+                        new RespawnPolicyDefinition
+                        {
+                            RespawnPolicyKey = "ordinary.incomplete-rebuild.240",
+                            Mode = WorldRespawnMode.FixedDelay,
+                            FixedDelaySeconds = 240.0,
+                            RespawnAtOriginalPosition = true,
+                            ResetHealth = true,
+                            ResetMovementState = true,
+                            ResetAggressionState = true,
+                            DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
+                            Evidence = "private-regular-enemy-policy;"
+                                       + "20260709-222339;20260716-034559;"
+                                       + "20260716-222007;20260717-215250",
+                            Confidence = "POLICY",
+                            Enabled = true
+                        })));
+            result.Add(
                 "slum_runner",
                 new OrdinaryEnemySpawnPolicyConfiguration(
                     null,
@@ -531,6 +601,67 @@ namespace AORebirth.Core.Playfields
                             Enabled = true
                         })));
             return result;
+        }
+
+        private static OrdinaryEnemySpawnLevelDefinition BuildCapturedLevelDefinition(
+            CapturedSubwayOrdinaryContentProvider content,
+            CapturedSubwayOrdinarySpawnDefinition source,
+            OrdinaryEnemySpawnLevelDefinition configuredDefinition)
+        {
+            CapturedSubwayGenerationVariantDefinition[] capturedVariants =
+                content.GetGenerationVariants(IncompleteRebuildMonsterData, source.SourceInstance);
+            if (capturedVariants.Length == 0)
+            {
+                if (string.Equals(
+                    source.ArchetypeKey,
+                    "incomplete_rebuild",
+                    StringComparison.Ordinal))
+                {
+                    throw new InvalidOperationException(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Incomplete Rebuild source 0x{0:X8} has no reviewed atomic generation variants.",
+                            source.SourceInstance));
+                }
+
+                return configuredDefinition;
+            }
+
+            if (!string.Equals(
+                source.ArchetypeKey,
+                "incomplete_rebuild",
+                StringComparison.Ordinal)
+                || capturedVariants.Any(
+                    value => value.MonsterData != IncompleteRebuildMonsterData
+                             || value.SourceInstance != source.SourceInstance))
+            {
+                throw new InvalidOperationException(
+                    "Captured ordinary generation variants are attached to an unexpected source.");
+            }
+
+            OrdinaryEnemySpawnVariant[] variants = capturedVariants
+                .Select(
+                    value => new OrdinaryEnemySpawnVariant(
+                        value.Level,
+                        value.Health,
+                        value.HealthDamage,
+                        value.MonsterScale,
+                        value.RunSpeed,
+                        value.Evidence,
+                        new OrdinaryEnemySpawnWeaponLoadout(
+                            value.WeaponLowId,
+                            value.WeaponHighId,
+                            value.WeaponQuality,
+                            value.Evidence)))
+                .ToArray();
+            return OrdinaryEnemySpawnLevelDefinition.ExplicitObservedVariants(
+                variants,
+                "uniform-selection-private-policy;"
+                + "capture-reviewed atomic level/stat/weapon generations;"
+                + string.Join(
+                    ",",
+                    capturedVariants.Select(value => value.Evidence)
+                        .Distinct(StringComparer.Ordinal)));
         }
 
         private static OrdinaryEnemyAppearanceProfile BuildSupportedAppearance(
@@ -613,21 +744,72 @@ namespace AORebirth.Core.Playfields
 
         private static OrdinaryEnemyAggressionProfile AggressionFor(int monsterData)
         {
-            return monsterData == BloodcreeperMonsterData
-                       ? BloodcreeperAutomaticAggression
+            if (monsterData == BloodcreeperMonsterData)
+            {
+                return BloodcreeperAutomaticAggression;
+            }
+
+            if (monsterData == IncompleteRebuildMonsterData)
+            {
+                return IncompleteRebuildAutomaticAggression;
+            }
+
+            return monsterData == RedundantScanMonsterData
+                       ? RedundantScanAutomaticAggression
                        : RetaliateAggression();
+        }
+
+        private static OrdinaryEnemySupportNanoProfile SupportNanoFor(int monsterData)
+        {
+            if (monsterData == IncompleteRebuildMonsterData)
+            {
+                return OrdinaryEnemySupportNanoProfile.CapturedIncompleteRebuild90405();
+            }
+
+            if (monsterData != RedundantScanMonsterData)
+            {
+                return null;
+            }
+
+            return new OrdinaryEnemySupportNanoProfile(
+                121336,
+                121248,
+                60.0,
+                1.400106,
+                25.590325,
+                18000,
+                180.0,
+                7.5,
+                true,
+                220,
+                0,
+                9,
+                -13,
+                new[]
+                    {
+                        113, 102, 107, 103, 105, 104, 106, 100, 109, 133, 110, 112,
+                        130, 114, 115, 116, 108, 128, 122, 129, 127, 131, 111
+                    },
+                OrdinaryEnemyEvidenceState.Policy,
+                "20260709-222339,20260716-033326,20260716-034104,"
+                + "20260716-221358,20260717-214751;"
+                + "primary=121336;triggered-self=121248;duration-centiseconds=18000;"
+                + "primary-modify=+9;triggered-self-modify=-13;"
+                + "nearest-observed-ordinary-target-with-self-fallback");
         }
 
         private static OrdinaryEnemyCombatProfile BuildCombatProfile(
             CapturedEnemyCombatContract contract,
             int monsterData,
             Func<int, CapturedEnemyCombatContract> contractResolver = null,
-            Func<int, int, CapturedEnemyCombatContract> sourceContractResolver = null)
+            Func<int, int, CapturedEnemyCombatContract> sourceContractResolver = null,
+            Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>
+                sourceVariantContractResolver = null)
         {
             OrdinaryEnemyCombatMode mode = OrdinaryEnemyCombatMode.Unresolved;
             OrdinaryEnemyDamageSource damageSource = OrdinaryEnemyDamageSource.Unresolved;
             bool visibleWeapon = false;
-            if (sourceContractResolver != null)
+            if (sourceContractResolver != null || sourceVariantContractResolver != null)
             {
                 mode = OrdinaryEnemyCombatMode.EquippedRanged;
                 damageSource = OrdinaryEnemyDamageSource.WeaponRoll;
@@ -664,14 +846,17 @@ namespace AORebirth.Core.Playfields
                 damageSource,
                 visibleWeapon,
                 contract,
-                contract.IsCombatReady || sourceContractResolver != null
+                contract.IsCombatReady
+                || sourceContractResolver != null
+                || sourceVariantContractResolver != null
                     ? OrdinaryEnemyEvidenceState.Observed
                     : OrdinaryEnemyEvidenceState.Unresolved,
                 monsterData == 26092 ? 1.0 : (double?)null,
                 monsterData == 26092 ? 1 : (int?)null,
                 monsterData == 26092,
                 contractResolver,
-                sourceContractResolver);
+                sourceContractResolver,
+                sourceVariantContractResolver);
         }
 
         private static OrdinaryEnemyLootEntry[] BuildStrictLootEntries(
@@ -806,6 +991,35 @@ namespace AORebirth.Core.Playfields
                                             value.DeadNpcIdentity,
                                             value.CorpseIdentity)))))
                     .ToArray();
+                bool preserveIncompleteRebuildCreditProgression =
+                    monsterData == IncompleteRebuildMonsterData;
+                if (preserveIncompleteRebuildCreditProgression)
+                {
+                    // Four exact levels follow floor((13 * level - 11) / 2).
+                    // Fill only the two selectable missing levels as explicit private policy;
+                    // exact captured levels retain observed evidence and confidence.
+                    levelCreditRules = levelCreditRules
+                        .Concat(
+                            new[]
+                                {
+                                    new OrdinaryEnemyLevelCreditRule(
+                                        20,
+                                        124,
+                                        124,
+                                        0,
+                                        "policy:floor((13*level-11)/2);captured-levels=17,18,19,21",
+                                        OrdinaryEnemyEvidenceState.Policy),
+                                    new OrdinaryEnemyLevelCreditRule(
+                                        22,
+                                        137,
+                                        137,
+                                        0,
+                                        "policy:floor((13*level-11)/2);captured-levels=17,18,19,21",
+                                        OrdinaryEnemyEvidenceState.Policy)
+                                })
+                        .OrderBy(value => value.EnemyLevel)
+                        .ToArray();
+                }
                 // Exact L4/L5 rules win first. Other captured Flea spawn levels retain
                 // the previously accepted observed-outcome range as private policy;
                 // the new 23-credit outcome expands its lower bound.
@@ -820,7 +1034,7 @@ namespace AORebirth.Core.Playfields
                     observedCompleteInventories,
                     observedEmptyInventories,
                     itemEvidenceReference,
-                    preserveFilthFleaFallback
+                    preserveFilthFleaFallback || preserveIncompleteRebuildCreditProgression
                         ? OrdinaryEnemyEvidenceState.Policy
                         : OrdinaryEnemyEvidenceState.Observed,
                     preserveFilthFleaFallback ? 23 : (int?)null,

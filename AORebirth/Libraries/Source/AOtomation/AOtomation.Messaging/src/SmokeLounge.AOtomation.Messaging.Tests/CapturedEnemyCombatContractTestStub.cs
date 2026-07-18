@@ -56,9 +56,17 @@ namespace AORebirth.Core.Playfields
     {
         private const int BloodcreeperMonsterData = 30379;
 
+        private const int DerangedShopperMonsterData = 203736;
+
+        private const int DerangedShopperSourceInstance = 0x79574527;
+
+        private const int IncompleteRebuildMonsterData = 203728;
+
         private const int LooterMonsterData = 203745;
 
         private const int MuggerMonsterData = 203734;
+
+        private const int RedundantScanMonsterData = 204178;
 
         private const int WorkmanStrikerMonsterData = 203854;
 
@@ -73,6 +81,28 @@ namespace AORebirth.Core.Playfields
             0x7957E5C7,
             0x7957E5C8,
             0x7957E5CA
+        };
+
+        private static readonly int[] IncompleteRebuildSourceInstances =
+        {
+            0x79545170,
+            0x79545172,
+            0x79545177,
+            0x79545181,
+            0x79545188,
+            0x795451BC,
+            0x795451C1,
+            0x795451CB,
+            0x795451FD,
+            0x79545241
+        };
+
+        private static readonly int[] RedundantScanSourceInstances =
+        {
+            0x7953AF85,
+            0x795451BF,
+            0x795451C4,
+            0x795451D3
         };
 
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
@@ -173,6 +203,114 @@ namespace AORebirth.Core.Playfields
             return true;
         }
 
+        private static bool HasCompleteRedundantScanSourceWeaponEvidence(
+            CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence)
+        {
+            if (sourceWeaponEvidence == null
+                || sourceWeaponEvidence.Length != RedundantScanSourceInstances.Length)
+            {
+                return false;
+            }
+
+            foreach (int expectedSource in RedundantScanSourceInstances)
+            {
+                int matches = sourceWeaponEvidence.Count(
+                    evidence => IsExactRedundantScanSourceWeapon(evidence, expectedSource));
+                if (matches != 1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool HasCompleteIncompleteRebuildSourceWeaponEvidence(
+            CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence)
+        {
+            if (sourceWeaponEvidence == null
+                || sourceWeaponEvidence.Length != IncompleteRebuildSourceInstances.Length)
+            {
+                return false;
+            }
+
+            foreach (int expectedSource in IncompleteRebuildSourceInstances)
+            {
+                int matches = sourceWeaponEvidence.Count(
+                    evidence => IsExactIncompleteRebuildSourceWeapon(evidence, expectedSource));
+                if (matches != 1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool IsExactIncompleteRebuildSourceWeapon(
+            CapturedSubwaySourceWeaponEvidenceDefinition evidence,
+            int expectedSource)
+        {
+            if (evidence == null || evidence.SourceInstance != expectedSource)
+            {
+                return false;
+            }
+
+            switch (expectedSource)
+            {
+                case 0x79545170:
+                case 0x79545177:
+                case 0x795451BC:
+                    return evidence.LowId == 122653 && evidence.HighId == 122654 && evidence.Quality == 18;
+                case 0x79545172:
+                    return evidence.LowId == 122653 && evidence.HighId == 122654 && evidence.Quality == 14;
+                case 0x79545188:
+                    return evidence.LowId == 122653 && evidence.HighId == 122654 && evidence.Quality == 17;
+                case 0x79545181:
+                case 0x795451FD:
+                case 0x79545241:
+                    return evidence.LowId == 122654 && evidence.HighId == 122654 && evidence.Quality == 20;
+                case 0x795451C1:
+                    return evidence.LowId == 122655 && evidence.HighId == 122655 && evidence.Quality == 21;
+                case 0x795451CB:
+                    return evidence.LowId == 122655 && evidence.HighId == 122656 && evidence.Quality == 24;
+                default:
+                    return false;
+            }
+        }
+
+        private static bool IsExactRedundantScanSourceWeapon(
+            CapturedSubwaySourceWeaponEvidenceDefinition evidence,
+            int expectedSource)
+        {
+            if (evidence == null || evidence.SourceInstance != expectedSource)
+            {
+                return false;
+            }
+
+            switch (expectedSource)
+            {
+                case 0x7953AF85:
+                    return evidence.LowId == 122027
+                           && evidence.HighId == 122027
+                           && evidence.Quality == 20;
+                case 0x795451BF:
+                    return evidence.LowId == 122026
+                           && evidence.HighId == 122027
+                           && evidence.Quality == 14;
+                case 0x795451C4:
+                    return evidence.LowId == 122028
+                           && evidence.HighId == 122029
+                           && evidence.Quality == 25;
+                case 0x795451D3:
+                    return evidence.LowId == 122026
+                           && evidence.HighId == 122027
+                           && evidence.Quality == 16;
+                default:
+                    return false;
+            }
+        }
+
         internal static CapturedEnemyCombatContract For(string name, int monsterData, int? level)
         {
             return For(name, monsterData);
@@ -182,8 +320,11 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayOrdinaryArchetypeDefinition archetype)
         {
             if (archetype != null
-                && (archetype.MonsterData == WorkmanStrikerMonsterData
-                    || archetype.MonsterData == LooterMonsterData))
+                && (archetype.MonsterData == DerangedShopperMonsterData
+                    || archetype.MonsterData == IncompleteRebuildMonsterData
+                    || archetype.MonsterData == WorkmanStrikerMonsterData
+                    || archetype.MonsterData == LooterMonsterData
+                    || archetype.MonsterData == RedundantScanMonsterData))
             {
                 return new CapturedEnemyCombatContract
                 {
@@ -260,6 +401,172 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayOrdinaryArchetypeDefinition archetype,
             int sourceInstance)
         {
+            if (archetype != null && archetype.MonsterData == DerangedShopperMonsterData)
+            {
+                CapturedSubwaySourceWeaponEvidenceDefinition[] evidence =
+                    archetype.SourceWeaponEvidence;
+                if (sourceInstance != DerangedShopperSourceInstance
+                    || evidence == null
+                    || evidence.Length != 1
+                    || evidence[0].SourceInstance != DerangedShopperSourceInstance
+                    || evidence[0].LowId != 125454
+                    || evidence[0].HighId != 125455
+                    || evidence[0].Quality != 8)
+                {
+                    return new CapturedEnemyCombatContract
+                    {
+                        AttackModel = CapturedEnemyAttackModel.Unresolved,
+                        IsCombatReady = false,
+                        Evidence = "Deranged Shopper source weapon evidence is missing or conflicting."
+                    };
+                }
+
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
+                    IsCombatReady = true,
+                    Evidence = "Deranged Shopper source 0x79574527 QL8 125454/125455; item owns runtime damage, damage bonus, and recharge; one critical is report-only and one captured miss preserves ammo -1, slot 6, and unknown 0.",
+                    WeaponLowId = evidence[0].LowId,
+                    WeaponHighId = evidence[0].HighId,
+                    WeaponQuality = evidence[0].Quality,
+                    WeaponInventorySlot = 6,
+                    HasCapturedEquippedAttackInfo = true,
+                    AttackInfoAmmoCount = -1,
+                    AttackInfoWeaponSlot = 6,
+                    AttackInfoUnknown = 0,
+                    AttackInfoWeaponInstance = 0
+                };
+            }
+
+            if (archetype != null && archetype.MonsterData == IncompleteRebuildMonsterData)
+            {
+                CapturedSubwaySourceWeaponEvidenceDefinition[] evidence = archetype.SourceWeaponEvidence;
+                CapturedSubwayCombatEvidenceDefinition combat = archetype.Combat;
+                bool hasExactCombatEvidence = combat != null
+                                              && combat.Observed
+                                              && combat.ObservedRows == 2
+                                              && combat.MinDamage == 17
+                                              && combat.MaxDamage == 35
+                                              && combat.WeaponSlot == 6
+                                              && combat.AttackInfoUnknown == 0
+                                              && combat.WeaponInstance == 0;
+                if (!hasExactCombatEvidence
+                    || !HasCompleteIncompleteRebuildSourceWeaponEvidence(evidence))
+                {
+                    return new CapturedEnemyCombatContract
+                    {
+                        AttackModel = CapturedEnemyAttackModel.Unresolved,
+                        IsCombatReady = false,
+                        Evidence = "Incomplete Rebuild combat or source weapon evidence is missing or conflicting."
+                    };
+                }
+
+                CapturedSubwaySourceWeaponEvidenceDefinition incompleteMatched = null;
+                int incompleteMatches = 0;
+                foreach (CapturedSubwaySourceWeaponEvidenceDefinition candidate in evidence)
+                {
+                    if (candidate.SourceInstance != sourceInstance)
+                    {
+                        continue;
+                    }
+
+                    incompleteMatched = candidate;
+                    incompleteMatches++;
+                }
+
+                if (incompleteMatches != 1 || incompleteMatched == null)
+                {
+                    return new CapturedEnemyCombatContract
+                    {
+                        AttackModel = CapturedEnemyAttackModel.Unresolved,
+                        IsCombatReady = false,
+                        Evidence = "Incomplete Rebuild source weapon evidence is missing or conflicting."
+                    };
+                }
+
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
+                    IsCombatReady = true,
+                    Evidence = string.Format(
+                        "{0}: Incomplete Rebuild source 0x{1:X8} owner-linked QL{2} weapon {3}/{4}; two normal local-player hits span 17..35 and one captured miss shares ammo 9, slot 6, unknown 0, and weapon instance 0; item owns runtime damage and recharge; no empty SIW or captured attack-start/stop context",
+                        incompleteMatched.EvidenceCaptures,
+                        sourceInstance,
+                        incompleteMatched.Quality,
+                        incompleteMatched.LowId,
+                        incompleteMatched.HighId),
+                    WeaponLowId = incompleteMatched.LowId,
+                    WeaponHighId = incompleteMatched.HighId,
+                    WeaponQuality = incompleteMatched.Quality,
+                    WeaponInventorySlot = 6,
+                    HasCapturedEquippedAttackInfo = true,
+                    AttackInfoAmmoCount = 9,
+                    AttackInfoWeaponSlot = 6,
+                    AttackInfoUnknown = 0,
+                    AttackInfoWeaponInstance = 0
+                };
+            }
+
+            if (archetype != null && archetype.MonsterData == RedundantScanMonsterData)
+            {
+                CapturedSubwaySourceWeaponEvidenceDefinition[] evidence =
+                    archetype.SourceWeaponEvidence;
+                if (!HasCompleteRedundantScanSourceWeaponEvidence(evidence))
+                {
+                    return new CapturedEnemyCombatContract
+                    {
+                        AttackModel = CapturedEnemyAttackModel.Unresolved,
+                        IsCombatReady = false,
+                        Evidence = "Redundant Scan source weapon evidence is missing or conflicting."
+                    };
+                }
+
+                CapturedSubwaySourceWeaponEvidenceDefinition redundantMatched = null;
+                int redundantMatches = 0;
+                foreach (CapturedSubwaySourceWeaponEvidenceDefinition candidate in evidence)
+                {
+                    if (candidate.SourceInstance != sourceInstance)
+                    {
+                        continue;
+                    }
+
+                    redundantMatched = candidate;
+                    redundantMatches++;
+                }
+
+                if (redundantMatches != 1 || redundantMatched == null)
+                {
+                    return new CapturedEnemyCombatContract
+                    {
+                        AttackModel = CapturedEnemyAttackModel.Unresolved,
+                        IsCombatReady = false,
+                        Evidence = "Redundant Scan source weapon evidence is missing or conflicting."
+                    };
+                }
+
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
+                    IsCombatReady = true,
+                    Evidence = string.Format(
+                        "{0}: Redundant Scan source 0x{1:X8} owner-linked QL{2} weapon {3}/{4}; one normal local-player hit is 19; item owns runtime damage and recharge; captured AttackInfo carries only ammo 17, slot 6, unknown 0, and weapon instance 0; no fixed damage, empty SIW, or captured attack-start/stop context",
+                        redundantMatched.EvidenceCaptures,
+                        sourceInstance,
+                        redundantMatched.Quality,
+                        redundantMatched.LowId,
+                        redundantMatched.HighId),
+                    WeaponLowId = redundantMatched.LowId,
+                    WeaponHighId = redundantMatched.HighId,
+                    WeaponQuality = redundantMatched.Quality,
+                    WeaponInventorySlot = 6,
+                    HasCapturedEquippedAttackInfo = true,
+                    AttackInfoAmmoCount = 17,
+                    AttackInfoWeaponSlot = 6,
+                    AttackInfoUnknown = 0,
+                    AttackInfoWeaponInstance = 0
+                };
+            }
+
             if (archetype == null
                 || (archetype.MonsterData != WorkmanStrikerMonsterData
                     && archetype.MonsterData != LooterMonsterData))
@@ -307,6 +614,57 @@ namespace AORebirth.Core.Playfields
                 WeaponHighId = matched.HighId,
                 WeaponQuality = matched.Quality,
                 WeaponInventorySlot = 6
+            };
+        }
+
+        internal static CapturedEnemyCombatContract ForOrdinary(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            OrdinaryEnemySpawnVariant variant,
+            CapturedSubwayGenerationVariantDefinition[] generationEvidence)
+        {
+            if (archetype == null || archetype.MonsterData != IncompleteRebuildMonsterData)
+            {
+                return ForOrdinary(archetype, sourceInstance);
+            }
+
+            CapturedEnemyCombatContract baseline = ForOrdinary(archetype, sourceInstance);
+            OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
+                ? null
+                : variant.WeaponLoadout;
+            string atomicFailure = string.Empty;
+            if (!baseline.IsCombatReady
+                || !OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
+                    IncompleteRebuildMonsterData,
+                    sourceInstance,
+                    variant,
+                    generationEvidence,
+                    out atomicFailure))
+            {
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.Unresolved,
+                    IsCombatReady = false,
+                    Evidence = "Incomplete Rebuild atomic generation evidence is incomplete: "
+                               + atomicFailure
+                };
+            }
+
+            return new CapturedEnemyCombatContract
+            {
+                AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
+                IsCombatReady = true,
+                Evidence = weapon.Evidence
+                           + ": Incomplete Rebuild selected one captured atomic level/stat/weapon generation; two normal local-player hits span 17..35; item owns runtime damage and recharge.",
+                WeaponLowId = weapon.LowId,
+                WeaponHighId = weapon.HighId,
+                WeaponQuality = weapon.Quality,
+                WeaponInventorySlot = 6,
+                HasCapturedEquippedAttackInfo = true,
+                AttackInfoAmmoCount = 9,
+                AttackInfoWeaponSlot = 6,
+                AttackInfoUnknown = 0,
+                AttackInfoWeaponInstance = 0
             };
         }
     }

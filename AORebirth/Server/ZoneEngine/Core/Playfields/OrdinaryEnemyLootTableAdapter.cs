@@ -182,7 +182,9 @@ namespace AORebirth.Core.Playfields
                 return CreditsRange(
                     level.MinimumCredits,
                     level.MaximumCredits,
-                    LootEvidenceConfidence.ProvenCapture);
+                    level.EvidenceState == OrdinaryEnemyEvidenceState.Observed
+                        ? LootEvidenceConfidence.ProvenCapture
+                        : LootEvidenceConfidence.Inferred);
             }
 
             if (loot.ObservedCreditOutcomes.Length > 0)

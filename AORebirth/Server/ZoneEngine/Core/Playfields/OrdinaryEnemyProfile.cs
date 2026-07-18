@@ -141,6 +141,312 @@ namespace AORebirth.Core.Playfields
         internal OrdinaryEnemyEvidenceState EvidenceState { get; private set; }
     }
 
+    internal sealed class OrdinaryEnemySupportNanoProfile
+    {
+        internal OrdinaryEnemySupportNanoProfile(
+            int primaryNanoId,
+            int triggeredSelfNanoId,
+            double initialDelaySeconds,
+            double castSeconds,
+            double repeatSeconds,
+            int durationParameter,
+            double effectLifetimeSeconds,
+            double targetRange,
+            bool fallbackToSelf,
+            int primaryStrain,
+            int triggeredSelfStrain,
+            int primaryModifierDelta,
+            int triggeredSelfModifierDelta,
+            int[] affectedStatIds,
+            OrdinaryEnemyEvidenceState evidenceState,
+            string evidence,
+            int periodicStatId = 0,
+            int periodicStatDelta = 0,
+            int periodicTickCount = 0,
+            double periodicTickSeconds = 0.0,
+            int nanoCost = 0,
+            bool castWhileFighting = false,
+            bool allowCombatActionsDuringCast = false,
+            int castChanceBasisPoints = 10000,
+            int selfTargetChanceBasisPoints = 0,
+            bool randomizeInitialDelay = false,
+            int ncuCost = 0,
+            IDictionary<int, int> spawnNanoPoolByLevel = null)
+        {
+            this.PrimaryNanoId = primaryNanoId;
+            this.TriggeredSelfNanoId = triggeredSelfNanoId;
+            this.InitialDelaySeconds = initialDelaySeconds;
+            this.CastSeconds = castSeconds;
+            this.RepeatSeconds = repeatSeconds;
+            this.DurationParameter = durationParameter;
+            this.EffectLifetimeSeconds = effectLifetimeSeconds;
+            this.TargetRange = targetRange;
+            this.FallbackToSelf = fallbackToSelf;
+            this.PrimaryStrain = primaryStrain;
+            this.TriggeredSelfStrain = triggeredSelfStrain;
+            this.PrimaryModifierDelta = primaryModifierDelta;
+            this.TriggeredSelfModifierDelta = triggeredSelfModifierDelta;
+            this.AffectedStatIds = affectedStatIds ?? new int[0];
+            this.EvidenceState = evidenceState;
+            this.Evidence = evidence ?? string.Empty;
+            this.PeriodicStatId = periodicStatId;
+            this.PeriodicStatDelta = periodicStatDelta;
+            this.PeriodicTickCount = periodicTickCount;
+            this.PeriodicTickSeconds = periodicTickSeconds;
+            this.NanoCost = nanoCost;
+            this.CastWhileFighting = castWhileFighting;
+            this.AllowCombatActionsDuringCast = allowCombatActionsDuringCast;
+            this.CastChanceBasisPoints = castChanceBasisPoints;
+            this.SelfTargetChanceBasisPoints = selfTargetChanceBasisPoints;
+            this.RandomizeInitialDelay = randomizeInitialDelay;
+            this.NcuCost = ncuCost;
+            this.spawnNanoPoolByLevel = spawnNanoPoolByLevel == null
+                ? new Dictionary<int, int>()
+                : new Dictionary<int, int>(spawnNanoPoolByLevel);
+        }
+
+        private readonly Dictionary<int, int> spawnNanoPoolByLevel;
+
+        internal int PrimaryNanoId { get; private set; }
+        internal int TriggeredSelfNanoId { get; private set; }
+        internal double InitialDelaySeconds { get; private set; }
+        internal double CastSeconds { get; private set; }
+        internal double RepeatSeconds { get; private set; }
+        internal int DurationParameter { get; private set; }
+        internal double EffectLifetimeSeconds { get; private set; }
+        internal double TargetRange { get; private set; }
+        internal bool FallbackToSelf { get; private set; }
+        internal int PrimaryStrain { get; private set; }
+        internal int TriggeredSelfStrain { get; private set; }
+        internal int PrimaryModifierDelta { get; private set; }
+        internal int TriggeredSelfModifierDelta { get; private set; }
+        internal int[] AffectedStatIds { get; private set; }
+        internal OrdinaryEnemyEvidenceState EvidenceState { get; private set; }
+        internal string Evidence { get; private set; }
+
+        internal int PeriodicStatId { get; private set; }
+        internal int PeriodicStatDelta { get; private set; }
+        internal int PeriodicTickCount { get; private set; }
+        internal double PeriodicTickSeconds { get; private set; }
+        internal int NanoCost { get; private set; }
+        internal bool CastWhileFighting { get; private set; }
+        internal bool AllowCombatActionsDuringCast { get; private set; }
+        internal int CastChanceBasisPoints { get; private set; }
+        internal int SelfTargetChanceBasisPoints { get; private set; }
+        internal bool RandomizeInitialDelay { get; private set; }
+        internal int NcuCost { get; private set; }
+
+        internal bool HasPeriodicStatHit
+        {
+            get { return this.PeriodicStatId > 0; }
+        }
+
+        internal bool HasTriggeredSelfEffect
+        {
+            get { return this.TriggeredSelfNanoId > 0; }
+        }
+
+        internal KeyValuePair<int, int>[] SpawnNanoPoolByLevel
+        {
+            get { return this.spawnNanoPoolByLevel.OrderBy(value => value.Key).ToArray(); }
+        }
+
+        internal int ResolveSpawnNanoPool(int level)
+        {
+            int pool;
+            return this.spawnNanoPoolByLevel.TryGetValue(level, out pool) ? pool : 0;
+        }
+
+        internal static OrdinaryEnemySupportNanoProfile CapturedIncompleteRebuild90405()
+        {
+            return new OrdinaryEnemySupportNanoProfile(
+                90405,
+                0,
+                5.0,
+                2.5,
+                5.0,
+                1440000,
+                14400.0,
+                20.0,
+                true,
+                14,
+                0,
+                0,
+                0,
+                new int[0],
+                OrdinaryEnemyEvidenceState.Policy,
+                "20260709-222339,20260709-225408,20260716-034104,"
+                + "20260716-221358;nano=90405;hit-currentnano=+21;"
+                + "tick-count=960;tick-seconds=15;nano-cost=47;ncu=6;"
+                + "duration-centiseconds=1440000;range=20;"
+                + "policy=5-second-decisions-at-25-percent,50-percent-self,"
+                + "random-initial-phase,combat-casting;"
+                + "spawn-nano-pools=inferred-from-captured-currentnano-plateaus",
+                periodicStatId: 214,
+                periodicStatDelta: 21,
+                periodicTickCount: 960,
+                periodicTickSeconds: 15.0,
+                nanoCost: 47,
+                castWhileFighting: true,
+                allowCombatActionsDuringCast: true,
+                castChanceBasisPoints: 2500,
+                selfTargetChanceBasisPoints: 5000,
+                randomizeInitialDelay: true,
+                ncuCost: 6,
+                spawnNanoPoolByLevel: new Dictionary<int, int>
+                    {
+                        { 17, 918 },
+                        { 18, 985 },
+                        { 19, 1051 },
+                        { 20, 1117 },
+                        { 21, 1183 },
+                        { 22, 1250 }
+                    });
+        }
+    }
+
+    internal static class OrdinaryEnemySupportNanoRuntimeRules
+    {
+        internal static double SelectInitialDelaySeconds(
+            OrdinaryEnemySupportNanoProfile profile,
+            Func<int, int> selector)
+        {
+            if (profile == null)
+            {
+                throw new ArgumentNullException("profile");
+            }
+
+            if (!profile.RandomizeInitialDelay || profile.InitialDelaySeconds <= 0.0)
+            {
+                return profile.InitialDelaySeconds;
+            }
+
+            if (selector == null)
+            {
+                throw new ArgumentNullException("selector");
+            }
+
+            int maximumMilliseconds = checked((int)Math.Round(profile.InitialDelaySeconds * 1000.0));
+            int selectedMilliseconds = selector(maximumMilliseconds + 1);
+            if (selectedMilliseconds < 0 || selectedMilliseconds > maximumMilliseconds)
+            {
+                throw new InvalidOperationException(
+                    "Support nano random selector returned an out-of-range initial phase.");
+            }
+
+            return selectedMilliseconds / 1000.0;
+        }
+
+        internal static bool RollChance(int chanceBasisPoints, Func<int, int> selector)
+        {
+            if (chanceBasisPoints <= 0)
+            {
+                return false;
+            }
+
+            if (chanceBasisPoints >= 10000)
+            {
+                return true;
+            }
+
+            if (selector == null)
+            {
+                throw new ArgumentNullException("selector");
+            }
+
+            int roll = selector(10000);
+            if (roll < 0 || roll >= 10000)
+            {
+                throw new InvalidOperationException(
+                    "Support nano random selector returned an out-of-range chance roll.");
+            }
+
+            return roll < chanceBasisPoints;
+        }
+
+        internal static bool TrySpendNano(int currentNano, int nanoCost, out int remainingNano)
+        {
+            currentNano = Math.Max(0, currentNano);
+            nanoCost = Math.Max(0, nanoCost);
+            remainingNano = currentNano;
+            if (nanoCost > currentNano)
+            {
+                return false;
+            }
+
+            remainingNano = currentNano - nanoCost;
+            return true;
+        }
+
+        internal static int ApplyPositiveCappedDelta(
+            int current,
+            int maximum,
+            int delta)
+        {
+            current = Math.Max(0, current);
+            maximum = Math.Max(0, maximum);
+            if (delta <= 0 || current >= maximum)
+            {
+                return Math.Min(current, maximum);
+            }
+
+            return current + Math.Min(delta, maximum - current);
+        }
+    }
+
+    internal sealed class OrdinaryEnemyPeriodicNanoSchedule
+    {
+        internal OrdinaryEnemyPeriodicNanoSchedule(
+            OrdinaryEnemySupportNanoProfile profile,
+            DateTime appliedAtUtc)
+        {
+            this.Refresh(profile, appliedAtUtc);
+        }
+
+        internal DateTime ExpiresAtUtc { get; private set; }
+
+        internal DateTime NextTickAtUtc { get; private set; }
+
+        internal int RemainingTicks { get; private set; }
+
+        internal double TickSeconds { get; private set; }
+
+        internal void Refresh(
+            OrdinaryEnemySupportNanoProfile profile,
+            DateTime appliedAtUtc)
+        {
+            if (profile == null
+                || !profile.HasPeriodicStatHit
+                || profile.PeriodicTickCount <= 0
+                || profile.PeriodicTickSeconds <= 0.0
+                || profile.EffectLifetimeSeconds <= 0.0)
+            {
+                throw new InvalidOperationException(
+                    "Periodic support nano profile is incomplete.");
+            }
+
+            this.ExpiresAtUtc = appliedAtUtc.AddSeconds(profile.EffectLifetimeSeconds);
+            this.TickSeconds = profile.PeriodicTickSeconds;
+            this.RemainingTicks = profile.PeriodicTickCount - 1;
+            this.NextTickAtUtc = appliedAtUtc.AddSeconds(this.TickSeconds);
+        }
+
+        internal int ConsumeDueTicks(DateTime utcNow)
+        {
+            int consumed = 0;
+            while (this.RemainingTicks > 0
+                   && this.NextTickAtUtc <= utcNow
+                   && this.NextTickAtUtc < this.ExpiresAtUtc)
+            {
+                consumed++;
+                this.RemainingTicks--;
+                this.NextTickAtUtc = this.NextTickAtUtc.AddSeconds(this.TickSeconds);
+            }
+
+            return consumed;
+        }
+    }
+
     internal sealed class OrdinaryEnemyCombatProfile
     {
         internal OrdinaryEnemyCombatProfile(
@@ -153,7 +459,9 @@ namespace AORebirth.Core.Playfields
             int? healthRegenDelta = null,
             bool regenerateHealthWhileInCombat = false,
             Func<int, CapturedEnemyCombatContract> contractResolver = null,
-            Func<int, int, CapturedEnemyCombatContract> sourceContractResolver = null)
+            Func<int, int, CapturedEnemyCombatContract> sourceContractResolver = null,
+            Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>
+                sourceVariantContractResolver = null)
         {
             this.Mode = mode;
             this.DamageSource = damageSource;
@@ -165,6 +473,7 @@ namespace AORebirth.Core.Playfields
             this.RegenerateHealthWhileInCombat = regenerateHealthWhileInCombat;
             this.contractResolver = contractResolver;
             this.sourceContractResolver = sourceContractResolver;
+            this.sourceVariantContractResolver = sourceVariantContractResolver;
         }
 
         internal OrdinaryEnemyCombatMode Mode { get; private set; }
@@ -180,6 +489,9 @@ namespace AORebirth.Core.Playfields
 
         private readonly Func<int, int, CapturedEnemyCombatContract> sourceContractResolver;
 
+        private readonly Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>
+            sourceVariantContractResolver;
+
         internal CapturedEnemyCombatContract ResolveContract(int level)
         {
             return this.contractResolver == null
@@ -192,6 +504,20 @@ namespace AORebirth.Core.Playfields
             return this.sourceContractResolver == null
                        ? this.ResolveContract(level)
                        : this.sourceContractResolver(sourceIdentity, level);
+        }
+
+        internal CapturedEnemyCombatContract ResolveContract(
+            int sourceIdentity,
+            OrdinaryEnemySpawnVariant variant)
+        {
+            if (variant == null)
+            {
+                throw new ArgumentNullException("variant");
+            }
+
+            return this.sourceVariantContractResolver == null
+                       ? this.ResolveContract(sourceIdentity, variant.Level)
+                       : this.sourceVariantContractResolver(sourceIdentity, variant);
         }
     }
 
@@ -472,7 +798,8 @@ namespace AORebirth.Core.Playfields
             int minimumCredits,
             int maximumCredits,
             int observedCorpses,
-            string evidence)
+            string evidence,
+            OrdinaryEnemyEvidenceState evidenceState = OrdinaryEnemyEvidenceState.Observed)
         {
             if (enemyLevel <= 0)
             {
@@ -484,7 +811,14 @@ namespace AORebirth.Core.Playfields
                 throw new ArgumentOutOfRangeException("minimumCredits");
             }
 
-            if (observedCorpses <= 0)
+            if (evidenceState != OrdinaryEnemyEvidenceState.Observed
+                && evidenceState != OrdinaryEnemyEvidenceState.Policy)
+            {
+                throw new ArgumentOutOfRangeException("evidenceState");
+            }
+
+            if ((evidenceState == OrdinaryEnemyEvidenceState.Observed && observedCorpses <= 0)
+                || (evidenceState == OrdinaryEnemyEvidenceState.Policy && observedCorpses < 0))
             {
                 throw new ArgumentOutOfRangeException("observedCorpses");
             }
@@ -499,6 +833,7 @@ namespace AORebirth.Core.Playfields
             this.MaximumCredits = maximumCredits;
             this.ObservedCorpses = observedCorpses;
             this.Evidence = evidence;
+            this.EvidenceState = evidenceState;
         }
 
         internal int EnemyLevel { get; private set; }
@@ -506,6 +841,7 @@ namespace AORebirth.Core.Playfields
         internal int MaximumCredits { get; private set; }
         internal int ObservedCorpses { get; private set; }
         internal string Evidence { get; private set; }
+        internal OrdinaryEnemyEvidenceState EvidenceState { get; private set; }
     }
 
     internal sealed class OrdinaryEnemyCorpseProfile
@@ -565,7 +901,8 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemyCorpseProfile corpse,
             string[] evidence,
             bool bossOrScripted,
-            bool ownedSummon)
+            bool ownedSummon,
+            OrdinaryEnemySupportNanoProfile supportNano = null)
         {
             this.ProfileKey = profileKey;
             this.FamilyKey = familyKey;
@@ -581,6 +918,7 @@ namespace AORebirth.Core.Playfields
             this.Evidence = evidence ?? new string[0];
             this.BossOrScripted = bossOrScripted;
             this.OwnedSummon = ownedSummon;
+            this.SupportNano = supportNano;
         }
 
         internal string ProfileKey { get; private set; }
@@ -597,6 +935,7 @@ namespace AORebirth.Core.Playfields
         internal string[] Evidence { get; private set; }
         internal bool BossOrScripted { get; private set; }
         internal bool OwnedSummon { get; private set; }
+        internal OrdinaryEnemySupportNanoProfile SupportNano { get; private set; }
     }
 
     internal sealed class OrdinaryEnemyWaypoint
@@ -613,6 +952,37 @@ namespace AORebirth.Core.Playfields
         internal float Z { get; private set; }
     }
 
+    internal sealed class OrdinaryEnemySpawnWeaponLoadout
+    {
+        internal OrdinaryEnemySpawnWeaponLoadout(
+            int lowId,
+            int highId,
+            int quality,
+            string evidence)
+        {
+            this.LowId = lowId;
+            this.HighId = highId;
+            this.Quality = quality;
+            this.Evidence = evidence ?? string.Empty;
+        }
+
+        internal int LowId { get; private set; }
+        internal int HighId { get; private set; }
+        internal int Quality { get; private set; }
+        internal string Evidence { get; private set; }
+
+        internal bool IsValid
+        {
+            get
+            {
+                return this.LowId > 0
+                       && this.HighId > 0
+                       && this.Quality > 0
+                       && !string.IsNullOrWhiteSpace(this.Evidence);
+            }
+        }
+    }
+
     internal sealed class OrdinaryEnemySpawnVariant
     {
         internal OrdinaryEnemySpawnVariant(
@@ -621,7 +991,8 @@ namespace AORebirth.Core.Playfields
             int healthDamage,
             int monsterScale,
             int runSpeed,
-            string evidence)
+            string evidence,
+            OrdinaryEnemySpawnWeaponLoadout weaponLoadout = null)
         {
             this.Level = level;
             this.Health = health;
@@ -629,6 +1000,7 @@ namespace AORebirth.Core.Playfields
             this.MonsterScale = monsterScale;
             this.RunSpeed = runSpeed;
             this.Evidence = evidence ?? string.Empty;
+            this.WeaponLoadout = weaponLoadout;
         }
 
         internal int Level { get; private set; }
@@ -637,13 +1009,117 @@ namespace AORebirth.Core.Playfields
         internal int MonsterScale { get; private set; }
         internal int RunSpeed { get; private set; }
         internal string Evidence { get; private set; }
+        internal OrdinaryEnemySpawnWeaponLoadout WeaponLoadout { get; private set; }
+
+        internal bool IsValid
+        {
+            get
+            {
+                return this.Level > 0
+                       && this.Health > 0
+                       && this.HealthDamage >= 0
+                       && this.HealthDamage < this.Health
+                       && this.MonsterScale > 0
+                       && this.RunSpeed > 0
+                       && !string.IsNullOrWhiteSpace(this.Evidence)
+                       && (this.WeaponLoadout == null || this.WeaponLoadout.IsValid);
+            }
+        }
+    }
+
+    internal static class OrdinaryEnemyAtomicGenerationEvidenceValidator
+    {
+        internal static bool TryValidateSelectedVariant(
+            int expectedMonsterData,
+            int expectedSourceInstance,
+            OrdinaryEnemySpawnVariant variant,
+            CapturedSubwayGenerationVariantDefinition[] generationEvidence,
+            out string failure)
+        {
+            failure = string.Empty;
+            OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
+                ? null
+                : variant.WeaponLoadout;
+            if (expectedMonsterData <= 0
+                || expectedSourceInstance <= 0
+                || variant == null
+                || !variant.IsValid
+                || weapon == null
+                || !weapon.IsValid
+                || generationEvidence == null
+                || generationEvidence.Length == 0)
+            {
+                failure = "Atomic generation selection or evidence is incomplete.";
+                return false;
+            }
+
+            var signatures = new HashSet<string>(StringComparer.Ordinal);
+            int matches = 0;
+            foreach (CapturedSubwayGenerationVariantDefinition value in generationEvidence)
+            {
+                if (value == null
+                    || value.MonsterData != expectedMonsterData
+                    || value.SourceInstance != expectedSourceInstance
+                    || value.Level <= 0
+                    || value.Health <= 0
+                    || value.HealthDamage < 0
+                    || value.HealthDamage >= value.Health
+                    || value.MonsterScale <= 0
+                    || value.RunSpeed <= 0
+                    || value.WeaponLowId <= 0
+                    || value.WeaponHighId <= 0
+                    || value.WeaponQuality <= 0
+                    || string.IsNullOrWhiteSpace(value.Evidence))
+                {
+                    failure = "Atomic generation evidence contains an invalid or cross-source row.";
+                    return false;
+                }
+
+                string signature = string.Join(
+                    ":",
+                    value.Level,
+                    value.Health,
+                    value.HealthDamage,
+                    value.MonsterScale,
+                    value.RunSpeed,
+                    value.WeaponLowId,
+                    value.WeaponHighId,
+                    value.WeaponQuality);
+                if (!signatures.Add(signature))
+                {
+                    failure = "Atomic generation evidence contains a duplicate tuple.";
+                    return false;
+                }
+
+                if (value.Level == variant.Level
+                    && value.Health == variant.Health
+                    && value.HealthDamage == variant.HealthDamage
+                    && value.MonsterScale == variant.MonsterScale
+                    && value.RunSpeed == variant.RunSpeed
+                    && value.WeaponLowId == weapon.LowId
+                    && value.WeaponHighId == weapon.HighId
+                    && value.WeaponQuality == weapon.Quality)
+                {
+                    matches++;
+                }
+            }
+
+            if (matches != 1)
+            {
+                failure = "Selected atomic generation is missing or conflicting.";
+                return false;
+            }
+
+            return true;
+        }
     }
 
     internal enum OrdinaryEnemySpawnLevelMode
     {
         Invalid = 0,
         Fixed = 1,
-        InclusiveRange = 2
+        InclusiveRange = 2,
+        ExplicitObservedVariants = 3
     }
 
     internal enum OrdinaryEnemyLevelRerollPolicy
@@ -668,7 +1144,8 @@ namespace AORebirth.Core.Playfields
             int runSpeedPerLevel,
             OrdinaryEnemyLevelRerollPolicy rerollPolicy,
             OrdinaryEnemyEvidenceState evidenceState,
-            string evidence)
+            string evidence,
+            OrdinaryEnemySpawnVariant[] explicitVariants = null)
         {
             this.Mode = mode;
             this.MinimumLevel = minimumLevel;
@@ -683,6 +1160,9 @@ namespace AORebirth.Core.Playfields
             this.RerollPolicy = rerollPolicy;
             this.EvidenceState = evidenceState;
             this.Evidence = evidence ?? string.Empty;
+            this.explicitVariants = explicitVariants == null
+                ? new OrdinaryEnemySpawnVariant[0]
+                : (OrdinaryEnemySpawnVariant[])explicitVariants.Clone();
         }
 
         internal OrdinaryEnemySpawnLevelMode Mode { get; private set; }
@@ -698,6 +1178,8 @@ namespace AORebirth.Core.Playfields
         internal OrdinaryEnemyLevelRerollPolicy RerollPolicy { get; private set; }
         internal OrdinaryEnemyEvidenceState EvidenceState { get; private set; }
         internal string Evidence { get; private set; }
+
+        private readonly OrdinaryEnemySpawnVariant[] explicitVariants;
 
         internal static OrdinaryEnemySpawnLevelDefinition Fixed(
             OrdinaryEnemySpawnVariant variant,
@@ -725,10 +1207,76 @@ namespace AORebirth.Core.Playfields
                 evidence);
         }
 
+        internal static OrdinaryEnemySpawnLevelDefinition ExplicitObservedVariants(
+            OrdinaryEnemySpawnVariant[] variants,
+            string evidence)
+        {
+            if (variants == null || variants.Length == 0)
+            {
+                throw new ArgumentException(
+                    "At least one explicit observed ordinary enemy variant is required.",
+                    "variants");
+            }
+
+            OrdinaryEnemySpawnVariant first = variants[0];
+            if (first == null)
+            {
+                throw new ArgumentException(
+                    "Explicit observed ordinary enemy variants cannot contain null.",
+                    "variants");
+            }
+
+            return new OrdinaryEnemySpawnLevelDefinition(
+                OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants,
+                variants.Min(value => value == null ? int.MaxValue : value.Level),
+                variants.Max(value => value == null ? int.MinValue : value.Level),
+                first.Level,
+                first.Health,
+                0,
+                first.HealthDamage,
+                first.MonsterScale,
+                first.RunSpeed,
+                0,
+                OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration,
+                OrdinaryEnemyEvidenceState.Policy,
+                evidence,
+                variants);
+        }
+
         internal bool IsValid
         {
             get
             {
+                if (this.Mode == OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants)
+                {
+                    if (this.explicitVariants.Length == 0
+                        || this.RerollPolicy
+                           != OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration
+                        || this.EvidenceState != OrdinaryEnemyEvidenceState.Policy
+                        || string.IsNullOrWhiteSpace(this.Evidence)
+                        || this.explicitVariants.Any(value => value == null || !value.IsValid)
+                        || this.MinimumLevel
+                           != this.explicitVariants.Min(value => value.Level)
+                        || this.MaximumLevel
+                           != this.explicitVariants.Max(value => value.Level))
+                    {
+                        return false;
+                    }
+
+                    bool hasWeaponLoadout = this.explicitVariants[0].WeaponLoadout != null;
+                    if (this.explicitVariants.Any(
+                        value => (value.WeaponLoadout != null) != hasWeaponLoadout))
+                    {
+                        return false;
+                    }
+
+                    return this.explicitVariants
+                               .Select(VariantSignature)
+                               .Distinct(StringComparer.Ordinal)
+                               .Count()
+                           == this.explicitVariants.Length;
+                }
+
                 if ((this.Mode != OrdinaryEnemySpawnLevelMode.Fixed
                      && this.Mode != OrdinaryEnemySpawnLevelMode.InclusiveRange)
                     || this.MinimumLevel <= 0
@@ -746,6 +1294,11 @@ namespace AORebirth.Core.Playfields
                     || (this.EvidenceState != OrdinaryEnemyEvidenceState.Observed
                         && this.EvidenceState != OrdinaryEnemyEvidenceState.Policy)
                     || string.IsNullOrWhiteSpace(this.Evidence))
+                {
+                    return false;
+                }
+
+                if (this.explicitVariants.Length != 0)
                 {
                     return false;
                 }
@@ -795,6 +1348,22 @@ namespace AORebirth.Core.Playfields
                 return this.Resolve(this.MinimumLevel);
             }
 
+            if (this.Mode == OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants)
+            {
+                if (nextRandom == null)
+                {
+                    throw new ArgumentNullException("nextRandom");
+                }
+
+                int variantIndex = nextRandom(this.explicitVariants.Length);
+                if (variantIndex < 0 || variantIndex >= this.explicitVariants.Length)
+                {
+                    throw new ArgumentOutOfRangeException("nextRandom");
+                }
+
+                return this.explicitVariants[variantIndex];
+            }
+
             if (nextRandom == null)
             {
                 throw new ArgumentNullException("nextRandom");
@@ -822,6 +1391,20 @@ namespace AORebirth.Core.Playfields
                 throw new ArgumentOutOfRangeException("level");
             }
 
+            if (this.Mode == OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants)
+            {
+                OrdinaryEnemySpawnVariant[] matches = this.explicitVariants
+                    .Where(value => value.Level == level)
+                    .ToArray();
+                if (matches.Length != 1)
+                {
+                    throw new InvalidOperationException(
+                        "An explicit observed level must resolve to exactly one atomic variant.");
+                }
+
+                return matches[0];
+            }
+
             return new OrdinaryEnemySpawnVariant(
                 level,
                 (int)this.HealthAt(level),
@@ -829,6 +1412,59 @@ namespace AORebirth.Core.Playfields
                 this.MonsterScale,
                 (int)this.RunSpeedAt(level),
                 this.Evidence);
+        }
+
+        internal OrdinaryEnemySpawnVariant[] GetExplicitVariants()
+        {
+            return (OrdinaryEnemySpawnVariant[])this.explicitVariants.Clone();
+        }
+
+        internal bool ContainsSourceRow(
+            int level,
+            int health,
+            int healthDamage,
+            int monsterScale,
+            int runSpeed)
+        {
+            if (!this.IsValid)
+            {
+                return false;
+            }
+
+            if (this.Mode == OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants)
+            {
+                return this.explicitVariants.Any(
+                    value => value.Level == level
+                             && value.Health == health
+                             && value.HealthDamage == healthDamage
+                             && value.MonsterScale == monsterScale
+                             && value.RunSpeed == runSpeed);
+            }
+
+            OrdinaryEnemySpawnVariant resolved = level >= this.MinimumLevel
+                                                 && level <= this.MaximumLevel
+                ? this.Resolve(level)
+                : null;
+            return resolved != null
+                   && resolved.Health == health
+                   && resolved.HealthDamage == healthDamage
+                   && resolved.MonsterScale == monsterScale
+                   && resolved.RunSpeed == runSpeed;
+        }
+
+        private static string VariantSignature(OrdinaryEnemySpawnVariant variant)
+        {
+            OrdinaryEnemySpawnWeaponLoadout weapon = variant.WeaponLoadout;
+            return string.Join(
+                ":",
+                variant.Level,
+                variant.Health,
+                variant.HealthDamage,
+                variant.MonsterScale,
+                variant.RunSpeed,
+                weapon == null ? 0 : weapon.LowId,
+                weapon == null ? 0 : weapon.HighId,
+                weapon == null ? 0 : weapon.Quality);
         }
 
         private long HealthAt(int level)
@@ -900,7 +1536,7 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemySpawnVariant variant =
                 this.current != null
                 && definition.RerollPolicy == OrdinaryEnemyLevelRerollPolicy.Never
-                    ? definition.Resolve(this.current.SelectedVariant.Level)
+                    ? this.current.SelectedVariant
                     : definition.SelectVariant(nextRandom);
             this.current = new OrdinaryEnemySpawnGeneration(generation, variant);
             return this.current;
@@ -1164,6 +1800,63 @@ namespace AORebirth.Core.Playfields
                     throw new InvalidOperationException("Automatic aggression requires a positive captured radius: " + profile.ProfileKey);
                 }
 
+                OrdinaryEnemySupportNanoProfile supportNano = profile.SupportNano;
+                bool staticModifierNano = supportNano != null
+                                          && !supportNano.HasPeriodicStatHit;
+                bool periodicStatHitNano = supportNano != null
+                                           && supportNano.HasPeriodicStatHit;
+                bool invalidStaticModifierNano = staticModifierNano
+                    && (!supportNano.HasTriggeredSelfEffect
+                        || supportNano.PrimaryNanoId == supportNano.TriggeredSelfNanoId
+                        || supportNano.PrimaryModifierDelta == 0
+                        || supportNano.TriggeredSelfModifierDelta == 0
+                        || supportNano.AffectedStatIds.Length == 0
+                        || supportNano.AffectedStatIds.Any(value => value <= 0)
+                        || supportNano.AffectedStatIds.Distinct().Count()
+                           != supportNano.AffectedStatIds.Length
+                        || supportNano.PeriodicStatDelta != 0
+                        || supportNano.PeriodicTickCount != 0
+                        || supportNano.PeriodicTickSeconds != 0.0);
+                bool invalidPeriodicStatHitNano = periodicStatHitNano
+                    && (supportNano.HasTriggeredSelfEffect
+                        || supportNano.PeriodicStatId != 214
+                        || supportNano.TriggeredSelfStrain != 0
+                        || supportNano.PrimaryModifierDelta != 0
+                        || supportNano.TriggeredSelfModifierDelta != 0
+                        || supportNano.AffectedStatIds.Length != 0
+                        || supportNano.PeriodicStatDelta <= 0
+                        || supportNano.PeriodicTickCount <= 0
+                        || supportNano.PeriodicTickSeconds <= 0.0);
+                bool invalidSpawnNanoPool = supportNano != null
+                    && supportNano.SpawnNanoPoolByLevel.Any(
+                        value => value.Key <= 0 || value.Value <= 0);
+                if (supportNano != null
+                    && (supportNano.PrimaryNanoId <= 0
+                        || supportNano.InitialDelaySeconds < 0.0
+                        || supportNano.CastSeconds <= 0.0
+                        || supportNano.RepeatSeconds <= supportNano.CastSeconds
+                        || supportNano.DurationParameter <= 0
+                        || supportNano.EffectLifetimeSeconds <= 0.0
+                        || supportNano.TargetRange <= 0.0
+                        || supportNano.PrimaryStrain < 0
+                        || supportNano.TriggeredSelfStrain < 0
+                        || supportNano.NanoCost < 0
+                        || supportNano.NcuCost < 0
+                        || supportNano.CastChanceBasisPoints <= 0
+                        || supportNano.CastChanceBasisPoints > 10000
+                        || supportNano.SelfTargetChanceBasisPoints < 0
+                        || supportNano.SelfTargetChanceBasisPoints > 10000
+                        || invalidStaticModifierNano
+                        || invalidPeriodicStatHitNano
+                        || invalidSpawnNanoPool
+                        || supportNano.EvidenceState == OrdinaryEnemyEvidenceState.Invalid
+                        || supportNano.EvidenceState == OrdinaryEnemyEvidenceState.Unresolved
+                        || string.IsNullOrWhiteSpace(supportNano.Evidence)))
+                {
+                    throw new InvalidOperationException(
+                        "Ordinary enemy support nano data is invalid: " + profile.ProfileKey);
+                }
+
                 bool hasHealthRegenInterval = profile.Combat.HealthRegenIntervalSeconds.HasValue;
                 bool hasHealthRegenDelta = profile.Combat.HealthRegenDelta.HasValue;
                 if (hasHealthRegenInterval != hasHealthRegenDelta
@@ -1247,16 +1940,12 @@ namespace AORebirth.Core.Playfields
                         "Ordinary enemy spawn level definition is invalid: " + spawn.SpawnKey);
                 }
 
-                OrdinaryEnemySpawnVariant sourceVariant =
-                    spawn.Level >= spawn.LevelDefinition.MinimumLevel
-                    && spawn.Level <= spawn.LevelDefinition.MaximumLevel
-                        ? spawn.LevelDefinition.Resolve(spawn.Level)
-                        : null;
-                if (sourceVariant == null
-                    || sourceVariant.Health != spawn.Health
-                    || sourceVariant.HealthDamage != spawn.HealthDamage
-                    || sourceVariant.MonsterScale != spawn.MonsterScale
-                    || sourceVariant.RunSpeed != spawn.RunSpeed)
+                if (!spawn.LevelDefinition.ContainsSourceRow(
+                    spawn.Level,
+                    spawn.Health,
+                    spawn.HealthDamage,
+                    spawn.MonsterScale,
+                    spawn.RunSpeed))
                 {
                     throw new InvalidOperationException(
                         "Ordinary enemy spawn level definition does not preserve its source row: "
@@ -1297,6 +1986,26 @@ namespace AORebirth.Core.Playfields
 
             OrdinaryEnemyLootEntry[] entries = loot.Entries ?? new OrdinaryEnemyLootEntry[0];
             int[] observedCreditOutcomes = loot.ObservedCreditOutcomes ?? new int[0];
+            OrdinaryEnemyLevelCreditRule[] levelCreditRules =
+                loot.LevelCreditRules ?? new OrdinaryEnemyLevelCreditRule[0];
+            if (levelCreditRules.Any(
+                    value => value == null
+                             || value.EnemyLevel <= 0
+                             || value.MinimumCredits < 0
+                             || value.MaximumCredits < value.MinimumCredits
+                             || string.IsNullOrWhiteSpace(value.Evidence)
+                             || (value.EvidenceState == OrdinaryEnemyEvidenceState.Observed
+                                 && value.ObservedCorpses <= 0)
+                             || (value.EvidenceState == OrdinaryEnemyEvidenceState.Policy
+                                 && value.ObservedCorpses < 0)
+                             || (value.EvidenceState != OrdinaryEnemyEvidenceState.Observed
+                                 && value.EvidenceState != OrdinaryEnemyEvidenceState.Policy))
+                || levelCreditRules.GroupBy(value => value.EnemyLevel).Any(value => value.Count() > 1))
+            {
+                throw new InvalidOperationException(
+                    "Ordinary enemy level-credit rules are invalid: " + key);
+            }
+
             if (observedCreditOutcomes.Length > 0)
             {
                 if (loot.CreditEvidence != OrdinaryEnemyEvidenceState.Observed
