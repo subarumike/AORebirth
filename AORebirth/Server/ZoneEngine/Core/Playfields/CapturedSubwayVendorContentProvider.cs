@@ -1,5 +1,6 @@
-// Capture-derived Subway merchant content. Source: AOSharpLiveCapture 20260709-212115.
-// Do not add stock or dialogue that is not present in that capture.
+// Capture-derived Subway merchant content. Appearance and owner/terminal links:
+// AOSharpLiveCapture 20260709-212115. Container stock uses exact template 99634
+// slot evidence from AOSharpLiveCapture 20260613-221619; dialogue remains unresolved.
 
 namespace ZoneEngine.Core.Playfields
 {
@@ -14,6 +15,11 @@ namespace ZoneEngine.Core.Playfields
         internal const int SubwayPlayfieldResource = 127;
 
         private const string Evidence = "AOSharpLiveCapture/20260709-212115";
+
+        private const string ContainerStockEvidence =
+            "AOSharpLiveCapture/20260613-221619;"
+            + "identity=VendingMachine:C0000317;template=99634;slots=62;"
+            + "exact-template-reuse";
 
         private static readonly ReadOnlyCollection<CapturedSubwayVendorDefinition> CapturedDefinitions =
             Array.AsReadOnly(
@@ -144,7 +150,8 @@ namespace ZoneEngine.Core.Playfields
                         "00000000000000000000000003010001000100010001000000020000",
                         false,
                         false,
-                        null)
+                        ContainerStock(),
+                        ContainerStockEvidence)
                 });
 
         internal static ReadOnlyCollection<CapturedSubwayVendorDefinition> Definitions
@@ -172,7 +179,8 @@ namespace ZoneEngine.Core.Playfields
             string unknown1Hex,
             bool isPet,
             bool hasWaypoint,
-            CapturedSubwayVendorStockDefinition[] stock)
+            CapturedSubwayVendorStockDefinition[] stock,
+            string stockEvidence = null)
         {
             SimpleCharFullUpdateFlags flags =
                 SimpleCharFullUpdateFlags.IsNpc
@@ -244,7 +252,8 @@ namespace ZoneEngine.Core.Playfields
                 },
                 waypoints,
                 stock,
-                Evidence);
+                Evidence,
+                stock == null ? string.Empty : stockEvidence ?? Evidence);
         }
 
         private static byte[] HexToBytes(string value)
@@ -432,6 +441,75 @@ namespace ZoneEngine.Core.Playfields
                 new CapturedSubwayVendorStockDefinition(18, 88373, 88374, 33)
             };
         }
+
+        private static CapturedSubwayVendorStockDefinition[] ContainerStock()
+        {
+            return new[]
+            {
+                new CapturedSubwayVendorStockDefinition(0, 99302, 99302, 1),
+                new CapturedSubwayVendorStockDefinition(1, 143832, 143832, 1),
+                new CapturedSubwayVendorStockDefinition(2, 157684, 157684, 1),
+                new CapturedSubwayVendorStockDefinition(3, 157689, 157689, 1),
+                new CapturedSubwayVendorStockDefinition(4, 157686, 157686, 1),
+                new CapturedSubwayVendorStockDefinition(5, 157691, 157691, 1),
+                new CapturedSubwayVendorStockDefinition(6, 157692, 157692, 1),
+                new CapturedSubwayVendorStockDefinition(7, 157683, 157683, 1),
+                new CapturedSubwayVendorStockDefinition(8, 157693, 157693, 1),
+                new CapturedSubwayVendorStockDefinition(9, 157682, 157682, 1),
+                new CapturedSubwayVendorStockDefinition(10, 157685, 157685, 1),
+                new CapturedSubwayVendorStockDefinition(11, 157688, 157688, 1),
+                new CapturedSubwayVendorStockDefinition(12, 157687, 157687, 1),
+                new CapturedSubwayVendorStockDefinition(13, 157694, 157694, 1),
+                new CapturedSubwayVendorStockDefinition(14, 157695, 157695, 1),
+                new CapturedSubwayVendorStockDefinition(15, 157690, 157690, 1),
+                new CapturedSubwayVendorStockDefinition(16, 99241, 99241, 1),
+                new CapturedSubwayVendorStockDefinition(17, 99228, 99228, 1),
+                new CapturedSubwayVendorStockDefinition(18, 287422, 287422, 1),
+                new CapturedSubwayVendorStockDefinition(19, 287421, 287421, 1),
+                new CapturedSubwayVendorStockDefinition(20, 287423, 287423, 1),
+                new CapturedSubwayVendorStockDefinition(21, 287609, 287609, 1),
+                new CapturedSubwayVendorStockDefinition(22, 287610, 287610, 1),
+                new CapturedSubwayVendorStockDefinition(23, 287427, 287427, 1),
+                new CapturedSubwayVendorStockDefinition(24, 287417, 287417, 1),
+                new CapturedSubwayVendorStockDefinition(25, 287424, 287424, 1),
+                new CapturedSubwayVendorStockDefinition(26, 287425, 287425, 1),
+                new CapturedSubwayVendorStockDefinition(27, 287426, 287426, 1),
+                new CapturedSubwayVendorStockDefinition(28, 287611, 287611, 1),
+                new CapturedSubwayVendorStockDefinition(29, 287428, 287428, 1),
+                new CapturedSubwayVendorStockDefinition(30, 287418, 287418, 1),
+                new CapturedSubwayVendorStockDefinition(31, 287612, 287612, 1),
+                new CapturedSubwayVendorStockDefinition(32, 287613, 287613, 1),
+                new CapturedSubwayVendorStockDefinition(33, 287429, 287429, 1),
+                new CapturedSubwayVendorStockDefinition(34, 287430, 287430, 1),
+                new CapturedSubwayVendorStockDefinition(35, 287614, 287614, 1),
+                new CapturedSubwayVendorStockDefinition(36, 287431, 287431, 1),
+                new CapturedSubwayVendorStockDefinition(37, 287615, 287615, 1),
+                new CapturedSubwayVendorStockDefinition(38, 287432, 287432, 1),
+                new CapturedSubwayVendorStockDefinition(39, 287433, 287433, 1),
+                new CapturedSubwayVendorStockDefinition(40, 287434, 287434, 1),
+                new CapturedSubwayVendorStockDefinition(41, 287435, 287435, 1),
+                new CapturedSubwayVendorStockDefinition(42, 287437, 287437, 1),
+                new CapturedSubwayVendorStockDefinition(43, 287436, 287436, 1),
+                new CapturedSubwayVendorStockDefinition(44, 287616, 287616, 1),
+                new CapturedSubwayVendorStockDefinition(45, 287438, 287438, 1),
+                new CapturedSubwayVendorStockDefinition(46, 287439, 287439, 1),
+                new CapturedSubwayVendorStockDefinition(47, 287419, 287419, 1),
+                new CapturedSubwayVendorStockDefinition(48, 287440, 287440, 1),
+                new CapturedSubwayVendorStockDefinition(49, 287441, 287441, 1),
+                new CapturedSubwayVendorStockDefinition(50, 287617, 287617, 1),
+                new CapturedSubwayVendorStockDefinition(51, 287442, 287442, 1),
+                new CapturedSubwayVendorStockDefinition(52, 287618, 287618, 1),
+                new CapturedSubwayVendorStockDefinition(53, 287420, 287420, 1),
+                new CapturedSubwayVendorStockDefinition(54, 287443, 287443, 1),
+                new CapturedSubwayVendorStockDefinition(55, 287444, 287444, 1),
+                new CapturedSubwayVendorStockDefinition(56, 287445, 287445, 1),
+                new CapturedSubwayVendorStockDefinition(57, 287446, 287446, 1),
+                new CapturedSubwayVendorStockDefinition(58, 287619, 287619, 1),
+                new CapturedSubwayVendorStockDefinition(59, 287447, 287447, 1),
+                new CapturedSubwayVendorStockDefinition(60, 287620, 287620, 1),
+                new CapturedSubwayVendorStockDefinition(61, 287448, 287448, 1)
+            };
+        }
     }
 
     internal sealed class CapturedSubwayVendorDefinition
@@ -468,7 +546,8 @@ namespace ZoneEngine.Core.Playfields
             CapturedSubwayVendorMeshDefinition[] meshes,
             CapturedSubwayVendorWaypointDefinition[] waypoints,
             CapturedSubwayVendorStockDefinition[] stock,
-            string evidence)
+            string evidence,
+            string stockEvidence)
         {
             this.SourceNpcInstance = sourceNpcInstance;
             this.SourceVendorInstance = sourceVendorInstance;
@@ -506,6 +585,7 @@ namespace ZoneEngine.Core.Playfields
                     : (CapturedSubwayVendorStockDefinition[])stock.Clone());
             this.HasCapturedStock = stock != null;
             this.Evidence = evidence;
+            this.StockEvidence = stockEvidence ?? string.Empty;
         }
 
         internal int SourceNpcInstance { get; private set; }
@@ -541,6 +621,7 @@ namespace ZoneEngine.Core.Playfields
         internal ReadOnlyCollection<CapturedSubwayVendorStockDefinition> Stock { get; private set; }
         internal bool HasCapturedStock { get; private set; }
         internal string Evidence { get; private set; }
+        internal string StockEvidence { get; private set; }
     }
 
     internal sealed class CapturedSubwayVendorStockDefinition

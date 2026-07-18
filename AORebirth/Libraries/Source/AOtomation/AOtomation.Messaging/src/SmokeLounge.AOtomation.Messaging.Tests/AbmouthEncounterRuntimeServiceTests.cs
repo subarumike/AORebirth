@@ -398,11 +398,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && encounter.Contains("EumenidesProfileKey = \"subway.127.named.eumenides\"")
                 && encounter.Contains("EumenidesEncounterKey = \"subway.127.encounter.eumenides\"")
                 && encounter.Contains("CapturedEumenidesAggroRadius = 15.609f")
-                && encounter.Contains("EumenidesPrivateRespawnDelay = TimeSpan.FromMinutes(10)")
-                && encounter.Contains("this.eumenidesRespawnDueAtUtc = diedAtUtc.Add(EumenidesPrivateRespawnDelay)")
+                && encounter.Contains("EumenidesObservedRespawnDelay = TimeSpan.FromMinutes(10)")
+                && encounter.Contains("this.eumenidesRespawnDueAtUtc = diedAtUtc.Add(EumenidesObservedRespawnDelay)")
                 && encounter.Contains("this.ProcessEumenidesRespawn(utcNow);")
                 && encounter.Contains("maximumNpcLeashDistanceFromHome: 100.0"),
-                "Eumenides must use its own named profile, bounded observed acquisition radius, and explicit private lifecycle policy.");
+                "Eumenides must use its own named profile, bounded observed acquisition radius, and Mike-observed official-live respawn timing.");
             Assert.IsTrue(
                 encounter.Contains("EumenidesProfileKey,\n                \"subway.127.named.eumenides.spawn\",\n                EumenidesEncounterKey,\n                \"Eumenides\",\n                EumenidesMonsterData,\n                false,\n                false,")
                 && encounter.Contains("20,\n                2792,\n                130,\n                76,\n                76,")
@@ -420,7 +420,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && encounter.Contains("new CapturedSubwayTextureDefinition(4, 9625, 0)")
                 && encounter.Contains("new CapturedSubwayMeshDefinition(0, 29708u, 0, 4)")
                 && encounter.Contains("new CapturedSubwayMeshDefinition(1, 35564u, 0, 2)"),
-                "Eumenides must preserve one atomic 20260716-034559 SCFU plus the captured corpse CATMesh and private corpse timings.");
+                "Eumenides must preserve one atomic 20260716-034559 SCFU plus the captured corpse CATMesh and observed corpse timing.");
             Assert.IsFalse(
                 ordinary.Contains("Eumenides") || ordinary.Contains("203726"),
                 "Eumenides must remain outside ordinary population generation.");
@@ -464,21 +464,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && contracts.Contains("NpcCombatAttackRules.CapturedSubwayEumenidesWeaponHighTemplate")
                 && contracts.Contains("NpcCombatAttackRules.CapturedSubwayEumenidesRechargeOverrideSeconds")
                 && contracts.Contains("requiresDamageLineOfSight: true")
-                && contracts.Contains("two observed normal player hits 39/45")
-                && contracts.Contains("one observed 9.749082-second interval"),
+                && contracts.Contains("21 observed normal local-player hits 25..45")
+                && contracts.Contains("4.311321-second median interval across 17 intervals"),
                 "The runtime contract must equip the weapon, preserve observed evidence, and require PF127 damage LOS.");
             Assert.IsTrue(
-                eumenides.Contains("\"normalAttackInfoRows\": 2")
-                && eumenides.Contains("\"normalMinDamage\": 39")
+                eumenides.Contains("\"normalAttackInfoRows\": 21")
+                && eumenides.Contains("\"normalMinDamage\": 25")
                 && eumenides.Contains("\"normalMaxDamage\": 45")
-                && eumenides.Contains("\"medianRechargeSeconds\": 9.749082")
+                && eumenides.Contains("\"medianRechargeSeconds\": 4.311321")
+                && eumenides.Contains("20260717-214751")
                 && eumenides.Contains("\"equippedWeaponTemplateId\": 123267")
                 && eumenides.Contains("\"equippedWeaponQuality\": 20"),
                 "Observed Eumenides hits and cadence must remain evidence only and separate from the zero runtime overrides.");
         }
 
         [TestMethod]
-        public void EumenidesCorpseEvidenceReplaysExactCapturedShapeWithoutInventingItemLoot()
+        public void EumenidesCorpseEvidenceReplaysExactCapturedShapeAndAtomicItemLoot()
         {
             string root = FindRepositoryRoot();
             string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
@@ -488,13 +489,36 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     root,
                     @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260716-222007\corpse-full-updates.csv"));
+            string capturedLoot = File.ReadAllText(
+                Path.Combine(
+                    root,
+                    @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260717-214751\corpse-loot-observations.csv"));
+            string membershipLoot = File.ReadAllText(
+                Path.Combine(
+                    root,
+                    @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260717-220340\corpse-loot-observations.csv"));
+            string membershipLifecycle = File.ReadAllText(
+                Path.Combine(
+                    root,
+                    @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260717-220340\npc-lifecycle.csv"));
 
             Assert.IsTrue(
                 captured.Contains("Remains of Eumenides")
                 && captured.Contains(",130,2,3,1,")
                 && captured.Contains(",17905,186,203726,")
-                && captured.Contains(",416,\""),
+                && captured.Contains(",416,"),
                 "The preserved official-live corpse row must retain packet length, scale, sex, breed, race, CATMesh, credits, and MonsterData.");
+            Assert.IsTrue(
+                capturedLoot.Contains("\"Eumenides\",\"203726\",\"20\",\"186\"")
+                && capturedLoot.Contains("163430:163431:22:1;301714:301714:1:1;287146:287146:200:1"),
+                "The finalized capture must preserve Eumenides' exact initial three-item plus 186-credit corpse snapshot.");
+            Assert.IsTrue(
+                membershipLifecycle.Contains("(Corpse:F6900F)")
+                && membershipLifecycle.Contains("(Corpse:F6900C)")
+                && membershipLifecycle.Contains("Remains of Eumenides")
+                && membershipLoot.Contains("234875:234875:1:1;202717:202718:15:1;301717:301717:1:1;163426:163427:23:1;85521:85520:15:1;287146:287146:200:1")
+                && membershipLoot.Contains("\"unlinked\""),
+                "The later capture must retain exact item membership while remaining unlinked to credits, dead-NPC identity, and playfield context.");
             Assert.IsTrue(
                 encounter.Contains("17905,\n                1800.0,\n                3.0,")
                 && corpse.Contains("CapturedSubwayEumenidesPacketLength = 416")
@@ -509,15 +533,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpse.Contains("CapturedSubwayEumenidesTailDeadNpcInstanceOffset"),
                 "Eumenides must replay the captured 416-byte corpse visual while patching only runtime state fields.");
             Assert.IsTrue(
-                encounter.Contains("private named-enemy policy: 10-minute respawn, 30-minute loot-bearing corpse")
+                encounter.Contains("20260717-220340-associated Mike observation (not packet-timestamp encoded): official-live exact 10-minute respawn and Temporary 30m loot-bearing corpse")
                 && encounter.Contains("active nano refresh unresolved and omitted"),
-                "Private timing substitutions and unresolved capture fields must remain explicit rather than presented as official-live facts.");
+                "Mike-observed official-live timing and the capture's packet-timestamp limitation must both remain explicit.");
             Assert.IsTrue(
                 loot.Contains("CapturedEumenidesCredits = 186")
+                && loot.Contains("CapturedEumenidesLootEvidence")
                 && loot.Contains("CapturedSubwayEncounterRuntimeService.EumenidesProfileKey")
-                && loot.Contains("isEumenides ? CapturedEumenidesCredits : CapturedInfectorCredits")
-                && loot.Contains("20260716-222007 fixed 186 corpse credits; item pool unresolved"),
-                "Eumenides must award the fixed captured 186 credits while leaving its item pool unresolved.");
+                && loot.Contains("\"capture.20260717-214751\",\n                        CapturedEumenidesCredits,")
+                && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-214751\", 163430, 163431, 22, 1)")
+                && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-214751\", 301714, 301714, 1, 1)")
+                && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-214751\", 287146, 287146, 200, 1)")
+                && loot.Contains("20260717-220340 adds exact local-name/identity-linked item membership")
+                && loot.Contains("ItemPoolUnresolved = true"),
+                "Eumenides must replay the exact captured item-plus-credit snapshot without claiming wider-pool probabilities.");
+            Assert.IsFalse(
+                loot.Contains("\"capture.20260717-220340\""),
+                "The unlinked membership-only rows must not become an atomic runtime snapshot.");
         }
 
         [TestMethod]

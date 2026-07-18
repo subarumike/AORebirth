@@ -73,6 +73,42 @@ class AOSharpCaptureInventoryTests(unittest.TestCase):
         self.assertEqual(1, packets_rows)
         self.assertEqual(1, csv_rows)
 
+    def test_official_pf127_start_only_capture_is_subway_without_raw(self) -> None:
+        (self.capture / "capture_info.json").write_text(
+            json.dumps(
+                {
+                    "playfieldId": "(Playfield2:15781E)",
+                    "captureEndUtc": None,
+                    "validation": {"status": "running"},
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        row = inventory.inspect_capture(self.repo_root, self.capture, {}, {})
+
+        self.assertEqual("SUBWAY", row["classification"])
+        self.assertEqual("none", row["raw_packet_evidence"])
+
+    def test_reviewed_corpus_contract_includes_latest_four_subway_folders(self) -> None:
+        self.assertEqual("20260717-220340", inventory.REVIEWED_CAPTURE_CUTOFF)
+        self.assertTrue(
+            {
+                "20260717-214612",
+                "20260717-214751",
+                "20260717-215250",
+                "20260717-220340",
+            }.issubset(inventory.EXPECTED_REVIEWED_SUBWAY_ONLY)
+        )
+        self.assertEqual(72, inventory.EXPECTED_REVIEWED_SUBWAY_CAPTURE_COUNT)
+        self.assertEqual(69, inventory.EXPECTED_REVIEWED_SUBWAY_RAW_CAPTURE_COUNT)
+        self.assertTrue(
+            {"20260717-214612", "20260717-215250"}.isdisjoint(
+                inventory.EXPECTED_REVIEWED_SUBWAY_NO_RAW
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -644,7 +644,7 @@ namespace AORebirth.Core.Playfields
             {
                 case 203726:
                     return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
-                        "20260709-222339: Eumenides QL20 weapon 123267/123268, empty-special context 143/171/143/143/0, immediate attack start, 0.233124-second movement transition, 5.199992-second first hit, two observed normal player hits 39/45, and one observed 9.749082-second interval; weapon owns runtime damage and recharge",
+                        "20260709-222339 plus 20260717-214612/214751/215250: Eumenides QL20 weapon 123267/123268, empty-special context 143/171/143/143/0, immediate attack start, 0.233124-second movement transition, 5.199992-second first hit, 21 observed normal local-player hits 25..45, and 4.311321-second median interval across 17 intervals; weapon owns runtime damage and recharge",
                         NpcCombatAttackRules.CapturedSubwayEumenidesWeaponLowTemplate,
                         NpcCombatAttackRules.CapturedSubwayEumenidesWeaponHighTemplate,
                         NpcCombatAttackRules.CapturedSubwayEumenidesWeaponQuality,

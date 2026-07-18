@@ -32,8 +32,8 @@ population in bounded runtime batches.
   `docs/generated/aosharp_capture_inventory.csv` and
   `docs/generated/aosharp_capture_inventory.md` by
   `Tools/inventory_aosharp_captures.py`.
-- The content-level ledger covers all `68` Subway-bearing sessions with `23,993`
-  aggregated evidence rows: `55` official-live and `13` AORebirth-private.
+- The content-level ledger covers all `72` Subway-bearing sessions with `25,320`
+  aggregated evidence rows: `59` official-live and `13` AORebirth-private.
   It records identities, related identities, evidence kinds, source artifacts,
   row scope, realm, and reference category in
   `docs/generated/aosharp_subway_capture_content.csv` and `.md`.
@@ -113,9 +113,12 @@ population in bounded runtime batches.
   Redundant Scan `19`, and Uncontrollable Anger `11..18`.
 - Strict `corpse-loot-observations.csv` snapshots now contribute empty corpses
   to loot denominators. Redundant Scan's observed item is `1/2`, Molested
-  Molecules item `301713` is `1/8`, and the twelve strict Slum Runner outcomes
+  Molecules item `301713` is `1/3`, and the twelve strict Slum Runner outcomes
   from `20260716-222201` are included without treating every observed item as
   guaranteed.
+- Capture-local SCFU ownership now preclassifies player-owned pets before the
+  weaker dossier/combat/stat/movement role heuristics, so Killer and other
+  owner-linked pets can no longer be projected into the enemy ledger.
 - Combat evidence indexing now includes `20260709-225408`,
   `20260710-211430`, `20260716-221358`, and `20260716-222201`, with normal and
   critical hit summaries separated in
@@ -135,19 +138,34 @@ population in bounded runtime batches.
   damage and `4.210098`-second cadence, shared chase, strict loot sample,
   CATMesh `31774`, 19 corpse/credit observations, ordinary corpse lifetimes,
   and observed `59.433`-second death-to-respawn interval are guarded together.
+- Molested Molecules is the fourth accepted ordinary enemy. Its nine exact
+  spawns, `16..42` normal player-facing damage, `4.763456`-second cadence,
+  shared chase, three strict loot outcomes, CATMesh `5921`, seven exact
+  positive-credit corpses, four-minute private ordinary respawn policy, and
+  ordinary corpse lifetimes are guarded together. The respawn value remains
+  explicit private-server policy rather than an official-live timing claim.
 - Eumenides is now a dedicated named PF127 encounter from atomic capture
   `20260716-034559`: exact L20/2792 HP appearance, QL20 weapon context,
   capture-bounded proactive acquisition, shared LOS/chase/leash behavior, exact
   416-byte CATMesh `17905` corpse, and fixed observed `186` credits. Weapon
-  damage and recharge remain item-owned; item loot and active-nano refresh
-  semantics remain unresolved. The private named-enemy policy is ten-minute
-  respawn, 30-minute loot-bearing corpse, and three-second empty cleanup.
+  damage and recharge remain item-owned; the expanded three-capture fight set
+  proves 21 normal local-player hits at `25..45` with a `4.311321`-second median
+  interval. Finalized `20260717-214751` adds one exact atomic corpse snapshot:
+  186 credits plus QL22 Living Cyber Armor Sleeves `163430/163431`, QL1 item
+  `301714`, and QL200 item `287146`. Wider loot-pool probabilities and active-
+  nano refresh semantics remain unresolved. Follow-up `20260717-220340` starts
+  after the corpses already exist, so its additional item rows remain membership
+  evidence rather than a fabricated item-plus-credit outcome. Mike observed the
+  live ten-minute respawn and 30-minute loot-bearing corpse timer during that
+  session; the folder does not packet-encode those UI/timing boundaries. Runtime
+  already uses those values, plus three-second empty cleanup.
 - Capture `20260709-212115` now supplies six exact Subway merchant appearances.
-  Tailor, Weaponsdealer, Armorer, Pharmacist, and Tools expose their five atomic
-  captured shop snapshots with all `140` stock rows in captured slot order.
-  Container Supplier is visible but has no invented shop endpoint because its
-  owner/terminal relationship is repeated in the corpus but no stock update or
-  dialogue was captured.
+  Tailor, Weaponsdealer, Armorer, Pharmacist, Tools, and Container Supplier now
+  expose six owner-linked shop endpoints with all `202` stock rows in exact
+  slot order. Container Supplier reuses the exact 62-row `Cont` inventory
+  captured on vending-machine template `99634` in `20260613-221619`; its
+  appearance and owner/terminal link remain sourced from `20260709-212115`.
+  Dialogue remains unresolved and is not synthesized.
 - Bitaxel is a player, not a Subway enemy: complete SCFU `PlayerInfo` and
   lifecycle `player=True npc=False pet=False` evidence now override combat-role
   heuristics throughout the generated content ledger.
@@ -158,12 +176,17 @@ population in bounded runtime batches.
 - NPC lifecycle decoder self-test, including finalized-window, legacy metadata,
   terminal-tail salvage, and snapshot-only corpse cases: PASS.
 - Content-ledger classification and population-diagnostic tests: `34/34` PASS.
-- Full lifecycle reprocess: `65/65` PASS; zero offline repairs, recaptures, and
-  tool errors.
-- Full `294`-folder location inventory and `68`-session Subway ledger
+- Previously reviewed lifecycle reprocess set: `65/65` PASS; zero offline
+  repairs, recaptures, and tool errors. The four newly indexed Eumenides folders
+  are handled by their actual completion boundary: `214751` complete,
+  `214612`/`215250` partial combat evidence, and `220340` analyzer-INCOMPLETE
+  with offline decode required but no recapture required.
+- Full `298`-folder location inventory and `72`-session Subway ledger
   regeneration: PASS.
+- Current inventory/content-ledger regression suites: `27/27` PASS.
 - Subway loot/corpse evidence: `18/18` PASS.
-- Three-entry whole-enemy acceptance gate (Thief, Filth Flea, Slum Runner): PASS.
+- Four-entry whole-enemy acceptance gate (Thief, Filth Flea, Slum Runner,
+  Molested Molecules): PASS.
 - Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
 - World population foundation: `25/25` PASS.
@@ -175,6 +198,10 @@ population in bounded runtime batches.
 - Approved AORebirth Debug build: PASS.
 - Chat, Login, and Zone restart: PASS; ports `6996`, `7012`, `7500`, and `7501`
   listening.
+- Repository-wide AOtomation suite: `354/368`; 14 broader failures remain
+  outside these changed Subway surfaces. Every focused test for
+  Eumenides, global loot, merchants, the whole-enemy gate, and capture inventory
+  passes.
 - The broader visibility lifecycle class still exposes its pre-existing pet
   observer source-guardrail failure because `PetRuntimeService` contains both
   the shared visibility hook and the older `AnnounceOthers` call. It is outside
@@ -205,8 +232,8 @@ until the staged identity has a private-client runtime result.
    remain unresolved together with item loot, respawn timing, leash, and exact
    acquisition range. Do not activate it by guessing the missing behavior.
 4. Bitaxel is classified as a player artifact and is not an enemy gap.
-5. Container Supplier stock and dialogue remain unresolved. Keep the captured
-   appearance visible without synthesizing an inventory or interaction.
+5. Container Supplier stock is resolved by exact template-`99634` capture
+   evidence. Dialogue remains unresolved and must not be synthesized.
 6. Geometry-safe capture `20260714-202820` identifies 18 unlocked interior door
    identities, including five observed in both open and closed states. It does
    not contain safe room-link indices. The working client-owned doors must not

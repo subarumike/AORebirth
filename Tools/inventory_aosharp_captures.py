@@ -65,10 +65,10 @@ TEXT_EVIDENCE_FILES = (
 
 MAX_DECODED_RESOURCE_PLAYFIELD = 65535
 
-# The complete 294-folder corpus through this timestamp was manually reviewed
+# The complete 298-folder corpus through this timestamp was manually reviewed
 # against capture/event playfields, packet presence, PF127 artifacts, and zoning
 # boundaries on 2026-07-17. Newer captures fall through to the evidence rules.
-REVIEWED_CAPTURE_CUTOFF = "20260717-012651"
+REVIEWED_CAPTURE_CUTOFF = "20260717-220340"
 PF127_CORPUS_RUNTIME_INSTANCES = {127, 1187842, 1363982, 1388552, 1407006}
 EXPECTED_REVIEWED_SUBWAY_ONLY = {
     "20260708-143600",
@@ -108,6 +108,10 @@ EXPECTED_REVIEWED_SUBWAY_ONLY = {
     "20260716-222007",
     "20260716-222201",
     "20260717-012651",
+    "20260717-214612",
+    "20260717-214751",
+    "20260717-215250",
+    "20260717-220340",
 }
 EXPECTED_REVIEWED_MIXED = {
     "20260708-004038",
@@ -148,8 +152,8 @@ EXPECTED_REVIEWED_INSUFFICIENT = {
     "20260621-013227",
     "20260622-081426",
 }
-EXPECTED_REVIEWED_SUBWAY_CAPTURE_COUNT = 68
-EXPECTED_REVIEWED_SUBWAY_RAW_CAPTURE_COUNT = 65
+EXPECTED_REVIEWED_SUBWAY_CAPTURE_COUNT = 72
+EXPECTED_REVIEWED_SUBWAY_RAW_CAPTURE_COUNT = 69
 EXPECTED_REVIEWED_SUBWAY_NO_RAW = {
     "20260714-171439",
     "20260714-185728",
@@ -617,7 +621,7 @@ def validate_reviewed_corpus(rows: list[dict[str, object]]) -> None:
         for row in rows
         if str(row["capture_id"]) <= REVIEWED_CAPTURE_CUTOFF
     }
-    if len(reviewed) != 294:
+    if len(reviewed) != 298:
         return
     expected = {
         capture_id: "SUBWAY" for capture_id in EXPECTED_REVIEWED_SUBWAY_ONLY

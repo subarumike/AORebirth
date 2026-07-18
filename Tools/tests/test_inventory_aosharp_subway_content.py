@@ -16,6 +16,13 @@ import inventory_aosharp_subway_content as content
 
 
 class CaptureRealmTests(unittest.TestCase):
+    def test_current_selected_corpus_contract(self) -> None:
+        self.assertEqual(72, content.EXPECTED_SELECTED_CAPTURE_COUNT)
+        self.assertEqual(
+            {"SUBWAY": 41, "MIXED": 31},
+            dict(content.EXPECTED_SELECTED_CLASSIFICATIONS),
+        )
+
     def test_runtime_127_is_private(self) -> None:
         realm, basis = content.capture_realm(
             {
@@ -212,6 +219,102 @@ class CharacterIdentityClassificationTests(unittest.TestCase):
             '"character_info_type":"PlayerInfo"',
             content.evidence_to_row(scfu, references)["observed_values_json"],
         )
+
+    def test_scfu_owner_preclassifies_pet_across_all_evidence_kinds(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            capture_path = root / "captures" / "20260709-222339"
+            capture_path.mkdir(parents=True)
+            identity = "(SimpleChar:7954523C)"
+            owner = "(SimpleChar:7944C065)"
+            (capture_path / "scfu-appearance.csv").write_text(
+                "CapturedUtc,Identity,Name,PlayfieldId,Level,Health,MonsterData,"
+                "CharacterInfoType,Owner,DecodeStatus,DecodeFullyConsumed\n"
+                "2026-07-10T03:24:32Z,(SimpleChar:7954523C),Killer,1187842,"
+                "22,500,96195,NPCInfo,(SimpleChar:7944C065),decoded_complete,true\n",
+                encoding="utf-8",
+            )
+            (capture_path / "enemy-dossier.json").write_text(
+                '{"enemies":[{"identity":"(SimpleChar:7954523C)",'
+                '"name":"Killer","monsterData":96195,"level":22,'
+                '"resourcePlayfieldId":1187842}]}',
+                encoding="utf-8",
+            )
+            (capture_path / "enemy-full-updates.csv").write_text(
+                "CapturedUtc,Identity,Name,PlayfieldId,Level,Health,MonsterData\n"
+                "2026-07-10T03:24:32Z,(SimpleChar:7954523C),Killer,1187842,"
+                "22,500,96195\n",
+                encoding="utf-8",
+            )
+            (capture_path / "enemy-state.csv").write_text(
+                "timestamp,entityId,level,currentHealth,maxHealth,eventType\n"
+                "2026-07-10T03:24:33Z,(SimpleChar:7954523C),22,500,500,seen\n",
+                encoding="utf-8",
+            )
+            (capture_path / "enemy-stat-updates.csv").write_text(
+                "CapturedUtc,IdentityRole,Identity,Stat,Value\n"
+                "2026-07-10T03:24:34Z,enemy,(SimpleChar:7954523C),Health,500\n",
+                encoding="utf-8",
+            )
+            (capture_path / "enemy-combat.csv").write_text(
+                "CapturedUtc,MessageType,SourceRole,SourceIdentity,TargetRole,"
+                "TargetIdentity,Action,Amount\n"
+                "2026-07-10T03:24:35Z,AttackInfo,enemy,(SimpleChar:7954523C),"
+                "enemy,(SimpleChar:79545201),,73\n",
+                encoding="utf-8",
+            )
+            (capture_path / "enemy-movement.csv").write_text(
+                "CapturedUtc,IdentityRole,Identity,MessageType,MoveType\n"
+                "2026-07-10T03:24:36Z,enemy,(SimpleChar:7954523C),"
+                "CharacterMove,Walk\n",
+                encoding="utf-8",
+            )
+            (capture_path / "movement-packets.csv").write_text(
+                "CapturedUtc,MessageType,SourceIdentity,SourceName,TargetIdentity,"
+                "TargetName,FollowKind\n"
+                "2026-07-10T03:24:37Z,CharacterMove,(SimpleChar:7954523C),"
+                "Killer,(SimpleChar:79545201),Molested Molecules,Follow\n",
+                encoding="utf-8",
+            )
+            references = {
+                category: set() for category in content.REFERENCE_CATEGORIES
+            }
+            analyzer = content.CaptureAnalyzer(
+                root,
+                {
+                    "capture_id": "20260709-222339",
+                    "capture_path": "captures/20260709-222339",
+                    "classification": "SUBWAY",
+                    "confidence": "high",
+                    "capture_playfield_id": 1187842,
+                },
+                references,
+            )
+            pet_records = [
+                record
+                for record in analyzer.analyze()
+                if record.subject_identity == identity
+            ]
+
+        self.assertTrue(pet_records)
+        self.assertEqual({"pet"}, {record.subject_kind for record in pet_records})
+        self.assertEqual(
+            {
+                "combat_as_source",
+                "enemy_state",
+                "movement",
+                "movement_path",
+                "population_dossier",
+                "scfu_appearance",
+                "simple_char_full_update",
+                "stat_update",
+            },
+            {record.evidence_kind for record in pet_records},
+        )
+        scfu = next(
+            record for record in pet_records if record.evidence_kind == "scfu_appearance"
+        )
+        self.assertEqual(owner, scfu.related_identity)
 
     def test_lifecycle_dynel_player_flag_prevents_enemy_classification(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

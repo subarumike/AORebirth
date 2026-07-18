@@ -33,6 +33,9 @@ CAPTURES = (
     "20260716-220400",
     "20260716-221358",
     "20260716-222201",
+    "20260717-214612",
+    "20260717-214751",
+    "20260717-215250",
 )
 CAPTURE_ENEMY_FILTERS = {
     "20260708-004038": frozenset({"Filth Flea"}),
@@ -40,6 +43,9 @@ CAPTURE_ENEMY_FILTERS = {
     "20260716-034559": frozenset({"Melded Patterns"}),
     "20260716-034656": frozenset({"Slum Runner"}),
     "20260716-220400": frozenset({"Abmouth Supremus"}),
+    "20260717-214612": frozenset({"Eumenides"}),
+    "20260717-214751": frozenset({"Eumenides"}),
+    "20260717-215250": frozenset({"Eumenides"}),
 }
 ENEMY_ATTACK_CAPTURE_FILTERS = {
     "Filth Flea": frozenset({"20260708-004038", "20260709-193914"}),

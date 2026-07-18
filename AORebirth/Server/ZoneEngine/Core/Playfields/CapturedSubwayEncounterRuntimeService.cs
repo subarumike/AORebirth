@@ -58,7 +58,7 @@ namespace AORebirth.Core.Playfields
         private const int VergilSelfHealTriggerPermille = 180;
         private const float VergilDirectHealRange = 13.0f;
         private static readonly TimeSpan CapturedNamedBossRespawnDelay = TimeSpan.FromMinutes(10);
-        private static readonly TimeSpan EumenidesPrivateRespawnDelay = TimeSpan.FromMinutes(10);
+        private static readonly TimeSpan EumenidesObservedRespawnDelay = TimeSpan.FromMinutes(10);
 
         private static readonly double[] CapturedRefillDelays = { 0.830, 0.380, 3.322, 3.490 };
         private static readonly CapturedEncounterLevelHealthVariant[] VergilAeneidVariants =
@@ -380,7 +380,7 @@ namespace AORebirth.Core.Playfields
                 EumenidesProfileKey,
                 StringComparison.Ordinal))
             {
-                this.eumenidesRespawnDueAtUtc = diedAtUtc.Add(EumenidesPrivateRespawnDelay);
+                this.eumenidesRespawnDueAtUtc = diedAtUtc.Add(EumenidesObservedRespawnDelay);
                 return new ICharacter[0];
             }
 
@@ -1033,10 +1033,11 @@ namespace AORebirth.Core.Playfields
                 17905,
                 1800.0,
                 3.0,
-                "20260716-034559 atomic SCFU; 20260709-222339 weapon/combat/chase; "
+                "20260716-034559 atomic SCFU; 20260709-222339 plus 20260717-214612/214751/215250 weapon/combat/chase; "
                 + "20260716-222007 exact 416-byte corpse CATMesh 17905/MonsterData 203726/scale 130; "
-                + "private named-enemy policy: 10-minute respawn, 30-minute loot-bearing corpse, "
-                + "3-second empty cleanup, and shared 100-unit leash; active nano refresh unresolved and omitted",
+                + "20260717-214751 exact 186-credit item-plus-credit corpse snapshot; "
+                + "20260717-220340-associated Mike observation (not packet-timestamp encoded): official-live exact 10-minute respawn and Temporary 30m loot-bearing corpse; "
+                + "confirmed 3-second empty cleanup and shared 100-unit leash; active nano refresh unresolved and omitted",
                 npcFamily: 148,
                 npcLosHeight: 0,
                 fatness: 1,

@@ -156,8 +156,9 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayEumenidesWeaponQuality = 20;
 
-        // The two observed 39/45 hits are evidence, not a captured weapon roll
-        // envelope. Damage and recharge remain owned by the equipped item.
+        // Twenty-one observed local-player hits span 25..45 with a 4.311321s
+        // median interval. They remain evidence, not hard-coded weapon rolls;
+        // damage and recharge stay owned by the equipped item.
         public const int CapturedSubwayEumenidesWeaponDamageMinimumOverride = 0;
 
         public const int CapturedSubwayEumenidesWeaponDamageMaximumOverride = 0;
