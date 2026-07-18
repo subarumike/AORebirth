@@ -605,6 +605,60 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void FilthFleaReviewedCombatEvidenceAddsOnlyRequested205921Source()
+        {
+            string root = FindRepositoryRoot();
+            string analyzer = File.ReadAllText(
+                    Path.Combine(root, @"tools-temp\AOSharpCaptureAnalyzer\analyze_subway_enemy_combat_contracts.py"))
+                .Replace("\r\n", "\n");
+            string generated = File.ReadAllText(
+                    Path.Combine(root, @"docs\generated\subway_enemy_combat_contracts.json"))
+                .Replace("\r\n", "\n");
+            int fleaStart = generated.IndexOf("\"Filth Flea\": {", StringComparison.Ordinal);
+            Assert.IsTrue(fleaStart >= 0, "The generated Filth Flea combat contract must exist.");
+            int nextContract = generated.IndexOf("\n  \"", fleaStart + 20, StringComparison.Ordinal);
+            string flea = nextContract < 0
+                ? generated.Substring(fleaStart)
+                : generated.Substring(fleaStart, nextContract - fleaStart);
+            int criticalShapesStart = flea.IndexOf("\"criticalAttackShapes\": [", StringComparison.Ordinal);
+            Assert.IsTrue(criticalShapesStart >= 0, "Filth Flea critical attack shapes must remain separate.");
+            string normalShapes = flea.Substring(0, criticalShapesStart);
+            string criticalShapes = flea.Substring(criticalShapesStart);
+
+            Assert.IsTrue(
+                analyzer.Contains("\"Filth Flea\": frozenset({\"20260708-004038\", \"20260709-193914\"})")
+                && analyzer.Contains("(\"Filth Flea\", \"20260709-205921\"): frozenset(")
+                && analyzer.Contains("{\"(SimpleChar:79531748)\"}")
+                && analyzer.Contains("or source in reviewed_attack_sources")
+                && analyzer.Contains("row.get(\"TargetRole\") != \"local-player\""),
+                "Capture 205921 must admit only reviewed Flea source 79531748 while retaining the local-player boundary and focused capture filter.");
+            Assert.IsTrue(
+                flea.Contains("\"20260709-205921\"")
+                && flea.Contains("\"attackInfoRows\": 46")
+                && flea.Contains("\"normalAttackInfoRows\": 43")
+                && flea.Contains("\"normalMinDamage\": 3")
+                && flea.Contains("\"normalMaxDamage\": 24")
+                && flea.Contains("\"criticalAttackInfoRows\": 3")
+                && flea.Contains("\"criticalMinDamage\": 7")
+                && flea.Contains("\"criticalMaxDamage\": 47"),
+                "The reviewed source must add exactly one normal 15 and one critical 7 local-player outcome.");
+            Assert.IsTrue(
+                normalShapes.Contains(
+                    "\"weaponSlot\": 1,\n"
+                    + "        \"attackInfoUnknown\": 0,\n"
+                    + "        \"weaponInstance\": 1162887496,\n"
+                    + "        \"rows\": 10")
+                && criticalShapes.Contains(
+                    "\"weaponSlot\": 0,\n"
+                    + "        \"attackInfoUnknown\": 0,\n"
+                    + "        \"weaponInstance\": 1096439123,\n"
+                    + "        \"rows\": 2")
+                && criticalShapes.Contains("\"minDamage\": 7")
+                && criticalShapes.Contains("\"maxDamage\": 13"),
+                "The added outcomes must stay in their exact normal slot-1 and critical slot-0 attack shapes.");
+        }
+
+        [TestMethod]
         public void VergilFollowupCombatEvidenceSeparatesLocalPlayerAndKillerPet()
         {
             string root = FindRepositoryRoot();
@@ -665,10 +719,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ? generated.Substring(abmouthStart)
                 : generated.Substring(abmouthStart, nextContract - abmouthStart);
             int petStart = abmouth.IndexOf("\"playerOwnedPet\": {", StringComparison.Ordinal);
+            int targetRoleStart = analyzer.IndexOf(
+                "TARGET_ROLE_EVIDENCE_ENEMIES = frozenset(",
+                StringComparison.Ordinal);
+            int targetRoleEnd = analyzer.IndexOf(
+                "PLAYER_OWNED_PET_TARGETS =",
+                targetRoleStart,
+                StringComparison.Ordinal);
+            string targetRoleSet = targetRoleStart >= 0 && targetRoleEnd > targetRoleStart
+                ? analyzer.Substring(targetRoleStart, targetRoleEnd - targetRoleStart)
+                : string.Empty;
 
             Assert.IsTrue(
                 analyzer.Contains("\"20260716-220400\": frozenset({\"Abmouth Supremus\"})")
-                && analyzer.Contains("{\"Abmouth Supremus\", \"Melded Patterns\", \"Vergil Aeneid\"}")
+                && targetRoleSet.Contains("\"Abmouth Supremus\"")
                 && analyzer.Contains("\"(SimpleChar:7970253A)\", \"(SimpleChar:7970253C)\""),
                 "Capture 220400 must stay Abmouth-only and classify Healer plus Wrath Incarnation as player-owned pets.");
             Assert.IsTrue(

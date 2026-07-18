@@ -218,10 +218,11 @@ empty snapshots, when calculating observed item frequencies. It does not infer
 guaranteed loot from a successful roll. The catalog now contains 321 represented
 rows, 283 active rows, and 38 quarantined rows.
 
-Slum Runner now has 19 identity-linked corpse generations: seven focused
-records from `20260716-034656` and `20260716-215947`, plus twelve recovered
+Slum Runner now has 21 identity-linked corpse generations: seven focused
+records from `20260716-034656` and `20260716-215947`, plus fourteen recovered
 deep-corpus records. They use CATMesh `31774`; exact credit rules cover observed
-levels 11, 12, 16, 17, 18, 21, 22, and 23 while other levels remain unresolved.
+levels 11, 12, 15, 16, 17, 18, 20, 21, 22, and 23. Every active Slum Runner
+level now has an exact rule, while other levels remain unresolved.
 Its 24 exact spawns, captured `5..11` normal damage and `4.210098`-second
 cadence, shared chase, strict loot sample, ordinary corpse lifetimes, and
 `59.433`-second observed death-to-respawn interval now pass the whole-enemy
@@ -259,8 +260,8 @@ apply. Two Bot rows remain in the existing operational quarantine; acceptance
 does not activate them. Proactive aggro radius and leash/reset distance remain
 unresolved.
 
-Workman Striker is not yet an accepted profile, but its existing corpus is now
-materially stronger. Declared overlap rules reduce simultaneous capture
+Workman Striker is the tenth accepted ordinary profile. Declared overlap rules
+reduce simultaneous capture
 projections to 47 distinct normal local-player hits at `14..23`, six criticals
 at `36..42`, and a `5.092328`-second median attack interval; two Killer-pet hits
 stay in a separate target-role bucket. Twenty-one active exact spawns cover
@@ -272,8 +273,12 @@ with wider pool completeness unresolved. Every active source now resolves its
 exact owner-linked captured low/high/QL weapon tuple; unknown, missing,
 conflicting, or aggregate resolution fails closed. Those equipped items own
 normal damage and recharge without a fixed-damage or captured-AttackInfo
-override. A non-invented shared weapon-critical formula remains required before
-whole-enemy acceptance.
+override. The six observed critical outcomes remain report-only, matching the
+explicit critical-parity gap already allowed for other accepted ordinary
+profiles; no shared weapon-critical formula is invented. Whole-enemy coverage
+now guards all 21 exact source weapons and spawns, fail-closed aggregate/unknown
+selection, shared chase, strict incomplete-pool loot, CATMesh/credits, private
+four-minute respawn, and ordinary corpse lifetimes together.
 
 Melded Patterns no longer uses a fixed post-mitigation attack range as its
 runtime damage source. Focused capture `20260716-034559` proves the QL20
@@ -281,8 +286,7 @@ Irreparable Sleekblaster Minor `121817/121818`; the ordinary combat profile now
 equips that item and lets its stats own damage and recharge. The exact-evidence
 gate fails closed if the focused capture or seven normal `21..34` hit boundary
 drifts. No special-attack context or critical behavior is inferred, and the
-profile remains outside the accepted gate pending a fresh whole-enemy coverage
-audit.
+profile is accepted by the whole-enemy gate with those exclusions preserved.
 
 Legacy first-open evidence now supplies strict item denominators for four more
 ordinary profiles through one reusable raw-generation validator. Shadow uses
@@ -294,6 +298,18 @@ projections from `20260709-212115/212336` count once; unopened and snapshot-only
 corpses remain excluded. All four profiles use `IndependentEntries`, preserve
 their observed empty counts, and keep `ItemPoolComplete=false`; the replay
 weights are private observed-sample policy rather than official drop odds.
+
+Shadow, ordinary Infector, Architect Striker, and Melded Patterns are the sixth
+through ninth accepted ordinary profiles. Their gate coverage binds exact
+spawns, appearance, captured normal combat, shared chase, strict incomplete-pool
+loot, corpse visuals/credits, the private 240-second post-despawn ordinary
+respawn policy, and shared three-second empty/four-minute loot-bearing corpse
+lifetimes. Shadow's two, Infector's three, and Architect Striker's one observed
+critical outcomes remain report-only. Ordinary Infector's generated `16..36`
+fixed contract stays isolated from the Abmouth-owned specialized Infector path.
+Architect Striker retains its captured fixed contract without an invented
+weapon. Melded Patterns retains its exact QL20 `121817/121818` weapon-owned
+damage/recharge path without invented special-attack or critical context.
 
 ## Ordinary respawn policy
 

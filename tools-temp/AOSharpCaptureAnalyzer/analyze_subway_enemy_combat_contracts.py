@@ -54,6 +54,13 @@ CAPTURE_ENEMY_FILTERS = {
 ENEMY_ATTACK_CAPTURE_FILTERS = {
     "Filth Flea": frozenset({"20260708-004038", "20260709-193914"}),
 }
+# Admit only the reviewed source from a broader capture whose other combat
+# rows are outside the focused enemy evidence boundary.
+REVIEWED_ATTACK_INFO_SOURCES = {
+    ("Filth Flea", "20260709-205921"): frozenset(
+        {"(SimpleChar:79531748)"}
+    ),
+}
 # Keep local-player, player-owned-pet, and other-player targets separate.  Only
 # local-player hits feed the player-facing aggregate used by runtime reviews.
 TARGET_ROLE_EVIDENCE_ENEMIES = frozenset(
@@ -632,12 +639,16 @@ def main():
             group["identities"].add(source)
             group["captures"].add(capture_name)
             group["monsterData"].add(enemy["monsterData"])
+            reviewed_attack_sources = REVIEWED_ATTACK_INFO_SOURCES.get(
+                (enemy["name"], capture_name), frozenset()
+            )
             attack_info_allowed = (
                 message_type != "AttackInfo"
                 or capture_name
                 in ENEMY_ATTACK_CAPTURE_FILTERS.get(
                     enemy["name"], frozenset({capture_name})
                 )
+                or source in reviewed_attack_sources
             )
             evidence_role = ""
             role_evidence = None

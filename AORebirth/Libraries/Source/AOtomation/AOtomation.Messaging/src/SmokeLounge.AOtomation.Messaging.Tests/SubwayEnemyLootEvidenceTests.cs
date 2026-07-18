@@ -233,7 +233,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .SelectMany(value => provider.GetCorpseEvidence(value))
                 .ToArray();
 
-            Assert.AreEqual(282, evidence.Length);
+            Assert.AreEqual(298, evidence.Length);
             Assert.AreEqual(26, evidence.Select(value => value.MonsterData).Distinct().Count());
             CollectionAssert.AreEqual(
                 new[]
@@ -241,16 +241,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         "20260709-220439:41",
                         "20260709-222339:15",
                         "20260709-225408:61",
+                        "20260710-211430:6",
                         "20260712-223719:13",
-                        "20260716-222007:3"
+                        "20260712-232137:5",
+                        "20260716-034104:1",
+                        "20260716-221358:2",
+                        "20260716-222007:3",
+                        "20260716-222201:2"
                     },
                 evidence
                     .Where(
                         value => value.Capture == "20260709-220439"
                                  || value.Capture == "20260709-222339"
                                  || value.Capture == "20260709-225408"
+                                 || value.Capture == "20260710-211430"
                                  || value.Capture == "20260712-223719"
-                                 || value.Capture == "20260716-222007")
+                                 || value.Capture == "20260712-232137"
+                                 || value.Capture == "20260716-034104"
+                                 || value.Capture == "20260716-221358"
+                                 || value.Capture == "20260716-222007"
+                                 || value.Capture == "20260716-222201")
                     .GroupBy(value => value.Capture)
                     .OrderBy(value => value.Key, StringComparer.Ordinal)
                     .Select(value => value.Key + ":" + value.Count())
@@ -268,6 +278,55 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(30379, bloodcreeper.MonsterData);
             Assert.AreEqual(26978, bloodcreeper.CatMesh);
             Assert.AreEqual(150, bloodcreeper.Credits);
+        }
+
+        [TestMethod]
+        public void RecoveredLevelCreditRowsKeepSixteenExactDeathCorpseLinks()
+        {
+            var provider = new CapturedSubwayOrdinaryContentProvider();
+            int[] monsterData = { 31909, 203746, 203730, 203727, 204178, 55648, 96195 };
+            string[] captures =
+                {
+                    "20260710-211430",
+                    "20260712-232137",
+                    "20260716-034104",
+                    "20260716-221358",
+                    "20260716-222201"
+                };
+            string[] actual = monsterData
+                .SelectMany(value => provider.GetCorpseEvidence(value))
+                .Where(value => captures.Contains(value.Capture))
+                .Select(
+                    value => string.Format(
+                        "{0}|{1}|{2}|{3}|{4}",
+                        value.Capture,
+                        value.DeadNpcIdentity,
+                        value.CorpseIdentity,
+                        value.EnemyLevel,
+                        value.Credits))
+                .ToArray();
+
+            CollectionAssert.AreEquivalent(
+                new[]
+                    {
+                        "20260710-211430|(SimpleChar:7957E62C)|(Corpse:00F6C010)|15|92",
+                        "20260710-211430|(SimpleChar:7957E630)|(Corpse:00F6C00E)|12|15",
+                        "20260710-211430|(SimpleChar:7957E648)|(Corpse:00F6C003)|18|111",
+                        "20260710-211430|(SimpleChar:7957E653)|(Corpse:00F6C005)|21|26",
+                        "20260710-211430|(SimpleChar:7957E656)|(Corpse:00F6C007)|16|98",
+                        "20260710-211430|(SimpleChar:7957E65A)|(Corpse:00F6C019)|17|105",
+                        "20260712-232137|(SimpleChar:79607AC5)|(Corpse:00F6C005)|24|150",
+                        "20260712-232137|(SimpleChar:79607AC6)|(Corpse:00F6C008)|24|150",
+                        "20260712-232137|(SimpleChar:79607AD0)|(Corpse:00F6C00A)|24|150",
+                        "20260712-232137|(SimpleChar:79607AD1)|(Corpse:00F6C00D)|24|150",
+                        "20260712-232137|(SimpleChar:79607AD2)|(Corpse:00F6C00B)|24|150",
+                        "20260716-034104|(SimpleChar:796CD74A)|(Corpse:00F69001)|25|156",
+                        "20260716-221358|(SimpleChar:79702517)|(Corpse:00F69007)|25|156",
+                        "20260716-221358|(SimpleChar:7970251A)|(Corpse:00F69020)|25|156",
+                        "20260716-222201|(SimpleChar:797024DA)|(Corpse:00F6901A)|20|124",
+                        "20260716-222201|(SimpleChar:7970250F)|(Corpse:00F69009)|22|137"
+                    },
+                actual);
         }
 
         [TestMethod]
@@ -504,18 +563,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void SlumRunnerPreservesNineteenDeathLinkedCorpseVisualAndLevelCreditOutcomes()
+        public void SlumRunnerPreservesTwentyOneDeathLinkedCorpseVisualAndLevelCreditOutcomes()
         {
             CapturedSubwayOrdinaryArchetypeDefinition source =
                 new CapturedSubwayOrdinaryContentProvider()
                     .GetArchetypes()
                     .Single(value => value.Name == "Slum Runner");
-            Assert.AreEqual(19, source.CorpseEvidence.Length);
+            Assert.AreEqual(21, source.CorpseEvidence.Length);
             Assert.AreEqual(4, source.CorpseEvidence.Count(value => value.Capture == "20260709-220439"));
             Assert.AreEqual(2, source.CorpseEvidence.Count(value => value.Capture == "20260709-222339"));
             Assert.AreEqual(6, source.CorpseEvidence.Count(value => value.Capture == "20260709-225408"));
+            Assert.AreEqual(1, source.CorpseEvidence.Count(value => value.Capture == "20260710-211430"));
             Assert.AreEqual(6, source.CorpseEvidence.Count(value => value.Capture == "20260716-034656"));
             Assert.AreEqual(1, source.CorpseEvidence.Count(value => value.Capture == "20260716-215947"));
+            Assert.AreEqual(1, source.CorpseEvidence.Count(value => value.Capture == "20260716-222201"));
             Assert.IsTrue(source.CorpseEvidence.All(value => value.MonsterData == 55648));
             Assert.IsTrue(source.CorpseEvidence.All(value => value.CatMesh == 31774));
             string[] identityLinks = source.CorpseEvidence
@@ -530,7 +591,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         "(SimpleChar:796D4083)>(Corpse:00F69009)",
                         "(SimpleChar:796D407A)>(Corpse:00F6900A)",
                         "(SimpleChar:796D407C)>(Corpse:00F6900B)",
-                        "(SimpleChar:797024AE)>(Corpse:00F69002)"
+                        "(SimpleChar:797024AE)>(Corpse:00F69002)",
+                        "(SimpleChar:7957E62C)>(Corpse:00F6C010)",
+                        "(SimpleChar:797024DA)>(Corpse:00F6901A)"
                     }
                     .All(identityLinks.Contains));
 
@@ -544,9 +607,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     {
                         "11:66:1",
                         "12:72:3",
+                        "15:92:1",
                         "16:98:4",
                         "17:105:3",
                         "18:111:1",
+                        "20:124:1",
                         "21:131:2",
                         "22:137:2",
                         "23:144:3"
@@ -637,7 +702,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 31868,
                 "16:98:98:2",
                 "17:105:105:2",
+                "18:111:111:1",
                 "19:118:118:3",
+                "24:150:150:5",
                 "25:156:156:2");
             AssertCorpseAndLevelCredits(
                 "Looter",
@@ -667,7 +734,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "21:131:131:1",
                 "22:137:137:1",
                 "23:144:144:1",
-                "24:150:150:1");
+                "24:150:150:1",
+                "25:156:156:1");
             AssertCorpseAndLevelCredits(
                 "Mugger",
                 17534,
@@ -678,12 +746,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCorpseAndLevelCredits(
                 "Neural Burnout",
                 5941,
+                "16:98:98:1",
                 "17:105:105:1",
                 "18:111:111:2",
-                "23:144:144:1");
+                "23:144:144:1",
+                "25:156:156:2");
             AssertCorpseAndLevelCredits(
                 "Premature Pattern",
                 5941,
+                "17:105:105:1",
                 "18:111:111:1",
                 "23:144:144:2");
             AssertCorpseAndLevelCredits(
@@ -691,7 +762,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 23370,
                 "19:118:118:1",
                 "20:124:124:1",
-                "21:131:131:1");
+                "21:131:131:1",
+                "22:137:137:1");
             AssertCorpseAndLevelCredits(
                 "Shadow",
                 30434,
@@ -716,8 +788,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Uncontrollable Anger",
                 96177,
                 "11:14:14:1",
+                "12:15:15:1",
                 "13:16:16:2",
-                "20:25:25:1");
+                "20:25:25:1",
+                "21:26:26:1");
             AssertCorpseAndLevelCredits(
                 "Violent Vagabond",
                 17870,
