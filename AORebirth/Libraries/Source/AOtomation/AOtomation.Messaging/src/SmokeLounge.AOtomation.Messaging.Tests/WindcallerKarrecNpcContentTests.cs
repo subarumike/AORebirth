@@ -102,7 +102,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void ActiveCapturedPatrolDestinationReplacesInitialScfuWaypointsOnlyAfterMovementStarts()
+        public void ActiveCapturedPatrolProjectionEmitsCurrentPositionAndDestinationAfterMovementStarts()
         {
             WindcallerKarrecNpcDefinition maddy = WindcallerKarrecNpcContent.MaddyCardile;
             WindcallerKarrecNpcPatrolSegment activeSegment = maddy.PatrolSegments[0];
@@ -126,6 +126,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             WindcallerKarrecNpcWaypointDefinition[] beforeMovement =
                 maddy.ResolveScfuWaypoints(
                     false,
+                    projectedX,
+                    projectedY,
+                    projectedZ,
                     activeSegment.EndX,
                     activeSegment.EndY,
                     activeSegment.EndZ);
@@ -151,18 +154,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             WindcallerKarrecNpcWaypointDefinition[] whileMoving =
                 maddy.ResolveScfuWaypoints(
                     true,
+                    projectedX,
+                    projectedY,
+                    projectedZ,
                     activeSegment.EndX,
                     activeSegment.EndY,
                     activeSegment.EndZ);
-            Assert.AreEqual(1, whileMoving.Length);
-            Assert.AreEqual(activeSegment.EndX, whileMoving[0].X);
-            Assert.AreEqual(activeSegment.EndY, whileMoving[0].Y);
-            Assert.AreEqual(activeSegment.EndZ, whileMoving[0].Z);
+            Assert.AreEqual(2, whileMoving.Length);
+            Assert.AreEqual(projectedX, whileMoving[0].X);
+            Assert.AreEqual(projectedY, whileMoving[0].Y);
+            Assert.AreEqual(projectedZ, whileMoving[0].Z);
+            Assert.AreEqual(activeSegment.EndX, whileMoving[1].X);
+            Assert.AreEqual(activeSegment.EndY, whileMoving[1].Y);
+            Assert.AreEqual(activeSegment.EndZ, whileMoving[1].Z);
 
             Assert.AreEqual(
                 0,
                 WindcallerKarrecNpcContent.Karrec.ResolveScfuWaypoints(
                     true,
+                    projectedX,
+                    projectedY,
+                    projectedZ,
                     activeSegment.EndX,
                     activeSegment.EndY,
                     activeSegment.EndZ).Length);

@@ -464,6 +464,9 @@ namespace ZoneEngine.Core.Subway.Quests
 
         internal WindcallerKarrecNpcWaypointDefinition[] ResolveScfuWaypoints(
             bool hasActivePatrolDestination,
+            float currentX,
+            float currentY,
+            float currentZ,
             float destinationX,
             float destinationY,
             float destinationZ)
@@ -472,6 +475,10 @@ namespace ZoneEngine.Core.Subway.Quests
             {
                 return new[]
                        {
+                           new WindcallerKarrecNpcWaypointDefinition(
+                               currentX,
+                               currentY,
+                               currentZ),
                            new WindcallerKarrecNpcWaypointDefinition(
                                destinationX,
                                destinationY,

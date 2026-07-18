@@ -711,6 +711,9 @@ namespace ZoneEngine.Core.Packets
                 scfu.Waypoints =
                     definition.ResolveScfuWaypoints(
                         hasActivePatrolDestination,
+                        activePatrolCurrentPosition.xf,
+                        activePatrolCurrentPosition.yf,
+                        activePatrolCurrentPosition.zf,
                         activePatrolDestination.xf,
                         activePatrolDestination.yf,
                         activePatrolDestination.zf).Select(
