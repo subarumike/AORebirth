@@ -74,6 +74,10 @@ class SubwayVisibilityDiagnosticTests(unittest.TestCase):
                 self.assertEqual(0, diagnostic.prepare(args))
                 session = json.loads((root / "pf127-test" / "session.json").read_text())
                 self.assertEqual([], session["selected_identities"])
+                self.assertEqual(
+                    str(root / "pf127-test" / "population-activation-ledger.csv"),
+                    session["population_activation_ledger"],
+                )
                 active = (root / "active-session.cfg").read_text()
                 self.assertIn("selected_source_instances=\n", active)
                 record_args = argparse.Namespace(
@@ -124,6 +128,118 @@ class SubwayVisibilityDiagnosticTests(unittest.TestCase):
                 json.dumps(summary) + "\n", encoding="utf-8-sig"
             )
             self.assertEqual(summary, diagnostic.load_last_summary(target))
+
+    def test_population_activation_loader_rejects_materialized_before_eligible(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            (target / "population-activation-ledger.csv").write_text(
+                "TimestampUtc,SessionId,Slice,ProcessId,Phase,SourceInstanceHex,"
+                "RuntimeInstance,ManifestOrdinal,Name,Family,Detail\n"
+                "2026-07-17T00:00:00Z,pf127-test,IDENTITY_LIST,1234,"
+                "MATERIALIZED,79557C09,50001,1,Mugger,Mugger,registered\n",
+                encoding="utf-8",
+            )
+            result = diagnostic.load_population_activation_ledger(target)
+
+        self.assertEqual(1, len(result["rows"]))
+        self.assertIn(
+            "79557C09:1234:first-phase-not-eligible", result["errors"]
+        )
+
+    def test_analyzer_reports_selected_population_materialization_failure(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / "failed-materialization"
+            target.mkdir(parents=True)
+            (target / "session.json").write_text(
+                json.dumps(
+                    {
+                        "session_id": "failed-materialization",
+                        "slice": "IDENTITY_LIST",
+                        "selected_identities": ["SimpleChar:79557C09"],
+                    }
+                )
+            )
+            (target / "population-activation-ledger.csv").write_text(
+                "TimestampUtc,SessionId,Slice,ProcessId,Phase,SourceInstanceHex,"
+                "RuntimeInstance,ManifestOrdinal,Name,Family,Detail\n"
+                "2026-07-17T00:00:00Z,failed-materialization,IDENTITY_LIST,1234,"
+                "ELIGIBLE,79557C09,,1,Mugger,Mugger,selected\n"
+                "2026-07-17T00:00:01Z,failed-materialization,IDENTITY_LIST,1234,"
+                "FAILED,79557C09,,1,Mugger,Mugger,profile lookup failed\n",
+                encoding="utf-8",
+            )
+            with mock.patch.object(diagnostic, "local_root", return_value=root):
+                diagnostic.analyze(
+                    argparse.Namespace(session_id="failed-materialization")
+                )
+            report = json.loads((target / "analysis.json").read_text())
+
+        self.assertIn("POPULATION_MATERIALIZATION_FAILED", report["findings"])
+        self.assertEqual(2, len(report["population_activation"]["rows"]))
+        self.assertEqual([], report["population_activation"]["errors"])
+
+    def test_analyzer_keeps_activation_attempts_separate_by_process(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / "multi-process"
+            target.mkdir(parents=True)
+            (target / "session.json").write_text(
+                json.dumps(
+                    {
+                        "session_id": "multi-process",
+                        "slice": "IDENTITY_LIST",
+                        "selected_identities": ["SimpleChar:79557C09"],
+                    }
+                )
+            )
+            (target / "population-activation-ledger.csv").write_text(
+                "TimestampUtc,SessionId,Slice,ProcessId,Phase,SourceInstanceHex,"
+                "RuntimeInstance,ManifestOrdinal,Name,Family,Detail\n"
+                "2026-07-17T00:00:00Z,multi-process,IDENTITY_LIST,1001,"
+                "ELIGIBLE,79557C09,,1,Mugger,Mugger,selected\n"
+                "2026-07-17T00:01:00Z,multi-process,IDENTITY_LIST,1002,"
+                "ELIGIBLE,79557C09,,1,Mugger,Mugger,selected\n"
+                "2026-07-17T00:01:01Z,multi-process,IDENTITY_LIST,1002,"
+                "MATERIALIZED,79557C09,50001,1,Mugger,Mugger,registered\n",
+                encoding="utf-8",
+            )
+            with mock.patch.object(diagnostic, "local_root", return_value=root):
+                diagnostic.analyze(argparse.Namespace(session_id="multi-process"))
+            report = json.loads((target / "analysis.json").read_text())
+
+        self.assertIn("ELIGIBLE_ROWS_NOT_MATERIALIZED", report["findings"])
+
+    def test_runtime_records_bounded_selected_population_activation_phases(self):
+        root = MODULE_PATH.parents[1]
+        selection = (
+            root
+            / "AORebirth"
+            / "Server"
+            / "ZoneEngine"
+            / "Core"
+            / "Playfields"
+            / "SubwayVisibilityDiagnosticSelection.cs"
+        ).read_text()
+        runtime = (
+            root
+            / "AORebirth"
+            / "Server"
+            / "ZoneEngine"
+            / "Core"
+            / "Playfields"
+            / "OrdinaryEnemyRuntimeService.cs"
+        ).read_text()
+        self.assertIn('"ELIGIBLE"', selection)
+        self.assertIn('"MATERIALIZED"', selection)
+        self.assertIn('"FAILED"', selection)
+        self.assertIn("PopulationEventKeys.Add(eventKey)", selection)
+        self.assertIn("PopulationLedgerSync", selection)
+        self.assertIn("ProcessId", selection)
+        self.assertIn('"population-activation-ledger.csv"', selection)
+        self.assertIn(
+            "SubwayVisibilityDiagnosticSelection.RecordPopulationFailure(", runtime
+        )
 
 
 if __name__ == "__main__":

@@ -184,7 +184,7 @@ definition. Catalog data configures `L15..L25`, rerolled once per new population
 generation through the same selector used by every ordinary row. Captured
 `L24/691 HP/run 83` and `L25/724 HP/run 86` anchor the existing private derived
 progression. The level 15-23 values remain documented policy, not capture claims.
-All other 259 rows remain explicit fixed-level definitions until evidence or an
+All other 320 rows remain explicit fixed-level definitions until evidence or an
 approved design decision establishes a range; the shared mechanism does not
 guess one.
 
@@ -218,12 +218,15 @@ empty snapshots, when calculating observed item frequencies. It does not infer
 guaranteed loot from a successful roll. The catalog now contains 321 represented
 rows, 283 active rows, and 38 quarantined rows.
 
-Finalized Slum Runner capture `20260716-034656` contributes six exact corpse
-generations. All six use CATMesh `31774`; their atomic credit observations are
-`144/144/144/131/137/131`. The profile retains those duplicate observations as
-capture evidence, while the loot system labels their runtime replay explicitly
-as `ObservedSamples` rather than changing the unique-value `ObservedSet`
-contract. Item loot and credit-to-level correlation remain unresolved.
+Slum Runner now has 19 identity-linked corpse generations: seven focused
+records from `20260716-034656` and `20260716-215947`, plus twelve recovered
+deep-corpus records. They use CATMesh `31774`; exact credit rules cover observed
+levels 11, 12, 16, 17, 18, 21, 22, and 23 while other levels remain unresolved.
+Its 24 exact spawns, captured `5..11` normal damage and `4.210098`-second
+cadence, shared chase, strict loot sample, ordinary corpse lifetimes, and
+`59.433`-second observed death-to-respawn interval now pass the whole-enemy
+acceptance gate. Loot replay remains `ObservedSamples`; no official item
+probability distribution is claimed.
 
 ## Ordinary respawn policy
 
@@ -238,11 +241,11 @@ Resolution precedence is:
 3. the shared 240-second ordinary default for `OrdinaryEnemy` classifications;
 4. explicit no-respawn or unresolved/fail-closed behavior.
 
-Current explicit exceptions remain Thief at 60 seconds, Filth Flea at 240
-seconds, and Bloodcreeper at 240 seconds. The catalog contains 53 explicit
-spawn rows (the captured Thief row, the captured Filth Flea rows, and the
-Bloodcreeper row); the other 207 represented ordinary rows inherit the default
-without changing whether they are active or quarantined. Named enemies, bosses, scripted
+Current explicit exceptions are Thief at 60 seconds, Filth Flea at 240 seconds,
+Bloodcreeper at 240 seconds, and all 24 Slum Runner rows at 60 seconds. The
+catalog contains 77 explicit spawn rows; the other 244 represented ordinary
+rows inherit the default without changing whether they are active or
+quarantined. Named enemies, bosses, scripted
 encounters, summons, pets, temporary encounter adds, vendors, static objects,
 containers, and quest-owned entities cannot inherit the ordinary default.
 Their existing owners and encounter-specific policies remain separate.

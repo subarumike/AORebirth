@@ -457,6 +457,28 @@ namespace AORebirth.Core.Playfields
                             Confidence = "POLICY",
                             Enabled = true
                         })));
+            result.Add(
+                "slum_runner",
+                new OrdinaryEnemySpawnPolicyConfiguration(
+                    null,
+                    WorldRespawnPolicyAssignment.Explicit(
+                        new RespawnPolicyDefinition
+                        {
+                            RespawnPolicyKey = "ordinary.slum-runner.60",
+                            Mode = WorldRespawnMode.FixedDelay,
+                            FixedDelaySeconds = 60.0,
+                            RespawnAtOriginalPosition = true,
+                            ResetHealth = true,
+                            ResetMovementState = true,
+                            ResetAggressionState = true,
+                            DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
+                            Evidence = "official-live:20260716-215947;"
+                                + "enemy-respawns.csv;"
+                                + "death-to-respawn=59.433;"
+                                + "corpse-remained-present",
+                            Confidence = "CAPTURE_BOUNDED",
+                            Enabled = true
+                        })));
             return result;
         }
 

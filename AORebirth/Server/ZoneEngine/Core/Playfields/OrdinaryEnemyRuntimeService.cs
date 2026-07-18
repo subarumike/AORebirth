@@ -75,34 +75,64 @@ namespace AORebirth.Core.Playfields
         {
             runtimeIdentity = Identity.None;
             selectedGeneration = null;
-            if (spawn == null || this.activeRuntimeIdentityBySource.ContainsKey(spawn.SourceIdentity))
+            if (spawn == null)
+            {
+                return false;
+            }
+
+            if (this.activeRuntimeIdentityBySource.ContainsKey(spawn.SourceIdentity))
             {
                 return false;
             }
 
             OrdinaryEnemyProfile profile;
-            if (!this.catalog.TryGetProfile(spawn.ProfileKey, out profile)) return false;
-            OrdinaryEnemyLevelSelectionState selectionState;
-            if (!this.levelSelectionBySource.TryGetValue(spawn.SourceIdentity, out selectionState))
+            if (!this.catalog.TryGetProfile(spawn.ProfileKey, out profile))
             {
-                selectionState = new OrdinaryEnemyLevelSelectionState();
-                this.levelSelectionBySource.Add(spawn.SourceIdentity, selectionState);
+                SubwayVisibilityDiagnosticSelection.RecordPopulationFailure(
+                    spawn.SourceIdentity,
+                    "profile lookup failed");
+                return false;
+            }
+            bool spawned;
+            OrdinaryEnemySpawnGeneration spawnGeneration;
+            try
+            {
+                OrdinaryEnemyLevelSelectionState selectionState;
+                if (!this.levelSelectionBySource.TryGetValue(spawn.SourceIdentity, out selectionState))
+                {
+                    selectionState = new OrdinaryEnemyLevelSelectionState();
+                    this.levelSelectionBySource.Add(spawn.SourceIdentity, selectionState);
+                }
+
+                spawnGeneration = selectionState.ResolveForGeneration(
+                    spawn.LevelDefinition,
+                    generation,
+                    this.levelSelector);
+                spawned = this.Spawn(
+                    playfield,
+                    playfieldIdentity,
+                    spawn,
+                    profile,
+                    spawnGeneration,
+                    out runtimeIdentity);
+            }
+            catch (Exception exception)
+            {
+                SubwayVisibilityDiagnosticSelection.RecordPopulationFailure(
+                    spawn.SourceIdentity,
+                    "materialization exception: " + exception.GetType().Name);
+                throw;
             }
 
-            OrdinaryEnemySpawnGeneration spawnGeneration = selectionState.ResolveForGeneration(
-                spawn.LevelDefinition,
-                generation,
-                this.levelSelector);
-            bool spawned = this.Spawn(
-                playfield,
-                playfieldIdentity,
-                spawn,
-                profile,
-                spawnGeneration,
-                out runtimeIdentity);
             if (spawned)
             {
                 selectedGeneration = spawnGeneration;
+            }
+            else
+            {
+                SubwayVisibilityDiagnosticSelection.RecordPopulationFailure(
+                    spawn.SourceIdentity,
+                    "runtime materialization returned false");
             }
 
             return spawned;

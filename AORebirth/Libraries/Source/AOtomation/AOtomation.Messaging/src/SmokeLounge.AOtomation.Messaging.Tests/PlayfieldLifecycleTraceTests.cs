@@ -2396,6 +2396,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string repositoryRoot = FindRepositoryRoot();
             string providerText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+            string ordinaryProviderText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
             string catalogText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
             string combatContractText = File.ReadAllText(
@@ -2422,11 +2424,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string[] acceptedEnemyKeys =
                 {
                     "Thief|26092|138",
-                    "Filth Flea|17657|138"
+                    "Filth Flea|17657|138",
+                    "Slum Runner|55648|151"
                 };
 
             Assert.AreEqual(
-                2,
+                3,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
 
@@ -2450,6 +2453,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && catalogText.Contains("preserveFilthFleaFallback ? 23 : (int?)null")
                 && catalogText.Contains("preserveFilthFleaFallback ? 79 : (int?)null"),
                 "Accepted Subway Filth Flea must keep spawn, movement/chase, combat, appearance, corpse visual, loot, credits, and four-minute respawn coverage together.");
+
+            Assert.IsTrue(
+                ordinaryProviderText.Contains("\"slum_runner\"")
+                && ordinaryProviderText.Contains("\"Slum Runner\"")
+                && ordinaryProviderText.Contains("55648")
+                && ordinaryProviderText.Contains("new CapturedSubwayCombatEvidenceDefinition(")
+                && ordinaryProviderText.Contains("4.210098")
+                && ordinaryProviderText.Contains("31774")
+                && ordinaryProviderText.Contains("20260716-222201")
+                && catalogText.Contains("\"ordinary.slum-runner.60\"")
+                && catalogText.Contains("death-to-respawn=59.433")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted Subway Slum Runner must keep its 24 exact spawns, captured attack cadence, shared chase, strict loot sample, CATMesh/credits, observed one-minute respawn, and ordinary corpse lifetimes together.");
 
             Assert.IsTrue(
                 providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 146, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0, healthDamage: 31))")
