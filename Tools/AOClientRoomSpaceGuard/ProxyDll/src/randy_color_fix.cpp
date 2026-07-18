@@ -21,7 +21,9 @@ namespace
     uintptr_t DwordColorFaultAddress = 0;
     uintptr_t DwordColorResumeAddress = 0;
     uintptr_t GuiRenderBatchAddress = 0;
+    uintptr_t GuiConvertToScreenRectAddReturnAddress = 0;
     uintptr_t GuiNullDynamicVbFaultAddress = 0;
+    uintptr_t UtilsRectAddNullFaultAddress = 0;
     uintptr_t GuiDynamicVbGetAddress = 0;
     uintptr_t GuiDynamicVbGetVbAddress = 0;
     uintptr_t GuiResetMaterialAddress = 0;
@@ -37,6 +39,7 @@ namespace
     LONG DriverDrawInputSkipCount = 0;
     LONG DriverDrawExceptionSkipCount = 0;
     LONG GuiBatchExceptionSkipCount = 0;
+    LONG GuiConvertToScreenNullRectRecoverCount = 0;
     LONG GuiTreeInvalidKeySkipCount = 0;
 
     constexpr uintptr_t RenderStateVectorStartRva = 0x25110;
@@ -1651,6 +1654,88 @@ namespace
         }
 
         if (exception->ExceptionRecord->ExceptionAddress ==
+                reinterpret_cast<void*>(UtilsRectAddNullFaultAddress) &&
+            exception->ExceptionRecord->ExceptionInformation[1] == 0 &&
+            exception->ContextRecord->Ecx == 0)
+        {
+            DWORD operatorFrame = exception->ContextRecord->Ebp;
+            if (operatorFrame != exception->ContextRecord->Esp ||
+                operatorFrame < 0x10000 ||
+                operatorFrame > 0xFFFFFFFFUL - 16 ||
+                !IsReadableRange(
+                    reinterpret_cast<const void*>(operatorFrame),
+                    16))
+            {
+                return EXCEPTION_CONTINUE_SEARCH;
+            }
+
+            DWORD callerFrame = 0;
+            DWORD returnAddress = 0;
+            DWORD outputAddress = 0;
+            DWORD offsetAddress = 0;
+            std::memcpy(
+                &callerFrame,
+                reinterpret_cast<const void*>(operatorFrame),
+                sizeof(callerFrame));
+            std::memcpy(
+                &returnAddress,
+                reinterpret_cast<const void*>(operatorFrame + 4),
+                sizeof(returnAddress));
+            std::memcpy(
+                &outputAddress,
+                reinterpret_cast<const void*>(operatorFrame + 8),
+                sizeof(outputAddress));
+            std::memcpy(
+                &offsetAddress,
+                reinterpret_cast<const void*>(operatorFrame + 12),
+                sizeof(offsetAddress));
+
+            if (returnAddress != GuiConvertToScreenRectAddReturnAddress ||
+                callerFrame <= operatorFrame ||
+                callerFrame - operatorFrame <= 0x58 ||
+                callerFrame - operatorFrame > 0x1000)
+            {
+                return EXCEPTION_CONTINUE_SEARCH;
+            }
+
+            DWORD recoveredRectAddress = callerFrame - 0x58;
+            DWORD expectedOutputAddress = callerFrame - 0x48;
+            if (outputAddress != expectedOutputAddress ||
+                exception->ContextRecord->Eax != outputAddress ||
+                exception->ContextRecord->Edx != offsetAddress ||
+                !IsReadableRange(
+                    reinterpret_cast<const void*>(recoveredRectAddress),
+                    16) ||
+                !IsReadableRange(
+                    reinterpret_cast<const void*>(offsetAddress),
+                    8) ||
+                !IsWritableRange(
+                    reinterpret_cast<void*>(outputAddress),
+                    16))
+            {
+                return EXCEPTION_CONTINUE_SEARCH;
+            }
+
+            LONG count = InterlockedIncrement(
+                &GuiConvertToScreenNullRectRecoverCount);
+            if (count <= 16 || count % 100 == 0)
+            {
+                aorf::Log(
+                    "PATCH HIT GUI ConvertToScreen null scaled rectangle recovered "
+                    "view=0x%08lX rect=0x%08lX output=0x%08lX offset=0x%08lX "
+                    "count=%ld",
+                    static_cast<unsigned long>(exception->ContextRecord->Esi),
+                    static_cast<unsigned long>(recoveredRectAddress),
+                    static_cast<unsigned long>(outputAddress),
+                    static_cast<unsigned long>(offsetAddress),
+                    static_cast<long>(count));
+            }
+
+            exception->ContextRecord->Ecx = recoveredRectAddress;
+            return EXCEPTION_CONTINUE_EXECUTION;
+        }
+
+        if (exception->ExceptionRecord->ExceptionAddress ==
                 reinterpret_cast<void*>(DrawResourceFaultAddress) &&
             exception->ContextRecord->Eax < 0x10000 &&
             exception->ExceptionRecord->ExceptionInformation[1] ==
@@ -1819,7 +1904,8 @@ namespace aorf
 
         HMODULE randy = GetModuleHandleW(L"randy31.dll");
         HMODULE gui = GetModuleHandleW(L"GUI.dll");
-        if (!randy || !gui)
+        HMODULE utils = GetModuleHandleW(L"Utils.dll");
+        if (!randy || !gui || !utils)
         {
             Log("ERROR old-client renderer modules are not loaded");
             return false;
@@ -1827,6 +1913,7 @@ namespace aorf
 
         auto base = reinterpret_cast<uint8_t*>(randy);
         auto guiBase = reinterpret_cast<uint8_t*>(gui);
+        auto utilsBase = reinterpret_cast<uint8_t*>(utils);
         constexpr uint8_t ExpectedFaultSequence[] =
         {
             0x0F, 0xB6, 0x78, 0x02,
@@ -1901,6 +1988,39 @@ namespace aorf
             0x59,
             0xF3, 0xA5
         };
+        constexpr uint8_t ExpectedGuiConvertToScreenRectAddSetup[] =
+        {
+            0x89, 0x45, 0x0C,
+            0x8D, 0x45, 0xE8,
+            0x50,
+            0x8B, 0xCE,
+            0x89, 0x7D, 0xFC,
+            0xE8, 0x7D, 0xED, 0xFF, 0xFF,
+            0x8B, 0x4D, 0x0C,
+            0x50,
+            0x8D, 0x45, 0xB8,
+            0x50
+        };
+        constexpr uint8_t ExpectedUtilsRectAddFunction[] =
+        {
+            0x55, 0x8B, 0xEC,
+            0x8B, 0x55, 0x0C,
+            0xD9, 0x02,
+            0x8B, 0x45, 0x08,
+            0xD8, 0x01,
+            0xD9, 0x18,
+            0xD9, 0x41, 0x04,
+            0xD8, 0x42, 0x04,
+            0xD9, 0x58, 0x04,
+            0xD9, 0x41, 0x08,
+            0xD8, 0x02,
+            0xD9, 0x58, 0x08,
+            0xD9, 0x41, 0x0C,
+            0xD8, 0x42, 0x04,
+            0xD9, 0x58, 0x0C,
+            0x5D,
+            0xC2, 0x08, 0x00
+        };
         constexpr uint8_t ExpectedGuiFreeIndexBufferCall[] =
         {
             0xE8, 0x30, 0x2A, 0x02, 0x00
@@ -1909,6 +2029,7 @@ namespace aorf
         uint8_t expectedGuiDynamicVbGetVbCall[] = { 0xFF, 0x15, 0, 0, 0, 0 };
         uint8_t expectedGuiResetMaterialCall[] = { 0xFF, 0x15, 0, 0, 0, 0 };
         uint8_t expectedGuiStateBlobResetCall[] = { 0xFF, 0x15, 0, 0, 0, 0 };
+        uint8_t expectedGuiRectAddCall[] = { 0xFF, 0x15, 0, 0, 0, 0 };
         uint32_t guiDynamicVbGetSlot = static_cast<uint32_t>(
             reinterpret_cast<uintptr_t>(guiBase + 0x1A865C));
         uint32_t guiDynamicVbGetVbSlot = static_cast<uint32_t>(
@@ -1917,6 +2038,8 @@ namespace aorf
             reinterpret_cast<uintptr_t>(guiBase + 0x1A8638));
         uint32_t guiStateBlobResetSlot = static_cast<uint32_t>(
             reinterpret_cast<uintptr_t>(guiBase + 0x1A863C));
+        uint32_t guiRectAddSlot = static_cast<uint32_t>(
+            reinterpret_cast<uintptr_t>(guiBase + 0x1A83D0));
         std::memcpy(
             expectedGuiDynamicVbGetCall + 2,
             &guiDynamicVbGetSlot,
@@ -1933,10 +2056,15 @@ namespace aorf
             expectedGuiStateBlobResetCall + 2,
             &guiStateBlobResetSlot,
             sizeof(guiStateBlobResetSlot));
+        std::memcpy(
+            expectedGuiRectAddCall + 2,
+            &guiRectAddSlot,
+            sizeof(guiRectAddSlot));
         uint32_t guiDynamicVbGetFunction = 0;
         uint32_t guiDynamicVbGetVbFunction = 0;
         uint32_t guiResetMaterialFunction = 0;
         uint32_t guiStateBlobResetFunction = 0;
+        uint32_t guiRectAddFunction = 0;
         std::memcpy(
             &guiDynamicVbGetFunction,
             guiBase + 0x1A865C,
@@ -1953,6 +2081,10 @@ namespace aorf
             &guiStateBlobResetFunction,
             guiBase + 0x1A863C,
             sizeof(guiStateBlobResetFunction));
+        std::memcpy(
+            &guiRectAddFunction,
+            guiBase + 0x1A83D0,
+            sizeof(guiRectAddFunction));
         constexpr uint8_t ExpectedGuiTreeFindResume[] =
         {
             0xFF, 0x75, 0x0C,
@@ -2019,6 +2151,18 @@ namespace aorf
                 ExpectedGuiNullDynamicVbFaultSequence,
                 sizeof(ExpectedGuiNullDynamicVbFaultSequence)) != 0 ||
             std::memcmp(
+                guiBase + 0x14C490,
+                ExpectedGuiConvertToScreenRectAddSetup,
+                sizeof(ExpectedGuiConvertToScreenRectAddSetup)) != 0 ||
+            std::memcmp(
+                guiBase + 0x14C4A9,
+                expectedGuiRectAddCall,
+                sizeof(expectedGuiRectAddCall)) != 0 ||
+            std::memcmp(
+                utilsBase + 0x82E6,
+                ExpectedUtilsRectAddFunction,
+                sizeof(ExpectedUtilsRectAddFunction)) != 0 ||
+            std::memcmp(
                 guiBase + 0x150E85,
                 expectedGuiDynamicVbGetCall,
                 sizeof(expectedGuiDynamicVbGetCall)) != 0 ||
@@ -2046,6 +2190,8 @@ namespace aorf
                 reinterpret_cast<uintptr_t>(base + 0x4B724)) ||
             guiStateBlobResetFunction != static_cast<uint32_t>(
                 reinterpret_cast<uintptr_t>(base + 0x24D1E)) ||
+            guiRectAddFunction != static_cast<uint32_t>(
+                reinterpret_cast<uintptr_t>(utilsBase + 0x82E6)) ||
             !IsExecutableAddress(reinterpret_cast<const void*>(
                 static_cast<uintptr_t>(guiDynamicVbGetFunction))) ||
             !IsExecutableAddress(reinterpret_cast<const void*>(
@@ -2054,6 +2200,8 @@ namespace aorf
                 static_cast<uintptr_t>(guiResetMaterialFunction))) ||
             !IsExecutableAddress(reinterpret_cast<const void*>(
                 static_cast<uintptr_t>(guiStateBlobResetFunction))) ||
+            !IsExecutableAddress(reinterpret_cast<const void*>(
+                static_cast<uintptr_t>(guiRectAddFunction))) ||
             !IsExecutableAddress(guiBase + 0x1739C6) ||
             !IsWritableRange(guiBase + 0x2767C0, 0x18C) ||
             std::memcmp(
@@ -2079,8 +2227,12 @@ namespace aorf
         DwordColorFaultAddress = reinterpret_cast<uintptr_t>(base + 0x6C51D);
         DwordColorResumeAddress = reinterpret_cast<uintptr_t>(base + 0x6C51F);
         GuiRenderBatchAddress = reinterpret_cast<uintptr_t>(guiBase + 0x150E17);
+        GuiConvertToScreenRectAddReturnAddress = reinterpret_cast<uintptr_t>(
+            guiBase + 0x14C4AF);
         GuiNullDynamicVbFaultAddress = reinterpret_cast<uintptr_t>(
             guiBase + 0x150F22);
+        UtilsRectAddNullFaultAddress = reinterpret_cast<uintptr_t>(
+            utilsBase + 0x82F1);
         GuiDynamicVbGetAddress = guiDynamicVbGetFunction;
         GuiDynamicVbGetVbAddress = guiDynamicVbGetVbFunction;
         GuiResetMaterialAddress = guiResetMaterialFunction;
@@ -2264,7 +2416,9 @@ namespace aorf
             DwordColorFaultAddress = 0;
             DwordColorResumeAddress = 0;
             GuiRenderBatchAddress = 0;
+            GuiConvertToScreenRectAddReturnAddress = 0;
             GuiNullDynamicVbFaultAddress = 0;
+            UtilsRectAddNullFaultAddress = 0;
             GuiDynamicVbGetAddress = 0;
             GuiDynamicVbGetVbAddress = 0;
             GuiResetMaterialAddress = 0;
@@ -2280,6 +2434,7 @@ namespace aorf
 
         Log("PATCH PASS randy31 renderer/color/driver guards "
             "deviceSelector=preserved drawCallRva=0x219B4 "
+            "guiConvertNullRect=Utils+0x82F1/GUI+0x14C4AF "
             "guiBatchCallRva=0x152E49 guiNullDynamicVbRva=0x150F22 "
             "guiTreeFindRva=0x4F2EF "
             "faultRvas=0x21A94,0x25118,0x2511A,0x6C3A1,0x6C476,0x6C51D");
