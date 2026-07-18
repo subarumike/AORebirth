@@ -6,6 +6,7 @@ namespace AORebirth.Core.Playfields
     using System.Linq;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Nanos;
     using AORebirth.Core.NPCHandler;
     using AORebirth.Core.Textures;
     using AORebirth.Core.Vector;
@@ -14,10 +15,12 @@ namespace AORebirth.Core.Playfields
     using AORebirth.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using Utility;
 
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Playfields;
 
     internal sealed class OrdinaryEnemyRuntimeService
@@ -42,6 +45,14 @@ namespace AORebirth.Core.Playfields
 
         private readonly Dictionary<int, int> activeRuntimeIdentityBySource =
             new Dictionary<int, int>();
+
+        private readonly Dictionary<int, OrdinaryEnemySupportNanoRuntimeState>
+            supportNanoStateByRuntimeIdentity =
+                new Dictionary<int, OrdinaryEnemySupportNanoRuntimeState>();
+
+        private readonly Dictionary<int, Dictionary<int, OrdinaryEnemyTransientNanoEffectState>>
+            transientNanoEffectsByRecipient =
+                new Dictionary<int, Dictionary<int, OrdinaryEnemyTransientNanoEffectState>>();
 
         internal OrdinaryEnemyRuntimeService(
             OrdinaryEnemyCatalog catalog,
@@ -140,6 +151,7 @@ namespace AORebirth.Core.Playfields
 
         internal void ClearRuntimeState(int playfieldInstance)
         {
+            this.RemoveAllTransientNanoEffects();
             foreach (int runtimeIdentity in this.activeByRuntimeIdentity.Keys.ToArray())
             {
                 OrdinaryEnemyRuntimeRegistry.Remove(runtimeIdentity);
@@ -149,6 +161,8 @@ namespace AORebirth.Core.Playfields
 
             this.activeByRuntimeIdentity.Clear();
             this.activeRuntimeIdentityBySource.Clear();
+            this.supportNanoStateByRuntimeIdentity.Clear();
+            this.transientNanoEffectsByRecipient.Clear();
             this.levelSelectionBySource.Clear();
             OrdinaryEnemyRuntimeRegistry.RemoveForPlayfield(playfieldInstance);
         }
@@ -162,6 +176,85 @@ namespace AORebirth.Core.Playfields
 
             this.activeByRuntimeIdentity.Remove(target.Identity.Instance);
             this.activeRuntimeIdentityBySource.Remove(definition.Spawn.SourceIdentity);
+            this.supportNanoStateByRuntimeIdentity.Remove(target.Identity.Instance);
+            this.RemoveTransientNanoEffectsForRecipient(target);
+            return true;
+        }
+
+        internal void NotifyCharacterDied(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            this.supportNanoStateByRuntimeIdentity.Remove(character.Identity.Instance);
+            this.RemoveTransientNanoEffectsForRecipient(character);
+        }
+
+        internal void ProcessExpiredSupportNanoEffects(DateTime utcNow)
+        {
+            foreach (OrdinaryEnemyTransientNanoEffectState state in this.transientNanoEffectsByRecipient
+                .SelectMany(value => value.Value.Values)
+                .Where(value => value.ExpiresAtUtc <= utcNow)
+                .ToArray())
+            {
+                ICharacter recipient = this.dynelRegistry.FindByIdentity<ICharacter>(
+                    state.RecipientIdentity);
+                this.RemoveTransientNanoEffect(state, recipient);
+            }
+        }
+
+        internal bool TryProcessSupportNano(ICharacter caster, DateTime utcNow)
+        {
+            OrdinaryEnemyRuntimeDefinition definition;
+            OrdinaryEnemySupportNanoRuntimeState state;
+            if (caster == null
+                || caster.Stats[StatIds.health].Value <= 0
+                || !this.activeByRuntimeIdentity.TryGetValue(caster.Identity.Instance, out definition)
+                || definition.Profile.SupportNano == null
+                || !this.supportNanoStateByRuntimeIdentity.TryGetValue(
+                    caster.Identity.Instance,
+                    out state))
+            {
+                return false;
+            }
+
+            OrdinaryEnemySupportNanoProfile profile = definition.Profile.SupportNano;
+            if (state.CastInProgress)
+            {
+                if (utcNow < state.FinishAtUtc)
+                {
+                    return true;
+                }
+
+                this.FinishSupportNanoCast(caster, profile, state, utcNow);
+                state.CastInProgress = false;
+                state.TargetIdentity = Identity.None;
+                return true;
+            }
+
+            if (caster.FightingTarget.Instance != 0 || utcNow < state.NextCastAtUtc)
+            {
+                return false;
+            }
+
+            ICharacter target = this.FindSupportNanoTarget(caster, profile);
+            if (target == null)
+            {
+                state.NextCastAtUtc = utcNow.AddSeconds(profile.RepeatSeconds);
+                return false;
+            }
+
+            caster.Controller.StopMovement();
+            CastNanoSpellMessageHandler.Default.SendNpcCast(
+                caster,
+                profile.PrimaryNanoId,
+                target.Identity);
+            state.CastInProgress = true;
+            state.TargetIdentity = target.Identity;
+            state.FinishAtUtc = utcNow.AddSeconds(profile.CastSeconds);
+            state.NextCastAtUtc = utcNow.AddSeconds(profile.RepeatSeconds);
             return true;
         }
 
@@ -281,6 +374,15 @@ namespace AORebirth.Core.Playfields
             this.activateNpc(character);
             this.activeByRuntimeIdentity[character.Identity.Instance] = runtimeDefinition;
             this.activeRuntimeIdentityBySource[spawn.SourceIdentity] = character.Identity.Instance;
+            if (profile.SupportNano != null)
+            {
+                this.supportNanoStateByRuntimeIdentity[character.Identity.Instance] =
+                    new OrdinaryEnemySupportNanoRuntimeState
+                    {
+                        NextCastAtUtc = DateTime.UtcNow.AddSeconds(
+                            profile.SupportNano.InitialDelaySeconds)
+                    };
+            }
             SubwayVisibilityDiagnosticSelection.RegisterRuntimeIdentity(
                 character.Identity.Instance,
                 spawn.SourceIdentity);
@@ -304,6 +406,289 @@ namespace AORebirth.Core.Playfields
                     combatContract.AttackModel,
                     combatReady));
             return true;
+        }
+
+        private ICharacter FindSupportNanoTarget(
+            ICharacter caster,
+            OrdinaryEnemySupportNanoProfile profile)
+        {
+            ICharacter target = this.dynelRegistry
+                .FindCharactersInRange(caster, (float)profile.TargetRange)
+                .Where(
+                    candidate => candidate != null
+                                 && candidate.Identity != caster.Identity
+                                 && candidate.Stats[StatIds.health].Value > 0
+                                 && IsOrdinaryEnemy(candidate))
+                .OrderBy(
+                    candidate => candidate.Coordinates().coordinate.Distance2D(
+                        caster.Coordinates().coordinate))
+                .ThenBy(candidate => candidate.Identity.Instance)
+                .FirstOrDefault();
+            return target ?? (profile.FallbackToSelf ? caster : null);
+        }
+
+        private static bool IsOrdinaryEnemy(ICharacter candidate)
+        {
+            OrdinaryEnemyRuntimeDefinition ignored;
+            return candidate != null
+                   && OrdinaryEnemyRuntimeRegistry.TryGet(
+                       candidate.Identity.Instance,
+                       out ignored);
+        }
+
+        private void FinishSupportNanoCast(
+            ICharacter caster,
+            OrdinaryEnemySupportNanoProfile profile,
+            OrdinaryEnemySupportNanoRuntimeState state,
+            DateTime utcNow)
+        {
+            CharacterActionMessageHandler.Default.FinishNanoCasting(
+                caster,
+                CharacterActionType.FinishNanoCasting,
+                Identity.None,
+                1,
+                profile.PrimaryNanoId);
+
+            ICharacter target = this.dynelRegistry.FindByIdentity<ICharacter>(state.TargetIdentity);
+            if (target == null || target.Stats[StatIds.health].Value <= 0)
+            {
+                return;
+            }
+
+            bool primaryFirstActivation = this.ApplyOrRefreshTransientNanoEffect(
+                caster,
+                target,
+                profile.PrimaryNanoId,
+                profile.PrimaryStrain,
+                profile.PrimaryModifierDelta,
+                profile,
+                utcNow);
+            bool triggeredSelfFirstActivation = this.ApplyOrRefreshTransientNanoEffect(
+                caster,
+                caster,
+                profile.TriggeredSelfNanoId,
+                profile.TriggeredSelfStrain,
+                profile.TriggeredSelfModifierDelta,
+                profile,
+                utcNow);
+
+            if (primaryFirstActivation)
+            {
+                BuffMessageHandler.Default.SendAddNanoBuff(target, profile.PrimaryNanoId);
+            }
+
+            CharacterActionMessageHandler.Default.NotifyActiveNanoDurationToPlayfield(
+                caster,
+                target.Identity,
+                profile.PrimaryNanoId,
+                profile.DurationParameter);
+            CastNanoSpellMessageHandler.Default.SendTriggeredSelfCast(
+                caster,
+                profile.TriggeredSelfNanoId);
+            if (triggeredSelfFirstActivation)
+            {
+                BuffMessageHandler.Default.SendAddNanoBuff(caster, profile.TriggeredSelfNanoId);
+            }
+
+            CharacterActionMessageHandler.Default.NotifyActiveNanoDurationToPlayfield(
+                caster,
+                caster.Identity,
+                profile.TriggeredSelfNanoId,
+                profile.DurationParameter);
+        }
+
+        private bool ApplyOrRefreshTransientNanoEffect(
+            ICharacter caster,
+            ICharacter recipient,
+            int nanoId,
+            int strain,
+            int modifierDelta,
+            OrdinaryEnemySupportNanoProfile profile,
+            DateTime utcNow)
+        {
+            Dictionary<int, OrdinaryEnemyTransientNanoEffectState> recipientEffects;
+            if (!this.transientNanoEffectsByRecipient.TryGetValue(
+                recipient.Identity.Instance,
+                out recipientEffects))
+            {
+                recipientEffects = new Dictionary<int, OrdinaryEnemyTransientNanoEffectState>();
+                this.transientNanoEffectsByRecipient.Add(
+                    recipient.Identity.Instance,
+                    recipientEffects);
+            }
+
+            OrdinaryEnemyTransientNanoEffectState existing;
+            if (recipientEffects.TryGetValue(nanoId, out existing))
+            {
+                existing.CasterInstance = caster.Identity.Instance;
+                existing.ExpiresAtUtc = utcNow.AddSeconds(profile.EffectLifetimeSeconds);
+                RefreshProjectedActiveNano(
+                    recipient,
+                    existing,
+                    profile.DurationParameter);
+                return false;
+            }
+
+            foreach (OrdinaryEnemyTransientNanoEffectState replaced in recipientEffects.Values
+                .Where(value => value.Strain == strain && value.NanoId != nanoId)
+                .ToArray())
+            {
+                this.RemoveTransientNanoEffect(replaced, recipient);
+            }
+
+            if (!this.transientNanoEffectsByRecipient.ContainsKey(recipient.Identity.Instance))
+            {
+                this.transientNanoEffectsByRecipient.Add(
+                    recipient.Identity.Instance,
+                    recipientEffects);
+            }
+
+            int activeNanoKey = ResolveAvailableActiveNanoKey(recipient, strain, nanoId);
+            var state = new OrdinaryEnemyTransientNanoEffectState
+            {
+                RecipientIdentity = recipient.Identity,
+                NanoId = nanoId,
+                Strain = strain,
+                ModifierDelta = modifierDelta,
+                StatIds = (int[])profile.AffectedStatIds.Clone(),
+                CasterInstance = caster.Identity.Instance,
+                ActiveNanoKey = activeNanoKey,
+                ExpiresAtUtc = utcNow.AddSeconds(profile.EffectLifetimeSeconds)
+            };
+            foreach (int statId in state.StatIds)
+            {
+                recipient.Stats[statId].Modifier += modifierDelta;
+            }
+
+            recipientEffects.Add(nanoId, state);
+            recipient.ActiveNanos[activeNanoKey] = new ActiveNanoState
+            {
+                ID = nanoId,
+                Instance = nanoId,
+                Nanotype = 0,
+                TickCounter = profile.DurationParameter,
+                TickInterval = profile.DurationParameter,
+                NcuCost = 0,
+                ExpiresAtUtc = state.ExpiresAtUtc,
+                PlayfieldBound = true,
+                DurationPacketIdentity = recipient.Identity,
+                DurationParameter1 = caster.Identity.Instance
+            };
+            return true;
+        }
+
+        private static int ResolveAvailableActiveNanoKey(
+            ICharacter recipient,
+            int strain,
+            int nanoId)
+        {
+            IActiveNano activeNano;
+            if (!recipient.ActiveNanos.TryGetValue(strain, out activeNano)
+                || activeNano == null
+                || activeNano.ID == nanoId)
+            {
+                return strain;
+            }
+
+            int key = -nanoId;
+            while (recipient.ActiveNanos.ContainsKey(key))
+            {
+                key--;
+            }
+
+            return key;
+        }
+
+        private static void RefreshProjectedActiveNano(
+            ICharacter recipient,
+            OrdinaryEnemyTransientNanoEffectState state,
+            int durationParameter)
+        {
+            IActiveNano activeNano;
+            if (!recipient.ActiveNanos.TryGetValue(state.ActiveNanoKey, out activeNano)
+                || activeNano == null
+                || activeNano.ID != state.NanoId)
+            {
+                return;
+            }
+
+            activeNano.TickCounter = durationParameter;
+            activeNano.TickInterval = durationParameter;
+            var projected = activeNano as ActiveNanoState;
+            if (projected != null)
+            {
+                projected.ExpiresAtUtc = state.ExpiresAtUtc;
+                projected.DurationPacketIdentity = recipient.Identity;
+                projected.DurationParameter1 = state.CasterInstance;
+            }
+        }
+
+        private void RemoveAllTransientNanoEffects()
+        {
+            foreach (OrdinaryEnemyTransientNanoEffectState state in this.transientNanoEffectsByRecipient
+                .SelectMany(value => value.Value.Values)
+                .ToArray())
+            {
+                ICharacter recipient = this.dynelRegistry.FindByIdentity<ICharacter>(
+                    state.RecipientIdentity);
+                this.RemoveTransientNanoEffect(state, recipient);
+            }
+        }
+
+        private void RemoveTransientNanoEffectsForRecipient(ICharacter recipient)
+        {
+            Dictionary<int, OrdinaryEnemyTransientNanoEffectState> recipientEffects;
+            if (recipient == null
+                || !this.transientNanoEffectsByRecipient.TryGetValue(
+                    recipient.Identity.Instance,
+                    out recipientEffects))
+            {
+                return;
+            }
+
+            foreach (OrdinaryEnemyTransientNanoEffectState state in recipientEffects.Values.ToArray())
+            {
+                this.RemoveTransientNanoEffect(state, recipient);
+            }
+        }
+
+        private void RemoveTransientNanoEffect(
+            OrdinaryEnemyTransientNanoEffectState state,
+            ICharacter recipient)
+        {
+            if (state == null)
+            {
+                return;
+            }
+
+            if (recipient != null)
+            {
+                foreach (int statId in state.StatIds)
+                {
+                    recipient.Stats[statId].Modifier -= state.ModifierDelta;
+                }
+
+                IActiveNano activeNano;
+                if (recipient.ActiveNanos.TryGetValue(state.ActiveNanoKey, out activeNano)
+                    && activeNano != null
+                    && activeNano.ID == state.NanoId)
+                {
+                    recipient.ActiveNanos.Remove(state.ActiveNanoKey);
+                }
+            }
+
+            Dictionary<int, OrdinaryEnemyTransientNanoEffectState> recipientEffects;
+            if (this.transientNanoEffectsByRecipient.TryGetValue(
+                state.RecipientIdentity.Instance,
+                out recipientEffects))
+            {
+                recipientEffects.Remove(state.NanoId);
+                if (recipientEffects.Count == 0)
+                {
+                    this.transientNanoEffectsByRecipient.Remove(
+                        state.RecipientIdentity.Instance);
+                }
+            }
         }
 
         private Character ConstructCharacter(
@@ -513,6 +898,26 @@ namespace AORebirth.Core.Playfields
             character.Stats.SetBaseValueWithoutTriggering((int)stat, (uint)Math.Max(0, value));
         }
 
+    }
+
+    internal sealed class OrdinaryEnemySupportNanoRuntimeState
+    {
+        internal DateTime NextCastAtUtc { get; set; }
+        internal bool CastInProgress { get; set; }
+        internal Identity TargetIdentity { get; set; }
+        internal DateTime FinishAtUtc { get; set; }
+    }
+
+    internal sealed class OrdinaryEnemyTransientNanoEffectState
+    {
+        internal Identity RecipientIdentity { get; set; }
+        internal int NanoId { get; set; }
+        internal int Strain { get; set; }
+        internal int ModifierDelta { get; set; }
+        internal int[] StatIds { get; set; }
+        internal int CasterInstance { get; set; }
+        internal int ActiveNanoKey { get; set; }
+        internal DateTime ExpiresAtUtc { get; set; }
     }
 
     internal sealed class OrdinaryEnemyRuntimeDefinition

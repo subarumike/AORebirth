@@ -141,6 +141,62 @@ namespace AORebirth.Core.Playfields
         internal OrdinaryEnemyEvidenceState EvidenceState { get; private set; }
     }
 
+    internal sealed class OrdinaryEnemySupportNanoProfile
+    {
+        internal OrdinaryEnemySupportNanoProfile(
+            int primaryNanoId,
+            int triggeredSelfNanoId,
+            double initialDelaySeconds,
+            double castSeconds,
+            double repeatSeconds,
+            int durationParameter,
+            double effectLifetimeSeconds,
+            double targetRange,
+            bool fallbackToSelf,
+            int primaryStrain,
+            int triggeredSelfStrain,
+            int primaryModifierDelta,
+            int triggeredSelfModifierDelta,
+            int[] affectedStatIds,
+            OrdinaryEnemyEvidenceState evidenceState,
+            string evidence)
+        {
+            this.PrimaryNanoId = primaryNanoId;
+            this.TriggeredSelfNanoId = triggeredSelfNanoId;
+            this.InitialDelaySeconds = initialDelaySeconds;
+            this.CastSeconds = castSeconds;
+            this.RepeatSeconds = repeatSeconds;
+            this.DurationParameter = durationParameter;
+            this.EffectLifetimeSeconds = effectLifetimeSeconds;
+            this.TargetRange = targetRange;
+            this.FallbackToSelf = fallbackToSelf;
+            this.PrimaryStrain = primaryStrain;
+            this.TriggeredSelfStrain = triggeredSelfStrain;
+            this.PrimaryModifierDelta = primaryModifierDelta;
+            this.TriggeredSelfModifierDelta = triggeredSelfModifierDelta;
+            this.AffectedStatIds = affectedStatIds ?? new int[0];
+            this.EvidenceState = evidenceState;
+            this.Evidence = evidence ?? string.Empty;
+        }
+
+        internal int PrimaryNanoId { get; private set; }
+        internal int TriggeredSelfNanoId { get; private set; }
+        internal double InitialDelaySeconds { get; private set; }
+        internal double CastSeconds { get; private set; }
+        internal double RepeatSeconds { get; private set; }
+        internal int DurationParameter { get; private set; }
+        internal double EffectLifetimeSeconds { get; private set; }
+        internal double TargetRange { get; private set; }
+        internal bool FallbackToSelf { get; private set; }
+        internal int PrimaryStrain { get; private set; }
+        internal int TriggeredSelfStrain { get; private set; }
+        internal int PrimaryModifierDelta { get; private set; }
+        internal int TriggeredSelfModifierDelta { get; private set; }
+        internal int[] AffectedStatIds { get; private set; }
+        internal OrdinaryEnemyEvidenceState EvidenceState { get; private set; }
+        internal string Evidence { get; private set; }
+    }
+
     internal sealed class OrdinaryEnemyCombatProfile
     {
         internal OrdinaryEnemyCombatProfile(
@@ -565,7 +621,8 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemyCorpseProfile corpse,
             string[] evidence,
             bool bossOrScripted,
-            bool ownedSummon)
+            bool ownedSummon,
+            OrdinaryEnemySupportNanoProfile supportNano = null)
         {
             this.ProfileKey = profileKey;
             this.FamilyKey = familyKey;
@@ -581,6 +638,7 @@ namespace AORebirth.Core.Playfields
             this.Evidence = evidence ?? new string[0];
             this.BossOrScripted = bossOrScripted;
             this.OwnedSummon = ownedSummon;
+            this.SupportNano = supportNano;
         }
 
         internal string ProfileKey { get; private set; }
@@ -597,6 +655,7 @@ namespace AORebirth.Core.Playfields
         internal string[] Evidence { get; private set; }
         internal bool BossOrScripted { get; private set; }
         internal bool OwnedSummon { get; private set; }
+        internal OrdinaryEnemySupportNanoProfile SupportNano { get; private set; }
     }
 
     internal sealed class OrdinaryEnemyWaypoint
@@ -1162,6 +1221,33 @@ namespace AORebirth.Core.Playfields
                         || profile.Aggression.AutomaticAggroRadius.Value <= 0.0))
                 {
                     throw new InvalidOperationException("Automatic aggression requires a positive captured radius: " + profile.ProfileKey);
+                }
+
+                OrdinaryEnemySupportNanoProfile supportNano = profile.SupportNano;
+                if (supportNano != null
+                    && (supportNano.PrimaryNanoId <= 0
+                        || supportNano.TriggeredSelfNanoId <= 0
+                        || supportNano.PrimaryNanoId == supportNano.TriggeredSelfNanoId
+                        || supportNano.InitialDelaySeconds < 0.0
+                        || supportNano.CastSeconds <= 0.0
+                        || supportNano.RepeatSeconds <= supportNano.CastSeconds
+                        || supportNano.DurationParameter <= 0
+                        || supportNano.EffectLifetimeSeconds <= 0.0
+                        || supportNano.TargetRange <= 0.0
+                        || supportNano.PrimaryStrain < 0
+                        || supportNano.TriggeredSelfStrain < 0
+                        || supportNano.PrimaryModifierDelta == 0
+                        || supportNano.TriggeredSelfModifierDelta == 0
+                        || supportNano.AffectedStatIds.Length == 0
+                        || supportNano.AffectedStatIds.Any(value => value <= 0)
+                        || supportNano.AffectedStatIds.Distinct().Count()
+                           != supportNano.AffectedStatIds.Length
+                        || supportNano.EvidenceState == OrdinaryEnemyEvidenceState.Invalid
+                        || supportNano.EvidenceState == OrdinaryEnemyEvidenceState.Unresolved
+                        || string.IsNullOrWhiteSpace(supportNano.Evidence)))
+                {
+                    throw new InvalidOperationException(
+                        "Ordinary enemy support nano data is invalid: " + profile.ProfileKey);
                 }
 
                 bool hasHealthRegenInterval = profile.Combat.HealthRegenIntervalSeconds.HasValue;

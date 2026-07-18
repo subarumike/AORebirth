@@ -2687,7 +2687,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ordinaryProviderText.Contains("\"Workman Striker\"")
                 && ordinaryProviderText.Contains("203854")
                 && ordinaryProviderText.Contains("5.092328")
-                && CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 39
+                && CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 43
                 && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(202719, 202720, 14, 2, 10, 2000)")
                 && CountOccurrences(ordinaryProviderText, ", 203854, 17899,") == 20
                 && workmanStriker.Loot.PoolMode == OrdinaryEnemyLootPoolMode.IndependentEntries
@@ -2762,7 +2762,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(240.0, looter.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(3.0, looter.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
-                CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 39
+                CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 43
                 && CountOccurrences(ordinaryProviderText, ", 203745, 17870,") == 11
                 && catalogText.Contains("archetype.MonsterData == LooterMonsterData")
                 && looterCombatContract.Contains("ForSourceSpecificWeaponArchetype")
@@ -2882,7 +2882,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(240.0, mugger.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(3.0, mugger.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
-                CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 39
+                CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 43
                 && CountOccurrences(ordinaryProviderText, ", 203734, 17534,") == 24
                 && combatContractText.Contains("Mugger combat requires an exact captured source identity; aggregate weapon fallback is forbidden")
                 && muggerCombatContract.Contains("HasCompleteMuggerSourceWeaponEvidence")
@@ -7118,6 +7118,91 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 suppressionMethod.Contains("default:") && suppressionMethod.Contains("return false;"),
                 "Non-matching DB spawns, including non-Arete DB spawns, must remain unaffected.");
+        }
+
+        [TestMethod]
+        public void RedundantScanSupportNanoRuntimeKeepsCapturedPacketOrderAndReversibleOwnedState()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string runtimeText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
+            string npcRuntimeText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+            string castHandlerText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CastNanoMessageHandler.cs"));
+            string buffHandlerText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\BuffMessageHandler.cs"));
+            string actionHandlerText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CharacterActionMessageHandler.cs"));
+
+            string finish = ExtractMethodBlock(
+                runtimeText,
+                "private void FinishSupportNanoCast(");
+            AssertTextBefore(finish, "FinishNanoCasting(", "if (target == null");
+            AssertTextBefore(finish, "FinishNanoCasting(", "SendAddNanoBuff(target");
+            AssertTextBefore(
+                finish,
+                "SendAddNanoBuff(target",
+                "NotifyActiveNanoDurationToPlayfield(");
+            AssertTextBefore(
+                finish,
+                "profile.PrimaryNanoId,",
+                "SendTriggeredSelfCast(");
+            AssertTextBefore(
+                finish,
+                "SendTriggeredSelfCast(",
+                "SendAddNanoBuff(caster");
+            Assert.IsTrue(
+                finish.Contains("profile.TriggeredSelfNanoId")
+                && CountOccurrences(finish, "profile.DurationParameter") == 2,
+                "Redundant Scan must announce both captured duration packets.");
+
+            string apply = ExtractMethodBlock(
+                runtimeText,
+                "private bool ApplyOrRefreshTransientNanoEffect(");
+            Assert.IsTrue(
+                apply.Contains("existing.ExpiresAtUtc = utcNow.AddSeconds(profile.EffectLifetimeSeconds)")
+                && apply.Contains("return false;")
+                && apply.Contains("recipient.Stats[statId].Modifier += modifierDelta")
+                && apply.Contains("recipient.ActiveNanos[activeNanoKey] = new ActiveNanoState"),
+                "Transient NPC nanos must refresh without restacking and project active state for late observers.");
+            Assert.IsTrue(
+                runtimeText.Contains("recipient.Stats[statId].Modifier -= state.ModifierDelta")
+                && runtimeText.Contains("ProcessExpiredSupportNanoEffects(DateTime utcNow)")
+                && runtimeText.Contains("RemoveAllTransientNanoEffects();")
+                && runtimeText.Contains("NotifyCharacterDied(ICharacter character)"),
+                "Transient NPC nano cleanup must reverse only its owned modifier deltas on expiry, death, and reset.");
+            Assert.IsFalse(runtimeText.Contains("ActiveNanoRuntimeService"));
+            Assert.IsFalse(runtimeText.Contains("CharacterActiveNanosDao"));
+
+            Assert.IsTrue(
+                npcRuntimeText.Contains("this.ordinaryEnemies.ProcessExpiredSupportNanoEffects(utcNow);")
+                && npcRuntimeText.Contains("this.ordinaryEnemies.NotifyCharacterDied(target);")
+                && CountOccurrences(
+                    npcRuntimeText,
+                    "this.ordinaryEnemies.TryProcessSupportNano(") == 2,
+                "NPC runtime must own deterministic expiry, death cleanup, and patrol/combat cast pauses.");
+            Assert.IsTrue(
+                castHandlerText.Contains("public void SendNpcCast(")
+                && castHandlerText.Contains("x.Caster = Identity.None;")
+                && castHandlerText.Contains("public void SendTriggeredSelfCast(")
+                && castHandlerText.Contains("x.Unknown1 = 1;"));
+            Assert.IsTrue(
+                buffHandlerText.Contains("public void SendAddNanoBuff(")
+                && buffHandlerText.Contains("Type = (IdentityType)character.Identity.Instance")
+                && actionHandlerText.Contains("public void NotifyActiveNanoDurationToPlayfield(")
+                && actionHandlerText.Contains("true);"),
+                "NPC Buff and SetNanoDuration packets must broadcast to the playfield instead of a nonexistent NPC client.");
         }
 
         private static void AssertExpectedOrder(

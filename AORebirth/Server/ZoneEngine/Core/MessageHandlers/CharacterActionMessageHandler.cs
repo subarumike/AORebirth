@@ -559,6 +559,18 @@ namespace ZoneEngine.Core.MessageHandlers
             this.Send(character, this.ConstructSetNanoDuration(character, target, nanoId, duration));
         }
 
+        public void NotifyActiveNanoDurationToPlayfield(
+            ICharacter character,
+            Identity target,
+            int nanoId,
+            int duration)
+        {
+            this.Send(
+                character,
+                this.ConstructSetNanoDuration(character, target, nanoId, duration),
+                true);
+        }
+
         public void SendActiveNanoDuration(ICharacter character, Identity target, int nanoId, int duration)
         {
             this.NotifyActiveNanoDuration(character, target, nanoId, duration);

@@ -23,9 +23,13 @@ namespace AORebirth.Core.Playfields
 
         private const int LooterMonsterData = 203745;
 
+        private const int RedundantScanMonsterData = 204178;
+
         private const int WorkmanStrikerMonsterData = 203854;
 
         private const double BloodcreeperAutomaticAggroRadius = 7.0;
+
+        private const double RedundantScanAutomaticAggroRadius = 7.0;
 
         private static readonly Dictionary<string, OrdinaryEnemySpawnPolicyConfiguration>
             CapturedOrdinarySpawnPolicies = BuildCapturedOrdinarySpawnPolicies();
@@ -45,6 +49,14 @@ namespace AORebirth.Core.Playfields
                 true,
                 false,
                 OrdinaryEnemyEvidenceState.Observed);
+
+        private static readonly OrdinaryEnemyAggressionProfile RedundantScanAutomaticAggression =
+            new OrdinaryEnemyAggressionProfile(
+                OrdinaryEnemyAggressionMode.Auto,
+                RedundantScanAutomaticAggroRadius,
+                true,
+                false,
+                OrdinaryEnemyEvidenceState.Policy);
 
         private static readonly OrdinaryEnemyCorpseProfile StandardGenericCorpse =
             new OrdinaryEnemyCorpseProfile(
@@ -323,6 +335,7 @@ namespace AORebirth.Core.Playfields
                     archetype.MonsterData == DerangedShopperMonsterData
                     || archetype.MonsterData == WorkmanStrikerMonsterData
                     || archetype.MonsterData == LooterMonsterData
+                    || archetype.MonsterData == RedundantScanMonsterData
                         ? new Func<int, int, CapturedEnemyCombatContract>(
                             (sourceIdentity, level) =>
                                 CapturedSubwayCombatCatalog.ForOrdinary(
@@ -404,7 +417,8 @@ namespace AORebirth.Core.Playfields
                             archetype.CorpseEvidence),
                         archetype.EvidenceCaptures,
                         false,
-                        false));
+                        false,
+                        SupportNanoFor(archetype.MonsterData)));
             }
 
             foreach (CapturedSubwayOrdinarySpawnDefinition source in content.GetAllSpawns())
@@ -616,9 +630,48 @@ namespace AORebirth.Core.Playfields
 
         private static OrdinaryEnemyAggressionProfile AggressionFor(int monsterData)
         {
-            return monsterData == BloodcreeperMonsterData
-                       ? BloodcreeperAutomaticAggression
+            if (monsterData == BloodcreeperMonsterData)
+            {
+                return BloodcreeperAutomaticAggression;
+            }
+
+            return monsterData == RedundantScanMonsterData
+                       ? RedundantScanAutomaticAggression
                        : RetaliateAggression();
+        }
+
+        private static OrdinaryEnemySupportNanoProfile SupportNanoFor(int monsterData)
+        {
+            if (monsterData != RedundantScanMonsterData)
+            {
+                return null;
+            }
+
+            return new OrdinaryEnemySupportNanoProfile(
+                121336,
+                121248,
+                60.0,
+                1.400106,
+                25.590325,
+                18000,
+                180.0,
+                7.5,
+                true,
+                220,
+                0,
+                9,
+                -13,
+                new[]
+                    {
+                        113, 102, 107, 103, 105, 104, 106, 100, 109, 133, 110, 112,
+                        130, 114, 115, 116, 108, 128, 122, 129, 127, 131, 111
+                    },
+                OrdinaryEnemyEvidenceState.Policy,
+                "20260709-222339,20260716-033326,20260716-034104,"
+                + "20260716-221358,20260717-214751;"
+                + "primary=121336;triggered-self=121248;duration-centiseconds=18000;"
+                + "primary-modify=+9;triggered-self-modify=-13;"
+                + "nearest-observed-ordinary-target-with-self-fallback");
         }
 
         private static OrdinaryEnemyCombatProfile BuildCombatProfile(

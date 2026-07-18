@@ -64,6 +64,8 @@ namespace AORebirth.Core.Playfields
 
         private const int MuggerMonsterData = 203734;
 
+        private const int RedundantScanMonsterData = 204178;
+
         private const int WorkmanStrikerMonsterData = 203854;
 
         private static readonly int[] MuggerSourceInstances =
@@ -77,6 +79,14 @@ namespace AORebirth.Core.Playfields
             0x7957E5C7,
             0x7957E5C8,
             0x7957E5CA
+        };
+
+        private static readonly int[] RedundantScanSourceInstances =
+        {
+            0x7953AF85,
+            0x795451BF,
+            0x795451C4,
+            0x795451D3
         };
 
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
@@ -177,6 +187,60 @@ namespace AORebirth.Core.Playfields
             return true;
         }
 
+        private static bool HasCompleteRedundantScanSourceWeaponEvidence(
+            CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence)
+        {
+            if (sourceWeaponEvidence == null
+                || sourceWeaponEvidence.Length != RedundantScanSourceInstances.Length)
+            {
+                return false;
+            }
+
+            foreach (int expectedSource in RedundantScanSourceInstances)
+            {
+                int matches = sourceWeaponEvidence.Count(
+                    evidence => IsExactRedundantScanSourceWeapon(evidence, expectedSource));
+                if (matches != 1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool IsExactRedundantScanSourceWeapon(
+            CapturedSubwaySourceWeaponEvidenceDefinition evidence,
+            int expectedSource)
+        {
+            if (evidence == null || evidence.SourceInstance != expectedSource)
+            {
+                return false;
+            }
+
+            switch (expectedSource)
+            {
+                case 0x7953AF85:
+                    return evidence.LowId == 122027
+                           && evidence.HighId == 122027
+                           && evidence.Quality == 20;
+                case 0x795451BF:
+                    return evidence.LowId == 122026
+                           && evidence.HighId == 122027
+                           && evidence.Quality == 14;
+                case 0x795451C4:
+                    return evidence.LowId == 122028
+                           && evidence.HighId == 122029
+                           && evidence.Quality == 25;
+                case 0x795451D3:
+                    return evidence.LowId == 122026
+                           && evidence.HighId == 122027
+                           && evidence.Quality == 16;
+                default:
+                    return false;
+            }
+        }
+
         internal static CapturedEnemyCombatContract For(string name, int monsterData, int? level)
         {
             return For(name, monsterData);
@@ -188,7 +252,8 @@ namespace AORebirth.Core.Playfields
             if (archetype != null
                 && (archetype.MonsterData == DerangedShopperMonsterData
                     || archetype.MonsterData == WorkmanStrikerMonsterData
-                    || archetype.MonsterData == LooterMonsterData))
+                    || archetype.MonsterData == LooterMonsterData
+                    || archetype.MonsterData == RedundantScanMonsterData))
             {
                 return new CapturedEnemyCombatContract
                 {
@@ -296,6 +361,66 @@ namespace AORebirth.Core.Playfields
                     WeaponInventorySlot = 6,
                     HasCapturedEquippedAttackInfo = true,
                     AttackInfoAmmoCount = -1,
+                    AttackInfoWeaponSlot = 6,
+                    AttackInfoUnknown = 0,
+                    AttackInfoWeaponInstance = 0
+                };
+            }
+
+            if (archetype != null && archetype.MonsterData == RedundantScanMonsterData)
+            {
+                CapturedSubwaySourceWeaponEvidenceDefinition[] evidence =
+                    archetype.SourceWeaponEvidence;
+                if (!HasCompleteRedundantScanSourceWeaponEvidence(evidence))
+                {
+                    return new CapturedEnemyCombatContract
+                    {
+                        AttackModel = CapturedEnemyAttackModel.Unresolved,
+                        IsCombatReady = false,
+                        Evidence = "Redundant Scan source weapon evidence is missing or conflicting."
+                    };
+                }
+
+                CapturedSubwaySourceWeaponEvidenceDefinition redundantMatched = null;
+                int redundantMatches = 0;
+                foreach (CapturedSubwaySourceWeaponEvidenceDefinition candidate in evidence)
+                {
+                    if (candidate.SourceInstance != sourceInstance)
+                    {
+                        continue;
+                    }
+
+                    redundantMatched = candidate;
+                    redundantMatches++;
+                }
+
+                if (redundantMatches != 1 || redundantMatched == null)
+                {
+                    return new CapturedEnemyCombatContract
+                    {
+                        AttackModel = CapturedEnemyAttackModel.Unresolved,
+                        IsCombatReady = false,
+                        Evidence = "Redundant Scan source weapon evidence is missing or conflicting."
+                    };
+                }
+
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
+                    IsCombatReady = true,
+                    Evidence = string.Format(
+                        "{0}: Redundant Scan source 0x{1:X8} owner-linked QL{2} weapon {3}/{4}; one normal local-player hit is 19; item owns runtime damage and recharge; captured AttackInfo carries only ammo 17, slot 6, unknown 0, and weapon instance 0; no fixed damage, empty SIW, or captured attack-start/stop context",
+                        redundantMatched.EvidenceCaptures,
+                        sourceInstance,
+                        redundantMatched.Quality,
+                        redundantMatched.LowId,
+                        redundantMatched.HighId),
+                    WeaponLowId = redundantMatched.LowId,
+                    WeaponHighId = redundantMatched.HighId,
+                    WeaponQuality = redundantMatched.Quality,
+                    WeaponInventorySlot = 6,
+                    HasCapturedEquippedAttackInfo = true,
+                    AttackInfoAmmoCount = 17,
                     AttackInfoWeaponSlot = 6,
                     AttackInfoUnknown = 0,
                     AttackInfoWeaponInstance = 0
