@@ -19,6 +19,8 @@ namespace AORebirth.Core.Playfields
         private const int BloodcreeperMonsterData =
             NpcCombatAttackRules.CapturedSubwayBloodcreeperMonsterData;
 
+        private const int DerangedShopperMonsterData = 203736;
+
         private const int LooterMonsterData = 203745;
 
         private const int WorkmanStrikerMonsterData = 203854;
@@ -318,7 +320,8 @@ namespace AORebirth.Core.Playfields
                 uint appearance = archetype.AppearanceValue;
                 CapturedEnemyCombatContract contract = CapturedSubwayCombatCatalog.ForOrdinary(archetype);
                 Func<int, int, CapturedEnemyCombatContract> sourceContractResolver =
-                    archetype.MonsterData == WorkmanStrikerMonsterData
+                    archetype.MonsterData == DerangedShopperMonsterData
+                    || archetype.MonsterData == WorkmanStrikerMonsterData
                     || archetype.MonsterData == LooterMonsterData
                         ? new Func<int, int, CapturedEnemyCombatContract>(
                             (sourceIdentity, level) =>

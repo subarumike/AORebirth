@@ -663,6 +663,10 @@ namespace AORebirth.Core.Playfields
 
     internal static class CapturedSubwayCombatCatalog
     {
+        private const int DerangedShopperMonsterData = 203736;
+
+        private const int DerangedShopperSourceInstance = unchecked((int)0x79574527);
+
         private const int LooterMonsterData = 203745;
 
         private const int MuggerMonsterData = 203734;
@@ -693,7 +697,7 @@ namespace AORebirth.Core.Playfields
             {
                 case 203726:
                     return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
-                        "20260709-222339 plus 20260717-214612/214751/215250: Eumenides QL20 weapon 123267/123268, empty-special context 143/171/143/143/0, immediate attack start, 0.233124-second movement transition, 5.199992-second first hit, 21 observed normal local-player hits 25..45, and 4.311321-second median interval across 17 intervals; weapon owns runtime damage and recharge",
+                        "20260709-222339 plus 20260717-214612/214751/215250: Eumenides owner-linked 123267/123268 weapons are observed at QL20 and QL17; runtime retains QL20 because the respawn selection rule is unresolved; initial empty-special context is 143/143/143/143/0, with two captured misses; immediate attack start, 0.233124-second movement transition, 5.199992-second first hit, 21 observed normal local-player hits 25..45, and 4.311321-second median interval across 17 intervals; weapon owns runtime damage and recharge",
                         NpcCombatAttackRules.CapturedSubwayEumenidesWeaponLowTemplate,
                         NpcCombatAttackRules.CapturedSubwayEumenidesWeaponHighTemplate,
                         NpcCombatAttackRules.CapturedSubwayEumenidesWeaponQuality,
@@ -1062,6 +1066,42 @@ namespace AORebirth.Core.Playfields
             return ForSourceSpecificWeaponArchetype(archetype, sourceInstance, "Looter");
         }
 
+        private static CapturedEnemyCombatContract ForDerangedShopper(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance)
+        {
+            CapturedSubwaySourceWeaponEvidenceDefinition[] evidence =
+                archetype == null
+                    ? new CapturedSubwaySourceWeaponEvidenceDefinition[0]
+                    : archetype.SourceWeaponEvidence;
+            if (sourceInstance != DerangedShopperSourceInstance
+                || evidence == null
+                || evidence.Length != 1
+                || evidence[0].SourceInstance != DerangedShopperSourceInstance
+                || evidence[0].LowId != 125454
+                || evidence[0].HighId != 125455
+                || evidence[0].Quality != 8)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    string.Format(
+                        "Deranged Shopper source 0x{0:X8} requires the one exact owner-linked QL8 125454/125455 tuple",
+                        sourceInstance),
+                    archetype != null && archetype.Combat != null && archetype.Combat.Observed);
+            }
+
+            return CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(
+                evidence[0].EvidenceCaptures
+                + ": Deranged Shopper source 0x79574527 owner-linked QL8 weapon 125454/125455; eight normal local-player hits span 9..15, one 27-point critical is report-only, and one captured miss preserves ammo -1, slot 6, and unknown 0; item owns runtime damage, damage bonus, and recharge; captured AttackInfo carries only ammo -1, slot 6, unknown 0, and weapon instance 0; no empty SIW or captured attack-start/stop context",
+                evidence[0].LowId,
+                evidence[0].HighId,
+                evidence[0].Quality,
+                (int)WeaponSlots.Righthand,
+                -1,
+                (int)WeaponSlots.Righthand,
+                0,
+                0);
+        }
+
         private static CapturedEnemyCombatContract ForSourceSpecificWeaponArchetype(
             CapturedSubwayOrdinaryArchetypeDefinition archetype,
             int sourceInstance,
@@ -1235,7 +1275,8 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayOrdinaryArchetypeDefinition archetype)
         {
             if (archetype != null
-                && (archetype.MonsterData == WorkmanStrikerMonsterData
+                && (archetype.MonsterData == DerangedShopperMonsterData
+                    || archetype.MonsterData == WorkmanStrikerMonsterData
                     || archetype.MonsterData == LooterMonsterData))
             {
                 return CapturedEnemyCombatContract.Unresolved(
@@ -1279,6 +1320,11 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayOrdinaryArchetypeDefinition archetype,
             int sourceInstance)
         {
+            if (archetype != null && archetype.MonsterData == DerangedShopperMonsterData)
+            {
+                return ForDerangedShopper(archetype, sourceInstance);
+            }
+
             if (archetype != null && archetype.MonsterData == WorkmanStrikerMonsterData)
             {
                 return ForWorkmanStriker(archetype, sourceInstance);

@@ -1671,6 +1671,10 @@ namespace AORebirth.Core.Playfields
                     "20260708-143600",
                     "20260709-210452",
                     "20260710-202132"
+                },
+                new CapturedSubwaySourceWeaponEvidenceDefinition[]
+                {
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x79574527, 125454, 125455, 8, "20260710-202132")
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "empty_shell",

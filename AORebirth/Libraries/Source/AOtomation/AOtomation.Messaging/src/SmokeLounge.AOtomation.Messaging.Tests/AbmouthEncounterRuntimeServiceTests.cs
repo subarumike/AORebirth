@@ -449,6 +449,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 rules.Contains("CapturedSubwayEumenidesWeaponLowTemplate = 123267")
                 && rules.Contains("CapturedSubwayEumenidesWeaponHighTemplate = 123268")
                 && rules.Contains("CapturedSubwayEumenidesWeaponQuality = 20")
+                && rules.Contains("CapturedSubwayEumenidesAlternateObservedWeaponQuality = 17")
                 && rules.Contains("CapturedSubwayEumenidesWeaponDamageMinimumOverride = 0")
                 && rules.Contains("CapturedSubwayEumenidesWeaponDamageMaximumOverride = 0")
                 && rules.Contains("CapturedSubwayEumenidesRechargeOverrideSeconds = 0.0")
@@ -456,26 +457,41 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && rules.Contains("CapturedSubwayEumenidesMovementTransitionDelaySeconds = 0.233124")
                 && rules.Contains("CapturedSubwayEumenidesFirstHitDelaySeconds = 5.199992")
                 && rules.Contains("CapturedSubwayEumenidesSpecialAttackWeaponUnknown1 = 143")
-                && rules.Contains("CapturedSubwayEumenidesSpecialAttackWeaponUnknown2 = 171"),
-                "Eumenides must retain the captured QL20 weapon, SIW shape, and opening timing without hard-coded runtime rolls.");
+                && rules.Contains("CapturedSubwayEumenidesSpecialAttackWeaponUnknown2 = 143"),
+                "Eumenides must retain runtime QL20, record the alternate observed QL17 weapon, and use the corrected initial SIW shape without hard-coded runtime rolls.");
             Assert.IsTrue(
                 contracts.Contains("case 203726:")
                 && contracts.Contains("NpcCombatAttackRules.CapturedSubwayEumenidesWeaponLowTemplate")
                 && contracts.Contains("NpcCombatAttackRules.CapturedSubwayEumenidesWeaponHighTemplate")
                 && contracts.Contains("NpcCombatAttackRules.CapturedSubwayEumenidesRechargeOverrideSeconds")
                 && contracts.Contains("requiresDamageLineOfSight: true")
+                && contracts.Contains("weapons are observed at QL20 and QL17")
+                && contracts.Contains("runtime retains QL20 because the respawn selection rule is unresolved")
                 && contracts.Contains("21 observed normal local-player hits 25..45")
                 && contracts.Contains("4.311321-second median interval across 17 intervals"),
-                "The runtime contract must equip the weapon, preserve observed evidence, and require PF127 damage LOS.");
+                "The runtime contract must preserve both observed weapon variants without inventing their selection rule and require PF127 damage LOS.");
             Assert.IsTrue(
                 eumenides.Contains("\"normalAttackInfoRows\": 21")
                 && eumenides.Contains("\"normalMinDamage\": 25")
                 && eumenides.Contains("\"normalMaxDamage\": 45")
                 && eumenides.Contains("\"medianRechargeSeconds\": 4.311321")
+                && eumenides.Contains("\"missedAttackInfoRows\": 2")
+                && eumenides.Contains("\"ammoCount\": 10,\n        \"weaponSlot\": 6,\n        \"unknown\": 0,\n        \"rows\": 1")
+                && eumenides.Contains("\"ammoCount\": 16,\n        \"weaponSlot\": 6,\n        \"unknown\": 0,\n        \"rows\": 1")
+                && eumenides.Contains("\"specialAttackWeaponShapes\": [")
+                && eumenides.Contains("\"unknown5\": 25,\n        \"rows\": 3")
+                && eumenides.Contains("\"unknown5\": 0,\n        \"rows\": 2")
                 && eumenides.Contains("20260717-214751")
-                && eumenides.Contains("\"equippedWeaponTemplateId\": 123267")
-                && eumenides.Contains("\"equippedWeaponQuality\": 20"),
-                "Observed Eumenides hits and cadence must remain evidence only and separate from the zero runtime overrides.");
+                && eumenides.Contains("\"equippedWeaponAggregateResolved\": false")
+                && eumenides.Contains("\"equippedWeaponTemplateId\": 0")
+                && eumenides.Contains("\"equippedWeaponQuality\": 0")
+                && eumenides.Contains("\"lowId\": 123267")
+                && eumenides.Contains("\"highId\": 123268")
+                && eumenides.Contains("\"quality\": 17")
+                && eumenides.Contains("\"quality\": 20")
+                && eumenides.Contains("(SimpleChar:79748626)")
+                && eumenides.Contains("(SimpleChar:79545042)"),
+                "Observed Eumenides hits, misses, SIW variants, and source-specific weapon QLs must remain evidence only and separate from the zero runtime overrides.");
         }
 
         [TestMethod]

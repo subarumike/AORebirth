@@ -56,6 +56,10 @@ namespace AORebirth.Core.Playfields
     {
         private const int BloodcreeperMonsterData = 30379;
 
+        private const int DerangedShopperMonsterData = 203736;
+
+        private const int DerangedShopperSourceInstance = 0x79574527;
+
         private const int LooterMonsterData = 203745;
 
         private const int MuggerMonsterData = 203734;
@@ -182,7 +186,8 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayOrdinaryArchetypeDefinition archetype)
         {
             if (archetype != null
-                && (archetype.MonsterData == WorkmanStrikerMonsterData
+                && (archetype.MonsterData == DerangedShopperMonsterData
+                    || archetype.MonsterData == WorkmanStrikerMonsterData
                     || archetype.MonsterData == LooterMonsterData))
             {
                 return new CapturedEnemyCombatContract
@@ -260,6 +265,43 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayOrdinaryArchetypeDefinition archetype,
             int sourceInstance)
         {
+            if (archetype != null && archetype.MonsterData == DerangedShopperMonsterData)
+            {
+                CapturedSubwaySourceWeaponEvidenceDefinition[] evidence =
+                    archetype.SourceWeaponEvidence;
+                if (sourceInstance != DerangedShopperSourceInstance
+                    || evidence == null
+                    || evidence.Length != 1
+                    || evidence[0].SourceInstance != DerangedShopperSourceInstance
+                    || evidence[0].LowId != 125454
+                    || evidence[0].HighId != 125455
+                    || evidence[0].Quality != 8)
+                {
+                    return new CapturedEnemyCombatContract
+                    {
+                        AttackModel = CapturedEnemyAttackModel.Unresolved,
+                        IsCombatReady = false,
+                        Evidence = "Deranged Shopper source weapon evidence is missing or conflicting."
+                    };
+                }
+
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
+                    IsCombatReady = true,
+                    Evidence = "Deranged Shopper source 0x79574527 QL8 125454/125455; item owns runtime damage, damage bonus, and recharge; one critical is report-only and one captured miss preserves ammo -1, slot 6, and unknown 0.",
+                    WeaponLowId = evidence[0].LowId,
+                    WeaponHighId = evidence[0].HighId,
+                    WeaponQuality = evidence[0].Quality,
+                    WeaponInventorySlot = 6,
+                    HasCapturedEquippedAttackInfo = true,
+                    AttackInfoAmmoCount = -1,
+                    AttackInfoWeaponSlot = 6,
+                    AttackInfoUnknown = 0,
+                    AttackInfoWeaponInstance = 0
+                };
+            }
+
             if (archetype == null
                 || (archetype.MonsterData != WorkmanStrikerMonsterData
                     && archetype.MonsterData != LooterMonsterData))
