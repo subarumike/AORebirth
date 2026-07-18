@@ -29,7 +29,7 @@ namespace AORebirth.Core.Playfields
         private const string CapturedVergilLootEvidence =
             "official-live-captures 20260712-232711/234401/20260716-034433; three exact observed corpse snapshots with linked credits 610/587/563; 20260716-034433 inventory linked by normalized corpse identity F69001; snapshot probabilities and wider pool unresolved";
         private const string CapturedEumenidesLootEvidence =
-            "official-live-capture 20260717-214751; exact identity-linked Eumenides corpse snapshot with 186 credits and three item rows; 20260717-220340 adds exact local-name/identity-linked item membership for two already-existing Remains of Eumenides corpses but no CorpseFullUpdate, credits, dead-NPC link, or playfield context, so those rows are not promoted as atomic runtime snapshots; snapshot probabilities and wider pool unresolved";
+            "official-live-captures 20260717-214751/20260717-215250; two exact identity-linked Eumenides corpse snapshots, each with 186 credits and three item rows; 20260717-220340 adds exact local-name/identity-linked item membership for two already-existing Remains of Eumenides corpses but no CorpseFullUpdate, credits, dead-NPC link, or playfield context, so those rows are not promoted as atomic runtime snapshots; snapshot probabilities and wider pool unresolved";
         private readonly object sync = new object();
         private readonly object productionRandomSync = new object();
         private readonly Random productionRandom = new Random();
@@ -209,7 +209,14 @@ namespace AORebirth.Core.Playfields
                         CapturedEumenidesCredits,
                         ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, "capture.20260717-214751", 163430, 163431, 22, 1),
                         ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, "capture.20260717-214751", 301714, 301714, 1, 1),
-                        ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, "capture.20260717-214751", 287146, 287146, 200, 1))
+                        ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, "capture.20260717-214751", 287146, 287146, 200, 1)),
+                    ObservedCorpseSnapshot(
+                        CapturedEumenidesLootEvidence,
+                        "capture.20260717-215250",
+                        CapturedEumenidesCredits,
+                        ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, "capture.20260717-215250", 301715, 301715, 1, 1),
+                        ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, "capture.20260717-215250", 160051, 160050, 16, 1),
+                        ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, "capture.20260717-215250", 287146, 287146, 200, 1))
                 }
                 : new ObservedCorpseSnapshotDefinition[0];
             var table = new LootTableDefinition

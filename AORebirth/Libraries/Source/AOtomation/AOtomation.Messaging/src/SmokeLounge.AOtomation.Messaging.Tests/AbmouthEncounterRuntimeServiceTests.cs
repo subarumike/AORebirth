@@ -479,7 +479,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void EumenidesCorpseEvidenceReplaysExactCapturedShapeAndAtomicItemLoot()
+        public void EumenidesCorpseEvidenceReplaysExactCapturedShapeAndTwoAtomicItemLootSnapshots()
         {
             string root = FindRepositoryRoot();
             string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
@@ -493,6 +493,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     root,
                     @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260717-214751\corpse-loot-observations.csv"));
+            string capturedLootSecond = File.ReadAllText(
+                Path.Combine(
+                    root,
+                    @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260717-215250\corpse-loot-observations.csv"));
             string membershipLoot = File.ReadAllText(
                 Path.Combine(
                     root,
@@ -511,7 +515,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 capturedLoot.Contains("\"Eumenides\",\"203726\",\"20\",\"186\"")
                 && capturedLoot.Contains("163430:163431:22:1;301714:301714:1:1;287146:287146:200:1"),
-                "The finalized capture must preserve Eumenides' exact initial three-item plus 186-credit corpse snapshot.");
+                "The first finalized capture must preserve Eumenides' exact initial three-item plus 186-credit corpse snapshot.");
+            Assert.IsTrue(
+                capturedLootSecond.Contains("\"(Corpse:F6900C)\"")
+                && capturedLootSecond.Contains("\"SimpleChar:79748626\",\"Eumenides\",\"203726\",\"20\",\"186\"")
+                && capturedLootSecond.Contains("301715:301715:1:1;160051:160050:16:1;287146:287146:200:1")
+                && capturedLootSecond.Contains("\"linked\""),
+                "The second finalized capture must preserve Eumenides' exact linked three-item plus 186-credit corpse snapshot.");
             Assert.IsTrue(
                 membershipLifecycle.Contains("(Corpse:F6900F)")
                 && membershipLifecycle.Contains("(Corpse:F6900C)")
@@ -544,9 +554,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-214751\", 163430, 163431, 22, 1)")
                 && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-214751\", 301714, 301714, 1, 1)")
                 && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-214751\", 287146, 287146, 200, 1)")
+                && loot.Contains("\"capture.20260717-215250\",\n                        CapturedEumenidesCredits,")
+                && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-215250\", 301715, 301715, 1, 1)")
+                && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-215250\", 160051, 160050, 16, 1)")
+                && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-215250\", 287146, 287146, 200, 1)")
                 && loot.Contains("20260717-220340 adds exact local-name/identity-linked item membership")
                 && loot.Contains("ItemPoolUnresolved = true"),
-                "Eumenides must replay the exact captured item-plus-credit snapshot without claiming wider-pool probabilities.");
+                "Eumenides must replay both exact captured item-plus-credit snapshots without claiming wider-pool probabilities.");
             Assert.IsFalse(
                 loot.Contains("\"capture.20260717-220340\""),
                 "The unlinked membership-only rows must not become an atomic runtime snapshot.");
