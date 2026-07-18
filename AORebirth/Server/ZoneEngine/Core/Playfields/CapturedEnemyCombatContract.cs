@@ -1313,6 +1313,63 @@ namespace AORebirth.Core.Playfields
                 0);
         }
 
+        private static CapturedEnemyCombatContract ForRedundantScan(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            OrdinaryEnemySpawnVariant variant,
+            CapturedSubwayGenerationVariantDefinition[] generationEvidence)
+        {
+            CapturedSubwayCombatEvidenceDefinition combat = archetype == null
+                ? null
+                : archetype.Combat;
+            bool hasExactCombatEvidence = combat != null
+                                          && combat.Observed
+                                          && combat.ObservedRows == 1
+                                          && combat.MinDamage == 19
+                                          && combat.MaxDamage == 19
+                                          && combat.WeaponSlot == (int)WeaponSlots.Righthand
+                                          && combat.AttackInfoUnknown == 0
+                                          && combat.WeaponInstance == 0;
+            OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
+                ? null
+                : variant.WeaponLoadout;
+            string atomicFailure = string.Empty;
+            if (!hasExactCombatEvidence
+                || archetype == null
+                || !HasCompleteRedundantScanSourceWeaponEvidence(
+                    archetype.SourceWeaponEvidence)
+                || Array.IndexOf(RedundantScanSourceInstances, sourceInstance) < 0
+                || !OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
+                    RedundantScanMonsterData,
+                    sourceInstance,
+                    variant,
+                    generationEvidence,
+                    out atomicFailure))
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Redundant Scan combat requires one exact reviewed atomic level/stat/weapon generation for the selected source",
+                    hasExactCombatEvidence);
+            }
+
+            return CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(
+                string.Format(
+                    "{0}: Redundant Scan source 0x{1:X8} selected captured L{2} QL{3} weapon {4}/{5} as one atomic generation; one normal local-player hit is 19; item owns runtime damage and recharge; captured AttackInfo carries only ammo 17, slot 6, unknown 0, and weapon instance 0; uniform selection over distinct captured generations is private policy",
+                    weapon.Evidence,
+                    sourceInstance,
+                    variant.Level,
+                    weapon.Quality,
+                    weapon.LowId,
+                    weapon.HighId),
+                weapon.LowId,
+                weapon.HighId,
+                weapon.Quality,
+                (int)WeaponSlots.Righthand,
+                17,
+                (int)WeaponSlots.Righthand,
+                0,
+                0);
+        }
+
         private static CapturedEnemyCombatContract ForSourceSpecificWeaponArchetype(
             CapturedSubwayOrdinaryArchetypeDefinition archetype,
             int sourceInstance,
@@ -1701,9 +1758,19 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemySpawnVariant variant,
             CapturedSubwayGenerationVariantDefinition[] generationEvidence)
         {
+            if (archetype != null
+                && archetype.MonsterData == IncompleteRebuildMonsterData)
+            {
+                return ForIncompleteRebuild(
+                    archetype,
+                    sourceInstance,
+                    variant,
+                    generationEvidence);
+            }
+
             return archetype != null
-                   && archetype.MonsterData == IncompleteRebuildMonsterData
-                ? ForIncompleteRebuild(
+                   && archetype.MonsterData == RedundantScanMonsterData
+                ? ForRedundantScan(
                     archetype,
                     sourceInstance,
                     variant,

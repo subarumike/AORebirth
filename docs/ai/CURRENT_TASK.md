@@ -159,19 +159,26 @@ population in bounded runtime batches.
   phase, and L17..L22 nano pools remain explicit private policy; combat actions
   continue while it casts.
 - Redundant Scan no longer uses that observed `19` as fixed runtime damage. Its
-  four current sources now resolve their exact owner-linked `122026..122029`
-  weapon pairs at QL14/20/25/16, fail closed without one exact tuple, and let
-  item stats own damage and recharge while preserving captured AttackInfo
-  `ammo=17`, slot `6`, unknown `0`, instance `0`. Its captured
+  four current sources now select from ten source-local capture-reviewed atomic
+  level/health/scale/RunSpeed/weapon generations across L19..L22, including
+  same-level weapon rerolls. Three stationary anchors require a unique
+  1.5-unit position association; source `795451C4` is the sole captured patrol
+  anchor and later rows must retain that unique waypoint shape. Incomplete SCFU
+  or weapon observations remain report-only. Runtime fails closed without one
+  exact selected tuple and lets item stats own damage and recharge while
+  preserving captured AttackInfo `ammo=17`, slot `6`, unknown `0`, instance
+  `0`. Its captured
   `121336 -> 121248` support-nano pair now selects the nearest ordinary ally in
   the observed 7.5-unit envelope with self fallback, pauses weapon/patrol ticks
   for the 1.400106-second cast, broadcasts the captured packet sequence, applies
   the nanos.dat-backed `+9/-13` deltas to the exact 23 weapon/nano skills, and
   refreshes/reverses owned transient state after the 180-second duration without
   NCU, DAO, or threaded-timer reuse. A conservative 7-unit private proactive
-  aggro policy is enabled from the observed acquisition. Redundant Scan remains
-  outside the accepted whole-enemy set until its captured per-anchor level
-  rerolls are represented and private runtime behavior is checked.
+  aggro policy is enabled from the observed acquisition. Its four exact active
+  spawns, captured patrol/static dispositions, strict `2/1 empty` loot, exact
+  L19..L22 corpse credits/CATMesh, ordinary corpse lifetimes, and private
+  four-minute respawn now pass the whole-enemy gate. Private runtime behavior
+  remains to be checked.
 - Reviewed raw first opens and strict `corpse-loot-observations.csv` snapshots
   contribute explicit empty corpses to denominators. Redundant Scan's observed
   item is `1/2`, Molested Molecules item `301713` is `1/3`, and the twelve
@@ -353,8 +360,9 @@ population in bounded runtime batches.
   regeneration: PASS.
 - Current inventory/content-ledger regression suites: `27/27` PASS.
 - Subway loot/corpse evidence: `22/22` PASS.
-- Seventeen-entry whole-enemy gate now includes Incomplete Rebuild after
-  Deranged Shopper, Mugger, Looter, Bloodcreeper, Stim Fiend, and Neural Burnout
+- Eighteen-entry whole-enemy gate now includes Redundant Scan and Incomplete
+  Rebuild after Deranged Shopper, Mugger, Looter, Bloodcreeper, Stim Fiend, and
+  Neural Burnout
   joined the previously confirmed ten. Ordinary generation check, expanded
   gate, WorldPopulation `35/35`, and Subway loot `22/22` pass.
 - Playfield lifecycle class: `55/62`; every Subway and ordinary-enemy test

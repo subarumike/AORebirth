@@ -623,19 +623,25 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemySpawnVariant variant,
             CapturedSubwayGenerationVariantDefinition[] generationEvidence)
         {
-            if (archetype == null || archetype.MonsterData != IncompleteRebuildMonsterData)
+            if (archetype == null
+                || (archetype.MonsterData != IncompleteRebuildMonsterData
+                    && archetype.MonsterData != RedundantScanMonsterData))
             {
                 return ForOrdinary(archetype, sourceInstance);
             }
 
             CapturedEnemyCombatContract baseline = ForOrdinary(archetype, sourceInstance);
+            int monsterData = archetype.MonsterData;
+            string displayName = monsterData == IncompleteRebuildMonsterData
+                ? "Incomplete Rebuild"
+                : "Redundant Scan";
             OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
                 ? null
                 : variant.WeaponLoadout;
             string atomicFailure = string.Empty;
             if (!baseline.IsCombatReady
                 || !OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
-                    IncompleteRebuildMonsterData,
+                    monsterData,
                     sourceInstance,
                     variant,
                     generationEvidence,
@@ -645,7 +651,7 @@ namespace AORebirth.Core.Playfields
                 {
                     AttackModel = CapturedEnemyAttackModel.Unresolved,
                     IsCombatReady = false,
-                    Evidence = "Incomplete Rebuild atomic generation evidence is incomplete: "
+                    Evidence = displayName + " atomic generation evidence is incomplete: "
                                + atomicFailure
                 };
             }
@@ -655,13 +661,20 @@ namespace AORebirth.Core.Playfields
                 AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
                 IsCombatReady = true,
                 Evidence = weapon.Evidence
-                           + ": Incomplete Rebuild selected one captured atomic level/stat/weapon generation; two normal local-player hits span 17..35; item owns runtime damage and recharge.",
+                           + ": " + displayName
+                           + " selected one captured atomic level/stat/weapon generation; "
+                           + (monsterData == IncompleteRebuildMonsterData
+                               ? "two normal local-player hits span 17..35; "
+                               : "one normal local-player hit is 19; ")
+                           + "item owns runtime damage and recharge; captured AttackInfo ammo "
+                           + (monsterData == IncompleteRebuildMonsterData ? "9" : "17")
+                           + ", slot 6, unknown 0.",
                 WeaponLowId = weapon.LowId,
                 WeaponHighId = weapon.HighId,
                 WeaponQuality = weapon.Quality,
                 WeaponInventorySlot = 6,
                 HasCapturedEquippedAttackInfo = true,
-                AttackInfoAmmoCount = 9,
+                AttackInfoAmmoCount = monsterData == IncompleteRebuildMonsterData ? 9 : 17,
                 AttackInfoWeaponSlot = 6,
                 AttackInfoUnknown = 0,
                 AttackInfoWeaponInstance = 0

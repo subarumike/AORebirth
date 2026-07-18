@@ -274,7 +274,17 @@ namespace AORebirth.Core.Playfields
             new CapturedSubwayGenerationVariantDefinition(203728, 0x795451FD, 21, 474, 0, 99, 73, 122654, 122654, 20, "20260716-222007:(SimpleChar:7970254C)"),
             new CapturedSubwayGenerationVariantDefinition(203728, 0x795451FD, 22, 500, 0, 99, 76, 122655, 122656, 22, "20260716-033326:(SimpleChar:796D403C)"),
             new CapturedSubwayGenerationVariantDefinition(203728, 0x79545241, 17, 368, 0, 98, 59, 122654, 122654, 20, "20260709-222339:(SimpleChar:79545241)"),
-            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545241, 19, 421, 0, 98, 66, 122655, 122656, 22, "20260709-225408:(SimpleChar:79545352)")
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545241, 19, 421, 0, 98, 66, 122655, 122656, 22, "20260709-225408:(SimpleChar:79545352)"),
+            new CapturedSubwayGenerationVariantDefinition(204178, 0x7953AF85, 20, 782, 0, 99, 69, 122027, 122027, 20, "20260709-222339:(SimpleChar:7953AF85)"),
+            new CapturedSubwayGenerationVariantDefinition(204178, 0x7953AF85, 21, 829, 0, 99, 73, 122026, 122027, 19, "20260717-214612:(SimpleChar:7973F090)"),
+            new CapturedSubwayGenerationVariantDefinition(204178, 0x7953AF85, 21, 829, 0, 99, 73, 122028, 122029, 22, "20260716-034559:(SimpleChar:796CD6EF)"),
+            new CapturedSubwayGenerationVariantDefinition(204178, 0x7953AF85, 21, 829, 0, 99, 73, 122028, 122029, 25, "20260716-222007:(SimpleChar:79702286)"),
+            new CapturedSubwayGenerationVariantDefinition(204178, 0x795451BF, 19, 736, 0, 98, 66, 122026, 122027, 14, "20260709-222339:(SimpleChar:795451BF)"),
+            new CapturedSubwayGenerationVariantDefinition(204178, 0x795451C4, 20, 782, 0, 99, 69, 122026, 122027, 16, "20260716-034559:(SimpleChar:796CD7D0)"),
+            new CapturedSubwayGenerationVariantDefinition(204178, 0x795451C4, 20, 782, 0, 99, 69, 122028, 122029, 23, "20260716-222007:(SimpleChar:797024B6)"),
+            new CapturedSubwayGenerationVariantDefinition(204178, 0x795451C4, 21, 829, 0, 99, 73, 122028, 122029, 25, "20260709-222339:(SimpleChar:795451C4)"),
+            new CapturedSubwayGenerationVariantDefinition(204178, 0x795451D3, 19, 736, 0, 98, 66, 122026, 122027, 16, "20260709-222339:(SimpleChar:795451D3)"),
+            new CapturedSubwayGenerationVariantDefinition(204178, 0x795451D3, 22, 875, 0, 99, 76, 122026, 122027, 19, "20260716-220400:(SimpleChar:7970250F)")
         };
 
         private static readonly CapturedSubwayStrictLootProfileDefinition[] StrictLootProfiles =
