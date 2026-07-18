@@ -58,12 +58,17 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayDisobedientBotMonsterData = 17649;
 
-        public const int CapturedSubwayDisobedientBotMinimumDamage = 10;
+        // Nine projected official-live hits plus eight authoritative raw-only hits
+        // prove the normal local-player SIW1 damage envelope. No critical hit
+        // has been observed and critical behavior remains unresolved.
+        public const int CapturedSubwayDisobedientBotMinimumDamage = 8;
 
-        public const int CapturedSubwayDisobedientBotMaximumDamage = 11;
+        public const int CapturedSubwayDisobedientBotMaximumDamage = 15;
 
         public const double CapturedSubwayDisobedientBotInitialAttackSeconds = 3.270444;
 
+        // Focused raw traffic includes missed attempts and therefore preserves
+        // the attack-attempt cadence instead of deriving recharge from landed hits.
         public const double CapturedSubwayDisobedientBotRechargeSeconds = 5.973723;
 
         public const int CapturedSubwayDisobedientBotWeaponSlot = 0;
@@ -76,7 +81,20 @@ namespace ZoneEngine.Core.Playfields
 
         public const string CapturedSubwayDisobedientBotWeaponName = "SIW1";
 
-        public const int CapturedSubwayDisobedientBotSpecialAttackWeaponValue = 49;
+        public const int CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponValue = 30;
+
+        public const int CapturedSubwayDisobedientBotLevel6SpecialAttackWeaponValue = 35;
+
+        // Private midpoint policy between captured level-6 value 35 and level-8 value 45.
+        public const int CapturedSubwayDisobedientBotLevel7SpecialAttackWeaponPolicyValue = 40;
+
+        public const int CapturedSubwayDisobedientBotLevel8SpecialAttackWeaponValue = 45;
+
+        public const int CapturedSubwayDisobedientBotLevel9SpecialAttackWeaponValue = 49;
+
+        public const int CapturedSubwayDisobedientBotLevel10SpecialAttackWeaponValue = 54;
+
+        public const int CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponLastValue = 22;
 
         public const int CapturedSubwayDisobedientBotSpecialAttackWeaponLastValue = 0;
 

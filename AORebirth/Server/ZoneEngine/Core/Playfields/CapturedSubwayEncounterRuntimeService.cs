@@ -831,7 +831,8 @@ namespace AORebirth.Core.Playfields
             string combatFailure;
             CapturedEnemyCombatContract combat = CapturedSubwayCombatCatalog.For(
                 definition.DisplayName,
-                definition.MonsterData);
+                definition.MonsterData,
+                definition.Level);
             if (!CapturedEnemyCombatRuntime.Prepare(character, controller, combat, out combatFailure))
             {
                 LogUtil.Debug(

@@ -676,6 +676,8 @@ namespace ZoneEngine.Core.Playfields
             int monsterScale = 90,
             int runSpeed = 33)
         {
+            // Official capture 20260708-143600 records 449.953427 seconds from
+            // dead-NPC despawn to same-position replacement (0.190-unit delta).
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
                 "A120",
@@ -686,13 +688,14 @@ namespace ZoneEngine.Core.Playfields
                 monsterScale,
                 0,
                 runSpeed,
-                95,
+                138,
                 403182081,
                 7,
                 5,
                 x,
                 y,
-                z);
+                z,
+                respawnDelaySeconds: 450.0);
         }
 
         private static CapturedSubwaySpawnDefinition Mugger(
@@ -844,7 +847,7 @@ namespace ZoneEngine.Core.Playfields
             this.PatrolZ = patrolZ;
             this.UseSpawnAsPatrolStart = useSpawnAsPatrolStart;
             this.RespawnDelaySeconds = respawnDelaySeconds;
-            this.Combat = CapturedSubwayCombatCatalog.For(name, monsterData);
+            this.Combat = CapturedSubwayCombatCatalog.For(name, monsterData, level);
         }
 
         public int SourceInstance { get; private set; }

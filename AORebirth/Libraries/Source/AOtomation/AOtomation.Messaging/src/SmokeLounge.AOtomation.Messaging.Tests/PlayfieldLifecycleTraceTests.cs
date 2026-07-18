@@ -1220,7 +1220,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "public CapturedSubwayLootDefinition[] GetLootDefinitions()");
             string lootProfile = ExtractMethodBlock(
                 catalogText,
-                "private static OrdinaryEnemyLootProfile BuildLootProfile(");
+                "CapturedSubwayCorpseEvidenceDefinition[] corpseEvidence)");
             string corpseRegistration = ExtractMethodBlock(
                 playfieldText,
                 "private void RegisterCorpse(ICharacter target, Identity corpseIdentity)");
@@ -2408,6 +2408,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
             string movementRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs"));
+            string ordinaryProfileText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyProfile.cs"));
+            string ordinaryRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
             string heartbeatRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCharacterHeartbeatRuntimeService.cs"));
             string weaponPacketText = File.ReadAllText(
@@ -2420,17 +2424,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string corpseRulesText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
+            string generatedCombatReportText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"docs\generated\subway_enemy_combat_contracts.json"));
+            string disobedientBotDefinition = ExtractMethodBlock(
+                providerText,
+                "private static CapturedSubwaySpawnDefinition DisobedientBot(");
 
             string[] acceptedEnemyKeys =
                 {
                     "Thief|26092|138",
                     "Filth Flea|17657|138",
+                    "Disobedient Bot|17649|138",
                     "Slum Runner|55648|151",
                     "Molested Molecules|203746|148"
                 };
 
             Assert.AreEqual(
-                4,
+                5,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
 
@@ -2489,6 +2499,66 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
                 "Accepted Subway Molested Molecules must keep its nine exact spawns, captured attack range/cadence, shared chase, three strict loot outcomes, CATMesh/credits, private four-minute respawn policy, and ordinary corpse lifetimes together.");
+
+            Assert.AreEqual(
+                12,
+                CountOccurrences(providerText, "CapturedSurveySpawn(DisobedientBot("),
+                "Accepted Subway Disobedient Bot must preserve all 12 exact spawn rows.");
+            Assert.IsTrue(disobedientBotDefinition.Contains("\"Disobedient Bot\""), "Accepted Disobedient Bot name is missing.");
+            Assert.IsTrue(disobedientBotDefinition.Contains("17649"), "Accepted Disobedient Bot MonsterData is missing.");
+            Assert.IsTrue(disobedientBotDefinition.Contains("138"), "Accepted Disobedient Bot NPC family is missing.");
+            Assert.IsTrue(disobedientBotDefinition.Contains("respawnDelaySeconds: 450.0"), "Accepted Disobedient Bot scheduler delay is missing.");
+            Assert.IsTrue(disobedientBotDefinition.Contains("449.953427 seconds"), "Accepted Disobedient Bot respawn provenance is missing.");
+            Assert.IsTrue(disobedientBotDefinition.Contains("0.190-unit delta"), "Accepted Disobedient Bot respawn-position provenance is missing.");
+            Assert.IsTrue(
+                combatContractText.Contains("case 17649:")
+                && providerText.Contains("CapturedSubwayCombatCatalog.For(name, monsterData, level)")
+                && combatContractText.Contains("17 Disobedient Bot SIW1 normal local-player hits span 8-15 damage")
+                && combatContractText.Contains("SpecialAttackWeapon contexts are capture-backed for levels 5, 6, 8, 9, and 10")
+                && combatContractText.Contains("including the level-5 terminal value 22")
+                && combatContractText.Contains("level 7 explicitly using the bounded 35/45 midpoint policy")
+                && combatContractText.Contains("Disobedient Bot SIW1 attack context is unresolved for level")
+                && attackRulesText.Contains("CapturedSubwayDisobedientBotMinimumDamage = 8")
+                && attackRulesText.Contains("CapturedSubwayDisobedientBotMaximumDamage = 15")
+                && attackRulesText.Contains("CapturedSubwayDisobedientBotRechargeSeconds = 5.973723")
+                && attackRulesText.Contains("CapturedSubwayDisobedientBotWeaponTag = 0x53495731")
+                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponValue = 30")
+                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel6SpecialAttackWeaponValue = 35")
+                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel7SpecialAttackWeaponPolicyValue = 40")
+                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel8SpecialAttackWeaponValue = 45")
+                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel9SpecialAttackWeaponValue = 49")
+                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel10SpecialAttackWeaponValue = 54")
+                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponLastValue = 22")
+                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponValue") == 1
+                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel6SpecialAttackWeaponValue") == 1
+                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel7SpecialAttackWeaponPolicyValue") == 1
+                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel8SpecialAttackWeaponValue") == 1
+                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel9SpecialAttackWeaponValue") == 1
+                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel10SpecialAttackWeaponValue") == 1
+                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponLastValue") == 1
+                && catalogText.Contains("level => CapturedSubwayCombatCatalog.For(first.Name, first.MonsterData, level)")
+                && ordinaryProfileText.Contains("CapturedEnemyCombatContract ResolveContract(int level)")
+                && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(variant.Level)")
+                && ordinaryRuntimeText.Contains("combatContract.AttackModel")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue"),
+                "Accepted Subway Disobedient Bot must preserve level-aware SIW1 context, captured damage/attempt cadence, and shared chase while failing closed outside bounded levels.");
+            Assert.IsTrue(
+                providerText.Contains("234877")
+                && providerText.Contains("104683")
+                && catalogText.Contains("if (monsterData == 17649)")
+                && catalogText.Contains("OrdinaryEnemyLootPoolMode.WeightedOne")
+                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(5, 6, 6, 2")
+                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(10, 12, 12, 2")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted Subway Disobedient Bot must preserve strict weighted loot evidence, exact credits, CATMesh behavior, and ordinary corpse lifetimes.");
+            Assert.IsTrue(
+                generatedCombatReportText.Contains("\"Disobedient Bot\":")
+                && generatedCombatReportText.Contains("\"20260708-143600\"")
+                && generatedCombatReportText.Contains("\"normalMinDamage\": 8")
+                && generatedCombatReportText.Contains("\"normalMaxDamage\": 15"),
+                "Accepted Subway Disobedient Bot generated combat evidence must retain the official-live 8..15 local-player envelope.");
 
             Assert.IsTrue(
                 providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 146, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0, healthDamage: 31))")

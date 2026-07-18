@@ -15,6 +15,7 @@ REPO = Path(__file__).resolve().parents[2]
 CAPTURE_ROOT = REPO / "tools-temp" / "AOSharpLiveCapture" / "bin" / "Debug" / "captures"
 CAPTURES = (
     "20260708-004038",
+    "20260708-143600",
     "20260709-193914",
     "20260709-205921",
     "20260709-210452",
@@ -39,6 +40,7 @@ CAPTURES = (
 )
 CAPTURE_ENEMY_FILTERS = {
     "20260708-004038": frozenset({"Filth Flea"}),
+    "20260708-143600": frozenset({"Disobedient Bot"}),
     "20260716-034433": frozenset({"Vergil Aeneid"}),
     "20260716-034559": frozenset({"Melded Patterns"}),
     "20260716-034656": frozenset({"Slum Runner"}),
@@ -84,6 +86,12 @@ def read_csv(path: Path):
         return list(csv.DictReader(handle))
 
 
+def read_json(path: Path):
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8-sig"))
+
+
 def parse_time(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
@@ -117,12 +125,15 @@ def add_identity(identities: dict[str, dict[str, object]], row: dict[str, str]):
             "EnemyIdentity",
             "CharacterIdentity",
             "PrimaryIdentity",
+            "identity",
         )
     )
-    name = first_value(row, "Name", "NpcName", "NPCName", "EnemyName")
+    name = first_value(row, "Name", "NpcName", "NPCName", "EnemyName", "name")
     if not identity or not name or name.startswith("Remains of "):
         return
-    monster_data_value = first_value(row, "MonsterData", "MonsterDataId")
+    monster_data_value = first_value(
+        row, "MonsterData", "MonsterDataId", "monsterData"
+    )
     if not monster_data_value:
         match = MONSTER_DATA_DETAIL.search(row.get("Detail", ""))
         monster_data_value = match.group("monster_data") if match else ""
@@ -195,6 +206,22 @@ def main():
             add_identity(identities, row)
         for row in read_csv(folder / "npc-lifecycle.csv"):
             add_identity(identities, row)
+        for row in read_json(folder / "enemy-dossier.json").get("enemies", []):
+            add_identity(identities, row)
+        for row in read_csv(folder / "corpse-full-updates.csv"):
+            corpse_name = first_value(row, "DeadNpcName", "CorpseName")
+            if corpse_name.startswith("Remains of "):
+                corpse_name = corpse_name[len("Remains of ") :]
+            add_identity(
+                identities,
+                {
+                    "Identity": first_value(
+                        row, "DeadNpcIdentity", "TailDeadNpcIdentity"
+                    ),
+                    "Name": corpse_name,
+                    "MonsterData": first_value(row, "CorpseMonsterData"),
+                },
+            )
 
         for row in read_csv(folder / "enemy-combat.csv"):
             source = row.get("SourceIdentity", "")

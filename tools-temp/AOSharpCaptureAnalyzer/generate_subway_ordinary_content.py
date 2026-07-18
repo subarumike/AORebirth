@@ -138,6 +138,7 @@ CAPTURE_CORPSE_EVIDENCE_FILTERS = {
             "Workman Striker",
         )
     ),
+    "20260709-205921": frozenset(("Disobedient Bot",)),
     "20260712-153918": frozenset(
         (
             "Discarded Pet",
@@ -150,8 +151,11 @@ CAPTURE_CORPSE_EVIDENCE_FILTERS = {
     ),
     "20260710-202132": frozenset(("Mugger",)),
     "20260712-155528": frozenset(("Filth Flea",)),
+    "20260712-160257": frozenset(("Disobedient Bot",)),
     "20260712-161506": frozenset(("Filth Flea", "Thief")),
     "20260713-013906": frozenset(("Discarded Pet", "Mugger")),
+    "20260713-014714": frozenset(("Disobedient Bot",)),
+    "20260713-033511": frozenset(("Disobedient Bot",)),
     "20260712-223719": frozenset(
         (
             "Bloodcreeper",
@@ -180,6 +184,7 @@ CAPTURE_CORPSE_EVIDENCE_FILTERS = {
     ),
 }
 CAPTURE_CORPSE_IDENTITY_FILTERS = {
+    "20260709-205921": frozenset(("(SimpleChar:795310FB)",)),
     "20260709-220439": frozenset(
         (
             "(SimpleChar:79513A87)",
@@ -326,6 +331,9 @@ CAPTURE_CORPSE_IDENTITY_FILTERS = {
             "(SimpleChar:7960787F)",
         )
     ),
+    "20260712-160257": frozenset(("(SimpleChar:795EC78A)",)),
+    "20260713-014714": frozenset(("(SimpleChar:79607CD0)",)),
+    "20260713-033511": frozenset(("(SimpleChar:79607E2C)",)),
     "20260716-222007": frozenset(
         (
             "(SimpleChar:79702459)",
@@ -333,6 +341,9 @@ CAPTURE_CORPSE_IDENTITY_FILTERS = {
             "(SimpleChar:7970245E)",
         )
     ),
+}
+CAPTURE_LIFECYCLE_DEATH_LEVEL_FILTERS = {
+    "20260712-160257": frozenset(("(SimpleChar:795EC78A)",)),
 }
 ARCHETYPE_CAPTURE_FILTERS = {
     "Deranged Shopper": frozenset(("20260710-202132",)),
@@ -1029,6 +1040,54 @@ def corpse_profiles() -> dict[str, list[dict[str, object]]]:
             if dead_identity and enemy_level > 0:
                 death_levels[dead_identity] = enemy_level
 
+        lifecycle_dead_identities = CAPTURE_LIFECYCLE_DEATH_LEVEL_FILTERS.get(capture)
+        if lifecycle_dead_identities is not None:
+            lifecycle_levels = {}
+            lifecycle_deaths = set()
+            for row in read_csv(CAPTURE_ROOT / capture / "npc-lifecycle.csv"):
+                identity = row.get("PrimaryIdentity", "")
+                if identity.startswith("SimpleChar:"):
+                    identity = f"({identity})"
+                if identity not in lifecycle_dead_identities:
+                    continue
+                phase = str(row.get("Phase") or "").lower()
+                if phase == "character-seen":
+                    match = re.search(r"\blevel=(\d+)\b", row.get("Detail", ""), re.IGNORECASE)
+                    if match is None:
+                        continue
+                    level = int(match.group(1))
+                    if level <= 0:
+                        continue
+                    previous = lifecycle_levels.get(identity)
+                    if previous is not None and previous != level:
+                        raise ValueError(
+                            "lifecycle level evidence conflicted capture={0} identity={1} levels={2},{3}".format(
+                                capture, identity, previous, level
+                            )
+                        )
+                    lifecycle_levels[identity] = level
+                elif phase == "death-action":
+                    lifecycle_deaths.add(identity)
+
+            for identity in lifecycle_dead_identities:
+                if identity not in lifecycle_levels or identity not in lifecycle_deaths:
+                    raise ValueError(
+                        "lifecycle death-level evidence drifted capture={0} identity={1} level={2} death={3}".format(
+                            capture,
+                            identity,
+                            lifecycle_levels.get(identity),
+                            identity in lifecycle_deaths,
+                        )
+                    )
+                existing_level = death_levels.get(identity)
+                if existing_level is not None and existing_level != lifecycle_levels[identity]:
+                    raise ValueError(
+                        "enemy-state and lifecycle levels conflicted capture={0} identity={1} levels={2},{3}".format(
+                            capture, identity, existing_level, lifecycle_levels[identity]
+                        )
+                    )
+                death_levels[identity] = lifecycle_levels[identity]
+
         seen_dead_identities = set()
         selected_dead_identities = set()
         for row in read_csv(CAPTURE_ROOT / capture / "corpse-full-updates.csv"):
@@ -1250,7 +1309,7 @@ def validate_content(
             {(5, 18): 1, (6, 21): 2, (7, 25): 8, (8, 28): 1, (9, 32): 4, (10, 35): 7}
         ),
         "Disobedient Bot": Counter(
-            {(5, 6): 2, (6, 8): 2, (8, 10): 2, (9, 11): 1, (10, 12): 2}
+            {(5, 6): 2, (6, 8): 2, (8, 10): 4, (9, 11): 3, (10, 12): 2}
         ),
         "Empty Shell": Counter({(19, 118): 1, (21, 131): 1}),
         "Filth Flea": Counter(

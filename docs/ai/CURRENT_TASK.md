@@ -59,7 +59,7 @@ population in bounded runtime batches.
 - Reused corpse identities now keep the exact name and dead-NPC relationship
   from their own generation instead of inheriting the union of every prior use
   of the same identity.
-- The generated ordinary provider now preserves `278` exact, death-linked,
+- The generated ordinary provider now preserves `282` exact, death-linked,
   positive-credit corpse observations across `26` capture-backed profiles.
   The recovered deep batches include all accepted observations from
   `20260709-220439`, `20260709-222339`, `20260709-225408`,
@@ -144,6 +144,26 @@ population in bounded runtime batches.
   positive-credit corpses, four-minute private ordinary respawn policy, and
   ordinary corpse lifetimes are guarded together. The respawn value remains
   explicit private-server policy rather than an official-live timing claim.
+- Disobedient Bot is the fifth accepted ordinary enemy. All 12 exact spawn rows
+  now preserve captured NPC family `138` and an explicit `450`-second post-NPC-
+  despawn schedule; official capture `20260708-143600` records `459.913`
+  seconds death-to-replacement and a `0.190`-unit position delta. Seventeen
+  normal local-player SIW1 hits prove the aggregate `8..15` damage envelope,
+  while focused attempts retain the capture-exact `5.973723`-second recharge.
+  SIW1 context is selected from the spawned level (`L5=30/30/30/30/22`,
+  `L6=35`, `L8=45`, `L9=49`, `L10=54`); active L7 uses the explicit bounded
+  midpoint policy `40`, and other levels fail closed. Thirteen valid exact
+  corpse/credit chains, seven strict loot outcomes, two proven item
+  memberships, CATMesh `15215`, shared chase, and ordinary corpse lifetimes are
+  guarded with combat and respawn. The two existing Bot rows in the 38-row
+  operational quarantine remain quarantined; profile acceptance did not enable
+  them. Critical behavior, proactive aggro radius, and leash/reset distance
+  remain unobserved rather than guessed.
+- The Subway combat-contract analyzer now supplements legacy identity mapping
+  from `enemy-dossier.json` and exact corpse dead-NPC links before consuming
+  combat rows. Its regenerated Bot projection recovers nine decoded
+  local-player hits at `8..15`; the eight additional authoritative raw rows are
+  retained in the 17-hit source audit instead of being silently discarded.
 - Eumenides is now a dedicated named PF127 encounter from atomic capture
   `20260716-034559`: exact L20/2792 HP appearance, QL20 weapon context,
   capture-bounded proactive acquisition, shared LOS/chase/leash behavior, exact
@@ -185,11 +205,11 @@ population in bounded runtime batches.
   regeneration: PASS.
 - Current inventory/content-ledger regression suites: `27/27` PASS.
 - Subway loot/corpse evidence: `18/18` PASS.
-- Four-entry whole-enemy acceptance gate (Thief, Filth Flea, Slum Runner,
-  Molested Molecules): PASS.
+- Five-entry whole-enemy acceptance gate (Thief, Filth Flea, Disobedient Bot,
+  Slum Runner, Molested Molecules): PASS.
 - Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
-- World population foundation: `25/25` PASS.
+- World population foundation: `26/26` PASS.
 - Subway merchant content: `4/4` PASS.
 - Visibility interest/catalog: `12/12` PASS.
 - Quarantine/spatial-selection guardrail: PASS.
@@ -198,10 +218,10 @@ population in bounded runtime batches.
 - Approved AORebirth Debug build: PASS.
 - Chat, Login, and Zone restart: PASS; ports `6996`, `7012`, `7500`, and `7501`
   listening.
-- Repository-wide AOtomation suite: `354/368`; 14 broader failures remain
+- Repository-wide AOtomation suite: `356/369`; 13 broader failures remain
   outside these changed Subway surfaces. Every focused test for
-  Eumenides, global loot, merchants, the whole-enemy gate, and capture inventory
-  passes.
+  Eumenides, Disobedient Bot combat/corpse/respawn, global loot, merchants, the
+  whole-enemy gate, and capture inventory passes.
 - The broader visibility lifecycle class still exposes its pre-existing pet
   observer source-guardrail failure because `PetRuntimeService` contains both
   the shared visibility hook and the older `AnnounceOthers` call. It is outside
