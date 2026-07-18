@@ -152,7 +152,8 @@ namespace AORebirth.Core.Playfields
             double? healthRegenIntervalSeconds = null,
             int? healthRegenDelta = null,
             bool regenerateHealthWhileInCombat = false,
-            Func<int, CapturedEnemyCombatContract> contractResolver = null)
+            Func<int, CapturedEnemyCombatContract> contractResolver = null,
+            Func<int, int, CapturedEnemyCombatContract> sourceContractResolver = null)
         {
             this.Mode = mode;
             this.DamageSource = damageSource;
@@ -163,6 +164,7 @@ namespace AORebirth.Core.Playfields
             this.HealthRegenDelta = healthRegenDelta;
             this.RegenerateHealthWhileInCombat = regenerateHealthWhileInCombat;
             this.contractResolver = contractResolver;
+            this.sourceContractResolver = sourceContractResolver;
         }
 
         internal OrdinaryEnemyCombatMode Mode { get; private set; }
@@ -176,11 +178,20 @@ namespace AORebirth.Core.Playfields
 
         private readonly Func<int, CapturedEnemyCombatContract> contractResolver;
 
+        private readonly Func<int, int, CapturedEnemyCombatContract> sourceContractResolver;
+
         internal CapturedEnemyCombatContract ResolveContract(int level)
         {
             return this.contractResolver == null
                        ? this.Contract
                        : this.contractResolver(level);
+        }
+
+        internal CapturedEnemyCombatContract ResolveContract(int sourceIdentity, int level)
+        {
+            return this.sourceContractResolver == null
+                       ? this.ResolveContract(level)
+                       : this.sourceContractResolver(sourceIdentity, level);
         }
     }
 

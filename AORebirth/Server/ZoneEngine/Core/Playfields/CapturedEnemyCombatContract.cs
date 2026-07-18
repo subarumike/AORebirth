@@ -638,6 +638,8 @@ namespace AORebirth.Core.Playfields
 
     internal static class CapturedSubwayCombatCatalog
     {
+        private const int WorkmanStrikerMonsterData = 203854;
+
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
         {
             return For(name, monsterData, null);
@@ -1009,9 +1011,95 @@ namespace AORebirth.Core.Playfields
                     specialAttackWeaponLastValue));
         }
 
+        private static CapturedEnemyCombatContract ForWorkmanStriker(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance)
+        {
+            CapturedSubwaySourceWeaponEvidenceDefinition matched = null;
+            int matches = 0;
+            foreach (CapturedSubwaySourceWeaponEvidenceDefinition evidence in
+                archetype.SourceWeaponEvidence)
+            {
+                if (evidence.SourceInstance != sourceInstance)
+                {
+                    continue;
+                }
+
+                matched = evidence;
+                matches++;
+            }
+
+            if (matches != 1 || matched == null)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    string.Format(
+                        "Workman Striker source 0x{0:X8} requires exactly one owner-linked captured weapon tuple; found {1}",
+                        sourceInstance,
+                        matches),
+                    archetype.Combat != null && archetype.Combat.Observed);
+            }
+
+            return CapturedEnemyCombatContract.EquippedWeapon(
+                string.Format(
+                    "{0}: Workman Striker source 0x{1:X8} owner-linked QL{2} weapon {3}/{4}; item owns normal damage and recharge; no fixed damage, special-attack, or captured AttackInfo context",
+                    matched.EvidenceCaptures,
+                    sourceInstance,
+                    matched.Quality,
+                    matched.LowId,
+                    matched.HighId),
+                matched.LowId,
+                matched.HighId,
+                matched.Quality,
+                (int)WeaponSlots.Righthand);
+        }
+
+        private static CapturedEnemyCombatContract ForMeldedPatterns(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype)
+        {
+            CapturedSubwayCombatEvidenceDefinition combat = archetype.Combat;
+            bool hasFocusedWeaponCapture = archetype.EvidenceCaptures != null
+                                           && Array.IndexOf(
+                                               archetype.EvidenceCaptures,
+                                               "20260716-034559") >= 0;
+            bool hasExactNormalHitBoundary = combat != null
+                                             && combat.Observed
+                                             && combat.ObservedRows == 7
+                                             && combat.MinDamage == 21
+                                             && combat.MaxDamage == 34
+                                             && combat.WeaponSlot
+                                                == (int)WeaponSlots.Righthand;
+            if (!hasFocusedWeaponCapture || !hasExactNormalHitBoundary)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Melded Patterns equipped-weapon context requires focused capture 20260716-034559 and its seven normal 21..34 local-player hits",
+                    combat != null && combat.Observed);
+            }
+
+            return CapturedEnemyCombatContract.EquippedWeapon(
+                "20260716-034559: Melded Patterns QL20 Irreparable Sleekblaster Minor 121817/121818; seven normal local-player hits span 21..34 and no critical was observed; weapon owns runtime damage and recharge",
+                NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponLowTemplate,
+                NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponHighTemplate,
+                NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponQuality,
+                (int)WeaponSlots.Righthand);
+        }
+
         internal static CapturedEnemyCombatContract ForOrdinary(
             CapturedSubwayOrdinaryArchetypeDefinition archetype)
         {
+            if (archetype != null && archetype.MonsterData == WorkmanStrikerMonsterData)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Workman Striker combat requires an exact captured source identity; aggregate weapon fallback is forbidden",
+                    archetype.Combat != null && archetype.Combat.Observed);
+            }
+
+            if (archetype != null
+                && archetype.MonsterData
+                   == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData)
+            {
+                return ForMeldedPatterns(archetype);
+            }
+
             if (archetype != null
                 && archetype.MonsterData == NpcCombatAttackRules.CapturedSubwayBloodcreeperMonsterData)
             {
@@ -1034,6 +1122,18 @@ namespace AORebirth.Core.Playfields
                 combat.WeaponSlot,
                 combat.AttackInfoUnknown,
                 combat.WeaponInstance);
+        }
+
+        internal static CapturedEnemyCombatContract ForOrdinary(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance)
+        {
+            if (archetype != null && archetype.MonsterData == WorkmanStrikerMonsterData)
+            {
+                return ForWorkmanStriker(archetype, sourceInstance);
+            }
+
+            return ForOrdinary(archetype);
         }
     }
 }

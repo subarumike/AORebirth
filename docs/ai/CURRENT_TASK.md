@@ -10,6 +10,24 @@ projections no longer require repeat gameplay captures. The active work is to
 promote the recovered exact evidence and then validate the quarantined PF127
 population in bounded runtime batches.
 
+## Quest-system foundation and TOTW gateway (2026-07-17)
+
+- The MySQL-backed, character-scoped mission repository now covers lifecycle,
+  objective progress, replay-safe observations, character/account flags, and
+  idempotent reward stages. Rex B18C through the B18F/B194 handoff now use this
+  runtime instead of process-local authoritative state.
+- Windcaller Karrec's capture-backed PF655 flow now covers dialogue acceptance,
+  burger/card handout, an exact two-item trade, `+2` stat-75 side tokens, a
+  durable `5000` personal-research allocation record, mission cleanup, and
+  account flag `totw-wall-access`. The known wall `Terminal:C004028F` transfers
+  eligible accounts to PF647 at payload landing `(1814, 29, 2699)`.
+- Remaining validation is live database/schema startup and private-client smoke
+  for restart persistence, duplicate prevention, dialogue/trade/rewards, and
+  denied/eligible wall use. The capture does not prove the official account-flag
+  identity, denial packet, NPC spawn template, total ordinary XP, or research
+  progression semantics; unresolved `PerkUpdate` fields are not replayed.
+- Detailed status: `docs/project/QUEST_SYSTEM_AUDIT_20260717.md`.
+
 ## Corpus Inventory
 
 - `294` timestamped AOSharp capture folders were classified using exact
@@ -123,10 +141,22 @@ population in bounded runtime batches.
   `20260710-211430`, `20260716-221358`, and `20260716-222201`, with normal and
   critical hit summaries separated in
   `docs/generated/subway_enemy_combat_contracts.json`.
-- Two exact reviewed raw packets from legacy capture `20260709-222339` now add
-  evidence-only Strike Foreman special-attack and attack-initiation context.
-  The fallback is sequence/byte exact, yields to derived combat rows, and does
-  not infer outgoing damage or cadence.
+- Reviewed legacy capture `20260709-213711` now contributes exact Workman
+  Striker and Architect Striker combat rows. Declared overlap rules deduplicate
+  only the simultaneous `20260709-212115 -> 212336/213711` projections within
+  a `20`-millisecond audited logger-skew boundary. Workman therefore has `47`
+  distinct normal local-player hits at `14..23`, six distinct criticals at
+  `36..42`, and a `5.092328`-second median attack interval; two Killer-pet hits
+  remain separate. Architect has `15` distinct normal hits at `13..17`, one
+  `38` critical, and a `5.425420`-second median interval. Unrelated captures,
+  events within one capture, and target roles are never collapsed.
+- The reviewed raw combat burst from legacy capture `20260709-222339` proves
+  Strike Foreman's empty `SpecialAttackWeapon`, `Attack` initiation, and three
+  outgoing `AttackInfo` packets against the non-local player Wardog: two normal
+  `18` hits and one `40` critical at `4.849144`- and `5.000854`-second
+  intervals. These rows are other-player evidence only; they do not become a
+  local-player damage range. The sequence/byte-exact fallback yields to derived
+  rows and preserves that target-role boundary.
 - The diagnostic quarantine selector now changes spawn eligibility in the
   world-population owner when explicitly selected. The selector is disabled in
   the normal runtime; all `38` rows remain quarantined. A bounded
@@ -139,7 +169,7 @@ population in bounded runtime batches.
   CATMesh `31774`, 19 corpse/credit observations, ordinary corpse lifetimes,
   and observed `59.433`-second death-to-respawn interval are guarded together.
 - Molested Molecules is the fourth accepted ordinary enemy. Its nine exact
-  spawns, `16..42` normal player-facing damage, `4.763456`-second cadence,
+  spawns, `16..42` normal player-facing damage, `4.749995`-second cadence,
   shared chase, three strict loot outcomes, CATMesh `5921`, seven exact
   positive-credit corpses, four-minute private ordinary respawn policy, and
   ordinary corpse lifetimes are guarded together. The respawn value remains
@@ -159,6 +189,32 @@ population in bounded runtime batches.
   operational quarantine remain quarantined; profile acceptance did not enable
   them. Critical behavior, proactive aggro radius, and leash/reset distance
   remain unobserved rather than guessed.
+- Workman Striker now has a strict, generation-deduplicated loot denominator
+  from ten complete first corpse opens: eight positive and two explicitly
+  empty. Ten item/QL entries retain exact `1/10` or `2/10` observed frequencies;
+  ten other corpse generations were never opened and remain corpse/credit-only
+  evidence. The generator fails closed against the two exact zero-item packet
+  lines and matching corpse/dead-NPC generations. Wider pool completeness and
+  official probabilities remain unresolved. All 21 active Workman spawns now
+  resolve their exact owner-linked captured low/high/QL weapon tuple at runtime;
+  missing, conflicting, unknown, or aggregate source selection fails closed.
+  Weapon items own normal damage and recharge, with no fixed damage or synthetic
+  attack context. The shared weapon-critical formula is still not evidence-
+  backed, so Workman is not yet admitted by the whole-enemy gate.
+- Melded Patterns now equips its capture-proven QL20 Irreparable Sleekblaster
+  Minor `121817/121818`. Damage and recharge are item-owned through the shared
+  equipped-weapon path; no special-attack context, fixed damage override,
+  critical policy, loot probability, respawn exception, or acceptance claim is
+  synthesized.
+- One reusable reviewed legacy-open validator now promotes four more strict
+  item tables from exact corpse-full-update/dead-NPC generations and their first
+  raw `InventoryUpdate` before identity reuse. Shadow has 15 complete opens
+  (eight positive/seven empty), ordinary Infector seven (three/four), Architect
+  Striker four (three/one), and Melded Patterns four (three/one). Overlapping
+  `20260709-212115/212336` Shadow generations count once; unopened and snapshot-
+  only corpses never enter a denominator. Runtime uses independent observed-
+  sample entries with `ItemPoolComplete=false`; the basis values are private
+  existing-capture policy, not claims about official probabilities.
 - The Subway combat-contract analyzer now supplements legacy identity mapping
   from `enemy-dossier.json` and exact corpse dead-NPC links before consuming
   combat rows. Its regenerated Bot projection recovers nine decoded
@@ -246,11 +302,14 @@ until the staged identity has a private-client runtime result.
    Discarded Pets, 11 Violent Vagabonds, 6 Stim Fiends, 5 Muggers, 2
    Disobedient Bots, 2 Looters, and 1 Deranged Shopper.
 3. Strike Foreman has usable exact L19/736 HP appearance, QL19 weapon, raw
-   `SpecialAttackWeapon` plus `Attack` initiation against the player's Killer
-   pet, chase context, CATMesh `17870`, and `176` corpse credits. The raw sink
-   does not contain outgoing Strike Foreman `AttackInfo`, so damage and cadence
-   remain unresolved together with item loot, respawn timing, leash, and exact
-   acquisition range. Do not activate it by guessing the missing behavior.
+   `SpecialAttackWeapon` plus `Attack` initiation against the non-local player
+   Wardog, three other-player outgoing hits (`18`, `18`, and critical `40`),
+   approximately five-second observed target cadence, chase initiation,
+   CATMesh `17870`, and `176` corpse credits. Local-player outcomes remain
+   unobserved, and item loot, respawn timing, leash/reset, and exact acquisition
+   range remain unresolved. Do not activate the encounter by guessing those
+   missing boundaries; weapon-owned rolls must remain distinct from the
+   observed post-mitigation other-player outcomes.
 4. Bitaxel is classified as a player artifact and is not an enemy gap.
 5. Container Supplier stock is resolved by exact template-`99634` capture
    evidence. Dialogue remains unresolved and must not be synthesized.

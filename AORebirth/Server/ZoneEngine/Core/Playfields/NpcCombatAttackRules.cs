@@ -203,6 +203,14 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown5 = 0;
 
+        public const int CapturedSubwayMeldedPatternsMonsterData = 203747;
+
+        public const int CapturedSubwayMeldedPatternsWeaponLowTemplate = 121817;
+
+        public const int CapturedSubwayMeldedPatternsWeaponHighTemplate = 121818;
+
+        public const int CapturedSubwayMeldedPatternsWeaponQuality = 20;
+
         public const int CapturedSubwayAbmouthMonsterData = 155962;
 
         public const int CapturedSubwayAbmouthXopzMinimumDamage = 74;

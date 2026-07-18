@@ -293,6 +293,65 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void WorkmanStrikerUsesTenDeduplicatedCompleteCorpseOpens()
+        {
+            OrdinaryEnemyLootProfile loot = Profile("Workman Striker").Loot;
+
+            Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, loot.PoolMode);
+            Assert.IsFalse(loot.ItemPoolComplete);
+            Assert.AreEqual(10, loot.ObservedCompleteInventories);
+            Assert.AreEqual(2, loot.ObservedEmptyInventories);
+            Assert.AreEqual(10, loot.Entries.Length);
+            Assert.IsTrue(
+                loot.Entries.All(
+                    value => value.Evidence == OrdinaryEnemyLootEvidence.ObservedAvailableLoot
+                             && value.ProbabilityEvidence
+                             == OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy
+                             && value.ObservedCorpses == 10));
+            CollectionAssert.AreEqual(
+                new[]
+                    {
+                        "85562:85561:14:1:10:1000",
+                        "124025:124026:12:1:10:1000",
+                        "124263:124264:13:1:10:1000",
+                        "130087:130088:16:1:10:1000",
+                        "202719:202720:12:1:10:1000",
+                        "202719:202720:14:2:10:2000",
+                        "202719:202720:17:1:10:1000",
+                        "234874:234874:1:1:10:1000",
+                        "234877:234877:1:1:10:1000",
+                        "301714:301714:1:2:10:2000"
+                    },
+                loot.Entries
+                    .OrderBy(value => value.LowId)
+                    .ThenBy(value => value.QualityLevel)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}:{3}:{4}:{5}",
+                            value.LowId,
+                            value.HighId,
+                            value.QualityLevel,
+                            value.ObservedCount,
+                            value.ObservedCorpses,
+                            value.DropChanceBasisPoints))
+                    .ToArray());
+
+            CapturedSubwayLootOutcomeEvidenceDefinition[] outcomes =
+                new CapturedSubwayOrdinaryContentProvider().GetLootOutcomeEvidence(203854);
+            Assert.AreEqual(12, outcomes.Length);
+            Assert.IsFalse(outcomes.Any(value => value.Capture == "20260709-212115"));
+
+            OrdinaryEnemyLootTableAdapterResult adapted = OrdinaryEnemyLootTableAdapter.Build(
+                Profile("Workman Striker"),
+                "subway.test.workman-striker",
+                "subway.test.workman-striker.assignment");
+            Assert.IsTrue(adapted.Table.ItemPoolUnresolved);
+            Assert.AreEqual(10, adapted.Table.RollGroups.Length);
+            Assert.IsTrue(
+                adapted.Table.RollGroups.All(value => value.RollMode == LootRollMode.Independent));
+        }
+
+        [TestMethod]
         public void LegacyItemSnapshotsStayIdentityLinkedAndCannotBecomeGuessedRuntimeDrops()
         {
             var provider = new CapturedSubwayOrdinaryContentProvider();
@@ -359,8 +418,89 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "The later reopen must not count the starter item a second time.");
 
             OrdinaryEnemyProfile runtimeShadow = Profile("Shadow");
-            Assert.AreEqual(0, runtimeShadow.Loot.Entries.Length);
+            Assert.AreEqual(10, runtimeShadow.Loot.Entries.Length);
             Assert.IsFalse(runtimeShadow.Loot.ItemPoolComplete);
+        }
+
+        [TestMethod]
+        public void ReviewedLegacyStrictOpensSupplyFourIncompleteIndependentLootPools()
+        {
+            AssertReviewedLegacyStrictLoot(
+                "Shadow",
+                15,
+                7,
+                new[]
+                    {
+                        "21601:21601:1:1:15:667",
+                        "27199:27199:10:1:15:667",
+                        "121931:121932:15:1:15:667",
+                        "122007:122008:12:1:15:667",
+                        "123666:123667:9:1:15:667",
+                        "124364:124365:10:1:15:667",
+                        "124512:124513:28:1:15:667",
+                        "152279:152280:18:1:15:667",
+                        "234875:234875:1:2:15:1333",
+                        "234876:234876:1:1:15:667"
+                    });
+            AssertReviewedLegacyStrictLoot(
+                "Infector",
+                7,
+                4,
+                new[]
+                    {
+                        "101507:101508:20:1:7:1429",
+                        "101735:101736:21:1:7:1429",
+                        "107491:107492:15:1:7:1429",
+                        "234875:234875:1:1:7:1429"
+                    });
+            AssertReviewedLegacyStrictLoot(
+                "Architect Striker",
+                4,
+                1,
+                new[]
+                    {
+                        "122482:122483:14:1:4:2500",
+                        "124422:124423:13:1:4:2500",
+                        "128890:128891:14:1:4:2500",
+                        "234877:234877:1:1:4:2500"
+                    });
+            AssertReviewedLegacyStrictLoot(
+                "Melded Patterns",
+                4,
+                1,
+                new[]
+                    {
+                        "122672:122673:15:1:4:2500",
+                        "144067:144068:23:1:4:2500",
+                        "152328:152329:24:1:4:2500",
+                        "234874:234874:1:1:4:2500",
+                        "301710:301710:1:1:4:2500"
+                    });
+
+            CapturedSubwayOrdinaryArchetypeDefinition[] source =
+                new CapturedSubwayOrdinaryContentProvider().GetArchetypes();
+            CapturedSubwayLootOutcomeEvidenceDefinition[] shadowOutcomes = source
+                .Single(value => value.Name == "Shadow")
+                .LootOutcomeEvidence;
+            Assert.AreEqual(11, shadowOutcomes.Length);
+            Assert.IsFalse(
+                shadowOutcomes.Any(value => value.Capture == "20260709-212115"));
+            CollectionAssert.AreEquivalent(
+                new[] { "2914:152279", "2941:124512", "3180:21601" },
+                shadowOutcomes
+                    .Where(value => value.Capture == "20260712-223719")
+                    .Select(value => value.Sequence + ":" + value.LowId)
+                    .ToArray());
+
+            CapturedSubwayLootOutcomeEvidenceDefinition[] meldedOutcomes = source
+                .Single(value => value.Name == "Melded Patterns")
+                .LootOutcomeEvidence;
+            CollectionAssert.AreEquivalent(
+                new[] { "2997:144067", "2997:301710" },
+                meldedOutcomes
+                    .Where(value => value.Capture == "20260712-223719")
+                    .Select(value => value.Sequence + ":" + value.LowId)
+                    .ToArray());
         }
 
         [TestMethod]
@@ -762,6 +902,62 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new CapturedSubwayContentProvider(),
                 new CapturedSubwayOrdinaryContentProvider());
             return catalog.GetProfiles().Single(value => value.DisplayName == displayName);
+        }
+
+        private static void AssertReviewedLegacyStrictLoot(
+            string displayName,
+            int observedCorpses,
+            int observedEmptyCorpses,
+            string[] expectedEntries)
+        {
+            OrdinaryEnemyProfile profile = Profile(displayName);
+            OrdinaryEnemyLootProfile loot = profile.Loot;
+
+            Assert.AreEqual(
+                OrdinaryEnemyLootEvidence.ObservedAvailableLoot,
+                loot.Evidence);
+            Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, loot.PoolMode);
+            Assert.AreEqual(0, loot.EmptyWeight);
+            Assert.IsFalse(loot.ItemPoolComplete);
+            Assert.AreEqual(observedCorpses, loot.ObservedCompleteInventories);
+            Assert.AreEqual(observedEmptyCorpses, loot.ObservedEmptyInventories);
+            Assert.IsFalse(
+                loot.Entries.Any(
+                    value => value.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven));
+            Assert.IsTrue(
+                loot.Entries.All(
+                    value => value.Evidence == OrdinaryEnemyLootEvidence.ObservedAvailableLoot
+                             && value.ProbabilityEvidence
+                             == OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy
+                             && value.ObservedCorpses == observedCorpses));
+            CollectionAssert.AreEqual(
+                expectedEntries,
+                loot.Entries
+                    .OrderBy(value => value.LowId)
+                    .ThenBy(value => value.QualityLevel)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}:{3}:{4}:{5}",
+                            value.LowId,
+                            value.HighId,
+                            value.QualityLevel,
+                            value.ObservedCount,
+                            value.ObservedCorpses,
+                            value.DropChanceBasisPoints))
+                    .ToArray());
+
+            OrdinaryEnemyLootTableAdapterResult adapted = OrdinaryEnemyLootTableAdapter.Build(
+                profile,
+                "subway.test.reviewed-legacy." + displayName,
+                "subway.test.reviewed-legacy.assignment." + displayName);
+            Assert.IsTrue(adapted.Table.ItemPoolUnresolved);
+            Assert.AreEqual(expectedEntries.Length, adapted.Table.RollGroups.Length);
+            Assert.IsTrue(
+                adapted.Table.RollGroups.All(
+                    value => value.RollMode == LootRollMode.Independent));
+            Assert.IsFalse(
+                adapted.Table.RollGroups.Any(
+                    value => value.RollMode == LootRollMode.Guaranteed));
         }
 
         private static void AssertCorpseAndLevelCredits(

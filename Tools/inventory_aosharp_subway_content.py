@@ -55,9 +55,108 @@ REVIEWED_RAW_COMBAT_FALLBACKS = {
             "source": "(SimpleChar:7954512E)",
             "target": "(SimpleChar:794D8062)",
             "evidence_kind": "combat_as_source",
+            "target_role": "other-player",
+            "damage_unresolved": True,
+        },
+        {
+            "captured_utc": "2026-07-10T03:28:50.6684934Z",
+            "sequence": 4870,
+            "length": 61,
+            "message_type": "AttackInfo",
+            "raw_hex": "13A0000A0001003D00000DB97944C06546002F160000C3507954512E000000002800000013000000060000C350794D8062000000000000000400000000",
+            "source": "(SimpleChar:7954512E)",
+            "target": "(SimpleChar:794D8062)",
+            "evidence_kind": "combat_as_source_other_player",
+            "target_role": "other-player",
+            "damage_unresolved": False,
+            "amount": 40,
+            "weapon_slot": 6,
+            "attack_info_unknown": 0,
+            "hit_type": "Critical",
+            "weapon_instance": 0,
+        },
+        {
+            "captured_utc": "2026-07-10T03:28:55.5176374Z",
+            "sequence": 4963,
+            "length": 61,
+            "message_type": "AttackInfo",
+            "raw_hex": "13FD000A0001003D00000DB97944C06546002F160000C3507954512E000000001200000012000000060000C350794D8062000000000000000300000000",
+            "source": "(SimpleChar:7954512E)",
+            "target": "(SimpleChar:794D8062)",
+            "evidence_kind": "combat_as_source_other_player",
+            "target_role": "other-player",
+            "damage_unresolved": False,
+            "amount": 18,
+            "weapon_slot": 6,
+            "attack_info_unknown": 0,
+            "hit_type": "Normal",
+            "weapon_instance": 0,
+        },
+        {
+            "captured_utc": "2026-07-10T03:29:00.5184911Z",
+            "sequence": 5107,
+            "length": 61,
+            "message_type": "AttackInfo",
+            "raw_hex": "148D000A0001003D00000DB97944C06546002F160000C3507954512E000000001200000011000000060000C350794D8062000000000000000300000000",
+            "source": "(SimpleChar:7954512E)",
+            "target": "(SimpleChar:794D8062)",
+            "evidence_kind": "combat_as_source_other_player",
+            "target_role": "other-player",
+            "damage_unresolved": False,
+            "amount": 18,
+            "weapon_slot": 6,
+            "attack_info_unknown": 0,
+            "hit_type": "Normal",
+            "weapon_instance": 0,
         },
     )
 }
+
+REVIEWED_EVENT_IDENTITIES = {
+    "20260709-213711": {
+        "(SimpleChar:7953AE99)": {
+            "name": "Killer",
+            "monster_data": 96195,
+            "level": 13,
+            "player": False,
+            "npc": False,
+            "pet": True,
+        },
+        "(SimpleChar:7953AFBC)": {
+            "name": "Workman Striker",
+            "monster_data": 203854,
+            "level": 16,
+            "player": False,
+            "npc": True,
+            "pet": False,
+        },
+        "(SimpleChar:7953AFDA)": {
+            "name": "Architect Striker",
+            "monster_data": 203743,
+            "level": 15,
+            "player": False,
+            "npc": True,
+            "pet": False,
+        },
+        "(SimpleChar:7953AFDD)": {
+            "name": "Workman Striker",
+            "monster_data": 203854,
+            "level": 16,
+            "player": False,
+            "npc": True,
+            "pet": False,
+        },
+    }
+}
+
+CHARACTER_EVENT_PATTERN = re.compile(
+    r"\[(?:CHAR-SEEN|DYNEL-SPAWNED)\] "
+    r"identity=(?P<identity>\(SimpleChar:[0-9A-F]+\)) "
+    r"name=(?P<name>.*?) "
+    r"player=(?P<player>True|False) npc=(?P<npc>True|False) "
+    r"pet=(?P<pet>True|False).*?\blevel=(?P<level>\d+).*?"
+    r"\bmonsterData=(?P<monster_data>\d+)"
+)
 
 CSV_SCHEMAS: dict[str, set[str]] = {
     "raw-packets.csv": {
@@ -704,6 +803,56 @@ class CaptureAnalyzer:
         if parsed_level is not None and parsed_level >= 0:
             metadata.levels.add(parsed_level)
 
+    def _parse_reviewed_event_identities(self) -> None:
+        reviewed = REVIEWED_EVENT_IDENTITIES.get(self.capture_id, {})
+        if not reviewed:
+            return
+        path = self.path / "events.log"
+        if not path.exists():
+            self.issues.add("reviewed-event-identities:events.log-missing")
+            return
+        found: set[str] = set()
+        try:
+            lines = path.read_text(
+                encoding="utf-8-sig", errors="replace"
+            ).splitlines()
+        except OSError as error:
+            self.issues.add(
+                "reviewed-event-identities:read-error=" + type(error).__name__
+            )
+            return
+        for line in lines:
+            match = CHARACTER_EVENT_PATTERN.search(line)
+            if not match:
+                continue
+            identity = match.group("identity")
+            expected = reviewed.get(identity)
+            if expected is None:
+                continue
+            observed = {
+                "name": match.group("name"),
+                "monster_data": int(match.group("monster_data")),
+                "level": int(match.group("level")),
+                "player": match.group("player") == "True",
+                "npc": match.group("npc") == "True",
+                "pet": match.group("pet") == "True",
+            }
+            if observed != expected:
+                continue
+            found.add(identity)
+            self._metadata(
+                identity,
+                expected["name"],
+                expected["monster_data"],
+                expected["level"],
+            )
+            if expected["player"]:
+                self.player_ids.add(identity)
+            if expected["pet"]:
+                self.pet_ids.add(identity)
+        for identity in sorted(set(reviewed).difference(found)):
+            self.issues.add("reviewed-event-identity-missing=" + identity)
+
     def _subject_kind(self, identity: str, role: object = "") -> str:
         parsed_role = string_value(role).lower()
         # Complete SCFU identity discriminators are stronger than the
@@ -1124,10 +1273,11 @@ class CaptureAnalyzer:
                 related_identity=target,
                 evidence_kind=packet["evidence_kind"],
                 source_artifact="packets.hex.log",
-                source_schema="reviewed-raw-combat-v1",
+                source_schema="reviewed-raw-combat-v2",
             )
             record.add(
                 timestamps=(packet["captured_utc"],),
+                numeric=packet.get("amount"),
                 observation={
                     "message_type": packet["message_type"],
                     "packet_sequence": packet["sequence"],
@@ -1136,8 +1286,13 @@ class CaptureAnalyzer:
                         expected_line.encode("utf-8")
                     ).hexdigest(),
                     "source_role": "enemy",
-                    "target_role": "pet" if target else "",
-                    "damage_unresolved": True,
+                    "target_role": packet.get("target_role", ""),
+                    "damage_unresolved": packet.get("damage_unresolved", True),
+                    "amount": packet.get("amount"),
+                    "weapon_slot": packet.get("weapon_slot"),
+                    "attack_info_unknown": packet.get("attack_info_unknown"),
+                    "hit_type": packet.get("hit_type"),
+                    "weapon_instance": packet.get("weapon_instance"),
                 },
             )
     def _parse_movement(self) -> None:
@@ -1625,6 +1780,7 @@ class CaptureAnalyzer:
     def analyze(self) -> list[EvidenceRecord]:
         self._parse_vendors()
         self._preclassify_scfu_identities()
+        self._parse_reviewed_event_identities()
         self._parse_dossier()
         self._parse_character_updates()
         self._parse_state_and_stats()
