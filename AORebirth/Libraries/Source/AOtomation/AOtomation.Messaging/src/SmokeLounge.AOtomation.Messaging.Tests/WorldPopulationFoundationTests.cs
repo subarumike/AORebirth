@@ -969,6 +969,89 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void FragmentedSoulGenerationEvidenceCoversEveryReviewedSourceLocalAtomicVariant()
+        {
+            const int monsterData = 203729;
+            int[] expectedSources =
+            {
+                0x7954516A,
+                0x7954516F,
+                0x7954517A,
+                0x7954518A,
+                0x7954518B,
+                0x7954518E,
+                0x795451AA,
+                0x795451AE,
+                0x79545248,
+                0x79545367
+            };
+            var ordinaryProvider = new CapturedSubwayOrdinaryContentProvider();
+            CapturedSubwayGenerationVariantDefinition[] variants = expectedSources
+                .SelectMany(
+                    source => ordinaryProvider.GetGenerationVariants(monsterData, source))
+                .OrderBy(value => value.SourceInstance)
+                .ThenBy(value => value.Level)
+                .ThenBy(value => value.WeaponLowId)
+                .ThenBy(value => value.WeaponHighId)
+                .ThenBy(value => value.WeaponQuality)
+                .ToArray();
+
+            Assert.AreEqual(19, variants.Length);
+            CollectionAssert.AreEqual(
+                expectedSources,
+                variants
+                    .Select(value => value.SourceInstance)
+                    .Distinct()
+                    .OrderBy(value => value)
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "7954516A:17:368:98:59:123685:123686:14:20260709-222339:(SimpleChar:7954516A);20260716-033326:(SimpleChar:796D403E)",
+                    "7954516F:17:368:98:59:123685:123686:17:20260709-222339:(SimpleChar:7954516F)",
+                    "7954516F:18:394:98:62:123685:123686:18:20260716-034559:(SimpleChar:796D401F)",
+                    "7954517A:18:394:98:62:123686:123686:20:20260716-034559:(SimpleChar:796D4013)",
+                    "7954517A:19:421:98:66:123685:123686:19:20260709-222339:(SimpleChar:7954517A)",
+                    "7954518A:18:394:98:62:123685:123686:15:20260716-034656:(SimpleChar:796D4002)",
+                    "7954518A:20:447:99:69:123687:123688:25:20260709-222339:(SimpleChar:7954518A)",
+                    "7954518A:21:474:99:73:123685:123686:17:20260717-215250:(SimpleChar:79748629)",
+                    "7954518B:18:394:98:62:123685:123686:14:20260709-222339:(SimpleChar:7954518B)",
+                    "7954518B:19:421:98:66:123687:123688:23:20260716-034656:(SimpleChar:796D4004)",
+                    "7954518B:20:447:99:69:123685:123686:18:20260717-215250:(SimpleChar:7974862E)",
+                    "7954518E:18:394:98:62:123685:123686:17:20260709-222339:(SimpleChar:7954518E)",
+                    "7954518E:18:394:98:62:123686:123686:20:20260717-215250:(SimpleChar:7974862B)",
+                    "795451AA:21:474:99:73:123687:123688:26:20260709-222339:(SimpleChar:795451AA)",
+                    "795451AE:21:474:99:73:123687:123688:25:20260709-222339:(SimpleChar:795451AE)",
+                    "79545248:18:394:98:62:123685:123686:18:20260709-222339:(SimpleChar:79545248)",
+                    "79545248:18:394:98:62:123687:123687:21:20260710-211430:(SimpleChar:7957E5F7)",
+                    "79545367:18:394:98:62:123685:123686:18:20260716-033326:(SimpleChar:796D403F)",
+                    "79545367:18:394:98:62:123685:123686:19:20260709-225408:(SimpleChar:79545367)"
+                },
+                variants
+                    .Select(
+                        value => string.Format(
+                            "{0:X8}:{1}:{2}:{3}:{4}:{5}:{6}:{7}:{8}",
+                            value.SourceInstance,
+                            value.Level,
+                            value.Health,
+                            value.MonsterScale,
+                            value.RunSpeed,
+                            value.WeaponLowId,
+                            value.WeaponHighId,
+                            value.WeaponQuality,
+                            value.Evidence))
+                    .ToArray());
+            Assert.IsFalse(
+                variants.Any(value => value.Evidence.Contains("7970245D")));
+            Assert.AreEqual(
+                0,
+                ordinaryProvider.GetGenerationVariants(monsterData, 0x7970245D).Length);
+            Assert.AreEqual(
+                0,
+                ordinaryProvider.GetGenerationVariants(monsterData, 0x7953FFFF).Length);
+        }
+
+        [TestMethod]
         public void IncompleteRebuildUsesEveryExactSourceWeaponAndCapturedAttackInfoWithoutFixedDamage()
         {
             const int monsterData = 203728;

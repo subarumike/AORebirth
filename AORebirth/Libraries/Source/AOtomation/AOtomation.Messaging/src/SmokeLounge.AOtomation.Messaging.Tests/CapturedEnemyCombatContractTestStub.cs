@@ -62,6 +62,8 @@ namespace AORebirth.Core.Playfields
 
         private const int IncompleteRebuildMonsterData = 203728;
 
+        private const int FragmentedSoulMonsterData = 203729;
+
         private const int LooterMonsterData = 203745;
 
         private const int MuggerMonsterData = 203734;
@@ -103,6 +105,20 @@ namespace AORebirth.Core.Playfields
             0x795451BF,
             0x795451C4,
             0x795451D3
+        };
+
+        private static readonly int[] FragmentedSoulSourceInstances =
+        {
+            0x7954516A,
+            0x7954516F,
+            0x7954517A,
+            0x7954518A,
+            0x7954518B,
+            0x7954518E,
+            0x795451AA,
+            0x795451AE,
+            0x79545248,
+            0x79545367
         };
 
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
@@ -322,6 +338,7 @@ namespace AORebirth.Core.Playfields
             if (archetype != null
                 && (archetype.MonsterData == DerangedShopperMonsterData
                     || archetype.MonsterData == IncompleteRebuildMonsterData
+                    || archetype.MonsterData == FragmentedSoulMonsterData
                     || archetype.MonsterData == WorkmanStrikerMonsterData
                     || archetype.MonsterData == LooterMonsterData
                     || archetype.MonsterData == RedundantScanMonsterData))
@@ -394,6 +411,65 @@ namespace AORebirth.Core.Playfields
                 AttackInfoWeaponSlot = observed ? archetype.Combat.WeaponSlot : 0,
                 AttackInfoUnknown = observed ? archetype.Combat.AttackInfoUnknown : 0,
                 AttackInfoWeaponInstance = observed ? archetype.Combat.WeaponInstance : 0
+            };
+        }
+
+        private static CapturedEnemyCombatContract ForFragmentedSoul(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            OrdinaryEnemySpawnVariant variant,
+            CapturedSubwayGenerationVariantDefinition[] generationEvidence)
+        {
+            CapturedSubwayCombatEvidenceDefinition combat = archetype == null
+                ? null
+                : archetype.Combat;
+            bool hasExactCombatEvidence = combat != null
+                                          && combat.Observed
+                                          && combat.ObservedRows == 2
+                                          && combat.MinDamage == 18
+                                          && combat.MaxDamage == 23
+                                          && combat.WeaponSlot == 6
+                                          && combat.AttackInfoUnknown == 0
+                                          && combat.WeaponInstance == 0;
+            OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
+                ? null
+                : variant.WeaponLoadout;
+            string atomicFailure = string.Empty;
+            if (!hasExactCombatEvidence
+                || !FragmentedSoulSourceInstances.Contains(sourceInstance)
+                || !OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
+                    FragmentedSoulMonsterData,
+                    sourceInstance,
+                    variant,
+                    generationEvidence,
+                    out atomicFailure))
+            {
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.Unresolved,
+                    IsCombatReady = false,
+                    Evidence = "Fragmented Soul atomic generation evidence is incomplete: "
+                               + atomicFailure
+                };
+            }
+
+            return new CapturedEnemyCombatContract
+            {
+                AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
+                IsCombatReady = true,
+                Evidence = weapon.Evidence
+                           + ": Fragmented Soul selected one captured atomic level/stat/weapon generation; "
+                           + "two normal local-player hits span 18..23; item owns runtime damage and recharge; "
+                           + "captured AttackInfo ammo 24, slot 6, unknown 0.",
+                WeaponLowId = weapon.LowId,
+                WeaponHighId = weapon.HighId,
+                WeaponQuality = weapon.Quality,
+                WeaponInventorySlot = 6,
+                HasCapturedEquippedAttackInfo = true,
+                AttackInfoAmmoCount = 24,
+                AttackInfoWeaponSlot = 6,
+                AttackInfoUnknown = 0,
+                AttackInfoWeaponInstance = 0
             };
         }
 
@@ -625,9 +701,19 @@ namespace AORebirth.Core.Playfields
         {
             if (archetype == null
                 || (archetype.MonsterData != IncompleteRebuildMonsterData
-                    && archetype.MonsterData != RedundantScanMonsterData))
+                    && archetype.MonsterData != RedundantScanMonsterData
+                    && archetype.MonsterData != FragmentedSoulMonsterData))
             {
                 return ForOrdinary(archetype, sourceInstance);
+            }
+
+            if (archetype.MonsterData == FragmentedSoulMonsterData)
+            {
+                return ForFragmentedSoul(
+                    archetype,
+                    sourceInstance,
+                    variant,
+                    generationEvidence);
             }
 
             CapturedEnemyCombatContract baseline = ForOrdinary(archetype, sourceInstance);

@@ -263,6 +263,55 @@ REDUNDANT_SCAN_GENERATION_EVIDENCE = {
 
 REDUNDANT_SCAN_PATROL_SOURCE = 0x795451C4
 
+# Reviewed complete SCFU + owner WeaponItemFullUpdate pairs for Fragmented
+# Soul. Every later identity is attached to one canonical PF127 anchor only by
+# a unique <=1.5-unit position. Source 0x7954517A is the sole captured patrol
+# anchor; unmatched identity 0x7970245D remains report-only.
+FRAGMENTED_SOUL_GENERATION_EVIDENCE = {
+    0x7954516A: (
+        ("20260709-222339", "(SimpleChar:7954516A)"),
+        ("20260716-033326", "(SimpleChar:796D403E)"),
+    ),
+    0x7954516F: (
+        ("20260709-222339", "(SimpleChar:7954516F)"),
+        ("20260716-034559", "(SimpleChar:796D401F)"),
+    ),
+    0x7954517A: (
+        ("20260709-222339", "(SimpleChar:7954517A)"),
+        ("20260716-034559", "(SimpleChar:796D4013)"),
+    ),
+    0x7954518A: (
+        ("20260709-222339", "(SimpleChar:7954518A)"),
+        ("20260716-034656", "(SimpleChar:796D4002)"),
+        ("20260717-215250", "(SimpleChar:79748629)"),
+    ),
+    0x7954518B: (
+        ("20260709-222339", "(SimpleChar:7954518B)"),
+        ("20260716-034656", "(SimpleChar:796D4004)"),
+        ("20260717-215250", "(SimpleChar:7974862E)"),
+    ),
+    0x7954518E: (
+        ("20260709-222339", "(SimpleChar:7954518E)"),
+        ("20260717-215250", "(SimpleChar:7974862B)"),
+    ),
+    0x795451AA: (
+        ("20260709-222339", "(SimpleChar:795451AA)"),
+    ),
+    0x795451AE: (
+        ("20260709-222339", "(SimpleChar:795451AE)"),
+    ),
+    0x79545248: (
+        ("20260709-222339", "(SimpleChar:79545248)"),
+        ("20260710-211430", "(SimpleChar:7957E5F7)"),
+    ),
+    0x79545367: (
+        ("20260709-225408", "(SimpleChar:79545367)"),
+        ("20260716-033326", "(SimpleChar:796D403F)"),
+    ),
+}
+
+FRAGMENTED_SOUL_PATROL_SOURCE = 0x7954517A
+
 # Audited complete-open denominator for Workman Striker.  The legacy capture
 # predates corpse-loot-observations.csv, so the item rows are recovered from
 # the identity-linked first inventory snapshots below.  The four canonical
@@ -2003,6 +2052,23 @@ def redundant_scan_generation_variants() -> list[dict[str, object]]:
     )
 
 
+def fragmented_soul_generation_variants() -> list[dict[str, object]]:
+    return reviewed_atomic_generation_variants(
+        "Fragmented Soul",
+        203729,
+        FRAGMENTED_SOUL_GENERATION_EVIDENCE,
+        {
+            17: (368, 0, 98, 59),
+            18: (394, 0, 98, 62),
+            19: (421, 0, 98, 66),
+            20: (447, 0, 99, 69),
+            21: (474, 0, 99, 73),
+        },
+        19,
+        FRAGMENTED_SOUL_PATROL_SOURCE,
+    )
+
+
 def visual_profile(row: dict[str, str]) -> tuple:
     return (
         row["AppearanceValue"],
@@ -3377,6 +3443,7 @@ def generate() -> str:
     generation_variants = (
         incomplete_rebuild_generation_variants()
         + redundant_scan_generation_variants()
+        + fragmented_soul_generation_variants()
     )
     profiles = select_archetype_profiles(spawns)
     combat = combat_profiles()

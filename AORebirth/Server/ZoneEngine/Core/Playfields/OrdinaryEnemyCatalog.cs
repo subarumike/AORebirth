@@ -27,6 +27,8 @@ namespace AORebirth.Core.Playfields
 
         private const int IncompleteRebuildMonsterData = 203728;
 
+        private const int FragmentedSoulMonsterData = 203729;
+
         private const int WorkmanStrikerMonsterData = 203854;
 
         private const double BloodcreeperAutomaticAggroRadius = 7.0;
@@ -358,6 +360,7 @@ namespace AORebirth.Core.Playfields
                     sourceVariantContractResolver =
                         archetype.MonsterData == IncompleteRebuildMonsterData
                         || archetype.MonsterData == RedundantScanMonsterData
+                        || archetype.MonsterData == FragmentedSoulMonsterData
                             ? new Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>(
                                 (sourceIdentity, variant) =>
                                     CapturedSubwayCombatCatalog.ForOrdinary(
@@ -618,7 +621,12 @@ namespace AORebirth.Core.Playfields
                     "redundant_scan",
                     StringComparison.Ordinal)
                     ? RedundantScanMonsterData
-                    : 0;
+                    : string.Equals(
+                        source.ArchetypeKey,
+                        "fragmented_soul",
+                        StringComparison.Ordinal)
+                        ? FragmentedSoulMonsterData
+                        : 0;
             CapturedSubwayGenerationVariantDefinition[] capturedVariants =
                 expectedMonsterData == 0
                     ? new CapturedSubwayGenerationVariantDefinition[0]
@@ -771,6 +779,11 @@ namespace AORebirth.Core.Playfields
             if (monsterData == IncompleteRebuildMonsterData)
             {
                 return OrdinaryEnemySupportNanoProfile.CapturedIncompleteRebuild90405();
+            }
+
+            if (monsterData == FragmentedSoulMonsterData)
+            {
+                return OrdinaryEnemySupportNanoProfile.CapturedFragmentedSoul95447();
             }
 
             if (monsterData != RedundantScanMonsterData)
@@ -1000,6 +1013,8 @@ namespace AORebirth.Core.Playfields
                     .ToArray();
                 bool preserveIncompleteRebuildCreditProgression =
                     monsterData == IncompleteRebuildMonsterData;
+                bool preserveFragmentedSoulCreditProgression =
+                    monsterData == FragmentedSoulMonsterData;
                 if (preserveIncompleteRebuildCreditProgression)
                 {
                     // Four exact levels follow floor((13 * level - 11) / 2).
@@ -1027,6 +1042,33 @@ namespace AORebirth.Core.Playfields
                         .OrderBy(value => value.EnemyLevel)
                         .ToArray();
                 }
+                else if (preserveFragmentedSoulCreditProgression)
+                {
+                    // Three exact levels follow floor((13 * level - 11) / 2).
+                    // Fill only the two selectable missing levels as explicit private policy;
+                    // exact captured levels retain observed evidence and confidence.
+                    levelCreditRules = levelCreditRules
+                        .Concat(
+                            new[]
+                                {
+                                    new OrdinaryEnemyLevelCreditRule(
+                                        19,
+                                        118,
+                                        118,
+                                        0,
+                                        "policy:floor((13*level-11)/2);captured-levels=17,18,21",
+                                        OrdinaryEnemyEvidenceState.Policy),
+                                    new OrdinaryEnemyLevelCreditRule(
+                                        20,
+                                        124,
+                                        124,
+                                        0,
+                                        "policy:floor((13*level-11)/2);captured-levels=17,18,21",
+                                        OrdinaryEnemyEvidenceState.Policy)
+                                })
+                        .OrderBy(value => value.EnemyLevel)
+                        .ToArray();
+                }
                 // Exact L4/L5 rules win first. Other captured Flea spawn levels retain
                 // the previously accepted observed-outcome range as private policy;
                 // the new 23-credit outcome expands its lower bound.
@@ -1041,7 +1083,9 @@ namespace AORebirth.Core.Playfields
                     observedCompleteInventories,
                     observedEmptyInventories,
                     itemEvidenceReference,
-                    preserveFilthFleaFallback || preserveIncompleteRebuildCreditProgression
+                    preserveFilthFleaFallback
+                    || preserveIncompleteRebuildCreditProgression
+                    || preserveFragmentedSoulCreditProgression
                         ? OrdinaryEnemyEvidenceState.Policy
                         : OrdinaryEnemyEvidenceState.Observed,
                     preserveFilthFleaFallback ? 23 : (int?)null,
