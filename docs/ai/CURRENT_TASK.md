@@ -20,7 +20,10 @@ population in bounded runtime batches.
   burger/card handout, an exact two-item trade, `+2` stat-75 side tokens, a
   durable `5000` personal-research allocation record, mission cleanup, and
   account flag `totw-wall-access`. The known wall `Terminal:C004028F` transfers
-  eligible accounts to PF647 at payload landing `(1814, 29, 2699)`.
+  eligible accounts to PF647 at payload landing `(1814, 29, 2699)`. PF655 now
+  also materializes Karrec, Annoying Dude, and Maddy Cardile from their exact
+  captured appearance contract; Annoying Dude and Maddy replay their complete
+  `16`- and `19`-segment walking cycles while all three remain passive social NPCs.
 - Remaining validation is live database/schema startup and private-client smoke
   for restart persistence, duplicate prevention, dialogue/trade/rewards, and
   denied/eligible wall use. The capture does not prove the official account-flag

@@ -388,6 +388,31 @@ namespace AORebirth.Core.Playfields
             };
         }
 
+        internal static CapturedEnemyCombatContract EquippedWeaponWithCapturedAttackInfo(
+            string evidence,
+            int lowId,
+            int highId,
+            int quality,
+            int inventorySlot,
+            int attackInfoAmmoCount,
+            int attackInfoWeaponSlot,
+            int attackInfoUnknown,
+            int attackInfoWeaponInstance)
+        {
+            CapturedEnemyCombatContract contract = EquippedWeapon(
+                evidence,
+                lowId,
+                highId,
+                quality,
+                inventorySlot);
+            contract.HasCapturedEquippedAttackInfo = true;
+            contract.AttackInfoAmmoCount = attackInfoAmmoCount;
+            contract.AttackInfoWeaponSlot = attackInfoWeaponSlot;
+            contract.AttackInfoUnknown = attackInfoUnknown;
+            contract.AttackInfoWeaponInstance = attackInfoWeaponInstance;
+            return contract;
+        }
+
         internal static CapturedEnemyCombatContract EquippedWeaponWithEmptySpecialAttackContext(
             string evidence,
             int lowId,
@@ -640,7 +665,22 @@ namespace AORebirth.Core.Playfields
     {
         private const int LooterMonsterData = 203745;
 
+        private const int MuggerMonsterData = 203734;
+
         private const int WorkmanStrikerMonsterData = 203854;
+
+        private static readonly int[] MuggerSourceInstances =
+        {
+            unchecked((int)0x7953AA11),
+            unchecked((int)0x7953AD6B),
+            unchecked((int)0x795450D4),
+            unchecked((int)0x795451FE),
+            unchecked((int)0x79557F14),
+            unchecked((int)0x7957E5C6),
+            unchecked((int)0x7957E5C7),
+            unchecked((int)0x7957E5C8),
+            unchecked((int)0x7957E5CA)
+        };
 
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
         {
@@ -905,14 +945,9 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponValue,
                             NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponLastValue));
                 case 203734:
-                    return CapturedEnemyCombatContract.FixedAttack(
-                        "20260709-210452/212115/212336/220439: Mugger AttackInfo",
-                        10,
-                        21,
-                        5.900159,
-                        (int)WeaponSlots.Righthand,
-                        0,
-                        0);
+                    return CapturedEnemyCombatContract.Unresolved(
+                        "Mugger combat requires an exact captured source identity; aggregate weapon fallback is forbidden",
+                        true);
                 case 26092:
                     return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
                         "20260711-170337 packets 301-654: Thief attack start, movement transition, three landed projectile hits, and six-second repeat cadence; 2026-07-12 private validation proved the weapon context renders projectile damage",
@@ -1070,6 +1105,100 @@ namespace AORebirth.Core.Playfields
                 matched.HighId,
                 matched.Quality,
                 (int)WeaponSlots.Righthand);
+        }
+
+        internal static CapturedEnemyCombatContract ForSupportedSourceWeapon(
+            string name,
+            int monsterData,
+            CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence,
+            int sourceInstance)
+        {
+            if (!string.Equals(name, "Mugger", StringComparison.Ordinal)
+                || monsterData != MuggerMonsterData)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    string.Format(
+                        "Unsupported source-specific weapon profile {0} monsterData={1}",
+                        name,
+                        monsterData),
+                    false);
+            }
+
+            if (!HasCompleteMuggerSourceWeaponEvidence(sourceWeaponEvidence))
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Mugger combat requires one exact QL1 121567/121567 owner-linked weapon tuple for each of the nine current sources",
+                    true);
+            }
+
+            CapturedSubwaySourceWeaponEvidenceDefinition matched = null;
+            int matches = 0;
+            foreach (CapturedSubwaySourceWeaponEvidenceDefinition evidence in sourceWeaponEvidence)
+            {
+                if (evidence.SourceInstance != sourceInstance)
+                {
+                    continue;
+                }
+
+                matched = evidence;
+                matches++;
+            }
+
+            if (matches != 1 || matched == null)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    string.Format(
+                        "Mugger source 0x{0:X8} requires exactly one owner-linked captured weapon tuple; found {1}",
+                        sourceInstance,
+                        matches),
+                    true);
+            }
+
+            return CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(
+                string.Format(
+                    "{0}: Mugger source 0x{1:X8} owner-linked QL1 weapon 121567/121567; 38 normal local-player hits span 9..12, three 21-point criticals are report-only, and the median interval is 5.816469 seconds; item owns runtime damage, damage bonus, and recharge; captured AttackInfo carries only ammo -1, slot 6, unknown 0, and weapon instance 0; no empty SIW or captured attack-start/stop context",
+                    matched.EvidenceCaptures,
+                    sourceInstance),
+                matched.LowId,
+                matched.HighId,
+                matched.Quality,
+                (int)WeaponSlots.Righthand,
+                -1,
+                (int)WeaponSlots.Righthand,
+                0,
+                0);
+        }
+
+        private static bool HasCompleteMuggerSourceWeaponEvidence(
+            CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence)
+        {
+            if (sourceWeaponEvidence == null
+                || sourceWeaponEvidence.Length != MuggerSourceInstances.Length)
+            {
+                return false;
+            }
+
+            foreach (int expectedSource in MuggerSourceInstances)
+            {
+                int matches = 0;
+                foreach (CapturedSubwaySourceWeaponEvidenceDefinition evidence in sourceWeaponEvidence)
+                {
+                    if (evidence.SourceInstance == expectedSource
+                        && evidence.LowId == 121567
+                        && evidence.HighId == 121567
+                        && evidence.Quality == 1)
+                    {
+                        matches++;
+                    }
+                }
+
+                if (matches != 1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static CapturedEnemyCombatContract ForMeldedPatterns(

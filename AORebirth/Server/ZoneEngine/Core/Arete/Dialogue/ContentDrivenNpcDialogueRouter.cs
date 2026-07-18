@@ -34,26 +34,9 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
         private const int MarcusStoneInstance = unchecked((int)0x782DE567);
 
-        private const int SubwayPlayfieldId = 655;
-
-        private const int WindcallerKarrecInstance = unchecked((int)0x796360BB);
-
-        private const int AnnoyingDudeInstance = unchecked((int)0x796360BD);
-
-        private const int MaddyCardileInstance = unchecked((int)0x796360BC);
-
         private const string RexLarssonNpcIdentity = "SimpleChar:782DE568";
 
         private const string MarcusStoneNpcIdentity = "SimpleChar:782DE567";
-
-        private const string WindcallerKarrecNpcIdentity = "SimpleChar:796360BB";
-
-        private const string AnnoyingDudeNpcIdentity = "SimpleChar:796360BD";
-
-        private const string MaddyCardileNpcIdentity = "SimpleChar:796360BC";
-
-        private const string WindcallerGateEnvironmentVariableName =
-            "AO_REBIRTH_ENABLE_SUBWAY_KARREC_QUEST";
 
         private const string RexB18EReturnNodeId = "rex_194454_006";
 
@@ -94,52 +77,13 @@ namespace ZoneEngine.Core.Arete.Dialogue
             };
 
         private static readonly ContentDrivenNpcDialogueRegistration WindcallerKarrecRegistration =
-            new ContentDrivenNpcDialogueRegistration
-            {
-                Name = "Windcaller Karrec",
-                ExpectedNpcName = "Windcaller Karrec",
-                NpcIdentity = new Identity
-                              {
-                                  Type = IdentityType.CanbeAffected,
-                                  Instance = WindcallerKarrecInstance
-                              },
-                NpcIdentityText = WindcallerKarrecNpcIdentity,
-                PlayfieldId = SubwayPlayfieldId,
-                GateEnvironmentVariableName = WindcallerGateEnvironmentVariableName,
-                LogPrefix = "SUBWAY_KARREC_DIALOGUE"
-            };
+            CreateWindcallerRegistration(WindcallerKarrecNpcContent.Karrec);
 
         private static readonly ContentDrivenNpcDialogueRegistration AnnoyingDudeRegistration =
-            new ContentDrivenNpcDialogueRegistration
-            {
-                Name = "Annoying Dude",
-                ExpectedNpcName = "Annoying Dude",
-                NpcIdentity = new Identity
-                              {
-                                  Type = IdentityType.CanbeAffected,
-                                  Instance = AnnoyingDudeInstance
-                              },
-                NpcIdentityText = AnnoyingDudeNpcIdentity,
-                PlayfieldId = SubwayPlayfieldId,
-                GateEnvironmentVariableName = WindcallerGateEnvironmentVariableName,
-                LogPrefix = "SUBWAY_KARREC_DIALOGUE"
-            };
+            CreateWindcallerRegistration(WindcallerKarrecNpcContent.AnnoyingDude);
 
         private static readonly ContentDrivenNpcDialogueRegistration MaddyCardileRegistration =
-            new ContentDrivenNpcDialogueRegistration
-            {
-                Name = "Maddy Cardile",
-                ExpectedNpcName = "Maddy Cardile",
-                NpcIdentity = new Identity
-                              {
-                                  Type = IdentityType.CanbeAffected,
-                                  Instance = MaddyCardileInstance
-                              },
-                NpcIdentityText = MaddyCardileNpcIdentity,
-                PlayfieldId = SubwayPlayfieldId,
-                GateEnvironmentVariableName = WindcallerGateEnvironmentVariableName,
-                LogPrefix = "SUBWAY_KARREC_DIALOGUE"
-            };
+            CreateWindcallerRegistration(WindcallerKarrecNpcContent.MaddyCardile);
 
         private static readonly ContentDrivenNpcDialogueRegistration[] Registrations =
         {
@@ -156,6 +100,25 @@ namespace ZoneEngine.Core.Arete.Dialogue
         private static readonly object SyncRoot = new object();
 
         private static DialogueSessionService sharedDialogueSessionService;
+
+        private static ContentDrivenNpcDialogueRegistration CreateWindcallerRegistration(
+            WindcallerKarrecNpcDefinition definition)
+        {
+            return new ContentDrivenNpcDialogueRegistration
+                   {
+                       Name = definition.DisplayName,
+                       ExpectedNpcName = definition.DisplayName,
+                       NpcIdentity = new Identity
+                                     {
+                                         Type = IdentityType.CanbeAffected,
+                                         Instance = definition.SourceNpcInstance
+                                     },
+                       NpcIdentityText = definition.SourceNpcIdentity,
+                       PlayfieldId = definition.PlayfieldId,
+                       GateEnvironmentVariableName = WindcallerKarrecNpcContent.GateEnvironmentVariableName,
+                       LogPrefix = "SUBWAY_KARREC_DIALOGUE"
+                   };
+        }
 
         public static bool IsRexLarssonRoutingEnabled
         {
@@ -203,7 +166,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return false;
             }
 
-            registration.NpcIdentity = npc.Identity;
             return TryStartDialogueForSource(source, npc, registration);
         }
 
@@ -244,7 +206,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return false;
             }
 
-            registration.NpcIdentity = npc.Identity;
             return TryStartDialogueForSource(source, npc, registration);
         }
 
@@ -427,7 +388,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ICharacter npc,
             ContentDrivenNpcDialogueRegistration registration)
         {
-            if (registration == WindcallerKarrecRegistration)
+            if (IsRegistration(registration, WindcallerKarrecRegistration))
             {
                 WindcallerKarrecTradeAdapter.TryResumeDurableCompletion(source, registration.NpcIdentity);
                 if (WindcallerKarrecQuestRuntime.IsCompleted(source))
@@ -442,7 +403,8 @@ namespace ZoneEngine.Core.Arete.Dialogue
                     return CloseRegisteredDialogueSafely(source, npc, registration);
                 }
             }
-            else if ((registration == AnnoyingDudeRegistration || registration == MaddyCardileRegistration)
+            else if ((IsRegistration(registration, AnnoyingDudeRegistration)
+                      || IsRegistration(registration, MaddyCardileRegistration))
                      && !WindcallerKarrecQuestRuntime.IsActive(source))
             {
                 return CloseRegisteredDialogueSafely(source, npc, registration);
@@ -521,7 +483,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             string previousNodeId,
             int answerIndex)
         {
-            if (registration == RexLarssonRegistration)
+            if (IsRegistration(registration, RexLarssonRegistration))
             {
                 return RexQuestPreviewEmitter.TryEmitB18CPreview(
                     source,
@@ -541,7 +503,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             int answerIndex,
             string optionText)
         {
-            if (registration == MarcusStoneRegistration)
+            if (IsRegistration(registration, MarcusStoneRegistration))
             {
                 return MarcusB18FCompletionHandler.TryCompleteFromDialogue(
                     source,
@@ -561,7 +523,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             string previousNodeId,
             int answerIndex)
         {
-            if (registration == WindcallerKarrecRegistration
+            if (IsRegistration(registration, WindcallerKarrecRegistration)
                 && string.Equals(previousNodeId, "karrec_223626_005", StringComparison.OrdinalIgnoreCase)
                 && answerIndex == 0)
             {
@@ -575,7 +537,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return false;
             }
 
-            if (registration == WindcallerKarrecRegistration
+            if (IsRegistration(registration, WindcallerKarrecRegistration)
                 && string.Equals(
                     previousNodeId,
                     "karrec_223626_return_offer",
@@ -591,7 +553,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return true;
             }
 
-            if (registration == AnnoyingDudeRegistration
+            if (IsRegistration(registration, AnnoyingDudeRegistration)
                 && string.Equals(previousNodeId, "annoying_223626_006", StringComparison.OrdinalIgnoreCase)
                 && answerIndex == 0)
             {
@@ -599,7 +561,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return false;
             }
 
-            if (registration == MaddyCardileRegistration
+            if (IsRegistration(registration, MaddyCardileRegistration)
                 && string.Equals(previousNodeId, "maddy_223626_004", StringComparison.OrdinalIgnoreCase)
                 && answerIndex == 0)
             {
@@ -613,14 +575,14 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ICharacter source,
             ContentDrivenNpcDialogueRegistration registration)
         {
-            if (registration == WindcallerKarrecRegistration)
+            if (IsRegistration(registration, WindcallerKarrecRegistration))
             {
                 return WindcallerKarrecQuestRuntime.HasBothOfferingItems(source)
                            ? "karrec_223626_return_offer"
                            : null;
             }
 
-            if (registration != RexLarssonRegistration)
+            if (!IsRegistration(registration, RexLarssonRegistration))
             {
                 return null;
             }
@@ -638,14 +600,14 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ICharacter source,
             ContentDrivenNpcDialogueRegistration registration)
         {
-            if (registration == RexLarssonRegistration)
+            if (IsRegistration(registration, RexLarssonRegistration))
             {
                 return RexMissionChainStateStore.GetState(source).ToString();
             }
 
-            if (registration == WindcallerKarrecRegistration
-                || registration == AnnoyingDudeRegistration
-                || registration == MaddyCardileRegistration)
+            if (IsRegistration(registration, WindcallerKarrecRegistration)
+                || IsRegistration(registration, AnnoyingDudeRegistration)
+                || IsRegistration(registration, MaddyCardileRegistration))
             {
                 return WindcallerKarrecQuestRuntime.IsCompleted(source)
                            ? "Completed"
@@ -706,9 +668,15 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             foreach (ContentDrivenNpcDialogueRegistration registration in Registrations)
             {
-                if (HasActiveSession(source, registration))
+                DialogueSessionRecord record;
+                lock (SyncRoot)
                 {
-                    return registration;
+                    SessionsByCharacter.TryGetValue(CreateSessionKey(source.Identity, registration), out record);
+                }
+
+                if (record != null && record.Session != null && record.Session.IsActive)
+                {
+                    return record.Registration;
                 }
             }
 
@@ -937,6 +905,12 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return null;
             }
 
+            ContentDrivenNpcDialogueRegistration runtimeRegistration = FindWindcallerRuntimeRegistration(npc);
+            if (runtimeRegistration != null)
+            {
+                return runtimeRegistration;
+            }
+
             ContentDrivenNpcDialogueRegistration byIdentity = FindRegistration(npc.Identity);
             if (byIdentity != null)
             {
@@ -944,7 +918,8 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             return Registrations.FirstOrDefault(
-                registration => !string.IsNullOrWhiteSpace(registration.ExpectedNpcName)
+                registration => !IsWindcallerQuestRegistration(registration)
+                                && !string.IsNullOrWhiteSpace(registration.ExpectedNpcName)
                                 && string.Equals(
                                     npc.Name,
                                     registration.ExpectedNpcName,
@@ -970,11 +945,73 @@ namespace ZoneEngine.Core.Arete.Dialogue
         {
             return npc != null
                    && (IsRegisteredIdentity(npc.Identity, registration)
-                       || (!string.IsNullOrWhiteSpace(registration.ExpectedNpcName)
+                       || (!IsWindcallerQuestRegistration(registration)
+                           && !string.IsNullOrWhiteSpace(registration.ExpectedNpcName)
                            && string.Equals(
                                npc.Name,
                                registration.ExpectedNpcName,
                                StringComparison.OrdinalIgnoreCase)));
+        }
+
+        private static ContentDrivenNpcDialogueRegistration FindWindcallerRuntimeRegistration(ICharacter npc)
+        {
+            if (npc == null || npc.Playfield == null)
+            {
+                return null;
+            }
+
+            WindcallerKarrecNpcRuntimeDefinition runtime;
+            if (!WindcallerKarrecNpcRuntimeRegistry.TryGet(
+                    npc.Playfield.Identity,
+                    npc.Identity,
+                    out runtime)
+                || runtime == null
+                || runtime.Content == null)
+            {
+                return null;
+            }
+
+            ContentDrivenNpcDialogueRegistration registration = Registrations.FirstOrDefault(
+                candidate => IsWindcallerQuestRegistration(candidate)
+                             && candidate.NpcIdentity.Instance == runtime.Content.SourceNpcInstance);
+            return registration == null ? null : BindRegistration(registration, runtime.NpcIdentity);
+        }
+
+        private static ContentDrivenNpcDialogueRegistration BindRegistration(
+            ContentDrivenNpcDialogueRegistration registration,
+            Identity npcIdentity)
+        {
+            return new ContentDrivenNpcDialogueRegistration
+                   {
+                       Name = registration.Name,
+                       ExpectedNpcName = registration.ExpectedNpcName,
+                       NpcIdentity = npcIdentity,
+                       NpcIdentityText = registration.NpcIdentityText,
+                       PlayfieldId = registration.PlayfieldId,
+                       GateEnvironmentVariableName = registration.GateEnvironmentVariableName,
+                       LogPrefix = registration.LogPrefix
+                   };
+        }
+
+        private static bool IsWindcallerQuestRegistration(
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            return IsRegistration(registration, WindcallerKarrecRegistration)
+                   || IsRegistration(registration, AnnoyingDudeRegistration)
+                   || IsRegistration(registration, MaddyCardileRegistration);
+        }
+
+        private static bool IsRegistration(
+            ContentDrivenNpcDialogueRegistration registration,
+            ContentDrivenNpcDialogueRegistration expected)
+        {
+            return registration != null
+                   && expected != null
+                   && (ReferenceEquals(registration, expected)
+                       || string.Equals(
+                           registration.NpcIdentityText,
+                           expected.NpcIdentityText,
+                           StringComparison.OrdinalIgnoreCase));
         }
 
         private static bool IsRegisteredIdentity(

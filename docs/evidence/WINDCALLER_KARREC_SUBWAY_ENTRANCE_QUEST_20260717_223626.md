@@ -22,6 +22,13 @@ Primary-capture raw-sink SHA-256 values recorded during the audit:
 
 Capture-local player identity is `(SimpleChar:7944C065)` / `{type:50000, instance:2034548837}`. The character name is deliberately normalized to `{playerName}` in the one server line that interpolates it.
 
+## Runtime promotion
+
+- Playfield `655` now materializes Windcaller Karrec, Annoying Dude, and Maddy Cardile from one code-backed capture contract. No unproven database template hash or `mobspawns` row is invented.
+- Initial positions, headings, SCFU version/flags/appearance, textures, meshes, visible titles, waypoint projections, and Karrec's active nano are preserved from the exact participant rows below.
+- Karrec remains stationary. Annoying Dude replays the complete captured `16`-segment walking cycle and Maddy replays the complete captured `19`-segment walking cycle. Each replay retains the sampled current position, destination, packet interval, and `MoveMode=24`, including observed discontinuities between packets.
+- All three runtime NPCs use the passive social AI profile. Their runtime identities are registered against this capture contract before visibility is announced, and the dialogue router uses the same names/source identities while binding the actual runtime identity on interaction.
+
 ## Exact participants and positions
 
 The following identities come from exact SCFU rows in playfield `655`:

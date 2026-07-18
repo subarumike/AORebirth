@@ -1,6 +1,7 @@
 namespace AORebirth.Core.Playfields
 {
     using System;
+    using System.Linq;
 
     using ZoneEngine.Core.Playfields;
 
@@ -45,6 +46,10 @@ namespace AORebirth.Core.Playfields
         internal bool HasCapturedAttackStartContext { get; set; }
 
         internal bool HasCapturedEquippedAttackInfo { get; set; }
+
+        internal bool HasCapturedCombatStopSequence { get; set; }
+
+        internal int AttackInfoAmmoCount { get; set; }
     }
 
     internal static class CapturedSubwayCombatCatalog
@@ -53,7 +58,22 @@ namespace AORebirth.Core.Playfields
 
         private const int LooterMonsterData = 203745;
 
+        private const int MuggerMonsterData = 203734;
+
         private const int WorkmanStrikerMonsterData = 203854;
+
+        private static readonly int[] MuggerSourceInstances =
+        {
+            0x7953AA11,
+            0x7953AD6B,
+            0x795450D4,
+            0x795451FE,
+            0x79557F14,
+            0x7957E5C6,
+            0x7957E5C7,
+            0x7957E5C8,
+            0x7957E5CA
+        };
 
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
         {
@@ -65,6 +85,92 @@ namespace AORebirth.Core.Playfields
                         Evidence = "Bloodcreeper captured dual natural attack sequence."
                     }
                 : new CapturedEnemyCombatContract();
+        }
+
+        internal static CapturedEnemyCombatContract ForSupportedSourceWeapon(
+            string name,
+            int monsterData,
+            CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence,
+            int sourceInstance)
+        {
+            if (!string.Equals(name, "Mugger", StringComparison.Ordinal)
+                || monsterData != MuggerMonsterData
+                || !HasCompleteMuggerSourceWeaponEvidence(sourceWeaponEvidence))
+            {
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.Unresolved,
+                    IsCombatReady = false,
+                    Evidence = "Mugger source weapon evidence is incomplete or unsupported."
+                };
+            }
+
+            CapturedSubwaySourceWeaponEvidenceDefinition matched = null;
+            int matches = 0;
+            foreach (CapturedSubwaySourceWeaponEvidenceDefinition evidence in sourceWeaponEvidence)
+            {
+                if (evidence.SourceInstance != sourceInstance)
+                {
+                    continue;
+                }
+
+                matched = evidence;
+                matches++;
+            }
+
+            if (matches != 1 || matched == null)
+            {
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.Unresolved,
+                    IsCombatReady = false,
+                    Evidence = "Mugger source weapon evidence is missing or conflicting."
+                };
+            }
+
+            return new CapturedEnemyCombatContract
+            {
+                AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
+                IsCombatReady = true,
+                Evidence = string.Format(
+                    "{0}: Mugger source 0x{1:X8} QL1 weapon 121567/121567; 38 normal local-player hits span 9..12; three 21-point criticals are report-only; median interval 5.816469 seconds; item owns runtime damage, damage bonus, and recharge; captured AttackInfo only; no empty SIW or attack-start/stop context",
+                    matched.EvidenceCaptures,
+                    sourceInstance),
+                WeaponLowId = matched.LowId,
+                WeaponHighId = matched.HighId,
+                WeaponQuality = matched.Quality,
+                WeaponInventorySlot = 6,
+                HasCapturedEquippedAttackInfo = true,
+                AttackInfoAmmoCount = -1,
+                AttackInfoWeaponSlot = 6,
+                AttackInfoUnknown = 0,
+                AttackInfoWeaponInstance = 0
+            };
+        }
+
+        private static bool HasCompleteMuggerSourceWeaponEvidence(
+            CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence)
+        {
+            if (sourceWeaponEvidence == null
+                || sourceWeaponEvidence.Length != MuggerSourceInstances.Length)
+            {
+                return false;
+            }
+
+            foreach (int expectedSource in MuggerSourceInstances)
+            {
+                int matches = sourceWeaponEvidence.Count(
+                    evidence => evidence.SourceInstance == expectedSource
+                                && evidence.LowId == 121567
+                                && evidence.HighId == 121567
+                                && evidence.Quality == 1);
+                if (matches != 1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         internal static CapturedEnemyCombatContract For(string name, int monsterData, int? level)

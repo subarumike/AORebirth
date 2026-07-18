@@ -184,6 +184,18 @@ namespace AORebirth.Core.Playfields
                         ? new Func<int, CapturedEnemyCombatContract>(
                             level => CapturedSubwayCombatCatalog.For(first.Name, first.MonsterData, level))
                         : null;
+                CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence =
+                    ordinaryContent.GetSourceWeaponEvidence(first.MonsterData);
+                Func<int, int, CapturedEnemyCombatContract> sourceContractResolver =
+                    sourceWeaponEvidence.Length > 0
+                        ? new Func<int, int, CapturedEnemyCombatContract>(
+                            (sourceIdentity, level) =>
+                                CapturedSubwayCombatCatalog.ForSupportedSourceWeapon(
+                                    first.Name,
+                                    first.MonsterData,
+                                    sourceWeaponEvidence,
+                                    sourceIdentity))
+                        : null;
                 CapturedSubwayStrictLootProfileDefinition strictLootProfile =
                     ordinaryContent.GetStrictLootProfile(first.MonsterData);
                 OrdinaryEnemyLootEntry[] lootEntries = strictLootProfile == null
@@ -222,7 +234,11 @@ namespace AORebirth.Core.Playfields
                         first.TemplateHash,
                         BuildSupportedAppearance(first),
                         RetaliateAggression(),
-                        BuildCombatProfile(contract, first.MonsterData, contractResolver),
+                        BuildCombatProfile(
+                            contract,
+                            first.MonsterData,
+                            contractResolver,
+                            sourceContractResolver),
                         BuildLootProfile(
                             first.MonsterData,
                             lootEntries,

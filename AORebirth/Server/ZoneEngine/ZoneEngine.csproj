@@ -160,6 +160,9 @@
     <Compile Include="Core\Missions\PersistentMissionService.cs" />
     <Compile Include="Core\Missions\MissionRuntime.cs" />
     <Compile Include="Core\Subway\Quests\TotwGatewayInteractionHandler.cs" />
+    <Compile Include="Core\Subway\Quests\WindcallerKarrecNpcContent.cs" />
+    <Compile Include="Core\Subway\Quests\WindcallerKarrecNpcRuntimeRegistry.cs" />
+    <Compile Include="Core\Subway\Quests\WindcallerKarrecNpcRuntimeService.cs" />
     <Compile Include="Core\Subway\Quests\WindcallerKarrecInteractionRules.cs" />
     <Compile Include="Core\Subway\Quests\WindcallerKarrecPacketSender.cs" />
     <Compile Include="Core\Subway\Quests\WindcallerKarrecQuestRuntime.cs" />
