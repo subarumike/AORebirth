@@ -305,6 +305,27 @@ namespace ZoneEngine.Core.Controllers
             return this.capturedPatrolReplaySegments != null && this.capturedPatrolReplaySegments.Length > 0;
         }
 
+        public bool TryGetCapturedPatrolReplayProjection(
+            out Vector3 currentPosition,
+            out Vector3 destination)
+        {
+            currentPosition = new Vector3();
+            destination = new Vector3();
+            if (!this.IsCapturedIdlePatrolReplay()
+                || !this.hasMotionPacket
+                || !this.followMotionSegment.Active)
+            {
+                return false;
+            }
+
+            currentPosition = this.CurrentMotionSegmentPosition(DateTime.UtcNow);
+            destination = new Vector3(
+                this.followMotionSegment.End.xf,
+                this.followMotionSegment.End.yf,
+                this.followMotionSegment.End.zf);
+            return true;
+        }
+
         private bool TrySendCapturedPatrolReplay()
         {
             if (!this.IsCapturedIdlePatrolReplay())

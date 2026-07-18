@@ -503,8 +503,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && coordinatorText.Contains("hasCapturedEquippedAttackInfo")
                 && coordinatorText.Contains("AttackInfoAmmoCount = hasCapturedEquippedAttackInfo")
                 && coordinatorText.Contains("AttackInfoUnk1 = hasCapturedEquippedAttackInfo")
-                && coordinatorText.Contains("DamageBonus = 0,"),
-                "Thief must use its captured attack context, delayed movement transition, and fixed normal-hit envelope without reusing weapon max-damage as flat add damage.");
+                && coordinatorText.Contains("weapon.GetAttribute((int)StatIds.damagebonus)")
+                && coordinatorText.Contains("DamageBonus = damageBonus,"),
+                "Captured equipped AttackInfo must preserve its packet shape without zeroing the equipped item's own damage bonus.");
             int contextIndex = coordinatorText.IndexOf(
                 "this.AnnounceCapturedSpecialAttackSequenceContext(attacker, specialAttackSequence);",
                 StringComparison.Ordinal);
@@ -2428,6 +2429,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\WorldPopulationController.cs"));
             string generatedCombatReportText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"docs\generated\subway_enemy_combat_contracts.json"));
+            int muggerCombatReportStart = generatedCombatReportText.IndexOf(
+                "\"Mugger\":",
+                StringComparison.Ordinal);
+            int muggerCombatReportEnd = generatedCombatReportText.IndexOf(
+                "\"Neural Burnout\":",
+                muggerCombatReportStart,
+                StringComparison.Ordinal);
+            Assert.IsTrue(muggerCombatReportStart >= 0 && muggerCombatReportEnd > muggerCombatReportStart);
+            string muggerCombatReport = generatedCombatReportText.Substring(
+                muggerCombatReportStart,
+                muggerCombatReportEnd - muggerCombatReportStart);
             string disobedientBotDefinition = ExtractMethodBlock(
                 providerText,
                 "private static CapturedSubwaySpawnDefinition DisobedientBot(");
@@ -2446,6 +2458,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string looterCombatContract = ExtractMethodBlock(
                 combatContractText,
                 "private static CapturedEnemyCombatContract ForLooter(");
+            string muggerCombatContract = ExtractMethodBlock(
+                combatContractText,
+                "internal static CapturedEnemyCombatContract ForSupportedSourceWeapon(");
             var ordinaryCatalog = new OrdinaryEnemyCatalog(
                 new CapturedSubwayContentProvider(),
                 new CapturedSubwayOrdinaryContentProvider());
@@ -2465,13 +2480,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Melded Patterns|203747|148",
                     "Workman Striker|203854|149",
                     "Looter|203745|138",
+                    "Mugger|203734|138",
                     "Bloodcreeper|30379|63",
                     "Stim Fiend|203739|138",
                     "Neural Burnout|203730|148"
                 };
 
             Assert.AreEqual(
-                14,
+                15,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
 
@@ -2654,7 +2670,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ordinaryProviderText.Contains("\"Workman Striker\"")
                 && ordinaryProviderText.Contains("203854")
                 && ordinaryProviderText.Contains("5.092328")
-                && CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 29
+                && CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 38
                 && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(202719, 202720, 14, 2, 10, 2000)")
                 && CountOccurrences(ordinaryProviderText, ", 203854, 17899,") == 20
                 && workmanStriker.Loot.PoolMode == OrdinaryEnemyLootPoolMode.IndependentEntries
@@ -2729,7 +2745,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(240.0, looter.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(3.0, looter.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
-                CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 29
+                CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 38
                 && CountOccurrences(ordinaryProviderText, ", 203745, 17870,") == 11
                 && catalogText.Contains("archetype.MonsterData == LooterMonsterData")
                 && looterCombatContract.Contains("ForSourceSpecificWeaponArchetype")
@@ -2750,6 +2766,129 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
                 "Accepted Subway Looter must keep eight exact source weapons and dispositions, fail-closed aggregate/missing/conflicting/unknown selection, item-owned visible weapon damage/recharge, report-only critical, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
+
+            OrdinaryEnemyProfile mugger = ordinaryProfiles.Single(value => value.DisplayName == "Mugger");
+            OrdinaryEnemySpawnDefinition[] muggerSpawns = ordinarySpawns
+                .Where(value => value.ProfileKey == mugger.ProfileKey)
+                .ToArray();
+            Assert.AreEqual(9, CountOccurrences(providerText, "CapturedSurveySpawn(Mugger("));
+            Assert.AreEqual(9, muggerSpawns.Length);
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "7953AA11:8:Active",
+                    "7953AD6B:10:Active",
+                    "795450D4:5:Active",
+                    "795451FE:10:Active",
+                    "79557F14:10:Quarantined",
+                    "7957E5C6:9:Quarantined",
+                    "7957E5C7:8:Quarantined",
+                    "7957E5C8:8:Quarantined",
+                    "7957E5CA:10:Quarantined"
+                },
+                muggerSpawns
+                    .OrderBy(value => value.SourceIdentity)
+                    .Select(
+                        value => string.Format(
+                            "{0:X8}:{1}:{2}",
+                            value.SourceIdentity,
+                            value.Level,
+                            value.Disposition))
+                    .ToArray());
+            Assert.IsTrue(muggerSpawns.All(value => value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Inherit));
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, mugger.Aggression.Mode);
+            Assert.IsTrue(mugger.Aggression.Chase);
+            Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, mugger.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, mugger.Combat.DamageSource);
+            Assert.IsTrue(mugger.Combat.VisibleWeapon);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, mugger.Combat.Contract.AttackModel);
+            Assert.IsFalse(mugger.Combat.Contract.IsCombatReady);
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.Unresolved,
+                mugger.Combat.ResolveContract(muggerSpawns[0].Level).AttackModel);
+            foreach (OrdinaryEnemySpawnDefinition spawn in muggerSpawns)
+            {
+                CapturedEnemyCombatContract contract = mugger.Combat.ResolveContract(
+                    spawn.SourceIdentity,
+                    spawn.Level);
+                Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
+                Assert.IsTrue(contract.IsCombatReady);
+                Assert.AreEqual(121567, contract.WeaponLowId);
+                Assert.AreEqual(121567, contract.WeaponHighId);
+                Assert.AreEqual(1, contract.WeaponQuality);
+                Assert.AreEqual(6, contract.WeaponInventorySlot);
+                Assert.AreEqual(0, contract.MinDamage);
+                Assert.AreEqual(0, contract.MaxDamage);
+                Assert.AreEqual(0.0, contract.RechargeSeconds);
+                Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
+                Assert.AreEqual(-1, contract.AttackInfoAmmoCount);
+                Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, contract.AttackInfoUnknown);
+                Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+                Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
+                Assert.IsFalse(contract.HasCapturedAttackStartContext);
+                Assert.IsFalse(contract.HasCapturedCombatStopSequence);
+            }
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.Unresolved,
+                mugger.Combat.ResolveContract(0x7953FFFF, muggerSpawns[0].Level).AttackModel);
+            Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, mugger.Loot.PoolMode);
+            Assert.IsFalse(mugger.Loot.ItemPoolComplete);
+            Assert.AreEqual(17, mugger.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(3, mugger.Loot.ObservedEmptyInventories);
+            CollectionAssert.AreEquivalent(
+                new[]
+                {
+                    "25822:25831:5:1:17", "85711:22014:8:1:17",
+                    "123704:123705:9:1:17", "123723:123724:6:1:17",
+                    "123976:123977:9:1:17", "124348:124349:7:1:17",
+                    "124545:124546:10:1:17", "128636:128637:8:1:17",
+                    "128839:128840:9:1:17", "130060:130061:5:1:17",
+                    "130060:130061:9:1:17", "131605:131606:7:1:17",
+                    "136638:136639:9:1:17", "136638:136639:12:1:17",
+                    "136640:136641:7:1:17", "136640:136641:8:1:17",
+                    "136640:136641:9:1:17", "136646:136647:9:1:17",
+                    "160224:160225:10:1:17", "234875:234875:1:2:17",
+                    "234876:234876:1:1:17"
+                },
+                mugger.Loot.Entries
+                    .Select(value => string.Format("{0}:{1}:{2}:{3}:{4}", value.LowId, value.HighId, value.QualityLevel, value.ObservedCount, value.ObservedCorpses))
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[] { "5:44:44:6", "8:71:71:6", "9:80:80:6", "10:88:88:6" },
+                mugger.Loot.LevelCreditRules
+                    .OrderBy(value => value.EnemyLevel)
+                    .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
+                    .ToArray());
+            Assert.AreEqual(17534, mugger.Corpse.CapturedCatMesh);
+            Assert.AreEqual(3.0, mugger.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(240.0, mugger.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(3.0, mugger.Corpse.LootedCleanupSeconds);
+            Assert.IsTrue(
+                CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 38
+                && CountOccurrences(ordinaryProviderText, ", 203734, 17534,") == 24
+                && combatContractText.Contains("Mugger combat requires an exact captured source identity; aggregate weapon fallback is forbidden")
+                && muggerCombatContract.Contains("HasCompleteMuggerSourceWeaponEvidence")
+                && muggerCombatContract.Contains("if (matches != 1 || matched == null)")
+                && muggerCombatContract.Contains("EquippedWeaponWithCapturedAttackInfo")
+                && muggerCombatContract.Contains("item owns runtime damage, damage bonus, and recharge")
+                && muggerCombatContract.Contains("criticals are report-only")
+                && muggerCombatContract.Contains("no empty SIW or captured attack-start/stop context")
+                && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(spawn.SourceIdentity, variant.Level)")
+                && muggerCombatReport.Contains("\"normalAttackInfoRows\": 38")
+                && muggerCombatReport.Contains("\"normalMinDamage\": 9")
+                && muggerCombatReport.Contains("\"normalMaxDamage\": 12")
+                && muggerCombatReport.Contains("\"criticalAttackInfoRows\": 3")
+                && muggerCombatReport.Contains("\"criticalMinDamage\": 21")
+                && muggerCombatReport.Contains("\"criticalMaxDamage\": 21")
+                && muggerCombatReport.Contains("\"medianRechargeSeconds\": 5.816469")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue")
+                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
+                && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted Subway Mugger must keep all nine exact source weapons, spawn levels, and dispositions; fail-closed aggregate/missing/conflicting/unknown selection; item-owned damage/recharge with captured AttackInfo shape; report-only criticals; strict 17-open incomplete-pool loot; exact CATMesh/level credits; shared chase; private four-minute respawn; and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile bloodcreeper = ordinaryProfiles.Single(value => value.DisplayName == "Bloodcreeper");
             OrdinaryEnemySpawnDefinition[] bloodcreeperSpawns = ordinarySpawns

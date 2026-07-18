@@ -4,6 +4,8 @@ namespace ZoneEngine.Core.Playfields.Content
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.Core.Subway.Quests;
+
     #endregion
 
     public sealed class AreteContentModule : IPlayfieldContentModule
@@ -12,7 +14,8 @@ namespace ZoneEngine.Core.Playfields.Content
 
         public bool Supports(Identity playfieldIdentity)
         {
-            return playfieldIdentity.Instance == PrivateAretePlayfieldInstance;
+            return playfieldIdentity.Instance == PrivateAretePlayfieldInstance
+                   || playfieldIdentity.Instance == WindcallerKarrecNpcContent.PlayfieldId;
         }
 
         public void Register(PlayfieldContentRegistration registration)

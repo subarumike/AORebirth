@@ -231,6 +231,25 @@ namespace AORebirth.Core.Playfields
             new CapturedSubwayLootOutcomeEvidenceDefinition("20260710-202132", "2026-07-11T01:25:15.801207Z", "(Corpse:00F6C001)", "(SimpleChar:7957E5CA)", 203734, 4091, 2, 128839, 128840, 9)
         };
 
+        private static readonly CapturedSubwaySourceWeaponProfileDefinition[] SupportedSourceWeaponProfiles =
+        {
+            new CapturedSubwaySourceWeaponProfileDefinition(
+                "Mugger",
+                203734,
+                new CapturedSubwaySourceWeaponEvidenceDefinition[]
+                {
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x7953AA11, 121567, 121567, 1, "20260709-212115,20260709-212336"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x7953AD6B, 121567, 121567, 1, "20260709-212115,20260709-212336,20260709-220439"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795450D4, 121567, 121567, 1, "20260709-212115,20260709-212336,20260709-220439"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795451FE, 121567, 121567, 1, "20260709-222339"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x79557F14, 121567, 121567, 1, "20260710-202132"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x7957E5C6, 121567, 121567, 1, "20260710-202132"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x7957E5C7, 121567, 121567, 1, "20260710-202132,20260710-211430"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x7957E5C8, 121567, 121567, 1, "20260710-202132"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x7957E5CA, 121567, 121567, 1, "20260710-202132")
+                })
+        };
+
         private static readonly CapturedSubwayStrictLootProfileDefinition[] StrictLootProfiles =
         {
             new CapturedSubwayStrictLootProfileDefinition(
@@ -6255,6 +6274,22 @@ namespace AORebirth.Core.Playfields
                 .ToArray();
         }
 
+        public CapturedSubwaySourceWeaponEvidenceDefinition[] GetSourceWeaponEvidence(int monsterData)
+        {
+            CapturedSubwaySourceWeaponProfileDefinition supported = SupportedSourceWeaponProfiles
+                .SingleOrDefault(value => value.MonsterData == monsterData);
+            if (supported != null)
+            {
+                return supported.SourceWeaponEvidence.ToArray();
+            }
+
+            CapturedSubwayOrdinaryArchetypeDefinition archetype = Archetypes
+                .SingleOrDefault(value => value.MonsterData == monsterData);
+            return archetype == null
+                       ? new CapturedSubwaySourceWeaponEvidenceDefinition[0]
+                       : archetype.SourceWeaponEvidence.ToArray();
+        }
+
         public CapturedSubwayStrictLootProfileDefinition GetStrictLootProfile(int monsterData)
         {
             return StrictLootProfiles.SingleOrDefault(value => value.MonsterData == monsterData);
@@ -6349,6 +6384,7 @@ namespace AORebirth.Core.Playfields
     internal sealed class CapturedSubwayTextureDefinition { public CapturedSubwayTextureDefinition(int place, int id, int unknown) { this.Place = place; this.Id = id; this.Unknown = unknown; } public int Place { get; private set; } public int Id { get; private set; } public int Unknown { get; private set; } }
     internal sealed class CapturedSubwayMeshDefinition { public CapturedSubwayMeshDefinition(int position, uint id, int overrideTextureId, int layer) { this.Position = position; this.Id = id; this.OverrideTextureId = overrideTextureId; this.Layer = layer; } public int Position { get; private set; } public uint Id { get; private set; } public int OverrideTextureId { get; private set; } public int Layer { get; private set; } }
     internal sealed class CapturedSubwayWaypointDefinition { public CapturedSubwayWaypointDefinition(float x, float y, float z) { this.X = x; this.Y = y; this.Z = z; } public float X { get; private set; } public float Y { get; private set; } public float Z { get; private set; } }
+    internal sealed class CapturedSubwaySourceWeaponProfileDefinition { public CapturedSubwaySourceWeaponProfileDefinition(string name, int monsterData, CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { this.Name = name; this.MonsterData = monsterData; this.SourceWeaponEvidence = sourceWeaponEvidence ?? new CapturedSubwaySourceWeaponEvidenceDefinition[0]; } public string Name { get; private set; } public int MonsterData { get; private set; } public CapturedSubwaySourceWeaponEvidenceDefinition[] SourceWeaponEvidence { get; private set; } }
     internal sealed class CapturedSubwaySourceWeaponEvidenceDefinition { public CapturedSubwaySourceWeaponEvidenceDefinition(int sourceInstance, int lowId, int highId, int quality, string evidenceCaptures) { this.SourceInstance = sourceInstance; this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.EvidenceCaptures = evidenceCaptures; } public int SourceInstance { get; private set; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public string EvidenceCaptures { get; private set; } }
     internal sealed class CapturedSubwayCombatEvidenceDefinition { public CapturedSubwayCombatEvidenceDefinition(bool observed, int minDamage, int maxDamage, double rechargeSeconds, int weaponSlot, int attackInfoUnknown, int weaponInstance, int observedRows) { this.Observed = observed; this.MinDamage = minDamage; this.MaxDamage = maxDamage; this.RechargeSeconds = rechargeSeconds; this.WeaponSlot = weaponSlot; this.AttackInfoUnknown = attackInfoUnknown; this.WeaponInstance = weaponInstance; this.ObservedRows = observedRows; } public bool Observed { get; private set; } public int MinDamage { get; private set; } public int MaxDamage { get; private set; } public double RechargeSeconds { get; private set; } public int WeaponSlot { get; private set; } public int AttackInfoUnknown { get; private set; } public int WeaponInstance { get; private set; } public int ObservedRows { get; private set; } }
     internal sealed class CapturedSubwayLootEvidenceDefinition { public CapturedSubwayLootEvidenceDefinition(int lowId, int highId, int quality, int observedCount, int observedCorpses, int observedBasisPoints) { this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.ObservedCount = observedCount; this.ObservedCorpses = observedCorpses; this.ObservedBasisPoints = observedBasisPoints; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public int ObservedCount { get; private set; } public int ObservedCorpses { get; private set; } public int ObservedBasisPoints { get; private set; } }

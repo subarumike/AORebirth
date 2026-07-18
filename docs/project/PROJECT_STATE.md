@@ -12,7 +12,10 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   this runtime. Windcaller Karrec's bounded PF655 flow includes burger/card
   handout and exact trade, `+2` stat-75 side tokens, a durable `5000`
   personal-research allocation record, account flag `totw-wall-access`, mission
-  cleanup, and the captured wall transfer to PF647. See
+  cleanup, and the captured wall transfer to PF647. PF655 now also materializes
+  Karrec, Annoying Dude, and Maddy Cardile from capture-exact appearances; the
+  latter two replay their complete `16`- and `19`-segment walking cycles as
+  passive social NPCs. See
   `docs/project/QUEST_SYSTEM_AUDIT_20260717.md`.
 - Quest limitations remain explicit: live mission-table creation/startup and
   private-client restart/duplicate/reward/gateway smoke are pending; no general

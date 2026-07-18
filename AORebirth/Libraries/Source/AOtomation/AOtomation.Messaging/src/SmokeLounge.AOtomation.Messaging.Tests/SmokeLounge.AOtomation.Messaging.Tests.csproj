@@ -83,6 +83,7 @@
     <Compile Include="PersistentMissionFoundationTests.cs" />
     <Compile Include="QuestRuntimePersistenceTests.cs" />
     <Compile Include="AreteFrameworkBootstrapTests.cs" />
+    <Compile Include="WindcallerKarrecNpcContentTests.cs" />
     <Compile Include="WindcallerKarrecInteractionRulesTests.cs" />
     <Compile Include="SubwayLootPoolRulesTests.cs" />
     <Compile Include="SubwayEnemyLootEvidenceTests.cs" />
@@ -169,6 +170,8 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\InMemoryMissionRepository.cs"><Link>InMemoryMissionRepository.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\PersistentMissionService.cs"><Link>PersistentMissionService.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\RexB18CFeedbackPolicy.cs"><Link>RexB18CFeedbackPolicy.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Subway\Quests\WindcallerKarrecNpcContent.cs"><Link>WindcallerKarrecNpcContent.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Subway\Quests\WindcallerKarrecNpcRuntimeRegistry.cs"><Link>WindcallerKarrecNpcRuntimeRegistry.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Subway\Quests\WindcallerKarrecInteractionRules.cs"><Link>WindcallerKarrecInteractionRules.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRewardCoordinator.cs"><Link>MissionRewardCoordinator.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteConditionReferenceValidator.cs"><Link>AreteConditionReferenceValidator.cs</Link></Compile>

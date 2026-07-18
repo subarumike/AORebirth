@@ -42,6 +42,7 @@ This is not a general production-ready AO mission system. The implemented scope 
 
 - Source playfield is `655`. The capture-local player identity is `SimpleChar:7944C065` (`2034548837`).
 - Captured NPC identities are Windcaller Karrec `SimpleChar:796360BB`, Annoying Dude `SimpleChar:796360BD`, and Maddy Cardile `SimpleChar:796360BC`.
+- Playfield `655` now materializes all three as passive code-backed capture NPCs. Their exact captured SCFU appearances are preserved; Karrec is stationary, Annoying Dude replays the complete `16`-segment walking cycle, and Maddy Cardile replays the complete `19`-segment walking cycle. Runtime identity registration, spawn cleanup, and dialogue registration share the same bounded content definitions.
 - Mission `Mission:55579381` is accepted through the captured Karrec dialogue path. No speculative mission-window accept/decline/abandon handler was added.
 - Annoying Dude grants Bronto Burger `297042`; Maddy grants Maddy's Credit Card `297043` through persisted inventory writes.
 - Completion requires exactly two distinct offered slots containing one burger and one card. Unknown or extra offerings fail closed. The selected slots and durable trade-pending state are used for crash recovery, so unrelated duplicate copies elsewhere in inventory do not decide whether the offered copies were consumed.
@@ -71,7 +72,7 @@ This is not a general production-ready AO mission system. The implemented scope 
 - No general mission-journal reconstruction occurs on login/reconnect/zoning. Durable state reloads, while captured quest packets are emitted only by their proven dialogue, objective, and completion triggers.
 - No team missions, shared kill credit, random missions, repeatable missions, timed missions, escort missions, branching quests, or broad mission-window client actions were added.
 - The capture does not prove abandon, failure, repeat acceptance, alternate completion, or team-sharing behavior for Karrec, so those routes remain unavailable.
-- The capture does not identify a Karrec NPC template/spawn ID. Runtime dialogue can bind an already-loaded exact Karrec identity or exact-name DB spawn; this change does not create a speculative NPC spawn.
+- The capture does not identify database template or `mobspawns` IDs for this trio. They are therefore materialized from code-backed capture definitions with free runtime identities rather than speculative database rows; the dialogue router binds those identities by the shared exact names/content contract.
 - The gateway capture proves one nearby successful use but not the official maximum interaction distance. The implementation verifies exact identity, loaded playfield object, playfield, and account access without inventing a retail distance threshold.
 - Live schema creation and private-client restart persistence remain unconfirmed. An approved ZoneEngine restart attempt did not open port `7501` within 60 seconds after startup database connection; ChatEngine and LoginEngine were healthy. No destructive database operation was performed.
 - A private-client smoke is still required for Karrec dialogue, item handout/trade, reward display, restart recovery, account-shared wall access, denied wall use, and the PF647 landing.
@@ -84,6 +85,7 @@ This is not a general production-ready AO mission system. The implemented scope 
 - Quest runtime persistence and duplicate-reward tests: `7/7` PASS.
 - Checked-in bootstrap/runtime-definition tests: `4/4` PASS.
 - Karrec eligibility and gateway identity rules: `3/3` PASS.
+- Capture-backed Karrec NPC population/appearance/patrol/dialogue-link/lifecycle tests: `7/7` PASS; complete Windcaller-focused suite: `10/10` PASS.
 - AORebirth Debug build, including ZoneEngine: PASS.
 
 The capture evidence remains bounded in `Content/Captured/Quests`; the original raw captures were not modified or copied into source control.

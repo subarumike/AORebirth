@@ -708,6 +708,199 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void MuggerUsesExactCurrentSourceWeaponsAndCapturedAttackInfoShapeWithoutFixedDamage()
+        {
+            int[] expectedSources =
+            {
+                0x7953AA11,
+                0x7953AD6B,
+                0x795450D4,
+                0x795451FE,
+                0x79557F14,
+                0x7957E5C6,
+                0x7957E5C7,
+                0x7957E5C8,
+                0x7957E5CA
+            };
+            int[] activeSources =
+            {
+                0x7953AA11,
+                0x7953AD6B,
+                0x795450D4,
+                0x795451FE
+            };
+            int[] quarantinedSources =
+            {
+                0x79557F14,
+                0x7957E5C6,
+                0x7957E5C7,
+                0x7957E5C8,
+                0x7957E5CA
+            };
+            var ordinaryProvider = new CapturedSubwayOrdinaryContentProvider();
+            CapturedSubwaySourceWeaponEvidenceDefinition[] sourceEvidence =
+                ordinaryProvider.GetSourceWeaponEvidence(203734);
+
+            Assert.AreEqual(9, sourceEvidence.Length);
+            CollectionAssert.AreEquivalent(
+                expectedSources,
+                sourceEvidence.Select(value => value.SourceInstance).ToArray());
+            foreach (CapturedSubwaySourceWeaponEvidenceDefinition evidence in sourceEvidence)
+            {
+                Assert.AreEqual(121567, evidence.LowId);
+                Assert.AreEqual(121567, evidence.HighId);
+                Assert.AreEqual(1, evidence.Quality);
+                Assert.IsFalse(string.IsNullOrWhiteSpace(evidence.EvidenceCaptures));
+            }
+
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                ordinaryProvider);
+            OrdinaryEnemyProfile mugger = catalog.GetProfiles()
+                .Single(value => value.DisplayName == "Mugger");
+            OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns()
+                .Where(value => value.ProfileKey == mugger.ProfileKey)
+                .ToArray();
+
+            Assert.AreEqual(9, spawns.Length);
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "7953AA11:8:Active",
+                    "7953AD6B:10:Active",
+                    "795450D4:5:Active",
+                    "795451FE:10:Active",
+                    "79557F14:10:Quarantined",
+                    "7957E5C6:9:Quarantined",
+                    "7957E5C7:8:Quarantined",
+                    "7957E5C8:8:Quarantined",
+                    "7957E5CA:10:Quarantined"
+                },
+                spawns
+                    .OrderBy(value => value.SourceIdentity)
+                    .Select(value => string.Format("{0:X8}:{1}:{2}", value.SourceIdentity, value.Level, value.Disposition))
+                    .ToArray());
+            CollectionAssert.AreEquivalent(
+                activeSources,
+                spawns
+                    .Where(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active)
+                    .Select(value => value.SourceIdentity)
+                    .ToArray());
+            CollectionAssert.AreEquivalent(
+                quarantinedSources,
+                spawns
+                    .Where(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined)
+                    .Select(value => value.SourceIdentity)
+                    .ToArray());
+            Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, mugger.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, mugger.Combat.DamageSource);
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, mugger.Combat.EvidenceState);
+            Assert.IsTrue(mugger.Combat.VisibleWeapon);
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, mugger.Aggression.Mode);
+            Assert.IsTrue(mugger.Aggression.Chase);
+            Assert.IsTrue(spawns.All(value => value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Inherit));
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, mugger.Combat.Contract.AttackModel);
+            Assert.IsFalse(mugger.Combat.Contract.IsCombatReady);
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.Unresolved,
+                mugger.Combat.ResolveContract(spawns[0].Level).AttackModel,
+                "A Mugger contract without its source identity must fail closed.");
+
+            foreach (OrdinaryEnemySpawnDefinition spawn in spawns)
+            {
+                CapturedEnemyCombatContract contract = mugger.Combat.ResolveContract(
+                    spawn.SourceIdentity,
+                    spawn.Level);
+                Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
+                Assert.IsTrue(contract.IsCombatReady);
+                Assert.AreEqual(121567, contract.WeaponLowId);
+                Assert.AreEqual(121567, contract.WeaponHighId);
+                Assert.AreEqual(1, contract.WeaponQuality);
+                Assert.AreEqual(6, contract.WeaponInventorySlot);
+                Assert.AreEqual(0, contract.MinDamage);
+                Assert.AreEqual(0, contract.MaxDamage);
+                Assert.AreEqual(0.0, contract.RechargeSeconds);
+                Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
+                Assert.AreEqual(-1, contract.AttackInfoAmmoCount);
+                Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, contract.AttackInfoUnknown);
+                Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+                Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
+                Assert.IsFalse(contract.HasCapturedAttackStartContext);
+                Assert.IsFalse(contract.HasCapturedCombatStopSequence);
+                Assert.IsTrue(contract.Evidence.Contains("38 normal local-player hits"));
+                Assert.IsTrue(contract.Evidence.Contains("three 21-point criticals are report-only"));
+                Assert.IsTrue(contract.Evidence.Contains("5.816469"));
+                Assert.IsTrue(contract.Evidence.Contains("item owns runtime damage, damage bonus, and recharge"));
+            }
+
+            CapturedEnemyCombatContract unknown = mugger.Combat.ResolveContract(
+                0x7953FFFF,
+                spawns[0].Level);
+            CapturedEnemyCombatContract missing =
+                CapturedSubwayCombatCatalog.ForSupportedSourceWeapon(
+                    "Mugger",
+                    203734,
+                    sourceEvidence.Take(sourceEvidence.Length - 1).ToArray(),
+                    expectedSources[0]);
+            CapturedEnemyCombatContract conflicting =
+                CapturedSubwayCombatCatalog.ForSupportedSourceWeapon(
+                    "Mugger",
+                    203734,
+                    sourceEvidence
+                        .Concat(
+                            new[]
+                            {
+                                new CapturedSubwaySourceWeaponEvidenceDefinition(
+                                    expectedSources[0],
+                                    121567,
+                                    121567,
+                                    1,
+                                    "conflict")
+                            })
+                        .ToArray(),
+                    expectedSources[0]);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, unknown.AttackModel);
+            Assert.IsFalse(unknown.IsCombatReady);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, missing.AttackModel);
+            Assert.IsFalse(missing.IsCombatReady);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, conflicting.AttackModel);
+            Assert.IsFalse(conflicting.IsCombatReady);
+            Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, mugger.Loot.PoolMode);
+            Assert.IsFalse(mugger.Loot.ItemPoolComplete);
+            Assert.AreEqual(17, mugger.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(3, mugger.Loot.ObservedEmptyInventories);
+            CollectionAssert.AreEquivalent(
+                new[]
+                {
+                    "25822:25831:5:1:17", "85711:22014:8:1:17",
+                    "123704:123705:9:1:17", "123723:123724:6:1:17",
+                    "123976:123977:9:1:17", "124348:124349:7:1:17",
+                    "124545:124546:10:1:17", "128636:128637:8:1:17",
+                    "128839:128840:9:1:17", "130060:130061:5:1:17",
+                    "130060:130061:9:1:17", "131605:131606:7:1:17",
+                    "136638:136639:9:1:17", "136638:136639:12:1:17",
+                    "136640:136641:7:1:17", "136640:136641:8:1:17",
+                    "136640:136641:9:1:17", "136646:136647:9:1:17",
+                    "160224:160225:10:1:17", "234875:234875:1:2:17",
+                    "234876:234876:1:1:17"
+                },
+                mugger.Loot.Entries
+                    .Select(value => string.Format("{0}:{1}:{2}:{3}:{4}", value.LowId, value.HighId, value.QualityLevel, value.ObservedCount, value.ObservedCorpses))
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[] { "5:44:44:6", "8:71:71:6", "9:80:80:6", "10:88:88:6" },
+                mugger.Loot.LevelCreditRules
+                    .OrderBy(value => value.EnemyLevel)
+                    .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
+                    .ToArray());
+            Assert.AreEqual(17534, mugger.Corpse.CapturedCatMesh);
+            Assert.AreEqual(3.0, mugger.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(240.0, mugger.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(3.0, mugger.Corpse.LootedCleanupSeconds);
+        }
+
+        [TestMethod]
         public void DistinctNoRespawnAssignmentsKeepStablePolicyKeysAndProvenance()
         {
             WorldRespawnPolicyResolution first = WorldRespawnPolicyResolver.Resolve(

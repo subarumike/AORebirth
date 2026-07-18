@@ -21,8 +21,8 @@ namespace ZoneEngine.Core.Subway.Quests
 
     internal static class WindcallerKarrecInteractionRules
     {
-        internal const int PlayfieldId = 655;
-        internal const int KarrecInstance = unchecked((int)0x796360BB);
+        internal const int PlayfieldId = WindcallerKarrecNpcContent.PlayfieldId;
+        internal const int KarrecInstance = WindcallerKarrecNpcContent.KarrecSourceInstance;
         internal const int BurgerItemId = 297042;
         internal const int CreditCardItemId = 297043;
         internal const int GatewayInstance = unchecked((int)0xC004028F);
