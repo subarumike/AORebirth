@@ -85,19 +85,24 @@ namespace AORebirth.Core.Playfields
 
         private const float CapturedSubwayEntryVerticalTolerance = 8.0f;
 
-        private const float CapturedSubwayEntranceLandingX = 71.4f;
+        // Official-live SCFU landing repeated in captures 20260708-004038,
+        // 20260708-175514, 20260708-181729, 20260708-182237,
+        // 20260709-164219, 20260710-212455, 20260712-155528, and
+        // 20260717-012522. Representative row: 20260708-004038 events.log:741
+        // (IN-N3 packet #510).
+        private const float CapturedSubwayEntranceLandingX = 65.80835f;
 
-        private const float CapturedSubwayEntranceLandingY = 115.6f;
+        private const float CapturedSubwayEntranceLandingY = 115.6148f;
 
-        private const float CapturedSubwayEntranceLandingZ = 319.0f;
+        private const float CapturedSubwayEntranceLandingZ = 318.9879f;
 
-        private const float CapturedSubwayEntranceHeadingX = 0.707102f;
+        private const float CapturedSubwayEntranceHeadingX = 0.0f;
 
-        private const float CapturedSubwayEntranceHeadingY = 0.0f;
+        private const float CapturedSubwayEntranceHeadingY = 0.7071124f;
 
-        private const float CapturedSubwayEntranceHeadingZ = 0.707112f;
+        private const float CapturedSubwayEntranceHeadingZ = 0.0f;
 
-        private const float CapturedSubwayEntranceHeadingW = 0.0f;
+        private const float CapturedSubwayEntranceHeadingW = 0.7071012f;
 
         private static readonly Dictionary<int, DateTime> PostZoneCollisionGraceUntil =
             new Dictionary<int, DateTime>();
@@ -110,6 +115,8 @@ namespace AORebirth.Core.Playfields
             new Dictionary<int, HashSet<string>>();
 
         private readonly HashSet<int> statelCollisionInitializedCharacters = new HashSet<int>();
+
+        private readonly HashSet<int> capturedSubwayEntryContacts = new HashSet<int>();
 
         internal static void ArmPostZoneCollisionGrace(ICharacter character)
         {
@@ -153,6 +160,7 @@ namespace AORebirth.Core.Playfields
         {
             this.statelEnterContacts.Remove(dynelId);
             this.statelCollisionInitializedCharacters.Remove(dynelId);
+            this.capturedSubwayEntryContacts.Remove(dynelId);
         }
 
         internal void PrimeStatelCollisionContacts(
@@ -389,11 +397,27 @@ namespace AORebirth.Core.Playfields
             double deltaZ = sourceZ - CapturedSubwayEntrySourceZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
             double verticalDistance = Math.Abs(sourceY - CapturedSubwayEntrySourceY);
-            if (horizontalDistanceSquared > CapturedSubwayEntryRadius * CapturedSubwayEntryRadius
-                || verticalDistance > CapturedSubwayEntryVerticalTolerance)
+            bool inEntryTrigger =
+                horizontalDistanceSquared <= CapturedSubwayEntryRadius * CapturedSubwayEntryRadius
+                && verticalDistance <= CapturedSubwayEntryVerticalTolerance;
+            int dynelId = character.Identity.Instance;
+            if (!inEntryTrigger)
             {
+                this.capturedSubwayEntryContacts.Remove(dynelId);
                 return false;
             }
+
+            // The official PF655 return landing is inside this four-unit trigger.
+            // Treat arrival as an existing contact so post-zone grace cannot turn
+            // into a delayed bounce back to PF127; leaving and re-entering re-arms it.
+            if (this.capturedSubwayEntryContacts.Contains(dynelId)
+                || !this.statelCollisionInitializedCharacters.Contains(dynelId))
+            {
+                this.capturedSubwayEntryContacts.Add(dynelId);
+                return false;
+            }
+
+            this.capturedSubwayEntryContacts.Add(dynelId);
 
             var destination = new Coordinate(
                 CapturedSubwayEntranceLandingX,

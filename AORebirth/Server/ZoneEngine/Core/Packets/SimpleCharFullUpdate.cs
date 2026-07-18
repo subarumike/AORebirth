@@ -50,7 +50,9 @@ namespace ZoneEngine.Core.Packets
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.Playfields;
+    using ZoneEngine.Core.Subway.Quests;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
@@ -248,12 +250,24 @@ namespace ZoneEngine.Core.Packets
             CapturedEncounterRuntimeDefinition encounterRuntime;
             bool hasEncounterRuntime =
                 CapturedEncounterRuntimeRegistry.TryGet(character.Identity.Instance, out encounterRuntime);
+            CapturedSubwayVendorRuntimeDefinition capturedVendorRuntime;
+            bool hasCapturedVendorRuntime =
+                CapturedSubwayVendorRuntimeRegistry.TryGet(
+                    character.Identity.Instance,
+                    out capturedVendorRuntime);
+            WindcallerKarrecNpcRuntimeDefinition windcallerNpcRuntime;
+            bool hasWindcallerNpcRuntime =
+                WindcallerKarrecNpcRuntimeRegistry.TryGet(
+                    character.Identity.Instance,
+                    out windcallerNpcRuntime);
 
             // affected identity
             scfu.Identity = charId;
 
             scfu.Version = 57; // SCFU packet version (57/0x39)
             if (hasEncounterRuntime
+                || hasCapturedVendorRuntime
+                || hasWindcallerNpcRuntime
                 || (hasOrdinaryRuntime
                  && ordinaryRuntime.Profile.Appearance.ScfuProfile
                  == OrdinaryEnemyScfuProfile.CapturedThief)
@@ -294,24 +308,52 @@ namespace ZoneEngine.Core.Packets
             // Race
             scfu.Appearance = new Appearance
                               {
-                                  Side = hasEncounterRuntime
+                                  Side = hasWindcallerNpcRuntime
+                                             ? (Side)windcallerNpcRuntime.Content.Side
+                                             : hasCapturedVendorRuntime
+                                             ? (Side)capturedVendorRuntime.Content.Side
+                                             : hasEncounterRuntime
                                              ? (Side)encounterRuntime.Side
                                              : (Side)sideValue,
-                                  Fatness = hasEncounterRuntime
+                                  Fatness = hasWindcallerNpcRuntime
+                                                ? (Fatness)windcallerNpcRuntime.Content.Fatness
+                                                : hasCapturedVendorRuntime
+                                                ? (Fatness)capturedVendorRuntime.Content.Fatness
+                                                : hasEncounterRuntime
                                                 ? (Fatness)encounterRuntime.Fatness
                                                 : (Fatness)fatValue,
-                                  Breed = hasEncounterRuntime
+                                  Breed = hasWindcallerNpcRuntime
+                                              ? (Breed)windcallerNpcRuntime.Content.Breed
+                                              : hasCapturedVendorRuntime
+                                              ? (Breed)capturedVendorRuntime.Content.Breed
+                                              : hasEncounterRuntime
                                               ? (Breed)encounterRuntime.Breed
                                               : (Breed)breedValue,
-                                  Gender = hasEncounterRuntime
+                                  Gender = hasWindcallerNpcRuntime
+                                               ? (Gender)windcallerNpcRuntime.Content.Sex
+                                               : hasCapturedVendorRuntime
+                                               ? (Gender)capturedVendorRuntime.Content.Sex
+                                               : hasEncounterRuntime
                                                ? (Gender)encounterRuntime.Sex
                                                : (Gender)sexValue,
-                                  Race = hasEncounterRuntime
+                                  Race = hasWindcallerNpcRuntime
+                                             ? (uint)windcallerNpcRuntime.Content.Race
+                                             : hasCapturedVendorRuntime
+                                             ? (uint)capturedVendorRuntime.Content.Race
+                                             : hasEncounterRuntime
                                              ? (uint)encounterRuntime.Race
                                              : raceValue
                               }; // appearance
 
-            if (hasEncounterRuntime)
+            if (hasWindcallerNpcRuntime)
+            {
+                scfu.Appearance.Value = (uint)windcallerNpcRuntime.Content.AppearanceValue;
+            }
+            else if (hasCapturedVendorRuntime)
+            {
+                scfu.Appearance.Value = (uint)capturedVendorRuntime.Content.AppearanceValue;
+            }
+            else if (hasEncounterRuntime)
             {
                 scfu.Appearance.Value = encounterRuntime.AppearanceValue;
             }
@@ -329,7 +371,9 @@ namespace ZoneEngine.Core.Packets
             scfu.AccountFlags = (short)accFlagsValue;
             scfu.Expansions = (short)expansionValue;
 
-            bool isNpc = (NPCFamily != 1234567890) && (NPCFamily != 0);
+            bool isNpc = hasWindcallerNpcRuntime
+                         || hasCapturedVendorRuntime
+                         || ((NPCFamily != 1234567890) && (NPCFamily != 0));
 
             if (isNpc)
             {
@@ -429,7 +473,11 @@ namespace ZoneEngine.Core.Packets
                     | SimpleCharFullUpdateFlags.UnknownDataFlag;
             }
 
-            int emittedHeadMesh = hasEncounterRuntime
+            int emittedHeadMesh = hasWindcallerNpcRuntime
+                                      ? windcallerNpcRuntime.Content.HeadMesh
+                                      : hasCapturedVendorRuntime
+                                      ? capturedVendorRuntime.Content.HeadMesh
+                                      : hasEncounterRuntime
                                       ? encounterRuntime.HeadMesh
                                       : headMeshValue;
             if (emittedHeadMesh != 0)
@@ -438,7 +486,11 @@ namespace ZoneEngine.Core.Packets
             }
 
             // Runspeed
-            scfu.RunSpeedBase = hasEncounterRuntime
+            scfu.RunSpeedBase = hasWindcallerNpcRuntime
+                                    ? (short)windcallerNpcRuntime.Content.RunSpeed
+                                    : hasCapturedVendorRuntime
+                                    ? (short)capturedVendorRuntime.Content.RunSpeed
+                                    : hasEncounterRuntime
                                     ? (short)encounterRuntime.CapturedScfuRunSpeedBase
                                     : (short)runSpeedBaseValue;
 
@@ -574,6 +626,142 @@ namespace ZoneEngine.Core.Packets
                             }).ToArray();
                 scfu.Waypoints =
                     encounterRuntime.Waypoints.Select(
+                        waypoint =>
+                            new Vector3
+                            {
+                                X = waypoint.X,
+                                Y = waypoint.Y,
+                                Z = waypoint.Z
+                            }).ToArray();
+            }
+            else if (hasWindcallerNpcRuntime)
+            {
+                WindcallerKarrecNpcDefinition definition = windcallerNpcRuntime.Content;
+                var capturedFlags = (SimpleCharFullUpdateFlags)definition.CapturedScfuFlags;
+                scfu.CharacterInfo =
+                    new SimpleNpcInfo
+                    {
+                        Family = (short)definition.NpcFamily,
+                        LosHeight = (short)definition.NpcLosHeight
+                    };
+                scfu.CharacterFlags = (CharacterFlags)definition.CharacterFlags;
+                scfu.AccountFlags = 0;
+                scfu.Expansions = 0;
+                scfu.AdditionalFlags = capturedFlags;
+                scfu.SuppressedFlags = ~capturedFlags;
+                scfu.Flags2 = 0;
+                scfu.Unknown1 = definition.CapturedScfuUnknown1.ToArray();
+                scfu.Unknown2 = 0;
+                scfu.VisibleTitle = (byte)definition.VisibleTitle;
+                scfu.ActiveNanos =
+                    definition.ActiveNanos.Select(
+                        nano =>
+                            new ActiveNano
+                            {
+                                NanoId = nano.NanoId,
+                                NanoInstance = nano.NanoInstance,
+                                Time1 = nano.Time1,
+                                Time2 = nano.Time2
+                            }).ToArray();
+                scfu.Textures =
+                    definition.Textures.Select(
+                        texture =>
+                            new Texture
+                            {
+                                Place = texture.Place,
+                                Id = texture.Id,
+                                Unknown = texture.Unknown
+                            }).ToArray();
+                scfu.Meshes =
+                    definition.Meshes.Select(
+                        mesh =>
+                            new Mesh
+                            {
+                                Position = (byte)mesh.Position,
+                                Id = mesh.Id,
+                                OverrideTextureId = mesh.OverrideTextureId,
+                                Layer = (byte)mesh.Layer
+                            }).ToArray();
+                var activePatrolCurrentPosition = new AORebirth.Core.Vector.Vector3();
+                var activePatrolDestination = new AORebirth.Core.Vector.Vector3();
+                NPCController npcController = character.Controller as NPCController;
+                bool hasActivePatrolDestination =
+                    npcController != null
+                    && npcController.TryGetCapturedPatrolReplayProjection(
+                        out activePatrolCurrentPosition,
+                        out activePatrolDestination);
+
+                WindcallerKarrecNpcWaypointDefinition resolvedCoordinates =
+                    definition.ResolveScfuCoordinates(
+                        hasActivePatrolDestination,
+                        scfu.Coordinates.X,
+                        scfu.Coordinates.Y,
+                        scfu.Coordinates.Z,
+                        activePatrolCurrentPosition.xf,
+                        activePatrolCurrentPosition.yf,
+                        activePatrolCurrentPosition.zf);
+                scfu.Coordinates =
+                    new Vector3
+                    {
+                        X = resolvedCoordinates.X,
+                        Y = resolvedCoordinates.Y,
+                        Z = resolvedCoordinates.Z
+                    };
+
+                scfu.Waypoints =
+                    definition.ResolveScfuWaypoints(
+                        hasActivePatrolDestination,
+                        activePatrolCurrentPosition.xf,
+                        activePatrolCurrentPosition.yf,
+                        activePatrolCurrentPosition.zf,
+                        activePatrolDestination.xf,
+                        activePatrolDestination.yf,
+                        activePatrolDestination.zf).Select(
+                        waypoint =>
+                            new Vector3
+                            {
+                                X = waypoint.X,
+                                Y = waypoint.Y,
+                                Z = waypoint.Z
+                            }).ToArray();
+            }
+            else if (hasCapturedVendorRuntime)
+            {
+                CapturedSubwayVendorDefinition definition = capturedVendorRuntime.Content;
+                var capturedFlags = (SimpleCharFullUpdateFlags)definition.CapturedScfuFlags;
+                scfu.CharacterInfo =
+                    new SimpleNpcInfo
+                    {
+                        Family = 0,
+                        LosHeight = 0
+                    };
+                scfu.AdditionalFlags = capturedFlags;
+                scfu.SuppressedFlags = ~capturedFlags;
+                scfu.Flags2 = 0;
+                scfu.Unknown1 = definition.CapturedScfuUnknown1.ToArray();
+                scfu.Unknown2 = 0;
+                scfu.VisibleTitle = 0;
+                scfu.Textures =
+                    definition.Textures.Select(
+                        texture =>
+                            new Texture
+                            {
+                                Place = texture.Place,
+                                Id = texture.Id,
+                                Unknown = texture.Unknown
+                            }).ToArray();
+                scfu.Meshes =
+                    definition.Meshes.Select(
+                        mesh =>
+                            new Mesh
+                            {
+                                Position = (byte)mesh.Position,
+                                Id = mesh.Id,
+                                OverrideTextureId = mesh.OverrideTextureId,
+                                Layer = (byte)mesh.Layer
+                            }).ToArray();
+                scfu.Waypoints =
+                    definition.Waypoints.Select(
                         waypoint =>
                             new Vector3
                             {

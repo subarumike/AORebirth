@@ -29,6 +29,7 @@ namespace AORebirth.CaptureProtocol
         private const int UnknownFlag3 = 0x01000000;
         private const int UnknownDataFlag = 0x02000000;
         private const int HasOrgName = 0x04000000;
+        private const int IsPet = 0x08000000;
 
         private const int CharacterTower = 0x00020000;
         private const int CharacterHasVisibleName = 0x00400000;
@@ -219,9 +220,22 @@ namespace AORebirth.CaptureProtocol
                 result.HeadMesh = reader.ReadInt32("HeadMesh");
             }
 
-            result.RunSpeedBase = Has(result.Flags, HasExtendedRunSpeed)
-                                      ? reader.ReadInt16("RunSpeedBase")
-                                      : (short)reader.ReadByte("RunSpeedBase");
+            if (Has(result.Flags, HasExtendedRunSpeed))
+            {
+                result.RunSpeedBase = reader.ReadInt16("RunSpeedBase");
+            }
+            else if (HasLegacyExtendedRunSpeedAlignment(reader, result.Flags))
+            {
+                // Some preserved legacy SCFUs contain a two-byte run speed while
+                // omitting HasExtendedRunSpeed. Only accept the alternate width
+                // when it is proven by the immediately following X3F1 marker.
+                result.RunSpeedBase = reader.ReadInt16("LegacyExtendedRunSpeedBase");
+                result.LegacyExtendedRunSpeedAlignment = true;
+            }
+            else
+            {
+                result.RunSpeedBase = reader.ReadByte("RunSpeedBase");
+            }
 
             if (Has(result.Flags, IsUnderAttack))
             {
@@ -345,6 +359,15 @@ namespace AORebirth.CaptureProtocol
                 var attacks = new RawScfuSpecialAttack[count];
                 for (int i = 0; i < count; i++)
                 {
+                    if (IsObservedTerminalSpecialAttackSlotOmission(result, reader, i, count))
+                    {
+                        // The final byte is the flags2 Unknown1 field which follows
+                        // the attack list. Preserve that byte for the normal field
+                        // decoder instead of treating it as a truncated attack slot.
+                        result.TerminalSpecialAttackSlotOmitted = true;
+                        break;
+                    }
+
                     short unknown1 = reader.ReadInt16("SpecialAttackUnknown1");
                     if (unknown1 == 0)
                     {
@@ -374,6 +397,8 @@ namespace AORebirth.CaptureProtocol
             {
                 result.Unknown4 = reader.ReadByte("ScfuUnknown4");
             }
+
+            result.OpaqueExtension = ReadObservedOpaqueExtension(result, reader);
 
             result.BytesConsumed = reader.Position;
             result.UndecodedTail = reader.ReadRemaining();
@@ -422,6 +447,76 @@ namespace AORebirth.CaptureProtocol
             int count = marker / 0x3F1 - 1;
             ValidateCount(count, field);
             return count;
+        }
+
+        private static bool HasLegacyExtendedRunSpeedAlignment(BigEndianReader reader, int flags)
+        {
+            if (Has(flags, IsUnderAttack)
+                || Has(flags, HasExtendedTextures)
+                || Has(flags, IsImmune)
+                || Has(flags, UnknownFlag3)
+                || reader.Remaining < 6
+                || reader.PeekByte(0) != 0)
+            {
+                return false;
+            }
+
+            return !IsValidX3F1Marker(reader.PeekInt32(1))
+                   && IsValidX3F1Marker(reader.PeekInt32(2));
+        }
+
+        private static bool IsValidX3F1Marker(int marker)
+        {
+            if (marker < 0x3F1 || marker % 0x3F1 != 0)
+            {
+                return false;
+            }
+
+            int count = marker / 0x3F1 - 1;
+            return count >= 0 && count <= 4096;
+        }
+
+        private static bool IsObservedTerminalSpecialAttackSlotOmission(
+            RawSimpleCharFullUpdate result,
+            BigEndianReader reader,
+            int index,
+            int count)
+        {
+            return result.Flags2 == 0x000007E2
+                   && Has(result.Flags, IsNpc)
+                   && !Has(result.Flags, IsPet)
+                   && Has(result.Flags2, Flags2Unknown1)
+                   && index == count - 1
+                   && reader.Remaining == 1
+                   && reader.PeekByte(0) == 0;
+        }
+
+        private static byte[] ReadObservedOpaqueExtension(
+            RawSimpleCharFullUpdate result,
+            BigEndianReader reader)
+        {
+            byte[] playerFlags2Fc4 =
+            {
+                0x12, 0x95, 0x00, 0x00, 0x00, 0x8E, 0x42, 0x52,
+                0x41, 0x57, 0x00, 0x00, 0x00, 0x00, 0x00
+            };
+            byte[] petFlags2Bd3 =
+            {
+                0x3D, 0x00, 0x01, 0xD7, 0x3E, 0x4D, 0x45, 0x57,
+                0x31, 0x4D, 0x45, 0x57, 0x31, 0x00, 0x00, 0x00,
+                0x04, 0x79, 0x1C, 0x10, 0x0D, 0x00
+            };
+            byte[] petFlags27e2 = { 0x04, 0x79, 0x1C, 0x10, 0x0D, 0x00 };
+
+            bool observedFamily =
+                (result.Flags2 == 0x00000FC4 && reader.RemainingEquals(playerFlags2Fc4))
+                || (result.Flags2 == 0x00000BD3
+                    && Has(result.Flags, IsPet)
+                    && reader.RemainingEquals(petFlags2Bd3))
+                || (result.Flags2 == 0x000007E2
+                    && Has(result.Flags, IsPet)
+                    && reader.RemainingEquals(petFlags27e2));
+            return observedFamily ? reader.ReadRemaining() : new byte[0];
         }
 
         private static void ValidateCount(int count, string field)
@@ -477,6 +572,40 @@ namespace AORebirth.CaptureProtocol
             internal int Remaining
             {
                 get { return this.bytes.Length - this.position; }
+            }
+
+            internal byte PeekByte(int offset)
+            {
+                this.EnsureRemaining(offset + 1, "PeekByte");
+                return this.bytes[this.position + offset];
+            }
+
+            internal int PeekInt32(int offset)
+            {
+                this.EnsureRemaining(offset + 4, "PeekInt32");
+                int start = this.position + offset;
+                return (this.bytes[start] << 24)
+                       | (this.bytes[start + 1] << 16)
+                       | (this.bytes[start + 2] << 8)
+                       | this.bytes[start + 3];
+            }
+
+            internal bool RemainingEquals(byte[] expected)
+            {
+                if (expected == null || this.Remaining != expected.Length)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < expected.Length; i++)
+                {
+                    if (this.bytes[this.position + i] != expected[i])
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
             }
 
             internal void EnsureRemaining(int count, string field)
@@ -600,6 +729,9 @@ namespace AORebirth.CaptureProtocol
         internal float? Unknown3 { get; set; }
         internal byte? Unknown4 { get; set; }
         internal RawScfuSpecialAttack[] SpecialAttacks { get; set; }
+        internal bool TerminalSpecialAttackSlotOmitted { get; set; }
+        internal bool LegacyExtendedRunSpeedAlignment { get; set; }
+        internal byte[] OpaqueExtension { get; set; }
         internal int BytesConsumed { get; set; }
         internal bool DecodeFullyConsumed { get; set; }
         internal byte[] UndecodedTail { get; set; }
@@ -830,7 +962,10 @@ namespace AORebirth.CaptureProtocol
                 "N3MessageTypeNumeric",
                 "DecodeFullyConsumed",
                 "NpcUnknownDataWidth",
-                "ScfuUnknown3"
+                "ScfuUnknown3",
+                "LegacyExtendedRunSpeedAlignment",
+                "TerminalSpecialAttackSlotOmitted",
+                "OpaqueExtensionHex"
             });
 
         internal static string FormatRow(
@@ -925,7 +1060,10 @@ namespace AORebirth.CaptureProtocol
                 message == null ? string.Empty : FormatInt(message.N3MessageType),
                 message == null ? string.Empty : message.DecodeFullyConsumed ? "true" : "false",
                 npc == null ? string.Empty : FormatInt(npc.UnknownDataWidth),
-                message == null || !message.Unknown3.HasValue ? string.Empty : FormatFloat(message.Unknown3.Value)
+                message == null || !message.Unknown3.HasValue ? string.Empty : FormatFloat(message.Unknown3.Value),
+                message == null ? string.Empty : message.LegacyExtendedRunSpeedAlignment ? "true" : "false",
+                message == null ? string.Empty : message.TerminalSpecialAttackSlotOmitted ? "true" : "false",
+                message == null ? string.Empty : RawScfuFormatting.ToHex(message.OpaqueExtension)
             };
 
             for (int i = 0; i < fields.Count; i++)

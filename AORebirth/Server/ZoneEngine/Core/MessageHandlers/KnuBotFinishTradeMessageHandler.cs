@@ -39,6 +39,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Subway.Quests;
+
     #endregion
 
     /// <summary>
@@ -53,6 +55,13 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public override void Receive(MessageWrapper<KnuBotFinishTradeMessage> messageWrapper)
         {
+            if (WindcallerKarrecTradeAdapter.TryFinishTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
             // TODO: Code it!
             // As always, find KnuBot npc by its identity and call the appropriate method
             ICharacter npc = Pool.Instance.GetObject<ICharacter>(messageWrapper.MessageBody.Target);

@@ -19,6 +19,10 @@ namespace AORebirth.Core.Playfields
         private const int BloodcreeperMonsterData =
             NpcCombatAttackRules.CapturedSubwayBloodcreeperMonsterData;
 
+        private const int LooterMonsterData = 203745;
+
+        private const int WorkmanStrikerMonsterData = 203854;
+
         private const double BloodcreeperAutomaticAggroRadius = 7.0;
 
         private static readonly Dictionary<string, OrdinaryEnemySpawnPolicyConfiguration>
@@ -83,7 +87,7 @@ namespace AORebirth.Core.Playfields
 
             var profileRows = new List<OrdinaryEnemyProfile>();
             var spawnRows = new List<OrdinaryEnemySpawnDefinition>();
-            BuildSupportedRows(supportedContent, profileRows, spawnRows);
+            BuildSupportedRows(supportedContent, ordinaryContent, profileRows, spawnRows);
             BuildCapturedOrdinaryRows(ordinaryContent, profileRows, spawnRows);
 
             this.profiles = profileRows
@@ -164,6 +168,7 @@ namespace AORebirth.Core.Playfields
 
         private static void BuildSupportedRows(
             CapturedSubwayContentProvider content,
+            CapturedSubwayOrdinaryContentProvider ordinaryContent,
             ICollection<OrdinaryEnemyProfile> profiles,
             ICollection<OrdinaryEnemySpawnDefinition> spawns)
         {
@@ -174,28 +179,51 @@ namespace AORebirth.Core.Playfields
                 .OrderBy(value => SupportedProfileKey(value.First()), StringComparer.Ordinal))
             {
                 CapturedSubwaySpawnDefinition first = group.First();
-                OrdinaryEnemyLootEntry[] lootEntries = sourceLoot
-                    .Where(value => value.MonsterData == first.MonsterData)
-                    .Select(
-                        value =>
-                            new OrdinaryEnemyLootEntry(
-                                value.LowId,
-                                value.HighId,
-                                value.Quality,
-                                value.Slot,
-                                value.Quantity,
-                                value.RuntimeWeight,
-                                value.ObservedBasisPoints,
-                                value.ObservedBasisPoints == 10000
-                                    ? OrdinaryEnemyLootEvidence.GuaranteedProven
-                                    : OrdinaryEnemyLootEvidence.ObservedAvailableLoot,
-                                value.LinkageEvidence,
-                                value.ProbabilityEvidence,
-                                value.ObservedCount,
-                                value.ObservedCorpses,
-                                value.EvidenceReference))
-                    .ToArray();
+                Func<int, CapturedEnemyCombatContract> contractResolver =
+                    first.MonsterData == NpcCombatAttackRules.CapturedSubwayDisobedientBotMonsterData
+                        ? new Func<int, CapturedEnemyCombatContract>(
+                            level => CapturedSubwayCombatCatalog.For(first.Name, first.MonsterData, level))
+                        : null;
+                CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence =
+                    ordinaryContent.GetSourceWeaponEvidence(first.MonsterData);
+                Func<int, int, CapturedEnemyCombatContract> sourceContractResolver =
+                    sourceWeaponEvidence.Length > 0
+                        ? new Func<int, int, CapturedEnemyCombatContract>(
+                            (sourceIdentity, level) =>
+                                CapturedSubwayCombatCatalog.ForSupportedSourceWeapon(
+                                    first.Name,
+                                    first.MonsterData,
+                                    sourceWeaponEvidence,
+                                    sourceIdentity))
+                        : null;
+                CapturedSubwayStrictLootProfileDefinition strictLootProfile =
+                    ordinaryContent.GetStrictLootProfile(first.MonsterData);
+                OrdinaryEnemyLootEntry[] lootEntries = strictLootProfile == null
+                    ? sourceLoot
+                        .Where(value => value.MonsterData == first.MonsterData)
+                        .Select(
+                            value =>
+                                new OrdinaryEnemyLootEntry(
+                                    value.LowId,
+                                    value.HighId,
+                                    value.Quality,
+                                    value.Slot,
+                                    value.Quantity,
+                                    value.RuntimeWeight,
+                                    value.ObservedBasisPoints,
+                                    value.ObservedBasisPoints == 10000
+                                        ? OrdinaryEnemyLootEvidence.GuaranteedProven
+                                        : OrdinaryEnemyLootEvidence.ObservedAvailableLoot,
+                                    value.LinkageEvidence,
+                                    value.ProbabilityEvidence,
+                                    value.ObservedCount,
+                                    value.ObservedCorpses,
+                                    value.EvidenceReference))
+                        .ToArray()
+                    : BuildStrictLootEntries(strictLootProfile);
                 CapturedEnemyCombatContract contract = first.Combat;
+                CapturedSubwayCorpseEvidenceDefinition[] corpseEvidence =
+                    ordinaryContent.GetCorpseEvidence(first.MonsterData);
                 profiles.Add(
                     new OrdinaryEnemyProfile(
                         SupportedProfileKey(first),
@@ -206,9 +234,17 @@ namespace AORebirth.Core.Playfields
                         first.TemplateHash,
                         BuildSupportedAppearance(first),
                         RetaliateAggression(),
-                        BuildCombatProfile(contract, first.MonsterData),
-                        BuildLootProfile(first.MonsterData, lootEntries),
-                        StandardCorpseProfile(first.MonsterData),
+                        BuildCombatProfile(
+                            contract,
+                            first.MonsterData,
+                            contractResolver,
+                            sourceContractResolver),
+                        BuildLootProfile(
+                            first.MonsterData,
+                            lootEntries,
+                            corpseEvidence,
+                            strictLootProfile),
+                        StandardCorpseProfile(first.MonsterData, corpseEvidence),
                         group.Select(value => value.ContentSection)
                             .Distinct(StringComparer.Ordinal)
                             .OrderBy(value => value, StringComparer.Ordinal)
@@ -281,24 +317,37 @@ namespace AORebirth.Core.Playfields
             {
                 uint appearance = archetype.AppearanceValue;
                 CapturedEnemyCombatContract contract = CapturedSubwayCombatCatalog.ForOrdinary(archetype);
-                OrdinaryEnemyLootEntry[] lootEntries = archetype.LootEvidence
-                    .Select(
-                        (value, index) =>
-                            new OrdinaryEnemyLootEntry(
-                                value.LowId,
-                                value.HighId,
-                                value.Quality,
-                                index,
-                                1,
-                                0,
-                                value.ObservedBasisPoints,
-                                OrdinaryEnemyLootEvidence.ObservedAvailableLoot,
-                                OrdinaryEnemyLootLinkageEvidence.ImportedCaptureEvidence,
-                                OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
-                                value.ObservedCount,
-                                value.ObservedCorpses,
-                                string.Join(",", archetype.EvidenceCaptures)))
-                    .ToArray();
+                Func<int, int, CapturedEnemyCombatContract> sourceContractResolver =
+                    archetype.MonsterData == WorkmanStrikerMonsterData
+                    || archetype.MonsterData == LooterMonsterData
+                        ? new Func<int, int, CapturedEnemyCombatContract>(
+                            (sourceIdentity, level) =>
+                                CapturedSubwayCombatCatalog.ForOrdinary(
+                                    archetype,
+                                    sourceIdentity))
+                        : null;
+                CapturedSubwayStrictLootProfileDefinition strictLootProfile =
+                    content.GetStrictLootProfile(archetype.MonsterData);
+                OrdinaryEnemyLootEntry[] lootEntries = strictLootProfile == null
+                    ? archetype.LootEvidence
+                        .Select(
+                            (value, index) =>
+                                new OrdinaryEnemyLootEntry(
+                                    value.LowId,
+                                    value.HighId,
+                                    value.Quality,
+                                    index,
+                                    1,
+                                    0,
+                                    value.ObservedBasisPoints,
+                                    OrdinaryEnemyLootEvidence.ObservedAvailableLoot,
+                                    OrdinaryEnemyLootLinkageEvidence.ImportedCaptureEvidence,
+                                    OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                                    value.ObservedCount,
+                                    value.ObservedCorpses,
+                                    string.Join(",", archetype.EvidenceCaptures)))
+                        .ToArray()
+                    : BuildStrictLootEntries(strictLootProfile);
                 profiles.Add(
                     new OrdinaryEnemyProfile(
                         OrdinaryProfileKey(archetype.Key),
@@ -337,9 +386,19 @@ namespace AORebirth.Core.Playfields
                                 .ToArray(),
                             OrdinaryEnemyScfuProfile.CapturedExact),
                         AggressionFor(archetype.MonsterData),
-                        BuildCombatProfile(contract, archetype.MonsterData),
-                        BuildLootProfile(archetype.MonsterData, lootEntries),
-                        StandardCorpseProfile(archetype.MonsterData),
+                        BuildCombatProfile(
+                            contract,
+                            archetype.MonsterData,
+                            null,
+                            sourceContractResolver),
+                        BuildLootProfile(
+                            archetype.MonsterData,
+                            lootEntries,
+                            archetype.CorpseEvidence,
+                            strictLootProfile),
+                        StandardCorpseProfile(
+                            archetype.MonsterData,
+                            archetype.CorpseEvidence),
                         archetype.EvidenceCaptures,
                         false,
                         false));
@@ -449,6 +508,28 @@ namespace AORebirth.Core.Playfields
                             Confidence = "POLICY",
                             Enabled = true
                         })));
+            result.Add(
+                "slum_runner",
+                new OrdinaryEnemySpawnPolicyConfiguration(
+                    null,
+                    WorldRespawnPolicyAssignment.Explicit(
+                        new RespawnPolicyDefinition
+                        {
+                            RespawnPolicyKey = "ordinary.slum-runner.60",
+                            Mode = WorldRespawnMode.FixedDelay,
+                            FixedDelaySeconds = 60.0,
+                            RespawnAtOriginalPosition = true,
+                            ResetHealth = true,
+                            ResetMovementState = true,
+                            ResetAggressionState = true,
+                            DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
+                            Evidence = "official-live:20260716-215947;"
+                                + "enemy-respawns.csv;"
+                                + "death-to-respawn=59.433;"
+                                + "corpse-remained-present",
+                            Confidence = "CAPTURE_BOUNDED",
+                            Enabled = true
+                        })));
             return result;
         }
 
@@ -539,30 +620,43 @@ namespace AORebirth.Core.Playfields
 
         private static OrdinaryEnemyCombatProfile BuildCombatProfile(
             CapturedEnemyCombatContract contract,
-            int monsterData)
+            int monsterData,
+            Func<int, CapturedEnemyCombatContract> contractResolver = null,
+            Func<int, int, CapturedEnemyCombatContract> sourceContractResolver = null)
         {
             OrdinaryEnemyCombatMode mode = OrdinaryEnemyCombatMode.Unresolved;
             OrdinaryEnemyDamageSource damageSource = OrdinaryEnemyDamageSource.Unresolved;
             bool visibleWeapon = false;
-            switch (contract.AttackModel)
+            if (sourceContractResolver != null)
             {
-                case CapturedEnemyAttackModel.FixedAttackInfo:
-                    mode = OrdinaryEnemyCombatMode.UnarmedMelee;
-                    damageSource = OrdinaryEnemyDamageSource.CapturedFixed;
-                    break;
+                mode = OrdinaryEnemyCombatMode.EquippedRanged;
+                damageSource = OrdinaryEnemyDamageSource.WeaponRoll;
+                visibleWeapon = true;
+            }
+            else
+            {
+                switch (contract.AttackModel)
+                {
+                    case CapturedEnemyAttackModel.FixedAttackInfo:
+                        mode = OrdinaryEnemyCombatMode.UnarmedMelee;
+                        damageSource = OrdinaryEnemyDamageSource.CapturedFixed;
+                        break;
 
-                case CapturedEnemyAttackModel.EquippedWeapon:
-                    mode = monsterData == 26092
-                        ? OrdinaryEnemyCombatMode.EquippedRanged
-                        : OrdinaryEnemyCombatMode.Unresolved;
-                    damageSource = OrdinaryEnemyDamageSource.WeaponRoll;
-                    visibleWeapon = true;
-                    break;
+                    case CapturedEnemyAttackModel.EquippedWeapon:
+                        mode = monsterData == 26092
+                               || monsterData
+                                  == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData
+                            ? OrdinaryEnemyCombatMode.EquippedRanged
+                            : OrdinaryEnemyCombatMode.Unresolved;
+                        damageSource = OrdinaryEnemyDamageSource.WeaponRoll;
+                        visibleWeapon = true;
+                        break;
 
-                case CapturedEnemyAttackModel.Specialized:
-                    mode = OrdinaryEnemyCombatMode.NaturalMelee;
-                    damageSource = OrdinaryEnemyDamageSource.NaturalAttack;
-                    break;
+                    case CapturedEnemyAttackModel.Specialized:
+                        mode = OrdinaryEnemyCombatMode.NaturalMelee;
+                        damageSource = OrdinaryEnemyDamageSource.NaturalAttack;
+                        break;
+                }
             }
 
             return new OrdinaryEnemyCombatProfile(
@@ -570,54 +664,104 @@ namespace AORebirth.Core.Playfields
                 damageSource,
                 visibleWeapon,
                 contract,
-                contract.IsCombatReady
+                contract.IsCombatReady || sourceContractResolver != null
                     ? OrdinaryEnemyEvidenceState.Observed
                     : OrdinaryEnemyEvidenceState.Unresolved,
                 monsterData == 26092 ? 1.0 : (double?)null,
                 monsterData == 26092 ? 1 : (int?)null,
-                monsterData == 26092);
+                monsterData == 26092,
+                contractResolver,
+                sourceContractResolver);
+        }
+
+        private static OrdinaryEnemyLootEntry[] BuildStrictLootEntries(
+            CapturedSubwayStrictLootProfileDefinition strictLootProfile)
+        {
+            string evidenceReference = string.Join(",", strictLootProfile.EvidenceCaptures);
+            return strictLootProfile.Entries
+                .Select(
+                    (value, index) =>
+                        new OrdinaryEnemyLootEntry(
+                            value.LowId,
+                            value.HighId,
+                            value.Quality,
+                            index,
+                            1,
+                            0,
+                            value.ObservedBasisPoints,
+                            OrdinaryEnemyLootEvidence.ObservedAvailableLoot,
+                            OrdinaryEnemyLootLinkageEvidence.ImportedCaptureEvidence,
+                            OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                            value.ObservedCount,
+                            value.ObservedCorpses,
+                            evidenceReference))
+                .ToArray();
         }
 
         private static OrdinaryEnemyLootProfile BuildLootProfile(
             int monsterData,
             OrdinaryEnemyLootEntry[] entries)
         {
+            return BuildLootProfile(
+                monsterData,
+                entries,
+                new CapturedSubwayCorpseEvidenceDefinition[0],
+                null);
+        }
+
+        private static OrdinaryEnemyLootProfile BuildLootProfile(
+            int monsterData,
+            OrdinaryEnemyLootEntry[] entries,
+            CapturedSubwayCorpseEvidenceDefinition[] corpseEvidence)
+        {
+            return BuildLootProfile(monsterData, entries, corpseEvidence, null);
+        }
+
+        private static OrdinaryEnemyLootProfile BuildLootProfile(
+            int monsterData,
+            OrdinaryEnemyLootEntry[] entries,
+            CapturedSubwayCorpseEvidenceDefinition[] corpseEvidence,
+            CapturedSubwayStrictLootProfileDefinition strictLootProfile)
+        {
+            corpseEvidence = corpseEvidence ?? new CapturedSubwayCorpseEvidenceDefinition[0];
             OrdinaryEnemyLootEvidence evidence = entries.Length == 0
                 ? OrdinaryEnemyLootEvidence.Unresolved
-                : entries.All(value => value.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven)
-                    ? OrdinaryEnemyLootEvidence.GuaranteedProven
-                    : OrdinaryEnemyLootEvidence.ObservedAvailableLoot;
-            int observedCompleteInventories = entries
-                .Select(value => value.ObservedCorpses)
-                .DefaultIfEmpty(0)
-                .Max();
+                : strictLootProfile != null
+                    ? OrdinaryEnemyLootEvidence.ObservedAvailableLoot
+                    : entries.All(value => value.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven)
+                        ? OrdinaryEnemyLootEvidence.GuaranteedProven
+                        : OrdinaryEnemyLootEvidence.ObservedAvailableLoot;
+            int observedCompleteInventories = strictLootProfile == null
+                ? entries
+                    .Select(value => value.ObservedCorpses)
+                    .DefaultIfEmpty(0)
+                    .Max()
+                : strictLootProfile.ObservedCompleteInventories;
+            int observedEmptyInventories;
+            if (strictLootProfile != null)
+            {
+                observedEmptyInventories = strictLootProfile.ObservedEmptyInventories;
+            }
+            else if (monsterData == 17657)
+            {
+                observedEmptyInventories = 5;
+            }
+            else
+            {
+                observedEmptyInventories = 0;
+            }
             string itemEvidenceReference = string.Join(
                 ",",
                 entries
                     .Select(value => value.EvidenceReference)
                     .Where(value => !string.IsNullOrWhiteSpace(value))
                     .Distinct(StringComparer.Ordinal));
-            if (monsterData == 17657)
-            {
-                return new OrdinaryEnemyLootProfile(
-                    evidence,
-                    entries,
-                    OrdinaryEnemyLootPoolMode.IndependentEntries,
-                    0,
-                    true,
-                    Math.Max(8, observedCompleteInventories),
-                    0,
-                    itemEvidenceReference,
-                    OrdinaryEnemyEvidenceState.Observed,
-                    29,
-                    79,
-                    new OrdinaryEnemyLevelCreditRule[0]);
-            }
-
             if (monsterData == 17649)
             {
                 // Identity-correlated official-live corpses prove level-conditioned values.
                 // Keep unobserved levels unresolved instead of inventing a global range or formula.
+                // Newly decoded corpse rows also supply the exact visual shape, but do not alter
+                // the separately accepted weighted-one item policy or its full evidence set.
                 return new OrdinaryEnemyLootProfile(
                     evidence,
                     entries,
@@ -640,6 +784,67 @@ namespace AORebirth.Core.Playfields
                         });
             }
 
+            if (corpseEvidence.Length > 0 && monsterData != BloodcreeperMonsterData)
+            {
+                OrdinaryEnemyLevelCreditRule[] levelCreditRules = corpseEvidence
+                    .GroupBy(value => value.EnemyLevel)
+                    .OrderBy(value => value.Key)
+                    .Select(
+                        group =>
+                            new OrdinaryEnemyLevelCreditRule(
+                                group.Key,
+                                group.Min(value => value.Credits),
+                                group.Max(value => value.Credits),
+                                group.Count(),
+                                string.Join(
+                                    ",",
+                                    group.Select(
+                                        value => string.Format(
+                                            CultureInfo.InvariantCulture,
+                                            "{0}:{1}>{2}",
+                                            value.Capture,
+                                            value.DeadNpcIdentity,
+                                            value.CorpseIdentity)))))
+                    .ToArray();
+                // Exact L4/L5 rules win first. Other captured Flea spawn levels retain
+                // the previously accepted observed-outcome range as private policy;
+                // the new 23-credit outcome expands its lower bound.
+                bool preserveFilthFleaFallback = monsterData == 17657;
+                return new OrdinaryEnemyLootProfile(
+                    evidence,
+                    entries,
+                    OrdinaryEnemyLootPoolMode.IndependentEntries,
+                    0,
+                    entries.Length > 0
+                        && (strictLootProfile == null || strictLootProfile.ItemPoolComplete),
+                    observedCompleteInventories,
+                    observedEmptyInventories,
+                    itemEvidenceReference,
+                    preserveFilthFleaFallback
+                        ? OrdinaryEnemyEvidenceState.Policy
+                        : OrdinaryEnemyEvidenceState.Observed,
+                    preserveFilthFleaFallback ? 23 : (int?)null,
+                    preserveFilthFleaFallback ? 79 : (int?)null,
+                    levelCreditRules);
+            }
+
+            if (monsterData == 17657)
+            {
+                return new OrdinaryEnemyLootProfile(
+                    evidence,
+                    entries,
+                    OrdinaryEnemyLootPoolMode.IndependentEntries,
+                    0,
+                    true,
+                    Math.Max(8, observedCompleteInventories),
+                    0,
+                    itemEvidenceReference,
+                    OrdinaryEnemyEvidenceState.Observed,
+                    29,
+                    79,
+                    new OrdinaryEnemyLevelCreditRule[0]);
+            }
+
             if (monsterData == BloodcreeperMonsterData)
             {
                 // Both completed level-24 official-live fights carried 150 credits.
@@ -650,10 +855,10 @@ namespace AORebirth.Core.Playfields
                     entries,
                     OrdinaryEnemyLootPoolMode.IndependentEntries,
                     0,
-                    false,
-                    2,
-                    2,
-                    "20260716-033326:Corpse:F69003,20260716-034104:Corpse:F69004",
+                    strictLootProfile != null && strictLootProfile.ItemPoolComplete,
+                    observedCompleteInventories,
+                    observedEmptyInventories,
+                    itemEvidenceReference,
                     OrdinaryEnemyEvidenceState.Policy,
                     150,
                     150,
@@ -663,8 +868,8 @@ namespace AORebirth.Core.Playfields
                                 24,
                                 150,
                                 150,
-                                2,
-                                "20260716-033326,20260716-034104")
+                                3,
+                                "20260712-223719,20260716-033326,20260716-034104")
                         });
             }
 
@@ -673,9 +878,10 @@ namespace AORebirth.Core.Playfields
                 entries,
                 OrdinaryEnemyLootPoolMode.IndependentEntries,
                 0,
-                entries.Length > 0,
+                entries.Length > 0
+                    && (strictLootProfile == null || strictLootProfile.ItemPoolComplete),
                 observedCompleteInventories,
-                0,
+                observedEmptyInventories,
                 itemEvidenceReference,
                 OrdinaryEnemyEvidenceState.Unresolved,
                 null,
@@ -685,6 +891,51 @@ namespace AORebirth.Core.Playfields
 
         private static OrdinaryEnemyCorpseProfile StandardCorpseProfile(int monsterData)
         {
+            return StandardCorpseProfile(
+                monsterData,
+                new CapturedSubwayCorpseEvidenceDefinition[0]);
+        }
+
+        private static OrdinaryEnemyCorpseProfile StandardCorpseProfile(
+            int monsterData,
+            CapturedSubwayCorpseEvidenceDefinition[] corpseEvidence)
+        {
+            corpseEvidence = corpseEvidence ?? new CapturedSubwayCorpseEvidenceDefinition[0];
+            if (corpseEvidence.Length > 0)
+            {
+                OrdinaryEnemyCorpsePacketProfile packetProfile = monsterData == 26092
+                    ? OrdinaryEnemyCorpsePacketProfile.CapturedThief
+                    : monsterData == 17657
+                        ? OrdinaryEnemyCorpsePacketProfile.CapturedFilthFlea
+                        : OrdinaryEnemyCorpsePacketProfile.Generic;
+                int[] catMeshes = corpseEvidence
+                    .Select(value => value.CatMesh)
+                    .Distinct()
+                    .ToArray();
+                if (catMeshes.Length != 1)
+                {
+                    throw new InvalidOperationException(
+                        "Captured ordinary corpse evidence has conflicting CATMesh values: "
+                        + monsterData.ToString(CultureInfo.InvariantCulture));
+                }
+
+                return new OrdinaryEnemyCorpseProfile(
+                    packetProfile,
+                    3.0,
+                    240.0,
+                    3.0,
+                    catMeshes[0],
+                    string.Join(
+                        ",",
+                        corpseEvidence.Select(
+                            value => string.Format(
+                                CultureInfo.InvariantCulture,
+                                "{0}:{1}>{2}",
+                                value.Capture,
+                                value.DeadNpcIdentity,
+                                value.CorpseIdentity))));
+            }
+
             if (monsterData == 26092)
             {
                 return CapturedThiefCorpse;

@@ -8,6 +8,7 @@ namespace ZoneEngine.Core.Playfields
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Subway.Quests;
 
     #endregion
 
@@ -56,6 +57,16 @@ namespace ZoneEngine.Core.Playfields
             }
 
             if (SurgeryClinicInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (CapturedSubwayVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (TotwGatewayInteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;
             }

@@ -88,6 +88,7 @@ namespace ZoneEngine.Core.Arete.Quests
             Dictionary<string, HashSet<string>> stepsByQuest)
         {
             var stepIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var objectiveIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             int stepIndex = 0;
 
             foreach (QuestStep step in quest.Steps ?? Enumerable.Empty<QuestStep>())
@@ -109,7 +110,7 @@ namespace ZoneEngine.Core.Arete.Quests
                     result.AddError(stepLocation, "duplicate quest step id '" + step.StepId + "'");
                 }
 
-                ValidateObjectives(result, step, stepLocation);
+                ValidateObjectives(result, step, stepLocation, objectiveIds);
                 stepIndex++;
             }
 
@@ -124,9 +125,12 @@ namespace ZoneEngine.Core.Arete.Quests
             }
         }
 
-        private static void ValidateObjectives(AreteValidationResult result, QuestStep step, string stepLocation)
+        private static void ValidateObjectives(
+            AreteValidationResult result,
+            QuestStep step,
+            string stepLocation,
+            HashSet<string> objectiveIds)
         {
-            var objectiveIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             int objectiveIndex = 0;
 
             foreach (QuestObjective objective in step.Objectives ?? Enumerable.Empty<QuestObjective>())
@@ -139,7 +143,11 @@ namespace ZoneEngine.Core.Arete.Quests
                     continue;
                 }
 
-                if (!string.IsNullOrWhiteSpace(objective.ObjectiveId) && !objectiveIds.Add(objective.ObjectiveId))
+                if (string.IsNullOrWhiteSpace(objective.ObjectiveId))
+                {
+                    result.AddError(objectiveLocation, "missing quest objective id");
+                }
+                else if (!objectiveIds.Add(objective.ObjectiveId))
                 {
                     result.AddError(objectiveLocation, "duplicate quest objective id '" + objective.ObjectiveId + "'");
                 }

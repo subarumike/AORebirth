@@ -34,6 +34,7 @@ namespace ZoneEngine.Core.MessageHandlers
     #region Usings ...
 
     using System.Collections.Generic;
+    using System.Linq;
 
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
@@ -61,7 +62,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.Identity = shop.Identity;
                 x.Unknown = 1;
                 List<VendingMachineSlot> tempList = new List<VendingMachineSlot>();
-                foreach (IItem item in page.List().Values)
+                foreach (IItem item in page.List().OrderBy(pair => pair.Key).Select(pair => pair.Value))
                 {
                     VendingMachineSlot temp = new VendingMachineSlot();
                     temp.ItemHighId = item.HighID;

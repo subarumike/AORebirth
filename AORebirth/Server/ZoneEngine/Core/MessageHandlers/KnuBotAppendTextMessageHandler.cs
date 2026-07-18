@@ -57,7 +57,12 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public void Send(ICharacter character, Identity knubotTarget, string text)
         {
-            this.Send(character, this.KnuBotAppendText(character, knubotTarget, text), false);
+            this.Send(character, knubotTarget, text, 0);
+        }
+
+        public void Send(ICharacter character, Identity knubotTarget, string text, int unknown2)
+        {
+            this.Send(character, this.KnuBotAppendText(character, knubotTarget, text, unknown2), false);
         }
 
         /// <summary>
@@ -70,7 +75,11 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         /// <returns>
         /// </returns>
-        private MessageDataFiller KnuBotAppendText(ICharacter character, Identity knubotTarget, string text)
+        private MessageDataFiller KnuBotAppendText(
+            ICharacter character,
+            Identity knubotTarget,
+            string text,
+            int unknown2)
         {
             return x =>
             {
@@ -78,6 +87,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.Target = knubotTarget;
                 x.Text = text;
                 x.Unknown1 = 2;
+                x.Unknown2 = unknown2;
             };
         }
     }

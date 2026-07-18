@@ -58,12 +58,17 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayDisobedientBotMonsterData = 17649;
 
-        public const int CapturedSubwayDisobedientBotMinimumDamage = 10;
+        // Nine projected official-live hits plus eight authoritative raw-only hits
+        // prove the normal local-player SIW1 damage envelope. No critical hit
+        // has been observed and critical behavior remains unresolved.
+        public const int CapturedSubwayDisobedientBotMinimumDamage = 8;
 
-        public const int CapturedSubwayDisobedientBotMaximumDamage = 11;
+        public const int CapturedSubwayDisobedientBotMaximumDamage = 15;
 
         public const double CapturedSubwayDisobedientBotInitialAttackSeconds = 3.270444;
 
+        // Focused raw traffic includes missed attempts and therefore preserves
+        // the attack-attempt cadence instead of deriving recharge from landed hits.
         public const double CapturedSubwayDisobedientBotRechargeSeconds = 5.973723;
 
         public const int CapturedSubwayDisobedientBotWeaponSlot = 0;
@@ -76,7 +81,20 @@ namespace ZoneEngine.Core.Playfields
 
         public const string CapturedSubwayDisobedientBotWeaponName = "SIW1";
 
-        public const int CapturedSubwayDisobedientBotSpecialAttackWeaponValue = 49;
+        public const int CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponValue = 30;
+
+        public const int CapturedSubwayDisobedientBotLevel6SpecialAttackWeaponValue = 35;
+
+        // Private midpoint policy between captured level-6 value 35 and level-8 value 45.
+        public const int CapturedSubwayDisobedientBotLevel7SpecialAttackWeaponPolicyValue = 40;
+
+        public const int CapturedSubwayDisobedientBotLevel8SpecialAttackWeaponValue = 45;
+
+        public const int CapturedSubwayDisobedientBotLevel9SpecialAttackWeaponValue = 49;
+
+        public const int CapturedSubwayDisobedientBotLevel10SpecialAttackWeaponValue = 54;
+
+        public const int CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponLastValue = 22;
 
         public const int CapturedSubwayDisobedientBotSpecialAttackWeaponLastValue = 0;
 
@@ -147,6 +165,51 @@ namespace ZoneEngine.Core.Playfields
         public const int CapturedSubwayVergilSpecialAttackWeaponValue = 167;
 
         public const int CapturedSubwayVergilSpecialAttackWeaponLastValue = 0;
+
+        public const int CapturedSubwayEumenidesMonsterData = 203726;
+
+        public const int CapturedSubwayEumenidesWeaponLowTemplate = 123267;
+
+        public const int CapturedSubwayEumenidesWeaponHighTemplate = 123268;
+
+        public const int CapturedSubwayEumenidesWeaponQuality = 20;
+
+        // Twenty-one observed local-player hits span 25..45 with a 4.311321s
+        // median interval. They remain evidence, not hard-coded weapon rolls;
+        // damage and recharge stay owned by the equipped item.
+        public const int CapturedSubwayEumenidesWeaponDamageMinimumOverride = 0;
+
+        public const int CapturedSubwayEumenidesWeaponDamageMaximumOverride = 0;
+
+        public const double CapturedSubwayEumenidesRechargeOverrideSeconds = 0.0;
+
+        public const double CapturedSubwayEumenidesAttackStartDelaySeconds = 0.001000;
+
+        public const double CapturedSubwayEumenidesMovementTransitionDelaySeconds = 0.233124;
+
+        public const double CapturedSubwayEumenidesFirstHitDelaySeconds = 5.199992;
+
+        public const int CapturedSubwayEumenidesInitialAttackInfoAmmoCount = 19;
+
+        public const int CapturedSubwayEumenidesAttackInfoUnknown = 0;
+
+        public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown1 = 143;
+
+        public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown2 = 171;
+
+        public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown3 = 143;
+
+        public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown4 = 143;
+
+        public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown5 = 0;
+
+        public const int CapturedSubwayMeldedPatternsMonsterData = 203747;
+
+        public const int CapturedSubwayMeldedPatternsWeaponLowTemplate = 121817;
+
+        public const int CapturedSubwayMeldedPatternsWeaponHighTemplate = 121818;
+
+        public const int CapturedSubwayMeldedPatternsWeaponQuality = 20;
 
         public const int CapturedSubwayAbmouthMonsterData = 155962;
 
@@ -234,9 +297,13 @@ namespace ZoneEngine.Core.Playfields
 
         public const double CapturedSubwayFilthFleaMeleeRechargeSeconds = 2.8;
 
-        public const int CapturedSubwayFilthFleaPoisonDamage = 15;
+        public const int CapturedSubwayFilthFleaPoisonMinimumDamage = 14;
 
-        public const int CapturedSubwayFilthFleaMeleeDamage = 3;
+        public const int CapturedSubwayFilthFleaPoisonMaximumDamage = 24;
+
+        public const int CapturedSubwayFilthFleaMeleeMinimumDamage = 3;
+
+        public const int CapturedSubwayFilthFleaMeleeMaximumDamage = 10;
 
         public const int CapturedSubwayFilthFleaPoisonWeaponSlot = 1;
 

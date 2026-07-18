@@ -228,6 +228,33 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void ObservedCreditSetsRemainUniqueWhileObservedSamplesPreserveMultiplicity()
+        {
+            LootTableRegistry registry = Registry();
+            LootTableDefinition set = Table(
+                "credits-set",
+                LootRollMode.Guaranteed,
+                Guaranteed(1001),
+                CreditsPolicyMode.ObservedSet,
+                1,
+                2);
+            set.CreditsPolicy.ObservedCredits = new[] { 2, 1, 1 };
+            registry.RegisterTable(set);
+            CollectionAssert.AreEqual(new[] { 1, 2 }, set.CreditsPolicy.ObservedCredits);
+
+            LootTableDefinition samples = Table(
+                "credits-samples",
+                LootRollMode.Guaranteed,
+                Guaranteed(1001),
+                CreditsPolicyMode.ObservedSamples,
+                1,
+                2);
+            samples.CreditsPolicy.ObservedCredits = new[] { 2, 1, 1 };
+            registry.RegisterTable(samples);
+            CollectionAssert.AreEqual(new[] { 1, 1, 2 }, samples.CreditsPolicy.ObservedCredits);
+        }
+
+        [TestMethod]
         public void ArchitectureGuardrailsKeepLootOwnershipOutOfPlayfieldAndEnemyBranches()
         {
             string root = FindRepositoryRoot();

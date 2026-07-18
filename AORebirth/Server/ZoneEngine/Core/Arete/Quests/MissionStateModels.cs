@@ -21,6 +21,8 @@ namespace ZoneEngine.Core.Arete.Quests
 
     public sealed class MissionStateRecord
     {
+        public int CharacterId { get; set; }
+
         public string QuestId { get; set; }
 
         public string CurrentStepId { get; set; }

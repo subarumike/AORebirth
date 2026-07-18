@@ -14,8 +14,8 @@ from another entity are not accepted as drop proof.
 - **Bloodcreeper:** no item identity is proven. Its item pool remains explicitly
   unresolved and inactive. Two complete empty snapshots do not prove a
   universally empty item pool.
-- No population row was activated. The population boundary remains 260
-  represented, 222 active, and 38 quarantined.
+- No population row was activated by this audit. The current population boundary
+  remains 321 represented, 283 active, and 38 quarantined.
 - This offline audit is not Bloodcreeper private-client acceptance.
 
 The item database was used only to resolve display names after an item identity
@@ -108,6 +108,24 @@ fully linked item-empty outcomes. It excludes six corpses with no inventory
 snapshot and the `20260713-013906` inventory whose capture lacks the preceding
 enemy identity and Death chain. That ambiguous transferred item remains useful
 research evidence but cannot affect runtime loot.
+
+## Disobedient Bot whole-enemy boundary
+
+Loot acceptance is now joined to the other required systems rather than treated
+as completion by itself. The corpus contains 17 normal local-player SIW1 hits at
+`8..15`; two player-owned Killer-pet hits stay excluded, and no critical is
+observed. Focused attempt traffic preserves `5.973723` seconds. Captured
+SpecialAttackWeapon contexts are level-specific: `L5=30/30/30/30/22`, `L6=35`,
+`L8=45`, `L9=49`, and `L10=54`; active L7 uses the explicit bounded midpoint
+policy `40`, not a capture claim.
+
+All 12 exact rows use captured NPC family `138` and a `450`-second post-NPC-
+despawn schedule. Capture `20260708-143600` records `459.913` seconds from death
+to same-position replacement at a `0.190`-unit delta. The 13 valid corpse/credit
+chains, strict loot denominator, CATMesh `15215`, shared chase, and ordinary
+corpse lifetimes now pass the same whole-enemy gate. The two existing Bot rows
+in the 38-row operational quarantine were not activated. Critical behavior,
+proactive acquisition radius, and leash/reset distance remain unresolved.
 
 ## Bloodcreeper identity linkage
 

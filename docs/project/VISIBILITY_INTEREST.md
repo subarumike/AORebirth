@@ -111,4 +111,4 @@ visibility evidence; current cross-repository validation is recorded in
 
 The aggregate wrapper completed with 203 tests: 194 passed and the same nine established baseline failures remained (three damage-evidence tests, one inventory-ownership guardrail, and five session/zoning source guardrails). Every visibility-task test passed. These results are not live AO client validation.
 
-The safe PF127 production disposition is 222 active rows: 95 supported-family plus 127 ordinary rows. The complete catalog represents 260 rows and 18 profiles. The remaining 29 supported-family plus 9 ordinary rows stay quarantined. Generic level selection and ordinary respawn inheritance do not authorize those 38 rows or change the visibility rollout boundary.
+The safe PF127 production disposition is 283 active rows: 95 supported-family plus 188 ordinary rows. The complete catalog represents 321 rows and 26 profiles. The remaining 29 supported-family plus 9 ordinary rows stay quarantined. Generic level selection and ordinary respawn inheritance do not authorize those 38 rows or change the visibility rollout boundary.

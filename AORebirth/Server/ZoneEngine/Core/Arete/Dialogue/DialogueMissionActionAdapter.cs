@@ -87,17 +87,20 @@ namespace ZoneEngine.Core.Arete.Dialogue
             this.missionStateService = missionStateService;
         }
 
-        public DialogueMissionActionAdapterResult ExecuteAction(DialogueAction action)
+        public DialogueMissionActionAdapterResult ExecuteAction(int characterId, DialogueAction action)
         {
-            return this.ExecuteActionsForSession(null, new[] { action });
+            return this.ExecuteActionsForSession(characterId, null, new[] { action });
         }
 
-        public DialogueMissionActionAdapterResult ExecuteActions(IEnumerable<DialogueAction> actions)
+        public DialogueMissionActionAdapterResult ExecuteActions(
+            int characterId,
+            IEnumerable<DialogueAction> actions)
         {
-            return this.ExecuteActionsForSession(null, actions);
+            return this.ExecuteActionsForSession(characterId, null, actions);
         }
 
         public DialogueMissionActionAdapterResult ExecuteActionsForSession(
+            int characterId,
             DialogueSession session,
             IEnumerable<DialogueAction> actions)
         {
@@ -107,7 +110,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             foreach (DialogueAction action in actions ?? Enumerable.Empty<DialogueAction>())
             {
-                DialogueMissionActionResult actionResult = this.ExecuteSingleAction(session, action);
+                DialogueMissionActionResult actionResult = this.ExecuteSingleAction(characterId, session, action);
                 actionResults.Add(actionResult);
                 validation.AddErrors(actionResult.Validation);
 
@@ -120,7 +123,10 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return new DialogueMissionActionAdapterResult(actionResults, endedDialogue, validation);
         }
 
-        private DialogueMissionActionResult ExecuteSingleAction(DialogueSession session, DialogueAction action)
+        private DialogueMissionActionResult ExecuteSingleAction(
+            int characterId,
+            DialogueSession session,
+            DialogueAction action)
         {
             var validation = new AreteValidationResult();
             if (action == null)
@@ -145,7 +151,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return this.CreateActionResult(action.Type, action.QuestId, true, null, true, validation);
             }
 
-            MissionStateResult missionStateResult = this.ExecuteMissionAction(action, validation);
+            MissionStateResult missionStateResult = this.ExecuteMissionAction(characterId, action, validation);
             bool applied = missionStateResult != null && missionStateResult.IsValid;
 
             return this.CreateActionResult(
@@ -157,7 +163,10 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 validation);
         }
 
-        private MissionStateResult ExecuteMissionAction(DialogueAction action, AreteValidationResult validation)
+        private MissionStateResult ExecuteMissionAction(
+            int characterId,
+            DialogueAction action,
+            AreteValidationResult validation)
         {
             if (this.missionStateService == null)
             {
@@ -168,23 +177,23 @@ namespace ZoneEngine.Core.Arete.Dialogue
             MissionStateResult result;
             if (IsAction(action.Type, "OfferMission"))
             {
-                result = this.missionStateService.OfferMission(action.QuestId);
+                result = this.missionStateService.OfferMission(characterId, action.QuestId);
             }
             else if (IsAction(action.Type, "AcceptMission"))
             {
-                result = this.missionStateService.AcceptMission(action.QuestId);
+                result = this.missionStateService.AcceptMission(characterId, action.QuestId);
             }
             else if (IsAction(action.Type, "CompleteMission"))
             {
-                result = this.missionStateService.CompleteMission(action.QuestId);
+                result = this.missionStateService.CompleteMission(characterId, action.QuestId);
             }
             else if (IsAction(action.Type, "FailMission"))
             {
-                result = this.missionStateService.FailMission(action.QuestId);
+                result = this.missionStateService.FailMission(characterId, action.QuestId);
             }
             else if (IsAction(action.Type, "AbandonMission"))
             {
-                result = this.missionStateService.AbandonMission(action.QuestId);
+                result = this.missionStateService.AbandonMission(characterId, action.QuestId);
             }
             else
             {

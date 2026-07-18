@@ -160,6 +160,21 @@ VB output is **proven**. Current containment verifies the exact batch object,
 frame locals, byte counts, state blob, viewport, index-buffer path, and native
 cleanup functions before discarding the batch.
 
+### GUI `ConvertToScreen` null scaled-rectangle pointer
+
+The first-chance dump `AnarchyOnline.exe_260718_010217.dmp` captures the
+original access violation before the client's later exception handling obscures
+it. `Utils.dll +0x82F1` executes `fadd dword ptr [ecx]` with `ECX == 0`, reached
+from `GUI!View::ConvertToScreen` at return RVA `GUI.dll +0x14C4AF`. The
+operator's destination and offset operands remain accessible, and the scaled
+rectangle produced immediately before the call remains intact in the caller's
+`[EBP-0x58]` local.
+
+Containment recognizes only that exact Utils fault, GUI return address, verified
+module bytes, and stack-frame layout. It restores `ECX` to the intact scaled
+rectangle local and retries the same floating-point add. Any mismatch remains
+fail-closed and follows the normal crash/dump path.
+
 ### GUI tree/object lookup
 
 Report logical `GUI.dll +0x4DD00`; image RVA `GUI.dll +0x4ED00`.

@@ -80,8 +80,14 @@
     <Compile Include="AbmouthEncounterRuntimeServiceTests.cs" />
     <Compile Include="GlobalLootFoundationTests.cs" />
     <Compile Include="WorldPopulationFoundationTests.cs" />
+    <Compile Include="PersistentMissionFoundationTests.cs" />
+    <Compile Include="QuestRuntimePersistenceTests.cs" />
+    <Compile Include="AreteFrameworkBootstrapTests.cs" />
+    <Compile Include="WindcallerKarrecNpcContentTests.cs" />
+    <Compile Include="WindcallerKarrecInteractionRulesTests.cs" />
     <Compile Include="SubwayLootPoolRulesTests.cs" />
     <Compile Include="SubwayEnemyLootEvidenceTests.cs" />
+    <Compile Include="SubwayVendorContentTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestStateTests.cs" />
     <Compile Include="PlayfieldVisibilityLifecycleIntegrationTests.cs" />
@@ -127,6 +133,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\StatelInteractionRules.cs">
       <Link>StatelInteractionRules.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayVendorContentProvider.cs">
+      <Link>CapturedSubwayVendorContentProvider.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\UseItemOnItemInteractionRules.cs">
       <Link>UseItemOnItemInteractionRules.cs</Link>
     </Compile>
@@ -155,6 +164,32 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\LootGenerationService.cs"><Link>LootGenerationService.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\WorldPopulationDefinitions.cs"><Link>WorldPopulationDefinitions.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\WorldRespawnScheduler.cs"><Link>WorldRespawnScheduler.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionModels.cs"><Link>MissionModels.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionDefinitionCatalog.cs"><Link>MissionDefinitionCatalog.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\IMissionRepository.cs"><Link>IMissionRepository.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\InMemoryMissionRepository.cs"><Link>InMemoryMissionRepository.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\PersistentMissionService.cs"><Link>PersistentMissionService.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\RexB18CFeedbackPolicy.cs"><Link>RexB18CFeedbackPolicy.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Subway\Quests\WindcallerKarrecNpcContent.cs"><Link>WindcallerKarrecNpcContent.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Subway\Quests\WindcallerKarrecNpcRuntimeRegistry.cs"><Link>WindcallerKarrecNpcRuntimeRegistry.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Subway\Quests\WindcallerKarrecInteractionRules.cs"><Link>WindcallerKarrecInteractionRules.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRewardCoordinator.cs"><Link>MissionRewardCoordinator.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteConditionReferenceValidator.cs"><Link>AreteConditionReferenceValidator.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteContentLoadResult.cs"><Link>AreteContentLoadResult.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteContentManifest.cs"><Link>AreteContentManifest.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteContentManifestLoader.cs"><Link>AreteContentManifestLoader.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteFrameworkBootstrap.cs"><Link>AreteFrameworkBootstrap.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteJsonContentFileLoader.cs"><Link>AreteJsonContentFileLoader.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteValidationResult.cs"><Link>AreteValidationResult.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueActionReferenceValidator.cs"><Link>DialogueActionReferenceValidator.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueContentPackLoader.cs"><Link>DialogueContentPackLoader.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueContentPackValidator.cs"><Link>DialogueContentPackValidator.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueContentRegistry.cs"><Link>DialogueContentRegistry.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueModels.cs"><Link>DialogueModels.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestContentPackLoader.cs"><Link>QuestContentPackLoader.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestContentPackValidator.cs"><Link>QuestContentPackValidator.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestContentRegistry.cs"><Link>QuestContentRegistry.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestModels.cs"><Link>QuestModels.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\SubwayLootPoolRules.cs">
       <Link>SubwayLootPoolRules.cs</Link>
     </Compile>
@@ -224,6 +259,38 @@
   <ItemGroup>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\cleaning_robot_patrol_replay.csv">
       <Link>Content\Captured\Arete\cleaning_robot_patrol_replay.csv</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\rex-larsson\manifest.json">
+      <Link>Content\Arete\rex-larsson\manifest.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\rex-larsson\dialogue\rex-larsson.dialogue.json">
+      <Link>Content\Arete\rex-larsson\dialogue\rex-larsson.dialogue.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\rex-larsson\quests\rex-larsson.quests.json">
+      <Link>Content\Arete\rex-larsson\quests\rex-larsson.quests.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\marcus-stone\manifest.json">
+      <Link>Content\Arete\marcus-stone\manifest.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\marcus-stone\dialogue\marcus-stone.dialogue.json">
+      <Link>Content\Arete\marcus-stone\dialogue\marcus-stone.dialogue.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Subway\windcaller-karrec\manifest.json">
+      <Link>Content\Subway\windcaller-karrec\manifest.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Subway\windcaller-karrec\dialogue\windcaller-karrec.dialogue.json">
+      <Link>Content\Subway\windcaller-karrec\dialogue\windcaller-karrec.dialogue.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Subway\windcaller-karrec\quests\windcaller-karrec.quests.json">
+      <Link>Content\Subway\windcaller-karrec\quests\windcaller-karrec.quests.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <ProjectReference Include="..\SmokeLounge.AOtomation.Messaging\SmokeLounge.AOtomation.Messaging.csproj">
