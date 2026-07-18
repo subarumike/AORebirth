@@ -377,7 +377,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCapturedDamage(catalog, "Incomplete Rebuild", 17, 35);
             AssertCapturedDamage(catalog, "Molested Molecules", 16, 42);
             AssertCapturedDamage(catalog, "Neural Burnout", 16, 22);
-            AssertCapturedDamage(catalog, "Redundant Scan", 19, 19);
             AssertCapturedDamage(catalog, "Uncontrollable Anger", 11, 18);
 
             OrdinaryEnemyProfile molested = catalog.GetProfiles()
@@ -901,6 +900,166 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void RedundantScanUsesExactSourceWeaponsAndCapturedAttackInfoShapeWithoutFixedDamage()
+        {
+            const int monsterData = 204178;
+            int[] expectedSources =
+            {
+                0x7953AF85,
+                0x795451BF,
+                0x795451C4,
+                0x795451D3
+            };
+            var ordinaryProvider = new CapturedSubwayOrdinaryContentProvider();
+            CapturedSubwaySourceWeaponEvidenceDefinition[] sourceEvidence =
+                ordinaryProvider.GetSourceWeaponEvidence(monsterData);
+
+            Assert.AreEqual(4, sourceEvidence.Length);
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "7953AF85:122027:122027:20",
+                    "795451BF:122026:122027:14",
+                    "795451C4:122028:122029:25",
+                    "795451D3:122026:122027:16"
+                },
+                sourceEvidence
+                    .OrderBy(value => value.SourceInstance)
+                    .Select(
+                        value => string.Format(
+                            "{0:X8}:{1}:{2}:{3}",
+                            value.SourceInstance,
+                            value.LowId,
+                            value.HighId,
+                            value.Quality))
+                    .ToArray());
+            Assert.IsTrue(
+                sourceEvidence.All(
+                    value => value.EvidenceCaptures == "20260709-222339,20260709-225408"));
+
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                ordinaryProvider);
+            OrdinaryEnemyProfile redundantScan = catalog.GetProfiles()
+                .Single(value => value.DisplayName == "Redundant Scan");
+            OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns()
+                .Where(value => value.ProfileKey == redundantScan.ProfileKey)
+                .OrderBy(value => value.SourceIdentity)
+                .ToArray();
+
+            Assert.AreEqual(4, spawns.Length);
+            CollectionAssert.AreEqual(
+                expectedSources,
+                spawns.Select(value => value.SourceIdentity).ToArray());
+            Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, redundantScan.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, redundantScan.Combat.DamageSource);
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, redundantScan.Combat.EvidenceState);
+            Assert.IsTrue(redundantScan.Combat.VisibleWeapon);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, redundantScan.Combat.Contract.AttackModel);
+            Assert.IsFalse(redundantScan.Combat.Contract.IsCombatReady);
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.Unresolved,
+                redundantScan.Combat.ResolveContract(spawns[0].Level).AttackModel,
+                "A Redundant Scan contract without its source identity must fail closed.");
+
+            foreach (OrdinaryEnemySpawnDefinition spawn in spawns)
+            {
+                CapturedSubwaySourceWeaponEvidenceDefinition expected = sourceEvidence
+                    .Single(value => value.SourceInstance == spawn.SourceIdentity);
+                CapturedEnemyCombatContract contract = redundantScan.Combat.ResolveContract(
+                    spawn.SourceIdentity,
+                    spawn.Level);
+                Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
+                Assert.IsTrue(contract.IsCombatReady);
+                Assert.AreEqual(expected.LowId, contract.WeaponLowId);
+                Assert.AreEqual(expected.HighId, contract.WeaponHighId);
+                Assert.AreEqual(expected.Quality, contract.WeaponQuality);
+                Assert.AreEqual(6, contract.WeaponInventorySlot);
+                Assert.AreEqual(0, contract.MinDamage);
+                Assert.AreEqual(0, contract.MaxDamage);
+                Assert.AreEqual(0.0, contract.RechargeSeconds);
+                Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
+                Assert.AreEqual(17, contract.AttackInfoAmmoCount);
+                Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, contract.AttackInfoUnknown);
+                Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+                Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
+                Assert.IsFalse(contract.HasCapturedAttackStartContext);
+                Assert.IsFalse(contract.HasCapturedCombatStopSequence);
+                Assert.IsTrue(contract.Evidence.Contains("one normal local-player hit is 19"));
+                Assert.IsTrue(contract.Evidence.Contains("item owns runtime damage and recharge"));
+                Assert.IsTrue(contract.Evidence.Contains("ammo 17, slot 6, unknown 0"));
+            }
+
+            CapturedEnemyCombatContract unknown = redundantScan.Combat.ResolveContract(
+                0x7953FFFF,
+                spawns[0].Level);
+            CapturedEnemyCombatContract missing = CapturedSubwayCombatCatalog.ForOrdinary(
+                BuildRedundantScanArchetype(sourceEvidence.Take(3).ToArray()),
+                expectedSources[0]);
+            CapturedEnemyCombatContract conflicting = CapturedSubwayCombatCatalog.ForOrdinary(
+                BuildRedundantScanArchetype(
+                    sourceEvidence
+                        .Select(
+                            value => new CapturedSubwaySourceWeaponEvidenceDefinition(
+                                value.SourceInstance,
+                                value.LowId,
+                                value.HighId,
+                                value.SourceInstance == 0x795451D3
+                                    ? value.Quality - 1
+                                    : value.Quality,
+                                value.EvidenceCaptures))
+                        .ToArray()),
+                expectedSources[0]);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, unknown.AttackModel);
+            Assert.IsFalse(unknown.IsCombatReady);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, missing.AttackModel);
+            Assert.IsFalse(missing.IsCombatReady);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, conflicting.AttackModel);
+            Assert.IsFalse(conflicting.IsCombatReady);
+        }
+
+        [TestMethod]
+        public void RedundantScanKeepsCapturedSupportNanoPairAndConservativeAutomaticAggroPolicy()
+        {
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider());
+            OrdinaryEnemyProfile profile = catalog.GetProfiles()
+                .Single(value => value.DisplayName == "Redundant Scan");
+            OrdinaryEnemySupportNanoProfile nano = profile.SupportNano;
+
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Auto, profile.Aggression.Mode);
+            Assert.AreEqual(7.0, profile.Aggression.AutomaticAggroRadius.Value);
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Policy, profile.Aggression.EvidenceState);
+            Assert.IsTrue(profile.Aggression.Chase);
+            Assert.IsNotNull(nano);
+            Assert.AreEqual(121336, nano.PrimaryNanoId);
+            Assert.AreEqual(121248, nano.TriggeredSelfNanoId);
+            Assert.AreEqual(60.0, nano.InitialDelaySeconds);
+            Assert.AreEqual(1.400106, nano.CastSeconds);
+            Assert.AreEqual(25.590325, nano.RepeatSeconds);
+            Assert.AreEqual(18000, nano.DurationParameter);
+            Assert.AreEqual(180.0, nano.EffectLifetimeSeconds);
+            Assert.AreEqual(7.5, nano.TargetRange);
+            Assert.IsTrue(nano.FallbackToSelf);
+            Assert.AreEqual(220, nano.PrimaryStrain);
+            Assert.AreEqual(0, nano.TriggeredSelfStrain);
+            Assert.AreEqual(9, nano.PrimaryModifierDelta);
+            Assert.AreEqual(-13, nano.TriggeredSelfModifierDelta);
+            CollectionAssert.AreEqual(
+                new[]
+                    {
+                        113, 102, 107, 103, 105, 104, 106, 100, 109, 133, 110, 112,
+                        130, 114, 115, 116, 108, 128, 122, 129, 127, 131, 111
+                    },
+                nano.AffectedStatIds);
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Policy, nano.EvidenceState);
+            Assert.IsTrue(nano.Evidence.Contains("20260716-033326"));
+            Assert.IsTrue(nano.Evidence.Contains("20260717-214751"));
+        }
+
+        [TestMethod]
         public void DerangedShopperUsesItsOneExactQuarantinedSourceWeaponAndCapturedAttackInfoShape()
         {
             const int sourceIdentity = 0x79574527;
@@ -1225,6 +1384,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static void AssertExplicitDelay(OrdinaryEnemySpawnDefinition spawn, double seconds) { Assert.AreEqual(WorldRespawnPolicyAssignmentMode.Explicit, spawn.RespawnPolicy.Mode); Assert.IsNotNull(spawn.RespawnPolicy.ExplicitPolicy); Assert.AreEqual(seconds, spawn.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds.Value); }
         private static CapturedSubwayOrdinaryArchetypeDefinition BuildMeldedPatternsArchetype(CapturedSubwayCombatEvidenceDefinition combat, params string[] captures) { return new CapturedSubwayOrdinaryArchetypeDefinition("melded_patterns_test", "melded_patterns", "Melded Patterns", NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData, 148, 0, 268964353, 0, 0, 31, 0, 1899u, 29701, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], combat, new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], captures); }
         private static CapturedSubwayOrdinaryArchetypeDefinition BuildLooterArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("looter_test", "looter", "Looter", 203745, 138, 0, 268964353, 0, 0, 31, 1, 1579u, 40695, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 11, 11, 5.282358, 6, 0, 0, 15), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260709-212115" }, sourceWeaponEvidence); }
+        private static CapturedSubwayOrdinaryArchetypeDefinition BuildRedundantScanArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("redundant_scan_test", "redundant_scan", "Redundant Scan", 204178, 148, 0, 268964353, 0, 0, 31, 0, 1899u, 40660, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 19, 19, 0.0, 6, 0, 0, 1), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260709-222339", "20260709-225408" }, sourceWeaponEvidence); }
         private static CapturedSubwayOrdinaryArchetypeDefinition BuildDerangedShopperArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("deranged_shopper_test", "deranged_shopper", "Deranged Shopper", 203736, 138, 0, 268964353, 0, 0, 31, 1, 1579u, 5927, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 9, 15, 5.161083, 6, 0, 0, 8), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260710-202132" }, sourceWeaponEvidence); }
         private static void AssertThrows(Action action) { try { action(); Assert.Fail("Expected InvalidOperationException."); } catch (InvalidOperationException) { } }
         private static string Read(string root, string file) { return System.IO.File.ReadAllText(System.IO.Path.Combine(root, @"AORebirth\Server\ZoneEngine\Core\Playfields", file)); }

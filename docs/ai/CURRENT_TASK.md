@@ -138,6 +138,20 @@ population in bounded runtime batches.
 - Current runtime normal-hit ranges include Incomplete Rebuild `17..35`, Melded
   Patterns `21..34`, Molested Molecules `16..42`, Neural Burnout `16..22`,
   Redundant Scan `19`, and Uncontrollable Anger `11..18`.
+- Redundant Scan no longer uses that observed `19` as fixed runtime damage. Its
+  four current sources now resolve their exact owner-linked `122026..122029`
+  weapon pairs at QL14/20/25/16, fail closed without one exact tuple, and let
+  item stats own damage and recharge while preserving captured AttackInfo
+  `ammo=17`, slot `6`, unknown `0`, instance `0`. Its captured
+  `121336 -> 121248` support-nano pair now selects the nearest ordinary ally in
+  the observed 7.5-unit envelope with self fallback, pauses weapon/patrol ticks
+  for the 1.400106-second cast, broadcasts the captured packet sequence, applies
+  the nanos.dat-backed `+9/-13` deltas to the exact 23 weapon/nano skills, and
+  refreshes/reverses owned transient state after the 180-second duration without
+  NCU, DAO, or threaded-timer reuse. A conservative 7-unit private proactive
+  aggro policy is enabled from the observed acquisition. Redundant Scan remains
+  outside the accepted whole-enemy set until its captured per-anchor level
+  rerolls are represented and private runtime behavior is checked.
 - Reviewed raw first opens and strict `corpse-loot-observations.csv` snapshots
   contribute explicit empty corpses to denominators. Redundant Scan's observed
   item is `1/2`, Molested Molecules item `301713` is `1/3`, and the twelve
@@ -322,7 +336,7 @@ population in bounded runtime batches.
 - Sixteen-entry whole-enemy gate now includes Deranged Shopper after Mugger,
   Looter, Bloodcreeper, Stim Fiend, and Neural Burnout joined the previously
   confirmed ten. Ordinary generation check, diff check, expanded gate,
-  WorldPopulation `31/31`, and Subway loot `22/22` all pass.
+  WorldPopulation `33/33`, and Subway loot `22/22` all pass.
 - Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
 - World population foundation: `31/31` PASS.

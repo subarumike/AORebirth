@@ -2143,6 +2143,13 @@ namespace AORebirth.Core.Playfields
                     "20260716-033326",
                     "20260716-034104",
                     "20260716-222201"
+                },
+                new CapturedSubwaySourceWeaponEvidenceDefinition[]
+                {
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x7953AF85, 122027, 122027, 20, "20260709-222339,20260709-225408"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795451BF, 122026, 122027, 14, "20260709-222339,20260709-225408"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795451C4, 122028, 122029, 25, "20260709-222339,20260709-225408"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795451D3, 122026, 122027, 16, "20260709-222339,20260709-225408")
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "uncontrollable_anger",
