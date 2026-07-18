@@ -247,6 +247,13 @@ population in bounded runtime batches.
   closed, and no special-attack body is invented. The whole-enemy gate definition
   now also covers Looter, Bloodcreeper, Stim Fiend, and Neural Burnout, bringing
   the accepted set to fourteen.
+- Mugger is the fifteenth accepted ordinary profile. All nine current sources
+  resolve exact QL1 `121567/121567` weapons and fail closed for aggregate,
+  missing, conflicting, or unknown selection. The item owns damage, damage
+  bonus, and recharge while the captured AttackInfo keeps only ammo `-1`, slot
+  `6`, unknown `0`, and weapon instance `0`. The 38 normal `9..12` outcomes stay
+  separate from three report-only `21` criticals; strict 17-open loot, exact
+  CATMesh/level credits, chase, respawn, and corpse lifetimes pass together.
 - The Subway combat-contract analyzer now supplements legacy identity mapping
   from `enemy-dossier.json` and exact corpse dead-NPC links before consuming
   combat rows. Its regenerated Bot projection recovers nine decoded
@@ -295,8 +302,8 @@ population in bounded runtime batches.
   regeneration: PASS.
 - Current inventory/content-ledger regression suites: `27/27` PASS.
 - Subway loot/corpse evidence: `22/22` PASS.
-- Fourteen-entry whole-enemy gate definition now includes Looter, Bloodcreeper,
-  Stim Fiend, and Neural Burnout after the previously confirmed ten. Ordinary
+- Fifteen-entry whole-enemy gate now includes Mugger after Looter, Bloodcreeper,
+  Stim Fiend, and Neural Burnout joined the previously confirmed ten. Ordinary
   generation check, Debug build, diff check, expanded gate, WorldPopulation
   `29/29`, and Subway loot `22/22` all pass.
 - Official entry/main-exit zoning guardrails: PASS.
