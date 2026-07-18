@@ -32,7 +32,7 @@ population in bounded runtime batches.
   `docs/generated/aosharp_capture_inventory.csv` and
   `docs/generated/aosharp_capture_inventory.md` by
   `Tools/inventory_aosharp_captures.py`.
-- The content-level ledger covers all `68` Subway-bearing sessions with `23,991`
+- The content-level ledger covers all `68` Subway-bearing sessions with `23,993`
   aggregated evidence rows: `55` official-live and `13` AORebirth-private.
   It records identities, related identities, evidence kinds, source artifacts,
   row scope, realm, and reference category in
@@ -120,9 +120,21 @@ population in bounded runtime batches.
   `20260710-211430`, `20260716-221358`, and `20260716-222201`, with normal and
   critical hit summaries separated in
   `docs/generated/subway_enemy_combat_contracts.json`.
+- Two exact reviewed raw packets from legacy capture `20260709-222339` now add
+  evidence-only Strike Foreman special-attack and attack-initiation context.
+  The fallback is sequence/byte exact, yields to derived combat rows, and does
+  not infer outgoing damage or cadence.
 - The diagnostic quarantine selector now changes spawn eligibility in the
   world-population owner when explicitly selected. The selector is disabled in
-  the normal runtime; all `38` rows remain quarantined.
+  the normal runtime; all `38` rows remain quarantined. A bounded
+  `population-activation-ledger.csv` now records `ELIGIBLE`, `MATERIALIZED`, or
+  `FAILED` for selected rows so the next private-client batch can distinguish
+  selection from actual runtime creation without changing eligibility.
+- Slum Runner is the third enemy admitted by the whole-enemy acceptance gate,
+  after Thief and Filth Flea. Its 24 exact spawns, captured `5..11` normal
+  damage and `4.210098`-second cadence, shared chase, strict loot sample,
+  CATMesh `31774`, 19 corpse/credit observations, ordinary corpse lifetimes,
+  and observed `59.433`-second death-to-respawn interval are guarded together.
 - Eumenides is now a dedicated named PF127 encounter from atomic capture
   `20260716-034559`: exact L20/2792 HP appearance, QL20 weapon context,
   capture-bounded proactive acquisition, shared LOS/chase/leash behavior, exact
@@ -134,20 +146,24 @@ population in bounded runtime batches.
   Tailor, Weaponsdealer, Armorer, Pharmacist, and Tools expose their five atomic
   captured shop snapshots with all `140` stock rows in captured slot order.
   Container Supplier is visible but has no invented shop endpoint because its
-  stock was not captured.
+  owner/terminal relationship is repeated in the corpus but no stock update or
+  dialogue was captured.
+- Bitaxel is a player, not a Subway enemy: complete SCFU `PlayerInfo` and
+  lifecycle `player=True npc=False pet=False` evidence now override combat-role
+  heuristics throughout the generated content ledger.
 ## Validation
 
 - Ordinary provider generator content-equivalence check: PASS.
 - AOSharp analyzer build and SCFU self-test: PASS.
 - NPC lifecycle decoder self-test, including finalized-window, legacy metadata,
   terminal-tail salvage, and snapshot-only corpse cases: PASS.
-- Capture inventory, lifecycle batch, and content-ledger tests: `27/27` PASS.
+- Content-ledger classification and population-diagnostic tests: `34/34` PASS.
 - Full lifecycle reprocess: `65/65` PASS; zero offline repairs, recaptures, and
   tool errors.
 - Full `294`-folder location inventory and `68`-session Subway ledger
   regeneration: PASS.
 - Subway loot/corpse evidence: `18/18` PASS.
-- Flea combat and whole-enemy acceptance guardrails: PASS.
+- Three-entry whole-enemy acceptance gate (Thief, Filth Flea, Slum Runner): PASS.
 - Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
 - World population foundation: `25/25` PASS.
@@ -182,24 +198,28 @@ until the staged identity has a private-client runtime result.
    quarantine until bounded private-client validation. They comprise 11
    Discarded Pets, 11 Violent Vagabonds, 6 Stim Fiends, 5 Muggers, 2
    Disobedient Bots, 2 Looters, and 1 Deranged Shopper.
-3. Strike Foreman has a complete captured population profile but no indexed
-   outgoing combat or loot. Keep those subsystems unresolved rather than
-   guessing.
-4. Bitaxel has exact appearance evidence but no player-facing combat and an
-   unresolved MonsterData value. Do not activate it yet.
+3. Strike Foreman has usable exact L19/736 HP appearance, QL19 weapon, raw
+   `SpecialAttackWeapon` plus `Attack` initiation against the player's Killer
+   pet, chase context, CATMesh `17870`, and `176` corpse credits. The raw sink
+   does not contain outgoing Strike Foreman `AttackInfo`, so damage and cadence
+   remain unresolved together with item loot, respawn timing, leash, and exact
+   acquisition range. Do not activate it by guessing the missing behavior.
+4. Bitaxel is classified as a player artifact and is not an enemy gap.
 5. Container Supplier stock and dialogue remain unresolved. Keep the captured
    appearance visible without synthesizing an inventory or interaction.
-6. Existing PF127 door evidence describes working interior doors, not exits.
-   Do not remove them. The corpus does not yet provide identity-complete world
-   static/container placements.
+6. Geometry-safe capture `20260714-202820` identifies 18 unlocked interior door
+   identities, including five observed in both open and closed states. It does
+   not contain safe room-link indices. The working client-owned doors must not
+   be replaced with invented server statels; the corpus still lacks
+   identity-complete world static/container placements.
 
 ## Constraints
 
 - Audit the existing corpus before any new capture request. No new capture is
   currently required.
 - Mixed captures may contribute only exact PF127 identity rows.
-- Keep Abmouth, Vergil, Eumenides, Strike Foreman, and Bitaxel out of the
-  ordinary recurring-enemy generator.
+- Keep Abmouth, Vergil, Eumenides, and Strike Foreman out of the ordinary
+  recurring-enemy generator. Keep Bitaxel excluded as player evidence.
 - Keep normal, critical, local-player, and player-owned-pet damage evidence
   separate.
 - Loot observations prove membership and observed outcomes, not a complete

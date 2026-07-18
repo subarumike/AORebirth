@@ -156,6 +156,213 @@ class CorpseEvidenceTests(unittest.TestCase):
         self.assertIn('"dead_npc_name":"Killer"', killer["observed_values_json"])
 
 
+class CharacterIdentityClassificationTests(unittest.TestCase):
+    def test_scfu_player_info_overrides_enemy_role_and_transient_owner(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            capture_path = root / "captures" / "20260709-222339"
+            capture_path.mkdir(parents=True)
+            (capture_path / "scfu-appearance.csv").write_text(
+                "CapturedUtc,Identity,Name,PlayfieldId,Level,Health,MonsterData,"
+                "CharacterInfoType,Owner,DecodeStatus,DecodeFullyConsumed\n"
+                "2026-07-10T03:25:38Z,(SimpleChar:792AD841),Bitaxel,1187842,"
+                "21,448,0,PlayerInfo,(SimpleChar:0000AAC0),decoded_complete,true\n",
+                encoding="utf-8",
+            )
+            (capture_path / "enemy-dossier.json").write_text(
+                '{"enemies":[{"identity":"(SimpleChar:792AD841)",'
+                '"name":"Bitaxel","monsterData":0,"level":21,'
+                '"resourcePlayfieldId":1187842}]}',
+                encoding="utf-8",
+            )
+            (capture_path / "enemy-combat.csv").write_text(
+                "CapturedUtc,MessageType,SourceRole,SourceIdentity,TargetRole,"
+                "TargetIdentity,Action,Amount\n"
+                "2026-07-10T03:25:39Z,AttackInfo,enemy,"
+                "(SimpleChar:792AD841),enemy,(SimpleChar:79545245),,14\n",
+                encoding="utf-8",
+            )
+            references = {
+                category: set() for category in content.REFERENCE_CATEGORIES
+            }
+            analyzer = content.CaptureAnalyzer(
+                root,
+                {
+                    "capture_id": "20260709-222339",
+                    "capture_path": "captures/20260709-222339",
+                    "classification": "SUBWAY",
+                    "confidence": "high",
+                    "capture_playfield_id": 1187842,
+                },
+                references,
+            )
+            bitaxel_records = [
+                record
+                for record in analyzer.analyze()
+                if record.subject_identity == "(SimpleChar:792AD841)"
+            ]
+
+        self.assertTrue(bitaxel_records)
+        self.assertEqual({"player"}, {record.subject_kind for record in bitaxel_records})
+        scfu = next(
+            record for record in bitaxel_records if record.evidence_kind == "scfu_appearance"
+        )
+        self.assertEqual("(SimpleChar:0000AAC0)", scfu.related_identity)
+        self.assertIn(
+            '"character_info_type":"PlayerInfo"',
+            content.evidence_to_row(scfu, references)["observed_values_json"],
+        )
+
+    def test_lifecycle_dynel_player_flag_prevents_enemy_classification(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            capture_path = root / "captures" / "20260711-170337"
+            capture_path.mkdir(parents=True)
+            (capture_path / "npc-lifecycle.csv").write_text(
+                "CapturedUtc,Phase,MessageType,PrimaryIdentity,RelatedIdentity,Name,Detail\n"
+                "2026-07-11T22:03:38Z,character-seen,DynelSnapshot,"
+                "(SimpleChar:792AD841),,Bitaxel,"
+                "identity=(SimpleChar:792AD841) player=True npc=False pet=False\n",
+                encoding="utf-8",
+            )
+            references = {
+                category: set() for category in content.REFERENCE_CATEGORIES
+            }
+            analyzer = content.CaptureAnalyzer(
+                root,
+                {
+                    "capture_id": "20260711-170337",
+                    "capture_path": "captures/20260711-170337",
+                    "classification": "MIXED",
+                    "confidence": "high",
+                    "capture_playfield_id": 1388552,
+                },
+                references,
+            )
+            row = next(
+                content.evidence_to_row(record, references)
+                for record in analyzer.analyze()
+                if record.evidence_kind == "lifecycle_character-seen"
+            )
+
+        self.assertEqual("player", row["subject_kind"])
+        self.assertIn('"dynel_role":"player"', row["observed_values_json"])
+
+
+class ReviewedRawCombatFallbackTests(unittest.TestCase):
+    @staticmethod
+    def _analyze(raw_lines: list[str], derived_combat: str = ""):
+        temporary = tempfile.TemporaryDirectory()
+        root = Path(temporary.name)
+        capture_path = root / "captures" / "20260709-222339"
+        capture_path.mkdir(parents=True)
+        (capture_path / "enemy-dossier.json").write_text(
+            '{"enemies":[{"identity":"(SimpleChar:7954512E)",'
+            '"name":"Strike Foreman","monsterData":203744,"level":19,'
+            '"resourcePlayfieldId":1187842}]}',
+            encoding="utf-8",
+        )
+        (capture_path / "packets.hex.log").write_text(
+            "\n".join(raw_lines) + "\n", encoding="utf-8"
+        )
+        if derived_combat:
+            (capture_path / "enemy-combat.csv").write_text(
+                "CapturedUtc,MessageType,SourceRole,SourceIdentity,TargetRole,"
+                "TargetIdentity,Action,Amount\n" + derived_combat,
+                encoding="utf-8",
+            )
+        references = {category: set() for category in content.REFERENCE_CATEGORIES}
+        analyzer = content.CaptureAnalyzer(
+            root,
+            {
+                "capture_id": "20260709-222339",
+                "capture_path": "captures/20260709-222339",
+                "classification": "SUBWAY",
+                "confidence": "high",
+                "capture_playfield_id": 1187842,
+            },
+            references,
+        )
+        records = analyzer.analyze()
+        return temporary, records
+
+    def test_exact_reviewed_packets_add_evidence_only_strike_context(self) -> None:
+        packets = content.REVIEWED_RAW_COMBAT_FALLBACKS["20260709-222339"]
+        raw_lines = [
+            f"{packet['captured_utc']} IN #{packet['sequence']} "
+            f"len={packet['length']} n3={packet['message_type']} "
+            f"hex={packet['raw_hex']}"
+            for packet in packets
+        ]
+        temporary, records = self._analyze(raw_lines)
+        try:
+            strike = [
+                record
+                for record in records
+                if record.subject_identity == "(SimpleChar:7954512E)"
+            ]
+            self.assertTrue(
+                any(record.evidence_kind == "raw_combat_context" for record in strike)
+            )
+            attack = next(
+                record
+                for record in strike
+                if record.evidence_kind == "combat_as_source"
+            )
+            self.assertEqual("packets.hex.log", attack.source_artifact)
+            self.assertIn(
+                '"damage_unresolved":true',
+                content.evidence_to_row(attack, {category: set() for category in content.REFERENCE_CATEGORIES})[
+                    "observed_values_json"
+                ],
+            )
+        finally:
+            temporary.cleanup()
+
+    def test_reviewed_packet_byte_mismatch_fails_closed(self) -> None:
+        packet = content.REVIEWED_RAW_COMBAT_FALLBACKS["20260709-222339"][1]
+        raw_lines = [
+            f"{packet['captured_utc']} IN #{packet['sequence']} "
+            f"len={packet['length']} n3={packet['message_type']} "
+            f"hex={packet['raw_hex'][:-2]}FF"
+        ]
+        temporary, records = self._analyze(raw_lines)
+        try:
+            self.assertFalse(
+                any(
+                    record.source_artifact == "packets.hex.log"
+                    and record.subject_identity == "(SimpleChar:7954512E)"
+                    for record in records
+                )
+            )
+        finally:
+            temporary.cleanup()
+
+    def test_derived_combat_row_takes_precedence_over_raw_fallback(self) -> None:
+        packet = content.REVIEWED_RAW_COMBAT_FALLBACKS["20260709-222339"][1]
+        raw_lines = [
+            f"{packet['captured_utc']} IN #{packet['sequence']} "
+            f"len={packet['length']} n3={packet['message_type']} "
+            f"hex={packet['raw_hex']}"
+        ]
+        derived = (
+            "2026-07-10T03:28:45Z,Attack,enemy,(SimpleChar:7954512E),pet,"
+            "(SimpleChar:794D8062),start,\n"
+        )
+        temporary, records = self._analyze(raw_lines, derived)
+        try:
+            attack_records = [
+                record
+                for record in records
+                if record.subject_identity == "(SimpleChar:7954512E)"
+                and record.evidence_kind == "combat_as_source"
+            ]
+            self.assertEqual(1, len(attack_records))
+            self.assertEqual("enemy-combat.csv", attack_records[0].source_artifact)
+        finally:
+            temporary.cleanup()
+
+
 class PendingProjectionTests(unittest.TestCase):
     @staticmethod
     def _analyzer(root: Path, capture_id: str = "20260709-220439") -> content.CaptureAnalyzer:

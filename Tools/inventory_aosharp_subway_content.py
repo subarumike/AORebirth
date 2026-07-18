@@ -32,6 +32,31 @@ IDENTITY_PATTERN = re.compile(
 OUTPUT_CSV = "docs/generated/aosharp_subway_capture_content.csv"
 OUTPUT_MD = "docs/generated/aosharp_subway_capture_content.md"
 
+REVIEWED_RAW_COMBAT_FALLBACKS = {
+    "20260709-222339": (
+        {
+            "captured_utc": "2026-07-10T03:28:45.1013226Z",
+            "sequence": 4770,
+            "length": 53,
+            "message_type": "SpecialAttackWeapon",
+            "raw_hex": "133C000A0001003500000DB97944C0651D3C0F1C0000C3507954512E00000003F10000009A0000009A0000009A0000007500000000",
+            "source": "(SimpleChar:7954512E)",
+            "target": "",
+            "evidence_kind": "raw_combat_context",
+        },
+        {
+            "captured_utc": "2026-07-10T03:28:45.1013226Z",
+            "sequence": 4771,
+            "length": 38,
+            "message_type": "Attack",
+            "raw_hex": "133D000A0001002600000DB97944C065284940700000C3507954512E000000C350794D806200",
+            "source": "(SimpleChar:7954512E)",
+            "target": "(SimpleChar:794D8062)",
+            "evidence_kind": "combat_as_source",
+        },
+    )
+}
+
 CSV_SCHEMAS: dict[str, set[str]] = {
     "raw-packets.csv": {
         "CapturedUtc",
@@ -589,6 +614,7 @@ class CaptureAnalyzer:
         self.scope_index = IdentityScopeIndex()
         self.identity_metadata: dict[str, IdentityMetadata] = defaultdict(IdentityMetadata)
         self.vendor_owner_ids: set[str] = set()
+        self.player_ids: set[str] = set()
         self.records: dict[tuple[str, ...], EvidenceRecord] = {}
         self.artifact_status: dict[str, str] = {}
         self.artifact_rows: dict[str, int] = {}
@@ -677,6 +703,11 @@ class CaptureAnalyzer:
 
     def _subject_kind(self, identity: str, role: object = "") -> str:
         parsed_role = string_value(role).lower()
+        # A complete SCFU PlayerInfo discriminator is stronger than the
+        # capture-side combat/dossier role heuristic.  In particular, other
+        # players fighting Subway NPCs were historically projected as enemies.
+        if identity in self.player_ids:
+            return "player"
         if parsed_role in {"enemy", "player", "pet", "corpse", "vendor"}:
             return "vendor_npc" if parsed_role == "vendor" else parsed_role
         if identity in self.vendor_owner_ids:
@@ -688,6 +719,15 @@ class CaptureAnalyzer:
         if identity.startswith("(Door:"):
             return "door"
         return "enemy"
+
+    def _preclassify_scfu_identities(self) -> None:
+        rows, _, _, _ = self._read_projection_csv("scfu-appearance.csv")
+        for row in rows:
+            if string_value(row.get("CharacterInfoType")).lower() != "playerinfo":
+                continue
+            identity = normalize_identity(row.get("Identity"))
+            if identity:
+                self.player_ids.add(identity)
 
     def _record(
         self,
@@ -887,7 +927,9 @@ class CaptureAnalyzer:
             self.scope_index.register(identity, scope)
             self._metadata(identity, row.get("Name"), row.get("MonsterData"), row.get("Level"))
             owner = normalize_identity(row.get("Owner"))
-            kind = "pet" if owner else self._subject_kind(identity)
+            kind = self._subject_kind(identity)
+            if owner and kind != "player":
+                kind = "pet"
             record = self._record(
                 subject_kind=kind,
                 subject_identity=identity,
@@ -897,28 +939,31 @@ class CaptureAnalyzer:
                 source_schema=schema,
                 explicit_scope=scope,
             )
+            observation = {
+                "decode_status": decode_status,
+                "fully_consumed": fully_consumed,
+                "health": integer_value(row.get("Health")),
+                "monster_scale": integer_value(row.get("MonsterScale")),
+                "npc_family": integer_value(row.get("NpcFamily")),
+                "los_height": integer_value(row.get("NpcLosHeight")),
+                "appearance": integer_value(row.get("AppearanceValue")),
+                "breed": row.get("Breed"),
+                "gender": row.get("Gender"),
+                "race": row.get("Race"),
+                "head_mesh": integer_value(row.get("HeadMesh")),
+                "run_speed": integer_value(row.get("RunSpeedBase")),
+                "active_nanos": row.get("ActiveNanos"),
+                "textures": row.get("Textures"),
+                "meshes": row.get("Meshes"),
+            }
+            if string_value(row.get("CharacterInfoType")).lower() == "playerinfo":
+                observation["character_info_type"] = row.get("CharacterInfoType")
             record.add(
                 name=row.get("Name"),
                 monster_data=row.get("MonsterData"),
                 level=row.get("Level"),
                 timestamps=(row.get("CapturedUtc"),),
-                observation={
-                    "decode_status": decode_status,
-                    "fully_consumed": fully_consumed,
-                    "health": integer_value(row.get("Health")),
-                    "monster_scale": integer_value(row.get("MonsterScale")),
-                    "npc_family": integer_value(row.get("NpcFamily")),
-                    "los_height": integer_value(row.get("NpcLosHeight")),
-                    "appearance": integer_value(row.get("AppearanceValue")),
-                    "breed": row.get("Breed"),
-                    "gender": row.get("Gender"),
-                    "race": row.get("Race"),
-                    "head_mesh": integer_value(row.get("HeadMesh")),
-                    "run_speed": integer_value(row.get("RunSpeedBase")),
-                    "active_nanos": row.get("ActiveNanos"),
-                    "textures": row.get("Textures"),
-                    "meshes": row.get("Meshes"),
-                },
+                observation=observation,
                 issue="projection-pending" if projection_pending else "",
             )
             if decode_incomplete:
@@ -978,9 +1023,12 @@ class CaptureAnalyzer:
 
     def _parse_combat(self) -> None:
         rows, schema = self._read_csv("enemy-combat.csv")
+        derived_source_keys = set()
         for row in rows:
             source = normalize_identity(row.get("SourceIdentity"))
             target = normalize_identity(row.get("TargetIdentity"))
+            if source:
+                derived_source_keys.add((source, string_value(row.get("MessageType"))))
             common = {
                 "message_type": row.get("MessageType"),
                 "action": row.get("Action"),
@@ -1023,7 +1071,66 @@ class CaptureAnalyzer:
                         "target_role": row.get("TargetRole"),
                     },
                 )
+        self._parse_reviewed_raw_combat_fallbacks(derived_source_keys)
 
+    def _parse_reviewed_raw_combat_fallbacks(
+        self, derived_source_keys: set[tuple[str, str]]
+    ) -> None:
+        reviewed = REVIEWED_RAW_COMBAT_FALLBACKS.get(self.capture_id, ())
+        if not reviewed:
+            return
+        path = self.path / "packets.hex.log"
+        if not path.exists():
+            return
+        try:
+            raw_lines = set(path.read_text(encoding="utf-8-sig").splitlines())
+        except OSError:
+            return
+
+        for packet in reviewed:
+            source = packet["source"]
+            metadata = self.identity_metadata.get(source)
+            if (
+                metadata is None
+                or "Strike Foreman" not in metadata.names
+                or 203744 not in metadata.monster_data
+                or 19 not in metadata.levels
+            ):
+                continue
+            derived_key = (source, packet["message_type"])
+            if derived_key in derived_source_keys:
+                continue
+            expected_line = (
+                f"{packet['captured_utc']} IN #{packet['sequence']} "
+                f"len={packet['length']} n3={packet['message_type']} "
+                f"hex={packet['raw_hex']}"
+            )
+            if expected_line not in raw_lines:
+                continue
+
+            target = packet["target"]
+            record = self._record(
+                subject_kind="enemy",
+                subject_identity=source,
+                related_identity=target,
+                evidence_kind=packet["evidence_kind"],
+                source_artifact="packets.hex.log",
+                source_schema="reviewed-raw-combat-v1",
+            )
+            record.add(
+                timestamps=(packet["captured_utc"],),
+                observation={
+                    "message_type": packet["message_type"],
+                    "packet_sequence": packet["sequence"],
+                    "packet_length": packet["length"],
+                    "packet_sha256": hashlib.sha256(
+                        expected_line.encode("utf-8")
+                    ).hexdigest(),
+                    "source_role": "enemy",
+                    "target_role": "pet" if target else "",
+                    "damage_unresolved": True,
+                },
+            )
     def _parse_movement(self) -> None:
         rows, schema = self._read_csv("enemy-movement.csv")
         for row in rows:
@@ -1178,19 +1285,29 @@ class CaptureAnalyzer:
             primary = normalize_identity(row.get("PrimaryIdentity"))
             related = normalize_identity(row.get("RelatedIdentity"))
             phase = string_value(row.get("Phase")).lower() or "unknown"
+            detail = string_value(row.get("Detail"))
+            detail_lower = detail.lower()
+            detail_role = ""
+            if "player=true" in detail_lower:
+                detail_role = "player"
+            elif "pet=true" in detail_lower:
+                detail_role = "pet"
             self._metadata(primary, row.get("Name"))
             record = self._record(
-                subject_kind=self._subject_kind(primary),
+                subject_kind=self._subject_kind(primary, detail_role),
                 subject_identity=primary,
                 related_identity=related,
                 evidence_kind="lifecycle_" + phase.replace(" ", "_"),
                 source_artifact="npc-lifecycle.csv",
                 source_schema=schema,
             )
+            observation = {"message_type": row.get("MessageType")}
+            if detail_role:
+                observation["dynel_role"] = detail_role
             record.add(
                 name=row.get("Name"),
                 timestamps=(row.get("CapturedUtc"),),
-                observation={"message_type": row.get("MessageType")},
+                observation=observation,
             )
 
     def _parse_respawns(self) -> None:
@@ -1498,6 +1615,7 @@ class CaptureAnalyzer:
 
     def analyze(self) -> list[EvidenceRecord]:
         self._parse_vendors()
+        self._preclassify_scfu_identities()
         self._parse_dossier()
         self._parse_character_updates()
         self._parse_state_and_stats()
