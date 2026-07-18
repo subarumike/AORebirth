@@ -240,7 +240,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .SelectMany(value => provider.GetCorpseEvidence(value))
                 .ToArray();
 
-            Assert.AreEqual(298, evidence.Length);
+            Assert.AreEqual(299, evidence.Length);
             Assert.AreEqual(26, evidence.Select(value => value.MonsterData).Distinct().Count());
             CollectionAssert.AreEqual(
                 new[]
@@ -253,7 +253,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         "20260712-232137:5",
                         "20260716-034104:1",
                         "20260716-221358:2",
-                        "20260716-222007:3",
+                        "20260716-222007:4",
                         "20260716-222201:2"
                     },
                 evidence
@@ -845,6 +845,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Incomplete Rebuild",
                 5921,
                 "17:105:105:1",
+                "18:111:111:1",
                 "19:118:118:3",
                 "21:131:131:2");
             AssertCorpseAndLevelCredits(
@@ -1297,6 +1298,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CollectionAssert.AreEqual(
                 expectedRules,
                 profile.Loot.LevelCreditRules
+                    .Where(value => value.EvidenceState == OrdinaryEnemyEvidenceState.Observed)
                     .Select(
                         value => string.Format(
                             "{0}:{1}:{2}:{3}",
