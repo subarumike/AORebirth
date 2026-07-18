@@ -1,0 +1,147 @@
+{
+  "Identity": {
+    "Id": "subway-windcaller-karrec-dialogue-20260717-223626",
+    "Version": "capture-backed-1",
+    "Source": "docs/evidence/WINDCALLER_KARREC_SUBWAY_ENTRANCE_QUEST_20260717_223626.md"
+  },
+  "SourceCaptures": [
+    "20260717-223626"
+  ],
+  "Npcs": [
+    {
+      "Id": "windcaller_karrec_796360BB",
+      "NpcIdentity": "SimpleChar:796360BB",
+      "Name": "Windcaller Karrec",
+      "RootNodeId": "karrec_223626_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "karrec_223626_001",
+          "PromptText": "Greetings, traveller. My name is Karrec.\nWould you spare a moment of your precious time?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            { "Id": "karrec_001_0", "Index": 0, "Text": "You can have a moment, but no more.", "TextEvidence": "20260717-223626", "NextNodeId": "karrec_223626_002", "Conditions": [], "Actions": [] },
+            { "Id": "karrec_001_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "karrec_223626_002",
+          "PromptText": "I am but a humble servant carrying out his duties. But even servants need food once in a while...",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            { "Id": "karrec_002_0", "Index": 0, "Text": "So, you want food?", "TextEvidence": "20260717-223626", "NextNodeId": "karrec_223626_003", "Conditions": [], "Actions": [] },
+            { "Id": "karrec_002_1", "Index": 1, "Text": "A servant?", "TextEvidence": "20260717-223626-unselected", "NextNodeId": "close", "Conditions": [], "Actions": [] },
+            { "Id": "karrec_002_2", "Index": 2, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "karrec_223626_003",
+          "PromptText": "Yes, and of course any spare change...",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            { "Id": "karrec_003_0", "Index": 0, "Text": "What will I get out of this?", "TextEvidence": "20260717-223626", "NextNodeId": "karrec_223626_004", "Conditions": [], "Actions": [] },
+            { "Id": "karrec_003_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "karrec_223626_004",
+          "PromptText": "I shall grant you access to the Temple of the Three Winds.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            { "Id": "karrec_004_0", "Index": 0, "Text": "Fine, tell me what to do.", "TextEvidence": "20260717-223626", "NextNodeId": "karrec_223626_005", "Conditions": [], "Actions": [] },
+            { "Id": "karrec_004_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "karrec_223626_005",
+          "PromptText": "There is an annoying man that always eats his bronto burger in front of me.. You must find him and take his burger.\nSecondly, the rich old woman Maddy Cardile never donated any money to our cause. Force her to do so.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            { "Id": "karrec_005_0", "Index": 0, "Text": "I'll do it...", "TextEvidence": "20260717-223626", "NextNodeId": "karrec_223626_006", "Conditions": [], "Actions": [] },
+            { "Id": "karrec_005_1", "Index": 1, "Text": "You are a scum, I will never help you.", "TextEvidence": "20260717-223626-unselected", "NextNodeId": "close", "Conditions": [], "Actions": [] },
+            { "Id": "karrec_005_2", "Index": 2, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "karrec_223626_006",
+          "PromptText": "Good, good. You know where to find me when you are done.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            { "Id": "karrec_006_0", "Index": 0, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "karrec_223626_return_offer",
+          "PromptText": null,
+          "PromptTextConfidence": "no-append-text-observed",
+          "Options": [
+            { "Id": "karrec_return_0", "Index": 0, "Text": "I have the bronto burger and a donation to your temple", "TextEvidence": "20260717-223626", "NextNodeId": "karrec_223626_return_trade", "Conditions": [], "Actions": [] },
+            { "Id": "karrec_return_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "karrec_223626_return_trade",
+          "PromptText": "Give it to me!",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            { "Id": "karrec_trade_0", "Index": 0, "Text": "Thank you, Karrec.", "TextEvidence": "20260717-223626", "NextNodeId": "karrec_223626_return_thanks", "Conditions": [], "Actions": [] },
+            { "Id": "karrec_trade_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "karrec_223626_return_thanks",
+          "PromptText": null,
+          "PromptTextConfidence": "no-append-text-observed",
+          "Options": [
+            { "Id": "karrec_thanks_0", "Index": 0, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] }
+          ],
+          "EnterActions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": []
+    },
+    {
+      "Id": "annoying_dude_796360BD",
+      "NpcIdentity": "SimpleChar:796360BD",
+      "Name": "Annoying Dude",
+      "RootNodeId": "annoying_223626_001",
+      "Aliases": [],
+      "Nodes": [
+        { "Id": "annoying_223626_001", "PromptText": "Yo!", "PromptTextConfidence": "captured-exact", "Options": [ { "Id": "annoying_001_0", "Index": 0, "Text": "I'm here to make sure you don't bother Karrec again.", "TextEvidence": "20260717-223626", "NextNodeId": "annoying_223626_002", "Conditions": [], "Actions": [] }, { "Id": "annoying_001_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] } ], "EnterActions": [] },
+        { "Id": "annoying_223626_002", "PromptText": "I would never do such thing!", "PromptTextConfidence": "captured-exact", "Options": [ { "Id": "annoying_002_0", "Index": 0, "Text": "Enough lies, hand me your burger.", "TextEvidence": "20260717-223626", "NextNodeId": "annoying_223626_003", "Conditions": [], "Actions": [] }, { "Id": "annoying_002_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] } ], "EnterActions": [] },
+        { "Id": "annoying_223626_003", "PromptText": "You are nuts, come on! I'm hungry.", "PromptTextConfidence": "captured-exact", "Options": [ { "Id": "annoying_003_0", "Index": 0, "Text": "I will count to three...", "TextEvidence": "20260717-223626", "NextNodeId": "annoying_223626_004", "Conditions": [], "Actions": [] }, { "Id": "annoying_003_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] } ], "EnterActions": [] },
+        { "Id": "annoying_223626_004", "PromptText": "You will not have my burger!", "PromptTextConfidence": "captured-exact", "Options": [ { "Id": "annoying_004_0", "Index": 0, "Text": "1...", "TextEvidence": "20260717-223626", "NextNodeId": "annoying_223626_005", "Conditions": [], "Actions": [] }, { "Id": "annoying_004_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] } ], "EnterActions": [] },
+        { "Id": "annoying_223626_005", "PromptText": "I'm sure we can arrange some sort of agreement?", "PromptTextConfidence": "captured-exact", "Options": [ { "Id": "annoying_005_0", "Index": 0, "Text": "2...", "TextEvidence": "20260717-223626", "NextNodeId": "annoying_223626_006", "Conditions": [], "Actions": [] }, { "Id": "annoying_005_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] } ], "EnterActions": [] },
+        { "Id": "annoying_223626_006", "PromptText": "Come on, I'm skinny I need the calories...", "PromptTextConfidence": "captured-exact", "Options": [ { "Id": "annoying_006_0", "Index": 0, "Text": "3!", "TextEvidence": "20260717-223626", "NextNodeId": "annoying_223626_007", "Conditions": [], "Actions": [] }, { "Id": "annoying_006_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] } ], "EnterActions": [] },
+        { "Id": "annoying_223626_007", "PromptText": "Ok, ok, ok! Take it, it didn't taste that good anyway. Just leave me alone!", "PromptTextConfidence": "captured-exact", "Options": [ { "Id": "annoying_007_0", "Index": 0, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] } ], "EnterActions": [] }
+      ],
+      "Conditions": [],
+      "Actions": []
+    },
+    {
+      "Id": "maddy_cardile_796360BC",
+      "NpcIdentity": "SimpleChar:796360BC",
+      "Name": "Maddy Cardile",
+      "RootNodeId": "maddy_223626_001",
+      "Aliases": [],
+      "Nodes": [
+        { "Id": "maddy_223626_001", "PromptText": "Hello there, young one.", "PromptTextConfidence": "captured-exact", "Options": [ { "Id": "maddy_001_0", "Index": 0, "Text": "I heard you have not donated any money to Karrec's cause.", "TextEvidence": "20260717-223626", "NextNodeId": "maddy_223626_002", "Conditions": [], "Actions": [] }, { "Id": "maddy_001_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] } ], "EnterActions": [] },
+        { "Id": "maddy_223626_002", "PromptText": "You should not mingle with people like him, child.", "PromptTextConfidence": "captured-exact", "Options": [ { "Id": "maddy_002_0", "Index": 0, "Text": "I am here to collect your donation. Who I mingle with is not your business.", "TextEvidence": "20260717-223626", "NextNodeId": "maddy_223626_003", "Conditions": [], "Actions": [] }, { "Id": "maddy_002_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] } ], "EnterActions": [] },
+        { "Id": "maddy_223626_003", "PromptText": "Well, now. You are one of those. I don't have the time or patience to deal with you. Get lost before I tell one of the peacekeepers what you are up to.", "PromptTextConfidence": "captured-exact", "Options": [ { "Id": "maddy_003_0", "Index": 0, "Text": "I kick peacekeeper butt for fun. Tell them and I will show you!", "TextEvidence": "20260717-223626", "NextNodeId": "maddy_223626_004", "Conditions": [], "Actions": [] }, { "Id": "maddy_003_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] } ], "EnterActions": [] },
+        { "Id": "maddy_223626_004", "PromptText": "I'm disappointed in you, child. I will give you my credit card if you leave me alone. Money is not worth risking anyone's life for. Not even yours.", "PromptTextConfidence": "captured-exact", "Options": [ { "Id": "maddy_004_0", "Index": 0, "Text": "I knew you would come to your senses, old woman.", "TextEvidence": "20260717-223626", "NextNodeId": "maddy_223626_005", "Conditions": [], "Actions": [] }, { "Id": "maddy_004_1", "Index": 1, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] } ], "EnterActions": [] },
+        { "Id": "maddy_223626_005", "PromptText": "Leave now, before I change my mind.", "PromptTextConfidence": "captured-exact", "Options": [ { "Id": "maddy_005_0", "Index": 0, "Text": "Goodbye", "TextEvidence": "20260717-223626", "NextNodeId": "close", "Conditions": [], "Actions": [] } ], "EnterActions": [] }
+      ],
+      "Conditions": [],
+      "Actions": []
+    }
+  ]
+}

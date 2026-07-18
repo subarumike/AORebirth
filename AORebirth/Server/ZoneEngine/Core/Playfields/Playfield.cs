@@ -738,6 +738,16 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void Teleport(Dynel dynel, Coordinate destination, IQuaternion heading, Identity playfield)
         {
+            this.Teleport(dynel, destination, heading, playfield, null);
+        }
+
+        internal void Teleport(
+            Dynel dynel,
+            Coordinate destination,
+            IQuaternion heading,
+            Identity playfield,
+            Action<ICharacter> sendTeleportPacket)
+        {
             // Prevent client from entering this again
             if (dynel.DoNotDoTimers)
             {
@@ -757,11 +767,22 @@ namespace AORebirth.Core.Playfields
                 this.ClearPlayfieldTransferContactState,
                 DisableTimersForPlayfieldTransfer,
                 CapturePlayfieldTransferEnterZoningPhase,
-                () => TeleportMessageHandler.Default.Send(
-                    dynel as ICharacter,
-                    destination.coordinate,
-                    (Vector.Quaternion)heading,
-                    playfield),
+                () =>
+                    {
+                        ICharacter character = dynel as ICharacter;
+                        if (sendTeleportPacket == null)
+                        {
+                            TeleportMessageHandler.Default.Send(
+                                character,
+                                destination.coordinate,
+                                (Vector.Quaternion)heading,
+                                playfield);
+                        }
+                        else
+                        {
+                            sendTeleportPacket(character);
+                        }
+                    },
                 this.AnnouncePlayfieldTransferDespawn,
                 ApplyPlayfieldTransferState,
                 CapturePlayfieldTransferClient,

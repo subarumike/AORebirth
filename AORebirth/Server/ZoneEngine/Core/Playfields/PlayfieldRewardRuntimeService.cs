@@ -6,6 +6,8 @@ namespace AORebirth.Core.Playfields
 
     using AORebirth.Core.Entities;
 
+    using ZoneEngine.Core.Arete.Quests;
+
     #endregion
 
     internal sealed class PlayfieldRewardRuntimeService
@@ -24,6 +26,8 @@ namespace AORebirth.Core.Playfields
             {
                 awardCombatXp(attacker, target);
             }
+
+            RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);
         }
     }
 }

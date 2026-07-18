@@ -59,6 +59,7 @@ namespace ZoneEngine.Core
 
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Playfields;
 
     using IBus = MemBus.IBus;
@@ -259,6 +260,7 @@ namespace ZoneEngine.Core
                 throw new Exception("Character " + charId + " not found.");
             }
 
+            bool isZoningReload = this.SessionLifecycle.Phase == ZoneClientSessionPhase.Zoning;
             this.SessionLifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();
 
             // TODO: Save playfield type into Character table and use it accordingly
@@ -303,6 +305,19 @@ namespace ZoneEngine.Core
             this.Controller.Character.Playfield = pf;
             this.Playfield = pf;
             this.Controller.Character.Stats.Read();
+            if (pooledCharacter == null)
+            {
+                MissionRuntime.ReloadForLogin(charId);
+            }
+            else if (isZoningReload)
+            {
+                MissionRuntime.ReloadForZoning(charId);
+            }
+            else
+            {
+                MissionRuntime.ReloadForReconnect(charId);
+            }
+
             ActiveNanoRuntimeService.Default.TryRestoreZoneTransferStats(this.Controller.Character);
             this.controller.Character.Stats[StatIds.visualprofession].BaseValue = (uint)this.controller.Character.Stats[StatIds.profession].Value;
         }
