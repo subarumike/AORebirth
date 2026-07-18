@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
+import json
 import math
 import os
 import re
@@ -180,12 +182,13 @@ WORKMAN_STRIKER_EMPTY_INVENTORY_GENERATIONS = (
     ),
 )
 
-# These older captures predate corpse-loot-observations.csv.  Each reviewed
-# generation is pinned to one exact CorpseFullUpdate identity and the first
-# raw corpse InventoryUpdate before that corpse identity is reused.  Empty
-# packets are first-class denominator evidence; unopened and snapshot-only
-# corpses never enter this table.  The resulting basis points are private
-# existing-capture policy, not an official-live probability claim.
+# Each reviewed generation is pinned to one exact CorpseFullUpdate identity
+# and the first raw corpse InventoryUpdate before that corpse identity is
+# reused.  This applies equally to legacy captures and newer captures that
+# also emitted derived corpse-loot observations.  Empty packets are
+# first-class denominator evidence; unopened and snapshot-only corpses never
+# enter this table.  The resulting basis points are private existing-capture
+# policy, not an official-live probability claim.
 REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS = {
     "Shadow": {
         "monster_data": 30464,
@@ -297,6 +300,315 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS = {
         ),
     },
 }
+
+
+def reviewed_strict_loot_definition(
+    monster_data: int,
+    captures: tuple[str, ...],
+    capture_allocations: dict[str, int],
+    opened: int,
+    positive: int,
+    empty: int,
+    generation_digest: str,
+    item_counts: dict[tuple[int, int, int], int],
+    overlap: tuple[str, str, int] | None = None,
+) -> dict[str, object]:
+    return {
+        "monster_data": monster_data,
+        "captures": captures,
+        "capture_allocations": Counter(capture_allocations),
+        "opened": opened,
+        "positive": positive,
+        "empty": empty,
+        "overlap": overlap,
+        "item_counts": Counter(item_counts),
+        "generation_digest": generation_digest,
+    }
+
+
+REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.update(
+    {
+        "Mugger": reviewed_strict_loot_definition(
+            203734,
+            (
+                "20260708-143600",
+                "20260709-205921",
+                "20260709-210452",
+                "20260709-212336",
+                "20260710-202132",
+            ),
+            {
+                "20260708-143600": 6,
+                "20260709-205921": 1,
+                "20260709-210452": 5,
+                "20260709-212336": 4,
+                "20260710-202132": 1,
+            },
+            17,
+            14,
+            3,
+            "18c7678d6b6b3f31f76d87d55316a9dc32c554d7b37f18ef7416858082f3b5fc",
+            {
+                (25822, 25831, 5): 1,
+                (85711, 22014, 8): 1,
+                (123704, 123705, 9): 1,
+                (123723, 123724, 6): 1,
+                (123976, 123977, 9): 1,
+                (124348, 124349, 7): 1,
+                (124545, 124546, 10): 1,
+                (128636, 128637, 8): 1,
+                (128839, 128840, 9): 1,
+                (130060, 130061, 5): 1,
+                (130060, 130061, 9): 1,
+                (131605, 131606, 7): 1,
+                (136638, 136639, 9): 1,
+                (136638, 136639, 12): 1,
+                (136640, 136641, 7): 1,
+                (136640, 136641, 8): 1,
+                (136640, 136641, 9): 1,
+                (136646, 136647, 9): 1,
+                (160224, 160225, 10): 1,
+                (234875, 234875, 1): 2,
+                (234876, 234876, 1): 1,
+            },
+            ("20260709-212115", "20260709-212336", 7),
+        ),
+        "Discarded Pet": reviewed_strict_loot_definition(
+            17720,
+            ("20260708-143600", "20260709-210452"),
+            {"20260708-143600": 13, "20260709-210452": 3},
+            16,
+            13,
+            3,
+            "7a038d4800544dd8f29f108bba8fb7f35f945abbdf6b84dc5a82373de4831aa6",
+            {
+                (101681, 101682, 7): 1,
+                (102283, 102284, 9): 1,
+                (103973, 103974, 10): 1,
+                (106005, 106006, 11): 1,
+                (107283, 107284, 10): 1,
+                (109520, 109521, 7): 1,
+                (111623, 111624, 8): 1,
+                (112160, 112161, 6): 1,
+                (112798, 112799, 6): 1,
+                (234874, 234874, 1): 3,
+                (234876, 234876, 1): 3,
+                (234877, 234877, 1): 1,
+                (290619, 202727, 9): 1,
+            },
+        ),
+        "Stim Fiend": reviewed_strict_loot_definition(
+            203739,
+            ("20260708-143600", "20260709-210452", "20260709-212336"),
+            {
+                "20260708-143600": 6,
+                "20260709-210452": 6,
+                "20260709-212336": 1,
+            },
+            13,
+            13,
+            0,
+            "f2e9afd7eefb65b8c7b1e33103d08f7ff876f44b8e1421561259f1b02d96edb1",
+            {
+                (102055, 102056, 11): 1,
+                (112232, 112233, 11): 1,
+                (234874, 234874, 1): 1,
+                (234876, 234876, 1): 1,
+                (234877, 234877, 1): 1,
+                (291043, 291044, 9): 6,
+                (291043, 291044, 10): 2,
+                (291043, 291044, 11): 1,
+                (291043, 291044, 12): 2,
+                (291043, 291044, 13): 1,
+                (291043, 291044, 15): 1,
+                (291082, 291083, 9): 6,
+                (291082, 291083, 10): 2,
+                (291082, 291083, 11): 1,
+                (291082, 291083, 12): 2,
+                (291082, 291083, 13): 1,
+                (291082, 291083, 15): 1,
+            },
+            ("20260709-212115", "20260709-212336", 2),
+        ),
+        "Looter": reviewed_strict_loot_definition(
+            203745,
+            ("20260708-143600", "20260709-210452"),
+            {"20260708-143600": 6, "20260709-210452": 5},
+            11,
+            6,
+            5,
+            "e33606057496b305707490580c6c2628f83092eb8529ee817a67d83e04aa13cb",
+            {
+                (21605, 21605, 1): 1,
+                (85501, 22343, 12): 1,
+                (124422, 124422, 12): 1,
+                (144082, 144083, 7): 1,
+                (234874, 234874, 1): 1,
+                (234875, 234875, 1): 1,
+                (234877, 234877, 1): 1,
+                (301713, 301713, 1): 1,
+                (301714, 301714, 1): 1,
+            },
+        ),
+        "Violent Vagabond": reviewed_strict_loot_definition(
+            203733,
+            ("20260708-143600", "20260709-210452", "20260709-225408"),
+            {
+                "20260708-143600": 6,
+                "20260709-210452": 4,
+                "20260709-225408": 1,
+            },
+            11,
+            10,
+            1,
+            "33efb5b56c8c9120aff3a3f718a3e944d5c42410415f91c1a6e76f0a6a90ae12",
+            {
+                (85531, 22289, 8): 1,
+                (122140, 122141, 7): 1,
+                (123704, 123705, 12): 1,
+                (128715, 128716, 6): 1,
+                (130586, 130586, 1): 4,
+                (130592, 130592, 1): 2,
+                (130621, 130621, 1): 1,
+                (152326, 152327, 6): 1,
+                (234876, 234876, 1): 1,
+                (258543, 258543, 1): 7,
+                (273381, 204397, 8): 1,
+            },
+        ),
+        "Bloodcreeper": reviewed_strict_loot_definition(
+            30379,
+            (
+                "20260716-033326",
+                "20260716-034104",
+                "20260716-221358",
+                "20260717-214751",
+            ),
+            {
+                "20260716-033326": 1,
+                "20260716-034104": 1,
+                "20260716-221358": 1,
+                "20260717-214751": 1,
+            },
+            4,
+            1,
+            3,
+            "0920f73b01e6961b8be84945307a8a36c9b2546ed1efef302b0cf9e0e0365d51",
+            {(42640, 42641, 30): 1},
+        ),
+        "Infected Attendant": reviewed_strict_loot_definition(
+            96056,
+            ("20260709-220439", "20260709-225408"),
+            {"20260709-220439": 3, "20260709-225408": 1},
+            4,
+            3,
+            1,
+            "ca54bf62cea4862f6b0255d0525d200f18cb120fc0fda4a3e853076aa048870b",
+            {
+                (101695, 101696, 24): 1,
+                (109194, 109195, 12): 1,
+                (112823, 112824, 17): 1,
+                (234875, 234875, 1): 1,
+                (290619, 202727, 12): 1,
+            },
+        ),
+        "Fragmented Soul": reviewed_strict_loot_definition(
+            203729,
+            ("20260709-225408",),
+            {"20260709-225408": 4},
+            4,
+            4,
+            0,
+            "b659cb5707c6616b644993e3bf43a0ad6457bb328779931f9b208f114d6e395f",
+            {
+                (26471, 26471, 14): 3,
+                (85691, 22004, 18): 1,
+                (85732, 21963, 17): 1,
+                (124304, 124305, 17): 1,
+                (234877, 234877, 1): 2,
+                (301712, 301712, 1): 1,
+            },
+        ),
+        "Deranged Shopper": reviewed_strict_loot_definition(
+            203736,
+            ("20260708-143600", "20260709-210452"),
+            {"20260708-143600": 1, "20260709-210452": 1},
+            2,
+            2,
+            0,
+            "b8b38b0fc4613cb3bcabaa811388e980b8ca63eb5480d4a37900d8959286c7c5",
+            {(123019, 123020, 6): 1, (124465, 124466, 10): 1},
+        ),
+        "Incomplete Rebuild": reviewed_strict_loot_definition(
+            203728,
+            ("20260709-225408", "20260710-211430"),
+            {"20260709-225408": 1, "20260710-211430": 1},
+            2,
+            2,
+            0,
+            "b6c9f072d13195abb684afcf77bd53dabce096fb3c59300720c6ada86edc2c10",
+            {(26503, 26503, 14): 1, (142817, 142818, 16): 1},
+        ),
+        "Redundant Scan": reviewed_strict_loot_definition(
+            204178,
+            ("20260709-225408", "20260716-222201"),
+            {"20260709-225408": 1, "20260716-222201": 1},
+            2,
+            1,
+            1,
+            "b7acb4c6b6e02c366e496f47581d3c2cb433bd5e673d24637ef76ab73e22a6b1",
+            {(27263, 27263, 10): 1},
+        ),
+        "Uncontrollable Anger": reviewed_strict_loot_definition(
+            96195,
+            ("20260709-225408", "20260710-211430"),
+            {"20260709-225408": 1, "20260710-211430": 1},
+            2,
+            2,
+            0,
+            "d6cb96590fc22adab7cffc3e90ac137cb9acc16697c3f32a45a44d4d20d3540e",
+            {
+                (101809, 101810, 24): 1,
+                (109366, 109367, 9): 1,
+                (290619, 202727, 19): 1,
+            },
+        ),
+        "Lost Thought": reviewed_strict_loot_definition(
+            96193,
+            ("20260709-225408",),
+            {"20260709-225408": 1},
+            1,
+            1,
+            0,
+            "6b2e02b3c2587fdfebf627159930d52fbd2e66855f6c173e6569e8aba2dd20ad",
+            {(101675, 101676, 25): 1},
+        ),
+        "Neural Burnout": reviewed_strict_loot_definition(
+            203730,
+            (
+                "20260709-225408",
+                "20260710-211430",
+                "20260716-034104",
+                "20260716-221358",
+            ),
+            {
+                "20260709-225408": 1,
+                "20260710-211430": 1,
+                "20260716-034104": 1,
+                "20260716-221358": 1,
+            },
+            4,
+            2,
+            2,
+            "10fd92c4c311009c7f4fcc8e605fa63b2e95c414efd78d743373cddf8d819c17",
+            {
+                (26471, 26471, 14): 1,
+                (123021, 123021, 21): 1,
+                (124560, 124561, 16): 1,
+            },
+        ),
+    }
+)
 CAPTURE_CORPSE_EVIDENCE_FILTERS = {
     "20260708-004038": frozenset(("Filth Flea", "Thief")),
     "20260708-143600": frozenset(
@@ -1515,7 +1827,7 @@ def reviewed_legacy_strict_open_generations() -> dict[str, list[dict[str, object
                     }
                 )
 
-        actual_fingerprints = Counter(
+        actual_fingerprints = sorted(
             (
                 row["capture"],
                 row["cfuCapturedUtc"],
@@ -1527,10 +1839,31 @@ def reviewed_legacy_strict_open_generations() -> dict[str, list[dict[str, object
             )
             for row in observed
         )
-        expected_fingerprints = Counter(definition["generations"])
-        if actual_fingerprints != expected_fingerprints:
+        if "generations" in definition:
+            generations_match = Counter(actual_fingerprints) == Counter(
+                definition["generations"]
+            )
+        else:
+            actual_digest = hashlib.sha256(
+                json.dumps(
+                    actual_fingerprints,
+                    ensure_ascii=True,
+                    separators=(",", ":"),
+                ).encode("utf-8")
+            ).hexdigest()
+            generations_match = actual_digest == definition["generation_digest"]
+        if not generations_match:
             raise ValueError(
                 f"Reviewed legacy strict-open generation evidence drifted: {name}"
+            )
+        expected_capture_allocations = definition.get("capture_allocations")
+        if (
+            expected_capture_allocations is not None
+            and Counter(row["capture"] for row in observed)
+            != expected_capture_allocations
+        ):
+            raise ValueError(
+                f"Reviewed legacy strict-open capture allocation drifted: {name}"
             )
         positive = sum(bool(row["items"]) for row in observed)
         empty = len(observed) - positive
@@ -1581,6 +1914,7 @@ def loot_profiles() -> dict[str, list[dict[str, int]]]:
                 row.get("InitialSnapshot", "").lower() != "true"
                 or not row.get("CorrelationStatus", "").startswith("linked-")
                 or name not in ARCHETYPES
+                or name in REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS
                 or not capture_allows_archetype(capture, name)
             ):
                 continue
@@ -1656,6 +1990,51 @@ def loot_profiles() -> dict[str, list[dict[str, int]]]:
                 }
             )
     return mapped
+
+
+def strict_loot_profile_summaries(
+    loot: dict[str, list[dict[str, int]]],
+) -> list[dict[str, object]]:
+    summaries = []
+    for name, definition in REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.items():
+        opened = int(definition["opened"])
+        entries = loot.get(name, [])
+        if not entries or any(int(entry["corpses"]) != opened for entry in entries):
+            raise ValueError(f"Reviewed strict-loot generated entries drifted: {name}")
+        summaries.append(
+            {
+                "name": name,
+                "monsterData": int(definition["monster_data"]),
+                "opened": opened,
+                "positive": int(definition["positive"]),
+                "empty": int(definition["empty"]),
+                "itemPoolComplete": False,
+                "captures": tuple(definition["captures"]),
+                "entries": entries,
+            }
+        )
+
+    workman_entries = loot.get("Workman Striker", [])
+    if not workman_entries or any(
+        int(entry["corpses"]) != WORKMAN_STRIKER_STRICT_OPENED_CORPSES
+        for entry in workman_entries
+    ):
+        raise ValueError("Workman Striker strict-loot generated entries drifted")
+    summaries.append(
+        {
+            "name": "Workman Striker",
+            "monsterData": 203854,
+            "opened": WORKMAN_STRIKER_STRICT_OPENED_CORPSES,
+            "positive": WORKMAN_STRIKER_STRICT_POSITIVE_CORPSES,
+            "empty": WORKMAN_STRIKER_STRICT_EMPTY_CORPSES,
+            "itemPoolComplete": False,
+            "captures": tuple(sorted(WORKMAN_STRIKER_STRICT_LOOT_CAPTURES)),
+            "entries": workman_entries,
+        }
+    )
+    if len({int(summary["monsterData"]) for summary in summaries}) != len(summaries):
+        raise ValueError("Reviewed strict-loot MonsterData keys are not unique")
+    return sorted(summaries, key=lambda value: (int(value["monsterData"]), value["name"]))
 
 
 def normalize_identity(value: str) -> str:
@@ -2156,6 +2535,51 @@ def loot_outcome_definition(item: dict[str, object]) -> str:
     )
 
 
+def strict_loot_profile_definition(
+    summary: dict[str, object],
+    trailing_comma: bool,
+) -> list[str]:
+    entries = summary["entries"]
+    captures = summary["captures"]
+    lines = [
+        "            new CapturedSubwayStrictLootProfileDefinition(",
+        f"                {cs_string(str(summary['name']))},",
+        f"                {int(summary['monsterData'])},",
+        f"                {int(summary['opened'])},",
+        f"                {int(summary['positive'])},",
+        f"                {int(summary['empty'])},",
+        f"                {str(bool(summary['itemPoolComplete'])).lower()},",
+        "                new string[]",
+        "                {",
+    ]
+    for index, capture in enumerate(captures):
+        lines.append(
+            "                    "
+            + cs_string(str(capture))
+            + ("," if index < len(captures) - 1 else "")
+        )
+    lines.extend(
+        [
+            "                },",
+            "                new CapturedSubwayLootEvidenceDefinition[]",
+            "                {",
+        ]
+    )
+    for index, item in enumerate(entries):
+        lines.append(
+            "                    new CapturedSubwayLootEvidenceDefinition("
+            f"{item['low']}, {item['high']}, {item['quality']}, "
+            f"{item['count']}, {item['corpses']}, {item['basis']})"
+            + ("," if index < len(entries) - 1 else "")
+        )
+    lines.extend(
+        [
+            "                })" + ("," if trailing_comma else ""),
+        ]
+    )
+    return lines
+
+
 def validate_content(
     spawns: list[dict[str, str]],
     profiles: dict[str, dict[str, str]],
@@ -2416,6 +2840,7 @@ def generate() -> str:
     profiles = select_archetype_profiles(spawns)
     combat = combat_profiles()
     loot = loot_profiles()
+    strict_loot = strict_loot_profile_summaries(loot)
     loot_outcomes = loot_outcome_profiles()
     corpses = corpse_profiles()
     validate_content(spawns, profiles, combat, corpses)
@@ -2459,6 +2884,14 @@ def generate() -> str:
             value["slot"],
         ),
     )
+    strict_loot_definition_lines = []
+    for index, summary in enumerate(strict_loot):
+        strict_loot_definition_lines.extend(
+            strict_loot_profile_definition(
+                summary,
+                index < len(strict_loot) - 1,
+            )
+        )
     lines = [
         "// <auto-generated>",
         "// Generated only from completed AOSharp Subway captures by generate_subway_ordinary_content.py.",
@@ -2495,6 +2928,11 @@ def generate() -> str:
             + ("," if index < len(supported_loot_outcomes) - 1 else "")
             for index, item in enumerate(supported_loot_outcomes)
         ],
+        "        };",
+        "",
+        "        private static readonly CapturedSubwayStrictLootProfileDefinition[] StrictLootProfiles =",
+        "        {",
+        *strict_loot_definition_lines,
         "        };",
         "",
         "        private static readonly CapturedSubwayOrdinaryArchetypeDefinition[] Archetypes =",
@@ -2688,6 +3126,11 @@ def generate() -> str:
             "                .ToArray();",
             "        }",
             "",
+            "        public CapturedSubwayStrictLootProfileDefinition GetStrictLootProfile(int monsterData)",
+            "        {",
+            "            return StrictLootProfiles.SingleOrDefault(value => value.MonsterData == monsterData);",
+            "        }",
+            "",
             "        public CapturedSubwayOrdinarySpawnDefinition[] GetSpawns()",
             "        {",
             "            return Spawns",
@@ -2710,37 +3153,48 @@ def generate() -> str:
             "        public CombatLootTableEntry[] BuildCapturedLootEntries()",
             "        {",
             "            var entries = new List<CombatLootTableEntry>();",
-            "            foreach (CapturedSubwayOrdinaryArchetypeDefinition archetype in Archetypes)",
+            "            foreach (CapturedSubwayStrictLootProfileDefinition strictLoot in StrictLootProfiles)",
             "            {",
-            "                int slot = 0;",
-            "                foreach (CapturedSubwayLootEvidenceDefinition loot in archetype.LootEvidence)",
-            "                {",
-            "                    entries.Add(",
-            "                        new CombatLootTableEntry",
-            "                        {",
-            "                            ExactName = archetype.Name,",
-            "                            MonsterData = archetype.MonsterData,",
-            "                            NpcFamily = archetype.NpcFamily,",
-            "                            Slot = slot++,",
-            "                            DropChanceBasisPoints = loot.ObservedBasisPoints,",
-            "                            ItemTemplates =",
-            "                                new[]",
-            "                                {",
-            "                                    new CombatLootItemTemplate",
-            "                                    {",
-            "                                        LowId = loot.LowId,",
-            "                                        HighId = loot.HighId,",
-            "                                        MinQuality = loot.Quality,",
-            "                                        MaxQuality = loot.Quality,",
-            "                                        RangeCheck = 0,",
-            "                                        DropGroupHash = \"captured-subway-ordinary\"",
-            "                                    }",
-            "                                }",
-            "                        });",
-            "                }",
+            "                AddCapturedLootEntries(entries, strictLoot.Name, strictLoot.MonsterData, 0, strictLoot.Entries);",
+            "            }",
+            "",
+            "            foreach (CapturedSubwayOrdinaryArchetypeDefinition archetype in Archetypes.Where(",
+            "                value => StrictLootProfiles.All(strictLoot => strictLoot.MonsterData != value.MonsterData)))",
+            "            {",
+            "                AddCapturedLootEntries(entries, archetype.Name, archetype.MonsterData, archetype.NpcFamily, archetype.LootEvidence);",
             "            }",
             "",
             "            return entries.ToArray();",
+            "        }",
+            "",
+            "        private static void AddCapturedLootEntries(List<CombatLootTableEntry> entries, string name, int monsterData, int npcFamily, CapturedSubwayLootEvidenceDefinition[] lootEvidence)",
+            "        {",
+            "            int slot = 0;",
+            "            foreach (CapturedSubwayLootEvidenceDefinition loot in lootEvidence)",
+            "            {",
+            "                entries.Add(",
+            "                    new CombatLootTableEntry",
+            "                    {",
+            "                        ExactName = name,",
+            "                        MonsterData = monsterData,",
+            "                        NpcFamily = npcFamily,",
+            "                        Slot = slot++,",
+            "                        DropChanceBasisPoints = loot.ObservedBasisPoints,",
+            "                        ItemTemplates =",
+            "                            new[]",
+            "                            {",
+            "                                new CombatLootItemTemplate",
+            "                                {",
+            "                                    LowId = loot.LowId,",
+            "                                    HighId = loot.HighId,",
+            "                                    MinQuality = loot.Quality,",
+            "                                    MaxQuality = loot.Quality,",
+            "                                    RangeCheck = 0,",
+            "                                    DropGroupHash = \"captured-subway-ordinary\"",
+            "                                }",
+            "                            }",
+            "                    });",
+            "            }",
             "        }",
             "    }",
             "",
@@ -2769,6 +3223,7 @@ def generate() -> str:
             "    internal sealed class CapturedSubwaySourceWeaponEvidenceDefinition { public CapturedSubwaySourceWeaponEvidenceDefinition(int sourceInstance, int lowId, int highId, int quality, string evidenceCaptures) { this.SourceInstance = sourceInstance; this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.EvidenceCaptures = evidenceCaptures; } public int SourceInstance { get; private set; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public string EvidenceCaptures { get; private set; } }",
             "    internal sealed class CapturedSubwayCombatEvidenceDefinition { public CapturedSubwayCombatEvidenceDefinition(bool observed, int minDamage, int maxDamage, double rechargeSeconds, int weaponSlot, int attackInfoUnknown, int weaponInstance, int observedRows) { this.Observed = observed; this.MinDamage = minDamage; this.MaxDamage = maxDamage; this.RechargeSeconds = rechargeSeconds; this.WeaponSlot = weaponSlot; this.AttackInfoUnknown = attackInfoUnknown; this.WeaponInstance = weaponInstance; this.ObservedRows = observedRows; } public bool Observed { get; private set; } public int MinDamage { get; private set; } public int MaxDamage { get; private set; } public double RechargeSeconds { get; private set; } public int WeaponSlot { get; private set; } public int AttackInfoUnknown { get; private set; } public int WeaponInstance { get; private set; } public int ObservedRows { get; private set; } }",
             "    internal sealed class CapturedSubwayLootEvidenceDefinition { public CapturedSubwayLootEvidenceDefinition(int lowId, int highId, int quality, int observedCount, int observedCorpses, int observedBasisPoints) { this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.ObservedCount = observedCount; this.ObservedCorpses = observedCorpses; this.ObservedBasisPoints = observedBasisPoints; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public int ObservedCount { get; private set; } public int ObservedCorpses { get; private set; } public int ObservedBasisPoints { get; private set; } }",
+            "    internal sealed class CapturedSubwayStrictLootProfileDefinition { public CapturedSubwayStrictLootProfileDefinition(string name, int monsterData, int observedCompleteInventories, int observedPositiveInventories, int observedEmptyInventories, bool itemPoolComplete, string[] evidenceCaptures, CapturedSubwayLootEvidenceDefinition[] entries) { this.Name = name; this.MonsterData = monsterData; this.ObservedCompleteInventories = observedCompleteInventories; this.ObservedPositiveInventories = observedPositiveInventories; this.ObservedEmptyInventories = observedEmptyInventories; this.ItemPoolComplete = itemPoolComplete; this.EvidenceCaptures = evidenceCaptures ?? new string[0]; this.Entries = entries ?? new CapturedSubwayLootEvidenceDefinition[0]; } public string Name { get; private set; } public int MonsterData { get; private set; } public int ObservedCompleteInventories { get; private set; } public int ObservedPositiveInventories { get; private set; } public int ObservedEmptyInventories { get; private set; } public bool ItemPoolComplete { get; private set; } public string[] EvidenceCaptures { get; private set; } public CapturedSubwayLootEvidenceDefinition[] Entries { get; private set; } }",
             "    internal sealed class CapturedSubwayLootOutcomeEvidenceDefinition { public CapturedSubwayLootOutcomeEvidenceDefinition(string capture, string capturedUtc, string corpseIdentity, string deadNpcIdentity, int monsterData, int sequence, int slot, int lowId, int highId, int quality) { this.Capture = capture; this.CapturedUtc = capturedUtc; this.CorpseIdentity = corpseIdentity; this.DeadNpcIdentity = deadNpcIdentity; this.MonsterData = monsterData; this.Sequence = sequence; this.Slot = slot; this.LowId = lowId; this.HighId = highId; this.Quality = quality; } public string Capture { get; private set; } public string CapturedUtc { get; private set; } public string CorpseIdentity { get; private set; } public string DeadNpcIdentity { get; private set; } public int MonsterData { get; private set; } public int Sequence { get; private set; } public int Slot { get; private set; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } }",
             "    internal sealed class CapturedSubwayCorpseEvidenceDefinition { public CapturedSubwayCorpseEvidenceDefinition(string capture, string capturedUtc, string corpseIdentity, string deadNpcIdentity, int enemyLevel, int monsterData, int catMesh, int credits) { this.Capture = capture; this.CapturedUtc = capturedUtc; this.CorpseIdentity = corpseIdentity; this.DeadNpcIdentity = deadNpcIdentity; this.EnemyLevel = enemyLevel; this.MonsterData = monsterData; this.CatMesh = catMesh; this.Credits = credits; } public string Capture { get; private set; } public string CapturedUtc { get; private set; } public string CorpseIdentity { get; private set; } public string DeadNpcIdentity { get; private set; } public int EnemyLevel { get; private set; } public int MonsterData { get; private set; } public int CatMesh { get; private set; } public int Credits { get; private set; } }",
             "}",

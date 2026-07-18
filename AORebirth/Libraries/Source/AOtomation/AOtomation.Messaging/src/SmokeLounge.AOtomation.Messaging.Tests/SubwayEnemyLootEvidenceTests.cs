@@ -62,16 +62,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void BloodcreeperKeepsItemsUnresolvedAndUsesCapturedCredits()
+        public void BloodcreeperUsesFourReviewedOpensAndKeepsItsPoolIncomplete()
         {
             OrdinaryEnemyLootProfile loot = Profile("Bloodcreeper").Loot;
 
             Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, loot.PoolMode);
             Assert.AreEqual(0, loot.EmptyWeight);
             Assert.IsFalse(loot.ItemPoolComplete);
-            Assert.AreEqual(2, loot.ObservedCompleteInventories);
-            Assert.AreEqual(2, loot.ObservedEmptyInventories);
-            Assert.AreEqual(0, loot.Entries.Length);
+            Assert.AreEqual(4, loot.ObservedCompleteInventories);
+            Assert.AreEqual(3, loot.ObservedEmptyInventories);
+            Assert.AreEqual(1, loot.Entries.Length);
+            Assert.AreEqual(42640, loot.Entries[0].LowId);
+            Assert.AreEqual(42641, loot.Entries[0].HighId);
+            Assert.AreEqual(30, loot.Entries[0].QualityLevel);
+            Assert.AreEqual(1, loot.Entries[0].ObservedCount);
+            Assert.AreEqual(4, loot.Entries[0].ObservedCorpses);
+            Assert.AreEqual(2500, loot.Entries[0].DropChanceBasisPoints);
             Assert.AreEqual(OrdinaryEnemyEvidenceState.Policy, loot.CreditEvidence);
             Assert.AreEqual(150, loot.MinimumCredits);
             Assert.AreEqual(150, loot.MaximumCredits);
@@ -81,7 +87,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "subway.test.bloodcreeper",
                 "subway.test.bloodcreeper.assignment");
             Assert.IsTrue(adapted.Table.ItemPoolUnresolved);
-            Assert.AreEqual(0, adapted.Table.RollGroups.Length);
+            Assert.AreEqual(1, adapted.Table.RollGroups.Length);
+            Assert.AreEqual(LootRollMode.Independent, adapted.Table.RollGroups[0].RollMode);
             Assert.AreEqual(CreditsPolicyMode.Fixed, adapted.Table.CreditsPolicy.Mode);
             Assert.AreEqual(150, adapted.Table.CreditsPolicy.MinimumCredits);
             Assert.AreEqual(150, adapted.Table.CreditsPolicy.MaximumCredits);
@@ -332,10 +339,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void StrictDeepCorpseSnapshotsAloneSupplyRuntimeProbabilityDenominators()
         {
-            Assert.AreEqual(
-                0,
-                Profile("Redundant Scan").Loot.Entries.Length,
-                "An exact empty snapshot plus a legacy item-bearing observation does not prove item odds.");
+            OrdinaryEnemyLootProfile redundant = Profile("Redundant Scan").Loot;
+            Assert.AreEqual(2, redundant.ObservedCompleteInventories);
+            Assert.AreEqual(1, redundant.ObservedEmptyInventories);
+            Assert.IsFalse(redundant.ItemPoolComplete);
+            OrdinaryEnemyLootEntry redundantItem = redundant.Entries.Single();
+            Assert.AreEqual(27263, redundantItem.LowId);
+            Assert.AreEqual(10, redundantItem.QualityLevel);
+            Assert.AreEqual(5000, redundantItem.DropChanceBasisPoints);
 
             OrdinaryEnemyLootEntry molested = Profile("Molested Molecules").Loot.Entries
                 .Single(value => value.LowId == 301713);
@@ -441,13 +452,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(stim.LootOutcomeEvidence.Any(value => value.LowId == 291043));
 
             OrdinaryEnemyProfile runtimeStim = Profile("Stim Fiend");
-            Assert.AreEqual(0, runtimeStim.Loot.Entries.Length);
+            Assert.AreEqual(13, runtimeStim.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(0, runtimeStim.Loot.ObservedEmptyInventories);
+            Assert.AreEqual(17, runtimeStim.Loot.Entries.Length);
+            Assert.IsFalse(runtimeStim.Loot.Entries.Any(value => value.LowId == 130592));
+            Assert.IsFalse(runtimeStim.Loot.Entries.Any(value => value.LowId == 123704));
             Assert.IsFalse(runtimeStim.Loot.ItemPoolComplete);
             OrdinaryEnemyLootTableAdapterResult adapted = OrdinaryEnemyLootTableAdapter.Build(
                 runtimeStim,
                 "subway.test.stim-outcomes",
                 "subway.test.stim-outcomes.assignment");
-            Assert.AreEqual(0, adapted.Table.RollGroups.Length);
+            Assert.AreEqual(17, adapted.Table.RollGroups.Length);
+            Assert.IsTrue(
+                adapted.Table.RollGroups.All(value => value.RollMode == LootRollMode.Independent));
             Assert.IsTrue(adapted.Table.ItemPoolUnresolved);
         }
 
@@ -560,6 +577,146 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     .Where(value => value.Capture == "20260712-223719")
                     .Select(value => value.Sequence + ":" + value.LowId)
                     .ToArray());
+        }
+
+        [TestMethod]
+        public void RecoveredFirstOpenCorpusSuppliesFourteenIncompleteIndependentLootPools()
+        {
+            AssertRecoveredStrictLoot(
+                "Mugger",
+                17,
+                3,
+                new[]
+                    {
+                        "25822:25831:5:1", "85711:22014:8:1", "123704:123705:9:1",
+                        "123723:123724:6:1", "123976:123977:9:1", "124348:124349:7:1",
+                        "124545:124546:10:1", "128636:128637:8:1", "128839:128840:9:1",
+                        "130060:130061:5:1", "130060:130061:9:1", "131605:131606:7:1",
+                        "136638:136639:9:1", "136638:136639:12:1", "136640:136641:7:1",
+                        "136640:136641:8:1", "136640:136641:9:1", "136646:136647:9:1",
+                        "160224:160225:10:1", "234875:234875:1:2", "234876:234876:1:1"
+                    });
+            AssertRecoveredStrictLoot(
+                "Discarded Pet",
+                16,
+                3,
+                new[]
+                    {
+                        "101681:101682:7:1", "102283:102284:9:1", "103973:103974:10:1",
+                        "106005:106006:11:1", "107283:107284:10:1", "109520:109521:7:1",
+                        "111623:111624:8:1", "112160:112161:6:1", "112798:112799:6:1",
+                        "234874:234874:1:3", "234876:234876:1:3", "234877:234877:1:1",
+                        "290619:202727:9:1"
+                    });
+            AssertRecoveredStrictLoot(
+                "Stim Fiend",
+                13,
+                0,
+                new[]
+                    {
+                        "102055:102056:11:1", "112232:112233:11:1", "234874:234874:1:1",
+                        "234876:234876:1:1", "234877:234877:1:1", "291043:291044:9:6",
+                        "291043:291044:10:2", "291043:291044:11:1", "291043:291044:12:2",
+                        "291043:291044:13:1", "291043:291044:15:1", "291082:291083:9:6",
+                        "291082:291083:10:2", "291082:291083:11:1", "291082:291083:12:2",
+                        "291082:291083:13:1", "291082:291083:15:1"
+                    });
+            AssertRecoveredStrictLoot(
+                "Looter",
+                11,
+                5,
+                new[]
+                    {
+                        "21605:21605:1:1", "85501:22343:12:1", "124422:124422:12:1",
+                        "144082:144083:7:1", "234874:234874:1:1", "234875:234875:1:1",
+                        "234877:234877:1:1", "301713:301713:1:1", "301714:301714:1:1"
+                    });
+            AssertRecoveredStrictLoot(
+                "Violent Vagabond",
+                11,
+                1,
+                new[]
+                    {
+                        "85531:22289:8:1", "122140:122141:7:1", "123704:123705:12:1",
+                        "128715:128716:6:1", "130586:130586:1:4", "130592:130592:1:2",
+                        "130621:130621:1:1", "152326:152327:6:1", "234876:234876:1:1",
+                        "258543:258543:1:7", "273381:204397:8:1"
+                    });
+            AssertRecoveredStrictLoot(
+                "Bloodcreeper",
+                4,
+                3,
+                new[] { "42640:42641:30:1" });
+            AssertRecoveredStrictLoot(
+                "Infected Attendant",
+                4,
+                1,
+                new[]
+                    {
+                        "101695:101696:24:1", "109194:109195:12:1", "112823:112824:17:1",
+                        "234875:234875:1:1", "290619:202727:12:1"
+                    });
+            AssertRecoveredStrictLoot(
+                "Fragmented Soul",
+                4,
+                0,
+                new[]
+                    {
+                        "26471:26471:14:3", "85691:22004:18:1", "85732:21963:17:1",
+                        "124304:124305:17:1", "234877:234877:1:2", "301712:301712:1:1"
+                    });
+            AssertRecoveredStrictLoot(
+                "Deranged Shopper",
+                2,
+                0,
+                new[] { "123019:123020:6:1", "124465:124466:10:1" });
+            AssertRecoveredStrictLoot(
+                "Incomplete Rebuild",
+                2,
+                0,
+                new[] { "26503:26503:14:1", "142817:142818:16:1" });
+            AssertRecoveredStrictLoot(
+                "Redundant Scan",
+                2,
+                1,
+                new[] { "27263:27263:10:1" });
+            AssertRecoveredStrictLoot(
+                "Uncontrollable Anger",
+                2,
+                0,
+                new[]
+                    {
+                        "101809:101810:24:1", "109366:109367:9:1", "290619:202727:19:1"
+                    });
+            AssertRecoveredStrictLoot(
+                "Lost Thought",
+                1,
+                0,
+                new[] { "101675:101676:25:1" });
+            AssertRecoveredStrictLoot(
+                "Neural Burnout",
+                4,
+                2,
+                new[]
+                    {
+                        "26471:26471:14:1", "123021:123021:21:1", "124560:124561:16:1"
+                    });
+
+            var provider = new CapturedSubwayOrdinaryContentProvider();
+            foreach (string excludedName in new[] { "Empty Shell", "Premature Pattern" })
+            {
+                CapturedSubwayOrdinaryArchetypeDefinition archetype = provider.GetArchetypes()
+                    .Single(value => value.Name == excludedName);
+                Assert.IsNull(provider.GetStrictLootProfile(archetype.MonsterData), excludedName);
+                Assert.AreEqual(0, Profile(excludedName).Loot.Entries.Length, excludedName);
+            }
+
+            CapturedSubwayStrictLootProfileDefinition mugger =
+                provider.GetStrictLootProfile(203734);
+            CapturedSubwayStrictLootProfileDefinition stim =
+                provider.GetStrictLootProfile(203739);
+            Assert.IsFalse(mugger.EvidenceCaptures.Contains("20260709-212115"));
+            Assert.IsFalse(stim.EvidenceCaptures.Contains("20260709-212115"));
         }
 
         [TestMethod]
@@ -810,7 +967,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void MuggerLevelTenUsesIdentityLinkedCorpseCreditsWithoutInventingItemOdds()
+        public void MuggerLevelTenUsesIdentityLinkedCreditsAndReviewedStrictLoot()
         {
             CapturedSubwayCorpseEvidenceDefinition[] source =
                 new CapturedSubwayOrdinaryContentProvider().GetCorpseEvidence(203734);
@@ -823,7 +980,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(88, levelTen.Credits);
 
             OrdinaryEnemyProfile profile = Profile("Mugger");
-            Assert.AreEqual(0, profile.Loot.Entries.Length);
+            Assert.AreEqual(17, profile.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(3, profile.Loot.ObservedEmptyInventories);
+            Assert.AreEqual(21, profile.Loot.Entries.Length);
             Assert.IsFalse(profile.Loot.ItemPoolComplete);
 
             OrdinaryEnemyLootTableAdapterResult adapted = OrdinaryEnemyLootTableAdapter.Build(
@@ -834,7 +993,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(CreditsPolicyMode.Fixed, adapted.Table.CreditsPolicy.Mode);
             Assert.AreEqual(88, adapted.Table.CreditsPolicy.MinimumCredits);
             Assert.AreEqual(88, adapted.Table.CreditsPolicy.MaximumCredits);
-            Assert.AreEqual(0, adapted.Table.RollGroups.Length);
+            Assert.AreEqual(21, adapted.Table.RollGroups.Length);
+            Assert.IsTrue(
+                adapted.Table.RollGroups.All(value => value.RollMode == LootRollMode.Independent));
             Assert.IsTrue(adapted.Table.ItemPoolUnresolved);
         }
 
@@ -1032,6 +1193,97 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(
                 adapted.Table.RollGroups.Any(
                     value => value.RollMode == LootRollMode.Guaranteed));
+        }
+
+        private static void AssertRecoveredStrictLoot(
+            string displayName,
+            int observedCorpses,
+            int observedEmptyCorpses,
+            string[] expectedEntries)
+        {
+            OrdinaryEnemyProfile profile = Profile(displayName);
+            OrdinaryEnemyLootProfile loot = profile.Loot;
+            var provider = new CapturedSubwayOrdinaryContentProvider();
+            CapturedSubwayStrictLootProfileDefinition source =
+                provider.GetStrictLootProfile(profile.MonsterData);
+
+            Assert.IsNotNull(source, displayName);
+            Assert.AreEqual(displayName, source.Name, displayName);
+            Assert.AreEqual(observedCorpses, source.ObservedCompleteInventories, displayName);
+            Assert.AreEqual(
+                observedCorpses - observedEmptyCorpses,
+                source.ObservedPositiveInventories,
+                displayName);
+            Assert.AreEqual(observedEmptyCorpses, source.ObservedEmptyInventories, displayName);
+            Assert.IsFalse(source.ItemPoolComplete, displayName);
+            Assert.AreEqual(expectedEntries.Length, source.Entries.Length, displayName);
+            Assert.AreEqual(
+                expectedEntries.Length,
+                provider.BuildCapturedLootEntries()
+                    .Count(
+                        value => value.ExactName == displayName
+                                 && value.MonsterData == profile.MonsterData),
+                displayName + " legacy runtime table");
+
+            Assert.AreEqual(
+                OrdinaryEnemyLootEvidence.ObservedAvailableLoot,
+                loot.Evidence,
+                displayName);
+            Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, loot.PoolMode, displayName);
+            Assert.AreEqual(0, loot.EmptyWeight, displayName);
+            Assert.IsFalse(loot.ItemPoolComplete, displayName);
+            Assert.AreEqual(observedCorpses, loot.ObservedCompleteInventories, displayName);
+            Assert.AreEqual(observedEmptyCorpses, loot.ObservedEmptyInventories, displayName);
+            Assert.IsTrue(
+                loot.Entries.All(
+                    value => value.Evidence == OrdinaryEnemyLootEvidence.ObservedAvailableLoot
+                             && value.ProbabilityEvidence
+                             == OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy
+                             && value.ObservedCorpses == observedCorpses),
+                displayName);
+            Assert.IsFalse(
+                loot.Entries.Any(
+                    value => value.Evidence == OrdinaryEnemyLootEvidence.GuaranteedProven),
+                displayName);
+            CollectionAssert.AreEqual(
+                expectedEntries,
+                loot.Entries
+                    .OrderBy(value => value.LowId)
+                    .ThenBy(value => value.QualityLevel)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}:{3}",
+                            value.LowId,
+                            value.HighId,
+                            value.QualityLevel,
+                            value.ObservedCount))
+                    .ToArray(),
+                displayName);
+            foreach (OrdinaryEnemyLootEntry entry in loot.Entries)
+            {
+                Assert.AreEqual(
+                    Math.Min(
+                        10000,
+                        (int)Math.Round(
+                            entry.ObservedCount * 10000.0 / observedCorpses)),
+                    entry.DropChanceBasisPoints,
+                    displayName + ":" + entry.LowId + ":" + entry.QualityLevel);
+            }
+
+            OrdinaryEnemyLootTableAdapterResult adapted = OrdinaryEnemyLootTableAdapter.Build(
+                profile,
+                "subway.test.recovered-strict." + displayName,
+                "subway.test.recovered-strict.assignment." + displayName);
+            Assert.IsTrue(adapted.Table.ItemPoolUnresolved, displayName);
+            Assert.AreEqual(expectedEntries.Length, adapted.Table.RollGroups.Length, displayName);
+            Assert.IsTrue(
+                adapted.Table.RollGroups.All(
+                    value => value.RollMode == LootRollMode.Independent),
+                displayName);
+            Assert.IsFalse(
+                adapted.Table.RollGroups.Any(
+                    value => value.RollMode == LootRollMode.Guaranteed),
+                displayName);
         }
 
         private static void AssertCorpseAndLevelCredits(
