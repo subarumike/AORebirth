@@ -203,6 +203,7 @@ namespace AORebirth.Core.Playfields
 
         internal void ProcessDueCapturedSubwayRespawns(Identity playfieldIdentity, DateTime utcNow)
         {
+            this.ordinaryEnemies.ProcessExpiredSupportNanoEffects(utcNow);
             this.worldPopulation.ProcessDue(utcNow);
             this.capturedSubwayEncounters.ProcessDue(utcNow, this.AcquireAggro);
         }
@@ -226,6 +227,7 @@ namespace AORebirth.Core.Playfields
             }
 
             DateTime diedAtUtc = DateTime.UtcNow;
+            this.ordinaryEnemies.NotifyCharacterDied(target);
             Identity corpseIdentity = Identity.None;
             if (this.playfield.CanBuildKnownCorpseVisual(target))
             {
@@ -301,6 +303,11 @@ namespace AORebirth.Core.Playfields
         internal void ProcessCombatTick(ICharacter attacker)
         {
             if (this.TryBeginLeashReturn(attacker))
+            {
+                return;
+            }
+
+            if (this.ordinaryEnemies.TryProcessSupportNano(attacker, DateTime.UtcNow))
             {
                 return;
             }
@@ -439,6 +446,11 @@ namespace AORebirth.Core.Playfields
             }
 
             if (this.TryProcessLeashReturn(character, utcNow))
+            {
+                return;
+            }
+
+            if (this.ordinaryEnemies.TryProcessSupportNano(character, utcNow))
             {
                 return;
             }

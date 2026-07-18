@@ -141,6 +141,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             var serializerResolver = new DebuggingSerializerResolverBuilder<MessageBody>().Build();
             var serializationContext = new SerializationContext(serializerResolver);
+            long compactLevelBodyLength;
             using (var memoryStream = new MemoryStream())
             using (var streamWriter = new StreamWriter(memoryStream))
             using (var streamReader = new StreamReader(memoryStream))
@@ -150,8 +151,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     streamWriter,
                     serializationContext,
                     message);
+                compactLevelBodyLength = memoryStream.Length;
                 memoryStream.Position = 30;
                 Assert.AreEqual((int)capturedFlags, streamReader.ReadInt32());
+            }
+
+            message.Level = 200;
+            using (var memoryStream = new MemoryStream())
+            using (var streamWriter = new StreamWriter(memoryStream))
+            using (var streamReader = new StreamReader(memoryStream))
+            {
+                streamWriter.Position = 16;
+                new SimpleCharFullUpdateSerializer().Serialize(
+                    streamWriter,
+                    serializationContext,
+                    message);
+
+                Assert.AreEqual(compactLevelBodyLength, memoryStream.Length);
+                memoryStream.Position = 16;
+                var decoded =
+                    (SimpleCharFullUpdateMessage)new SimpleCharFullUpdateSerializer().Deserialize(
+                        streamReader,
+                        serializationContext);
+                Assert.AreEqual((short)200, decoded.Level);
+                Assert.IsFalse(decoded.Flags.HasFlag(SimpleCharFullUpdateFlags.HasExtendedLevel));
+                Assert.IsTrue(decoded.TailFullyDecoded);
             }
 
             message.Waypoints = new Vector3[0];

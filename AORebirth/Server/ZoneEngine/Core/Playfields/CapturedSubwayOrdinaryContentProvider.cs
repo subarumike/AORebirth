@@ -250,6 +250,33 @@ namespace AORebirth.Core.Playfields
                 })
         };
 
+        private static readonly CapturedSubwayGenerationVariantDefinition[] GenerationVariants =
+        {
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545170, 17, 368, 0, 98, 59, 122653, 122654, 18, "20260709-222339:(SimpleChar:79545170)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545170, 18, 394, 0, 98, 62, 122653, 122654, 16, "20260716-034559:(SimpleChar:796D4020)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545172, 18, 394, 0, 98, 62, 122653, 122654, 14, "20260709-222339:(SimpleChar:79545172)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545172, 18, 394, 0, 98, 62, 122653, 122654, 15, "20260716-034559:(SimpleChar:796D401E)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545177, 19, 421, 0, 98, 66, 122653, 122654, 18, "20260709-222339:(SimpleChar:79545177);20260716-034559:(SimpleChar:796D4010)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545177, 19, 421, 0, 98, 66, 122655, 122656, 22, "20260716-222007:(SimpleChar:79702459)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545181, 18, 394, 0, 98, 62, 122653, 122654, 15, "20260716-222007:(SimpleChar:79702463)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545181, 18, 394, 0, 98, 62, 122653, 122654, 16, "20260716-034559:(SimpleChar:796D4017)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545181, 19, 421, 0, 98, 66, 122653, 122654, 18, "20260717-215250:(SimpleChar:79748620)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545181, 19, 421, 0, 98, 66, 122654, 122654, 20, "20260709-222339:(SimpleChar:79545181)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545188, 19, 421, 0, 98, 66, 122653, 122654, 17, "20260709-222339:(SimpleChar:79545188)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545188, 19, 421, 0, 98, 66, 122655, 122655, 21, "20260716-034656:(SimpleChar:796D4003)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545188, 19, 421, 0, 98, 66, 122655, 122656, 23, "20260717-215250:(SimpleChar:79748630)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x795451BC, 21, 474, 0, 99, 73, 122653, 122654, 18, "20260709-222339:(SimpleChar:795451BC)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x795451C1, 19, 421, 0, 98, 66, 122655, 122655, 21, "20260709-222339:(SimpleChar:795451C1)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x795451CB, 19, 421, 0, 98, 66, 122655, 122655, 21, "20260716-034559:(SimpleChar:796CD7DA)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x795451CB, 20, 447, 0, 99, 69, 122655, 122656, 23, "20260716-222007:(SimpleChar:797024C6)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x795451CB, 21, 474, 0, 99, 73, 122655, 122656, 24, "20260709-222339:(SimpleChar:795451CB)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x795451FD, 19, 421, 0, 98, 66, 122654, 122654, 20, "20260709-222339:(SimpleChar:795451FD)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x795451FD, 21, 474, 0, 99, 73, 122654, 122654, 20, "20260716-222007:(SimpleChar:7970254C)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x795451FD, 22, 500, 0, 99, 76, 122655, 122656, 22, "20260716-033326:(SimpleChar:796D403C)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545241, 17, 368, 0, 98, 59, 122654, 122654, 20, "20260709-222339:(SimpleChar:79545241)"),
+            new CapturedSubwayGenerationVariantDefinition(203728, 0x79545241, 19, 421, 0, 98, 66, 122655, 122656, 22, "20260709-225408:(SimpleChar:79545352)")
+        };
+
         private static readonly CapturedSubwayStrictLootProfileDefinition[] StrictLootProfiles =
         {
             new CapturedSubwayStrictLootProfileDefinition(
@@ -1671,6 +1698,10 @@ namespace AORebirth.Core.Playfields
                     "20260708-143600",
                     "20260709-210452",
                     "20260710-202132"
+                },
+                new CapturedSubwaySourceWeaponEvidenceDefinition[]
+                {
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x79574527, 125454, 125455, 8, "20260710-202132")
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "empty_shell",
@@ -1853,6 +1884,7 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayCorpseEvidenceDefinition("20260709-225408", "2026-07-10T04:01:02.6007301Z", "(Corpse:00F6E01B)", "(SimpleChar:795451FD)", 19, 203728, 5921, 118),
                     new CapturedSubwayCorpseEvidenceDefinition("20260709-225408", "2026-07-10T04:02:19.1138049Z", "(Corpse:00F6E015)", "(SimpleChar:795451C1)", 19, 203728, 5921, 118),
                     new CapturedSubwayCorpseEvidenceDefinition("20260709-225408", "2026-07-10T04:02:37.4294298Z", "(Corpse:00F6E00E)", "(SimpleChar:795451BC)", 21, 203728, 5921, 131),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260716-222007", "2026-07-17T03:20:16.0778439Z", "(Corpse:00F69009)", "(SimpleChar:79702438)", 18, 203728, 5921, 111),
                     new CapturedSubwayCorpseEvidenceDefinition("20260716-222007", "2026-07-17T03:20:24.6178720Z", "(Corpse:00F69012)", "(SimpleChar:79702459)", 19, 203728, 5921, 118)
                 },
                 new string[]
@@ -1864,6 +1896,19 @@ namespace AORebirth.Core.Playfields
                     "20260716-034104",
                     "20260716-222007",
                     "20260716-222201"
+                },
+                new CapturedSubwaySourceWeaponEvidenceDefinition[]
+                {
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x79545170, 122653, 122654, 18, "20260709-222339"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x79545172, 122653, 122654, 14, "20260709-222339"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x79545177, 122653, 122654, 18, "20260709-222339"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x79545181, 122654, 122654, 20, "20260709-222339"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x79545188, 122653, 122654, 17, "20260709-222339"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795451BC, 122653, 122654, 18, "20260709-222339,20260709-225408"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795451C1, 122655, 122655, 21, "20260709-222339,20260709-225408"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795451CB, 122655, 122656, 24, "20260709-222339,20260709-225408"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795451FD, 122654, 122654, 20, "20260709-222339,20260709-225408"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x79545241, 122654, 122654, 20, "20260709-222339")
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "melded_patterns",
@@ -2139,6 +2184,13 @@ namespace AORebirth.Core.Playfields
                     "20260716-033326",
                     "20260716-034104",
                     "20260716-222201"
+                },
+                new CapturedSubwaySourceWeaponEvidenceDefinition[]
+                {
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x7953AF85, 122027, 122027, 20, "20260709-222339,20260709-225408"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795451BF, 122026, 122027, 14, "20260709-222339,20260709-225408"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795451C4, 122028, 122029, 25, "20260709-222339,20260709-225408"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795451D3, 122026, 122027, 16, "20260709-222339,20260709-225408")
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "uncontrollable_anger",
@@ -6290,6 +6342,13 @@ namespace AORebirth.Core.Playfields
                        : archetype.SourceWeaponEvidence.ToArray();
         }
 
+        public CapturedSubwayGenerationVariantDefinition[] GetGenerationVariants(int monsterData, int sourceInstance)
+        {
+            return GenerationVariants
+                .Where(value => value.MonsterData == monsterData && value.SourceInstance == sourceInstance)
+                .ToArray();
+        }
+
         public CapturedSubwayStrictLootProfileDefinition GetStrictLootProfile(int monsterData)
         {
             return StrictLootProfiles.SingleOrDefault(value => value.MonsterData == monsterData);
@@ -6386,6 +6445,7 @@ namespace AORebirth.Core.Playfields
     internal sealed class CapturedSubwayWaypointDefinition { public CapturedSubwayWaypointDefinition(float x, float y, float z) { this.X = x; this.Y = y; this.Z = z; } public float X { get; private set; } public float Y { get; private set; } public float Z { get; private set; } }
     internal sealed class CapturedSubwaySourceWeaponProfileDefinition { public CapturedSubwaySourceWeaponProfileDefinition(string name, int monsterData, CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { this.Name = name; this.MonsterData = monsterData; this.SourceWeaponEvidence = sourceWeaponEvidence ?? new CapturedSubwaySourceWeaponEvidenceDefinition[0]; } public string Name { get; private set; } public int MonsterData { get; private set; } public CapturedSubwaySourceWeaponEvidenceDefinition[] SourceWeaponEvidence { get; private set; } }
     internal sealed class CapturedSubwaySourceWeaponEvidenceDefinition { public CapturedSubwaySourceWeaponEvidenceDefinition(int sourceInstance, int lowId, int highId, int quality, string evidenceCaptures) { this.SourceInstance = sourceInstance; this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.EvidenceCaptures = evidenceCaptures; } public int SourceInstance { get; private set; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public string EvidenceCaptures { get; private set; } }
+    internal sealed class CapturedSubwayGenerationVariantDefinition { public CapturedSubwayGenerationVariantDefinition(int monsterData, int sourceInstance, int level, int health, int healthDamage, int monsterScale, int runSpeed, int weaponLowId, int weaponHighId, int weaponQuality, string evidence) { this.MonsterData = monsterData; this.SourceInstance = sourceInstance; this.Level = level; this.Health = health; this.HealthDamage = healthDamage; this.MonsterScale = monsterScale; this.RunSpeed = runSpeed; this.WeaponLowId = weaponLowId; this.WeaponHighId = weaponHighId; this.WeaponQuality = weaponQuality; this.Evidence = evidence; } public int MonsterData { get; private set; } public int SourceInstance { get; private set; } public int Level { get; private set; } public int Health { get; private set; } public int HealthDamage { get; private set; } public int MonsterScale { get; private set; } public int RunSpeed { get; private set; } public int WeaponLowId { get; private set; } public int WeaponHighId { get; private set; } public int WeaponQuality { get; private set; } public string Evidence { get; private set; } }
     internal sealed class CapturedSubwayCombatEvidenceDefinition { public CapturedSubwayCombatEvidenceDefinition(bool observed, int minDamage, int maxDamage, double rechargeSeconds, int weaponSlot, int attackInfoUnknown, int weaponInstance, int observedRows) { this.Observed = observed; this.MinDamage = minDamage; this.MaxDamage = maxDamage; this.RechargeSeconds = rechargeSeconds; this.WeaponSlot = weaponSlot; this.AttackInfoUnknown = attackInfoUnknown; this.WeaponInstance = weaponInstance; this.ObservedRows = observedRows; } public bool Observed { get; private set; } public int MinDamage { get; private set; } public int MaxDamage { get; private set; } public double RechargeSeconds { get; private set; } public int WeaponSlot { get; private set; } public int AttackInfoUnknown { get; private set; } public int WeaponInstance { get; private set; } public int ObservedRows { get; private set; } }
     internal sealed class CapturedSubwayLootEvidenceDefinition { public CapturedSubwayLootEvidenceDefinition(int lowId, int highId, int quality, int observedCount, int observedCorpses, int observedBasisPoints) { this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.ObservedCount = observedCount; this.ObservedCorpses = observedCorpses; this.ObservedBasisPoints = observedBasisPoints; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public int ObservedCount { get; private set; } public int ObservedCorpses { get; private set; } public int ObservedBasisPoints { get; private set; } }
     internal sealed class CapturedSubwayStrictLootProfileDefinition { public CapturedSubwayStrictLootProfileDefinition(string name, int monsterData, int observedCompleteInventories, int observedPositiveInventories, int observedEmptyInventories, bool itemPoolComplete, string[] evidenceCaptures, CapturedSubwayLootEvidenceDefinition[] entries) { this.Name = name; this.MonsterData = monsterData; this.ObservedCompleteInventories = observedCompleteInventories; this.ObservedPositiveInventories = observedPositiveInventories; this.ObservedEmptyInventories = observedEmptyInventories; this.ItemPoolComplete = itemPoolComplete; this.EvidenceCaptures = evidenceCaptures ?? new string[0]; this.Entries = entries ?? new CapturedSubwayLootEvidenceDefinition[0]; } public string Name { get; private set; } public int MonsterData { get; private set; } public int ObservedCompleteInventories { get; private set; } public int ObservedPositiveInventories { get; private set; } public int ObservedEmptyInventories { get; private set; } public bool ItemPoolComplete { get; private set; } public string[] EvidenceCaptures { get; private set; } public CapturedSubwayLootEvidenceDefinition[] Entries { get; private set; } }

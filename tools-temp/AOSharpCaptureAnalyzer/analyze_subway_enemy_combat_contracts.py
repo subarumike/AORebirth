@@ -25,6 +25,7 @@ CAPTURES = (
     "20260709-220439",
     "20260709-222339",
     "20260709-225408",
+    "20260710-202132",
     "20260710-205400",
     "20260710-211430",
     "20260716-033326",
@@ -41,8 +42,9 @@ CAPTURES = (
 )
 CAPTURE_ENEMY_FILTERS = {
     "20260708-004038": frozenset({"Filth Flea"}),
-    "20260708-143600": frozenset({"Disobedient Bot"}),
+    "20260708-143600": frozenset({"Deranged Shopper", "Disobedient Bot"}),
     "20260709-213711": frozenset({"Architect Striker", "Workman Striker"}),
+    "20260710-202132": frozenset({"Deranged Shopper"}),
     "20260716-034433": frozenset({"Vergil Aeneid"}),
     "20260716-034559": frozenset({"Melded Patterns"}),
     "20260716-034656": frozenset({"Slum Runner"}),
@@ -197,10 +199,22 @@ ATTACK_DETAIL = re.compile(
 ATTACK_TARGET_DETAIL = re.compile(
     r"\bTarget=(?P<target>\(SimpleChar:[0-9A-F]+\))"
 )
+MESSAGE_IDENTITY_DETAIL = re.compile(
+    r"\bIdentity=(?P<identity>\(SimpleChar:[0-9A-F]+\))"
+)
 WEAPON_UPDATE = re.compile(
-    r"type=WeaponItemFullUpdate identity=\(WeaponInstance:(?P<weapon>[0-9A-F]+)\).*"
+    r"WeaponItemFullUpdateMessage .*"
     r"Owner=(?P<owner>\(SimpleChar:[0-9A-F]+\)).*"
-    r"ACGItemLevel=(?P<quality>\d+).*ACGItemTemplateID=(?P<template>\d+)"
+    r"ACGItemLevel=(?P<quality>\d+).*ACGItemTemplateID=(?P<template>\d+).*"
+    r"ACGItemTemplateID2=(?P<template2>\d+).*"
+    r"Identity=\(WeaponInstance:(?P<weapon>[0-9A-F]+)\)"
+)
+MISSED_ATTACK_INFO = re.compile(
+    r"^(?P<captured_utc>\S+).*MissedAttackInfoMessage .*"
+    r"Unknown1=(?P<ammo>-?\d+).*Unknown2=(?P<slot>-?\d+).*"
+    r"Attacker=(?P<attacker>\(SimpleChar:[0-9A-F]+\)).*"
+    r"Defender=(?P<defender>\(SimpleChar:[0-9A-F]+\)).*"
+    r"Unknown3=(?P<unknown>-?\d+)"
 )
 MONSTER_DATA_DETAIL = re.compile(r"\bmonsterData=(?P<monster_data>\d+)")
 CHARACTER_EVENT = re.compile(
@@ -583,7 +597,10 @@ def main():
             "captures": set(),
             "retaliationRows": 0,
             "attacks": [],
+            "misses": [],
             "weapons": [],
+            "weaponKeys": set(),
+            "specialAttackWeapons": [],
             "monsterData": set(),
             "targetRoleEvidence": defaultdict(
                 lambda: {
@@ -624,7 +641,20 @@ def main():
         add_reviewed_event_identities(capture_name, events_path, identities)
 
         derived_source_keys = set()
-        for row in read_csv(folder / "enemy-combat.csv"):
+        combat_rows = read_csv(folder / "enemy-combat.csv")
+        local_player_identities = set()
+        for row in combat_rows:
+            detail = row.get("Detail", "")
+            if row.get("SourceRole") == "local-player":
+                identity_match = MESSAGE_IDENTITY_DETAIL.search(detail)
+                if identity_match:
+                    local_player_identities.add(identity_match.group("identity"))
+            if row.get("TargetRole") == "local-player":
+                target_match = ATTACK_TARGET_DETAIL.search(detail)
+                if target_match:
+                    local_player_identities.add(target_match.group("target"))
+
+        for row in combat_rows:
             source = row.get("SourceIdentity", "")
             enemy = identities.get(source)
             if (
@@ -639,6 +669,19 @@ def main():
             group["identities"].add(source)
             group["captures"].add(capture_name)
             group["monsterData"].add(enemy["monsterData"])
+            if message_type == "SpecialAttackWeapon":
+                group["specialAttackWeapons"].append(
+                    {
+                        "capture": capture_name,
+                        "identity": source,
+                        "capturedUtc": row.get("CapturedUtc", ""),
+                        "unknown1": int(row.get("Unknown1") or 0),
+                        "unknown2": int(row.get("Unknown2") or 0),
+                        "unknown3": int(row.get("Unknown3") or 0),
+                        "unknown4": int(row.get("Unknown4") or 0),
+                        "unknown5": int(row.get("Unknown5") or 0),
+                    }
+                )
             reviewed_attack_sources = REVIEWED_ATTACK_INFO_SOURCES.get(
                 (enemy["name"], capture_name), frozenset()
             )
@@ -716,20 +759,52 @@ def main():
         if events_path.exists():
             for line in events_path.read_text(encoding="utf-8-sig", errors="replace").splitlines():
                 match = WEAPON_UPDATE.search(line)
-                if not match:
+                if match:
+                    enemy = identities.get(match.group("owner"))
+                    if enemy and capture_includes_enemy(capture_name, enemy["name"]):
+                        group = grouped[enemy["name"]]
+                        weapon_key = (
+                            capture_name,
+                            match.group("owner"),
+                            match.group("weapon"),
+                            int(match.group("template")),
+                            int(match.group("template2")),
+                            int(match.group("quality")),
+                        )
+                        if weapon_key not in group["weaponKeys"]:
+                            group["weaponKeys"].add(weapon_key)
+                            group["identities"].add(match.group("owner"))
+                            group["captures"].add(capture_name)
+                            group["monsterData"].add(enemy["monsterData"])
+                            group["weapons"].append(
+                                {
+                                    "capture": capture_name,
+                                    "owner": match.group("owner"),
+                                    "weaponIdentity": match.group("weapon"),
+                                    "templateId": int(match.group("template")),
+                                    "templateId2": int(match.group("template2")),
+                                    "quality": int(match.group("quality")),
+                                }
+                            )
+
+                miss = MISSED_ATTACK_INFO.search(line)
+                if not miss or miss.group("defender") not in local_player_identities:
                     continue
-                enemy = identities.get(match.group("owner"))
+                enemy = identities.get(miss.group("attacker"))
                 if not enemy or not capture_includes_enemy(capture_name, enemy["name"]):
                     continue
                 group = grouped[enemy["name"]]
-                group["identities"].add(match.group("owner"))
+                group["identities"].add(miss.group("attacker"))
                 group["captures"].add(capture_name)
                 group["monsterData"].add(enemy["monsterData"])
-                group["weapons"].append(
+                group["misses"].append(
                     {
-                        "weaponIdentity": match.group("weapon"),
-                        "templateId": int(match.group("template")),
-                        "quality": int(match.group("quality")),
+                        "capture": capture_name,
+                        "identity": miss.group("attacker"),
+                        "capturedUtc": miss.group("captured_utc"),
+                        "ammoCount": int(miss.group("ammo")),
+                        "weaponSlot": int(miss.group("slot")),
+                        "unknown": int(miss.group("unknown")),
                     }
                 )
 
@@ -769,9 +844,34 @@ def main():
             for row in critical_attacks
         )
         weapon_shapes = Counter(
-            (row["templateId"], row["quality"])
+            (row["templateId"], row["templateId2"], row["quality"])
             for row in group["weapons"]
         )
+        weapon_shape_evidence = []
+        for (low_id, high_id, weapon_quality), rows in sorted(
+            weapon_shapes.items(),
+            key=lambda item: (-item[1], item[0]),
+        ):
+            matching = [
+                row
+                for row in group["weapons"]
+                if (
+                    row["templateId"],
+                    row["templateId2"],
+                    row["quality"],
+                )
+                == (low_id, high_id, weapon_quality)
+            ]
+            weapon_shape_evidence.append(
+                {
+                    "lowId": low_id,
+                    "highId": high_id,
+                    "quality": weapon_quality,
+                    "rows": rows,
+                    "captures": sorted({row["capture"] for row in matching}),
+                    "owners": sorted({row["owner"] for row in matching}),
+                }
+            )
         attack_shape_evidence = []
         for (shape_slot, shape_unknown, shape_instance), rows in sorted(
             attack_shapes.items(),
@@ -859,7 +959,19 @@ def main():
                     "maxDamage": max(row["amount"] for row in matching),
                 }
             )
-        template_id, quality = weapon_shapes.most_common(1)[0][0] if weapon_shapes else (0, 0)
+        template_id, template_id2, quality = (
+            next(iter(weapon_shapes)) if len(weapon_shapes) == 1 else (0, 0, 0)
+        )
+        special_attack_weapon_shapes = Counter(
+            (
+                row["unknown1"],
+                row["unknown2"],
+                row["unknown3"],
+                row["unknown4"],
+                row["unknown5"],
+            )
+            for row in group["specialAttackWeapons"]
+        )
         report_entry = {
             "monsterData": sorted(group["monsterData"]),
             "captures": sorted(group["captures"]),
@@ -876,6 +988,81 @@ def main():
             "criticalAttackInfoRows": len(critical_attacks),
             "criticalMinDamage": min((row["amount"] for row in critical_attacks), default=0),
             "criticalMaxDamage": max((row["amount"] for row in critical_attacks), default=0),
+            "missedAttackInfoRows": len(group["misses"]),
+            "missedAttackShapes": [
+                {
+                    "ammoCount": ammo_count,
+                    "weaponSlot": miss_slot,
+                    "unknown": miss_unknown,
+                    "rows": rows,
+                    "captures": sorted(
+                        {
+                            row["capture"]
+                            for row in group["misses"]
+                            if (
+                                row["ammoCount"],
+                                row["weaponSlot"],
+                                row["unknown"],
+                            )
+                            == (ammo_count, miss_slot, miss_unknown)
+                        }
+                    ),
+                }
+                for (ammo_count, miss_slot, miss_unknown), rows in sorted(
+                    Counter(
+                        (
+                            row["ammoCount"],
+                            row["weaponSlot"],
+                            row["unknown"],
+                        )
+                        for row in group["misses"]
+                    ).items(),
+                    key=lambda item: (-item[1], item[0]),
+                )
+            ],
+            "specialAttackWeaponRows": len(group["specialAttackWeapons"]),
+            "specialAttackWeaponShapes": [
+                {
+                    "unknown1": unknown1,
+                    "unknown2": unknown2,
+                    "unknown3": unknown3,
+                    "unknown4": unknown4,
+                    "unknown5": unknown5,
+                    "rows": rows,
+                    "captures": sorted(
+                        {
+                            row["capture"]
+                            for row in group["specialAttackWeapons"]
+                            if (
+                                row["unknown1"],
+                                row["unknown2"],
+                                row["unknown3"],
+                                row["unknown4"],
+                                row["unknown5"],
+                            )
+                            == (unknown1, unknown2, unknown3, unknown4, unknown5)
+                        }
+                    ),
+                    "owners": sorted(
+                        {
+                            row["identity"]
+                            for row in group["specialAttackWeapons"]
+                            if (
+                                row["unknown1"],
+                                row["unknown2"],
+                                row["unknown3"],
+                                row["unknown4"],
+                                row["unknown5"],
+                            )
+                            == (unknown1, unknown2, unknown3, unknown4, unknown5)
+                        }
+                    ),
+                }
+                for (unknown1, unknown2, unknown3, unknown4, unknown5), rows in sorted(
+                    special_attack_weapon_shapes.items(),
+                    key=lambda item: (-item[1], item[0]),
+                )
+            ],
             "medianRechargeSeconds": intervals[(len(intervals) - 1) // 2] if intervals else 0.0,
             "weaponSlot": slot,
             "attackInfoUnknown": unknown,
@@ -910,8 +1097,11 @@ def main():
         report_entry.update(
             {
                 "equippedWeaponObserved": bool(weapon_shapes),
+                "equippedWeaponAggregateResolved": len(weapon_shapes) == 1,
                 "equippedWeaponTemplateId": template_id,
+                "equippedWeaponHighTemplateId": template_id2,
                 "equippedWeaponQuality": quality,
+                "equippedWeaponShapes": weapon_shape_evidence,
             }
         )
         if name == "Workman Striker":

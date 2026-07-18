@@ -174,6 +174,12 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayEumenidesWeaponQuality = 20;
 
+        // Owner-linked official-live weapons exist at QL20 (source 0x79545042)
+        // and QL17 (source 0x79748626).  No capture proves the respawn selection
+        // rule, so runtime retains the existing QL20 variant and keeps QL17 as
+        // explicit evidence instead of inventing a probability.
+        public const int CapturedSubwayEumenidesAlternateObservedWeaponQuality = 17;
+
         // Twenty-one observed local-player hits span 25..45 with a 4.311321s
         // median interval. They remain evidence, not hard-coded weapon rolls;
         // damage and recharge stay owned by the equipped item.
@@ -195,7 +201,7 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown1 = 143;
 
-        public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown2 = 171;
+        public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown2 = 143;
 
         public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown3 = 143;
 
