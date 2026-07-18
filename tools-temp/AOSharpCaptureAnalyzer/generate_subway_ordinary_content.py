@@ -111,6 +111,16 @@ WORKMAN_STRIKER_DUPLICATE_LOOT_ROWS = 4
 # explicit so a missing, duplicate-conflicting, or silently changed tuple stops
 # generation instead of collapsing the family to one representative QL.
 EXPECTED_SOURCE_WEAPON_EVIDENCE = {
+    "Looter": {
+        0x795312DC: (123038, 123039, 12),
+        0x795313CB: (123038, 123039, 9),
+        0x7954501B: (123038, 123039, 8),
+        0x79545029: (123038, 123039, 9),
+        0x79545034: (123038, 123039, 12),
+        0x7954503C: (123038, 123039, 11),
+        0x79557CB8: (123038, 123039, 8),
+        0x7957E5CD: (123038, 123039, 9),
+    },
     "Workman Striker": {
         0x7953A84F: (122905, 122906, 19),
         0x7953A9F0: (122905, 122906, 17),

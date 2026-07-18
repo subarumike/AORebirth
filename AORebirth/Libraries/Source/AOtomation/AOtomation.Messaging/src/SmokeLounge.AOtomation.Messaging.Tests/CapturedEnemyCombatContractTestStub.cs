@@ -49,11 +49,22 @@ namespace AORebirth.Core.Playfields
 
     internal static class CapturedSubwayCombatCatalog
     {
+        private const int BloodcreeperMonsterData = 30379;
+
+        private const int LooterMonsterData = 203745;
+
         private const int WorkmanStrikerMonsterData = 203854;
 
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
         {
-            return new CapturedEnemyCombatContract();
+            return monsterData == BloodcreeperMonsterData
+                ? new CapturedEnemyCombatContract
+                    {
+                        AttackModel = CapturedEnemyAttackModel.Specialized,
+                        IsCombatReady = true,
+                        Evidence = "Bloodcreeper captured dual natural attack sequence."
+                    }
+                : new CapturedEnemyCombatContract();
         }
 
         internal static CapturedEnemyCombatContract For(string name, int monsterData, int? level)
@@ -64,14 +75,21 @@ namespace AORebirth.Core.Playfields
         internal static CapturedEnemyCombatContract ForOrdinary(
             CapturedSubwayOrdinaryArchetypeDefinition archetype)
         {
-            if (archetype != null && archetype.MonsterData == WorkmanStrikerMonsterData)
+            if (archetype != null
+                && (archetype.MonsterData == WorkmanStrikerMonsterData
+                    || archetype.MonsterData == LooterMonsterData))
             {
                 return new CapturedEnemyCombatContract
                 {
                     AttackModel = CapturedEnemyAttackModel.Unresolved,
                     IsCombatReady = false,
-                    Evidence = "Workman Striker requires exact source weapon evidence."
+                    Evidence = archetype.Name + " requires exact source weapon evidence."
                 };
+            }
+
+            if (archetype != null && archetype.MonsterData == BloodcreeperMonsterData)
+            {
+                return For(archetype.Name, archetype.MonsterData);
             }
 
             if (archetype != null
@@ -124,7 +142,11 @@ namespace AORebirth.Core.Playfields
                     ? string.Empty
                     : string.Join(",", archetype.EvidenceCaptures),
                 MinDamage = observed ? archetype.Combat.MinDamage : 0,
-                MaxDamage = observed ? archetype.Combat.MaxDamage : 0
+                MaxDamage = observed ? archetype.Combat.MaxDamage : 0,
+                RechargeSeconds = observed ? archetype.Combat.RechargeSeconds : 0,
+                AttackInfoWeaponSlot = observed ? archetype.Combat.WeaponSlot : 0,
+                AttackInfoUnknown = observed ? archetype.Combat.AttackInfoUnknown : 0,
+                AttackInfoWeaponInstance = observed ? archetype.Combat.WeaponInstance : 0
             };
         }
 
@@ -132,7 +154,9 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayOrdinaryArchetypeDefinition archetype,
             int sourceInstance)
         {
-            if (archetype == null || archetype.MonsterData != WorkmanStrikerMonsterData)
+            if (archetype == null
+                || (archetype.MonsterData != WorkmanStrikerMonsterData
+                    && archetype.MonsterData != LooterMonsterData))
             {
                 return ForOrdinary(archetype);
             }
@@ -157,7 +181,7 @@ namespace AORebirth.Core.Playfields
                 {
                     AttackModel = CapturedEnemyAttackModel.Unresolved,
                     IsCombatReady = false,
-                    Evidence = "Workman Striker source weapon evidence is missing or conflicting."
+                    Evidence = archetype.Name + " source weapon evidence is missing or conflicting."
                 };
             }
 
@@ -166,8 +190,9 @@ namespace AORebirth.Core.Playfields
                 AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
                 IsCombatReady = true,
                 Evidence = string.Format(
-                    "{0}: source 0x{1:X8} QL{2} weapon {3}/{4}; item owns normal damage and recharge",
+                    "{0}: {1} source 0x{2:X8} QL{3} weapon {4}/{5}; item owns normal damage and recharge",
                     matched.EvidenceCaptures,
+                    archetype.Name,
                     sourceInstance,
                     matched.Quality,
                     matched.LowId,

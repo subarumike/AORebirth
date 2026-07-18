@@ -1325,6 +1325,17 @@ namespace AORebirth.Core.Playfields
                     "20260709-212115",
                     "20260709-212336",
                     "20260710-202132"
+                },
+                new CapturedSubwaySourceWeaponEvidenceDefinition[]
+                {
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795312DC, 123038, 123039, 12, "20260709-210452,20260709-212115,20260709-212336"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795313CB, 123038, 123039, 9, "20260709-210452,20260709-212115,20260709-212336"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x7954501B, 123038, 123039, 8, "20260709-212115,20260709-212336"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x79545029, 123038, 123039, 9, "20260709-212115,20260709-212336"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x79545034, 123038, 123039, 12, "20260709-212115,20260709-212336"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x7954503C, 123038, 123039, 11, "20260709-212115,20260709-212336"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x79557CB8, 123038, 123039, 8, "20260710-202132"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x7957E5CD, 123038, 123039, 9, "20260710-202132")
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "infector",
