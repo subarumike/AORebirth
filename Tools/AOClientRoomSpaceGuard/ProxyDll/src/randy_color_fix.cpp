@@ -21,7 +21,6 @@ namespace
     uintptr_t DwordColorFaultAddress = 0;
     uintptr_t DwordColorResumeAddress = 0;
     uintptr_t GuiRenderBatchAddress = 0;
-    uintptr_t GuiCallRenderAddress = 0;
     uintptr_t GuiNullDynamicVbFaultAddress = 0;
     uintptr_t GuiDynamicVbGetAddress = 0;
     uintptr_t GuiDynamicVbGetVbAddress = 0;
@@ -38,11 +37,7 @@ namespace
     LONG DriverDrawInputSkipCount = 0;
     LONG DriverDrawExceptionSkipCount = 0;
     LONG GuiBatchExceptionSkipCount = 0;
-    LONG GuiCallRenderDepthSkipCount = 0;
     LONG GuiTreeInvalidKeySkipCount = 0;
-
-    __declspec(thread) LONG GuiCallRenderDepth = 0;
-    constexpr LONG MaximumGuiCallRenderDepth = 128;
 
     constexpr uintptr_t RenderStateVectorStartRva = 0x25110;
     constexpr uintptr_t RenderStateEntryFaultRva = 0x25118;
@@ -1042,84 +1037,6 @@ namespace
         }
     }
 
-    void InvokeGuiCallRenderChild(
-        void* childView,
-        DWORD argument1,
-        DWORD argument2,
-        DWORD argument3,
-        DWORD argument4,
-        DWORD argument5,
-        DWORD argument6)
-    {
-        __asm
-        {
-            push argument6
-            push argument5
-            push argument4
-            push argument3
-            push argument2
-            push argument1
-            mov ecx, childView
-            call dword ptr [GuiCallRenderAddress]
-        }
-    }
-
-    void __stdcall GuardedGuiCallRenderChild(
-        void* childView,
-        DWORD argument1,
-        DWORD argument2,
-        DWORD argument3,
-        DWORD argument4,
-        DWORD argument5,
-        DWORD argument6)
-    {
-        LONG depth = ++GuiCallRenderDepth;
-        if (depth > MaximumGuiCallRenderDepth)
-        {
-            --GuiCallRenderDepth;
-            LONG count = InterlockedIncrement(&GuiCallRenderDepthSkipCount);
-            if (count <= 16 || count % 100 == 0)
-            {
-                aorf::Log(
-                    "PATCH HIT GUI render recursion depth capped "
-                    "child=0x%08lX depth=%ld limit=%ld count=%ld",
-                    static_cast<unsigned long>(
-                        reinterpret_cast<uintptr_t>(childView)),
-                    static_cast<long>(depth),
-                    static_cast<long>(MaximumGuiCallRenderDepth),
-                    static_cast<long>(count));
-            }
-            return;
-        }
-
-        InvokeGuiCallRenderChild(
-            childView,
-            argument1,
-            argument2,
-            argument3,
-            argument4,
-            argument5,
-            argument6);
-        --GuiCallRenderDepth;
-    }
-
-    __declspec(naked) void GuardedGuiCallRenderChildThunk()
-    {
-        __asm
-        {
-            mov edx, esp
-            push dword ptr [edx + 18h]
-            push dword ptr [edx + 14h]
-            push dword ptr [edx + 10h]
-            push dword ptr [edx + 0Ch]
-            push dword ptr [edx + 08h]
-            push dword ptr [edx + 04h]
-            push ecx
-            call GuardedGuiCallRenderChild
-            ret 18h
-        }
-    }
-
     __declspec(naked) void GuiTreeFindOriginalTrampoline()
     {
         __asm
@@ -1609,109 +1526,6 @@ namespace
         if (!flushed || !verified || !restored)
         {
             FailFastPatchRollback("GUI render-batch patch");
-        }
-    }
-
-    bool PatchGuiCallRenderChildCall(uint8_t* callsite)
-    {
-        constexpr uint8_t ExpectedCall[] =
-        {
-            0xE8, 0x16, 0xFE, 0xFF, 0xFF
-        };
-        if (std::memcmp(callsite, ExpectedCall, sizeof(ExpectedCall)) != 0)
-        {
-            return false;
-        }
-
-        uint8_t patchedCall[sizeof(ExpectedCall)] = { 0xE8, 0, 0, 0, 0 };
-        uint32_t nextInstruction = static_cast<uint32_t>(
-            reinterpret_cast<uintptr_t>(callsite + sizeof(patchedCall)));
-        uint32_t destination = static_cast<uint32_t>(
-            reinterpret_cast<uintptr_t>(&GuardedGuiCallRenderChildThunk));
-        int32_t displacement = static_cast<int32_t>(destination - nextInstruction);
-        std::memcpy(patchedCall + 1, &displacement, sizeof(displacement));
-
-        DWORD oldProtection = 0;
-        if (!VirtualProtect(
-                callsite,
-                sizeof(patchedCall),
-                PAGE_EXECUTE_READWRITE,
-                &oldProtection))
-        {
-            return false;
-        }
-
-        std::memcpy(callsite, patchedCall, sizeof(patchedCall));
-        bool flushed = FlushInstructionCache(
-            GetCurrentProcess(),
-            callsite,
-            sizeof(patchedCall)) != FALSE;
-        bool verified = std::memcmp(
-            callsite,
-            patchedCall,
-            sizeof(patchedCall)) == 0;
-        if (!flushed || !verified)
-        {
-            RestorePatchedBytesOrTerminate(
-                callsite,
-                ExpectedCall,
-                sizeof(ExpectedCall),
-                oldProtection,
-                "GUI render-depth call patch");
-            return false;
-        }
-
-        DWORD ignored = 0;
-        if (!VirtualProtect(
-                callsite,
-                sizeof(patchedCall),
-                oldProtection,
-                &ignored))
-        {
-            RestorePatchedBytesOrTerminate(
-                callsite,
-                ExpectedCall,
-                sizeof(ExpectedCall),
-                oldProtection,
-                "GUI render-depth call patch");
-            return false;
-        }
-        return true;
-    }
-
-    void RestoreGuiCallRenderChildCall(uint8_t* callsite)
-    {
-        constexpr uint8_t OriginalCall[] =
-        {
-            0xE8, 0x16, 0xFE, 0xFF, 0xFF
-        };
-        DWORD oldProtection = 0;
-        if (!VirtualProtect(
-                callsite,
-                sizeof(OriginalCall),
-                PAGE_EXECUTE_READWRITE,
-                &oldProtection))
-        {
-            FailFastPatchRollback("GUI render-depth call patch");
-        }
-        std::memcpy(callsite, OriginalCall, sizeof(OriginalCall));
-        bool flushed = FlushInstructionCache(
-            GetCurrentProcess(),
-            callsite,
-            sizeof(OriginalCall)) != FALSE;
-        bool verified = std::memcmp(
-            callsite,
-            OriginalCall,
-            sizeof(OriginalCall)) == 0;
-        DWORD ignored = 0;
-        bool restored = VirtualProtect(
-            callsite,
-            sizeof(OriginalCall),
-            oldProtection,
-            &ignored) != FALSE;
-        if (!flushed || !verified || !restored)
-        {
-            FailFastPatchRollback("GUI render-depth call patch");
         }
     }
 
@@ -2265,7 +2079,6 @@ namespace aorf
         DwordColorFaultAddress = reinterpret_cast<uintptr_t>(base + 0x6C51D);
         DwordColorResumeAddress = reinterpret_cast<uintptr_t>(base + 0x6C51F);
         GuiRenderBatchAddress = reinterpret_cast<uintptr_t>(guiBase + 0x150E17);
-        GuiCallRenderAddress = reinterpret_cast<uintptr_t>(guiBase + 0x14D4F5);
         GuiNullDynamicVbFaultAddress = reinterpret_cast<uintptr_t>(
             guiBase + 0x150F22);
         GuiDynamicVbGetAddress = guiDynamicVbGetFunction;
@@ -2349,15 +2162,6 @@ namespace aorf
                 if (contextsRead)
                 {
                     contextsRead = suspension.IsAnyThreadExecutingInRange(
-                        reinterpret_cast<uintptr_t>(guiBase + 0x14D4F5),
-                        reinterpret_cast<uintptr_t>(guiBase + 0x14D8F6),
-                        &executing);
-                    unsafeRendererExecution =
-                        unsafeRendererExecution || executing;
-                }
-                if (contextsRead)
-                {
-                    contextsRead = suspension.IsAnyThreadExecutingInRange(
                         reinterpret_cast<uintptr_t>(guiBase + 0x150E17),
                         reinterpret_cast<uintptr_t>(guiBase + 0x150FAE),
                         &executing);
@@ -2433,15 +2237,8 @@ namespace aorf
                         RestoreDriverDrawCall(base + 0x219B4);
                         patchFailure = "GUI render-batch patch failed";
                     }
-                    else if (!PatchGuiCallRenderChildCall(guiBase + 0x14D6DA))
-                    {
-                        RestoreGuiRenderBatchCall(guiBase + 0x152E49);
-                        RestoreDriverDrawCall(base + 0x219B4);
-                        patchFailure = "GUI render-depth call patch failed";
-                    }
                     else if (!PatchGuiTreeFindEntry(guiBase + 0x4F2EF))
                     {
-                        RestoreGuiCallRenderChildCall(guiBase + 0x14D6DA);
                         RestoreGuiRenderBatchCall(guiBase + 0x152E49);
                         RestoreDriverDrawCall(base + 0x219B4);
                         patchFailure = "GUI tree-find patch failed";
@@ -2467,7 +2264,6 @@ namespace aorf
             DwordColorFaultAddress = 0;
             DwordColorResumeAddress = 0;
             GuiRenderBatchAddress = 0;
-            GuiCallRenderAddress = 0;
             GuiNullDynamicVbFaultAddress = 0;
             GuiDynamicVbGetAddress = 0;
             GuiDynamicVbGetVbAddress = 0;
@@ -2484,7 +2280,6 @@ namespace aorf
 
         Log("PATCH PASS randy31 renderer/color/driver guards "
             "deviceSelector=preserved drawCallRva=0x219B4 "
-            "guiRenderDepthCallRva=0x14D6DA guiRenderDepthLimit=128 "
             "guiBatchCallRva=0x152E49 guiNullDynamicVbRva=0x150F22 "
             "guiTreeFindRva=0x4F2EF "
             "faultRvas=0x21A94,0x25118,0x2511A,0x6C3A1,0x6C476,0x6C51D");
