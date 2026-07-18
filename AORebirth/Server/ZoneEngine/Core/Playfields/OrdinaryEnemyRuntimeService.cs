@@ -6,6 +6,8 @@ namespace AORebirth.Core.Playfields
     using System.Linq;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Events;
+    using AORebirth.Core.Functions;
     using AORebirth.Core.Nanos;
     using AORebirth.Core.NPCHandler;
     using AORebirth.Core.Textures;
@@ -268,6 +270,17 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            int resolvedModifierStatId;
+            int resolvedModifierDelta;
+            if (profile.ResolvePrimaryModifierFromNanoData
+                && !TryResolveNanoDataStaticModifier(
+                    profile.PrimaryNanoId,
+                    out resolvedModifierStatId,
+                    out resolvedModifierDelta))
+            {
+                return false;
+            }
+
             int remainingNano;
             if (!OrdinaryEnemySupportNanoRuntimeRules.TrySpendNano(
                 caster.Stats[StatIds.currentnano].Value,
@@ -491,6 +504,65 @@ namespace AORebirth.Core.Playfields
                 this.levelSelector);
         }
 
+        internal static bool TryResolveNanoDataStaticModifier(
+            int nanoId,
+            out int statId,
+            out int modifierDelta)
+        {
+            NanoFormula nano;
+            statId = 0;
+            modifierDelta = 0;
+            return NanoLoader.NanoList.TryGetValue(nanoId, out nano)
+                   && TryResolveNanoDataStaticModifier(
+                       nano,
+                       out statId,
+                       out modifierDelta);
+        }
+
+        internal static bool TryResolveNanoDataStaticModifier(
+            NanoFormula nano,
+            out int statId,
+            out int modifierDelta)
+        {
+            statId = 0;
+            modifierDelta = 0;
+            if (nano == null
+                || nano.Events == null
+                || nano.Events.Count != 1)
+            {
+                return false;
+            }
+
+            Event onUse = nano.Events[0];
+            if (onUse == null
+                || onUse.EventType != EventType.OnUse
+                || onUse.Functions == null
+                || onUse.Functions.Count != 1)
+            {
+                return false;
+            }
+
+            Function function = onUse.Functions[0];
+            if (function == null
+                || function.FunctionType != (int)FunctionType.Skill
+                || function.Target != (int)ItemTarget.Target
+                || function.TickCount != 1
+                || function.TickInterval != 0
+                || !function.dolocalstats
+                || function.Requirements == null
+                || function.Requirements.Count != 0
+                || function.Arguments == null
+                || function.Arguments.Values == null
+                || function.Arguments.Values.Count != 2)
+            {
+                return false;
+            }
+
+            statId = function.Arguments.Values[0].AsInt32();
+            modifierDelta = function.Arguments.Values[1].AsInt32();
+            return statId > 0 && modifierDelta != 0;
+        }
+
         private static bool IsOrdinaryEnemy(ICharacter candidate)
         {
             OrdinaryEnemyRuntimeDefinition ignored;
@@ -519,6 +591,22 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            int primaryModifierDelta = profile.PrimaryModifierDelta;
+            int[] primaryAffectedStatIds = profile.AffectedStatIds;
+            if (profile.ResolvePrimaryModifierFromNanoData)
+            {
+                int primaryModifierStatId;
+                if (!TryResolveNanoDataStaticModifier(
+                    profile.PrimaryNanoId,
+                    out primaryModifierStatId,
+                    out primaryModifierDelta))
+                {
+                    return;
+                }
+
+                primaryAffectedStatIds = new[] { primaryModifierStatId };
+            }
+
             bool primaryFirstActivation = profile.HasPeriodicStatHit
                 ? this.ApplyOrRefreshPeriodicNanoHit(caster, target, profile, utcNow)
                 : this.ApplyOrRefreshTransientNanoEffect(
@@ -526,9 +614,10 @@ namespace AORebirth.Core.Playfields
                     target,
                     profile.PrimaryNanoId,
                     profile.PrimaryStrain,
-                    profile.PrimaryModifierDelta,
+                    primaryModifierDelta,
                     profile,
-                    utcNow);
+                    utcNow,
+                    primaryAffectedStatIds);
 
             if (primaryFirstActivation)
             {
@@ -660,7 +749,8 @@ namespace AORebirth.Core.Playfields
             int strain,
             int modifierDelta,
             OrdinaryEnemySupportNanoProfile profile,
-            DateTime utcNow)
+            DateTime utcNow,
+            int[] affectedStatIds = null)
         {
             Dictionary<int, OrdinaryEnemyTransientNanoEffectState> recipientEffects;
             if (!this.transientNanoEffectsByRecipient.TryGetValue(
@@ -706,7 +796,7 @@ namespace AORebirth.Core.Playfields
                 NanoId = nanoId,
                 Strain = strain,
                 ModifierDelta = modifierDelta,
-                StatIds = (int[])profile.AffectedStatIds.Clone(),
+                StatIds = (int[])(affectedStatIds ?? profile.AffectedStatIds).Clone(),
                 CasterInstance = caster.Identity.Instance,
                 ActiveNanoKey = activeNanoKey,
                 ExpiresAtUtc = utcNow.AddSeconds(profile.EffectLifetimeSeconds)

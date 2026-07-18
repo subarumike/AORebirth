@@ -2535,11 +2535,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Stim Fiend|203739|138",
                     "Neural Burnout|203730|148",
                     "Incomplete Rebuild|203728|148",
+                    "Fragmented Soul|203729|148",
                     "Redundant Scan|204178|148"
                 };
 
             Assert.AreEqual(
-                18,
+                19,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
 
@@ -3297,6 +3298,113 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(3.0, incompleteRebuild.Corpse.EmptyLifetimeSeconds);
             Assert.AreEqual(240.0, incompleteRebuild.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(3.0, incompleteRebuild.Corpse.LootedCleanupSeconds);
+
+            OrdinaryEnemyProfile fragmentedSoul = ordinaryProfiles.Single(
+                value => value.DisplayName == "Fragmented Soul");
+            OrdinaryEnemySpawnDefinition[] fragmentedSoulSpawns = ordinarySpawns
+                .Where(value => value.ProfileKey == fragmentedSoul.ProfileKey)
+                .OrderBy(value => value.SourceIdentity)
+                .ToArray();
+            Assert.AreEqual(10, fragmentedSoulSpawns.Length);
+            Assert.AreEqual(
+                10,
+                fragmentedSoulSpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(
+                19,
+                fragmentedSoulSpawns.Sum(
+                    value => value.LevelDefinition.GetExplicitVariants().Length));
+            Assert.IsTrue(
+                fragmentedSoulSpawns.All(
+                    value => value.MovementMode == OrdinaryEnemyMovementMode.Static));
+            CollectionAssert.AreEqual(
+                new[] { 0x7954517A },
+                fragmentedSoulSpawns
+                    .Where(value => value.Waypoints.Length == 1)
+                    .Select(value => value.SourceIdentity)
+                    .ToArray());
+            Assert.IsTrue(
+                fragmentedSoulSpawns.All(
+                    spawn => spawn.LevelDefinition.Mode
+                             == OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants
+                             && spawn.RespawnPolicy.Mode
+                                == WorldRespawnPolicyAssignmentMode.Inherit));
+            foreach (OrdinaryEnemySpawnDefinition spawn in fragmentedSoulSpawns)
+            {
+                foreach (OrdinaryEnemySpawnVariant variant in
+                    spawn.LevelDefinition.GetExplicitVariants())
+                {
+                    Assert.IsNotNull(variant.WeaponLoadout);
+                    CapturedEnemyCombatContract contract =
+                        fragmentedSoul.Combat.ResolveContract(
+                            spawn.SourceIdentity,
+                            variant);
+                    Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
+                    Assert.IsTrue(contract.IsCombatReady);
+                    Assert.AreEqual(variant.WeaponLoadout.LowId, contract.WeaponLowId);
+                    Assert.AreEqual(variant.WeaponLoadout.HighId, contract.WeaponHighId);
+                    Assert.AreEqual(variant.WeaponLoadout.Quality, contract.WeaponQuality);
+                    Assert.AreEqual(6, contract.WeaponInventorySlot);
+                    Assert.AreEqual(0, contract.MinDamage);
+                    Assert.AreEqual(0, contract.MaxDamage);
+                    Assert.AreEqual(0.0, contract.RechargeSeconds);
+                    Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
+                    Assert.AreEqual(24, contract.AttackInfoAmmoCount);
+                    Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
+                    Assert.AreEqual(0, contract.AttackInfoUnknown);
+                    Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+                }
+            }
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, fragmentedSoul.Aggression.Mode);
+            Assert.IsFalse(fragmentedSoul.Aggression.AutomaticAggroRadius.HasValue);
+            Assert.IsTrue(fragmentedSoul.Aggression.Chase);
+            Assert.IsFalse(fragmentedSoul.Aggression.ReturnToSpawn);
+            Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, fragmentedSoul.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, fragmentedSoul.Combat.DamageSource);
+            Assert.IsTrue(fragmentedSoul.Combat.VisibleWeapon);
+            Assert.IsNotNull(fragmentedSoul.SupportNano);
+            Assert.AreEqual(95447, fragmentedSoul.SupportNano.PrimaryNanoId);
+            Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, fragmentedSoul.Loot.PoolMode);
+            Assert.IsFalse(fragmentedSoul.Loot.ItemPoolComplete);
+            Assert.AreEqual(4, fragmentedSoul.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(0, fragmentedSoul.Loot.ObservedEmptyInventories);
+            CollectionAssert.AreEqual(
+                new[]
+                    {
+                        "26471:26471:14:3:4", "85691:22004:18:1:4",
+                        "85732:21963:17:1:4", "124304:124305:17:1:4",
+                        "234877:234877:1:2:4", "301712:301712:1:1:4"
+                    },
+                fragmentedSoul.Loot.Entries
+                    .OrderBy(value => value.LowId)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}:{3}:{4}",
+                            value.LowId,
+                            value.HighId,
+                            value.QualityLevel,
+                            value.ObservedCount,
+                            value.ObservedCorpses))
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[]
+                    {
+                        "17:105:Observed", "18:111:Observed", "19:118:Policy",
+                        "20:124:Policy", "21:131:Observed"
+                    },
+                fragmentedSoul.Loot.LevelCreditRules
+                    .OrderBy(value => value.EnemyLevel)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}",
+                            value.EnemyLevel,
+                            value.MinimumCredits,
+                            value.EvidenceState))
+                    .ToArray());
+            Assert.AreEqual(5921, fragmentedSoul.Corpse.CapturedCatMesh);
+            Assert.AreEqual(3.0, fragmentedSoul.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(240.0, fragmentedSoul.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(3.0, fragmentedSoul.Corpse.LootedCleanupSeconds);
 
             OrdinaryEnemyProfile redundantScan = ordinaryProfiles.Single(
                 value => value.DisplayName == "Redundant Scan");
@@ -7395,6 +7503,112 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && actionHandlerText.Contains("public void NotifyActiveNanoDurationToPlayfield(")
                 && actionHandlerText.Contains("true);"),
                 "NPC Buff and SetNanoDuration packets must broadcast to the playfield instead of a nonexistent NPC client.");
+        }
+
+        [TestMethod]
+        public void FragmentedSoulNano95447UsesDynamicSkillAndOwnedOrdinaryAllyLifecycle()
+        {
+            OrdinaryEnemySupportNanoProfile nano =
+                OrdinaryEnemySupportNanoProfile.CapturedFragmentedSoul95447();
+
+            Assert.AreEqual(95447, nano.PrimaryNanoId);
+            Assert.AreEqual(0, nano.TriggeredSelfNanoId);
+            Assert.AreEqual(10.0, nano.InitialDelaySeconds);
+            Assert.AreEqual(2.5, nano.CastSeconds);
+            Assert.AreEqual(10.0, nano.RepeatSeconds);
+            Assert.AreEqual(1440000, nano.DurationParameter);
+            Assert.AreEqual(14400.0, nano.EffectLifetimeSeconds);
+            Assert.AreEqual(20.0, nano.TargetRange);
+            Assert.IsTrue(nano.FallbackToSelf);
+            Assert.AreEqual(181, nano.PrimaryStrain);
+            Assert.AreEqual(0, nano.TriggeredSelfStrain);
+            Assert.AreEqual(0, nano.PrimaryModifierDelta);
+            Assert.AreEqual(0, nano.TriggeredSelfModifierDelta);
+            Assert.AreEqual(0, nano.AffectedStatIds.Length);
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Policy, nano.EvidenceState);
+            Assert.IsFalse(nano.HasPeriodicStatHit);
+            Assert.IsFalse(nano.HasTriggeredSelfEffect);
+            Assert.AreEqual(44, nano.NanoCost);
+            Assert.IsFalse(nano.CastWhileFighting);
+            Assert.IsFalse(nano.AllowCombatActionsDuringCast);
+            Assert.AreEqual(10000, nano.CastChanceBasisPoints);
+            Assert.AreEqual(5000, nano.SelfTargetChanceBasisPoints);
+            Assert.IsTrue(nano.RandomizeInitialDelay);
+            Assert.AreEqual(7, nano.NcuCost);
+            Assert.IsTrue(nano.ResolvePrimaryModifierFromNanoData);
+            Assert.IsTrue(nano.Evidence.Contains("on-use-skill-stat=381,delta=+42"));
+            CollectionAssert.AreEqual(
+                new[] { "19:665", "20:782", "21:829" },
+                nano.SpawnNanoPoolByLevel
+                    .Select(value => string.Format("{0}:{1}", value.Key, value.Value))
+                    .ToArray());
+            Assert.AreEqual(0, nano.ResolveSpawnNanoPool(17));
+            Assert.AreEqual(0, nano.ResolveSpawnNanoPool(18));
+            Assert.AreEqual(665, nano.ResolveSpawnNanoPool(19));
+            Assert.AreEqual(782, nano.ResolveSpawnNanoPool(20));
+            Assert.AreEqual(829, nano.ResolveSpawnNanoPool(21));
+            Assert.AreEqual(0, nano.ResolveSpawnNanoPool(22));
+
+            string repositoryRoot = FindRepositoryRoot();
+            string runtimeText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
+            string dynamicLookup = ExtractMethodBlock(
+                runtimeText,
+                "internal static bool TryResolveNanoDataStaticModifier(");
+            string targetSelection = ExtractMethodBlock(
+                runtimeText,
+                "private ICharacter FindSupportNanoTarget(");
+            string targetEligibility = ExtractMethodBlock(
+                runtimeText,
+                "private static bool IsOrdinaryEnemy(");
+            string finish = ExtractMethodBlock(
+                runtimeText,
+                "private void FinishSupportNanoCast(");
+            string apply = ExtractMethodBlock(
+                runtimeText,
+                "private bool ApplyOrRefreshTransientNanoEffect(");
+            string remove = ExtractMethodBlock(
+                runtimeText,
+                "private void RemoveTransientNanoEffect(");
+
+            Assert.IsTrue(
+                dynamicLookup.Contains("NanoLoader.NanoList.TryGetValue(nanoId, out nano)")
+                && runtimeText.Contains("nano.Events.Count != 1")
+                && runtimeText.Contains("onUse.EventType != EventType.OnUse")
+                && runtimeText.Contains("function.FunctionType != (int)FunctionType.Skill")
+                && runtimeText.Contains("function.Target != (int)ItemTarget.Target")
+                && runtimeText.Contains("function.TickCount != 1")
+                && runtimeText.Contains("function.TickInterval != 0")
+                && runtimeText.Contains("!function.dolocalstats")
+                && runtimeText.Contains("function.Requirements.Count != 0")
+                && runtimeText.Contains("function.Arguments.Values.Count != 2")
+                && runtimeText.Contains("statId = function.Arguments.Values[0].AsInt32();")
+                && runtimeText.Contains("modifierDelta = function.Arguments.Values[1].AsInt32();"),
+                "Nano 95447 must resolve its one target Skill effect dynamically from NanoLoader data instead of hard-coding stat 381 or delta +42 in runtime.");
+            Assert.IsTrue(
+                targetSelection.Contains("candidate.Identity != caster.Identity")
+                && targetSelection.Contains("IsOrdinaryEnemy(candidate)")
+                && targetSelection.Contains("profile.FallbackToSelf")
+                && targetEligibility.Contains("OrdinaryEnemyRuntimeRegistry.TryGet("),
+                "Nano 95447 must target any ordinary ally, with self fallback, rather than only another Fragmented Soul.");
+            Assert.IsTrue(
+                finish.Contains("profile.ResolvePrimaryModifierFromNanoData")
+                && finish.Contains("primaryAffectedStatIds = new[] { primaryModifierStatId }")
+                && finish.Contains("ApplyOrRefreshTransientNanoEffect("),
+                "Nano 95447 must carry the dynamically resolved stat and delta into the transient-effect lifecycle.");
+            Assert.IsTrue(
+                apply.Contains("existing.ExpiresAtUtc = utcNow.AddSeconds(profile.EffectLifetimeSeconds)")
+                && apply.Contains("return false;")
+                && apply.Contains("recipient.Stats[statId].Modifier += modifierDelta")
+                && apply.Contains("ModifierDelta = modifierDelta")
+                && apply.Contains("StatIds = (int[])(affectedStatIds ?? profile.AffectedStatIds).Clone()"),
+                "Refreshing nano 95447 must extend expiry without stacking a second +42 delta.");
+            Assert.IsTrue(
+                remove.Contains("recipient.Stats[statId].Modifier -= state.ModifierDelta")
+                && remove.Contains("recipient.ActiveNanos.Remove(state.ActiveNanoKey)"),
+                "Nano 95447 cleanup must remove only the modifier delta and active state owned by its transient effect.");
         }
 
         [TestMethod]
