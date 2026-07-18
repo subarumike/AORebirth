@@ -618,7 +618,35 @@ namespace AORebirth.Core.Playfields
                     .Select(value => value.EvidenceReference)
                     .Where(value => !string.IsNullOrWhiteSpace(value))
                     .Distinct(StringComparer.Ordinal));
-            if (corpseEvidence.Length > 0)
+            if (monsterData == 17649)
+            {
+                // Identity-correlated official-live corpses prove level-conditioned values.
+                // Keep unobserved levels unresolved instead of inventing a global range or formula.
+                // Newly decoded corpse rows also supply the exact visual shape, but do not alter
+                // the separately accepted weighted-one item policy or its full evidence set.
+                return new OrdinaryEnemyLootProfile(
+                    evidence,
+                    entries,
+                    OrdinaryEnemyLootPoolMode.WeightedOne,
+                    5,
+                    false,
+                    7,
+                    5,
+                    itemEvidenceReference,
+                    OrdinaryEnemyEvidenceState.Observed,
+                    null,
+                    null,
+                    new[]
+                        {
+                            new OrdinaryEnemyLevelCreditRule(5, 6, 6, 2, "20260709-210452"),
+                            new OrdinaryEnemyLevelCreditRule(6, 8, 8, 2, "20260709-210452,20260712-153918"),
+                            new OrdinaryEnemyLevelCreditRule(8, 10, 10, 4, "20260708-143600,20260709-205921,20260713-033511"),
+                            new OrdinaryEnemyLevelCreditRule(9, 11, 11, 3, "20260709-220439,20260712-160257,20260713-014714"),
+                            new OrdinaryEnemyLevelCreditRule(10, 12, 12, 2, "20260709-220439")
+                        });
+            }
+
+            if (corpseEvidence.Length > 0 && monsterData != BloodcreeperMonsterData)
             {
                 OrdinaryEnemyLevelCreditRule[] levelCreditRules = corpseEvidence
                     .GroupBy(value => value.EnemyLevel)
@@ -678,32 +706,6 @@ namespace AORebirth.Core.Playfields
                     new OrdinaryEnemyLevelCreditRule[0]);
             }
 
-            if (monsterData == 17649)
-            {
-                // Identity-correlated official-live corpses prove level-conditioned values.
-                // Keep unobserved levels unresolved instead of inventing a global range or formula.
-                return new OrdinaryEnemyLootProfile(
-                    evidence,
-                    entries,
-                    OrdinaryEnemyLootPoolMode.WeightedOne,
-                    5,
-                    false,
-                    7,
-                    5,
-                    itemEvidenceReference,
-                    OrdinaryEnemyEvidenceState.Observed,
-                    null,
-                    null,
-                    new[]
-                        {
-                            new OrdinaryEnemyLevelCreditRule(5, 6, 6, 2, "20260709-210452"),
-                            new OrdinaryEnemyLevelCreditRule(6, 8, 8, 2, "20260709-210452,20260712-153918"),
-                            new OrdinaryEnemyLevelCreditRule(8, 10, 10, 4, "20260708-143600,20260709-205921,20260713-033511"),
-                            new OrdinaryEnemyLevelCreditRule(9, 11, 11, 3, "20260709-220439,20260712-160257,20260713-014714"),
-                            new OrdinaryEnemyLevelCreditRule(10, 12, 12, 2, "20260709-220439")
-                        });
-            }
-
             if (monsterData == BloodcreeperMonsterData)
             {
                 // Both completed level-24 official-live fights carried 150 credits.
@@ -727,8 +729,8 @@ namespace AORebirth.Core.Playfields
                                 24,
                                 150,
                                 150,
-                                2,
-                                "20260716-033326,20260716-034104")
+                                3,
+                                "20260712-223719,20260716-033326,20260716-034104")
                         });
             }
 

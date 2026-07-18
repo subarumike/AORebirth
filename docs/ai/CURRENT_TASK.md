@@ -3,10 +3,12 @@
 ## Current Focus
 
 Complete the Subway dungeon from the existing capture corpus before requesting
-more gameplay evidence. The full location inventory and the content-level
-Subway ledger are complete. Previously unindexed official-live combat, loot,
-corpse, credits, and teleport evidence is now integrated; the remaining
-unreferenced folders do not currently prove another safe implementation slice.
+more gameplay evidence. The full location inventory, raw lifecycle recovery,
+and content-level Subway ledger are complete. All `65` Subway-bearing sessions
+with raw packet rows now reprocess successfully, so incomplete legacy
+projections no longer require repeat gameplay captures. The active work is to
+promote the recovered exact evidence and then validate the quarantined PF127
+population in bounded runtime batches.
 
 ## Corpus Inventory
 
@@ -15,26 +17,58 @@ unreferenced folders do not currently prove another safe implementation slice.
 - `37` are Subway-only, `31` are mixed Subway/outside zoning sessions, and
   `222` are elsewhere.
 - `4` folders are unresolved because they contain no gameplay packets or
-  location snapshots; they are empty startup remnants, not missing evidence.
-- After the current integrations, `15` Subway or mixed folders have no
-  generated/runtime reference in the location inventory. The content ledger
-  narrows that to only three official-live Subway-only sessions without a
-  runtime-source reference: `20260709-213711`, `20260712-232848`, and
-  `20260716-220255`. They contain partial/ambient evidence, not a new complete
-  runtime slice.
+  location snapshots: `20260509-182711`, `20260528-210106`,
+  `20260621-013227`, and `20260622-081426`. They are empty startup remnants,
+  not missing Subway evidence.
+- The `68` Subway-bearing sessions contain `65` sessions with actual raw packet
+  rows. The three without raw rows are private validation/geometry sessions
+  `20260714-171439`, `20260714-185728`, and `20260714-202820`; their exact
+  non-packet artifacts remain indexed.
+- The deterministic lifecycle batch reprocessor now reports `65/65` PASS,
+  zero offline repairs, zero recapture requirements, and zero tool errors.
 - Names, character names, capture dates, and repository references do not
   determine location.
 - The complete per-folder result is generated at
   `docs/generated/aosharp_capture_inventory.csv` and
   `docs/generated/aosharp_capture_inventory.md` by
   `Tools/inventory_aosharp_captures.py`.
-- The content-level ledger covers all `68` Subway-bearing sessions with `21,559`
+- The content-level ledger covers all `68` Subway-bearing sessions with `23,991`
   aggregated evidence rows: `55` official-live and `13` AORebirth-private.
   It records identities, related identities, evidence kinds, source artifacts,
   row scope, realm, and reference category in
   `docs/generated/aosharp_subway_capture_content.csv` and `.md`.
 
 ## Implemented In This Slice
+
+- Raw-evidence inventory now counts actual packet-log and CSV data rows rather
+  than nonzero file size. BOM-only and header-only sinks can no longer be
+  mistaken for captured traffic.
+- Legacy start-only metadata, one demonstrably truncated terminal packet row,
+  exact two-byte run-speed alignment, observed opaque player/pet extensions,
+  terminal special-attack slot omission, and the legacy ActiveNanos alignment
+  family are handled as narrowly versioned evidence patterns. Internal or
+  arbitrary corruption remains fail-closed.
+- Lifecycle recovery is row-granular: one incomplete packet variant cannot
+  quarantine hundreds of completely decoded SCFU or corpse rows. Final
+  artifacts remain authoritative; pending artifacts are indexed only when a
+  final artifact is absent and can never imply absence or completeness.
+- Snapshot-only corpse presence no longer becomes a false decoder debt when no
+  raw `CorpseFullUpdate` packet exists. Local presence remains usable evidence,
+  while dead-NPC links, CATMesh, MonsterData, and credits stay unresolved
+  unless a raw corpse update proves them.
+- Reused corpse identities now keep the exact name and dead-NPC relationship
+  from their own generation instead of inheriting the union of every prior use
+  of the same identity.
+- The generated ordinary provider now preserves `278` exact, death-linked,
+  positive-credit corpse observations across `26` capture-backed profiles.
+  The recovered deep batches include all accepted observations from
+  `20260709-220439`, `20260709-222339`, `20260709-225408`,
+  `20260712-153918`, `20260712-223719`, and `20260716-222007`.
+- Legacy item snapshots are indexed as identity-linked evidence-only outcomes;
+  they cannot become runtime drop odds. Runtime probability denominators come
+  only from strict initial corpse snapshots, and reused loot-window opens count
+  once per corpse generation. The previously false Stim Fiend attribution is
+  removed; Disobedient Bot, Thief, and Filth Flea policies remain unchanged.
 
 - Legacy finalized capture folders whose packet log continued after capture
   shutdown now decode only rows within `captureStartUtc..captureEndUtc`.
@@ -47,13 +81,9 @@ unreferenced folders do not currently prove another safe implementation slice.
   normal runtime rolls.
 - Filth Flea loot now preserves `18` complete official-live corpse outcomes:
   `15` proven item memberships and `5` empty inventories. Exact L4=`23` and
-  L5=`29` credit rules are active; other captured spawn levels retain the
-  accepted private `23..79` fallback policy instead of becoming unresolved.
-- Thirty-two identity-matched, death-linked official-live corpse observations
-  now supply exact CATMesh and per-level credit rules for Filth Flea, Thief,
-  Mugger, Discarded Pet, Shadow, Slum Runner, Infector, Neural Burnout,
-  Fragmented Soul, Melded Patterns, Molested Molecules, and Premature Pattern.
-  Pre-existing and zero-credit unlinked corpses remain excluded.
+  L5=`29` credit rules remain active; the recovered corpus adds exact rules for
+  every further observed level while retaining private fallback only for
+  levels with no official corpse-credit observation.
 - Offline recovery of raw capture `20260710-202132` now links L10 Mugger
   `(SimpleChar:7957E5CA)` to `(Corpse:00F6C001)`, exact CATMesh `17534`, and
   `88` credits. Its three-item inventory is indexed as one observed corpse
@@ -105,20 +135,18 @@ unreferenced folders do not currently prove another safe implementation slice.
   captured shop snapshots with all `140` stock rows in captured slot order.
   Container Supplier is visible but has no invented shop endpoint because its
   stock was not captured.
-- Slum Runner now uses seven death-linked corpse observations across
-  `20260716-034656` and `20260716-215947`, CATMesh `31774`, and exact captured
-  level rules L21=`131`, L22=`137`, and L23=`144`. Item loot remains a separate
-  observed pool and no credit rule is invented for unobserved levels.
-
 ## Validation
 
 - Ordinary provider generator content-equivalence check: PASS.
 - AOSharp analyzer build and SCFU self-test: PASS.
-- NPC lifecycle decoder self-test, including finalized-window filtering: PASS.
-- Real offline recovery of `20260708-004038`: PASS.
-- Subway content inventory tests: `10/10` PASS; full `294`/`68` corpus
+- NPC lifecycle decoder self-test, including finalized-window, legacy metadata,
+  terminal-tail salvage, and snapshot-only corpse cases: PASS.
+- Capture inventory, lifecycle batch, and content-ledger tests: `27/27` PASS.
+- Full lifecycle reprocess: `65/65` PASS; zero offline repairs, recaptures, and
+  tool errors.
+- Full `294`-folder location inventory and `68`-session Subway ledger
   regeneration: PASS.
-- Subway loot evidence: `14/14` PASS.
+- Subway loot/corpse evidence: `18/18` PASS.
 - Flea combat and whole-enemy acceptance guardrails: PASS.
 - Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
@@ -138,32 +166,29 @@ unreferenced folders do not currently prove another safe implementation slice.
 
 ## Next Runtime Check
 
-Diagnostic session `pf127-vis-one-bot-20260717` currently enables only captured
-Disobedient Bot source identity `79557C66`; all other quarantined rows remain
-disabled. Log into the private server, enter PF127, traverse into and out of the
-bot's interest range near `(151.409,107.615,271.044)`, then fight and kill it.
-Confirm the client remains stable, the bot behaves normally, and its corpse can
-be opened. This is the first bounded population rollout gate; do not enable
-`ALL_38`.
+No additional official-live capture is required. The next runtime gate is the
+already-staged diagnostic Disobedient Bot identity `79557C66`, followed by
+bounded family batches from the `38` quarantined PF127 rows. All `38` are exact,
+unique, and profile-backed; quarantine is an operational client-stability hold,
+not missing content evidence. Do not permanently enable all `38` in one step
+until the staged identity has a private-client runtime result.
 
 ## Remaining Capture-Backed Work
 
-1. The three official-live Subway-only sessions without runtime references are
-   audited: `20260709-213711` is unfinalized partial SCFU evidence,
-   `20260712-232848` contains no Abmouth/Vergil identity row, and
-   `20260716-220255` is ambient bridge evidence. None proves a missing safe
-   content slice.
-2. Strike Foreman has a complete captured population profile but no indexed
+1. The raw lifecycle backlog is closed: all `65` raw Subway-bearing sessions
+   decode and promote. The four location-unresolved folders are empty startup
+   remnants and contain no recoverable gameplay traffic.
+2. The `38` capture-backed PF127 population rows remain behind the diagnostic
+   quarantine until bounded private-client validation. They comprise 11
+   Discarded Pets, 11 Violent Vagabonds, 6 Stim Fiends, 5 Muggers, 2
+   Disobedient Bots, 2 Looters, and 1 Deranged Shopper.
+3. Strike Foreman has a complete captured population profile but no indexed
    outgoing combat or loot. Keep those subsystems unresolved rather than
    guessing.
-3. Bitaxel has exact appearance evidence but no player-facing combat and an
+4. Bitaxel has exact appearance evidence but no player-facing combat and an
    unresolved MonsterData value. Do not activate it yet.
-4. Container Supplier stock and dialogue remain unresolved. Keep the captured
+5. Container Supplier stock and dialogue remain unresolved. Keep the captured
    appearance visible without synthesizing an inventory or interaction.
-5. The `38` diagnostic population rows are all exact, non-duplicate official
-   PF127 rows. One Disobedient Bot row is staged behind the ignored diagnostic
-   selector; the remaining `37` stay quarantined until bounded private
-   login/traversal validation proves the first activation is stable.
 6. Existing PF127 door evidence describes working interior doors, not exits.
    Do not remove them. The corpus does not yet provide identity-complete world
    static/container placements.
