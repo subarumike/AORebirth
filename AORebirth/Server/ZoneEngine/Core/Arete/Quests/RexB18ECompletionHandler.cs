@@ -3,7 +3,6 @@ namespace ZoneEngine.Core.Arete.Quests
     #region Usings ...
 
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
 
     using AORebirth.Core.Entities;
@@ -17,6 +16,7 @@ namespace ZoneEngine.Core.Arete.Quests
     using ZoneEngine.Core.Arete;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Missions;
 
     #endregion
 
@@ -37,10 +37,11 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const string RewardFeedbackText = "Received reward: 1281 XP, 1040 credits.";
 
-        private static readonly Dictionary<string, RexB18ECompletionState> StateByCharacter =
-            new Dictionary<string, RexB18ECompletionState>(StringComparer.OrdinalIgnoreCase);
+        private const string MissionId = "Mission:5514B18E";
 
-        private static readonly object SyncRoot = new object();
+        private const string ObjectiveId = "mission_5514B18E_objective_questfullupdate";
+
+        private const string RewardKey = "captured-xp-and-credits";
 
         public static bool IsCompletionEnabled
         {
@@ -83,139 +84,210 @@ namespace ZoneEngine.Core.Arete.Quests
                     "B18E completion failed: source is missing, not a player, or not in Arete Landing 6553.");
             }
 
-            RexMissionChainState chainState = RexMissionChainStateStore.GetState(source);
-            if (chainState < RexMissionChainState.B18EPreviewed)
+            if (!MissionRuntime.IsInitialized)
+            {
+                return RexB18ECompletionResult.Failed(
+                    "B18E completion failed: persistent mission runtime is not initialized.");
+            }
+
+            int characterId = source.Identity.Instance;
+            ZoneEngine.Core.Missions.MissionStateRecord mission = MissionRuntime.Service.GetMission(characterId, MissionId);
+            if (mission == null
+                || (mission.State != MissionLifecycleState.Active
+                    && mission.State != MissionLifecycleState.Completed))
             {
                 return RexB18ECompletionResult.Skipped(
-                    "B18E completion skipped because Rex chain state is "
-                    + chainState
-                    + ". b18ePreviewRequired=true noAction59=true noRewards=true noQuestDelete=true");
+                    "B18E completion skipped because the persistent mission is not active.");
             }
 
-            if (chainState >= RexMissionChainState.B18FPreviewed)
+            if (mission.State == MissionLifecycleState.Active)
             {
-                return RexB18ECompletionResult.Skipped(
-                    "B18E completion skipped because B18F was already previewed. duplicateCompletionBlocked=true "
-                    + "noDuplicateXp=true noDuplicateQuestDelete=true noDuplicateB18F=true");
-            }
-
-            RexB18ECompletionState completionState = GetOrCreateState(source.Identity);
-
-            RexQuestPreviewEmissionResult deleteResult = null;
-            if (!completionState.B18EDeleteSent)
-            {
-                deleteResult = SafeQuestFullUpdateSender.TrySendB18EQuestDelete(source);
-                if (!deleteResult.Emitted)
+                MissionOperationResult objective = MissionRuntime.Service.ObserveObjective(
+                    new MissionObjectiveObservation
+                    {
+                        CharacterId = characterId,
+                        QuestId = MissionId,
+                        ObjectiveId = ObjectiveId,
+                        ObservationKey = "dialogue-return:" + npcIdentity.ToString(true),
+                        Amount = 1,
+                        EventType = "NpcDialogueOpen",
+                        SourceIdentity = source.Identity.ToString(true),
+                        TargetIdentity = npcIdentity.ToString(true)
+                    });
+                if (objective.Status != MissionOperationStatus.Applied
+                    && objective.Status != MissionOperationStatus.AlreadyApplied
+                    && objective.Status != MissionOperationStatus.DuplicateObservation)
                 {
                     return RexB18ECompletionResult.Failed(
-                        "B18E completion failed before XP/B18F because Quest Delete was not emitted. "
-                        + "message=\"" + deleteResult.Message + "\" noAction59=true noXpGranted=true "
-                        + "noCreditsGranted=true noRewardFeedback=true noItems=true noInventory=true "
-                        + "noDbMissionPersistence=true");
+                        "B18E objective persistence failed: " + objective.Message);
                 }
 
-                lock (SyncRoot)
+                MissionOperationResult completion = MissionRuntime.Service.CompleteMission(characterId, MissionId);
+                if (completion.Status != MissionOperationStatus.Applied
+                    && completion.Status != MissionOperationStatus.AlreadyApplied)
                 {
-                    completionState.B18EDeleteSent = true;
-                }
-            }
-
-            RewardFeedbackResult rewardFeedbackResult = null;
-            if (!completionState.RewardFeedbackSent)
-            {
-                rewardFeedbackResult = SendCapturedRewardFeedback(source);
-                lock (SyncRoot)
-                {
-                    completionState.RewardFeedbackSent = rewardFeedbackResult.Sent;
-                }
-            }
-
-            CreditGrantResult creditResult = null;
-            if (!completionState.CreditsGranted)
-            {
-                creditResult = GrantCapturedCredits(source);
-                lock (SyncRoot)
-                {
-                    completionState.CreditsGranted = true;
-                    completionState.CashBefore = creditResult.CashBefore;
-                    completionState.CashAfter = creditResult.CashAfter;
-                }
-            }
-
-            XpGrantResult xpResult = null;
-            if (!completionState.XpGranted)
-            {
-                xpResult = GrantCapturedXp(source);
-                lock (SyncRoot)
-                {
-                    completionState.XpGranted = true;
-                    completionState.XpBefore = xpResult.XpBefore;
-                    completionState.XpAfter = xpResult.XpAfter;
-                }
-            }
-
-            RexQuestPreviewEmissionResult b18fResult = null;
-            if (!completionState.B18FQuestFullUpdateSent)
-            {
-                b18fResult = SafeQuestFullUpdateSender.TrySendB18FPreview(source);
-                if (!b18fResult.Emitted)
-                {
-                    RexMissionChainStateStore.AdvanceAtLeast(
-                        source,
-                        RexMissionChainState.B18ECompleted,
-                        "B18E delete and XP applied; B18F QuestFullUpdate retry still pending");
-
                     return RexB18ECompletionResult.Failed(
-                        "B18E completion partially applied but B18F QuestFullUpdate was not emitted. "
-                        + "b18eDeleteSent=true rewardFeedbackSent=" + completionState.RewardFeedbackSent
-                        + " creditsGranted=true xpGranted=true message=\"" + b18fResult.Message + "\" "
-                        + "noAction59=true noItems=true noInventory=true "
-                        + "noDbMissionPersistence=true noMarcusStoneImplementation=true");
-                }
-
-                lock (SyncRoot)
-                {
-                    completionState.B18FQuestFullUpdateSent = true;
+                        "B18E completion persistence failed: " + completion.Message);
                 }
             }
 
-            RexMissionChainStateStore.AdvanceAtLeast(
+            MissionRewardExecutionResult rewardResult = ApplyPersistentRewards(source);
+            if (!rewardResult.Succeeded)
+            {
+                return RexB18ECompletionResult.Failed(
+                    "B18E durable reward failed: " + rewardResult.Message);
+            }
+
+            MissionOperationResult b18fTransition = MissionRuntime.Service.CompleteAndActivateNextMission(
+                characterId,
+                MissionId,
+                MissionRuntime.RexB18FQuestId);
+            if (IsPersistenceFailure(b18fTransition))
+            {
+                return RexB18ECompletionResult.Failed(
+                    "B18F handoff persistence failed: " + b18fTransition.Message);
+            }
+
+            bool deleteProjected = EnsureQuestProjection(
                 source,
-                RexMissionChainState.B18FPreviewed,
-                "B18E return completed and B18F QuestFullUpdate sent");
+                "b18e-delete-projected",
+                () => SafeQuestFullUpdateSender.TrySendB18EQuestDelete(source));
+            RewardFeedbackResult feedback = null;
+            if (MissionRuntime.Service.GetFlag(characterId, MissionId, "reward-feedback-projected") == null)
+            {
+                feedback = SendCapturedRewardFeedback(source);
+                if (feedback.Sent)
+                {
+                    MissionRuntime.Service.SetFlag(
+                        characterId,
+                        MissionId,
+                        "reward-feedback-projected",
+                        "true");
+                }
+            }
+
+            bool b18fProjected = EnsureQuestProjection(
+                source,
+                "b18f-preview-projected",
+                () => SafeQuestFullUpdateSender.TrySendB18FPreview(source));
+            if (!deleteProjected || !b18fProjected)
+            {
+                return RexB18ECompletionResult.Failed(
+                    "B18E state and rewards are durable, but a client quest projection remains retryable.");
+            }
 
             return RexB18ECompletionResult.Succeeded(
-                "B18E completion applied mission=Mission:5514B18E deleteSent="
-                + completionState.B18EDeleteSent
-                + " xpGranted=true xpDelta=290 xpBefore="
-                + completionState.XpBefore
-                + " xpAfter="
-                + completionState.XpAfter
-                + " creditsGranted=true creditDelta=1040 cashBefore="
-                + completionState.CashBefore
-                + " cashAfter="
-                + completionState.CashAfter
-                + " rewardFeedbackSent="
-                + completionState.RewardFeedbackSent
-                + " rewardFeedbackMessage=\""
-                + RewardFeedbackText
-                + "\" rewardMessageDisplayXp="
-                + RewardMessageDisplayXp
-                + " b18fQuestFullUpdateSent="
-                + completionState.B18FQuestFullUpdateSent
-                + " b18fMission=Mission:5514B18F nextNpc=SimpleChar:782DE567 "
-                + "deleteMessage=\""
-                + (deleteResult == null ? "already-sent" : deleteResult.Message)
-                + "\" xpMessage=\""
-                + (xpResult == null ? "already-granted" : xpResult.Message)
-                + "\" creditMessage=\""
-                + (creditResult == null ? "already-granted" : creditResult.Message)
-                + "\" rewardFeedbackStatus=\""
-                + (rewardFeedbackResult == null ? "already-sent" : rewardFeedbackResult.Message)
-                + "\" b18fMessage=\""
-                + (b18fResult == null ? "already-sent" : b18fResult.Message)
-                + "\" noAction59=true noApplied1281Xp=true noItems=true noInventory=true "
-                + "noDbMissionPersistence=true noMarcusStoneImplementation=true");
+                "B18E completion applied persistently mission=" + MissionId
+                + " rewardStatus=" + rewardResult.Status
+                + " xpDelta=" + XpReward
+                + " creditDelta=" + CreditReward
+                + " displayXp=" + RewardMessageDisplayXp
+                + " b18fMission=" + MissionRuntime.RexB18FQuestId
+                + " deleteProjected=" + deleteProjected
+                + " rewardFeedback=" + (feedback == null ? "already-projected" : feedback.Message)
+                + " b18fProjected=" + b18fProjected);
+        }
+
+        private static MissionRewardExecutionResult ApplyPersistentRewards(ICharacter source)
+        {
+            var definition = new MissionRewardDefinition
+                             {
+                                 RewardKey = RewardKey,
+                                 RewardType = "character-stats",
+                                 IsResolved = true,
+                                 StatMutations = new[]
+                                                 {
+                                                     new MissionCharacterStatMutation
+                                                     {
+                                                         StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                         StatId = (int)StatIds.cash,
+                                                         Kind = MissionStatMutationKind.AddClamped,
+                                                         Value = CreditReward,
+                                                         MinimumValue = 0,
+                                                         MaximumValue = uint.MaxValue
+                                                     },
+                                                     new MissionCharacterStatMutation
+                                                     {
+                                                         StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                         StatId = (int)StatIds.xp,
+                                                         Kind = MissionStatMutationKind.AddClamped,
+                                                         Value = XpReward,
+                                                         MinimumValue = 0,
+                                                         MaximumValue = uint.MaxValue
+                                                     },
+                                                     new MissionCharacterStatMutation
+                                                     {
+                                                         StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                         StatId = (int)StatIds.unsavedxp,
+                                                         Kind = MissionStatMutationKind.AddClamped,
+                                                         Value = XpReward,
+                                                         MinimumValue = 0,
+                                                         MaximumValue = uint.MaxValue
+                                                     },
+                                                     new MissionCharacterStatMutation
+                                                     {
+                                                         StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                         StatId = (int)StatIds.lastxp,
+                                                         Kind = MissionStatMutationKind.Set,
+                                                         Value = XpReward,
+                                                         MinimumValue = 0,
+                                                         MaximumValue = uint.MaxValue
+                                                     }
+                                                 }
+                             };
+            MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
+                source.Identity.Instance,
+                MissionId,
+                definition,
+                "capture:20260618-083035:rex-b18e-xp-credits");
+            if (result.Succeeded && result.StatValues != null)
+            {
+                foreach (MissionCharacterStatValue statValue in result.StatValues)
+                {
+                    uint value = statValue.Value <= 0
+                                     ? 0
+                                     : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                    source.Stats[(StatIds)statValue.StatId].Set(value);
+                }
+
+                StatMessageHandler.Default.SendChanged(source);
+            }
+
+            return result;
+        }
+
+        private static bool EnsureQuestProjection(
+            ICharacter source,
+            string flagKey,
+            Func<RexQuestPreviewEmissionResult> sender)
+        {
+            int characterId = source.Identity.Instance;
+            if (MissionRuntime.Service.GetFlag(characterId, MissionId, flagKey) != null)
+            {
+                return true;
+            }
+
+            RexQuestPreviewEmissionResult result = sender();
+            if (result == null || !result.Emitted)
+            {
+                return false;
+            }
+
+            MissionOperationResult flag = MissionRuntime.Service.SetFlag(
+                characterId,
+                MissionId,
+                flagKey,
+                "true");
+            return flag.Status == MissionOperationStatus.Applied
+                   || flag.Status == MissionOperationStatus.AlreadyApplied;
+        }
+
+        private static bool IsPersistenceFailure(MissionOperationResult result)
+        {
+            return result == null
+                   || result.Status == MissionOperationStatus.Rejected
+                   || result.Status == MissionOperationStatus.NotFound
+                   || result.Status == MissionOperationStatus.Unresolved;
         }
 
         private static RewardFeedbackResult SendCapturedRewardFeedback(ICharacter source)
@@ -256,90 +328,6 @@ namespace ZoneEngine.Core.Arete.Quests
                    };
         }
 
-        private static CreditGrantResult GrantCapturedCredits(ICharacter source)
-        {
-            uint cashBeforeBase = source.Stats[StatIds.cash].BaseValue;
-            int cashBefore = CashStatRules.Clamp(cashBeforeBase);
-            int cashAfter = CashStatRules.Clamp((long)cashBefore + CreditReward);
-
-            source.Stats[StatIds.cash].Set((uint)cashAfter);
-            StatMessageHandler.Default.SendChanged(source);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                "ARETE_REX_B18E_COMPLETION credit grant applied character="
-                + source.Identity.ToString(true)
-                + " cashBefore=" + cashBefore.ToString(CultureInfo.InvariantCulture)
-                + " cashBeforeBase=" + cashBeforeBase.ToString(CultureInfo.InvariantCulture)
-                + " cashAfter=" + cashAfter.ToString(CultureInfo.InvariantCulture)
-                + " creditDelta=1040 source=20260618-083035/events.log:1077,system-messages.log:282 "
-                + "noAction59=true noItems=true noInventory=true noDbMissionPersistence=true");
-
-            return new CreditGrantResult
-                   {
-                       CashBefore = cashBefore,
-                       CashAfter = cashAfter,
-                       Message = "Credits +1040 applied using existing cash stat update path."
-                   };
-        }
-
-        private static XpGrantResult GrantCapturedXp(ICharacter source)
-        {
-            uint xpBefore = source.Stats[StatIds.xp].BaseValue;
-            uint unsavedXpBefore = source.Stats[StatIds.unsavedxp].BaseValue;
-            uint xpAfter = AddClamped(xpBefore, XpReward);
-            uint unsavedXpAfter = AddClamped(unsavedXpBefore, XpReward);
-
-            source.Stats[StatIds.xp].Set(xpAfter);
-            source.Stats[StatIds.lastxp].Set((uint)XpReward);
-            source.Stats[StatIds.unsavedxp].Set(unsavedXpAfter);
-            StatMessageHandler.Default.SendChanged(source);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                "ARETE_REX_B18E_COMPLETION xp grant applied character="
-                + source.Identity.ToString(true)
-                + " xpBefore=" + xpBefore.ToString(CultureInfo.InvariantCulture)
-                + " xpAfter=" + xpAfter.ToString(CultureInfo.InvariantCulture)
-                + " xpDelta=290 displayXp=1281 displayXpNotApplied=true "
-                + "source=20260618-083035/events.log:923,1078 "
-                + "noItems=true noInventory=true noDbMissionPersistence=true");
-
-            return new XpGrantResult
-                   {
-                       XpBefore = xpBefore,
-                       XpAfter = xpAfter,
-                       Message = "XP +290 applied using existing stat update path."
-                   };
-        }
-
-        private static uint AddClamped(uint value, int delta)
-        {
-            uint safeDelta = (uint)Math.Max(0, delta);
-            if (value > uint.MaxValue - safeDelta)
-            {
-                return uint.MaxValue;
-            }
-
-            return value + safeDelta;
-        }
-
-        private static RexB18ECompletionState GetOrCreateState(Identity identity)
-        {
-            lock (SyncRoot)
-            {
-                string key = MakeCharacterKey(identity);
-                RexB18ECompletionState state;
-                if (!StateByCharacter.TryGetValue(key, out state))
-                {
-                    state = new RexB18ECompletionState();
-                    StateByCharacter[key] = state;
-                }
-
-                return state;
-            }
-        }
-
         private static bool IsRexLarsson(Identity identity)
         {
             return identity.Type == IdentityType.CanbeAffected
@@ -356,34 +344,6 @@ namespace ZoneEngine.Core.Arete.Quests
                    && source.Playfield.Identity.Instance == AreteLandingPlayfieldId;
         }
 
-        private static string MakeCharacterKey(Identity identity)
-        {
-            return ((int)identity.Type).ToString(CultureInfo.InvariantCulture)
-                   + ":"
-                   + identity.Instance.ToString("X8", CultureInfo.InvariantCulture);
-        }
-
-        private sealed class RexB18ECompletionState
-        {
-            public bool B18EDeleteSent { get; set; }
-
-            public bool RewardFeedbackSent { get; set; }
-
-            public bool CreditsGranted { get; set; }
-
-            public bool XpGranted { get; set; }
-
-            public bool B18FQuestFullUpdateSent { get; set; }
-
-            public uint XpBefore { get; set; }
-
-            public uint XpAfter { get; set; }
-
-            public int CashBefore { get; set; }
-
-            public int CashAfter { get; set; }
-        }
-
         private sealed class RewardFeedbackResult
         {
             public bool Sent { get; set; }
@@ -391,23 +351,6 @@ namespace ZoneEngine.Core.Arete.Quests
             public string Message { get; set; }
         }
 
-        private sealed class CreditGrantResult
-        {
-            public int CashBefore { get; set; }
-
-            public int CashAfter { get; set; }
-
-            public string Message { get; set; }
-        }
-
-        private sealed class XpGrantResult
-        {
-            public uint XpBefore { get; set; }
-
-            public uint XpAfter { get; set; }
-
-            public string Message { get; set; }
-        }
     }
 
     public sealed class RexB18ECompletionResult

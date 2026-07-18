@@ -84,6 +84,24 @@ namespace ZoneEngine.Core.MessageHandlers
             this.Send(character, this.LocalTeleport(character, destination, heading), false);
         }
 
+        public void SendCapturedGatewayTransfer(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Vector3 landingDestination,
+            Quaternion heading,
+            int destinationPlayfieldId)
+        {
+            this.Send(
+                character,
+                this.CapturedGatewayTransfer(
+                    character,
+                    envelopeDestination,
+                    landingDestination,
+                    heading,
+                    destinationPlayfieldId),
+                false);
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="character">
@@ -274,6 +292,46 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.Unknown5 = 0;
                 x.Playfield2 = Identity.None;
                 x.Payload = BuildDestinationPayload(destination);
+            };
+        }
+
+        private MessageDataFiller CapturedGatewayTransfer(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Vector3 landingDestination,
+            Quaternion heading,
+            int destinationPlayfieldId)
+        {
+            return x =>
+            {
+                x.Identity = character.Identity;
+                x.Unknown = 0;
+                x.Destination = new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                {
+                    X = (float)envelopeDestination.x,
+                    Y = (float)envelopeDestination.y,
+                    Z = (float)envelopeDestination.z
+                };
+                x.Heading = new SmokeLounge.AOtomation.Messaging.GameData.Quaternion
+                {
+                    X = (float)heading.x,
+                    Y = (float)heading.y,
+                    Z = (float)heading.z,
+                    W = (float)heading.w
+                };
+                x.Unknown1 = 97;
+                x.Playfield = new Identity { Type = (IdentityType)51100, Instance = destinationPlayfieldId };
+                x.GameServerId = 0;
+                x.SgId = 0;
+                x.ChangePlayfield = new Identity
+                {
+                    Type = (IdentityType)40016,
+                    Instance = destinationPlayfieldId
+                };
+                x.Unknown4 = 0;
+                x.Unknown5 = 0;
+                x.Playfield2 = Identity.None;
+                x.Payload = BuildDestinationPayload(landingDestination);
             };
         }
 

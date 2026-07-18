@@ -274,6 +274,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs");
             string catalogText = ReadRepositoryFile(
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs");
+            string populationText = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\WorldPopulationController.cs");
             string visibilityText = ReadRepositoryFile(
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs");
             string interestText = ReadRepositoryFile(
@@ -297,15 +299,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "The supported-family quarantine must remain 29 rows.");
             Assert.AreEqual(6, supported.Select(row => row.MonsterData).Distinct().Count());
             Assert.AreEqual(
-                136,
+                197,
                 CountOccurrences(ordinaryText, "new CapturedSubwayOrdinarySpawnDefinition("),
-                "Ordinary captured spawn data must remain 136 rows.");
+                "Ordinary captured spawn data must remain 197 rows.");
             Assert.AreEqual(
-                12,
+                20,
                 CountOccurrences(ordinaryText, "new CapturedSubwayOrdinaryArchetypeDefinition("),
-                "Ordinary profile data must remain 12 archetypes.");
-            Assert.AreEqual(260, supported.Length + 136, "The normalized catalog must remain 260 spawn rows.");
-            Assert.AreEqual(18, 6 + 12, "The normalized catalog must remain 18 profiles.");
+                "Ordinary profile data must remain 20 archetypes.");
+            Assert.AreEqual(321, supported.Length + 197, "The normalized catalog must remain 321 spawn rows.");
+            Assert.AreEqual(26, 6 + 20, "The normalized catalog must remain 26 profiles.");
             Assert.AreEqual(107, manifestRows.Length);
             Assert.AreEqual(
                 29,
@@ -320,13 +322,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "!string.Equals(spawn.EvidenceCapture, \"20260710-202132\", StringComparison.Ordinal)")
                 && catalogText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined("),
                 "The existing supported and ordinary quarantine gates must remain unchanged.");
+            Assert.IsTrue(
+                CountOccurrences(
+                    populationText,
+                    "SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(") >= 2
+                && populationText.Contains("Enabled = runtimeEnabled")
+                && populationText.Contains("&& !runtimeEnabled"),
+                "The world population owner must activate selected diagnostic rows and count them in the active group.");
             Assert.IsFalse(
                 visibilityText.Contains("SubwayVisibilityDiagnosticSelection")
                 || interestText.Contains("SubwayVisibilityDiagnosticSelection"),
                 "Diagnostic ALL_38 selection may affect spawn eligibility only, never spatial visibility eligibility.");
             Assert.IsTrue(
                 visibilityText.Contains("this.visibilityInterest.SelectInitialCharacters(recipient)")
-                && visibilityText.Contains("recipient,\n                selectedCharacters,"),
+                && visibilityText.Contains("this.visibilityFanout.FanoutExistingCharactersForScfu(")
+                && visibilityText.Contains("selectedCharacters,"),
                 "Every initial snapshot, including diagnostic populations, must still pass through bounded selection.");
         }
 
@@ -363,7 +373,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
         private static string ReadRepositoryFile(string relativePath)
         {
-            return File.ReadAllText(Path.Combine(FindRepositoryRoot(), relativePath));
+            return File.ReadAllText(Path.Combine(FindRepositoryRoot(), relativePath))
+                .Replace("\r\n", "\n");
         }
 
         private static string ExtractBlock(string text, string marker)

@@ -44,9 +44,18 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemyProfileValidator.ValidateLootProfile(profile.ProfileKey, profile.Loot);
             LootGroupDefinition[] groups = BuildGroups(profile.Loot);
             bool levelSpecificCredits = profile.Loot.LevelCreditRules.Length > 0 && targetLevel > 0;
-            string evidence = string.IsNullOrWhiteSpace(profile.Loot.ItemEvidenceReference)
-                ? profile.Loot.Evidence.ToString()
-                : profile.Loot.ItemEvidenceReference;
+            string evidence = string.Join(
+                ",",
+                new[]
+                    {
+                        profile.Loot.ItemEvidenceReference,
+                        profile.Loot.CreditEvidenceReference
+                    }
+                    .Where(value => !string.IsNullOrWhiteSpace(value)));
+            if (string.IsNullOrWhiteSpace(evidence))
+            {
+                evidence = profile.Loot.Evidence.ToString();
+            }
             LootEvidenceConfidence confidence = ConfidenceFor(profile.Loot);
             var table = new LootTableDefinition
             {
@@ -174,6 +183,19 @@ namespace AORebirth.Core.Playfields
                     level.MinimumCredits,
                     level.MaximumCredits,
                     LootEvidenceConfidence.ProvenCapture);
+            }
+
+            if (loot.ObservedCreditOutcomes.Length > 0)
+            {
+                int[] outcomes = (int[])loot.ObservedCreditOutcomes.Clone();
+                return new CreditsPolicyDefinition
+                {
+                    Mode = CreditsPolicyMode.ObservedSamples,
+                    MinimumCredits = outcomes.Min(),
+                    MaximumCredits = outcomes.Max(),
+                    ObservedCredits = outcomes,
+                    Evidence = LootEvidenceConfidence.ObservedAvailableLoot
+                };
             }
 
             if ((loot.CreditEvidence == OrdinaryEnemyEvidenceState.Observed

@@ -3,7 +3,6 @@ namespace ZoneEngine.Core.Arete.Quests
     #region Usings ...
 
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
 
     using AORebirth.Core.Entities;
@@ -15,6 +14,7 @@ namespace ZoneEngine.Core.Arete.Quests
 
     using ZoneEngine.Core.Arete;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Missions;
 
     #endregion
 
@@ -40,11 +40,6 @@ namespace ZoneEngine.Core.Arete.Quests
         private const string TargetName = "Malfunctioning Cleaning Robot";
 
         private const int RequiredCount = 5;
-
-        private static readonly Dictionary<string, RexB18CProgressState> ProgressByCharacter =
-            new Dictionary<string, RexB18CProgressState>(StringComparer.OrdinalIgnoreCase);
-
-        private static readonly object SyncRoot = new object();
 
         public static bool IsProgressEnabled
         {
@@ -93,34 +88,28 @@ namespace ZoneEngine.Core.Arete.Quests
                 return false;
             }
 
-            string characterKey = MakeCharacterKey(source.Identity);
-            var progress = new ObjectiveProgressRecord
-                           {
-                               MissionId = MissionId,
-                               ObjectiveId = ObjectiveId,
-                               ObjectiveType = ObjectiveType,
-                               CurrentCount = 0,
-                               RequiredCount = RequiredCount,
-                               Completed = false,
-                               MatchedEvidenceCount = 0,
-                               IgnoredEvidenceCount = 0,
-                               LastMatchedEvidenceReference = null
-                           };
-
-            lock (SyncRoot)
+            if (!MissionRuntime.IsInitialized)
             {
-                ProgressByCharacter[characterKey] =
-                    new RexB18CProgressState
-                    {
-                        CharacterIdentity = source.Identity,
-                        CharacterIdentityText = source.Identity.ToString(true),
-                        Progress = progress,
-                        ActivatedAtUtc = DateTime.UtcNow
-                    };
+                Log("activation failed mission={0} reason=mission-runtime-not-initialized", MissionId);
+                return false;
+            }
+
+            MissionOperationResult offer = MissionRuntime.Service.OfferMission(source.Identity.Instance, MissionId);
+            if (IsTerminalFailure(offer))
+            {
+                Log("activation failed mission={0} status={1} message=\"{2}\"", MissionId, offer.Status, offer.Message);
+                return false;
+            }
+
+            MissionOperationResult accept = MissionRuntime.Service.AcceptMission(source.Identity.Instance, MissionId);
+            if (IsTerminalFailure(accept))
+            {
+                Log("activation failed mission={0} status={1} message=\"{2}\"", MissionId, accept.Status, accept.Message);
+                return false;
             }
 
             Log(
-                "activated mission={0} character={1} progress=0/{2} inMemoryOnly=true noPersistence=true noCompletion=true noQuestDelete=true noRewards=true",
+                "activated mission={0} character={1} progress=0/{2} persistent=true",
                 MissionId,
                 source.Identity.ToString(true),
                 RequiredCount);
@@ -161,83 +150,106 @@ namespace ZoneEngine.Core.Arete.Quests
                 return RexB18CProgressUpdateResult.Ignored("attacker is not in Arete Landing");
             }
 
+            if (!MissionRuntime.IsInitialized)
+            {
+                return RexB18CProgressUpdateResult.Ignored("mission runtime is not initialized");
+            }
+
+            ZoneEngine.Core.Missions.MissionStateRecord mission = MissionRuntime.Service.GetMission(attacker.Identity.Instance, MissionId);
+            if (mission == null
+                || (mission.State != MissionLifecycleState.Active
+                    && mission.State != MissionLifecycleState.Completed))
+            {
+                return RexB18CProgressUpdateResult.Ignored("no active or completed B18C mission for attacker");
+            }
+
             string targetName = EffectiveName(target);
             bool targetMatches = string.Equals(targetName, TargetName, StringComparison.OrdinalIgnoreCase);
-            string characterKey = MakeCharacterKey(attacker.Identity);
-            RexB18CProgressState state;
-            ObjectiveProgressRecord matchedProgress;
-            bool shouldSendCompletionHandoff = false;
-
-            lock (SyncRoot)
+            if (!targetMatches)
             {
-                if (!ProgressByCharacter.TryGetValue(characterKey, out state))
-                {
-                    if (targetMatches)
-                    {
-                        Log(
-                            "death ignored mission={0} reason=no-active-preview character={1} target={2} targetName=\"{3}\" inMemoryOnly=true",
-                            MissionId,
-                            IdentityText(attacker),
-                            IdentityText(target),
-                            targetName);
-                    }
-
-                    return RexB18CProgressUpdateResult.Ignored("no active B18C preview for attacker");
-                }
-
-                if (!targetMatches)
-                {
-                    state.Progress.IgnoredEvidenceCount++;
-                    return RexB18CProgressUpdateResult.Ignored("target name did not match");
-                }
-
-                state.Progress.MatchedEvidenceCount++;
-                state.Progress.LastMatchedEvidenceReference =
-                    "live:KillNpcTarget:CharacterAction Action=Death target="
-                    + target.Identity.ToString(true);
-
-                if (!state.Progress.Completed)
-                {
-                    state.Progress.CurrentCount = Math.Min(
-                        state.Progress.CurrentCount + 1,
-                        state.Progress.RequiredCount);
-                    state.Progress.Completed =
-                        state.Progress.CurrentCount >= state.Progress.RequiredCount;
-                }
-                else
-                {
-                    state.Progress.IgnoredEvidenceCount++;
-                }
-
-                if (state.Progress.Completed && !state.CompletionHandoffSent)
-                {
-                    state.CompletionHandoffSent = true;
-                    shouldSendCompletionHandoff = true;
-                }
-
-                LogProgress(attacker, target, state.Progress);
-                matchedProgress = CopyProgress(state.Progress);
+                return RexB18CProgressUpdateResult.Ignored("target name did not match");
             }
+
+            string observationKey = "npc-death:" + target.Identity.ToString(true);
+            ObjectiveProgressRecord matchedProgress;
+            if (mission.State == MissionLifecycleState.Active)
+            {
+                MissionOperationResult observation = MissionRuntime.Service.ObserveObjective(
+                    new MissionObjectiveObservation
+                    {
+                        CharacterId = attacker.Identity.Instance,
+                        QuestId = MissionId,
+                        ObjectiveId = ObjectiveId,
+                        ObservationKey = observationKey,
+                        Amount = 1,
+                        EventType = "KillNpcTarget:CharacterAction:Death",
+                        SourceIdentity = attacker.Identity.ToString(true),
+                        TargetIdentity = target.Identity.ToString(true)
+                    });
+                if (observation.Status != MissionOperationStatus.Applied
+                    && observation.Status != MissionOperationStatus.AlreadyApplied
+                    && observation.Status != MissionOperationStatus.DuplicateObservation)
+                {
+                    return RexB18CProgressUpdateResult.Ignored(observation.Message ?? observation.Status.ToString());
+                }
+
+                matchedProgress = ToRuntimeProgress(observation.Objective, observationKey);
+            }
+            else
+            {
+                MissionObjectiveProgressRecord persistedProgress = MissionRuntime.Service.GetObjective(
+                    attacker.Identity.Instance,
+                    MissionId,
+                    ObjectiveId);
+                matchedProgress = ToRuntimeProgress(
+                    persistedProgress,
+                    persistedProgress == null ? observationKey : persistedProgress.LastObservationKey);
+            }
+
+            LogProgress(attacker, target, matchedProgress);
 
             RexB18CProgressFeedbackSender.TrySend(attacker, matchedProgress);
             if (matchedProgress != null && matchedProgress.Completed)
             {
-                RexMissionChainStateStore.AdvanceAtLeast(
-                    attacker,
-                    RexMissionChainState.B18CObjectiveComplete,
-                    "B18C kill count reached required progress");
-            }
-
-            if (shouldSendCompletionHandoff)
-            {
-                bool handoffSent = SafeQuestFullUpdateSender.TrySendB18CCompletionHandoff(attacker);
-                if (handoffSent)
+                MissionOperationResult completion = MissionRuntime.Service.CompleteAndActivateNextMission(
+                    attacker.Identity.Instance,
+                    MissionId,
+                    MissionRuntime.RexB18DQuestId);
+                if (completion.Status == MissionOperationStatus.Applied
+                    || completion.Status == MissionOperationStatus.AlreadyApplied)
                 {
-                    RexB18DBoxProgressTracker.TryActivateFromPreview(attacker);
+                    RexMissionChainStateStore.AdvanceAtLeast(
+                        attacker,
+                        RexMissionChainState.B18DPreviewed,
+                        "B18C completion activated B18D persistently");
+                    EnsureCompletionHandoffProjection(attacker);
                 }
             }
 
             return RexB18CProgressUpdateResult.MatchedProgress(matchedProgress);
+        }
+
+        private static bool EnsureCompletionHandoffProjection(ICharacter source)
+        {
+            const string flagKey = "b18c-completion-handoff-projected";
+            int characterId = source.Identity.Instance;
+            if (MissionRuntime.Service.GetFlag(characterId, MissionId, flagKey) != null)
+            {
+                return true;
+            }
+
+            if (!SafeQuestFullUpdateSender.TrySendB18CCompletionHandoff(source))
+            {
+                return false;
+            }
+
+            MissionOperationResult flag = MissionRuntime.Service.SetFlag(
+                characterId,
+                MissionId,
+                flagKey,
+                "true");
+            return flag.Status == MissionOperationStatus.Applied
+                   || flag.Status == MissionOperationStatus.AlreadyApplied;
         }
 
         public static ObjectiveProgressRecord GetProgressForCharacter(ICharacter source)
@@ -247,16 +259,22 @@ namespace ZoneEngine.Core.Arete.Quests
                 return null;
             }
 
-            RexB18CProgressState state;
-            lock (SyncRoot)
+            if (!MissionRuntime.IsInitialized)
             {
-                if (ProgressByCharacter.TryGetValue(MakeCharacterKey(source.Identity), out state))
-                {
-                    return CopyProgress(state.Progress);
-                }
+                return null;
             }
 
-            return null;
+            ZoneEngine.Core.Missions.MissionStateRecord mission = MissionRuntime.Service.GetMission(source.Identity.Instance, MissionId);
+            if (mission == null)
+            {
+                return null;
+            }
+
+            MissionObjectiveProgressRecord progress = MissionRuntime.Service.GetObjective(
+                source.Identity.Instance,
+                MissionId,
+                ObjectiveId);
+            return ToRuntimeProgress(progress, progress == null ? null : progress.LastObservationKey);
         }
 
         private static void LogProgress(
@@ -340,11 +358,35 @@ namespace ZoneEngine.Core.Arete.Quests
             return fullName;
         }
 
-        private static string MakeCharacterKey(Identity identity)
+        private static ObjectiveProgressRecord ToRuntimeProgress(
+            MissionObjectiveProgressRecord progress,
+            string evidenceReference)
         {
-            return ((int)identity.Type).ToString(CultureInfo.InvariantCulture)
-                   + ":"
-                   + identity.Instance.ToString("X8", CultureInfo.InvariantCulture);
+            if (progress == null)
+            {
+                return null;
+            }
+
+            return new ObjectiveProgressRecord
+                   {
+                       MissionId = MissionId,
+                       ObjectiveId = ObjectiveId,
+                       ObjectiveType = ObjectiveType,
+                       CurrentCount = progress.Progress,
+                       RequiredCount = progress.RequiredCount,
+                       Completed = progress.Progress >= progress.RequiredCount,
+                       MatchedEvidenceCount = progress.Progress,
+                       IgnoredEvidenceCount = 0,
+                       LastMatchedEvidenceReference = evidenceReference
+                   };
+        }
+
+        private static bool IsTerminalFailure(MissionOperationResult result)
+        {
+            return result == null
+                   || result.Status == MissionOperationStatus.Rejected
+                   || result.Status == MissionOperationStatus.NotFound
+                   || result.Status == MissionOperationStatus.Unresolved;
         }
 
         private static string IdentityText(ICharacter character)
@@ -381,6 +423,13 @@ namespace ZoneEngine.Core.Arete.Quests
 
             public static bool TrySend(ICharacter character, ObjectiveProgressRecord progress)
             {
+                if (!RexB18CFeedbackPolicy.ShouldSendPerKillFeedback(
+                        ProgressCount(progress),
+                        progress == null ? 0 : progress.RequiredCount))
+                {
+                    return false;
+                }
+
                 // B18C kill feedback disabled until mission work resumes.
                 return false;
             }

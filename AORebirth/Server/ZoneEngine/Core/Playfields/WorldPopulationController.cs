@@ -9,6 +9,7 @@ namespace AORebirth.Core.Playfields
     using AORebirth.Interfaces;
     using SmokeLounge.AOtomation.Messaging.GameData;
     using Utility;
+    using ZoneEngine.Core.Playfields;
 
     internal sealed class WorldPopulationController
     {
@@ -203,7 +204,9 @@ namespace AORebirth.Core.Playfields
                 string key = "ordinary.playfield." + playfieldRows.Key;
                 var group = new SpawnGroupDefinition { SpawnGroupKey = key, DisplayName = key, PlayfieldId = playfieldRows.Key,
                     SpawnKeys = playfieldRows.Select(x => x.SpawnKey).OrderBy(x => x, StringComparer.Ordinal).ToArray(), ActivationPolicy = WorldSpawnActivationPolicy.PlayfieldStart,
-                    MinimumAlive = 0, MaximumAlive = playfieldRows.Count(x => x.Disposition == OrdinaryEnemyRuntimeDisposition.Active), Enabled = true,
+                    MinimumAlive = 0, MaximumAlive = playfieldRows.Count(
+                        x => x.Disposition == OrdinaryEnemyRuntimeDisposition.Active
+                             || SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(x.SourceIdentity)), Enabled = true,
                     Evidence = "ordinary-catalog", Confidence = "CAPTURE_BACKED" };
                 WorldRespawnPolicyResolver.ApplyGroupConfiguration(group, this.ordinaryGroupRespawnPolicies, this.policies);
                 this.groups.Add(key, group);
@@ -214,6 +217,9 @@ namespace AORebirth.Core.Playfields
             foreach (OrdinaryEnemySpawnDefinition row in ordinaryRows)
             {
                 string groupKey = "ordinary.playfield." + row.PlayfieldInstance;
+                bool runtimeEnabled = row.Disposition == OrdinaryEnemyRuntimeDisposition.Active
+                                      || SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(
+                                          row.SourceIdentity);
                 WorldRespawnPolicyResolution respawn = WorldRespawnPolicyResolver.Resolve(
                     WorldPopulationClassification.OrdinaryEnemy,
                     row.RespawnPolicy,
@@ -237,8 +243,9 @@ namespace AORebirth.Core.Playfields
                     RespawnPolicyKey = resolvedPolicy.RespawnPolicyKey,
                     ActivationPolicy = WorldSpawnActivationPolicy.PlayfieldStart,
                     Classification = WorldPopulationClassification.OrdinaryEnemy,
-                    Enabled = row.Disposition == OrdinaryEnemyRuntimeDisposition.Active,
-                    Quarantined = row.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined,
+                    Enabled = runtimeEnabled,
+                    Quarantined = row.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined
+                                  && !runtimeEnabled,
                     Evidence = row.SourceCapture, Confidence = "CAPTURE_BACKED", Source = row.SourceOwnerIdentity
                 };
                 this.definitions.Add(definition.SpawnKey, definition); this.ordinaryRows.Add(definition.SpawnKey, row);

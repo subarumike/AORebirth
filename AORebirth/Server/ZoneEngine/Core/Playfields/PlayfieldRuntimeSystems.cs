@@ -25,6 +25,7 @@ namespace ZoneEngine.Core.Playfields
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Navigation;
     using ZoneEngine.Core.Playfields.Content;
+    using ZoneEngine.Core.Subway.Quests;
 
     #endregion
 
@@ -61,6 +62,8 @@ namespace ZoneEngine.Core.Playfields
         private readonly InventoryContainerRuntimeService inventoryContainer;
 
         private readonly NPCRuntimeService npcRuntime;
+
+        private readonly WindcallerKarrecNpcRuntimeService windcallerKarrecNpcs;
 
         private readonly PlayfieldNpcCombatMovementRuntimeService npcCombatMovement;
 
@@ -142,6 +145,7 @@ namespace ZoneEngine.Core.Playfields
                     this.dynelRegistry,
                     this.rewards,
                     this.npcChaseNavigation);
+            this.windcallerKarrecNpcs = new WindcallerKarrecNpcRuntimeService();
             this.npcCombatMovement =
                 new PlayfieldNpcCombatMovementRuntimeService(this.npcChaseNavigation);
             this.lifecycle = new PlayfieldLifecycleRuntimeService();
@@ -209,10 +213,22 @@ namespace ZoneEngine.Core.Playfields
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
         {
             this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);
+            this.windcallerKarrecNpcs.Spawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc,
+                this.DeactivateNpc);
+            this.vendors.SpawnCapturedSubwayVendors(
+                this.playfield,
+                playfieldIdentity,
+                this.dynelRegistry,
+                this.RegisterDynel);
         }
 
         internal void ClearNpcRuntimeState()
         {
+            this.windcallerKarrecNpcs.Clear(this.playfield.Identity, this.DeactivateNpc);
+            this.vendors.ClearCapturedSubwayVendors(this.playfield.Identity, this.dynelRegistry);
             this.npcRuntime.ClearRuntimeState();
             this.npcChaseNavigation.Dispose();
             this.visibilityInterest.Clear();
@@ -339,6 +355,12 @@ namespace ZoneEngine.Core.Playfields
         {
             this.npcRuntime.ActivateNpc(character);
             this.visibilityInterest.Register(character);
+        }
+
+        private void DeactivateNpc(Identity identity)
+        {
+            this.npcRuntime.RemoveNpcHome(identity);
+            this.UnregisterDynel(identity);
         }
 
         internal void RegisterNpcHome(ICharacter character)

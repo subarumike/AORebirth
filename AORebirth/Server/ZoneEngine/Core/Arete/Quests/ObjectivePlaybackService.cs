@@ -26,11 +26,23 @@ namespace ZoneEngine.Core.Arete.Quests
             this.registry = registry;
         }
 
-        public ObjectivePlaybackObservationResult Observe(ObjectivePlaybackObservation observation)
+        public ObjectivePlaybackObservationResult Observe(
+            int characterId,
+            ObjectivePlaybackObservation observation)
         {
             var validation = new AreteValidationResult();
             var matchedProgress = new List<ObjectiveProgressRecord>();
             var ignoredProgress = new List<ObjectiveProgressRecord>();
+
+            if (characterId <= 0)
+            {
+                validation.AddError("objectivePlayback", "stable character identity must be positive");
+                return new ObjectivePlaybackObservationResult(
+                    observation,
+                    matchedProgress,
+                    ignoredProgress,
+                    validation);
+            }
 
             if (observation == null)
             {
@@ -60,6 +72,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 }
 
                 ObjectiveProgressRecord progress = this.GetOrCreateProgress(
+                    characterId,
                     binding.Quest,
                     binding.Objective);
 
@@ -92,7 +105,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 validation);
         }
 
-        public ObjectivePlaybackReplayResult ReplayStoredObjectiveEvidence()
+        public ObjectivePlaybackReplayResult ReplayStoredObjectiveEvidence(int characterId)
         {
             var validation = new AreteValidationResult();
             var results = new List<ObjectivePlaybackObservationResult>();
@@ -104,19 +117,29 @@ namespace ZoneEngine.Core.Arete.Quests
 
                 foreach (ObjectivePlaybackObservation observation in observations)
                 {
-                    ObjectivePlaybackObservationResult result = this.Observe(observation);
+                    ObjectivePlaybackObservationResult result = this.Observe(characterId, observation);
                     results.Add(result);
                     validation.AddErrors(result.Validation);
                 }
             }
 
-            return new ObjectivePlaybackReplayResult(results, this.GetAllProgress(), validation);
+            return new ObjectivePlaybackReplayResult(results, this.GetAllProgress(characterId), validation);
         }
 
-        public ObjectiveProgressRecord GetProgress(string missionId, string objectiveId)
+        public ObjectiveProgressRecord GetProgress(
+            int characterId,
+            string missionId,
+            string objectiveId)
         {
+            if (characterId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "characterId",
+                    "Stable character identity must be positive.");
+            }
+
             ObjectiveProgressRecord progress;
-            if (this.progressByKey.TryGetValue(MakeKey(missionId, objectiveId), out progress))
+            if (this.progressByKey.TryGetValue(MakeKey(characterId, missionId, objectiveId), out progress))
             {
                 return progress;
             }
@@ -125,20 +148,28 @@ namespace ZoneEngine.Core.Arete.Quests
             QuestObjective objective;
             if (this.TryFindObjective(missionId, objectiveId, out quest, out objective))
             {
-                return this.GetOrCreateProgress(quest, objective);
+                return this.GetOrCreateProgress(characterId, quest, objective);
             }
 
             return null;
         }
 
-        public IList<ObjectiveProgressRecord> GetAllProgress()
+        public IList<ObjectiveProgressRecord> GetAllProgress(int characterId)
         {
+            if (characterId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "characterId",
+                    "Stable character identity must be positive.");
+            }
+
             foreach (ObjectiveBinding binding in this.GetSupportedObjectiveBindings())
             {
-                this.GetOrCreateProgress(binding.Quest, binding.Objective);
+                this.GetOrCreateProgress(characterId, binding.Quest, binding.Objective);
             }
 
             return this.progressByKey.Values
+                .Where(progress => progress.CharacterId == characterId)
                 .OrderBy(progress => progress.MissionId)
                 .ThenBy(progress => progress.ObjectiveId)
                 .ToList();
@@ -303,10 +334,14 @@ namespace ZoneEngine.Core.Arete.Quests
         }
 
         private ObjectiveProgressRecord GetOrCreateProgress(
+            int characterId,
             QuestDefinition quest,
             QuestObjective objective)
         {
-            string key = MakeKey(quest == null ? null : quest.QuestId, objective == null ? null : objective.ObjectiveId);
+            string key = MakeKey(
+                characterId,
+                quest == null ? null : quest.QuestId,
+                objective == null ? null : objective.ObjectiveId);
             ObjectiveProgressRecord progress;
             if (this.progressByKey.TryGetValue(key, out progress))
             {
@@ -315,6 +350,7 @@ namespace ZoneEngine.Core.Arete.Quests
 
             progress = new ObjectiveProgressRecord
             {
+                CharacterId = characterId,
                 MissionId = quest == null ? null : quest.QuestId,
                 ObjectiveId = objective == null ? null : objective.ObjectiveId,
                 ObjectiveType = objective == null ? null : objective.Type,
@@ -514,9 +550,9 @@ namespace ZoneEngine.Core.Arete.Quests
             return null;
         }
 
-        private static string MakeKey(string missionId, string objectiveId)
+        private static string MakeKey(int characterId, string missionId, string objectiveId)
         {
-            return (missionId ?? string.Empty) + "|" + (objectiveId ?? string.Empty);
+            return characterId + "|" + (missionId ?? string.Empty) + "|" + (objectiveId ?? string.Empty);
         }
 
         private sealed class ObjectiveBinding

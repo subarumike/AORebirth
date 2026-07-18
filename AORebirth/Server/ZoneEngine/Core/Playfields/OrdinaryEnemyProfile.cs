@@ -151,7 +151,9 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemyEvidenceState evidenceState,
             double? healthRegenIntervalSeconds = null,
             int? healthRegenDelta = null,
-            bool regenerateHealthWhileInCombat = false)
+            bool regenerateHealthWhileInCombat = false,
+            Func<int, CapturedEnemyCombatContract> contractResolver = null,
+            Func<int, int, CapturedEnemyCombatContract> sourceContractResolver = null)
         {
             this.Mode = mode;
             this.DamageSource = damageSource;
@@ -161,6 +163,8 @@ namespace AORebirth.Core.Playfields
             this.HealthRegenIntervalSeconds = healthRegenIntervalSeconds;
             this.HealthRegenDelta = healthRegenDelta;
             this.RegenerateHealthWhileInCombat = regenerateHealthWhileInCombat;
+            this.contractResolver = contractResolver;
+            this.sourceContractResolver = sourceContractResolver;
         }
 
         internal OrdinaryEnemyCombatMode Mode { get; private set; }
@@ -171,6 +175,24 @@ namespace AORebirth.Core.Playfields
         internal double? HealthRegenIntervalSeconds { get; private set; }
         internal int? HealthRegenDelta { get; private set; }
         internal bool RegenerateHealthWhileInCombat { get; private set; }
+
+        private readonly Func<int, CapturedEnemyCombatContract> contractResolver;
+
+        private readonly Func<int, int, CapturedEnemyCombatContract> sourceContractResolver;
+
+        internal CapturedEnemyCombatContract ResolveContract(int level)
+        {
+            return this.contractResolver == null
+                       ? this.Contract
+                       : this.contractResolver(level);
+        }
+
+        internal CapturedEnemyCombatContract ResolveContract(int sourceIdentity, int level)
+        {
+            return this.sourceContractResolver == null
+                       ? this.ResolveContract(level)
+                       : this.sourceContractResolver(sourceIdentity, level);
+        }
     }
 
     internal sealed class OrdinaryEnemyTextureProfile
@@ -377,6 +399,39 @@ namespace AORebirth.Core.Playfields
             int? minimumCredits,
             int? maximumCredits,
             OrdinaryEnemyLevelCreditRule[] levelCreditRules)
+            : this(
+                evidence,
+                entries,
+                poolMode,
+                emptyWeight,
+                itemPoolComplete,
+                observedCompleteInventories,
+                observedEmptyInventories,
+                itemEvidenceReference,
+                creditEvidence,
+                minimumCredits,
+                maximumCredits,
+                levelCreditRules,
+                new int[0],
+                string.Empty)
+        {
+        }
+
+        internal OrdinaryEnemyLootProfile(
+            OrdinaryEnemyLootEvidence evidence,
+            OrdinaryEnemyLootEntry[] entries,
+            OrdinaryEnemyLootPoolMode poolMode,
+            int emptyWeight,
+            bool itemPoolComplete,
+            int observedCompleteInventories,
+            int observedEmptyInventories,
+            string itemEvidenceReference,
+            OrdinaryEnemyEvidenceState creditEvidence,
+            int? minimumCredits,
+            int? maximumCredits,
+            OrdinaryEnemyLevelCreditRule[] levelCreditRules,
+            int[] observedCreditOutcomes,
+            string creditEvidenceReference)
         {
             this.Evidence = evidence;
             this.Entries = entries ?? new OrdinaryEnemyLootEntry[0];
@@ -390,6 +445,8 @@ namespace AORebirth.Core.Playfields
             this.MinimumCredits = minimumCredits;
             this.MaximumCredits = maximumCredits;
             this.LevelCreditRules = levelCreditRules ?? new OrdinaryEnemyLevelCreditRule[0];
+            this.ObservedCreditOutcomes = observedCreditOutcomes ?? new int[0];
+            this.CreditEvidenceReference = creditEvidenceReference ?? string.Empty;
         }
 
         internal OrdinaryEnemyLootEvidence Evidence { get; private set; }
@@ -404,6 +461,8 @@ namespace AORebirth.Core.Playfields
         internal int? MinimumCredits { get; private set; }
         internal int? MaximumCredits { get; private set; }
         internal OrdinaryEnemyLevelCreditRule[] LevelCreditRules { get; private set; }
+        internal int[] ObservedCreditOutcomes { get; private set; }
+        internal string CreditEvidenceReference { get; private set; }
     }
 
     internal sealed class OrdinaryEnemyLevelCreditRule
@@ -456,17 +515,38 @@ namespace AORebirth.Core.Playfields
             double emptyLifetimeSeconds,
             double unlootedLifetimeSeconds,
             double lootedCleanupSeconds)
+            : this(
+                packetProfile,
+                emptyLifetimeSeconds,
+                unlootedLifetimeSeconds,
+                lootedCleanupSeconds,
+                null,
+                string.Empty)
+        {
+        }
+
+        internal OrdinaryEnemyCorpseProfile(
+            OrdinaryEnemyCorpsePacketProfile packetProfile,
+            double emptyLifetimeSeconds,
+            double unlootedLifetimeSeconds,
+            double lootedCleanupSeconds,
+            int? capturedCatMesh,
+            string visualEvidence)
         {
             this.PacketProfile = packetProfile;
             this.EmptyLifetimeSeconds = emptyLifetimeSeconds;
             this.UnlootedLifetimeSeconds = unlootedLifetimeSeconds;
             this.LootedCleanupSeconds = lootedCleanupSeconds;
+            this.CapturedCatMesh = capturedCatMesh;
+            this.VisualEvidence = visualEvidence ?? string.Empty;
         }
 
         internal OrdinaryEnemyCorpsePacketProfile PacketProfile { get; private set; }
         internal double EmptyLifetimeSeconds { get; private set; }
         internal double UnlootedLifetimeSeconds { get; private set; }
         internal double LootedCleanupSeconds { get; private set; }
+        internal int? CapturedCatMesh { get; private set; }
+        internal string VisualEvidence { get; private set; }
     }
 
     internal sealed class OrdinaryEnemyProfile
@@ -1064,7 +1144,13 @@ namespace AORebirth.Core.Playfields
                      && string.IsNullOrWhiteSpace(profile.TemplateHash))
                     || profile.Corpse.EmptyLifetimeSeconds <= 0.0
                     || profile.Corpse.UnlootedLifetimeSeconds <= 0.0
-                    || profile.Corpse.LootedCleanupSeconds <= 0.0)
+                    || profile.Corpse.LootedCleanupSeconds <= 0.0
+                    || (profile.Corpse.CapturedCatMesh.HasValue
+                        && (profile.Corpse.CapturedCatMesh.Value <= 0
+                            || profile.Corpse.CapturedCatMesh.Value == 1234567890
+                            || string.IsNullOrWhiteSpace(profile.Corpse.VisualEvidence)))
+                    || (!profile.Corpse.CapturedCatMesh.HasValue
+                        && !string.IsNullOrWhiteSpace(profile.Corpse.VisualEvidence)))
                 {
                     throw new InvalidOperationException("Ordinary enemy construction or corpse lifecycle data is invalid: " + profile.ProfileKey);
                 }
@@ -1210,6 +1296,28 @@ namespace AORebirth.Core.Playfields
             }
 
             OrdinaryEnemyLootEntry[] entries = loot.Entries ?? new OrdinaryEnemyLootEntry[0];
+            int[] observedCreditOutcomes = loot.ObservedCreditOutcomes ?? new int[0];
+            if (observedCreditOutcomes.Length > 0)
+            {
+                if (loot.CreditEvidence != OrdinaryEnemyEvidenceState.Observed
+                    || !loot.MinimumCredits.HasValue
+                    || !loot.MaximumCredits.HasValue
+                    || loot.MinimumCredits.Value != observedCreditOutcomes.Min()
+                    || loot.MaximumCredits.Value != observedCreditOutcomes.Max()
+                    || observedCreditOutcomes.Any(value => value < 0)
+                    || loot.LevelCreditRules.Length > 0
+                    || string.IsNullOrWhiteSpace(loot.CreditEvidenceReference))
+                {
+                    throw new InvalidOperationException(
+                        "Observed ordinary enemy credit outcomes are invalid: " + key);
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(loot.CreditEvidenceReference))
+            {
+                throw new InvalidOperationException(
+                    "Ordinary enemy credit evidence has no captured outcomes: " + key);
+            }
+
             if (entries.Length == 0)
             {
                 if (loot.PoolMode != OrdinaryEnemyLootPoolMode.IndependentEntries

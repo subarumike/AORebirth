@@ -738,6 +738,16 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void Teleport(Dynel dynel, Coordinate destination, IQuaternion heading, Identity playfield)
         {
+            this.Teleport(dynel, destination, heading, playfield, null);
+        }
+
+        internal void Teleport(
+            Dynel dynel,
+            Coordinate destination,
+            IQuaternion heading,
+            Identity playfield,
+            Action<ICharacter> sendTeleportPacket)
+        {
             // Prevent client from entering this again
             if (dynel.DoNotDoTimers)
             {
@@ -757,11 +767,22 @@ namespace AORebirth.Core.Playfields
                 this.ClearPlayfieldTransferContactState,
                 DisableTimersForPlayfieldTransfer,
                 CapturePlayfieldTransferEnterZoningPhase,
-                () => TeleportMessageHandler.Default.Send(
-                    dynel as ICharacter,
-                    destination.coordinate,
-                    (Vector.Quaternion)heading,
-                    playfield),
+                () =>
+                    {
+                        ICharacter character = dynel as ICharacter;
+                        if (sendTeleportPacket == null)
+                        {
+                            TeleportMessageHandler.Default.Send(
+                                character,
+                                destination.coordinate,
+                                (Vector.Quaternion)heading,
+                                playfield);
+                        }
+                        else
+                        {
+                            sendTeleportPacket(character);
+                        }
+                    },
                 this.AnnouncePlayfieldTransferDespawn,
                 ApplyPlayfieldTransferState,
                 CapturePlayfieldTransferClient,
@@ -3212,11 +3233,19 @@ namespace AORebirth.Core.Playfields
         internal bool CanBuildKnownCorpseVisual(ICharacter target)
         {
             CapturedEncounterRuntimeDefinition encounterDefinition;
+            OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
             return (target != null
                     && CapturedEncounterRuntimeRegistry.TryGet(
                         target.Identity.Instance,
                         out encounterDefinition)
                     && CombatCorpseVisuals.IsUsableVisualId(encounterDefinition.CorpseCatMesh))
+                   || (target != null
+                       && OrdinaryEnemyRuntimeRegistry.TryGet(
+                           target.Identity.Instance,
+                           out ordinaryDefinition)
+                       && ordinaryDefinition.Profile.Corpse.CapturedCatMesh.HasValue
+                       && CombatCorpseVisuals.IsUsableVisualId(
+                           ordinaryDefinition.Profile.Corpse.CapturedCatMesh.Value))
                    || IsCapturedCleaningRobot(target)
                    || UsesCapturedThiefCorpseProfile(target)
                    || CombatCorpseVisuals.IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
@@ -3232,6 +3261,16 @@ namespace AORebirth.Core.Playfields
                     out encounterDefinition))
             {
                 return encounterDefinition.CorpseCatMesh;
+            }
+
+            OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
+            if (target != null
+                && OrdinaryEnemyRuntimeRegistry.TryGet(
+                    target.Identity.Instance,
+                    out ordinaryDefinition)
+                && ordinaryDefinition.Profile.Corpse.CapturedCatMesh.HasValue)
+            {
+                return ordinaryDefinition.Profile.Corpse.CapturedCatMesh.Value;
             }
 
             if (IsCapturedCleaningRobot(target))

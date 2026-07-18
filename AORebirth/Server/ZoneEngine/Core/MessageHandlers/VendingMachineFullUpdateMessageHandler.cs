@@ -58,22 +58,31 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 x.Identity = vendor.Identity;
                 x.Unknown = 0;
-                x.Coordinates = new Vector3()
+                if (vendor.NpcIdentity.Instance != 0)
+                {
+                    x.Coordinates = null;
+                    x.Heading = null;
+                    x.NpcIdentity = vendor.NpcIdentity;
+                }
+                else
+                {
+                    x.Coordinates = new Vector3()
+                                    {
+                                        X = vendor.Coordinates().x,
+                                        Y = vendor.Coordinates().y,
+                                        Z = vendor.Coordinates().z
+                                    };
+
+                    x.Heading = new Quaternion()
                                 {
-                                    X = vendor.Coordinates().x,
-                                    Y = vendor.Coordinates().y,
-                                    Z = vendor.Coordinates().z
+                                    X = vendor.Heading.xf,
+                                    Y = vendor.Heading.yf,
+                                    Z = vendor.Heading.zf,
+                                    W = vendor.Heading.wf
                                 };
 
-                x.Heading = new Quaternion()
-                            {
-                                X = vendor.Heading.xf,
-                                Y = vendor.Heading.yf,
-                                Z = vendor.Heading.zf,
-                                W = vendor.Heading.wf
-                            };
-
-                x.NpcIdentity = Identity.None;
+                    x.NpcIdentity = Identity.None;
+                }
                 x.TypeIdentifier = 0x0b;
                 x.PlayfieldId = vendor.Playfield.Identity.Instance;
                 x.Unknown4 = 0xf424f;

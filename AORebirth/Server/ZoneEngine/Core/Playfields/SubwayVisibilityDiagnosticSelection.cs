@@ -7,6 +7,7 @@ namespace ZoneEngine.Core.Playfields
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Text;
 
     using Utility;
 
@@ -65,8 +66,12 @@ namespace ZoneEngine.Core.Playfields
 
         private static readonly object Sync = new object();
 
+        private static readonly object PopulationLedgerSync = new object();
+
         private static readonly Dictionary<int, SubwayVisibilityDiagnosticManifestEntry> RuntimeEntries =
             new Dictionary<int, SubwayVisibilityDiagnosticManifestEntry>();
+
+        private static readonly HashSet<string> PopulationEventKeys = new HashSet<string>();
 
         private static bool loaded;
         private static SubwayVisibilityDiagnosticConfiguration configuration =
@@ -86,7 +91,13 @@ namespace ZoneEngine.Core.Playfields
         internal static bool ShouldIncludeQuarantined(int sourceInstance)
         {
             SubwayVisibilityDiagnosticConfiguration current = Configuration;
-            return current.Enabled && current.SelectedSourceInstances.Contains(sourceInstance);
+            bool selected = current.Enabled && current.SelectedSourceInstances.Contains(sourceInstance);
+            if (selected)
+            {
+                RecordPopulationEventOnce(current, sourceInstance, "ELIGIBLE", null, "selected quarantine row enabled");
+            }
+
+            return selected;
         }
 
         internal static void RegisterRuntimeIdentity(int runtimeInstance, int sourceInstance)
@@ -102,6 +113,24 @@ namespace ZoneEngine.Core.Playfields
             {
                 RuntimeEntries[runtimeInstance] = entry;
             }
+
+            RecordPopulationEventOnce(
+                Configuration,
+                sourceInstance,
+                "MATERIALIZED",
+                runtimeInstance,
+                "runtime identity registered");
+        }
+
+        internal static void RecordPopulationFailure(int sourceInstance, string detail)
+        {
+            SubwayVisibilityDiagnosticConfiguration current = Configuration;
+            if (!current.Enabled || !current.SelectedSourceInstances.Contains(sourceInstance))
+            {
+                return;
+            }
+
+            RecordPopulationEventOnce(current, sourceInstance, "FAILED", null, detail);
         }
 
         internal static void RemoveRuntimeIdentity(int runtimeInstance)
@@ -364,6 +393,82 @@ namespace ZoneEngine.Core.Playfields
                    || value == "ORDINAL_RANGE"
                    || value == "IDENTITY_LIST"
                    || value == "FAMILY";
+        }
+
+        private static void RecordPopulationEventOnce(
+            SubwayVisibilityDiagnosticConfiguration current,
+            int sourceInstance,
+            string phase,
+            int? runtimeInstance,
+            string detail)
+        {
+            if (current == null
+                || !current.Enabled
+                || !current.SelectedSourceInstances.Contains(sourceInstance))
+            {
+                return;
+            }
+
+            SubwayVisibilityDiagnosticManifestEntry entry;
+            if (!manifestBySource.TryGetValue(sourceInstance, out entry))
+            {
+                return;
+            }
+
+            string eventKey = phase + ":" + sourceInstance.ToString("X8", CultureInfo.InvariantCulture);
+            lock (PopulationLedgerSync)
+            {
+                if (PopulationEventKeys.Contains(eventKey))
+                {
+                    return;
+                }
+
+                try
+                {
+                    Directory.CreateDirectory(current.ArtifactDirectory);
+                    string path = Path.Combine(current.ArtifactDirectory, "population-activation-ledger.csv");
+                    bool writeHeader = !File.Exists(path);
+                    using (var writer = new StreamWriter(path, true, new UTF8Encoding(false)))
+                    {
+                        if (writeHeader)
+                        {
+                            writer.WriteLine(
+                                "TimestampUtc,SessionId,Slice,ProcessId,Phase,SourceInstanceHex,RuntimeInstance,ManifestOrdinal,Name,Family,Detail");
+                        }
+
+                        writer.WriteLine(
+                            string.Join(
+                                ",",
+                                Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                                Csv(current.SessionId),
+                                Csv(current.Slice),
+                                Csv(System.Diagnostics.Process.GetCurrentProcess().Id.ToString(CultureInfo.InvariantCulture)),
+                                Csv(phase),
+                                Csv(sourceInstance.ToString("X8", CultureInfo.InvariantCulture)),
+                                Csv(runtimeInstance.HasValue
+                                    ? runtimeInstance.Value.ToString(CultureInfo.InvariantCulture)
+                                    : string.Empty),
+                                Csv(entry.Ordinal.ToString(CultureInfo.InvariantCulture)),
+                                Csv(entry.Name),
+                                Csv(entry.Family),
+                                Csv(detail)));
+                    }
+
+                    PopulationEventKeys.Add(eventKey);
+                }
+                catch (Exception exception)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        "PF127 population activation diagnostic write failed: " + exception.Message);
+                }
+            }
+        }
+
+        private static string Csv(string value)
+        {
+            string text = value ?? string.Empty;
+            return "\"" + text.Replace("\"", "\"\"") + "\"";
         }
     }
 }

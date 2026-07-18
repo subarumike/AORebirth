@@ -1194,11 +1194,9 @@ namespace AORebirth.Core.Playfields
             int maxDamage = hasCapturedEquippedAttackInfo && capturedContract.MaxDamage > 0
                                 ? capturedContract.MaxDamage
                                 : NormalizeCombatItemStat(weapon.GetAttribute((int)StatIds.maxdamage), 0);
-            int damageBonus = hasCapturedEquippedAttackInfo
-                                  ? 0
-                                  : NormalizeCombatItemStat(
-                                      weapon.GetAttribute((int)StatIds.damagebonus),
-                                      0);
+            int damageBonus = NormalizeCombatItemStat(
+                weapon.GetAttribute((int)StatIds.damagebonus),
+                0);
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,
@@ -1217,7 +1215,7 @@ namespace AORebirth.Core.Playfields
                    {
                        MinDamage = minDamage,
                        MaxDamage = maxDamage,
-                       DamageBonus = 0,
+                       DamageBonus = damageBonus,
                        Range = NormalizeCombatRange(weapon.GetAttribute((int)StatIds.attackrange)),
                        RechargeSeconds = hasCapturedEquippedAttackInfo
                                              && capturedContract.RechargeSeconds > 0

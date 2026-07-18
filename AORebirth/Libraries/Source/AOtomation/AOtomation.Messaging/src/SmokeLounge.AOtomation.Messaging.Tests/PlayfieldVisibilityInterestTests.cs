@@ -344,9 +344,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AORebirth.Core.Playfields.OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns();
             var index = NewIndex();
 
-            Assert.AreEqual(260, spawns.Length);
-            Assert.AreEqual(260, spawns.Select(value => value.SourceIdentity).Distinct().Count());
-            Assert.AreEqual(260, spawns.Count(value => value.PlayfieldInstance == 127));
+            Assert.AreEqual(321, spawns.Length);
+            Assert.AreEqual(321, spawns.Select(value => value.SourceIdentity).Distinct().Count());
+            Assert.AreEqual(321, spawns.Count(value => value.PlayfieldInstance == 127));
             foreach (AORebirth.Core.Playfields.OrdinaryEnemySpawnDefinition spawn in spawns)
             {
                 AORebirth.Core.Playfields.OrdinaryEnemyProfile profile;
@@ -355,9 +355,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Upsert(index, Character(spawn.SourceIdentity, spawn.X, spawn.Y, spawn.Z));
             }
 
-            Assert.AreEqual(260, index.Count);
+            Assert.AreEqual(321, index.Count);
             Assert.AreEqual(
-                222,
+                283,
                 spawns.Count(
                     value => value.Disposition
                              == AORebirth.Core.Playfields.OrdinaryEnemyRuntimeDisposition.Active));
@@ -366,7 +366,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 spawns.Count(
                     value => value.Disposition
                              == AORebirth.Core.Playfields.OrdinaryEnemyRuntimeDisposition.Quarantined));
-            Assert.AreEqual(18, profiles.Length);
+            Assert.AreEqual(26, profiles.Length);
             foreach (AORebirth.Core.Playfields.OrdinaryEnemySpawnDefinition spawn in spawns)
             {
                 Assert.AreEqual(

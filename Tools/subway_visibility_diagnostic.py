@@ -172,6 +172,7 @@ def prepare(args: argparse.Namespace) -> int:
         "selected_identities": [f"SimpleChar:{value}" for value in selected_hex],
         "manifest": str(manifest_path()),
         "runtime_log": str(target / "runtime-events.jsonl"),
+        "population_activation_ledger": str(target / "population-activation-ledger.csv"),
         "send_ledger": str(target / "per-enemy-send-ledger.csv"),
         "snapshot_summary": str(target / "snapshot-summary.jsonl"),
     }
@@ -266,7 +267,50 @@ def session_evidence(target: Path) -> dict:
     session = read_json(target / "session.json")
     outcome = read_json(target / "outcome.json") if (target / "outcome.json").exists() else None
     summary = load_last_summary(target)
-    return {"session": session, "outcome": outcome, "summary": summary}
+    activation = load_population_activation_ledger(target)
+    return {
+        "session": session,
+        "outcome": outcome,
+        "summary": summary,
+        "population_activation": activation,
+    }
+
+
+def load_population_activation_ledger(target: Path) -> dict:
+    path = target / "population-activation-ledger.csv"
+    if not path.exists():
+        return {"rows": [], "errors": []}
+
+    try:
+        with path.open("r", encoding="utf-8-sig", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+    except (OSError, csv.Error) as exc:
+        return {"rows": [], "errors": [f"read-error:{type(exc).__name__}"]}
+
+    errors = []
+    phase_order: dict[tuple[str, str], list[str]] = {}
+    for ordinal, row in enumerate(rows, start=2):
+        phase = str(row.get("Phase", "")).upper()
+        source = str(row.get("SourceInstanceHex", "")).upper()
+        process_id = str(row.get("ProcessId", ""))
+        if phase not in {"ELIGIBLE", "MATERIALIZED", "FAILED"}:
+            errors.append(f"row-{ordinal}:invalid-phase")
+            continue
+        if not re.fullmatch(r"[0-9A-F]{8}", source):
+            errors.append(f"row-{ordinal}:invalid-source")
+            continue
+        if not process_id.isdigit():
+            errors.append(f"row-{ordinal}:invalid-process")
+            continue
+        phase_order.setdefault((source, process_id), []).append(phase)
+
+    for (source, process_id), phases in phase_order.items():
+        if phases[0] != "ELIGIBLE":
+            errors.append(f"{source}:{process_id}:first-phase-not-eligible")
+        if len(phases) != len(set(phases)):
+            errors.append(f"{source}:{process_id}:duplicate-phase")
+
+    return {"rows": rows, "errors": errors}
 
 
 def analyze(args: argparse.Namespace) -> int:
@@ -279,6 +323,7 @@ def analyze(args: argparse.Namespace) -> int:
     findings = []
     outcome = current["outcome"]
     summary = current["summary"]
+    activation = current["population_activation"]
     if outcome is None:
         findings.append("INCONCLUSIVE")
     elif summary is None:
@@ -290,6 +335,41 @@ def analyze(args: argparse.Namespace) -> int:
             findings.append("SERVER_SEND_SEQUENCE_INCOMPLETE")
         elif failed:
             findings.append("SERVER_SEND_SEQUENCE_COMPLETE_BEFORE_CLIENT_FAILURE")
+
+    selected_sources = {
+        value.split(":", 1)[1].upper()
+        for value in current["session"].get("selected_identities", [])
+        if ":" in value
+    }
+    activation_rows = activation["rows"]
+    activation_errors = activation["errors"]
+    if activation_errors:
+        findings.append("POPULATION_ACTIVATION_LEDGER_INVALID")
+    if selected_sources and not activation_rows:
+        findings.append("POPULATION_ACTIVATION_UNOBSERVED")
+    if activation_rows:
+        eligible_attempts = {
+            (row.get("SourceInstanceHex", "").upper(), row.get("ProcessId", ""))
+            for row in activation_rows
+            if row.get("Phase", "").upper() == "ELIGIBLE"
+        }
+        materialized_attempts = {
+            (row.get("SourceInstanceHex", "").upper(), row.get("ProcessId", ""))
+            for row in activation_rows
+            if row.get("Phase", "").upper() == "MATERIALIZED"
+        }
+        failed_attempts = {
+            (row.get("SourceInstanceHex", "").upper(), row.get("ProcessId", ""))
+            for row in activation_rows
+            if row.get("Phase", "").upper() == "FAILED"
+        }
+        eligible_sources = {source for source, _ in eligible_attempts}
+        if selected_sources - eligible_sources:
+            findings.append("SELECTED_ROWS_NOT_EVALUATED")
+        if eligible_attempts - materialized_attempts - failed_attempts:
+            findings.append("ELIGIBLE_ROWS_NOT_MATERIALIZED")
+        if failed_attempts:
+            findings.append("POPULATION_MATERIALIZATION_FAILED")
 
     usable = [item for item in all_sessions if item["outcome"] and item["summary"]]
     passing = [item for item in usable if item["outcome"]["outcome"] == "PASS_LOGIN_STABLE"]
@@ -347,6 +427,7 @@ def analyze(args: argparse.Namespace) -> int:
         "findings": sorted(set(findings)),
         "selected_identities": selected,
         "snapshot": summary,
+        "population_activation": activation,
         "operator_outcome": outcome,
         "cross_session": {
             "smallest_passing_npc_count": min(pass_counts) if pass_counts else None,
@@ -369,6 +450,11 @@ def analyze(args: argparse.Namespace) -> int:
         "## Findings",
         "",
         *[f"- `{finding}`" for finding in report["findings"]],
+        "",
+        "## Population activation",
+        "",
+        f"- Ledger rows: `{len(activation_rows)}`",
+        f"- Validation errors: `{len(activation_errors)}`",
         "",
         "## Causality boundary",
         "",

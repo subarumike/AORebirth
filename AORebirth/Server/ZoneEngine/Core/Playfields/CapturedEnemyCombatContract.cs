@@ -388,6 +388,31 @@ namespace AORebirth.Core.Playfields
             };
         }
 
+        internal static CapturedEnemyCombatContract EquippedWeaponWithCapturedAttackInfo(
+            string evidence,
+            int lowId,
+            int highId,
+            int quality,
+            int inventorySlot,
+            int attackInfoAmmoCount,
+            int attackInfoWeaponSlot,
+            int attackInfoUnknown,
+            int attackInfoWeaponInstance)
+        {
+            CapturedEnemyCombatContract contract = EquippedWeapon(
+                evidence,
+                lowId,
+                highId,
+                quality,
+                inventorySlot);
+            contract.HasCapturedEquippedAttackInfo = true;
+            contract.AttackInfoAmmoCount = attackInfoAmmoCount;
+            contract.AttackInfoWeaponSlot = attackInfoWeaponSlot;
+            contract.AttackInfoUnknown = attackInfoUnknown;
+            contract.AttackInfoWeaponInstance = attackInfoWeaponInstance;
+            return contract;
+        }
+
         internal static CapturedEnemyCombatContract EquippedWeaponWithEmptySpecialAttackContext(
             string evidence,
             int lowId,
@@ -638,10 +663,56 @@ namespace AORebirth.Core.Playfields
 
     internal static class CapturedSubwayCombatCatalog
     {
+        private const int LooterMonsterData = 203745;
+
+        private const int MuggerMonsterData = 203734;
+
+        private const int WorkmanStrikerMonsterData = 203854;
+
+        private static readonly int[] MuggerSourceInstances =
+        {
+            unchecked((int)0x7953AA11),
+            unchecked((int)0x7953AD6B),
+            unchecked((int)0x795450D4),
+            unchecked((int)0x795451FE),
+            unchecked((int)0x79557F14),
+            unchecked((int)0x7957E5C6),
+            unchecked((int)0x7957E5C7),
+            unchecked((int)0x7957E5C8),
+            unchecked((int)0x7957E5CA)
+        };
+
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
+        {
+            return For(name, monsterData, null);
+        }
+
+        internal static CapturedEnemyCombatContract For(string name, int monsterData, int? level)
         {
             switch (monsterData)
             {
+                case 203726:
+                    return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
+                        "20260709-222339 plus 20260717-214612/214751/215250: Eumenides QL20 weapon 123267/123268, empty-special context 143/171/143/143/0, immediate attack start, 0.233124-second movement transition, 5.199992-second first hit, 21 observed normal local-player hits 25..45, and 4.311321-second median interval across 17 intervals; weapon owns runtime damage and recharge",
+                        NpcCombatAttackRules.CapturedSubwayEumenidesWeaponLowTemplate,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesWeaponHighTemplate,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesWeaponQuality,
+                        (int)WeaponSlots.Righthand,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesWeaponDamageMinimumOverride,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesWeaponDamageMaximumOverride,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesAttackStartDelaySeconds,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesMovementTransitionDelaySeconds,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesFirstHitDelaySeconds,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesRechargeOverrideSeconds,
+                        false,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesInitialAttackInfoAmmoCount,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesAttackInfoUnknown,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown1,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown2,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown3,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown4,
+                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown5,
+                        requiresDamageLineOfSight: true);
                 case 203748:
                     return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
                         "20260712-232711/234401: Vergil Aeneid QL23 Cast-Off E-Beamer 122123; 23-25 player damage, 23-34 all-target damage, captured attack-start/first-hit timing, and weapon-owned roll/cadence",
@@ -760,12 +831,12 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayAbmouthInfectorSpecialAttackWeaponLastValue));
                 case 17657:
                     return CapturedEnemyCombatContract.CapturedSpecialSequence(
-                        "20260709-193914: Filth Flea poison opener and melee cycle",
+                        "20260708-004038 and 20260709-193914: Filth Flea normal slot rolls with criticals excluded",
                         new CapturedEnemySpecialAttackSequenceDefinition(
                             NpcCombatAttackRules.CapturedSubwayFilthFleaInitialAttackSeconds,
                             new CapturedEnemyCombatAttackDefinition(
-                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonDamage,
-                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonDamage,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonMinimumDamage,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonMaximumDamage,
                                 0,
                                 NpcCombatAttackRules.MaxMeleeCombatDistance,
                                 NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonRechargeSeconds,
@@ -777,8 +848,8 @@ namespace AORebirth.Core.Playfields
                                 NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
                                 true),
                             new CapturedEnemyCombatAttackDefinition(
-                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeDamage,
-                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeDamage,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeMinimumDamage,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeMaximumDamage,
                                 0,
                                 NpcCombatAttackRules.MaxMeleeCombatDistance,
                                 NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeRechargeSeconds,
@@ -817,37 +888,7 @@ namespace AORebirth.Core.Playfields
                         0,
                         1397315377);
                 case 17649:
-                    return CapturedEnemyCombatContract.CapturedSpecialSequence(
-                        "20260713-014714 packets 123-346: Disobedient Bot SIW1 attack context, 10-11 melee damage, 3.270444-second first hit, and 5.973723-second repeat",
-                        new CapturedEnemySpecialAttackSequenceDefinition(
-                            NpcCombatAttackRules.CapturedSubwayDisobedientBotInitialAttackSeconds,
-                            null,
-                            new CapturedEnemyCombatAttackDefinition(
-                                NpcCombatAttackRules.CapturedSubwayDisobedientBotMinimumDamage,
-                                NpcCombatAttackRules.CapturedSubwayDisobedientBotMaximumDamage,
-                                0,
-                                NpcCombatAttackRules.MaxMeleeCombatDistance,
-                                NpcCombatAttackRules.CapturedSubwayDisobedientBotRechargeSeconds,
-                                false,
-                                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
-                                NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponSlot,
-                                0,
-                                NpcCombatAttackRules.NormalAttackInfoHitType,
-                                NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponTag,
-                                true),
-                            new[]
-                            {
-                                new CapturedEnemySpecialAttackDefinition(
-                                    NpcCombatAttackRules.CapturedSubwayDisobedientBotLowTemplate,
-                                    NpcCombatAttackRules.CapturedSubwayDisobedientBotHighTemplate,
-                                    NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponTag,
-                                    NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponName)
-                            },
-                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponLastValue));
+                    return ForDisobedientBot(level);
                 case 30379:
                     return CapturedEnemyCombatContract.CapturedParallelAttackSequence(
                         "20260709-222339 and 20260716-033326/034104: Bloodcreeper proactive dual Skinspider Bite/Spit natural attacks, 21-41 rolled damage, and independent captured hand cadence",
@@ -904,14 +945,9 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponValue,
                             NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponLastValue));
                 case 203734:
-                    return CapturedEnemyCombatContract.FixedAttack(
-                        "20260709-210452/212115/212336/220439: Mugger AttackInfo",
-                        10,
-                        21,
-                        5.900159,
-                        (int)WeaponSlots.Righthand,
-                        0,
-                        0);
+                    return CapturedEnemyCombatContract.Unresolved(
+                        "Mugger combat requires an exact captured source identity; aggregate weapon fallback is forbidden",
+                        true);
                 case 26092:
                     return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
                         "20260711-170337 packets 301-654: Thief attack start, movement transition, three landed projectile hits, and six-second repeat cadence; 2026-07-12 private validation proved the weapon context renders projectile damage",
@@ -947,9 +983,274 @@ namespace AORebirth.Core.Playfields
             }
         }
 
+        private static CapturedEnemyCombatContract ForDisobedientBot(int? level)
+        {
+            int specialAttackWeaponValue;
+            int specialAttackWeaponLastValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponLastValue;
+            switch (level)
+            {
+                case 5:
+                    specialAttackWeaponValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponValue;
+                    specialAttackWeaponLastValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponLastValue;
+                    break;
+                case 6:
+                    specialAttackWeaponValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel6SpecialAttackWeaponValue;
+                    break;
+                case 7:
+                    specialAttackWeaponValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel7SpecialAttackWeaponPolicyValue;
+                    break;
+                case 8:
+                    specialAttackWeaponValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel8SpecialAttackWeaponValue;
+                    break;
+                case 9:
+                    specialAttackWeaponValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel9SpecialAttackWeaponValue;
+                    break;
+                case 10:
+                    specialAttackWeaponValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel10SpecialAttackWeaponValue;
+                    break;
+                default:
+                    return CapturedEnemyCombatContract.Unresolved(
+                        "Disobedient Bot SIW1 attack context is unresolved for level "
+                        + (level.HasValue ? level.Value.ToString() : "unknown"),
+                        true);
+            }
+
+            return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                "20260708-143600, 20260709-205921/210452/220439, 20260712-153918, and 20260713-014714/033511: 17 Disobedient Bot SIW1 normal local-player hits span 8-15 damage; focused raw packets prove a 3.270444-second first hit and 5.973723-second repeat attempt cadence; SpecialAttackWeapon contexts are capture-backed for levels 5, 6, 8, 9, and 10, including the level-5 terminal value 22, with level 7 explicitly using the bounded 35/45 midpoint policy",
+                new CapturedEnemySpecialAttackSequenceDefinition(
+                    NpcCombatAttackRules.CapturedSubwayDisobedientBotInitialAttackSeconds,
+                    null,
+                    new CapturedEnemyCombatAttackDefinition(
+                        NpcCombatAttackRules.CapturedSubwayDisobedientBotMinimumDamage,
+                        NpcCombatAttackRules.CapturedSubwayDisobedientBotMaximumDamage,
+                        0,
+                        NpcCombatAttackRules.MaxMeleeCombatDistance,
+                        NpcCombatAttackRules.CapturedSubwayDisobedientBotRechargeSeconds,
+                        false,
+                        NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                        NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponSlot,
+                        0,
+                        NpcCombatAttackRules.NormalAttackInfoHitType,
+                        NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponTag,
+                        true),
+                    new[]
+                    {
+                        new CapturedEnemySpecialAttackDefinition(
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotLowTemplate,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotHighTemplate,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponTag,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponName)
+                    },
+                    specialAttackWeaponValue,
+                    specialAttackWeaponValue,
+                    specialAttackWeaponValue,
+                    specialAttackWeaponValue,
+                    specialAttackWeaponLastValue));
+        }
+
+        private static CapturedEnemyCombatContract ForWorkmanStriker(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance)
+        {
+            return ForSourceSpecificWeaponArchetype(archetype, sourceInstance, "Workman Striker");
+        }
+
+        private static CapturedEnemyCombatContract ForLooter(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance)
+        {
+            return ForSourceSpecificWeaponArchetype(archetype, sourceInstance, "Looter");
+        }
+
+        private static CapturedEnemyCombatContract ForSourceSpecificWeaponArchetype(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            string displayName)
+        {
+            CapturedSubwaySourceWeaponEvidenceDefinition matched = null;
+            int matches = 0;
+            foreach (CapturedSubwaySourceWeaponEvidenceDefinition evidence in
+                archetype.SourceWeaponEvidence)
+            {
+                if (evidence.SourceInstance != sourceInstance)
+                {
+                    continue;
+                }
+
+                matched = evidence;
+                matches++;
+            }
+
+            if (matches != 1 || matched == null)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    string.Format(
+                        "{0} source 0x{1:X8} requires exactly one owner-linked captured weapon tuple; found {2}",
+                        displayName,
+                        sourceInstance,
+                        matches),
+                    archetype.Combat != null && archetype.Combat.Observed);
+            }
+
+            return CapturedEnemyCombatContract.EquippedWeapon(
+                string.Format(
+                    "{0}: {1} source 0x{2:X8} owner-linked QL{3} weapon {4}/{5}; item owns normal damage and recharge; no fixed damage, special-attack, or captured AttackInfo context",
+                    matched.EvidenceCaptures,
+                    displayName,
+                    sourceInstance,
+                    matched.Quality,
+                    matched.LowId,
+                    matched.HighId),
+                matched.LowId,
+                matched.HighId,
+                matched.Quality,
+                (int)WeaponSlots.Righthand);
+        }
+
+        internal static CapturedEnemyCombatContract ForSupportedSourceWeapon(
+            string name,
+            int monsterData,
+            CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence,
+            int sourceInstance)
+        {
+            if (!string.Equals(name, "Mugger", StringComparison.Ordinal)
+                || monsterData != MuggerMonsterData)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    string.Format(
+                        "Unsupported source-specific weapon profile {0} monsterData={1}",
+                        name,
+                        monsterData),
+                    false);
+            }
+
+            if (!HasCompleteMuggerSourceWeaponEvidence(sourceWeaponEvidence))
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Mugger combat requires one exact QL1 121567/121567 owner-linked weapon tuple for each of the nine current sources",
+                    true);
+            }
+
+            CapturedSubwaySourceWeaponEvidenceDefinition matched = null;
+            int matches = 0;
+            foreach (CapturedSubwaySourceWeaponEvidenceDefinition evidence in sourceWeaponEvidence)
+            {
+                if (evidence.SourceInstance != sourceInstance)
+                {
+                    continue;
+                }
+
+                matched = evidence;
+                matches++;
+            }
+
+            if (matches != 1 || matched == null)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    string.Format(
+                        "Mugger source 0x{0:X8} requires exactly one owner-linked captured weapon tuple; found {1}",
+                        sourceInstance,
+                        matches),
+                    true);
+            }
+
+            return CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(
+                string.Format(
+                    "{0}: Mugger source 0x{1:X8} owner-linked QL1 weapon 121567/121567; 38 normal local-player hits span 9..12, three 21-point criticals are report-only, and the median interval is 5.816469 seconds; item owns runtime damage, damage bonus, and recharge; captured AttackInfo carries only ammo -1, slot 6, unknown 0, and weapon instance 0; no empty SIW or captured attack-start/stop context",
+                    matched.EvidenceCaptures,
+                    sourceInstance),
+                matched.LowId,
+                matched.HighId,
+                matched.Quality,
+                (int)WeaponSlots.Righthand,
+                -1,
+                (int)WeaponSlots.Righthand,
+                0,
+                0);
+        }
+
+        private static bool HasCompleteMuggerSourceWeaponEvidence(
+            CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence)
+        {
+            if (sourceWeaponEvidence == null
+                || sourceWeaponEvidence.Length != MuggerSourceInstances.Length)
+            {
+                return false;
+            }
+
+            foreach (int expectedSource in MuggerSourceInstances)
+            {
+                int matches = 0;
+                foreach (CapturedSubwaySourceWeaponEvidenceDefinition evidence in sourceWeaponEvidence)
+                {
+                    if (evidence.SourceInstance == expectedSource
+                        && evidence.LowId == 121567
+                        && evidence.HighId == 121567
+                        && evidence.Quality == 1)
+                    {
+                        matches++;
+                    }
+                }
+
+                if (matches != 1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static CapturedEnemyCombatContract ForMeldedPatterns(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype)
+        {
+            CapturedSubwayCombatEvidenceDefinition combat = archetype.Combat;
+            bool hasFocusedWeaponCapture = archetype.EvidenceCaptures != null
+                                           && Array.IndexOf(
+                                               archetype.EvidenceCaptures,
+                                               "20260716-034559") >= 0;
+            bool hasExactNormalHitBoundary = combat != null
+                                             && combat.Observed
+                                             && combat.ObservedRows == 7
+                                             && combat.MinDamage == 21
+                                             && combat.MaxDamage == 34
+                                             && combat.WeaponSlot
+                                                == (int)WeaponSlots.Righthand;
+            if (!hasFocusedWeaponCapture || !hasExactNormalHitBoundary)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Melded Patterns equipped-weapon context requires focused capture 20260716-034559 and its seven normal 21..34 local-player hits",
+                    combat != null && combat.Observed);
+            }
+
+            return CapturedEnemyCombatContract.EquippedWeapon(
+                "20260716-034559: Melded Patterns QL20 Irreparable Sleekblaster Minor 121817/121818; seven normal local-player hits span 21..34 and no critical was observed; weapon owns runtime damage and recharge",
+                NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponLowTemplate,
+                NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponHighTemplate,
+                NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponQuality,
+                (int)WeaponSlots.Righthand);
+        }
+
         internal static CapturedEnemyCombatContract ForOrdinary(
             CapturedSubwayOrdinaryArchetypeDefinition archetype)
         {
+            if (archetype != null
+                && (archetype.MonsterData == WorkmanStrikerMonsterData
+                    || archetype.MonsterData == LooterMonsterData))
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    archetype.Name
+                    + " combat requires an exact captured source identity; aggregate weapon fallback is forbidden",
+                    archetype.Combat != null && archetype.Combat.Observed);
+            }
+
+            if (archetype != null
+                && archetype.MonsterData
+                   == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData)
+            {
+                return ForMeldedPatterns(archetype);
+            }
+
             if (archetype != null
                 && archetype.MonsterData == NpcCombatAttackRules.CapturedSubwayBloodcreeperMonsterData)
             {
@@ -972,6 +1273,23 @@ namespace AORebirth.Core.Playfields
                 combat.WeaponSlot,
                 combat.AttackInfoUnknown,
                 combat.WeaponInstance);
+        }
+
+        internal static CapturedEnemyCombatContract ForOrdinary(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance)
+        {
+            if (archetype != null && archetype.MonsterData == WorkmanStrikerMonsterData)
+            {
+                return ForWorkmanStriker(archetype, sourceInstance);
+            }
+
+            if (archetype != null && archetype.MonsterData == LooterMonsterData)
+            {
+                return ForLooter(archetype, sourceInstance);
+            }
+
+            return ForOrdinary(archetype);
         }
     }
 }

@@ -27,13 +27,17 @@ namespace AORebirth.Core.Playfields
         internal const int AbmouthMonsterData = 155962;
         internal const int InfectorMonsterData = 31909;
         internal const int VergilAeneidMonsterData = 203748;
+        internal const int EumenidesMonsterData = 203726;
         internal const string AbmouthProfileKey = "subway.127.boss.abmouth-supremus";
         internal const string InfectorProfileKey = "subway.127.encounter.abmouth-infector";
         internal const string VergilAeneidProfileKey = "subway.127.boss.vergil-aeneid";
+        internal const string EumenidesProfileKey = "subway.127.named.eumenides";
         internal const string EncounterKey = "subway.127.encounter.abmouth";
         internal const string VergilAeneidEncounterKey = "subway.127.encounter.vergil-aeneid";
+        internal const string EumenidesEncounterKey = "subway.127.encounter.eumenides";
 
         private const float CapturedAggroRadius = 13.4151f;
+        private const float CapturedEumenidesAggroRadius = 15.609f;
         private const float CapturedReplacementInfectorOffsetX = 3.0f;
         private const string FirstInfectorUnknown1 =
             "80000000000000000000000003010001000100010001000000020000";
@@ -54,6 +58,7 @@ namespace AORebirth.Core.Playfields
         private const int VergilSelfHealTriggerPermille = 180;
         private const float VergilDirectHealRange = 13.0f;
         private static readonly TimeSpan CapturedNamedBossRespawnDelay = TimeSpan.FromMinutes(10);
+        private static readonly TimeSpan EumenidesObservedRespawnDelay = TimeSpan.FromMinutes(10);
 
         private static readonly double[] CapturedRefillDelays = { 0.830, 0.380, 3.322, 3.490 };
         private static readonly CapturedEncounterLevelHealthVariant[] VergilAeneidVariants =
@@ -91,12 +96,14 @@ namespace AORebirth.Core.Playfields
 
         private Identity abmouthIdentity = Identity.None;
         private Identity vergilAeneidIdentity = Identity.None;
+        private Identity eumenidesIdentity = Identity.None;
         private bool combatActive;
         private bool abmouthDead;
         private DateTime? abmouthRespawnDueAtUtc;
         private bool vergilCombatActive;
         private bool vergilDead;
         private DateTime? vergilRespawnDueAtUtc;
+        private DateTime? eumenidesRespawnDueAtUtc;
         private DateTime vergilNextHealAtUtc;
         private PendingVergilHeal vergilPendingHeal;
         private int refillDelayIndex;
@@ -139,6 +146,17 @@ namespace AORebirth.Core.Playfields
                     this.vergilAeneidIdentity = vergil.Identity;
                 }
             }
+
+            if (this.eumenidesIdentity.Instance == 0 && !this.eumenidesRespawnDueAtUtc.HasValue)
+            {
+                Character eumenides = this.SpawnCharacter(
+                    CreateEumenidesDefinition(),
+                    Identity.None);
+                if (eumenides != null)
+                {
+                    this.eumenidesIdentity = eumenides.Identity;
+                }
+            }
         }
 
         internal void ClearRuntimeState()
@@ -146,11 +164,13 @@ namespace AORebirth.Core.Playfields
             CapturedEncounterRuntimeRegistry.RemoveForPlayfield(this.playfield.Identity.Instance);
             this.abmouthIdentity = Identity.None;
             this.vergilAeneidIdentity = Identity.None;
+            this.eumenidesIdentity = Identity.None;
             this.combatActive = false;
             this.abmouthDead = false;
             this.abmouthRespawnDueAtUtc = null;
             this.ClearVergilCombatState();
             this.vergilRespawnDueAtUtc = null;
+            this.eumenidesRespawnDueAtUtc = null;
             this.refillDelayIndex = 0;
             foreach (InfectorSlotState slot in this.infectorSlots)
             {
@@ -166,19 +186,31 @@ namespace AORebirth.Core.Playfields
             if (npc == null
                 || npc.FightingTarget.Instance != 0
                 || npc.Stats[StatIds.health].Value <= 0
-                || !CapturedEncounterRuntimeRegistry.TryGet(npc.Identity.Instance, out definition)
-                || !string.Equals(
-                    definition.ProfileKey,
-                    AbmouthProfileKey,
-                    StringComparison.Ordinal))
+                || !CapturedEncounterRuntimeRegistry.TryGet(npc.Identity.Instance, out definition))
             {
                 return null;
             }
 
-            // The capture proves proactive aggro at this horizontal distance. It does
-            // not prove the live maximum, so do not extend the radius beyond it.
+            bool isAbmouth = string.Equals(
+                definition.ProfileKey,
+                AbmouthProfileKey,
+                StringComparison.Ordinal);
+            bool isEumenides = string.Equals(
+                definition.ProfileKey,
+                EumenidesProfileKey,
+                StringComparison.Ordinal);
+            if (!isAbmouth && !isEumenides)
+            {
+                return null;
+            }
+
+            // Each capture proves proactive acquisition only at its observed
+            // horizontal boundary. Do not extend either profile beyond it.
+            float radius = isEumenides
+                               ? CapturedEumenidesAggroRadius
+                               : CapturedAggroRadius;
             return this.dynelRegistry
-                .FindCharactersInRange(npc, CapturedAggroRadius)
+                .FindCharactersInRange(npc, radius)
                 .Where(
                     candidate => candidate != null
                                  && candidate.Controller is PlayerController
@@ -283,6 +315,7 @@ namespace AORebirth.Core.Playfields
         internal void ProcessDue(DateTime utcNow, Action<ICharacter, ICharacter> acquireAggro)
         {
             this.ProcessNamedBossRespawns(utcNow);
+            this.ProcessEumenidesRespawn(utcNow);
             this.ProcessVergilHealing(utcNow);
 
             if (!this.combatActive || this.abmouthDead || this.abmouthIdentity.Instance == 0)
@@ -339,6 +372,15 @@ namespace AORebirth.Core.Playfields
                 this.ClearVergilCombatState();
                 this.vergilDead = true;
                 this.vergilRespawnDueAtUtc = diedAtUtc.Add(CapturedNamedBossRespawnDelay);
+                return new ICharacter[0];
+            }
+
+            if (string.Equals(
+                definition.ProfileKey,
+                EumenidesProfileKey,
+                StringComparison.Ordinal))
+            {
+                this.eumenidesRespawnDueAtUtc = diedAtUtc.Add(EumenidesObservedRespawnDelay);
                 return new ICharacter[0];
             }
 
@@ -413,6 +455,27 @@ namespace AORebirth.Core.Playfields
             }
         }
 
+        private void ProcessEumenidesRespawn(DateTime utcNow)
+        {
+            if (!this.eumenidesRespawnDueAtUtc.HasValue
+                || this.eumenidesRespawnDueAtUtc.Value > utcNow
+                || this.eumenidesIdentity.Instance != 0)
+            {
+                return;
+            }
+
+            Character eumenides = this.SpawnCharacter(
+                CreateEumenidesDefinition(),
+                Identity.None);
+            if (eumenides == null)
+            {
+                return;
+            }
+
+            this.eumenidesIdentity = eumenides.Identity;
+            this.eumenidesRespawnDueAtUtc = null;
+        }
+
         internal void NotifyNpcDespawn(ICharacter target, DateTime utcNow)
         {
             CapturedEncounterRuntimeDefinition definition;
@@ -439,6 +502,15 @@ namespace AORebirth.Core.Playfields
             {
                 this.vergilAeneidIdentity = Identity.None;
                 this.ClearVergilCombatState();
+                return;
+            }
+
+            if (string.Equals(
+                definition.ProfileKey,
+                EumenidesProfileKey,
+                StringComparison.Ordinal))
+            {
+                this.eumenidesIdentity = Identity.None;
                 return;
             }
 
@@ -759,7 +831,8 @@ namespace AORebirth.Core.Playfields
             string combatFailure;
             CapturedEnemyCombatContract combat = CapturedSubwayCombatCatalog.For(
                 definition.DisplayName,
-                definition.MonsterData);
+                definition.MonsterData,
+                definition.Level);
             if (!CapturedEnemyCombatRuntime.Prepare(character, controller, combat, out combatFailure))
             {
                 LogUtil.Debug(
@@ -927,6 +1000,66 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayWaypointDefinition(278.045074f, 73.01795f, 98.80104f)
                 },
                 maximumNpcLeashDistanceFromHome: 40.0);
+        }
+
+        private static CapturedEncounterRuntimeDefinition CreateEumenidesDefinition()
+        {
+            return new CapturedEncounterRuntimeDefinition(
+                EumenidesProfileKey,
+                "subway.127.named.eumenides.spawn",
+                EumenidesEncounterKey,
+                "Eumenides",
+                EumenidesMonsterData,
+                false,
+                false,
+                20,
+                2792,
+                130,
+                76,
+                76,
+                0,
+                3,
+                241.105133f,
+                73.0453949f,
+                44.0469055f,
+                0.0f,
+                0.250876963f,
+                0.0f,
+                -0.96801883f,
+                1643u,
+                unchecked((int)0x020A4ACB),
+                0,
+                HexToBytes("80000000000000000000000002010001000100010001000000020000"),
+                0,
+                17905,
+                1800.0,
+                3.0,
+                "20260716-034559 atomic SCFU; 20260709-222339 plus 20260717-214612/214751/215250 weapon/combat/chase; "
+                + "20260716-222007 exact 416-byte corpse CATMesh 17905/MonsterData 203726/scale 130; "
+                + "20260717-214751/215250 two exact 186-credit item-plus-credit corpse snapshots; "
+                + "20260717-220340-associated Mike observation (not packet-timestamp encoded): official-live exact 10-minute respawn and Temporary 30m loot-bearing corpse; "
+                + "confirmed 3-second empty cleanup and shared 100-unit leash; active nano refresh unresolved and omitted",
+                npcFamily: 148,
+                npcLosHeight: 0,
+                fatness: 1,
+                breed: 3,
+                sex: 2,
+                race: 1,
+                headMesh: 29708,
+                textures: new[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 9620, 0),
+                    new CapturedSubwayTextureDefinition(1, 9612, 0),
+                    new CapturedSubwayTextureDefinition(2, 9618, 0),
+                    new CapturedSubwayTextureDefinition(3, 99779, 0),
+                    new CapturedSubwayTextureDefinition(4, 9625, 0)
+                },
+                meshes: new[]
+                {
+                    new CapturedSubwayMeshDefinition(0, 29708u, 0, 4),
+                    new CapturedSubwayMeshDefinition(1, 35564u, 0, 2)
+                },
+                maximumNpcLeashDistanceFromHome: 100.0);
         }
 
         private static CapturedEncounterRuntimeDefinition CreateFirstInfectorDefinition()
