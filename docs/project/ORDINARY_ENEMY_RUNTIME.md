@@ -207,11 +207,11 @@ official probability claim, and the broader pool remains incomplete. Burnt Out
 Memory Chip (`234876/234876`) cannot roll because its corpse linkage is
 incomplete.
 
-Bloodcreeper has four exact corpse generations and two strict complete item
-inventories, both empty. No item identity or transfer is proven. That evidence
-does not establish an empty pool, so Bloodcreeper item loot remains explicitly
-unresolved and inactive; its proven 150-credit behavior is independent of the
-item-pool boundary.
+Bloodcreeper has four reviewed complete first opens: one positive and three
+empty. The positive generation proves QL30 item `42640/42641`; runtime replays
+that observed `1/4` entry independently while preserving
+`ItemPoolComplete=false`. Its proven 150-credit behavior remains independent of
+the incomplete item-pool boundary.
 
 The restored deep-population slice uses strict initial corpse snapshots, including
 empty snapshots, when calculating observed item frequencies. It does not infer
@@ -288,16 +288,20 @@ gate fails closed if the focused capture or seven normal `21..34` hit boundary
 drifts. No special-attack context or critical behavior is inferred, and the
 profile is accepted by the whole-enemy gate with those exclusions preserved.
 
-Legacy first-open evidence now supplies strict item denominators for four more
-ordinary profiles through one reusable raw-generation validator. Shadow uses
-15 complete opens (eight positive/seven empty), ordinary Infector seven
-(three/four), Architect Striker four (three/one), and Melded Patterns four
-(three/one). Each reviewed row binds the exact corpse full-update time, corpse,
-dead NPC, first raw inventory packet, and reuse boundary. Simultaneous Shadow
-projections from `20260709-212115/212336` count once; unopened and snapshot-only
-corpses remain excluded. All four profiles use `IndependentEntries`, preserve
-their observed empty counts, and keep `ItemPoolComplete=false`; the replay
-weights are private observed-sample policy rather than official drop odds.
+Reviewed first-open evidence now supplies strict item denominators for 18
+ordinary profiles through one reusable raw-generation validator. In addition
+to Shadow, ordinary Infector, Architect Striker, and Melded Patterns, the
+recovered set is Mugger `17/3 empty`, Discarded Pet `16/3`, Stim Fiend `13/0`,
+Looter `11/5`, Violent Vagabond `11/1`, Bloodcreeper `4/3`, Infected Attendant
+`4/1`, Fragmented Soul `4/0`, Deranged Shopper `2/0`, Incomplete Rebuild `2/0`,
+Redundant Scan `2/1`, Uncontrollable Anger `2/0`, Lost Thought `1/0`, and Neural
+Burnout `4/2`. Each reviewed source is capture-allowlisted and its complete set
+of exact corpse/dead-NPC/first-raw-inventory generations is fingerprinted;
+capture allocations and declared overlap projections also fail closed. Unopened
+and snapshot-only corpses remain excluded, as does the known false Stim Fiend
+attribution. Runtime consumes generated strict-loot summary metadata, uses
+`IndependentEntries`, preserves observed empty counts, and keeps
+`ItemPoolComplete=false`; Empty Shell and Premature Pattern receive no table.
 
 Shadow, ordinary Infector, Architect Striker, and Melded Patterns are the sixth
 through ninth accepted ordinary profiles. Their gate coverage binds exact

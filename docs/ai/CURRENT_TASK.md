@@ -86,11 +86,12 @@ population in bounded runtime batches.
   `20260716-222007`, and `20260716-222201`. The latest recovery adds 16
   identity-linked generations and 11 previously missing profile/level/credit
   tuples without inferring cross-profile credit rules.
-- Legacy item snapshots are indexed as identity-linked evidence-only outcomes;
-  they cannot become runtime drop odds. Runtime probability denominators come
-  only from strict initial corpse snapshots, and reused loot-window opens count
-  once per corpse generation. The previously false Stim Fiend attribution is
-  removed; Disobedient Bot, Thief, and Filth Flea policies remain unchanged.
+- Legacy item snapshots remain identity-linked evidence-only outcomes unless a
+  reviewed raw first-open denominator pins every included corpse generation.
+  Reused loot-window opens count once per generation, explicit empty packets
+  count, and unopened or snapshot-only corpses do not. The previously false
+  Stim Fiend attribution remains excluded; Disobedient Bot, Thief, and Filth
+  Flea policies remain unchanged.
 
 - Legacy finalized capture folders whose packet log continued after capture
   shutdown now decode only rows within `captureStartUtc..captureEndUtc`.
@@ -109,9 +110,9 @@ population in bounded runtime batches.
   levels with no official corpse-credit observation.
 - Offline recovery of raw capture `20260710-202132` now links L10 Mugger
   `(SimpleChar:7957E5CA)` to `(Corpse:00F6C001)`, exact CATMesh `17534`, and
-  `88` credits. Its three-item inventory is indexed as one observed corpse
-  outcome, but remains outside runtime loot because one outcome proves item
-  membership, not independent odds or a guaranteed bundle.
+  `88` credits. Mugger runtime loot now uses the complete reviewed corpus of 17
+  first opens (14 positive/three empty), rather than promoting that one corpse
+  as a guaranteed bundle.
 - Official-live Subway zoning is restored exactly: PF127 entry landing
   `(65.80835,115.6148,318.9879)`, PF655 main-exit landing
   `(3304.028,35.11,837.9951)`, and their captured headings. The main exit keeps
@@ -134,11 +135,11 @@ population in bounded runtime batches.
 - Current runtime normal-hit ranges include Incomplete Rebuild `17..35`, Melded
   Patterns `21..34`, Molested Molecules `16..42`, Neural Burnout `16..22`,
   Redundant Scan `19`, and Uncontrollable Anger `11..18`.
-- Strict `corpse-loot-observations.csv` snapshots now contribute empty corpses
-  to loot denominators. Redundant Scan's observed item is `1/2`, Molested
-  Molecules item `301713` is `1/3`, and the twelve strict Slum Runner outcomes
-  from `20260716-222201` are included without treating every observed item as
-  guaranteed.
+- Reviewed raw first opens and strict `corpse-loot-observations.csv` snapshots
+  contribute explicit empty corpses to denominators. Redundant Scan's observed
+  item is `1/2`, Molested Molecules item `301713` is `1/3`, and the twelve
+  strict Slum Runner outcomes from `20260716-222201` are included without
+  treating every observed item as guaranteed.
 - Capture-local SCFU ownership now preclassifies player-owned pets before the
   weaker dossier/combat/stat/movement role heuristics, so Killer and other
   owner-linked pets can no longer be projected into the enemy ledger.
@@ -215,15 +216,18 @@ population in bounded runtime batches.
   equipped-weapon path; no special-attack context, fixed damage override,
   critical policy, loot probability, or respawn exception is synthesized. Its
   exact weapon path and those exclusions now pass the whole-enemy gate.
-- One reusable reviewed legacy-open validator now promotes four more strict
-  item tables from exact corpse-full-update/dead-NPC generations and their first
-  raw `InventoryUpdate` before identity reuse. Shadow has 15 complete opens
-  (eight positive/seven empty), ordinary Infector seven (three/four), Architect
-  Striker four (three/one), and Melded Patterns four (three/one). Overlapping
-  `20260709-212115/212336` Shadow generations count once; unopened and snapshot-
-  only corpses never enter a denominator. Runtime uses independent observed-
-  sample entries with `ItemPoolComplete=false`; the basis values are private
-  existing-capture policy, not claims about official probabilities.
+- One reusable reviewed first-open validator now owns 18 strict item tables.
+  In addition to Shadow, ordinary Infector, Architect Striker, and Melded
+  Patterns, it recovers Mugger `17/3 empty`, Discarded Pet `16/3`, Stim Fiend
+  `13/0`, Looter `11/5`, Violent Vagabond `11/1`, Bloodcreeper `4/3`, Infected
+  Attendant `4/1`, Fragmented Soul `4/0`, Deranged Shopper `2/0`, Incomplete
+  Rebuild `2/0`, Redundant Scan `2/1`, Uncontrollable Anger `2/0`, Lost Thought
+  `1/0`, and Neural Burnout `4/2`. Exact source/allocation allowlists and
+  generation fingerprints fail closed; declared overlaps deduplicate, while
+  unopened and snapshot-only corpses remain excluded. Generated summary
+  metadata drives `IndependentEntries`, observed empty counts, and
+  `ItemPoolComplete=false` without a catalog MonsterData hardcode list. Empty
+  Shell and Premature Pattern still have no item table.
 - Shadow, ordinary Infector, Architect Striker, and Melded Patterns are now the
   sixth through ninth accepted ordinary profiles. Coverage binds their exact
   spawns, appearance, capture-backed normal combat, shared chase, strict
@@ -279,7 +283,7 @@ population in bounded runtime batches.
 - Full `298`-folder location inventory and `72`-session Subway ledger
   regeneration: PASS.
 - Current inventory/content-ledger regression suites: `27/27` PASS.
-- Subway loot/corpse evidence: `21/21` PASS.
+- Subway loot/corpse evidence: `22/22` PASS.
 - Ten-entry whole-enemy acceptance gate (Thief, Filth Flea, Disobedient Bot,
   Slum Runner, Molested Molecules, Shadow, ordinary Infector, Architect
   Striker, Melded Patterns, Workman Striker): PASS. The newly accepted profiles
