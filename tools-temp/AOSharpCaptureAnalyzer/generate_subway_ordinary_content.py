@@ -115,6 +115,18 @@ EXPECTED_SOURCE_WEAPON_EVIDENCE = {
     "Deranged Shopper": {
         0x79574527: (125454, 125455, 8),
     },
+    "Incomplete Rebuild": {
+        0x79545170: (122653, 122654, 18),
+        0x79545172: (122653, 122654, 14),
+        0x79545177: (122653, 122654, 18),
+        0x79545181: (122654, 122654, 20),
+        0x79545188: (122653, 122654, 17),
+        0x795451BC: (122653, 122654, 18),
+        0x795451C1: (122655, 122655, 21),
+        0x795451CB: (122655, 122656, 24),
+        0x795451FD: (122654, 122654, 20),
+        0x79545241: (122654, 122654, 20),
+    },
     "Looter": {
         0x795312DC: (123038, 123039, 12),
         0x795313CB: (123038, 123039, 9),
@@ -169,6 +181,58 @@ EXPECTED_SOURCE_WEAPON_EVIDENCE = {
 
 SUPPORTED_SOURCE_WEAPON_MONSTER_DATA = {
     "Mugger": 203734,
+}
+
+# Reviewed complete SCFU + owner WeaponItemFullUpdate pairs for every safe
+# Incomplete Rebuild generation variant. Each tuple is attached to one
+# canonical PF127 anchor; same-level weapon rerolls remain distinct atomic
+# variants, while repeated observations of the same exact tuple only extend
+# provenance. Ambiguous or level-only generations are deliberately excluded.
+INCOMPLETE_REBUILD_GENERATION_EVIDENCE = {
+    0x79545170: (
+        ("20260709-222339", "(SimpleChar:79545170)"),
+        ("20260716-034559", "(SimpleChar:796D4020)"),
+    ),
+    0x79545172: (
+        ("20260709-222339", "(SimpleChar:79545172)"),
+        ("20260716-034559", "(SimpleChar:796D401E)"),
+    ),
+    0x79545177: (
+        ("20260709-222339", "(SimpleChar:79545177)"),
+        ("20260716-034559", "(SimpleChar:796D4010)"),
+        ("20260716-222007", "(SimpleChar:79702459)"),
+    ),
+    0x79545181: (
+        ("20260709-222339", "(SimpleChar:79545181)"),
+        ("20260716-034559", "(SimpleChar:796D4017)"),
+        ("20260716-222007", "(SimpleChar:79702463)"),
+        ("20260717-215250", "(SimpleChar:79748620)"),
+    ),
+    0x79545188: (
+        ("20260709-222339", "(SimpleChar:79545188)"),
+        ("20260716-034656", "(SimpleChar:796D4003)"),
+        ("20260717-215250", "(SimpleChar:79748630)"),
+    ),
+    0x795451BC: (
+        ("20260709-222339", "(SimpleChar:795451BC)"),
+    ),
+    0x795451C1: (
+        ("20260709-222339", "(SimpleChar:795451C1)"),
+    ),
+    0x795451CB: (
+        ("20260709-222339", "(SimpleChar:795451CB)"),
+        ("20260716-034559", "(SimpleChar:796CD7DA)"),
+        ("20260716-222007", "(SimpleChar:797024C6)"),
+    ),
+    0x795451FD: (
+        ("20260709-222339", "(SimpleChar:795451FD)"),
+        ("20260716-033326", "(SimpleChar:796D403C)"),
+        ("20260716-222007", "(SimpleChar:7970254C)"),
+    ),
+    0x79545241: (
+        ("20260709-222339", "(SimpleChar:79545241)"),
+        ("20260709-225408", "(SimpleChar:79545352)"),
+    ),
 }
 
 # Audited complete-open denominator for Workman Striker.  The legacy capture
@@ -963,6 +1027,7 @@ CAPTURE_CORPSE_IDENTITY_FILTERS = {
     ),
     "20260716-222007": frozenset(
         (
+            "(SimpleChar:79702438)",
             "(SimpleChar:79702459)",
             "(SimpleChar:7970245D)",
             "(SimpleChar:7970245E)",
@@ -974,6 +1039,22 @@ CAPTURE_CORPSE_IDENTITY_FILTERS = {
 }
 CAPTURE_LIFECYCLE_DEATH_LEVEL_FILTERS = {
     "20260712-160257": frozenset(("(SimpleChar:795EC78A)",)),
+}
+# The same official-live PF127 instance stayed alive across these adjacent
+# captures. The earlier dossier pins the living NPC's identity and level; the
+# later CFU pins that exact dead identity to its positive initial corpse credit
+# outcome. This recovers evidence that a single capture-local death table cannot
+# join without inventing a level.
+CROSS_SESSION_CORPSE_LEVEL_EVIDENCE = {
+    "20260716-222007": {
+        "(SimpleChar:79702438)": {
+            "dossier_capture": "20260716-221358",
+            "name": "Incomplete Rebuild",
+            "monster_data": "203728",
+            "level": 18,
+            "health": 394,
+        }
+    }
 }
 ARCHETYPE_CAPTURE_FILTERS = {
     "Deranged Shopper": frozenset(("20260710-202132",)),
@@ -1543,6 +1624,296 @@ def source_weapon_evidence_profiles(
             )
         result[name] = records
     return result
+
+
+def captured_weapon_tuples(capture: str, identity: str) -> set[tuple[int, int, int]]:
+    captured_weapons = set()
+    events_path = CAPTURE_ROOT / capture / "events.log"
+    if events_path.exists():
+        with events_path.open("r", encoding="utf-8-sig", errors="replace") as stream:
+            for line in stream:
+                if "type=WeaponItemFullUpdate" not in line:
+                    continue
+                owner_match = WEAPON_OWNER_DETAIL.search(line)
+                if owner_match is None:
+                    continue
+                owner = "(SimpleChar:{0:08X})".format(
+                    int(owner_match.group("owner"), 16)
+                )
+                if owner != identity:
+                    continue
+                quality_match = WEAPON_QUALITY_DETAIL.search(line)
+                low_match = WEAPON_LOW_TEMPLATE_DETAIL.search(line)
+                high_match = WEAPON_HIGH_TEMPLATE_DETAIL.search(line)
+                if quality_match is None or low_match is None or high_match is None:
+                    raise ValueError(
+                        "captured weapon is incomplete capture={0} identity={1}".format(
+                            capture, identity
+                        )
+                    )
+                captured_weapons.add(
+                    (
+                        int(low_match.group("low")),
+                        int(high_match.group("high")),
+                        int(quality_match.group("quality")),
+                    )
+                )
+        if captured_weapons:
+            return captured_weapons
+
+    raw_packets_path = CAPTURE_ROOT / capture / "raw-packets.csv"
+    if not raw_packets_path.exists():
+        raise ValueError(
+            "captured weapon has no decoded events or raw packets capture={0} identity={1}".format(
+                capture, identity
+            )
+        )
+
+    identity_instance = int(identity[len("(SimpleChar:") : -1], 16)
+    raw_weapon_rows = 0
+    with raw_packets_path.open("r", encoding="utf-8-sig", newline="") as stream:
+        for row in csv.DictReader(stream):
+            if row.get("N3TypeName") != "WeaponItemFullUpdate":
+                continue
+            raw_weapon_rows += 1
+            packet = bytes.fromhex(row["RawHex"])
+            packet_length = int(row["PacketLength"])
+            if (row.get("PreservationStatus") != "raw_complete"
+                or packet_length != len(packet)
+                or int.from_bytes(packet[2:4], "big") != 10
+                or int.from_bytes(packet[6:8], "big") != packet_length
+                or int.from_bytes(packet[16:20], "big") != 0x3B1D2268
+                or len(packet) < 63):
+                raise ValueError(
+                    "captured raw weapon envelope is invalid capture={0} identity={1}".format(
+                        capture, identity
+                    )
+                )
+            owner_type = int.from_bytes(packet[33:37], "big")
+            owner_instance = int.from_bytes(packet[37:41], "big")
+            if owner_type != 50000 or owner_instance != identity_instance:
+                continue
+            count_offset = 55
+            encoded_count = int.from_bytes(packet[count_offset : count_offset + 4], "big")
+            if encoded_count % 0x03F1 != 0:
+                raise ValueError(
+                    "captured raw weapon stat count is invalid capture={0} identity={1}".format(
+                        capture, identity
+                    )
+                )
+            stat_count = (encoded_count // 0x03F1) - 1
+            stats_offset = count_offset + 4
+            stats_end = stats_offset + (stat_count * 8)
+            if stat_count <= 0 or stats_end + 4 != len(packet):
+                raise ValueError(
+                    "captured raw weapon stat array is invalid capture={0} identity={1}".format(
+                        capture, identity
+                    )
+                )
+            stat_rows = [
+                (
+                    int.from_bytes(packet[offset : offset + 4], "big"),
+                    int.from_bytes(packet[offset + 4 : offset + 8], "big"),
+                )
+                for offset in range(stats_offset, stats_end, 8)
+            ]
+            required_stats = (701, 702, 703)
+            if any(sum(1 for stat, _ in stat_rows if stat == required) != 1
+                   for required in required_stats):
+                raise ValueError(
+                    "captured raw weapon required stats are missing capture={0} identity={1}".format(
+                        capture, identity
+                    )
+                )
+            stats = dict(stat_rows)
+            captured_weapons.add((stats[702], stats[703], stats[701]))
+    if not captured_weapons:
+        raise ValueError(
+            "captured raw weapon owner was not found capture={0} identity={1} weaponRows={2} ownerHex={3}".format(
+                capture,
+                identity,
+                raw_weapon_rows,
+                ((50000).to_bytes(4, "big")
+                 + identity_instance.to_bytes(4, "big")).hex().upper(),
+            )
+        )
+    return captured_weapons
+
+
+def incomplete_rebuild_generation_variants() -> list[dict[str, object]]:
+    scfu_by_evidence: dict[tuple[str, str], dict[str, str]] = {}
+    for canonical_source, evidence_pairs in sorted(
+        INCOMPLETE_REBUILD_GENERATION_EVIDENCE.items()
+    ):
+        for capture, identity in evidence_pairs:
+            scfu_rows = [
+                row
+                for row in first_rows_by_identity(load_raw_scfu_rows((capture,)))
+                if row.get("Identity") == identity
+            ]
+            if len(scfu_rows) != 1:
+                raise ValueError(
+                    "Incomplete Rebuild atomic variant SCFU drifted capture={0} identity={1} rows={2}".format(
+                        capture, identity, len(scfu_rows)
+                    )
+                )
+            row = scfu_rows[0]
+            if row.get("Name") != "Incomplete Rebuild" or int(row["MonsterData"]) != 203728:
+                raise ValueError(
+                    "Incomplete Rebuild atomic variant identity changed capture={0} identity={1}".format(
+                        capture, identity
+                    )
+                )
+            scfu_by_evidence[(capture, identity)] = row
+
+    canonical_positions: dict[int, tuple[float, float, float]] = {}
+    for canonical_source, evidence_pairs in sorted(
+        INCOMPLETE_REBUILD_GENERATION_EVIDENCE.items()
+    ):
+        capture, identity = evidence_pairs[0]
+        if identity != "(SimpleChar:{0:08X})".format(canonical_source):
+            raise ValueError(
+                "Incomplete Rebuild canonical source row drifted source=0x{0:08X} identity={1}".format(
+                    canonical_source, identity
+                )
+            )
+        row = scfu_by_evidence[(capture, identity)]
+        canonical_positions[canonical_source] = (
+            float(row["PositionX"]),
+            float(row["PositionY"]),
+            float(row["PositionZ"]),
+        )
+
+    for canonical_source, evidence_pairs in sorted(
+        INCOMPLETE_REBUILD_GENERATION_EVIDENCE.items()
+    ):
+        for capture, identity in evidence_pairs[1:]:
+            row = scfu_by_evidence[(capture, identity)]
+            association_points = [
+                (
+                    float(row["PositionX"]),
+                    float(row["PositionY"]),
+                    float(row["PositionZ"]),
+                )
+            ]
+            for waypoint in row.get("Waypoints", "").split("|"):
+                parts = waypoint.split(":")
+                if len(parts) == 3 and all(parts):
+                    association_points.append(tuple(float(value) for value in parts))
+            distances = {
+                source: min(
+                    math.sqrt(
+                        sum(
+                            (point[index] - source_position[index]) ** 2
+                            for index in range(3)
+                        )
+                    )
+                    for point in association_points
+                )
+                for source, source_position in canonical_positions.items()
+            }
+            ordered = sorted(distances.items(), key=lambda value: (value[1], value[0]))
+            intended_distance = distances[canonical_source]
+            if (intended_distance > 1.5
+                or ordered[0][0] != canonical_source
+                or (len(ordered) > 1 and ordered[1][1] <= intended_distance + 0.05)):
+                raise ValueError(
+                    "Incomplete Rebuild source-anchor association is not unique capture={0} identity={1} intended=0x{2:08X} distance={3:.6f} nearest={4}".format(
+                        capture,
+                        identity,
+                        canonical_source,
+                        intended_distance,
+                        ordered[:2],
+                    )
+                )
+
+    records = []
+    for canonical_source, evidence_pairs in sorted(
+        INCOMPLETE_REBUILD_GENERATION_EVIDENCE.items()
+    ):
+        by_signature: dict[tuple[int, ...], dict[str, object]] = {}
+        for capture, identity in evidence_pairs:
+            row = scfu_by_evidence[(capture, identity)]
+
+            captured_weapons = captured_weapon_tuples(capture, identity)
+            if len(captured_weapons) != 1:
+                raise ValueError(
+                    "Incomplete Rebuild atomic variant weapon drifted capture={0} identity={1} tuples={2}".format(
+                        capture, identity, sorted(captured_weapons)
+                    )
+                )
+            low, high, quality = next(iter(captured_weapons))
+            signature = (
+                int(row["Level"]),
+                int(row["Health"]),
+                int(row["HealthDamage"]),
+                int(row["MonsterScale"]),
+                int(row["RunSpeedBase"]),
+                low,
+                high,
+                quality,
+            )
+            existing = by_signature.get(signature)
+            if existing is None:
+                existing = {
+                    "source": canonical_source,
+                    "level": signature[0],
+                    "health": signature[1],
+                    "healthDamage": signature[2],
+                    "monsterScale": signature[3],
+                    "runSpeed": signature[4],
+                    "low": signature[5],
+                    "high": signature[6],
+                    "quality": signature[7],
+                    "evidence": [],
+                }
+                by_signature[signature] = existing
+            existing["evidence"].append(capture + ":" + identity)
+
+        records.extend(
+            sorted(
+                by_signature.values(),
+                key=lambda value: (
+                    int(value["level"]),
+                    int(value["quality"]),
+                    int(value["low"]),
+                    int(value["high"]),
+                ),
+            )
+        )
+
+    expected_stats = {
+        17: (368, 0, 98, 59),
+        18: (394, 0, 98, 62),
+        19: (421, 0, 98, 66),
+        20: (447, 0, 99, 69),
+        21: (474, 0, 99, 73),
+        22: (500, 0, 99, 76),
+    }
+    if len(records) != 23:
+        raise ValueError(
+            "Incomplete Rebuild atomic variant count drifted expected=23 actual={0}".format(
+                len(records)
+            )
+        )
+    if {int(value["source"]) for value in records} != set(
+        INCOMPLETE_REBUILD_GENERATION_EVIDENCE
+    ):
+        raise ValueError("Incomplete Rebuild atomic variant source coverage drifted")
+    for record in records:
+        actual_stats = (
+            int(record["health"]),
+            int(record["healthDamage"]),
+            int(record["monsterScale"]),
+            int(record["runSpeed"]),
+        )
+        if expected_stats.get(int(record["level"])) != actual_stats:
+            raise ValueError(
+                "Incomplete Rebuild atomic variant stat progression drifted source=0x{0:08X} level={1}".format(
+                    int(record["source"]), int(record["level"])
+                )
+            )
+    return records
 
 
 def visual_profile(row: dict[str, str]) -> tuple:
@@ -2435,6 +2806,46 @@ def corpse_profiles() -> dict[str, list[dict[str, object]]]:
                     )
                 death_levels[identity] = lifecycle_levels[identity]
 
+        cross_session_levels = CROSS_SESSION_CORPSE_LEVEL_EVIDENCE.get(capture, {})
+        for identity, expected in cross_session_levels.items():
+            dossier_path = (
+                CAPTURE_ROOT / str(expected["dossier_capture"]) / "enemy-dossier.json"
+            )
+            with dossier_path.open("r", encoding="utf-8-sig") as stream:
+                dossier = json.load(stream)
+            matching = [
+                row
+                for row in dossier.get("enemies", [])
+                if row.get("identity") == identity
+            ]
+            if len(matching) != 1:
+                raise ValueError(
+                    "cross-session corpse dossier identity drifted capture={0} identity={1} rows={2}".format(
+                        expected["dossier_capture"], identity, len(matching)
+                    )
+                )
+            row = matching[0]
+            if (
+                row.get("name") != expected["name"]
+                or row.get("monsterData") != expected["monster_data"]
+                or int(row.get("level", 0)) != int(expected["level"])
+                or int(row.get("currentHealth", 0)) != int(expected["health"])
+                or int(row.get("maxHealth", 0)) != int(expected["health"])
+            ):
+                raise ValueError(
+                    "cross-session corpse dossier evidence drifted capture={0} identity={1}".format(
+                        expected["dossier_capture"], identity
+                    )
+                )
+            existing_level = death_levels.get(identity)
+            if existing_level is not None and existing_level != int(expected["level"]):
+                raise ValueError(
+                    "cross-session corpse level conflicted capture={0} identity={1} levels={2},{3}".format(
+                        capture, identity, existing_level, expected["level"]
+                    )
+                )
+            death_levels[identity] = int(expected["level"])
+
         seen_dead_identities = set()
         selected_dead_identities = set()
         for row in read_csv(CAPTURE_ROOT / capture / "corpse-full-updates.csv"):
@@ -2725,7 +3136,7 @@ def validate_content(
             {(17, 105): 1, (18, 111): 2, (21, 131): 2}
         ),
         "Incomplete Rebuild": Counter(
-            {(17, 105): 1, (19, 118): 3, (21, 131): 2}
+            {(17, 105): 1, (18, 111): 1, (19, 118): 3, (21, 131): 2}
         ),
         "Infected Attendant": Counter(
             {(11, 14): 2, (12, 15): 2, (15, 19): 1, (23, 29): 1}
@@ -2876,6 +3287,7 @@ def validate_content(
 def generate() -> str:
     spawns = select_spawns()
     source_weapons = source_weapon_evidence_profiles(spawns)
+    generation_variants = incomplete_rebuild_generation_variants()
     profiles = select_archetype_profiles(spawns)
     combat = combat_profiles()
     loot = loot_profiles()
@@ -2962,6 +3374,15 @@ def generate() -> str:
                 "                })" + profile_suffix,
             ]
         )
+    generation_variant_definition_lines = [
+        "            new CapturedSubwayGenerationVariantDefinition("
+        f"203728, 0x{int(item['source']):08X}, {int(item['level'])}, "
+        f"{int(item['health'])}, {int(item['healthDamage'])}, "
+        f"{int(item['monsterScale'])}, {int(item['runSpeed'])}, "
+        f"{int(item['low'])}, {int(item['high'])}, {int(item['quality'])}, "
+        f"{cs_string(';'.join(item['evidence']))})"
+        for item in generation_variants
+    ]
     lines = [
         "// <auto-generated>",
         "// Generated only from completed AOSharp Subway captures by generate_subway_ordinary_content.py.",
@@ -3003,6 +3424,14 @@ def generate() -> str:
         "        private static readonly CapturedSubwaySourceWeaponProfileDefinition[] SupportedSourceWeaponProfiles =",
         "        {",
         *supported_source_weapon_definition_lines,
+        "        };",
+        "",
+        "        private static readonly CapturedSubwayGenerationVariantDefinition[] GenerationVariants =",
+        "        {",
+        *[
+            line + ("," if index < len(generation_variant_definition_lines) - 1 else "")
+            for index, line in enumerate(generation_variant_definition_lines)
+        ],
         "        };",
         "",
         "        private static readonly CapturedSubwayStrictLootProfileDefinition[] StrictLootProfiles =",
@@ -3217,6 +3646,13 @@ def generate() -> str:
             "                       : archetype.SourceWeaponEvidence.ToArray();",
             "        }",
             "",
+            "        public CapturedSubwayGenerationVariantDefinition[] GetGenerationVariants(int monsterData, int sourceInstance)",
+            "        {",
+            "            return GenerationVariants",
+            "                .Where(value => value.MonsterData == monsterData && value.SourceInstance == sourceInstance)",
+            "                .ToArray();",
+            "        }",
+            "",
             "        public CapturedSubwayStrictLootProfileDefinition GetStrictLootProfile(int monsterData)",
             "        {",
             "            return StrictLootProfiles.SingleOrDefault(value => value.MonsterData == monsterData);",
@@ -3313,6 +3749,7 @@ def generate() -> str:
             "    internal sealed class CapturedSubwayWaypointDefinition { public CapturedSubwayWaypointDefinition(float x, float y, float z) { this.X = x; this.Y = y; this.Z = z; } public float X { get; private set; } public float Y { get; private set; } public float Z { get; private set; } }",
             "    internal sealed class CapturedSubwaySourceWeaponProfileDefinition { public CapturedSubwaySourceWeaponProfileDefinition(string name, int monsterData, CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { this.Name = name; this.MonsterData = monsterData; this.SourceWeaponEvidence = sourceWeaponEvidence ?? new CapturedSubwaySourceWeaponEvidenceDefinition[0]; } public string Name { get; private set; } public int MonsterData { get; private set; } public CapturedSubwaySourceWeaponEvidenceDefinition[] SourceWeaponEvidence { get; private set; } }",
             "    internal sealed class CapturedSubwaySourceWeaponEvidenceDefinition { public CapturedSubwaySourceWeaponEvidenceDefinition(int sourceInstance, int lowId, int highId, int quality, string evidenceCaptures) { this.SourceInstance = sourceInstance; this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.EvidenceCaptures = evidenceCaptures; } public int SourceInstance { get; private set; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public string EvidenceCaptures { get; private set; } }",
+            "    internal sealed class CapturedSubwayGenerationVariantDefinition { public CapturedSubwayGenerationVariantDefinition(int monsterData, int sourceInstance, int level, int health, int healthDamage, int monsterScale, int runSpeed, int weaponLowId, int weaponHighId, int weaponQuality, string evidence) { this.MonsterData = monsterData; this.SourceInstance = sourceInstance; this.Level = level; this.Health = health; this.HealthDamage = healthDamage; this.MonsterScale = monsterScale; this.RunSpeed = runSpeed; this.WeaponLowId = weaponLowId; this.WeaponHighId = weaponHighId; this.WeaponQuality = weaponQuality; this.Evidence = evidence; } public int MonsterData { get; private set; } public int SourceInstance { get; private set; } public int Level { get; private set; } public int Health { get; private set; } public int HealthDamage { get; private set; } public int MonsterScale { get; private set; } public int RunSpeed { get; private set; } public int WeaponLowId { get; private set; } public int WeaponHighId { get; private set; } public int WeaponQuality { get; private set; } public string Evidence { get; private set; } }",
             "    internal sealed class CapturedSubwayCombatEvidenceDefinition { public CapturedSubwayCombatEvidenceDefinition(bool observed, int minDamage, int maxDamage, double rechargeSeconds, int weaponSlot, int attackInfoUnknown, int weaponInstance, int observedRows) { this.Observed = observed; this.MinDamage = minDamage; this.MaxDamage = maxDamage; this.RechargeSeconds = rechargeSeconds; this.WeaponSlot = weaponSlot; this.AttackInfoUnknown = attackInfoUnknown; this.WeaponInstance = weaponInstance; this.ObservedRows = observedRows; } public bool Observed { get; private set; } public int MinDamage { get; private set; } public int MaxDamage { get; private set; } public double RechargeSeconds { get; private set; } public int WeaponSlot { get; private set; } public int AttackInfoUnknown { get; private set; } public int WeaponInstance { get; private set; } public int ObservedRows { get; private set; } }",
             "    internal sealed class CapturedSubwayLootEvidenceDefinition { public CapturedSubwayLootEvidenceDefinition(int lowId, int highId, int quality, int observedCount, int observedCorpses, int observedBasisPoints) { this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.ObservedCount = observedCount; this.ObservedCorpses = observedCorpses; this.ObservedBasisPoints = observedBasisPoints; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public int ObservedCount { get; private set; } public int ObservedCorpses { get; private set; } public int ObservedBasisPoints { get; private set; } }",
             "    internal sealed class CapturedSubwayStrictLootProfileDefinition { public CapturedSubwayStrictLootProfileDefinition(string name, int monsterData, int observedCompleteInventories, int observedPositiveInventories, int observedEmptyInventories, bool itemPoolComplete, string[] evidenceCaptures, CapturedSubwayLootEvidenceDefinition[] entries) { this.Name = name; this.MonsterData = monsterData; this.ObservedCompleteInventories = observedCompleteInventories; this.ObservedPositiveInventories = observedPositiveInventories; this.ObservedEmptyInventories = observedEmptyInventories; this.ItemPoolComplete = itemPoolComplete; this.EvidenceCaptures = evidenceCaptures ?? new string[0]; this.Entries = entries ?? new CapturedSubwayLootEvidenceDefinition[0]; } public string Name { get; private set; } public int MonsterData { get; private set; } public int ObservedCompleteInventories { get; private set; } public int ObservedPositiveInventories { get; private set; } public int ObservedEmptyInventories { get; private set; } public bool ItemPoolComplete { get; private set; } public string[] EvidenceCaptures { get; private set; } public CapturedSubwayLootEvidenceDefinition[] Entries { get; private set; } }",

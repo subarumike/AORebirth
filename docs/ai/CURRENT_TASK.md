@@ -135,9 +135,29 @@ population in bounded runtime batches.
 - Deep ordinary combat now uses capture-scoped identity mapping and only normal
   hits against the local player for runtime ranges. Critical hits and
   player-owned-pet hits remain separate evidence.
-- Current runtime normal-hit ranges include Incomplete Rebuild `17..35`, Melded
-  Patterns `21..34`, Molested Molecules `16..42`, Neural Burnout `16..22`,
-  Redundant Scan `19`, and Uncontrollable Anger `11..18`.
+- Reviewed normal local-player hit evidence includes Incomplete Rebuild
+  `17..35`, Melded Patterns `21..34`, Molested Molecules `16..42`, Neural
+  Burnout `16..22`, Redundant Scan `19`, and Uncontrollable Anger `11..18`.
+  Weapon-backed profiles do not replay those post-mitigation outcomes as fixed
+  runtime damage.
+- Incomplete Rebuild is now a complete accepted ordinary profile. Its ten exact
+  PF127 sources select from `23` source-local capture-reviewed atomic
+  level/health/scale/RunSpeed/weapon generations; selection occurs once per new
+  population generation and cannot mix fields between observations. Fourteen
+  later identities are associated to their unique source by an exact position
+  or waypoint endpoint; ambiguous identity `7957E5F9` remains excluded because
+  it has neither a close position nor a decoded waypoint. Every selected weapon
+  owns runtime damage and recharge with captured AttackInfo context. The profile
+  also preserves shared chase, captured return-home behavior, a conservative
+  7-unit proactive policy, four-minute respawn, standard corpse lifetimes,
+  strict `2/0 empty` first-open loot evidence, exact observed L17/L18/L19/L21
+  credits, and explicit private-policy L20/L22 credit interpolation.
+- Incomplete Rebuild nano `90405` restores `21` CurrentNano immediately and for
+  `959` later 15-second ticks, refreshes without stacking, costs `47` nano and
+  `6` NCU, and uses the capture-backed four-hour duration and 20-unit range.
+  Selection timing, 25-percent cast chance, 50-percent self targeting, initial
+  phase, and L17..L22 nano pools remain explicit private policy; combat actions
+  continue while it casts.
 - Redundant Scan no longer uses that observed `19` as fixed runtime damage. Its
   four current sources now resolve their exact owner-linked `122026..122029`
   weapon pairs at QL14/20/25/16, fail closed without one exact tuple, and let
@@ -333,21 +353,24 @@ population in bounded runtime batches.
   regeneration: PASS.
 - Current inventory/content-ledger regression suites: `27/27` PASS.
 - Subway loot/corpse evidence: `22/22` PASS.
-- Sixteen-entry whole-enemy gate now includes Deranged Shopper after Mugger,
-  Looter, Bloodcreeper, Stim Fiend, and Neural Burnout joined the previously
-  confirmed ten. Ordinary generation check, diff check, expanded gate,
-  WorldPopulation `33/33`, and Subway loot `22/22` all pass.
+- Seventeen-entry whole-enemy gate now includes Incomplete Rebuild after
+  Deranged Shopper, Mugger, Looter, Bloodcreeper, Stim Fiend, and Neural Burnout
+  joined the previously confirmed ten. Ordinary generation check, expanded
+  gate, WorldPopulation `35/35`, and Subway loot `22/22` pass.
+- Playfield lifecycle class: `55/62`; every Subway and ordinary-enemy test
+  passes. The seven remaining failures are the existing session lifecycle,
+  teleport sequencing, and visibility ownership guardrails outside this slice.
 - Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
-- World population foundation: `31/31` PASS.
+- World population foundation: `35/35` PASS.
 - Subway merchant content: `4/4` PASS.
 - Visibility interest/catalog: `12/12` PASS.
 - Quarantine/spatial-selection guardrail: PASS.
 - Named encounter/capture contract suite: `26/26` PASS.
 - Runtime-coordinator ownership guard: PASS.
-- ZoneEngine alternate-output Debug build: PASS. The approved wrapper compiled
-  AORebirth.Core but could not replace the active private-server
-  `ZoneEngine.exe` held by PID `27044`; the running server was not stopped.
+- ZoneEngine compile: PASS. The approved wrapper could not replace the active
+  private-server `ZoneEngine.exe` held by PID `30744`; the running server was
+  not stopped.
 - Chat, Login, and Zone restart: PASS; ports `6996`, `7012`, `7500`, and `7501`
   listening.
 - Repository-wide AOtomation suite: `356/369`; 13 broader failures remain
@@ -361,12 +384,14 @@ population in bounded runtime batches.
 
 ## Next Runtime Check
 
-No additional official-live capture is required. The next runtime gate is the
-already-staged diagnostic Disobedient Bot identity `79557C66`, followed by
-bounded family batches from the `38` quarantined PF127 rows. All `38` are exact,
-unique, and profile-backed; quarantine is an operational client-stability hold,
-not missing content evidence. Do not permanently enable all `38` in one step
-until the staged identity has a private-client runtime result.
+No additional official-live capture is required before auditing the existing
+corpus. The next runtime gate is the already-staged diagnostic Disobedient Bot
+identity `79557C66`. Sixteen of the `38` quarantined rows belong to accepted
+whole-enemy profiles and can follow in bounded batches after that private-client
+result. The other `22` exact population rows are 11 Discarded Pets and 11
+Violent Vagabonds; their current profiles lack sufficient local-player combat
+or cadence evidence and must remain quarantined until the existing corpus has
+been exhausted for stronger proof.
 
 ## Remaining Capture-Backed Work
 
@@ -374,9 +399,11 @@ until the staged identity has a private-client runtime result.
    decode and promote. The four location-unresolved folders are empty startup
    remnants and contain no recoverable gameplay traffic.
 2. The `38` capture-backed PF127 population rows remain behind the diagnostic
-   quarantine until bounded private-client validation. They comprise 11
-   Discarded Pets, 11 Violent Vagabonds, 6 Stim Fiends, 5 Muggers, 2
-   Disobedient Bots, 2 Looters, and 1 Deranged Shopper.
+   quarantine. Sixteen accepted-profile rows await bounded private-client
+   activation: 6 Stim Fiends, 5 Muggers, 2 Disobedient Bots, 2 Looters, and 1
+   Deranged Shopper. The 11 Discarded Pets and 11 Violent Vagabonds remain
+   evidence-gated while their existing captures are audited for combat and
+   cadence proof.
 3. Strike Foreman has usable exact L19/736 HP appearance, QL19 weapon, raw
    `SpecialAttackWeapon` plus `Attack` initiation against the non-local player
    Wardog, three other-player outgoing hits (`18`, `18`, and critical `40`),
