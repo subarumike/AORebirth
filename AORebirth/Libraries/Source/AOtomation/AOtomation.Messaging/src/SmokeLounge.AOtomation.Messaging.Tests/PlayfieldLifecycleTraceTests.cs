@@ -2440,6 +2440,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string muggerCombatReport = generatedCombatReportText.Substring(
                 muggerCombatReportStart,
                 muggerCombatReportEnd - muggerCombatReportStart);
+            int derangedShopperCombatReportStart = generatedCombatReportText.IndexOf(
+                "\"Deranged Shopper\":",
+                StringComparison.Ordinal);
+            int derangedShopperCombatReportEnd = generatedCombatReportText.IndexOf(
+                "\"Discarded Pet\":",
+                derangedShopperCombatReportStart,
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                derangedShopperCombatReportStart >= 0
+                && derangedShopperCombatReportEnd > derangedShopperCombatReportStart);
+            string derangedShopperCombatReport = generatedCombatReportText.Substring(
+                derangedShopperCombatReportStart,
+                derangedShopperCombatReportEnd - derangedShopperCombatReportStart);
             string disobedientBotDefinition = ExtractMethodBlock(
                 providerText,
                 "private static CapturedSubwaySpawnDefinition DisobedientBot(");
@@ -2461,6 +2474,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string muggerCombatContract = ExtractMethodBlock(
                 combatContractText,
                 "internal static CapturedEnemyCombatContract ForSupportedSourceWeapon(");
+            string derangedShopperCombatContract = ExtractMethodBlock(
+                combatContractText,
+                "private static CapturedEnemyCombatContract ForDerangedShopper(");
             var ordinaryCatalog = new OrdinaryEnemyCatalog(
                 new CapturedSubwayContentProvider(),
                 new CapturedSubwayOrdinaryContentProvider());
@@ -2481,13 +2497,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Workman Striker|203854|149",
                     "Looter|203745|138",
                     "Mugger|203734|138",
+                    "Deranged Shopper|203736|138",
                     "Bloodcreeper|30379|63",
                     "Stim Fiend|203739|138",
                     "Neural Burnout|203730|148"
                 };
 
             Assert.AreEqual(
-                15,
+                16,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
 
@@ -2670,7 +2687,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ordinaryProviderText.Contains("\"Workman Striker\"")
                 && ordinaryProviderText.Contains("203854")
                 && ordinaryProviderText.Contains("5.092328")
-                && CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 38
+                && CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 39
                 && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(202719, 202720, 14, 2, 10, 2000)")
                 && CountOccurrences(ordinaryProviderText, ", 203854, 17899,") == 20
                 && workmanStriker.Loot.PoolMode == OrdinaryEnemyLootPoolMode.IndependentEntries
@@ -2745,7 +2762,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(240.0, looter.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(3.0, looter.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
-                CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 38
+                CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 39
                 && CountOccurrences(ordinaryProviderText, ", 203745, 17870,") == 11
                 && catalogText.Contains("archetype.MonsterData == LooterMonsterData")
                 && looterCombatContract.Contains("ForSourceSpecificWeaponArchetype")
@@ -2865,7 +2882,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(240.0, mugger.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(3.0, mugger.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
-                CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 38
+                CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 39
                 && CountOccurrences(ordinaryProviderText, ", 203734, 17534,") == 24
                 && combatContractText.Contains("Mugger combat requires an exact captured source identity; aggregate weapon fallback is forbidden")
                 && muggerCombatContract.Contains("HasCompleteMuggerSourceWeaponEvidence")
@@ -2889,6 +2906,133 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
                 "Accepted Subway Mugger must keep all nine exact source weapons, spawn levels, and dispositions; fail-closed aggregate/missing/conflicting/unknown selection; item-owned damage/recharge with captured AttackInfo shape; report-only criticals; strict 17-open incomplete-pool loot; exact CATMesh/level credits; shared chase; private four-minute respawn; and ordinary corpse lifetimes together.");
+
+            OrdinaryEnemyProfile derangedShopper = ordinaryProfiles.Single(
+                value => value.DisplayName == "Deranged Shopper");
+            OrdinaryEnemySpawnDefinition derangedShopperSpawn = ordinarySpawns.Single(
+                value => value.ProfileKey == derangedShopper.ProfileKey);
+            CapturedSubwaySourceWeaponEvidenceDefinition[] derangedShopperSourceEvidence =
+                new CapturedSubwayOrdinaryContentProvider().GetSourceWeaponEvidence(203736);
+            CapturedEnemyCombatContract derangedShopperContract =
+                derangedShopper.Combat.ResolveContract(
+                    derangedShopperSpawn.SourceIdentity,
+                    derangedShopperSpawn.Level);
+            CapturedEnemyCombatContract derangedShopperUnknownSource =
+                derangedShopper.Combat.ResolveContract(
+                    0x7957FFFF,
+                    derangedShopperSpawn.Level);
+            Assert.AreEqual(1, derangedShopperSourceEvidence.Length);
+            Assert.AreEqual(0x79574527, derangedShopperSourceEvidence[0].SourceInstance);
+            Assert.AreEqual(125454, derangedShopperSourceEvidence[0].LowId);
+            Assert.AreEqual(125455, derangedShopperSourceEvidence[0].HighId);
+            Assert.AreEqual(8, derangedShopperSourceEvidence[0].Quality);
+            Assert.IsTrue(
+                derangedShopperSourceEvidence[0].EvidenceCaptures.Contains("20260710-202132"));
+            Assert.AreEqual(0x79574527, derangedShopperSpawn.SourceIdentity);
+            Assert.AreEqual(8, derangedShopperSpawn.Level);
+            Assert.AreEqual(256, derangedShopperSpawn.LevelDefinition.Resolve(8).Health);
+            Assert.AreEqual(
+                OrdinaryEnemyRuntimeDisposition.Quarantined,
+                derangedShopperSpawn.Disposition,
+                "The only captured Deranged Shopper row is still quarantined and must not imply private activation.");
+            Assert.AreEqual(
+                WorldRespawnPolicyAssignmentMode.Inherit,
+                derangedShopperSpawn.RespawnPolicy.Mode);
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, derangedShopper.Aggression.Mode);
+            Assert.IsTrue(derangedShopper.Aggression.Chase);
+            Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, derangedShopper.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, derangedShopper.Combat.DamageSource);
+            Assert.IsTrue(derangedShopper.Combat.VisibleWeapon);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, derangedShopper.Combat.Contract.AttackModel);
+            Assert.IsFalse(derangedShopper.Combat.Contract.IsCombatReady);
+            Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, derangedShopperContract.AttackModel);
+            Assert.IsTrue(derangedShopperContract.IsCombatReady);
+            Assert.AreEqual(125454, derangedShopperContract.WeaponLowId);
+            Assert.AreEqual(125455, derangedShopperContract.WeaponHighId);
+            Assert.AreEqual(8, derangedShopperContract.WeaponQuality);
+            Assert.AreEqual(6, derangedShopperContract.WeaponInventorySlot);
+            Assert.AreEqual(0, derangedShopperContract.MinDamage);
+            Assert.AreEqual(0, derangedShopperContract.MaxDamage);
+            Assert.AreEqual(0.0, derangedShopperContract.RechargeSeconds);
+            Assert.IsTrue(derangedShopperContract.HasCapturedEquippedAttackInfo);
+            Assert.AreEqual(-1, derangedShopperContract.AttackInfoAmmoCount);
+            Assert.AreEqual(6, derangedShopperContract.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, derangedShopperContract.AttackInfoUnknown);
+            Assert.AreEqual(0, derangedShopperContract.AttackInfoWeaponInstance);
+            Assert.IsFalse(derangedShopperContract.HasEmptySpecialAttackWeaponContext);
+            Assert.IsFalse(derangedShopperContract.HasCapturedAttackStartContext);
+            Assert.IsFalse(derangedShopperContract.HasCapturedCombatStopSequence);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, derangedShopperUnknownSource.AttackModel);
+            Assert.IsFalse(derangedShopperUnknownSource.IsCombatReady);
+            Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, derangedShopper.Loot.PoolMode);
+            Assert.IsFalse(derangedShopper.Loot.ItemPoolComplete);
+            Assert.AreEqual(2, derangedShopper.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(0, derangedShopper.Loot.ObservedEmptyInventories);
+            CollectionAssert.AreEquivalent(
+                new[] { "123019:123020:6:1:2", "124465:124466:10:1:2" },
+                derangedShopper.Loot.Entries
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}:{3}:{4}",
+                            value.LowId,
+                            value.HighId,
+                            value.QualityLevel,
+                            value.ObservedCount,
+                            value.ObservedCorpses))
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[] { "8:47:47:1", "9:53:53:1" },
+                derangedShopper.Loot.LevelCreditRules
+                    .OrderBy(value => value.EnemyLevel)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}:{3}",
+                            value.EnemyLevel,
+                            value.MinimumCredits,
+                            value.MaximumCredits,
+                            value.ObservedCorpses))
+                    .ToArray());
+            Assert.AreEqual(5927, derangedShopper.Corpse.CapturedCatMesh);
+            Assert.AreEqual(3.0, derangedShopper.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(240.0, derangedShopper.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(3.0, derangedShopper.Corpse.LootedCleanupSeconds);
+            Assert.IsTrue(
+                ordinaryCombatContract.Contains("DerangedShopperMonsterData")
+                && derangedShopperCombatContract.Contains("evidence.Length != 1")
+                && derangedShopperCombatContract.Contains("125454")
+                && derangedShopperCombatContract.Contains("125455")
+                && derangedShopperCombatContract.Contains("EquippedWeaponWithCapturedAttackInfo")
+                && derangedShopperCombatContract.Contains("eight normal local-player hits span 9..15")
+                && derangedShopperCombatContract.Contains("one 27-point critical is report-only")
+                && derangedShopperCombatContract.Contains("one captured miss")
+                && derangedShopperCombatContract.Contains("item owns runtime damage, damage bonus, and recharge")
+                && derangedShopperCombatContract.Contains("no empty SIW or captured attack-start/stop context")
+                && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(spawn.SourceIdentity, variant.Level)")
+                && derangedShopperCombatReport.Contains("\"normalAttackInfoRows\": 8")
+                && derangedShopperCombatReport.Contains("\"normalMinDamage\": 9")
+                && derangedShopperCombatReport.Contains("\"normalMaxDamage\": 15")
+                && derangedShopperCombatReport.Contains("\"criticalAttackInfoRows\": 1")
+                && derangedShopperCombatReport.Contains("\"criticalMinDamage\": 27")
+                && derangedShopperCombatReport.Contains("\"criticalMaxDamage\": 27")
+                && derangedShopperCombatReport.Contains("\"missedAttackInfoRows\": 2")
+                && derangedShopperCombatReport.Contains("\"missedAttackShapes\": [")
+                && derangedShopperCombatReport.Contains("\"ammoCount\": -1")
+                && derangedShopperCombatReport.Contains("\"weaponSlot\": 6")
+                && derangedShopperCombatReport.Contains("\"unknown\": 0")
+                && derangedShopperCombatReport.Contains("\"rows\": 2")
+                && derangedShopperCombatReport.Contains("\"equippedWeaponShapes\": [")
+                && derangedShopperCombatReport.Contains("\"lowId\": 125454")
+                && derangedShopperCombatReport.Contains("\"highId\": 125455")
+                && derangedShopperCombatReport.Contains("\"quality\": 8")
+                && derangedShopperCombatReport.Contains("20260710-202132")
+                && derangedShopperCombatReport.Contains("(SimpleChar:79574527)")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue")
+                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
+                && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted Subway Deranged Shopper must keep its one quarantined source, exact QL8 source-owned weapon and captured AttackInfo shape, fail-closed aggregate/unknown/missing/conflicting selection, item-owned damage/recharge, report-only critical, one captured miss shape, strict two-open incomplete-pool loot, exact CATMesh/credits, shared chase, inherited private four-minute respawn, and ordinary corpse lifetimes together without claiming private activation.");
 
             OrdinaryEnemyProfile bloodcreeper = ordinaryProfiles.Single(value => value.DisplayName == "Bloodcreeper");
             OrdinaryEnemySpawnDefinition[] bloodcreeperSpawns = ordinarySpawns

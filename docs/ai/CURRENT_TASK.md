@@ -254,18 +254,35 @@ population in bounded runtime batches.
   `6`, unknown `0`, and weapon instance `0`. The 38 normal `9..12` outcomes stay
   separate from three report-only `21` criticals; strict 17-open loot, exact
   CATMesh/level credits, chase, respawn, and corpse lifetimes pass together.
+- Deranged Shopper is the sixteenth accepted ordinary profile while its one
+  exact runtime row remains quarantined for bounded private activation. Source
+  `0x79574527` resolves only its owner-linked QL8 `125454/125455` weapon; the
+  aggregate, unknown, missing, or conflicting paths fail closed. Eight normal
+  local-player hits span `9..15`, one `27` critical remains report-only, and the
+  corpus retains two misses at ammo `-1`, slot `6`, unknown `0` (one from the
+  current source). Strict `2/0 empty` loot, L8/L9 credits, CATMesh `5927`,
+  chase, inherited four-minute respawn, and `3/240/3` corpse rules pass
+  together.
 - The Subway combat-contract analyzer now supplements legacy identity mapping
   from `enemy-dossier.json` and exact corpse dead-NPC links before consuming
   combat rows. Its regenerated Bot projection recovers nine decoded
   local-player hits at `8..15`; the eight additional authoritative raw rows are
   retained in the 17-hit source audit instead of being silently discarded.
+- The combat analyzer now also recovers split detail-only weapon updates, raw
+  enemy misses, and captured SpecialAttackWeapon shapes. Repeated identical
+  weapon updates deduplicate, multiple owner-linked weapon shapes leave the
+  aggregate summary unresolved, and source-specific evidence remains intact.
 - Eumenides is now a dedicated named PF127 encounter from atomic capture
-  `20260716-034559`: exact L20/2792 HP appearance, QL20 weapon context,
+  `20260716-034559`: exact L20/2792 HP appearance, owner-linked QL20 and QL17
+  `123267/123268` weapon evidence,
   capture-bounded proactive acquisition, shared LOS/chase/leash behavior, exact
   416-byte CATMesh `17905` corpse, and fixed observed `186` credits. Weapon
   damage and recharge remain item-owned; the expanded three-capture fight set
-  proves 21 normal local-player hits at `25..45` with a `4.311321`-second median
-  interval. Finalized `20260717-214751` and `20260717-215250` add two exact
+  proves 21 normal local-player hits at `25..45`, two captured misses, initial
+  `143/143/143/143/0` special-attack context, and a `4.311321`-second median
+  interval. Runtime retains the existing QL20 variant because no capture proves
+  the QL17/QL20 respawn selection rule. Finalized `20260717-214751` and
+  `20260717-215250` add two exact
   atomic 186-credit corpse snapshots. The first contains QL22 Living Cyber
   Armor Sleeves `163430/163431`, QL1 item `301714`, and QL200 item `287146`;
   the second contains QL1 item `301715`, QL16 item `160051/160050`, and QL200
@@ -302,19 +319,21 @@ population in bounded runtime batches.
   regeneration: PASS.
 - Current inventory/content-ledger regression suites: `27/27` PASS.
 - Subway loot/corpse evidence: `22/22` PASS.
-- Fifteen-entry whole-enemy gate now includes Mugger after Looter, Bloodcreeper,
-  Stim Fiend, and Neural Burnout joined the previously confirmed ten. Ordinary
-  generation check, Debug build, diff check, expanded gate, WorldPopulation
-  `29/29`, and Subway loot `22/22` all pass.
+- Sixteen-entry whole-enemy gate now includes Deranged Shopper after Mugger,
+  Looter, Bloodcreeper, Stim Fiend, and Neural Burnout joined the previously
+  confirmed ten. Ordinary generation check, diff check, expanded gate,
+  WorldPopulation `31/31`, and Subway loot `22/22` all pass.
 - Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
-- World population foundation: `28/28` PASS.
+- World population foundation: `31/31` PASS.
 - Subway merchant content: `4/4` PASS.
 - Visibility interest/catalog: `12/12` PASS.
 - Quarantine/spatial-selection guardrail: PASS.
-- Named encounter/capture contract suite: `25/25` PASS.
+- Named encounter/capture contract suite: `26/26` PASS.
 - Runtime-coordinator ownership guard: PASS.
-- Approved AORebirth Debug build: PASS.
+- ZoneEngine alternate-output Debug build: PASS. The approved wrapper compiled
+  AORebirth.Core but could not replace the active private-server
+  `ZoneEngine.exe` held by PID `27044`; the running server was not stopped.
 - Chat, Login, and Zone restart: PASS; ports `6996`, `7012`, `7500`, and `7501`
   listening.
 - Repository-wide AOtomation suite: `356/369`; 13 broader failures remain

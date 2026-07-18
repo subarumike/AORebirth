@@ -901,6 +901,138 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void DerangedShopperUsesItsOneExactQuarantinedSourceWeaponAndCapturedAttackInfoShape()
+        {
+            const int sourceIdentity = 0x79574527;
+            var ordinaryProvider = new CapturedSubwayOrdinaryContentProvider();
+            CapturedSubwaySourceWeaponEvidenceDefinition[] sourceEvidence =
+                ordinaryProvider.GetSourceWeaponEvidence(203736);
+
+            Assert.AreEqual(1, sourceEvidence.Length);
+            Assert.AreEqual(sourceIdentity, sourceEvidence[0].SourceInstance);
+            Assert.AreEqual(125454, sourceEvidence[0].LowId);
+            Assert.AreEqual(125455, sourceEvidence[0].HighId);
+            Assert.AreEqual(8, sourceEvidence[0].Quality);
+            Assert.IsTrue(sourceEvidence[0].EvidenceCaptures.Contains("20260710-202132"));
+            string generatedCombatReportText = System.IO.File.ReadAllText(
+                System.IO.Path.Combine(
+                    FindRepositoryRoot(),
+                    @"docs\generated\subway_enemy_combat_contracts.json"));
+            int reportStart = generatedCombatReportText.IndexOf(
+                "\"Deranged Shopper\":",
+                StringComparison.Ordinal);
+            int reportEnd = generatedCombatReportText.IndexOf(
+                "\"Discarded Pet\":",
+                reportStart,
+                StringComparison.Ordinal);
+            Assert.IsTrue(reportStart >= 0 && reportEnd > reportStart);
+            string report = generatedCombatReportText.Substring(reportStart, reportEnd - reportStart);
+            Assert.IsTrue(report.Contains("\"missedAttackInfoRows\": 2"));
+            Assert.IsTrue(report.Contains("\"missedAttackShapes\": ["));
+            Assert.IsTrue(report.Contains("\"ammoCount\": -1"));
+            Assert.IsTrue(report.Contains("\"weaponSlot\": 6"));
+            Assert.IsTrue(report.Contains("\"unknown\": 0"));
+            Assert.IsTrue(report.Contains("\"rows\": 2"));
+            Assert.IsTrue(report.Contains("\"equippedWeaponShapes\": ["));
+            Assert.IsTrue(report.Contains("\"lowId\": 125454"));
+            Assert.IsTrue(report.Contains("\"highId\": 125455"));
+            Assert.IsTrue(report.Contains("\"quality\": 8"));
+            Assert.IsTrue(report.Contains("20260710-202132"));
+            Assert.IsTrue(report.Contains("(SimpleChar:79574527)"));
+
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                ordinaryProvider);
+            OrdinaryEnemyProfile shopper = catalog.GetProfiles()
+                .Single(value => value.DisplayName == "Deranged Shopper");
+            OrdinaryEnemySpawnDefinition spawn = catalog.GetSpawns()
+                .Single(value => value.ProfileKey == shopper.ProfileKey);
+
+            Assert.AreEqual(sourceIdentity, spawn.SourceIdentity);
+            Assert.AreEqual(8, spawn.Level);
+            Assert.AreEqual(256, spawn.LevelDefinition.Resolve(spawn.Level).Health);
+            Assert.AreEqual(OrdinaryEnemyRuntimeDisposition.Quarantined, spawn.Disposition);
+            Assert.AreEqual(WorldRespawnPolicyAssignmentMode.Inherit, spawn.RespawnPolicy.Mode);
+            Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, shopper.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, shopper.Combat.DamageSource);
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, shopper.Combat.EvidenceState);
+            Assert.IsTrue(shopper.Combat.VisibleWeapon);
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, shopper.Aggression.Mode);
+            Assert.IsTrue(shopper.Aggression.Chase);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, shopper.Combat.Contract.AttackModel);
+            Assert.IsFalse(shopper.Combat.Contract.IsCombatReady);
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.Unresolved,
+                shopper.Combat.ResolveContract(spawn.Level).AttackModel,
+                "Deranged Shopper combat without the source identity must fail closed.");
+
+            CapturedEnemyCombatContract contract = shopper.Combat.ResolveContract(
+                spawn.SourceIdentity,
+                spawn.Level);
+            Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
+            Assert.IsTrue(contract.IsCombatReady);
+            Assert.AreEqual(125454, contract.WeaponLowId);
+            Assert.AreEqual(125455, contract.WeaponHighId);
+            Assert.AreEqual(8, contract.WeaponQuality);
+            Assert.AreEqual(6, contract.WeaponInventorySlot);
+            Assert.AreEqual(0, contract.MinDamage);
+            Assert.AreEqual(0, contract.MaxDamage);
+            Assert.AreEqual(0.0, contract.RechargeSeconds);
+            Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
+            Assert.AreEqual(-1, contract.AttackInfoAmmoCount);
+            Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, contract.AttackInfoUnknown);
+            Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+            Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
+            Assert.IsFalse(contract.HasCapturedAttackStartContext);
+            Assert.IsFalse(contract.HasCapturedCombatStopSequence);
+            Assert.IsTrue(contract.Evidence.Contains("critical is report-only"));
+            Assert.IsTrue(contract.Evidence.Contains("one captured miss"));
+            Assert.IsTrue(contract.Evidence.Contains("item owns runtime damage, damage bonus, and recharge"));
+
+            CapturedEnemyCombatContract unknown = shopper.Combat.ResolveContract(
+                0x7957FFFF,
+                spawn.Level);
+            CapturedEnemyCombatContract missing = CapturedSubwayCombatCatalog.ForOrdinary(
+                BuildDerangedShopperArchetype(new CapturedSubwaySourceWeaponEvidenceDefinition[0]),
+                sourceIdentity);
+            CapturedEnemyCombatContract conflicting = CapturedSubwayCombatCatalog.ForOrdinary(
+                BuildDerangedShopperArchetype(
+                    new[]
+                    {
+                        new CapturedSubwaySourceWeaponEvidenceDefinition(sourceIdentity, 125454, 125455, 8, "capture-a"),
+                        new CapturedSubwaySourceWeaponEvidenceDefinition(sourceIdentity, 125454, 125455, 7, "capture-b")
+                    }),
+                sourceIdentity);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, unknown.AttackModel);
+            Assert.IsFalse(unknown.IsCombatReady);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, missing.AttackModel);
+            Assert.IsFalse(missing.IsCombatReady);
+            Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, conflicting.AttackModel);
+            Assert.IsFalse(conflicting.IsCombatReady);
+
+            Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, shopper.Loot.PoolMode);
+            Assert.IsFalse(shopper.Loot.ItemPoolComplete);
+            Assert.AreEqual(2, shopper.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(0, shopper.Loot.ObservedEmptyInventories);
+            CollectionAssert.AreEquivalent(
+                new[] { "123019:123020:6:1:2", "124465:124466:10:1:2" },
+                shopper.Loot.Entries
+                    .Select(value => string.Format("{0}:{1}:{2}:{3}:{4}", value.LowId, value.HighId, value.QualityLevel, value.ObservedCount, value.ObservedCorpses))
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[] { "8:47:47:1", "9:53:53:1" },
+                shopper.Loot.LevelCreditRules
+                    .OrderBy(value => value.EnemyLevel)
+                    .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
+                    .ToArray());
+            Assert.AreEqual(5927, shopper.Corpse.CapturedCatMesh);
+            Assert.AreEqual(3.0, shopper.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(240.0, shopper.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(3.0, shopper.Corpse.LootedCleanupSeconds);
+        }
+
+        [TestMethod]
         public void DistinctNoRespawnAssignmentsKeepStablePolicyKeysAndProvenance()
         {
             WorldRespawnPolicyResolution first = WorldRespawnPolicyResolver.Resolve(
@@ -1093,6 +1225,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static void AssertExplicitDelay(OrdinaryEnemySpawnDefinition spawn, double seconds) { Assert.AreEqual(WorldRespawnPolicyAssignmentMode.Explicit, spawn.RespawnPolicy.Mode); Assert.IsNotNull(spawn.RespawnPolicy.ExplicitPolicy); Assert.AreEqual(seconds, spawn.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds.Value); }
         private static CapturedSubwayOrdinaryArchetypeDefinition BuildMeldedPatternsArchetype(CapturedSubwayCombatEvidenceDefinition combat, params string[] captures) { return new CapturedSubwayOrdinaryArchetypeDefinition("melded_patterns_test", "melded_patterns", "Melded Patterns", NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData, 148, 0, 268964353, 0, 0, 31, 0, 1899u, 29701, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], combat, new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], captures); }
         private static CapturedSubwayOrdinaryArchetypeDefinition BuildLooterArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("looter_test", "looter", "Looter", 203745, 138, 0, 268964353, 0, 0, 31, 1, 1579u, 40695, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 11, 11, 5.282358, 6, 0, 0, 15), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260709-212115" }, sourceWeaponEvidence); }
+        private static CapturedSubwayOrdinaryArchetypeDefinition BuildDerangedShopperArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("deranged_shopper_test", "deranged_shopper", "Deranged Shopper", 203736, 138, 0, 268964353, 0, 0, 31, 1, 1579u, 5927, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 9, 15, 5.161083, 6, 0, 0, 8), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260710-202132" }, sourceWeaponEvidence); }
         private static void AssertThrows(Action action) { try { action(); Assert.Fail("Expected InvalidOperationException."); } catch (InvalidOperationException) { } }
         private static string Read(string root, string file) { return System.IO.File.ReadAllText(System.IO.Path.Combine(root, @"AORebirth\Server\ZoneEngine\Core\Playfields", file)); }
         private static string FindRepositoryRoot() { string current = AppDomain.CurrentDomain.BaseDirectory; while (!string.IsNullOrEmpty(current)) { if (System.IO.Directory.Exists(System.IO.Path.Combine(current, ".git"))) return current; System.IO.DirectoryInfo parent = System.IO.Directory.GetParent(current); current = parent == null ? null : parent.FullName; } throw new InvalidOperationException("Repository root not found."); }

@@ -106,11 +106,15 @@ WORKMAN_STRIKER_DUPLICATE_LOOT_CAPTURE = "20260709-212115"
 WORKMAN_STRIKER_CANONICAL_LOOT_CAPTURE = "20260709-212336"
 WORKMAN_STRIKER_DUPLICATE_LOOT_ROWS = 4
 
-# Every active Workman source has one exact owner-linked WeaponItemFullUpdate
-# tuple in the completed capture corpus.  Keep the expected review boundary
-# explicit so a missing, duplicate-conflicting, or silently changed tuple stops
-# generation instead of collapsing the family to one representative QL.
+# Source-specific equipped enemies below have one exact owner-linked
+# WeaponItemFullUpdate tuple per reviewed runtime row.  Keep the expected review
+# boundary explicit so a missing, duplicate-conflicting, or silently changed
+# tuple stops generation instead of collapsing the family to one representative
+# QL.
 EXPECTED_SOURCE_WEAPON_EVIDENCE = {
+    "Deranged Shopper": {
+        0x79574527: (125454, 125455, 8),
+    },
     "Looter": {
         0x795312DC: (123038, 123039, 12),
         0x795313CB: (123038, 123039, 9),
