@@ -22,6 +22,8 @@ import inventory_aosharp_captures as location_inventory
 
 
 SELECTED_CLASSIFICATIONS = {"SUBWAY", "MIXED"}
+EXPECTED_SELECTED_CAPTURE_COUNT = 72
+EXPECTED_SELECTED_CLASSIFICATIONS = Counter({"SUBWAY": 41, "MIXED": 31})
 OFFICIAL_LIVE_PF127_INSTANCES = (
     location_inventory.PF127_CORPUS_RUNTIME_INSTANCES - {127}
 )
@@ -615,6 +617,7 @@ class CaptureAnalyzer:
         self.identity_metadata: dict[str, IdentityMetadata] = defaultdict(IdentityMetadata)
         self.vendor_owner_ids: set[str] = set()
         self.player_ids: set[str] = set()
+        self.pet_ids: set[str] = set()
         self.records: dict[tuple[str, ...], EvidenceRecord] = {}
         self.artifact_status: dict[str, str] = {}
         self.artifact_rows: dict[str, int] = {}
@@ -703,11 +706,13 @@ class CaptureAnalyzer:
 
     def _subject_kind(self, identity: str, role: object = "") -> str:
         parsed_role = string_value(role).lower()
-        # A complete SCFU PlayerInfo discriminator is stronger than the
+        # Complete SCFU identity discriminators are stronger than the
         # capture-side combat/dossier role heuristic.  In particular, other
-        # players fighting Subway NPCs were historically projected as enemies.
+        # players and their owned pets were historically projected as enemies.
         if identity in self.player_ids:
             return "player"
+        if identity in self.pet_ids:
+            return "pet"
         if parsed_role in {"enemy", "player", "pet", "corpse", "vendor"}:
             return "vendor_npc" if parsed_role == "vendor" else parsed_role
         if identity in self.vendor_owner_ids:
@@ -723,11 +728,15 @@ class CaptureAnalyzer:
     def _preclassify_scfu_identities(self) -> None:
         rows, _, _, _ = self._read_projection_csv("scfu-appearance.csv")
         for row in rows:
-            if string_value(row.get("CharacterInfoType")).lower() != "playerinfo":
-                continue
             identity = normalize_identity(row.get("Identity"))
-            if identity:
+            if not identity:
+                continue
+            if string_value(row.get("CharacterInfoType")).lower() == "playerinfo":
                 self.player_ids.add(identity)
+                continue
+            owner = normalize_identity(row.get("Owner"))
+            if owner.startswith("(SimpleChar:"):
+                self.pet_ids.add(identity)
 
     def _record(
         self,
@@ -1914,10 +1923,16 @@ def validate(
     analyzers: dict[str, CaptureAnalyzer],
 ) -> None:
     selected_ids = {string_value(row["capture_id"]) for row in base_rows}
-    if len(selected_ids) != 68:
-        raise SystemExit("Expected 68 Subway/mixed captures, found {0}.".format(len(selected_ids)))
-    if Counter(string_value(row["classification"]) for row in base_rows) != Counter(
-        {"SUBWAY": 37, "MIXED": 31}
+    if len(selected_ids) != EXPECTED_SELECTED_CAPTURE_COUNT:
+        raise SystemExit(
+            "Expected {0} Subway/mixed captures, found {1}.".format(
+                EXPECTED_SELECTED_CAPTURE_COUNT,
+                len(selected_ids),
+            )
+        )
+    if (
+        Counter(string_value(row["classification"]) for row in base_rows)
+        != EXPECTED_SELECTED_CLASSIFICATIONS
     ):
         raise SystemExit("Subway/mixed classification totals drifted.")
     session_counts = Counter(

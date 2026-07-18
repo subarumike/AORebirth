@@ -15,7 +15,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     public class SubwayVendorContentTests
     {
         [TestMethod]
-        public void CaptureDefinesSixNpcOwnersAndOnlyFiveResolvedShopEndpoints()
+        public void CaptureDefinesSixNpcOwnersAndSixResolvedShopEndpoints()
         {
             CapturedSubwayVendorDefinition[] definitions =
                 CapturedSubwayVendorContentProvider.Definitions.ToArray();
@@ -49,16 +49,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             CapturedSubwayVendorDefinition supplier = definitions.Single(
                 definition => definition.DisplayName == "Container Supplier");
-            Assert.IsFalse(supplier.HasCapturedStock);
-            Assert.AreEqual(0, supplier.Stock.Count);
+            Assert.IsTrue(supplier.HasCapturedStock);
+            Assert.AreEqual(62, supplier.Stock.Count);
             Assert.AreEqual(
-                5,
+                6,
                 definitions.Count(definition => definition.HasCapturedStock),
-                "No endpoint may be synthesized for Container Supplier without captured stock.");
+                "Exact template-99634 stock evidence must resolve the Container Supplier endpoint.");
         }
 
         [TestMethod]
-        public void CapturedShopStocksPreserveAll140RowsAndContiguousSlots()
+        public void CapturedShopStocksPreserveAll202RowsAndContiguousSlots()
         {
             var expectedCounts =
                 new Dictionary<string, int>
@@ -67,13 +67,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     { "Basic Quality Weaponsdealer", 31 },
                     { "Basic Quality Armorer", 29 },
                     { "Basic Quality Pharmacist", 40 },
-                    { "Basic Tools Merchant", 19 }
+                    { "Basic Tools Merchant", 19 },
+                    { "Container Supplier", 62 }
                 };
 
             CapturedSubwayVendorDefinition[] stocked = CapturedSubwayVendorContentProvider.Definitions
                 .Where(definition => definition.HasCapturedStock)
                 .ToArray();
-            Assert.AreEqual(140, stocked.Sum(definition => definition.Stock.Count));
+            Assert.AreEqual(202, stocked.Sum(definition => definition.Stock.Count));
             foreach (CapturedSubwayVendorDefinition definition in stocked)
             {
                 Assert.AreEqual(expectedCounts[definition.DisplayName], definition.Stock.Count);
@@ -111,7 +112,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string actual = string.Concat(digest.Select(value => value.ToString("x2")));
             Assert.AreEqual(
-                "f95754b8b657b74d41144a653fba1a1fc685d1cc2edf4091d051132a070a6553",
+                "df02869ae481758d371dc23c9a4f5f11734d7aae97648f4b2e040de2daa21507",
                 actual);
         }
 
@@ -131,6 +132,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(26082, supplier.MonsterData);
             Assert.AreEqual(40634, supplier.HeadMesh);
             Assert.AreEqual("AOSharpLiveCapture/20260709-212115", supplier.Evidence);
+            Assert.AreEqual(
+                "AOSharpLiveCapture/20260613-221619;"
+                + "identity=VendingMachine:C0000317;template=99634;slots=62;"
+                + "exact-template-reuse",
+                supplier.StockEvidence);
         }
     }
 }

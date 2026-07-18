@@ -28,6 +28,8 @@ namespace AORebirth.Core.Playfields
             "official-live-captures 20260712-232137/20260716-220400; two exact Abmouth corpse snapshots with linked 587 credits; 20260716-220400 inventory generation rebound after corpse identity F69001 reuse; snapshot probabilities and wider pool unresolved";
         private const string CapturedVergilLootEvidence =
             "official-live-captures 20260712-232711/234401/20260716-034433; three exact observed corpse snapshots with linked credits 610/587/563; 20260716-034433 inventory linked by normalized corpse identity F69001; snapshot probabilities and wider pool unresolved";
+        private const string CapturedEumenidesLootEvidence =
+            "official-live-capture 20260717-214751; exact identity-linked Eumenides corpse snapshot with 186 credits and three item rows; 20260717-220340 adds exact local-name/identity-linked item membership for two already-existing Remains of Eumenides corpses but no CorpseFullUpdate, credits, dead-NPC link, or playfield context, so those rows are not promoted as atomic runtime snapshots; snapshot probabilities and wider pool unresolved";
         private readonly object sync = new object();
         private readonly object productionRandomSync = new object();
         private readonly Random productionRandom = new Random();
@@ -198,6 +200,17 @@ namespace AORebirth.Core.Playfields
                         ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, "capture.20260716-220400", 123968, 123970, 25, 1),
                         ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, "capture.20260716-220400", 287146, 287146, 200, 1))
                 }
+                : isEumenides
+                ? new[]
+                {
+                    ObservedCorpseSnapshot(
+                        CapturedEumenidesLootEvidence,
+                        "capture.20260717-214751",
+                        CapturedEumenidesCredits,
+                        ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, "capture.20260717-214751", 163430, 163431, 22, 1),
+                        ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, "capture.20260717-214751", 301714, 301714, 1, 1),
+                        ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, "capture.20260717-214751", 287146, 287146, 200, 1))
+                }
                 : new ObservedCorpseSnapshotDefinition[0];
             var table = new LootTableDefinition
             {
@@ -206,24 +219,25 @@ namespace AORebirth.Core.Playfields
                 TableType = isAbmouth ? LootTableType.Boss : LootTableType.EnemyType,
                 RollGroups = new LootGroupDefinition[0],
                 ObservedCorpseSnapshots = snapshots,
-                CreditsPolicy = isAbmouth
+                CreditsPolicy = isAbmouth || isEumenides
                     ? new CreditsPolicyDefinition
                     {
                         Mode = CreditsPolicyMode.Unresolved,
                         Evidence = LootEvidenceConfidence.Unresolved
                     }
                     : CreditsRange(
-                        isEumenides ? CapturedEumenidesCredits : CapturedInfectorCredits,
-                        isEumenides ? CapturedEumenidesCredits : CapturedInfectorCredits,
+                        CapturedInfectorCredits,
+                        CapturedInfectorCredits,
                         LootEvidenceConfidence.ProvenCapture),
-                QualityPolicy = isAbmouth ? "captured-observed-corpse-snapshots" : "unresolved",
+                QualityPolicy = isAbmouth || isEumenides
+                    ? "captured-observed-corpse-snapshots"
+                    : "unresolved",
                 Evidence = isAbmouth
                     ? CapturedAbmouthLootEvidence
-                    : encounter.Evidence
-                      + (isEumenides
-                             ? "; 20260716-222007 fixed 186 corpse credits; item pool unresolved"
-                             : "; item pool unresolved"),
-                Confidence = isAbmouth
+                    : isEumenides
+                    ? CapturedEumenidesLootEvidence
+                    : encounter.Evidence + "; item pool unresolved",
+                Confidence = isAbmouth || isEumenides
                     ? LootEvidenceConfidence.ObservedAvailableLoot
                     : LootEvidenceConfidence.Unresolved,
                 ItemPoolUnresolved = true,

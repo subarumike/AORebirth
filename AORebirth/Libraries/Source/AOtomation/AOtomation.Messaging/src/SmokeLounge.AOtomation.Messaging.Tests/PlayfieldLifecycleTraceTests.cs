@@ -2425,11 +2425,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 {
                     "Thief|26092|138",
                     "Filth Flea|17657|138",
-                    "Slum Runner|55648|151"
+                    "Slum Runner|55648|151",
+                    "Molested Molecules|203746|148"
                 };
 
             Assert.AreEqual(
-                3,
+                4,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
 
@@ -2469,6 +2470,25 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
                 "Accepted Subway Slum Runner must keep its 24 exact spawns, captured attack cadence, shared chase, strict loot sample, CATMesh/credits, observed one-minute respawn, and ordinary corpse lifetimes together.");
+
+            Assert.IsTrue(
+                ordinaryProviderText.Contains("\"molested_molecules\"")
+                && ordinaryProviderText.Contains("\"Molested Molecules\"")
+                && ordinaryProviderText.Contains("203746")
+                && ordinaryProviderText.Contains("4.763456")
+                && ordinaryProviderText.Contains("new CapturedSubwayCombatEvidenceDefinition(")
+                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(27199, 27199, 10, 1, 3, 3333)")
+                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(121743, 121744, 25, 1, 3, 3333)")
+                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(301712, 301712, 1, 1, 3, 3333)")
+                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(301713, 301713, 1, 1, 3, 3333)")
+                && ordinaryProviderText.Contains("20260716-034104")
+                && ordinaryProviderText.Contains("20260716-221358")
+                && ordinaryProviderText.Contains("203746, 5921")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted Subway Molested Molecules must keep its nine exact spawns, captured attack range/cadence, shared chase, three strict loot outcomes, CATMesh/credits, private four-minute respawn policy, and ordinary corpse lifetimes together.");
 
             Assert.IsTrue(
                 providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 146, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0, healthDamage: 31))")

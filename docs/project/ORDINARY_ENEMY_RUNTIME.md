@@ -228,6 +228,15 @@ cadence, shared chase, strict loot sample, ordinary corpse lifetimes, and
 acceptance gate. Loot replay remains `ObservedSamples`; no official item
 probability distribution is claimed.
 
+Molested Molecules is the fourth accepted ordinary profile. Its nine exact
+spawns cover captured levels 17 through 24. Twenty normal local-player hits
+prove `16..42` damage with slot `6` and `4.763456`-second cadence. Three strict
+complete inventories prove four observed `1/3` item memberships and one empty
+outcome; seven positive-credit corpses preserve CATMesh `5921` and exact
+captured level-credit rules. Shared chase and ordinary three-second empty/four-
+minute loot-bearing corpse behavior apply. Its four-minute respawn remains the
+centralized private PF127 ordinary policy, not an official-live timing claim.
+
 ## Ordinary respawn policy
 
 PF127 eligible ordinary enemies inherit a 240-second post-NPC-despawn default.
