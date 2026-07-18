@@ -176,8 +176,11 @@ def new_source_state(path):
         "path": str(path),
         "exists": path.exists(),
         "records": {},
+        "physicalRows": 0,
         "validRows": 0,
         "invalidRows": 0,
+        "terminalPartialRows": 0,
+        "terminalPartialRowNumbers": [],
         "duplicateRows": 0,
         "internalConflictCount": 0,
         "outsideCaptureWindowRows": 0,
@@ -222,13 +225,30 @@ def inside_capture_window(timestamp, capture_info):
     return (start is None or observed >= start) and (end is None or observed <= end)
 
 
+def packet_log_record_is_partial(match, error):
+    """Return true only for a structurally valid row with a truncated payload."""
+    raw_hex = match.group("hex")
+    if len(raw_hex) % 2:
+        return str(error) == "raw hex is empty or has an odd number of characters"
+    try:
+        raw_length = len(bytes.fromhex(raw_hex))
+        declared_length = int(match.group("length"))
+    except (TypeError, ValueError):
+        return False
+    return bool(
+        raw_length < declared_length
+        and str(error)
+        == f"declared length {declared_length} does not match raw length {raw_length}"
+    )
+
+
 def load_packet_log_source(path, capture_info=None):
     state = new_source_state(path)
     if not state["exists"]:
         return state
-    for row_number, line in enumerate(
-        path.read_text(encoding="utf-8-sig", errors="replace").splitlines(), 1
-    ):
+    lines = path.read_text(encoding="utf-8-sig", errors="replace").splitlines()
+    state["physicalRows"] = len(lines)
+    for row_number, line in enumerate(lines, 1):
         match = SOURCE_PACKET_RE.match(line)
         if not match:
             state["invalidRows"] += 1
@@ -249,6 +269,9 @@ def load_packet_log_source(path, capture_info=None):
         except ValueError as exc:
             state["invalidRows"] += 1
             state["issues"].append(f"row {row_number}: {exc}")
+            if row_number == len(lines) and packet_log_record_is_partial(match, exc):
+                state["terminalPartialRows"] += 1
+                state["terminalPartialRowNumbers"].append(row_number)
             continue
         add_source_record(state, record, row_number)
     return state
@@ -297,12 +320,44 @@ def source_is_clean(state):
     )
 
 
-def public_source_summary(state, complete):
+def is_start_only_legacy_capture(capture_info):
+    return bool(
+        capture_info["available"]
+        and not capture_info["finalized"]
+        and capture_info["captureStartUtc"]
+        and not capture_info["captureEndUtc"]
+        and capture_info["observedPackets"] is None
+        and capture_info["validationStatus"] == "running"
+        and not capture_info["validationRecaptureRequired"]
+    )
+
+
+def source_has_salvageable_terminal_partial(state, capture_info):
+    return bool(
+        is_start_only_legacy_capture(capture_info)
+        and state["exists"]
+        and state["validRows"] > 0
+        and state["invalidRows"] == 1
+        and state["terminalPartialRows"] == 1
+        and state["terminalPartialRowNumbers"] == [state["physicalRows"]]
+        and state["duplicateRows"] == 0
+        and state["internalConflictCount"] == 0
+    )
+
+
+def public_source_summary(
+    state, complete, positive_evidence_usable=False, terminal_partial_salvaged=False
+):
     return {
         "path": state["path"],
         "exists": state["exists"],
+        "physicalRows": state["physicalRows"],
         "validRows": state["validRows"],
         "invalidRows": state["invalidRows"],
+        "terminalPartialRows": state["terminalPartialRows"],
+        "terminalPartialRowNumbers": state["terminalPartialRowNumbers"],
+        "terminalPartialSalvaged": terminal_partial_salvaged,
+        "positiveEvidenceUsable": positive_evidence_usable,
         "duplicateRows": state["duplicateRows"],
         "internalConflictCount": state["internalConflictCount"],
         "outsideCaptureWindowRows": state["outsideCaptureWindowRows"],
@@ -339,7 +394,17 @@ def load_packet_lines(capture):
     )
     sources = [packet_log, raw_index]
     observed = capture_info["observedPackets"]
-    legacy_inference = not capture_info["available"]
+    # Early capture builds wrote start-only capture_info.json metadata but never
+    # persisted finalized packet counts.  In that case the durable raw sinks,
+    # rather than the mere presence of provisional metadata, are the only
+    # available completeness contract.  Keep the structural checks below
+    # fail-closed: malformed, empty, conflicting, or non-superset sinks still
+    # cannot become canonical.
+    legacy_inference = observed is None
+    terminal_partial_candidates = {
+        source["path"]: source_has_salvageable_terminal_partial(source, capture_info)
+        for source in sources
+    }
 
     complete = {}
     for source in sources:
@@ -364,6 +429,11 @@ def load_packet_lines(capture):
                 )
 
     complete_sources = [source for source in sources if complete[source["path"]]]
+    trusted_sources = [
+        source
+        for source in sources
+        if complete[source["path"]] or terminal_partial_candidates[source["path"]]
+    ]
     conflicts = []
     all_keys = set(packet_log["records"]) | set(raw_index["records"])
     for key in sorted(all_keys):
@@ -381,11 +451,15 @@ def load_packet_lines(capture):
 
     internal_conflicts = sum(source["internalConflictCount"] for source in sources)
     exactly_one_complete = len(complete_sources) == 1
-    unresolved_conflicts = bool(conflicts or internal_conflicts) and not exactly_one_complete
+    exactly_one_trusted = len(trusted_sources) == 1
+    terminal_partial_candidate = any(terminal_partial_candidates.values())
+    unresolved_conflicts = bool(conflicts or internal_conflicts) and (
+        terminal_partial_candidate or not exactly_one_complete
+    )
 
     canonical = {}
-    if exactly_one_complete:
-        authoritative = complete_sources[0]
+    if exactly_one_trusted:
+        authoritative = trusted_sources[0]
         other = raw_index if authoritative is packet_log else packet_log
         for key, record in authoritative["records"].items():
             canonical[key] = dict(record)
@@ -406,11 +480,24 @@ def load_packet_lines(capture):
                         existing["timestamp"] = record["timestamp"]
 
     if observed is not None:
-        canonical_complete = len(canonical) == observed and not unresolved_conflicts
+        existing_sources = [source for source in sources if source["exists"]]
+        finalized_sources_structurally_valid = bool(complete_sources) or bool(
+            existing_sources
+            and all(source_is_clean(source) for source in existing_sources)
+        )
+        canonical_valid = bool(
+            finalized_sources_structurally_valid
+            and len(canonical) == observed
+            and not unresolved_conflicts
+        )
     else:
-        canonical_complete = bool(complete_sources) and not unresolved_conflicts
+        canonical_valid = bool(trusted_sources) and not unresolved_conflicts
+    terminal_partial_salvaged = bool(
+        terminal_partial_candidate and canonical_valid
+    )
+    capture_complete = bool(canonical_valid and observed is not None)
     recapture_required = bool(
-        capture_info["validationRecaptureRequired"] or not canonical_complete
+        capture_info["validationRecaptureRequired"] or not canonical_valid
     )
 
     records = list(canonical.values())
@@ -421,6 +508,8 @@ def load_packet_lines(capture):
 
     if recapture_required:
         capability_status = "raw_source_recapture_required"
+    elif terminal_partial_salvaged:
+        capability_status = "raw_source_legacy_terminal_tail_salvaged"
     elif legacy_inference:
         capability_status = "raw_source_legacy_inferred_complete"
     elif exactly_one_complete:
@@ -433,16 +522,29 @@ def load_packet_lines(capture):
         "canonicalValid": not recapture_required,
         "recaptureRequired": recapture_required,
         "legacyInference": legacy_inference,
+        "captureComplete": capture_complete,
+        "positiveEvidenceUsable": not recapture_required,
+        "positiveEvidenceOnly": bool(not recapture_required and not capture_complete),
+        "absenceInferenceAllowed": capture_complete,
+        "terminalPartialTailSalvaged": terminal_partial_salvaged,
         "captureInfo": capture_info,
         "observedPackets": observed,
         "canonicalPackets": len(records),
         "conflictCount": len(conflicts) + internal_conflicts,
         "conflicts": conflicts,
         "packetLog": public_source_summary(
-            packet_log, complete[packet_log["path"]]
+            packet_log,
+            complete[packet_log["path"]],
+            packet_log in trusted_sources and not recapture_required,
+            terminal_partial_salvaged
+            and terminal_partial_candidates[packet_log["path"]],
         ),
         "rawPacketIndex": public_source_summary(
-            raw_index, complete[raw_index["path"]]
+            raw_index,
+            complete[raw_index["path"]],
+            raw_index in trusted_sources and not recapture_required,
+            terminal_partial_salvaged
+            and terminal_partial_candidates[raw_index["path"]],
         ),
     }
     return [normalized_packet_line(record) for record in records], source_summary
@@ -595,6 +697,38 @@ def count_raw_scfu_packets(packet_lines):
     return count
 
 
+def count_raw_corpse_full_update_packets(packet_lines):
+    count = 0
+    for line in packet_lines:
+        match = PACKET_RE.match(line)
+        if match and match.group("message") == "CorpseFullUpdate":
+            count += 1
+    return count
+
+
+def classify_corpse_decode(
+    raw_packets, decoded_rows, decode_errors, local_evidence_observed
+):
+    decode_error_count = len(decode_errors)
+    if raw_packets == 0:
+        if decoded_rows or decode_error_count:
+            return False, "offline_corpse_decode_required"
+        return True, (
+            "no_raw_corpse_full_update_observed"
+            if local_evidence_observed
+            else "no_corpse_full_update_observed"
+        )
+
+    fully_decoded = bool(
+        decode_error_count == 0 and len(decoded_rows) == raw_packets
+    )
+    return (
+        (True, "corpse_full_update_decode_complete")
+        if fully_decoded
+        else (False, "offline_corpse_decode_required")
+    )
+
+
 def pending_path(final_path):
     return final_path.with_name(f"{final_path.stem}.pending{final_path.suffix}")
 
@@ -676,7 +810,11 @@ def run_scfu_analyzer(capture, packet_lines, raw_scfu_packets):
             if completed.returncode != 0:
                 result["analyzerError"] = (completed.stderr or completed.stdout).strip()
             staging_output = staging / SCFU_OUTPUT_NAME
+            if not staging_output.exists():
+                staging_output = pending_path(staging_output)
             staging_errors = staging / SCFU_ERROR_OUTPUT_NAME
+            if not staging_errors.exists():
+                staging_errors = pending_path(staging_errors)
             if staging_output.exists():
                 staging_output.replace(pending_output_path)
             if staging_errors.exists():
@@ -1412,6 +1550,230 @@ def run_self_tests():
         )
         tests.append("projection-incomplete-offline-decode")
 
+        start_only_metadata = root / "start-only-metadata"
+        start_only_metadata.mkdir()
+        (start_only_metadata / "capture_info.json").write_text(
+            json.dumps(
+                {
+                    "captureStartUtc": "2026-01-01T00:00:01Z",
+                    "packetCounts": {"inboundRaw": 0, "outboundRaw": 0},
+                    "validation": {
+                        "status": "running",
+                        "processingAllowed": False,
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        (start_only_metadata / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #24 len=24 n3=Wrong hex="
+            + packet_one.hex()
+            + "\n",
+            encoding="utf-8",
+        )
+        lines, source = load_packet_lines(start_only_metadata)
+        self_test_check(
+            source["canonicalValid"]
+            and source["legacyInference"]
+            and not source["captureInfo"]["finalized"]
+            and len(lines) == 1,
+            "clean raw evidence must remain recoverable from start-only metadata",
+        )
+        tests.append("start-only-metadata-structural-inference")
+
+        terminal_partial = root / "start-only-terminal-partial"
+        terminal_partial.mkdir()
+        (terminal_partial / "capture_info.json").write_text(
+            json.dumps(
+                {
+                    "captureStartUtc": "2026-01-01T00:00:01Z",
+                    "validation": {"status": "running"},
+                }
+            ),
+            encoding="utf-8",
+        )
+        (terminal_partial / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #25 len=24 n3=Wrong hex="
+            + packet_one.hex()
+            + "\n2026-01-01T00:00:02Z IN #26 len=24 n3=Wrong hex=001\n",
+            encoding="utf-8",
+        )
+        lines, source = load_packet_lines(terminal_partial)
+        self_test_check(
+            source["canonicalValid"]
+            and not source["recaptureRequired"]
+            and source["terminalPartialTailSalvaged"]
+            and source["capabilityStatus"]
+            == "raw_source_legacy_terminal_tail_salvaged"
+            and source["positiveEvidenceUsable"]
+            and source["positiveEvidenceOnly"]
+            and not source["captureComplete"]
+            and not source["absenceInferenceAllowed"]
+            and not source["packetLog"]["complete"]
+            and source["packetLog"]["terminalPartialRows"] == 1
+            and source["packetLog"]["terminalPartialRowNumbers"] == [2]
+            and source["packetLog"]["terminalPartialSalvaged"]
+            and len(lines) == 1,
+            "one final partial write must expose only the valid positive prefix",
+        )
+        tests.append("start-only-terminal-partial-positive-evidence")
+
+        internal_partial = root / "start-only-internal-partial"
+        internal_partial.mkdir()
+        (internal_partial / "capture_info.json").write_text(
+            (terminal_partial / "capture_info.json").read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        (internal_partial / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #27 len=24 n3=Wrong hex=001\n"
+            "2026-01-01T00:00:02Z IN #28 len=24 n3=Wrong hex="
+            + packet_one.hex()
+            + "\n",
+            encoding="utf-8",
+        )
+        _, source = load_packet_lines(internal_partial)
+        self_test_check(
+            source["recaptureRequired"]
+            and not source["canonicalValid"]
+            and not source["terminalPartialTailSalvaged"],
+            "an internal partial row must remain fail-closed",
+        )
+        tests.append("start-only-internal-partial-fails-closed")
+
+        multiple_partial = root / "start-only-multiple-partial"
+        multiple_partial.mkdir()
+        (multiple_partial / "capture_info.json").write_text(
+            (terminal_partial / "capture_info.json").read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        (multiple_partial / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #29 len=24 n3=Wrong hex="
+            + packet_one.hex()
+            + "\n2026-01-01T00:00:02Z IN #30 len=24 n3=Wrong hex=001\n"
+            "2026-01-01T00:00:03Z IN #31 len=24 n3=Wrong hex=003\n",
+            encoding="utf-8",
+        )
+        _, source = load_packet_lines(multiple_partial)
+        self_test_check(
+            source["recaptureRequired"]
+            and not source["canonicalValid"]
+            and source["packetLog"]["invalidRows"] == 2,
+            "multiple malformed rows must remain fail-closed",
+        )
+        tests.append("start-only-multiple-partial-fails-closed")
+
+        arbitrary_terminal = root / "start-only-arbitrary-terminal"
+        arbitrary_terminal.mkdir()
+        (arbitrary_terminal / "capture_info.json").write_text(
+            (terminal_partial / "capture_info.json").read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        (arbitrary_terminal / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #32 len=24 n3=Wrong hex="
+            + packet_one.hex()
+            + "\ntruncated garbage\n",
+            encoding="utf-8",
+        )
+        _, source = load_packet_lines(arbitrary_terminal)
+        self_test_check(
+            source["recaptureRequired"]
+            and not source["canonicalValid"]
+            and source["packetLog"]["terminalPartialRows"] == 0,
+            "an arbitrary malformed final row must remain fail-closed",
+        )
+        tests.append("start-only-arbitrary-terminal-fails-closed")
+
+        explicit_recapture = root / "start-only-explicit-recapture"
+        explicit_recapture.mkdir()
+        (explicit_recapture / "capture_info.json").write_text(
+            json.dumps(
+                {
+                    "captureStartUtc": "2026-01-01T00:00:01Z",
+                    "validation": {
+                        "status": "running",
+                        "recaptureRequired": True,
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        (explicit_recapture / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #25 len=24 n3=Wrong hex="
+            + packet_one.hex()
+            + "\n2026-01-01T00:00:02Z IN #26 len=24 n3=Wrong hex=001\n",
+            encoding="utf-8",
+        )
+        _, source = load_packet_lines(explicit_recapture)
+        self_test_check(
+            source["recaptureRequired"]
+            and not source["canonicalValid"]
+            and not source["terminalPartialTailSalvaged"],
+            "explicit recapture-required metadata must remain fail-closed",
+        )
+        tests.append("start-only-explicit-recapture-fails-closed")
+
+        terminal_partial_conflict = root / "terminal-partial-conflict"
+        terminal_partial_conflict.mkdir()
+        (terminal_partial_conflict / "capture_info.json").write_text(
+            (terminal_partial / "capture_info.json").read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        conflict_left = make_raw_packet(SIMPLE_CHAR_FULL_UPDATE, 41)
+        conflict_right = make_raw_packet(SIMPLE_CHAR_FULL_UPDATE, 42)
+        (terminal_partial_conflict / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #33 len=24 n3=Wrong hex="
+            + conflict_left.hex()
+            + "\n2026-01-01T00:00:02Z IN #34 len=24 n3=Wrong hex=001\n",
+            encoding="utf-8",
+        )
+        write_raw_index(
+            terminal_partial_conflict / RAW_PACKET_INDEX_NAME,
+            [{
+                "CapturedUtc": "2026-01-01T00:00:01Z", "Direction": "IN",
+                "GlobalOrdinal": 1, "Sequence": 33,
+                "PacketLength": len(conflict_right),
+                "PreservationStatus": "raw_complete", "RawHex": conflict_right.hex(),
+            }],
+        )
+        _, source = load_packet_lines(terminal_partial_conflict)
+        self_test_check(
+            source["recaptureRequired"]
+            and not source["canonicalValid"]
+            and source["conflictCount"] == 1
+            and not source["terminalPartialTailSalvaged"],
+            "a terminal partial row must never mask a cross-sink conflict",
+        )
+        tests.append("terminal-partial-conflict-fails-closed")
+
+        finalized_partial_mismatch = root / "finalized-partial-count-mismatch"
+        finalized_partial_mismatch.mkdir()
+        (finalized_partial_mismatch / "capture_info.json").write_text(
+            json.dumps(
+                {
+                    "captureStartUtc": "2026-01-01T00:00:01Z",
+                    "captureEndUtc": "2026-01-01T00:00:02Z",
+                    "packetCounts": {"inboundRaw": 1, "outboundRaw": 0},
+                    "validation": {"status": "complete"},
+                }
+            ),
+            encoding="utf-8",
+        )
+        (finalized_partial_mismatch / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #35 len=24 n3=Wrong hex="
+            + packet_one.hex()
+            + "\n2026-01-01T00:00:02Z IN #36 len=24 n3=Wrong hex=001\n",
+            encoding="utf-8",
+        )
+        _, source = load_packet_lines(finalized_partial_mismatch)
+        self_test_check(
+            source["recaptureRequired"]
+            and not source["canonicalValid"]
+            and not source["terminalPartialTailSalvaged"]
+            and source["observedPackets"] == 1,
+            "a finalized count mismatch must never use terminal-tail salvage",
+        )
+        tests.append("finalized-partial-count-mismatch-fails-closed")
+
         conflict = root / "conflict"
         conflict.mkdir()
         left = make_raw_packet(SIMPLE_CHAR_FULL_UPDATE, 6)
@@ -1657,6 +2019,35 @@ def run_self_tests():
         )
         tests.append("reused-corpse-generation")
 
+        corpse_pattern_cases = (
+            (
+                "no-corpse-evidence",
+                (0, [], [], False),
+                (True, "no_corpse_full_update_observed"),
+            ),
+            (
+                "snapshot-only-no-raw-cfu",
+                (0, [], [], True),
+                (True, "no_raw_corpse_full_update_observed"),
+            ),
+            (
+                "raw-cfu-fully-decoded",
+                (1, [["decoded"]], [], True),
+                (True, "corpse_full_update_decode_complete"),
+            ),
+            (
+                "raw-cfu-decode-error",
+                (1, [], [{"line": 1, "error": "malformed"}], True),
+                (False, "offline_corpse_decode_required"),
+            ),
+        )
+        for case_name, arguments, expected in corpse_pattern_cases:
+            self_test_check(
+                classify_corpse_decode(*arguments) == expected,
+                case_name,
+            )
+            tests.append(case_name)
+
         preservation = root / "preservation"
         preservation.mkdir()
         final = preservation / "derived.csv"
@@ -1719,6 +2110,9 @@ def main():
     packet_lines, source_summary = load_packet_lines(capture)
     raw_source_valid = source_summary["canonicalValid"]
     raw_scfu_packets = count_raw_scfu_packets(packet_lines)
+    raw_corpse_full_update_packets = count_raw_corpse_full_update_packets(
+        packet_lines
+    )
     scfu_summary = (
         run_scfu_analyzer(capture, packet_lines, raw_scfu_packets)
         if raw_source_valid
@@ -1767,8 +2161,11 @@ def main():
         or event_counts["corpseUses"]
         or corpse_inventory_updates
     )
-    corpse_processing_allowed = not errors and (
-        not corpse_evidence_observed or bool(rows)
+    corpse_processing_allowed, corpse_capability_status = classify_corpse_decode(
+        raw_corpse_full_update_packets,
+        rows,
+        errors,
+        corpse_evidence_observed,
     )
     processing_allowed = bool(
         raw_source_valid
@@ -1776,7 +2173,10 @@ def main():
         and loot_rebind_summary["ambiguousRows"] == 0
         and not scfu_summary["offlineDecodeRequired"]
     )
-    if source_summary["recaptureRequired"]:
+    if (
+        source_summary["recaptureRequired"]
+        or source_summary["terminalPartialTailSalvaged"]
+    ):
         capability_status = source_summary["capabilityStatus"]
     elif not corpse_processing_allowed:
         capability_status = "offline_corpse_decode_required"
@@ -1802,8 +2202,12 @@ def main():
 
     summary = {
         "captureFolder": str(capture),
+        "rawCorpseFullUpdatePackets": raw_corpse_full_update_packets,
         "corpseFullUpdateRows": len(rows),
         "corpseFullUpdateDecodeErrors": errors,
+        "corpseFullUpdateDecodeErrorCount": len(errors),
+        "corpseCapabilityStatus": corpse_capability_status,
+        "localCorpseEvidenceObserved": corpse_evidence_observed,
         "corpseInventoryUpdateRows": corpse_inventory_updates,
         "enemyRespawnRows": respawn_summary["rows"],
         "enemyRespawnCompleteRows": respawn_summary["completeRows"],
@@ -1818,6 +2222,10 @@ def main():
         "pendingSimpleCharFullUpdateRows": scfu_summary["pendingRows"],
         "simpleCharFullUpdateDecodeErrors": scfu_summary["decodeErrors"],
         "recaptureRequired": source_summary["recaptureRequired"],
+        "captureComplete": source_summary["captureComplete"],
+        "positiveEvidenceUsable": source_summary["positiveEvidenceUsable"],
+        "positiveEvidenceOnly": source_summary["positiveEvidenceOnly"],
+        "absenceInferenceAllowed": source_summary["absenceInferenceAllowed"],
         "offlineDecodeRequired": bool(
             not source_summary["recaptureRequired"]
             and (not corpse_processing_allowed or scfu_summary["offlineDecodeRequired"])
@@ -1849,7 +2257,13 @@ def main():
     promotion_pairs.append((pending_summary_path, summary_path))
     promote_pending_outputs(promotion_pairs, processing_allowed)
 
-    print(f"corpseFullUpdateRows={len(rows)} decodeErrors={len(errors)}")
+    print(
+        "rawCorpseFullUpdatePackets="
+        f"{raw_corpse_full_update_packets} "
+        f"corpseFullUpdateRows={len(rows)} "
+        f"decodeErrors={len(errors)} "
+        f"corpseCapabilityStatus={corpse_capability_status}"
+    )
     print(
         "enemyRespawnRows="
         f"{respawn_summary['rows']} complete={respawn_summary['completeRows']} "

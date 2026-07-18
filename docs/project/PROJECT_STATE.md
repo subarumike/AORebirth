@@ -6,21 +6,35 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 - The completed 294-folder location inventory identifies 37 Subway-only
   captures, 31 mixed Subway/outside captures, 222 elsewhere captures, and four
-  empty startup remnants with no usable location evidence. A second
-  content-level ledger covers all 68 Subway-bearing sessions with 21,559 rows
-  while keeping 55 official-live sessions separate from 13 AORebirth-private
-  validations. Only three official-live Subway-only sessions still lack a
-  runtime-source reference, and their partial/ambient evidence does not prove a
-  new implementation slice. See `docs/ai/CURRENT_TASK.md`,
+  empty startup remnants with no usable location evidence. Of the 68
+  Subway-bearing sessions, 65 contain actual raw packet rows and all 65 now
+  reprocess successfully with zero offline repairs, recapture requirements, or
+  tool errors. The content ledger contains 23,991 rows while keeping 55
+  official-live sessions separate from 13 AORebirth-private validations. See
+  `docs/ai/CURRENT_TASK.md`,
   `docs/generated/aosharp_capture_inventory.md`, and
   `docs/generated/aosharp_subway_capture_content.md`.
-- Previously unindexed official-live corpse evidence now contributes 32 exact,
-  identity-matched death links across 12 ordinary enemy types. Runtime profiles
-  preserve each proven CATMesh and only the observed level-credit rules;
-  pre-existing/death-unlinked zero-credit corpses remain excluded. Filth Flea
-  now has 18 complete corpse outcomes, 15 proven item memberships, five empty
-  outcomes, exact L4=23/L5=29 credits, and normal damage streams of melee
-  3..10 and poison 14..24 with critical 13/47 outcomes kept separate.
+- The generated ordinary provider now preserves 278 exact, identity-matched,
+  death-linked positive-credit corpse observations across 26 profiles. The
+  recovered batches include all accepted ordinary observations from the deep
+  `20260709-220439`, `20260709-222339`, `20260709-225408`,
+  `20260712-153918`, `20260712-223719`, and `20260716-222007` sessions.
+  Runtime profiles preserve each proven CATMesh and only observed level-credit
+  rules; players, owned pets, named encounters, outside-playfield rows,
+  ambiguous links, and zero/post-loot rows remain excluded.
+- Legacy item snapshots are retained only as exact identity-linked evidence
+  outcomes and cannot become runtime drop odds. Strict initial corpse snapshots
+  alone supply runtime probability denominators; reopened loot windows count
+  once per corpse generation. The false Stim Fiend item attribution is removed,
+  while Disobedient Bot, Thief, and Filth Flea runtime loot policies remain
+  unchanged.
+- Legacy lifecycle recovery now supports exact start-only metadata, a single
+  demonstrably truncated terminal packet, observed SCFU run-speed/alignment and
+  opaque-tail families, and terminal special-attack slot omission without
+  inventing field semantics. Snapshot-only corpses with no raw
+  `CorpseFullUpdate` are positive local-presence evidence rather than false
+  decoder debt; CFU-only fields remain unresolved unless a raw packet proves
+  them.
 - Raw offline recovery of capture `20260710-202132` adds an exact L10 Mugger
   death link from `(SimpleChar:7957E5CA)` to `(Corpse:00F6C001)`, CATMesh
   `17534`, and `88` credits. The same corpse's three item rows are indexed as a
@@ -66,7 +80,13 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - First-room Subway Thief behavior is capture-backed through finalized capture `20260717-012651`: maximum health is 146, captured current health is 115, and passive recovery is one point per second including during combat. The observed disappearance after closing with the guaranteed QL1 Stolen Handbag still present is treated as the reported bug, not intended Thief behavior. The Thief now follows the same four-minute loot-bearing corpse rule as every normal enemy, with close/reopen preserving the body and three-second cleanup only after it becomes empty. Earlier combat behavior, projectile attack text, pistol-based damage rolls, captured movement/attack context, exact corpse visual, and 60-second respawn remain unchanged. Raw packet `CorpseFullUpdate #1580` from capture `20260710-205400` proves the exact 412-byte corpse shape, CATMesh `5907`, MonsterData `26092`, and material tail. The deferred mission chain is unchanged.
 - AOSharpLiveCapture now has generic one-pass NPC lifecycle coverage: `packets.hex.log` preserves the original traffic and `raw-packets.csv` is its lossless, ordered, bidirectional packet index; capture modes and markers add validation requirements but never narrow raw collection. Broad visible non-player NPC/enemy/pet state, promoted full updates without a focus-only gate, movement, combat/death, exact corpse full updates, corpse inventory, loot movement, corpse presence/despawn, same-archetype same-position respawn timing from both death and corpse disappearance in `enemy-respawns.csv`, and capture-completeness validation remain covered. Respawn-marked captures validate incomplete unless a respawn is correlated. Loot-marked captures write `corpse-loot-observations.csv`, preserve the initial snapshot even when empty, retain corpse credits plus enemy/player levels and item rows, and validate a ten-corpse one-enemy sample. Live capture and `decode_npc_lifecycle_capture.py` use the same tracked direct raw SCFU decoder, while the offline path also merges dossier/full-update identity profiles and retro-decodes existing folders. Loot reconstruction canonicalizes padded and unpadded numeric corpse identities before identity joins and now tracks corpse identity generations: reused identities reset their open ordinal, rebind to the latest corpse full update, and cannot inherit stale enemy or credit metadata. Intact raw evidence with an incomplete or failed projection requires offline reconstruction, not repeated gameplay, whenever `recaptureRequired=false`, including `processingAllowed=false` or `offlineDecodeRequired=true`; gameplay recapture is reserved for missing or incomplete authoritative raw traffic. Raw callbacks now use a lossless start/restart boundary and an in-flight-aware quiet/maximum-stop gate; teardown drain failure is explicitly recapture-required. Offline tools validate raw lengths, reconcile both sinks by packet event, reject unresolved conflicts, preserve chronological order, and promote derived outputs atomically only after validation succeeds. Legacy folders with trailing packet-log data are bounded by their recorded capture start/end timestamps before completeness checks and decoding.
 - Subway layered-loot rules define a dungeon-wide pool plus stable enemy-type pools for ordinary enemies and dedicated tables for named/boss enemies. Observed counts, sample size, runtime weight, empty weight, and explicit guaranteed exceptions remain separate fields; a `10/10` observation is not automatically guaranteed. The first active ordinary item rule is the provisional Disobedient Bot weighted-one policy: QL1 Small Power Supply (`234877/234877`) weight 1, QL10 Eye Implant: Pharma Tech, Bright (`104683/104684`) weight 1, and empty weight 5. Those memberships are capture-proven, but the weighting is private-server policy and the broader pool remains incomplete. Bloodcreeper item loot remains explicitly unresolved and inactive after two complete empty inventories.
-- Slum Runner captures `20260716-034656` and `20260716-215947` contribute seven identity-linked death/corpse records with CATMesh `31774`. Their exact level-credit rules are L21=`131` (2), L22=`137` (2), and L23=`144` (3); unobserved levels remain unresolved. Item loot remains a separately sampled pool and no official distribution is claimed.
+- Slum Runner now has 19 identity-linked death/corpse observations with CATMesh
+  `31774`: the seven focused records from `20260716-034656` and
+  `20260716-215947`, plus twelve recovered deep-corpus records. Exact observed
+  credit rules cover L11=`66`, L12=`72`, L16=`98`, L17=`105`, L18=`111`,
+  L21=`131`, L22=`137`, and L23=`144`; unobserved levels remain unresolved.
+  Item loot remains a separately sampled pool and no official distribution is
+  claimed.
 - The completed corpus audit is `docs/evidence/SUBWAY_BLOODCREEPER_DISOBEDIENT_BOT_LOOT_AUDIT.md`. Fourteen identity-correlated official-live Disobedient Bot corpses disprove the earlier global `8..11` credit range. Known-level values remain exact observed rules (`L5=6`, `L6=8`, `L8=10`, `L9=11`, `L10=12`); unobserved levels remain unresolved instead of using a guessed formula. Seven strict complete item outcomes prove the two active memberships and five empty outcomes. Burnt Out Memory Chip (`234876/234876`) remains inactive because its corpse linkage is incomplete.
 - Captured enemy combat uses a shared atomic contract and runtime registry across supported and generated ordinary Subway populations. Each spawn declares fixed captured `AttackInfo`, captured equipped weapon, specialized captured behavior, or unresolved evidence; captured weapons are equipped during spawn, retaliation and attack-source selection use the registry, contracts are removed on despawn, and incomplete contracts are logged/refused. For Thief, live capture `20260711-170337` proves QL1 Solar-Powered Pistol `121567`, attack-context header `Unknown=0`, `SpecialAttackWeapon` body `32/32/32/32/0`, attack start after `1.409765s`, Target -> `StopMovingCmd` -> `SetPos` -> `NpcPath` after another `0.219999s`, first landed hit `11.409643s` after Thief attack start, captured `9`-point normal `AttackInfo`, approximately six-second repeats, and `StopFight` immediately before Death. Private capture `20260711-172309` proves the pre-repair mismatch. Mike's post-repair live validation confirms the accepted Thief slice now matches live behavior. Disobedient Bot combat/chase is privately validated; its two proven transferred item memberships are active under the provisional weighted-one policy, while the broader pool remains incomplete.
 - Bloodcreeper is activated as ordinary non-boss content from survey capture `20260709-222339` and two focused fights of the same enemy in captures `20260716-033326`/`20260716-034104`. Mike confirmed there is one Bloodcreeper spawn, so runtime population retains only the exact patrol position. Catalog data uses the generic spawn-level definition to roll the repository's community-documented inclusive `L15..L25` band once per new population generation; no Bloodcreeper-specific selection logic exists in the shared model or runtime. Captured adjacent points `L24/691 HP/run 83` and `L25/724 HP/run 86` anchor a private derived progression of `+33 HP` and `+3 run speed` per level; `L15..L23` values are explicitly policy rather than capture claims. The spawn preserves scale `70`, NPC family `63`, appearance `1483`, flags, heading, and optional SCFU fields. Proactive acquisition is enabled with a bounded `7`-unit private radius from the observed approximately `6.25`-unit trigger. Its specialized contract replays independent Skinspider Bite/SKW1 and Skinspider Spit/SKW2 streams with exact templates/tags/slots, captured initial timing, roughly `7.4`-second per-hand cadence, and non-constant ranges `21..35` and `21..41`. CATMesh `26978` and level-24 credits `150` are proven repeatedly; `150` is retained across the private level range as inferred policy so other level rolls do not lose credits. Two empty item snapshots do not resolve its complete item-loot profile. Private validation remains pending, so Bloodcreeper is not yet in the whole-enemy accepted gate.

@@ -191,6 +191,13 @@ CSV_SCHEMAS: dict[str, set[str]] = {
     },
 }
 
+PENDING_PROJECTION_FILES = {
+    "scfu-appearance.csv": "scfu-appearance.pending.csv",
+    "corpse-full-updates.csv": "corpse-full-updates.pending.csv",
+    "corpse-loot-observations.csv": "corpse-loot-observations.pending.csv",
+    "enemy-respawns.csv": "enemy-respawns.pending.csv",
+}
+
 DECLARED_COUNT_FIELDS = {
     "enemy-state.csv": "enemyStateRows",
     "enemy-full-updates.csv": "enemyFullUpdateRows",
@@ -456,6 +463,7 @@ class EvidenceRecord:
     evidence_kind: str
     source_artifact: str
     source_schema: str
+    evidence_status: str = "observed"
     names: set[str] = field(default_factory=set)
     monster_data: set[int] = field(default_factory=set)
     levels: set[int] = field(default_factory=set)
@@ -587,7 +595,12 @@ class CaptureAnalyzer:
         self.artifact_schemas: dict[str, str] = {}
         self.issues: set[str] = set()
 
-    def _read_csv(self, filename: str) -> tuple[list[dict[str, str]], str]:
+    def _read_csv(
+        self,
+        filename: str,
+        *,
+        schema_filename: str | None = None,
+    ) -> tuple[list[dict[str, str]], str]:
         path = self.path / filename
         if not path.exists():
             self.artifact_status[filename] = "missing"
@@ -600,7 +613,7 @@ class CaptureAnalyzer:
             with path.open("r", encoding="utf-8-sig", errors="replace", newline="") as stream:
                 reader = csv.DictReader(stream)
                 fieldnames = reader.fieldnames or []
-                required = CSV_SCHEMAS[filename]
+                required = CSV_SCHEMAS[schema_filename or filename]
                 missing = sorted(required.difference(fieldnames))
                 schema = "csv:" + schema_fingerprint(fieldnames)
                 self.artifact_schemas[filename] = schema
@@ -618,6 +631,29 @@ class CaptureAnalyzer:
         self.artifact_rows[filename] = len(rows)
         self.artifact_status[filename] = "rows={0}".format(len(rows))
         return rows, schema
+
+    def _read_projection_csv(
+        self,
+        filename: str,
+    ) -> tuple[list[dict[str, str]], str, str, bool]:
+        """Read one projection generation without mixing final and pending rows."""
+        final_path = self.path / filename
+        if final_path.exists():
+            rows, schema = self._read_csv(filename)
+            return rows, schema, filename, False
+
+        pending_filename = PENDING_PROJECTION_FILES[filename]
+        pending_path = self.path / pending_filename
+        if pending_path.exists():
+            rows, schema = self._read_csv(
+                pending_filename,
+                schema_filename=filename,
+            )
+            self.artifact_status[filename] = "using-pending=" + pending_filename
+            return rows, schema, pending_filename, True
+
+        rows, schema = self._read_csv(filename)
+        return rows, schema, filename, False
 
     def _metadata(
         self,
@@ -837,9 +873,16 @@ class CaptureAnalyzer:
                 },
             )
 
-        rows, schema = self._read_csv("scfu-appearance.csv")
+        rows, schema, source_artifact, projection_pending = self._read_projection_csv(
+            "scfu-appearance.csv"
+        )
         for row in rows:
             identity = normalize_identity(row.get("Identity"))
+            decode_status = string_value(row.get("DecodeStatus")).lower()
+            fully_consumed = boolean_value(row.get("DecodeFullyConsumed"))
+            decode_incomplete = (
+                bool(decode_status) and decode_status != "decoded_complete"
+            ) or fully_consumed is False
             scope = playfield_scope(row.get("PlayfieldId"))
             self.scope_index.register(identity, scope)
             self._metadata(identity, row.get("Name"), row.get("MonsterData"), row.get("Level"))
@@ -850,7 +893,7 @@ class CaptureAnalyzer:
                 subject_identity=identity,
                 related_identity=owner,
                 evidence_kind="scfu_appearance",
-                source_artifact="scfu-appearance.csv",
+                source_artifact=source_artifact,
                 source_schema=schema,
                 explicit_scope=scope,
             )
@@ -860,8 +903,8 @@ class CaptureAnalyzer:
                 level=row.get("Level"),
                 timestamps=(row.get("CapturedUtc"),),
                 observation={
-                    "decode_status": row.get("DecodeStatus"),
-                    "fully_consumed": boolean_value(row.get("DecodeFullyConsumed")),
+                    "decode_status": decode_status,
+                    "fully_consumed": fully_consumed,
                     "health": integer_value(row.get("Health")),
                     "monster_scale": integer_value(row.get("MonsterScale")),
                     "npc_family": integer_value(row.get("NpcFamily")),
@@ -876,7 +919,17 @@ class CaptureAnalyzer:
                     "textures": row.get("Textures"),
                     "meshes": row.get("Meshes"),
                 },
+                issue="projection-pending" if projection_pending else "",
             )
+            if decode_incomplete:
+                record.issues.add("incomplete-decode-not-absence")
+                record.evidence_status = (
+                    "projection-pending-incomplete"
+                    if projection_pending
+                    else "incomplete-observation"
+                )
+            elif projection_pending and record.evidence_status == "observed":
+                record.evidence_status = "projection-pending-observed"
 
     def _parse_state_and_stats(self) -> None:
         rows, schema = self._read_csv("enemy-state.csv")
@@ -1017,29 +1070,34 @@ class CaptureAnalyzer:
             )
 
     def _parse_corpses_and_loot(self) -> None:
-        rows, schema = self._read_csv("corpse-full-updates.csv")
+        rows, schema, source_artifact, projection_pending = self._read_projection_csv(
+            "corpse-full-updates.csv"
+        )
         for row in rows:
             corpse = normalize_identity(row.get("CorpseIdentity"))
             dead_npc = normalize_identity(row.get("DeadNpcIdentity"))
+            corpse_name = row.get("CorpseName") or row.get("DeadNpcName")
             scope = playfield_scope(row.get("PlayfieldId"))
             self.scope_index.register(corpse, scope)
             self.scope_index.register(dead_npc, scope)
-            self._metadata(corpse, row.get("CorpseName"), row.get("CorpseMonsterData"))
+            self._metadata(corpse, corpse_name, row.get("CorpseMonsterData"))
             record = self._record(
                 subject_kind="corpse",
                 subject_identity=corpse,
                 related_identity=dead_npc,
                 evidence_kind="corpse_full_update",
-                source_artifact="corpse-full-updates.csv",
+                source_artifact=source_artifact,
                 source_schema=schema,
                 explicit_scope=scope,
             )
             record.add(
-                name=row.get("CorpseName"),
+                name=corpse_name,
                 monster_data=row.get("CorpseMonsterData"),
                 timestamps=(row.get("CapturedUtc"),),
                 numeric=row.get("CorpseCredits"),
                 observation={
+                    "corpse_name": row.get("CorpseName"),
+                    "dead_npc_name": row.get("DeadNpcName"),
                     "playfield_id": integer_value(row.get("PlayfieldId")),
                     "cat_mesh": integer_value(row.get("CorpseCatMesh")),
                     "credits": integer_value(row.get("CorpseCredits")),
@@ -1051,9 +1109,14 @@ class CaptureAnalyzer:
                         float_value(row.get("PositionZ")),
                     ],
                 },
+                issue="projection-pending" if projection_pending else "",
             )
+            if projection_pending:
+                record.evidence_status = "projection-pending-observed"
 
-        rows, schema = self._read_csv("corpse-loot-observations.csv")
+        rows, schema, source_artifact, projection_pending = self._read_projection_csv(
+            "corpse-loot-observations.csv"
+        )
         for row in rows:
             corpse = normalize_identity(row.get("CorpseIdentity"))
             dead_npc = normalize_identity(row.get("DeadNpcIdentity"))
@@ -1063,7 +1126,7 @@ class CaptureAnalyzer:
                 subject_identity=corpse,
                 related_identity=dead_npc,
                 evidence_kind="loot_snapshot",
-                source_artifact="corpse-loot-observations.csv",
+                source_artifact=source_artifact,
                 source_schema=schema,
             )
             record.add(
@@ -1082,7 +1145,10 @@ class CaptureAnalyzer:
                     "player_level": integer_value(row.get("PlayerLevel")),
                     "correlation_status": row.get("CorrelationStatus"),
                 },
+                issue="projection-pending" if projection_pending else "",
             )
+            if projection_pending:
+                record.evidence_status = "projection-pending-observed"
 
         rows, schema = self._read_csv("inventory-updates.csv")
         for row in rows:
@@ -1128,7 +1194,9 @@ class CaptureAnalyzer:
             )
 
     def _parse_respawns(self) -> None:
-        rows, schema = self._read_csv("enemy-respawns.csv")
+        rows, schema, source_artifact, projection_pending = self._read_projection_csv(
+            "enemy-respawns.csv"
+        )
         for row in rows:
             death = normalize_identity(row.get("DeathIdentity"))
             respawn = normalize_identity(row.get("RespawnIdentity"))
@@ -1140,7 +1208,7 @@ class CaptureAnalyzer:
                 subject_identity=death,
                 related_identity=respawn,
                 evidence_kind="respawn_" + status,
-                source_artifact="enemy-respawns.csv",
+                source_artifact=source_artifact,
                 source_schema=schema,
             )
             record.add(
@@ -1159,7 +1227,25 @@ class CaptureAnalyzer:
                     "candidate_count": integer_value(row.get("CandidateCount")),
                     "detail": row.get("Detail"),
                 },
+                issue=(
+                    "projection-pending"
+                    if projection_pending
+                    else (
+                        "incomplete-correlation-not-absence"
+                        if status == "incomplete"
+                        else ""
+                    )
+                ),
             )
+            if status == "incomplete":
+                record.issues.add("incomplete-correlation-not-absence")
+                record.evidence_status = (
+                    "projection-pending-incomplete"
+                    if projection_pending
+                    else "incomplete-observation"
+                )
+            elif projection_pending:
+                record.evidence_status = "projection-pending-observed"
 
     def _parse_shops(self) -> None:
         rows, schema = self._read_csv("shop-updates.csv")
@@ -1364,6 +1450,7 @@ class CaptureAnalyzer:
     def _evidence_digest(self) -> str:
         artifact_names = sorted(
             set(CSV_SCHEMAS)
+            | set(PENDING_PROJECTION_FILES.values())
             | {
                 "capture-session.json",
                 "capture_info.json",
@@ -1426,7 +1513,7 @@ class CaptureAnalyzer:
 
         for record in self.records.values():
             metadata = self.identity_metadata.get(record.subject_identity)
-            if metadata is not None:
+            if metadata is not None and record.evidence_kind != "corpse_full_update":
                 record.names.update(metadata.names)
                 record.monster_data.update(metadata.monster_data)
                 record.levels.update(metadata.levels)
@@ -1502,7 +1589,7 @@ def evidence_to_row(record: EvidenceRecord, references: dict[str, set[str]]) -> 
         "generator_references": ";".join(sorted(capture_references["generator"])),
         "generated_references": ";".join(sorted(capture_references["generated"])),
         "documentation_references": ";".join(sorted(capture_references["documentation"])),
-        "evidence_status": "observed",
+        "evidence_status": record.evidence_status,
         "issues": ";".join(sorted(record.issues)),
     }
 

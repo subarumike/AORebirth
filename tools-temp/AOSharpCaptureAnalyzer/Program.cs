@@ -1118,6 +1118,72 @@ namespace AOSharpCaptureAnalyzer
                 Assert(infector.Unknown4.HasValue, "Infector unknown4 present");
                 AssertEqual(0, infector.Unknown4.GetValueOrDefault(), "Infector unknown4");
 
+                int abmouthActiveNanoMarker = FindBytes(
+                    abmouthPacket,
+                    new byte[] { 0x00, 0x00, 0x03, 0xF1 },
+                    RawSimpleCharFullUpdateDecoder.N3BodyOffset);
+                Assert(abmouthActiveNanoMarker > 0, "Abmouth run-speed alignment marker found");
+                byte[] legacyRunSpeedPacket = InsertByte(
+                    abmouthPacket,
+                    abmouthActiveNanoMarker - 1,
+                    0x00);
+                RawSimpleCharFullUpdate legacyRunSpeed =
+                    RawSimpleCharFullUpdateDecoder.DecodePacket(legacyRunSpeedPacket);
+                Assert(legacyRunSpeed.DecodeFullyConsumed, "Legacy two-byte run speed fully decoded");
+                AssertEqual(114, legacyRunSpeed.RunSpeedBase, "Legacy two-byte run speed value");
+                Assert(
+                    legacyRunSpeed.LegacyExtendedRunSpeedAlignment,
+                    "Legacy two-byte run speed alignment recorded");
+
+                byte[] playerOpaquePacket = ReplaceScfuTail(
+                    abmouthPacket,
+                    FromHex(
+                        "00000FC4000000000000"
+                        + "12950000008E425241570000000000"));
+                RawSimpleCharFullUpdate playerOpaque =
+                    RawSimpleCharFullUpdateDecoder.DecodePacket(playerOpaquePacket);
+                Assert(playerOpaque.DecodeFullyConsumed, "Observed flags2 FC4 extension fully decoded");
+                AssertEqual(15, playerOpaque.OpaqueExtension.Length, "Observed flags2 FC4 extension length");
+
+                byte[] petBd3Packet = ReplaceScfuTail(
+                    abmouthPacket,
+                    FromHex(
+                        "00000BD3000000"
+                        + "3D0001D73E4D4557314D45573100000004791C100D00"));
+                SetInt32BigEndian(petBd3Packet, 30, 0x0A2A4A43);
+                RawSimpleCharFullUpdate petBd3 =
+                    RawSimpleCharFullUpdateDecoder.DecodePacket(petBd3Packet);
+                Assert(petBd3.DecodeFullyConsumed, "Observed pet flags2 BD3 extension fully decoded");
+                AssertEqual(22, petBd3.OpaqueExtension.Length, "Observed pet flags2 BD3 extension length");
+
+                byte[] pet7e2Packet = ReplaceScfuTail(
+                    abmouthPacket,
+                    FromHex("000007E200000004791C100D00"));
+                SetInt32BigEndian(pet7e2Packet, 30, 0x0A2A4A43);
+                RawSimpleCharFullUpdate pet7e2 =
+                    RawSimpleCharFullUpdateDecoder.DecodePacket(pet7e2Packet);
+                Assert(pet7e2.DecodeFullyConsumed, "Observed pet flags2 7E2 extension fully decoded");
+                AssertEqual(6, pet7e2.OpaqueExtension.Length, "Observed pet flags2 7E2 extension length");
+
+                byte[] terminalSpecialAttackPacket = ReplaceScfuTail(
+                    abmouthPacket,
+                    FromHex(
+                        "000007E20003"
+                        + "115D0003115E44425057444250570000"
+                        + "000000"));
+                RawSimpleCharFullUpdate terminalSpecialAttack =
+                    RawSimpleCharFullUpdateDecoder.DecodePacket(terminalSpecialAttackPacket);
+                Assert(
+                    terminalSpecialAttack.DecodeFullyConsumed,
+                    "Observed terminal special-attack slot omission fully decoded");
+                Assert(
+                    terminalSpecialAttack.TerminalSpecialAttackSlotOmitted,
+                    "Observed terminal special-attack slot omission recorded");
+                AssertEqual(
+                    0,
+                    terminalSpecialAttack.Unknown4.GetValueOrDefault(),
+                    "Observed terminal special-attack Unknown4 preserved");
+
                 var truncated = new byte[infectorPacket.Length - 1];
                 Buffer.BlockCopy(infectorPacket, 0, truncated, 0, truncated.Length);
                 RawSimpleCharFullUpdate frameMismatchMessage;
@@ -1305,6 +1371,34 @@ namespace AOSharpCaptureAnalyzer
 
             packet[6] = (byte)(packet.Length >> 8);
             packet[7] = (byte)packet.Length;
+        }
+
+        private static byte[] InsertByte(byte[] packet, int offset, byte value)
+        {
+            var result = new byte[packet.Length + 1];
+            Buffer.BlockCopy(packet, 0, result, 0, offset);
+            result[offset] = value;
+            Buffer.BlockCopy(packet, offset, result, offset + 1, packet.Length - offset);
+            SetFrameLength(result);
+            return result;
+        }
+
+        private static byte[] ReplaceScfuTail(byte[] packet, byte[] replacement)
+        {
+            int prefixLength = packet.Length - 5;
+            var result = new byte[prefixLength + replacement.Length];
+            Buffer.BlockCopy(packet, 0, result, 0, prefixLength);
+            Buffer.BlockCopy(replacement, 0, result, prefixLength, replacement.Length);
+            SetFrameLength(result);
+            return result;
+        }
+
+        private static void SetInt32BigEndian(byte[] bytes, int offset, int value)
+        {
+            bytes[offset] = (byte)(value >> 24);
+            bytes[offset + 1] = (byte)(value >> 16);
+            bytes[offset + 2] = (byte)(value >> 8);
+            bytes[offset + 3] = (byte)value;
         }
 
         private static PacketSourceReport CreateSelfTestSource(
