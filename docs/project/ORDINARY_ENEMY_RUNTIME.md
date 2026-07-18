@@ -237,6 +237,28 @@ captured level-credit rules. Shared chase and ordinary three-second empty/four-
 minute loot-bearing corpse behavior apply. Its four-minute respawn remains the
 centralized private PF127 ordinary policy, not an official-live timing claim.
 
+Disobedient Bot is the fifth accepted ordinary profile. Its 12 exact spawn rows
+use captured NPC family `138`. Seventeen normal SIW1 hits against local players
+prove the aggregate `8..15` envelope; two Killer-pet hits remain separate, no
+critical is observed, and focused attack attempts retain the exact
+`5.973723`-second recharge instead of a miss-biased landed-hit interval. The
+ordinary combat profile resolves SIW1 context from the selected spawn level:
+captured `L5=30/30/30/30/22`, `L6=35`, `L8=45`, `L9=49`, and `L10=54`; L7 uses
+the explicit bounded midpoint policy `40`, while other levels fail closed. The
+generated combat projection contains nine decoded hits at `8..15`; eight
+additional authoritative raw rows complete the 17-hit audit.
+
+Thirteen valid identity-linked corpse rows preserve CATMesh `15215` and exact
+level-credit rules. The unlinked `20260713-013906` item outcome remains excluded.
+Seven strict inventories retain the provisional weighted-one `1 + 1 + 5 empty`
+policy for the two proven memberships. All Bot rows use an observed
+`450`-second post-NPC-despawn delay; capture `20260708-143600` records
+`459.913` seconds death-to-replacement at a `0.190`-unit position delta. Shared
+chase and ordinary three-second empty/four-minute loot-bearing corpse behavior
+apply. Two Bot rows remain in the existing operational quarantine; acceptance
+does not activate them. Proactive aggro radius and leash/reset distance remain
+unresolved.
+
 ## Ordinary respawn policy
 
 PF127 eligible ordinary enemies inherit a 240-second post-NPC-despawn default.
@@ -251,8 +273,9 @@ Resolution precedence is:
 4. explicit no-respawn or unresolved/fail-closed behavior.
 
 Current explicit exceptions are Thief at 60 seconds, Filth Flea at 240 seconds,
-Bloodcreeper at 240 seconds, and all 24 Slum Runner rows at 60 seconds. The
-catalog contains 77 explicit spawn rows; the other 244 represented ordinary
+all 12 Disobedient Bot rows at 450 seconds, Bloodcreeper at 240 seconds, and all
+24 Slum Runner rows at 60 seconds. The catalog contains 89 explicit spawn rows;
+the other 232 represented ordinary
 rows inherit the default without changing whether they are active or
 quarantined. Named enemies, bosses, scripted
 encounters, summons, pets, temporary encounter adds, vendors, static objects,

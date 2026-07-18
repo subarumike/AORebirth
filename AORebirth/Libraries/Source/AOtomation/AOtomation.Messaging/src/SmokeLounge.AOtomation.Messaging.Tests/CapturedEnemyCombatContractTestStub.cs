@@ -28,6 +28,11 @@ namespace AORebirth.Core.Playfields
             return new CapturedEnemyCombatContract();
         }
 
+        internal static CapturedEnemyCombatContract For(string name, int monsterData, int? level)
+        {
+            return For(name, monsterData);
+        }
+
         internal static CapturedEnemyCombatContract ForOrdinary(
             CapturedSubwayOrdinaryArchetypeDefinition archetype)
         {

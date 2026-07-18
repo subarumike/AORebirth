@@ -640,6 +640,11 @@ namespace AORebirth.Core.Playfields
     {
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
         {
+            return For(name, monsterData, null);
+        }
+
+        internal static CapturedEnemyCombatContract For(string name, int monsterData, int? level)
+        {
             switch (monsterData)
             {
                 case 203726:
@@ -839,37 +844,7 @@ namespace AORebirth.Core.Playfields
                         0,
                         1397315377);
                 case 17649:
-                    return CapturedEnemyCombatContract.CapturedSpecialSequence(
-                        "20260713-014714 packets 123-346: Disobedient Bot SIW1 attack context, 10-11 melee damage, 3.270444-second first hit, and 5.973723-second repeat",
-                        new CapturedEnemySpecialAttackSequenceDefinition(
-                            NpcCombatAttackRules.CapturedSubwayDisobedientBotInitialAttackSeconds,
-                            null,
-                            new CapturedEnemyCombatAttackDefinition(
-                                NpcCombatAttackRules.CapturedSubwayDisobedientBotMinimumDamage,
-                                NpcCombatAttackRules.CapturedSubwayDisobedientBotMaximumDamage,
-                                0,
-                                NpcCombatAttackRules.MaxMeleeCombatDistance,
-                                NpcCombatAttackRules.CapturedSubwayDisobedientBotRechargeSeconds,
-                                false,
-                                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
-                                NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponSlot,
-                                0,
-                                NpcCombatAttackRules.NormalAttackInfoHitType,
-                                NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponTag,
-                                true),
-                            new[]
-                            {
-                                new CapturedEnemySpecialAttackDefinition(
-                                    NpcCombatAttackRules.CapturedSubwayDisobedientBotLowTemplate,
-                                    NpcCombatAttackRules.CapturedSubwayDisobedientBotHighTemplate,
-                                    NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponTag,
-                                    NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponName)
-                            },
-                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponLastValue));
+                    return ForDisobedientBot(level);
                 case 30379:
                     return CapturedEnemyCombatContract.CapturedParallelAttackSequence(
                         "20260709-222339 and 20260716-033326/034104: Bloodcreeper proactive dual Skinspider Bite/Spit natural attacks, 21-41 rolled damage, and independent captured hand cadence",
@@ -967,6 +942,71 @@ namespace AORebirth.Core.Playfields
                         "No captured combat contract for " + name + " monsterData=" + monsterData,
                         false);
             }
+        }
+
+        private static CapturedEnemyCombatContract ForDisobedientBot(int? level)
+        {
+            int specialAttackWeaponValue;
+            int specialAttackWeaponLastValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotSpecialAttackWeaponLastValue;
+            switch (level)
+            {
+                case 5:
+                    specialAttackWeaponValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponValue;
+                    specialAttackWeaponLastValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponLastValue;
+                    break;
+                case 6:
+                    specialAttackWeaponValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel6SpecialAttackWeaponValue;
+                    break;
+                case 7:
+                    specialAttackWeaponValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel7SpecialAttackWeaponPolicyValue;
+                    break;
+                case 8:
+                    specialAttackWeaponValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel8SpecialAttackWeaponValue;
+                    break;
+                case 9:
+                    specialAttackWeaponValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel9SpecialAttackWeaponValue;
+                    break;
+                case 10:
+                    specialAttackWeaponValue = NpcCombatAttackRules.CapturedSubwayDisobedientBotLevel10SpecialAttackWeaponValue;
+                    break;
+                default:
+                    return CapturedEnemyCombatContract.Unresolved(
+                        "Disobedient Bot SIW1 attack context is unresolved for level "
+                        + (level.HasValue ? level.Value.ToString() : "unknown"),
+                        true);
+            }
+
+            return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                "20260708-143600, 20260709-205921/210452/220439, 20260712-153918, and 20260713-014714/033511: 17 Disobedient Bot SIW1 normal local-player hits span 8-15 damage; focused raw packets prove a 3.270444-second first hit and 5.973723-second repeat attempt cadence; SpecialAttackWeapon contexts are capture-backed for levels 5, 6, 8, 9, and 10, including the level-5 terminal value 22, with level 7 explicitly using the bounded 35/45 midpoint policy",
+                new CapturedEnemySpecialAttackSequenceDefinition(
+                    NpcCombatAttackRules.CapturedSubwayDisobedientBotInitialAttackSeconds,
+                    null,
+                    new CapturedEnemyCombatAttackDefinition(
+                        NpcCombatAttackRules.CapturedSubwayDisobedientBotMinimumDamage,
+                        NpcCombatAttackRules.CapturedSubwayDisobedientBotMaximumDamage,
+                        0,
+                        NpcCombatAttackRules.MaxMeleeCombatDistance,
+                        NpcCombatAttackRules.CapturedSubwayDisobedientBotRechargeSeconds,
+                        false,
+                        NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                        NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponSlot,
+                        0,
+                        NpcCombatAttackRules.NormalAttackInfoHitType,
+                        NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponTag,
+                        true),
+                    new[]
+                    {
+                        new CapturedEnemySpecialAttackDefinition(
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotLowTemplate,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotHighTemplate,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponTag,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponName)
+                    },
+                    specialAttackWeaponValue,
+                    specialAttackWeaponValue,
+                    specialAttackWeaponValue,
+                    specialAttackWeaponValue,
+                    specialAttackWeaponLastValue));
         }
 
         internal static CapturedEnemyCombatContract ForOrdinary(

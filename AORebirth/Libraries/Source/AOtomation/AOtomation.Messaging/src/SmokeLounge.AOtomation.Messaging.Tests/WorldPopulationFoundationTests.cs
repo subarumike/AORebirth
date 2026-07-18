@@ -340,6 +340,34 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void DisobedientBotCorpseEvidenceKeepsEveryIdentityLinkedCreditOutcome()
+        {
+            CapturedSubwayCorpseEvidenceDefinition[] evidence =
+                new CapturedSubwayOrdinaryContentProvider().GetCorpseEvidence(17649);
+
+            Assert.AreEqual(13, evidence.Length);
+            Assert.IsTrue(evidence.All(value => value.MonsterData == 17649));
+            Assert.IsTrue(evidence.All(value => value.CatMesh == 15215));
+            CollectionAssert.AreEqual(
+                new[] { "5:6:2", "6:8:2", "8:10:4", "9:11:3", "10:12:2" },
+                evidence
+                    .GroupBy(value => new { value.EnemyLevel, value.Credits })
+                    .OrderBy(group => group.Key.EnemyLevel)
+                    .ThenBy(group => group.Key.Credits)
+                    .Select(group => string.Format(
+                        "{0}:{1}:{2}",
+                        group.Key.EnemyLevel,
+                        group.Key.Credits,
+                        group.Count()))
+                    .ToArray());
+            Assert.IsTrue(evidence.Any(value => value.Capture == "20260709-205921" && value.DeadNpcIdentity == "(SimpleChar:795310FB)" && value.CorpseIdentity == "(Corpse:00F6E013)"));
+            Assert.IsTrue(evidence.Any(value => value.Capture == "20260712-160257" && value.DeadNpcIdentity == "(SimpleChar:795EC78A)" && value.CorpseIdentity == "(Corpse:00F6C006)"));
+            Assert.IsTrue(evidence.Any(value => value.Capture == "20260713-014714" && value.DeadNpcIdentity == "(SimpleChar:79607CD0)" && value.CorpseIdentity == "(Corpse:00F6C005)"));
+            Assert.IsTrue(evidence.Any(value => value.Capture == "20260713-033511" && value.DeadNpcIdentity == "(SimpleChar:79607E2C)" && value.CorpseIdentity == "(Corpse:00F6C003)"));
+            Assert.IsFalse(evidence.Any(value => value.Capture == "20260713-013906"));
+        }
+
+        [TestMethod]
         public void DeepSubwayOrdinaryCombatUsesLocalPlayerNormalHitEvidence()
         {
             var catalog = new OrdinaryEnemyCatalog(

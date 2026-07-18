@@ -175,6 +175,11 @@ namespace AORebirth.Core.Playfields
                 .OrderBy(value => SupportedProfileKey(value.First()), StringComparer.Ordinal))
             {
                 CapturedSubwaySpawnDefinition first = group.First();
+                Func<int, CapturedEnemyCombatContract> contractResolver =
+                    first.MonsterData == NpcCombatAttackRules.CapturedSubwayDisobedientBotMonsterData
+                        ? new Func<int, CapturedEnemyCombatContract>(
+                            level => CapturedSubwayCombatCatalog.For(first.Name, first.MonsterData, level))
+                        : null;
                 OrdinaryEnemyLootEntry[] lootEntries = sourceLoot
                     .Where(value => value.MonsterData == first.MonsterData)
                     .Select(
@@ -209,7 +214,7 @@ namespace AORebirth.Core.Playfields
                         first.TemplateHash,
                         BuildSupportedAppearance(first),
                         RetaliateAggression(),
-                        BuildCombatProfile(contract, first.MonsterData),
+                        BuildCombatProfile(contract, first.MonsterData, contractResolver),
                         BuildLootProfile(first.MonsterData, lootEntries, corpseEvidence),
                         StandardCorpseProfile(first.MonsterData, corpseEvidence),
                         group.Select(value => value.ContentSection)
@@ -569,7 +574,8 @@ namespace AORebirth.Core.Playfields
 
         private static OrdinaryEnemyCombatProfile BuildCombatProfile(
             CapturedEnemyCombatContract contract,
-            int monsterData)
+            int monsterData,
+            Func<int, CapturedEnemyCombatContract> contractResolver = null)
         {
             OrdinaryEnemyCombatMode mode = OrdinaryEnemyCombatMode.Unresolved;
             OrdinaryEnemyDamageSource damageSource = OrdinaryEnemyDamageSource.Unresolved;
@@ -605,7 +611,8 @@ namespace AORebirth.Core.Playfields
                     : OrdinaryEnemyEvidenceState.Unresolved,
                 monsterData == 26092 ? 1.0 : (double?)null,
                 monsterData == 26092 ? 1 : (int?)null,
-                monsterData == 26092);
+                monsterData == 26092,
+                contractResolver);
         }
 
         private static OrdinaryEnemyLootProfile BuildLootProfile(

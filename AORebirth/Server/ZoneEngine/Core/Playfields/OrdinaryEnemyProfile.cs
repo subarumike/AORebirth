@@ -151,7 +151,8 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemyEvidenceState evidenceState,
             double? healthRegenIntervalSeconds = null,
             int? healthRegenDelta = null,
-            bool regenerateHealthWhileInCombat = false)
+            bool regenerateHealthWhileInCombat = false,
+            Func<int, CapturedEnemyCombatContract> contractResolver = null)
         {
             this.Mode = mode;
             this.DamageSource = damageSource;
@@ -161,6 +162,7 @@ namespace AORebirth.Core.Playfields
             this.HealthRegenIntervalSeconds = healthRegenIntervalSeconds;
             this.HealthRegenDelta = healthRegenDelta;
             this.RegenerateHealthWhileInCombat = regenerateHealthWhileInCombat;
+            this.contractResolver = contractResolver;
         }
 
         internal OrdinaryEnemyCombatMode Mode { get; private set; }
@@ -171,6 +173,15 @@ namespace AORebirth.Core.Playfields
         internal double? HealthRegenIntervalSeconds { get; private set; }
         internal int? HealthRegenDelta { get; private set; }
         internal bool RegenerateHealthWhileInCombat { get; private set; }
+
+        private readonly Func<int, CapturedEnemyCombatContract> contractResolver;
+
+        internal CapturedEnemyCombatContract ResolveContract(int level)
+        {
+            return this.contractResolver == null
+                       ? this.Contract
+                       : this.contractResolver(level);
+        }
     }
 
     internal sealed class OrdinaryEnemyTextureProfile
