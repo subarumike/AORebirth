@@ -131,6 +131,12 @@ population in bounded runtime batches.
   `20260709-225408` packet log: Fragmented Soul `79545367` and Premature Pattern
   `79545356`. The stale start-time metadata and unrelated incomplete SCFUs do
   not invalidate those two `decoded_complete` rows.
+- Capture `20260712-232848` links Premature Pattern identity `79607A3B` back to
+  source `79545356` through exact shared movement. That source now selects one
+  complete stat-only generation: L17/368 HP/scale 98/RunSpeed 65 or L18/394
+  HP/scale 98/RunSpeed 68. Its reviewed patrol follows the complete captured
+  out-and-back route; this does not add an eighth population row. Neither
+  generation invents a weapon, and uniform selection is private runtime policy.
 - The normalized PF127 catalog is now `321` rows: `310` active and `11`
   quarantined diagnostic rows. It contains `26` profiles.
 - Deep ordinary combat now uses capture-scoped identity mapping and only normal
@@ -246,8 +252,11 @@ population in bounded runtime batches.
   outgoing `AttackInfo` packets against the non-local player Wardog: two normal
   `18` hits and one `40` critical at `4.849144`- and `5.000854`-second
   intervals. These rows are other-player evidence only; they do not become a
-  local-player damage range. The sequence/byte-exact fallback yields to derived
-  rows and preserves that target-role boundary.
+  local-player damage range. Killed source `7954512E` is bound to exact QL19
+  WeaponInstance `25713A73` and corpse `00F6E017`; exact captured positions
+  prove a `20.250672`-unit proactive-acquisition lower bound. The sequence/
+  byte-exact fallback yields to derived rows and preserves that target-role
+  boundary.
 - The diagnostic quarantine selector now changes spawn eligibility in the
   world-population owner when explicitly selected. The selector is disabled in
   the normal runtime; only the `11` evidence-incomplete Violent Vagabond rows
@@ -465,6 +474,11 @@ Vagabond; and strict Empty Shell/Premature Pattern loot.
    `19`, and nanos `26414`, `81998`, and `82482`; Premature retains local normal
    `22`, critical `41`, other-player `16`, and pet `38`. These incomplete
    outcomes remain report-only instead of becoming constant fixed attacks.
+   Premature source `79545356` now has its two exact stat-only generations and
+   complete captured out-and-back patrol, but combat, strict loot, respawn
+   timing, and leash/reset remain incomplete. Self-cast nano `81829` remains
+   report-only because current runtime support cannot safely represent its
+   captured multi-effect/ChangeVariable behavior.
    Vagabond now has 26 distinct local misses after overlap deduplication, a
    `4.0799494`-second median attempt interval, and two exact simultaneous
    other-player attack starts. Automatic acquisition/chase is capture-proven at
@@ -477,11 +491,14 @@ Vagabond; and strict Empty Shell/Premature Pattern loot.
    `SpecialAttackWeapon` plus `Attack` initiation against the non-local player
    Wardog, three other-player outgoing hits (`18`, `18`, and critical `40`),
    approximately five-second observed target cadence, chase initiation,
-   CATMesh `17870`, and `176` corpse credits. Local-player outcomes remain
-   unobserved, and item loot, respawn timing, leash/reset, and exact acquisition
-   range remain unresolved. Do not activate the encounter by guessing those
-   missing boundaries; weapon-owned rolls must remain distinct from the
-   observed post-mitigation other-player outcomes.
+   CATMesh `17870`, and `176` corpse credits. Killed source `7954512E` is bound
+   to QL19 WeaponInstance `25713A73` and corpse `00F6E017`; exact source/target
+   positions prove proactive acquisition at `20.250672` units. Local-player
+   outcomes remain unobserved, and item loot, respawn timing, leash/reset, and
+   the exact acquisition threshold/upper bound remain unresolved. Do not
+   activate the encounter by guessing those missing boundaries; weapon-owned
+   rolls must remain distinct from the observed post-mitigation other-player
+   outcomes.
 5. Bitaxel is classified as a player artifact and is not an enemy gap.
 6. Container Supplier stock is resolved by exact template-`99634` capture
    evidence. Dialogue remains unresolved and must not be synthesized.
