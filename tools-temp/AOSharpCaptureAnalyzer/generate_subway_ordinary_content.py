@@ -33,6 +33,7 @@ CAPTURES = (
     "20260716-034656",
     "20260716-221358",
     "20260716-222201",
+    "20260719-020104",
 )
 SPAWN_CAPTURES = (
     "20260709-212336",
@@ -56,6 +57,9 @@ CAPTURE_ARCHETYPE_FILTERS = {
             "Redundant Scan",
             "Slum Runner",
         )
+    ),
+    "20260719-020104": frozenset(
+        ("Disobedient Bot", "Violent Vagabond")
     ),
 }
 CAPTURE_IDENTITY_NAME_OVERRIDES = {
@@ -661,28 +665,41 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.update(
         ),
         "Violent Vagabond": reviewed_strict_loot_definition(
             203733,
-            ("20260708-143600", "20260709-210452", "20260709-225408"),
+            (
+                "20260708-143600",
+                "20260709-210452",
+                "20260709-225408",
+                "20260719-020104",
+            ),
             {
                 "20260708-143600": 6,
                 "20260709-210452": 4,
                 "20260709-225408": 1,
+                "20260719-020104": 3,
             },
-            11,
-            10,
+            14,
+            13,
             1,
-            "33efb5b56c8c9120aff3a3f718a3e944d5c42410415f91c1a6e76f0a6a90ae12",
+            "1a04bd68bbd289fd4bb434adddfdd4ce966d500a82172dd3021c90627ebf6393",
             {
                 (85531, 22289, 8): 1,
                 (122140, 122141, 7): 1,
                 (123704, 123705, 12): 1,
                 (128715, 128716, 6): 1,
-                (130586, 130586, 1): 4,
+                (124016, 124017, 6): 1,
+                (124545, 124546, 6): 1,
+                (130586, 130586, 1): 6,
                 (130592, 130592, 1): 2,
+                (130607, 130607, 1): 1,
                 (130621, 130621, 1): 1,
                 (152326, 152327, 6): 1,
                 (234876, 234876, 1): 1,
-                (258543, 258543, 1): 7,
+                (234877, 234877, 1): 1,
+                (258543, 258543, 1): 8,
+                (273381, 204397, 5): 1,
+                (273381, 204397, 6): 1,
                 (273381, 204397, 8): 1,
+                (273381, 204397, 9): 1,
             },
         ),
         "Bloodcreeper": reviewed_strict_loot_definition(
@@ -960,6 +977,9 @@ CAPTURE_CORPSE_EVIDENCE_FILTERS = {
         ("Fragmented Soul", "Incomplete Rebuild", "Molested Molecules")
     ),
     "20260716-222201": frozenset(("Redundant Scan", "Slum Runner")),
+    "20260719-020104": frozenset(
+        ("Disobedient Bot", "Violent Vagabond")
+    ),
 }
 CAPTURE_CORPSE_IDENTITY_FILTERS = {
     "20260709-205921": frozenset(
@@ -1147,6 +1167,14 @@ CAPTURE_CORPSE_IDENTITY_FILTERS = {
     ),
     "20260716-222201": frozenset(
         ("(SimpleChar:797024DA)", "(SimpleChar:7970250F)")
+    ),
+    "20260719-020104": frozenset(
+        (
+            "(SimpleChar:797AD6E4)",
+            "(SimpleChar:797B885C)",
+            "(SimpleChar:797B885D)",
+            "(SimpleChar:797B885E)",
+        )
     ),
 }
 CAPTURE_LIFECYCLE_DEATH_LEVEL_FILTERS = {
@@ -3803,7 +3831,7 @@ def validate_content(
             {(5, 18): 1, (6, 21): 3, (7, 25): 8, (8, 28): 1, (9, 32): 4, (10, 35): 8}
         ),
         "Disobedient Bot": Counter(
-            {(5, 6): 2, (6, 8): 2, (8, 10): 4, (9, 11): 3, (10, 12): 2}
+            {(5, 6): 2, (6, 8): 3, (8, 10): 4, (9, 11): 3, (10, 12): 2}
         ),
         "Empty Shell": Counter({(19, 118): 1, (21, 131): 1}),
         "Filth Flea": Counter(
@@ -3916,7 +3944,7 @@ def validate_content(
                 (21, 26): 1,
             }
         ),
-        "Violent Vagabond": Counter({(6, 21): 9, (7, 25): 5, (10, 35): 3}),
+        "Violent Vagabond": Counter({(6, 21): 11, (7, 25): 6, (10, 35): 3}),
         "Workman Striker": Counter(
             {(13, 79): 2, (14, 85): 7, (15, 92): 3, (16, 98): 4, (17, 105): 3, (25, 156): 1}
         ),

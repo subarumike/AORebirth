@@ -65,7 +65,7 @@ namespace ZoneEngine.Core.Playfields
             CapturedSurveySpawn(DisobedientBot(0x7953AF6F, 9, 205, 114.499268f, 107.61483f, 231.651047f, 95, 31)),
             CapturedSurveySpawn(DisobedientBot(0x7953AF98, 7, 160, 173.610947f, 107.61483f, 232.288391f, 94, 25)),
             CapturedSurveySpawn(DisobedientBot(0x7953AFA3, 6, 138, 179.514313f, 107.61483f, 232.11319f, 93, 22)),
-            CapturedSurveySpawn(DisobedientBot(0x79557C66, 7, 160, 151.409119f, 107.61483f, 271.044f, 94, 25)),
+            CapturedSurveySpawn(DisobedientBot(0x79557C66, 7, 160, 151.409119f, 107.61483f, 271.044f, 94, 25, useSpawnAsPatrolStart: true)),
             CapturedSurveySpawn(DisobedientBot(0x7957E40A, 10, 227, 211.504623f, 107.6164f, 166.472961f, 95, 34)),
             CapturedSurveySpawn(FilthFlea(0x795313FC, 5, 115, 147.950089f, 107.61483f, 229.4221f, 21)),
             CapturedSurveySpawn(FilthFlea(0x7953174B, 6, 138, 120.682472f, 107.61483f, 241.098831f, 24)),
@@ -150,7 +150,7 @@ namespace ZoneEngine.Core.Playfields
             CapturedSurveySpawn(ViolentVagabond(0x7957E123, 6, 110, 149.739487f, 107.61483f, 279.861847f, 93, 18)),
             CapturedSurveySpawn(ViolentVagabond(0x7957E40E, 6, 110, 182.846771f, 107.6164f, 165.3118f, 93, 18)),
             CapturedSurveySpawn(ViolentVagabond(0x7957E5BF, 7, 128, 165.985245f, 107.613258f, 305.1552f, 94, 20)),
-            CapturedSurveySpawn(ViolentVagabond(0x7957E5C4, 7, 128, 153.280945f, 107.61483f, 277.751068f, 94, 20)),
+            CapturedSurveySpawn(ViolentVagabond(0x7957E5C4, 7, 128, 153.280945f, 107.61483f, 277.751068f, 94, 20, useSpawnAsPatrolStart: true)),
             CapturedSurveySpawn(ViolentVagabond(0x7957E5C5, 6, 110, 151.613754f, 107.61483f, 280.145721f, 93, 18))
         };
 
@@ -159,6 +159,55 @@ namespace ZoneEngine.Core.Playfields
         private static readonly Dictionary<int, CapturedSubwayPatrolReplaySegment[]> PatrolReplaySegments =
             new Dictionary<int, CapturedSubwayPatrolReplaySegment[]>
             {
+                {
+                    // Source: finalized official-live capture 20260719-020104,
+                    // movement-packets.csv rows 33-224 plus row 340 as the
+                    // next-cycle boundary. Five complete loops were observed.
+                    0x79557C66,
+                    new[]
+                    {
+                        new CapturedSubwayPatrolReplaySegment(3.250491, 143.6185f, 107.61483f, 268.443359f, 146.634003f, 107.615051f, 273.261841f, 24),
+                        new CapturedSubwayPatrolReplaySegment(5.769040, 145.755829f, 107.61483f, 272.136932f, 155.204407f, 107.614883f, 269.847229f, 24),
+                        new CapturedSubwayPatrolReplaySegment(2.360521, 153.898438f, 107.61483f, 270.226776f, 153.062408f, 107.614868f, 265.973206f, 24),
+                        new CapturedSubwayPatrolReplaySegment(6.951918, 153.496094f, 107.61483f, 267.230835f, 142.236206f, 107.615051f, 268.698242f, 24)
+                    }
+                },
+                {
+                    // Source: finalized official-live capture 20260719-020104,
+                    // movement-packets.csv rows 223-973 plus row 1001 as the
+                    // next-cycle boundary. The exact ping-pong cycle completed
+                    // before combat began.
+                    0x7957E5C4,
+                    new[]
+                    {
+                        new CapturedSubwayPatrolReplaySegment(2.149372, 147.409149f, 107.61483f, 276.985291f, 148.064957f, 107.61483f, 281.590118f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.310516, 147.687668f, 107.61483f, 280.186462f, 147.151947f, 107.61483f, 278.350006f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.911020, 147.546127f, 107.61483f, 279.740997f, 147.787338f, 107.61483f, 275.665527f, 24),
+                        new CapturedSubwayPatrolReplaySegment(5.628537, 147.440796f, 107.61483f, 276.889008f, 153.603455f, 107.61483f, 269.554871f, 24),
+                        new CapturedSubwayPatrolReplaySegment(0.849001, 152.819916f, 107.61483f, 270.454956f, 151.23465f, 107.61483f, 269.086761f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.330234, 152.577377f, 107.61483f, 269.66922f, 150.052429f, 107.61483f, 271.464203f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.660517, 151.075043f, 107.61483f, 270.494385f, 150.037842f, 107.61483f, 274.029968f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.560077, 150.315353f, 107.61483f, 272.834717f, 152.757324f, 107.61483f, 274.542358f, 24),
+                        new CapturedSubwayPatrolReplaySegment(0.599019, 151.550339f, 107.61483f, 273.977753f, 153.417984f, 107.61483f, 275.648132f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.480538, 152.52272f, 107.61483f, 274.771942f, 153.231735f, 107.61483f, 278.308685f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.351025, 152.990005f, 107.61483f, 276.867279f, 153.649582f, 107.61483f, 280.288971f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.661019, 153.355667f, 107.61483f, 278.831604f, 152.866592f, 107.61483f, 282.571075f, 24),
+                        new CapturedSubwayPatrolReplaySegment(2.120690, 153.07341f, 107.61483f, 281.321289f, 149.078705f, 107.61483f, 282.622803f, 24),
+                        new CapturedSubwayPatrolReplaySegment(2.721522, 150.497238f, 107.61483f, 282.325684f, 145.200012f, 108.604828f, 281.800018f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.890045, 146.475876f, 107.61483f, 282.01001f, 149.078705f, 107.61483f, 282.622803f, 24),
+                        new CapturedSubwayPatrolReplaySegment(2.401630, 147.942276f, 107.61483f, 282.388f, 152.866592f, 107.61483f, 282.571075f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.551510, 151.545807f, 107.61483f, 282.538422f, 153.649582f, 107.61483f, 280.288971f, 24),
+                        new CapturedSubwayPatrolReplaySegment(0.949508, 152.931808f, 107.61483f, 281.256165f, 153.231735f, 107.61483f, 278.308685f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.939551, 153.19339f, 107.61483f, 279.599274f, 153.417984f, 107.61483f, 275.648132f, 24),
+                        new CapturedSubwayPatrolReplaySegment(0.669893, 153.34201f, 107.61483f, 276.943024f, 152.757324f, 107.61483f, 274.542358f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.710677, 153.116806f, 107.61483f, 275.753326f, 150.037842f, 107.61483f, 274.029968f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.160020, 151.232956f, 107.61483f, 274.570404f, 150.052429f, 107.61483f, 271.464203f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.659540, 150.437088f, 107.61483f, 272.863281f, 151.23465f, 107.61483f, 269.086761f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.490525, 150.883392f, 107.61483f, 270.43689f, 153.603455f, 107.61483f, 269.554871f, 24),
+                        new CapturedSubwayPatrolReplaySegment(4.569248, 152.218414f, 107.61483f, 269.769348f, 147.787338f, 107.61483f, 275.665527f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.990639, 148.578888f, 107.61483f, 274.748779f, 147.151947f, 107.61483f, 278.350006f, 24)
+                    }
+                },
                 {
                     // Source: completed Thief capture 20260710-205400,
                     // movement-packets.csv rows 602-964 plus the next-cycle boundary.
@@ -292,11 +341,11 @@ namespace ZoneEngine.Core.Playfields
             // Filth Flea: 18 complete official-live corpse opens across 20260708-004038,
             // 20260709-210452, 20260709-220439, 20260712-155528, and 20260712-161506.
             // Five initial inventories were empty; activated items retain exact corpse/death linkage.
-            // Disobedient Bot: the two active memberships below each have a complete
-            // enemy -> death -> corpse -> inventory -> transfer chain. The observed
-            // 1 + 1 item / 5 empty weighting is provisional project policy, not an
-            // asserted official probability. The incompletely linked 234876 candidate
-            // remains excluded.
+            // Disobedient Bot: the three active memberships below each have a complete
+            // enemy -> death -> corpse -> initial inventory chain. Two also include a
+            // transfer. The observed 1 + 1 + 1 item / 5 empty weighting is provisional
+            // project policy, not an asserted official probability. The incompletely
+            // linked 234876 candidate remains excluded.
             return new[]
             {
                 new CapturedSubwayLootDefinition(
@@ -567,7 +616,7 @@ namespace ZoneEngine.Core.Playfields
                     1,
                     0,
                     1,
-                    7,
+                    8,
                     OrdinaryEnemyLootLinkageEvidence.ProvenTransferredEnemyCorpseItem,
                     OrdinaryEnemyLootProbabilityEvidence.ProvisionalProjectPolicy,
                     "20260709-210452:SimpleChar:794E807A>Corpse:F6E030>InventoryUpdate#3770>ContainerAddItem#3819"),
@@ -583,10 +632,26 @@ namespace ZoneEngine.Core.Playfields
                     1,
                     0,
                     1,
-                    7,
+                    8,
                     OrdinaryEnemyLootLinkageEvidence.ProvenTransferredEnemyCorpseItem,
                     OrdinaryEnemyLootProbabilityEvidence.ProvisionalProjectPolicy,
-                    "20260713-033511:SimpleChar:79607E2C>Corpse:F6C003>InventoryUpdate#1392>ContainerAddItem#1426")
+                    "20260713-033511:SimpleChar:79607E2C>Corpse:F6C003>InventoryUpdate#1392>ContainerAddItem#1426"),
+                new CapturedSubwayLootDefinition(
+                    "Disobedient Bot",
+                    17649,
+                    138,
+                    113398,
+                    113399,
+                    7,
+                    0,
+                    1,
+                    1,
+                    0,
+                    1,
+                    8,
+                    OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem,
+                    OrdinaryEnemyLootProbabilityEvidence.ProvisionalProjectPolicy,
+                    "20260719-020104:SimpleChar:797AD6E4>Corpse:F74004>InventoryUpdate#2383")
             };
         }
 
@@ -670,7 +735,8 @@ namespace ZoneEngine.Core.Playfields
             float y,
             float z,
             int monsterScale = 90,
-            int runSpeed = 33)
+            int runSpeed = 33,
+            bool useSpawnAsPatrolStart = false)
         {
             // Official capture 20260708-143600 records 449.953427 seconds from
             // dead-NPC despawn to same-position replacement (0.190-unit delta).
@@ -691,6 +757,7 @@ namespace ZoneEngine.Core.Playfields
                 x,
                 y,
                 z,
+                useSpawnAsPatrolStart: useSpawnAsPatrolStart,
                 respawnDelaySeconds: 450.0);
         }
 
@@ -772,7 +839,8 @@ namespace ZoneEngine.Core.Playfields
             float y,
             float z,
             int monsterScale = 93,
-            int runSpeed = 18)
+            int runSpeed = 18,
+            bool useSpawnAsPatrolStart = false)
         {
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
@@ -790,7 +858,8 @@ namespace ZoneEngine.Core.Playfields
                 6,
                 x,
                 y,
-                z);
+                z,
+                useSpawnAsPatrolStart: useSpawnAsPatrolStart);
         }
     }
 

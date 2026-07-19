@@ -198,12 +198,13 @@ canonicalize padded and unpadded numeric identities, remain generation-scoped,
 and exclude names, proximity, database identity alone, or duplicate observations
 as substitutes for an exact identity chain.
 
-Disobedient Bot has fourteen exact corpse generations in the audited corpus and
-seven strict complete loot outcomes. Those strict outcomes contain one QL1 Small
+Disobedient Bot has fifteen exact corpse generations in the audited corpus and
+eight strict complete loot outcomes. Those strict outcomes contain one QL1 Small
 Power Supply (`234877/234877`), one QL10 Eye Implant: Pharma Tech, Bright
-(`104683/104684`), and five item-empty inventories. The runtime uses a
-provisional weighted-one policy with relative weights `1 + 1 + 5 empty`. The two
-memberships are capture-proven; the weighting is private-server policy, not an
+(`104683/104684`), one QL7 `113398/113399` item, and five item-empty inventories.
+The runtime uses a provisional weighted-one policy with relative weights
+`1 + 1 + 1 + 5 empty`. The three memberships are capture-proven; the weighting
+is private-server policy, not an
 official probability claim, and the broader pool remains incomplete. Burnt Out
 Memory Chip (`234876/234876`) cannot roll because its corpse linkage is
 incomplete.
@@ -240,8 +241,9 @@ minute loot-bearing corpse behavior apply. Its four-minute respawn remains the
 centralized private PF127 ordinary policy, not an official-live timing claim.
 
 Disobedient Bot is the fifth accepted ordinary profile. Its 12 exact spawn rows
-use captured NPC family `138`. Fourteen normal SIW1 hits against local players
-prove the aggregate `8..15` envelope; three other-player hits and two
+use captured NPC family `138`. Fifteen normal SIW1 hits against local players
+prove the aggregate `6..15` envelope, with ten captured misses kept explicit;
+three other-player hits and two
 player-owned Killer-pet hits remain separate, no critical is observed, and
 focused attack attempts retain the exact
 `5.973723`-second recharge instead of a miss-biased landed-hit interval. The
@@ -294,7 +296,7 @@ Reviewed first-open evidence now supplies strict item denominators for 18
 ordinary profiles through one reusable raw-generation validator. In addition
 to Shadow, ordinary Infector, Architect Striker, and Melded Patterns, the
 recovered set is Mugger `17/3 empty`, Discarded Pet `16/3`, Stim Fiend `13/0`,
-Looter `11/5`, Violent Vagabond `11/1`, Bloodcreeper `4/3`, Infected Attendant
+Looter `11/5`, Violent Vagabond `14/1`, Bloodcreeper `4/3`, Infected Attendant
 `4/1`, Fragmented Soul `4/0`, Deranged Shopper `2/0`, Incomplete Rebuild `2/0`,
 Redundant Scan `2/1`, Uncontrollable Anger `2/0`, Lost Thought `1/0`, and Neural
 Burnout `4/2`. Each reviewed source is capture-allowlisted and its complete set
@@ -451,11 +453,20 @@ batching, throttling, delayed SCFU, pagination, acknowledgements, or per-enemy
 visibility suppression. Enabling many quarantined rows can still exercise that
 known boundary.
 
+Finalized capture `20260719-020104` supplies an exact four-segment replay patrol
+for Disobedient Bot source `0x79557C66` and an exact 26-segment replay patrol for
+Violent Vagabond source `0x7957E5C4`. These are source-specific captured routes,
+not evidence that other rows should receive background patrols. The same capture
+brings Vagabond strict loot to 14 atomic outcomes (`13` positive, `1` empty), but
+its combat sample still contains 40 misses and no landed local-player damage.
+It proves neither respawn timing nor corpse lifetime.
+
 Current unresolved data remains fail-closed, including combat sources without a
 landed captured hit, unsupported/nonordinary respawn classifications without an
 explicit owner policy, automatic-aggro radii not yet captured, level ranges not
 established by evidence or decision, and random roam behavior not proven by
-movement evidence. The remaining 11 Violent Vagabond rows stay quarantined.
+movement evidence. The remaining 11 Violent Vagabond rows stay quarantined;
+one exact patrol does not resolve their missing landed-damage contract.
 The whole-enemy gate still accepts 21 of 26 profiles. Infected Attendant, Lost
 Thought, Empty Shell, Premature Pattern, and Violent Vagabond account for 32
 active rows plus the 11 quarantined Vagabonds and require the next

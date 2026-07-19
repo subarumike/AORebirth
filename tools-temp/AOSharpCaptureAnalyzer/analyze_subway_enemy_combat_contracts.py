@@ -44,6 +44,7 @@ CAPTURES = (
     "20260717-214612",
     "20260717-214751",
     "20260717-215250",
+    "20260719-020104",
 )
 CAPTURE_ENEMY_FILTERS = {
     "20260708-004038": frozenset({"Filth Flea"}),
@@ -67,6 +68,9 @@ CAPTURE_ENEMY_FILTERS = {
     "20260717-214612": frozenset({"Eumenides"}),
     "20260717-214751": frozenset({"Eumenides"}),
     "20260717-215250": frozenset({"Eumenides"}),
+    "20260719-020104": frozenset(
+        {"Disobedient Bot", "Violent Vagabond"}
+    ),
 }
 ENEMY_ATTACK_CAPTURE_FILTERS = {
     "Filth Flea": frozenset({"20260708-004038", "20260709-193914"}),
@@ -1119,33 +1123,49 @@ def validate_disobedient_bot_combat(report_entry: dict[str, object]) -> None:
         "20260712-153918",
         "20260713-014714",
         "20260713-033511",
+        "20260719-020104",
     }
     if not required_captures.issubset(set(report_entry["captures"])):
         raise ValueError("Disobedient Bot reviewed combat captures are missing")
     if (
-        report_entry["normalAttackInfoRows"] != 14
-        or report_entry["normalMinDamage"] != 8
+        report_entry["retaliationRows"] != 13
+        or report_entry["specialAttackWeaponRows"] != 1
+        or report_entry["normalAttackInfoRows"] != 15
+        or report_entry["normalMinDamage"] != 6
         or report_entry["normalMaxDamage"] != 15
         or report_entry["criticalAttackInfoRows"] != 0
-        or report_entry["missedAttackInfoRows"] != 7
+        or report_entry["missedAttackInfoRows"] != 10
         or report_entry["weaponSlot"] != 0
         or report_entry["attackInfoUnknown"] != 0
         or report_entry["attackInfoWeaponInstance"] != 0x53495731
         or report_entry["medianRechargeSeconds"] != 5.479593
     ):
         raise ValueError("Disobedient Bot local-player SIW1 evidence drifted")
+    special_weapon_shapes = report_entry["specialAttackWeaponShapes"]
+    if (
+        len(special_weapon_shapes) != 1
+        or special_weapon_shapes[0]["unknown1"] != 35
+        or special_weapon_shapes[0]["unknown2"] != 35
+        or special_weapon_shapes[0]["unknown3"] != 35
+        or special_weapon_shapes[0]["unknown4"] != 35
+        or special_weapon_shapes[0]["unknown5"] != 0
+        or special_weapon_shapes[0]["rows"] != 1
+        or special_weapon_shapes[0]["captures"] != ["20260719-020104"]
+        or special_weapon_shapes[0]["owners"] != ["(SimpleChar:797AD6E4)"]
+    ):
+        raise ValueError("Disobedient Bot special attack-weapon evidence drifted")
     miss_shapes = report_entry["missedAttackShapes"]
     if (
         len(miss_shapes) != 1
         or miss_shapes[0]["ammoCount"] != -1
         or miss_shapes[0]["weaponSlot"] != 0
         or miss_shapes[0]["unknown"] != 0
-        or miss_shapes[0]["rows"] != 7
+        or miss_shapes[0]["rows"] != 10
     ):
         raise ValueError("Disobedient Bot local-player miss evidence drifted")
     target_roles = report_entry["targetRoleEvidence"]
     role_expectations = {
-        "localPlayer": (14, 8, 15),
+        "localPlayer": (15, 6, 15),
         "playerOwnedPet": (2, 8, 19),
         "otherPlayer": (3, 8, 8),
     }
@@ -1496,18 +1516,21 @@ def validate_violent_vagabond_combat(report_entry: dict[str, object]) -> None:
     shapes = report_entry["missedAttackShapes"]
     behavior = report_entry["reviewedBehaviorEvidence"]
     if (
-        report_entry["attackInfoRows"] != 0
-        or report_entry["missedAttackInfoRows"] != 26
+        report_entry["retaliationRows"] != 19
+        or report_entry["attackInfoRows"] != 0
+        or report_entry["missedAttackInfoRows"] != 40
+        or report_entry["specialAttackWeaponRows"] != 3
         or len(shapes) != 1
         or shapes[0]["ammoCount"] != 0
         or shapes[0]["weaponSlot"] != 6
         or shapes[0]["unknown"] != 0
-        or shapes[0]["rows"] != 26
+        or shapes[0]["rows"] != 40
         or cadence is None
-        or cadence["attemptRows"] != 26
+        or cadence["attemptRows"] != 40
+        or cadence["intervalRows"] != 25
         or cadence["minIntervalSeconds"] != 3.7795296
-        or cadence["medianIntervalSeconds"] != 4.0799494
-        or cadence["maxIntervalSeconds"] != 4.5802404
+        or cadence["medianIntervalSeconds"] != 4.5802404
+        or cadence["maxIntervalSeconds"] != 5.0595685
         or report_entry["equippedWeaponTemplateId"] != 130590
         or report_entry["equippedWeaponCombatUsable"]
         or behavior["acquisitionDistanceLowerBound"] != 16.606338
@@ -1528,6 +1551,20 @@ def validate_violent_vagabond_combat(report_entry: dict[str, object]) -> None:
                 }
             )
         )
+    special_weapon_shapes = report_entry["specialAttackWeaponShapes"]
+    if (
+        len(special_weapon_shapes) != 1
+        or special_weapon_shapes[0]["unknown1"] != 32
+        or special_weapon_shapes[0]["unknown2"] != 35
+        or special_weapon_shapes[0]["unknown3"] != 29
+        or special_weapon_shapes[0]["unknown4"] != 31
+        or special_weapon_shapes[0]["unknown5"] != 0
+        or special_weapon_shapes[0]["rows"] != 3
+        or special_weapon_shapes[0]["captures"] != ["20260719-020104"]
+        or special_weapon_shapes[0]["owners"]
+        != ["(SimpleChar:797B885C)", "(SimpleChar:797B885D)"]
+    ):
+        raise ValueError("Violent Vagabond special attack-weapon evidence drifted")
     validate_target_role(
         report_entry, "Violent Vagabond", "otherPlayer", (2, 0, 0, 0)
     )

@@ -1084,7 +1084,7 @@ namespace AORebirth.Core.Playfields
                     OrdinaryEnemyLootPoolMode.WeightedOne,
                     5,
                     false,
-                    7,
+                    8,
                     5,
                     itemEvidenceReference,
                     OrdinaryEnemyEvidenceState.Observed,
@@ -1093,7 +1093,7 @@ namespace AORebirth.Core.Playfields
                     new[]
                         {
                             new OrdinaryEnemyLevelCreditRule(5, 6, 6, 2, "20260709-210452"),
-                            new OrdinaryEnemyLevelCreditRule(6, 8, 8, 2, "20260709-210452,20260712-153918"),
+                            new OrdinaryEnemyLevelCreditRule(6, 8, 8, 3, "20260709-210452,20260712-153918,20260719-020104"),
                             new OrdinaryEnemyLevelCreditRule(8, 10, 10, 4, "20260708-143600,20260709-205921,20260713-033511"),
                             new OrdinaryEnemyLevelCreditRule(9, 11, 11, 3, "20260709-220439,20260712-160257,20260713-014714"),
                             new OrdinaryEnemyLevelCreditRule(10, 12, 12, 2, "20260709-220439")

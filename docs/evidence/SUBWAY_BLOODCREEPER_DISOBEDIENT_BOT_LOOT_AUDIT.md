@@ -8,14 +8,15 @@ death, corpse identity, corpse inventory, and transfer traffic are joined in
 that order. Display names, proximity, database membership, and inventory rows
 from another entity are not accepted as drop proof.
 
-- **Disobedient Bot:** two item identities have complete capture-backed
+- **Disobedient Bot:** three item identities have complete capture-backed
   membership proof and may be activated. The observed strict sample is one
-  Small Power Supply, one Eye Implant, and five item-empty inventories.
+  Small Power Supply, one Eye Implant, one QL7 `113398/113399` item, and five
+  item-empty inventories.
 - **Bloodcreeper:** no item identity is proven. Its item pool remains explicitly
   unresolved and inactive. Two complete empty snapshots do not prove a
   universally empty item pool.
-- No population row was activated by this audit. The current population boundary
-  remains 321 represented, 283 active, and 38 quarantined.
+- The capture update does not change population activation. The current boundary
+  remains 321 represented, 310 active, and 11 quarantined.
 - This offline audit is not Bloodcreeper private-client acceptance.
 
 The item database was used only to resolve display names after an item identity
@@ -60,6 +61,7 @@ derived projection was incomplete or marked unlinked.
 - `20260713-013906`: one corpse.
 - `20260713-014714`: one corpse.
 - `20260713-033511`: one corpse.
+- `20260719-020104`: one complete item-positive corpse.
 
 ## Evidence counts and strict denominators
 
@@ -90,20 +92,20 @@ snapshot. No independent Bloodcreeper corpse generation was a duplicate.
 
 | Measure | Count |
 | --- | ---: |
-| Direct raw Death events | 13 |
+| Direct raw Death events | 14 |
 | Additional corpse-implied death | 1 |
-| Distinct Disobedient Bot corpses | 14 |
-| Complete corpse inventories | 8 |
-| Corpses with observed Use/open traffic | 9 |
+| Distinct Disobedient Bot corpses | 15 |
+| Complete corpse inventories | 9 |
+| Corpses with observed Use/open traffic | 10 |
 | Item-empty complete inventories | 5 |
 | Successful observed item transfers | 3 |
 | Incomplete or ambiguous item outcomes | 7 |
-| Candidate item identities | 3 |
-| Fully proven item identities | 2 |
+| Candidate item identities | 4 |
+| Fully proven item identities | 3 |
 | Duplicate raw corpse observations removed | 1 |
-| Strict complete identity-linked denominator | 7 |
+| Strict complete identity-linked denominator | 8 |
 
-The strict denominator contains the two fully linked item outcomes and five
+The strict denominator contains three fully linked item outcomes and five
 fully linked item-empty outcomes. It excludes six corpses with no inventory
 snapshot and the `20260713-013906` inventory whose capture lacks the preceding
 enemy identity and Death chain. That ambiguous transferred item remains useful
@@ -112,19 +114,21 @@ research evidence but cannot affect runtime loot.
 ## Disobedient Bot whole-enemy boundary
 
 Loot acceptance is now joined to the other required systems rather than treated
-as completion by itself. The corpus contains 17 normal local-player SIW1 hits at
-`8..15`; two player-owned Killer-pet hits stay excluded, and no critical is
-observed. Focused attempt traffic preserves `5.973723` seconds. Captured
+as completion by itself. The corpus contains 15 normal local-player SIW1 hits at
+`6..15` and ten misses; two player-owned Killer-pet hits stay excluded, and no
+critical is observed. Focused attempt traffic preserves `5.973723` seconds. Captured
 SpecialAttackWeapon contexts are level-specific: `L5=30/30/30/30/22`, `L6=35`,
 `L8=45`, `L9=49`, and `L10=54`; active L7 uses the explicit bounded midpoint
 policy `40`, not a capture claim.
 
 All 12 exact rows use captured NPC family `138` and a `450`-second post-NPC-
 despawn schedule. Capture `20260708-143600` records `459.913` seconds from death
-to same-position replacement at a `0.190`-unit delta. The 13 valid corpse/credit
+to same-position replacement at a `0.190`-unit delta. The 14 valid corpse/credit
 chains, strict loot denominator, CATMesh `15215`, shared chase, and ordinary
-corpse lifetimes now pass the same whole-enemy gate. The two existing Bot rows
-in the 38-row operational quarantine were not activated. Critical behavior,
+corpse lifetimes now pass the same whole-enemy gate. All 12 Bot rows are active.
+Capture `20260719-020104` also supplies an exact four-segment replay patrol for
+source `0x79557C66`, but proves neither respawn timing nor corpse lifetime.
+Critical behavior,
 proactive acquisition radius, and leash/reset distance remain unresolved.
 
 ## Bloodcreeper identity linkage
@@ -202,6 +206,19 @@ Raw chain in `20260713-033511`:
    `ClientMoveItemToInventory`.
 7. `packets.hex.log:1501`, inbound packet `#1426`: `ContainerAddItem`.
 
+### QL7 item `113398/113399`
+
+- Identity: `113398/113399`
+- Quality: QL7
+- Count: 1
+- Source slot: 0
+- Classification: `Proven enemy corpse item`
+
+Capture `20260719-020104` joins `SimpleChar:797AD6E4` to `Corpse:F74004` and
+its first complete InventoryUpdate (`#2383`) containing this item. The same
+atomic corpse outcome records 8 credits. It is the eighth strict Bot outcome;
+the capture contains no Bot respawn or corpse-lifetime proof.
+
 ## Rejected and ambiguous candidates
 
 ### A Burnt Out Memory Chip
@@ -259,10 +276,11 @@ death, corpse, inventory, and transfer in one complete session.
 
 ## Disobedient Bot strict observation and provisional runtime policy
 
-The strict seven-corpse denominator is:
+The strict eight-corpse denominator is:
 
 - 1 Small Power Supply outcome;
 - 1 Eye Implant outcome;
+- 1 QL7 `113398/113399` outcome;
 - 5 complete item-empty outcomes.
 
 The five exact empty inventories are:
@@ -273,16 +291,17 @@ The five exact empty inventories are:
 - `20260709-210452`, `Corpse:F6E02B`, raw inventory line `4817`.
 - `20260709-220439`, `Corpse:F6E009`, raw inventory line `6165`.
 
-The evidence proves membership for the two items and proves that item-empty
+The evidence proves membership for the three items and proves that item-empty
 outcomes occur. It does **not** prove official probabilities. Where the runtime
 requires weights, this slice uses an isolated provisional private-project
 policy with relative weights:
 
 - Small Power Supply: `1`
 - Eye Implant: `1`
+- QL7 `113398/113399`: `1`
 - Empty outcome: `5`
 
-This `1 + 1 + 5` policy mirrors the strict observed outcomes only. It is not a
+This `1 + 1 + 1 + 5` policy mirrors the strict observed outcomes only. It is not a
 claim of official AO drop rates, does not make either item guaranteed, and must
 remain separately labeled from the capture-proven item identities. The
 `234876/234876` candidate is excluded from both membership and weights.
@@ -308,8 +327,8 @@ bounded requirements if the unresolved pools are continued later.
 
 ### Disobedient Bot
 
-- Evidence minimum: **3 additional independent kills**, bringing the strict
-  complete denominator from 7 to 10.
+- Evidence minimum: **2 additional independent kills**, bringing the strict
+  complete denominator from 8 to 10.
 - Open every corpse and transfer every item; retain item-empty snapshots.
 - Record one dedicated session label such as
   `disobedient-bot-loot-remaining-3` in the handoff/notes.

@@ -1021,7 +1021,7 @@ namespace AORebirth.Core.Playfields
                         NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown5);
                 case 203733:
                     return CapturedEnemyCombatContract.Unresolved(
-                        "Violent Vagabond holds QL1 template 130590 (Red Wine); 26 captured local-player outcomes are misses and no landed-damage or usable weapon semantics are proven",
+                        "Violent Vagabond holds QL1 template 130590 (Red Wine); 40 captured local-player outcomes are misses, three SpecialAttackWeapon rows preserve 32/35/29/31/0 context, and no landed-damage or usable weapon semantics are proven",
                         true);
                 default:
                     return CapturedEnemyCombatContract.Unresolved(
@@ -1063,7 +1063,7 @@ namespace AORebirth.Core.Playfields
             }
 
             return CapturedEnemyCombatContract.CapturedSpecialSequence(
-                "20260708-143600, 20260709-205921/210452/220439, 20260712-153918, and 20260713-014714/033511: 14 Disobedient Bot SIW1 normal local-player hits span 8-15 damage; three other-player hits and two player-owned Killer-pet hits remain separate; focused raw packets prove a 3.270444-second first hit and 5.973723-second repeat attempt cadence; SpecialAttackWeapon contexts are capture-backed for levels 5, 6, 8, 9, and 10, including the level-5 terminal value 22, with level 7 explicitly using the bounded 35/45 midpoint policy",
+                "20260708-143600, 20260709-205921/210452/220439, 20260712-153918, 20260713-014714/033511, and 20260719-020104: 15 Disobedient Bot SIW1 normal local-player hits span 6-15 damage; three other-player hits and two player-owned Killer-pet hits remain separate; focused raw packets prove a 3.270444-second first hit and 5.973723-second repeat attempt cadence; SpecialAttackWeapon contexts are capture-backed for levels 5, 6, 8, 9, and 10, including the level-5 terminal value 22, with level 7 explicitly using the bounded 35/45 midpoint policy",
                 new CapturedEnemySpecialAttackSequenceDefinition(
                     NpcCombatAttackRules.CapturedSubwayDisobedientBotInitialAttackSeconds,
                     null,

@@ -1233,7 +1233,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 catalogText.Contains("if (monsterData == 17649)")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(5, 6, 6, 2")
-                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(6, 8, 8, 2")
+                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(6, 8, 8, 3")
+                && catalogText.Contains("20260719-020104")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(8, 10, 10, 4")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(9, 11, 11, 3")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(10, 12, 12, 2")
@@ -1245,9 +1246,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && capturedLootDefinitions.Contains("234877")
                 && capturedLootDefinitions.Contains("104683")
                 && capturedLootDefinitions.Contains("104684")
+                && capturedLootDefinitions.Contains("113398")
+                && capturedLootDefinitions.Contains("113399")
                 && capturedLootDefinitions.Contains("ProvenTransferredEnemyCorpseItem")
+                && capturedLootDefinitions.Contains("ProvenEnemyCorpseItem")
                 && capturedLootDefinitions.Contains("ProvisionalProjectPolicy"),
-                "Disobedient Bot must expose only the two fully linked transferred items and must keep the ambiguous 234876 candidate inactive.");
+                "Disobedient Bot must expose only the three fully linked observed items and must keep the ambiguous 234876 candidate inactive.");
             string globalLootText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
             string ordinaryLootAdapterText = File.ReadAllText(
@@ -1790,6 +1794,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string[] patrolSourceIdentities =
                 {
+                    "0x79557C66",
+                    "0x7957E5C4",
                     "0x7953AF18",
                     "0x7953AF57",
                     "0x79531752",
@@ -1805,15 +1811,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.AreEqual(
-                53,
+                83,
                 CountOccurrences(providerText, "new CapturedSubwayPatrolReplaySegment("),
-                "Existing periodic patrol cycles and the accepted Thief replay must remain loaded.");
+                "Existing periodic patrol cycles plus the accepted Bot, Vagabond, and Thief replays must remain loaded.");
             Assert.IsTrue(
-                providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.665506, 90.9275284f")
+                providerText.Contains("new CapturedSubwayPatrolReplaySegment(3.250491, 143.6185f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(2.149372, 147.409149f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.665506, 90.9275284f")
+                && providerText.Contains("0x79557C66")
+                && providerText.Contains("0x7957E5C4")
                 && providerText.Contains("0x7953AF18")
                 && providerText.Contains("0x7953AF57")
                 && providerText.Contains("0x79531752")
                 && providerText.Contains("0x79531754")
+                && providerText.Contains("useSpawnAsPatrolStart: true")
                 && providerText.Contains("GetPatrolReplaySegments(int sourceInstance)"),
                 "Captured patrol replay must preserve complete cycle timing, movement modes, and captured route speeds.");
             Assert.IsTrue(
@@ -3795,13 +3806,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 combatContractText.Contains("case 17649:")
                 && providerText.Contains("CapturedSubwayCombatCatalog.For(name, monsterData, level)")
-                && combatContractText.Contains("14 Disobedient Bot SIW1 normal local-player hits span 8-15 damage")
+                && combatContractText.Contains("15 Disobedient Bot SIW1 normal local-player hits span 6-15 damage")
                 && combatContractText.Contains("three other-player hits and two player-owned Killer-pet hits remain separate")
                 && combatContractText.Contains("SpecialAttackWeapon contexts are capture-backed for levels 5, 6, 8, 9, and 10")
                 && combatContractText.Contains("including the level-5 terminal value 22")
                 && combatContractText.Contains("level 7 explicitly using the bounded 35/45 midpoint policy")
                 && combatContractText.Contains("Disobedient Bot SIW1 attack context is unresolved for level")
-                && attackRulesText.Contains("CapturedSubwayDisobedientBotMinimumDamage = 8")
+                && attackRulesText.Contains("CapturedSubwayDisobedientBotMinimumDamage = 6")
                 && attackRulesText.Contains("CapturedSubwayDisobedientBotMaximumDamage = 15")
                 && attackRulesText.Contains("CapturedSubwayDisobedientBotRechargeSeconds = 5.973723")
                 && attackRulesText.Contains("CapturedSubwayDisobedientBotWeaponTag = 0x53495731")
@@ -3829,9 +3840,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 providerText.Contains("234877")
                 && providerText.Contains("104683")
+                && providerText.Contains("113398")
                 && catalogText.Contains("if (monsterData == 17649)")
                 && catalogText.Contains("OrdinaryEnemyLootPoolMode.WeightedOne")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(5, 6, 6, 2")
+                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(6, 8, 8, 3")
+                && catalogText.Contains("20260719-020104")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(10, 12, 12, 2")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
@@ -3841,12 +3855,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && disobedientBotCombatReport.Contains("\"20260712-153918\"")
                 && disobedientBotCombatReport.Contains("\"20260713-014714\"")
                 && disobedientBotCombatReport.Contains("\"20260713-033511\"")
-                && disobedientBotCombatReport.Contains("\"normalAttackInfoRows\": 14")
-                && disobedientBotCombatReport.Contains("\"normalMinDamage\": 8")
+                && disobedientBotCombatReport.Contains("\"20260719-020104\"")
+                && disobedientBotCombatReport.Contains("\"normalAttackInfoRows\": 15")
+                && disobedientBotCombatReport.Contains("\"normalMinDamage\": 6")
                 && disobedientBotCombatReport.Contains("\"normalMaxDamage\": 15")
-                && disobedientBotCombatReport.Contains("\"missedAttackInfoRows\": 7")
+                && disobedientBotCombatReport.Contains("\"missedAttackInfoRows\": 10")
                 && disobedientBotCombatReport.Contains("\"medianIntervalSeconds\": 5.973723")
-                && disobedientBotCombatReport.Contains("\"attackInfoRows\": 14")
+                && disobedientBotCombatReport.Contains("\"attackInfoRows\": 15")
                 && disobedientBotCombatReport.Contains("\"attackInfoRows\": 3")
                 && disobedientBotCombatReport.Contains("\"attackInfoRows\": 2"),
                 "Accepted Subway Disobedient Bot generated combat evidence must retain the local-player, other-player, and player-owned-pet boundaries plus focused attempt cadence.");

@@ -388,11 +388,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration, bloodcreeper.LevelDefinition.RerollPolicy);
 
             var profilesByKey = profiles.ToDictionary(value => value.ProfileKey, StringComparer.Ordinal);
+            OrdinaryEnemySpawnDefinition disobedientBotPatrol = spawns.Single(
+                value => value.SourceIdentity == 0x79557C66);
             OrdinaryEnemyProfile violentVagabond = profiles.Single(
                 value => value.DisplayName == "Violent Vagabond");
             OrdinaryEnemySpawnDefinition[] violentVagabondSpawns = spawns
                 .Where(value => value.ProfileKey == violentVagabond.ProfileKey)
                 .ToArray();
+            OrdinaryEnemySpawnDefinition violentVagabondPatrol = violentVagabondSpawns.Single(
+                value => value.SourceIdentity == 0x7957E5C4);
+            Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, disobedientBotPatrol.MovementMode);
+            Assert.IsTrue(disobedientBotPatrol.UseCapturedPatrolReplay);
+            Assert.IsTrue(disobedientBotPatrol.UseSpawnAsPatrolStart);
+            Assert.AreEqual(
+                OrdinaryEnemyRuntimeDisposition.Active,
+                disobedientBotPatrol.Disposition);
+            Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, violentVagabondPatrol.MovementMode);
+            Assert.IsTrue(violentVagabondPatrol.UseCapturedPatrolReplay);
+            Assert.IsTrue(violentVagabondPatrol.UseSpawnAsPatrolStart);
+            Assert.AreEqual(
+                OrdinaryEnemyRuntimeDisposition.Quarantined,
+                violentVagabondPatrol.Disposition);
             Assert.AreEqual(22, violentVagabondSpawns.Length);
             Assert.AreEqual(
                 11,
@@ -530,11 +546,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedSubwayCorpseEvidenceDefinition[] evidence =
                 new CapturedSubwayOrdinaryContentProvider().GetCorpseEvidence(17649);
 
-            Assert.AreEqual(13, evidence.Length);
+            Assert.AreEqual(14, evidence.Length);
             Assert.IsTrue(evidence.All(value => value.MonsterData == 17649));
             Assert.IsTrue(evidence.All(value => value.CatMesh == 15215));
             CollectionAssert.AreEqual(
-                new[] { "5:6:2", "6:8:2", "8:10:4", "9:11:3", "10:12:2" },
+                new[] { "5:6:2", "6:8:3", "8:10:4", "9:11:3", "10:12:2" },
                 evidence
                     .GroupBy(value => new { value.EnemyLevel, value.Credits })
                     .OrderBy(group => group.Key.EnemyLevel)
@@ -549,6 +565,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(evidence.Any(value => value.Capture == "20260712-160257" && value.DeadNpcIdentity == "(SimpleChar:795EC78A)" && value.CorpseIdentity == "(Corpse:00F6C006)"));
             Assert.IsTrue(evidence.Any(value => value.Capture == "20260713-014714" && value.DeadNpcIdentity == "(SimpleChar:79607CD0)" && value.CorpseIdentity == "(Corpse:00F6C005)"));
             Assert.IsTrue(evidence.Any(value => value.Capture == "20260713-033511" && value.DeadNpcIdentity == "(SimpleChar:79607E2C)" && value.CorpseIdentity == "(Corpse:00F6C003)"));
+            Assert.IsTrue(evidence.Any(value => value.Capture == "20260719-020104" && value.DeadNpcIdentity == "(SimpleChar:797AD6E4)" && value.CorpseIdentity == "(Corpse:00F74004)"));
             Assert.IsFalse(evidence.Any(value => value.Capture == "20260713-013906"));
         }
 
