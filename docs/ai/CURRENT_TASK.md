@@ -438,14 +438,14 @@ population in bounded runtime batches.
 
 ## Next Runtime Check
 
-No additional official-live capture is required before the next corpus-backed
-implementation pass. The whole-enemy gate currently accepts 21 of 26 ordinary
-profiles. The five incomplete profiles are Infected Attendant, Lost Thought,
-Empty Shell, Premature Pattern, and Violent Vagabond. Existing captures contain
-usable evidence that is not yet fully indexed for all five; implement that
-evidence before requesting new captures. Residual gaps after that pass include
-reset/leash boundaries for all five, four respawn cycles, several weapon/cadence
-boundaries, landed Vagabond damage, and strict Empty/Premature loot.
+The existing-corpus implementation pass for the five incomplete ordinary
+profiles is complete. Do not request duplicate captures for any evidence now
+indexed below. The whole-enemy gate remains 21 of 26 because the remaining
+gaps are genuinely absent from the 72-session corpus: reset/leash boundaries
+for all five; respawn cycles for Infected Attendant, Lost Thought, Empty Shell,
+and Premature Pattern; usable weapon and repeated local cadence/range evidence;
+local landed damage for Lost Thought; landed damage semantics for Violent
+Vagabond; and strict Empty Shell/Premature Pattern loot.
 
 ## Remaining Capture-Backed Work
 
@@ -456,15 +456,23 @@ boundaries, landed Vagabond damage, and strict Empty/Premature loot.
    validation: 6 Stim Fiends, 5 Muggers, 2 Disobedient Bots, 2 Looters, and 1
    Deranged Shopper. Only 11 rows remain quarantined, all Violent Vagabonds.
 3. Five of the 26 ordinary profiles remain outside the whole-enemy accepted
-   set. Their rows are currently 32 active plus 11 quarantined: Infected
-   Attendant `5/0`, Lost Thought `4/0`, Empty Shell `5/0`, Premature Pattern
-   `7/0`, and Violent Vagabond `11/11`. Existing evidence now queued for the
-   analyzer/runtime pass includes Infected local damage/social aggression;
-   Lost other-player damage/cadence; Empty local damage/misses/group aggression;
-   Premature local/other-player/pet damage and group aggression; and Vagabond
-   miss cadence, `16.629`-unit acquisition/chase evidence, exact `459.978`-second
-   respawn, strict loot, corpse, and credits. Item `130590` is Red Wine and must
-   not be treated as a Vagabond weapon.
+   set. Their rows remain 32 active plus 11 quarantined: Infected Attendant
+   `5/0`, Lost Thought `4/0`, Empty Shell `5/0`, Premature Pattern `7/0`, and
+   Violent Vagabond `11/11`. The combat report now separates every reviewed
+   target role: Infected retains one local `11` outcome plus local, other-player,
+   and pet attack starts; Lost retains 11 other-player hits at `15..20` with a
+   `4.5320703`-second median; Empty retains local `15`, two misses, other-player
+   `19`, and nanos `26414`, `81998`, and `82482`; Premature retains local normal
+   `22`, critical `41`, other-player `16`, and pet `38`. These incomplete
+   outcomes remain report-only instead of becoming constant fixed attacks.
+   Vagabond now has 26 distinct local misses after overlap deduplication, a
+   `4.0799494`-second median attempt interval, and two exact simultaneous
+   other-player attack starts. Automatic acquisition/chase is capture-proven at
+   a guaranteed `16.606338`-unit lower bound but remains report-only while
+   landed damage is unresolved; runtime stays retaliatory with shared chase and
+   no automatic radius. Its `450`-second post-NPC-despawn policy is derived from
+   the exact `449.759588` interval. QL1 template `130590` is Red Wine, is
+   rejected as combat input, and the 11 incomplete rows remain quarantined.
 4. Strike Foreman has usable exact L19/736 HP appearance, QL19 weapon, raw
    `SpecialAttackWeapon` plus `Attack` initiation against the non-local player
    Wardog, three other-player outgoing hits (`18`, `18`, and critical `40`),

@@ -29,6 +29,8 @@ namespace AORebirth.Core.Playfields
 
         private const int WorkmanStrikerMonsterData = 203854;
 
+        private const int ViolentVagabondMonsterData = 203733;
+
         private const double BloodcreeperAutomaticAggroRadius = 7.0;
 
         private const double IncompleteRebuildAutomaticAggroRadius = 7.0;
@@ -124,6 +126,7 @@ namespace AORebirth.Core.Playfields
                 .OrderBy(value => value.SourceIdentity)
                 .ToArray();
             OrdinaryEnemyProfileValidator.Validate(this.profiles, this.spawns);
+            ValidateViolentVagabondEvidenceBoundary(this.profiles, this.spawns);
             this.profilesByKey = this.profiles.ToDictionary(value => value.ProfileKey, StringComparer.Ordinal);
         }
 
@@ -260,7 +263,7 @@ namespace AORebirth.Core.Playfields
                         OrdinaryEnemyConstructionMode.TemplateBacked,
                         first.TemplateHash,
                         BuildSupportedAppearance(first),
-                        RetaliateAggression(),
+                        AggressionFor(first.MonsterData),
                         BuildCombatProfile(
                             contract,
                             first.MonsterData,
@@ -295,6 +298,17 @@ namespace AORebirth.Core.Playfields
                         }
                     : new OrdinaryEnemyWaypoint[0];
                 bool patrol = source.HasPatrolWaypoint || replay.Length > 0;
+                bool violentVagabond = source.MonsterData == ViolentVagabondMonsterData;
+                OrdinaryEnemyEvidenceState respawnEvidence = source.HasRespawnDelay
+                    ? OrdinaryEnemyEvidenceState.Observed
+                    : violentVagabond
+                        ? OrdinaryEnemyEvidenceState.Policy
+                        : OrdinaryEnemyEvidenceState.Unresolved;
+                double? respawnDelaySeconds = source.HasRespawnDelay
+                    ? source.RespawnDelaySeconds
+                    : violentVagabond
+                        ? (double?)450.0
+                        : null;
                 spawns.Add(
                     new OrdinaryEnemySpawnDefinition(
                         SpawnKey(source.SourceInstance),
@@ -322,16 +336,18 @@ namespace AORebirth.Core.Playfields
                         0,
                         new byte[0],
                         0,
-                        source.HasRespawnDelay
-                            ? OrdinaryEnemyEvidenceState.Observed
-                            : OrdinaryEnemyEvidenceState.Unresolved,
-                        source.RespawnDelaySeconds,
+                        respawnEvidence,
+                        respawnDelaySeconds,
                         CapturedSubwayContentProvider.IsRuntimeQuarantined(source.SourceInstance)
                             ? OrdinaryEnemyRuntimeDisposition.Quarantined
                             : OrdinaryEnemyRuntimeDisposition.Active,
                         string.Empty,
                         source.ContentSection,
-                        string.Empty));
+                        string.Empty,
+                        null,
+                        violentVagabond
+                            ? ViolentVagabondRespawnPolicy()
+                            : null));
             }
         }
 
@@ -434,7 +450,8 @@ namespace AORebirth.Core.Playfields
                             archetype.MonsterData,
                             null,
                             sourceContractResolver,
-                            sourceVariantContractResolver),
+                            sourceVariantContractResolver,
+                            archetype.Combat != null && archetype.Combat.Observed),
                         BuildLootProfile(
                             archetype.MonsterData,
                             lootEntries,
@@ -767,6 +784,71 @@ namespace AORebirth.Core.Playfields
                        : RetaliateAggression();
         }
 
+        private static WorldRespawnPolicyAssignment ViolentVagabondRespawnPolicy()
+        {
+            return WorldRespawnPolicyAssignment.Explicit(
+                new RespawnPolicyDefinition
+                {
+                    RespawnPolicyKey = "ordinary.violent-vagabond.450",
+                    Mode = WorldRespawnMode.FixedDelay,
+                    FixedDelaySeconds = 450.0,
+                    RespawnAtOriginalPosition = true,
+                    ResetHealth = true,
+                    ResetMovementState = true,
+                    ResetAggressionState = true,
+                    DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
+                    Evidence = "official-live:20260708-143600;"
+                               + "794CD74B>794DF301;"
+                               + "449.759588-seconds-after-npc-despawn;"
+                               + "1.088-position-delta",
+                    Confidence = "CAPTURE_BOUNDED",
+                    Enabled = true
+                });
+        }
+
+        private static void ValidateViolentVagabondEvidenceBoundary(
+            IEnumerable<OrdinaryEnemyProfile> profiles,
+            IEnumerable<OrdinaryEnemySpawnDefinition> spawns)
+        {
+            OrdinaryEnemyProfile profile = profiles.Single(
+                value => value.MonsterData == ViolentVagabondMonsterData);
+            CapturedEnemyCombatContract contract = profile.Combat.Contract;
+            if (contract == null
+                || contract.IsCombatReady
+                || contract.WeaponLowId == 130590
+                || contract.WeaponHighId == 130590
+                || profile.Aggression.Mode != OrdinaryEnemyAggressionMode.Retaliate
+                || profile.Aggression.AutomaticAggroRadius.HasValue
+                || !profile.Aggression.Chase
+                || profile.Aggression.ReturnToSpawn
+                || profile.Aggression.EvidenceState != OrdinaryEnemyEvidenceState.Observed)
+            {
+                throw new InvalidOperationException(
+                    "Violent Vagabond combat/aggression evidence boundary drifted");
+            }
+
+            OrdinaryEnemySpawnDefinition[] rows = spawns
+                .Where(value => value.ProfileKey == profile.ProfileKey)
+                .ToArray();
+            if (rows.Length != 22
+                || rows.Count(
+                    value => value.Disposition
+                             == OrdinaryEnemyRuntimeDisposition.Quarantined) != 11
+                || rows.Any(
+                    value => value.RespawnEvidence != OrdinaryEnemyEvidenceState.Policy
+                             || value.RespawnDelaySeconds != 450.0
+                             || value.RespawnPolicy.Mode
+                                != WorldRespawnPolicyAssignmentMode.Explicit
+                             || value.RespawnPolicy.ExplicitPolicy == null
+                             || value.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds != 450.0
+                             || value.RespawnPolicy.ExplicitPolicy.DelayStartsAt
+                                != RespawnDelayStartsAt.NpcDespawn))
+            {
+                throw new InvalidOperationException(
+                    "Violent Vagabond population/respawn evidence boundary drifted");
+            }
+        }
+
         private static OrdinaryEnemySupportNanoProfile SupportNanoFor(int monsterData)
         {
             if (monsterData == IncompleteRebuildMonsterData)
@@ -817,7 +899,8 @@ namespace AORebirth.Core.Playfields
             Func<int, CapturedEnemyCombatContract> contractResolver = null,
             Func<int, int, CapturedEnemyCombatContract> sourceContractResolver = null,
             Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>
-                sourceVariantContractResolver = null)
+                sourceVariantContractResolver = null,
+            bool capturedCombatEvidenceObserved = false)
         {
             OrdinaryEnemyCombatMode mode = OrdinaryEnemyCombatMode.Unresolved;
             OrdinaryEnemyDamageSource damageSource = OrdinaryEnemyDamageSource.Unresolved;
@@ -862,6 +945,7 @@ namespace AORebirth.Core.Playfields
                 contract.IsCombatReady
                 || sourceContractResolver != null
                 || sourceVariantContractResolver != null
+                || capturedCombatEvidenceObserved
                     ? OrdinaryEnemyEvidenceState.Observed
                     : OrdinaryEnemyEvidenceState.Unresolved,
                 monsterData == 26092 ? 1.0 : (double?)null,

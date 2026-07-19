@@ -183,6 +183,10 @@ EXPECTED_SOURCE_WEAPON_EVIDENCE = {
 SUPPORTED_SOURCE_WEAPON_MONSTER_DATA = {
     "Mugger": 203734,
 }
+NON_COMBAT_HELD_ITEM_TEMPLATES = frozenset({130590})
+RUNTIME_INCOMPLETE_FIXED_COMBAT = frozenset(
+    {"Empty Shell", "Infected Attendant", "Premature Pattern"}
+)
 
 # Reviewed complete SCFU + owner WeaponItemFullUpdate pairs for every safe
 # Incomplete Rebuild generation variant. Each tuple is attached to one
@@ -1773,6 +1777,13 @@ def source_weapon_evidence_profiles(
                 }
             )
         result[name] = records
+    if any(
+        record["low"] in NON_COMBAT_HELD_ITEM_TEMPLATES
+        or record["high"] in NON_COMBAT_HELD_ITEM_TEMPLATES
+        for records in result.values()
+        for record in records
+    ):
+        raise ValueError("non-combat held item entered source weapon evidence")
     return result
 
 
@@ -2299,6 +2310,8 @@ def combat_profiles() -> dict[str, dict[str, object]]:
             recharge = uncontrollable_anger_recharge
         result[name] = {
             "observed": bool(normal_rows),
+            "runtimeReady": bool(normal_rows)
+            and name not in RUNTIME_INCOMPLETE_FIXED_COMBAT,
             "min": min((row["amount"] for row in normal_rows), default=None),
             "max": max((row["amount"] for row in normal_rows), default=None),
             "recharge": recharge,
@@ -3392,6 +3405,8 @@ def validate_content(
             )
 
     for name, evidence in combat.items():
+        if evidence["runtimeReady"] and not evidence["observed"]:
+            raise ValueError("runtime-ready combat is not observed: " + name)
         if evidence["observed"]:
             if evidence["min"] is None or evidence["max"] is None:
                 raise ValueError("observed combat is missing damage evidence: " + name)
@@ -3402,6 +3417,17 @@ def validate_content(
             for field in ("min", "max", "recharge", "slot", "unknown", "instance")
         ):
             raise ValueError("unobserved combat contains invented values: " + name)
+    for name in RUNTIME_INCOMPLETE_FIXED_COMBAT:
+        evidence = combat[name]
+        if (
+            not evidence["observed"]
+            or evidence["runtimeReady"]
+            or evidence["rows"] != 1
+            or evidence["recharge"] is not None
+        ):
+            raise ValueError(name + " incomplete fixed-combat boundary drifted")
+    if combat["Lost Thought"]["observed"] or combat["Lost Thought"]["runtimeReady"]:
+        raise ValueError("Lost Thought non-local combat entered runtime evidence")
 
     expected_level_credits = {
         "Architect Striker": Counter({(13, 79): 2, (14, 85): 1, (15, 92): 1}),
@@ -3802,6 +3828,7 @@ def generate() -> str:
                 "                },",
                 "                new CapturedSubwayCombatEvidenceDefinition(",
                 f"                    {str(combat_row['observed']).lower()},",
+                f"                    {str(combat_row['runtimeReady']).lower()},",
                 f"                    {compatibility_int(combat_row['min'])},",
                 f"                    {compatibility_int(combat_row['max'])},",
                 f"                    {compatibility_float(combat_row['recharge']):.6f},",
@@ -4049,7 +4076,7 @@ def generate() -> str:
             "    internal sealed class CapturedSubwaySourceWeaponProfileDefinition { public CapturedSubwaySourceWeaponProfileDefinition(string name, int monsterData, CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { this.Name = name; this.MonsterData = monsterData; this.SourceWeaponEvidence = sourceWeaponEvidence ?? new CapturedSubwaySourceWeaponEvidenceDefinition[0]; } public string Name { get; private set; } public int MonsterData { get; private set; } public CapturedSubwaySourceWeaponEvidenceDefinition[] SourceWeaponEvidence { get; private set; } }",
             "    internal sealed class CapturedSubwaySourceWeaponEvidenceDefinition { public CapturedSubwaySourceWeaponEvidenceDefinition(int sourceInstance, int lowId, int highId, int quality, string evidenceCaptures) { this.SourceInstance = sourceInstance; this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.EvidenceCaptures = evidenceCaptures; } public int SourceInstance { get; private set; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public string EvidenceCaptures { get; private set; } }",
             "    internal sealed class CapturedSubwayGenerationVariantDefinition { public CapturedSubwayGenerationVariantDefinition(int monsterData, int sourceInstance, int level, int health, int healthDamage, int monsterScale, int runSpeed, int weaponLowId, int weaponHighId, int weaponQuality, string evidence) { this.MonsterData = monsterData; this.SourceInstance = sourceInstance; this.Level = level; this.Health = health; this.HealthDamage = healthDamage; this.MonsterScale = monsterScale; this.RunSpeed = runSpeed; this.WeaponLowId = weaponLowId; this.WeaponHighId = weaponHighId; this.WeaponQuality = weaponQuality; this.Evidence = evidence; } public int MonsterData { get; private set; } public int SourceInstance { get; private set; } public int Level { get; private set; } public int Health { get; private set; } public int HealthDamage { get; private set; } public int MonsterScale { get; private set; } public int RunSpeed { get; private set; } public int WeaponLowId { get; private set; } public int WeaponHighId { get; private set; } public int WeaponQuality { get; private set; } public string Evidence { get; private set; } }",
-            "    internal sealed class CapturedSubwayCombatEvidenceDefinition { public CapturedSubwayCombatEvidenceDefinition(bool observed, int minDamage, int maxDamage, double rechargeSeconds, int weaponSlot, int attackInfoUnknown, int weaponInstance, int observedRows) { this.Observed = observed; this.MinDamage = minDamage; this.MaxDamage = maxDamage; this.RechargeSeconds = rechargeSeconds; this.WeaponSlot = weaponSlot; this.AttackInfoUnknown = attackInfoUnknown; this.WeaponInstance = weaponInstance; this.ObservedRows = observedRows; } public bool Observed { get; private set; } public int MinDamage { get; private set; } public int MaxDamage { get; private set; } public double RechargeSeconds { get; private set; } public int WeaponSlot { get; private set; } public int AttackInfoUnknown { get; private set; } public int WeaponInstance { get; private set; } public int ObservedRows { get; private set; } }",
+            "    internal sealed class CapturedSubwayCombatEvidenceDefinition { public CapturedSubwayCombatEvidenceDefinition(bool observed, int minDamage, int maxDamage, double rechargeSeconds, int weaponSlot, int attackInfoUnknown, int weaponInstance, int observedRows) : this(observed, observed, minDamage, maxDamage, rechargeSeconds, weaponSlot, attackInfoUnknown, weaponInstance, observedRows) { } public CapturedSubwayCombatEvidenceDefinition(bool observed, bool runtimeReady, int minDamage, int maxDamage, double rechargeSeconds, int weaponSlot, int attackInfoUnknown, int weaponInstance, int observedRows) { this.Observed = observed; this.RuntimeReady = runtimeReady; this.MinDamage = minDamage; this.MaxDamage = maxDamage; this.RechargeSeconds = rechargeSeconds; this.WeaponSlot = weaponSlot; this.AttackInfoUnknown = attackInfoUnknown; this.WeaponInstance = weaponInstance; this.ObservedRows = observedRows; } public bool Observed { get; private set; } public bool RuntimeReady { get; private set; } public int MinDamage { get; private set; } public int MaxDamage { get; private set; } public double RechargeSeconds { get; private set; } public int WeaponSlot { get; private set; } public int AttackInfoUnknown { get; private set; } public int WeaponInstance { get; private set; } public int ObservedRows { get; private set; } }",
             "    internal sealed class CapturedSubwayLootEvidenceDefinition { public CapturedSubwayLootEvidenceDefinition(int lowId, int highId, int quality, int observedCount, int observedCorpses, int observedBasisPoints) { this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.ObservedCount = observedCount; this.ObservedCorpses = observedCorpses; this.ObservedBasisPoints = observedBasisPoints; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public int ObservedCount { get; private set; } public int ObservedCorpses { get; private set; } public int ObservedBasisPoints { get; private set; } }",
             "    internal sealed class CapturedSubwayStrictLootProfileDefinition { public CapturedSubwayStrictLootProfileDefinition(string name, int monsterData, int observedCompleteInventories, int observedPositiveInventories, int observedEmptyInventories, bool itemPoolComplete, string[] evidenceCaptures, CapturedSubwayLootEvidenceDefinition[] entries) { this.Name = name; this.MonsterData = monsterData; this.ObservedCompleteInventories = observedCompleteInventories; this.ObservedPositiveInventories = observedPositiveInventories; this.ObservedEmptyInventories = observedEmptyInventories; this.ItemPoolComplete = itemPoolComplete; this.EvidenceCaptures = evidenceCaptures ?? new string[0]; this.Entries = entries ?? new CapturedSubwayLootEvidenceDefinition[0]; } public string Name { get; private set; } public int MonsterData { get; private set; } public int ObservedCompleteInventories { get; private set; } public int ObservedPositiveInventories { get; private set; } public int ObservedEmptyInventories { get; private set; } public bool ItemPoolComplete { get; private set; } public string[] EvidenceCaptures { get; private set; } public CapturedSubwayLootEvidenceDefinition[] Entries { get; private set; } }",
             "    internal sealed class CapturedSubwayLootOutcomeEvidenceDefinition { public CapturedSubwayLootOutcomeEvidenceDefinition(string capture, string capturedUtc, string corpseIdentity, string deadNpcIdentity, int monsterData, int sequence, int slot, int lowId, int highId, int quality) { this.Capture = capture; this.CapturedUtc = capturedUtc; this.CorpseIdentity = corpseIdentity; this.DeadNpcIdentity = deadNpcIdentity; this.MonsterData = monsterData; this.Sequence = sequence; this.Slot = slot; this.LowId = lowId; this.HighId = highId; this.Quality = quality; } public string Capture { get; private set; } public string CapturedUtc { get; private set; } public string CorpseIdentity { get; private set; } public string DeadNpcIdentity { get; private set; } public int MonsterData { get; private set; } public int Sequence { get; private set; } public int Slot { get; private set; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } }",

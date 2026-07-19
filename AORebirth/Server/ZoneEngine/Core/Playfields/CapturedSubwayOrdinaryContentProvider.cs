@@ -762,6 +762,7 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
+                    true,
                     11,
                     39,
                     5.299336,
@@ -861,6 +862,7 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayMeshDefinition(0, 40693u, 0, 4)
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
+                    true,
                     true,
                     10,
                     16,
@@ -983,6 +985,7 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayMeshDefinition(1, 30235u, 0, 2)
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
+                    true,
                     true,
                     14,
                     23,
@@ -1107,6 +1110,7 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
+                    true,
                     13,
                     17,
                     5.425420,
@@ -1172,6 +1176,7 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
+                    false,
                     11,
                     11,
                     0.000000,
@@ -1241,6 +1246,7 @@ namespace AORebirth.Core.Playfields
                 {
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
+                    true,
                     true,
                     5,
                     11,
@@ -1350,6 +1356,7 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
+                    true,
                     11,
                     11,
                     5.282358,
@@ -1441,6 +1448,7 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
+                    true,
                     16,
                     36,
                     5.016862,
@@ -1518,6 +1526,7 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     false,
+                    false,
                     0,
                     0,
                     0.000000,
@@ -1575,6 +1584,7 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayMeshDefinition(0, 29702u, 0, 4)
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
+                    true,
                     true,
                     16,
                     22,
@@ -1645,6 +1655,7 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
+                    true,
                     21,
                     41,
                     4.999308,
@@ -1701,6 +1712,7 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayMeshDefinition(1, 95784u, 0, 2)
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
+                    true,
                     true,
                     9,
                     9,
@@ -1762,6 +1774,7 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
+                    false,
                     15,
                     15,
                     0.000000,
@@ -1815,6 +1828,7 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayMeshDefinition(1, 7834u, 0, 2)
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
+                    true,
                     true,
                     18,
                     23,
@@ -1890,6 +1904,7 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayMeshDefinition(1, 7830u, 0, 2)
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
+                    true,
                     true,
                     17,
                     35,
@@ -1970,6 +1985,7 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
+                    true,
                     21,
                     34,
                     4.466488,
@@ -2046,6 +2062,7 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayMeshDefinition(1, 35547u, 0, 2)
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
+                    true,
                     true,
                     16,
                     42,
@@ -2125,6 +2142,7 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
+                    false,
                     22,
                     22,
                     0.000000,
@@ -2185,6 +2203,7 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayMeshDefinition(1, 7817u, 0, 2)
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
+                    true,
                     true,
                     19,
                     19,
@@ -2249,6 +2268,7 @@ namespace AORebirth.Core.Playfields
                 {
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
+                    true,
                     true,
                     11,
                     18,
@@ -6473,7 +6493,7 @@ namespace AORebirth.Core.Playfields
     internal sealed class CapturedSubwaySourceWeaponProfileDefinition { public CapturedSubwaySourceWeaponProfileDefinition(string name, int monsterData, CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { this.Name = name; this.MonsterData = monsterData; this.SourceWeaponEvidence = sourceWeaponEvidence ?? new CapturedSubwaySourceWeaponEvidenceDefinition[0]; } public string Name { get; private set; } public int MonsterData { get; private set; } public CapturedSubwaySourceWeaponEvidenceDefinition[] SourceWeaponEvidence { get; private set; } }
     internal sealed class CapturedSubwaySourceWeaponEvidenceDefinition { public CapturedSubwaySourceWeaponEvidenceDefinition(int sourceInstance, int lowId, int highId, int quality, string evidenceCaptures) { this.SourceInstance = sourceInstance; this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.EvidenceCaptures = evidenceCaptures; } public int SourceInstance { get; private set; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public string EvidenceCaptures { get; private set; } }
     internal sealed class CapturedSubwayGenerationVariantDefinition { public CapturedSubwayGenerationVariantDefinition(int monsterData, int sourceInstance, int level, int health, int healthDamage, int monsterScale, int runSpeed, int weaponLowId, int weaponHighId, int weaponQuality, string evidence) { this.MonsterData = monsterData; this.SourceInstance = sourceInstance; this.Level = level; this.Health = health; this.HealthDamage = healthDamage; this.MonsterScale = monsterScale; this.RunSpeed = runSpeed; this.WeaponLowId = weaponLowId; this.WeaponHighId = weaponHighId; this.WeaponQuality = weaponQuality; this.Evidence = evidence; } public int MonsterData { get; private set; } public int SourceInstance { get; private set; } public int Level { get; private set; } public int Health { get; private set; } public int HealthDamage { get; private set; } public int MonsterScale { get; private set; } public int RunSpeed { get; private set; } public int WeaponLowId { get; private set; } public int WeaponHighId { get; private set; } public int WeaponQuality { get; private set; } public string Evidence { get; private set; } }
-    internal sealed class CapturedSubwayCombatEvidenceDefinition { public CapturedSubwayCombatEvidenceDefinition(bool observed, int minDamage, int maxDamage, double rechargeSeconds, int weaponSlot, int attackInfoUnknown, int weaponInstance, int observedRows) { this.Observed = observed; this.MinDamage = minDamage; this.MaxDamage = maxDamage; this.RechargeSeconds = rechargeSeconds; this.WeaponSlot = weaponSlot; this.AttackInfoUnknown = attackInfoUnknown; this.WeaponInstance = weaponInstance; this.ObservedRows = observedRows; } public bool Observed { get; private set; } public int MinDamage { get; private set; } public int MaxDamage { get; private set; } public double RechargeSeconds { get; private set; } public int WeaponSlot { get; private set; } public int AttackInfoUnknown { get; private set; } public int WeaponInstance { get; private set; } public int ObservedRows { get; private set; } }
+    internal sealed class CapturedSubwayCombatEvidenceDefinition { public CapturedSubwayCombatEvidenceDefinition(bool observed, int minDamage, int maxDamage, double rechargeSeconds, int weaponSlot, int attackInfoUnknown, int weaponInstance, int observedRows) : this(observed, observed, minDamage, maxDamage, rechargeSeconds, weaponSlot, attackInfoUnknown, weaponInstance, observedRows) { } public CapturedSubwayCombatEvidenceDefinition(bool observed, bool runtimeReady, int minDamage, int maxDamage, double rechargeSeconds, int weaponSlot, int attackInfoUnknown, int weaponInstance, int observedRows) { this.Observed = observed; this.RuntimeReady = runtimeReady; this.MinDamage = minDamage; this.MaxDamage = maxDamage; this.RechargeSeconds = rechargeSeconds; this.WeaponSlot = weaponSlot; this.AttackInfoUnknown = attackInfoUnknown; this.WeaponInstance = weaponInstance; this.ObservedRows = observedRows; } public bool Observed { get; private set; } public bool RuntimeReady { get; private set; } public int MinDamage { get; private set; } public int MaxDamage { get; private set; } public double RechargeSeconds { get; private set; } public int WeaponSlot { get; private set; } public int AttackInfoUnknown { get; private set; } public int WeaponInstance { get; private set; } public int ObservedRows { get; private set; } }
     internal sealed class CapturedSubwayLootEvidenceDefinition { public CapturedSubwayLootEvidenceDefinition(int lowId, int highId, int quality, int observedCount, int observedCorpses, int observedBasisPoints) { this.LowId = lowId; this.HighId = highId; this.Quality = quality; this.ObservedCount = observedCount; this.ObservedCorpses = observedCorpses; this.ObservedBasisPoints = observedBasisPoints; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } public int ObservedCount { get; private set; } public int ObservedCorpses { get; private set; } public int ObservedBasisPoints { get; private set; } }
     internal sealed class CapturedSubwayStrictLootProfileDefinition { public CapturedSubwayStrictLootProfileDefinition(string name, int monsterData, int observedCompleteInventories, int observedPositiveInventories, int observedEmptyInventories, bool itemPoolComplete, string[] evidenceCaptures, CapturedSubwayLootEvidenceDefinition[] entries) { this.Name = name; this.MonsterData = monsterData; this.ObservedCompleteInventories = observedCompleteInventories; this.ObservedPositiveInventories = observedPositiveInventories; this.ObservedEmptyInventories = observedEmptyInventories; this.ItemPoolComplete = itemPoolComplete; this.EvidenceCaptures = evidenceCaptures ?? new string[0]; this.Entries = entries ?? new CapturedSubwayLootEvidenceDefinition[0]; } public string Name { get; private set; } public int MonsterData { get; private set; } public int ObservedCompleteInventories { get; private set; } public int ObservedPositiveInventories { get; private set; } public int ObservedEmptyInventories { get; private set; } public bool ItemPoolComplete { get; private set; } public string[] EvidenceCaptures { get; private set; } public CapturedSubwayLootEvidenceDefinition[] Entries { get; private set; } }
     internal sealed class CapturedSubwayLootOutcomeEvidenceDefinition { public CapturedSubwayLootOutcomeEvidenceDefinition(string capture, string capturedUtc, string corpseIdentity, string deadNpcIdentity, int monsterData, int sequence, int slot, int lowId, int highId, int quality) { this.Capture = capture; this.CapturedUtc = capturedUtc; this.CorpseIdentity = corpseIdentity; this.DeadNpcIdentity = deadNpcIdentity; this.MonsterData = monsterData; this.Sequence = sequence; this.Slot = slot; this.LowId = lowId; this.HighId = highId; this.Quality = quality; } public string Capture { get; private set; } public string CapturedUtc { get; private set; } public string CorpseIdentity { get; private set; } public string DeadNpcIdentity { get; private set; } public int MonsterData { get; private set; } public int Sequence { get; private set; } public int Slot { get; private set; } public int LowId { get; private set; } public int HighId { get; private set; } public int Quality { get; private set; } }
