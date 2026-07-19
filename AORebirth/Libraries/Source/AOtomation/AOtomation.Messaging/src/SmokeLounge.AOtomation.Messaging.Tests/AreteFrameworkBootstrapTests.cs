@@ -19,14 +19,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     public class AreteFrameworkBootstrapTests
     {
         [TestMethod]
-        public void CheckedInBootstrapLoadsRexMarcusAndWindcallerAsOneValidatedSet()
+        public void CheckedInBootstrapLoadsAreteAndSubwayDialogueAsOneValidatedSet()
         {
             AreteFrameworkRegistries result =
                 AreteFrameworkBootstrap.InitializeCheckedInContent(AppDomain.CurrentDomain.BaseDirectory);
 
             Assert.IsTrue(result.IsValid);
-            Assert.AreEqual(3, result.DialogueRegistry.PackCount);
-            Assert.AreEqual(5, result.DialogueRegistry.NpcCount);
+            Assert.AreEqual(4, result.DialogueRegistry.PackCount);
+            Assert.AreEqual(6, result.DialogueRegistry.NpcCount);
             Assert.AreEqual(2, result.QuestRegistry.PackCount);
             Assert.AreEqual(4, result.QuestRegistry.QuestCount);
             Assert.AreSame(result, AreteFrameworkBootstrap.Current);
@@ -36,10 +36,72 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertNpc(result, "SimpleChar:796360BB");
             AssertNpc(result, "SimpleChar:796360BD");
             AssertNpc(result, "SimpleChar:796360BC");
+            AssertNpc(result, "SimpleChar:79135F51");
             AssertQuest(result, "Mission:5514B18C");
             AssertQuest(result, "Mission:5514B18D");
             AssertQuest(result, "Mission:5514B18E");
             AssertQuest(result, "Mission:55579381");
+        }
+
+        [TestMethod]
+        public void TailorDialoguePreservesCapturedPromptsOptionsAndMeasurementBranches()
+        {
+            AreteFrameworkRegistries result =
+                AreteFrameworkBootstrap.InitializeCheckedInContent(AppDomain.CurrentDomain.BaseDirectory);
+
+            DialogueNpcEntry tailor;
+            Assert.IsTrue(result.DialogueRegistry.TryGetNpc("SimpleChar:79135F51", out tailor));
+
+            DialogueNode root = tailor.Nodes.Single(node => node.Id == "tailor_root");
+            Assert.AreEqual("Howdy.", root.PromptText);
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "How is life?",
+                    "Um, I'd just like to look at your wares.",
+                    "Goodbye"
+                },
+                root.Options.OrderBy(option => option.Index).Select(option => option.Text).ToArray());
+
+            DialogueNode about = tailor.Nodes.Single(node => node.Id == "tailor_about");
+            Assert.AreEqual(2, about.PromptSegments.Count);
+            Assert.AreEqual("Not much to tell really... ", about.PromptSegments[0].Text);
+            Assert.AreEqual("\\nLife has actually become more interesting recently.", about.PromptSegments[1].Text);
+
+            DialogueNode parts = tailor.Nodes.Single(node => node.Id == "tailor_parts");
+            Assert.AreEqual(9, parts.Options.Count);
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "The Jobe Suit Pants.",
+                    "The Jobe Suit Sleeves.",
+                    "The Jobe Suit Boots.",
+                    "The Jobe Suit Gloves.",
+                    "The Jobe Suit Vest.",
+                    "The Jobe Suit Helmet.",
+                    "The Jobe Suit Support System.",
+                    "The Jobe Suit Shoulderpad."
+                },
+                parts.Options.OrderBy(option => option.Index).Take(8).Select(option => option.Text).ToArray());
+            Assert.IsTrue(parts.Options.Take(8).All(option => option.NextNodeId == "tailor_measurement_done"));
+
+            DialogueNode completed = tailor.Nodes.Single(node => node.Id == "tailor_measurement_done");
+            Assert.AreEqual("There you go.  Now, is there something else I can help you with? ", completed.PromptText);
+            Assert.AreEqual("tailor_parts", completed.Options.Single(option => option.Index == 0).NextNodeId);
+            Assert.AreEqual("tailor_wares", completed.Options.Single(option => option.Index == 1).NextNodeId);
+            Assert.AreEqual("tailor_goodbye", completed.Options.Single(option => option.Index == 2).NextNodeId);
+
+            DialogueNode wares = tailor.Nodes.Single(node => node.Id == "tailor_wares");
+            Assert.AreEqual(2, wares.PromptSegments.Count);
+            Assert.AreEqual("Of course!", wares.PromptSegments[0].Text);
+            Assert.AreEqual(0, wares.PromptSegments[0].Unknown2);
+            Assert.AreEqual(
+                "To do that you just left-clik the Shopping Basket icon at the bottom of this window.",
+                wares.PromptSegments[1].Text);
+            Assert.AreEqual(1, wares.PromptSegments[1].Unknown2);
+
+            DialogueNode reopen = tailor.Nodes.Single(node => node.Id == "tailor_root_reopen");
+            Assert.AreEqual("Yes?", reopen.PromptText);
         }
 
         [TestMethod]

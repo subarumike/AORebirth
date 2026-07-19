@@ -5,6 +5,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Threading;
 
     using AORebirth.Core.Entities;
@@ -19,6 +20,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Missions;
+    using ZoneEngine.Core.Playfields;
     using ZoneEngine.Core.Subway.Quests;
 
     #endregion
@@ -27,6 +29,9 @@ namespace ZoneEngine.Core.Arete.Dialogue
     {
         public const string RexLarssonGateEnvironmentVariableName =
             "AO_REBIRTH_ENABLE_ARETE_REX_DIALOGUE_ROUTING";
+
+        public const string SubwayTailorGateEnvironmentVariableName =
+            "AO_REBIRTH_ENABLE_SUBWAY_TAILOR_DIALOGUE_ROUTING";
 
         private const int AreteLandingPlayfieldId = 6553;
 
@@ -85,17 +90,38 @@ namespace ZoneEngine.Core.Arete.Dialogue
         private static readonly ContentDrivenNpcDialogueRegistration MaddyCardileRegistration =
             CreateWindcallerRegistration(WindcallerKarrecNpcContent.MaddyCardile);
 
+        private static readonly ContentDrivenNpcDialogueRegistration SubwayTailorRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Tailor",
+                ExpectedNpcName = "Tailor",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = CapturedSubwayTailorDialogueContent.SourceNpcInstance
+                    },
+                NpcIdentityText = CapturedSubwayTailorDialogueContent.SourceNpcIdentity,
+                PlayfieldId = CapturedSubwayVendorContentProvider.SubwayPlayfieldResource,
+                GateEnvironmentVariableName = SubwayTailorGateEnvironmentVariableName,
+                LogPrefix = "SUBWAY_TAILOR_DIALOGUE"
+            };
+
         private static readonly ContentDrivenNpcDialogueRegistration[] Registrations =
         {
             RexLarssonRegistration,
             MarcusStoneRegistration,
             WindcallerKarrecRegistration,
             AnnoyingDudeRegistration,
-            MaddyCardileRegistration
+            MaddyCardileRegistration,
+            SubwayTailorRegistration
         };
 
         private static readonly Dictionary<string, DialogueSessionRecord> SessionsByCharacter =
             new Dictionary<string, DialogueSessionRecord>(StringComparer.OrdinalIgnoreCase);
+
+        private static readonly ConditionalWeakTable<ICharacter, object> TailorOpenHistoryByCharacter =
+            new ConditionalWeakTable<ICharacter, object>();
 
         private static readonly object SyncRoot = new object();
 
@@ -289,6 +315,11 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             LogRecordedActions(source, result, registration);
+            TryHandleTailorMeasurementGrant(
+                source,
+                registration,
+                previousNodeId,
+                answerIndex);
             Func<bool> emitDialogueSideEffectsAfterPrompt = delegate
             {
                 LogQuestPreviewResult(
@@ -338,6 +369,31 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 + " answer=" + answerIndex);
             SendDialogueNode(source, result, registration, emitDialogueSideEffectsAfterPrompt);
             return true;
+        }
+
+        private static void TryHandleTailorMeasurementGrant(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, SubwayTailorRegistration)
+                || !string.Equals(
+                    previousNodeId,
+                    CapturedSubwayTailorDialogueContent.MeasurementNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                || answerIndex < 0
+                || answerIndex > 7)
+            {
+                return;
+            }
+
+            bool granted = CapturedSubwayTailorDialogueRuntime.TryGrantMeasurementItem(source, answerIndex);
+            LogDialogue(
+                registration,
+                "measurement item grant " + (granted ? "succeeded" : "failed")
+                + " character=" + source.Identity.ToString(true)
+                + " answer=" + answerIndex);
         }
 
         public static bool TryHandleClose(ICharacter source, Identity targetIdentity)
@@ -427,7 +483,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 LogValidation(registration, "dialogue start failed", result.Validation);
                 if (!string.IsNullOrWhiteSpace(requestedStartNodeId))
                 {
-                    KnuBotOpenChatWindowMessageHandler.Default.Send(source, registration.NpcIdentity);
+                    SendOpenChatWindow(source, registration);
                     PaceKnuBotPackets();
                     KnuBotCloseChatWindowMessageHandler.Default.Send(source, registration.NpcIdentity);
                     LogDialogue(
@@ -449,7 +505,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             FaceNpcTowardSource(npc, source);
-            KnuBotOpenChatWindowMessageHandler.Default.Send(source, registration.NpcIdentity);
+            SendOpenChatWindow(source, registration);
             PaceKnuBotPackets();
 
             if (string.Equals(requestedStartNodeId, RexB18EReturnNodeId, StringComparison.OrdinalIgnoreCase))
@@ -575,6 +631,21 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ICharacter source,
             ContentDrivenNpcDialogueRegistration registration)
         {
+            if (IsRegistration(registration, SubwayTailorRegistration))
+            {
+                lock (SyncRoot)
+                {
+                    object marker;
+                    bool hasPriorOpen = TailorOpenHistoryByCharacter.TryGetValue(source, out marker);
+                    if (!hasPriorOpen)
+                    {
+                        TailorOpenHistoryByCharacter.Add(source, new object());
+                    }
+
+                    return CapturedSubwayTailorDialogueContent.ResolveRootNodeId(hasPriorOpen);
+                }
+            }
+
             if (IsRegistration(registration, WindcallerKarrecRegistration))
             {
                 return WindcallerKarrecQuestRuntime.HasBothOfferingItems(source)
@@ -723,12 +794,30 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ContentDrivenNpcDialogueRegistration registration,
             Func<bool> afterPromptBeforeOptions = null)
         {
-            if (result.CurrentNode != null && !string.IsNullOrWhiteSpace(result.CurrentNode.PromptText))
+            DialogueNode node = result.CurrentNode;
+            bool sentPromptSegment = false;
+            if (node != null && node.PromptSegments != null && node.PromptSegments.Count > 0)
             {
-                KnuBotAppendTextMessageHandler.Default.Send(
-                    source,
-                    registration.NpcIdentity,
-                    result.CurrentNode.PromptText);
+                foreach (DialoguePromptSegment segment in node.PromptSegments)
+                {
+                    if (segment == null || segment.Text == null)
+                    {
+                        continue;
+                    }
+
+                    KnuBotAppendTextMessageHandler.Default.Send(
+                        source,
+                        registration.NpcIdentity,
+                        segment.Text,
+                        segment.Unknown2);
+                    PaceKnuBotPackets();
+                    sentPromptSegment = true;
+                }
+            }
+
+            if (!sentPromptSegment && node != null && !string.IsNullOrWhiteSpace(node.PromptText))
+            {
+                KnuBotAppendTextMessageHandler.Default.Send(source, registration.NpcIdentity, node.PromptText);
                 PaceKnuBotPackets();
             }
 
@@ -770,10 +859,21 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ContentDrivenNpcDialogueRegistration registration)
         {
             FaceNpcTowardSource(npc, source);
-            KnuBotOpenChatWindowMessageHandler.Default.Send(source, registration.NpcIdentity);
+            SendOpenChatWindow(source, registration);
             PaceKnuBotPackets();
             KnuBotCloseChatWindowMessageHandler.Default.Send(source, registration.NpcIdentity);
             return true;
+        }
+
+        private static void SendOpenChatWindow(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            int unknown2 = IsRegistration(registration, SubwayTailorRegistration) ? 0 : 1;
+            KnuBotOpenChatWindowMessageHandler.Default.Send(
+                source,
+                registration.NpcIdentity,
+                unknown2);
         }
 
         private static void CloseSession(
@@ -905,7 +1005,9 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return null;
             }
 
-            ContentDrivenNpcDialogueRegistration runtimeRegistration = FindWindcallerRuntimeRegistration(npc);
+            ContentDrivenNpcDialogueRegistration runtimeRegistration =
+                FindCapturedSubwayVendorRuntimeRegistration(npc)
+                ?? FindWindcallerRuntimeRegistration(npc);
             if (runtimeRegistration != null)
             {
                 return runtimeRegistration;
@@ -918,7 +1020,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             return Registrations.FirstOrDefault(
-                registration => !IsWindcallerQuestRegistration(registration)
+                registration => !IsRuntimeBoundRegistration(registration)
                                 && !string.IsNullOrWhiteSpace(registration.ExpectedNpcName)
                                 && string.Equals(
                                     npc.Name,
@@ -945,12 +1047,35 @@ namespace ZoneEngine.Core.Arete.Dialogue
         {
             return npc != null
                    && (IsRegisteredIdentity(npc.Identity, registration)
-                       || (!IsWindcallerQuestRegistration(registration)
+                       || (!IsRuntimeBoundRegistration(registration)
                            && !string.IsNullOrWhiteSpace(registration.ExpectedNpcName)
                            && string.Equals(
                                npc.Name,
                                registration.ExpectedNpcName,
                                StringComparison.OrdinalIgnoreCase)));
+        }
+
+        private static ContentDrivenNpcDialogueRegistration FindCapturedSubwayVendorRuntimeRegistration(
+            ICharacter npc)
+        {
+            if (npc == null || npc.Playfield == null)
+            {
+                return null;
+            }
+
+            CapturedSubwayVendorRuntimeDefinition runtime;
+            if (!CapturedSubwayVendorRuntimeRegistry.TryGet(npc.Identity.Instance, out runtime)
+                || runtime == null
+                || runtime.Content == null
+                || runtime.Content.SourceNpcInstance != CapturedSubwayTailorDialogueContent.SourceNpcInstance
+                || !CapturedSubwayVendorRuntimeRegistry.Same(
+                    runtime.PlayfieldIdentity,
+                    npc.Playfield.Identity))
+            {
+                return null;
+            }
+
+            return BindRegistration(SubwayTailorRegistration, runtime.NpcIdentity);
         }
 
         private static ContentDrivenNpcDialogueRegistration FindWindcallerRuntimeRegistration(ICharacter npc)
@@ -999,6 +1124,13 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return IsRegistration(registration, WindcallerKarrecRegistration)
                    || IsRegistration(registration, AnnoyingDudeRegistration)
                    || IsRegistration(registration, MaddyCardileRegistration);
+        }
+
+        private static bool IsRuntimeBoundRegistration(
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            return IsWindcallerQuestRegistration(registration)
+                   || IsRegistration(registration, SubwayTailorRegistration);
         }
 
         private static bool IsRegistration(

@@ -1,6 +1,7 @@
 // Capture-derived Subway merchant content. Appearance and owner/terminal links:
 // AOSharpLiveCapture 20260709-212115. Container stock uses exact template 99634
-// slot evidence from AOSharpLiveCapture 20260613-221619; dialogue remains unresolved.
+// slot evidence from AOSharpLiveCapture 20260613-221619. Tailor dialogue and
+// alternate rolled shop snapshots are preserved from AOSharpLiveCapture 20260719-021611.
 
 namespace ZoneEngine.Core.Playfields
 {

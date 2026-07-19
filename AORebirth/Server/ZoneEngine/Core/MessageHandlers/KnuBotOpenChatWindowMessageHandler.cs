@@ -39,14 +39,24 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Arete.Dialogue;
+
     #endregion
 
     /// <summary>
     /// </summary>
-    [MessageHandler(MessageHandlerDirection.OutboundOnly)]
+    [MessageHandler(MessageHandlerDirection.All)]
     public class KnuBotOpenChatWindowMessageHandler :
         BaseMessageHandler<KnuBotOpenChatWindowMessage, KnuBotOpenChatWindowMessageHandler>
     {
+        public override void Receive(MessageWrapper<KnuBotOpenChatWindowMessage> messageWrapper)
+        {
+            ICharacter source = messageWrapper.Client.Controller.Character;
+            ContentDrivenNpcDialogueRouter.TryStartDialogueForTarget(
+                source,
+                messageWrapper.MessageBody.Target);
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="character">
@@ -55,7 +65,12 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public void Send(ICharacter character, Identity knubotTarget)
         {
-            this.Send(character, this.KnuBotOpenWindow(character, knubotTarget), false);
+            this.Send(character, knubotTarget, 1);
+        }
+
+        public void Send(ICharacter character, Identity knubotTarget, int unknown2)
+        {
+            this.Send(character, this.KnuBotOpenWindow(character, knubotTarget, unknown2), false);
         }
 
         /// <summary>
@@ -66,14 +81,17 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         /// <returns>
         /// </returns>
-        private MessageDataFiller KnuBotOpenWindow(ICharacter character, Identity knubotTarget)
+        private MessageDataFiller KnuBotOpenWindow(
+            ICharacter character,
+            Identity knubotTarget,
+            int unknown2)
         {
             return x =>
             {
                 x.Identity = character.Identity;
                 x.Target = knubotTarget;
                 x.Unknown1 = 2;
-                x.Unknown2 = 1;
+                x.Unknown2 = unknown2;
             };
         }
     }

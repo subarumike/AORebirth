@@ -62,6 +62,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
     {
         public DialogueNode()
         {
+            this.PromptSegments = new List<DialoguePromptSegment>();
             this.Options = new List<DialogueOption>();
             this.EnterActions = new List<DialogueAction>();
         }
@@ -72,9 +73,18 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
         public string PromptTextConfidence { get; set; }
 
+        public IList<DialoguePromptSegment> PromptSegments { get; set; }
+
         public IList<DialogueOption> Options { get; set; }
 
         public IList<DialogueAction> EnterActions { get; set; }
+    }
+
+    public sealed class DialoguePromptSegment
+    {
+        public string Text { get; set; }
+
+        public int Unknown2 { get; set; }
     }
 
     public sealed class DialogueOption
