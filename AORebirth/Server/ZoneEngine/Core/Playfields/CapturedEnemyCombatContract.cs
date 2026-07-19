@@ -1020,9 +1020,30 @@ namespace AORebirth.Core.Playfields
                         NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown4,
                         NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown5);
                 case 203733:
-                    return CapturedEnemyCombatContract.Unresolved(
-                        "Violent Vagabond holds QL1 template 130590 (Red Wine); 40 captured local-player outcomes are misses, three SpecialAttackWeapon rows preserve 32/35/29/31/0 context, and no landed-damage or usable weapon semantics are proven",
-                        true);
+                    return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                        "Official-live captures 20260719-010047 and 20260719-020104 prove repeated Violent Vagabond attack attempts, all misses, a 4.5802404-second corpus cadence, AttackInfo 0/6/0/0, and SpecialAttackWeapon 32/35/29/31/0. Landed damage is unavailable because the Vagabonds could not hit the test character, so the private-project playability policy uses the adjacent same-level Subway Mugger normal range of 9..12. QL1 template 130590 is Red Wine and remains excluded from combat.",
+                        new CapturedEnemySpecialAttackSequenceDefinition(
+                            NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackSeconds,
+                            null,
+                            new CapturedEnemyCombatAttackDefinition(
+                                NpcCombatAttackRules.PolicySubwayViolentVagabondMinimumDamage,
+                                NpcCombatAttackRules.PolicySubwayViolentVagabondMaximumDamage,
+                                0,
+                                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackSeconds,
+                                false,
+                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoAmmoCount,
+                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoWeaponSlot,
+                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoUnknown,
+                                NpcCombatAttackRules.NormalAttackInfoHitType,
+                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoWeaponInstance,
+                                true),
+                            new CapturedEnemySpecialAttackDefinition[0],
+                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown1,
+                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown2,
+                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown3,
+                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown4,
+                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown5));
                 default:
                     return CapturedEnemyCombatContract.Unresolved(
                         "No captured combat contract for " + name + " monsterData=" + monsterData,

@@ -1699,7 +1699,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
             Assert.IsTrue(
                 providerText.Contains("RuntimeQuarantinedSourceInstances.Contains(spawn.SourceInstance)"),
-                "The 11 evidence-incomplete Violent Vagabond rows must remain behind the diagnostic selector.");
+                "The supported-family diagnostic quarantine mechanism must remain available even when no rows use it.");
             Assert.IsFalse(
                 providerText.Contains("122002"),
                 "CapturedSubwayContentProvider must bind content to resource/playfield 127, not capture object Playfield2:122002.");
@@ -2592,21 +2592,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             OrdinaryEnemySpawnDefinition[] ordinarySpawns = ordinaryCatalog.GetSpawns();
             Assert.AreEqual(321, ordinarySpawns.Length);
             Assert.AreEqual(
-                310,
+                321,
                 ordinarySpawns.Count(
                     value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
-            CollectionAssert.AreEquivalent(
-                new[]
-                {
-                    0x79557CAC, 0x7957405C, 0x795743A7, 0x795743A8,
-                    0x7957E02C, 0x7957E02E, 0x7957E123, 0x7957E40E,
-                    0x7957E5BF, 0x7957E5C4, 0x7957E5C5
-                },
-                ordinarySpawns
-                    .Where(
-                        value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined)
-                    .Select(value => value.SourceIdentity)
-                    .ToArray());
+            Assert.IsFalse(
+                ordinarySpawns.Any(
+                    value => value.Disposition
+                             == OrdinaryEnemyRuntimeDisposition.Quarantined));
 
             string[] acceptedEnemyKeys =
                 {

@@ -13,6 +13,46 @@ namespace AORebirth.Core.Playfields
         Specialized = 3
     }
 
+    internal sealed class CapturedEnemyCombatAttackDefinition
+    {
+        internal int MinDamage { get; set; }
+
+        internal int MaxDamage { get; set; }
+
+        internal double RechargeSeconds { get; set; }
+
+        internal int AttackInfoAmmoCount { get; set; }
+
+        internal int AttackInfoWeaponSlot { get; set; }
+
+        internal int AttackInfoUnknown { get; set; }
+
+        internal int AttackInfoWeaponInstance { get; set; }
+    }
+
+    internal sealed class CapturedEnemySpecialAttackDefinition
+    {
+    }
+
+    internal sealed class CapturedEnemySpecialAttackSequenceDefinition
+    {
+        internal CapturedEnemyCombatAttackDefinition OpeningAttack { get; set; }
+
+        internal CapturedEnemyCombatAttackDefinition RepeatingAttack { get; set; }
+
+        internal CapturedEnemySpecialAttackDefinition[] SpecialAttacks { get; set; }
+
+        internal int SpecialAttackWeaponUnknown1 { get; set; }
+
+        internal int SpecialAttackWeaponUnknown2 { get; set; }
+
+        internal int SpecialAttackWeaponUnknown3 { get; set; }
+
+        internal int SpecialAttackWeaponUnknown4 { get; set; }
+
+        internal int SpecialAttackWeaponUnknown5 { get; set; }
+    }
+
     internal sealed class CapturedEnemyCombatContract
     {
         internal CapturedEnemyAttackModel AttackModel { get; set; }
@@ -50,6 +90,8 @@ namespace AORebirth.Core.Playfields
         internal bool HasCapturedCombatStopSequence { get; set; }
 
         internal int AttackInfoAmmoCount { get; set; }
+
+        internal CapturedEnemySpecialAttackSequenceDefinition SpecialAttackSequence { get; set; }
     }
 
     internal static class CapturedSubwayCombatCatalog
@@ -149,6 +191,36 @@ namespace AORebirth.Core.Playfields
                     AttackInfoWeaponSlot = 0,
                     AttackInfoUnknown = 0,
                     AttackInfoWeaponInstance = 0x53495731
+                };
+            }
+
+            if (monsterData == 203733)
+            {
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.Specialized,
+                    IsCombatReady = true,
+                    Evidence = "private-project playability policy uses adjacent same-level Subway Mugger 9..12 damage; Red Wine remains excluded from combat.",
+                    SpecialAttackSequence = new CapturedEnemySpecialAttackSequenceDefinition
+                    {
+                        OpeningAttack = null,
+                        RepeatingAttack = new CapturedEnemyCombatAttackDefinition
+                        {
+                            MinDamage = 9,
+                            MaxDamage = 12,
+                            RechargeSeconds = 4.5802404,
+                            AttackInfoAmmoCount = 0,
+                            AttackInfoWeaponSlot = 6,
+                            AttackInfoUnknown = 0,
+                            AttackInfoWeaponInstance = 0
+                        },
+                        SpecialAttacks = new CapturedEnemySpecialAttackDefinition[0],
+                        SpecialAttackWeaponUnknown1 = 32,
+                        SpecialAttackWeaponUnknown2 = 35,
+                        SpecialAttackWeaponUnknown3 = 29,
+                        SpecialAttackWeaponUnknown4 = 31,
+                        SpecialAttackWeaponUnknown5 = 0
+                    }
                 };
             }
 

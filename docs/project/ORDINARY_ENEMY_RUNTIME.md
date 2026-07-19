@@ -1,6 +1,6 @@
 # Generic Ordinary-Enemy Runtime
 
-Population ownership: profile-backed Subway rows are activated and respawned by `WorldPopulationController`. `OrdinaryEnemyRuntimeService` materializes requested rows only and does not enumerate population or own respawn timers. The catalog remains the capture-backed adapter with 321 rows, 310 active, and 11 quarantined.
+Population ownership: profile-backed Subway rows are activated and respawned by `WorldPopulationController`. `OrdinaryEnemyRuntimeService` materializes requested rows only and does not enumerate population or own respawn timers. The catalog remains the capture-backed adapter with 321 rows, all 321 active, and zero quarantined.
 
 ## Decision
 
@@ -139,11 +139,13 @@ Subway evidence into 26 reusable type profiles and 321 exact spawn rows:
   Rebuild, Fragmented Soul, Redundant Scan, Uncontrollable Anger, Infected
   Attendant, Lost Thought, Empty Shell, and Premature Pattern.
 
-The configured activation boundary is 310 active rows. The 16 accepted-profile
+The configured activation boundary is 321 active rows. The 16 accepted-profile
 rows activated in this slice require bounded private-client validation before
-this can be called the safe runtime boundary. The remaining 11 PF127 diagnostic
-rows are Violent Vagabonds still missing capture-proven local-player damage and
-reset boundaries. Profile or spawn existence alone does not enable a row.
+this can be called the safe runtime boundary. All 22 Violent Vagabond rows are
+active under the explicit same-level Subway damage policy because the official
+family repeatedly missed the test character and cannot supply a landed roll.
+Exact landed-damage parity and reset boundaries remain unresolved; profile or
+spawn existence alone still does not enable a row.
 
 Named bosses and owned summons are not in the catalog.
 
@@ -218,7 +220,7 @@ the incomplete item-pool boundary.
 The restored deep-population slice uses strict initial corpse snapshots, including
 empty snapshots, when calculating observed item frequencies. It does not infer
 guaranteed loot from a successful roll. The catalog now contains 321 represented
-rows, 310 active rows, and 11 quarantined rows.
+rows, all 321 active rows, and zero quarantined rows.
 
 Slum Runner now has 21 identity-linked corpse generations: seven focused
 records from `20260716-034656` and `20260716-215947`, plus fourteen recovered
@@ -458,7 +460,11 @@ for Disobedient Bot source `0x79557C66` and an exact 26-segment replay patrol fo
 Violent Vagabond source `0x7957E5C4`. These are source-specific captured routes,
 not evidence that other rows should receive background patrols. The same capture
 brings Vagabond strict loot to 14 atomic outcomes (`13` positive, `1` empty), but
-its combat sample still contains 40 misses and no landed local-player damage.
+its combat sample still contains only misses and no landed local-player damage.
+Runtime therefore uses the adjacent same-level Mugger normal range `9..12` as
+an explicit playability policy while retaining Vagabond cadence and packet
+shape. Red Wine template `130590` remains excluded from combat. All 22 exact
+population rows are active.
 It proves neither respawn timing nor corpse lifetime.
 
 Finalized capture `20260719-021022` supplies source-specific complete patrols for
@@ -468,8 +474,9 @@ active Filth Fleas `0x7953AFCC` (10 segments, 28 complete cycles) and
 `0x7953AFA1` (10 segments, four complete cycles). It independently corroborates
 four existing Flea routes and the existing Vagabond route. Ambiguous complete
 routes remain evidence-only and are not mapped. The Violent Vagabond patrol
-evidence adds no combat result, so the family remains partially quarantined and
-`0x7953AFA1` keeps its active disposition. Incidental Mugger evidence adds one
+evidence adds no landed combat result; the family remains capture-incomplete but
+runtime-active under the explicit damage policy, and `0x7953AFA1` keeps its
+active disposition. Incidental Mugger evidence adds one
 miss and SIW context without changing the captured Mugger landed-damage range.
 The capture also adds an exact L5 Mugger corpse with `44` credits, CATMesh
 `17534`, and one QL5 `123495/123496` item, raising strict Mugger loot from 17
@@ -480,10 +487,11 @@ Current unresolved data remains fail-closed, including combat sources without a
 landed captured hit, unsupported/nonordinary respawn classifications without an
 explicit owner policy, automatic-aggro radii not yet captured, level ranges not
 established by evidence or decision, and random roam behavior not proven by
-movement evidence. The remaining 11 Violent Vagabond rows stay quarantined;
-one exact patrol does not resolve their missing landed-damage contract.
+movement evidence. No Violent Vagabond row remains quarantined. Exact patrols
+do not resolve the missing landed-damage evidence, so the `9..12` runtime range
+remains explicitly policy-backed rather than capture-proven.
 The whole-enemy gate still accepts 21 of 26 profiles. Infected Attendant, Lost
-Thought, Empty Shell, Premature Pattern, and Violent Vagabond account for 32
-active rows plus the 11 quarantined Vagabonds and require the next
+Thought, Empty Shell, Premature Pattern, and Violent Vagabond account for 43
+active rows and require the next
 corpus-backed completion pass; active disposition is not a claim that those
 five profiles are complete.
