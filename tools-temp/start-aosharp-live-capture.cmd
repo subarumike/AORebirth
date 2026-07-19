@@ -9,6 +9,8 @@ set "PLUGIN_DLL=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\AOSharpLiveC
 set "CAPTURE_ROOT=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\captures"
 set "LOOT_CAPTURE_REQUEST=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\loot-10.request"
 set "PF127_GEOMETRY_ONLY_REQUEST=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\pf127-geometry-only.request"
+set "EXTERNAL_CONTROL_REQUEST=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\AOSharpLiveCapture.control"
+set "EXTERNAL_CONTROL_PROCESSING=%EXTERNAL_CONTROL_REQUEST%.processing"
 set "LOG_PATH=%REPO_ROOT%\tools-temp\AOSharpLiveInjector\bin\Debug\AOSharpLiveInjector-start.log"
 set "TARGET_SWITCH="
 set "TARGET_VALUE="
@@ -73,6 +75,21 @@ if not exist "%PLUGIN_DLL%" (
     echo FAILED: AOSharpLiveCapture plugin not found: "%PLUGIN_DLL%"
     exit /b 1
 )
+
+set "SELF_TEST_PLUGIN=%PLUGIN_DLL%.self-test-must-not-exist"
+set "SELF_TEST_OUTPUT=%TEMP%\aosharp-live-injector-self-test-%RANDOM%%RANDOM%.txt"
+if exist "%SELF_TEST_PLUGIN%" (
+    echo FAILED: injector self-test sentinel unexpectedly exists: "%SELF_TEST_PLUGIN%"
+    exit /b 1
+)
+
+"%INJECTOR_EXE%" --self-test --plugin "%SELF_TEST_PLUGIN%" > "%SELF_TEST_OUTPUT%" 2>&1
+set "SELF_TEST_EXIT=!ERRORLEVEL!"
+findstr /X /C:"PASS: capture-safe bootstrap disables the GUI chat patch." "%SELF_TEST_OUTPUT%" >nul 2>nul
+set "SELF_TEST_MATCH=!ERRORLEVEL!"
+del /q "%SELF_TEST_OUTPUT%" >nul 2>nul
+if not "!SELF_TEST_EXIT!"=="0" goto unsafe_injector
+if not "!SELF_TEST_MATCH!"=="0" goto unsafe_injector
 
 if not exist "%CAPTURE_ROOT%" mkdir "%CAPTURE_ROOT%" >nul 2>nul
 if not exist "%CAPTURE_ROOT%" (
@@ -148,6 +165,9 @@ if defined PREVIOUS_CAPTURE (
         )
     )
 )
+
+call :cleanup_external_control
+if errorlevel 1 exit /b 1
 
 if not defined LOOT_CAPTURE_MODE if exist "%LOOT_CAPTURE_REQUEST%" del /q "%LOOT_CAPTURE_REQUEST%" >nul 2>nul
 if defined LOOT_CAPTURE_MODE (
@@ -264,6 +284,12 @@ if defined POST_ARM_FAILURE_LOG echo FailureLog: "%POST_ARM_FAILURE_LOG%"
 if defined POST_ARM_SHOW_ERRORS if exist "%POST_ARM_FAILURE_LOG%" findstr /C:"ERROR:" "%POST_ARM_FAILURE_LOG%" 2>nul
 exit /b %POST_ARM_EXIT_CODE%
 
+:unsafe_injector
+if exist "%SELF_TEST_OUTPUT%" del /q "%SELF_TEST_OUTPUT%" >nul 2>nul
+echo FAILED: capture-safe injector self-test failed; refusing to inject.
+echo RebuildCommand: cmd /d /c tools-temp\build-aosharp-live-injector.cmd
+exit /b 1
+
 :usage
 echo Usage: cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "Anarchy Online"
 echo    or: cmd /d /c tools-temp\start-aosharp-live-capture.cmd --pid 1234
@@ -289,3 +315,16 @@ if exist "%PF127_GEOMETRY_ONLY_REQUEST%" (
     exit /b 1
 )
 exit /b 0
+
+:cleanup_external_control
+if exist "%EXTERNAL_CONTROL_REQUEST%" del /q "%EXTERNAL_CONTROL_REQUEST%" >nul 2>nul
+if exist "%EXTERNAL_CONTROL_PROCESSING%" del /q "%EXTERNAL_CONTROL_PROCESSING%" >nul 2>nul
+for %%F in ("%EXTERNAL_CONTROL_REQUEST%.*.tmp") do if exist "%%~fF" del /q "%%~fF" >nul 2>nul
+if exist "%EXTERNAL_CONTROL_REQUEST%" goto external_control_cleanup_failed
+if exist "%EXTERNAL_CONTROL_PROCESSING%" goto external_control_cleanup_failed
+exit /b 0
+
+:external_control_cleanup_failed
+echo FAILED: could not clear stale AOSharp capture-control files; refusing to inject.
+echo RequestFile: "%EXTERNAL_CONTROL_REQUEST%"
+exit /b 1

@@ -1,0 +1,135 @@
+diff --git a/AOSharp.Bootstrap/Main.cs b/AOSharp.Bootstrap/Main.cs
+index 639dde5..ccb222a 100644
+--- a/AOSharp.Bootstrap/Main.cs
++++ b/AOSharp.Bootstrap/Main.cs
+@@ -15,6 +15,10 @@ namespace AOSharp.Bootstrap
+     [Serializable]
+     public class Main : IEntryPoint
+     {
++        public const string CaptureSafeChannelSuffix = "_capture_safe";
++        public const int CaptureSafeContractVersion = 1;
++        public const string CaptureSafeSingletonNamePrefix = @"Local\AOSharpCaptureBootstrap_";
++
+         private IPCServer _ipcPipe;
+         private AppDomain _pluginAppDomain;
+         private ManualResetEvent _connectEvent;
+@@ -23,36 +27,88 @@ namespace AOSharp.Bootstrap
+         private PluginProxy _pluginProxy;
+         private ChatSocketListener _chatSocketListener;
+         private bool _exiting = false;
++        private readonly bool _captureSafeMode;
++        private readonly EventWaitHandle _captureSafeSingleton;
+ 
+         private string _lastChatInput;
+         private IntPtr _lastChatInputWindowPtr;
+ 
+         public Main(RemoteHooking.IContext inContext, String inChannelName)
+         {
+-            Log.Logger = new LoggerConfiguration()
+-                .WriteTo.File("AOSharp.Bootstrapper.txt", restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug)
+-                .CreateLogger();
++            _captureSafeMode = IsCaptureSafeChannel(inChannelName);
++            if (_captureSafeMode)
++            {
++                bool createdNew;
++                _captureSafeSingleton = new EventWaitHandle(
++                    false,
++                    EventResetMode.ManualReset,
++                    GetCaptureSafeSingletonName(inChannelName),
++                    out createdNew);
++                if (!createdNew)
++                {
++                    _captureSafeSingleton.Dispose();
++                    throw new InvalidOperationException(
++                        "A capture-safe AOSharp bootstrap is already active in this client process.");
++                }
++            }
+ 
+-            _connectEvent = new ManualResetEvent(false);
+-            _unloadEvent = new ManualResetEvent(false);
+-            _chatSocketListener = new ChatSocketListener();
++            try
++            {
++                Log.Logger = new LoggerConfiguration()
++                    .WriteTo.File("AOSharp.Bootstrapper.txt", restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug)
++                    .CreateLogger();
++
++                Log.Information("Bootstrap capture-safe mode: {CaptureSafeMode}", _captureSafeMode);
++
++                _connectEvent = new ManualResetEvent(false);
++                _unloadEvent = new ManualResetEvent(false);
++                _chatSocketListener = new ChatSocketListener();
++
++                //Setup IPC server that will be used for handling API requests and events.
++                _ipcPipe = new IPCServer(inChannelName);
++                _ipcPipe.OnConnected = OnIPCClientConnected;
++                _ipcPipe.OnDisconnected = OnIPCClientDisconnected;
++                _ipcPipe.RegisterCallback((byte)HookOpCode.LoadAssembly, typeof(LoadAssemblyMessage), OnAssembliesChanged);
++                _ipcPipe.Start();
++            }
++            catch
++            {
++                _captureSafeSingleton?.Dispose();
++                throw;
++            }
++        }
+ 
+-            //Setup IPC server that will be used for handling API requests and events.
+-            _ipcPipe = new IPCServer(inChannelName);
+-            _ipcPipe.OnConnected = OnIPCClientConnected;
+-            _ipcPipe.OnDisconnected = OnIPCClientDisconnected;
+-            _ipcPipe.RegisterCallback((byte)HookOpCode.LoadAssembly, typeof(LoadAssemblyMessage), OnAssembliesChanged);
+-            _ipcPipe.Start();
++        public static bool IsCaptureSafeChannel(string channelName)
++        {
++            return !string.IsNullOrEmpty(channelName)
++                && channelName.EndsWith(CaptureSafeChannelSuffix, StringComparison.Ordinal);
++        }
++
++        public static bool ShouldInstallGuiChatPatch(bool captureSafeMode)
++        {
++            return !captureSafeMode;
++        }
++
++        public static string GetCaptureSafeSingletonName(string channelName)
++        {
++            return CaptureSafeSingletonNamePrefix + channelName;
+         }
+ 
+         public void Run(RemoteHooking.IContext inContext, String inChannelName)
+         {
+-            //If the GameController doesn't connect within 10 seconds we will unload the dll.
+-            if (!_connectEvent.WaitOne(10000))
+-                return;
++            try
++            {
++                //If the GameController doesn't connect within 10 seconds we will unload the dll.
++                if (!_connectEvent.WaitOne(10000))
++                    return;
+ 
+-            //Wait for the signal to unload the dll.
+-            _unloadEvent.WaitOne();
++                //Wait for the signal to unload the dll.
++                _unloadEvent.WaitOne();
++            }
++            finally
++            {
++                _captureSafeSingleton?.Dispose();
++            }
+         }
+ 
+         private void OnIPCClientConnected(IPCServer pipe)
+@@ -204,7 +267,12 @@ namespace AOSharp.Bootstrap
+                         "recv",
+                         new Ws2_32.RecvDelegate(WsRecv_Hook));
+ 
+-            if (ProcessChatInputPatcher.Patch(out IntPtr pProcessCommand, out IntPtr pGetCommand))
++            // The live-client GUI patch rewrites 0x83 bytes in ProcessChatInput
++            // and has produced native heap/SEH corruption in captured dumps.
++            // Comprehensive capture starts automatically and uses external file
++            // control, so capture-safe injection must never install this patch.
++            if (ShouldInstallGuiChatPatch(_captureSafeMode)
++                && ProcessChatInputPatcher.Patch(out IntPtr pProcessCommand, out IntPtr pGetCommand))
+             {
+                 CommandInterpreter_c.ProcessChatInput = Marshal.GetDelegateForFunctionPointer<CommandInterpreter_c.DProcessChatInput>(pProcessCommand);
+                 CommandInterpreter_c.GetCommand = Marshal.GetDelegateForFunctionPointer<CommandInterpreter_c.DGetCommand>(pGetCommand);

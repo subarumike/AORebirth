@@ -58,6 +58,7 @@ namespace AOSharpLiveCapture
         private const int CorpseFullUpdateTailDeadNpcTypeSuffixOffset = 80;
         private const int CorpseFullUpdateTailDeadNpcInstanceSuffixOffset = 84;
         private const string LootCaptureRequestFileName = "loot-10.request";
+        private const string ExternalControlRequestFileName = "AOSharpLiveCapture.control";
         private readonly HashSet<string> interestingMessageNames = new HashSet<string>
         {
             "SimpleCharFullUpdate",
@@ -206,12 +207,15 @@ namespace AOSharpLiveCapture
         private int npcLifecycleRowCount;
         private DateTime nextFlushUtc;
         private DateTime nextSnapshotUtc;
+        private DateTime nextExternalControlPollUtc;
         private DateTime captureStartUtc;
         private DateTime captureStartLocal;
         private DateTime lastPacketUtc;
         private DateTime localEnemyCombatContextUntilUtc;
         private string lastPlayfieldId = string.Empty;
         private string lastCapturePlayfieldIdentity = string.Empty;
+        private string externalControlRequestPath;
+        private string externalControlProcessingPath;
         private CombatLootSmoke combatLootSmoke;
         private Pf127GeometryCapture pf127GeometryCapture;
         private int pf127CaptureRuntimeReady;
@@ -267,6 +271,8 @@ namespace AOSharpLiveCapture
         private void Initialize(string pluginDir)
         {
             this.pluginDirectory = pluginDir;
+            this.externalControlRequestPath = Path.Combine(pluginDir, ExternalControlRequestFileName);
+            this.externalControlProcessingPath = this.externalControlRequestPath + ".processing";
             Interlocked.Exchange(ref this.pf127CaptureRuntimeReady, 0);
             Interlocked.Exchange(ref this.callbackDispatchEnabled, 0);
             Interlocked.Exchange(ref this.pf127CollectionArmed, 0);
@@ -293,8 +299,10 @@ namespace AOSharpLiveCapture
             Game.TeleportFailed += this.OnTeleportFailedBoundary;
 
             this.LogEvent("PLUGIN", "AOSharpLiveCapture loaded. session=" + this.sessionDirectory);
-            this.LogEvent("PLUGIN", "Commands: /aocap start | stop | mark <text> | status | flush | snapshot | dynels [force] | fight start|stop|auto on|auto off|status");
-            this.LogEvent("PLUGIN", "Smoke commands: /aosmoke start [mobAlias] | stop | status | log");
+            this.LogEvent(
+                "PLUGIN",
+                "Capture-safe injection disables GUI chat commands; external control file: "
+                + this.externalControlRequestPath);
             this.LogEvent("PLUGIN", "ShopUpdate CSV: " + Path.Combine(this.sessionDirectory, "shop-updates.csv"));
             this.LogEvent("PLUGIN", "VendingMachineFullUpdate CSV: " + Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
             this.LogEvent("PLUGIN", "System messages log: " + Path.Combine(this.sessionDirectory, "system-messages.log"));
@@ -311,10 +319,9 @@ namespace AOSharpLiveCapture
             this.LogEvent("PLUGIN", "Enemy fight events log: " + Path.Combine(this.sessionDirectory, "enemy-fight-events.log"));
             this.LogEvent("PLUGIN", "Enemy dossier JSON: " + Path.Combine(this.sessionDirectory, "enemy-dossier.json"));
             this.LogEvent("PLUGIN", "Enemy state JSON: " + Path.Combine(this.sessionDirectory, "enemy-state.json"));
-            this.LogEvent("PLUGIN", "PF127 geometry JSON: " + Path.Combine(this.sessionDirectory, "pf127-geometry.json"));
-            this.LogEvent("PLUGIN", "PF127 line-of-sight CSV: " + Path.Combine(this.sessionDirectory, "pf127-line-of-sight.csv"));
-            this.LogEvent("PLUGIN", "PF127 door-state CSV: " + Path.Combine(this.sessionDirectory, "pf127-door-state.csv"));
-            this.LogEvent("PLUGIN", "PF127 capture errors: " + Path.Combine(this.sessionDirectory, "pf127-capture-errors.log"));
+            this.LogEvent(
+                "PLUGIN",
+                "PF127 native geometry probing is disabled in comprehensive mode; use the explicit geometry-only workflow.");
             this.LogEvent("PLUGIN", "Capture callback errors: " + Path.Combine(this.sessionDirectory, "capture-callback-errors.log"));
             this.LogEvent("PLUGIN", "Capture info: " + Path.Combine(this.sessionDirectory, "capture_info.json"));
             this.LogEvent("PLUGIN", "Capture session metadata: " + Path.Combine(this.sessionDirectory, "capture-session.json"));
@@ -637,32 +644,15 @@ namespace AOSharpLiveCapture
                     break;
 
                 case "stop":
-                    DateTime stopUtc = DateTime.UtcNow;
-                    if (!this.captureStopDrainRequested)
+                    if (this.RequestCaptureStop(DateTime.UtcNow, "COMMAND"))
                     {
-                        this.captureStopDrainRequested = true;
-                        this.captureStopRequestedUtc = stopUtc;
-                        this.captureStopQuietDeadlineUtc = stopUtc.AddSeconds(CaptureStopQuietPeriodSeconds);
-                        this.captureStopMaximumDeadlineUtc = stopUtc.AddSeconds(CaptureStopMaximumDrainSeconds);
-                        this.LogEvent("COMMAND", "capture stop requested; draining raw packets until quiet");
-                        this.Flush();
                         chatWindow.WriteLine("AO capture stop requested; finalizing after the packet drain.", ChatColor.Gold);
                     }
                     break;
 
                 case "mark":
                     string marker = args.Length > 1 ? string.Join(" ", args.Skip(1).ToArray()) : "(no text)";
-                    if (marker.IndexOf("respawn", StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        this.respawnCaptureRequested = true;
-                    }
-
-                    if (marker.IndexOf("loot", StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        this.lootCaptureRequested = true;
-                    }
-
-                    this.LogEvent("MARK", marker);
+                    this.RecordCaptureMarker(marker);
                     chatWindow.WriteLine("AO capture marker written.", ChatColor.Gold);
                     break;
 
@@ -1448,6 +1438,8 @@ namespace AOSharpLiveCapture
 
         private void OnUpdate(object sender, float deltaTime)
         {
+            DateTime now = DateTime.UtcNow;
+            this.PollExternalControl(now);
             if (!this.enabled)
             {
                 return;
@@ -1455,7 +1447,6 @@ namespace AOSharpLiveCapture
 
             this.combatLootSmoke?.Update(deltaTime);
 
-            DateTime now = DateTime.UtcNow;
             Pf127GeometryCapture geometryCapture = this.pf127GeometryCapture;
             if (geometryCapture != null
                 && Volatile.Read(ref this.pf127CaptureRuntimeReady) != 0
@@ -1493,6 +1484,135 @@ namespace AOSharpLiveCapture
                     this.CompleteCaptureStop(now, quietPeriodPassed, true);
                 }
             }
+        }
+
+        private void PollExternalControl(DateTime now)
+        {
+            if (now < this.nextExternalControlPollUtc)
+            {
+                return;
+            }
+
+            this.nextExternalControlPollUtc = now.AddMilliseconds(250);
+            if (string.IsNullOrEmpty(this.externalControlRequestPath)
+                || !File.Exists(this.externalControlRequestPath))
+            {
+                return;
+            }
+
+            try
+            {
+                if (File.Exists(this.externalControlProcessingPath))
+                {
+                    return;
+                }
+
+                File.Move(this.externalControlRequestPath, this.externalControlProcessingPath);
+                string request = File.ReadAllText(this.externalControlProcessingPath).Trim();
+                File.Delete(this.externalControlProcessingPath);
+
+                if (string.Equals(request, "start", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!this.enabled)
+                    {
+                        this.OpenFreshCaptureSession(this.pluginDirectory, true, true);
+                        this.LogEvent("EXTERNAL-CONTROL", "capture started");
+                    }
+
+                    return;
+                }
+
+                if (!this.enabled)
+                {
+                    return;
+                }
+
+                if (string.Equals(request, "stop", StringComparison.OrdinalIgnoreCase))
+                {
+                    this.RequestCaptureStop(now, "EXTERNAL-CONTROL");
+                    return;
+                }
+
+                if (string.Equals(request, "flush", StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Flush();
+                    this.LogEvent("EXTERNAL-CONTROL", "capture flushed");
+                    return;
+                }
+
+                if (string.Equals(request, "snapshot", StringComparison.OrdinalIgnoreCase))
+                {
+                    this.LogSnapshot("external-control");
+                    this.LogEvent("EXTERNAL-CONTROL", "snapshot written");
+                    return;
+                }
+
+                if (string.Equals(request, "mark", StringComparison.OrdinalIgnoreCase)
+                    || request.StartsWith("mark ", StringComparison.OrdinalIgnoreCase))
+                {
+                    string marker = request.Length > 4 ? request.Substring(5).Trim() : "(no text)";
+                    if (string.IsNullOrEmpty(marker))
+                    {
+                        marker = "(no text)";
+                    }
+
+                    this.RecordCaptureMarker(marker);
+                    this.LogEvent("EXTERNAL-CONTROL", "marker written");
+                    return;
+                }
+
+                this.LogEvent("EXTERNAL-CONTROL", "unknown request ignored: " + request);
+            }
+            catch (Exception ex)
+            {
+                if (this.enabled)
+                {
+                    this.LogEvent("EXTERNAL-CONTROL", "request failed: " + ex);
+                }
+
+                try
+                {
+                    if (!string.IsNullOrEmpty(this.externalControlProcessingPath)
+                        && File.Exists(this.externalControlProcessingPath))
+                    {
+                        File.Delete(this.externalControlProcessingPath);
+                    }
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        private bool RequestCaptureStop(DateTime stopUtc, string source)
+        {
+            if (this.captureStopDrainRequested)
+            {
+                return false;
+            }
+
+            this.captureStopDrainRequested = true;
+            this.captureStopRequestedUtc = stopUtc;
+            this.captureStopQuietDeadlineUtc = stopUtc.AddSeconds(CaptureStopQuietPeriodSeconds);
+            this.captureStopMaximumDeadlineUtc = stopUtc.AddSeconds(CaptureStopMaximumDrainSeconds);
+            this.LogEvent(source, "capture stop requested; draining raw packets until quiet");
+            this.Flush();
+            return true;
+        }
+
+        private void RecordCaptureMarker(string marker)
+        {
+            if (marker.IndexOf("respawn", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                this.respawnCaptureRequested = true;
+            }
+
+            if (marker.IndexOf("loot", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                this.lootCaptureRequested = true;
+            }
+
+            this.LogEvent("MARK", marker);
         }
 
         private void CompleteCaptureStop(
@@ -7369,7 +7489,11 @@ namespace AOSharpLiveCapture
             this.corpseFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,ReceiverInstance,CorpseType,CorpseInstance,CorpseIdentity,CorpseName,PlayfieldId,PositionX,PositionY,PositionZ,MonsterScale,Sex,Breed,Race,DeadNpcType,DeadNpcInstance,DeadNpcIdentity,DeadNpcName,CorpseCatMesh,CorpseCredits,CorpseMonsterData,TailDeadNpcType,TailDeadNpcInstance,TailDeadNpcIdentity,PacketLength,RawHex");
             this.npcLifecycleLog = CreateWriter(Path.Combine(this.sessionDirectory, "npc-lifecycle.csv"));
             this.npcLifecycleLog.WriteLine("CapturedUtc,Direction,Sequence,Phase,MessageType,PrimaryIdentity,RelatedIdentity,Name,Detail");
-            this.pf127GeometryCapture = new Pf127GeometryCapture(this.sessionDirectory, this.LogEvent);
+            // Native surface loading/raycast/door probes are isolated to the
+            // explicit MinimalPf127Capture workflow. They are not required for
+            // gameplay evidence and cannot safely run in a comprehensive packet
+            // capture callback inside the live client.
+            this.pf127GeometryCapture = null;
             this.WriteEnemyStateJson();
             this.WriteEnemyDossierJson();
             this.WriteMovementSummaryJson();
@@ -7400,6 +7524,7 @@ namespace AOSharpLiveCapture
             this.enabled = true;
             this.nextFlushUtc = DateTime.UtcNow.AddSeconds(2);
             this.nextSnapshotUtc = DateTime.UtcNow.AddSeconds(1);
+            this.nextExternalControlPollUtc = DateTime.UtcNow;
         }
 
         private void ResetCaptureState()
