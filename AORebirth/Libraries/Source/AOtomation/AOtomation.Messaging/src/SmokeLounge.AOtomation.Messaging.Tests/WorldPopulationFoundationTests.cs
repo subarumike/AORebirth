@@ -388,27 +388,43 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration, bloodcreeper.LevelDefinition.RerollPolicy);
 
             var profilesByKey = profiles.ToDictionary(value => value.ProfileKey, StringComparer.Ordinal);
-            OrdinaryEnemySpawnDefinition disobedientBotPatrol = spawns.Single(
-                value => value.SourceIdentity == 0x79557C66);
+            OrdinaryEnemySpawnDefinition[] activeCapturedPatrols =
+                {
+                    spawns.Single(value => value.SourceIdentity == 0x79557C66),
+                    spawns.Single(value => value.SourceIdentity == 0x7953AFCC),
+                    spawns.Single(value => value.SourceIdentity == 0x795317F5),
+                    spawns.Single(value => value.SourceIdentity == 0x79528FDA),
+                    spawns.Single(value => value.SourceIdentity == 0x7953AFA1)
+                };
             OrdinaryEnemyProfile violentVagabond = profiles.Single(
                 value => value.DisplayName == "Violent Vagabond");
             OrdinaryEnemySpawnDefinition[] violentVagabondSpawns = spawns
                 .Where(value => value.ProfileKey == violentVagabond.ProfileKey)
                 .ToArray();
-            OrdinaryEnemySpawnDefinition violentVagabondPatrol = violentVagabondSpawns.Single(
-                value => value.SourceIdentity == 0x7957E5C4);
-            Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, disobedientBotPatrol.MovementMode);
-            Assert.IsTrue(disobedientBotPatrol.UseCapturedPatrolReplay);
-            Assert.IsTrue(disobedientBotPatrol.UseSpawnAsPatrolStart);
-            Assert.AreEqual(
-                OrdinaryEnemyRuntimeDisposition.Active,
-                disobedientBotPatrol.Disposition);
-            Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, violentVagabondPatrol.MovementMode);
-            Assert.IsTrue(violentVagabondPatrol.UseCapturedPatrolReplay);
-            Assert.IsTrue(violentVagabondPatrol.UseSpawnAsPatrolStart);
-            Assert.AreEqual(
-                OrdinaryEnemyRuntimeDisposition.Quarantined,
-                violentVagabondPatrol.Disposition);
+            OrdinaryEnemySpawnDefinition[] quarantinedCapturedPatrols =
+                {
+                    violentVagabondSpawns.Single(value => value.SourceIdentity == 0x7957E5C4)
+                };
+            foreach (OrdinaryEnemySpawnDefinition capturedPatrol in activeCapturedPatrols)
+            {
+                Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, capturedPatrol.MovementMode);
+                Assert.IsTrue(capturedPatrol.UseCapturedPatrolReplay);
+                Assert.IsTrue(capturedPatrol.UseSpawnAsPatrolStart);
+                Assert.AreEqual(
+                    OrdinaryEnemyRuntimeDisposition.Active,
+                    capturedPatrol.Disposition);
+            }
+
+            foreach (OrdinaryEnemySpawnDefinition capturedPatrol in quarantinedCapturedPatrols)
+            {
+                Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, capturedPatrol.MovementMode);
+                Assert.IsTrue(capturedPatrol.UseCapturedPatrolReplay);
+                Assert.IsTrue(capturedPatrol.UseSpawnAsPatrolStart);
+                Assert.AreEqual(
+                    OrdinaryEnemyRuntimeDisposition.Quarantined,
+                    capturedPatrol.Disposition);
+            }
+
             Assert.AreEqual(22, violentVagabondSpawns.Length);
             Assert.AreEqual(
                 11,
@@ -1053,28 +1069,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(conflicting.IsCombatReady);
             Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, mugger.Loot.PoolMode);
             Assert.IsFalse(mugger.Loot.ItemPoolComplete);
-            Assert.AreEqual(17, mugger.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(18, mugger.Loot.ObservedCompleteInventories);
             Assert.AreEqual(3, mugger.Loot.ObservedEmptyInventories);
             CollectionAssert.AreEquivalent(
                 new[]
                 {
-                    "25822:25831:5:1:17", "85711:22014:8:1:17",
-                    "123704:123705:9:1:17", "123723:123724:6:1:17",
-                    "123976:123977:9:1:17", "124348:124349:7:1:17",
-                    "124545:124546:10:1:17", "128636:128637:8:1:17",
-                    "128839:128840:9:1:17", "130060:130061:5:1:17",
-                    "130060:130061:9:1:17", "131605:131606:7:1:17",
-                    "136638:136639:9:1:17", "136638:136639:12:1:17",
-                    "136640:136641:7:1:17", "136640:136641:8:1:17",
-                    "136640:136641:9:1:17", "136646:136647:9:1:17",
-                    "160224:160225:10:1:17", "234875:234875:1:2:17",
-                    "234876:234876:1:1:17"
+                    "25822:25831:5:1:18", "85711:22014:8:1:18",
+                    "123495:123496:5:1:18", "123704:123705:9:1:18",
+                    "123723:123724:6:1:18", "123976:123977:9:1:18",
+                    "124348:124349:7:1:18", "124545:124546:10:1:18",
+                    "128636:128637:8:1:18", "128839:128840:9:1:18",
+                    "130060:130061:5:1:18", "130060:130061:9:1:18",
+                    "131605:131606:7:1:18", "136638:136639:9:1:18",
+                    "136638:136639:12:1:18", "136640:136641:7:1:18",
+                    "136640:136641:8:1:18", "136640:136641:9:1:18",
+                    "136646:136647:9:1:18", "160224:160225:10:1:18",
+                    "234875:234875:1:2:18", "234876:234876:1:1:18"
                 },
                 mugger.Loot.Entries
                     .Select(value => string.Format("{0}:{1}:{2}:{3}:{4}", value.LowId, value.HighId, value.QualityLevel, value.ObservedCount, value.ObservedCorpses))
                     .ToArray());
             CollectionAssert.AreEqual(
-                new[] { "5:44:44:6", "8:71:71:6", "9:80:80:6", "10:88:88:6" },
+                new[] { "5:44:44:7", "8:71:71:6", "9:80:80:6", "10:88:88:6" },
                 mugger.Loot.LevelCreditRules
                     .OrderBy(value => value.EnemyLevel)
                     .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))

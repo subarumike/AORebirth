@@ -29,7 +29,7 @@ namespace ZoneEngine.Core.Playfields
             CapturedSurveySpawn(DiscardedPet(0x794DF1E5, 5, 115, 184.843964f, 107.61483f, 240.569778f, 93, 24)),
             CapturedSurveySpawn(DiscardedPet(0x794E83C1, 7, 160, 195.351364f, 107.611687f, 290.974426f, 94, 32)),
             CapturedSurveySpawn(DiscardedPet(0x79528F6A, 9, 205, 171.851227f, 107.611687f, 304.098846f, 95, 40)),
-            CapturedSurveySpawn(DiscardedPet(0x79528FDA, 8, 183, 188.99f, 107.611687f, 309.9072f, 94, 36)),
+            CapturedSurveySpawn(DiscardedPet(0x79528FDA, 8, 183, 188.99f, 107.611687f, 309.9072f, 94, 36, useSpawnAsPatrolStart: true)),
             CapturedSurveySpawn(DiscardedPet(0x795317D6, 5, 115, 178.220322f, 107.61483f, 247.394058f, 93, 24)),
             CapturedSurveySpawn(DiscardedPet(0x7953AA04, 10, 227, 346.527771f, 102.814827f, 161.956f, 95, 44)),
             CapturedSurveySpawn(DiscardedPet(0x7953AA1B, 10, 227, 346.468719f, 102.814827f, 165.56929f, 95, 44)),
@@ -71,7 +71,7 @@ namespace ZoneEngine.Core.Playfields
             CapturedSurveySpawn(FilthFlea(0x7953174B, 6, 138, 120.682472f, 107.61483f, 241.098831f, 24)),
             CapturedSurveySpawn(FilthFlea(0x79531752, 5, 115, 120.437515f, 107.61483f, 238.616013f, 21)),
             CapturedSurveySpawn(FilthFlea(0x79531754, 5, 115, 120.613022f, 107.61483f, 237.217636f, 21)),
-            CapturedSurveySpawn(FilthFlea(0x795317F5, 7, 160, 158.915558f, 107.6164f, 162.843613f, 27)),
+            CapturedSurveySpawn(FilthFlea(0x795317F5, 7, 160, 158.915558f, 107.6164f, 162.843613f, 27, useSpawnAsPatrolStart: true)),
             CapturedSurveySpawn(FilthFlea(0x7953A9C2, 15, 393, 283.226f, 100.8164f, 212.817139f, 57)),
             CapturedSurveySpawn(FilthFlea(0x7953A9C6, 14, 360, 278.982574f, 100.8164f, 212.5821f, 53)),
             CapturedSurveySpawn(FilthFlea(0x7953AA0B, 15, 393, 316.3524f, 102.8164f, 218.6188f, 57)),
@@ -100,7 +100,7 @@ namespace ZoneEngine.Core.Playfields
             CapturedSurveySpawn(FilthFlea(0x7953AFAE, 5, 115, 176.862076f, 107.61483f, 249.52832f, 21)),
             CapturedSurveySpawn(FilthFlea(0x7953AFC4, 7, 160, 182.377f, 107.61483f, 222.0669f, 27)),
             CapturedSurveySpawn(FilthFlea(0x7953AFC6, 5, 115, 190.181137f, 107.61483f, 224.268433f, 21)),
-            CapturedSurveySpawn(FilthFlea(0x7953AFCC, 5, 115, 177.573273f, 107.61483f, 224.148026f, 21)),
+            CapturedSurveySpawn(FilthFlea(0x7953AFCC, 5, 115, 177.573273f, 107.61483f, 224.148026f, 21, useSpawnAsPatrolStart: true)),
             CapturedSurveySpawn(FilthFlea(0x7953A9E1, 13, 327, 330.578979f, 102.865f, 150.1263f, 49)),
             CapturedSurveySpawn(FilthFlea(0x7953A9E7, 11, 261, 328.6433f, 102.965f, 143.931885f, 41)),
             CapturedSurveySpawn(FilthFlea(0x7953A9EA, 11, 261, 325.99f, 102.8164f, 148.119644f, 41)),
@@ -140,7 +140,7 @@ namespace ZoneEngine.Core.Playfields
             CapturedSurveySpawn(ViolentVagabond(0x7953AD58, 10, 182, 201.0314f, 107.6164f, 183.943253f, 95, 27)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AD76, 10, 182, 282.375244f, 102.8164f, 166.22612f, 95, 27)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AF49, 7, 128, 90.4653f, 107.61483f, 245.882523f, 94, 20)),
-            CapturedSurveySpawn(ViolentVagabond(0x7953AFA1, 7, 128, 184.873016f, 107.61483f, 245.969681f, 94, 20)),
+            CapturedSurveySpawn(ViolentVagabond(0x7953AFA1, 7, 128, 184.873016f, 107.61483f, 245.969681f, 94, 20, useSpawnAsPatrolStart: true)),
             CapturedSurveySpawn(ViolentVagabond(0x79557CAC, 10, 182, 273.7663f, 107.611687f, 284.703522f, 95, 27)),
             CapturedSurveySpawn(ViolentVagabond(0x7957405C, 7, 128, 166.46637f, 107.6164f, 165.103058f, 94, 20)),
             CapturedSurveySpawn(ViolentVagabond(0x795743A7, 10, 182, 197.541138f, 108.416405f, 209.092392f, 95, 27)),
@@ -206,6 +206,104 @@ namespace ZoneEngine.Core.Playfields
                         new CapturedSubwayPatrolReplaySegment(1.490525, 150.883392f, 107.61483f, 270.43689f, 153.603455f, 107.61483f, 269.554871f, 24),
                         new CapturedSubwayPatrolReplaySegment(4.569248, 152.218414f, 107.61483f, 269.769348f, 147.787338f, 107.61483f, 275.665527f, 24),
                         new CapturedSubwayPatrolReplaySegment(1.990639, 148.578888f, 107.61483f, 274.748779f, 147.151947f, 107.61483f, 278.350006f, 24)
+                    }
+                },
+                {
+                    // Source: finalized official-live capture 20260719-021022.
+                    // Ten-segment NpcPath cycle aggregated by segment median across
+                    // 28 complete cycles; combat movement was excluded.
+                    0x7953AFCC,
+                    new[]
+                    {
+                        new CapturedSubwayPatrolReplaySegment(0.894761, 186.2874605f, 107.61483f, 224.1153105f, 190.765228f, 107.61483f, 220.862061f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.410009, 189.859497f, 107.61483f, 221.3813095f, 191.247925f, 107.61483f, 219.197021f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.714996, 191.029686f, 107.61483f, 219.8557205f, 190.765228f, 107.61483f, 220.862061f, 25),
+                        new CapturedSubwayPatrolReplaySegment(1.145737, 191.1833035f, 107.61483f, 219.9270785f, 186.897339f, 107.61483f, 223.747055f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.694343, 187.646164f, 107.61483f, 223.0608215f, 183.363922f, 107.61483f, 225.432129f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.450506, 184.2392655f, 107.61483f, 225.0424805f, 181.134644f, 107.61483f, 225.941238f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.874281, 182.065048f, 107.61483f, 225.78598f, 177.692444f, 108.604088f, 224.192627f, 25),
+                        new CapturedSubwayPatrolReplaySegment(1.330127, 178.434639f, 107.61483f, 224.6455155f, 181.134644f, 107.61483f, 225.941238f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.419805, 180.4034575f, 107.61483f, 225.555969f, 183.363922f, 107.61483f, 225.432129f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.874444, 182.4417115f, 107.61483f, 225.736267f, 186.897339f, 107.61483f, 223.747055f, 25)
+                    }
+                },
+                {
+                    // Source: finalized official-live capture 20260719-021022.
+                    // Eighteen-segment NpcPath cycle aggregated by segment median
+                    // across 12 complete cycles; combat movement was excluded.
+                    0x795317F5,
+                    new[]
+                    {
+                        new CapturedSubwayPatrolReplaySegment(1.539519, 149.2577665f, 107.616402f, 181.128677f, 148.443878f, 107.616402f, 172.391769f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.834284, 148.4845355f, 107.616402f, 173.3694455f, 149.20787f, 107.616402f, 168.524597f, 25),
+                        new CapturedSubwayPatrolReplaySegment(1.580319, 149.0320585f, 107.616402f, 169.266945f, 154.570465f, 107.616402f, 163.034729f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.780525, 154.0946045f, 107.616402f, 163.493408f, 159.04628f, 107.616402f, 162.813141f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.635756, 158.1108855f, 107.616402f, 162.7259825f, 162.359528f, 107.616402f, 162.747345f, 25),
+                        new CapturedSubwayPatrolReplaySegment(1.361425, 161.3319395f, 107.616402f, 162.7496335f, 159.04628f, 107.616402f, 162.813141f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.889734, 159.6598125f, 107.616402f, 162.808273f, 154.570465f, 107.616402f, 163.034729f, 25),
+                        new CapturedSubwayPatrolReplaySegment(1.554936, 155.3301315f, 107.616402f, 162.988441f, 149.20787f, 107.616402f, 168.524597f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.834082, 149.770943f, 107.616402f, 167.880562f, 148.443878f, 107.616402f, 172.391769f, 25),
+                        new CapturedSubwayPatrolReplaySegment(1.539983, 148.53949f, 107.616402f, 171.3582075f, 148.925385f, 107.616402f, 180.108063f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.439907, 148.857063f, 107.616402f, 179.2956615f, 149.01416f, 107.616402f, 182.187836f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.244752, 148.988182f, 107.616402f, 181.410797f, 150.451965f, 107.616402f, 183.310013f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.664526, 149.5592425f, 107.616402f, 182.5940475f, 150.547974f, 107.616402f, 186.317978f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.895026, 150.5140385f, 107.616402f, 185.578354f, 150.62973f, 108.106377f, 191.216583f, 25),
+                        new CapturedSubwayPatrolReplaySegment(1.514288, 150.659737f, 107.616402f, 190.20916f, 150.547974f, 107.616402f, 186.317978f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.565255, 150.554596f, 107.616402f, 187.283035f, 150.451965f, 107.616402f, 183.310013f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.409967, 150.4812315f, 107.616402f, 184.155647f, 149.01416f, 107.616402f, 182.187836f, 25),
+                        new CapturedSubwayPatrolReplaySegment(0.415537, 150.1217345f, 107.616402f, 182.906952f, 148.925385f, 107.616402f, 180.108063f, 25)
+                    }
+                },
+                {
+                    // Source: finalized official-live capture 20260719-021022.
+                    // Exact first complete 24-segment NpcPath cycle; later
+                    // repetitions corroborate the route and were not averaged.
+                    0x79528FDA,
+                    new[]
+                    {
+                        new CapturedSubwayPatrolReplaySegment(2.379826, 179.052765f, 107.611687f, 305.914032f, 174.761993f, 107.611687f, 302.958862f, 24),
+                        new CapturedSubwayPatrolReplaySegment(2.110088, 175.868256f, 107.611687f, 303.72348f, 171.546417f, 108.601685f, 302.847473f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.110508, 172.953888f, 107.611687f, 303.084198f, 174.761993f, 107.611687f, 302.958862f, 24),
+                        new CapturedSubwayPatrolReplaySegment(2.720032, 173.273132f, 107.611687f, 303.01001f, 177.868011f, 107.611687f, 305.121887f, 24),
+                        new CapturedSubwayPatrolReplaySegment(2.910029, 176.668015f, 107.611687f, 304.52121f, 181.394287f, 107.611687f, 307.397461f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.620021, 180.38205f, 107.611687f, 306.773224f, 183.560028f, 107.611687f, 309.41803f, 24),
+                        new CapturedSubwayPatrolReplaySegment(2.289555, 182.498947f, 107.611687f, 308.515198f, 186.511749f, 107.611687f, 310.817566f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.949692, 185.477646f, 107.611687f, 310.236206f, 189.647064f, 107.611687f, 310.691254f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.620035, 188.149002f, 107.611687f, 310.61673f, 189.096588f, 107.611687f, 308.889374f, 24),
+                        new CapturedSubwayPatrolReplaySegment(0.680509, 189.069717f, 107.611687f, 309.075623f, 187.166321f, 107.611687f, 309.371582f, 24),
+                        new CapturedSubwayPatrolReplaySegment(0.469507, 188.484406f, 107.611687f, 309.166626f, 186.296997f, 107.611687f, 310.008789f, 24),
+                        new CapturedSubwayPatrolReplaySegment(0.190005, 187.566559f, 107.611687f, 309.460144f, 185.820709f, 107.611687f, 309.12384f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.330019, 187.26532f, 107.611687f, 309.505066f, 188.586823f, 107.611687f, 308.036591f, 24),
+                        new CapturedSubwayPatrolReplaySegment(0.24, 187.606461f, 107.611687f, 308.722076f, 188.441589f, 107.611687f, 307.406952f, 24),
+                        new CapturedSubwayPatrolReplaySegment(0.401001, 187.845856f, 107.611687f, 308.474762f, 188.586823f, 107.611687f, 308.036591f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.379053, 188.059998f, 107.611687f, 308.279602f, 185.820709f, 107.611687f, 309.12384f, 24),
+                        new CapturedSubwayPatrolReplaySegment(0.230001, 187.14502f, 107.611687f, 308.506653f, 186.296997f, 107.611687f, 310.008789f, 24),
+                        new CapturedSubwayPatrolReplaySegment(0.410509, 186.884323f, 107.611687f, 308.716461f, 187.166321f, 107.611687f, 309.371582f, 24),
+                        new CapturedSubwayPatrolReplaySegment(0.880498, 186.769623f, 107.611687f, 308.942108f, 189.096588f, 107.611687f, 308.889374f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.679154, 187.698578f, 107.611687f, 309.205933f, 189.647064f, 107.611687f, 310.691254f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.380401, 189.534897f, 107.611687f, 310.568329f, 186.511749f, 107.611687f, 310.817566f, 24),
+                        new CapturedSubwayPatrolReplaySegment(2.249535, 187.895142f, 107.611687f, 310.703522f, 183.560028f, 107.611687f, 309.41803f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.949761, 184.688675f, 107.611687f, 309.786346f, 181.394287f, 107.611687f, 307.397461f, 24),
+                        new CapturedSubwayPatrolReplaySegment(2.660205, 182.538712f, 107.611687f, 308.279785f, 177.868011f, 107.611687f, 305.121887f, 24)
+                    }
+                },
+                {
+                    // Source: finalized official-live capture 20260719-021022.
+                    // Exact ten-segment NpcPath cycle repeated four consecutive
+                    // times without combat movement.
+                    0x7953AFA1,
+                    new[]
+                    {
+                        new CapturedSubwayPatrolReplaySegment(4.491099, 183.153702f, 107.61483f, 242.178345f, 185.182495f, 107.61483f, 248.968842f, 24),
+                        new CapturedSubwayPatrolReplaySegment(3.519240, 184.990005f, 107.61483f, 247.817535f, 184.62561f, 107.61483f, 242.415771f, 24),
+                        new CapturedSubwayPatrolReplaySegment(3.679619, 184.711685f, 107.61483f, 243.721329f, 179.047791f, 107.61483f, 241.651398f, 24),
+                        new CapturedSubwayPatrolReplaySegment(6.129729, 180.191498f, 107.61483f, 241.888733f, 169.740967f, 107.61483f, 242.00235f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.755648, 171.11412f, 107.61483f, 241.977951f, 168.774445f, 107.61483f, 245.066956f, 24),
+                        new CapturedSubwayPatrolReplaySegment(1.780827, 169.503754f, 107.61483f, 243.894791f, 169.152496f, 107.900414f, 247.763138f, 24),
+                        new CapturedSubwayPatrolReplaySegment(0.850175, 169.208481f, 107.61483f, 246.528732f, 168.774445f, 107.61483f, 245.066956f, 24),
+                        new CapturedSubwayPatrolReplaySegment(2.399826, 169.009995f, 107.61483f, 246.423981f, 169.740967f, 107.61483f, 242.00235f, 24),
+                        new CapturedSubwayPatrolReplaySegment(5.834848, 169.517609f, 107.61483f, 243.189835f, 179.047791f, 107.61483f, 241.651398f, 24),
+                        new CapturedSubwayPatrolReplaySegment(3.720079, 177.731461f, 107.61483f, 241.893234f, 184.62561f, 107.61483f, 242.415771f, 24)
                     }
                 },
                 {
@@ -676,7 +774,8 @@ namespace ZoneEngine.Core.Playfields
             float x,
             float y,
             float z,
-            int runSpeed = 22)
+            int runSpeed = 22,
+            bool useSpawnAsPatrolStart = false)
         {
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
@@ -695,6 +794,7 @@ namespace ZoneEngine.Core.Playfields
                 x,
                 y,
                 z,
+                useSpawnAsPatrolStart: useSpawnAsPatrolStart,
                 respawnDelaySeconds: 240.0);
         }
 
@@ -706,7 +806,8 @@ namespace ZoneEngine.Core.Playfields
             float y,
             float z,
             int monsterScale = 94,
-            int runSpeed = 33)
+            int runSpeed = 33,
+            bool useSpawnAsPatrolStart = false)
         {
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
@@ -724,7 +825,8 @@ namespace ZoneEngine.Core.Playfields
                 5,
                 x,
                 y,
-                z);
+                z,
+                useSpawnAsPatrolStart: useSpawnAsPatrolStart);
         }
 
         private static CapturedSubwaySpawnDefinition DisobedientBot(

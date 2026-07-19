@@ -160,9 +160,10 @@ population in bounded runtime batches.
   levels with no official corpse-credit observation.
 - Offline recovery of raw capture `20260710-202132` now links L10 Mugger
   `(SimpleChar:7957E5CA)` to `(Corpse:00F6C001)`, exact CATMesh `17534`, and
-  `88` credits. Mugger runtime loot now uses the complete reviewed corpus of 17
-  first opens (14 positive/three empty), rather than promoting that one corpse
-  as a guaranteed bundle.
+  `88` credits. Finalized capture `20260719-021022` adds one exact L5 Mugger
+  corpse with CATMesh `17534`, `44` credits, and one QL5 `123495/123496` item.
+  Mugger runtime loot now uses the complete reviewed corpus of 18 first opens
+  (15 positive/three empty), rather than promoting either corpse as guaranteed.
 - Official-live Subway zoning is restored exactly: PF127 entry landing
   `(65.80835,115.6148,318.9879)`, PF655 main-exit landing
   `(3304.028,35.11,837.9951)`, and their captured headings. The main exit keeps
@@ -367,9 +368,21 @@ population in bounded runtime batches.
   misses and no landed local-player damage. The capture proves neither respawn
   timing nor corpse lifetime, and it does not establish background patrols for
   any other source.
+- Finalized capture `20260719-021022` adds source-specific complete patrols for
+  active Filth Fleas `0x7953AFCC` (10 segments, 28 complete cycles) and
+  `0x795317F5` (18 segments, 12 complete cycles), active Discarded Pet
+  `0x79528FDA` (24 segments, five complete cycles), and active Violent Vagabond
+  `0x7953AFA1` (10 segments, four complete cycles). Four existing Flea routes
+  and the existing Vagabond route are independently corroborated. Ambiguous
+  complete routes remain evidence-only and are not mapped. The Violent
+  Vagabond patrol evidence adds no combat result, so the family remains
+  partially quarantined and `0x7953AFA1` keeps its active disposition.
+  Incidental Mugger evidence adds one miss and SIW context without changing
+  the captured Mugger landed-damage range. This capture proves neither respawn
+  timing nor corpse lifetime.
 - One reusable reviewed first-open validator now owns 18 strict item tables.
   In addition to Shadow, ordinary Infector, Architect Striker, and Melded
-  Patterns, it recovers Mugger `17/3 empty`, Discarded Pet `16/3`, Stim Fiend
+  Patterns, it recovers Mugger `18/3 empty`, Discarded Pet `16/3`, Stim Fiend
   `13/0`, Looter `11/5`, Violent Vagabond `14/1`, Bloodcreeper `4/3`, Infected
   Attendant `4/1`, Fragmented Soul `4/0`, Deranged Shopper `2/0`, Incomplete
   Rebuild `2/0`, Redundant Scan `2/1`, Uncontrollable Anger `2/0`, Lost Thought

@@ -246,7 +246,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .SelectMany(value => provider.GetCorpseEvidence(value))
                 .ToArray();
 
-            Assert.AreEqual(305, evidence.Length);
+            Assert.AreEqual(306, evidence.Length);
             Assert.AreEqual(26, evidence.Select(value => value.MonsterData).Distinct().Count());
             CollectionAssert.AreEqual(
                 new[]
@@ -465,6 +465,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                          && value.LowId == 123704);
             Assert.AreEqual("(Corpse:00F6E00E)", muggerOutcome.CorpseIdentity);
             Assert.AreEqual(203734, muggerOutcome.MonsterData);
+            CapturedSubwayLootOutcomeEvidenceDefinition capturedMuggerOutcome = mugger.Single(
+                value => value.Capture == "20260719-021022"
+                         && value.DeadNpcIdentity == "(SimpleChar:797B889D)"
+                         && value.LowId == 123495);
+            Assert.AreEqual("(Corpse:00F74005)", capturedMuggerOutcome.CorpseIdentity);
+            Assert.AreEqual(123496, capturedMuggerOutcome.HighId);
+            Assert.AreEqual(5, capturedMuggerOutcome.Quality);
 
             Assert.IsFalse(stim.LootOutcomeEvidence.Any(value => value.LowId == 130592));
             Assert.IsFalse(stim.LootOutcomeEvidence.Any(value => value.LowId == 123704));
@@ -604,12 +611,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             AssertRecoveredStrictLoot(
                 "Mugger",
-                17,
+                18,
                 3,
                 new[]
                     {
-                        "25822:25831:5:1", "85711:22014:8:1", "123704:123705:9:1",
-                        "123723:123724:6:1", "123976:123977:9:1", "124348:124349:7:1",
+                        "25822:25831:5:1", "85711:22014:8:1", "123495:123496:5:1",
+                        "123704:123705:9:1", "123723:123724:6:1", "123976:123977:9:1",
+                        "124348:124349:7:1",
                         "124545:124546:10:1", "128636:128637:8:1", "128839:128840:9:1",
                         "130060:130061:5:1", "130060:130061:9:1", "131605:131606:7:1",
                         "136638:136639:9:1", "136638:136639:12:1", "136640:136641:7:1",
@@ -919,7 +927,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCorpseAndLevelCredits(
                 "Mugger",
                 17534,
-                "5:44:44:6",
+                "5:44:44:7",
                 "8:71:71:6",
                 "9:80:80:6",
                 "10:88:88:6");
@@ -990,12 +998,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void MuggerLevelTenUsesIdentityLinkedCreditsAndReviewedStrictLoot()
+        public void MuggerUsesIdentityLinkedCreditsAndReviewedStrictLoot()
         {
             CapturedSubwayCorpseEvidenceDefinition[] source =
                 new CapturedSubwayOrdinaryContentProvider().GetCorpseEvidence(203734);
+            CapturedSubwayCorpseEvidenceDefinition levelFive = source.Single(
+                value => value.Capture == "20260719-021022");
             CapturedSubwayCorpseEvidenceDefinition levelTen = source.Single(
                 value => value.Capture == "20260710-202132");
+            Assert.AreEqual("(SimpleChar:797B889D)", levelFive.DeadNpcIdentity);
+            Assert.AreEqual("(Corpse:00F74005)", levelFive.CorpseIdentity);
+            Assert.AreEqual(5, levelFive.EnemyLevel);
+            Assert.AreEqual(17534, levelFive.CatMesh);
+            Assert.AreEqual(44, levelFive.Credits);
             Assert.AreEqual("(SimpleChar:7957E5CA)", levelTen.DeadNpcIdentity);
             Assert.AreEqual("(Corpse:00F6C001)", levelTen.CorpseIdentity);
             Assert.AreEqual(10, levelTen.EnemyLevel);
@@ -1003,9 +1018,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(88, levelTen.Credits);
 
             OrdinaryEnemyProfile profile = Profile("Mugger");
-            Assert.AreEqual(17, profile.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(18, profile.Loot.ObservedCompleteInventories);
             Assert.AreEqual(3, profile.Loot.ObservedEmptyInventories);
-            Assert.AreEqual(21, profile.Loot.Entries.Length);
+            Assert.AreEqual(22, profile.Loot.Entries.Length);
             Assert.IsFalse(profile.Loot.ItemPoolComplete);
 
             OrdinaryEnemyLootTableAdapterResult adapted = OrdinaryEnemyLootTableAdapter.Build(
@@ -1016,7 +1031,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(CreditsPolicyMode.Fixed, adapted.Table.CreditsPolicy.Mode);
             Assert.AreEqual(88, adapted.Table.CreditsPolicy.MinimumCredits);
             Assert.AreEqual(88, adapted.Table.CreditsPolicy.MaximumCredits);
-            Assert.AreEqual(21, adapted.Table.RollGroups.Length);
+            Assert.AreEqual(22, adapted.Table.RollGroups.Length);
             Assert.IsTrue(
                 adapted.Table.RollGroups.All(value => value.RollMode == LootRollMode.Independent));
             Assert.IsTrue(adapted.Table.ItemPoolUnresolved);

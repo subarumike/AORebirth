@@ -1796,6 +1796,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 {
                     "0x79557C66",
                     "0x7957E5C4",
+                    "0x7953AFCC",
+                    "0x795317F5",
+                    "0x79528FDA",
+                    "0x7953AFA1",
                     "0x7953AF18",
                     "0x7953AF57",
                     "0x79531752",
@@ -1811,15 +1815,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.AreEqual(
-                83,
+                145,
                 CountOccurrences(providerText, "new CapturedSubwayPatrolReplaySegment("),
-                "Existing periodic patrol cycles plus the accepted Bot, Vagabond, and Thief replays must remain loaded.");
+                "Existing periodic patrol cycles plus the accepted Bot, Vagabond, Pet, Flea, and Thief replays must remain loaded.");
             Assert.IsTrue(
                 providerText.Contains("new CapturedSubwayPatrolReplaySegment(3.250491, 143.6185f")
                 && providerText.Contains("new CapturedSubwayPatrolReplaySegment(2.149372, 147.409149f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.894761, 186.2874605f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(1.539519, 149.2577665f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(2.379826, 179.052765f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(4.491099, 183.153702f")
                 && providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.665506, 90.9275284f")
                 && providerText.Contains("0x79557C66")
                 && providerText.Contains("0x7957E5C4")
+                && providerText.Contains("0x7953AFCC")
+                && providerText.Contains("0x795317F5")
+                && providerText.Contains("0x79528FDA")
+                && providerText.Contains("0x7953AFA1")
                 && providerText.Contains("0x7953AF18")
                 && providerText.Contains("0x7953AF57")
                 && providerText.Contains("0x79531752")
@@ -2969,28 +2981,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 mugger.Combat.ResolveContract(0x7953FFFF, muggerSpawns[0].Level).AttackModel);
             Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, mugger.Loot.PoolMode);
             Assert.IsFalse(mugger.Loot.ItemPoolComplete);
-            Assert.AreEqual(17, mugger.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(18, mugger.Loot.ObservedCompleteInventories);
             Assert.AreEqual(3, mugger.Loot.ObservedEmptyInventories);
             CollectionAssert.AreEquivalent(
                 new[]
                 {
-                    "25822:25831:5:1:17", "85711:22014:8:1:17",
-                    "123704:123705:9:1:17", "123723:123724:6:1:17",
-                    "123976:123977:9:1:17", "124348:124349:7:1:17",
-                    "124545:124546:10:1:17", "128636:128637:8:1:17",
-                    "128839:128840:9:1:17", "130060:130061:5:1:17",
-                    "130060:130061:9:1:17", "131605:131606:7:1:17",
-                    "136638:136639:9:1:17", "136638:136639:12:1:17",
-                    "136640:136641:7:1:17", "136640:136641:8:1:17",
-                    "136640:136641:9:1:17", "136646:136647:9:1:17",
-                    "160224:160225:10:1:17", "234875:234875:1:2:17",
-                    "234876:234876:1:1:17"
+                    "25822:25831:5:1:18", "85711:22014:8:1:18",
+                    "123495:123496:5:1:18", "123704:123705:9:1:18",
+                    "123723:123724:6:1:18", "123976:123977:9:1:18",
+                    "124348:124349:7:1:18", "124545:124546:10:1:18",
+                    "128636:128637:8:1:18", "128839:128840:9:1:18",
+                    "130060:130061:5:1:18", "130060:130061:9:1:18",
+                    "131605:131606:7:1:18", "136638:136639:9:1:18",
+                    "136638:136639:12:1:18", "136640:136641:7:1:18",
+                    "136640:136641:8:1:18", "136640:136641:9:1:18",
+                    "136646:136647:9:1:18", "160224:160225:10:1:18",
+                    "234875:234875:1:2:18", "234876:234876:1:1:18"
                 },
                 mugger.Loot.Entries
                     .Select(value => string.Format("{0}:{1}:{2}:{3}:{4}", value.LowId, value.HighId, value.QualityLevel, value.ObservedCount, value.ObservedCorpses))
                     .ToArray());
             CollectionAssert.AreEqual(
-                new[] { "5:44:44:6", "8:71:71:6", "9:80:80:6", "10:88:88:6" },
+                new[] { "5:44:44:7", "8:71:71:6", "9:80:80:6", "10:88:88:6" },
                 mugger.Loot.LevelCreditRules
                     .OrderBy(value => value.EnemyLevel)
                     .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
@@ -3001,7 +3013,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(3.0, mugger.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
                 CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 53
-                && CountOccurrences(ordinaryProviderText, ", 203734, 17534,") == 24
+                && CountOccurrences(ordinaryProviderText, ", 203734, 17534,") == 25
                 && combatContractText.Contains("Mugger combat requires an exact captured source identity; aggregate weapon fallback is forbidden")
                 && muggerCombatContract.Contains("HasCompleteMuggerSourceWeaponEvidence")
                 && muggerCombatContract.Contains("if (matches != 1 || matched == null)")
@@ -3023,7 +3035,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
-                "Accepted Subway Mugger must keep all nine exact source weapons, spawn levels, and dispositions; fail-closed aggregate/missing/conflicting/unknown selection; item-owned damage/recharge with captured AttackInfo shape; report-only criticals; strict 17-open incomplete-pool loot; exact CATMesh/level credits; shared chase; private four-minute respawn; and ordinary corpse lifetimes together.");
+                "Accepted Subway Mugger must keep all nine exact source weapons, spawn levels, and dispositions; fail-closed aggregate/missing/conflicting/unknown selection; item-owned damage/recharge with captured AttackInfo shape; report-only criticals; strict 18-open incomplete-pool loot; exact CATMesh/level credits; shared chase; private four-minute respawn; and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile derangedShopper = ordinaryProfiles.Single(
                 value => value.DisplayName == "Deranged Shopper");
