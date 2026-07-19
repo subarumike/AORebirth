@@ -34,6 +34,7 @@ CAPTURES = (
     "20260716-221358",
     "20260716-222201",
     "20260719-020104",
+    "20260719-021022",
 )
 SPAWN_CAPTURES = (
     "20260709-212336",
@@ -61,6 +62,7 @@ CAPTURE_ARCHETYPE_FILTERS = {
     "20260719-020104": frozenset(
         ("Disobedient Bot", "Violent Vagabond")
     ),
+    "20260719-021022": frozenset(("Mugger",)),
 }
 CAPTURE_IDENTITY_NAME_OVERRIDES = {
     # This combat-only capture has no matching SCFU/name row.  Its two slot-6
@@ -549,6 +551,7 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.update(
                 "20260709-210452",
                 "20260709-212336",
                 "20260710-202132",
+                "20260719-021022",
             ),
             {
                 "20260708-143600": 6,
@@ -556,14 +559,16 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.update(
                 "20260709-210452": 5,
                 "20260709-212336": 4,
                 "20260710-202132": 1,
+                "20260719-021022": 1,
             },
-            17,
-            14,
+            18,
+            15,
             3,
-            "18c7678d6b6b3f31f76d87d55316a9dc32c554d7b37f18ef7416858082f3b5fc",
+            "94151cee11ede34d36180f5acb62e8832838e629144243ae55ade2f3e18cfd9f",
             {
                 (25822, 25831, 5): 1,
                 (85711, 22014, 8): 1,
+                (123495, 123496, 5): 1,
                 (123704, 123705, 9): 1,
                 (123723, 123724, 6): 1,
                 (123976, 123977, 9): 1,
@@ -980,6 +985,7 @@ CAPTURE_CORPSE_EVIDENCE_FILTERS = {
     "20260719-020104": frozenset(
         ("Disobedient Bot", "Violent Vagabond")
     ),
+    "20260719-021022": frozenset(("Mugger",)),
 }
 CAPTURE_CORPSE_IDENTITY_FILTERS = {
     "20260709-205921": frozenset(
@@ -1176,6 +1182,7 @@ CAPTURE_CORPSE_IDENTITY_FILTERS = {
             "(SimpleChar:797B885E)",
         )
     ),
+    "20260719-021022": frozenset(("(SimpleChar:797B889D)",)),
 }
 CAPTURE_LIFECYCLE_DEATH_LEVEL_FILTERS = {
     "20260712-160257": frozenset(("(SimpleChar:795EC78A)",)),
@@ -3888,7 +3895,7 @@ def validate_content(
                 (25, 156): 1,
             }
         ),
-        "Mugger": Counter({(5, 44): 6, (8, 71): 6, (9, 80): 6, (10, 88): 6}),
+        "Mugger": Counter({(5, 44): 7, (8, 71): 6, (9, 80): 6, (10, 88): 6}),
         "Neural Burnout": Counter(
             {
                 (16, 98): 1,

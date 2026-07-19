@@ -45,6 +45,7 @@ CAPTURES = (
     "20260717-214751",
     "20260717-215250",
     "20260719-020104",
+    "20260719-021022",
 )
 CAPTURE_ENEMY_FILTERS = {
     "20260708-004038": frozenset({"Filth Flea"}),
@@ -71,6 +72,7 @@ CAPTURE_ENEMY_FILTERS = {
     "20260719-020104": frozenset(
         {"Disobedient Bot", "Violent Vagabond"}
     ),
+    "20260719-021022": frozenset({"Mugger"}),
 }
 ENEMY_ATTACK_CAPTURE_FILTERS = {
     "Filth Flea": frozenset({"20260708-004038", "20260709-193914"}),
@@ -1200,6 +1202,38 @@ def validate_disobedient_bot_combat(report_entry: dict[str, object]) -> None:
         raise ValueError(
             "Disobedient Bot focused attempt cadence drifted: {0}".format(focused)
         )
+
+
+def validate_mugger_combat(report_entry: dict[str, object]) -> None:
+    capture = "20260719-021022"
+    identity = "(SimpleChar:797B889D)"
+    special_weapon_shapes = report_entry["specialAttackWeaponShapes"]
+    miss_shapes = report_entry["missedAttackShapes"]
+    if (
+        capture not in report_entry["captures"]
+        or identity not in report_entry["identities"]
+        or report_entry["retaliationRows"] != 20
+        or report_entry["attackInfoRows"] != 41
+        or report_entry["missedAttackInfoRows"] != 4
+        or report_entry["specialAttackWeaponRows"] != 1
+        or any(capture in shape["captures"] for shape in report_entry["attackShapes"])
+        or len(miss_shapes) != 1
+        or miss_shapes[0]["ammoCount"] != -1
+        or miss_shapes[0]["weaponSlot"] != 6
+        or miss_shapes[0]["unknown"] != 0
+        or miss_shapes[0]["rows"] != 4
+        or capture not in miss_shapes[0]["captures"]
+        or len(special_weapon_shapes) != 1
+        or special_weapon_shapes[0]["unknown1"] != 28
+        or special_weapon_shapes[0]["unknown2"] != 31
+        or special_weapon_shapes[0]["unknown3"] != 17
+        or special_weapon_shapes[0]["unknown4"] != 28
+        or special_weapon_shapes[0]["unknown5"] != 0
+        or special_weapon_shapes[0]["rows"] != 1
+        or special_weapon_shapes[0]["captures"] != [capture]
+        or special_weapon_shapes[0]["owners"] != [identity]
+    ):
+        raise ValueError("Mugger reviewed incidental combat evidence drifted")
 
 
 def reviewed_uncontrollable_anger_cadence(
@@ -2886,6 +2920,8 @@ def main():
             validate_discarded_pet_combat(report_entry)
         if name == "Disobedient Bot":
             validate_disobedient_bot_combat(report_entry)
+        if name == "Mugger":
+            validate_mugger_combat(report_entry)
         if name == "Uncontrollable Anger":
             validate_uncontrollable_anger_combat(report_entry)
         if name == "Infected Attendant":

@@ -3187,7 +3187,8 @@
       "20260709-222339",
       "20260709-225408",
       "20260710-205400",
-      "20260710-211430"
+      "20260710-211430",
+      "20260719-021022"
     ],
     "identities": [
       "(SimpleChar:7953AA11)",
@@ -3212,10 +3213,13 @@
       "(SimpleChar:795452E5)",
       "(SimpleChar:79545329)",
       "(SimpleChar:7957E627)",
-      "(SimpleChar:7957E632)"
+      "(SimpleChar:7957E632)",
+      "(SimpleChar:797AD6F6)",
+      "(SimpleChar:797AD70D)",
+      "(SimpleChar:797B889D)"
     ],
     "retaliationObserved": true,
-    "retaliationRows": 19,
+    "retaliationRows": 20,
     "attackInfoObserved": true,
     "attackInfoRows": 41,
     "minDamage": 9,
@@ -3226,21 +3230,37 @@
     "criticalAttackInfoRows": 3,
     "criticalMinDamage": 21,
     "criticalMaxDamage": 21,
-    "missedAttackInfoRows": 3,
+    "missedAttackInfoRows": 4,
     "missedAttackShapes": [
       {
         "ammoCount": -1,
         "weaponSlot": 6,
         "unknown": 0,
-        "rows": 3,
+        "rows": 4,
         "captures": [
           "20260709-212115",
-          "20260709-212336"
+          "20260709-212336",
+          "20260719-021022"
         ]
       }
     ],
-    "specialAttackWeaponRows": 0,
-    "specialAttackWeaponShapes": [],
+    "specialAttackWeaponRows": 1,
+    "specialAttackWeaponShapes": [
+      {
+        "unknown1": 28,
+        "unknown2": 31,
+        "unknown3": 17,
+        "unknown4": 28,
+        "unknown5": 0,
+        "rows": 1,
+        "captures": [
+          "20260719-021022"
+        ],
+        "owners": [
+          "(SimpleChar:797B889D)"
+        ]
+      }
+    ],
     "medianRechargeSeconds": 5.816469,
     "weaponSlot": 6,
     "attackInfoUnknown": 0,
@@ -3276,7 +3296,7 @@
         "lowId": 121567,
         "highId": 121567,
         "quality": 1,
-        "rows": 23,
+        "rows": 25,
         "captures": [
           "20260709-193914",
           "20260709-210452",
@@ -3286,7 +3306,8 @@
           "20260709-222339",
           "20260709-225408",
           "20260710-205400",
-          "20260710-211430"
+          "20260710-211430",
+          "20260719-021022"
         ],
         "owners": [
           "(SimpleChar:7953AA11)",
@@ -3306,7 +3327,9 @@
           "(SimpleChar:795451FE)",
           "(SimpleChar:79545329)",
           "(SimpleChar:7957E627)",
-          "(SimpleChar:7957E632)"
+          "(SimpleChar:7957E632)",
+          "(SimpleChar:797AD6F6)",
+          "(SimpleChar:797AD70D)"
         ]
       }
     ]

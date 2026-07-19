@@ -295,7 +295,7 @@ profile is accepted by the whole-enemy gate with those exclusions preserved.
 Reviewed first-open evidence now supplies strict item denominators for 18
 ordinary profiles through one reusable raw-generation validator. In addition
 to Shadow, ordinary Infector, Architect Striker, and Melded Patterns, the
-recovered set is Mugger `17/3 empty`, Discarded Pet `16/3`, Stim Fiend `13/0`,
+recovered set is Mugger `18/3 empty`, Discarded Pet `16/3`, Stim Fiend `13/0`,
 Looter `11/5`, Violent Vagabond `14/1`, Bloodcreeper `4/3`, Infected Attendant
 `4/1`, Fragmented Soul `4/0`, Deranged Shopper `2/0`, Incomplete Rebuild `2/0`,
 Redundant Scan `2/1`, Uncontrollable Anger `2/0`, Lost Thought `1/0`, and Neural
@@ -460,6 +460,21 @@ not evidence that other rows should receive background patrols. The same capture
 brings Vagabond strict loot to 14 atomic outcomes (`13` positive, `1` empty), but
 its combat sample still contains 40 misses and no landed local-player damage.
 It proves neither respawn timing nor corpse lifetime.
+
+Finalized capture `20260719-021022` supplies source-specific complete patrols for
+active Filth Fleas `0x7953AFCC` (10 segments, 28 complete cycles) and
+`0x795317F5` (18 segments, 12 complete cycles), active Discarded Pet
+`0x79528FDA` (24 segments, five complete cycles), and active Violent Vagabond
+`0x7953AFA1` (10 segments, four complete cycles). It independently corroborates
+four existing Flea routes and the existing Vagabond route. Ambiguous complete
+routes remain evidence-only and are not mapped. The Violent Vagabond patrol
+evidence adds no combat result, so the family remains partially quarantined and
+`0x7953AFA1` keeps its active disposition. Incidental Mugger evidence adds one
+miss and SIW context without changing the captured Mugger landed-damage range.
+The capture also adds an exact L5 Mugger corpse with `44` credits, CATMesh
+`17534`, and one QL5 `123495/123496` item, raising strict Mugger loot from 17
+outcomes (14 positive, three empty) to 18 (15 positive, three empty). It proves
+neither respawn timing nor corpse lifetime.
 
 Current unresolved data remains fail-closed, including combat sources without a
 landed captured hit, unsupported/nonordinary respawn classifications without an
