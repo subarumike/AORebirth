@@ -80,7 +80,7 @@ population in bounded runtime batches.
 - Reused corpse identities now keep the exact name and dead-NPC relationship
   from their own generation instead of inheriting the union of every prior use
   of the same identity.
-- The generated ordinary provider now preserves `298` exact, death-linked,
+- The generated ordinary provider now preserves `301` exact, death-linked,
   positive-credit corpse observations across `26` capture-backed profiles.
   The recovered deep batches include all accepted observations from
   `20260709-220439`, `20260709-222339`, `20260709-225408`,
@@ -88,7 +88,8 @@ population in bounded runtime batches.
   `20260712-232137`, `20260716-034104`, `20260716-221358`,
   `20260716-222007`, and `20260716-222201`. The latest recovery adds 16
   identity-linked generations and 11 previously missing profile/level/credit
-  tuples without inferring cross-profile credit rules.
+  tuples; the Discarded Pet audit adds exact L10 and L6 credit corpses from
+  `20260708-004038` and `20260709-205921` without inferring cross-profile rules.
 - Legacy item snapshots remain identity-linked evidence-only outcomes unless a
   reviewed raw first-open denominator pins every included corpse generation.
   Reused loot-window opens count once per generation, explicit empty packets
@@ -255,8 +256,9 @@ population in bounded runtime batches.
 - Disobedient Bot is the fifth accepted ordinary enemy. All 12 exact spawn rows
   now preserve captured NPC family `138` and an explicit `450`-second post-NPC-
   despawn schedule; official capture `20260708-143600` records `459.913`
-  seconds death-to-replacement and a `0.190`-unit position delta. Seventeen
-  normal local-player SIW1 hits prove the aggregate `8..15` damage envelope,
+  seconds death-to-replacement and a `0.190`-unit position delta. Fourteen
+  normal local-player SIW1 hits prove the aggregate `8..15` damage envelope;
+  three other-player hits and two player-owned Killer-pet hits remain separate,
   while focused attempts retain the capture-exact `5.973723`-second recharge.
   SIW1 context is selected from the spawned level (`L5=30/30/30/30/22`,
   `L6=35`, `L8=45`, `L9=49`, `L10=54`); active L7 uses the explicit bounded

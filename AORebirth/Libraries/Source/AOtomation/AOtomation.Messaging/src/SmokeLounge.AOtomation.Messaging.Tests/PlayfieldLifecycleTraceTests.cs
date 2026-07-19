@@ -2499,6 +2499,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string discardedPetCombatReport = generatedCombatReportText.Substring(
                 discardedPetCombatReportStart,
                 discardedPetCombatReportEnd - discardedPetCombatReportStart);
+            int disobedientBotCombatReportStart = generatedCombatReportText.IndexOf(
+                "\"Disobedient Bot\":",
+                StringComparison.Ordinal);
+            int disobedientBotCombatReportEnd = generatedCombatReportText.IndexOf(
+                "\"Empty Shell\":",
+                disobedientBotCombatReportStart,
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                disobedientBotCombatReportStart >= 0
+                && disobedientBotCombatReportEnd > disobedientBotCombatReportStart);
+            string disobedientBotCombatReport = generatedCombatReportText.Substring(
+                disobedientBotCombatReportStart,
+                disobedientBotCombatReportEnd - disobedientBotCombatReportStart);
             int discardedPetContractStart = combatContractText.IndexOf(
                 "case 17720:",
                 StringComparison.Ordinal);
@@ -3625,7 +3638,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 combatContractText.Contains("case 17649:")
                 && providerText.Contains("CapturedSubwayCombatCatalog.For(name, monsterData, level)")
-                && combatContractText.Contains("17 Disobedient Bot SIW1 normal local-player hits span 8-15 damage")
+                && combatContractText.Contains("14 Disobedient Bot SIW1 normal local-player hits span 8-15 damage")
+                && combatContractText.Contains("three other-player hits and two player-owned Killer-pet hits remain separate")
                 && combatContractText.Contains("SpecialAttackWeapon contexts are capture-backed for levels 5, 6, 8, 9, and 10")
                 && combatContractText.Contains("including the level-5 terminal value 22")
                 && combatContractText.Contains("level 7 explicitly using the bounded 35/45 midpoint policy")
@@ -3666,11 +3680,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
                 "Accepted Subway Disobedient Bot must preserve strict weighted loot evidence, exact credits, CATMesh behavior, and ordinary corpse lifetimes.");
             Assert.IsTrue(
-                generatedCombatReportText.Contains("\"Disobedient Bot\":")
-                && generatedCombatReportText.Contains("\"20260708-143600\"")
-                && generatedCombatReportText.Contains("\"normalMinDamage\": 8")
-                && generatedCombatReportText.Contains("\"normalMaxDamage\": 15"),
-                "Accepted Subway Disobedient Bot generated combat evidence must retain the official-live 8..15 local-player envelope.");
+                disobedientBotCombatReport.Contains("\"20260708-143600\"")
+                && disobedientBotCombatReport.Contains("\"20260712-153918\"")
+                && disobedientBotCombatReport.Contains("\"20260713-014714\"")
+                && disobedientBotCombatReport.Contains("\"20260713-033511\"")
+                && disobedientBotCombatReport.Contains("\"normalAttackInfoRows\": 14")
+                && disobedientBotCombatReport.Contains("\"normalMinDamage\": 8")
+                && disobedientBotCombatReport.Contains("\"normalMaxDamage\": 15")
+                && disobedientBotCombatReport.Contains("\"missedAttackInfoRows\": 7")
+                && disobedientBotCombatReport.Contains("\"medianIntervalSeconds\": 5.973723")
+                && disobedientBotCombatReport.Contains("\"attackInfoRows\": 14")
+                && disobedientBotCombatReport.Contains("\"attackInfoRows\": 3")
+                && disobedientBotCombatReport.Contains("\"attackInfoRows\": 2"),
+                "Accepted Subway Disobedient Bot generated combat evidence must retain the local-player, other-player, and player-owned-pet boundaries plus focused attempt cadence.");
 
             Assert.IsTrue(
                 providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 146, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0, healthDamage: 31))")

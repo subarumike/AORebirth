@@ -8,6 +8,7 @@ import json
 import re
 from collections import Counter, defaultdict
 from datetime import datetime
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 
 
@@ -28,6 +29,9 @@ CAPTURES = (
     "20260710-202132",
     "20260710-205400",
     "20260710-211430",
+    "20260712-153918",
+    "20260713-014714",
+    "20260713-033511",
     "20260716-033326",
     "20260716-034104",
     "20260716-034433",
@@ -47,6 +51,9 @@ CAPTURE_ENEMY_FILTERS = {
     ),
     "20260709-213711": frozenset({"Architect Striker", "Workman Striker"}),
     "20260710-202132": frozenset({"Deranged Shopper"}),
+    "20260712-153918": frozenset({"Disobedient Bot"}),
+    "20260713-014714": frozenset({"Disobedient Bot"}),
+    "20260713-033511": frozenset({"Disobedient Bot"}),
     "20260716-034433": frozenset({"Vergil Aeneid"}),
     "20260716-034559": frozenset({"Melded Patterns"}),
     "20260716-034656": frozenset({"Slum Runner"}),
@@ -71,12 +78,15 @@ TARGET_ROLE_EVIDENCE_ENEMIES = frozenset(
     {
         "Abmouth Supremus",
         "Architect Striker",
+        "Disobedient Bot",
         "Strike Foreman",
         "Vergil Aeneid",
         "Workman Striker",
     }
 )
 PLAYER_OWNED_PET_TARGETS = {
+    "20260708-143600": frozenset({"(SimpleChar:794DF23C)"}),
+    "20260709-210452": frozenset({"(SimpleChar:7953AE99)"}),
     "20260709-213711": frozenset({"(SimpleChar:7953AE99)"}),
     "20260716-034433": frozenset({"(SimpleChar:796D400B)"}),
     "20260716-220400": frozenset(
@@ -85,6 +95,7 @@ PLAYER_OWNED_PET_TARGETS = {
 }
 OTHER_PLAYER_TARGETS = {
     "20260709-222339": frozenset({"(SimpleChar:794D8062)"}),
+    "20260712-153918": frozenset({"(SimpleChar:795AB07F)"}),
 }
 REVIEWED_EVENT_IDENTITIES = {
     "20260709-213711": {
@@ -179,7 +190,263 @@ REVIEWED_RAW_TARGET_ROLE_PACKETS = {
             "hitType": "Normal",
             "weaponInstance": 0,
         },
-    )
+    ),
+    "20260712-153918": (
+        {
+            "capturedUtc": "2026-07-12T20:43:16.7626155Z",
+            "sequence": 3662,
+            "length": 61,
+            "messageType": "AttackInfo",
+            "rawHex": "0AA3000A0001003D00000DB47944C06546002F160000C350795EC78D0000000008FFFFFFFF000000000000C350795AB07F000000000000000353495731",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:795EC78D)",
+            "target": "(SimpleChar:795AB07F)",
+            "targetRole": "otherPlayer",
+            "amount": 8,
+            "weaponSlot": 0,
+            "attackInfoUnknown": 0,
+            "hitType": "Normal",
+            "weaponInstance": 0x53495731,
+        },
+        {
+            "capturedUtc": "2026-07-12T20:43:22.5774603Z",
+            "sequence": 3743,
+            "length": 61,
+            "messageType": "AttackInfo",
+            "rawHex": "0AF4000A0001003D00000DB47944C06546002F160000C350795EC78D0000000008FFFFFFFF000000000000C350795AB07F000000000000000353495731",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:795EC78D)",
+            "target": "(SimpleChar:795AB07F)",
+            "targetRole": "otherPlayer",
+            "amount": 8,
+            "weaponSlot": 0,
+            "attackInfoUnknown": 0,
+            "hitType": "Normal",
+            "weaponInstance": 0x53495731,
+        },
+        {
+            "capturedUtc": "2026-07-12T20:43:28.3824738Z",
+            "sequence": 3828,
+            "length": 61,
+            "messageType": "AttackInfo",
+            "rawHex": "0B49000A0001003D00000DB47944C06546002F160000C350795EC78D0000000008FFFFFFFF000000000000C350795AB07F000000000000000353495731",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:795EC78D)",
+            "target": "(SimpleChar:795AB07F)",
+            "targetRole": "otherPlayer",
+            "amount": 8,
+            "weaponSlot": 0,
+            "attackInfoUnknown": 0,
+            "hitType": "Normal",
+            "weaponInstance": 0x53495731,
+        },
+    ),
+    "20260713-014714": (
+        {
+            "capturedUtc": "2026-07-13T06:47:19.2700007Z",
+            "sequence": 124,
+            "length": 38,
+            "messageType": "Attack",
+            "rawHex": "0224000A0001002600000DB47944C065284940700000C35079607CD0000000C3507944C06500",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:79607CD0)",
+            "target": "(SimpleChar:7944C065)",
+            "targetRole": "localPlayer",
+        },
+        {
+            "capturedUtc": "2026-07-13T06:47:22.5404450Z",
+            "sequence": 207,
+            "length": 61,
+            "messageType": "AttackInfo",
+            "rawHex": "0277000A0001003D00000DB47944C06546002F160000C35079607CD0000000000AFFFFFFFF000000000000C3507944C065000000000000000353495731",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:79607CD0)",
+            "target": "(SimpleChar:7944C065)",
+            "targetRole": "localPlayer",
+            "amount": 10,
+            "weaponSlot": 0,
+            "attackInfoUnknown": 0,
+            "hitType": "Normal",
+            "weaponInstance": 0x53495731,
+        },
+        {
+            "capturedUtc": "2026-07-13T06:47:28.5141679Z",
+            "sequence": 346,
+            "length": 61,
+            "messageType": "AttackInfo",
+            "rawHex": "0302000A0001003D00000DB47944C06546002F160000C35079607CD0000000000BFFFFFFFF000000000000C3507944C065000000000000000353495731",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:79607CD0)",
+            "target": "(SimpleChar:7944C065)",
+            "targetRole": "localPlayer",
+            "amount": 11,
+            "weaponSlot": 0,
+            "attackInfoUnknown": 0,
+            "hitType": "Normal",
+            "weaponInstance": 0x53495731,
+        },
+        {
+            "capturedUtc": "2026-07-13T06:47:34.5932972Z",
+            "sequence": 496,
+            "length": 57,
+            "messageType": "MissedAttackInfo",
+            "rawHex": "0398000A0001003900000DB47944C0655C654B280000C3507944C06501FFFFFFFF000000000000C35079607CD00000C3507944C06500000000",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:79607CD0)",
+            "target": "(SimpleChar:7944C065)",
+            "targetRole": "localPlayer",
+            "ammoCount": -1,
+            "weaponSlot": 0,
+            "unknown": 0,
+        },
+        {
+            "capturedUtc": "2026-07-13T06:47:40.4668227Z",
+            "sequence": 639,
+            "length": 61,
+            "messageType": "AttackInfo",
+            "rawHex": "0427000A0001003D00000DB47944C06546002F160000C35079607CD0000000000BFFFFFFFF000000000000C3507944C065000000000000000353495731",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:79607CD0)",
+            "target": "(SimpleChar:7944C065)",
+            "targetRole": "localPlayer",
+            "amount": 11,
+            "weaponSlot": 0,
+            "attackInfoUnknown": 0,
+            "hitType": "Normal",
+            "weaponInstance": 0x53495731,
+        },
+    ),
+    "20260713-033511": (
+        {
+            "capturedUtc": "2026-07-13T08:35:17.0173119Z",
+            "sequence": 123,
+            "length": 38,
+            "messageType": "Attack",
+            "rawHex": "031B000A0001002600000DB47944C065284940700000C35079607E2C000000C3507944C06500",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:79607E2C)",
+            "target": "(SimpleChar:7944C065)",
+            "targetRole": "localPlayer",
+        },
+        {
+            "capturedUtc": "2026-07-13T08:35:19.5148109Z",
+            "sequence": 190,
+            "length": 57,
+            "messageType": "MissedAttackInfo",
+            "rawHex": "035E000A0001003900000DB47944C0655C654B280000C3507944C06501FFFFFFFF000000000000C35079607E2C0000C3507944C06500000000",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:79607E2C)",
+            "target": "(SimpleChar:7944C065)",
+            "targetRole": "localPlayer",
+            "ammoCount": -1,
+            "weaponSlot": 0,
+            "unknown": 0,
+        },
+        {
+            "capturedUtc": "2026-07-13T08:35:25.5173816Z",
+            "sequence": 345,
+            "length": 61,
+            "messageType": "AttackInfo",
+            "rawHex": "03F9000A0001003D00000DB47944C06546002F160000C35079607E2C000000000AFFFFFFFF000000000000C3507944C065000000000000000353495731",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:79607E2C)",
+            "target": "(SimpleChar:7944C065)",
+            "targetRole": "localPlayer",
+            "amount": 10,
+            "weaponSlot": 0,
+            "attackInfoUnknown": 0,
+            "hitType": "Normal",
+            "weaponInstance": 0x53495731,
+        },
+        {
+            "capturedUtc": "2026-07-13T08:35:31.6572511Z",
+            "sequence": 503,
+            "length": 57,
+            "messageType": "MissedAttackInfo",
+            "rawHex": "0497000A0001003900000DB47944C0655C654B280000C3507944C06501FFFFFFFF000000000000C35079607E2C0000C3507944C06500000000",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:79607E2C)",
+            "target": "(SimpleChar:7944C065)",
+            "targetRole": "localPlayer",
+            "ammoCount": -1,
+            "weaponSlot": 0,
+            "unknown": 0,
+        },
+        {
+            "capturedUtc": "2026-07-13T08:35:37.6402997Z",
+            "sequence": 637,
+            "length": 57,
+            "messageType": "MissedAttackInfo",
+            "rawHex": "051D000A0001003900000DB47944C0655C654B280000C3507944C06501FFFFFFFF000000000000C35079607E2C0000C3507944C06500000000",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:79607E2C)",
+            "target": "(SimpleChar:7944C065)",
+            "targetRole": "localPlayer",
+            "ammoCount": -1,
+            "weaponSlot": 0,
+            "unknown": 0,
+        },
+        {
+            "capturedUtc": "2026-07-13T08:35:49.5411768Z",
+            "sequence": 938,
+            "length": 57,
+            "messageType": "MissedAttackInfo",
+            "rawHex": "064A000A0001003900000DB47944C0655C654B280000C3507944C06501FFFFFFFF000000000000C35079607E2C0000C3507944C06500000000",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:79607E2C)",
+            "target": "(SimpleChar:7944C065)",
+            "targetRole": "localPlayer",
+            "ammoCount": -1,
+            "weaponSlot": 0,
+            "unknown": 0,
+        },
+        {
+            "capturedUtc": "2026-07-13T08:35:55.5457139Z",
+            "sequence": 1067,
+            "length": 57,
+            "messageType": "MissedAttackInfo",
+            "rawHex": "06CB000A0001003900000DB47944C0655C654B280000C3507944C06501FFFFFFFF000000000000C35079607E2C0000C3507944C06500000000",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:79607E2C)",
+            "target": "(SimpleChar:7944C065)",
+            "targetRole": "localPlayer",
+            "ammoCount": -1,
+            "weaponSlot": 0,
+            "unknown": 0,
+        },
+        {
+            "capturedUtc": "2026-07-13T08:36:01.7428204Z",
+            "sequence": 1205,
+            "length": 61,
+            "messageType": "AttackInfo",
+            "rawHex": "0755000A0001003D00000DB47944C06546002F160000C35079607E2C000000000AFFFFFFFF000000000000C3507944C065000000000000000353495731",
+            "enemyName": "Disobedient Bot",
+            "monsterData": 17649,
+            "source": "(SimpleChar:79607E2C)",
+            "target": "(SimpleChar:7944C065)",
+            "targetRole": "localPlayer",
+            "amount": 10,
+            "weaponSlot": 0,
+            "attackInfoUnknown": 0,
+            "hitType": "Normal",
+            "weaponInstance": 0x53495731,
+        },
+    ),
 }
 CADENCE_UNRESOLVED_ENEMIES = frozenset({"Vergil Aeneid"})
 OUTPUT = REPO / "docs" / "generated" / "subway_enemy_combat_contracts.json"
@@ -564,6 +831,146 @@ def validate_discarded_pet_combat(report_entry: dict[str, object]) -> None:
         raise ValueError("Discarded Pet SIW1 local-player cadence drifted")
 
 
+def validate_disobedient_bot_combat(report_entry: dict[str, object]) -> None:
+    required_captures = {
+        "20260708-143600",
+        "20260709-205921",
+        "20260709-210452",
+        "20260712-153918",
+        "20260713-014714",
+        "20260713-033511",
+    }
+    if not required_captures.issubset(set(report_entry["captures"])):
+        raise ValueError("Disobedient Bot reviewed combat captures are missing")
+    if (
+        report_entry["normalAttackInfoRows"] != 14
+        or report_entry["normalMinDamage"] != 8
+        or report_entry["normalMaxDamage"] != 15
+        or report_entry["criticalAttackInfoRows"] != 0
+        or report_entry["missedAttackInfoRows"] != 7
+        or report_entry["weaponSlot"] != 0
+        or report_entry["attackInfoUnknown"] != 0
+        or report_entry["attackInfoWeaponInstance"] != 0x53495731
+        or report_entry["medianRechargeSeconds"] != 5.479593
+    ):
+        raise ValueError("Disobedient Bot local-player SIW1 evidence drifted")
+    miss_shapes = report_entry["missedAttackShapes"]
+    if (
+        len(miss_shapes) != 1
+        or miss_shapes[0]["ammoCount"] != -1
+        or miss_shapes[0]["weaponSlot"] != 0
+        or miss_shapes[0]["unknown"] != 0
+        or miss_shapes[0]["rows"] != 7
+    ):
+        raise ValueError("Disobedient Bot local-player miss evidence drifted")
+    target_roles = report_entry["targetRoleEvidence"]
+    role_expectations = {
+        "localPlayer": (14, 8, 15),
+        "playerOwnedPet": (2, 8, 19),
+        "otherPlayer": (3, 8, 8),
+    }
+    for role, expected in role_expectations.items():
+        evidence = target_roles[role]
+        actual = (
+            evidence["attackInfoRows"],
+            evidence["minDamage"],
+            evidence["maxDamage"],
+        )
+        if actual != expected:
+            raise ValueError(
+                "Disobedient Bot target-role evidence drifted role={0} actual={1}".format(
+                    role, actual
+                )
+            )
+    focused = [
+        row
+        for row in report_entry["reviewedRawAttemptCadence"]
+        if row["capture"] == "20260713-014714"
+        and row["identity"] == "(SimpleChar:79607CD0)"
+    ]
+    if (
+        len(focused) != 1
+        or focused[0]["initialDelaySeconds"] != 3.270444
+        or focused[0]["attemptRows"] != 4
+        or focused[0]["intervalRows"] != 3
+        or focused[0]["minIntervalSeconds"] != 5.873526
+        or focused[0]["medianIntervalSeconds"] != 5.973723
+        or focused[0]["maxIntervalSeconds"] != 6.079129
+    ):
+        raise ValueError(
+            "Disobedient Bot focused attempt cadence drifted: {0}".format(focused)
+        )
+
+
+def reviewed_raw_attempt_cadence(group: dict[str, object]) -> list[dict[str, object]]:
+    def precise_seconds(value: str) -> Decimal:
+        normalized = value.removesuffix("Z")
+        date_text, time_text = normalized.split("T", 1)
+        year, month, day = (int(part) for part in date_text.split("-"))
+        hour_text, minute_text, second_text = time_text.split(":")
+        day_number = datetime(year, month, day).toordinal()
+        return (
+            Decimal(day_number * 86400)
+            + Decimal(int(hour_text) * 3600)
+            + Decimal(int(minute_text) * 60)
+            + Decimal(second_text)
+        )
+
+    def rounded_seconds(value: Decimal) -> float:
+        return float(value.quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP))
+
+    starts_by_source = defaultdict(list)
+    for row in group["reviewedRawAttackStarts"]:
+        starts_by_source[(row["capture"], row["identity"])].append(row["capturedUtc"])
+    attempts_by_source = defaultdict(list)
+    for row in group["reviewedRawAttempts"]:
+        attempts_by_source[(row["capture"], row["identity"])].append(row["capturedUtc"])
+    result = []
+    for (capture, identity), attempts in sorted(attempts_by_source.items()):
+        attempts.sort(key=precise_seconds)
+        starts = sorted(
+            starts_by_source.get((capture, identity), ()), key=precise_seconds
+        )
+        first_attempt_seconds = precise_seconds(attempts[0])
+        eligible_starts = [
+            value for value in starts if precise_seconds(value) <= first_attempt_seconds
+        ]
+        attack_start = eligible_starts[-1] if eligible_starts else None
+        intervals = [
+            precise_seconds(current) - precise_seconds(previous)
+            for previous, current in zip(attempts, attempts[1:])
+            if precise_seconds(current) > precise_seconds(previous)
+        ]
+        intervals.sort()
+        if not intervals:
+            continue
+        middle = len(intervals) // 2
+        median = (
+            intervals[middle]
+            if len(intervals) % 2 == 1
+            else (intervals[middle - 1] + intervals[middle]) / Decimal(2)
+        )
+        result.append(
+            {
+                "capture": capture,
+                "identity": identity,
+                "attackStartUtc": attack_start if attack_start is not None else "",
+                "firstAttemptUtc": attempts[0],
+                "initialDelaySeconds": rounded_seconds(
+                    first_attempt_seconds - precise_seconds(attack_start)
+                )
+                if attack_start is not None
+                else None,
+                "attemptRows": len(attempts),
+                "intervalRows": len(intervals),
+                "minIntervalSeconds": rounded_seconds(intervals[0]),
+                "medianIntervalSeconds": rounded_seconds(median),
+                "maxIntervalSeconds": rounded_seconds(intervals[-1]),
+            }
+        )
+    return result
+
+
 def add_reviewed_raw_target_role_evidence(
     capture_name: str,
     folder: Path,
@@ -581,10 +988,12 @@ def add_reviewed_raw_target_role_evidence(
     for packet in reviewed:
         source = packet["source"]
         enemy = identities.get(source)
+        expected_name = packet.get("enemyName", "Strike Foreman")
+        expected_monster_data = int(packet.get("monsterData", 203744))
         if (
             not enemy
-            or enemy["name"] != "Strike Foreman"
-            or enemy["monsterData"] != 203744
+            or enemy["name"] != expected_name
+            or enemy["monsterData"] != expected_monster_data
             or (source, packet["messageType"]) in derived_source_keys
         ):
             continue
@@ -604,20 +1013,59 @@ def add_reviewed_raw_target_role_evidence(
         role_evidence["targetIdentities"].add(packet["target"])
         if packet["messageType"] == "Attack":
             role_evidence["retaliationRows"] += 1
+            if packet["targetRole"] == "localPlayer":
+                group["retaliationRows"] += 1
+                group["reviewedRawAttackStarts"].append(
+                    {
+                        "capture": capture_name,
+                        "identity": source,
+                        "capturedUtc": packet["capturedUtc"],
+                    }
+                )
             continue
-        role_evidence["attacks"].append(
-            {
-                "capture": capture_name,
-                "identity": source,
-                "capturedUtc": packet["capturedUtc"],
-                "amount": packet["amount"],
-                "weaponSlot": packet["weaponSlot"],
-                "attackInfoUnknown": packet["attackInfoUnknown"],
-                "hitType": packet["hitType"],
-                "weaponInstance": packet["weaponInstance"],
-                "provenanceCaptures": {capture_name},
-            }
-        )
+        if packet["messageType"] == "MissedAttackInfo":
+            if packet["targetRole"] == "localPlayer":
+                group["misses"].append(
+                    {
+                        "capture": capture_name,
+                        "identity": source,
+                        "capturedUtc": packet["capturedUtc"],
+                        "ammoCount": packet["ammoCount"],
+                        "weaponSlot": packet["weaponSlot"],
+                        "unknown": packet["unknown"],
+                    }
+                )
+                group["reviewedRawAttempts"].append(
+                    {
+                        "capture": capture_name,
+                        "identity": source,
+                        "capturedUtc": packet["capturedUtc"],
+                        "messageType": packet["messageType"],
+                    }
+                )
+            continue
+        parsed_attack = {
+            "capture": capture_name,
+            "identity": source,
+            "capturedUtc": packet["capturedUtc"],
+            "amount": packet["amount"],
+            "weaponSlot": packet["weaponSlot"],
+            "attackInfoUnknown": packet["attackInfoUnknown"],
+            "hitType": packet["hitType"],
+            "weaponInstance": packet["weaponInstance"],
+            "provenanceCaptures": {capture_name},
+        }
+        role_evidence["attacks"].append(parsed_attack)
+        if packet["targetRole"] == "localPlayer":
+            group["attacks"].append(parsed_attack)
+            group["reviewedRawAttempts"].append(
+                {
+                    "capture": capture_name,
+                    "identity": source,
+                    "capturedUtc": packet["capturedUtc"],
+                    "messageType": packet["messageType"],
+                }
+            )
 
 
 def main():
@@ -631,6 +1079,8 @@ def main():
             "weapons": [],
             "weaponKeys": set(),
             "specialAttackWeapons": [],
+            "reviewedRawAttackStarts": [],
+            "reviewedRawAttempts": [],
             "monsterData": set(),
             "targetRoleEvidence": defaultdict(
                 lambda: {
@@ -1002,6 +1452,7 @@ def main():
             )
             for row in group["specialAttackWeapons"]
         )
+        raw_attempt_cadence = reviewed_raw_attempt_cadence(group)
         report_entry = {
             "monsterData": sorted(group["monsterData"]),
             "captures": sorted(group["captures"]),
@@ -1099,6 +1550,8 @@ def main():
             "attackInfoWeaponInstance": instance,
             "attackShapes": attack_shape_evidence,
         }
+        if raw_attempt_cadence:
+            report_entry["reviewedRawAttemptCadence"] = raw_attempt_cadence
         if name == "Filth Flea":
             report_entry["criticalAttackShapes"] = critical_shape_evidence
         if name in TARGET_ROLE_EVIDENCE_ENEMIES:
@@ -1138,6 +1591,8 @@ def main():
             validate_workman_striker_distinct_combat(attacks, report_entry)
         if name == "Discarded Pet":
             validate_discarded_pet_combat(report_entry)
+        if name == "Disobedient Bot":
+            validate_disobedient_bot_combat(report_entry)
         report[name] = report_entry
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)

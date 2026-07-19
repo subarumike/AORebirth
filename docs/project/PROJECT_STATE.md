@@ -37,7 +37,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   `docs/ai/CURRENT_TASK.md`,
   `docs/generated/aosharp_capture_inventory.md`, and
   `docs/generated/aosharp_subway_capture_content.md`.
-- The generated ordinary provider now preserves 298 exact, identity-matched,
+- The generated ordinary provider now preserves 301 exact, identity-matched,
   death-linked positive-credit corpse observations across 26 profiles. The
   recovered batches include all accepted ordinary observations from the deep
   `20260709-220439`, `20260709-222339`, `20260709-225408`,
@@ -45,7 +45,9 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   `20260712-232137`, `20260716-034104`, `20260716-221358`,
   `20260716-222007`, and `20260716-222201` sessions. The latest recovery adds
   16 exact generations and 11 previously missing profile/level/credit tuples;
-  no cross-profile credit rule is presented as capture proof.
+  the Discarded Pet audit adds exact L10 and L6 credit corpses from
+  `20260708-004038` and `20260709-205921`. No cross-profile credit rule is
+  presented as capture proof.
   Runtime profiles preserve each proven CATMesh and only observed level-credit
   rules; players, owned pets, named encounters, outside-playfield rows,
   ambiguous links, and zero/post-loot rows remain excluded.
@@ -135,8 +137,9 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   whole-enemy gate together. Its four-minute respawn remains the documented
   private ordinary policy, not an official-live timing claim.
 - Disobedient Bot is the fifth accepted ordinary enemy. Its 12 exact spawn rows
-  now use captured NPC family `138`; 17 normal local-player SIW1 hits prove the
-  aggregate `8..15` envelope and focused attempt traffic retains a
+  now use captured NPC family `138`; 14 normal local-player SIW1 hits prove the
+  aggregate `8..15` envelope, while three other-player hits and two player-owned
+  Killer-pet hits remain separate. Focused attempt traffic retains a
   `5.973723`-second recharge. Runtime resolves captured SIW1 contexts per spawn
   level (`L5=30/30/30/30/22`, `L6=35`, `L8=45`, `L9=49`, `L10=54`) instead of
   reusing the first L10 row for every Bot. L7 is an explicit bounded midpoint
@@ -148,10 +151,10 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   existing two quarantined Bot rows remain quarantined, and criticals, proactive
   aggro radius, and leash/reset distance remain unresolved.
 - The generated Subway combat-contract report now supplements legacy identities
-  from enemy dossiers and exact corpse dead-NPC links. This recovers nine
-  projected Disobedient Bot local-player hits at `8..15`; eight additional
-  authoritative raw rows remain explicitly represented by the 17-hit runtime
-  evidence audit.
+  from enemy dossiers and exact corpse dead-NPC links. It records nine projected
+  plus five reviewed-raw Disobedient Bot local-player hits at `8..15`, three
+  other-player hits at `8`, and two player-owned Killer-pet hits at `8` and `19`
+  without crossing target-role boundaries.
 - The completed corpus audit is `docs/evidence/SUBWAY_BLOODCREEPER_DISOBEDIENT_BOT_LOOT_AUDIT.md`. Fourteen identity-correlated official-live Disobedient Bot corpses disprove the earlier global `8..11` credit range. Known-level values remain exact observed rules (`L5=6`, `L6=8`, `L8=10`, `L9=11`, `L10=12`); unobserved levels remain unresolved instead of using a guessed formula. Seven strict complete item outcomes prove the two active memberships and five empty outcomes. Burnt Out Memory Chip (`234876/234876`) remains inactive because its corpse linkage is incomplete.
 - Captured enemy combat uses a shared atomic contract and runtime registry across supported and generated ordinary Subway populations. Each spawn declares fixed captured `AttackInfo`, captured equipped weapon, specialized captured behavior, or unresolved evidence; captured weapons are equipped during spawn, retaliation and attack-source selection use the registry, contracts are removed on despawn, and incomplete contracts are logged/refused. Ordinary combat profiles can resolve a contract from the selected spawn level, preventing level-varying captured context from collapsing to the first grouped row. For Thief, live capture `20260711-170337` proves QL1 Solar-Powered Pistol `121567`, attack-context header `Unknown=0`, `SpecialAttackWeapon` body `32/32/32/32/0`, attack start after `1.409765s`, Target -> `StopMovingCmd` -> `SetPos` -> `NpcPath` after another `0.219999s`, first landed hit `11.409643s` after Thief attack start, captured `9`-point normal `AttackInfo`, approximately six-second repeats, and `StopFight` immediately before Death. Private capture `20260711-172309` proves the pre-repair mismatch. Mike's post-repair live validation confirms the accepted Thief slice now matches live behavior. Disobedient Bot combat/chase is privately validated; its two proven transferred item memberships are active under the provisional weighted-one policy, while the broader pool remains incomplete.
 - Bloodcreeper is activated as ordinary non-boss content from survey capture `20260709-222339` and focused captures of the same single spawn. Catalog data uses the generic spawn-level definition to roll the repository's community-documented inclusive `L15..L25` band once per new population generation; no Bloodcreeper-specific selection logic exists in the shared model or runtime. Captured adjacent points `L24/691 HP/run 83` and `L25/724 HP/run 86` anchor a private derived progression of `+33 HP` and `+3 run speed` per level; `L15..L23` values are explicitly policy rather than capture claims. The spawn preserves scale `70`, NPC family `63`, appearance `1483`, flags, heading, and optional SCFU fields. Proactive acquisition is enabled with a bounded `7`-unit private radius from the observed approximately `6.25`-unit trigger. Its specialized contract replays independent Skinspider Bite/SKW1 and Skinspider Spit/SKW2 streams with exact templates/tags/slots, captured initial timing, roughly `7.4`-second per-hand cadence, and non-constant ranges `21..35` and `21..41`. CATMesh `26978` and level-24 credits `150` are proven repeatedly; `150` is retained across the private level range as inferred policy so other level rolls do not lose credits. Four reviewed first opens prove one QL30 `42640/42641` entry and three empty inventories; the runtime pool remains incomplete. Private validation remains pending, so Bloodcreeper is not yet in the whole-enemy accepted gate.

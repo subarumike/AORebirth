@@ -75,9 +75,10 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayDisobedientBotMonsterData = 17649;
 
-        // Nine projected official-live hits plus eight authoritative raw-only hits
-        // prove the normal local-player SIW1 damage envelope. No critical hit
-        // has been observed and critical behavior remains unresolved.
+        // Nine projected official-live hits plus five reviewed raw-only hits
+        // prove the normal local-player SIW1 damage envelope. Three other-player
+        // hits and two player-owned-pet hits stay separate. No critical hit has
+        // been observed and critical behavior remains unresolved.
         public const int CapturedSubwayDisobedientBotMinimumDamage = 8;
 
         public const int CapturedSubwayDisobedientBotMaximumDamage = 15;
