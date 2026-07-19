@@ -14,8 +14,6 @@ namespace AORebirth.Core.Playfields
     {
         internal const int SubwayPlayfieldInstance = 127;
 
-        private const string QuarantinedOrdinaryCapture = "20260710-202132";
-
         private const int BloodcreeperMonsterData =
             NpcCombatAttackRules.CapturedSubwayBloodcreeperMonsterData;
 
@@ -505,12 +503,7 @@ namespace AORebirth.Core.Playfields
                         && policyConfiguration.RespawnPolicy.ExplicitPolicy != null
                             ? policyConfiguration.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds
                             : null,
-                        string.Equals(
-                            source.EvidenceCapture,
-                            QuarantinedOrdinaryCapture,
-                            StringComparison.Ordinal)
-                            ? OrdinaryEnemyRuntimeDisposition.Quarantined
-                            : OrdinaryEnemyRuntimeDisposition.Active,
+                        OrdinaryEnemyRuntimeDisposition.Active,
                         source.SourceOwnerIdentity,
                         source.EvidenceCapture,
                         source.EvidenceTimestamp,

@@ -1,6 +1,6 @@
 # Generic Ordinary-Enemy Runtime
 
-Population ownership: profile-backed Subway rows are activated and respawned by `WorldPopulationController`. `OrdinaryEnemyRuntimeService` materializes requested rows only and does not enumerate population or own respawn timers. The catalog remains the capture-backed adapter with 321 rows, 294 active, and 27 quarantined.
+Population ownership: profile-backed Subway rows are activated and respawned by `WorldPopulationController`. `OrdinaryEnemyRuntimeService` materializes requested rows only and does not enumerate population or own respawn timers. The catalog remains the capture-backed adapter with 321 rows, 310 active, and 11 quarantined.
 
 ## Decision
 
@@ -133,19 +133,17 @@ Subway evidence into 26 reusable type profiles and 321 exact spawn rows:
 
 - supported profiles: Filth Flea, Discarded Pet, Disobedient Bot, Mugger, Thief,
   and Violent Vagabond;
-- generated ordinary profiles: Shadow, Stim Fiend, Workman Striker, Architect
-  Striker, Workman, Architect, Looter, Deranged Shopper, Infector, Striker,
-  Lost Thought, Bloodcreeper, Empty Shell, Fragmented Soul, Incomplete Rebuild,
-  Melded Patterns, Molested Molecules, Premature Pattern, Redundant Scan, and
-  Uncontrollable Anger.
+- generated ordinary profiles: Slum Runner, Molested Molecules, Shadow,
+  Infector, Architect Striker, Melded Patterns, Workman Striker, Looter,
+  Deranged Shopper, Bloodcreeper, Stim Fiend, Neural Burnout, Incomplete
+  Rebuild, Fragmented Soul, Redundant Scan, Uncontrollable Anger, Infected
+  Attendant, Lost Thought, Empty Shell, and Premature Pattern.
 
-The configured activation boundary is 294 active rows; the 11 newly enabled
-Discarded Pet rows still require bounded private-client validation before this
-can be called the safe runtime boundary. The remaining 27 PF127 diagnostic rows
-are present as data but quarantined by default: 16 rows
-belong to accepted profiles awaiting bounded private activation, and 11 are
-Violent Vagabonds still missing capture-proven local-player damage and reset
-boundaries. Profile or spawn existence does not enable a row.
+The configured activation boundary is 310 active rows. The 16 accepted-profile
+rows activated in this slice require bounded private-client validation before
+this can be called the safe runtime boundary. The remaining 11 PF127 diagnostic
+rows are Violent Vagabonds still missing capture-proven local-player damage and
+reset boundaries. Profile or spawn existence alone does not enable a row.
 
 Named bosses and owned summons are not in the catalog.
 
@@ -219,7 +217,7 @@ the incomplete item-pool boundary.
 The restored deep-population slice uses strict initial corpse snapshots, including
 empty snapshots, when calculating observed item frequencies. It does not infer
 guaranteed loot from a successful roll. The catalog now contains 321 represented
-rows, 294 active rows, and 27 quarantined rows.
+rows, 310 active rows, and 11 quarantined rows.
 
 Slum Runner now has 21 identity-linked corpse generations: seven focused
 records from `20260716-034656` and `20260716-215947`, plus fourteen recovered
@@ -261,9 +259,8 @@ policy for the two proven memberships. All Bot rows use an observed
 `450`-second post-NPC-despawn delay; capture `20260708-143600` records
 `459.913` seconds death-to-replacement at a `0.190`-unit position delta. Shared
 chase and ordinary three-second empty/four-minute loot-bearing corpse behavior
-apply. Two Bot rows remain in the existing operational quarantine; acceptance
-does not activate them. Proactive aggro radius and leash/reset distance remain
-unresolved.
+apply. Both previously quarantined Bot rows are active for bounded private
+validation. Proactive aggro radius and leash/reset distance remain unresolved.
 
 Workman Striker is the tenth accepted ordinary profile. Declared overlap rules
 reduce simultaneous capture
@@ -360,9 +357,9 @@ seconds; runtime uses the six-decimal median `5.167153` without dropping or
 dividing the doubled interval. Exact positive-credit evidence covers
 L11/L12/L13/L20/L21, while active L19 and L23 remain unresolved. The
 twenty-one-profile gate, WorldPopulation `36/36`, and Subway loot `22/22` pass.
-ZoneEngine compiles; the approved wrapper's final output copy is currently
-blocked by running PID `24356`. Private activation validation remains pending
-for the 11 newly enabled rows.
+ZoneEngine compiles. Private activation validation remains pending for the 16
+rows activated in this slice; the prior Discarded Pet validation boundary is
+tracked separately.
 
 ## Ordinary respawn policy
 
@@ -458,4 +455,9 @@ Current unresolved data remains fail-closed, including combat sources without a
 landed captured hit, unsupported/nonordinary respawn classifications without an
 explicit owner policy, automatic-aggro radii not yet captured, level ranges not
 established by evidence or decision, and random roam behavior not proven by
-movement evidence. The remaining 27 diagnostic rows stay quarantined.
+movement evidence. The remaining 11 Violent Vagabond rows stay quarantined.
+The whole-enemy gate still accepts 21 of 26 profiles. Infected Attendant, Lost
+Thought, Empty Shell, Premature Pattern, and Violent Vagabond account for 32
+active rows plus the 11 quarantined Vagabonds and require the next
+corpus-backed completion pass; active disposition is not a claim that those
+five profiles are complete.

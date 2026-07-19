@@ -33,10 +33,10 @@ population in bounded runtime batches.
 
 ## Corpus Inventory
 
-- `294` timestamped AOSharp capture folders were classified using exact
+- `307` timestamped AOSharp capture folders were classified using exact
   playfield evidence only.
-- `37` are Subway-only, `31` are mixed Subway/outside zoning sessions, and
-  `222` are elsewhere.
+- `41` are Subway-only, `31` are mixed Subway/outside zoning sessions, and
+  `231` are elsewhere.
 - `4` folders are unresolved because they contain no gameplay packets or
   location snapshots: `20260509-182711`, `20260528-210106`,
   `20260621-013227`, and `20260622-081426`. They are empty startup remnants,
@@ -131,7 +131,7 @@ population in bounded runtime batches.
   `20260709-225408` packet log: Fragmented Soul `79545367` and Premature Pattern
   `79545356`. The stale start-time metadata and unrelated incomplete SCFUs do
   not invalidate those two `decoded_complete` rows.
-- The normalized PF127 catalog is now `321` rows: `294` active and `27`
+- The normalized PF127 catalog is now `321` rows: `310` active and `11`
   quarantined diagnostic rows. It contains `26` profiles.
 - Deep ordinary combat now uses capture-scoped identity mapping and only normal
   hits against the local player for runtime ranges. Critical hits and
@@ -250,7 +250,8 @@ population in bounded runtime batches.
   rows and preserves that target-role boundary.
 - The diagnostic quarantine selector now changes spawn eligibility in the
   world-population owner when explicitly selected. The selector is disabled in
-  the normal runtime; all `27` rows remain quarantined. A bounded
+  the normal runtime; only the `11` evidence-incomplete Violent Vagabond rows
+  remain quarantined. A bounded
   `population-activation-ledger.csv` now records `ELIGIBLE`, `MATERIALIZED`, or
   `FAILED` for selected rows so the next private-client batch can distinguish
   selection from actual runtime creation without changing eligibility.
@@ -277,10 +278,9 @@ population in bounded runtime batches.
   midpoint policy `40`, and other levels fail closed. Thirteen valid exact
   corpse/credit chains, seven strict loot outcomes, two proven item
   memberships, CATMesh `15215`, shared chase, and ordinary corpse lifetimes are
-  guarded with combat and respawn. The two existing Bot rows in the 27-row
-  operational quarantine remain quarantined; profile acceptance did not enable
-  them. Critical behavior, proactive aggro radius, and leash/reset distance
-  remain unobserved rather than guessed.
+  guarded with combat and respawn. Both previously quarantined Bot rows are now
+  active for bounded private validation. Critical behavior, proactive aggro
+  radius, and leash/reset distance remain unobserved rather than guessed.
 - Workman Striker now has a strict, generation-deduplicated loot denominator
   from ten complete first corpse opens: eight positive and two explicitly
   empty. Ten item/QL entries retain exact `1/10` or `2/10` observed frequencies;
@@ -337,8 +337,8 @@ population in bounded runtime batches.
   `6`, unknown `0`, and weapon instance `0`. The 38 normal `9..12` outcomes stay
   separate from three report-only `21` criticals; strict 17-open loot, exact
   CATMesh/level credits, chase, respawn, and corpse lifetimes pass together.
-- Deranged Shopper is the sixteenth accepted ordinary profile while its one
-  exact runtime row remains quarantined for bounded private activation. Source
+- Deranged Shopper is the sixteenth accepted ordinary profile and its one exact
+  runtime row is active for bounded private validation. Source
   `0x79574527` resolves only its owner-linked QL8 `125454/125455` weapon; the
   aggregate, unknown, missing, or conflicting paths fail closed. Eight normal
   local-player hits span `9..15`, one `27` critical remains report-only, and the
@@ -348,9 +348,9 @@ population in bounded runtime batches.
   together.
 - The Subway combat-contract analyzer now supplements legacy identity mapping
   from `enemy-dossier.json` and exact corpse dead-NPC links before consuming
-  combat rows. Its regenerated Bot projection recovers nine decoded
-  local-player hits at `8..15`; the eight additional authoritative raw rows are
-  retained in the 17-hit source audit instead of being silently discarded.
+  combat rows. Its regenerated Bot projection retains 14 local-player hits at
+  `8..15`, three other-player hits, and two player-owned Killer-pet hits as
+  separate target-role evidence instead of silently mixing them.
 - The combat analyzer now also recovers split detail-only weapon updates, raw
   enemy misses, and captured SpecialAttackWeapon shapes. Repeated identical
   weapon updates deduplicate, multiple owner-linked weapon shapes leave the
@@ -406,7 +406,7 @@ population in bounded runtime batches.
   regeneration: PASS.
 - Current inventory/content-ledger regression suites: `27/27` PASS.
 - Subway loot/corpse evidence: `22/22` PASS.
-- Twenty-entry whole-enemy gate now includes Discarded Pet, Fragmented Soul,
+- Twenty-one-profile whole-enemy gate now includes Discarded Pet, Fragmented Soul,
   Redundant Scan, and Incomplete Rebuild after Deranged Shopper, Mugger, Looter,
   Bloodcreeper, Stim Fiend, and Neural Burnout
   joined the previously confirmed ten. Ordinary generation check, expanded
@@ -423,11 +423,11 @@ population in bounded runtime batches.
 - Named encounter/capture contract suite: `26/26` PASS.
 - Runtime-coordinator ownership guard: PASS.
 - ZoneEngine compile: PASS. The approved wrapper reached final output copy but
-  could not replace the running `ZoneEngine.exe` held by PID `24356`; the
-  private server was not stopped.
+  could not replace the running `ZoneEngine.exe`; the private server was not
+  stopped.
 - Chat, Login, and Zone restart: PASS; ports `6996`, `7012`, `7500`, and `7501`
   listening.
-- Repository-wide AOtomation suite: `356/369`; 13 broader failures remain
+- Repository-wide AOtomation suite: `405/422`; 17 broader failures remain
   outside these changed Subway surfaces. Every focused test for
   Eumenides, Disobedient Bot combat/corpse/respawn, global loot, merchants, the
   whole-enemy gate, and capture inventory passes.
@@ -438,25 +438,34 @@ population in bounded runtime batches.
 
 ## Next Runtime Check
 
-No additional official-live capture is required before continuing the corpus
-work. Discarded Pet implementation is complete from the existing corpus; its
-11 newly configured rows still need bounded private-client activation
-validation. Violent Vagabond has exact population, weapon, miss cadence, loot,
-and corpse evidence but still lacks any Vagabond-origin local-player
-normal/critical hit outcome and numeric reset boundary. Continue auditing the
-indexed corpus before requesting any new capture.
+No additional official-live capture is required before the next corpus-backed
+implementation pass. The whole-enemy gate currently accepts 21 of 26 ordinary
+profiles. The five incomplete profiles are Infected Attendant, Lost Thought,
+Empty Shell, Premature Pattern, and Violent Vagabond. Existing captures contain
+usable evidence that is not yet fully indexed for all five; implement that
+evidence before requesting new captures. Residual gaps after that pass include
+reset/leash boundaries for all five, four respawn cycles, several weapon/cadence
+boundaries, landed Vagabond damage, and strict Empty/Premature loot.
 
 ## Remaining Capture-Backed Work
 
-1. The raw lifecycle backlog is closed: all `65` raw Subway-bearing sessions
-   decode and promote. The four location-unresolved folders are empty startup
-   remnants and contain no recoverable gameplay traffic.
-2. The `27` capture-backed PF127 population rows remain behind the diagnostic
-   quarantine. Sixteen accepted-profile rows await bounded private-client
-   activation: 6 Stim Fiends, 5 Muggers, 2 Disobedient Bots, 2 Looters, and 1
-   Deranged Shopper. The 11 Violent Vagabonds remain evidence-gated for missing
-   local-player hit outcomes and reset boundaries.
-3. Strike Foreman has usable exact L19/736 HP appearance, QL19 weapon, raw
+1. The current inventory contains `72` Subway/mixed sessions: `69` have raw
+   packet data and `3` do not. The four location-unresolved folders are empty
+   startup remnants and contain no recoverable gameplay traffic.
+2. Sixteen accepted-profile rows are active and await bounded private-client
+   validation: 6 Stim Fiends, 5 Muggers, 2 Disobedient Bots, 2 Looters, and 1
+   Deranged Shopper. Only 11 rows remain quarantined, all Violent Vagabonds.
+3. Five of the 26 ordinary profiles remain outside the whole-enemy accepted
+   set. Their rows are currently 32 active plus 11 quarantined: Infected
+   Attendant `5/0`, Lost Thought `4/0`, Empty Shell `5/0`, Premature Pattern
+   `7/0`, and Violent Vagabond `11/11`. Existing evidence now queued for the
+   analyzer/runtime pass includes Infected local damage/social aggression;
+   Lost other-player damage/cadence; Empty local damage/misses/group aggression;
+   Premature local/other-player/pet damage and group aggression; and Vagabond
+   miss cadence, `16.629`-unit acquisition/chase evidence, exact `459.978`-second
+   respawn, strict loot, corpse, and credits. Item `130590` is Red Wine and must
+   not be treated as a Vagabond weapon.
+4. Strike Foreman has usable exact L19/736 HP appearance, QL19 weapon, raw
    `SpecialAttackWeapon` plus `Attack` initiation against the non-local player
    Wardog, three other-player outgoing hits (`18`, `18`, and critical `40`),
    approximately five-second observed target cadence, chase initiation,
@@ -465,10 +474,10 @@ indexed corpus before requesting any new capture.
    range remain unresolved. Do not activate the encounter by guessing those
    missing boundaries; weapon-owned rolls must remain distinct from the
    observed post-mitigation other-player outcomes.
-4. Bitaxel is classified as a player artifact and is not an enemy gap.
-5. Container Supplier stock is resolved by exact template-`99634` capture
+5. Bitaxel is classified as a player artifact and is not an enemy gap.
+6. Container Supplier stock is resolved by exact template-`99634` capture
    evidence. Dialogue remains unresolved and must not be synthesized.
-6. Geometry-safe capture `20260714-202820` identifies 18 unlocked interior door
+7. Geometry-safe capture `20260714-202820` identifies 18 unlocked interior door
    identities, including five observed in both open and closed states. It does
    not contain safe room-link indices. The working client-owned doors must not
    be replaced with invented server statels; the corpus still lacks

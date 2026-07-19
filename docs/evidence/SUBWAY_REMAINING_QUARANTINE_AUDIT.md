@@ -2,12 +2,12 @@
 
 ## Decision
 
-The 16 rows below already belong to whole-enemy accepted profiles, but the
-existing corpus does not prove private-client visibility and lifecycle safety
-for their restored identities. They remain quarantined. No additional
-official-live capture is required; the missing evidence is bounded AORebirth
-materialization, client-send, traversal, combat, death, corpse, and respawn
-validation.
+The 16 rows below belong to whole-enemy accepted profiles and are now active.
+No additional official-live capture is required. Their remaining evidence gap
+is bounded AORebirth private-client validation of materialization, client-send,
+traversal, combat, death, corpse, and respawn behavior. The only rows still
+quarantined are 11 Violent Vagabonds whose profiles lack local-player landed
+damage and reset/leash proof.
 
 ## Exact accepted-profile rows
 
@@ -37,11 +37,9 @@ and `31..38` from capture `20260710-202132`.
 
 - Profile-level gates already bind population, appearance, combat, movement,
   loot, corpse, credits, respawn, and corpse lifetime for all five families.
-- The restored supported-family and ordinary-population tests intentionally
-  keep the `20260710-202132` rows evidence-only pending safe visibility
-  isolation.
-- The Deranged Shopper whole-enemy gate explicitly separates profile
-  acceptance from private activation.
+- The supported-family and ordinary-population tests now require all 16 rows
+  to be active while preserving an exact 11-row Violent Vagabond quarantine.
+- The Deranged Shopper whole-enemy gate now requires its exact row to be active.
 - Source `79557C66` is the only row with a private diagnostic artifact. It
   reached `ELIGIBLE` and `MATERIALIZED`, but remained outside client visibility
   and never entered the per-enemy send ledger. That does not prove its SCFU or
@@ -60,5 +58,5 @@ and `31..38` from capture `20260710-202132`.
    credits retain explicit policy boundaries.
 
 The Disobedient Bot generated-report/runtime provenance mismatch is reconciled
-from the existing capture corpus. Its two-row private activation sequence still
-requires the same visibility validation described above.
+from the existing capture corpus. Its two active rows still require the same
+private-client validation described above.

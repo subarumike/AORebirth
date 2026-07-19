@@ -1695,7 +1695,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
             Assert.IsTrue(
                 providerText.Contains("RuntimeQuarantinedSourceInstances.Contains(spawn.SourceInstance)"),
-                "The client-crashing 20260710 population batch must remain evidence-only until its visibility snapshot is isolated safely.");
+                "The 11 evidence-incomplete Violent Vagabond rows must remain behind the diagnostic selector.");
             Assert.IsFalse(
                 providerText.Contains("122002"),
                 "CapturedSubwayContentProvider must bind content to resource/playfield 127, not capture object Playfield2:122002.");
@@ -1921,8 +1921,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 ordinaryCatalogText.Contains("spawn.Disposition == OrdinaryEnemyRuntimeDisposition.Active")
                 && ordinaryCatalogText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(")
-                && ordinaryGeneratorText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(spawn.SourceInstance)"),
-                "The unified catalog must keep both quarantined population groups behind the same opt-in selector.");
+                && !ordinaryGeneratorText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(spawn.SourceInstance)"),
+                "The unified catalog must keep only explicitly quarantined supported rows behind the opt-in selector.");
 
             AssertTextBefore(
                 visibilityText,
@@ -2008,9 +2008,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                  == Convert.ToInt32(restoredOrdinarySourceInstances[i].Substring(2), 16)),
                     "Restored ordinary source identity must map to exactly one spawn: " + restoredOrdinarySourceInstances[i]);
             }
-            Assert.IsTrue(
+            Assert.IsFalse(
                 providerText.Contains("!string.Equals(spawn.EvidenceCapture, \"20260710-202132\", StringComparison.Ordinal)"),
-                "The client-crashing 20260710 ordinary batch must remain evidence-only until its visibility snapshot is isolated safely.");
+                "Accepted ordinary rows must not remain behind a capture-wide quarantine.");
 
             string[] capturedNames =
                 {
@@ -2373,7 +2373,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Population restoration must not add a RoomSpace workaround or coordinate mutation.");
             Assert.IsTrue(
                 ordinaryCatalogText.Contains("CapturedSubwayContentProvider.IsRuntimeQuarantined(source.SourceInstance)")
-                && ordinaryCatalogText.Contains("QuarantinedOrdinaryCapture")
+                && !ordinaryCatalogText.Contains("QuarantinedOrdinaryCapture")
                 && ordinaryRuntimeText.Contains("SpawnMobFromTemplate")
                 && ordinaryRuntimeText.Contains("Pool.Instance.GetFreeInstance<Character>")
                 && ordinaryRuntimeText.Contains("spawn.SourceIdentity")
@@ -2567,6 +2567,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new CapturedSubwayOrdinaryContentProvider());
             OrdinaryEnemyProfile[] ordinaryProfiles = ordinaryCatalog.GetProfiles();
             OrdinaryEnemySpawnDefinition[] ordinarySpawns = ordinaryCatalog.GetSpawns();
+            Assert.AreEqual(321, ordinarySpawns.Length);
+            Assert.AreEqual(
+                310,
+                ordinarySpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            CollectionAssert.AreEquivalent(
+                new[]
+                {
+                    0x79557CAC, 0x7957405C, 0x795743A7, 0x795743A8,
+                    0x7957E02C, 0x7957E02E, 0x7957E123, 0x7957E40E,
+                    0x7957E5BF, 0x7957E5C4, 0x7957E5C5
+                },
+                ordinarySpawns
+                    .Where(
+                        value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined)
+                    .Select(value => value.SourceIdentity)
+                    .ToArray());
 
             string[] acceptedEnemyKeys =
                 {
@@ -2814,8 +2831,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .ToArray();
             Assert.AreEqual(10, CountOccurrences(ordinaryProviderText, "\"looter\""));
             Assert.AreEqual(8, looterSpawns.Length);
-            Assert.AreEqual(6, looterSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
-            Assert.AreEqual(2, looterSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            Assert.AreEqual(8, looterSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(0, looterSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
             Assert.IsTrue(looterSpawns.All(value => value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Inherit));
             Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, looter.Combat.Mode);
             Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, looter.Combat.DamageSource);
@@ -2887,11 +2904,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "7953AD6B:10:Active",
                     "795450D4:5:Active",
                     "795451FE:10:Active",
-                    "79557F14:10:Quarantined",
-                    "7957E5C6:9:Quarantined",
-                    "7957E5C7:8:Quarantined",
-                    "7957E5C8:8:Quarantined",
-                    "7957E5CA:10:Quarantined"
+                    "79557F14:10:Active",
+                    "7957E5C6:9:Active",
+                    "7957E5C7:8:Active",
+                    "7957E5C8:8:Active",
+                    "7957E5CA:10:Active"
                 },
                 muggerSpawns
                     .OrderBy(value => value.SourceIdentity)
@@ -3022,9 +3039,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(8, derangedShopperSpawn.Level);
             Assert.AreEqual(256, derangedShopperSpawn.LevelDefinition.Resolve(8).Health);
             Assert.AreEqual(
-                OrdinaryEnemyRuntimeDisposition.Quarantined,
+                OrdinaryEnemyRuntimeDisposition.Active,
                 derangedShopperSpawn.Disposition,
-                "The only captured Deranged Shopper row is still quarantined and must not imply private activation.");
+                "The capture-complete Deranged Shopper row must be active for private validation.");
             Assert.AreEqual(
                 WorldRespawnPolicyAssignmentMode.Inherit,
                 derangedShopperSpawn.RespawnPolicy.Mode);
@@ -3122,7 +3139,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
-                "Accepted Subway Deranged Shopper must keep its one quarantined source, exact QL8 source-owned weapon and captured AttackInfo shape, fail-closed aggregate/unknown/missing/conflicting selection, item-owned damage/recharge, report-only critical, one captured miss shape, strict two-open incomplete-pool loot, exact CATMesh/credits, shared chase, inherited private four-minute respawn, and ordinary corpse lifetimes together without claiming private activation.");
+                "Accepted Subway Deranged Shopper must keep its one active source, exact QL8 source-owned weapon and captured AttackInfo shape, fail-closed aggregate/unknown/missing/conflicting selection, item-owned damage/recharge, report-only critical, one captured miss shape, strict two-open incomplete-pool loot, exact CATMesh/credits, shared chase, inherited private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile discardedPet = ordinaryProfiles.Single(
                 value => value.DisplayName == "Discarded Pet");
@@ -3289,8 +3306,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .ToArray();
             Assert.AreEqual(17, CountOccurrences(ordinaryProviderText, "\"stim_fiend\""));
             Assert.AreEqual(15, stimFiendSpawns.Length);
-            Assert.AreEqual(9, stimFiendSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
-            Assert.AreEqual(6, stimFiendSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            Assert.AreEqual(15, stimFiendSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(0, stimFiendSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
             Assert.IsTrue(stimFiendSpawns.All(value => value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Inherit));
             Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, stimFiend.Aggression.Mode);
             Assert.IsTrue(stimFiend.Aggression.Chase);

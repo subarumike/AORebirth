@@ -6387,11 +6387,7 @@ namespace AORebirth.Core.Playfields
 
         public CapturedSubwayOrdinarySpawnDefinition[] GetSpawns()
         {
-            return Spawns
-                .Where(
-                    spawn => !string.Equals(spawn.EvidenceCapture, "20260710-202132", StringComparison.Ordinal)
-                             || SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(spawn.SourceInstance))
-                .ToArray();
+            return Spawns.ToArray();
         }
 
         internal CapturedSubwayOrdinarySpawnDefinition[] GetAllSpawns()
