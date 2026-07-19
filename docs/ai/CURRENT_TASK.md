@@ -19,21 +19,29 @@ population in bounded runtime batches.
   `GUI.dll 0xc00001a5`, and `0xc0000005`; prior dump analysis ties this signature
   family to the injected `ProcessChatInput` GUI patch. This is capture-tool/client
   corruption, not evidence of a Subway server failure.
-- Capture-tagged injection now skips that GUI patch while retaining packet/game
-  hooks, rejects duplicate Bootstrap injection with a named per-client guard,
-  and releases the guard on constructor failure or Bootstrap unload. The launcher
-  refuses stale binaries through a deployed Bootstrap contract self-test before
-  it selects a client target.
+- Capture-tagged injection retains packet/game hooks, rejects duplicate Bootstrap
+  injection with a named per-client guard, and releases the guard on constructor
+  failure or Bootstrap unload. The launcher refuses stale binaries through a
+  deployed Bootstrap contract self-test before it selects a client target.
 - Comprehensive enemy capture no longer instantiates the native PF127 geometry
   probe. Geometry remains isolated to the explicit geometry-only workflow; the
   promoted server collision asset is unchanged.
-- Comprehensive capture starts automatically and now accepts `start`, `stop`,
-  `mark`, `flush`, and `snapshot` through an atomic one-slot external control
-  file. This replaces typed `/aocap` control for capture-safe injection.
-- Capture-plugin build and capture-safe injector build/self-test pass without
-  launching or injecting a client. Live official-client regression remains
-  pending; do not describe the crash repair as live-proven until Mike confirms a
-  stable capture.
+- The original crash attribution to the long-standing 131-byte native GUI rewrite
+  was not live-proven, but disabling all chat interception caused the `/aocap`
+  regression. Capture-safe mode now installs one isolated `ProcessChatInput`
+  EasyHook only after the duplicate-injection guard is held. It dispatches exact
+  `/aocap` and `/aosmoke` prefixes, passes every other command through unchanged,
+  and never runs the native NOP rewrite or `GetCommand` hook. The tracked native
+  string layout now allocates the required `0x18` bytes instead of the upstream
+  undersized `0x14`, and every hook invocation disposes it deterministically.
+  AOSharpLiveCapture itself acknowledges readiness only after initialization and
+  both command registrations; the injector times out fail-closed otherwise. Mike
+  again owns in-game `/aocap start` and `/aocap stop`; atomic
+  external control remains a fallback. Native PF127 geometry probing remains
+  disabled in comprehensive mode.
+- Capture-plugin build and capture-safe injector build/self-test are the offline
+  validation boundary. Live typed-command validation remains pending; do not
+  describe the restoration as live-proven until Mike confirms it.
 
 ## Quest-system foundation and TOTW gateway (2026-07-17)
 

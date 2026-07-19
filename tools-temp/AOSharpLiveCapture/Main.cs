@@ -59,6 +59,8 @@ namespace AOSharpLiveCapture
         private const int CorpseFullUpdateTailDeadNpcInstanceSuffixOffset = 84;
         private const string LootCaptureRequestFileName = "loot-10.request";
         private const string ExternalControlRequestFileName = "AOSharpLiveCapture.control";
+        private const string CaptureBootstrapReadyEventPrefix = @"Local\AOSharpCaptureBootstrap_";
+        private const string CaptureBootstrapChannelSuffix = "_capture_safe";
         private readonly HashSet<string> interestingMessageNames = new HashSet<string>
         {
             "SimpleCharFullUpdate",
@@ -299,10 +301,9 @@ namespace AOSharpLiveCapture
             Game.TeleportFailed += this.OnTeleportFailedBoundary;
 
             this.LogEvent("PLUGIN", "AOSharpLiveCapture loaded. session=" + this.sessionDirectory);
-            this.LogEvent(
-                "PLUGIN",
-                "Capture-safe injection disables GUI chat commands; external control file: "
-                + this.externalControlRequestPath);
+            this.LogEvent("PLUGIN", "Commands: /aocap start | stop | mark <text> | status | flush | snapshot | dynels [force] | fight start|stop|auto on|auto off|status");
+            this.LogEvent("PLUGIN", "Smoke commands: /aosmoke start [mobAlias] | stop | status | log");
+            this.LogEvent("PLUGIN", "External control fallback: " + this.externalControlRequestPath);
             this.LogEvent("PLUGIN", "ShopUpdate CSV: " + Path.Combine(this.sessionDirectory, "shop-updates.csv"));
             this.LogEvent("PLUGIN", "VendingMachineFullUpdate CSV: " + Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
             this.LogEvent("PLUGIN", "System messages log: " + Path.Combine(this.sessionDirectory, "system-messages.log"));
@@ -336,6 +337,25 @@ namespace AOSharpLiveCapture
             Chat.RegisterCommand("aocap", this.OnCommandBoundary);
             Chat.RegisterCommand("aosmoke", this.OnSmokeCommandBoundary);
             this.initialized = true;
+            SignalCaptureBootstrapReady();
+        }
+
+        private static void SignalCaptureBootstrapReady()
+        {
+            string eventName = CaptureBootstrapReadyEventPrefix
+                + Process.GetCurrentProcess().Id.ToString(CultureInfo.InvariantCulture)
+                + CaptureBootstrapChannelSuffix;
+            try
+            {
+                using (EventWaitHandle ready = EventWaitHandle.OpenExisting(eventName))
+                {
+                    ready.Set();
+                }
+            }
+            catch (WaitHandleCannotBeOpenedException)
+            {
+                // The standard non-capture Bootstrap has no readiness event.
+            }
         }
 
         public override void Teardown()
@@ -402,6 +422,7 @@ namespace AOSharpLiveCapture
                 "AOSharpLiveCapture PF127 geometry-only safe mode logging to " + capture.SessionDirectory,
                 ChatColor.Gold);
             this.initialized = true;
+            SignalCaptureBootstrapReady();
         }
 
         private void OnMinimalPf127CaptureUpdateBoundary(object sender, float deltaTime)

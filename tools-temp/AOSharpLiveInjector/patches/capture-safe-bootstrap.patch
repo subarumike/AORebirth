@@ -7,18 +7,19 @@ index 639dde5..ccb222a 100644
      public class Main : IEntryPoint
      {
 +        public const string CaptureSafeChannelSuffix = "_capture_safe";
-+        public const int CaptureSafeContractVersion = 1;
++        public const int CaptureSafeContractVersion = 3;
 +        public const string CaptureSafeSingletonNamePrefix = @"Local\AOSharpCaptureBootstrap_";
 +
          private IPCServer _ipcPipe;
          private AppDomain _pluginAppDomain;
          private ManualResetEvent _connectEvent;
-@@ -23,36 +27,88 @@ namespace AOSharp.Bootstrap
+@@ -23,36 +27,117 @@ namespace AOSharp.Bootstrap
          private PluginProxy _pluginProxy;
          private ChatSocketListener _chatSocketListener;
          private bool _exiting = false;
 +        private readonly bool _captureSafeMode;
 +        private readonly EventWaitHandle _captureSafeSingleton;
++        private volatile bool _captureCommandHookReady;
  
          private string _lastChatInput;
          private IntPtr _lastChatInputWindowPtr;
@@ -86,9 +87,37 @@ index 639dde5..ccb222a 100644
 +                && channelName.EndsWith(CaptureSafeChannelSuffix, StringComparison.Ordinal);
 +        }
 +
-+        public static bool ShouldInstallGuiChatPatch(bool captureSafeMode)
++        public static bool ShouldInstallCaptureCommandHook(bool captureSafeMode, bool captureSafeSingletonHeld)
 +        {
-+            return !captureSafeMode;
++            return captureSafeMode && captureSafeSingletonHeld;
++        }
++
++        public static bool IsCaptureChatCommand(string input)
++        {
++            return NormalizeCaptureChatCommand(input) != null;
++        }
++
++        public static string NormalizeCaptureChatCommand(string input)
++        {
++            if (string.IsNullOrWhiteSpace(input))
++                return null;
++
++            string trimmed = input.TrimStart();
++            if (HasCommandPrefix(trimmed, "/aocap"))
++                return "/aocap" + trimmed.Substring(6);
++
++            if (HasCommandPrefix(trimmed, "/aosmoke"))
++                return "/aosmoke" + trimmed.Substring(8);
++
++            return null;
++        }
++
++        private static bool HasCommandPrefix(string input, string command)
++        {
++            return string.Equals(input, command, StringComparison.OrdinalIgnoreCase)
++                || (input.Length > command.Length
++                    && input.StartsWith(command, StringComparison.OrdinalIgnoreCase)
++                    && input[command.Length] == ' ');
 +        }
 +
 +        public static string GetCaptureSafeSingletonName(string channelName)
@@ -119,17 +148,197 @@ index 639dde5..ccb222a 100644
          }
  
          private void OnIPCClientConnected(IPCServer pipe)
-@@ -204,7 +267,12 @@ namespace AOSharp.Bootstrap
+@@ -65,13 +150,33 @@ namespace AOSharp.Bootstrap
+         private void OnIPCClientDisconnected(IPCServer pipe)
+         {
++            if (_pluginProxy != null && IsCaptureReadySignaled())
++            {
++                return;
++            }
++
+             _exiting = true;
+             _ipcPipe.Close();
+         }
+ 
++        private bool IsCaptureReadySignaled()
++        {
++            try
++            {
++                return _captureSafeSingleton != null && _captureSafeSingleton.WaitOne(0);
++            }
++            catch
++            {
++                return false;
++            }
++        }
++
+         private void OnAssembliesChanged(object pipe, IPCMessage message)
+         {
+             try
+             {
++                if (_captureSafeMode && !_captureCommandHookReady)
++                    throw new InvalidOperationException("Capture-safe chat command hook is unavailable; plugin load refused.");
++
+                 LoadAssemblyMessage msg = message as LoadAssemblyMessage;
+ 
+                 if (_pluginAppDomain != null)
+@@ -101,6 +197,8 @@ namespace AOSharp.Bootstrap
+                 {
+                     _pluginProxy.LoadPlugin(assembly);
+                 }
++
++                _pluginProxy.RunPluginInitializations();
+             }
+             catch (Exception e)
+             {
+@@ -204,7 +299,12 @@ namespace AOSharp.Bootstrap
                          "recv",
                          new Ws2_32.RecvDelegate(WsRecv_Hook));
  
 -            if (ProcessChatInputPatcher.Patch(out IntPtr pProcessCommand, out IntPtr pGetCommand))
-+            // The live-client GUI patch rewrites 0x83 bytes in ProcessChatInput
-+            // and has produced native heap/SEH corruption in captured dumps.
-+            // Comprehensive capture starts automatically and uses external file
-+            // control, so capture-safe injection must never install this patch.
-+            if (ShouldInstallGuiChatPatch(_captureSafeMode)
++            if (ShouldInstallCaptureCommandHook(_captureSafeMode, _captureSafeSingleton != null))
++            {
++                _captureCommandHookReady = TryInstallCaptureCommandHook();
++            }
++            else if (!_captureSafeMode
 +                && ProcessChatInputPatcher.Patch(out IntPtr pProcessCommand, out IntPtr pGetCommand))
              {
                  CommandInterpreter_c.ProcessChatInput = Marshal.GetDelegateForFunctionPointer<CommandInterpreter_c.DProcessChatInput>(pProcessCommand);
                  CommandInterpreter_c.GetCommand = Marshal.GetDelegateForFunctionPointer<CommandInterpreter_c.DGetCommand>(pGetCommand);
+@@ -213,6 +313,53 @@ namespace AOSharp.Bootstrap
+                 CreateHook(pProcessCommand, new CommandInterpreter_c.DProcessChatInput(ProcessChatInput_Hook));
+                 CreateHook(pGetCommand, new CommandInterpreter_c.DGetCommand(GetCommand_Hook));
+             }
+         }
+ 
++        private bool TryInstallCaptureCommandHook()
++        {
++            LocalHook hook = null;
++            try
++            {
++                IntPtr processChatInput = ProcessChatInputPatcher.FindProcessChatInput();
++                if (processChatInput == IntPtr.Zero)
++                {
++                    TryLogError("Capture-safe chat input signature was not found.", null);
++                    return false;
++                }
++
++                CommandInterpreter_c.ProcessChatInput = Marshal.GetDelegateForFunctionPointer<CommandInterpreter_c.DProcessChatInput>(processChatInput);
++                hook = LocalHook.Create(
++                    processChatInput,
++                    new CommandInterpreter_c.DProcessChatInput(ProcessChatInput_Hook),
++                    this);
++                hook.ThreadACL.SetExclusiveACL(new Int32[] { 0 });
++                _hooks.Add(hook);
++                return true;
++            }
++            catch (Exception ex)
++            {
++                try
++                {
++                    hook?.Dispose();
++                }
++                catch
++                {
++                }
++
++                TryLogError("Capture-safe chat command hook installation failed.", ex);
++                return false;
++            }
++        }
++
++        private static void TryLogError(string message, Exception ex)
++        {
++            try
++            {
++                Log.Error(ex == null ? message : message + " " + ex);
++            }
++            catch
++            {
++            }
++        }
++
+         private void CreateHook(string module, string funcName, Delegate newFunc)
+@@ -285,10 +446,27 @@ namespace AOSharp.Bootstrap
+         }
+ 
+         public byte ProcessChatInput_Hook(IntPtr pThis, IntPtr pWindow, IntPtr pCmdText)
+         {
+-            StdString tokenized = StdString.Create();
+-            ChatGUIModule_t.ExpandChatTextArgs(tokenized.Pointer, pCmdText);
+-            _lastChatInput = tokenized.ToString();
+-            _lastChatInputWindowPtr = pWindow;
++            try
++            {
++                using (StdString tokenized = StdString.Create())
++                {
++                    ChatGUIModule_t.ExpandChatTextArgs(tokenized.Pointer, pCmdText);
++                    string chatInput = tokenized.ToString();
++                    string captureCommand = NormalizeCaptureChatCommand(chatInput);
++                    if (_captureSafeMode && captureCommand != null && _pluginProxy != null)
++                    {
++                        _pluginProxy.UnknownChatCommand(pWindow, captureCommand);
++                        return 1;
++                    }
++
++                    _lastChatInput = chatInput;
++                    _lastChatInputWindowPtr = pWindow;
++                }
++            }
++            catch (Exception ex)
++            {
++                TryLogError("Chat input hook failed open.", ex);
++            }
+ 
+             return CommandInterpreter_c.ProcessChatInput(pThis, pWindow, pCmdText);
+         }
+diff --git a/AOSharp.Bootstrap/ProcessChatInputPatcher.cs b/AOSharp.Bootstrap/ProcessChatInputPatcher.cs
+index eb20162..ee951c8 100644
+--- a/AOSharp.Bootstrap/ProcessChatInputPatcher.cs
++++ b/AOSharp.Bootstrap/ProcessChatInputPatcher.cs
+@@ -18,9 +18,14 @@ namespace AOSharp.Bootstrap
+         private static IntPtr _pProcessChatInput;
+         private static IntPtr _pOrig;
+ 
++        public static IntPtr FindProcessChatInput()
++        {
++            return Utils.FindPattern("GUI.dll", ProcessChatInputSig);
++        }
++
+         public static unsafe bool Patch(out IntPtr pProcessChatInput, out IntPtr pGetCommand)
+         {
+-            pProcessChatInput = Utils.FindPattern("GUI.dll", ProcessChatInputSig);
++            pProcessChatInput = FindProcessChatInput();
+             pGetCommand = IntPtr.Zero;
+ 
+             if (pProcessChatInput == IntPtr.Zero)
+diff --git a/AOSharp.Common/Unmanaged/DataTypes/StdString.cs b/AOSharp.Common/Unmanaged/DataTypes/StdString.cs
+index 7d455c8..51285ea 100644
+--- a/AOSharp.Common/Unmanaged/DataTypes/StdString.cs
++++ b/AOSharp.Common/Unmanaged/DataTypes/StdString.cs
+@@ -7,6 +7,7 @@ namespace AOSharp.Common.Unmanaged.DataTypes
+ {
+     public class StdString : IDisposable
+     {
++        private const int NativeObjectSize = 0x18;
+         public readonly IntPtr Pointer;
+         public unsafe int Length => ((StdStringStruct*)Pointer)->Length;
+         private bool _disposedValue;
+@@ -31,7 +32,7 @@ namespace AOSharp.Common.Unmanaged.DataTypes
+         public static StdString Create(string str)
+         {
+             byte[] bytes = Encoding.ASCII.GetBytes(str);
+-            return new StdString(String_c.Constructor(MSVCR100.New(0x14), bytes, bytes.Length));
++            return new StdString(String_c.Constructor(MSVCR100.New(NativeObjectSize), bytes, bytes.Length));
+         }
+ 
+         public unsafe override string ToString()
+@@ -121,6 +122,8 @@ namespace AOSharp.Common.Unmanaged.DataTypes
+         private byte* _pLongBuffer;
+         [FieldOffset(16)]
+         public int Length;
++        [FieldOffset(20)]
++        public int Capacity;
+ 
+         public override string ToString()
+         {
