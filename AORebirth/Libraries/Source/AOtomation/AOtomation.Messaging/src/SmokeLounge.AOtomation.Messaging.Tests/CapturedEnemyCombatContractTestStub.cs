@@ -418,21 +418,24 @@ namespace AORebirth.Core.Playfields
             bool observed = archetype != null
                             && archetype.Combat != null
                             && archetype.Combat.Observed;
+            bool runtimeReady = observed && archetype.Combat.RuntimeReady;
             return new CapturedEnemyCombatContract
             {
-                AttackModel = observed
+                AttackModel = runtimeReady
                     ? CapturedEnemyAttackModel.FixedAttackInfo
                     : CapturedEnemyAttackModel.Unresolved,
-                IsCombatReady = observed,
+                IsCombatReady = runtimeReady,
                 Evidence = archetype == null
                     ? string.Empty
-                    : string.Join(",", archetype.EvidenceCaptures),
-                MinDamage = observed ? archetype.Combat.MinDamage : 0,
-                MaxDamage = observed ? archetype.Combat.MaxDamage : 0,
-                RechargeSeconds = observed ? archetype.Combat.RechargeSeconds : 0,
-                AttackInfoWeaponSlot = observed ? archetype.Combat.WeaponSlot : 0,
-                AttackInfoUnknown = observed ? archetype.Combat.AttackInfoUnknown : 0,
-                AttackInfoWeaponInstance = observed ? archetype.Combat.WeaponInstance : 0
+                    : runtimeReady
+                        ? string.Join(",", archetype.EvidenceCaptures)
+                        : archetype.Name + " combat evidence is report-only.",
+                MinDamage = runtimeReady ? archetype.Combat.MinDamage : 0,
+                MaxDamage = runtimeReady ? archetype.Combat.MaxDamage : 0,
+                RechargeSeconds = runtimeReady ? archetype.Combat.RechargeSeconds : 0,
+                AttackInfoWeaponSlot = runtimeReady ? archetype.Combat.WeaponSlot : 0,
+                AttackInfoUnknown = runtimeReady ? archetype.Combat.AttackInfoUnknown : 0,
+                AttackInfoWeaponInstance = runtimeReady ? archetype.Combat.WeaponInstance : 0
             };
         }
 

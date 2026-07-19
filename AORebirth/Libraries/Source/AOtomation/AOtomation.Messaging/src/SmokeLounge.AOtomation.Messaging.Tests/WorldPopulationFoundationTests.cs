@@ -355,9 +355,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void CapturedOrdinaryExceptionsAndPopulationBoundaryRemainStable()
         {
+            var ordinaryContent = new CapturedSubwayOrdinaryContentProvider();
             var catalog = new OrdinaryEnemyCatalog(
                 new CapturedSubwayContentProvider(),
-                new CapturedSubwayOrdinaryContentProvider());
+                ordinaryContent);
             OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns();
             OrdinaryEnemyProfile[] profiles = catalog.GetProfiles();
             Assert.AreEqual(321, spawns.Length);
@@ -387,6 +388,72 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration, bloodcreeper.LevelDefinition.RerollPolicy);
 
             var profilesByKey = profiles.ToDictionary(value => value.ProfileKey, StringComparer.Ordinal);
+            OrdinaryEnemyProfile violentVagabond = profiles.Single(
+                value => value.DisplayName == "Violent Vagabond");
+            OrdinaryEnemySpawnDefinition[] violentVagabondSpawns = spawns
+                .Where(value => value.ProfileKey == violentVagabond.ProfileKey)
+                .ToArray();
+            Assert.AreEqual(22, violentVagabondSpawns.Length);
+            Assert.AreEqual(
+                11,
+                violentVagabondSpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            Assert.IsTrue(
+                violentVagabondSpawns.All(
+                    value => value.RespawnEvidence == OrdinaryEnemyEvidenceState.Policy
+                             && value.RespawnDelaySeconds == 450.0
+                             && value.RespawnPolicy.Mode
+                                == WorldRespawnPolicyAssignmentMode.Explicit
+                             && value.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds == 450.0
+                             && value.RespawnPolicy.ExplicitPolicy.Evidence.Contains(
+                                 "449.759588-seconds-after-npc-despawn")));
+            Assert.AreEqual(
+                OrdinaryEnemyAggressionMode.Retaliate,
+                violentVagabond.Aggression.Mode);
+            Assert.IsFalse(violentVagabond.Aggression.AutomaticAggroRadius.HasValue);
+            Assert.IsTrue(violentVagabond.Aggression.Chase);
+            Assert.IsFalse(violentVagabond.Aggression.ReturnToSpawn);
+            Assert.AreEqual(
+                OrdinaryEnemyEvidenceState.Observed,
+                violentVagabond.Aggression.EvidenceState);
+            Assert.IsFalse(violentVagabond.Combat.Contract.IsCombatReady);
+            Assert.AreEqual(0, violentVagabond.Combat.Contract.WeaponLowId);
+            Assert.AreEqual(0, violentVagabond.Combat.Contract.WeaponHighId);
+
+            var reportOnlyCombatExpectations = new[]
+                {
+                    new { Name = "Empty Shell", Observed = true, RuntimeReady = false, MinDamage = 15, MaxDamage = 15, ObservedRows = 1 },
+                    new { Name = "Infected Attendant", Observed = true, RuntimeReady = false, MinDamage = 11, MaxDamage = 11, ObservedRows = 1 },
+                    new { Name = "Lost Thought", Observed = false, RuntimeReady = false, MinDamage = 0, MaxDamage = 0, ObservedRows = 0 },
+                    new { Name = "Premature Pattern", Observed = true, RuntimeReady = false, MinDamage = 22, MaxDamage = 22, ObservedRows = 1 }
+                };
+            foreach (var expected in reportOnlyCombatExpectations)
+            {
+                CapturedSubwayOrdinaryArchetypeDefinition archetype = ordinaryContent
+                    .GetArchetypes()
+                    .Single(value => value.Name == expected.Name);
+                OrdinaryEnemyProfile reportOnlyProfile = profiles.Single(
+                    value => value.DisplayName == expected.Name);
+                Assert.AreEqual(expected.Observed, archetype.Combat.Observed, expected.Name);
+                Assert.AreEqual(expected.RuntimeReady, archetype.Combat.RuntimeReady, expected.Name);
+                Assert.AreEqual(expected.MinDamage, archetype.Combat.MinDamage, expected.Name);
+                Assert.AreEqual(expected.MaxDamage, archetype.Combat.MaxDamage, expected.Name);
+                Assert.AreEqual(expected.ObservedRows, archetype.Combat.ObservedRows, expected.Name);
+                Assert.AreEqual(
+                    expected.Observed
+                        ? OrdinaryEnemyEvidenceState.Observed
+                        : OrdinaryEnemyEvidenceState.Unresolved,
+                    reportOnlyProfile.Combat.EvidenceState,
+                    expected.Name);
+                Assert.IsFalse(
+                    reportOnlyProfile.Combat.Contract.IsCombatReady,
+                    expected.Name
+                    + " must not promote incomplete evidence to fixed runtime combat; model="
+                    + reportOnlyProfile.Combat.Contract.AttackModel
+                    + "; evidence="
+                    + reportOnlyProfile.Combat.Contract.Evidence);
+            }
+
             Assert.AreEqual(24, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Slum Runner"));
             Assert.AreEqual(5, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Empty Shell"));
             Assert.AreEqual(10, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Fragmented Soul"));

@@ -1020,12 +1020,9 @@ namespace AORebirth.Core.Playfields
                         NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown4,
                         NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown5);
                 case 203733:
-                    return CapturedEnemyCombatContract.EquippedWeapon(
-                        "20260709-205921/210452/212115/212336: Violent Vagabond QL1 weapon 130590",
-                        130590,
-                        130590,
-                        1,
-                        (int)WeaponSlots.Righthand);
+                    return CapturedEnemyCombatContract.Unresolved(
+                        "Violent Vagabond holds QL1 template 130590 (Red Wine); 26 captured local-player outcomes are misses and no landed-damage or usable weapon semantics are proven",
+                        true);
                 default:
                     return CapturedEnemyCombatContract.Unresolved(
                         "No captured combat contract for " + name + " monsterData=" + monsterData,
@@ -1783,6 +1780,14 @@ namespace AORebirth.Core.Playfields
                 return CapturedEnemyCombatContract.Unresolved(
                     "Generated ordinary archetype has no observed AttackInfo: " + archetype.Name,
                     false);
+            }
+
+            if (!combat.RuntimeReady)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Generated ordinary archetype has report-only AttackInfo evidence without a runtime-ready damage range and cadence: "
+                    + archetype.Name,
+                    true);
             }
 
             return CapturedEnemyCombatContract.FixedAttack(

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 import re
 from collections import Counter, defaultdict
 from datetime import datetime
@@ -47,7 +48,12 @@ CAPTURES = (
 CAPTURE_ENEMY_FILTERS = {
     "20260708-004038": frozenset({"Filth Flea"}),
     "20260708-143600": frozenset(
-        {"Deranged Shopper", "Discarded Pet", "Disobedient Bot"}
+        {
+            "Deranged Shopper",
+            "Discarded Pet",
+            "Disobedient Bot",
+            "Violent Vagabond",
+        }
     ),
     "20260709-213711": frozenset({"Architect Striker", "Workman Striker"}),
     "20260710-202132": frozenset({"Deranged Shopper"}),
@@ -79,9 +85,14 @@ TARGET_ROLE_EVIDENCE_ENEMIES = frozenset(
         "Abmouth Supremus",
         "Architect Striker",
         "Disobedient Bot",
+        "Empty Shell",
+        "Infected Attendant",
+        "Lost Thought",
+        "Premature Pattern",
         "Strike Foreman",
         "Uncontrollable Anger",
         "Vergil Aeneid",
+        "Violent Vagabond",
         "Workman Striker",
     }
 )
@@ -99,6 +110,87 @@ OTHER_PLAYER_TARGETS = {
     "20260709-222339": frozenset({"(SimpleChar:794D8062)"}),
     "20260709-225408": frozenset({"(SimpleChar:7730002E)"}),
     "20260712-153918": frozenset({"(SimpleChar:795AB07F)"}),
+}
+REVIEWED_PLAYER_OWNED_PET_TARGETS_BY_ENEMY = {
+    ("20260709-220439", "Infected Attendant"): frozenset(
+        {"(SimpleChar:7953AE99)"}
+    ),
+    ("20260709-225408", "Infected Attendant"): frozenset(
+        {"(SimpleChar:7954523C)"}
+    ),
+    ("20260710-211430", "Premature Pattern"): frozenset(
+        {"(SimpleChar:7958802A)"}
+    ),
+}
+REVIEWED_OTHER_PLAYER_TARGETS_BY_ENEMY = {
+    ("20260709-220439", "Infected Attendant"): frozenset(
+        {"(SimpleChar:7730002E)"}
+    ),
+    ("20260709-225408", "Empty Shell"): frozenset(
+        {"(SimpleChar:77300149)"}
+    ),
+    ("20260710-211430", "Premature Pattern"): frozenset(
+        {"(SimpleChar:77300149)"}
+    ),
+}
+REVIEWED_PROACTIVE_LOCAL_ACQUISITIONS = {
+    "Empty Shell": (
+        {
+            "capture": "20260709-222339",
+            "sourceIdentity": "(SimpleChar:79545178)",
+            "targetIdentity": "(SimpleChar:7944C065)",
+            "capturedUtc": "2026-07-10T03:29:39.9995508Z",
+        },
+        {
+            "capture": "20260709-222339",
+            "sourceIdentity": "(SimpleChar:79545182)",
+            "targetIdentity": "(SimpleChar:7944C065)",
+            "capturedUtc": "2026-07-10T03:29:45.1172128Z",
+        },
+        {
+            "capture": "20260709-222339",
+            "sourceIdentity": "(SimpleChar:79545183)",
+            "targetIdentity": "(SimpleChar:7944C065)",
+            "capturedUtc": "2026-07-10T03:29:45.7667310Z",
+        },
+        {
+            "capture": "20260709-222339",
+            "sourceIdentity": "(SimpleChar:79545175)",
+            "targetIdentity": "(SimpleChar:7944C065)",
+            "capturedUtc": "2026-07-10T03:29:53.9664901Z",
+        },
+        {
+            "capture": "20260709-222339",
+            "sourceIdentity": "(SimpleChar:7954519B)",
+            "targetIdentity": "(SimpleChar:7944C065)",
+            "capturedUtc": "2026-07-10T03:29:58.6995895Z",
+        },
+        {
+            "capture": "20260709-222339",
+            "sourceIdentity": "(SimpleChar:79545179)",
+            "targetIdentity": "(SimpleChar:7944C065)",
+            "capturedUtc": "2026-07-10T03:29:59.5655333Z",
+        },
+    ),
+    "Premature Pattern": (
+        {
+            "capture": "20260709-222339",
+            "sourceIdentity": "(SimpleChar:7954516B)",
+            "targetIdentity": "(SimpleChar:7944C065)",
+            "capturedUtc": "2026-07-10T03:29:27.4343340Z",
+        },
+        {
+            "capture": "20260709-222339",
+            "sourceIdentity": "(SimpleChar:7954516C)",
+            "targetIdentity": "(SimpleChar:7944C065)",
+            "capturedUtc": "2026-07-10T03:29:27.6339293Z",
+        },
+    ),
+}
+REVIEWED_HOSTILE_NANO_NAMES = {
+    26414: "Drain Abilities",
+    81998: "Subsonic Blast",
+    82482: "Weight of the Guilty",
 }
 REVIEWED_EVENT_IDENTITIES = {
     "20260709-213711": {
@@ -192,6 +284,133 @@ REVIEWED_RAW_TARGET_ROLE_PACKETS = {
             "attackInfoUnknown": 0,
             "hitType": "Normal",
             "weaponInstance": 0,
+        },
+    ),
+    "20260709-225408": (
+        {
+            "capturedUtc": "2026-07-10T03:55:04.8152525Z",
+            "sequence": 1954,
+            "length": 38,
+            "messageType": "Attack",
+            "rawHex": "0B2E000A0001002600000DB97944C065284940700000C3507953AD4C000000C3507730002E00",
+            "enemyName": "Violent Vagabond",
+            "monsterData": 203733,
+            "source": "(SimpleChar:7953AD4C)",
+            "target": "(SimpleChar:7730002E)",
+            "targetRole": "otherPlayer",
+        },
+        {
+            "capturedUtc": "2026-07-10T03:55:04.8152525Z",
+            "sequence": 1956,
+            "length": 38,
+            "messageType": "Attack",
+            "rawHex": "0B30000A0001002600000DB97944C065284940700000C3507953AD4A000000C3507730002E00",
+            "enemyName": "Violent Vagabond",
+            "monsterData": 203733,
+            "source": "(SimpleChar:7953AD4A)",
+            "target": "(SimpleChar:7730002E)",
+            "targetRole": "otherPlayer",
+        },
+        {
+            "capturedUtc": "2026-07-10T03:59:37.9799584Z",
+            "sequence": 8437,
+            "length": 38,
+            "messageType": "Attack",
+            "rawHex": "2481000A0001002600000DB97944C065284940700000C3507954519B000000C3507730014900",
+            "enemyName": "Empty Shell",
+            "monsterData": 203731,
+            "source": "(SimpleChar:7954519B)",
+            "target": "(SimpleChar:77300149)",
+            "targetRole": "otherPlayer",
+        },
+        {
+            "capturedUtc": "2026-07-10T03:59:41.7687763Z",
+            "sequence": 8547,
+            "length": 61,
+            "messageType": "AttackInfo",
+            "rawHex": "24EF000A0001003D00000DB97944C06546002F160000C3507954519B0000000013FFFFFFFF000000000000C35077300149000000000000000353495731",
+            "enemyName": "Empty Shell",
+            "monsterData": 203731,
+            "source": "(SimpleChar:7954519B)",
+            "target": "(SimpleChar:77300149)",
+            "targetRole": "otherPlayer",
+            "amount": 19,
+            "weaponSlot": 0,
+            "attackInfoUnknown": 0,
+            "hitType": "Normal",
+            "weaponInstance": 0x53495731,
+        },
+    ),
+    "20260710-211430": (
+        {
+            "capturedUtc": "2026-07-11T02:17:53.3703315Z",
+            "sequence": 6076,
+            "length": 38,
+            "messageType": "Attack",
+            "rawHex": "18F0000A0001002600000DB47944C065284940700000C3507957E65A000000C3507730014900",
+            "enemyName": "Premature Pattern",
+            "monsterData": 203727,
+            "source": "(SimpleChar:7957E65A)",
+            "target": "(SimpleChar:77300149)",
+            "targetRole": "otherPlayer",
+        },
+        {
+            "capturedUtc": "2026-07-11T02:18:01.3966646Z",
+            "sequence": 6268,
+            "length": 61,
+            "messageType": "AttackInfo",
+            "rawHex": "19B0000A0001003D00000DB47944C06546002F160000C3507957E65A0000000010FFFFFFFF000000000000C35077300149000000000000000353495731",
+            "enemyName": "Premature Pattern",
+            "monsterData": 203727,
+            "source": "(SimpleChar:7957E65A)",
+            "target": "(SimpleChar:77300149)",
+            "targetRole": "otherPlayer",
+            "amount": 16,
+            "weaponSlot": 0,
+            "attackInfoUnknown": 0,
+            "hitType": "Normal",
+            "weaponInstance": 0x53495731,
+        },
+        {
+            "capturedUtc": "2026-07-11T02:18:03.6765617Z",
+            "sequence": 6335,
+            "length": 38,
+            "messageType": "Attack",
+            "rawHex": "19F3000A0001002600000DB47944C065284940700000C3507957E65A000000C3507958802A00",
+            "enemyName": "Premature Pattern",
+            "monsterData": 203727,
+            "source": "(SimpleChar:7957E65A)",
+            "target": "(SimpleChar:7958802A)",
+            "targetRole": "playerOwnedPet",
+        },
+        {
+            "capturedUtc": "2026-07-11T02:18:05.2377313Z",
+            "sequence": 6383,
+            "length": 61,
+            "messageType": "AttackInfo",
+            "rawHex": "1A23000A0001003D00000DB47944C06546002F160000C3507957E65A0000000026FFFFFFFF000000000000C3507958802A000000000000000353495731",
+            "enemyName": "Premature Pattern",
+            "monsterData": 203727,
+            "source": "(SimpleChar:7957E65A)",
+            "target": "(SimpleChar:7958802A)",
+            "targetRole": "playerOwnedPet",
+            "amount": 38,
+            "weaponSlot": 0,
+            "attackInfoUnknown": 0,
+            "hitType": "Normal",
+            "weaponInstance": 0x53495731,
+        },
+        {
+            "capturedUtc": "2026-07-11T02:18:07.7031157Z",
+            "sequence": 6457,
+            "length": 38,
+            "messageType": "Attack",
+            "rawHex": "1A6D000A0001002600000DB47944C065284940700000C3507957E65A000000C3507730014900",
+            "enemyName": "Premature Pattern",
+            "monsterData": 203727,
+            "source": "(SimpleChar:7957E65A)",
+            "target": "(SimpleChar:77300149)",
+            "targetRole": "otherPlayer",
         },
     ),
     "20260712-153918": (
@@ -488,6 +707,21 @@ MISSED_ATTACK_INFO = re.compile(
     r"Defender=(?P<defender>\(SimpleChar:[0-9A-F]+\)).*"
     r"Unknown3=(?P<unknown>-?\d+)"
 )
+FINISH_NANO_CASTING = re.compile(
+    r"^(?P<captured_utc>\S+) \[IN-N3\].*type=CharacterAction "
+    r"identity=(?P<source>\(SimpleChar:[0-9A-F]+\)).*"
+    r"Action=FinishNanoCasting .*Parameter2=(?P<nano_id>\d+)"
+)
+SET_NANO_DURATION = re.compile(
+    r"^(?P<captured_utc>\S+) \[IN-N3\].*type=CharacterAction "
+    r"identity=(?P<target>\(SimpleChar:[0-9A-F]+\)).*"
+    r"Action=SetNanoDuration .*Target=\(NanoProgram:(?P<nano_id>[0-9A-F]+)\) "
+    r"Parameter1=-?\d+ Parameter2=(?P<duration_ms>\d+)"
+)
+DESPAWN_EVENT = re.compile(
+    r"^(?P<captured_utc>\S+) \[IN-N3\].*type=Despawn "
+    r"identity=(?P<identity>\(SimpleChar:[0-9A-F]+\))"
+)
 MONSTER_DATA_DETAIL = re.compile(r"\bmonsterData=(?P<monster_data>\d+)")
 CHARACTER_EVENT = re.compile(
     r"\[(?:CHAR-SEEN|DYNEL-SPAWNED)\] "
@@ -534,6 +768,10 @@ def rounded_capture_seconds(value: Decimal) -> float:
     return float(value.quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP))
 
 
+def precise_capture_seconds(value: Decimal) -> float:
+    return float(value.quantize(Decimal("0.0000001"), rounding=ROUND_HALF_UP))
+
+
 def first_value(row: dict[str, str], *names: str) -> str:
     for name in names:
         value = row.get(name, "").strip()
@@ -551,6 +789,14 @@ def simple_char_identity(value: str) -> str:
     if re.fullmatch(r"[0-9A-Fa-f]{8}", value):
         return f"(SimpleChar:{value.upper()})"
     return ""
+
+
+def attack_target_identity(row: dict[str, str]) -> str:
+    target = simple_char_identity(row.get("TargetIdentity", ""))
+    if target:
+        return target
+    target_match = ATTACK_TARGET_DETAIL.search(row.get("Detail", ""))
+    return target_match.group("target") if target_match else ""
 
 
 def add_identity(identities: dict[str, dict[str, object]], row: dict[str, str]):
@@ -637,6 +883,7 @@ def attack_evidence(
     return {
         "capture": capture_name,
         "identity": source,
+        "targetIdentity": row.get("TargetIdentity", ""),
         "capturedUtc": row["CapturedUtc"],
         "amount": amount,
         "weaponSlot": int(match.group("slot")),
@@ -647,15 +894,22 @@ def attack_evidence(
     }
 
 
-def target_evidence_role(capture_name: str, row: dict[str, str]) -> str:
+def target_evidence_role(
+    capture_name: str, row: dict[str, str], enemy_name: str
+) -> str:
+    target_identity = attack_target_identity(row)
     if row.get("TargetRole") == "local-player":
         return "localPlayer"
-    if row.get("TargetIdentity") in PLAYER_OWNED_PET_TARGETS.get(
+    if target_identity in PLAYER_OWNED_PET_TARGETS.get(
         capture_name, frozenset()
+    ) or target_identity in REVIEWED_PLAYER_OWNED_PET_TARGETS_BY_ENEMY.get(
+        (capture_name, enemy_name), frozenset()
     ):
         return "playerOwnedPet"
-    if row.get("TargetIdentity") in OTHER_PLAYER_TARGETS.get(
+    if target_identity in OTHER_PLAYER_TARGETS.get(
         capture_name, frozenset()
+    ) or target_identity in REVIEWED_OTHER_PLAYER_TARGETS_BY_ENEMY.get(
+        (capture_name, enemy_name), frozenset()
     ):
         return "otherPlayer"
     return ""
@@ -665,15 +919,12 @@ def combat_event_fingerprint(
     row: dict[str, str], evidence_role: str
 ) -> tuple[object, ...] | None:
     message_type = row.get("MessageType", "")
-    if message_type not in {"Attack", "AttackInfo"}:
+    if message_type not in {"Attack", "AttackInfo", "MissedAttackInfo"}:
         return None
     source = simple_char_identity(row.get("SourceIdentity", ""))
     if not source:
         return None
-    target = simple_char_identity(row.get("TargetIdentity", ""))
-    if not target:
-        target_match = ATTACK_TARGET_DETAIL.search(row.get("Detail", ""))
-        target = target_match.group("target") if target_match else ""
+    target = attack_target_identity(row)
     target_role = evidence_role or row.get("TargetRole", "")
     if message_type == "AttackInfo":
         detail_match = ATTACK_DETAIL.search(row.get("Detail", ""))
@@ -685,6 +936,14 @@ def combat_event_fingerprint(
             int(detail_match.group("unknown")),
             detail_match.group("hit_type"),
             int(detail_match.group("instance")),
+        )
+    elif message_type == "MissedAttackInfo":
+        amount = 0
+        hit_shape = (
+            int(row.get("AmmoCount") or 0),
+            int(row.get("WeaponSlot") or 0),
+            int(row.get("Unknown") or 0),
+            0,
         )
     else:
         amount = int(row.get("Amount") or 0)
@@ -1016,6 +1275,264 @@ def validate_uncontrollable_anger_combat(report_entry: dict[str, object]) -> Non
         raise ValueError("Uncontrollable Anger reviewed cadence drifted")
 
 
+def validate_target_role(
+    report_entry: dict[str, object],
+    enemy_name: str,
+    role: str,
+    expected: tuple[int, int, int, int],
+) -> None:
+    evidence = report_entry["targetRoleEvidence"][role]
+    actual = (
+        evidence["retaliationRows"],
+        evidence["attackInfoRows"],
+        evidence["minDamage"],
+        evidence["maxDamage"],
+    )
+    if actual != expected:
+        raise ValueError(
+            "{0} target-role evidence drifted role={1} actual={2}".format(
+                enemy_name, role, actual
+            )
+        )
+
+
+def proactive_local_acquisition_key(row: dict[str, object]) -> tuple[str, ...]:
+    return (
+        str(row["capture"]),
+        str(row["capturedUtc"]),
+        str(row["sourceIdentity"]),
+        str(row["targetIdentity"]),
+    )
+
+
+def reviewed_proactive_local_acquisition_evidence(
+    enemy_name: str,
+    group: dict[str, object],
+    local_attack_starts_by_capture: dict[str, list[dict[str, str]]],
+) -> list[dict[str, object]]:
+    expected = sorted(
+        (dict(row) for row in REVIEWED_PROACTIVE_LOCAL_ACQUISITIONS[enemy_name]),
+        key=proactive_local_acquisition_key,
+    )
+    actual = sorted(
+        group["reviewedLocalAcquisitionStarts"],
+        key=proactive_local_acquisition_key,
+    )
+    if actual != expected:
+        raise ValueError(enemy_name + " proactive local acquisition rows drifted")
+
+    evidence = []
+    for row in expected:
+        prior_local_attacks = [
+            attack
+            for attack in local_attack_starts_by_capture.get(row["capture"], ())
+            if attack["targetIdentity"] == row["sourceIdentity"]
+            and attack["capturedUtc"] < row["capturedUtc"]
+        ]
+        if prior_local_attacks:
+            raise ValueError(
+                enemy_name
+                + " proactive acquisition claim has a prior local-player attack"
+            )
+        evidence.append(
+            {
+                **row,
+                "priorLocalAttackAgainstSourceObserved": False,
+            }
+        )
+    return evidence
+
+
+def validate_proactive_local_acquisition(
+    report_entry: dict[str, object], enemy_name: str
+) -> None:
+    expected = [
+        {
+            **dict(row),
+            "priorLocalAttackAgainstSourceObserved": False,
+        }
+        for row in sorted(
+            REVIEWED_PROACTIVE_LOCAL_ACQUISITIONS[enemy_name],
+            key=proactive_local_acquisition_key,
+        )
+    ]
+    if (
+        report_entry.get("proactiveLocalAcquisitionEvidence") != expected
+        or report_entry.get("automaticAggroRadiusStatus") != "unresolved"
+    ):
+        raise ValueError(enemy_name + " proactive acquisition evidence drifted")
+
+
+def validate_infected_attendant_combat(report_entry: dict[str, object]) -> None:
+    if (
+        report_entry["retaliationRows"] != 2
+        or report_entry["normalAttackInfoRows"] != 1
+        or report_entry["normalMinDamage"] != 11
+        or report_entry["normalMaxDamage"] != 11
+        or report_entry["criticalAttackInfoRows"] != 0
+        or report_entry["medianRechargeSeconds"] != 0.0
+    ):
+        raise ValueError("Infected Attendant local-player evidence drifted")
+    validate_target_role(report_entry, "Infected Attendant", "localPlayer", (2, 1, 11, 11))
+    validate_target_role(report_entry, "Infected Attendant", "playerOwnedPet", (2, 0, 0, 0))
+    validate_target_role(report_entry, "Infected Attendant", "otherPlayer", (4, 0, 0, 0))
+
+
+def validate_lost_thought_combat(report_entry: dict[str, object]) -> None:
+    if report_entry["attackInfoRows"] != 0 or report_entry["retaliationRows"] != 0:
+        raise ValueError("Lost Thought local-player evidence must remain empty")
+    validate_target_role(report_entry, "Lost Thought", "localPlayer", (0, 0, 0, 0))
+    validate_target_role(report_entry, "Lost Thought", "playerOwnedPet", (0, 0, 0, 0))
+    validate_target_role(report_entry, "Lost Thought", "otherPlayer", (4, 11, 15, 20))
+    other = report_entry["targetRoleEvidence"]["otherPlayer"]
+    cadence = other.get("landedHitCadence")
+    shapes = other["attackShapes"]
+    if (
+        cadence is None
+        or cadence["intervalRows"] != 7
+        or cadence["medianIntervalSeconds"] != 4.5320703
+        or len(shapes) != 1
+        or shapes[0]["weaponSlot"] != 0
+        or shapes[0]["attackInfoUnknown"] != 0
+        or shapes[0]["hitType"] != "Normal"
+        or shapes[0]["weaponInstance"] != 0x53495731
+        or shapes[0]["rows"] != 11
+    ):
+        raise ValueError("Lost Thought other-player SIW1 evidence drifted")
+
+
+def validate_empty_shell_combat(report_entry: dict[str, object]) -> None:
+    if (
+        report_entry["retaliationRows"] != 6
+        or report_entry["normalAttackInfoRows"] != 1
+        or report_entry["normalMinDamage"] != 15
+        or report_entry["normalMaxDamage"] != 15
+        or report_entry["criticalAttackInfoRows"] != 0
+        or report_entry["missedAttackInfoRows"] != 2
+    ):
+        raise ValueError("Empty Shell local-player evidence drifted")
+    validate_proactive_local_acquisition(report_entry, "Empty Shell")
+    validate_target_role(report_entry, "Empty Shell", "localPlayer", (6, 1, 15, 15))
+    validate_target_role(report_entry, "Empty Shell", "playerOwnedPet", (0, 0, 0, 0))
+    validate_target_role(report_entry, "Empty Shell", "otherPlayer", (1, 1, 19, 19))
+    nanos = {row["nanoId"]: row for row in report_entry["hostileNanoEvidence"]}
+    if set(nanos) != set(REVIEWED_HOSTILE_NANO_NAMES):
+        raise ValueError("Empty Shell hostile nano identities drifted")
+    expected_nanos = {
+        26414: {
+            "rows": 4,
+            "captures": ["20260709-222339", "20260709-225408"],
+            "sourceIdentities": [
+                "(SimpleChar:79545178)",
+                "(SimpleChar:79545179)",
+                "(SimpleChar:79545182)",
+            ],
+            "localDurationRows": 3,
+            "localDurationMilliseconds": [3000],
+            "localDurationTargetIdentities": ["(SimpleChar:7944C065)"],
+        },
+        81998: {
+            "rows": 4,
+            "captures": ["20260709-222339"],
+            "sourceIdentities": [
+                "(SimpleChar:79545175)",
+                "(SimpleChar:79545178)",
+                "(SimpleChar:79545182)",
+                "(SimpleChar:79545183)",
+            ],
+            "localDurationRows": 0,
+            "localDurationMilliseconds": [],
+            "localDurationTargetIdentities": [],
+        },
+        82482: {
+            "rows": 7,
+            "captures": ["20260709-222339", "20260709-225408"],
+            "sourceIdentities": [
+                "(SimpleChar:79545175)",
+                "(SimpleChar:79545183)",
+                "(SimpleChar:7954519B)",
+            ],
+            "localDurationRows": 6,
+            "localDurationMilliseconds": [39000],
+            "localDurationTargetIdentities": ["(SimpleChar:7944C065)"],
+        },
+    }
+    for nano_id, expected in expected_nanos.items():
+        actual = nanos[nano_id]
+        for field, value in expected.items():
+            if actual[field] != value:
+                raise ValueError(
+                    "Empty Shell hostile nano evidence drifted nano={0} field={1}".format(
+                        nano_id, field
+                    )
+                )
+        if (
+            actual["runtimeUsable"]
+            or actual["runtimeBlocker"]
+            != "effects-selection-cadence-and-range-unresolved"
+        ):
+            raise ValueError("Empty Shell hostile nano runtime boundary drifted")
+
+
+def validate_premature_pattern_combat(report_entry: dict[str, object]) -> None:
+    if (
+        report_entry["retaliationRows"] != 2
+        or report_entry["normalAttackInfoRows"] != 1
+        or report_entry["normalMinDamage"] != 22
+        or report_entry["normalMaxDamage"] != 22
+        or report_entry["criticalAttackInfoRows"] != 1
+        or report_entry["criticalMinDamage"] != 41
+        or report_entry["criticalMaxDamage"] != 41
+    ):
+        raise ValueError("Premature Pattern local-player evidence drifted")
+    validate_proactive_local_acquisition(report_entry, "Premature Pattern")
+    validate_target_role(report_entry, "Premature Pattern", "localPlayer", (2, 2, 22, 41))
+    validate_target_role(report_entry, "Premature Pattern", "playerOwnedPet", (1, 1, 38, 38))
+    validate_target_role(report_entry, "Premature Pattern", "otherPlayer", (2, 1, 16, 16))
+
+
+def validate_violent_vagabond_combat(report_entry: dict[str, object]) -> None:
+    cadence = report_entry.get("reviewedMissAttemptCadence")
+    shapes = report_entry["missedAttackShapes"]
+    behavior = report_entry["reviewedBehaviorEvidence"]
+    if (
+        report_entry["attackInfoRows"] != 0
+        or report_entry["missedAttackInfoRows"] != 26
+        or len(shapes) != 1
+        or shapes[0]["ammoCount"] != 0
+        or shapes[0]["weaponSlot"] != 6
+        or shapes[0]["unknown"] != 0
+        or shapes[0]["rows"] != 26
+        or cadence is None
+        or cadence["attemptRows"] != 26
+        or cadence["minIntervalSeconds"] != 3.7795296
+        or cadence["medianIntervalSeconds"] != 4.0799494
+        or cadence["maxIntervalSeconds"] != 4.5802404
+        or report_entry["equippedWeaponTemplateId"] != 130590
+        or report_entry["equippedWeaponCombatUsable"]
+        or behavior["acquisitionDistanceLowerBound"] != 16.606338
+        or behavior["runtimePolicyDelaySeconds"] != 450.0
+        or behavior["npcDespawnToReplacementSeconds"] != 449.759588
+    ):
+        raise ValueError(
+            "Violent Vagabond reviewed combat/behavior evidence drifted: "
+            + repr(
+                {
+                    "attackInfoRows": report_entry["attackInfoRows"],
+                    "missedAttackInfoRows": report_entry["missedAttackInfoRows"],
+                    "missedAttackShapes": shapes,
+                    "cadence": cadence,
+                    "weaponTemplate": report_entry["equippedWeaponTemplateId"],
+                    "weaponCombatUsable": report_entry["equippedWeaponCombatUsable"],
+                    "behavior": behavior,
+                }
+            )
+        )
+    validate_target_role(
+        report_entry, "Violent Vagabond", "otherPlayer", (2, 0, 0, 0)
+    )
+
+
 def reviewed_raw_attempt_cadence(group: dict[str, object]) -> list[dict[str, object]]:
     starts_by_source = defaultdict(list)
     for row in group["reviewedRawAttackStarts"]:
@@ -1071,12 +1588,203 @@ def reviewed_raw_attempt_cadence(group: dict[str, object]) -> list[dict[str, obj
     return result
 
 
+def interval_summary(
+    rows: list[dict[str, object]],
+    context_fields: tuple[str, ...],
+) -> dict[str, object] | None:
+    by_context = defaultdict(list)
+    for row in rows:
+        context = tuple(row.get(field, "") for field in context_fields)
+        by_context[context].append(parse_precise_seconds(row["capturedUtc"]))
+    intervals = []
+    for times in by_context.values():
+        times.sort()
+        intervals.extend(
+            current - previous
+            for previous, current in zip(times, times[1:])
+            if Decimal("0.5") <= current - previous <= Decimal("10.0")
+        )
+    intervals.sort()
+    if not intervals:
+        return None
+    middle = len(intervals) // 2
+    median = (
+        intervals[middle]
+        if len(intervals) % 2 == 1
+        else (intervals[middle - 1] + intervals[middle]) / Decimal(2)
+    )
+    return {
+        "intervalRows": len(intervals),
+        "minIntervalSeconds": precise_capture_seconds(intervals[0]),
+        "medianIntervalSeconds": precise_capture_seconds(median),
+        "maxIntervalSeconds": precise_capture_seconds(intervals[-1]),
+    }
+
+
+def target_role_attack_shapes(
+    attacks: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    shapes = Counter(
+        (
+            row["weaponSlot"],
+            row["attackInfoUnknown"],
+            row["hitType"],
+            row["weaponInstance"],
+        )
+        for row in attacks
+    )
+    result = []
+    for (slot, unknown, hit_type, instance), count in sorted(
+        shapes.items(), key=lambda item: (-item[1], item[0])
+    ):
+        matching = [
+            row
+            for row in attacks
+            if (
+                row["weaponSlot"],
+                row["attackInfoUnknown"],
+                row["hitType"],
+                row["weaponInstance"],
+            )
+            == (slot, unknown, hit_type, instance)
+        ]
+        result.append(
+            {
+                "weaponSlot": slot,
+                "attackInfoUnknown": unknown,
+                "hitType": hit_type,
+                "weaponInstance": instance,
+                "rows": count,
+                "minDamage": min(row["amount"] for row in matching),
+                "maxDamage": max(row["amount"] for row in matching),
+                "captures": sorted(
+                    {
+                        capture
+                        for row in matching
+                        for capture in row["provenanceCaptures"]
+                    }
+                ),
+            }
+        )
+    return result
+
+
+def reviewed_miss_attempt_cadence(
+    misses: list[dict[str, object]],
+) -> dict[str, object] | None:
+    summary = interval_summary(
+        misses,
+        (
+            "capture",
+            "identity",
+            "defender",
+            "ammoCount",
+            "weaponSlot",
+            "unknown",
+        ),
+    )
+    if summary is None:
+        return None
+    summary.update(
+        {
+            "attemptRows": len(misses),
+            "provenanceCaptures": sorted(
+                {
+                    capture
+                    for row in misses
+                    for capture in row["provenanceCaptures"]
+                }
+            ),
+        }
+    )
+    return summary
+
+
+def reviewed_violent_vagabond_behavior() -> dict[str, object]:
+    aggression_capture = "20260709-225408"
+    aggression_lines = (
+        CAPTURE_ROOT / aggression_capture / "events.log"
+    ).read_text(encoding="utf-8-sig", errors="replace").splitlines()
+    required_fragments = (
+        "#1747 type=Attack identity=(SimpleChar:7953AD4C) AttackMessage { Target=(SimpleChar:7730002E)",
+        "#1749 type=Attack identity=(SimpleChar:7953AD4A) AttackMessage { Target=(SimpleChar:7730002E)",
+        "#1751 type=FollowTarget identity=(SimpleChar:7953AD4C) FollowTargetMessage { Type=Target",
+        "#1756 type=FollowTarget identity=(SimpleChar:7953AD4A) FollowTargetMessage { Type=Target",
+        "#1752 type=SetPos identity=(SimpleChar:7953AD4C) SetPosMessage { Position=(165.705, 107.6164, 167.2476)",
+        "#1757 type=SetPos identity=(SimpleChar:7953AD4A) SetPosMessage { Position=(165.0867, 107.6164, 164.3835)",
+        "#1760 type=CharDCMove identity=(SimpleChar:7730002E) CharDCMoveMessage { MoveType=Update",
+        "Position=(149.1889, 107.6164, 169.1825)",
+    )
+    for fragment in required_fragments:
+        if not any(fragment in line for line in aggression_lines):
+            raise ValueError(
+                "Violent Vagabond reviewed aggression evidence drifted: " + fragment
+            )
+    target_x, target_z = 149.1889, 169.1825
+    source_positions = ((165.705, 167.2476), (165.0867, 164.3835))
+    distances = sorted(
+        math.hypot(source_x - target_x, source_z - target_z)
+        for source_x, source_z in source_positions
+    )
+
+    respawn_capture = "20260708-143600"
+    respawn_rows = [
+        row
+        for row in read_csv(CAPTURE_ROOT / respawn_capture / "enemy-respawns.csv")
+        if row.get("Status") == "complete"
+        and row.get("DeathIdentity") == "(SimpleChar:794CD74B)"
+        and row.get("RespawnIdentity") == "(SimpleChar:794DF301)"
+        and row.get("Name") == "Violent Vagabond"
+        and row.get("MonsterData") == "203733"
+    ]
+    if len(respawn_rows) != 1:
+        raise ValueError("Violent Vagabond complete respawn generation drifted")
+    respawn = respawn_rows[0]
+    respawn_events = (
+        CAPTURE_ROOT / respawn_capture / "events.log"
+    ).read_text(encoding="utf-8-sig", errors="replace").splitlines()
+    despawns = [
+        match
+        for line in respawn_events
+        for match in [DESPAWN_EVENT.search(line)]
+        if match is not None
+        and match.group("identity") == respawn["DeathIdentity"]
+    ]
+    if len(despawns) != 1:
+        raise ValueError("Violent Vagabond dead-NPC despawn evidence drifted")
+    after_npc_despawn = parse_precise_seconds(respawn["RespawnUtc"]) - parse_precise_seconds(
+        despawns[0].group("captured_utc")
+    )
+    return {
+        "automaticAggressionObserved": True,
+        "chaseObserved": True,
+        "acquisitionDistanceLowerBound": rounded_capture_seconds(
+            Decimal(str(min(distances)))
+        ),
+        "observedSourceDistances": [
+            rounded_capture_seconds(Decimal(str(value))) for value in distances
+        ],
+        "aggressionCapture": aggression_capture,
+        "respawnCapture": respawn_capture,
+        "deathIdentity": respawn["DeathIdentity"],
+        "replacementIdentity": respawn["RespawnIdentity"],
+        "deathToReplacementSeconds": float(respawn["RespawnDelaySeconds"]),
+        "npcDespawnToReplacementSeconds": rounded_capture_seconds(
+            after_npc_despawn
+        ),
+        "runtimePolicyDelaySeconds": 450.0,
+        "positionDelta": float(respawn["PositionDelta"]),
+        "radiusStatus": "observed-lower-bound-not-exact-threshold",
+        "respawnStatus": "capture-bounded-450-second-policy",
+    }
+
+
 def add_reviewed_raw_target_role_evidence(
     capture_name: str,
     folder: Path,
     identities: dict[str, dict[str, object]],
     grouped,
-    derived_source_keys: set[tuple[str, str]],
+    derived_event_keys: set[tuple[str, str, str, str]],
 ) -> None:
     reviewed = REVIEWED_RAW_TARGET_ROLE_PACKETS.get(capture_name, ())
     packets_path = folder / "packets.hex.log"
@@ -1094,7 +1802,13 @@ def add_reviewed_raw_target_role_evidence(
             not enemy
             or enemy["name"] != expected_name
             or enemy["monsterData"] != expected_monster_data
-            or (source, packet["messageType"]) in derived_source_keys
+            or (
+                source,
+                packet["messageType"],
+                packet["target"],
+                packet["capturedUtc"],
+            )
+            in derived_event_keys
         ):
             continue
         expected_line = (
@@ -1147,6 +1861,7 @@ def add_reviewed_raw_target_role_evidence(
         parsed_attack = {
             "capture": capture_name,
             "identity": source,
+            "targetIdentity": packet["target"],
             "capturedUtc": packet["capturedUtc"],
             "amount": packet["amount"],
             "weaponSlot": packet["weaponSlot"],
@@ -1181,6 +1896,8 @@ def main():
             "specialAttackWeapons": [],
             "reviewedRawAttackStarts": [],
             "reviewedRawAttempts": [],
+            "reviewedLocalAcquisitionStarts": [],
+            "hostileNanos": [],
             "monsterData": set(),
             "targetRoleEvidence": defaultdict(
                 lambda: {
@@ -1193,6 +1910,7 @@ def main():
         }
     )
     combat_deduplicator = OverlappingCombatEventDeduplicator()
+    local_attack_starts_by_capture = defaultdict(list)
 
     for capture_name in CAPTURES:
         folder = CAPTURE_ROOT / capture_name
@@ -1220,7 +1938,7 @@ def main():
             )
         add_reviewed_event_identities(capture_name, events_path, identities)
 
-        derived_source_keys = set()
+        derived_event_keys = set()
         combat_rows = read_csv(folder / "enemy-combat.csv")
         local_player_identities = set()
         for row in combat_rows:
@@ -1229,6 +1947,20 @@ def main():
                 identity_match = MESSAGE_IDENTITY_DETAIL.search(detail)
                 if identity_match:
                     local_player_identities.add(identity_match.group("identity"))
+                if row.get("MessageType") == "Attack":
+                    local_attack_target = row.get("TargetIdentity", "")
+                    if not local_attack_target:
+                        target_match = ATTACK_TARGET_DETAIL.search(detail)
+                        local_attack_target = (
+                            target_match.group("target") if target_match else ""
+                        )
+                    if local_attack_target:
+                        local_attack_starts_by_capture[capture_name].append(
+                            {
+                                "targetIdentity": local_attack_target,
+                                "capturedUtc": row.get("CapturedUtc", ""),
+                            }
+                        )
             if row.get("TargetRole") == "local-player":
                 target_match = ATTACK_TARGET_DETAIL.search(detail)
                 if target_match:
@@ -1244,7 +1976,18 @@ def main():
             ):
                 continue
             message_type = row.get("MessageType")
-            derived_source_keys.add((source, message_type))
+            derived_target = row.get("TargetIdentity", "")
+            if not derived_target:
+                target_match = ATTACK_TARGET_DETAIL.search(row.get("Detail", ""))
+                derived_target = target_match.group("target") if target_match else ""
+            derived_event_keys.add(
+                (
+                    source,
+                    message_type,
+                    derived_target,
+                    row.get("CapturedUtc", ""),
+                )
+            )
             group = grouped[enemy["name"]]
             group["identities"].add(source)
             group["captures"].add(capture_name)
@@ -1279,11 +2022,13 @@ def main():
                 enemy["name"] in TARGET_ROLE_EVIDENCE_ENEMIES
                 and message_type in {"Attack", "AttackInfo"}
             ):
-                evidence_role = target_evidence_role(capture_name, row)
+                evidence_role = target_evidence_role(
+                    capture_name, row, enemy["name"]
+                )
                 if evidence_role:
                     role_evidence = group["targetRoleEvidence"][evidence_role]
                     role_evidence["captures"].add(capture_name)
-                    target_identity = row.get("TargetIdentity", "")
+                    target_identity = attack_target_identity(row)
                     if target_identity:
                         role_evidence["targetIdentities"].add(target_identity)
             combat_event = None
@@ -1314,6 +2059,15 @@ def main():
             if role_evidence is not None:
                 if message_type == "Attack":
                     role_evidence["retaliationRows"] += 1
+                    if evidence_role == "localPlayer":
+                        group["reviewedLocalAcquisitionStarts"].append(
+                            {
+                                "capture": capture_name,
+                                "sourceIdentity": source,
+                                "targetIdentity": derived_target,
+                                "capturedUtc": row.get("CapturedUtc", ""),
+                            }
+                        )
                 elif parsed_attack is not None:
                     role_evidence["attacks"].append(parsed_attack)
             if (
@@ -1334,10 +2088,87 @@ def main():
             folder,
             identities,
             grouped,
-            derived_source_keys,
+            derived_event_keys,
         )
         if events_path.exists():
-            for line in events_path.read_text(encoding="utf-8-sig", errors="replace").splitlines():
+            event_lines = events_path.read_text(
+                encoding="utf-8-sig", errors="replace"
+            ).splitlines()
+            local_durations_by_timestamp_and_nano = defaultdict(set)
+            for line in event_lines:
+                duration = SET_NANO_DURATION.search(line)
+                if (
+                    duration is None
+                    or duration.group("target") not in local_player_identities
+                ):
+                    continue
+                local_durations_by_timestamp_and_nano[
+                    (
+                        duration.group("captured_utc"),
+                        int(duration.group("nano_id"), 16),
+                    )
+                ].add(
+                    (
+                        duration.group("target"),
+                        int(duration.group("duration_ms")),
+                    )
+                )
+            for line in event_lines:
+                nano_cast = FINISH_NANO_CASTING.search(line)
+                if nano_cast is not None:
+                    enemy = identities.get(nano_cast.group("source"))
+                    nano_id = int(nano_cast.group("nano_id"))
+                    if (
+                        enemy
+                        and enemy["name"] == "Empty Shell"
+                        and nano_id in REVIEWED_HOSTILE_NANO_NAMES
+                        and capture_includes_enemy(capture_name, enemy["name"])
+                    ):
+                        group = grouped[enemy["name"]]
+                        group["identities"].add(nano_cast.group("source"))
+                        group["captures"].add(capture_name)
+                        group["monsterData"].add(enemy["monsterData"])
+                        group["hostileNanos"].append(
+                            {
+                                "capture": capture_name,
+                                "identity": nano_cast.group("source"),
+                                "capturedUtc": nano_cast.group("captured_utc"),
+                                "nanoId": nano_id,
+                                "localDurationMilliseconds": sorted(
+                                    {
+                                        duration_ms
+                                        for _, duration_ms in local_durations_by_timestamp_and_nano.get(
+                                            (
+                                                nano_cast.group("captured_utc"),
+                                                nano_id,
+                                            ),
+                                            (),
+                                        )
+                                    }
+                                ),
+                                "localDurationTargetIdentities": sorted(
+                                    {
+                                        target_identity
+                                        for target_identity, _ in local_durations_by_timestamp_and_nano.get(
+                                            (
+                                                nano_cast.group("captured_utc"),
+                                                nano_id,
+                                            ),
+                                            (),
+                                        )
+                                    }
+                                ),
+                                "localDurationRows": len(
+                                    local_durations_by_timestamp_and_nano.get(
+                                        (
+                                            nano_cast.group("captured_utc"),
+                                            nano_id,
+                                        ),
+                                        (),
+                                    )
+                                ),
+                            }
+                        )
                 match = WEAPON_UPDATE.search(line)
                 if match:
                     enemy = identities.get(match.group("owner"))
@@ -1377,14 +2208,32 @@ def main():
                 group["identities"].add(miss.group("attacker"))
                 group["captures"].add(capture_name)
                 group["monsterData"].add(enemy["monsterData"])
+                miss_event, duplicate_miss = combat_deduplicator.observe(
+                    capture_name,
+                    {
+                        "CapturedUtc": miss.group("captured_utc"),
+                        "MessageType": "MissedAttackInfo",
+                        "SourceIdentity": miss.group("attacker"),
+                        "TargetIdentity": miss.group("defender"),
+                        "TargetRole": "local-player",
+                        "AmmoCount": miss.group("ammo"),
+                        "WeaponSlot": miss.group("slot"),
+                        "Unknown": miss.group("unknown"),
+                    },
+                    "localPlayer",
+                )
+                if duplicate_miss:
+                    continue
                 group["misses"].append(
                     {
                         "capture": capture_name,
                         "identity": miss.group("attacker"),
+                        "defender": miss.group("defender"),
                         "capturedUtc": miss.group("captured_utc"),
                         "ammoCount": int(miss.group("ammo")),
                         "weaponSlot": int(miss.group("slot")),
                         "unknown": int(miss.group("unknown")),
+                        "provenanceCaptures": miss_event["provenanceCaptures"],
                     }
                 )
 
@@ -1553,6 +2402,53 @@ def main():
             for row in group["specialAttackWeapons"]
         )
         raw_attempt_cadence = reviewed_raw_attempt_cadence(group)
+        miss_attempt_cadence = (
+            reviewed_miss_attempt_cadence(group["misses"])
+            if name == "Violent Vagabond"
+            else None
+        )
+        hostile_nano_evidence = []
+        hostile_nano_counts = Counter(
+            row["nanoId"] for row in group["hostileNanos"]
+        )
+        for nano_id, rows in sorted(hostile_nano_counts.items()):
+            matching_nanos = [
+                row for row in group["hostileNanos"] if row["nanoId"] == nano_id
+            ]
+            hostile_nano_evidence.append(
+                {
+                    "nanoId": nano_id,
+                    "name": REVIEWED_HOSTILE_NANO_NAMES[nano_id],
+                    "rows": rows,
+                    "captures": sorted(
+                        {row["capture"] for row in matching_nanos}
+                    ),
+                    "sourceIdentities": sorted(
+                        {row["identity"] for row in matching_nanos}
+                    ),
+                    "localDurationMilliseconds": sorted(
+                        {
+                            duration
+                            for row in matching_nanos
+                            for duration in row["localDurationMilliseconds"]
+                        }
+                    ),
+                    "localDurationTargetIdentities": sorted(
+                        {
+                            target_identity
+                            for row in matching_nanos
+                            for target_identity in row[
+                                "localDurationTargetIdentities"
+                            ]
+                        }
+                    ),
+                    "localDurationRows": sum(
+                        row["localDurationRows"] for row in matching_nanos
+                    ),
+                    "runtimeUsable": False,
+                    "runtimeBlocker": "effects-selection-cadence-and-range-unresolved",
+                }
+            )
         reviewed_target_cadence = (
             reviewed_uncontrollable_anger_cadence(group)
             if name == "Uncontrollable Anger"
@@ -1590,8 +2486,11 @@ def main():
                     "rows": rows,
                     "captures": sorted(
                         {
-                            row["capture"]
+                            capture
                             for row in group["misses"]
+                            for capture in row.get(
+                                "provenanceCaptures", {row["capture"]}
+                            )
                             if (
                                 row["ammoCount"],
                                 row["weaponSlot"],
@@ -1664,8 +2563,21 @@ def main():
         }
         if raw_attempt_cadence:
             report_entry["reviewedRawAttemptCadence"] = raw_attempt_cadence
+        if miss_attempt_cadence:
+            report_entry["reviewedMissAttemptCadence"] = miss_attempt_cadence
         if reviewed_target_cadence is not None:
             report_entry["reviewedTargetCadence"] = reviewed_target_cadence
+        if hostile_nano_evidence:
+            report_entry["hostileNanoEvidence"] = hostile_nano_evidence
+        if name in REVIEWED_PROACTIVE_LOCAL_ACQUISITIONS:
+            report_entry["proactiveLocalAcquisitionEvidence"] = (
+                reviewed_proactive_local_acquisition_evidence(
+                    name,
+                    group,
+                    local_attack_starts_by_capture,
+                )
+            )
+            report_entry["automaticAggroRadiusStatus"] = "unresolved"
         if name == "Filth Flea":
             report_entry["criticalAttackShapes"] = critical_shape_evidence
         if name in TARGET_ROLE_EVIDENCE_ENEMIES:
@@ -1676,7 +2588,7 @@ def main():
             for evidence_role in evidence_roles:
                 role_evidence = group["targetRoleEvidence"][evidence_role]
                 role_attacks = role_evidence["attacks"]
-                target_role_evidence[evidence_role] = {
+                role_entry = {
                     "captures": sorted(role_evidence["captures"]),
                     "targetIdentities": sorted(role_evidence["targetIdentities"]),
                     "retaliationRows": role_evidence["retaliationRows"],
@@ -1687,7 +2599,22 @@ def main():
                     "maxDamage": max(
                         (row["amount"] for row in role_attacks), default=0
                     ),
+                    "attackShapes": target_role_attack_shapes(role_attacks),
                 }
+                landed_cadence = interval_summary(
+                    role_attacks,
+                    (
+                        "capture",
+                        "identity",
+                        "targetIdentity",
+                        "weaponSlot",
+                        "attackInfoUnknown",
+                        "weaponInstance",
+                    ),
+                )
+                if landed_cadence is not None:
+                    role_entry["landedHitCadence"] = landed_cadence
+                target_role_evidence[evidence_role] = role_entry
             report_entry["targetRoleEvidence"] = target_role_evidence
         if name in CADENCE_UNRESOLVED_ENEMIES:
             report_entry["cadenceStatus"] = "unresolved-mixed-target-fight"
@@ -1701,6 +2628,14 @@ def main():
                 "equippedWeaponShapes": weapon_shape_evidence,
             }
         )
+        if name == "Violent Vagabond":
+            report_entry["equippedWeaponCombatUsable"] = False
+            report_entry["equippedWeaponCombatBlocker"] = (
+                "template 130590 is Red Wine and proves held-item identity only"
+            )
+            report_entry["reviewedBehaviorEvidence"] = (
+                reviewed_violent_vagabond_behavior()
+            )
         if name == "Workman Striker":
             validate_workman_striker_distinct_combat(attacks, report_entry)
         if name == "Discarded Pet":
@@ -1709,6 +2644,16 @@ def main():
             validate_disobedient_bot_combat(report_entry)
         if name == "Uncontrollable Anger":
             validate_uncontrollable_anger_combat(report_entry)
+        if name == "Infected Attendant":
+            validate_infected_attendant_combat(report_entry)
+        if name == "Lost Thought":
+            validate_lost_thought_combat(report_entry)
+        if name == "Empty Shell":
+            validate_empty_shell_combat(report_entry)
+        if name == "Premature Pattern":
+            validate_premature_pattern_combat(report_entry)
+        if name == "Violent Vagabond":
+            validate_violent_vagabond_combat(report_entry)
         report[name] = report_entry
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
