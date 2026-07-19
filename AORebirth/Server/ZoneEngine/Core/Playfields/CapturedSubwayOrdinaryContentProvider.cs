@@ -305,7 +305,9 @@ namespace AORebirth.Core.Playfields
             new CapturedSubwayGenerationVariantDefinition(203729, 0x79545248, 18, 394, 0, 98, 62, 123685, 123686, 18, "20260709-222339:(SimpleChar:79545248)"),
             new CapturedSubwayGenerationVariantDefinition(203729, 0x79545248, 18, 394, 0, 98, 62, 123687, 123687, 21, "20260710-211430:(SimpleChar:7957E5F7)"),
             new CapturedSubwayGenerationVariantDefinition(203729, 0x79545367, 18, 394, 0, 98, 62, 123685, 123686, 18, "20260716-033326:(SimpleChar:796D403F)"),
-            new CapturedSubwayGenerationVariantDefinition(203729, 0x79545367, 18, 394, 0, 98, 62, 123685, 123686, 19, "20260709-225408:(SimpleChar:79545367)")
+            new CapturedSubwayGenerationVariantDefinition(203729, 0x79545367, 18, 394, 0, 98, 62, 123685, 123686, 19, "20260709-225408:(SimpleChar:79545367)"),
+            new CapturedSubwayGenerationVariantDefinition(203727, 0x79545356, 17, 368, 0, 98, 65, 0, 0, 0, "20260712-232848:(SimpleChar:79607A3B)"),
+            new CapturedSubwayGenerationVariantDefinition(203727, 0x79545356, 18, 394, 0, 98, 68, 0, 0, 0, "20260709-225408:(SimpleChar:79545356)")
         };
 
         private static readonly CapturedSubwayStrictLootProfileDefinition[] StrictLootProfiles =
@@ -4272,6 +4274,18 @@ namespace AORebirth.Core.Playfields
                 new CapturedSubwayWaypointDefinition[]
                 {
                     new CapturedSubwayWaypointDefinition(246.99f, 81.01639f, 116.977585f),
+                    new CapturedSubwayWaypointDefinition(247.100052f, 80.99999f, 111.4f),
+                    new CapturedSubwayWaypointDefinition(247.100052f, 80.99999f, 108.3f),
+                    new CapturedSubwayWaypointDefinition(247.100006f, 81.0f, 87.5f),
+                    new CapturedSubwayWaypointDefinition(247.100052f, 80.99999f, 85.1f),
+                    new CapturedSubwayWaypointDefinition(249.500046f, 80.99999f, 84.4f),
+                    new CapturedSubwayWaypointDefinition(243.900055f, 80.99999f, 76.4f),
+                    new CapturedSubwayWaypointDefinition(250.000046f, 80.99999f, 76.3f),
+                    new CapturedSubwayWaypointDefinition(243.900055f, 80.99999f, 76.4f),
+                    new CapturedSubwayWaypointDefinition(249.500046f, 80.99999f, 84.4f),
+                    new CapturedSubwayWaypointDefinition(247.100052f, 80.99999f, 85.1f),
+                    new CapturedSubwayWaypointDefinition(247.100006f, 81.0f, 87.5f),
+                    new CapturedSubwayWaypointDefinition(247.100052f, 80.99999f, 108.3f),
                     new CapturedSubwayWaypointDefinition(247.100052f, 80.99999f, 111.4f)
                 },
                 "",

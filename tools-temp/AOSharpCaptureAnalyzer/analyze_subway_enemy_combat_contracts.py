@@ -1533,6 +1533,97 @@ def validate_violent_vagabond_combat(report_entry: dict[str, object]) -> None:
     )
 
 
+def validate_strike_foreman_combat(report_entry: dict[str, object]) -> None:
+    behavior = report_entry["reviewedBehaviorEvidence"]
+    weapon = report_entry["reviewedLifecycleBoundWeaponEvidence"]
+    other_player = report_entry["targetRoleEvidence"]["otherPlayer"]
+    cadence = other_player.get("landedHitCadence")
+    weapon_shapes = {
+        (
+            shape["lowId"],
+            shape["highId"],
+            shape["quality"],
+            tuple(shape["captures"]),
+            tuple(shape["owners"]),
+        )
+        for shape in report_entry["equippedWeaponShapes"]
+    }
+    expected_weapon_shapes = {
+        (
+            122767,
+            122768,
+            17,
+            ("20260709-212336",),
+            ("(SimpleChar:79545109)",),
+        ),
+        (
+            122767,
+            122768,
+            19,
+            ("20260709-220439",),
+            ("(SimpleChar:7954512E)",),
+        ),
+    }
+    expected_behavior = {
+        "automaticAggressionObserved": True,
+        "chaseObserved": True,
+        "acquisitionDistanceLowerBound": 20.250672,
+        "sourceIdentity": "(SimpleChar:7954512E)",
+        "targetIdentity": "(SimpleChar:794D8062)",
+        "sourcePosition": {"x": 333.5607, "y": 109.015, "z": 206.3987},
+        "targetPosition": {"x": 335.2865, "y": 107.015, "z": 186.2217},
+        "aggressionCapture": "20260709-222339",
+        "radiusStatus": "observed-lower-bound-not-exact-threshold",
+        "runtimeStatus": "report-only-dormant",
+    }
+    expected_lifecycle_bound_weapon = {
+        "sourceIdentity": "(SimpleChar:7954512E)",
+        "weaponIdentity": "(WeaponInstance:25713A73)",
+        "weaponCapture": "20260709-220439",
+        "deathCapture": "20260709-222339",
+        "corpseIdentity": "(Corpse:00F6E017)",
+        "lowId": 122767,
+        "highId": 122768,
+        "quality": 19,
+        "bindingStatus": "exact-source-identity-across-captures",
+        "runtimeSelectionStatus": "unresolved-report-only",
+    }
+    if (
+        report_entry["attackInfoRows"] != 0
+        or report_entry["equippedWeaponAggregateResolved"]
+        or weapon_shapes != expected_weapon_shapes
+        or behavior != expected_behavior
+        or weapon != expected_lifecycle_bound_weapon
+        or cadence is None
+        or cadence["intervalRows"] != 2
+        or cadence["minIntervalSeconds"] != 4.849144
+        or cadence["medianIntervalSeconds"] != 4.9249989
+        or cadence["maxIntervalSeconds"] != 5.0008537
+    ):
+        raise ValueError(
+            "Strike Foreman reviewed combat/behavior evidence drifted: "
+            + repr(
+                {
+                    "attackInfoRows": report_entry["attackInfoRows"],
+                    "weaponAggregateResolved": report_entry[
+                        "equippedWeaponAggregateResolved"
+                    ],
+                    "weaponShapes": report_entry["equippedWeaponShapes"],
+                    "behavior": behavior,
+                    "lifecycleBoundWeapon": weapon,
+                    "otherPlayerCadence": cadence,
+                }
+            )
+        )
+    validate_target_role(report_entry, "Strike Foreman", "localPlayer", (0, 0, 0, 0))
+    validate_target_role(
+        report_entry, "Strike Foreman", "playerOwnedPet", (0, 0, 0, 0)
+    )
+    validate_target_role(
+        report_entry, "Strike Foreman", "otherPlayer", (1, 3, 18, 40)
+    )
+
+
 def reviewed_raw_attempt_cadence(group: dict[str, object]) -> list[dict[str, object]]:
     starts_by_source = defaultdict(list)
     for row in group["reviewedRawAttackStarts"]:
@@ -1777,6 +1868,116 @@ def reviewed_violent_vagabond_behavior() -> dict[str, object]:
         "radiusStatus": "observed-lower-bound-not-exact-threshold",
         "respawnStatus": "capture-bounded-450-second-policy",
     }
+
+
+def reviewed_strike_foreman_evidence() -> tuple[dict[str, object], dict[str, object]]:
+    aggression_capture = "20260709-222339"
+    source_identity = "(SimpleChar:7954512E)"
+    target_identity = "(SimpleChar:794D8062)"
+    aggression_lines = (
+        CAPTURE_ROOT / aggression_capture / "events.log"
+    ).read_text(encoding="utf-8-sig", errors="replace").splitlines()
+    target_position_matches = [
+        line
+        for line in aggression_lines
+        if "#4371 type=CharDCMove identity=(SimpleChar:794D8062) CharDCMoveMessage { MoveType=TurnRightStop"
+        in line
+        and "Position=(335.2865, 107.015, 186.2217)" in line
+    ]
+    if len(target_position_matches) != 1:
+        raise ValueError(
+            "Strike Foreman target movement/position evidence drifted"
+        )
+    required_fragments = (
+        "#4421 type=SpecialAttackWeapon identity=(SimpleChar:7954512E)",
+        "#4422 type=Attack identity=(SimpleChar:7954512E) AttackMessage { Target=(SimpleChar:794D8062)",
+        "#4423 type=SetPos identity=(SimpleChar:7954512E) SetPosMessage { Position=(333.5607, 109.015, 206.3987)",
+        "#4424 type=FollowTarget identity=(SimpleChar:7954512E) FollowTargetMessage { Type=NpcPath",
+        "#4779 type=CharacterAction identity=(SimpleChar:7954512E) CharacterActionMessage { Action=Death",
+    )
+    for fragment in required_fragments:
+        if not any(fragment in line for line in aggression_lines):
+            raise ValueError(
+                "Strike Foreman reviewed aggression/death evidence drifted: "
+                + fragment
+            )
+
+    source_position = (333.5607, 109.015, 206.3987)
+    target_position = (335.2865, 107.015, 186.2217)
+    acquisition_distance = math.hypot(
+        source_position[0] - target_position[0],
+        source_position[2] - target_position[2],
+    )
+
+    weapon_capture = "20260709-220439"
+    weapon_identity = "(WeaponInstance:25713A73)"
+    weapon_lines = (
+        CAPTURE_ROOT / weapon_capture / "events.log"
+    ).read_text(encoding="utf-8-sig", errors="replace").splitlines()
+    weapon_matches = [
+        line
+        for line in weapon_lines
+        if "#11443 type=WeaponItemFullUpdate identity=(WeaponInstance:25713A73)"
+        in line
+        and "Owner=(SimpleChar:7954512E)" in line
+        and "StaticInstance=122767" in line
+        and "ACGItemLevel=19" in line
+        and "ACGItemTemplateID=122767" in line
+        and "ACGItemTemplateID2=122768" in line
+    ]
+    if len(weapon_matches) != 1:
+        raise ValueError("Strike Foreman QL19 weapon generation evidence drifted")
+
+    corpse_rows = [
+        row
+        for row in read_csv(
+            CAPTURE_ROOT / aggression_capture / "corpse-full-updates.csv"
+        )
+        if row.get("CorpseIdentity") == "(Corpse:00F6E017)"
+        and row.get("CorpseName") == "Remains of Strike Foreman"
+        and row.get("DeadNpcIdentity") == source_identity
+        and row.get("CorpseMonsterData") == "203744"
+        and row.get("CorpseCatMesh") == "17870"
+        and row.get("CorpseCredits") == "176"
+    ]
+    if len(corpse_rows) != 1:
+        raise ValueError("Strike Foreman death-to-corpse identity evidence drifted")
+
+    behavior = {
+        "automaticAggressionObserved": True,
+        "chaseObserved": True,
+        "acquisitionDistanceLowerBound": rounded_capture_seconds(
+            Decimal(str(acquisition_distance))
+        ),
+        "sourceIdentity": source_identity,
+        "targetIdentity": target_identity,
+        "sourcePosition": {
+            "x": source_position[0],
+            "y": source_position[1],
+            "z": source_position[2],
+        },
+        "targetPosition": {
+            "x": target_position[0],
+            "y": target_position[1],
+            "z": target_position[2],
+        },
+        "aggressionCapture": aggression_capture,
+        "radiusStatus": "observed-lower-bound-not-exact-threshold",
+        "runtimeStatus": "report-only-dormant",
+    }
+    lifecycle_bound_weapon = {
+        "sourceIdentity": source_identity,
+        "weaponIdentity": weapon_identity,
+        "weaponCapture": weapon_capture,
+        "deathCapture": aggression_capture,
+        "corpseIdentity": corpse_rows[0]["CorpseIdentity"],
+        "lowId": 122767,
+        "highId": 122768,
+        "quality": 19,
+        "bindingStatus": "exact-source-identity-across-captures",
+        "runtimeSelectionStatus": "unresolved-report-only",
+    }
+    return behavior, lifecycle_bound_weapon
 
 
 def add_reviewed_raw_target_role_evidence(
@@ -2636,6 +2837,12 @@ def main():
             report_entry["reviewedBehaviorEvidence"] = (
                 reviewed_violent_vagabond_behavior()
             )
+        if name == "Strike Foreman":
+            behavior, lifecycle_bound_weapon = reviewed_strike_foreman_evidence()
+            report_entry["reviewedBehaviorEvidence"] = behavior
+            report_entry["reviewedLifecycleBoundWeaponEvidence"] = (
+                lifecycle_bound_weapon
+            )
         if name == "Workman Striker":
             validate_workman_striker_distinct_combat(attacks, report_entry)
         if name == "Discarded Pet":
@@ -2652,6 +2859,8 @@ def main():
             validate_empty_shell_combat(report_entry)
         if name == "Premature Pattern":
             validate_premature_pattern_combat(report_entry)
+        if name == "Strike Foreman":
+            validate_strike_foreman_combat(report_entry)
         if name == "Violent Vagabond":
             validate_violent_vagabond_combat(report_entry)
         report[name] = report_entry

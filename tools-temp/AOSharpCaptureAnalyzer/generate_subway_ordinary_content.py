@@ -317,6 +317,34 @@ FRAGMENTED_SOUL_GENERATION_EVIDENCE = {
 
 FRAGMENTED_SOUL_PATROL_SOURCE = 0x7954517A
 
+# Premature Pattern source 0x79545356 was captured as two complete SCFU
+# generations at the same uniquely identified patrol anchor. Neither identity
+# has a captured owner weapon update, so the atomic variants intentionally
+# carry no weapon loadout.
+PREMATURE_PATTERN_PATROL_SOURCE = 0x79545356
+PREMATURE_PATTERN_GENERATION_EVIDENCE = {
+    PREMATURE_PATTERN_PATROL_SOURCE: (
+        ("20260709-225408", "(SimpleChar:79545356)"),
+        ("20260712-232848", "(SimpleChar:79607A3B)"),
+    ),
+}
+PREMATURE_PATTERN_PATROL_WAYPOINTS = (
+    ("246.99", "81.01639", "116.977585"),
+    ("247.100052", "80.99999", "111.4"),
+    ("247.100052", "80.99999", "108.3"),
+    ("247.100006", "81", "87.5"),
+    ("247.100052", "80.99999", "85.1"),
+    ("249.500046", "80.99999", "84.4"),
+    ("243.900055", "80.99999", "76.4"),
+    ("250.000046", "80.99999", "76.3"),
+    ("243.900055", "80.99999", "76.4"),
+    ("249.500046", "80.99999", "84.4"),
+    ("247.100052", "80.99999", "85.1"),
+    ("247.100006", "81", "87.5"),
+    ("247.100052", "80.99999", "108.3"),
+    ("247.100052", "80.99999", "111.4"),
+)
+
 # Audited complete-open denominator for Workman Striker.  The legacy capture
 # predates corpse-loot-observations.csv, so the item rows are recovered from
 # the identity-linked first inventory snapshots below.  The four canonical
@@ -1787,7 +1815,11 @@ def source_weapon_evidence_profiles(
     return result
 
 
-def captured_weapon_tuples(capture: str, identity: str) -> set[tuple[int, int, int]]:
+def captured_weapon_tuples(
+    capture: str,
+    identity: str,
+    allow_absent: bool = False,
+) -> set[tuple[int, int, int]]:
     captured_weapons = set()
     events_path = CAPTURE_ROOT / capture / "events.log"
     if events_path.exists():
@@ -1824,6 +1856,8 @@ def captured_weapon_tuples(capture: str, identity: str) -> set[tuple[int, int, i
 
     raw_packets_path = CAPTURE_ROOT / capture / "raw-packets.csv"
     if not raw_packets_path.exists():
+        if allow_absent:
+            return set()
         raise ValueError(
             "captured weapon has no decoded events or raw packets capture={0} identity={1}".format(
                 capture, identity
@@ -1888,6 +1922,8 @@ def captured_weapon_tuples(capture: str, identity: str) -> set[tuple[int, int, i
                 )
             stats = dict(stat_rows)
             captured_weapons.add((stats[702], stats[703], stats[701]))
+    if not captured_weapons and allow_absent:
+        return set()
     if not captured_weapons:
         raise ValueError(
             "captured raw weapon owner was not found capture={0} identity={1} weaponRows={2} ownerHex={3}".format(
@@ -1908,6 +1944,7 @@ def reviewed_atomic_generation_variants(
     expected_stats: dict[int, tuple[int, int, int, int]],
     expected_count: int,
     unique_patrol_source: int | None = None,
+    require_weapon_loadout: bool = True,
 ) -> list[dict[str, object]]:
     scfu_by_evidence: dict[tuple[str, str], dict[str, str]] = {}
     for canonical_source, evidence_pairs in sorted(
@@ -2029,14 +2066,27 @@ def reviewed_atomic_generation_variants(
         for capture, identity in evidence_pairs:
             row = scfu_by_evidence[(capture, identity)]
 
-            captured_weapons = captured_weapon_tuples(capture, identity)
-            if len(captured_weapons) != 1:
-                raise ValueError(
-                    "{0} atomic variant weapon drifted capture={1} identity={2} tuples={3}".format(
-                        name, capture, identity, sorted(captured_weapons)
+            captured_weapons = captured_weapon_tuples(
+                capture,
+                identity,
+                allow_absent=not require_weapon_loadout,
+            )
+            if require_weapon_loadout:
+                if len(captured_weapons) != 1:
+                    raise ValueError(
+                        "{0} atomic variant weapon drifted capture={1} identity={2} tuples={3}".format(
+                            name, capture, identity, sorted(captured_weapons)
+                        )
                     )
-                )
-            low, high, quality = next(iter(captured_weapons))
+                low, high, quality = next(iter(captured_weapons))
+            else:
+                if captured_weapons:
+                    raise ValueError(
+                        "{0} weaponless atomic variant gained a captured loadout capture={1} identity={2} tuples={3}".format(
+                            name, capture, identity, sorted(captured_weapons)
+                        )
+                    )
+                low, high, quality = (0, 0, 0)
             signature = (
                 int(row["Level"]),
                 int(row["Health"]),
@@ -2101,6 +2151,322 @@ def reviewed_atomic_generation_variants(
                 )
             )
     return records
+
+
+def require_exact_capture_row(
+    capture: str,
+    file_name: str,
+    sequence: int,
+    expected: dict[str, str],
+) -> None:
+    path = CAPTURE_ROOT / capture / file_name
+    rows = [
+        row
+        for row in read_csv(path)
+        if row.get("Sequence") == str(sequence)
+    ]
+    if len(rows) != 1:
+        raise ValueError(
+            "reviewed capture row drifted capture={0} file={1} sequence={2} rows={3}".format(
+                capture, file_name, sequence, len(rows)
+            )
+        )
+    row = rows[0]
+    drifted = {
+        key: (row.get(key), value)
+        for key, value in expected.items()
+        if row.get(key) != value
+    }
+    if drifted:
+        raise ValueError(
+            "reviewed capture fields drifted capture={0} file={1} sequence={2} fields={3}".format(
+                capture, file_name, sequence, drifted
+            )
+        )
+
+
+def validate_premature_pattern_reviewed_evidence() -> None:
+    require_exact_capture_row(
+        "20260709-225408",
+        "scfu-appearance.csv",
+        16234,
+        {
+            "PacketLength": "275",
+            "DecodeStatus": "decoded_complete",
+            "BytesConsumed": "259",
+            "Identity": "(SimpleChar:79545356)",
+            "Name": "Premature Pattern",
+            "PositionX": "246.99",
+            "PositionY": "81.01639",
+            "PositionZ": "116.977585",
+            "FlagsNumeric": "36391627",
+            "CharacterFlags": "268964353",
+            "NpcFamily": "148",
+            "Level": "18",
+            "Health": "394",
+            "HealthDamage": "0",
+            "MonsterData": "203727",
+            "MonsterScale": "98",
+            "RunSpeedBase": "68",
+            "WaypointOwner": "(SimpleChar:79545356)",
+            "Waypoints": "246.99:81.01639:116.977585|247.100052:80.99999:111.4",
+            "DecodeFullyConsumed": "true",
+        },
+    )
+    require_exact_capture_row(
+        "20260712-232848",
+        "scfu-appearance.csv",
+        1348,
+        {
+            "PacketLength": "295",
+            "DecodeStatus": "decoded_complete",
+            "BytesConsumed": "279",
+            "Identity": "(SimpleChar:79607A3B)",
+            "Name": "Premature Pattern",
+            "PositionX": "247.070038",
+            "PositionY": "81.01639",
+            "PositionZ": "109.974121",
+            "FlagsNumeric": "36391627",
+            "CharacterFlags": "268964353",
+            "NpcFamily": "148",
+            "Level": "17",
+            "Health": "368",
+            "HealthDamage": "0",
+            "MonsterData": "203727",
+            "MonsterScale": "98",
+            "RunSpeedBase": "65",
+            "WaypointOwner": "(SimpleChar:79607A3B)",
+            "Waypoints": "247.070038:81.01639:109.974121|247.100052:80.99999:108.3",
+            "DecodeFullyConsumed": "true",
+        },
+    )
+
+    movement_rows = (
+        (
+            "20260709-225408",
+            16463,
+            "79545356",
+            "247.054443",
+            "81.0163879",
+            "111.558258",
+            "247.100052",
+            "80.9999924",
+            "108.300003",
+        ),
+        (
+            "20260709-225408",
+            16494,
+            "79545356",
+            "247.080078",
+            "80.8150024",
+            "109.722031",
+            "247.100006",
+            "81",
+            "87.5",
+        ),
+        (
+            "20260712-232137",
+            1681,
+            "79607A3B",
+            "247.099167",
+            "80.8150024",
+            "88.9899979",
+            "247.100052",
+            "80.9999924",
+            "85.0999985",
+        ),
+        (
+            "20260712-232137",
+            1723,
+            "79607A3B",
+            "247.099869",
+            "80.8150024",
+            "86.3283539",
+            "249.500046",
+            "80.9999924",
+            "84.4000015",
+        ),
+        (
+            "20260712-232711",
+            615,
+            "79607A3B",
+            "249.35582",
+            "81.0163727",
+            "84.4392548",
+            "243.900055",
+            "80.9999924",
+            "76.4000015",
+        ),
+        (
+            "20260712-232711",
+            762,
+            "79607A3B",
+            "243.990005",
+            "81.0163727",
+            "76.5435867",
+            "250.000046",
+            "80.9999924",
+            "76.3000031",
+        ),
+        (
+            "20260712-232711",
+            897,
+            "79607A3B",
+            "249.811768",
+            "81.0163727",
+            "76.3076172",
+            "243.900055",
+            "80.9999924",
+            "76.4000015",
+        ),
+        (
+            "20260712-232711",
+            992,
+            "79607A3B",
+            "244.070816",
+            "81.0163727",
+            "76.3973312",
+            "249.500046",
+            "80.9999924",
+            "84.4000015",
+        ),
+        (
+            "20260712-232711",
+            1148,
+            "79607A3B",
+            "249.414154",
+            "81.0163727",
+            "84.2714539",
+            "247.100052",
+            "80.9999924",
+            "85.0999985",
+        ),
+        (
+            "20260712-232711",
+            1167,
+            "79607A3B",
+            "248.499893",
+            "81.0163727",
+            "84.6011581",
+            "247.100006",
+            "81",
+            "87.5",
+        ),
+        (
+            "20260712-232711",
+            1191,
+            "79607A3B",
+            "247.353806",
+            "81.0149994",
+            "86.069458",
+            "247.100052",
+            "80.9999924",
+            "108.300003",
+        ),
+        (
+            "20260712-232137",
+            2590,
+            "79607A3B",
+            "247.109558",
+            "80.8150024",
+            "106.829193",
+            "247.100052",
+            "80.9999924",
+            "111.400002",
+        ),
+    )
+    for (
+        capture,
+        sequence,
+        source_instance,
+        current_x,
+        current_y,
+        current_z,
+        destination_x,
+        destination_y,
+        destination_z,
+    ) in movement_rows:
+        require_exact_capture_row(
+            capture,
+            "movement-packets.csv",
+            sequence,
+            {
+                "Direction": "IN",
+                "MessageType": "FollowTarget",
+                "SourceType": "SimpleChar",
+                "SourceInstance": source_instance,
+                "SourceIdentity": "SimpleChar:" + source_instance,
+                "SourceName": "Premature Pattern",
+                "FollowKind": "NpcPath",
+                "CurrentX": current_x,
+                "CurrentY": current_y,
+                "CurrentZ": current_z,
+                "DestinationX": destination_x,
+                "DestinationY": destination_y,
+                "DestinationZ": destination_z,
+                "Animation": "24",
+                "Flags": "base_unknown=0;follow_type=1;follow_unknown=24",
+                "PathCount": "2",
+                "RawParams": "base_unknown=0;follow_type=1;follow_unknown=24;path_count=2;decoded_path_count=2",
+                "RawTailHex": "",
+            },
+        )
+
+
+def apply_premature_pattern_reviewed_patrol(
+    spawns: list[dict[str, str]],
+) -> list[dict[str, str]]:
+    expected_identity = "(SimpleChar:{0:08X})".format(
+        PREMATURE_PATTERN_PATROL_SOURCE
+    )
+    matching_indexes = [
+        index
+        for index, row in enumerate(spawns)
+        if row.get("Identity") == expected_identity
+    ]
+    if len(matching_indexes) != 1:
+        raise ValueError(
+            "Premature Pattern reviewed patrol source drifted rows={0}".format(
+                len(matching_indexes)
+            )
+        )
+    index = matching_indexes[0]
+    row = spawns[index]
+    expected_prefix = "|".join(
+        ":".join(point) for point in PREMATURE_PATTERN_PATROL_WAYPOINTS[:2]
+    )
+    if (
+        row.get("Name") != "Premature Pattern"
+        or row.get("MonsterData") != "203727"
+        or row.get("Waypoints") != expected_prefix
+    ):
+        raise ValueError("Premature Pattern canonical patrol source drifted")
+
+    result = list(spawns)
+    reviewed = dict(row)
+    reviewed["Waypoints"] = "|".join(
+        ":".join(point) for point in PREMATURE_PATTERN_PATROL_WAYPOINTS
+    )
+    result[index] = reviewed
+    if len(result) != len(spawns):
+        raise ValueError("Premature Pattern patrol override changed population size")
+    return result
+
+
+def premature_pattern_generation_variants() -> list[dict[str, object]]:
+    validate_premature_pattern_reviewed_evidence()
+    return reviewed_atomic_generation_variants(
+        "Premature Pattern",
+        203727,
+        PREMATURE_PATTERN_GENERATION_EVIDENCE,
+        {
+            17: (368, 0, 98, 65),
+            18: (394, 0, 98, 68),
+        },
+        2,
+        PREMATURE_PATTERN_PATROL_SOURCE,
+        require_weapon_loadout=False,
+    )
 
 
 def incomplete_rebuild_generation_variants() -> list[dict[str, object]]:
@@ -3611,11 +3977,14 @@ def validate_content(
 
 def generate() -> str:
     spawns = select_spawns()
+    premature_pattern_variants = premature_pattern_generation_variants()
+    spawns = apply_premature_pattern_reviewed_patrol(spawns)
     source_weapons = source_weapon_evidence_profiles(spawns)
     generation_variants = (
         incomplete_rebuild_generation_variants()
         + redundant_scan_generation_variants()
         + fragmented_soul_generation_variants()
+        + premature_pattern_variants
     )
     profiles = select_archetype_profiles(spawns)
     combat = combat_profiles()

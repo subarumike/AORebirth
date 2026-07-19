@@ -4313,7 +4313,39 @@
           "(SimpleChar:7954512E)"
         ]
       }
-    ]
+    ],
+    "reviewedBehaviorEvidence": {
+      "automaticAggressionObserved": true,
+      "chaseObserved": true,
+      "acquisitionDistanceLowerBound": 20.250672,
+      "sourceIdentity": "(SimpleChar:7954512E)",
+      "targetIdentity": "(SimpleChar:794D8062)",
+      "sourcePosition": {
+        "x": 333.5607,
+        "y": 109.015,
+        "z": 206.3987
+      },
+      "targetPosition": {
+        "x": 335.2865,
+        "y": 107.015,
+        "z": 186.2217
+      },
+      "aggressionCapture": "20260709-222339",
+      "radiusStatus": "observed-lower-bound-not-exact-threshold",
+      "runtimeStatus": "report-only-dormant"
+    },
+    "reviewedLifecycleBoundWeaponEvidence": {
+      "sourceIdentity": "(SimpleChar:7954512E)",
+      "weaponIdentity": "(WeaponInstance:25713A73)",
+      "weaponCapture": "20260709-220439",
+      "deathCapture": "20260709-222339",
+      "corpseIdentity": "(Corpse:00F6E017)",
+      "lowId": 122767,
+      "highId": 122768,
+      "quality": 19,
+      "bindingStatus": "exact-source-identity-across-captures",
+      "runtimeSelectionStatus": "unresolved-report-only"
+    }
   },
   "Tailor": {
     "monsterData": [

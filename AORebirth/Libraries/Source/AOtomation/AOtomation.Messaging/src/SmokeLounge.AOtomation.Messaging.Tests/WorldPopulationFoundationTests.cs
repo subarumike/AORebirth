@@ -463,6 +463,65 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(7, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Premature Pattern"));
             Assert.AreEqual(4, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Redundant Scan"));
             Assert.AreEqual(6, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Uncontrollable Anger"));
+
+            OrdinaryEnemySpawnDefinition[] prematurePatterns = spawns
+                .Where(value => profilesByKey[value.ProfileKey].DisplayName == "Premature Pattern")
+                .ToArray();
+            OrdinaryEnemySpawnDefinition reviewedPrematurePattern = prematurePatterns.Single(
+                value => value.SourceIdentity == 0x79545356);
+            Assert.AreEqual(
+                1,
+                prematurePatterns.Count(
+                    value => value.LevelDefinition.Mode
+                             == OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants));
+            Assert.IsTrue(
+                reviewedPrematurePattern.LevelDefinition.Evidence.Contains(
+                    "uniform-selection-private-policy"));
+            OrdinaryEnemySpawnVariant[] prematureVariants = reviewedPrematurePattern
+                .LevelDefinition
+                .GetExplicitVariants()
+                .OrderBy(value => value.Level)
+                .ToArray();
+            Assert.AreEqual(2, prematureVariants.Length);
+            Assert.AreEqual(17, prematureVariants[0].Level);
+            Assert.AreEqual(368, prematureVariants[0].Health);
+            Assert.AreEqual(0, prematureVariants[0].HealthDamage);
+            Assert.AreEqual(98, prematureVariants[0].MonsterScale);
+            Assert.AreEqual(65, prematureVariants[0].RunSpeed);
+            Assert.IsNull(prematureVariants[0].WeaponLoadout);
+            Assert.AreEqual(18, prematureVariants[1].Level);
+            Assert.AreEqual(394, prematureVariants[1].Health);
+            Assert.AreEqual(0, prematureVariants[1].HealthDamage);
+            Assert.AreEqual(98, prematureVariants[1].MonsterScale);
+            Assert.AreEqual(68, prematureVariants[1].RunSpeed);
+            Assert.IsNull(prematureVariants[1].WeaponLoadout);
+
+            float[][] expectedPrematurePatrol =
+                {
+                    new[] { 246.99f, 81.01639f, 116.977585f },
+                    new[] { 247.100052f, 80.99999f, 111.4f },
+                    new[] { 247.100052f, 80.99999f, 108.3f },
+                    new[] { 247.100006f, 81.0f, 87.5f },
+                    new[] { 247.100052f, 80.99999f, 85.1f },
+                    new[] { 249.500046f, 80.99999f, 84.4f },
+                    new[] { 243.900055f, 80.99999f, 76.4f },
+                    new[] { 250.000046f, 80.99999f, 76.3f },
+                    new[] { 243.900055f, 80.99999f, 76.4f },
+                    new[] { 249.500046f, 80.99999f, 84.4f },
+                    new[] { 247.100052f, 80.99999f, 85.1f },
+                    new[] { 247.100006f, 81.0f, 87.5f },
+                    new[] { 247.100052f, 80.99999f, 108.3f },
+                    new[] { 247.100052f, 80.99999f, 111.4f }
+                };
+            Assert.AreEqual(
+                expectedPrematurePatrol.Length,
+                reviewedPrematurePattern.Waypoints.Length);
+            for (int index = 0; index < expectedPrematurePatrol.Length; index++)
+            {
+                Assert.AreEqual(expectedPrematurePatrol[index][0], reviewedPrematurePattern.Waypoints[index].X);
+                Assert.AreEqual(expectedPrematurePatrol[index][1], reviewedPrematurePattern.Waypoints[index].Y);
+                Assert.AreEqual(expectedPrematurePatrol[index][2], reviewedPrematurePattern.Waypoints[index].Z);
+            }
         }
 
         [TestMethod]
