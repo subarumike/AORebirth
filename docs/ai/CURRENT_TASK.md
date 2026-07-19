@@ -208,6 +208,18 @@ population in bounded runtime batches.
   boundaries. Strict `16/3 empty` loot, CATMesh `15929`, standard `3/240/3`
   corpse lifetimes, and 25 exact positive-credit corpses now include recovered
   L6 and L10 records from `20260709-205921` and `20260708-004038`.
+- Uncontrollable Anger is now the twenty-first whole-enemy accepted ordinary
+  profile. Its six exact rows remain active at captured levels
+  `13,13,19,20,23,23`, with two captured patrols and four static anchors.
+  Runtime keeps the two local-player SIW1 outcomes at `11..18` separate from
+  four Killer-pet outcomes at `25..42` and one other-player outcome at `19`.
+  The reviewed `20260709-222339` Killer cadence window preserves all three CSV
+  intervals (`5.1165513`, `5.1671525`, and `10.1003489`) without discarding or
+  dividing the doubled interval; runtime uses the six-decimal median
+  `5.167153`. Retaliatory shared chase, strict `2/0 empty` loot, CATMesh
+  `96177`, six exact positive-credit corpses, inherited private respawn, and
+  standard `3/240/3` corpse rules pass together. Credits remain unresolved for
+  active L19 and L23 rows because no exact level-credit observation exists.
 - Reviewed raw first opens and strict `corpse-loot-observations.csv` snapshots
   contribute explicit empty corpses to denominators. Redundant Scan's observed
   item is `1/2`, Molested Molecules item `301713` is `1/3`, and the twelve

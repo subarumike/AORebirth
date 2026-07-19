@@ -341,7 +341,8 @@ shared chase, ordinary respawn, and corpse lifetimes.
 
 Deranged Shopper is the sixteenth accepted profile, Incomplete Rebuild the
 seventeenth, Redundant Scan the eighteenth, Fragmented Soul the nineteenth,
-and Discarded Pet the twentieth. Discarded Pet activates all 29 exact L5..L10
+Discarded Pet the twentieth, and Uncontrollable Anger the twenty-first.
+Discarded Pet activates all 29 exact L5..L10
 rows and keeps 37 normal local-player SIW1 outcomes at `9..18` separate from
 four report-only `30..33` criticals. Its fixed capture contract retains ammo
 `-1`, slot `0`, unknown `0`, instance `SIW1`, and a `5.089763`-second
@@ -349,7 +350,16 @@ conventional median cadence. Retaliatory acquisition and captured chase are
 enabled without inventing proactive aggro, leash, reset, or return-home
 boundaries. Strict `16/3 empty` loot, CATMesh `15929`, standard corpse
 lifetimes, and 25 exact credit corpses pass the same whole-enemy gate. The
-twenty-profile gate, WorldPopulation `36/36`, and Subway loot `22/22` pass.
+Uncontrollable Anger slice keeps six exact active rows at captured levels
+`13,13,19,20,23,23`, two patrols and four static anchors, retaliatory shared
+chase, local-player SIW1 damage `11..18`, strict `2/0 empty` loot, CATMesh
+`96177`, inherited private respawn, and `3/240/3` corpse rules. Four Killer-pet
+hits at `25..42` and one other-player hit at `19` remain separate. Its complete
+reviewed Killer cadence window is `5.1165513`, `5.1671525`, `10.1003489`
+seconds; runtime uses the six-decimal median `5.167153` without dropping or
+dividing the doubled interval. Exact positive-credit evidence covers
+L11/L12/L13/L20/L21, while active L19 and L23 remain unresolved. The
+twenty-one-profile gate, WorldPopulation `36/36`, and Subway loot `22/22` pass.
 ZoneEngine compiles; the approved wrapper's final output copy is currently
 blocked by running PID `24356`. Private activation validation remains pending
 for the 11 newly enabled rows.

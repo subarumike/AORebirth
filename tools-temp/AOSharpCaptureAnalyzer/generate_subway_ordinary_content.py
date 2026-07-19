@@ -10,6 +10,7 @@ import re
 import tempfile
 from collections import Counter, defaultdict
 from datetime import datetime
+from decimal import Decimal
 from pathlib import Path
 
 
@@ -1289,6 +1290,62 @@ def parse_time(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
+def parse_precise_seconds(value: str) -> Decimal:
+    normalized = value.removesuffix("Z")
+    date_text, time_text = normalized.split("T", 1)
+    year, month, day = (int(part) for part in date_text.split("-"))
+    hour_text, minute_text, second_text = time_text.split(":")
+    day_number = datetime(year, month, day).toordinal()
+    return (
+        Decimal(day_number * 86400)
+        + Decimal(int(hour_text) * 3600)
+        + Decimal(int(minute_text) * 60)
+        + Decimal(second_text)
+    )
+
+
+def reviewed_uncontrollable_anger_recharge(
+    rows: list[dict[str, object]],
+) -> float:
+    ordered = sorted(rows, key=lambda row: parse_precise_seconds(row["capturedUtc"]))
+    expected = (
+        ("2026-07-10T03:29:02.8010362Z", 42, 0, 0, 0x53495731),
+        ("2026-07-10T03:29:07.9175875Z", 25, 0, 0, 0x53495731),
+        ("2026-07-10T03:29:13.0847400Z", 27, 0, 0, 0x53495731),
+        ("2026-07-10T03:29:23.1850889Z", 27, 0, 0, 0x53495731),
+    )
+    actual = tuple(
+        (
+            row["capturedUtc"],
+            row["amount"],
+            row["slot"],
+            row["unknown"],
+            row["instance"],
+        )
+        for row in ordered
+    )
+    if actual != expected:
+        raise ValueError(
+            "Uncontrollable Anger reviewed Killer-pet cadence rows drifted: "
+            + repr(actual)
+        )
+    intervals = [
+        parse_precise_seconds(current["capturedUtc"])
+        - parse_precise_seconds(previous["capturedUtc"])
+        for previous, current in zip(ordered, ordered[1:])
+    ]
+    if intervals != [
+        Decimal("5.1165513"),
+        Decimal("5.1671525"),
+        Decimal("10.1003489"),
+    ]:
+        raise ValueError(
+            "Uncontrollable Anger reviewed Killer-pet cadence intervals drifted: "
+            + repr(intervals)
+        )
+    return float(sorted(intervals)[1])
+
+
 def combat_event_fingerprint(row: dict[str, object]) -> tuple[object, ...]:
     return (
         row["identity"],
@@ -2136,6 +2193,7 @@ def select_archetype_profiles(spawns: list[dict[str, str]]) -> dict[str, dict[st
 
 def combat_profiles() -> dict[str, dict[str, object]]:
     raw_attacks = []
+    uncontrollable_anger_cadence_rows = []
     for capture_index, capture in enumerate(CAPTURES):
         name_by_identity = capture_identity_names(capture)
         for row_index, row in enumerate(
@@ -2144,6 +2202,28 @@ def combat_profiles() -> dict[str, dict[str, object]]:
             source_identity = row["SourceIdentity"]
             name = name_by_identity.get(source_identity, "")
             detail = row.get("Detail", "")
+            if (
+                capture == "20260709-222339"
+                and name == "Uncontrollable Anger"
+                and source_identity == "(SimpleChar:79545202)"
+                and row["MessageType"] == "AttackInfo"
+                and row.get("TargetIdentity") == "(SimpleChar:7954523C)"
+            ):
+                cadence_match = COMBAT_ATTACK_DETAIL.search(detail)
+                cadence_amount = int(row.get("Amount") or 0)
+                if cadence_match is None or cadence_amount <= 0:
+                    raise ValueError(
+                        "Uncontrollable Anger reviewed cadence row is malformed"
+                    )
+                uncontrollable_anger_cadence_rows.append(
+                    {
+                        "capturedUtc": row["CapturedUtc"],
+                        "amount": cadence_amount,
+                        "slot": int(cadence_match.group("slot")),
+                        "unknown": int(cadence_match.group("unknown")),
+                        "instance": int(cadence_match.group("instance")),
+                    }
+                )
             if (
                 row["MessageType"] != "AttackInfo"
                 or row.get("SourceRole") != "enemy"
@@ -2186,6 +2266,9 @@ def combat_profiles() -> dict[str, dict[str, object]]:
 
     distinct_attacks, exclusions = deduplicate_overlapping_combat_events(raw_attacks)
     validate_combat_overlap_dedup(raw_attacks, distinct_attacks, exclusions)
+    uncontrollable_anger_recharge = reviewed_uncontrollable_anger_recharge(
+        uncontrollable_anger_cadence_rows
+    )
     attacks = defaultdict(list)
     for row in distinct_attacks:
         attacks[row["name"]].append(row)
@@ -2211,11 +2294,14 @@ def combat_profiles() -> dict[str, dict[str, object]]:
             )
         else:
             slot, unknown, instance = (None, None, None)
+        recharge = intervals[(len(intervals) - 1) // 2] if intervals else None
+        if name == "Uncontrollable Anger":
+            recharge = uncontrollable_anger_recharge
         result[name] = {
             "observed": bool(normal_rows),
             "min": min((row["amount"] for row in normal_rows), default=None),
             "max": max((row["amount"] for row in normal_rows), default=None),
-            "recharge": intervals[(len(intervals) - 1) // 2] if intervals else None,
+            "recharge": recharge,
             "slot": slot,
             "unknown": unknown,
             "instance": instance,
