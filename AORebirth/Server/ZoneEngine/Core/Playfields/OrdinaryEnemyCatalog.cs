@@ -27,6 +27,10 @@ namespace AORebirth.Core.Playfields
 
         private const int FragmentedSoulMonsterData = 203729;
 
+        private const int PrematurePatternMonsterData = 203727;
+
+        private const int PrematurePatternVariantSource = 0x79545356;
+
         private const int WorkmanStrikerMonsterData = 203854;
 
         private const int ViolentVagabondMonsterData = 203733;
@@ -636,7 +640,13 @@ namespace AORebirth.Core.Playfields
                         "fragmented_soul",
                         StringComparison.Ordinal)
                         ? FragmentedSoulMonsterData
-                        : 0;
+                        : string.Equals(
+                            source.ArchetypeKey,
+                            "premature_pattern",
+                            StringComparison.Ordinal)
+                          && source.SourceInstance == PrematurePatternVariantSource
+                            ? PrematurePatternMonsterData
+                            : 0;
             CapturedSubwayGenerationVariantDefinition[] capturedVariants =
                 expectedMonsterData == 0
                     ? new CapturedSubwayGenerationVariantDefinition[0]
@@ -658,10 +668,30 @@ namespace AORebirth.Core.Playfields
             if (expectedMonsterData == 0
                 || capturedVariants.Any(
                     value => value.MonsterData != expectedMonsterData
-                             || value.SourceInstance != source.SourceInstance))
+                             || value.SourceInstance != source.SourceInstance
+                             || !((value.WeaponLowId > 0
+                                   && value.WeaponHighId > 0
+                                   && value.WeaponQuality > 0)
+                                  || (value.WeaponLowId == 0
+                                      && value.WeaponHighId == 0
+                                      && value.WeaponQuality == 0))))
             {
                 throw new InvalidOperationException(
                     "Captured ordinary generation variants are attached to an unexpected source.");
+            }
+
+            bool variantsHaveWeapon = capturedVariants.All(
+                value => value.WeaponLowId > 0
+                         && value.WeaponHighId > 0
+                         && value.WeaponQuality > 0);
+            if (!variantsHaveWeapon
+                && capturedVariants.Any(
+                    value => value.WeaponLowId != 0
+                             || value.WeaponHighId != 0
+                             || value.WeaponQuality != 0))
+            {
+                throw new InvalidOperationException(
+                    "Captured ordinary generation variants mix weapon and weaponless rows.");
             }
 
             OrdinaryEnemySpawnVariant[] variants = capturedVariants
@@ -673,16 +703,20 @@ namespace AORebirth.Core.Playfields
                         value.MonsterScale,
                         value.RunSpeed,
                         value.Evidence,
-                        new OrdinaryEnemySpawnWeaponLoadout(
-                            value.WeaponLowId,
-                            value.WeaponHighId,
-                            value.WeaponQuality,
-                            value.Evidence)))
+                        variantsHaveWeapon
+                            ? new OrdinaryEnemySpawnWeaponLoadout(
+                                value.WeaponLowId,
+                                value.WeaponHighId,
+                                value.WeaponQuality,
+                                value.Evidence)
+                            : null))
                 .ToArray();
             return OrdinaryEnemySpawnLevelDefinition.ExplicitObservedVariants(
                 variants,
                 "uniform-selection-private-policy;"
-                + "capture-reviewed atomic level/stat/weapon generations;"
+                + (variantsHaveWeapon
+                    ? "capture-reviewed atomic level/stat/weapon generations;"
+                    : "capture-reviewed atomic level/stat generations;no weapon loadout captured;")
                 + string.Join(
                     ",",
                     capturedVariants.Select(value => value.Evidence)
