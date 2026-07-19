@@ -85,7 +85,7 @@ if exist "%SELF_TEST_PLUGIN%" (
 
 "%INJECTOR_EXE%" --self-test --plugin "%SELF_TEST_PLUGIN%" > "%SELF_TEST_OUTPUT%" 2>&1
 set "SELF_TEST_EXIT=!ERRORLEVEL!"
-findstr /X /C:"PASS: capture-safe bootstrap disables the GUI chat patch." "%SELF_TEST_OUTPUT%" >nul 2>nul
+findstr /X /C:"PASS: capture-safe bootstrap provides fail-closed isolated capture chat commands without native GUI rewriting." "%SELF_TEST_OUTPUT%" >nul 2>nul
 set "SELF_TEST_MATCH=!ERRORLEVEL!"
 del /q "%SELF_TEST_OUTPUT%" >nul 2>nul
 if not "!SELF_TEST_EXIT!"=="0" goto unsafe_injector

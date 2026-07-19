@@ -14,6 +14,7 @@ namespace AOSharpLiveInjector
     internal static class Program
     {
         private const string ProcessName = "AnarchyOnline";
+        private const int CaptureBootstrapReadyTimeoutMs = 5000;
 
         private static int Main(string[] args)
         {
@@ -28,6 +29,7 @@ namespace AOSharpLiveInjector
             string pidArg = GetArgument(args, "--pid");
             string logPath = GetArgument(args, "--log")
                 ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AOSharpLiveInjector.log");
+            IPCClient pipe = null;
 
             try
             {
@@ -48,7 +50,7 @@ namespace AOSharpLiveInjector
                 Log(logPath, "Bootstrap: " + bootstrapPath);
                 string channelName = target.Id.ToString(CultureInfo.InvariantCulture)
                     + AOSharp.Bootstrap.Main.CaptureSafeChannelSuffix;
-                Log(logPath, "Bootstrap mode: capture-safe; GUI chat patch disabled.");
+                Log(logPath, "Bootstrap mode: capture-safe; isolated capture chat commands enabled.");
                 if (IsCaptureBootstrapActive(channelName))
                 {
                     throw new InvalidOperationException(
@@ -62,9 +64,15 @@ namespace AOSharpLiveInjector
                     bootstrapPath,
                     channelName);
 
-                IPCClient pipe = new IPCClient(channelName);
+                pipe = new IPCClient(channelName);
                 pipe.Connect();
                 pipe.Send(new LoadAssemblyMessage { Assemblies = new[] { pluginPath } });
+                if (!WaitForCaptureBootstrapReady(channelName, CaptureBootstrapReadyTimeoutMs))
+                {
+                    throw new InvalidOperationException(
+                        "Capture-safe Bootstrap did not confirm hook and plugin readiness.");
+                }
+
                 Log(logPath, "Capture plugin injected.");
                 Thread.Sleep(3000);
                 return 0;
@@ -75,16 +83,39 @@ namespace AOSharpLiveInjector
                 Console.Error.WriteLine(ex);
                 return 1;
             }
+            finally
+            {
+                try
+                {
+                    pipe?.Disconnect();
+                }
+                catch
+                {
+                }
+            }
         }
 
         private static int RunSelfTest()
         {
             string safeChannel = "1234" + AOSharp.Bootstrap.Main.CaptureSafeChannelSuffix;
-            if (AOSharp.Bootstrap.Main.CaptureSafeContractVersion != 1
+            if (AOSharp.Bootstrap.Main.CaptureSafeContractVersion != 3
                 || !AOSharp.Bootstrap.Main.IsCaptureSafeChannel(safeChannel)
                 || AOSharp.Bootstrap.Main.IsCaptureSafeChannel("1234")
-                || AOSharp.Bootstrap.Main.ShouldInstallGuiChatPatch(true)
-                || !AOSharp.Bootstrap.Main.ShouldInstallGuiChatPatch(false)
+                || !AOSharp.Bootstrap.Main.ShouldInstallCaptureCommandHook(true, true)
+                || AOSharp.Bootstrap.Main.ShouldInstallCaptureCommandHook(true, false)
+                || AOSharp.Bootstrap.Main.ShouldInstallCaptureCommandHook(false, true)
+                || !AOSharp.Bootstrap.Main.IsCaptureChatCommand("/aocap start")
+                || !AOSharp.Bootstrap.Main.IsCaptureChatCommand("/AOCAP STOP")
+                || !AOSharp.Bootstrap.Main.IsCaptureChatCommand("/aosmoke status")
+                || !string.Equals(
+                    AOSharp.Bootstrap.Main.NormalizeCaptureChatCommand(" /AOCAP STOP"),
+                    "/aocap STOP",
+                    StringComparison.Ordinal)
+                || AOSharp.Bootstrap.Main.IsCaptureChatCommand("/aocapture start")
+                || AOSharp.Bootstrap.Main.IsCaptureChatCommand("/aosmoker stop")
+                || AOSharp.Bootstrap.Main.IsCaptureChatCommand("/aocap\tstop")
+                || AOSharp.Bootstrap.Main.IsCaptureChatCommand("/assist")
+                || AOSharp.Bootstrap.Main.IsCaptureChatCommand("aocap start")
                 || !string.Equals(
                     AOSharp.Bootstrap.Main.GetCaptureSafeSingletonName(safeChannel),
                     AOSharp.Bootstrap.Main.CaptureSafeSingletonNamePrefix + safeChannel,
@@ -94,7 +125,7 @@ namespace AOSharpLiveInjector
                 return 1;
             }
 
-            Console.WriteLine("PASS: capture-safe bootstrap disables the GUI chat patch.");
+            Console.WriteLine("PASS: capture-safe bootstrap provides fail-closed isolated capture chat commands without native GUI rewriting.");
             return 0;
         }
 
@@ -106,6 +137,22 @@ namespace AOSharpLiveInjector
                     AOSharp.Bootstrap.Main.GetCaptureSafeSingletonName(channelName)))
                 {
                     return true;
+                }
+            }
+            catch (WaitHandleCannotBeOpenedException)
+            {
+                return false;
+            }
+        }
+
+        private static bool WaitForCaptureBootstrapReady(string channelName, int timeoutMs)
+        {
+            try
+            {
+                using (EventWaitHandle ready = EventWaitHandle.OpenExisting(
+                    AOSharp.Bootstrap.Main.GetCaptureSafeSingletonName(channelName)))
+                {
+                    return ready.WaitOne(timeoutMs);
                 }
             }
             catch (WaitHandleCannotBeOpenedException)

@@ -245,7 +245,14 @@ Build the injector and its capture-safe Bootstrap only through:
 cmd /d /c tools-temp\build-aosharp-live-injector.cmd
 ```
 
-Capture-safe injection does not install AOSharp's native GUI chat-input patch, so typed `/aocap` and `/aosmoke` commands are intentionally unavailable. Comprehensive capture starts automatically. Codex controls an active capture through the one-slot external request wrapper:
+Capture-safe injection installs one isolated chat-input hook only after acquiring the per-client duplicate-injection guard. It recognizes only `/aocap` and `/aosmoke`, passes every other command to the client unchanged, and does not use AOSharp's native 131-byte GUI rewrite or its `GetCommand` hook. The native `StdString` allocation is fixed at the required 24-byte layout and deterministically disposed after every typed line. AOSharpLiveCapture itself signals readiness only after initialization and both command registrations succeed; the injector fails on a bounded readiness timeout instead of reporting a half-loaded capture, and disconnect unloads an unready Bootstrap so a retry is not blocked. Comprehensive capture starts automatically, and Mike can control it directly in game with:
+
+```text
+/aocap start
+/aocap stop
+```
+
+The remaining typed commands are `/aocap mark <text>`, `/aocap status`, `/aocap flush`, `/aocap snapshot`, `/aocap dynels [force]`, and `/aocap fight start|stop|auto on|auto off|status`. `/aosmoke` commands are also available. The external request wrapper remains an offline fallback and must not be used to launch the AO client:
 
 ```cmd
 cmd /d /c tools-temp\control-aosharp-live-capture.cmd start
