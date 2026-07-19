@@ -3909,7 +3909,7 @@
     "missedAttackShapes": [],
     "specialAttackWeaponRows": 0,
     "specialAttackWeaponShapes": [],
-    "medianRechargeSeconds": 0.0,
+    "medianRechargeSeconds": 5.167153,
     "weaponSlot": 0,
     "attackInfoUnknown": 0,
     "attackInfoWeaponInstance": 1397315377,
@@ -3931,6 +3931,59 @@
         "maxIntervalSeconds": null
       }
     ],
+    "reviewedTargetCadence": {
+      "capture": "20260709-222339",
+      "sourceIdentity": "(SimpleChar:79545202)",
+      "targetIdentity": "(SimpleChar:7954523C)",
+      "targetRole": "playerOwnedPet",
+      "attackInfoRows": 4,
+      "intervalSeconds": [
+        5.1165513,
+        5.1671525,
+        10.1003489
+      ],
+      "medianIntervalSeconds": 5.1671525,
+      "runtimeRechargeSeconds": 5.167153
+    },
+    "targetRoleEvidence": {
+      "localPlayer": {
+        "captures": [
+          "20260709-220439",
+          "20260709-222339",
+          "20260709-225408",
+          "20260710-211430"
+        ],
+        "targetIdentities": [],
+        "retaliationRows": 11,
+        "attackInfoRows": 2,
+        "minDamage": 11,
+        "maxDamage": 18
+      },
+      "playerOwnedPet": {
+        "captures": [
+          "20260709-222339"
+        ],
+        "targetIdentities": [
+          "(SimpleChar:7954523C)"
+        ],
+        "retaliationRows": 1,
+        "attackInfoRows": 4,
+        "minDamage": 25,
+        "maxDamage": 42
+      },
+      "otherPlayer": {
+        "captures": [
+          "20260709-225408"
+        ],
+        "targetIdentities": [
+          "(SimpleChar:7730002E)"
+        ],
+        "retaliationRows": 3,
+        "attackInfoRows": 1,
+        "minDamage": 19,
+        "maxDamage": 19
+      }
+    },
     "equippedWeaponObserved": false,
     "equippedWeaponAggregateResolved": false,
     "equippedWeaponTemplateId": 0,
@@ -4334,6 +4387,18 @@
         "attackInfoRows": 2,
         "minDamage": 21,
         "maxDamage": 25
+      },
+      "otherPlayer": {
+        "captures": [
+          "20260709-225408"
+        ],
+        "targetIdentities": [
+          "(SimpleChar:7730002E)"
+        ],
+        "retaliationRows": 2,
+        "attackInfoRows": 7,
+        "minDamage": 23,
+        "maxDamage": 52
       }
     },
     "equippedWeaponObserved": true,

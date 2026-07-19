@@ -2512,6 +2512,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string disobedientBotCombatReport = generatedCombatReportText.Substring(
                 disobedientBotCombatReportStart,
                 disobedientBotCombatReportEnd - disobedientBotCombatReportStart);
+            int uncontrollableAngerCombatReportStart = generatedCombatReportText.IndexOf(
+                "\"Uncontrollable Anger\":",
+                StringComparison.Ordinal);
+            int uncontrollableAngerCombatReportEnd = generatedCombatReportText.IndexOf(
+                "\"Vergil Aeneid\":",
+                uncontrollableAngerCombatReportStart,
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                uncontrollableAngerCombatReportStart >= 0
+                && uncontrollableAngerCombatReportEnd > uncontrollableAngerCombatReportStart);
+            string uncontrollableAngerCombatReport = generatedCombatReportText.Substring(
+                uncontrollableAngerCombatReportStart,
+                uncontrollableAngerCombatReportEnd - uncontrollableAngerCombatReportStart);
             int discardedPetContractStart = combatContractText.IndexOf(
                 "case 17720:",
                 StringComparison.Ordinal);
@@ -2576,11 +2589,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Neural Burnout|203730|148",
                     "Incomplete Rebuild|203728|148",
                     "Fragmented Soul|203729|148",
-                    "Redundant Scan|204178|148"
+                    "Redundant Scan|204178|148",
+                    "Uncontrollable Anger|96195|138"
                 };
 
             Assert.AreEqual(
-                20,
+                21,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
 
@@ -3384,6 +3398,132 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
                 "Accepted Subway Neural Burnout must keep seven exact active spawns, captured fixed normal combat with report-only critical, strict incomplete-pool loot, only observed level-credit rows with L22 unresolved, CATMesh, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
+
+            OrdinaryEnemyProfile uncontrollableAnger = ordinaryProfiles.Single(
+                value => value.DisplayName == "Uncontrollable Anger");
+            OrdinaryEnemySpawnDefinition[] uncontrollableAngerSpawns = ordinarySpawns
+                .Where(value => value.ProfileKey == uncontrollableAnger.ProfileKey)
+                .ToArray();
+            Assert.AreEqual(6, uncontrollableAngerSpawns.Length);
+            Assert.AreEqual(
+                6,
+                uncontrollableAngerSpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(
+                0,
+                uncontrollableAngerSpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            CollectionAssert.AreEqual(
+                new[] { 13, 13, 19, 20, 23, 23 },
+                uncontrollableAngerSpawns
+                    .Select(value => value.LevelDefinition.MinimumLevel)
+                    .OrderBy(value => value)
+                    .ToArray());
+            Assert.AreEqual(
+                2,
+                uncontrollableAngerSpawns.Count(
+                    value => value.MovementMode == OrdinaryEnemyMovementMode.Patrol));
+            Assert.AreEqual(
+                4,
+                uncontrollableAngerSpawns.Count(
+                    value => value.MovementMode == OrdinaryEnemyMovementMode.Static));
+            Assert.IsTrue(
+                uncontrollableAngerSpawns.All(
+                    value => value.RespawnPolicy.Mode
+                             == WorldRespawnPolicyAssignmentMode.Inherit));
+            Assert.AreEqual(
+                OrdinaryEnemyAggressionMode.Retaliate,
+                uncontrollableAnger.Aggression.Mode);
+            Assert.IsTrue(uncontrollableAnger.Aggression.Chase);
+            Assert.IsFalse(uncontrollableAnger.Aggression.ReturnToSpawn);
+            Assert.AreEqual(
+                OrdinaryEnemyCombatMode.UnarmedMelee,
+                uncontrollableAnger.Combat.Mode);
+            Assert.AreEqual(
+                OrdinaryEnemyDamageSource.CapturedFixed,
+                uncontrollableAnger.Combat.DamageSource);
+            Assert.IsFalse(uncontrollableAnger.Combat.VisibleWeapon);
+            Assert.IsTrue(uncontrollableAnger.Combat.Contract.IsCombatReady);
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.FixedAttackInfo,
+                uncontrollableAnger.Combat.Contract.AttackModel);
+            Assert.AreEqual(11, uncontrollableAnger.Combat.Contract.MinDamage);
+            Assert.AreEqual(18, uncontrollableAnger.Combat.Contract.MaxDamage);
+            Assert.AreEqual(5.167153, uncontrollableAnger.Combat.Contract.RechargeSeconds);
+            Assert.AreEqual(0, uncontrollableAnger.Combat.Contract.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, uncontrollableAnger.Combat.Contract.AttackInfoUnknown);
+            Assert.AreEqual(0x53495731, uncontrollableAnger.Combat.Contract.AttackInfoWeaponInstance);
+            Assert.AreEqual(
+                OrdinaryEnemyLootPoolMode.IndependentEntries,
+                uncontrollableAnger.Loot.PoolMode);
+            Assert.IsFalse(uncontrollableAnger.Loot.ItemPoolComplete);
+            Assert.AreEqual(2, uncontrollableAnger.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(0, uncontrollableAnger.Loot.ObservedEmptyInventories);
+            CollectionAssert.AreEquivalent(
+                new[]
+                {
+                    "101809:101810:24:1:2",
+                    "109366:109367:9:1:2",
+                    "290619:202727:19:1:2"
+                },
+                uncontrollableAnger.Loot.Entries
+                    .Select(value => string.Format(
+                        "{0}:{1}:{2}:{3}:{4}",
+                        value.LowId,
+                        value.HighId,
+                        value.QualityLevel,
+                        value.ObservedCount,
+                        value.ObservedCorpses))
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "11:14:14:1",
+                    "12:15:15:1",
+                    "13:16:16:2",
+                    "20:25:25:1",
+                    "21:26:26:1"
+                },
+                uncontrollableAnger.Loot.LevelCreditRules
+                    .OrderBy(value => value.EnemyLevel)
+                    .Select(value => string.Format(
+                        "{0}:{1}:{2}:{3}",
+                        value.EnemyLevel,
+                        value.MinimumCredits,
+                        value.MaximumCredits,
+                        value.ObservedCorpses))
+                    .ToArray());
+            Assert.IsFalse(
+                uncontrollableAnger.Loot.LevelCreditRules.Any(
+                    value => value.EnemyLevel == 19 || value.EnemyLevel == 23));
+            Assert.AreEqual(96177, uncontrollableAnger.Corpse.CapturedCatMesh);
+            Assert.AreEqual(3.0, uncontrollableAnger.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(240.0, uncontrollableAnger.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(3.0, uncontrollableAnger.Corpse.LootedCleanupSeconds);
+            Assert.IsTrue(
+                CountOccurrences(ordinaryProviderText, ", 96195, 96177,") == 6
+                && uncontrollableAngerCombatReport.Contains("\"normalAttackInfoRows\": 2")
+                && uncontrollableAngerCombatReport.Contains("\"normalMinDamage\": 11")
+                && uncontrollableAngerCombatReport.Contains("\"normalMaxDamage\": 18")
+                && uncontrollableAngerCombatReport.Contains("\"criticalAttackInfoRows\": 0")
+                && uncontrollableAngerCombatReport.Contains("\"attackInfoRows\": 4")
+                && uncontrollableAngerCombatReport.Contains("\"minDamage\": 25")
+                && uncontrollableAngerCombatReport.Contains("\"maxDamage\": 42")
+                && uncontrollableAngerCombatReport.Contains("\"attackInfoRows\": 1")
+                && uncontrollableAngerCombatReport.Contains("\"minDamage\": 19")
+                && uncontrollableAngerCombatReport.Contains("\"maxDamage\": 19")
+                && uncontrollableAngerCombatReport.Contains("\"reviewedTargetCadence\"")
+                && uncontrollableAngerCombatReport.Contains("5.1165513")
+                && uncontrollableAngerCombatReport.Contains("5.1671525")
+                && uncontrollableAngerCombatReport.Contains("10.1003489")
+                && uncontrollableAngerCombatReport.Contains("\"runtimeRechargeSeconds\": 5.167153")
+                && ordinaryCombatContract.Contains("CapturedEnemyCombatContract.FixedAttack(")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue")
+                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted Subway Uncontrollable Anger must keep six exact active spawns, two captured patrols, local-player damage separated from Killer-pet and other-player evidence, the reviewed full cadence window, strict loot and exact observed credits, CATMesh, shared chase, inherited private respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile incompleteRebuild = ordinaryProfiles.Single(
                 value => value.DisplayName == "Incomplete Rebuild");

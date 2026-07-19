@@ -80,6 +80,7 @@ TARGET_ROLE_EVIDENCE_ENEMIES = frozenset(
         "Architect Striker",
         "Disobedient Bot",
         "Strike Foreman",
+        "Uncontrollable Anger",
         "Vergil Aeneid",
         "Workman Striker",
     }
@@ -88,6 +89,7 @@ PLAYER_OWNED_PET_TARGETS = {
     "20260708-143600": frozenset({"(SimpleChar:794DF23C)"}),
     "20260709-210452": frozenset({"(SimpleChar:7953AE99)"}),
     "20260709-213711": frozenset({"(SimpleChar:7953AE99)"}),
+    "20260709-222339": frozenset({"(SimpleChar:7954523C)"}),
     "20260716-034433": frozenset({"(SimpleChar:796D400B)"}),
     "20260716-220400": frozenset(
         {"(SimpleChar:7970253A)", "(SimpleChar:7970253C)"}
@@ -95,6 +97,7 @@ PLAYER_OWNED_PET_TARGETS = {
 }
 OTHER_PLAYER_TARGETS = {
     "20260709-222339": frozenset({"(SimpleChar:794D8062)"}),
+    "20260709-225408": frozenset({"(SimpleChar:7730002E)"}),
     "20260712-153918": frozenset({"(SimpleChar:795AB07F)"}),
 }
 REVIEWED_EVENT_IDENTITIES = {
@@ -513,6 +516,24 @@ def parse_time(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
+def parse_precise_seconds(value: str) -> Decimal:
+    normalized = value.removesuffix("Z")
+    date_text, time_text = normalized.split("T", 1)
+    year, month, day = (int(part) for part in date_text.split("-"))
+    hour_text, minute_text, second_text = time_text.split(":")
+    day_number = datetime(year, month, day).toordinal()
+    return (
+        Decimal(day_number * 86400)
+        + Decimal(int(hour_text) * 3600)
+        + Decimal(int(minute_text) * 60)
+        + Decimal(second_text)
+    )
+
+
+def rounded_capture_seconds(value: Decimal) -> float:
+    return float(value.quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP))
+
+
 def first_value(row: dict[str, str], *names: str) -> str:
     for name in names:
         value = row.get(name, "").strip()
@@ -902,23 +923,100 @@ def validate_disobedient_bot_combat(report_entry: dict[str, object]) -> None:
         )
 
 
-def reviewed_raw_attempt_cadence(group: dict[str, object]) -> list[dict[str, object]]:
-    def precise_seconds(value: str) -> Decimal:
-        normalized = value.removesuffix("Z")
-        date_text, time_text = normalized.split("T", 1)
-        year, month, day = (int(part) for part in date_text.split("-"))
-        hour_text, minute_text, second_text = time_text.split(":")
-        day_number = datetime(year, month, day).toordinal()
-        return (
-            Decimal(day_number * 86400)
-            + Decimal(int(hour_text) * 3600)
-            + Decimal(int(minute_text) * 60)
-            + Decimal(second_text)
+def reviewed_uncontrollable_anger_cadence(
+    group: dict[str, object],
+) -> dict[str, object]:
+    reviewed = [
+        row
+        for row in group["targetRoleEvidence"]["playerOwnedPet"]["attacks"]
+        if row["capture"] == "20260709-222339"
+        and row["identity"] == "(SimpleChar:79545202)"
+    ]
+    reviewed.sort(key=lambda row: parse_precise_seconds(row["capturedUtc"]))
+    expected = (
+        ("2026-07-10T03:29:02.8010362Z", 42),
+        ("2026-07-10T03:29:07.9175875Z", 25),
+        ("2026-07-10T03:29:13.0847400Z", 27),
+        ("2026-07-10T03:29:23.1850889Z", 27),
+    )
+    actual = tuple((row["capturedUtc"], row["amount"]) for row in reviewed)
+    if actual != expected or any(
+        row["weaponSlot"] != 0
+        or row["attackInfoUnknown"] != 0
+        or row["hitType"] != "Normal"
+        or row["weaponInstance"] != 0x53495731
+        for row in reviewed
+    ):
+        raise ValueError(
+            "Uncontrollable Anger reviewed Killer-pet cadence rows drifted: {0}".format(
+                actual
+            )
         )
+    intervals = [
+        parse_precise_seconds(current["capturedUtc"])
+        - parse_precise_seconds(previous["capturedUtc"])
+        for previous, current in zip(reviewed, reviewed[1:])
+    ]
+    ordered_intervals = sorted(intervals)
+    median = ordered_intervals[len(ordered_intervals) // 2]
+    return {
+        "capture": "20260709-222339",
+        "sourceIdentity": "(SimpleChar:79545202)",
+        "targetIdentity": "(SimpleChar:7954523C)",
+        "targetRole": "playerOwnedPet",
+        "attackInfoRows": len(reviewed),
+        "intervalSeconds": [float(value) for value in intervals],
+        "medianIntervalSeconds": float(median),
+        "runtimeRechargeSeconds": rounded_capture_seconds(median),
+    }
 
-    def rounded_seconds(value: Decimal) -> float:
-        return float(value.quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP))
 
+def validate_uncontrollable_anger_combat(report_entry: dict[str, object]) -> None:
+    if (
+        report_entry["normalAttackInfoRows"] != 2
+        or report_entry["normalMinDamage"] != 11
+        or report_entry["normalMaxDamage"] != 18
+        or report_entry["criticalAttackInfoRows"] != 0
+        or report_entry["weaponSlot"] != 0
+        or report_entry["attackInfoUnknown"] != 0
+        or report_entry["attackInfoWeaponInstance"] != 0x53495731
+        or report_entry["medianRechargeSeconds"] != 5.167153
+    ):
+        raise ValueError("Uncontrollable Anger local-player combat evidence drifted")
+    target_roles = report_entry["targetRoleEvidence"]
+    role_expectations = {
+        "localPlayer": (2, 11, 18),
+        "playerOwnedPet": (4, 25, 42),
+        "otherPlayer": (1, 19, 19),
+    }
+    for role, expected in role_expectations.items():
+        evidence = target_roles[role]
+        actual = (
+            evidence["attackInfoRows"],
+            evidence["minDamage"],
+            evidence["maxDamage"],
+        )
+        if actual != expected:
+            raise ValueError(
+                "Uncontrollable Anger target-role evidence drifted role={0} actual={1}".format(
+                    role, actual
+                )
+            )
+    cadence = report_entry["reviewedTargetCadence"]
+    if (
+        cadence["capture"] != "20260709-222339"
+        or cadence["sourceIdentity"] != "(SimpleChar:79545202)"
+        or cadence["targetIdentity"] != "(SimpleChar:7954523C)"
+        or cadence["targetRole"] != "playerOwnedPet"
+        or cadence["attackInfoRows"] != 4
+        or cadence["intervalSeconds"] != [5.1165513, 5.1671525, 10.1003489]
+        or cadence["medianIntervalSeconds"] != 5.1671525
+        or cadence["runtimeRechargeSeconds"] != 5.167153
+    ):
+        raise ValueError("Uncontrollable Anger reviewed cadence drifted")
+
+
+def reviewed_raw_attempt_cadence(group: dict[str, object]) -> list[dict[str, object]]:
     starts_by_source = defaultdict(list)
     for row in group["reviewedRawAttackStarts"]:
         starts_by_source[(row["capture"], row["identity"])].append(row["capturedUtc"])
@@ -927,19 +1025,21 @@ def reviewed_raw_attempt_cadence(group: dict[str, object]) -> list[dict[str, obj
         attempts_by_source[(row["capture"], row["identity"])].append(row["capturedUtc"])
     result = []
     for (capture, identity), attempts in sorted(attempts_by_source.items()):
-        attempts.sort(key=precise_seconds)
+        attempts.sort(key=parse_precise_seconds)
         starts = sorted(
-            starts_by_source.get((capture, identity), ()), key=precise_seconds
+            starts_by_source.get((capture, identity), ()), key=parse_precise_seconds
         )
-        first_attempt_seconds = precise_seconds(attempts[0])
+        first_attempt_seconds = parse_precise_seconds(attempts[0])
         eligible_starts = [
-            value for value in starts if precise_seconds(value) <= first_attempt_seconds
+            value
+            for value in starts
+            if parse_precise_seconds(value) <= first_attempt_seconds
         ]
         attack_start = eligible_starts[-1] if eligible_starts else None
         intervals = [
-            precise_seconds(current) - precise_seconds(previous)
+            parse_precise_seconds(current) - parse_precise_seconds(previous)
             for previous, current in zip(attempts, attempts[1:])
-            if precise_seconds(current) > precise_seconds(previous)
+            if parse_precise_seconds(current) > parse_precise_seconds(previous)
         ]
         intervals.sort()
         if not intervals:
@@ -956,16 +1056,16 @@ def reviewed_raw_attempt_cadence(group: dict[str, object]) -> list[dict[str, obj
                 "identity": identity,
                 "attackStartUtc": attack_start if attack_start is not None else "",
                 "firstAttemptUtc": attempts[0],
-                "initialDelaySeconds": rounded_seconds(
-                    first_attempt_seconds - precise_seconds(attack_start)
+                "initialDelaySeconds": rounded_capture_seconds(
+                    first_attempt_seconds - parse_precise_seconds(attack_start)
                 )
                 if attack_start is not None
                 else None,
                 "attemptRows": len(attempts),
                 "intervalRows": len(intervals),
-                "minIntervalSeconds": rounded_seconds(intervals[0]),
-                "medianIntervalSeconds": rounded_seconds(median),
-                "maxIntervalSeconds": rounded_seconds(intervals[-1]),
+                "minIntervalSeconds": rounded_capture_seconds(intervals[0]),
+                "medianIntervalSeconds": rounded_capture_seconds(median),
+                "maxIntervalSeconds": rounded_capture_seconds(intervals[-1]),
             }
         )
     return result
@@ -1453,6 +1553,18 @@ def main():
             for row in group["specialAttackWeapons"]
         )
         raw_attempt_cadence = reviewed_raw_attempt_cadence(group)
+        reviewed_target_cadence = (
+            reviewed_uncontrollable_anger_cadence(group)
+            if name == "Uncontrollable Anger"
+            else None
+        )
+        median_recharge_seconds = (
+            intervals[(len(intervals) - 1) // 2] if intervals else 0.0
+        )
+        if reviewed_target_cadence is not None:
+            median_recharge_seconds = reviewed_target_cadence[
+                "runtimeRechargeSeconds"
+            ]
         report_entry = {
             "monsterData": sorted(group["monsterData"]),
             "captures": sorted(group["captures"]),
@@ -1544,7 +1656,7 @@ def main():
                     key=lambda item: (-item[1], item[0]),
                 )
             ],
-            "medianRechargeSeconds": intervals[(len(intervals) - 1) // 2] if intervals else 0.0,
+            "medianRechargeSeconds": median_recharge_seconds,
             "weaponSlot": slot,
             "attackInfoUnknown": unknown,
             "attackInfoWeaponInstance": instance,
@@ -1552,6 +1664,8 @@ def main():
         }
         if raw_attempt_cadence:
             report_entry["reviewedRawAttemptCadence"] = raw_attempt_cadence
+        if reviewed_target_cadence is not None:
+            report_entry["reviewedTargetCadence"] = reviewed_target_cadence
         if name == "Filth Flea":
             report_entry["criticalAttackShapes"] = critical_shape_evidence
         if name in TARGET_ROLE_EVIDENCE_ENEMIES:
@@ -1593,6 +1707,8 @@ def main():
             validate_discarded_pet_combat(report_entry)
         if name == "Disobedient Bot":
             validate_disobedient_bot_combat(report_entry)
+        if name == "Uncontrollable Anger":
+            validate_uncontrollable_anger_combat(report_entry)
         report[name] = report_entry
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)

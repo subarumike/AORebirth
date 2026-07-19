@@ -2252,7 +2252,7 @@ namespace AORebirth.Core.Playfields
                     true,
                     11,
                     18,
-                    0.000000,
+                    5.167153,
                     0,
                     0,
                     1397315377,
