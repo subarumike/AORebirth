@@ -15,14 +15,13 @@ namespace ZoneEngine.Core.Playfields
 
         // Remaining diagnostic quarantine rows from the PF127 restore batch. Families
         // leave this set only after their existing capture corpus passes the whole-enemy
-        // runtime gate; the 11 Discarded Pet rows were promoted by that process.
+        // runtime gate. Only the 11 evidence-incomplete Violent Vagabond rows remain.
         private static readonly HashSet<int> RuntimeQuarantinedSourceInstances =
             new HashSet<int>
             {
-                2035645542, 2035803146, 2035646228, 2035803590,
-                2035803591, 2035803592, 2035803594, 2035645612, 2035761244,
-                2035762087, 2035762088, 2035802156, 2035802158, 2035802403,
-                2035803150, 2035803583, 2035803588, 2035803589
+                2035645612, 2035761244, 2035762087, 2035762088,
+                2035802156, 2035802158, 2035802403, 2035803150,
+                2035803583, 2035803588, 2035803589
             };
 
         private static readonly CapturedSubwaySpawnDefinition[] SpawnDefinitions =

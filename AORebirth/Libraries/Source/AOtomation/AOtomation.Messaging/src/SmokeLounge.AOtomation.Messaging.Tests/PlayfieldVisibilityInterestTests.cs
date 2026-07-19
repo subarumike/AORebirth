@@ -357,12 +357,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.AreEqual(321, index.Count);
             Assert.AreEqual(
-                283,
+                310,
                 spawns.Count(
                     value => value.Disposition
                              == AORebirth.Core.Playfields.OrdinaryEnemyRuntimeDisposition.Active));
             Assert.AreEqual(
-                38,
+                11,
                 spawns.Count(
                     value => value.Disposition
                              == AORebirth.Core.Playfields.OrdinaryEnemyRuntimeDisposition.Quarantined));

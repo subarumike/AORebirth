@@ -361,8 +361,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns();
             OrdinaryEnemyProfile[] profiles = catalog.GetProfiles();
             Assert.AreEqual(321, spawns.Length);
-            Assert.AreEqual(294, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
-            Assert.AreEqual(27, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            Assert.AreEqual(310, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(11, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
             Assert.IsTrue(spawns.All(value => value.LevelDefinition.IsValid));
             Assert.IsTrue(
                 spawns.All(
@@ -702,18 +702,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .ToArray();
 
             Assert.AreEqual(8, spawns.Length);
-            Assert.AreEqual(6, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
-            Assert.AreEqual(2, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            Assert.AreEqual(8, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(0, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
             CollectionAssert.AreEquivalent(
-                new[] { 0x795312DC, 0x795313CB, 0x7954501B, 0x79545029, 0x79545034, 0x7954503C },
+                expected.Keys.ToArray(),
                 spawns
                     .Where(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active)
-                    .Select(value => value.SourceIdentity)
-                    .ToArray());
-            CollectionAssert.AreEquivalent(
-                new[] { 0x79557CB8, 0x7957E5CD },
-                spawns
-                    .Where(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined)
                     .Select(value => value.SourceIdentity)
                     .ToArray());
             Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, looter.Combat.EvidenceState);
@@ -790,21 +784,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 0x7957E5C8,
                 0x7957E5CA
             };
-            int[] activeSources =
-            {
-                0x7953AA11,
-                0x7953AD6B,
-                0x795450D4,
-                0x795451FE
-            };
-            int[] quarantinedSources =
-            {
-                0x79557F14,
-                0x7957E5C6,
-                0x7957E5C7,
-                0x7957E5C8,
-                0x7957E5CA
-            };
             var ordinaryProvider = new CapturedSubwayOrdinaryContentProvider();
             CapturedSubwaySourceWeaponEvidenceDefinition[] sourceEvidence =
                 ordinaryProvider.GetSourceWeaponEvidence(203734);
@@ -838,28 +817,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "7953AD6B:10:Active",
                     "795450D4:5:Active",
                     "795451FE:10:Active",
-                    "79557F14:10:Quarantined",
-                    "7957E5C6:9:Quarantined",
-                    "7957E5C7:8:Quarantined",
-                    "7957E5C8:8:Quarantined",
-                    "7957E5CA:10:Quarantined"
+                    "79557F14:10:Active",
+                    "7957E5C6:9:Active",
+                    "7957E5C7:8:Active",
+                    "7957E5C8:8:Active",
+                    "7957E5CA:10:Active"
                 },
                 spawns
                     .OrderBy(value => value.SourceIdentity)
                     .Select(value => string.Format("{0:X8}:{1}:{2}", value.SourceIdentity, value.Level, value.Disposition))
                     .ToArray());
             CollectionAssert.AreEquivalent(
-                activeSources,
+                expectedSources,
                 spawns
                     .Where(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active)
                     .Select(value => value.SourceIdentity)
                     .ToArray());
-            CollectionAssert.AreEquivalent(
-                quarantinedSources,
-                spawns
-                    .Where(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined)
-                    .Select(value => value.SourceIdentity)
-                    .ToArray());
+            Assert.IsFalse(spawns.Any(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
             Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, mugger.Combat.Mode);
             Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, mugger.Combat.DamageSource);
             Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, mugger.Combat.EvidenceState);
@@ -1641,7 +1615,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void DerangedShopperUsesItsOneExactQuarantinedSourceWeaponAndCapturedAttackInfoShape()
+        public void DerangedShopperUsesItsOneExactActiveSourceWeaponAndCapturedAttackInfoShape()
         {
             const int sourceIdentity = 0x79574527;
             var ordinaryProvider = new CapturedSubwayOrdinaryContentProvider();
@@ -1691,7 +1665,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(sourceIdentity, spawn.SourceIdentity);
             Assert.AreEqual(8, spawn.Level);
             Assert.AreEqual(256, spawn.LevelDefinition.Resolve(spawn.Level).Health);
-            Assert.AreEqual(OrdinaryEnemyRuntimeDisposition.Quarantined, spawn.Disposition);
+            Assert.AreEqual(OrdinaryEnemyRuntimeDisposition.Active, spawn.Disposition);
             Assert.AreEqual(WorldRespawnPolicyAssignmentMode.Inherit, spawn.RespawnPolicy.Mode);
             Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, shopper.Combat.Mode);
             Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, shopper.Combat.DamageSource);
