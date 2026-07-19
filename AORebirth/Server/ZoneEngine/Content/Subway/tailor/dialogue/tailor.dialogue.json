@@ -1,0 +1,392 @@
+{
+  "Identity": {
+    "Id": "subway-tailor-dialogue-20260719-021611",
+    "Version": "captured-static-20260719",
+    "Source": "docs/evidence/SUBWAY_TAILOR_AND_VENDORS_20260719_021611.md"
+  },
+  "SourceCaptures": [
+    "20260719-021611"
+  ],
+  "Npcs": [
+    {
+      "Id": "subway-tailor",
+      "NpcIdentity": "SimpleChar:79135F51",
+      "Name": "Tailor",
+      "RootNodeId": "tailor_root",
+      "Aliases": [
+        "(SimpleChar:79135F51)",
+        "Tailor"
+      ],
+      "Nodes": [
+        {
+          "Id": "tailor_root",
+          "PromptText": "Howdy.",
+          "PromptTextConfidence": "captured KnuBotAppendText raw-packets.csv ordinal 443 at 2026-07-19T07:16:58.3606426Z",
+          "Options": [
+            {
+              "Id": "tailor_root_option_0",
+              "Index": 0,
+              "Text": "How is life?",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 444; selected answer index 0 at ordinal 463.",
+              "NextNodeId": "tailor_life",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_root_option_1",
+              "Index": 1,
+              "Text": "Um, I'd just like to look at your wares.",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinals 444 and 1399; selected answer index 1 at ordinal 1408.",
+              "NextNodeId": "tailor_wares",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_root_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinals 444 and 1399; visible but not selected in this capture.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "tailor_root_option_2_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Close the captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "tailor_root_reopen",
+          "PromptText": "Yes?",
+          "PromptTextConfidence": "captured reopen KnuBotAppendText raw-packets.csv ordinal 1398 at 2026-07-19T07:18:59.4498909Z",
+          "Options": [
+            {
+              "Id": "tailor_root_reopen_option_0",
+              "Index": 0,
+              "Text": "How is life?",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 1399; visible but not selected on reopen.",
+              "NextNodeId": "tailor_life",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_root_reopen_option_1",
+              "Index": 1,
+              "Text": "Um, I'd just like to look at your wares.",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 1399; selected answer index 1 at ordinal 1408.",
+              "NextNodeId": "tailor_wares",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_root_reopen_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 1399; visible but not selected.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "tailor_root_reopen_option_2_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Close the captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "tailor_life",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "Just ask. ",
+              "Unknown2": 0
+            },
+            {
+              "Text": "",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "captured ordered KnuBotAppendText raw-packets.csv ordinals 464 and 486",
+          "Options": [
+            {
+              "Id": "tailor_life_option_0",
+              "Index": 0,
+              "Text": "Would you like to tell me a bit about yourself?",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 487; selected answer index 0 at ordinal 493.",
+              "NextNodeId": "tailor_about",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_life_option_1",
+              "Index": 1,
+              "Text": "I need to be measured for a set of Jobe Armor, can you help me?",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 487; visible but not selected at this node. The same exact option was selected at ordinal 524 from tailor_about.",
+              "NextNodeId": "tailor_parts",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_life_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 487; visible but not selected.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "tailor_life_option_2_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Close the captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "tailor_about",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "Not much to tell really... ",
+              "Unknown2": 0
+            },
+            {
+              "Text": "\\nLife has actually become more interesting recently.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "captured ordered KnuBotAppendText raw-packets.csv ordinals 497 and 521; the second segment contains a literal backslash-n",
+          "Options": [
+            {
+              "Id": "tailor_about_option_0",
+              "Index": 0,
+              "Text": "I need to be measured for a set of Jobe Armor, can you help me?",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 522; selected answer index 0 at ordinal 524.",
+              "NextNodeId": "tailor_parts",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_about_option_1",
+              "Index": 1,
+              "Text": "Um, I'd just like to look at your wares.",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 522; visible but not selected. The same exact option was selected at ordinal 1408 from the reopened root.",
+              "NextNodeId": "tailor_wares",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_about_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 522; visible but not selected.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "tailor_about_option_2_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Close the captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "tailor_parts",
+          "PromptText": "Certainly. Which armor piece do you need measurements for? ",
+          "PromptTextConfidence": "captured KnuBotAppendText raw-packets.csv ordinals 532, 621, 727, 802, 894, 1068, 1170, and 1273",
+          "Options": [
+            {
+              "Id": "tailor_parts_option_0",
+              "Index": 0,
+              "Text": "The Jobe Suit Pants.",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 543; selected answer index 0 at ordinal 569.",
+              "NextNodeId": "tailor_measurement_done",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_parts_option_1",
+              "Index": 1,
+              "Text": "The Jobe Suit Sleeves.",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 631; selected answer index 1 at ordinal 667.",
+              "NextNodeId": "tailor_measurement_done",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_parts_option_2",
+              "Index": 2,
+              "Text": "The Jobe Suit Boots.",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 734; selected answer index 2 at ordinal 745.",
+              "NextNodeId": "tailor_measurement_done",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_parts_option_3",
+              "Index": 3,
+              "Text": "The Jobe Suit Gloves.",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 811; selected answer index 3 at ordinal 823.",
+              "NextNodeId": "tailor_measurement_done",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_parts_option_4",
+              "Index": 4,
+              "Text": "The Jobe Suit Vest.",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 904; selected answer index 4 at ordinal 957.",
+              "NextNodeId": "tailor_measurement_done",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_parts_option_5",
+              "Index": 5,
+              "Text": "The Jobe Suit Helmet.",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 1079; selected answer index 5 at ordinal 1123.",
+              "NextNodeId": "tailor_measurement_done",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_parts_option_6",
+              "Index": 6,
+              "Text": "The Jobe Suit Support System.",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 1182; selected answer index 6 at ordinal 1234.",
+              "NextNodeId": "tailor_measurement_done",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_parts_option_7",
+              "Index": 7,
+              "Text": "The Jobe Suit Shoulderpad.",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 1280; selected answer index 7 at ordinal 1307.",
+              "NextNodeId": "tailor_measurement_done",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_parts_option_8",
+              "Index": 8,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinals 543, 631, 734, 811, 904, 1079, 1182, and 1280; visible but not selected.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "tailor_parts_option_8_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Close the captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "tailor_measurement_done",
+          "PromptText": "There you go.  Now, is there something else I can help you with? ",
+          "PromptTextConfidence": "captured KnuBotAppendText raw-packets.csv ordinals 593, 689, 766, 850, 978, 1145, 1250, and 1325",
+          "Options": [
+            {
+              "Id": "tailor_measurement_done_option_0",
+              "Index": 0,
+              "Text": "Yes, I need some other measurements taken as well.",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinals 604, 698, 776, 864, 988, 1153, 1256, and 1330; selected index 0 after the first seven pieces.",
+              "NextNodeId": "tailor_parts",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_measurement_done_option_1",
+              "Index": 1,
+              "Text": "Um, I'd just like to look at your wares.",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinals 604, 698, 776, 864, 988, 1153, 1256, and 1330; visible but not selected. The same exact option was selected at ordinal 1408 from the reopened root.",
+              "NextNodeId": "tailor_wares",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_measurement_done_option_2",
+              "Index": 2,
+              "Text": "No, that was it I believe.  Thank you!",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 1330; selected answer index 2 at ordinal 1355.",
+              "NextNodeId": "tailor_goodbye",
+              "Actions": []
+            },
+            {
+              "Id": "tailor_measurement_done_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinals 604, 698, 776, 864, 988, 1153, 1256, and 1330; visible but not selected.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "tailor_measurement_done_option_3_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Close the captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "tailor_goodbye",
+          "PromptText": "You're welcome. ",
+          "PromptTextConfidence": "captured KnuBotAppendText raw-packets.csv ordinal 1365",
+          "Options": [
+            {
+              "Id": "tailor_goodbye_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 1382; the player closed the window at ordinal 1392 without selecting the option.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "tailor_goodbye_option_0_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Close the captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "tailor_wares",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "Of course!",
+              "Unknown2": 0
+            },
+            {
+              "Text": "To do that you just left-clik the Shopping Basket icon at the bottom of this window.",
+              "Unknown2": 1
+            }
+          ],
+          "PromptTextConfidence": "captured ordered KnuBotAppendText raw-packets.csv ordinals 1415 and 1427",
+          "Options": [
+            {
+              "Id": "tailor_wares_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList raw-packets.csv ordinal 1432; the basket GenericCmd was used at ordinal 1439 and the player closed the chat at ordinal 1469 without selecting Goodbye.",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "tailor_wares_option_0_end_dialogue",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Close the captured Goodbye option."
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": []
+    }
+  ]
+}

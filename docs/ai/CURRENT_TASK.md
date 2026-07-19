@@ -10,6 +10,27 @@ projections no longer require repeat gameplay captures. The active work is to
 promote the recovered exact evidence and then validate the quarantined PF127
 population in bounded runtime batches.
 
+## Subway Tailor and vendors (2026-07-19)
+
+- Finalized official-live capture `20260719-021611` now supplies the complete
+  Tailor KnuBot dialogue, including exact ordered append segments, root/about/
+  measurement/wares transitions, eight QL1 measurement rewards `256415..256422`,
+  and the separate shopping-basket GenericCmd shop route.
+- The server now accepts the captured inbound `KnuBotOpenChatWindow`, binds the
+  allocated PF127 Tailor identity through the existing vendor runtime registry,
+  sends Tailor's captured `Unknown2=0` open, and preserves the shop as a distinct
+  GenericCmd action. The existing five non-Tailor merchants remain direct-use
+  shops because this capture contains no preceding dialogue for them.
+- The same capture preserves a second atomic stock observation for all six
+  merchants: 203 rows versus the current 202-row runtime baseline. Pharmacist
+  and Container match exactly; Tailor, Weaponsdealer, Armorer, and part of Tools
+  vary. The exact alternate CSV is checked in as evidence, but runtime stock is
+  unchanged because complete pools, weights, refresh timing, and QL-roll rules
+  remain unresolved.
+- Focused Tailor/bootstrap tests and the Debug build pass. Chat, Login, and Zone
+  were restarted on ports `6996`, `7012`, `7500`, and `7501`. Private-client
+  dialogue, reward, close/reopen, and basket validation remains pending.
+
 ## AOSharp capture-safety repair (2026-07-19)
 
 - Official-client attempts `20260719-001621` and `20260719-001715` terminated
@@ -495,17 +516,16 @@ population in bounded runtime batches.
 - Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
 - World population foundation: `36/36` PASS.
-- Subway merchant content: `4/4` PASS.
+- Subway merchant/Tailor content: `6/6` PASS; dialogue bootstrap: `5/5` PASS.
 - Visibility interest/catalog: `12/12` PASS.
 - Quarantine/spatial-selection guardrail: PASS.
 - Named encounter/capture contract suite: `26/26` PASS.
 - Runtime-coordinator ownership guard: PASS.
-- ZoneEngine compile: PASS. The approved wrapper reached final output copy but
-  could not replace the running `ZoneEngine.exe`; the private server was not
-  stopped.
+- ZoneEngine compile: PASS after the approved engine stop cleared the running
+  executable lock.
 - Chat, Login, and Zone restart: PASS; ports `6996`, `7012`, `7500`, and `7501`
   listening.
-- Repository-wide AOtomation suite: `405/422`; 17 broader failures remain
+- Repository-wide AOtomation suite: 20 broader failures remain
   outside these changed Subway surfaces. Every focused test for
   Eumenides, Disobedient Bot combat/corpse/respawn, global loot, merchants, the
   whole-enemy gate, and capture inventory passes.
@@ -569,8 +589,11 @@ Vagabond; and strict Empty Shell/Premature Pattern loot.
    rolls must remain distinct from the observed post-mitigation other-player
    outcomes.
 5. Bitaxel is classified as a player artifact and is not an enemy gap.
-6. Container Supplier stock is resolved by exact template-`99634` capture
-   evidence. Dialogue remains unresolved and must not be synthesized.
+6. Tailor dialogue is resolved by capture `20260719-021611`; the other five
+   merchants expose direct-use shops without preceding KnuBot dialogue in that
+   capture. Container Supplier stock remains resolved by exact template-`99634`
+   evidence. Variable stock pools, weights, refresh timing, and QL rolling are
+   unresolved and must not be synthesized.
 7. Geometry-safe capture `20260714-202820` identifies 18 unlocked interior door
    identities, including five observed in both open and closed states. It does
    not contain safe room-link indices. The working client-owned doors must not
