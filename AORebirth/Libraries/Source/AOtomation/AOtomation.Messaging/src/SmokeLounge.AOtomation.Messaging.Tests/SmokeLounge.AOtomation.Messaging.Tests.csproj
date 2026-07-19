@@ -90,6 +90,7 @@
     <Compile Include="SubwayVendorContentTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestStateTests.cs" />
+    <Compile Include="QuestNpcOutboundTransportDiagnosticsTests.cs" />
     <Compile Include="PlayfieldVisibilityLifecycleIntegrationTests.cs" />
     <Compile Include="SubwayVisibilityPacketMeasurementTests.cs" />
     <Compile Include="SubwayVisibilitySpatialInterestMetricsTests.cs" />
@@ -141,6 +142,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\ZoneClientSessionLifecycleCoordinator.cs">
       <Link>ZoneClientSessionLifecycleCoordinator.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\QuestNpcOutboundTransportDiagnostics.cs">
+      <Link>QuestNpcOutboundTransportDiagnostics.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotContentProvider.cs">
       <Link>CapturedAreteRobotContentProvider.cs</Link>

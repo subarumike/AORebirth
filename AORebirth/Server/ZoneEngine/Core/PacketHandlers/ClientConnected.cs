@@ -49,6 +49,7 @@ namespace ZoneEngine.Core.PacketHandlers
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
@@ -311,7 +312,8 @@ client.Controller.Character.Playfield.Identity,
                         "ClientConnected",
                         client.Controller.Character.Identity),
                     client.SessionLifecycle.EnterCharInPlayForVisibilityEntry,
-                    () => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character));
+                    () => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character),
+                    () => currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client }));
             }
 
             AppearanceUpdateMessageHandler.Default.Send(client.Controller.Character);

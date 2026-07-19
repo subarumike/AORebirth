@@ -17,6 +17,13 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   latter two replay their complete `16`- and `19`-segment walking cycles as
   passive social NPCs. See
   `docs/project/QUEST_SYSTEM_AUDIT_20260717.md`.
+- PF655 live validation on `2026-07-18` confirms the shared initial visibility
+  snapshot originates from `ClientConnected`. Karrec and Annoying Dude were
+  visually confirmed, all three quest NPC SCFUs reached and were accepted by
+  the final transport boundary, and Karrec's `254`-byte body matches official
+  capture `20260717-223626` apart from the expected runtime dynel identity. The
+  diagnostic is bounded to PF655 test client `CanbeAffected:22` and the three
+  quest-NPC runtime identities.
 - Quest limitations remain explicit: live mission-table creation/startup and
   private-client restart/duplicate/reward/gateway smoke are pending; no general
   research-progression subsystem applies the recorded allocation; total ordinary

@@ -10,6 +10,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.Core.Playfields;
+    using ZoneEngine.Core.Subway.Quests;
 
     [TestClass]
     public class PlayfieldVisibilityInterestStateTests
@@ -40,6 +41,45 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CollectionAssert.AreEqual(new[] { 100 }, Ids(state.VisibleRecipientsForSource(nearest.Identity)));
             Assert.IsTrue(state.CanReceive(nearest, recipient));
             Assert.IsFalse(state.CanReceive(far, recipient));
+        }
+
+        [TestMethod]
+        public void QuestNpcRuntimeIdentitiesRemainEligibleForInitialVisibilitySelection()
+        {
+            WindcallerKarrecNpcDefinition[] definitions = WindcallerKarrecNpcContent.Definitions.ToArray();
+            Assert.AreEqual(3, definitions.Length);
+
+            for (int targetIndex = 0; targetIndex < definitions.Length; targetIndex++)
+            {
+                PlayfieldVisibilityInterestState<TestValue> state = NewState();
+                WindcallerKarrecNpcDefinition targetDefinition = definitions[targetIndex];
+                TestValue recipient = Value(2000000 + targetIndex, targetDefinition.X, targetDefinition.Z);
+                recipient.Playfield = 655;
+                TestValue[] questNpcs = definitions
+                    .Select(
+                        (definition, index) =>
+                            {
+                                TestValue npc = Value(1000000 + index, definition.X, definition.Z);
+                                npc.Playfield = 655;
+                                return npc;
+                            })
+                    .ToArray();
+
+                state.Synchronize(new[] { recipient }.Concat(questNpcs));
+                TestValue[] selected = state.SelectInitialValues(recipient).ToArray();
+
+                Assert.AreEqual(
+                    1,
+                    selected.Count(value => value.Identity.Instance == 1000000 + targetIndex),
+                    targetDefinition.DisplayName + " must enter the shared initial visibility selection exactly once.");
+                foreach (TestValue source in selected)
+                {
+                    state.MarkVisibleEntry(recipient, source);
+                }
+
+                state.CompleteInitialRecipient(recipient);
+                Assert.IsTrue(state.CanReceive(questNpcs[targetIndex], recipient));
+            }
         }
 
         [TestMethod]

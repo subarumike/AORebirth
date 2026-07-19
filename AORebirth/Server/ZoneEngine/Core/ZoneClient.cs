@@ -118,7 +118,9 @@ namespace ZoneEngine.Core
 
         private bool disposed = false;
 
-        private readonly Queue<byte[]> sendQueue = new Queue<byte[]>();
+        private readonly Queue<QueuedOutboundPacket> sendQueue = new Queue<QueuedOutboundPacket>();
+
+        private readonly string questNpcTransportDiagnosticSessionId = Guid.NewGuid().ToString("N");
 
         private Thread dispatcherThread;
 
@@ -238,10 +240,43 @@ namespace ZoneEngine.Core
                 sender,
                 this.Controller.Character.Identity,
                 buffer);
+            int playfieldId = this.Controller.Character.Playfield == null
+                                  ? 0
+                                  : this.Controller.Character.Playfield.Identity.Instance;
+            bool traceQuestNpcTransport = QuestNpcOutboundTransportDiagnostics.OnSerialized(
+                this.questNpcTransportDiagnosticSessionId,
+                this.Controller.Character.Identity,
+                this.Controller.Character.Name,
+                playfieldId,
+                messageBody,
+                buffer,
+                EmitQuestNpcOutboundTransportDiagnostic);
 
-            lock (this.sendQueue)
+            try
             {
-                this.sendQueue.Enqueue(buffer);
+                var queuedPacket = new QueuedOutboundPacket(buffer, traceQuestNpcTransport);
+                lock (this.sendQueue)
+                {
+                    this.sendQueue.Enqueue(queuedPacket);
+                    queuedPacket.QueueDepthAtEnqueue = this.sendQueue.Count;
+                    if (traceQuestNpcTransport)
+                    {
+                        QuestNpcOutboundTransportDiagnostics.MarkEnqueued(buffer);
+                    }
+
+                }
+            }
+            catch (Exception exception)
+            {
+                if (traceQuestNpcTransport)
+                {
+                    QuestNpcOutboundTransportDiagnostics.OnQueueFailed(
+                        buffer,
+                        exception,
+                        EmitQuestNpcOutboundTransportDiagnostic);
+                }
+
+                throw;
             }
             LogUtil.Debug(DebugInfoDetail.AoTomation, messageBody.GetType().ToString());
         }
@@ -334,7 +369,7 @@ namespace ZoneEngine.Core
 
             lock (this.sendQueue)
             {
-                this.sendQueue.Enqueue(queuedBuffer);
+                this.sendQueue.Enqueue(new QueuedOutboundPacket(queuedBuffer, false));
             }
         }
 
@@ -344,8 +379,17 @@ namespace ZoneEngine.Core
         /// </param>
         public void SendCompressed(byte[] buffer)
         {
+            this.SendCompressed(buffer, QuestNpcOutboundTransportDiagnostics.IsTrackedBuffer(buffer));
+        }
+
+        private void SendCompressed(byte[] buffer, bool traceQuestNpcTransport)
+        {
             if (buffer == null || buffer.Length < 2)
             {
+                QuestNpcOutboundTransportDiagnostics.OnTransportUnavailable(
+                    buffer,
+                    "serialized buffer is shorter than the packet-number field",
+                    EmitQuestNpcOutboundTransportDiagnostic);
                 return;
             }
 
@@ -353,8 +397,24 @@ namespace ZoneEngine.Core
             if (this.netStream == null || this.zStream == null)
             {
                 SubwayVisibilitySnapshotDiagnostics.OnTransportUnavailable(buffer, "network or compression stream unavailable");
+                if (traceQuestNpcTransport)
+                {
+                    QuestNpcOutboundTransportDiagnostics.OnTransportUnavailable(
+                        buffer,
+                        "network or compression stream unavailable",
+                        EmitQuestNpcOutboundTransportDiagnostic);
+                }
+
                 return;
             }
+
+            bool writeReturned = false;
+            bool flushReturned = false;
+            bool disconnectAfterTransportFailure = false;
+            string transportUnavailableReason = string.Empty;
+            Exception transportFailure = null;
+            long zlibTotalIn = -1;
+            long zlibTotalOut = -1;
 
             // We can not be multithreaded here. packet numbers would be jumbled
             lock (this.locker)
@@ -365,12 +425,40 @@ namespace ZoneEngine.Core
                     byte[] pn = BitConverter.GetBytes(this.packetNumber++);
                     buffer[0] = pn[1];
                     buffer[1] = pn[0];
+                    if (traceQuestNpcTransport)
+                    {
+                        QuestNpcOutboundTransportDiagnostics.OnPacketNumberAssigned(buffer);
+                    }
 
                     try
                     {
                         SubwayVisibilitySnapshotDiagnostics.OnTransportStarted(buffer);
+                        if (traceQuestNpcTransport)
+                        {
+                            QuestNpcOutboundTransportDiagnostics.OnWriteStarted(buffer);
+                        }
+
                         this.zStream.Write(buffer, 0, buffer.Length);
+                        writeReturned = true;
+                        if (traceQuestNpcTransport)
+                        {
+                            zlibTotalIn = ZlibTotalInOrUnavailable(this.zStream);
+                            zlibTotalOut = ZlibTotalOutOrUnavailable(this.zStream);
+                            QuestNpcOutboundTransportDiagnostics.OnWriteReturned(
+                                buffer,
+                                buffer.Length,
+                                zlibTotalIn,
+                                zlibTotalOut);
+                        }
+
                         this.zStream.Flush();
+                        flushReturned = true;
+                        if (traceQuestNpcTransport)
+                        {
+                            zlibTotalIn = ZlibTotalInOrUnavailable(this.zStream);
+                            zlibTotalOut = ZlibTotalOutOrUnavailable(this.zStream);
+                        }
+
                         SubwayVisibilitySnapshotDiagnostics.OnTransportCompleted(buffer);
                         if (ContainsTradeOpcode(buffer))
                         {
@@ -382,16 +470,66 @@ namespace ZoneEngine.Core
                     }
                     catch (Exception e)
                     {
+                        transportFailure = e;
+                        disconnectAfterTransportFailure = true;
+                        if (traceQuestNpcTransport)
+                        {
+                            zlibTotalIn = ZlibTotalInOrUnavailable(this.zStream);
+                            zlibTotalOut = ZlibTotalOutOrUnavailable(this.zStream);
+                        }
+
                         SubwayVisibilitySnapshotDiagnostics.OnTransportFailed(buffer, e);
                         LogUtil.Debug(DebugInfoDetail.Error, "Error writing to zStream");
                         LogUtil.ErrorException(e);
-                        this.server.DisconnectClient(this);
                     }
                 }
                 else
                 {
                     SubwayVisibilitySnapshotDiagnostics.OnTransportUnavailable(buffer, "network stream is not writable");
+                    transportUnavailableReason = "network stream is not writable";
                 }
+            }
+
+            if (traceQuestNpcTransport && flushReturned)
+            {
+                QuestNpcOutboundTransportDiagnostics.OnFlushReturned(
+                    buffer,
+                    zlibTotalIn,
+                    zlibTotalOut,
+                    EmitQuestNpcOutboundTransportDiagnostic);
+            }
+            else if (traceQuestNpcTransport && transportFailure != null)
+            {
+                if (writeReturned)
+                {
+                    QuestNpcOutboundTransportDiagnostics.OnFlushFailed(
+                        buffer,
+                        transportFailure,
+                        zlibTotalIn,
+                        zlibTotalOut,
+                        EmitQuestNpcOutboundTransportDiagnostic);
+                }
+                else
+                {
+                    QuestNpcOutboundTransportDiagnostics.OnWriteFailed(
+                        buffer,
+                        transportFailure,
+                        zlibTotalIn,
+                        zlibTotalOut,
+                        EmitQuestNpcOutboundTransportDiagnostic);
+                }
+            }
+            else if (traceQuestNpcTransport && !string.IsNullOrEmpty(transportUnavailableReason))
+            {
+                QuestNpcOutboundTransportDiagnostics.OnTransportUnavailable(
+                    buffer,
+                    transportUnavailableReason,
+                    EmitQuestNpcOutboundTransportDiagnostic);
+            }
+
+            if (disconnectAfterTransportFailure)
+            {
+                this.server.DisconnectClient(this);
             }
 
             LogUtil.Debug(DebugInfoDetail.Network, HexOutput.Output(buffer));
@@ -413,6 +551,35 @@ namespace ZoneEngine.Core
             }
 
             return false;
+        }
+
+        private static void EmitQuestNpcOutboundTransportDiagnostic(string message)
+        {
+            LogUtil.Debug(DebugInfoDetail.Engine, message);
+        }
+
+        private static long ZlibTotalInOrUnavailable(ZlibStream stream)
+        {
+            try
+            {
+                return stream == null ? -1 : stream.TotalIn;
+            }
+            catch
+            {
+                return -1;
+            }
+        }
+
+        private static long ZlibTotalOutOrUnavailable(ZlibStream stream)
+        {
+            try
+            {
+                return stream == null ? -1 : stream.TotalOut;
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
         /// <summary>
@@ -508,6 +675,10 @@ namespace ZoneEngine.Core
                     {
                         Thread.Sleep(10);
                     }
+
+                    QuestNpcOutboundTransportDiagnostics.OnSessionDisposed(
+                        this.questNpcTransportDiagnosticSessionId,
+                        EmitQuestNpcOutboundTransportDiagnostic);
 
                     // Remove reference of character
                     if ((this.Controller != null) && (this.Controller.Character != null))
@@ -670,17 +841,31 @@ namespace ZoneEngine.Core
         {
             while (!this.stopDispatcher)
             {
-                byte[] data = null;
+                QueuedOutboundPacket queuedPacket = null;
+                int remainingQueueDepth = -1;
                 lock (this.sendQueue)
                 {
                     if (this.sendQueue.Count > 0)
                     {
-                        data = this.sendQueue.Dequeue();
+                        queuedPacket = this.sendQueue.Dequeue();
+                        remainingQueueDepth = this.sendQueue.Count;
                     }
                 }
-                if (data != null)
+                if (queuedPacket != null)
                 {
-                    this.SendCompressed(data);
+                    if (queuedPacket.TraceQuestNpcTransport)
+                    {
+                        QuestNpcOutboundTransportDiagnostics.EmitEnqueued(
+                            queuedPacket.Buffer,
+                            queuedPacket.QueueDepthAtEnqueue,
+                            EmitQuestNpcOutboundTransportDiagnostic);
+                        QuestNpcOutboundTransportDiagnostics.OnDequeued(
+                            queuedPacket.Buffer,
+                            remainingQueueDepth,
+                            EmitQuestNpcOutboundTransportDiagnostic);
+                    }
+
+                    this.SendCompressed(queuedPacket.Buffer, queuedPacket.TraceQuestNpcTransport);
                 }
                 else
                 {
@@ -688,6 +873,21 @@ namespace ZoneEngine.Core
                 }
             }
             this.stopDispatcher = false;
+        }
+
+        private sealed class QueuedOutboundPacket
+        {
+            internal QueuedOutboundPacket(byte[] buffer, bool traceQuestNpcTransport)
+            {
+                this.Buffer = buffer;
+                this.TraceQuestNpcTransport = traceQuestNpcTransport;
+            }
+
+            internal byte[] Buffer { get; private set; }
+
+            internal bool TraceQuestNpcTransport { get; private set; }
+
+            internal int QueueDepthAtEnqueue { get; set; }
         }
 
         #endregion

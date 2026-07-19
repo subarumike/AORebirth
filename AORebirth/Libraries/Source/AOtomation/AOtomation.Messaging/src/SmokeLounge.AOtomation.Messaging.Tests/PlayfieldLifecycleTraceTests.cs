@@ -6619,7 +6619,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void ExistingCharacterSnapshotsWaitUntilInboundCharInPlayReady()
+        public void ExistingCharacterSnapshotsInitializeOnceFromClientConnectedWithoutInboundCharInPlay()
         {
             string repositoryRoot = FindRepositoryRoot();
             string coordinatorText = File.ReadAllText(
@@ -6632,20 +6632,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 coordinatorText,
                 "public void RunVisibilityInitializationSequence");
 
-            Assert.IsFalse(
-                visibilitySequence.Contains("sendExistingCharacterSnapshots"),
-                "Existing-character snapshots must not be emitted during the pre-handshake visibility sequence.");
-            Assert.IsFalse(
-                clientConnectedText.Contains("currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client })"),
-                "ClientConnected must not mark initial NPCs visible before the client enters the world.");
-            Assert.IsTrue(
-                charInPlayText.Contains("currentPlayfield.SendSCFUsToClient(")
-                && charInPlayText.Contains("new IMSendPlayerSCFUs { toClient = client }"),
-                "Inbound CharInPlay must emit the deferred existing-character snapshot.");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(visibilitySequence, "Execute(sendExistingCharacterSnapshots"),
+                "The shared visibility sequence must execute the existing-character snapshot exactly once.");
             AssertTextBefore(
-                charInPlayText,
-                "client.Controller.Character.Starting = false;",
-                "currentPlayfield.SendSCFUsToClient(");
+                visibilitySequence,
+                "Execute(announceJoiningCharacter",
+                "Execute(sendExistingCharacterSnapshots");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(
+                    clientConnectedText,
+                    "currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client })"),
+                "ClientConnected must initiate one existing-character snapshot for the joining client.");
+            Assert.IsFalse(
+                charInPlayText.Contains("SendSCFUsToClient")
+                || charInPlayText.Contains("IMSendPlayerSCFUs"),
+                "Inbound CharInPlay must not be required for or duplicate the initial existing-character snapshot.");
         }
 
         [TestMethod]
@@ -6658,8 +6662,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
             string clientConnectedText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
-            string charInPlayText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CharInPlayMessageHandler.cs"));
             string playfieldText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string runtimeSystemsText = File.ReadAllText(
@@ -6714,9 +6716,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "public void RunVisibilityInitializationSequence");
             AssertTextBefore(visibilitySequence, "Execute(recordJoinerReady", "Execute(enterCharInPlay");
             AssertTextBefore(visibilitySequence, "Execute(enterCharInPlay", "Execute(announceJoiningCharacter");
-            Assert.IsFalse(
-                visibilitySequence.Contains("sendExistingCharacterSnapshots"),
-                "Existing-character snapshots must wait for the inbound CharInPlay-ready boundary.");
+            AssertTextBefore(
+                visibilitySequence,
+                "Execute(announceJoiningCharacter",
+                "Execute(sendExistingCharacterSnapshots");
 
             string simpleCharFullUpdateCharInPlaySequence = ExtractMethodBlock(
                 coordinatorText,
@@ -6737,7 +6740,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(
                 clientConnectedText,
                 "client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,",
-                "() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)");
+                "FullCharacterMessageHandler.Default.Send(client.Controller.Character);");
             Assert.AreEqual(
                 2,
                 CountOccurrences(playfieldText, "this.runtimeSystems.SendExistingCharacterVisibilityToClient(")
@@ -6801,20 +6804,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.IsTrue(
-                clientConnectedText.Contains("() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)")
-                && clientConnectedText.Contains("() => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character)"),
-                "Full-character and joining-character announcements must remain in ClientConnected.");
-            Assert.IsFalse(
-                clientConnectedText.Contains("currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client })"),
-                "Existing-character snapshots must not be sent before the client completes CharInPlay.");
-            Assert.IsTrue(
-                charInPlayText.Contains("currentPlayfield.SendSCFUsToClient(")
-                && charInPlayText.Contains("new IMSendPlayerSCFUs { toClient = client }"),
-                "The inbound CharInPlay handler must send the deferred existing-character snapshot.");
-            AssertTextBefore(
-                charInPlayText,
-                "client.Controller.Character.Starting = false;",
-                "currentPlayfield.SendSCFUsToClient(");
+                clientConnectedText.Contains("FullCharacterMessageHandler.Default.Send(client.Controller.Character);")
+                && clientConnectedText.Contains("() => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character)")
+                && clientConnectedText.Contains("() => currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client })"),
+                "Session packet send expressions must remain in ClientConnected for these sequencing slices.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.SendExistingCharacterVisibilityToClient(")
                 && playfieldText.Contains("body => sendSCFUs.toClient.SendCompressed(body)")

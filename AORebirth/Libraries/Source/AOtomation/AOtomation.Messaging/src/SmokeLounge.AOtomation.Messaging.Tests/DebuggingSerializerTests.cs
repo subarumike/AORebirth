@@ -26,6 +26,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using SmokeLounge.AOtomation.Messaging.Serialization;
     using SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom;
 
+    using ZoneEngine.Core;
+
     using StreamReader = SmokeLounge.AOtomation.Messaging.Serialization.StreamReader;
     using StreamWriter = SmokeLounge.AOtomation.Messaging.Serialization.StreamWriter;
 
@@ -338,6 +340,44 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Assert.AreEqual(IdentityType.NanoProgram, decoded.ActiveNanos[0].NanoIdentity.Type);
                 Assert.AreEqual(0x3233F, decoded.ActiveNanos[0].NanoIdentity.Instance);
                 Assert.AreEqual(0, decoded.ActiveNanos[0].NanoInstance);
+            }
+
+            message.Identity =
+                new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = QuestNpcOutboundTransportDiagnostics.KarrecRuntimeInstance
+                    };
+            var expectedRuntimeBody = new byte[capturedBody.Length];
+            Buffer.BlockCopy(capturedBody, 0, expectedRuntimeBody, 0, capturedBody.Length);
+            expectedRuntimeBody[8] = 0x00;
+            expectedRuntimeBody[9] = 0x0F;
+            expectedRuntimeBody[10] = 0x42;
+            expectedRuntimeBody[11] = 0x40;
+            using (var fullMessageStream = new MemoryStream())
+            {
+                var fullMessage =
+                    new Message
+                        {
+                            Header =
+                                new Header
+                                    {
+                                        MessageId = 0xDFDF,
+                                        PacketType = PacketType.N3Message,
+                                        Unknown = 1,
+                                        Sender = 1,
+                                        Receiver = 40012345
+                                    },
+                            Body = message
+                        };
+                new MessageSerializer().Serialize(fullMessageStream, fullMessage);
+                byte[] runtimeFullMessage = fullMessageStream.ToArray();
+                var runtimeBody = new byte[runtimeFullMessage.Length - 16];
+                Buffer.BlockCopy(runtimeFullMessage, 16, runtimeBody, 0, runtimeBody.Length);
+
+                Assert.AreEqual(270, runtimeFullMessage.Length);
+                Assert.AreEqual(254, runtimeBody.Length);
+                CollectionAssert.AreEqual(expectedRuntimeBody, runtimeBody);
             }
         }
 
