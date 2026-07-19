@@ -296,6 +296,7 @@
     <Compile Include="Core\MessageHandlers\NascenceStatueTeleportCatalog.cs" />
     <Compile Include="Core\MessageHandlers\NascenceStatueTeleportInteractionHandler.cs" />
     <Compile Include="Core\InventoryContainerRuntimeService.cs" />
+    <Compile Include="Core\QuestNpcOutboundTransportDiagnostics.cs" />
     <Compile Include="Core\PacketSequencingCoordinator.cs" />
     <Compile Include="Core\MessageHandlers\InventoryContainerInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\InventoryContainerInteractionRules.cs" />
@@ -421,6 +422,8 @@
     <Compile Include="Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldTransferRuntimeService.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayVendorContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedSubwayTailorDialogueContent.cs" />
+    <Compile Include="Core\Playfields\CapturedSubwayTailorDialogueRuntime.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayVendorRuntimeRegistry.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayVendorRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVendorRuntimeService.cs" />
@@ -556,6 +559,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Subway\windcaller-karrec\quests\windcaller-karrec.quests.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Subway\tailor\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Subway\tailor\dialogue\tailor.dialogue.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\dummy.txt">

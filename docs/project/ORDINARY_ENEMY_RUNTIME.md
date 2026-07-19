@@ -1,6 +1,6 @@
 # Generic Ordinary-Enemy Runtime
 
-Population ownership: profile-backed Subway rows are activated and respawned by `WorldPopulationController`. `OrdinaryEnemyRuntimeService` materializes requested rows only and does not enumerate population or own respawn timers. The catalog remains the capture-backed adapter with 321 rows, 283 active, and 38 quarantined.
+Population ownership: profile-backed Subway rows are activated and respawned by `WorldPopulationController`. `OrdinaryEnemyRuntimeService` materializes requested rows only and does not enumerate population or own respawn timers. The catalog remains the capture-backed adapter with 321 rows, all 321 active, and zero quarantined.
 
 ## Decision
 
@@ -133,16 +133,19 @@ Subway evidence into 26 reusable type profiles and 321 exact spawn rows:
 
 - supported profiles: Filth Flea, Discarded Pet, Disobedient Bot, Mugger, Thief,
   and Violent Vagabond;
-- generated ordinary profiles: Shadow, Stim Fiend, Workman Striker, Architect
-  Striker, Workman, Architect, Looter, Deranged Shopper, Infector, Striker,
-  Lost Thought, Bloodcreeper, Empty Shell, Fragmented Soul, Incomplete Rebuild,
-  Melded Patterns, Molested Molecules, Premature Pattern, Redundant Scan, and
-  Uncontrollable Anger.
+- generated ordinary profiles: Slum Runner, Molested Molecules, Shadow,
+  Infector, Architect Striker, Melded Patterns, Workman Striker, Looter,
+  Deranged Shopper, Bloodcreeper, Stim Fiend, Neural Burnout, Incomplete
+  Rebuild, Fragmented Soul, Redundant Scan, Uncontrollable Anger, Infected
+  Attendant, Lost Thought, Empty Shell, and Premature Pattern.
 
-The existing safe activation boundary is 283 active rows. The 29
-supported-family and 9 generated ordinary rows in the PF127 diagnostic slice
-remain present as data but quarantined by default. Profile or spawn existence
-does not enable a row.
+The configured activation boundary is 321 active rows. The 16 accepted-profile
+rows activated in this slice require bounded private-client validation before
+this can be called the safe runtime boundary. All 22 Violent Vagabond rows are
+active under the explicit same-level Subway damage policy because the official
+family repeatedly missed the test character and cannot supply a landed roll.
+Exact landed-damage parity and reset boundaries remain unresolved; profile or
+spawn existence alone still does not enable a row.
 
 Named bosses and owned summons are not in the catalog.
 
@@ -197,12 +200,13 @@ canonicalize padded and unpadded numeric identities, remain generation-scoped,
 and exclude names, proximity, database identity alone, or duplicate observations
 as substitutes for an exact identity chain.
 
-Disobedient Bot has fourteen exact corpse generations in the audited corpus and
-seven strict complete loot outcomes. Those strict outcomes contain one QL1 Small
+Disobedient Bot has fifteen exact corpse generations in the audited corpus and
+eight strict complete loot outcomes. Those strict outcomes contain one QL1 Small
 Power Supply (`234877/234877`), one QL10 Eye Implant: Pharma Tech, Bright
-(`104683/104684`), and five item-empty inventories. The runtime uses a
-provisional weighted-one policy with relative weights `1 + 1 + 5 empty`. The two
-memberships are capture-proven; the weighting is private-server policy, not an
+(`104683/104684`), one QL7 `113398/113399` item, and five item-empty inventories.
+The runtime uses a provisional weighted-one policy with relative weights
+`1 + 1 + 1 + 5 empty`. The three memberships are capture-proven; the weighting
+is private-server policy, not an
 official probability claim, and the broader pool remains incomplete. Burnt Out
 Memory Chip (`234876/234876`) cannot roll because its corpse linkage is
 incomplete.
@@ -216,7 +220,7 @@ the incomplete item-pool boundary.
 The restored deep-population slice uses strict initial corpse snapshots, including
 empty snapshots, when calculating observed item frequencies. It does not infer
 guaranteed loot from a successful roll. The catalog now contains 321 represented
-rows, 283 active rows, and 38 quarantined rows.
+rows, all 321 active rows, and zero quarantined rows.
 
 Slum Runner now has 21 identity-linked corpse generations: seven focused
 records from `20260716-034656` and `20260716-215947`, plus fourteen recovered
@@ -239,15 +243,18 @@ minute loot-bearing corpse behavior apply. Its four-minute respawn remains the
 centralized private PF127 ordinary policy, not an official-live timing claim.
 
 Disobedient Bot is the fifth accepted ordinary profile. Its 12 exact spawn rows
-use captured NPC family `138`. Seventeen normal SIW1 hits against local players
-prove the aggregate `8..15` envelope; two Killer-pet hits remain separate, no
-critical is observed, and focused attack attempts retain the exact
+use captured NPC family `138`. Fifteen normal SIW1 hits against local players
+prove the aggregate `6..15` envelope, with ten captured misses kept explicit;
+three other-player hits and two
+player-owned Killer-pet hits remain separate, no critical is observed, and
+focused attack attempts retain the exact
 `5.973723`-second recharge instead of a miss-biased landed-hit interval. The
 ordinary combat profile resolves SIW1 context from the selected spawn level:
 captured `L5=30/30/30/30/22`, `L6=35`, `L8=45`, `L9=49`, and `L10=54`; L7 uses
 the explicit bounded midpoint policy `40`, while other levels fail closed. The
-generated combat projection contains nine decoded hits at `8..15`; eight
-additional authoritative raw rows complete the 17-hit audit.
+generated combat projection contains nine decoded plus five reviewed-raw local
+hits at `8..15`, three other-player hits at `8`, and two player-owned Killer-pet
+hits at `8` and `19`.
 
 Thirteen valid identity-linked corpse rows preserve CATMesh `15215` and exact
 level-credit rules. The unlinked `20260713-013906` item outcome remains excluded.
@@ -256,9 +263,8 @@ policy for the two proven memberships. All Bot rows use an observed
 `450`-second post-NPC-despawn delay; capture `20260708-143600` records
 `459.913` seconds death-to-replacement at a `0.190`-unit position delta. Shared
 chase and ordinary three-second empty/four-minute loot-bearing corpse behavior
-apply. Two Bot rows remain in the existing operational quarantine; acceptance
-does not activate them. Proactive aggro radius and leash/reset distance remain
-unresolved.
+apply. Both previously quarantined Bot rows are active for bounded private
+validation. Proactive aggro radius and leash/reset distance remain unresolved.
 
 Workman Striker is the tenth accepted ordinary profile. Declared overlap rules
 reduce simultaneous capture
@@ -291,8 +297,8 @@ profile is accepted by the whole-enemy gate with those exclusions preserved.
 Reviewed first-open evidence now supplies strict item denominators for 18
 ordinary profiles through one reusable raw-generation validator. In addition
 to Shadow, ordinary Infector, Architect Striker, and Melded Patterns, the
-recovered set is Mugger `17/3 empty`, Discarded Pet `16/3`, Stim Fiend `13/0`,
-Looter `11/5`, Violent Vagabond `11/1`, Bloodcreeper `4/3`, Infected Attendant
+recovered set is Mugger `18/3 empty`, Discarded Pet `16/3`, Stim Fiend `13/0`,
+Looter `11/5`, Violent Vagabond `14/1`, Bloodcreeper `4/3`, Infected Attendant
 `4/1`, Fragmented Soul `4/0`, Deranged Shopper `2/0`, Incomplete Rebuild `2/0`,
 Redundant Scan `2/1`, Uncontrollable Anger `2/0`, Lost Thought `1/0`, and Neural
 Burnout `4/2`. Each reviewed source is capture-allowlisted and its complete set
@@ -315,15 +321,15 @@ Architect Striker retains its captured fixed contract without an invented
 weapon. Melded Patterns retains its exact QL20 `121817/121818` weapon-owned
 damage/recharge path without invented special-attack or critical context.
 
-The next gate definition adds Looter, Bloodcreeper, Stim Fiend, and Neural
+The gate also includes Looter, Bloodcreeper, Stim Fiend, and Neural
 Burnout. Looter resolves all eight exact owner-linked `123038/123039` tuples by
 source identity and QL; its visible equipped item owns normal damage and
 recharge, while aggregate, missing, conflicting, or unknown source selection
 fails closed. The other three retain their specialized or fixed capture-backed
 combat, strict incomplete loot samples, exact observed credit rows, shared chase,
 ordinary corpse lifetimes, and private respawn policy. The ordinary generator and
-Debug build pass, as do the expanded fourteen-profile gate, WorldPopulation
-`29/29`, and Subway loot `22/22` suites.
+Debug build pass, as do the expanded fourteen-profile gate, WorldPopulation,
+and Subway loot suites.
 
 Mugger is the fifteenth accepted profile. Its nine exact current source
 identities each resolve a QL1 `121567/121567` weapon; aggregate, missing,
@@ -333,6 +339,31 @@ damage bonus, and recharge, while only the captured AttackInfo ammo `-1`, slot
 `9..12` outcomes and three `21` criticals remain separate evidence, and the gate
 also binds the strict 17-open incomplete loot pool, exact CATMesh/level credits,
 shared chase, ordinary respawn, and corpse lifetimes.
+
+Deranged Shopper is the sixteenth accepted profile, Incomplete Rebuild the
+seventeenth, Redundant Scan the eighteenth, Fragmented Soul the nineteenth,
+Discarded Pet the twentieth, and Uncontrollable Anger the twenty-first.
+Discarded Pet activates all 29 exact L5..L10
+rows and keeps 37 normal local-player SIW1 outcomes at `9..18` separate from
+four report-only `30..33` criticals. Its fixed capture contract retains ammo
+`-1`, slot `0`, unknown `0`, instance `SIW1`, and a `5.089763`-second
+conventional median cadence. Retaliatory acquisition and captured chase are
+enabled without inventing proactive aggro, leash, reset, or return-home
+boundaries. Strict `16/3 empty` loot, CATMesh `15929`, standard corpse
+lifetimes, and 25 exact credit corpses pass the same whole-enemy gate. The
+Uncontrollable Anger slice keeps six exact active rows at captured levels
+`13,13,19,20,23,23`, two patrols and four static anchors, retaliatory shared
+chase, local-player SIW1 damage `11..18`, strict `2/0 empty` loot, CATMesh
+`96177`, inherited private respawn, and `3/240/3` corpse rules. Four Killer-pet
+hits at `25..42` and one other-player hit at `19` remain separate. Its complete
+reviewed Killer cadence window is `5.1165513`, `5.1671525`, `10.1003489`
+seconds; runtime uses the six-decimal median `5.167153` without dropping or
+dividing the doubled interval. Exact positive-credit evidence covers
+L11/L12/L13/L20/L21, while active L19 and L23 remain unresolved. The
+twenty-one-profile gate, WorldPopulation `36/36`, and Subway loot `22/22` pass.
+ZoneEngine compiles. Private activation validation remains pending for the 16
+rows activated in this slice; the prior Discarded Pet validation boundary is
+tracked separately.
 
 ## Ordinary respawn policy
 
@@ -424,8 +455,43 @@ batching, throttling, delayed SCFU, pagination, acknowledgements, or per-enemy
 visibility suppression. Enabling many quarantined rows can still exercise that
 known boundary.
 
+Finalized capture `20260719-020104` supplies an exact four-segment replay patrol
+for Disobedient Bot source `0x79557C66` and an exact 26-segment replay patrol for
+Violent Vagabond source `0x7957E5C4`. These are source-specific captured routes,
+not evidence that other rows should receive background patrols. The same capture
+brings Vagabond strict loot to 14 atomic outcomes (`13` positive, `1` empty), but
+its combat sample still contains only misses and no landed local-player damage.
+Runtime therefore uses the adjacent same-level Mugger normal range `9..12` as
+an explicit playability policy while retaining Vagabond cadence and packet
+shape. Red Wine template `130590` remains excluded from combat. All 22 exact
+population rows are active.
+It proves neither respawn timing nor corpse lifetime.
+
+Finalized capture `20260719-021022` supplies source-specific complete patrols for
+active Filth Fleas `0x7953AFCC` (10 segments, 28 complete cycles) and
+`0x795317F5` (18 segments, 12 complete cycles), active Discarded Pet
+`0x79528FDA` (24 segments, five complete cycles), and active Violent Vagabond
+`0x7953AFA1` (10 segments, four complete cycles). It independently corroborates
+four existing Flea routes and the existing Vagabond route. Ambiguous complete
+routes remain evidence-only and are not mapped. The Violent Vagabond patrol
+evidence adds no landed combat result; the family remains capture-incomplete but
+runtime-active under the explicit damage policy, and `0x7953AFA1` keeps its
+active disposition. Incidental Mugger evidence adds one
+miss and SIW context without changing the captured Mugger landed-damage range.
+The capture also adds an exact L5 Mugger corpse with `44` credits, CATMesh
+`17534`, and one QL5 `123495/123496` item, raising strict Mugger loot from 17
+outcomes (14 positive, three empty) to 18 (15 positive, three empty). It proves
+neither respawn timing nor corpse lifetime.
+
 Current unresolved data remains fail-closed, including combat sources without a
 landed captured hit, unsupported/nonordinary respawn classifications without an
 explicit owner policy, automatic-aggro radii not yet captured, level ranges not
 established by evidence or decision, and random roam behavior not proven by
-movement evidence. The same 38 diagnostic rows remain quarantined.
+movement evidence. No Violent Vagabond row remains quarantined. Exact patrols
+do not resolve the missing landed-damage evidence, so the `9..12` runtime range
+remains explicitly policy-backed rather than capture-proven.
+The whole-enemy gate still accepts 21 of 26 profiles. Infected Attendant, Lost
+Thought, Empty Shell, Premature Pattern, and Violent Vagabond account for 43
+active rows and require the next
+corpus-backed completion pass; active disposition is not a claim that those
+five profiles are complete.

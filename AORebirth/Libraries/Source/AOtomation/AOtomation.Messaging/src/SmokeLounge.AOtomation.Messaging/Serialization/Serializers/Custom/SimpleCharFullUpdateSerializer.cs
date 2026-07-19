@@ -159,7 +159,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                                 ? streamReader.ReadInt16()
                                 : streamReader.ReadByte();
             message.Health = flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallHealth)
-                                 ? streamReader.ReadInt16()
+                                 ? streamReader.ReadUInt16()
                                  : streamReader.ReadInt32();
             if (flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallHealthDamage))
             {
@@ -167,7 +167,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             }
             else if (flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallHealth))
             {
-                message.HealthDamage = streamReader.ReadInt16();
+                message.HealthDamage = streamReader.ReadUInt16();
             }
             else
             {
@@ -393,10 +393,10 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 streamWriter.WriteByte((byte)scfu.Level);
             }
 
-            if (scfu.Health <= short.MaxValue)
+            if (scfu.Health >= 0 && scfu.Health <= ushort.MaxValue)
             {
                 flags |= SimpleCharFullUpdateFlags.HasSmallHealth;
-                streamWriter.WriteInt16((short)scfu.Health);
+                streamWriter.WriteUInt16((ushort)scfu.Health);
             }
             else
             {
@@ -404,7 +404,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             }
 
 
-            if (scfu.HealthDamage <= byte.MaxValue)
+            if (scfu.HealthDamage >= 0 && scfu.HealthDamage <= byte.MaxValue)
             {
                 flags |= SimpleCharFullUpdateFlags.HasSmallHealthDamage;
                 streamWriter.WriteByte((byte)scfu.HealthDamage);
@@ -413,7 +413,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             {
                 if (flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallHealth))
                 {
-                    streamWriter.WriteInt16((short)scfu.HealthDamage);
+                    streamWriter.WriteUInt16((ushort)scfu.HealthDamage);
                 }
                 else
                 {
@@ -480,7 +480,8 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             streamWriter.WriteInt32((scfu.ActiveNanos.Length + 1) * 0x3F1);
             foreach (var activeNano in scfu.ActiveNanos)
             {
-                streamWriter.WriteInt32(activeNano.NanoId);
+                streamWriter.WriteInt32((int)activeNano.NanoIdentity.Type);
+                streamWriter.WriteInt32(activeNano.NanoIdentity.Instance);
                 streamWriter.WriteInt32(activeNano.NanoInstance);
                 streamWriter.WriteInt32(activeNano.Time1);
                 streamWriter.WriteInt32(activeNano.Time2);
@@ -553,6 +554,24 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             else
             {
                 flags &= ~SimpleCharFullUpdateFlags.HasExtendedLevel;
+            }
+
+            if (scfu.Health >= 0 && scfu.Health <= ushort.MaxValue)
+            {
+                flags |= SimpleCharFullUpdateFlags.HasSmallHealth;
+            }
+            else
+            {
+                flags &= ~SimpleCharFullUpdateFlags.HasSmallHealth;
+            }
+
+            if (scfu.HealthDamage >= 0 && scfu.HealthDamage <= byte.MaxValue)
+            {
+                flags |= SimpleCharFullUpdateFlags.HasSmallHealthDamage;
+            }
+            else
+            {
+                flags &= ~SimpleCharFullUpdateFlags.HasSmallHealthDamage;
             }
 
             if (scfu.RunSpeedBase > byte.MaxValue)
@@ -674,7 +693,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                         activeNanos.Add(
                             new ActiveNano
                             {
-                                NanoId = reader.ReadInt32(),
+                                NanoIdentity = reader.ReadIdentity(),
                                 NanoInstance = reader.ReadInt32(),
                                 Time1 = reader.ReadInt32(),
                                 Time2 = reader.ReadInt32()

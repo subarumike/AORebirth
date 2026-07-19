@@ -90,6 +90,7 @@
     <Compile Include="SubwayVendorContentTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestStateTests.cs" />
+    <Compile Include="QuestNpcOutboundTransportDiagnosticsTests.cs" />
     <Compile Include="PlayfieldVisibilityLifecycleIntegrationTests.cs" />
     <Compile Include="SubwayVisibilityPacketMeasurementTests.cs" />
     <Compile Include="SubwayVisibilitySpatialInterestMetricsTests.cs" />
@@ -136,11 +137,17 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayVendorContentProvider.cs">
       <Link>CapturedSubwayVendorContentProvider.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayTailorDialogueContent.cs">
+      <Link>CapturedSubwayTailorDialogueContent.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\UseItemOnItemInteractionRules.cs">
       <Link>UseItemOnItemInteractionRules.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\ZoneClientSessionLifecycleCoordinator.cs">
       <Link>ZoneClientSessionLifecycleCoordinator.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\QuestNpcOutboundTransportDiagnostics.cs">
+      <Link>QuestNpcOutboundTransportDiagnostics.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotContentProvider.cs">
       <Link>CapturedAreteRobotContentProvider.cs</Link>
@@ -291,6 +298,14 @@
     </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Subway\windcaller-karrec\quests\windcaller-karrec.quests.json">
       <Link>Content\Subway\windcaller-karrec\quests\windcaller-karrec.quests.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Subway\tailor\manifest.json">
+      <Link>Content\Subway\tailor\manifest.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Subway\tailor\dialogue\tailor.dialogue.json">
+      <Link>Content\Subway\tailor\dialogue\tailor.dialogue.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <ProjectReference Include="..\SmokeLounge.AOtomation.Messaging\SmokeLounge.AOtomation.Messaging.csproj">

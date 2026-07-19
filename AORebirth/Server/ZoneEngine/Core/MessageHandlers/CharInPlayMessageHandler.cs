@@ -106,7 +106,6 @@ namespace ZoneEngine.Core.MessageHandlers
                 PlayfieldLifecycleTrace.StageCharInPlayReady,
                 "CharacterReady",
                 client.Controller.Character.Identity);
-
             client.Controller.Character.Stats.ClearChangedFlags();
 
             // Needed fix, so gmlevel will be loaded

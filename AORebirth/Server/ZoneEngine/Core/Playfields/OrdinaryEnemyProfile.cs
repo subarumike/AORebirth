@@ -171,7 +171,8 @@ namespace AORebirth.Core.Playfields
             int selfTargetChanceBasisPoints = 0,
             bool randomizeInitialDelay = false,
             int ncuCost = 0,
-            IDictionary<int, int> spawnNanoPoolByLevel = null)
+            IDictionary<int, int> spawnNanoPoolByLevel = null,
+            bool resolvePrimaryModifierFromNanoData = false)
         {
             this.PrimaryNanoId = primaryNanoId;
             this.TriggeredSelfNanoId = triggeredSelfNanoId;
@@ -200,6 +201,7 @@ namespace AORebirth.Core.Playfields
             this.SelfTargetChanceBasisPoints = selfTargetChanceBasisPoints;
             this.RandomizeInitialDelay = randomizeInitialDelay;
             this.NcuCost = ncuCost;
+            this.ResolvePrimaryModifierFromNanoData = resolvePrimaryModifierFromNanoData;
             this.spawnNanoPoolByLevel = spawnNanoPoolByLevel == null
                 ? new Dictionary<int, int>()
                 : new Dictionary<int, int>(spawnNanoPoolByLevel);
@@ -235,6 +237,7 @@ namespace AORebirth.Core.Playfields
         internal int SelfTargetChanceBasisPoints { get; private set; }
         internal bool RandomizeInitialDelay { get; private set; }
         internal int NcuCost { get; private set; }
+        internal bool ResolvePrimaryModifierFromNanoData { get; private set; }
 
         internal bool HasPeriodicStatHit
         {
@@ -302,6 +305,46 @@ namespace AORebirth.Core.Playfields
                         { 21, 1183 },
                         { 22, 1250 }
                     });
+        }
+
+        internal static OrdinaryEnemySupportNanoProfile CapturedFragmentedSoul95447()
+        {
+            return new OrdinaryEnemySupportNanoProfile(
+                95447,
+                0,
+                10.0,
+                2.5,
+                10.0,
+                1440000,
+                14400.0,
+                20.0,
+                true,
+                181,
+                0,
+                0,
+                0,
+                new int[0],
+                OrdinaryEnemyEvidenceState.Policy,
+                "20260709-222339,20260717-215250;nano=95447;"
+                + "nanos.dat strain=181,ncu=7,cost=44,duration-centiseconds=1440000,"
+                + "range=20,on-use-skill-stat=381,delta=+42;"
+                + "capture-completion=2.209564..2.599639;"
+                + "repeat-decision=10-second-private-policy;"
+                + "self-or-nearest-ordinary-ally-with-self-fallback;"
+                + "spawn-nano-pools=minimum-observed-current-nano-only;"
+                + "levels-17-and-18-remain-unresolved",
+                nanoCost: 44,
+                castChanceBasisPoints: 10000,
+                selfTargetChanceBasisPoints: 5000,
+                randomizeInitialDelay: true,
+                ncuCost: 7,
+                spawnNanoPoolByLevel: new Dictionary<int, int>
+                    {
+                        { 19, 665 },
+                        { 20, 782 },
+                        { 21, 829 }
+                    },
+                resolvePrimaryModifierFromNanoData: true);
         }
     }
 
@@ -1806,19 +1849,26 @@ namespace AORebirth.Core.Playfields
                 bool periodicStatHitNano = supportNano != null
                                            && supportNano.HasPeriodicStatHit;
                 bool invalidStaticModifierNano = staticModifierNano
-                    && (!supportNano.HasTriggeredSelfEffect
-                        || supportNano.PrimaryNanoId == supportNano.TriggeredSelfNanoId
-                        || supportNano.PrimaryModifierDelta == 0
-                        || supportNano.TriggeredSelfModifierDelta == 0
-                        || supportNano.AffectedStatIds.Length == 0
-                        || supportNano.AffectedStatIds.Any(value => value <= 0)
-                        || supportNano.AffectedStatIds.Distinct().Count()
-                           != supportNano.AffectedStatIds.Length
-                        || supportNano.PeriodicStatDelta != 0
-                        || supportNano.PeriodicTickCount != 0
-                        || supportNano.PeriodicTickSeconds != 0.0);
+                    && (supportNano.ResolvePrimaryModifierFromNanoData
+                        ? supportNano.HasTriggeredSelfEffect
+                          || supportNano.PrimaryModifierDelta != 0
+                          || supportNano.TriggeredSelfModifierDelta != 0
+                          || supportNano.AffectedStatIds.Length != 0
+                        : !supportNano.HasTriggeredSelfEffect
+                          || supportNano.PrimaryNanoId == supportNano.TriggeredSelfNanoId
+                          || supportNano.PrimaryModifierDelta == 0
+                          || supportNano.TriggeredSelfModifierDelta == 0
+                          || supportNano.AffectedStatIds.Length == 0
+                          || supportNano.AffectedStatIds.Any(value => value <= 0)
+                          || supportNano.AffectedStatIds.Distinct().Count()
+                             != supportNano.AffectedStatIds.Length)
+                       || staticModifierNano
+                          && (supportNano.PeriodicStatDelta != 0
+                              || supportNano.PeriodicTickCount != 0
+                              || supportNano.PeriodicTickSeconds != 0.0);
                 bool invalidPeriodicStatHitNano = periodicStatHitNano
-                    && (supportNano.HasTriggeredSelfEffect
+                    && (supportNano.ResolvePrimaryModifierFromNanoData
+                        || supportNano.HasTriggeredSelfEffect
                         || supportNano.PeriodicStatId != 214
                         || supportNano.TriggeredSelfStrain != 0
                         || supportNano.PrimaryModifierDelta != 0

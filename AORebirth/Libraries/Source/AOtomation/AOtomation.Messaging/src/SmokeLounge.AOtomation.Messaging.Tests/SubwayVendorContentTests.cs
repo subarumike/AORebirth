@@ -138,5 +138,38 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 + "exact-template-reuse",
                 supplier.StockEvidence);
         }
+
+        [TestMethod]
+        public void TailorMeasurementChoicesMapToEightCapturedQlOneItems()
+        {
+            int[] actual = Enumerable.Range(0, 8)
+                .Select(
+                    index =>
+                    {
+                        int itemId;
+                        Assert.IsTrue(CapturedSubwayTailorDialogueContent.TryGetMeasurementItemId(index, out itemId));
+                        return itemId;
+                    })
+                .ToArray();
+
+            CollectionAssert.AreEqual(
+                new[] { 256415, 256416, 256417, 256418, 256419, 256420, 256421, 256422 },
+                actual);
+
+            int invalidItemId;
+            Assert.IsFalse(CapturedSubwayTailorDialogueContent.TryGetMeasurementItemId(-1, out invalidItemId));
+            Assert.IsFalse(CapturedSubwayTailorDialogueContent.TryGetMeasurementItemId(8, out invalidItemId));
+        }
+
+        [TestMethod]
+        public void TailorFirstOpenAndReopenResolveToCapturedGreetingNodes()
+        {
+            Assert.AreEqual(
+                "tailor_root",
+                CapturedSubwayTailorDialogueContent.ResolveRootNodeId(false));
+            Assert.AreEqual(
+                "tailor_root_reopen",
+                CapturedSubwayTailorDialogueContent.ResolveRootNodeId(true));
+        }
     }
 }

@@ -1233,7 +1233,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 catalogText.Contains("if (monsterData == 17649)")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(5, 6, 6, 2")
-                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(6, 8, 8, 2")
+                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(6, 8, 8, 3")
+                && catalogText.Contains("20260719-020104")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(8, 10, 10, 4")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(9, 11, 11, 3")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(10, 12, 12, 2")
@@ -1245,9 +1246,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && capturedLootDefinitions.Contains("234877")
                 && capturedLootDefinitions.Contains("104683")
                 && capturedLootDefinitions.Contains("104684")
+                && capturedLootDefinitions.Contains("113398")
+                && capturedLootDefinitions.Contains("113399")
                 && capturedLootDefinitions.Contains("ProvenTransferredEnemyCorpseItem")
+                && capturedLootDefinitions.Contains("ProvenEnemyCorpseItem")
                 && capturedLootDefinitions.Contains("ProvisionalProjectPolicy"),
-                "Disobedient Bot must expose only the two fully linked transferred items and must keep the ambiguous 234876 candidate inactive.");
+                "Disobedient Bot must expose only the three fully linked observed items and must keep the ambiguous 234876 candidate inactive.");
             string globalLootText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
             string ordinaryLootAdapterText = File.ReadAllText(
@@ -1695,7 +1699,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
             Assert.IsTrue(
                 providerText.Contains("RuntimeQuarantinedSourceInstances.Contains(spawn.SourceInstance)"),
-                "The client-crashing 20260710 population batch must remain evidence-only until its visibility snapshot is isolated safely.");
+                "The supported-family diagnostic quarantine mechanism must remain available even when no rows use it.");
             Assert.IsFalse(
                 providerText.Contains("122002"),
                 "CapturedSubwayContentProvider must bind content to resource/playfield 127, not capture object Playfield2:122002.");
@@ -1790,6 +1794,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string[] patrolSourceIdentities =
                 {
+                    "0x79557C66",
+                    "0x7957E5C4",
+                    "0x7953AFCC",
+                    "0x795317F5",
+                    "0x79528FDA",
+                    "0x7953AFA1",
                     "0x7953AF18",
                     "0x7953AF57",
                     "0x79531752",
@@ -1805,15 +1815,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.AreEqual(
-                53,
+                145,
                 CountOccurrences(providerText, "new CapturedSubwayPatrolReplaySegment("),
-                "Existing periodic patrol cycles and the accepted Thief replay must remain loaded.");
+                "Existing periodic patrol cycles plus the accepted Bot, Vagabond, Pet, Flea, and Thief replays must remain loaded.");
             Assert.IsTrue(
-                providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.665506, 90.9275284f")
+                providerText.Contains("new CapturedSubwayPatrolReplaySegment(3.250491, 143.6185f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(2.149372, 147.409149f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.894761, 186.2874605f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(1.539519, 149.2577665f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(2.379826, 179.052765f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(4.491099, 183.153702f")
+                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(0.665506, 90.9275284f")
+                && providerText.Contains("0x79557C66")
+                && providerText.Contains("0x7957E5C4")
+                && providerText.Contains("0x7953AFCC")
+                && providerText.Contains("0x795317F5")
+                && providerText.Contains("0x79528FDA")
+                && providerText.Contains("0x7953AFA1")
                 && providerText.Contains("0x7953AF18")
                 && providerText.Contains("0x7953AF57")
                 && providerText.Contains("0x79531752")
                 && providerText.Contains("0x79531754")
+                && providerText.Contains("useSpawnAsPatrolStart: true")
                 && providerText.Contains("GetPatrolReplaySegments(int sourceInstance)"),
                 "Captured patrol replay must preserve complete cycle timing, movement modes, and captured route speeds.");
             Assert.IsTrue(
@@ -1921,8 +1944,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 ordinaryCatalogText.Contains("spawn.Disposition == OrdinaryEnemyRuntimeDisposition.Active")
                 && ordinaryCatalogText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(")
-                && ordinaryGeneratorText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(spawn.SourceInstance)"),
-                "The unified catalog must keep both quarantined population groups behind the same opt-in selector.");
+                && !ordinaryGeneratorText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(spawn.SourceInstance)"),
+                "The unified catalog must keep only explicitly quarantined supported rows behind the opt-in selector.");
 
             AssertTextBefore(
                 visibilityText,
@@ -2008,9 +2031,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                  == Convert.ToInt32(restoredOrdinarySourceInstances[i].Substring(2), 16)),
                     "Restored ordinary source identity must map to exactly one spawn: " + restoredOrdinarySourceInstances[i]);
             }
-            Assert.IsTrue(
+            Assert.IsFalse(
                 providerText.Contains("!string.Equals(spawn.EvidenceCapture, \"20260710-202132\", StringComparison.Ordinal)"),
-                "The client-crashing 20260710 ordinary batch must remain evidence-only until its visibility snapshot is isolated safely.");
+                "Accepted ordinary rows must not remain behind a capture-wide quarantine.");
 
             string[] capturedNames =
                 {
@@ -2373,7 +2396,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Population restoration must not add a RoomSpace workaround or coordinate mutation.");
             Assert.IsTrue(
                 ordinaryCatalogText.Contains("CapturedSubwayContentProvider.IsRuntimeQuarantined(source.SourceInstance)")
-                && ordinaryCatalogText.Contains("QuarantinedOrdinaryCapture")
+                && !ordinaryCatalogText.Contains("QuarantinedOrdinaryCapture")
                 && ordinaryRuntimeText.Contains("SpawnMobFromTemplate")
                 && ordinaryRuntimeText.Contains("Pool.Instance.GetFreeInstance<Character>")
                 && ordinaryRuntimeText.Contains("spawn.SourceIdentity")
@@ -2486,6 +2509,58 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string derangedShopperCombatReport = generatedCombatReportText.Substring(
                 derangedShopperCombatReportStart,
                 derangedShopperCombatReportEnd - derangedShopperCombatReportStart);
+            int discardedPetCombatReportStart = generatedCombatReportText.IndexOf(
+                "\"Discarded Pet\":",
+                StringComparison.Ordinal);
+            int discardedPetCombatReportEnd = generatedCombatReportText.IndexOf(
+                "\"Disobedient Bot\":",
+                discardedPetCombatReportStart,
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                discardedPetCombatReportStart >= 0
+                && discardedPetCombatReportEnd > discardedPetCombatReportStart);
+            string discardedPetCombatReport = generatedCombatReportText.Substring(
+                discardedPetCombatReportStart,
+                discardedPetCombatReportEnd - discardedPetCombatReportStart);
+            int disobedientBotCombatReportStart = generatedCombatReportText.IndexOf(
+                "\"Disobedient Bot\":",
+                StringComparison.Ordinal);
+            int disobedientBotCombatReportEnd = generatedCombatReportText.IndexOf(
+                "\"Empty Shell\":",
+                disobedientBotCombatReportStart,
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                disobedientBotCombatReportStart >= 0
+                && disobedientBotCombatReportEnd > disobedientBotCombatReportStart);
+            string disobedientBotCombatReport = generatedCombatReportText.Substring(
+                disobedientBotCombatReportStart,
+                disobedientBotCombatReportEnd - disobedientBotCombatReportStart);
+            int uncontrollableAngerCombatReportStart = generatedCombatReportText.IndexOf(
+                "\"Uncontrollable Anger\":",
+                StringComparison.Ordinal);
+            int uncontrollableAngerCombatReportEnd = generatedCombatReportText.IndexOf(
+                "\"Vergil Aeneid\":",
+                uncontrollableAngerCombatReportStart,
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                uncontrollableAngerCombatReportStart >= 0
+                && uncontrollableAngerCombatReportEnd > uncontrollableAngerCombatReportStart);
+            string uncontrollableAngerCombatReport = generatedCombatReportText.Substring(
+                uncontrollableAngerCombatReportStart,
+                uncontrollableAngerCombatReportEnd - uncontrollableAngerCombatReportStart);
+            int discardedPetContractStart = combatContractText.IndexOf(
+                "case 17720:",
+                StringComparison.Ordinal);
+            int discardedPetContractEnd = combatContractText.IndexOf(
+                "case 17649:",
+                discardedPetContractStart,
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                discardedPetContractStart >= 0
+                && discardedPetContractEnd > discardedPetContractStart);
+            string discardedPetContractCase = combatContractText.Substring(
+                discardedPetContractStart,
+                discardedPetContractEnd - discardedPetContractStart);
             string disobedientBotDefinition = ExtractMethodBlock(
                 providerText,
                 "private static CapturedSubwaySpawnDefinition DisobedientBot(");
@@ -2515,6 +2590,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new CapturedSubwayOrdinaryContentProvider());
             OrdinaryEnemyProfile[] ordinaryProfiles = ordinaryCatalog.GetProfiles();
             OrdinaryEnemySpawnDefinition[] ordinarySpawns = ordinaryCatalog.GetSpawns();
+            Assert.AreEqual(321, ordinarySpawns.Length);
+            Assert.AreEqual(
+                321,
+                ordinarySpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.IsFalse(
+                ordinarySpawns.Any(
+                    value => value.Disposition
+                             == OrdinaryEnemyRuntimeDisposition.Quarantined));
 
             string[] acceptedEnemyKeys =
                 {
@@ -2531,14 +2615,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Looter|203745|138",
                     "Mugger|203734|138",
                     "Deranged Shopper|203736|138",
+                    "Discarded Pet|17720|138",
                     "Bloodcreeper|30379|63",
                     "Stim Fiend|203739|138",
                     "Neural Burnout|203730|148",
-                    "Incomplete Rebuild|203728|148"
+                    "Incomplete Rebuild|203728|148",
+                    "Fragmented Soul|203729|148",
+                    "Redundant Scan|204178|148",
+                    "Uncontrollable Anger|96195|138"
                 };
 
             Assert.AreEqual(
-                17,
+                21,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
 
@@ -2758,8 +2846,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .ToArray();
             Assert.AreEqual(10, CountOccurrences(ordinaryProviderText, "\"looter\""));
             Assert.AreEqual(8, looterSpawns.Length);
-            Assert.AreEqual(6, looterSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
-            Assert.AreEqual(2, looterSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            Assert.AreEqual(8, looterSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(0, looterSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
             Assert.IsTrue(looterSpawns.All(value => value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Inherit));
             Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, looter.Combat.Mode);
             Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, looter.Combat.DamageSource);
@@ -2831,11 +2919,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "7953AD6B:10:Active",
                     "795450D4:5:Active",
                     "795451FE:10:Active",
-                    "79557F14:10:Quarantined",
-                    "7957E5C6:9:Quarantined",
-                    "7957E5C7:8:Quarantined",
-                    "7957E5C8:8:Quarantined",
-                    "7957E5CA:10:Quarantined"
+                    "79557F14:10:Active",
+                    "7957E5C6:9:Active",
+                    "7957E5C7:8:Active",
+                    "7957E5C8:8:Active",
+                    "7957E5CA:10:Active"
                 },
                 muggerSpawns
                     .OrderBy(value => value.SourceIdentity)
@@ -2885,28 +2973,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 mugger.Combat.ResolveContract(0x7953FFFF, muggerSpawns[0].Level).AttackModel);
             Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, mugger.Loot.PoolMode);
             Assert.IsFalse(mugger.Loot.ItemPoolComplete);
-            Assert.AreEqual(17, mugger.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(18, mugger.Loot.ObservedCompleteInventories);
             Assert.AreEqual(3, mugger.Loot.ObservedEmptyInventories);
             CollectionAssert.AreEquivalent(
                 new[]
                 {
-                    "25822:25831:5:1:17", "85711:22014:8:1:17",
-                    "123704:123705:9:1:17", "123723:123724:6:1:17",
-                    "123976:123977:9:1:17", "124348:124349:7:1:17",
-                    "124545:124546:10:1:17", "128636:128637:8:1:17",
-                    "128839:128840:9:1:17", "130060:130061:5:1:17",
-                    "130060:130061:9:1:17", "131605:131606:7:1:17",
-                    "136638:136639:9:1:17", "136638:136639:12:1:17",
-                    "136640:136641:7:1:17", "136640:136641:8:1:17",
-                    "136640:136641:9:1:17", "136646:136647:9:1:17",
-                    "160224:160225:10:1:17", "234875:234875:1:2:17",
-                    "234876:234876:1:1:17"
+                    "25822:25831:5:1:18", "85711:22014:8:1:18",
+                    "123495:123496:5:1:18", "123704:123705:9:1:18",
+                    "123723:123724:6:1:18", "123976:123977:9:1:18",
+                    "124348:124349:7:1:18", "124545:124546:10:1:18",
+                    "128636:128637:8:1:18", "128839:128840:9:1:18",
+                    "130060:130061:5:1:18", "130060:130061:9:1:18",
+                    "131605:131606:7:1:18", "136638:136639:9:1:18",
+                    "136638:136639:12:1:18", "136640:136641:7:1:18",
+                    "136640:136641:8:1:18", "136640:136641:9:1:18",
+                    "136646:136647:9:1:18", "160224:160225:10:1:18",
+                    "234875:234875:1:2:18", "234876:234876:1:1:18"
                 },
                 mugger.Loot.Entries
                     .Select(value => string.Format("{0}:{1}:{2}:{3}:{4}", value.LowId, value.HighId, value.QualityLevel, value.ObservedCount, value.ObservedCorpses))
                     .ToArray());
             CollectionAssert.AreEqual(
-                new[] { "5:44:44:6", "8:71:71:6", "9:80:80:6", "10:88:88:6" },
+                new[] { "5:44:44:7", "8:71:71:6", "9:80:80:6", "10:88:88:6" },
                 mugger.Loot.LevelCreditRules
                     .OrderBy(value => value.EnemyLevel)
                     .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
@@ -2917,7 +3005,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(3.0, mugger.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
                 CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 53
-                && CountOccurrences(ordinaryProviderText, ", 203734, 17534,") == 24
+                && CountOccurrences(ordinaryProviderText, ", 203734, 17534,") == 25
                 && combatContractText.Contains("Mugger combat requires an exact captured source identity; aggregate weapon fallback is forbidden")
                 && muggerCombatContract.Contains("HasCompleteMuggerSourceWeaponEvidence")
                 && muggerCombatContract.Contains("if (matches != 1 || matched == null)")
@@ -2939,7 +3027,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
-                "Accepted Subway Mugger must keep all nine exact source weapons, spawn levels, and dispositions; fail-closed aggregate/missing/conflicting/unknown selection; item-owned damage/recharge with captured AttackInfo shape; report-only criticals; strict 17-open incomplete-pool loot; exact CATMesh/level credits; shared chase; private four-minute respawn; and ordinary corpse lifetimes together.");
+                "Accepted Subway Mugger must keep all nine exact source weapons, spawn levels, and dispositions; fail-closed aggregate/missing/conflicting/unknown selection; item-owned damage/recharge with captured AttackInfo shape; report-only criticals; strict 18-open incomplete-pool loot; exact CATMesh/level credits; shared chase; private four-minute respawn; and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile derangedShopper = ordinaryProfiles.Single(
                 value => value.DisplayName == "Deranged Shopper");
@@ -2966,9 +3054,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(8, derangedShopperSpawn.Level);
             Assert.AreEqual(256, derangedShopperSpawn.LevelDefinition.Resolve(8).Health);
             Assert.AreEqual(
-                OrdinaryEnemyRuntimeDisposition.Quarantined,
+                OrdinaryEnemyRuntimeDisposition.Active,
                 derangedShopperSpawn.Disposition,
-                "The only captured Deranged Shopper row is still quarantined and must not imply private activation.");
+                "The capture-complete Deranged Shopper row must be active for private validation.");
             Assert.AreEqual(
                 WorldRespawnPolicyAssignmentMode.Inherit,
                 derangedShopperSpawn.RespawnPolicy.Mode);
@@ -3066,7 +3154,116 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
-                "Accepted Subway Deranged Shopper must keep its one quarantined source, exact QL8 source-owned weapon and captured AttackInfo shape, fail-closed aggregate/unknown/missing/conflicting selection, item-owned damage/recharge, report-only critical, one captured miss shape, strict two-open incomplete-pool loot, exact CATMesh/credits, shared chase, inherited private four-minute respawn, and ordinary corpse lifetimes together without claiming private activation.");
+                "Accepted Subway Deranged Shopper must keep its one active source, exact QL8 source-owned weapon and captured AttackInfo shape, fail-closed aggregate/unknown/missing/conflicting selection, item-owned damage/recharge, report-only critical, one captured miss shape, strict two-open incomplete-pool loot, exact CATMesh/credits, shared chase, inherited private four-minute respawn, and ordinary corpse lifetimes together.");
+
+            OrdinaryEnemyProfile discardedPet = ordinaryProfiles.Single(
+                value => value.DisplayName == "Discarded Pet");
+            OrdinaryEnemySpawnDefinition[] discardedPetSpawns = ordinarySpawns
+                .Where(value => value.ProfileKey == discardedPet.ProfileKey)
+                .ToArray();
+            Assert.AreEqual(29, CountOccurrences(providerText, "CapturedSurveySpawn(DiscardedPet("));
+            Assert.AreEqual(29, discardedPetSpawns.Length);
+            Assert.AreEqual(
+                29,
+                discardedPetSpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(
+                0,
+                discardedPetSpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            Assert.IsTrue(
+                discardedPetSpawns.All(
+                    value => value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Inherit));
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, discardedPet.Aggression.Mode);
+            Assert.IsFalse(discardedPet.Aggression.AutomaticAggroRadius.HasValue);
+            Assert.IsTrue(discardedPet.Aggression.Chase);
+            Assert.IsFalse(discardedPet.Aggression.ReturnToSpawn);
+            Assert.AreEqual(OrdinaryEnemyCombatMode.UnarmedMelee, discardedPet.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.CapturedFixed, discardedPet.Combat.DamageSource);
+            Assert.IsFalse(discardedPet.Combat.VisibleWeapon);
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.FixedAttackInfo,
+                discardedPet.Combat.Contract.AttackModel);
+            Assert.IsTrue(discardedPet.Combat.Contract.IsCombatReady);
+            Assert.AreEqual(9, discardedPet.Combat.Contract.MinDamage);
+            Assert.AreEqual(18, discardedPet.Combat.Contract.MaxDamage);
+            Assert.AreEqual(5.089763, discardedPet.Combat.Contract.RechargeSeconds);
+            Assert.AreEqual(-1, discardedPet.Combat.Contract.AttackInfoAmmoCount);
+            Assert.AreEqual(0, discardedPet.Combat.Contract.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, discardedPet.Combat.Contract.AttackInfoUnknown);
+            Assert.AreEqual(0x53495731, discardedPet.Combat.Contract.AttackInfoWeaponInstance);
+            Assert.IsFalse(discardedPet.Combat.Contract.HasEmptySpecialAttackWeaponContext);
+            Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, discardedPet.Loot.PoolMode);
+            Assert.IsFalse(discardedPet.Loot.ItemPoolComplete);
+            Assert.AreEqual(16, discardedPet.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(3, discardedPet.Loot.ObservedEmptyInventories);
+            Assert.AreEqual(
+                13,
+                discardedPet.Loot.ObservedCompleteInventories
+                - discardedPet.Loot.ObservedEmptyInventories);
+            Assert.AreEqual(13, discardedPet.Loot.Entries.Length);
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "101681:101682:7:1:16", "102283:102284:9:1:16",
+                    "103973:103974:10:1:16", "106005:106006:11:1:16",
+                    "107283:107284:10:1:16", "109520:109521:7:1:16",
+                    "111623:111624:8:1:16", "112160:112161:6:1:16",
+                    "112798:112799:6:1:16", "234874:234874:1:3:16",
+                    "234876:234876:1:3:16", "234877:234877:1:1:16",
+                    "290619:202727:9:1:16"
+                },
+                discardedPet.Loot.Entries
+                    .OrderBy(value => value.LowId)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}:{3}:{4}",
+                            value.LowId,
+                            value.HighId,
+                            value.QualityLevel,
+                            value.ObservedCount,
+                            value.ObservedCorpses))
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "5:18:18:1", "6:21:21:3", "7:25:25:8",
+                    "8:28:28:1", "9:32:32:4", "10:35:35:8"
+                },
+                discardedPet.Loot.LevelCreditRules
+                    .OrderBy(value => value.EnemyLevel)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}:{3}",
+                            value.EnemyLevel,
+                            value.MinimumCredits,
+                            value.MaximumCredits,
+                            value.ObservedCorpses))
+                    .ToArray());
+            Assert.AreEqual(15929, discardedPet.Corpse.CapturedCatMesh);
+            Assert.AreEqual(3.0, discardedPet.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(240.0, discardedPet.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(3.0, discardedPet.Corpse.LootedCleanupSeconds);
+            Assert.IsTrue(
+                combatContractText.Contains("case 17720:")
+                && combatContractText.Contains("AttackInfoAmmoCount = attackInfoAmmoCount")
+                && discardedPetContractCase.Contains("CapturedSubwayDiscardedPetWeaponTag")
+                && discardedPetContractCase.Contains("-1")
+                && discardedPet.Combat.Contract.Evidence.Contains("37 normal local-player")
+                && discardedPet.Combat.Contract.Evidence.Contains("criticals remain report-only")
+                && discardedPet.Combat.Contract.Evidence.Contains("conventional median 5.089763")
+                && discardedPetCombatReport.Contains("\"normalAttackInfoRows\": 37")
+                && discardedPetCombatReport.Contains("\"normalMinDamage\": 9")
+                && discardedPetCombatReport.Contains("\"normalMaxDamage\": 18")
+                && discardedPetCombatReport.Contains("\"criticalAttackInfoRows\": 4")
+                && discardedPetCombatReport.Contains("\"criticalMinDamage\": 30")
+                && discardedPetCombatReport.Contains("\"criticalMaxDamage\": 33")
+                && discardedPetCombatReport.Contains("\"medianRechargeSeconds\": 5.079568")
+                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
+                && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted Subway Discarded Pet must keep all 29 exact active spawns, captured SIW1 9..18 normal roll and cadence, report-only critical observations, retaliatory chase without proactive aggro or return-to-spawn, strict 16-open incomplete-pool loot, exact CATMesh/level credits, inherited private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile bloodcreeper = ordinaryProfiles.Single(value => value.DisplayName == "Bloodcreeper");
             OrdinaryEnemySpawnDefinition[] bloodcreeperSpawns = ordinarySpawns
@@ -3124,8 +3321,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .ToArray();
             Assert.AreEqual(17, CountOccurrences(ordinaryProviderText, "\"stim_fiend\""));
             Assert.AreEqual(15, stimFiendSpawns.Length);
-            Assert.AreEqual(9, stimFiendSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
-            Assert.AreEqual(6, stimFiendSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            Assert.AreEqual(15, stimFiendSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(0, stimFiendSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
             Assert.IsTrue(stimFiendSpawns.All(value => value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Inherit));
             Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, stimFiend.Aggression.Mode);
             Assert.IsTrue(stimFiend.Aggression.Chase);
@@ -3234,6 +3431,132 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
                 "Accepted Subway Neural Burnout must keep seven exact active spawns, captured fixed normal combat with report-only critical, strict incomplete-pool loot, only observed level-credit rows with L22 unresolved, CATMesh, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
+            OrdinaryEnemyProfile uncontrollableAnger = ordinaryProfiles.Single(
+                value => value.DisplayName == "Uncontrollable Anger");
+            OrdinaryEnemySpawnDefinition[] uncontrollableAngerSpawns = ordinarySpawns
+                .Where(value => value.ProfileKey == uncontrollableAnger.ProfileKey)
+                .ToArray();
+            Assert.AreEqual(6, uncontrollableAngerSpawns.Length);
+            Assert.AreEqual(
+                6,
+                uncontrollableAngerSpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(
+                0,
+                uncontrollableAngerSpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            CollectionAssert.AreEqual(
+                new[] { 13, 13, 19, 20, 23, 23 },
+                uncontrollableAngerSpawns
+                    .Select(value => value.LevelDefinition.MinimumLevel)
+                    .OrderBy(value => value)
+                    .ToArray());
+            Assert.AreEqual(
+                2,
+                uncontrollableAngerSpawns.Count(
+                    value => value.MovementMode == OrdinaryEnemyMovementMode.Patrol));
+            Assert.AreEqual(
+                4,
+                uncontrollableAngerSpawns.Count(
+                    value => value.MovementMode == OrdinaryEnemyMovementMode.Static));
+            Assert.IsTrue(
+                uncontrollableAngerSpawns.All(
+                    value => value.RespawnPolicy.Mode
+                             == WorldRespawnPolicyAssignmentMode.Inherit));
+            Assert.AreEqual(
+                OrdinaryEnemyAggressionMode.Retaliate,
+                uncontrollableAnger.Aggression.Mode);
+            Assert.IsTrue(uncontrollableAnger.Aggression.Chase);
+            Assert.IsFalse(uncontrollableAnger.Aggression.ReturnToSpawn);
+            Assert.AreEqual(
+                OrdinaryEnemyCombatMode.UnarmedMelee,
+                uncontrollableAnger.Combat.Mode);
+            Assert.AreEqual(
+                OrdinaryEnemyDamageSource.CapturedFixed,
+                uncontrollableAnger.Combat.DamageSource);
+            Assert.IsFalse(uncontrollableAnger.Combat.VisibleWeapon);
+            Assert.IsTrue(uncontrollableAnger.Combat.Contract.IsCombatReady);
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.FixedAttackInfo,
+                uncontrollableAnger.Combat.Contract.AttackModel);
+            Assert.AreEqual(11, uncontrollableAnger.Combat.Contract.MinDamage);
+            Assert.AreEqual(18, uncontrollableAnger.Combat.Contract.MaxDamage);
+            Assert.AreEqual(5.167153, uncontrollableAnger.Combat.Contract.RechargeSeconds);
+            Assert.AreEqual(0, uncontrollableAnger.Combat.Contract.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, uncontrollableAnger.Combat.Contract.AttackInfoUnknown);
+            Assert.AreEqual(0x53495731, uncontrollableAnger.Combat.Contract.AttackInfoWeaponInstance);
+            Assert.AreEqual(
+                OrdinaryEnemyLootPoolMode.IndependentEntries,
+                uncontrollableAnger.Loot.PoolMode);
+            Assert.IsFalse(uncontrollableAnger.Loot.ItemPoolComplete);
+            Assert.AreEqual(2, uncontrollableAnger.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(0, uncontrollableAnger.Loot.ObservedEmptyInventories);
+            CollectionAssert.AreEquivalent(
+                new[]
+                {
+                    "101809:101810:24:1:2",
+                    "109366:109367:9:1:2",
+                    "290619:202727:19:1:2"
+                },
+                uncontrollableAnger.Loot.Entries
+                    .Select(value => string.Format(
+                        "{0}:{1}:{2}:{3}:{4}",
+                        value.LowId,
+                        value.HighId,
+                        value.QualityLevel,
+                        value.ObservedCount,
+                        value.ObservedCorpses))
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "11:14:14:1",
+                    "12:15:15:1",
+                    "13:16:16:2",
+                    "20:25:25:1",
+                    "21:26:26:1"
+                },
+                uncontrollableAnger.Loot.LevelCreditRules
+                    .OrderBy(value => value.EnemyLevel)
+                    .Select(value => string.Format(
+                        "{0}:{1}:{2}:{3}",
+                        value.EnemyLevel,
+                        value.MinimumCredits,
+                        value.MaximumCredits,
+                        value.ObservedCorpses))
+                    .ToArray());
+            Assert.IsFalse(
+                uncontrollableAnger.Loot.LevelCreditRules.Any(
+                    value => value.EnemyLevel == 19 || value.EnemyLevel == 23));
+            Assert.AreEqual(96177, uncontrollableAnger.Corpse.CapturedCatMesh);
+            Assert.AreEqual(3.0, uncontrollableAnger.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(240.0, uncontrollableAnger.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(3.0, uncontrollableAnger.Corpse.LootedCleanupSeconds);
+            Assert.IsTrue(
+                CountOccurrences(ordinaryProviderText, ", 96195, 96177,") == 6
+                && uncontrollableAngerCombatReport.Contains("\"normalAttackInfoRows\": 2")
+                && uncontrollableAngerCombatReport.Contains("\"normalMinDamage\": 11")
+                && uncontrollableAngerCombatReport.Contains("\"normalMaxDamage\": 18")
+                && uncontrollableAngerCombatReport.Contains("\"criticalAttackInfoRows\": 0")
+                && uncontrollableAngerCombatReport.Contains("\"attackInfoRows\": 4")
+                && uncontrollableAngerCombatReport.Contains("\"minDamage\": 25")
+                && uncontrollableAngerCombatReport.Contains("\"maxDamage\": 42")
+                && uncontrollableAngerCombatReport.Contains("\"attackInfoRows\": 1")
+                && uncontrollableAngerCombatReport.Contains("\"minDamage\": 19")
+                && uncontrollableAngerCombatReport.Contains("\"maxDamage\": 19")
+                && uncontrollableAngerCombatReport.Contains("\"reviewedTargetCadence\"")
+                && uncontrollableAngerCombatReport.Contains("5.1165513")
+                && uncontrollableAngerCombatReport.Contains("5.1671525")
+                && uncontrollableAngerCombatReport.Contains("10.1003489")
+                && uncontrollableAngerCombatReport.Contains("\"runtimeRechargeSeconds\": 5.167153")
+                && ordinaryCombatContract.Contains("CapturedEnemyCombatContract.FixedAttack(")
+                && movementRuntimeText.Contains("FollowTargetStart")
+                && movementRuntimeText.Contains("FollowTargetContinue")
+                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted Subway Uncontrollable Anger must keep six exact active spawns, two captured patrols, local-player damage separated from Killer-pet and other-player evidence, the reviewed full cadence window, strict loot and exact observed credits, CATMesh, shared chase, inherited private respawn, and ordinary corpse lifetimes together.");
+
             OrdinaryEnemyProfile incompleteRebuild = ordinaryProfiles.Single(
                 value => value.DisplayName == "Incomplete Rebuild");
             OrdinaryEnemySpawnDefinition[] incompleteRebuildSpawns = ordinarySpawns
@@ -3297,6 +3620,183 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(240.0, incompleteRebuild.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(3.0, incompleteRebuild.Corpse.LootedCleanupSeconds);
 
+            OrdinaryEnemyProfile fragmentedSoul = ordinaryProfiles.Single(
+                value => value.DisplayName == "Fragmented Soul");
+            OrdinaryEnemySpawnDefinition[] fragmentedSoulSpawns = ordinarySpawns
+                .Where(value => value.ProfileKey == fragmentedSoul.ProfileKey)
+                .OrderBy(value => value.SourceIdentity)
+                .ToArray();
+            Assert.AreEqual(10, fragmentedSoulSpawns.Length);
+            Assert.AreEqual(
+                10,
+                fragmentedSoulSpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(
+                19,
+                fragmentedSoulSpawns.Sum(
+                    value => value.LevelDefinition.GetExplicitVariants().Length));
+            Assert.IsTrue(
+                fragmentedSoulSpawns.All(
+                    value => value.MovementMode == OrdinaryEnemyMovementMode.Static));
+            CollectionAssert.AreEqual(
+                new[] { 0x7954517A },
+                fragmentedSoulSpawns
+                    .Where(value => value.Waypoints.Length == 1)
+                    .Select(value => value.SourceIdentity)
+                    .ToArray());
+            Assert.IsTrue(
+                fragmentedSoulSpawns.All(
+                    spawn => spawn.LevelDefinition.Mode
+                             == OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants
+                             && spawn.RespawnPolicy.Mode
+                                == WorldRespawnPolicyAssignmentMode.Inherit));
+            foreach (OrdinaryEnemySpawnDefinition spawn in fragmentedSoulSpawns)
+            {
+                foreach (OrdinaryEnemySpawnVariant variant in
+                    spawn.LevelDefinition.GetExplicitVariants())
+                {
+                    Assert.IsNotNull(variant.WeaponLoadout);
+                    CapturedEnemyCombatContract contract =
+                        fragmentedSoul.Combat.ResolveContract(
+                            spawn.SourceIdentity,
+                            variant);
+                    Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
+                    Assert.IsTrue(contract.IsCombatReady);
+                    Assert.AreEqual(variant.WeaponLoadout.LowId, contract.WeaponLowId);
+                    Assert.AreEqual(variant.WeaponLoadout.HighId, contract.WeaponHighId);
+                    Assert.AreEqual(variant.WeaponLoadout.Quality, contract.WeaponQuality);
+                    Assert.AreEqual(6, contract.WeaponInventorySlot);
+                    Assert.AreEqual(0, contract.MinDamage);
+                    Assert.AreEqual(0, contract.MaxDamage);
+                    Assert.AreEqual(0.0, contract.RechargeSeconds);
+                    Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
+                    Assert.AreEqual(24, contract.AttackInfoAmmoCount);
+                    Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
+                    Assert.AreEqual(0, contract.AttackInfoUnknown);
+                    Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+                }
+            }
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, fragmentedSoul.Aggression.Mode);
+            Assert.IsFalse(fragmentedSoul.Aggression.AutomaticAggroRadius.HasValue);
+            Assert.IsTrue(fragmentedSoul.Aggression.Chase);
+            Assert.IsFalse(fragmentedSoul.Aggression.ReturnToSpawn);
+            Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, fragmentedSoul.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, fragmentedSoul.Combat.DamageSource);
+            Assert.IsTrue(fragmentedSoul.Combat.VisibleWeapon);
+            Assert.IsNotNull(fragmentedSoul.SupportNano);
+            Assert.AreEqual(95447, fragmentedSoul.SupportNano.PrimaryNanoId);
+            Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, fragmentedSoul.Loot.PoolMode);
+            Assert.IsFalse(fragmentedSoul.Loot.ItemPoolComplete);
+            Assert.AreEqual(4, fragmentedSoul.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(0, fragmentedSoul.Loot.ObservedEmptyInventories);
+            CollectionAssert.AreEqual(
+                new[]
+                    {
+                        "26471:26471:14:3:4", "85691:22004:18:1:4",
+                        "85732:21963:17:1:4", "124304:124305:17:1:4",
+                        "234877:234877:1:2:4", "301712:301712:1:1:4"
+                    },
+                fragmentedSoul.Loot.Entries
+                    .OrderBy(value => value.LowId)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}:{3}:{4}",
+                            value.LowId,
+                            value.HighId,
+                            value.QualityLevel,
+                            value.ObservedCount,
+                            value.ObservedCorpses))
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[]
+                    {
+                        "17:105:Observed", "18:111:Observed", "19:118:Policy",
+                        "20:124:Policy", "21:131:Observed"
+                    },
+                fragmentedSoul.Loot.LevelCreditRules
+                    .OrderBy(value => value.EnemyLevel)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}",
+                            value.EnemyLevel,
+                            value.MinimumCredits,
+                            value.EvidenceState))
+                    .ToArray());
+            Assert.AreEqual(5921, fragmentedSoul.Corpse.CapturedCatMesh);
+            Assert.AreEqual(3.0, fragmentedSoul.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(240.0, fragmentedSoul.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(3.0, fragmentedSoul.Corpse.LootedCleanupSeconds);
+
+            OrdinaryEnemyProfile redundantScan = ordinaryProfiles.Single(
+                value => value.DisplayName == "Redundant Scan");
+            OrdinaryEnemySpawnDefinition[] redundantScanSpawns = ordinarySpawns
+                .Where(value => value.ProfileKey == redundantScan.ProfileKey)
+                .ToArray();
+            Assert.AreEqual(4, redundantScanSpawns.Length);
+            Assert.AreEqual(
+                4,
+                redundantScanSpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(
+                10,
+                redundantScanSpawns.Sum(
+                    value => value.LevelDefinition.GetExplicitVariants().Length));
+            Assert.AreEqual(
+                1,
+                redundantScanSpawns.Count(
+                    value => value.MovementMode == OrdinaryEnemyMovementMode.Patrol));
+            Assert.IsTrue(
+                redundantScanSpawns.All(
+                    spawn => spawn.LevelDefinition.Mode
+                             == OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants
+                             && spawn.RespawnPolicy.Mode
+                                == WorldRespawnPolicyAssignmentMode.Inherit
+                             && spawn.LevelDefinition.GetExplicitVariants().All(
+                                 variant => redundantScan.Combat.ResolveContract(
+                                                spawn.SourceIdentity,
+                                                variant)
+                                            .IsCombatReady)),
+                "Accepted Subway Redundant Scan must preserve four exact sources, ten atomic capture-reviewed generations, exact per-generation weapons, captured movement, and private inherited respawn together.");
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Auto, redundantScan.Aggression.Mode);
+            Assert.AreEqual(7.0, redundantScan.Aggression.AutomaticAggroRadius.Value);
+            Assert.IsTrue(redundantScan.Aggression.Chase);
+            Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, redundantScan.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, redundantScan.Combat.DamageSource);
+            Assert.IsTrue(redundantScan.Combat.VisibleWeapon);
+            Assert.IsNotNull(redundantScan.SupportNano);
+            Assert.AreEqual(121336, redundantScan.SupportNano.PrimaryNanoId);
+            Assert.AreEqual(121248, redundantScan.SupportNano.TriggeredSelfNanoId);
+            Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, redundantScan.Loot.PoolMode);
+            Assert.IsFalse(redundantScan.Loot.ItemPoolComplete);
+            Assert.AreEqual(2, redundantScan.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(1, redundantScan.Loot.ObservedEmptyInventories);
+            CollectionAssert.AreEqual(
+                new[] { "27263:27263:10:1:2" },
+                redundantScan.Loot.Entries
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}:{3}:{4}",
+                            value.LowId,
+                            value.HighId,
+                            value.QualityLevel,
+                            value.ObservedCount,
+                            value.ObservedCorpses))
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[] { "19:118", "20:124", "21:131", "22:137" },
+                redundantScan.Loot.LevelCreditRules
+                    .OrderBy(value => value.EnemyLevel)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}",
+                            value.EnemyLevel,
+                            value.MinimumCredits))
+                    .ToArray());
+            Assert.AreEqual(23370, redundantScan.Corpse.CapturedCatMesh);
+            Assert.AreEqual(3.0, redundantScan.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(240.0, redundantScan.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(3.0, redundantScan.Corpse.LootedCleanupSeconds);
+
             Assert.AreEqual(
                 12,
                 CountOccurrences(providerText, "CapturedSurveySpawn(DisobedientBot("),
@@ -3310,12 +3810,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 combatContractText.Contains("case 17649:")
                 && providerText.Contains("CapturedSubwayCombatCatalog.For(name, monsterData, level)")
-                && combatContractText.Contains("17 Disobedient Bot SIW1 normal local-player hits span 8-15 damage")
+                && combatContractText.Contains("15 Disobedient Bot SIW1 normal local-player hits span 6-15 damage")
+                && combatContractText.Contains("three other-player hits and two player-owned Killer-pet hits remain separate")
                 && combatContractText.Contains("SpecialAttackWeapon contexts are capture-backed for levels 5, 6, 8, 9, and 10")
                 && combatContractText.Contains("including the level-5 terminal value 22")
                 && combatContractText.Contains("level 7 explicitly using the bounded 35/45 midpoint policy")
                 && combatContractText.Contains("Disobedient Bot SIW1 attack context is unresolved for level")
-                && attackRulesText.Contains("CapturedSubwayDisobedientBotMinimumDamage = 8")
+                && attackRulesText.Contains("CapturedSubwayDisobedientBotMinimumDamage = 6")
                 && attackRulesText.Contains("CapturedSubwayDisobedientBotMaximumDamage = 15")
                 && attackRulesText.Contains("CapturedSubwayDisobedientBotRechargeSeconds = 5.973723")
                 && attackRulesText.Contains("CapturedSubwayDisobedientBotWeaponTag = 0x53495731")
@@ -3343,19 +3844,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 providerText.Contains("234877")
                 && providerText.Contains("104683")
+                && providerText.Contains("113398")
                 && catalogText.Contains("if (monsterData == 17649)")
                 && catalogText.Contains("OrdinaryEnemyLootPoolMode.WeightedOne")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(5, 6, 6, 2")
+                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(6, 8, 8, 3")
+                && catalogText.Contains("20260719-020104")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(10, 12, 12, 2")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
                 "Accepted Subway Disobedient Bot must preserve strict weighted loot evidence, exact credits, CATMesh behavior, and ordinary corpse lifetimes.");
             Assert.IsTrue(
-                generatedCombatReportText.Contains("\"Disobedient Bot\":")
-                && generatedCombatReportText.Contains("\"20260708-143600\"")
-                && generatedCombatReportText.Contains("\"normalMinDamage\": 8")
-                && generatedCombatReportText.Contains("\"normalMaxDamage\": 15"),
-                "Accepted Subway Disobedient Bot generated combat evidence must retain the official-live 8..15 local-player envelope.");
+                disobedientBotCombatReport.Contains("\"20260708-143600\"")
+                && disobedientBotCombatReport.Contains("\"20260712-153918\"")
+                && disobedientBotCombatReport.Contains("\"20260713-014714\"")
+                && disobedientBotCombatReport.Contains("\"20260713-033511\"")
+                && disobedientBotCombatReport.Contains("\"20260719-020104\"")
+                && disobedientBotCombatReport.Contains("\"normalAttackInfoRows\": 15")
+                && disobedientBotCombatReport.Contains("\"normalMinDamage\": 6")
+                && disobedientBotCombatReport.Contains("\"normalMaxDamage\": 15")
+                && disobedientBotCombatReport.Contains("\"missedAttackInfoRows\": 10")
+                && disobedientBotCombatReport.Contains("\"medianIntervalSeconds\": 5.973723")
+                && disobedientBotCombatReport.Contains("\"attackInfoRows\": 15")
+                && disobedientBotCombatReport.Contains("\"attackInfoRows\": 3")
+                && disobedientBotCombatReport.Contains("\"attackInfoRows\": 2"),
+                "Accepted Subway Disobedient Bot generated combat evidence must retain the local-player, other-player, and player-owned-pet boundaries plus focused attempt cadence.");
 
             Assert.IsTrue(
                 providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 146, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0, healthDamage: 31))")
@@ -6125,6 +6638,40 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void ExistingCharacterSnapshotsInitializeOnceFromClientConnectedWithoutInboundCharInPlay()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string coordinatorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketSequencingCoordinator.cs"));
+            string clientConnectedText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
+            string charInPlayText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CharInPlayMessageHandler.cs"));
+            string visibilitySequence = ExtractMethodBlock(
+                coordinatorText,
+                "public void RunVisibilityInitializationSequence");
+
+            Assert.AreEqual(
+                1,
+                CountOccurrences(visibilitySequence, "Execute(sendExistingCharacterSnapshots"),
+                "The shared visibility sequence must execute the existing-character snapshot exactly once.");
+            AssertTextBefore(
+                visibilitySequence,
+                "Execute(announceJoiningCharacter",
+                "Execute(sendExistingCharacterSnapshots");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(
+                    clientConnectedText,
+                    "currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client })"),
+                "ClientConnected must initiate one existing-character snapshot for the joining client.");
+            Assert.IsFalse(
+                charInPlayText.Contains("SendSCFUsToClient")
+                || charInPlayText.Contains("IMSendPlayerSCFUs"),
+                "Inbound CharInPlay must not be required for or duplicate the initial existing-character snapshot.");
+        }
+
+        [TestMethod]
         public void PacketSequencingCoordinatorOwnsSessionInitializationOrderWithoutOwningPackets()
         {
             string repositoryRoot = FindRepositoryRoot();
@@ -6188,7 +6735,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "public void RunVisibilityInitializationSequence");
             AssertTextBefore(visibilitySequence, "Execute(recordJoinerReady", "Execute(enterCharInPlay");
             AssertTextBefore(visibilitySequence, "Execute(enterCharInPlay", "Execute(announceJoiningCharacter");
-            AssertTextBefore(visibilitySequence, "Execute(announceJoiningCharacter", "Execute(sendExistingCharacterSnapshots");
+            AssertTextBefore(
+                visibilitySequence,
+                "Execute(announceJoiningCharacter",
+                "Execute(sendExistingCharacterSnapshots");
 
             string simpleCharFullUpdateCharInPlaySequence = ExtractMethodBlock(
                 coordinatorText,
@@ -6209,7 +6759,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(
                 clientConnectedText,
                 "client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,",
-                "() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)");
+                "FullCharacterMessageHandler.Default.Send(client.Controller.Character);");
             Assert.AreEqual(
                 2,
                 CountOccurrences(playfieldText, "this.runtimeSystems.SendExistingCharacterVisibilityToClient(")
@@ -6273,7 +6823,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.IsTrue(
-                clientConnectedText.Contains("() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)")
+                clientConnectedText.Contains("FullCharacterMessageHandler.Default.Send(client.Controller.Character);")
                 && clientConnectedText.Contains("() => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character)")
                 && clientConnectedText.Contains("() => currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client })"),
                 "Session packet send expressions must remain in ClientConnected for these sequencing slices.");
@@ -7324,6 +7874,112 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && actionHandlerText.Contains("public void NotifyActiveNanoDurationToPlayfield(")
                 && actionHandlerText.Contains("true);"),
                 "NPC Buff and SetNanoDuration packets must broadcast to the playfield instead of a nonexistent NPC client.");
+        }
+
+        [TestMethod]
+        public void FragmentedSoulNano95447UsesDynamicSkillAndOwnedOrdinaryAllyLifecycle()
+        {
+            OrdinaryEnemySupportNanoProfile nano =
+                OrdinaryEnemySupportNanoProfile.CapturedFragmentedSoul95447();
+
+            Assert.AreEqual(95447, nano.PrimaryNanoId);
+            Assert.AreEqual(0, nano.TriggeredSelfNanoId);
+            Assert.AreEqual(10.0, nano.InitialDelaySeconds);
+            Assert.AreEqual(2.5, nano.CastSeconds);
+            Assert.AreEqual(10.0, nano.RepeatSeconds);
+            Assert.AreEqual(1440000, nano.DurationParameter);
+            Assert.AreEqual(14400.0, nano.EffectLifetimeSeconds);
+            Assert.AreEqual(20.0, nano.TargetRange);
+            Assert.IsTrue(nano.FallbackToSelf);
+            Assert.AreEqual(181, nano.PrimaryStrain);
+            Assert.AreEqual(0, nano.TriggeredSelfStrain);
+            Assert.AreEqual(0, nano.PrimaryModifierDelta);
+            Assert.AreEqual(0, nano.TriggeredSelfModifierDelta);
+            Assert.AreEqual(0, nano.AffectedStatIds.Length);
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Policy, nano.EvidenceState);
+            Assert.IsFalse(nano.HasPeriodicStatHit);
+            Assert.IsFalse(nano.HasTriggeredSelfEffect);
+            Assert.AreEqual(44, nano.NanoCost);
+            Assert.IsFalse(nano.CastWhileFighting);
+            Assert.IsFalse(nano.AllowCombatActionsDuringCast);
+            Assert.AreEqual(10000, nano.CastChanceBasisPoints);
+            Assert.AreEqual(5000, nano.SelfTargetChanceBasisPoints);
+            Assert.IsTrue(nano.RandomizeInitialDelay);
+            Assert.AreEqual(7, nano.NcuCost);
+            Assert.IsTrue(nano.ResolvePrimaryModifierFromNanoData);
+            Assert.IsTrue(nano.Evidence.Contains("on-use-skill-stat=381,delta=+42"));
+            CollectionAssert.AreEqual(
+                new[] { "19:665", "20:782", "21:829" },
+                nano.SpawnNanoPoolByLevel
+                    .Select(value => string.Format("{0}:{1}", value.Key, value.Value))
+                    .ToArray());
+            Assert.AreEqual(0, nano.ResolveSpawnNanoPool(17));
+            Assert.AreEqual(0, nano.ResolveSpawnNanoPool(18));
+            Assert.AreEqual(665, nano.ResolveSpawnNanoPool(19));
+            Assert.AreEqual(782, nano.ResolveSpawnNanoPool(20));
+            Assert.AreEqual(829, nano.ResolveSpawnNanoPool(21));
+            Assert.AreEqual(0, nano.ResolveSpawnNanoPool(22));
+
+            string repositoryRoot = FindRepositoryRoot();
+            string runtimeText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
+            string dynamicLookup = ExtractMethodBlock(
+                runtimeText,
+                "internal static bool TryResolveNanoDataStaticModifier(");
+            string targetSelection = ExtractMethodBlock(
+                runtimeText,
+                "private ICharacter FindSupportNanoTarget(");
+            string targetEligibility = ExtractMethodBlock(
+                runtimeText,
+                "private static bool IsOrdinaryEnemy(");
+            string finish = ExtractMethodBlock(
+                runtimeText,
+                "private void FinishSupportNanoCast(");
+            string apply = ExtractMethodBlock(
+                runtimeText,
+                "private bool ApplyOrRefreshTransientNanoEffect(");
+            string remove = ExtractMethodBlock(
+                runtimeText,
+                "private void RemoveTransientNanoEffect(");
+
+            Assert.IsTrue(
+                dynamicLookup.Contains("NanoLoader.NanoList.TryGetValue(nanoId, out nano)")
+                && runtimeText.Contains("nano.Events.Count != 1")
+                && runtimeText.Contains("onUse.EventType != EventType.OnUse")
+                && runtimeText.Contains("function.FunctionType != (int)FunctionType.Skill")
+                && runtimeText.Contains("function.Target != (int)ItemTarget.Target")
+                && runtimeText.Contains("function.TickCount != 1")
+                && runtimeText.Contains("function.TickInterval != 0")
+                && runtimeText.Contains("!function.dolocalstats")
+                && runtimeText.Contains("function.Requirements.Count != 0")
+                && runtimeText.Contains("function.Arguments.Values.Count != 2")
+                && runtimeText.Contains("statId = function.Arguments.Values[0].AsInt32();")
+                && runtimeText.Contains("modifierDelta = function.Arguments.Values[1].AsInt32();"),
+                "Nano 95447 must resolve its one target Skill effect dynamically from NanoLoader data instead of hard-coding stat 381 or delta +42 in runtime.");
+            Assert.IsTrue(
+                targetSelection.Contains("candidate.Identity != caster.Identity")
+                && targetSelection.Contains("IsOrdinaryEnemy(candidate)")
+                && targetSelection.Contains("profile.FallbackToSelf")
+                && targetEligibility.Contains("OrdinaryEnemyRuntimeRegistry.TryGet("),
+                "Nano 95447 must target any ordinary ally, with self fallback, rather than only another Fragmented Soul.");
+            Assert.IsTrue(
+                finish.Contains("profile.ResolvePrimaryModifierFromNanoData")
+                && finish.Contains("primaryAffectedStatIds = new[] { primaryModifierStatId }")
+                && finish.Contains("ApplyOrRefreshTransientNanoEffect("),
+                "Nano 95447 must carry the dynamically resolved stat and delta into the transient-effect lifecycle.");
+            Assert.IsTrue(
+                apply.Contains("existing.ExpiresAtUtc = utcNow.AddSeconds(profile.EffectLifetimeSeconds)")
+                && apply.Contains("return false;")
+                && apply.Contains("recipient.Stats[statId].Modifier += modifierDelta")
+                && apply.Contains("ModifierDelta = modifierDelta")
+                && apply.Contains("StatIds = (int[])(affectedStatIds ?? profile.AffectedStatIds).Clone()"),
+                "Refreshing nano 95447 must extend expiry without stacking a second +42 delta.");
+            Assert.IsTrue(
+                remove.Contains("recipient.Stats[statId].Modifier -= state.ModifierDelta")
+                && remove.Contains("recipient.ActiveNanos.Remove(state.ActiveNanoKey)"),
+                "Nano 95447 cleanup must remove only the modifier delta and active state owned by its transient effect.");
         }
 
         [TestMethod]

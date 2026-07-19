@@ -12,6 +12,9 @@
 # Capture-backed PF127 geometry is byte-hash validated and must remain LF-only.
 AORebirth/Server/ZoneEngine/Content/Captured/Subway/pf127-geometry.json text eol=lf
 
+# Unified patches require the standard prefix space on blank context lines.
+tools-temp/AOSharpLiveInjector/patches/*.patch whitespace=-blank-at-eol
+
 # Standard to msysgit
 *.doc	 diff=astextplain
 *.DOC	 diff=astextplain

@@ -125,7 +125,7 @@ namespace ZoneEngine.Core.Subway.Quests
                 new WindcallerKarrecNpcPatrolSegment[0],
                 new[]
                 {
-                    new WindcallerKarrecNpcActiveNanoDefinition(53019, 0x3233F, 29050327, 29050327)
+                    new WindcallerKarrecNpcActiveNanoDefinition(53019, 0x3233F, 0, 29050327, 29050327)
                 },
                 Evidence);
         }
@@ -600,18 +600,22 @@ namespace ZoneEngine.Core.Subway.Quests
     internal sealed class WindcallerKarrecNpcActiveNanoDefinition
     {
         internal WindcallerKarrecNpcActiveNanoDefinition(
-            int nanoId,
+            int nanoIdentityType,
+            int nanoIdentityInstance,
             int nanoInstance,
             int time1,
             int time2)
         {
-            this.NanoId = nanoId;
+            this.NanoIdentityType = nanoIdentityType;
+            this.NanoIdentityInstance = nanoIdentityInstance;
             this.NanoInstance = nanoInstance;
             this.Time1 = time1;
             this.Time2 = time2;
         }
 
-        internal int NanoId { get; private set; }
+        internal int NanoIdentityType { get; private set; }
+
+        internal int NanoIdentityInstance { get; private set; }
 
         internal int NanoInstance { get; private set; }
 
