@@ -397,12 +397,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 encounter.Contains("EumenidesMonsterData = 203726")
                 && encounter.Contains("EumenidesProfileKey = \"subway.127.named.eumenides\"")
                 && encounter.Contains("EumenidesEncounterKey = \"subway.127.encounter.eumenides\"")
-                && encounter.Contains("CapturedEumenidesAggroRadius = 15.609f")
+                && encounter.Contains("CapturedEumenidesAggroRadius = 23.359f")
                 && encounter.Contains("EumenidesObservedRespawnDelay = TimeSpan.FromMinutes(10)")
                 && encounter.Contains("this.eumenidesRespawnDueAtUtc = diedAtUtc.Add(EumenidesObservedRespawnDelay)")
                 && encounter.Contains("this.ProcessEumenidesRespawn(utcNow);")
                 && encounter.Contains("maximumNpcLeashDistanceFromHome: 100.0"),
-                "Eumenides must use its own named profile, bounded observed acquisition radius, and Mike-observed official-live respawn timing.");
+                "Eumenides must use its own named profile, the 23.358918-unit capture-proven acquisition lower bound, and Mike-observed official-live respawn timing.");
             Assert.IsTrue(
                 encounter.Contains("EumenidesProfileKey,\n                \"subway.127.named.eumenides.spawn\",\n                EumenidesEncounterKey,\n                \"Eumenides\",\n                EumenidesMonsterData,\n                false,\n                false,")
                 && encounter.Contains("20,\n                2792,\n                130,\n                76,\n                76,")

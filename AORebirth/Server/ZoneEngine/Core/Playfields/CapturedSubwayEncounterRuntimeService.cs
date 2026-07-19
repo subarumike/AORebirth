@@ -37,7 +37,7 @@ namespace AORebirth.Core.Playfields
         internal const string EumenidesEncounterKey = "subway.127.encounter.eumenides";
 
         private const float CapturedAggroRadius = 13.4151f;
-        private const float CapturedEumenidesAggroRadius = 15.609f;
+        private const float CapturedEumenidesAggroRadius = 23.359f;
         private const float CapturedReplacementInfectorOffsetX = 3.0f;
         private const string FirstInfectorUnknown1 =
             "80000000000000000000000003010001000100010001000000020000";

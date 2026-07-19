@@ -358,15 +358,19 @@ population in bounded runtime batches.
 - Eumenides is now a dedicated named PF127 encounter from atomic capture
   `20260716-034559`: exact L20/2792 HP appearance, owner-linked QL20 and QL17
   `123267/123268` weapon evidence,
-  capture-bounded proactive acquisition, shared LOS/chase/leash behavior, exact
+  capture-bounded `23.359` proactive acquisition, shared LOS/chase/leash
+  behavior, exact
   416-byte CATMesh `17905` corpse, and fixed observed `186` credits. Weapon
   damage and recharge remain item-owned; the expanded three-capture fight set
   proves 21 normal local-player hits at `25..45`, two captured misses, initial
   `143/143/143/143/0` special-attack context, and a `4.311321`-second median
   interval. Runtime retains the existing QL20 variant because no capture proves
-  the QL17/QL20 respawn selection rule. Finalized `20260717-214751` and
-  `20260717-215250` add two exact
-  atomic 186-credit corpse snapshots. The first contains QL22 Living Cyber
+  the QL17/QL20 respawn selection rule. Capture `20260717-214612` proves
+  Eumenides attacks first at `23.358918` horizontal units; `20260717-215250`
+  independently proves the same behavior at `21.203307`. Complete capture
+  `20260717-214751` and the manually audited exact rows from metadata-
+  unfinalized `20260717-215250` add two atomic 186-credit corpse snapshots.
+  The first contains QL22 Living Cyber
   Armor Sleeves `163430/163431`, QL1 item `301714`, and QL200 item `287146`;
   the second contains QL1 item `301715`, QL16 item `160051/160050`, and QL200
   item `287146`. Wider loot-pool probabilities and active-nano refresh semantics
