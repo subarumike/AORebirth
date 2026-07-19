@@ -24,6 +24,14 @@ population in bounded runtime batches.
   also materializes Karrec, Annoying Dude, and Maddy Cardile from their exact
   captured appearance contract; Annoying Dude and Maddy replay their complete
   `16`- and `19`-segment walking cycles while all three remain passive social NPCs.
+- PF655 initial NPC visibility was recovered on `2026-07-18` by restoring the
+  proven `ClientConnected` existing-character snapshot. A live login visually
+  confirmed Karrec and Annoying Dude; final-boundary diagnostics recorded
+  successful SCFU and `CharInPlay` writes for all three NPCs. Karrec's runtime
+  SCFU body is `254` bytes and matches official capture `20260717-223626` after
+  normalizing only the runtime dynel identity. The retained final-boundary trace
+  is restricted to PF655 test client `CanbeAffected:22` and quest-NPC runtime
+  identities `1000000` through `1000002`.
 - Remaining validation is live database/schema startup and private-client smoke
   for restart persistence, duplicate prevention, dialogue/trade/rewards, and
   denied/eligible wall use. The capture does not prove the official account-flag

@@ -57,11 +57,13 @@ namespace ZoneEngine.Core
         public void RunVisibilityInitializationSequence(
             Action recordJoinerReady,
             Action enterCharInPlay,
-            Action announceJoiningCharacter)
+            Action announceJoiningCharacter,
+            Action sendExistingCharacterSnapshots)
         {
             Execute(recordJoinerReady, "recordJoinerReady");
             Execute(enterCharInPlay, "enterCharInPlay");
             Execute(announceJoiningCharacter, "announceJoiningCharacter");
+            Execute(sendExistingCharacterSnapshots, "sendExistingCharacterSnapshots");
         }
 
         public void RunSimpleCharFullUpdateCharInPlaySequence(
