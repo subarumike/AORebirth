@@ -13,16 +13,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     public class SubwayEnemyLootEvidenceTests
     {
         [TestMethod]
-        public void DisobedientBotUsesOnlyStrictlyProvenTransferredItems()
+        public void DisobedientBotUsesOnlyStrictlyProvenObservedItems()
         {
             OrdinaryEnemyLootProfile loot = Profile("Disobedient Bot").Loot;
 
             Assert.AreEqual(OrdinaryEnemyLootPoolMode.WeightedOne, loot.PoolMode);
             Assert.AreEqual(5, loot.EmptyWeight);
             Assert.IsFalse(loot.ItemPoolComplete);
-            Assert.AreEqual(7, loot.ObservedCompleteInventories);
+            Assert.AreEqual(8, loot.ObservedCompleteInventories);
             Assert.AreEqual(5, loot.ObservedEmptyInventories);
-            Assert.AreEqual(2, loot.Entries.Length);
+            Assert.AreEqual(3, loot.Entries.Length);
 
             AssertBotEntry(
                 loot.Entries.Single(value => value.LowId == 234877),
@@ -34,10 +34,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 104684,
                 10,
                 "20260713-033511");
+            AssertBotEntry(
+                loot.Entries.Single(value => value.LowId == 113398),
+                113399,
+                7,
+                "20260719-020104",
+                OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem);
             Assert.IsFalse(loot.Entries.Any(value => value.LowId == 234876));
             Assert.AreEqual(15215, Profile("Disobedient Bot").Corpse.CapturedCatMesh.Value);
             CollectionAssert.AreEqual(
-                new[] { "5:6:2", "6:8:2", "8:10:4", "9:11:3", "10:12:2" },
+                new[] { "5:6:2", "6:8:3", "8:10:4", "9:11:3", "10:12:2" },
                 loot.LevelCreditRules
                     .Select(
                         value => string.Format(
@@ -240,7 +246,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .SelectMany(value => provider.GetCorpseEvidence(value))
                 .ToArray();
 
-            Assert.AreEqual(301, evidence.Length);
+            Assert.AreEqual(305, evidence.Length);
             Assert.AreEqual(26, evidence.Select(value => value.MonsterData).Distinct().Count());
             CollectionAssert.AreEqual(
                 new[]
@@ -647,14 +653,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     });
             AssertRecoveredStrictLoot(
                 "Violent Vagabond",
-                11,
+                14,
                 1,
                 new[]
                     {
                         "85531:22289:8:1", "122140:122141:7:1", "123704:123705:12:1",
-                        "128715:128716:6:1", "130586:130586:1:4", "130592:130592:1:2",
+                        "124016:124017:6:1", "124545:124546:6:1", "128715:128716:6:1",
+                        "130586:130586:1:6", "130592:130592:1:2", "130607:130607:1:1",
                         "130621:130621:1:1", "152326:152327:6:1", "234876:234876:1:1",
-                        "258543:258543:1:7", "273381:204397:8:1"
+                        "234877:234877:1:1", "258543:258543:1:8", "273381:204397:5:1",
+                        "273381:204397:6:1", "273381:204397:8:1", "273381:204397:9:1"
                     });
             AssertRecoveredStrictLoot(
                 "Bloodcreeper",
@@ -967,8 +975,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCorpseAndLevelCredits(
                 "Violent Vagabond",
                 17870,
-                "6:21:21:9",
-                "7:25:25:5",
+                "6:21:21:11",
+                "7:25:25:6",
                 "10:35:35:3");
             AssertCorpseAndLevelCredits(
                 "Workman Striker",
@@ -1033,7 +1041,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             LootGroupDefinition group = adapted.Table.RollGroups[0];
             Assert.AreEqual(LootRollMode.WeightedOne, group.RollMode);
             Assert.AreEqual(5, group.EmptyWeight);
-            Assert.AreEqual(2, group.Entries.Length);
+            Assert.AreEqual(3, group.Entries.Length);
 
             AssertAdaptedEntry(
                 group.Entries.Single(value => value.ItemTemplateId == 234877),
@@ -1045,6 +1053,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 104684,
                 10,
                 "20260713-033511");
+            AssertAdaptedEntry(
+                group.Entries.Single(value => value.ItemTemplateId == 113398),
+                113399,
+                7,
+                "20260719-020104",
+                OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem);
         }
 
         [TestMethod]
@@ -1070,19 +1084,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             var emptyRandom = new FixedLootRandomSource(0);
             var firstItemRandom = new FixedLootRandomSource(5);
             var secondItemRandom = new FixedLootRandomSource(6);
+            var thirdItemRandom = new FixedLootRandomSource(7);
             LootGenerationResult empty = service.Generate(context, emptyRandom);
             LootGenerationResult firstItem = service.Generate(context, firstItemRandom);
             LootGenerationResult secondItem = service.Generate(context, secondItemRandom);
+            LootGenerationResult thirdItem = service.Generate(context, thirdItemRandom);
 
-            Assert.AreEqual(7, emptyRandom.RequestedMaximum);
+            Assert.AreEqual(8, emptyRandom.RequestedMaximum);
             Assert.AreEqual(0, empty.Items.Count);
             Assert.AreEqual("empty", empty.RollEvidence.Single().Outcome);
             Assert.AreEqual(104683, firstItem.Items.Single().ItemTemplateId);
             Assert.AreEqual(10, firstItem.Items.Single().Quality);
             Assert.AreEqual(1, firstItem.Items.Single().Quantity);
-            Assert.AreEqual(234877, secondItem.Items.Single().ItemTemplateId);
-            Assert.AreEqual(1, secondItem.Items.Single().Quality);
+            Assert.AreEqual(113398, secondItem.Items.Single().ItemTemplateId);
+            Assert.AreEqual(7, secondItem.Items.Single().Quality);
             Assert.AreEqual(1, secondItem.Items.Single().Quantity);
+            Assert.AreEqual(234877, thirdItem.Items.Single().ItemTemplateId);
+            Assert.AreEqual(1, thirdItem.Items.Single().Quality);
+            Assert.AreEqual(1, thirdItem.Items.Single().Quantity);
         }
 
         [TestMethod]
@@ -1376,16 +1395,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             OrdinaryEnemyLootEntry entry,
             int expectedHighId,
             int expectedQualityLevel,
-            string expectedCapture)
+            string expectedCapture,
+            OrdinaryEnemyLootLinkageEvidence expectedLinkage =
+                OrdinaryEnemyLootLinkageEvidence.ProvenTransferredEnemyCorpseItem)
         {
             Assert.AreEqual(expectedHighId, entry.HighId);
             Assert.AreEqual(expectedQualityLevel, entry.QualityLevel);
             Assert.AreEqual(1, entry.Quantity);
             Assert.AreEqual(1, entry.Weight);
             Assert.AreEqual(0, entry.DropChanceBasisPoints);
-            Assert.AreEqual(
-                OrdinaryEnemyLootLinkageEvidence.ProvenTransferredEnemyCorpseItem,
-                entry.LinkageEvidence);
+            Assert.AreEqual(expectedLinkage, entry.LinkageEvidence);
             Assert.AreEqual(
                 OrdinaryEnemyLootProbabilityEvidence.ProvisionalProjectPolicy,
                 entry.ProbabilityEvidence);
@@ -1393,14 +1412,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(entry.EvidenceReference, "SimpleChar:");
             StringAssert.Contains(entry.EvidenceReference, ">Corpse:");
             StringAssert.Contains(entry.EvidenceReference, ">InventoryUpdate#");
-            StringAssert.Contains(entry.EvidenceReference, ">ContainerAddItem#");
+            if (expectedLinkage == OrdinaryEnemyLootLinkageEvidence.ProvenTransferredEnemyCorpseItem)
+            {
+                StringAssert.Contains(entry.EvidenceReference, ">ContainerAddItem#");
+            }
         }
 
         private static void AssertAdaptedEntry(
             LootEntryDefinition entry,
             int expectedHighId,
             int expectedQualityLevel,
-            string expectedCapture)
+            string expectedCapture,
+            OrdinaryEnemyLootLinkageEvidence expectedLinkage =
+                OrdinaryEnemyLootLinkageEvidence.ProvenTransferredEnemyCorpseItem)
         {
             Assert.AreEqual(expectedHighId, entry.HighItemTemplateId);
             Assert.AreEqual(expectedQualityLevel, entry.FixedQuality);
@@ -1411,9 +1435,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1, entry.Weight);
             Assert.AreEqual(0, entry.DropChanceBasisPoints);
             Assert.AreEqual(LootEvidenceConfidence.ProvenCapture, entry.Evidence);
-            Assert.AreEqual(
-                OrdinaryEnemyLootLinkageEvidence.ProvenTransferredEnemyCorpseItem.ToString(),
-                entry.LinkageEvidence);
+            Assert.AreEqual(expectedLinkage.ToString(), entry.LinkageEvidence);
             Assert.AreEqual(
                 OrdinaryEnemyLootProbabilityEvidence.ProvisionalProjectPolicy.ToString(),
                 entry.ProbabilityEvidence);

@@ -3,9 +3,9 @@
 ## Current Focus
 
 Complete the Subway dungeon from the existing capture corpus before requesting
-more gameplay evidence. The full location inventory, raw lifecycle recovery,
-and content-level Subway ledger are complete. All `65` Subway-bearing sessions
-with raw packet rows now reprocess successfully, so incomplete legacy
+more gameplay evidence. The full location inventory and raw lifecycle recovery
+are complete. All `74` Subway-bearing sessions with raw packet rows now
+reprocess successfully, so incomplete legacy
 projections no longer require repeat gameplay captures. The active work is to
 promote the recovered exact evidence and then validate the quarantined PF127
 population in bounded runtime batches.
@@ -82,11 +82,13 @@ population in bounded runtime batches.
   location snapshots: `20260509-182711`, `20260528-210106`,
   `20260621-013227`, and `20260622-081426`. They are empty startup remnants,
   not missing Subway evidence.
-- The `68` Subway-bearing sessions contain `65` sessions with actual raw packet
-  rows. The three without raw rows are private validation/geometry sessions
-  `20260714-171439`, `20260714-185728`, and `20260714-202820`; their exact
+- The capture inventory contains `313` sessions: `44` Subway, `34` mixed,
+  `231` elsewhere, and `4` unresolved. Its `78` Subway-bearing sessions contain
+  `74` sessions with actual raw packet rows. The four without raw rows are
+  private validation/crash/geometry sessions `20260714-171439`,
+  `20260714-185728`, `20260714-202820`, and `20260719-001621`; their exact
   non-packet artifacts remain indexed.
-- The deterministic lifecycle batch reprocessor now reports `65/65` PASS,
+- The deterministic lifecycle batch reprocessor now reports `74/74` PASS,
   zero offline repairs, zero recapture requirements, and zero tool errors.
 - Names, character names, capture dates, and repository references do not
   determine location.
@@ -94,8 +96,11 @@ population in bounded runtime batches.
   `docs/generated/aosharp_capture_inventory.csv` and
   `docs/generated/aosharp_capture_inventory.md` by
   `Tools/inventory_aosharp_captures.py`.
-- The content-level ledger covers all `72` Subway-bearing sessions with `25,321`
-  aggregated evidence rows: `59` official-live and `13` AORebirth-private.
+- The checked-in content-level ledger currently covers `72` Subway-bearing
+  sessions with `25,321` aggregated evidence rows: `59` official-live and `13`
+  AORebirth-private. The six newer Subway-bearing sessions are present in the
+  capture inventory and lifecycle batch; the ledger must be regenerated before
+  its aggregate row and realm totals are restated.
   It records identities, related identities, evidence kinds, source artifacts,
   row scope, realm, and reference category in
   `docs/generated/aosharp_subway_capture_content.csv` and `.md`.
@@ -319,14 +324,15 @@ population in bounded runtime batches.
 - Disobedient Bot is the fifth accepted ordinary enemy. All 12 exact spawn rows
   now preserve captured NPC family `138` and an explicit `450`-second post-NPC-
   despawn schedule; official capture `20260708-143600` records `459.913`
-  seconds death-to-replacement and a `0.190`-unit position delta. Fourteen
-  normal local-player SIW1 hits prove the aggregate `8..15` damage envelope;
+  seconds death-to-replacement and a `0.190`-unit position delta. Fifteen
+  normal local-player SIW1 hits prove the aggregate `6..15` damage envelope;
+  ten captured misses remain explicit;
   three other-player hits and two player-owned Killer-pet hits remain separate,
   while focused attempts retain the capture-exact `5.973723`-second recharge.
   SIW1 context is selected from the spawned level (`L5=30/30/30/30/22`,
   `L6=35`, `L8=45`, `L9=49`, `L10=54`); active L7 uses the explicit bounded
-  midpoint policy `40`, and other levels fail closed. Thirteen valid exact
-  corpse/credit chains, seven strict loot outcomes, two proven item
+  midpoint policy `40`, and other levels fail closed. Fourteen valid exact
+  corpse/credit chains, eight strict loot outcomes, three proven item
   memberships, CATMesh `15215`, shared chase, and ordinary corpse lifetimes are
   guarded with combat and respawn. Both previously quarantined Bot rows are now
   active for bounded private validation. Critical behavior, proactive aggro
@@ -352,10 +358,19 @@ population in bounded runtime batches.
   equipped-weapon path; no special-attack context, fixed damage override,
   critical policy, loot probability, or respawn exception is synthesized. Its
   exact weapon path and those exclusions now pass the whole-enemy gate.
+- Finalized capture `20260719-020104` adds capture-exact replay patrols for Bot
+  source `0x79557C66` (four segments) and Vagabond source `0x7957E5C4`
+  (26 segments). The capture also adds the Bot's third strict item membership,
+  `113398/113399` at QL7, and brings its strict sample to three positive and five
+  empty outcomes. Vagabond now has 14 strict outcomes, 13 positive and one empty,
+  but remains quarantined because its reviewed combat evidence contains 40
+  misses and no landed local-player damage. The capture proves neither respawn
+  timing nor corpse lifetime, and it does not establish background patrols for
+  any other source.
 - One reusable reviewed first-open validator now owns 18 strict item tables.
   In addition to Shadow, ordinary Infector, Architect Striker, and Melded
   Patterns, it recovers Mugger `17/3 empty`, Discarded Pet `16/3`, Stim Fiend
-  `13/0`, Looter `11/5`, Violent Vagabond `11/1`, Bloodcreeper `4/3`, Infected
+  `13/0`, Looter `11/5`, Violent Vagabond `14/1`, Bloodcreeper `4/3`, Infected
   Attendant `4/1`, Fragmented Soul `4/0`, Deranged Shopper `2/0`, Incomplete
   Rebuild `2/0`, Redundant Scan `2/1`, Uncontrollable Anger `2/0`, Lost Thought
   `1/0`, and Neural Burnout `4/2`. Exact source/allocation allowlists and
@@ -499,8 +514,8 @@ Vagabond; and strict Empty Shell/Premature Pattern loot.
 
 ## Remaining Capture-Backed Work
 
-1. The current inventory contains `72` Subway/mixed sessions: `69` have raw
-   packet data and `3` do not. The four location-unresolved folders are empty
+1. The current inventory contains `78` Subway/mixed sessions: `74` have raw
+   packet data and `4` do not. The four location-unresolved folders are empty
    startup remnants and contain no recoverable gameplay traffic.
 2. Sixteen accepted-profile rows are active and await bounded private-client
    validation: 6 Stim Fiends, 5 Muggers, 2 Disobedient Bots, 2 Looters, and 1
