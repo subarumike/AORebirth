@@ -786,7 +786,7 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.update(
     }
 )
 CAPTURE_CORPSE_EVIDENCE_FILTERS = {
-    "20260708-004038": frozenset(("Filth Flea", "Thief")),
+    "20260708-004038": frozenset(("Discarded Pet", "Filth Flea", "Thief")),
     "20260708-143600": frozenset(
         (
             "Deranged Shopper",
@@ -870,7 +870,7 @@ CAPTURE_CORPSE_EVIDENCE_FILTERS = {
             "Workman Striker",
         )
     ),
-    "20260709-205921": frozenset(("Disobedient Bot",)),
+    "20260709-205921": frozenset(("Discarded Pet", "Disobedient Bot")),
     "20260712-153918": frozenset(
         (
             "Discarded Pet",
@@ -929,7 +929,9 @@ CAPTURE_CORPSE_EVIDENCE_FILTERS = {
     "20260716-222201": frozenset(("Redundant Scan", "Slum Runner")),
 }
 CAPTURE_CORPSE_IDENTITY_FILTERS = {
-    "20260709-205921": frozenset(("(SimpleChar:795310FB)",)),
+    "20260709-205921": frozenset(
+        ("(SimpleChar:795310FB)", "(SimpleChar:7953178A)")
+    ),
     "20260709-220439": frozenset(
         (
             "(SimpleChar:79513A87)",
@@ -1116,6 +1118,20 @@ CAPTURE_CORPSE_IDENTITY_FILTERS = {
 }
 CAPTURE_LIFECYCLE_DEATH_LEVEL_FILTERS = {
     "20260712-160257": frozenset(("(SimpleChar:795EC78A)",)),
+}
+# Legacy capture 004038 predates enemy-state death rows, but its complete SCFU
+# identifies the same living NPC that the exact corpse full update later names.
+# Keep this join explicit and fail closed so the L10 credit outcome cannot be
+# inferred from credits alone.
+SCFU_CORPSE_LEVEL_EVIDENCE = {
+    "20260708-004038": {
+        "(SimpleChar:794A16EE)": {
+            "name": "Discarded Pet",
+            "monster_data": 17720,
+            "level": 10,
+            "health": 227,
+        }
+    }
 }
 # The same official-live PF127 instance stayed alive across these adjacent
 # captures. The earlier dossier pins the living NPC's identity and level; the
@@ -2959,6 +2975,50 @@ def corpse_profiles() -> dict[str, list[dict[str, object]]]:
                     )
                 death_levels[identity] = lifecycle_levels[identity]
 
+        scfu_levels = SCFU_CORPSE_LEVEL_EVIDENCE.get(capture, {})
+        if scfu_levels:
+            scfu_rows = read_csv(CAPTURE_ROOT / capture / "scfu-appearance.csv")
+            for identity, expected in scfu_levels.items():
+                matching = [row for row in scfu_rows if row.get("Identity") == identity]
+                expected_shape = (
+                    expected["name"],
+                    int(expected["monster_data"]),
+                    int(expected["level"]),
+                    int(expected["health"]),
+                )
+                observed_shapes = set()
+                for row in matching:
+                    if (
+                        row.get("DecodeStatus") != "decoded_complete"
+                        or row.get("DecodeFullyConsumed", "").lower() != "true"
+                    ):
+                        continue
+                    try:
+                        observed_shapes.add(
+                            (
+                                row.get("Name", ""),
+                                int(row.get("MonsterData", "")),
+                                int(row.get("Level", "")),
+                                int(row.get("Health", "")),
+                            )
+                        )
+                    except ValueError:
+                        continue
+                if observed_shapes != {expected_shape}:
+                    raise ValueError(
+                        "SCFU corpse level evidence drifted capture={0} identity={1} shapes={2}".format(
+                            capture, identity, sorted(observed_shapes)
+                        )
+                    )
+                existing_level = death_levels.get(identity)
+                if existing_level is not None and existing_level != int(expected["level"]):
+                    raise ValueError(
+                        "SCFU corpse level conflicted capture={0} identity={1} levels={2},{3}".format(
+                            capture, identity, existing_level, expected["level"]
+                        )
+                    )
+                death_levels[identity] = int(expected["level"])
+
         cross_session_levels = CROSS_SESSION_CORPSE_LEVEL_EVIDENCE.get(capture, {})
         for identity, expected in cross_session_levels.items():
             dossier_path = (
@@ -3262,7 +3322,7 @@ def validate_content(
         "Bloodcreeper": Counter({(24, 150): 1}),
         "Deranged Shopper": Counter({(8, 47): 1, (9, 53): 1}),
         "Discarded Pet": Counter(
-            {(5, 18): 1, (6, 21): 2, (7, 25): 8, (8, 28): 1, (9, 32): 4, (10, 35): 7}
+            {(5, 18): 1, (6, 21): 3, (7, 25): 8, (8, 28): 1, (9, 32): 4, (10, 35): 8}
         ),
         "Disobedient Bot": Counter(
             {(5, 6): 2, (6, 8): 2, (8, 10): 4, (9, 11): 3, (10, 12): 2}

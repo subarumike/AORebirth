@@ -13,16 +13,13 @@ namespace ZoneEngine.Core.Playfields
     {
         public const int SubwayPlayfieldInstance = 127;
 
-        // Emergency runtime quarantine: restoring this capture as one batch repeatedly
-        // crashes the AO client during the PF127 existing-character visibility snapshot.
-        // Keep the evidence rows checked in, but do not announce them until the failing
-        // packet shape or visibility-volume boundary has been isolated in smaller slices.
+        // Remaining diagnostic quarantine rows from the PF127 restore batch. Families
+        // leave this set only after their existing capture corpus passes the whole-enemy
+        // runtime gate; the 11 Discarded Pet rows were promoted by that process.
         private static readonly HashSet<int> RuntimeQuarantinedSourceInstances =
             new HashSet<int>
             {
-                2035645449, 2035645478, 2035645489, 2035645579, 2035645607,
-                2035645611, 2035645613, 2035803153, 2035803301, 2035803313,
-                2035803324, 2035645542, 2035803146, 2035646228, 2035803590,
+                2035645542, 2035803146, 2035646228, 2035803590,
                 2035803591, 2035803592, 2035803594, 2035645612, 2035761244,
                 2035762087, 2035762088, 2035802156, 2035802158, 2035802403,
                 2035803150, 2035803583, 2035803588, 2035803589

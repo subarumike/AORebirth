@@ -240,7 +240,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .SelectMany(value => provider.GetCorpseEvidence(value))
                 .ToArray();
 
-            Assert.AreEqual(299, evidence.Length);
+            Assert.AreEqual(301, evidence.Length);
             Assert.AreEqual(26, evidence.Select(value => value.MonsterData).Distinct().Count());
             CollectionAssert.AreEqual(
                 new[]
@@ -285,6 +285,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(30379, bloodcreeper.MonsterData);
             Assert.AreEqual(26978, bloodcreeper.CatMesh);
             Assert.AreEqual(150, bloodcreeper.Credits);
+            CapturedSubwayCorpseEvidenceDefinition legacyDiscardedPet = evidence.Single(
+                value => value.Capture == "20260708-004038"
+                         && value.DeadNpcIdentity == "(SimpleChar:794A16EE)");
+            Assert.AreEqual(10, legacyDiscardedPet.EnemyLevel);
+            Assert.AreEqual(17720, legacyDiscardedPet.MonsterData);
+            Assert.AreEqual(15929, legacyDiscardedPet.CatMesh);
+            Assert.AreEqual(35, legacyDiscardedPet.Credits);
+            CapturedSubwayCorpseEvidenceDefinition focusedDiscardedPet = evidence.Single(
+                value => value.Capture == "20260709-205921"
+                         && value.DeadNpcIdentity == "(SimpleChar:7953178A)");
+            Assert.AreEqual(6, focusedDiscardedPet.EnemyLevel);
+            Assert.AreEqual(17720, focusedDiscardedPet.MonsterData);
+            Assert.AreEqual(15929, focusedDiscardedPet.CatMesh);
+            Assert.AreEqual(21, focusedDiscardedPet.Credits);
         }
 
         [TestMethod]
@@ -825,11 +839,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Discarded Pet",
                 15929,
                 "5:18:18:1",
-                "6:21:21:2",
+                "6:21:21:3",
                 "7:25:25:8",
                 "8:28:28:1",
                 "9:32:32:4",
-                "10:35:35:7");
+                "10:35:35:8");
             AssertCorpseAndLevelCredits(
                 "Empty Shell",
                 5941,

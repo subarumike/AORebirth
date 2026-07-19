@@ -130,8 +130,8 @@ population in bounded runtime batches.
   `20260709-225408` packet log: Fragmented Soul `79545367` and Premature Pattern
   `79545356`. The stale start-time metadata and unrelated incomplete SCFUs do
   not invalidate those two `decoded_complete` rows.
-- The normalized PF127 catalog is now `321` rows: `283` active and the same
-  `38` quarantined diagnostic rows. It contains `26` profiles.
+- The normalized PF127 catalog is now `321` rows: `294` active and `27`
+  quarantined diagnostic rows. It contains `26` profiles.
 - Deep ordinary combat now uses capture-scoped identity mapping and only normal
   hits against the local player for runtime ranges. Critical hits and
   player-owned-pet hits remain separate evidence.
@@ -193,6 +193,20 @@ population in bounded runtime batches.
   observed 50/50 self-or-ordinary-ally split, and ten-second decision baseline.
   Nano pools are limited to the non-interpolated observed floors L19=`665`,
   L20=`782`, and L21=`829`; L17/L18 remain unresolved.
+- Discarded Pet is now a capture-complete accepted ordinary profile from the
+  existing corpus. All 29 exact L5..L10 rows are configured active; the 11
+  newly enabled rows still need a bounded private-client activation smoke.
+  Captures `20260708-143600` and
+  `20260709-210452` prove 37 normal local-player SIW1 hits at `9..18`; four
+  `30..33` criticals remain report-only. Runtime preserves AttackInfo ammo
+  `-1`, slot `0`, unknown `0`, instance `SIW1`, and the conventional
+  `5.089763`-second median across 30 same-source landed-hit intervals. The raw
+  SpecialAttackWeapon fifth field varies without a proven rule and is not
+  synthesized. Retaliatory acquisition and an explicit 8.153-unit chase are
+  preserved without inventing proactive aggro, leash, reset, or return-home
+  boundaries. Strict `16/3 empty` loot, CATMesh `15929`, standard `3/240/3`
+  corpse lifetimes, and 25 exact positive-credit corpses now include recovered
+  L6 and L10 records from `20260709-205921` and `20260708-004038`.
 - Reviewed raw first opens and strict `corpse-loot-observations.csv` snapshots
   contribute explicit empty corpses to denominators. Redundant Scan's observed
   item is `1/2`, Molested Molecules item `301713` is `1/3`, and the twelve
@@ -223,7 +237,7 @@ population in bounded runtime batches.
   rows and preserves that target-role boundary.
 - The diagnostic quarantine selector now changes spawn eligibility in the
   world-population owner when explicitly selected. The selector is disabled in
-  the normal runtime; all `38` rows remain quarantined. A bounded
+  the normal runtime; all `27` rows remain quarantined. A bounded
   `population-activation-ledger.csv` now records `ELIGIBLE`, `MATERIALIZED`, or
   `FAILED` for selected rows so the next private-client batch can distinguish
   selection from actual runtime creation without changing eligibility.
@@ -249,7 +263,7 @@ population in bounded runtime batches.
   midpoint policy `40`, and other levels fail closed. Thirteen valid exact
   corpse/credit chains, seven strict loot outcomes, two proven item
   memberships, CATMesh `15215`, shared chase, and ordinary corpse lifetimes are
-  guarded with combat and respawn. The two existing Bot rows in the 38-row
+  guarded with combat and respawn. The two existing Bot rows in the 27-row
   operational quarantine remain quarantined; profile acceptance did not enable
   them. Critical behavior, proactive aggro radius, and leash/reset distance
   remain unobserved rather than guessed.
@@ -374,9 +388,9 @@ population in bounded runtime batches.
   regeneration: PASS.
 - Current inventory/content-ledger regression suites: `27/27` PASS.
 - Subway loot/corpse evidence: `22/22` PASS.
-- Nineteen-entry whole-enemy gate now includes Fragmented Soul, Redundant Scan,
-  and Incomplete Rebuild after Deranged Shopper, Mugger, Looter, Bloodcreeper,
-  Stim Fiend, and Neural Burnout
+- Twenty-entry whole-enemy gate now includes Discarded Pet, Fragmented Soul,
+  Redundant Scan, and Incomplete Rebuild after Deranged Shopper, Mugger, Looter,
+  Bloodcreeper, Stim Fiend, and Neural Burnout
   joined the previously confirmed ten. Ordinary generation check, expanded
   gate, WorldPopulation `36/36`, and Subway loot `22/22` pass.
 - Playfield lifecycle class: `56/63`; every Subway and ordinary-enemy test
@@ -390,9 +404,9 @@ population in bounded runtime batches.
 - Quarantine/spatial-selection guardrail: PASS.
 - Named encounter/capture contract suite: `26/26` PASS.
 - Runtime-coordinator ownership guard: PASS.
-- ZoneEngine compile: PASS. The approved wrapper could not replace the active
-  private-server `ZoneEngine.exe` held by PID `25388`; the running server was
-  not stopped.
+- ZoneEngine compile: PASS. The approved wrapper reached final output copy but
+  could not replace the running `ZoneEngine.exe` held by PID `24356`; the
+  private server was not stopped.
 - Chat, Login, and Zone restart: PASS; ports `6996`, `7012`, `7500`, and `7501`
   listening.
 - Repository-wide AOtomation suite: `356/369`; 13 broader failures remain
@@ -407,25 +421,23 @@ population in bounded runtime batches.
 ## Next Runtime Check
 
 No additional official-live capture is required before continuing the corpus
-work. Discarded Pet is the next implementation-ready slice: existing capture
-`20260708-143600` already proves its local-player combat, cadence, SIW1 level
-contexts, chase, strict loot, CATMesh, and credits, but the combat analyzer
-currently filters that evidence out. Violent Vagabond has exact population,
-weapon, miss cadence, loot, and corpse evidence but still lacks any
-Vagabond-origin local-player normal/critical hit outcome and numeric reset
-boundary.
+work. Discarded Pet implementation is complete from the existing corpus; its
+11 newly configured rows still need bounded private-client activation
+validation. Violent Vagabond has exact population, weapon, miss cadence, loot,
+and corpse evidence but still lacks any Vagabond-origin local-player
+normal/critical hit outcome and numeric reset boundary. Continue auditing the
+indexed corpus before requesting any new capture.
 
 ## Remaining Capture-Backed Work
 
 1. The raw lifecycle backlog is closed: all `65` raw Subway-bearing sessions
    decode and promote. The four location-unresolved folders are empty startup
    remnants and contain no recoverable gameplay traffic.
-2. The `38` capture-backed PF127 population rows remain behind the diagnostic
+2. The `27` capture-backed PF127 population rows remain behind the diagnostic
    quarantine. Sixteen accepted-profile rows await bounded private-client
    activation: 6 Stim Fiends, 5 Muggers, 2 Disobedient Bots, 2 Looters, and 1
-   Deranged Shopper. The 11 Discarded Pets remain quarantined only until the
-   already-proven corpus slice is implemented; the 11 Violent Vagabonds remain
-   evidence-gated for missing local-player hit outcomes and reset boundaries.
+   Deranged Shopper. The 11 Violent Vagabonds remain evidence-gated for missing
+   local-player hit outcomes and reset boundaries.
 3. Strike Foreman has usable exact L19/736 HP appearance, QL19 weapon, raw
    `SpecialAttackWeapon` plus `Attack` initiation against the non-local player
    Wardog, three other-player outgoing hits (`18`, `18`, and critical `40`),

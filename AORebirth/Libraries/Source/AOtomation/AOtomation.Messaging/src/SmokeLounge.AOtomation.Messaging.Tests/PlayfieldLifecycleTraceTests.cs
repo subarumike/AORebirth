@@ -2486,6 +2486,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string derangedShopperCombatReport = generatedCombatReportText.Substring(
                 derangedShopperCombatReportStart,
                 derangedShopperCombatReportEnd - derangedShopperCombatReportStart);
+            int discardedPetCombatReportStart = generatedCombatReportText.IndexOf(
+                "\"Discarded Pet\":",
+                StringComparison.Ordinal);
+            int discardedPetCombatReportEnd = generatedCombatReportText.IndexOf(
+                "\"Disobedient Bot\":",
+                discardedPetCombatReportStart,
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                discardedPetCombatReportStart >= 0
+                && discardedPetCombatReportEnd > discardedPetCombatReportStart);
+            string discardedPetCombatReport = generatedCombatReportText.Substring(
+                discardedPetCombatReportStart,
+                discardedPetCombatReportEnd - discardedPetCombatReportStart);
+            int discardedPetContractStart = combatContractText.IndexOf(
+                "case 17720:",
+                StringComparison.Ordinal);
+            int discardedPetContractEnd = combatContractText.IndexOf(
+                "case 17649:",
+                discardedPetContractStart,
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                discardedPetContractStart >= 0
+                && discardedPetContractEnd > discardedPetContractStart);
+            string discardedPetContractCase = combatContractText.Substring(
+                discardedPetContractStart,
+                discardedPetContractEnd - discardedPetContractStart);
             string disobedientBotDefinition = ExtractMethodBlock(
                 providerText,
                 "private static CapturedSubwaySpawnDefinition DisobedientBot(");
@@ -2531,6 +2557,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Looter|203745|138",
                     "Mugger|203734|138",
                     "Deranged Shopper|203736|138",
+                    "Discarded Pet|17720|138",
                     "Bloodcreeper|30379|63",
                     "Stim Fiend|203739|138",
                     "Neural Burnout|203730|148",
@@ -2540,7 +2567,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 };
 
             Assert.AreEqual(
-                19,
+                20,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
 
@@ -3069,6 +3096,115 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
                 "Accepted Subway Deranged Shopper must keep its one quarantined source, exact QL8 source-owned weapon and captured AttackInfo shape, fail-closed aggregate/unknown/missing/conflicting selection, item-owned damage/recharge, report-only critical, one captured miss shape, strict two-open incomplete-pool loot, exact CATMesh/credits, shared chase, inherited private four-minute respawn, and ordinary corpse lifetimes together without claiming private activation.");
+
+            OrdinaryEnemyProfile discardedPet = ordinaryProfiles.Single(
+                value => value.DisplayName == "Discarded Pet");
+            OrdinaryEnemySpawnDefinition[] discardedPetSpawns = ordinarySpawns
+                .Where(value => value.ProfileKey == discardedPet.ProfileKey)
+                .ToArray();
+            Assert.AreEqual(29, CountOccurrences(providerText, "CapturedSurveySpawn(DiscardedPet("));
+            Assert.AreEqual(29, discardedPetSpawns.Length);
+            Assert.AreEqual(
+                29,
+                discardedPetSpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(
+                0,
+                discardedPetSpawns.Count(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            Assert.IsTrue(
+                discardedPetSpawns.All(
+                    value => value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Inherit));
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, discardedPet.Aggression.Mode);
+            Assert.IsFalse(discardedPet.Aggression.AutomaticAggroRadius.HasValue);
+            Assert.IsTrue(discardedPet.Aggression.Chase);
+            Assert.IsFalse(discardedPet.Aggression.ReturnToSpawn);
+            Assert.AreEqual(OrdinaryEnemyCombatMode.UnarmedMelee, discardedPet.Combat.Mode);
+            Assert.AreEqual(OrdinaryEnemyDamageSource.CapturedFixed, discardedPet.Combat.DamageSource);
+            Assert.IsFalse(discardedPet.Combat.VisibleWeapon);
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.FixedAttackInfo,
+                discardedPet.Combat.Contract.AttackModel);
+            Assert.IsTrue(discardedPet.Combat.Contract.IsCombatReady);
+            Assert.AreEqual(9, discardedPet.Combat.Contract.MinDamage);
+            Assert.AreEqual(18, discardedPet.Combat.Contract.MaxDamage);
+            Assert.AreEqual(5.089763, discardedPet.Combat.Contract.RechargeSeconds);
+            Assert.AreEqual(-1, discardedPet.Combat.Contract.AttackInfoAmmoCount);
+            Assert.AreEqual(0, discardedPet.Combat.Contract.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, discardedPet.Combat.Contract.AttackInfoUnknown);
+            Assert.AreEqual(0x53495731, discardedPet.Combat.Contract.AttackInfoWeaponInstance);
+            Assert.IsFalse(discardedPet.Combat.Contract.HasEmptySpecialAttackWeaponContext);
+            Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, discardedPet.Loot.PoolMode);
+            Assert.IsFalse(discardedPet.Loot.ItemPoolComplete);
+            Assert.AreEqual(16, discardedPet.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(3, discardedPet.Loot.ObservedEmptyInventories);
+            Assert.AreEqual(
+                13,
+                discardedPet.Loot.ObservedCompleteInventories
+                - discardedPet.Loot.ObservedEmptyInventories);
+            Assert.AreEqual(13, discardedPet.Loot.Entries.Length);
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "101681:101682:7:1:16", "102283:102284:9:1:16",
+                    "103973:103974:10:1:16", "106005:106006:11:1:16",
+                    "107283:107284:10:1:16", "109520:109521:7:1:16",
+                    "111623:111624:8:1:16", "112160:112161:6:1:16",
+                    "112798:112799:6:1:16", "234874:234874:1:3:16",
+                    "234876:234876:1:3:16", "234877:234877:1:1:16",
+                    "290619:202727:9:1:16"
+                },
+                discardedPet.Loot.Entries
+                    .OrderBy(value => value.LowId)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}:{3}:{4}",
+                            value.LowId,
+                            value.HighId,
+                            value.QualityLevel,
+                            value.ObservedCount,
+                            value.ObservedCorpses))
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "5:18:18:1", "6:21:21:3", "7:25:25:8",
+                    "8:28:28:1", "9:32:32:4", "10:35:35:8"
+                },
+                discardedPet.Loot.LevelCreditRules
+                    .OrderBy(value => value.EnemyLevel)
+                    .Select(
+                        value => string.Format(
+                            "{0}:{1}:{2}:{3}",
+                            value.EnemyLevel,
+                            value.MinimumCredits,
+                            value.MaximumCredits,
+                            value.ObservedCorpses))
+                    .ToArray());
+            Assert.AreEqual(15929, discardedPet.Corpse.CapturedCatMesh);
+            Assert.AreEqual(3.0, discardedPet.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(240.0, discardedPet.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(3.0, discardedPet.Corpse.LootedCleanupSeconds);
+            Assert.IsTrue(
+                combatContractText.Contains("case 17720:")
+                && combatContractText.Contains("AttackInfoAmmoCount = attackInfoAmmoCount")
+                && discardedPetContractCase.Contains("CapturedSubwayDiscardedPetWeaponTag")
+                && discardedPetContractCase.Contains("-1")
+                && discardedPet.Combat.Contract.Evidence.Contains("37 normal local-player")
+                && discardedPet.Combat.Contract.Evidence.Contains("criticals remain report-only")
+                && discardedPet.Combat.Contract.Evidence.Contains("conventional median 5.089763")
+                && discardedPetCombatReport.Contains("\"normalAttackInfoRows\": 37")
+                && discardedPetCombatReport.Contains("\"normalMinDamage\": 9")
+                && discardedPetCombatReport.Contains("\"normalMaxDamage\": 18")
+                && discardedPetCombatReport.Contains("\"criticalAttackInfoRows\": 4")
+                && discardedPetCombatReport.Contains("\"criticalMinDamage\": 30")
+                && discardedPetCombatReport.Contains("\"criticalMaxDamage\": 33")
+                && discardedPetCombatReport.Contains("\"medianRechargeSeconds\": 5.079568")
+                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
+                && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
+                "Accepted Subway Discarded Pet must keep all 29 exact active spawns, captured SIW1 9..18 normal roll and cadence, report-only critical observations, retaliatory chase without proactive aggro or return-to-spawn, strict 16-open incomplete-pool loot, exact CATMesh/level credits, inherited private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile bloodcreeper = ordinaryProfiles.Single(value => value.DisplayName == "Bloodcreeper");
             OrdinaryEnemySpawnDefinition[] bloodcreeperSpawns = ordinarySpawns

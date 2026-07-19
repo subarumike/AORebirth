@@ -352,7 +352,8 @@ namespace AORebirth.Core.Playfields
             double rechargeSeconds,
             int weaponSlot,
             int attackInfoUnknown,
-            int weaponInstance)
+            int weaponInstance,
+            int attackInfoAmmoCount = 0)
         {
             return new CapturedEnemyCombatContract
             {
@@ -363,6 +364,7 @@ namespace AORebirth.Core.Playfields
                 MinDamage = minDamage,
                 MaxDamage = maxDamage,
                 RechargeSeconds = rechargeSeconds,
+                AttackInfoAmmoCount = attackInfoAmmoCount,
                 AttackInfoWeaponSlot = weaponSlot,
                 AttackInfoUnknown = attackInfoUnknown,
                 AttackInfoWeaponInstance = weaponInstance
@@ -927,13 +929,14 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue));
                 case 17720:
                     return CapturedEnemyCombatContract.FixedAttack(
-                        "20260709-210452/220439: Discarded Pet AttackInfo",
-                        9,
-                        9,
-                        0.0,
+                        "20260708-143600 and 20260709-210452: 37 normal local-player Discarded Pet SIW1 hits span 9..18; four 30..33 criticals remain report-only; 30 same-source landed-hit intervals span 4.609299..5.950416 seconds with conventional median 5.089763; AttackInfo uses ammo -1, slot 0, unknown 0, and instance SIW1; raw SpecialAttackWeapon first four fields are exact by level while the varying fifth field remains unresolved and is not synthesized",
+                        NpcCombatAttackRules.CapturedSubwayDiscardedPetMinimumDamage,
+                        NpcCombatAttackRules.CapturedSubwayDiscardedPetMaximumDamage,
+                        NpcCombatAttackRules.CapturedSubwayDiscardedPetRechargeSeconds,
+                        NpcCombatAttackRules.CapturedSubwayDiscardedPetWeaponSlot,
                         0,
-                        0,
-                        1397315377);
+                        NpcCombatAttackRules.CapturedSubwayDiscardedPetWeaponTag,
+                        -1);
                 case 17649:
                     return ForDisobedientBot(level);
                 case 30379:
