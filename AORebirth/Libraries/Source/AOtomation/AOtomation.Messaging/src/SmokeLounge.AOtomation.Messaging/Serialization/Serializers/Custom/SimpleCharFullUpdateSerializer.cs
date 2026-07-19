@@ -480,7 +480,8 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             streamWriter.WriteInt32((scfu.ActiveNanos.Length + 1) * 0x3F1);
             foreach (var activeNano in scfu.ActiveNanos)
             {
-                streamWriter.WriteInt32(activeNano.NanoId);
+                streamWriter.WriteInt32((int)activeNano.NanoIdentity.Type);
+                streamWriter.WriteInt32(activeNano.NanoIdentity.Instance);
                 streamWriter.WriteInt32(activeNano.NanoInstance);
                 streamWriter.WriteInt32(activeNano.Time1);
                 streamWriter.WriteInt32(activeNano.Time2);
@@ -692,7 +693,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                         activeNanos.Add(
                             new ActiveNano
                             {
-                                NanoId = reader.ReadInt32(),
+                                NanoIdentity = reader.ReadIdentity(),
                                 NanoInstance = reader.ReadInt32(),
                                 Time1 = reader.ReadInt32(),
                                 Time2 = reader.ReadInt32()

@@ -21,7 +21,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         #region AoMember Properties
 
         [AoMember(0)]
-        public int NanoId { get; set; }
+        public Identity NanoIdentity { get; set; }
 
         [AoMember(1)]
         public int NanoInstance { get; set; }

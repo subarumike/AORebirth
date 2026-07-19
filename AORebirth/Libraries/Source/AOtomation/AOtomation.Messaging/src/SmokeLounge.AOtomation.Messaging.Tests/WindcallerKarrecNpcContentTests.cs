@@ -95,8 +95,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(932.215942f, maddy.ScfuWaypoints[1].Z);
 
             Assert.AreEqual(1, karrec.ActiveNanos.Count);
-            Assert.AreEqual(53019, karrec.ActiveNanos[0].NanoId);
-            Assert.AreEqual(0x3233F, karrec.ActiveNanos[0].NanoInstance);
+            Assert.AreEqual(53019, karrec.ActiveNanos[0].NanoIdentityType);
+            Assert.AreEqual(0x3233F, karrec.ActiveNanos[0].NanoIdentityInstance);
+            Assert.AreEqual(0, karrec.ActiveNanos[0].NanoInstance);
             Assert.AreEqual(29050327, karrec.ActiveNanos[0].Time1);
             Assert.AreEqual(29050327, karrec.ActiveNanos[0].Time2);
         }
