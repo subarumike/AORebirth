@@ -13,16 +13,11 @@ namespace ZoneEngine.Core.Playfields
     {
         public const int SubwayPlayfieldInstance = 127;
 
-        // Remaining diagnostic quarantine rows from the PF127 restore batch. Families
-        // leave this set only after their existing capture corpus passes the whole-enemy
-        // runtime gate. Only the 11 evidence-incomplete Violent Vagabond rows remain.
+        // Diagnostic quarantine remains available for future bounded activation work.
+        // Violent Vagabond is now playable under the explicit same-level Subway damage
+        // policy, so no current PF127 population row remains quarantined.
         private static readonly HashSet<int> RuntimeQuarantinedSourceInstances =
-            new HashSet<int>
-            {
-                2035645612, 2035761244, 2035762087, 2035762088,
-                2035802156, 2035802158, 2035802403, 2035803150,
-                2035803583, 2035803588, 2035803589
-            };
+            new HashSet<int>();
 
         private static readonly CapturedSubwaySpawnDefinition[] SpawnDefinitions =
         {

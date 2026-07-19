@@ -294,9 +294,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new CapturedSubwayContentProvider().GetAllSpawnDefinitions();
             Assert.AreEqual(124, supported.Length, "Supported-family evidence rows must remain unchanged.");
             Assert.AreEqual(
-                11,
+                0,
                 supported.Count(row => CapturedSubwayContentProvider.IsRuntimeQuarantined(row.SourceInstance)),
-                "Only the 11 evidence-incomplete Violent Vagabond rows may remain quarantined.");
+                "All supported-family rows must now be active; the quarantine mechanism remains available for future evidence gaps.");
             Assert.AreEqual(6, supported.Select(row => row.MonsterData).Distinct().Count());
             Assert.AreEqual(
                 197,
@@ -321,7 +321,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && !ordinaryText.Contains(
                     "!string.Equals(spawn.EvidenceCapture, \"20260710-202132\", StringComparison.Ordinal)")
                 && catalogText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined("),
-                "Accepted ordinary rows must be active while the remaining supported quarantine stays opt-in.");
+                "Accepted ordinary rows must be active while the supported quarantine mechanism stays opt-in.");
             Assert.IsTrue(
                 CountOccurrences(
                     populationText,

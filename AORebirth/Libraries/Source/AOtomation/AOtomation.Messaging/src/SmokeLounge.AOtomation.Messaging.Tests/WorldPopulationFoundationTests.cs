@@ -362,8 +362,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns();
             OrdinaryEnemyProfile[] profiles = catalog.GetProfiles();
             Assert.AreEqual(321, spawns.Length);
-            Assert.AreEqual(310, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
-            Assert.AreEqual(11, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            Assert.AreEqual(321, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(0, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
             Assert.IsTrue(spawns.All(value => value.LevelDefinition.IsValid));
             Assert.IsTrue(
                 spawns.All(
@@ -394,17 +394,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     spawns.Single(value => value.SourceIdentity == 0x7953AFCC),
                     spawns.Single(value => value.SourceIdentity == 0x795317F5),
                     spawns.Single(value => value.SourceIdentity == 0x79528FDA),
-                    spawns.Single(value => value.SourceIdentity == 0x7953AFA1)
+                    spawns.Single(value => value.SourceIdentity == 0x7953AFA1),
+                    spawns.Single(value => value.SourceIdentity == 0x7957E5C4)
                 };
             OrdinaryEnemyProfile violentVagabond = profiles.Single(
                 value => value.DisplayName == "Violent Vagabond");
             OrdinaryEnemySpawnDefinition[] violentVagabondSpawns = spawns
                 .Where(value => value.ProfileKey == violentVagabond.ProfileKey)
                 .ToArray();
-            OrdinaryEnemySpawnDefinition[] quarantinedCapturedPatrols =
-                {
-                    violentVagabondSpawns.Single(value => value.SourceIdentity == 0x7957E5C4)
-                };
             foreach (OrdinaryEnemySpawnDefinition capturedPatrol in activeCapturedPatrols)
             {
                 Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, capturedPatrol.MovementMode);
@@ -415,21 +412,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     capturedPatrol.Disposition);
             }
 
-            foreach (OrdinaryEnemySpawnDefinition capturedPatrol in quarantinedCapturedPatrols)
-            {
-                Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, capturedPatrol.MovementMode);
-                Assert.IsTrue(capturedPatrol.UseCapturedPatrolReplay);
-                Assert.IsTrue(capturedPatrol.UseSpawnAsPatrolStart);
-                Assert.AreEqual(
-                    OrdinaryEnemyRuntimeDisposition.Quarantined,
-                    capturedPatrol.Disposition);
-            }
-
             Assert.AreEqual(22, violentVagabondSpawns.Length);
-            Assert.AreEqual(
-                11,
-                violentVagabondSpawns.Count(
-                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
+            Assert.IsTrue(
+                violentVagabondSpawns.All(
+                    value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
             Assert.IsTrue(
                 violentVagabondSpawns.All(
                     value => value.RespawnEvidence == OrdinaryEnemyEvidenceState.Policy
@@ -448,9 +434,33 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(
                 OrdinaryEnemyEvidenceState.Observed,
                 violentVagabond.Aggression.EvidenceState);
-            Assert.IsFalse(violentVagabond.Combat.Contract.IsCombatReady);
+            Assert.IsTrue(violentVagabond.Combat.Contract.IsCombatReady);
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.Specialized,
+                violentVagabond.Combat.Contract.AttackModel);
             Assert.AreEqual(0, violentVagabond.Combat.Contract.WeaponLowId);
             Assert.AreEqual(0, violentVagabond.Combat.Contract.WeaponHighId);
+            CapturedEnemySpecialAttackSequenceDefinition vagabondSequence =
+                violentVagabond.Combat.Contract.SpecialAttackSequence;
+            Assert.IsNotNull(vagabondSequence);
+            Assert.IsNull(vagabondSequence.OpeningAttack);
+            Assert.AreEqual(9, vagabondSequence.RepeatingAttack.MinDamage);
+            Assert.AreEqual(12, vagabondSequence.RepeatingAttack.MaxDamage);
+            Assert.AreEqual(4.5802404, vagabondSequence.RepeatingAttack.RechargeSeconds);
+            Assert.AreEqual(0, vagabondSequence.RepeatingAttack.AttackInfoAmmoCount);
+            Assert.AreEqual(6, vagabondSequence.RepeatingAttack.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, vagabondSequence.RepeatingAttack.AttackInfoUnknown);
+            Assert.AreEqual(0, vagabondSequence.RepeatingAttack.AttackInfoWeaponInstance);
+            Assert.AreEqual(0, vagabondSequence.SpecialAttacks.Length);
+            Assert.AreEqual(32, vagabondSequence.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(35, vagabondSequence.SpecialAttackWeaponUnknown2);
+            Assert.AreEqual(29, vagabondSequence.SpecialAttackWeaponUnknown3);
+            Assert.AreEqual(31, vagabondSequence.SpecialAttackWeaponUnknown4);
+            Assert.AreEqual(0, vagabondSequence.SpecialAttackWeaponUnknown5);
+            Assert.IsTrue(
+                violentVagabond.Combat.Contract.Evidence.Contains(
+                    "private-project playability policy"));
+            Assert.IsTrue(violentVagabond.Combat.Contract.Evidence.Contains("Red Wine"));
 
             var reportOnlyCombatExpectations = new[]
                 {

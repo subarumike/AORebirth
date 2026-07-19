@@ -848,9 +848,25 @@ namespace AORebirth.Core.Playfields
                 value => value.MonsterData == ViolentVagabondMonsterData);
             CapturedEnemyCombatContract contract = profile.Combat.Contract;
             if (contract == null
-                || contract.IsCombatReady
+                || !contract.IsCombatReady
+                || contract.AttackModel != CapturedEnemyAttackModel.Specialized
                 || contract.WeaponLowId == 130590
                 || contract.WeaponHighId == 130590
+                || contract.SpecialAttackSequence == null
+                || contract.SpecialAttackSequence.OpeningAttack != null
+                || contract.SpecialAttackSequence.RepeatingAttack == null
+                || contract.SpecialAttackSequence.RepeatingAttack.MinDamage
+                   != NpcCombatAttackRules.PolicySubwayViolentVagabondMinimumDamage
+                || contract.SpecialAttackSequence.RepeatingAttack.MaxDamage
+                   != NpcCombatAttackRules.PolicySubwayViolentVagabondMaximumDamage
+                || contract.SpecialAttackSequence.RepeatingAttack.RechargeSeconds
+                   != NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackSeconds
+                || contract.SpecialAttackSequence.RepeatingAttack.AttackInfoAmmoCount
+                   != NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoAmmoCount
+                || contract.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponSlot
+                   != NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoWeaponSlot
+                || contract.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponInstance
+                   != NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoWeaponInstance
                 || profile.Aggression.Mode != OrdinaryEnemyAggressionMode.Retaliate
                 || profile.Aggression.AutomaticAggroRadius.HasValue
                 || !profile.Aggression.Chase
@@ -865,9 +881,9 @@ namespace AORebirth.Core.Playfields
                 .Where(value => value.ProfileKey == profile.ProfileKey)
                 .ToArray();
             if (rows.Length != 22
-                || rows.Count(
+                || rows.Any(
                     value => value.Disposition
-                             == OrdinaryEnemyRuntimeDisposition.Quarantined) != 11
+                             != OrdinaryEnemyRuntimeDisposition.Active)
                 || rows.Any(
                     value => value.RespawnEvidence != OrdinaryEnemyEvidenceState.Policy
                              || value.RespawnDelaySeconds != 450.0

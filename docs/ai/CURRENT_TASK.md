@@ -327,8 +327,7 @@ population in bounded runtime batches.
   boundary.
 - The diagnostic quarantine selector now changes spawn eligibility in the
   world-population owner when explicitly selected. The selector is disabled in
-  the normal runtime; only the `11` evidence-incomplete Violent Vagabond rows
-  remain quarantined. A bounded
+  the normal runtime, and no current population row remains quarantined. A bounded
   `population-activation-ledger.csv` now records `ELIGIBLE`, `MATERIALIZED`, or
   `FAILED` for selected rows so the next private-client batch can distinguish
   selection from actual runtime creation without changing eligibility.
@@ -384,9 +383,10 @@ population in bounded runtime batches.
   source `0x79557C66` (four segments) and Vagabond source `0x7957E5C4`
   (26 segments). The capture also adds the Bot's third strict item membership,
   `113398/113399` at QL7, and brings its strict sample to three positive and five
-  empty outcomes. Vagabond now has 14 strict outcomes, 13 positive and one empty,
-  but remains quarantined because its reviewed combat evidence contains 40
-  misses and no landed local-player damage. The capture proves neither respawn
+  empty outcomes. Vagabond now has 14 strict outcomes, 13 positive and one empty.
+  Its reviewed combat evidence contains only misses, so runtime uses the
+  user-approved same-level Mugger `9..12` normal range while preserving the
+  Vagabond's captured cadence and attack packet shape. The capture proves neither respawn
   timing nor corpse lifetime, and it does not establish background patrols for
   any other source.
 - Finalized capture `20260719-021022` adds source-specific complete patrols for
@@ -396,8 +396,9 @@ population in bounded runtime batches.
   `0x7953AFA1` (10 segments, four complete cycles). Four existing Flea routes
   and the existing Vagabond route are independently corroborated. Ambiguous
   complete routes remain evidence-only and are not mapped. The Violent
-  Vagabond patrol evidence adds no combat result, so the family remains
-  partially quarantined and `0x7953AFA1` keeps its active disposition.
+  Vagabond patrol evidence adds no landed combat result; all 22 family rows are
+  nevertheless active under the explicit playability damage policy, and
+  `0x7953AFA1` keeps its active disposition.
   Incidental Mugger evidence adds one miss and SIW context without changing
   the captured Mugger landed-damage range. This capture proves neither respawn
   timing nor corpse lifetime.
@@ -552,11 +553,12 @@ Vagabond; and strict Empty Shell/Premature Pattern loot.
    startup remnants and contain no recoverable gameplay traffic.
 2. Sixteen accepted-profile rows are active and await bounded private-client
    validation: 6 Stim Fiends, 5 Muggers, 2 Disobedient Bots, 2 Looters, and 1
-   Deranged Shopper. Only 11 rows remain quarantined, all Violent Vagabonds.
+   Deranged Shopper. All 321 ordinary population rows are active; none remain
+   quarantined. The 22 Vagabonds require a private-client playability smoke.
 3. Five of the 26 ordinary profiles remain outside the whole-enemy accepted
-   set. Their rows remain 32 active plus 11 quarantined: Infected Attendant
+   set. Their 43 rows are active: Infected Attendant
    `5/0`, Lost Thought `4/0`, Empty Shell `5/0`, Premature Pattern `7/0`, and
-   Violent Vagabond `11/11`. The combat report now separates every reviewed
+   Violent Vagabond `22/0`. The combat report now separates every reviewed
    target role: Infected retains one local `11` outcome plus local, other-player,
    and pet attack starts; Lost retains 11 other-player hits at `15..20` with a
    `4.5320703`-second median; Empty retains local `15`, two misses, other-player
@@ -569,13 +571,14 @@ Vagabond; and strict Empty Shell/Premature Pattern loot.
    report-only because current runtime support cannot safely represent its
    captured multi-effect/ChangeVariable behavior.
    Vagabond now has 26 distinct local misses after overlap deduplication, a
-   `4.0799494`-second median attempt interval, and two exact simultaneous
+   `4.5802404`-second versioned median attempt interval, and two exact simultaneous
    other-player attack starts. Automatic acquisition/chase is capture-proven at
    a guaranteed `16.606338`-unit lower bound but remains report-only while
    landed damage is unresolved; runtime stays retaliatory with shared chase and
-   no automatic radius. Its `450`-second post-NPC-despawn policy is derived from
+   no automatic radius. Runtime damage is the explicit same-level Mugger
+   `9..12` playability policy, not a capture-parity claim. Its `450`-second post-NPC-despawn policy is derived from
    the exact `449.759588` interval. QL1 template `130590` is Red Wine, is
-   rejected as combat input, and the 11 incomplete rows remain quarantined.
+   rejected as combat input, and all 22 rows are active.
 4. Strike Foreman has usable exact L19/736 HP appearance, QL19 weapon, raw
    `SpecialAttackWeapon` plus `Attack` initiation against the non-local player
    Wardog, three other-player outgoing hits (`18`, `18`, and critical `40`),
