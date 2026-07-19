@@ -10,6 +10,31 @@ projections no longer require repeat gameplay captures. The active work is to
 promote the recovered exact evidence and then validate the quarantined PF127
 population in bounded runtime batches.
 
+## AOSharp capture-safety repair (2026-07-19)
+
+- Official-client attempts `20260719-001621` and `20260719-001715` terminated
+  abruptly. The second session loaded and recorded about 3.8 seconds of traffic,
+  then ended mid-write without a managed callback exception or finalized capture
+  boundary. Windows recorded the repeating native cascade `0xc0000409`,
+  `GUI.dll 0xc00001a5`, and `0xc0000005`; prior dump analysis ties this signature
+  family to the injected `ProcessChatInput` GUI patch. This is capture-tool/client
+  corruption, not evidence of a Subway server failure.
+- Capture-tagged injection now skips that GUI patch while retaining packet/game
+  hooks, rejects duplicate Bootstrap injection with a named per-client guard,
+  and releases the guard on constructor failure or Bootstrap unload. The launcher
+  refuses stale binaries through a deployed Bootstrap contract self-test before
+  it selects a client target.
+- Comprehensive enemy capture no longer instantiates the native PF127 geometry
+  probe. Geometry remains isolated to the explicit geometry-only workflow; the
+  promoted server collision asset is unchanged.
+- Comprehensive capture starts automatically and now accepts `start`, `stop`,
+  `mark`, `flush`, and `snapshot` through an atomic one-slot external control
+  file. This replaces typed `/aocap` control for capture-safe injection.
+- Capture-plugin build and capture-safe injector build/self-test pass without
+  launching or injecting a client. Live official-client regression remains
+  pending; do not describe the crash repair as live-proven until Mike confirms a
+  stable capture.
+
 ## Quest-system foundation and TOTW gateway (2026-07-17)
 
 - The MySQL-backed, character-scoped mission repository now covers lifecycle,

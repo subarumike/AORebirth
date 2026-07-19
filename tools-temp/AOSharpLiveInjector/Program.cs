@@ -17,6 +17,11 @@ namespace AOSharpLiveInjector
 
         private static int Main(string[] args)
         {
+            if (args.Any(arg => string.Equals(arg, "--self-test", StringComparison.OrdinalIgnoreCase)))
+            {
+                return RunSelfTest();
+            }
+
             string pluginPath = GetArgument(args, "--plugin")
                 ?? Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\AOSharpLiveCapture\bin\Debug\AOSharpLiveCapture.dll"));
             string titleContains = GetArgument(args, "--title");
@@ -41,15 +46,23 @@ namespace AOSharpLiveInjector
 
                 string bootstrapPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AOSharp.Bootstrap.dll");
                 Log(logPath, "Bootstrap: " + bootstrapPath);
+                string channelName = target.Id.ToString(CultureInfo.InvariantCulture)
+                    + AOSharp.Bootstrap.Main.CaptureSafeChannelSuffix;
+                Log(logPath, "Bootstrap mode: capture-safe; GUI chat patch disabled.");
+                if (IsCaptureBootstrapActive(channelName))
+                {
+                    throw new InvalidOperationException(
+                        "A capture-safe AOSharp bootstrap is already active in the target client; refusing duplicate injection.");
+                }
 
                 RemoteHooking.Inject(
                     target.Id,
                     InjectionOptions.DoNotRequireStrongName,
                     bootstrapPath,
                     bootstrapPath,
-                    target.Id.ToString(CultureInfo.InvariantCulture));
+                    channelName);
 
-                IPCClient pipe = new IPCClient(target.Id.ToString(CultureInfo.InvariantCulture));
+                IPCClient pipe = new IPCClient(channelName);
                 pipe.Connect();
                 pipe.Send(new LoadAssemblyMessage { Assemblies = new[] { pluginPath } });
                 Log(logPath, "Capture plugin injected.");
@@ -61,6 +74,43 @@ namespace AOSharpLiveInjector
                 Log(logPath, "ERROR: " + ex);
                 Console.Error.WriteLine(ex);
                 return 1;
+            }
+        }
+
+        private static int RunSelfTest()
+        {
+            string safeChannel = "1234" + AOSharp.Bootstrap.Main.CaptureSafeChannelSuffix;
+            if (AOSharp.Bootstrap.Main.CaptureSafeContractVersion != 1
+                || !AOSharp.Bootstrap.Main.IsCaptureSafeChannel(safeChannel)
+                || AOSharp.Bootstrap.Main.IsCaptureSafeChannel("1234")
+                || AOSharp.Bootstrap.Main.ShouldInstallGuiChatPatch(true)
+                || !AOSharp.Bootstrap.Main.ShouldInstallGuiChatPatch(false)
+                || !string.Equals(
+                    AOSharp.Bootstrap.Main.GetCaptureSafeSingletonName(safeChannel),
+                    AOSharp.Bootstrap.Main.CaptureSafeSingletonNamePrefix + safeChannel,
+                    StringComparison.Ordinal))
+            {
+                Console.Error.WriteLine("FAIL: capture-safe bootstrap channel contract is invalid.");
+                return 1;
+            }
+
+            Console.WriteLine("PASS: capture-safe bootstrap disables the GUI chat patch.");
+            return 0;
+        }
+
+        private static bool IsCaptureBootstrapActive(string channelName)
+        {
+            try
+            {
+                using (EventWaitHandle singleton = EventWaitHandle.OpenExisting(
+                    AOSharp.Bootstrap.Main.GetCaptureSafeSingletonName(channelName)))
+                {
+                    return true;
+                }
+            }
+            catch (WaitHandleCannotBeOpenedException)
+            {
+                return false;
             }
         }
 
