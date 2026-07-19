@@ -20,6 +20,7 @@ namespace AORebirth.Core.Playfields
         private static readonly CapturedSubwayCorpseEvidenceDefinition[] SupportedCorpseEvidence =
         {
             new CapturedSubwayCorpseEvidenceDefinition("20260708-004038", "2026-07-08T05:42:13.1283629Z", "(Corpse:00F6E00F)", "(SimpleChar:794ADB99)", 5, 26092, 5907, 29),
+            new CapturedSubwayCorpseEvidenceDefinition("20260708-004038", "2026-07-08T05:42:28.7676408Z", "(Corpse:00F6E00F)", "(SimpleChar:794A16EE)", 10, 17720, 15929, 35),
             new CapturedSubwayCorpseEvidenceDefinition("20260708-004038", "2026-07-08T05:44:19.0256869Z", "(Corpse:00F6E007)", "(SimpleChar:794AD9A9)", 4, 17657, 15231, 23),
             new CapturedSubwayCorpseEvidenceDefinition("20260708-004038", "2026-07-08T05:45:12.2764697Z", "(Corpse:00F6E01E)", "(SimpleChar:794ADBC4)", 5, 17657, 15231, 29),
             new CapturedSubwayCorpseEvidenceDefinition("20260708-143600", "2026-07-08T19:36:15.0738631Z", "(Corpse:00F6E00E)", "(SimpleChar:794DF18C)", 5, 17657, 15231, 29),
@@ -63,6 +64,7 @@ namespace AORebirth.Core.Playfields
             new CapturedSubwayCorpseEvidenceDefinition("20260708-143600", "2026-07-08T20:02:10.7306094Z", "(Corpse:00F6E005)", "(SimpleChar:794DF343)", 10, 17720, 15929, 35),
             new CapturedSubwayCorpseEvidenceDefinition("20260708-143600", "2026-07-08T20:03:55.2477489Z", "(Corpse:00F6E006)", "(SimpleChar:794DF34E)", 9, 17720, 15929, 32),
             new CapturedSubwayCorpseEvidenceDefinition("20260709-205921", "2026-07-10T02:03:30.1606625Z", "(Corpse:00F6E013)", "(SimpleChar:795310FB)", 8, 17649, 15215, 10),
+            new CapturedSubwayCorpseEvidenceDefinition("20260709-205921", "2026-07-10T02:03:50.9754522Z", "(Corpse:00F6E012)", "(SimpleChar:7953178A)", 6, 17720, 15929, 21),
             new CapturedSubwayCorpseEvidenceDefinition("20260709-210452", "2026-07-10T02:05:16.2220694Z", "(Corpse:00F6E01E)", "(SimpleChar:79531789)", 7, 17720, 15929, 25),
             new CapturedSubwayCorpseEvidenceDefinition("20260709-210452", "2026-07-10T02:05:24.5890734Z", "(Corpse:00F6E01F)", "(SimpleChar:795317EF)", 5, 17720, 15929, 18),
             new CapturedSubwayCorpseEvidenceDefinition("20260709-210452", "2026-07-10T02:05:43.7375936Z", "(Corpse:00F6E012)", "(SimpleChar:7953ABA3)", 6, 203733, 17870, 21),

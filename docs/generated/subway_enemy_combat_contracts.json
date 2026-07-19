@@ -790,12 +790,26 @@
       17720
     ],
     "captures": [
+      "20260708-143600",
       "20260709-205921",
       "20260709-210452",
       "20260709-220439"
     ],
     "identities": [
+      "(SimpleChar:794ADBEF)",
+      "(SimpleChar:794ADBF4)",
+      "(SimpleChar:794CD4D5)",
+      "(SimpleChar:794CD760)",
+      "(SimpleChar:794CD767)",
+      "(SimpleChar:794CD7BA)",
+      "(SimpleChar:794DF083)",
+      "(SimpleChar:794DF1B1)",
+      "(SimpleChar:794DF1BE)",
+      "(SimpleChar:794DF1D4)",
+      "(SimpleChar:794DF1E0)",
       "(SimpleChar:794DF1E3)",
+      "(SimpleChar:794DF343)",
+      "(SimpleChar:794DF34E)",
       "(SimpleChar:794F626A)",
       "(SimpleChar:79531789)",
       "(SimpleChar:7953178A)",
@@ -806,32 +820,33 @@
       "(SimpleChar:7953AA82)"
     ],
     "retaliationObserved": true,
-    "retaliationRows": 4,
+    "retaliationRows": 27,
     "attackInfoObserved": true,
-    "attackInfoRows": 2,
+    "attackInfoRows": 41,
     "minDamage": 9,
-    "maxDamage": 9,
-    "normalAttackInfoRows": 2,
+    "maxDamage": 33,
+    "normalAttackInfoRows": 37,
     "normalMinDamage": 9,
-    "normalMaxDamage": 9,
-    "criticalAttackInfoRows": 0,
-    "criticalMinDamage": 0,
-    "criticalMaxDamage": 0,
-    "missedAttackInfoRows": 1,
+    "normalMaxDamage": 18,
+    "criticalAttackInfoRows": 4,
+    "criticalMinDamage": 30,
+    "criticalMaxDamage": 33,
+    "missedAttackInfoRows": 2,
     "missedAttackShapes": [
       {
         "ammoCount": -1,
         "weaponSlot": 0,
         "unknown": 0,
-        "rows": 1,
+        "rows": 2,
         "captures": [
+          "20260708-143600",
           "20260709-210452"
         ]
       }
     ],
     "specialAttackWeaponRows": 0,
     "specialAttackWeaponShapes": [],
-    "medianRechargeSeconds": 0.0,
+    "medianRechargeSeconds": 5.079568,
     "weaponSlot": 0,
     "attackInfoUnknown": 0,
     "attackInfoWeaponInstance": 1397315377,
@@ -840,16 +855,17 @@
         "weaponSlot": 0,
         "attackInfoUnknown": 0,
         "weaponInstance": 1397315377,
-        "rows": 2,
+        "rows": 41,
         "captures": [
+          "20260708-143600",
           "20260709-210452"
         ],
         "minDamage": 9,
-        "maxDamage": 9,
-        "intervalRows": 0,
-        "minIntervalSeconds": null,
-        "medianIntervalSeconds": null,
-        "maxIntervalSeconds": null
+        "maxDamage": 33,
+        "intervalRows": 25,
+        "minIntervalSeconds": 4.609299,
+        "medianIntervalSeconds": 5.079568,
+        "maxIntervalSeconds": 5.950416
       }
     ],
     "equippedWeaponObserved": false,

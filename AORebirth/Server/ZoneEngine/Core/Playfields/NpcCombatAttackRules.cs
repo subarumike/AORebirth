@@ -56,6 +56,23 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayThiefMonsterData = 26092;
 
+        public const int CapturedSubwayDiscardedPetMonsterData = 17720;
+
+        // The focused official-live corpus contains 37 normal local-player SIW1
+        // hits. Four 30..33 criticals remain report-only because critical chance
+        // is not established by the sample.
+        public const int CapturedSubwayDiscardedPetMinimumDamage = 9;
+
+        public const int CapturedSubwayDiscardedPetMaximumDamage = 18;
+
+        // Conventional median of 30 same-source landed-hit intervals. The
+        // observed interval envelope is 4.609299..5.950416 seconds.
+        public const double CapturedSubwayDiscardedPetRechargeSeconds = 5.089763;
+
+        public const int CapturedSubwayDiscardedPetWeaponSlot = 0;
+
+        public const int CapturedSubwayDiscardedPetWeaponTag = 0x53495731;
+
         public const int CapturedSubwayDisobedientBotMonsterData = 17649;
 
         // Nine projected official-live hits plus eight authoritative raw-only hits

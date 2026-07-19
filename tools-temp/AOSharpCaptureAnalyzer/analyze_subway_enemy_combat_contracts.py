@@ -42,7 +42,9 @@ CAPTURES = (
 )
 CAPTURE_ENEMY_FILTERS = {
     "20260708-004038": frozenset({"Filth Flea"}),
-    "20260708-143600": frozenset({"Deranged Shopper", "Disobedient Bot"}),
+    "20260708-143600": frozenset(
+        {"Deranged Shopper", "Discarded Pet", "Disobedient Bot"}
+    ),
     "20260709-213711": frozenset({"Architect Striker", "Workman Striker"}),
     "20260710-202132": frozenset({"Deranged Shopper"}),
     "20260716-034433": frozenset({"Vergil Aeneid"}),
@@ -532,6 +534,34 @@ def validate_workman_striker_distinct_combat(
         )
     ):
         raise ValueError("non-overlapping Workman Striker combat rows changed")
+
+
+def validate_discarded_pet_combat(report_entry: dict[str, object]) -> None:
+    required_captures = {"20260708-143600", "20260709-210452"}
+    if not required_captures.issubset(set(report_entry["captures"])):
+        raise ValueError("Discarded Pet focused combat captures are missing")
+    if (
+        report_entry["normalAttackInfoRows"] != 37
+        or report_entry["normalMinDamage"] != 9
+        or report_entry["normalMaxDamage"] != 18
+        or report_entry["criticalAttackInfoRows"] != 4
+        or report_entry["criticalMinDamage"] != 30
+        or report_entry["criticalMaxDamage"] != 33
+        or report_entry["weaponSlot"] != 0
+        or report_entry["attackInfoUnknown"] != 0
+        or report_entry["attackInfoWeaponInstance"] != 0x53495731
+    ):
+        raise ValueError("Discarded Pet SIW1 local-player evidence drifted")
+    shapes = report_entry["attackShapes"]
+    if (
+        len(shapes) != 1
+        or shapes[0]["rows"] != 41
+        or shapes[0]["intervalRows"] != 25
+        or shapes[0]["minIntervalSeconds"] != 4.609299
+        or shapes[0]["medianIntervalSeconds"] != 5.079568
+        or shapes[0]["maxIntervalSeconds"] != 5.950416
+    ):
+        raise ValueError("Discarded Pet SIW1 local-player cadence drifted")
 
 
 def add_reviewed_raw_target_role_evidence(
@@ -1106,6 +1136,8 @@ def main():
         )
         if name == "Workman Striker":
             validate_workman_striker_distinct_combat(attacks, report_entry)
+        if name == "Discarded Pet":
+            validate_discarded_pet_combat(report_entry)
         report[name] = report_entry
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)

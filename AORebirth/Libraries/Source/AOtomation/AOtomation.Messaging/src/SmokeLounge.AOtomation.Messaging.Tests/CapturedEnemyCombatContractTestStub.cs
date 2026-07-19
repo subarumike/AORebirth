@@ -60,6 +60,8 @@ namespace AORebirth.Core.Playfields
 
         private const int DerangedShopperSourceInstance = 0x79574527;
 
+        private const int DiscardedPetMonsterData = 17720;
+
         private const int IncompleteRebuildMonsterData = 203728;
 
         private const int FragmentedSoulMonsterData = 203729;
@@ -123,14 +125,34 @@ namespace AORebirth.Core.Playfields
 
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
         {
-            return monsterData == BloodcreeperMonsterData
-                ? new CapturedEnemyCombatContract
+            if (monsterData == BloodcreeperMonsterData)
+            {
+                return new CapturedEnemyCombatContract
                     {
                         AttackModel = CapturedEnemyAttackModel.Specialized,
                         IsCombatReady = true,
                         Evidence = "Bloodcreeper captured dual natural attack sequence."
-                    }
-                : new CapturedEnemyCombatContract();
+                    };
+            }
+
+            if (monsterData == DiscardedPetMonsterData)
+            {
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.FixedAttackInfo,
+                    IsCombatReady = true,
+                    Evidence = "37 normal local-player Discarded Pet SIW1 hits span 9..18; four 30..33 criticals remain report-only; conventional median 5.089763 seconds.",
+                    MinDamage = 9,
+                    MaxDamage = 18,
+                    RechargeSeconds = 5.089763,
+                    AttackInfoAmmoCount = -1,
+                    AttackInfoWeaponSlot = 0,
+                    AttackInfoUnknown = 0,
+                    AttackInfoWeaponInstance = 0x53495731
+                };
+            }
+
+            return new CapturedEnemyCombatContract();
         }
 
         internal static CapturedEnemyCombatContract ForSupportedSourceWeapon(
