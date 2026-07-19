@@ -242,15 +242,17 @@ minute loot-bearing corpse behavior apply. Its four-minute respawn remains the
 centralized private PF127 ordinary policy, not an official-live timing claim.
 
 Disobedient Bot is the fifth accepted ordinary profile. Its 12 exact spawn rows
-use captured NPC family `138`. Seventeen normal SIW1 hits against local players
-prove the aggregate `8..15` envelope; two Killer-pet hits remain separate, no
-critical is observed, and focused attack attempts retain the exact
+use captured NPC family `138`. Fourteen normal SIW1 hits against local players
+prove the aggregate `8..15` envelope; three other-player hits and two
+player-owned Killer-pet hits remain separate, no critical is observed, and
+focused attack attempts retain the exact
 `5.973723`-second recharge instead of a miss-biased landed-hit interval. The
 ordinary combat profile resolves SIW1 context from the selected spawn level:
 captured `L5=30/30/30/30/22`, `L6=35`, `L8=45`, `L9=49`, and `L10=54`; L7 uses
 the explicit bounded midpoint policy `40`, while other levels fail closed. The
-generated combat projection contains nine decoded hits at `8..15`; eight
-additional authoritative raw rows complete the 17-hit audit.
+generated combat projection contains nine decoded plus five reviewed-raw local
+hits at `8..15`, three other-player hits at `8`, and two player-owned Killer-pet
+hits at `8` and `19`.
 
 Thirteen valid identity-linked corpse rows preserve CATMesh `15215` and exact
 level-credit rules. The unlinked `20260713-013906` item outcome remains excluded.
