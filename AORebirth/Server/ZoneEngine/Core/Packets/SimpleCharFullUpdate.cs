@@ -514,7 +514,12 @@ namespace ZoneEngine.Core.Packets
                 select
                     new ActiveNano
                     {
-                        NanoId = nano.ID,
+                        NanoIdentity =
+                            new Identity
+                            {
+                                Type = IdentityType.NanoProgram,
+                                Instance = nano.ID
+                            },
                         NanoInstance = nano.Instance,
                         Time1 = nano.TickCounter,
                         Time2 = nano.TickInterval
@@ -658,7 +663,12 @@ namespace ZoneEngine.Core.Packets
                         nano =>
                             new ActiveNano
                             {
-                                NanoId = nano.NanoId,
+                                NanoIdentity =
+                                    new Identity
+                                    {
+                                        Type = (IdentityType)nano.NanoIdentityType,
+                                        Instance = nano.NanoIdentityInstance
+                                    },
                                 NanoInstance = nano.NanoInstance,
                                 Time1 = nano.Time1,
                                 Time2 = nano.Time2

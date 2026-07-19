@@ -47,6 +47,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using Utility;
     using ZoneEngine.Core;
+    using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.Mail;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
@@ -106,6 +107,12 @@ namespace ZoneEngine.Core.MessageHandlers
                 PlayfieldLifecycleTrace.StageCharInPlayReady,
                 "CharacterReady",
                 client.Controller.Character.Identity);
+            var currentPlayfield =
+                client.Controller.Character.Playfield as AORebirth.Core.Playfields.Playfield;
+            if (currentPlayfield != null)
+            {
+                currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });
+            }
 
             client.Controller.Character.Stats.ClearChangedFlags();
 

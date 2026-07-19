@@ -230,9 +230,131 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
+        [TestMethod]
+        public void WindcallerKarrecActiveNanoScfuMatchesCapturedBodyByteForByte()
+        {
+            const string CapturedBodyHex =
+                "271B3A6B0000C350796360BB003A0A2A6ACB0000028F4548C602420FE666444530A6"
+                + "0000000000000000000000003F7FFFFF000006281257696E6463616C6C6572204B61"
+                + "727265630010881201000000008800000000C8C7400000009F720079001F010000001C"
+                + "0000000000000000000000000801000100010001000100000002000000009EF80203"
+                + "000007E20000CF1B0003233F0000000001BB45D701BB45D7000017A6000000000000"
+                + "00000000000000000001000277AE0000000000000002000277B30000000000000003"
+                + "000277A90000000000000004000277BD0000000000000BD30000004E8C000277B802"
+                + "0000009EF800000000040000000000";
+            var capturedFlags = (SimpleCharFullUpdateFlags)0x0A2A6ACB;
+            var message =
+                new SimpleCharFullUpdateMessage
+                    {
+                        Identity =
+                            new Identity
+                                {
+                                    Type = IdentityType.CanbeAffected,
+                                    Instance = unchecked((int)0x796360BB)
+                                },
+                        Version = 58,
+                        PlayfieldId = 655,
+                        Coordinates = new Vector3 { X = 3212.37549f, Y = 35.975f, Z = 788.760132f },
+                        Heading = new Quaternion { X = 0, Y = 0, Z = 0, W = 0.99999994f },
+                        Appearance = new Appearance { Value = 1576 },
+                        Name = "Windcaller Karrec",
+                        CharacterFlags = (CharacterFlags)277352961,
+                        CharacterInfo = new SimpleNpcInfo { Family = 136, LosHeight = 0 },
+                        Level = 200,
+                        Health = 51008,
+                        HealthDamage = 0,
+                        MonsterData = 40818,
+                        MonsterScale = 121,
+                        VisualFlags = 31,
+                        VisibleTitle = 1,
+                        Unknown1 =
+                            DecodeHex("00000000000000000000000008010001000100010001000000020000"),
+                        HeadMesh = 40696,
+                        RunSpeedBase = 515,
+                        ActiveNanos =
+                            new[]
+                                {
+                                    new ActiveNano
+                                        {
+                                            NanoIdentity =
+                                                new Identity
+                                                    {
+                                                        Type = IdentityType.NanoProgram,
+                                                        Instance = 0x3233F
+                                                    },
+                                            NanoInstance = 0,
+                                            Time1 = 29050327,
+                                            Time2 = 29050327
+                                        }
+                                },
+                        Waypoints = new Vector3[0],
+                        Textures =
+                            new[]
+                                {
+                                    new Texture { Place = 0, Id = 0, Unknown = 0 },
+                                    new Texture { Place = 1, Id = 161710, Unknown = 0 },
+                                    new Texture { Place = 2, Id = 161715, Unknown = 0 },
+                                    new Texture { Place = 3, Id = 161705, Unknown = 0 },
+                                    new Texture { Place = 4, Id = 161725, Unknown = 0 }
+                                },
+                        Meshes =
+                            new[]
+                                {
+                                    new Mesh { Position = 0, Id = 20108, OverrideTextureId = 161720, Layer = 2 },
+                                    new Mesh { Position = 0, Id = 40696, OverrideTextureId = 0, Layer = 4 }
+                                },
+                        AdditionalFlags = capturedFlags,
+                        SuppressedFlags = ~capturedFlags,
+                        Flags2 = 0,
+                        Unknown2 = 0
+                    };
+
+            var serializerResolver = new DebuggingSerializerResolverBuilder<MessageBody>().Build();
+            var serializationContext = new SerializationContext(serializerResolver);
+            byte[] capturedBody = DecodeHex(CapturedBodyHex);
+            using (var memoryStream = new MemoryStream())
+            using (var streamWriter = new StreamWriter(memoryStream))
+            using (var streamReader = new StreamReader(memoryStream))
+            {
+                streamWriter.Position = 16;
+                new SimpleCharFullUpdateSerializer().Serialize(
+                    streamWriter,
+                    serializationContext,
+                    message);
+
+                byte[] serializedPacket = memoryStream.ToArray();
+                var serializedBody = new byte[serializedPacket.Length - 16];
+                Buffer.BlockCopy(serializedPacket, 16, serializedBody, 0, serializedBody.Length);
+                Assert.AreEqual(254, serializedBody.Length);
+                CollectionAssert.AreEqual(capturedBody, serializedBody);
+
+                memoryStream.Position = 16;
+                var decoded =
+                    (SimpleCharFullUpdateMessage)new SimpleCharFullUpdateSerializer().Deserialize(
+                        streamReader,
+                        serializationContext);
+                Assert.IsTrue(decoded.TailFullyDecoded);
+                Assert.AreEqual(1, decoded.ActiveNanos.Length);
+                Assert.AreEqual(IdentityType.NanoProgram, decoded.ActiveNanos[0].NanoIdentity.Type);
+                Assert.AreEqual(0x3233F, decoded.ActiveNanos[0].NanoIdentity.Instance);
+                Assert.AreEqual(0, decoded.ActiveNanos[0].NanoInstance);
+            }
+        }
+
         #endregion
 
         #region Methods
+
+        private static byte[] DecodeHex(string value)
+        {
+            var bytes = new byte[value.Length / 2];
+            for (int index = 0; index < bytes.Length; index++)
+            {
+                bytes[index] = Convert.ToByte(value.Substring(index * 2, 2), 16);
+            }
+
+            return bytes;
+        }
 
         private object SerializeDeserialize(object obj)
         {
