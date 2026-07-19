@@ -352,7 +352,8 @@ namespace AORebirth.Core.Playfields
             double rechargeSeconds,
             int weaponSlot,
             int attackInfoUnknown,
-            int weaponInstance)
+            int weaponInstance,
+            int attackInfoAmmoCount = 0)
         {
             return new CapturedEnemyCombatContract
             {
@@ -363,6 +364,7 @@ namespace AORebirth.Core.Playfields
                 MinDamage = minDamage,
                 MaxDamage = maxDamage,
                 RechargeSeconds = rechargeSeconds,
+                AttackInfoAmmoCount = attackInfoAmmoCount,
                 AttackInfoWeaponSlot = weaponSlot,
                 AttackInfoUnknown = attackInfoUnknown,
                 AttackInfoWeaponInstance = weaponInstance
@@ -670,6 +672,8 @@ namespace AORebirth.Core.Playfields
 
         private const int IncompleteRebuildMonsterData = 203728;
 
+        private const int FragmentedSoulMonsterData = 203729;
+
         private const int LooterMonsterData = 203745;
 
         private const int MuggerMonsterData = 203734;
@@ -711,6 +715,20 @@ namespace AORebirth.Core.Playfields
             unchecked((int)0x795451BF),
             unchecked((int)0x795451C4),
             unchecked((int)0x795451D3)
+        };
+
+        private static readonly int[] FragmentedSoulSourceInstances =
+        {
+            unchecked((int)0x7954516A),
+            unchecked((int)0x7954516F),
+            unchecked((int)0x7954517A),
+            unchecked((int)0x7954518A),
+            unchecked((int)0x7954518B),
+            unchecked((int)0x7954518E),
+            unchecked((int)0x795451AA),
+            unchecked((int)0x795451AE),
+            unchecked((int)0x79545248),
+            unchecked((int)0x79545367)
         };
 
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
@@ -911,13 +929,14 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue));
                 case 17720:
                     return CapturedEnemyCombatContract.FixedAttack(
-                        "20260709-210452/220439: Discarded Pet AttackInfo",
-                        9,
-                        9,
-                        0.0,
+                        "20260708-143600 and 20260709-210452: 37 normal local-player Discarded Pet SIW1 hits span 9..18; four 30..33 criticals remain report-only; 30 same-source landed-hit intervals span 4.609299..5.950416 seconds with conventional median 5.089763; AttackInfo uses ammo -1, slot 0, unknown 0, and instance SIW1; raw SpecialAttackWeapon first four fields are exact by level while the varying fifth field remains unresolved and is not synthesized",
+                        NpcCombatAttackRules.CapturedSubwayDiscardedPetMinimumDamage,
+                        NpcCombatAttackRules.CapturedSubwayDiscardedPetMaximumDamage,
+                        NpcCombatAttackRules.CapturedSubwayDiscardedPetRechargeSeconds,
+                        NpcCombatAttackRules.CapturedSubwayDiscardedPetWeaponSlot,
                         0,
-                        0,
-                        1397315377);
+                        NpcCombatAttackRules.CapturedSubwayDiscardedPetWeaponTag,
+                        -1);
                 case 17649:
                     return ForDisobedientBot(level);
                 case 30379:
@@ -1001,12 +1020,30 @@ namespace AORebirth.Core.Playfields
                         NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown4,
                         NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown5);
                 case 203733:
-                    return CapturedEnemyCombatContract.EquippedWeapon(
-                        "20260709-205921/210452/212115/212336: Violent Vagabond QL1 weapon 130590",
-                        130590,
-                        130590,
-                        1,
-                        (int)WeaponSlots.Righthand);
+                    return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                        "Official-live captures 20260719-010047 and 20260719-020104 prove repeated Violent Vagabond attack attempts, all misses, a 4.5802404-second corpus cadence, AttackInfo 0/6/0/0, and SpecialAttackWeapon 32/35/29/31/0. Landed damage is unavailable because the Vagabonds could not hit the test character, so the private-project playability policy uses the adjacent same-level Subway Mugger normal range of 9..12. QL1 template 130590 is Red Wine and remains excluded from combat.",
+                        new CapturedEnemySpecialAttackSequenceDefinition(
+                            NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackSeconds,
+                            null,
+                            new CapturedEnemyCombatAttackDefinition(
+                                NpcCombatAttackRules.PolicySubwayViolentVagabondMinimumDamage,
+                                NpcCombatAttackRules.PolicySubwayViolentVagabondMaximumDamage,
+                                0,
+                                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackSeconds,
+                                false,
+                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoAmmoCount,
+                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoWeaponSlot,
+                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoUnknown,
+                                NpcCombatAttackRules.NormalAttackInfoHitType,
+                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoWeaponInstance,
+                                true),
+                            new CapturedEnemySpecialAttackDefinition[0],
+                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown1,
+                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown2,
+                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown3,
+                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown4,
+                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown5));
                 default:
                     return CapturedEnemyCombatContract.Unresolved(
                         "No captured combat contract for " + name + " monsterData=" + monsterData,
@@ -1047,7 +1084,7 @@ namespace AORebirth.Core.Playfields
             }
 
             return CapturedEnemyCombatContract.CapturedSpecialSequence(
-                "20260708-143600, 20260709-205921/210452/220439, 20260712-153918, and 20260713-014714/033511: 17 Disobedient Bot SIW1 normal local-player hits span 8-15 damage; focused raw packets prove a 3.270444-second first hit and 5.973723-second repeat attempt cadence; SpecialAttackWeapon contexts are capture-backed for levels 5, 6, 8, 9, and 10, including the level-5 terminal value 22, with level 7 explicitly using the bounded 35/45 midpoint policy",
+                "20260708-143600, 20260709-205921/210452/220439, 20260712-153918, 20260713-014714/033511, and 20260719-020104: 15 Disobedient Bot SIW1 normal local-player hits span 6-15 damage; three other-player hits and two player-owned Killer-pet hits remain separate; focused raw packets prove a 3.270444-second first hit and 5.973723-second repeat attempt cadence; SpecialAttackWeapon contexts are capture-backed for levels 5, 6, 8, 9, and 10, including the level-5 terminal value 22, with level 7 explicitly using the bounded 35/45 midpoint policy",
                 new CapturedEnemySpecialAttackSequenceDefinition(
                     NpcCombatAttackRules.CapturedSubwayDisobedientBotInitialAttackSeconds,
                     null,
@@ -1306,6 +1343,118 @@ namespace AORebirth.Core.Playfields
                 matched.LowId,
                 matched.HighId,
                 matched.Quality,
+                (int)WeaponSlots.Righthand,
+                17,
+                (int)WeaponSlots.Righthand,
+                0,
+                0);
+        }
+
+        private static CapturedEnemyCombatContract ForFragmentedSoul(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            OrdinaryEnemySpawnVariant variant,
+            CapturedSubwayGenerationVariantDefinition[] generationEvidence)
+        {
+            CapturedSubwayCombatEvidenceDefinition combat = archetype == null
+                ? null
+                : archetype.Combat;
+            bool hasExactCombatEvidence = combat != null
+                                          && combat.Observed
+                                          && combat.ObservedRows == 2
+                                          && combat.MinDamage == 18
+                                          && combat.MaxDamage == 23
+                                          && combat.WeaponSlot == (int)WeaponSlots.Righthand
+                                          && combat.AttackInfoUnknown == 0
+                                          && combat.WeaponInstance == 0;
+            OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
+                ? null
+                : variant.WeaponLoadout;
+            string atomicFailure = string.Empty;
+            if (!hasExactCombatEvidence
+                || archetype == null
+                || Array.IndexOf(FragmentedSoulSourceInstances, sourceInstance) < 0
+                || !OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
+                    FragmentedSoulMonsterData,
+                    sourceInstance,
+                    variant,
+                    generationEvidence,
+                    out atomicFailure))
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Fragmented Soul combat requires one exact reviewed atomic level/stat/weapon generation for the selected source",
+                    hasExactCombatEvidence);
+            }
+
+            return CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(
+                string.Format(
+                    "{0}: Fragmented Soul source 0x{1:X8} selected captured L{2} QL{3} weapon {4}/{5} as one atomic generation; two normal local-player hits span 18..23 with ammo 24, slot 6, unknown 0, and weapon instance 0; item owns runtime damage and recharge; uniform selection over distinct captured generations is private policy",
+                    weapon.Evidence,
+                    sourceInstance,
+                    variant.Level,
+                    weapon.Quality,
+                    weapon.LowId,
+                    weapon.HighId),
+                weapon.LowId,
+                weapon.HighId,
+                weapon.Quality,
+                (int)WeaponSlots.Righthand,
+                24,
+                (int)WeaponSlots.Righthand,
+                0,
+                0);
+        }
+
+        private static CapturedEnemyCombatContract ForRedundantScan(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            OrdinaryEnemySpawnVariant variant,
+            CapturedSubwayGenerationVariantDefinition[] generationEvidence)
+        {
+            CapturedSubwayCombatEvidenceDefinition combat = archetype == null
+                ? null
+                : archetype.Combat;
+            bool hasExactCombatEvidence = combat != null
+                                          && combat.Observed
+                                          && combat.ObservedRows == 1
+                                          && combat.MinDamage == 19
+                                          && combat.MaxDamage == 19
+                                          && combat.WeaponSlot == (int)WeaponSlots.Righthand
+                                          && combat.AttackInfoUnknown == 0
+                                          && combat.WeaponInstance == 0;
+            OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
+                ? null
+                : variant.WeaponLoadout;
+            string atomicFailure = string.Empty;
+            if (!hasExactCombatEvidence
+                || archetype == null
+                || !HasCompleteRedundantScanSourceWeaponEvidence(
+                    archetype.SourceWeaponEvidence)
+                || Array.IndexOf(RedundantScanSourceInstances, sourceInstance) < 0
+                || !OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
+                    RedundantScanMonsterData,
+                    sourceInstance,
+                    variant,
+                    generationEvidence,
+                    out atomicFailure))
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Redundant Scan combat requires one exact reviewed atomic level/stat/weapon generation for the selected source",
+                    hasExactCombatEvidence);
+            }
+
+            return CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(
+                string.Format(
+                    "{0}: Redundant Scan source 0x{1:X8} selected captured L{2} QL{3} weapon {4}/{5} as one atomic generation; one normal local-player hit is 19; item owns runtime damage and recharge; captured AttackInfo carries only ammo 17, slot 6, unknown 0, and weapon instance 0; uniform selection over distinct captured generations is private policy",
+                    weapon.Evidence,
+                    sourceInstance,
+                    variant.Level,
+                    weapon.Quality,
+                    weapon.LowId,
+                    weapon.HighId),
+                weapon.LowId,
+                weapon.HighId,
+                weapon.Quality,
                 (int)WeaponSlots.Righthand,
                 17,
                 (int)WeaponSlots.Righthand,
@@ -1622,6 +1771,7 @@ namespace AORebirth.Core.Playfields
             if (archetype != null
                 && (archetype.MonsterData == DerangedShopperMonsterData
                     || archetype.MonsterData == IncompleteRebuildMonsterData
+                    || archetype.MonsterData == FragmentedSoulMonsterData
                     || archetype.MonsterData == WorkmanStrikerMonsterData
                     || archetype.MonsterData == LooterMonsterData
                     || archetype.MonsterData == RedundantScanMonsterData))
@@ -1651,6 +1801,14 @@ namespace AORebirth.Core.Playfields
                 return CapturedEnemyCombatContract.Unresolved(
                     "Generated ordinary archetype has no observed AttackInfo: " + archetype.Name,
                     false);
+            }
+
+            if (!combat.RuntimeReady)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Generated ordinary archetype has report-only AttackInfo evidence without a runtime-ready damage range and cadence: "
+                    + archetype.Name,
+                    true);
             }
 
             return CapturedEnemyCombatContract.FixedAttack(
@@ -1701,9 +1859,29 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemySpawnVariant variant,
             CapturedSubwayGenerationVariantDefinition[] generationEvidence)
         {
+            if (archetype != null
+                && archetype.MonsterData == IncompleteRebuildMonsterData)
+            {
+                return ForIncompleteRebuild(
+                    archetype,
+                    sourceInstance,
+                    variant,
+                    generationEvidence);
+            }
+
+            if (archetype != null
+                && archetype.MonsterData == FragmentedSoulMonsterData)
+            {
+                return ForFragmentedSoul(
+                    archetype,
+                    sourceInstance,
+                    variant,
+                    generationEvidence);
+            }
+
             return archetype != null
-                   && archetype.MonsterData == IncompleteRebuildMonsterData
-                ? ForIncompleteRebuild(
+                   && archetype.MonsterData == RedundantScanMonsterData
+                ? ForRedundantScan(
                     archetype,
                     sourceInstance,
                     variant,

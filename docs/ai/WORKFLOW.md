@@ -231,7 +231,7 @@ For a one-enemy ten-corpse loot sample, Codex arms validation through the same a
 cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "<AO window title>" --loot-10
 ```
 
-This wrapper is the only approved Codex startup command for AOSharp live capture. It starts the existing AOSharp injector against an already-running AO client and reports only the exact injector command, success or failure, capture output path, and failure log path. It does not launch the AO game/client.
+This wrapper is the only approved Codex startup command for AOSharp live capture. It starts the existing AOSharp injector against an already-running AO client and reports only the exact injector command, success or failure, capture output path, and failure log path. It does not launch the AO game/client. Before target selection it runs a fail-closed capture-safe contract check against the deployed injector and Bootstrap pair. A stale or unsafe binary cannot proceed to injection.
 
 Build the capture plugin after capture-tool source changes with:
 
@@ -239,7 +239,32 @@ Build the capture plugin after capture-tool source changes with:
 cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.csproj /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 ```
 
-The default capture always records the comprehensive raw packet superset in independently auto-flushed `packets.hex.log` and `raw-packets.csv`; it never narrows recording by focus, enemy type, marker, or validation mode. Either raw sink, or their complete union, is sufficient for offline recovery. It also directly decodes raw `SimpleCharFullUpdate` packets into reusable SCFU evidence and promotes NPC evidence into `enemy-full-updates.csv`, `enemy-state.csv`, `enemy-dossier.json`, `enemy-movement.csv`, `movement-packets.csv`, `enemy-combat.csv`, `enemy-stat-updates.csv`, `npc-lifecycle.csv`, `corpse-full-updates.csv`, `enemy-respawns.csv`, `inventory-updates.csv`, and `corpse-loot-observations.csv`. `enemy-state.csv` rows include source direction, packet sequence, message type, and evidence source. Loot reconstruction canonicalizes padded and unpadded numeric corpse identities before joining inventory, transfer, lifecycle, and generation evidence. Markers and modes such as `/aocap mark respawn-start` and `--loot-10` only label the session or add acceptance requirements; they must never filter, suppress, or narrow captured evidence. A marked respawn capture validates incomplete unless the required respawn is correlated. A `--loot-10` capture validates incomplete if fewer than ten initial corpse snapshots or more than one enemy type is present, while still recording the same comprehensive superset. Final capture validation must report incomplete when corpse presence or inventory was observed without a successfully decoded identity-linked `CorpseFullUpdate`.
+Build the injector and its capture-safe Bootstrap only through:
+
+```cmd
+cmd /d /c tools-temp\build-aosharp-live-injector.cmd
+```
+
+Capture-safe injection installs one isolated chat-input hook only after acquiring the per-client duplicate-injection guard. It recognizes only `/aocap` and `/aosmoke`, passes every other command to the client unchanged, and does not use AOSharp's native 131-byte GUI rewrite or its `GetCommand` hook. The native `StdString` allocation is fixed at the required 24-byte layout and deterministically disposed after every typed line. AOSharpLiveCapture itself signals readiness only after initialization and both command registrations succeed; the injector fails on a bounded readiness timeout instead of reporting a half-loaded capture, and disconnect unloads an unready Bootstrap so a retry is not blocked. Comprehensive capture starts automatically, and Mike can control it directly in game with:
+
+```text
+/aocap start
+/aocap stop
+```
+
+The remaining typed commands are `/aocap mark <text>`, `/aocap status`, `/aocap flush`, `/aocap snapshot`, `/aocap dynels [force]`, and `/aocap fight start|stop|auto on|auto off|status`. `/aosmoke` commands are also available. The external request wrapper remains an offline fallback and must not be used to launch the AO client:
+
+```cmd
+cmd /d /c tools-temp\control-aosharp-live-capture.cmd start
+cmd /d /c tools-temp\control-aosharp-live-capture.cmd stop
+cmd /d /c tools-temp\control-aosharp-live-capture.cmd mark "respawn-start"
+cmd /d /c tools-temp\control-aosharp-live-capture.cmd flush
+cmd /d /c tools-temp\control-aosharp-live-capture.cmd snapshot
+```
+
+The wrapper writes a same-directory temporary request and atomically moves it into place. It refuses to overwrite a pending or in-process request. The capture launcher clears stale control artifacts only immediately before a fresh injection.
+
+The default capture always records the comprehensive raw packet superset in independently auto-flushed `packets.hex.log` and `raw-packets.csv`; it never narrows recording by focus, enemy type, marker, or validation mode. Either raw sink, or their complete union, is sufficient for offline recovery. It also directly decodes raw `SimpleCharFullUpdate` packets into reusable SCFU evidence and promotes NPC evidence into `enemy-full-updates.csv`, `enemy-state.csv`, `enemy-dossier.json`, `enemy-movement.csv`, `movement-packets.csv`, `enemy-combat.csv`, `enemy-stat-updates.csv`, `npc-lifecycle.csv`, `corpse-full-updates.csv`, `enemy-respawns.csv`, `inventory-updates.csv`, and `corpse-loot-observations.csv`. `enemy-state.csv` rows include source direction, packet sequence, message type, and evidence source. Loot reconstruction canonicalizes padded and unpadded numeric corpse identities before joining inventory, transfer, lifecycle, and generation evidence. External markers such as `control-aosharp-live-capture.cmd mark "respawn-start"` and launcher modes such as `--loot-10` only label the session or add acceptance requirements; they must never filter, suppress, or narrow captured evidence. A marked respawn capture validates incomplete unless the required respawn is correlated. A `--loot-10` capture validates incomplete if fewer than ten initial corpse snapshots or more than one enemy type is present, while still recording the same comprehensive superset. Final capture validation must report incomplete when corpse presence or inventory was observed without a successfully decoded identity-linked `CorpseFullUpdate`.
 
 If either raw sink contains the raw packet but a decoder, identity join, or promoted export fails, the gameplay capture remains intact. Treat an incomplete projection as an offline-reconstruction task whenever `recaptureRequired=false`, including when `processingAllowed=false` or `offlineDecodeRequired=true`; repair and rerun the offline decoder instead of asking Mike to repeat gameplay. Recapture only when the raw evidence itself is missing or incomplete, including an undrained teardown boundary.
 

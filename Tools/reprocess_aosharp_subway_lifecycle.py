@@ -29,15 +29,18 @@ GEOMETRY_ONLY_CAPTURE_IDS = frozenset(
         "20260714-202820",
     }
 )
-NO_RAW_CAPTURE_IDS = GEOMETRY_ONLY_CAPTURE_IDS | {"20260714-171439"}
+NO_RAW_CAPTURE_IDS = GEOMETRY_ONLY_CAPTURE_IDS | {
+    "20260714-171439",
+    "20260719-001621",
+}
 RAW_EVIDENCE_FILES = {
     "none": (False, False),
     "packets.hex.log": (True, False),
     "raw-packets.csv": (False, True),
     "both": (True, True),
 }
-EXPECTED_SUBWAY_CAPTURE_COUNT = 68
-EXPECTED_RAW_CAPTURE_COUNT = 65
+EXPECTED_SUBWAY_CAPTURE_COUNT = 78
+EXPECTED_RAW_CAPTURE_COUNT = 74
 
 REPORT_COLUMNS = (
     "capture_id",

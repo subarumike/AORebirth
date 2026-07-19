@@ -56,12 +56,30 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayThiefMonsterData = 26092;
 
+        public const int CapturedSubwayDiscardedPetMonsterData = 17720;
+
+        // The focused official-live corpus contains 37 normal local-player SIW1
+        // hits. Four 30..33 criticals remain report-only because critical chance
+        // is not established by the sample.
+        public const int CapturedSubwayDiscardedPetMinimumDamage = 9;
+
+        public const int CapturedSubwayDiscardedPetMaximumDamage = 18;
+
+        // Conventional median of 30 same-source landed-hit intervals. The
+        // observed interval envelope is 4.609299..5.950416 seconds.
+        public const double CapturedSubwayDiscardedPetRechargeSeconds = 5.089763;
+
+        public const int CapturedSubwayDiscardedPetWeaponSlot = 0;
+
+        public const int CapturedSubwayDiscardedPetWeaponTag = 0x53495731;
+
         public const int CapturedSubwayDisobedientBotMonsterData = 17649;
 
-        // Nine projected official-live hits plus eight authoritative raw-only hits
-        // prove the normal local-player SIW1 damage envelope. No critical hit
-        // has been observed and critical behavior remains unresolved.
-        public const int CapturedSubwayDisobedientBotMinimumDamage = 8;
+        // Ten projected official-live hits plus five reviewed raw-only hits
+        // prove the normal local-player SIW1 damage envelope. Three other-player
+        // hits and two player-owned-pet hits stay separate. No critical hit has
+        // been observed and critical behavior remains unresolved.
+        public const int CapturedSubwayDisobedientBotMinimumDamage = 6;
 
         public const int CapturedSubwayDisobedientBotMaximumDamage = 15;
 
@@ -97,6 +115,34 @@ namespace ZoneEngine.Core.Playfields
         public const int CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponLastValue = 22;
 
         public const int CapturedSubwayDisobedientBotSpecialAttackWeaponLastValue = 0;
+
+        // Official-live Vagabonds produced only misses, so their damage is a private
+        // playability policy using the captured 9..12 normal range of the adjacent,
+        // same-level Subway Mugger family. Cadence and packet shape remain Vagabond-
+        // specific capture evidence; Red Wine template 130590 is not a combat weapon.
+        public const int PolicySubwayViolentVagabondMinimumDamage = 9;
+
+        public const int PolicySubwayViolentVagabondMaximumDamage = 12;
+
+        public const double CapturedSubwayViolentVagabondAttackSeconds = 4.5802404;
+
+        public const int CapturedSubwayViolentVagabondAttackInfoAmmoCount = 0;
+
+        public const int CapturedSubwayViolentVagabondAttackInfoWeaponSlot = 6;
+
+        public const int CapturedSubwayViolentVagabondAttackInfoUnknown = 0;
+
+        public const int CapturedSubwayViolentVagabondAttackInfoWeaponInstance = 0;
+
+        public const int CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown1 = 32;
+
+        public const int CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown2 = 35;
+
+        public const int CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown3 = 29;
+
+        public const int CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown4 = 31;
+
+        public const int CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown5 = 0;
 
         public const int CapturedSubwayBloodcreeperMonsterData = 30379;
 
