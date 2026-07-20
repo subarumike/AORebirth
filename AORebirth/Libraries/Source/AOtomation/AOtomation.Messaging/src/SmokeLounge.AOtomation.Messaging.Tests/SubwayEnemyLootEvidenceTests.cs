@@ -246,7 +246,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .SelectMany(value => provider.GetCorpseEvidence(value))
                 .ToArray();
 
-            Assert.AreEqual(314, evidence.Length);
+            Assert.AreEqual(351, evidence.Length);
             Assert.AreEqual(26, evidence.Select(value => value.MonsterData).Distinct().Count());
             CollectionAssert.AreEqual(
                 new[]
@@ -264,7 +264,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         "20260720-031025:1",
                         "20260720-031855:3",
                         "20260720-032106:2",
-                        "20260720-033749:2"
+                        "20260720-033749:2",
+                        "20260720-042205:8",
+                        "20260720-043018:9",
+                        "20260720-044358:4",
+                        "20260720-044610:16"
                     },
                 evidence
                     .Where(
@@ -281,7 +285,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                   || value.Capture == "20260720-031025"
                                   || value.Capture == "20260720-031855"
                                   || value.Capture == "20260720-032106"
-                                  || value.Capture == "20260720-033749")
+                                  || value.Capture == "20260720-033749"
+                                  || value.Capture == "20260720-042205"
+                                  || value.Capture == "20260720-043018"
+                                  || value.Capture == "20260720-044358"
+                                  || value.Capture == "20260720-044610")
                     .GroupBy(value => value.Capture)
                     .OrderBy(value => value.Key, StringComparer.Ordinal)
                     .Select(value => value.Key + ":" + value.Count())
@@ -392,45 +400,44 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             OrdinaryEnemyLootEntry slumRunner = Profile("Slum Runner").Loot.Entries
                 .Single(value => value.LowId == 234876);
-            Assert.AreEqual(2, slumRunner.ObservedCount);
-            Assert.AreEqual(12, slumRunner.ObservedCorpses);
-            Assert.AreEqual(1667, slumRunner.DropChanceBasisPoints);
+            Assert.AreEqual(4, slumRunner.ObservedCount);
+            Assert.AreEqual(17, slumRunner.ObservedCorpses);
+            Assert.AreEqual(2353, slumRunner.DropChanceBasisPoints);
         }
 
         [TestMethod]
-        public void WorkmanStrikerUsesThirteenDeduplicatedCompleteCorpseOpens()
+        public void WorkmanStrikerUsesThirtyDeduplicatedCompleteCorpseOpens()
         {
             OrdinaryEnemyLootProfile loot = Profile("Workman Striker").Loot;
 
             Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, loot.PoolMode);
             Assert.IsFalse(loot.ItemPoolComplete);
-            Assert.AreEqual(13, loot.ObservedCompleteInventories);
-            Assert.AreEqual(2, loot.ObservedEmptyInventories);
-            Assert.AreEqual(15, loot.Entries.Length);
+            Assert.AreEqual(30, loot.ObservedCompleteInventories);
+            Assert.AreEqual(8, loot.ObservedEmptyInventories);
+            Assert.AreEqual(27, loot.Entries.Length);
             Assert.IsTrue(
                 loot.Entries.All(
                     value => value.Evidence == OrdinaryEnemyLootEvidence.ObservedAvailableLoot
                              && value.ProbabilityEvidence
                              == OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy
-                             && value.ObservedCorpses == 13));
+                             && value.ObservedCorpses == 30));
             CollectionAssert.AreEqual(
                 new[]
                     {
-                        "70562:85597:14:1:13:769",
-                        "85562:85561:14:1:13:769",
-                        "123774:123775:10:1:13:769",
-                        "124025:124026:12:1:13:769",
-                        "124263:124264:13:1:13:769",
-                        "128603:128604:15:1:13:769",
-                        "130087:130088:16:1:13:769",
-                        "202719:202720:11:1:13:769",
-                        "202719:202720:12:1:13:769",
-                        "202719:202720:14:2:13:1538",
-                        "202719:202720:17:1:13:769",
-                        "202719:202720:21:1:13:769",
-                        "234874:234874:1:1:13:769",
-                        "234877:234877:1:1:13:769",
-                        "301714:301714:1:2:13:1538"
+                        "70562:85597:14:1:30:333", "85562:85561:14:1:30:333",
+                        "85596:85595:18:1:30:333", "85655:22104:19:1:30:333",
+                        "121684:121685:15:1:30:333", "122539:122540:14:1:30:333",
+                        "123457:123458:15:1:30:333", "123774:123775:10:1:30:333",
+                        "124025:124026:12:1:30:333", "124042:124043:17:1:30:333",
+                        "124241:124242:12:1:30:333", "124263:124264:13:1:30:333",
+                        "128603:128604:15:1:30:333", "130087:130088:16:1:30:333",
+                        "202719:202720:11:1:30:333", "202719:202720:12:1:30:333",
+                        "202719:202720:14:2:30:667", "202719:202720:15:1:30:333",
+                        "202719:202720:17:1:30:333", "202719:202720:21:1:30:333",
+                        "234874:234874:1:2:30:667", "234875:234875:1:2:30:667",
+                        "234876:234876:1:1:30:333", "234877:234877:1:1:30:333",
+                        "301709:301709:1:1:30:333", "301714:301714:1:2:30:667",
+                        "301718:301718:1:1:30:333"
                     },
                 loot.Entries
                     .OrderBy(value => value.LowId)
@@ -448,7 +455,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             CapturedSubwayLootOutcomeEvidenceDefinition[] outcomes =
                 new CapturedSubwayOrdinaryContentProvider().GetLootOutcomeEvidence(203854);
-            Assert.AreEqual(17, outcomes.Length);
+            Assert.AreEqual(33, outcomes.Length);
             Assert.IsFalse(outcomes.Any(value => value.Capture == "20260709-212115"));
             Assert.IsFalse(outcomes.Any(value => value.Capture == "20260720-033513"));
             CollectionAssert.AreEquivalent(
@@ -475,7 +482,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "subway.test.workman-striker",
                 "subway.test.workman-striker.assignment");
             Assert.IsTrue(adapted.Table.ItemPoolUnresolved);
-            Assert.AreEqual(15, adapted.Table.RollGroups.Length);
+            Assert.AreEqual(27, adapted.Table.RollGroups.Length);
             Assert.IsTrue(
                 adapted.Table.RollGroups.All(value => value.RollMode == LootRollMode.Independent));
         }
@@ -586,14 +593,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     });
             AssertReviewedLegacyStrictLoot(
                 "Infector",
-                7,
-                4,
+                14,
+                8,
                 new[]
                     {
-                        "101507:101508:20:1:7:1429",
-                        "101735:101736:21:1:7:1429",
-                        "107491:107492:15:1:7:1429",
-                        "234875:234875:1:1:7:1429"
+                        "101507:101508:20:1:14:714",
+                        "101735:101736:21:1:14:714",
+                        "104127:104128:16:1:14:714",
+                        "107491:107492:15:1:14:714",
+                        "109374:109375:16:1:14:714",
+                        "112871:112872:20:1:14:714",
+                        "234875:234875:1:1:14:714"
                     });
             AssertReviewedLegacyStrictLoot(
                 "Architect Striker",
@@ -786,25 +796,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new[] { "27263:27263:10:1" });
             AssertRecoveredStrictLoot(
                 "Uncontrollable Anger",
-                3,
+                4,
                 0,
                 new[]
                     {
                         "101809:101810:24:1", "109366:109367:9:1",
-                        "112863:112864:13:1", "290619:202727:19:1"
+                        "112863:112864:13:1", "234877:234877:1:1",
+                        "290619:202727:19:1"
                     });
             AssertRecoveredStrictLoot(
                 "Lost Thought",
-                1,
+                3,
                 0,
-                new[] { "101675:101676:25:1" });
+                new[]
+                    {
+                        "101675:101676:25:1", "111347:111348:21:1",
+                        "290619:202727:19:1"
+                    });
             AssertRecoveredStrictLoot(
                 "Neural Burnout",
-                4,
+                6,
                 2,
                 new[]
                     {
-                        "26471:26471:14:1", "123021:123021:21:1", "124560:124561:16:1"
+                        "26471:26471:14:1", "122142:122142:21:1",
+                        "123021:123021:21:1", "124409:124410:18:1",
+                        "124560:124561:16:1"
                     });
 
             var provider = new CapturedSubwayOrdinaryContentProvider();
@@ -828,7 +845,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(112864, angerOutcome.HighId);
             Assert.AreEqual(13, angerOutcome.Quality);
 
-            foreach (string excludedName in new[] { "Empty Shell", "Premature Pattern" })
+            foreach (string excludedName in new[] { "Empty Shell" })
             {
                 CapturedSubwayOrdinaryArchetypeDefinition archetype = provider.GetArchetypes()
                     .Single(value => value.Name == excludedName);
@@ -845,13 +862,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void SlumRunnerPreservesTwentyOneDeathLinkedCorpseVisualAndLevelCreditOutcomes()
+        public void SlumRunnerPreservesTwentySevenDeathLinkedCorpseVisualAndLevelCreditOutcomes()
         {
             CapturedSubwayOrdinaryArchetypeDefinition source =
                 new CapturedSubwayOrdinaryContentProvider()
                     .GetArchetypes()
                     .Single(value => value.Name == "Slum Runner");
-            Assert.AreEqual(21, source.CorpseEvidence.Length);
+            Assert.AreEqual(27, source.CorpseEvidence.Length);
             Assert.AreEqual(4, source.CorpseEvidence.Count(value => value.Capture == "20260709-220439"));
             Assert.AreEqual(2, source.CorpseEvidence.Count(value => value.Capture == "20260709-222339"));
             Assert.AreEqual(6, source.CorpseEvidence.Count(value => value.Capture == "20260709-225408"));
@@ -859,6 +876,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(6, source.CorpseEvidence.Count(value => value.Capture == "20260716-034656"));
             Assert.AreEqual(1, source.CorpseEvidence.Count(value => value.Capture == "20260716-215947"));
             Assert.AreEqual(1, source.CorpseEvidence.Count(value => value.Capture == "20260716-222201"));
+            Assert.AreEqual(6, source.CorpseEvidence.Count(value => value.Capture == "20260720-044610"));
             Assert.IsTrue(source.CorpseEvidence.All(value => value.MonsterData == 55648));
             Assert.IsTrue(source.CorpseEvidence.All(value => value.CatMesh == 31774));
             string[] identityLinks = source.CorpseEvidence
@@ -890,9 +908,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         "11:66:1",
                         "12:72:3",
                         "15:92:1",
-                        "16:98:4",
-                        "17:105:3",
-                        "18:111:1",
+                        "16:98:5",
+                        "17:105:6",
+                        "18:111:3",
                         "20:124:1",
                         "21:131:2",
                         "22:137:2",
@@ -984,9 +1002,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCorpseAndLevelCredits(
                 "Infector",
                 31868,
-                "16:98:98:2",
-                "17:105:105:2",
-                "18:111:111:1",
+                "16:98:98:5",
+                "17:105:105:4",
+                "18:111:111:4",
                 "19:118:118:3",
                 "24:150:150:5",
                 "25:156:156:2");
@@ -999,7 +1017,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Lost Thought",
                 96179,
                 "16:20:20:1",
-                "18:23:23:1",
+                "18:23:23:2",
+                "19:24:24:1",
                 "21:26:26:1",
                 "22:28:28:1");
             AssertCorpseAndLevelCredits(
@@ -1031,15 +1050,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Neural Burnout",
                 5941,
                 "16:98:98:1",
-                "17:105:105:1",
-                "18:111:111:2",
+                "17:105:105:2",
+                "18:111:111:3",
                 "23:144:144:1",
                 "25:156:156:2");
             AssertCorpseAndLevelCredits(
                 "Premature Pattern",
                 5941,
                 "17:105:105:1",
-                "18:111:111:1",
+                "18:111:111:2",
                 "23:144:144:2");
             AssertCorpseAndLevelCredits(
                 "Redundant Scan",
@@ -1074,6 +1093,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "11:14:14:1",
                 "12:15:15:2",
                 "13:16:16:2",
+                "19:24:24:1",
                 "20:25:25:1",
                 "21:26:26:1");
             AssertCorpseAndLevelCredits(
@@ -1086,9 +1106,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Workman Striker",
                 17899,
                 "13:79:79:3",
-                "14:85:85:7",
-                "15:92:92:3",
-                "16:98:98:4",
+                "14:85:85:11",
+                "15:92:92:12",
+                "16:98:98:8",
                 "17:105:105:3",
                 "18:111:111:2",
                 "25:156:156:1");

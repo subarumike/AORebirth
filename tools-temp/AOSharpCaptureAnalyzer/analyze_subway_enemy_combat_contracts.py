@@ -51,6 +51,10 @@ CAPTURES = (
     "20260720-032106",
     "20260720-033513",
     "20260720-033749",
+    "20260720-042205",
+    "20260720-043018",
+    "20260720-044358",
+    "20260720-044610",
 )
 CAPTURE_ENEMY_FILTERS = {
     "20260708-004038": frozenset({"Filth Flea"}),
@@ -85,6 +89,73 @@ CAPTURE_ENEMY_FILTERS = {
     "20260720-033749": frozenset(
         {"Infected Attendant", "Uncontrollable Anger"}
     ),
+    "20260720-042205": frozenset({"Workman Striker"}),
+    "20260720-043018": frozenset({"Workman Striker"}),
+    "20260720-044358": frozenset({"Infector"}),
+    "20260720-044610": frozenset(
+        {
+            "Infector",
+            "Lost Thought",
+            "Neural Burnout",
+            "Premature Pattern",
+            "Slum Runner",
+            "Uncontrollable Anger",
+        }
+    ),
+}
+CAPTURE_ENEMY_SOURCE_FILTERS = {
+    "20260720-042205": {
+        "Workman Striker": frozenset(
+            {
+                "(SimpleChar:79803680)", "(SimpleChar:79803682)",
+                "(SimpleChar:79803683)", "(SimpleChar:79803685)",
+                "(SimpleChar:79803688)", "(SimpleChar:79803689)",
+                "(SimpleChar:7980368C)", "(SimpleChar:7980F07D)",
+            }
+        )
+    },
+    "20260720-043018": {
+        "Workman Striker": frozenset(
+            {
+                "(SimpleChar:7980F07E)", "(SimpleChar:7980F088)",
+                "(SimpleChar:7980F089)", "(SimpleChar:7980F08C)",
+                "(SimpleChar:7980F08D)", "(SimpleChar:7980F08F)",
+                "(SimpleChar:7980F094)", "(SimpleChar:7980F096)",
+                "(SimpleChar:7980F099)",
+            }
+        )
+    },
+    "20260720-044358": {
+        "Infector": frozenset(
+            {
+                "(SimpleChar:798036B6)", "(SimpleChar:798036B7)",
+                "(SimpleChar:798036BC)", "(SimpleChar:79803754)",
+            }
+        )
+    },
+    "20260720-044610": {
+        "Infector": frozenset(
+            {
+                "(SimpleChar:798035B8)", "(SimpleChar:798035FA)",
+                "(SimpleChar:798036BD)", "(SimpleChar:7980371A)",
+            }
+        ),
+        "Lost Thought": frozenset(
+            {"(SimpleChar:798036C7)", "(SimpleChar:798037EF)"}
+        ),
+        "Neural Burnout": frozenset(
+            {"(SimpleChar:798036BF)", "(SimpleChar:798036C0)"}
+        ),
+        "Premature Pattern": frozenset({"(SimpleChar:7980F0BA)"}),
+        "Slum Runner": frozenset(
+            {
+                "(SimpleChar:798036C2)", "(SimpleChar:798036C3)",
+                "(SimpleChar:79803722)", "(SimpleChar:79803724)",
+                "(SimpleChar:79803763)", "(SimpleChar:798037A0)",
+            }
+        ),
+        "Uncontrollable Anger": frozenset({"(SimpleChar:798036BE)"}),
+    },
 }
 ENEMY_ATTACK_CAPTURE_FILTERS = {
     "Filth Flea": frozenset({"20260708-004038", "20260709-193914"}),
@@ -885,9 +956,16 @@ def add_reviewed_event_identities(
         }
 
 
-def capture_includes_enemy(capture_name: str, enemy_name: str) -> bool:
+def capture_includes_enemy(
+    capture_name: str, enemy_name: str, source_identity: str = ""
+) -> bool:
     allowed_enemies = CAPTURE_ENEMY_FILTERS.get(capture_name)
-    return allowed_enemies is None or enemy_name in allowed_enemies
+    if allowed_enemies is not None and enemy_name not in allowed_enemies:
+        return False
+    allowed_sources = CAPTURE_ENEMY_SOURCE_FILTERS.get(capture_name, {}).get(
+        enemy_name
+    )
+    return allowed_sources is None or source_identity in allowed_sources
 
 
 def attack_evidence(
@@ -1055,9 +1133,9 @@ def validate_workman_striker_distinct_combat(
     report_entry: dict[str, object],
 ) -> None:
     expected_counts = {
-        "attackInfoRows": 62,
-        "normalAttackInfoRows": 56,
-        "criticalAttackInfoRows": 6,
+        "attackInfoRows": 66,
+        "normalAttackInfoRows": 59,
+        "criticalAttackInfoRows": 7,
     }
     for field, expected in expected_counts.items():
         if report_entry[field] != expected:
@@ -1070,28 +1148,80 @@ def validate_workman_striker_distinct_combat(
     if (
         report_entry["normalMinDamage"] != 9
         or report_entry["normalMaxDamage"] != 23
-        or report_entry["criticalMinDamage"] != 36
+        or report_entry["criticalMinDamage"] != 28
         or report_entry["criticalMaxDamage"] != 42
         or report_entry["weaponSlot"] != 6
         or report_entry["attackInfoUnknown"] != 0
         or report_entry["attackInfoWeaponInstance"] != 0
-        or report_entry["missedAttackInfoRows"] != 4
+        or report_entry["missedAttackInfoRows"] != 14
         or report_entry["missedAttackShapes"]
         != [
             {
                 "ammoCount": -1,
                 "weaponSlot": 6,
                 "unknown": 0,
-                "rows": 4,
+                "rows": 14,
                 "captures": [
                     "20260709-212115",
                     "20260709-212336",
                     "20260720-031855",
+                    "20260720-042205",
+                    "20260720-043018",
                 ],
             }
         ]
         or report_entry["specialAttackWeaponShapes"]
         != [
+            {
+                "unknown1": 83,
+                "unknown2": 83,
+                "unknown3": 83,
+                "unknown4": 83,
+                "unknown5": 0,
+                "rows": 9,
+                "captures": ["20260720-042205", "20260720-043018"],
+                "owners": [
+                    "(SimpleChar:79803680)",
+                    "(SimpleChar:79803683)",
+                    "(SimpleChar:79803688)",
+                    "(SimpleChar:79803689)",
+                    "(SimpleChar:7980F07D)",
+                    "(SimpleChar:7980F088)",
+                    "(SimpleChar:7980F089)",
+                    "(SimpleChar:7980F08D)",
+                    "(SimpleChar:7980F094)",
+                ],
+            },
+            {
+                "unknown1": 77,
+                "unknown2": 77,
+                "unknown3": 77,
+                "unknown4": 77,
+                "unknown5": 0,
+                "rows": 4,
+                "captures": ["20260720-042205", "20260720-043018"],
+                "owners": [
+                    "(SimpleChar:79803685)",
+                    "(SimpleChar:7980368C)",
+                    "(SimpleChar:7980F08C)",
+                    "(SimpleChar:7980F08F)",
+                ],
+            },
+            {
+                "unknown1": 88,
+                "unknown2": 88,
+                "unknown3": 88,
+                "unknown4": 88,
+                "unknown5": 0,
+                "rows": 4,
+                "captures": ["20260720-042205", "20260720-043018"],
+                "owners": [
+                    "(SimpleChar:79803682)",
+                    "(SimpleChar:7980F07E)",
+                    "(SimpleChar:7980F096)",
+                    "(SimpleChar:7980F099)",
+                ],
+            },
             {
                 "unknown1": 100,
                 "unknown2": 100,
@@ -1121,7 +1251,7 @@ def validate_workman_striker_distinct_combat(
     shapes = report_entry["attackShapes"]
     if (
         len(shapes) != 1
-        or shapes[0]["rows"] != 62
+        or shapes[0]["rows"] != 66
         or shapes[0]["intervalRows"] != 46
         or shapes[0]["medianIntervalSeconds"] != 5.139163
     ):
@@ -1153,7 +1283,7 @@ def validate_workman_striker_distinct_combat(
         )
     ):
         raise ValueError("non-overlapping Workman Striker combat rows changed")
-    validate_target_role(report_entry, "Workman Striker", "localPlayer", (27, 62, 9, 42))
+    validate_target_role(report_entry, "Workman Striker", "localPlayer", (44, 66, 9, 42))
     validate_target_role(report_entry, "Workman Striker", "playerOwnedPet", (3, 2, 21, 25))
     validate_target_role(report_entry, "Workman Striker", "otherPlayer", (2, 7, 23, 52))
 
@@ -1355,7 +1485,7 @@ def reviewed_uncontrollable_anger_cadence(
 
 def validate_uncontrollable_anger_combat(report_entry: dict[str, object]) -> None:
     if (
-        report_entry["normalAttackInfoRows"] != 4
+        report_entry["normalAttackInfoRows"] != 7
         or report_entry["normalMinDamage"] != 9
         or report_entry["normalMaxDamage"] != 18
         or report_entry["criticalAttackInfoRows"] != 1
@@ -1365,22 +1495,34 @@ def validate_uncontrollable_anger_combat(report_entry: dict[str, object]) -> Non
         or report_entry["attackInfoUnknown"] != 0
         or report_entry["attackInfoWeaponInstance"] != 0x53495731
         or report_entry["medianRechargeSeconds"] != 5.167153
-        or report_entry["missedAttackInfoRows"] != 3
+        or report_entry["missedAttackInfoRows"] != 9
         or report_entry["missedAttackShapes"]
         != [
             {
                 "ammoCount": -1,
                 "weaponSlot": 0,
                 "unknown": 0,
-                "rows": 3,
-                "captures": ["20260720-033749"],
+                "rows": 9,
+                "captures": ["20260720-033749", "20260720-044610"],
             }
         ]
-        or report_entry["specialAttackWeaponShapes"] != []
+        or report_entry["specialAttackWeaponShapes"]
+        != [
+            {
+                "unknown1": 103,
+                "unknown2": 103,
+                "unknown3": 103,
+                "unknown4": 103,
+                "unknown5": 2,
+                "rows": 1,
+                "captures": ["20260720-044610"],
+                "owners": ["(SimpleChar:798036BE)"],
+            }
+        ]
     ):
         raise ValueError("Uncontrollable Anger local-player combat evidence drifted")
     validate_target_role(
-        report_entry, "Uncontrollable Anger", "localPlayer", (11, 5, 9, 19)
+        report_entry, "Uncontrollable Anger", "localPlayer", (12, 8, 9, 19)
     )
     validate_target_role(
         report_entry, "Uncontrollable Anger", "playerOwnedPet", (1, 4, 25, 42)
@@ -1572,9 +1714,40 @@ def validate_infected_attendant_combat(report_entry: dict[str, object]) -> None:
 
 
 def validate_lost_thought_combat(report_entry: dict[str, object]) -> None:
-    if report_entry["attackInfoRows"] != 0 or report_entry["retaliationRows"] != 0:
-        raise ValueError("Lost Thought local-player evidence must remain empty")
-    validate_target_role(report_entry, "Lost Thought", "localPlayer", (0, 0, 0, 0))
+    if (
+        report_entry["attackInfoRows"] != 2
+        or report_entry["retaliationRows"] != 2
+        or report_entry["normalAttackInfoRows"] != 2
+        or report_entry["normalMinDamage"] != 14
+        or report_entry["normalMaxDamage"] != 14
+        or report_entry["criticalAttackInfoRows"] != 0
+        or report_entry["missedAttackInfoRows"] != 0
+        or report_entry["specialAttackWeaponShapes"]
+        != [
+            {
+                "unknown1": 98,
+                "unknown2": 98,
+                "unknown3": 98,
+                "unknown4": 98,
+                "unknown5": 0,
+                "rows": 1,
+                "captures": ["20260720-044610"],
+                "owners": ["(SimpleChar:798036C7)"],
+            },
+            {
+                "unknown1": 103,
+                "unknown2": 103,
+                "unknown3": 103,
+                "unknown4": 103,
+                "unknown5": 0,
+                "rows": 1,
+                "captures": ["20260720-044610"],
+                "owners": ["(SimpleChar:798037EF)"],
+            },
+        ]
+    ):
+        raise ValueError("Lost Thought local-player evidence drifted")
+    validate_target_role(report_entry, "Lost Thought", "localPlayer", (2, 2, 14, 14))
     validate_target_role(report_entry, "Lost Thought", "playerOwnedPet", (0, 0, 0, 0))
     validate_target_role(report_entry, "Lost Thought", "otherPlayer", (4, 11, 15, 20))
     other = report_entry["targetRoleEvidence"]["otherPlayer"]
@@ -1669,17 +1842,41 @@ def validate_empty_shell_combat(report_entry: dict[str, object]) -> None:
 
 def validate_premature_pattern_combat(report_entry: dict[str, object]) -> None:
     if (
-        report_entry["retaliationRows"] != 2
-        or report_entry["normalAttackInfoRows"] != 1
-        or report_entry["normalMinDamage"] != 22
+        report_entry["retaliationRows"] != 3
+        or report_entry["normalAttackInfoRows"] != 2
+        or report_entry["normalMinDamage"] != 17
         or report_entry["normalMaxDamage"] != 22
         or report_entry["criticalAttackInfoRows"] != 1
         or report_entry["criticalMinDamage"] != 41
         or report_entry["criticalMaxDamage"] != 41
+        or report_entry["missedAttackInfoRows"] != 1
+        or report_entry["missedAttackShapes"]
+        != [
+            {
+                "ammoCount": -1,
+                "weaponSlot": 0,
+                "unknown": 0,
+                "rows": 1,
+                "captures": ["20260720-044610"],
+            }
+        ]
+        or report_entry["specialAttackWeaponShapes"]
+        != [
+            {
+                "unknown1": 107,
+                "unknown2": 107,
+                "unknown3": 107,
+                "unknown4": 107,
+                "unknown5": 0,
+                "rows": 1,
+                "captures": ["20260720-044610"],
+                "owners": ["(SimpleChar:7980F0BA)"],
+            }
+        ]
     ):
         raise ValueError("Premature Pattern local-player evidence drifted")
     validate_proactive_local_acquisition(report_entry, "Premature Pattern")
-    validate_target_role(report_entry, "Premature Pattern", "localPlayer", (2, 2, 22, 41))
+    validate_target_role(report_entry, "Premature Pattern", "localPlayer", (3, 3, 17, 41))
     validate_target_role(report_entry, "Premature Pattern", "playerOwnedPet", (1, 1, 38, 38))
     validate_target_role(report_entry, "Premature Pattern", "otherPlayer", (2, 1, 16, 16))
 
@@ -2579,7 +2776,9 @@ def main():
             if (
                 not enemy
                 or row.get("SourceRole") != "enemy"
-                or not capture_includes_enemy(capture_name, enemy["name"])
+                or not capture_includes_enemy(
+                    capture_name, enemy["name"], source
+                )
             ):
                 continue
             message_type = row.get("MessageType")
@@ -2667,14 +2866,16 @@ def main():
                 if message_type == "Attack":
                     role_evidence["retaliationRows"] += 1
                     if evidence_role == "localPlayer":
-                        group["reviewedLocalAcquisitionStarts"].append(
-                            {
-                                "capture": capture_name,
-                                "sourceIdentity": source,
-                                "targetIdentity": derived_target,
-                                "capturedUtc": row.get("CapturedUtc", ""),
-                            }
-                        )
+                        candidate = {
+                            "capture": capture_name,
+                            "sourceIdentity": source,
+                            "targetIdentity": derived_target,
+                            "capturedUtc": row.get("CapturedUtc", ""),
+                        }
+                        if candidate in REVIEWED_PROACTIVE_LOCAL_ACQUISITIONS.get(
+                            enemy["name"], ()
+                        ):
+                            group["reviewedLocalAcquisitionStarts"].append(candidate)
                 elif parsed_attack is not None:
                     role_evidence["attacks"].append(parsed_attack)
             if (
@@ -2779,7 +2980,9 @@ def main():
                 match = WEAPON_UPDATE.search(line)
                 if match:
                     enemy = identities.get(match.group("owner"))
-                    if enemy and capture_includes_enemy(capture_name, enemy["name"]):
+                    if enemy and capture_includes_enemy(
+                        capture_name, enemy["name"], match.group("owner")
+                    ):
                         group = grouped[enemy["name"]]
                         weapon_key = (
                             capture_name,
@@ -2809,7 +3012,9 @@ def main():
                 if not miss or miss.group("defender") not in local_player_identities:
                     continue
                 enemy = identities.get(miss.group("attacker"))
-                if not enemy or not capture_includes_enemy(capture_name, enemy["name"]):
+                if not enemy or not capture_includes_enemy(
+                    capture_name, enemy["name"], miss.group("attacker")
+                ):
                     continue
                 group = grouped[enemy["name"]]
                 group["identities"].add(miss.group("attacker"))

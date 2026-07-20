@@ -4,6 +4,21 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- Finalized Subway captures `20260720-042205`, `20260720-043018`,
+  `20260720-044358`, and `20260720-044610` are integrated into the generated
+  PF127 ordinary provider. The corpus now has `351` exact identity-linked,
+  positive-credit corpse observations across `26` profiles. Workman strict
+  loot is `30` opens / `22` positive / `8` empty with `27` item/QL entries;
+  Infector is `14/6 positive/8 empty`; Neural Burnout is `6/4/2`; Lost Thought
+  is `3/3/0`; and Uncontrollable Anger is `4/4/0`. The default `240`-second
+  ordinary respawn policy remains unchanged because no capture proved a more
+  specific replacement timer.
+- Combat evidence now records Workman `59` normal `9..23` plus seven
+  report-only criticals `28..42`, Infector `54` normal `15..36` plus three
+  report-only criticals `52..75`, Neural Burnout `15..22`, and Slum Runner
+  cadence `4.210628`. Workman runtime weapon resolution no longer depends on
+  a hard-coded capture-row count; it requires the exact selected source and
+  generation tuple.
 - Finalized Subway captures `20260720-031855`, `20260720-032106`,
   `20260720-033513`, and `20260720-033749` are integrated. PF127 now has `322`
   active ordinary rows and zero quarantined rows. Workman Striker has `22`

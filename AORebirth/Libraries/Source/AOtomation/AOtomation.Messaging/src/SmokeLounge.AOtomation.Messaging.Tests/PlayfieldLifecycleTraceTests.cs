@@ -2753,7 +2753,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && ordinaryProviderText.Contains("\"Slum Runner\"")
                 && ordinaryProviderText.Contains("55648")
                 && ordinaryProviderText.Contains("new CapturedSubwayCombatEvidenceDefinition(")
-                && ordinaryProviderText.Contains("4.210098")
+                && ordinaryProviderText.Contains("4.210628")
                 && ordinaryProviderText.Contains("31774")
                 && ordinaryProviderText.Contains("20260716-222201")
                 && catalogText.Contains("\"ordinary.slum-runner.60\"")
@@ -2762,7 +2762,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
-                "Accepted Subway Slum Runner must keep its 24 exact spawns, captured attack cadence, shared chase, strict loot sample, CATMesh/credits, observed one-minute respawn, and ordinary corpse lifetimes together.");
+                "Accepted Subway Slum Runner must keep its 24 exact spawns, expanded captured attack cadence and loot sample, shared chase, CATMesh/credits, observed one-minute respawn, and ordinary corpse lifetimes together.");
 
             Assert.IsTrue(
                 ordinaryProviderText.Contains("\"molested_molecules\"")
@@ -2819,17 +2819,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 ordinaryProviderText.Contains("\"Infector\"")
                 && ordinaryProviderText.Contains("31909")
-                && ordinaryProviderText.Contains("5.016862")
-                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(101735, 101736, 21, 1, 7, 1429)")
-                && CountOccurrences(ordinaryProviderText, ", 31909, 31868,") == 15
-                && ordinaryProfiles.Single(value => value.DisplayName == "Infector").Loot.ObservedEmptyInventories == 4
+                && ordinaryProviderText.Contains("5.049360")
+                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(101735, 101736, 21, 1, 14, 714)")
+                && CountOccurrences(ordinaryProviderText, ", 31909, 31868,") == 23
+                && ordinaryProfiles.Single(value => value.DisplayName == "Infector").Loot.ObservedEmptyInventories == 8
                 && !ordinaryProfiles.Single(value => value.DisplayName == "Infector").Loot.ItemPoolComplete
                 && ordinaryCombatContract.Contains("CapturedEnemyCombatContract.FixedAttack(")
                 && !ordinaryCombatContract.Contains("31909")
                 && combatContractText.Contains("case 31909:")
                 && generatedCombatReportText.Contains("\"Infector\":")
-                && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 35")
-                && generatedCombatReportText.Contains("\"normalMinDamage\": 16")
+                && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 54")
+                && generatedCombatReportText.Contains("\"normalMinDamage\": 15")
                 && generatedCombatReportText.Contains("\"normalMaxDamage\": 36")
                 && generatedCombatReportText.Contains("\"criticalAttackInfoRows\": 3")
                 && generatedCombatReportText.Contains("\"criticalMinDamage\": 52")
@@ -2839,7 +2839,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
-                "Accepted ordinary Subway Infector must keep 12 exact spawns, 15 exact credit corpses, its generic fixed normal contract isolated from Abmouth-owned specialization, report-only criticals, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
+                "Accepted ordinary Subway Infector must keep 12 exact spawns, 23 exact credit corpses, its generic fixed normal contract isolated from Abmouth-owned specialization, report-only criticals, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             Assert.AreEqual(
                 8,
@@ -3014,28 +3014,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && ordinaryProviderText.Contains("5.139163")
                 && CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 32
                 && CountOccurrences(ordinaryProviderText, "new CapturedSubwayGenerationVariantDefinition(203854,") == 31
-                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(202719, 202720, 14, 2, 13, 1538)")
-                && CountOccurrences(ordinaryProviderText, ", 203854, 17899,") == 23
+                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(202719, 202720, 14, 2, 30, 667)")
+                && CountOccurrences(ordinaryProviderText, ", 203854, 17899,") == 40
                 && workmanStriker.Loot.PoolMode == OrdinaryEnemyLootPoolMode.IndependentEntries
                 && !workmanStriker.Loot.ItemPoolComplete
-                && workmanStriker.Loot.ObservedCompleteInventories == 13
-                && workmanStriker.Loot.ObservedEmptyInventories == 2
+                && workmanStriker.Loot.ObservedCompleteInventories == 30
+                && workmanStriker.Loot.ObservedEmptyInventories == 8
                 && catalogText.Contains("archetype.MonsterData == WorkmanStrikerMonsterData")
                 && catalogText.Contains("CapturedSubwayCombatCatalog.ForOrdinary(")
                 && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(spawn.SourceIdentity, variant)")
                 && workmanStrikerCombatContract.Contains("requires a selected capture-reviewed atomic generation variant")
-                && combatContractText.Contains("combat.ObservedRows == 56")
+                && combatContractText.Contains("combat != null && combat.Observed")
                 && combatContractText.Contains("Workman Striker combat requires one exact reviewed atomic level/stat/weapon generation")
                 && combatContractText.Contains("CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(")
                 && combatContractText.Contains("captured SIW shapes remain report-only")
-                && workmanStrikerCombatReport.Contains("\"normalAttackInfoRows\": 56")
+                && workmanStrikerCombatReport.Contains("\"normalAttackInfoRows\": 59")
                 && workmanStrikerCombatReport.Contains("\"normalMinDamage\": 9")
                 && workmanStrikerCombatReport.Contains("\"normalMaxDamage\": 23")
-                && workmanStrikerCombatReport.Contains("\"criticalAttackInfoRows\": 6")
-                && workmanStrikerCombatReport.Contains("\"criticalMinDamage\": 36")
+                && workmanStrikerCombatReport.Contains("\"criticalAttackInfoRows\": 7")
+                && workmanStrikerCombatReport.Contains("\"criticalMinDamage\": 28")
                 && workmanStrikerCombatReport.Contains("\"criticalMaxDamage\": 42")
-                && workmanStrikerCombatReport.Contains("\"missedAttackInfoRows\": 4")
-                && workmanStrikerCombatReport.Contains("\"specialAttackWeaponRows\": 3")
+                && workmanStrikerCombatReport.Contains("\"missedAttackInfoRows\": 14")
+                && workmanStrikerCombatReport.Contains("\"specialAttackWeaponRows\": 20")
                 && CountOccurrences(workmanStrikerCombatReport, "\"unknown1\": 100") == 1
                 && CountOccurrences(workmanStrikerCombatReport, "\"unknown2\": 100") == 1
                 && CountOccurrences(workmanStrikerCombatReport, "\"unknown3\": 100") == 1
@@ -3051,6 +3051,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
                 "Accepted Subway Workman Striker must keep 22 exact sources, 31 capture-reviewed atomic generations, item-owned normal damage/recharge, captured AttackInfo, report-only critical/SIW evidence, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
+            CapturedSubwayCombatEvidenceDefinition workmanCombatEvidence =
+                new CapturedSubwayOrdinaryContentProvider()
+                    .GetArchetypes()
+                    .Single(value => value.Name == "Workman Striker")
+                    .Combat;
+            Assert.IsTrue(workmanCombatEvidence.Observed);
+            Assert.IsTrue(workmanCombatEvidence.RuntimeReady);
+            Assert.AreEqual(59, workmanCombatEvidence.ObservedRows);
+            Assert.AreEqual(9, workmanCombatEvidence.MinDamage);
+            Assert.AreEqual(23, workmanCombatEvidence.MaxDamage);
+            Assert.AreEqual(6, workmanCombatEvidence.WeaponSlot);
+            Assert.AreEqual(0, workmanCombatEvidence.AttackInfoUnknown);
+            Assert.AreEqual(0, workmanCombatEvidence.WeaponInstance);
+
             foreach (OrdinaryEnemySpawnDefinition spawn in workmanStrikerSpawns)
             {
                 foreach (OrdinaryEnemySpawnVariant variant in
@@ -3060,7 +3074,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     CapturedEnemyCombatContract contract = workmanStriker.Combat.ResolveContract(
                         spawn.SourceIdentity,
                         variant);
-                    Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
+                    Assert.AreEqual(
+                        CapturedEnemyAttackModel.EquippedWeapon,
+                        contract.AttackModel,
+                        contract.Evidence);
                     Assert.IsTrue(contract.IsCombatReady);
                     Assert.AreEqual(variant.WeaponLoadout.LowId, contract.WeaponLowId);
                     Assert.AreEqual(variant.WeaponLoadout.HighId, contract.WeaponHighId);

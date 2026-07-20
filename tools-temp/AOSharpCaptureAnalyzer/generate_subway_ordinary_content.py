@@ -40,6 +40,10 @@ CAPTURES = (
     "20260720-032106",
     "20260720-033513",
     "20260720-033749",
+    "20260720-042205",
+    "20260720-043018",
+    "20260720-044358",
+    "20260720-044610",
 )
 SPAWN_CAPTURES = (
     "20260709-212336",
@@ -75,6 +79,19 @@ CAPTURE_ARCHETYPE_FILTERS = {
     "20260720-033513": frozenset(("Strike Foreman",)),
     "20260720-033749": frozenset(
         ("Infected Attendant", "Uncontrollable Anger")
+    ),
+    "20260720-042205": frozenset(("Workman Striker",)),
+    "20260720-043018": frozenset(("Workman Striker",)),
+    "20260720-044358": frozenset(("Infector",)),
+    "20260720-044610": frozenset(
+        (
+            "Infector",
+            "Lost Thought",
+            "Neural Burnout",
+            "Premature Pattern",
+            "Slum Runner",
+            "Uncontrollable Anger",
+        )
     ),
 }
 CAPTURE_IDENTITY_NAME_OVERRIDES = {
@@ -236,9 +253,12 @@ SUPPORTED_SOURCE_WEAPON_MONSTER_DATA = {
     "Mugger": 203734,
 }
 NON_COMBAT_HELD_ITEM_TEMPLATES = frozenset({130590})
-RUNTIME_INCOMPLETE_FIXED_COMBAT = frozenset(
-    {"Empty Shell", "Infected Attendant", "Premature Pattern"}
-)
+RUNTIME_INCOMPLETE_FIXED_COMBAT = {
+    "Empty Shell": 1,
+    "Infected Attendant": 1,
+    "Lost Thought": 2,
+    "Premature Pattern": 2,
+}
 
 # Reviewed complete SCFU + owner WeaponItemFullUpdate pairs for every safe
 # Incomplete Rebuild generation variant. Each tuple is attached to one
@@ -526,16 +546,21 @@ REVIEWED_PATROL_ASSOCIATIONS = (
 # identity-linked first inventory snapshots.  The four canonical
 # 20260709-212336 generations contain two positive and two explicit empty
 # opens; later complete captures contribute eleven positive opens in total.
-WORKMAN_STRIKER_STRICT_LOOT_CAPTURES = frozenset(
+WORKMAN_STRIKER_STRICT_LEGACY_LOOT_CAPTURES = frozenset(
     (
         "20260709-212336",
         "20260709-220439",
         "20260720-031855",
     )
 )
-WORKMAN_STRIKER_STRICT_OPENED_CORPSES = 13
-WORKMAN_STRIKER_STRICT_POSITIVE_CORPSES = 11
-WORKMAN_STRIKER_STRICT_EMPTY_CORPSES = 2
+WORKMAN_STRIKER_STRICT_LOOT_CAPTURES = (
+    WORKMAN_STRIKER_STRICT_LEGACY_LOOT_CAPTURES
+    | frozenset(("20260720-042205", "20260720-043018"))
+)
+WORKMAN_STRIKER_STRICT_OPENED_CORPSES = 30
+WORKMAN_STRIKER_STRICT_POSITIVE_CORPSES = 22
+WORKMAN_STRIKER_STRICT_EMPTY_CORPSES = 8
+WORKMAN_STRIKER_STRICT_LEGACY_EMPTY_CORPSES = 2
 WORKMAN_STRIKER_STRICT_ITEM_COUNTS = Counter(
     {
         (234877, 234877, 1): 1,
@@ -553,6 +578,19 @@ WORKMAN_STRIKER_STRICT_ITEM_COUNTS = Counter(
         (202719, 202720, 21): 1,
         (128603, 128604, 15): 1,
         (70562, 85597, 14): 1,
+        (121684, 121685, 15): 1,
+        (85596, 85595, 18): 1,
+        (85655, 22104, 19): 1,
+        (124042, 124043, 17): 1,
+        (122539, 122540, 14): 1,
+        (124241, 124242, 12): 1,
+        (234876, 234876, 1): 1,
+        (301718, 301718, 1): 1,
+        (301709, 301709, 1): 1,
+        (234874, 234874, 1): 2,
+        (202719, 202720, 15): 1,
+        (234875, 234875, 1): 2,
+        (123457, 123458, 15): 1,
     }
 )
 WORKMAN_STRIKER_EMPTY_INVENTORY_GENERATIONS = (
@@ -626,9 +664,18 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS = {
     "Infector": {
         "monster_data": 31909,
         "captures": ("20260709-222339", "20260709-225408", "20260710-211430"),
-        "opened": 7,
-        "positive": 3,
-        "empty": 4,
+        "capture_allocations": Counter(
+            {
+                "20260709-222339": 4,
+                "20260709-225408": 1,
+                "20260710-211430": 2,
+                "20260720-044358": 3,
+                "20260720-044610": 4,
+            }
+        ),
+        "opened": 14,
+        "positive": 6,
+        "empty": 8,
         "overlap": None,
         "item_counts": Counter(
             {
@@ -636,6 +683,9 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS = {
                 (101735, 101736, 21): 1,
                 (107491, 107492, 15): 1,
                 (234875, 234875, 1): 1,
+                (104127, 104128, 16): 1,
+                (109374, 109375, 16): 1,
+                (112871, 112872, 20): 1,
             }
         ),
         "generations": (
@@ -997,9 +1047,10 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.update(
                 "20260709-225408": 1,
                 "20260710-211430": 1,
                 "20260720-033749": 1,
+                "20260720-044610": 1,
             },
-            3,
-            3,
+            4,
+            4,
             0,
             "70d8361192915b25770aab2ae74fba519d7f48bb5086406a89ed1f4f0b9bee2f",
             {
@@ -1007,17 +1058,22 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.update(
                 (109366, 109367, 9): 1,
                 (290619, 202727, 19): 1,
                 (112863, 112864, 13): 1,
+                (234877, 234877, 1): 1,
             },
         ),
         "Lost Thought": reviewed_strict_loot_definition(
             96193,
             ("20260709-225408",),
-            {"20260709-225408": 1},
-            1,
-            1,
+            {"20260709-225408": 1, "20260720-044610": 2},
+            3,
+            3,
             0,
             "6b2e02b3c2587fdfebf627159930d52fbd2e66855f6c173e6569e8aba2dd20ad",
-            {(101675, 101676, 25): 1},
+            {
+                (101675, 101676, 25): 1,
+                (111347, 111348, 21): 1,
+                (290619, 202727, 19): 1,
+            },
         ),
         "Neural Burnout": reviewed_strict_loot_definition(
             203730,
@@ -1032,19 +1088,63 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.update(
                 "20260710-211430": 1,
                 "20260716-034104": 1,
                 "20260716-221358": 1,
+                "20260720-044610": 2,
             },
+            6,
             4,
-            2,
             2,
             "10fd92c4c311009c7f4fcc8e605fa63b2e95c414efd78d743373cddf8d819c17",
             {
                 (26471, 26471, 14): 1,
                 (123021, 123021, 21): 1,
                 (124560, 124561, 16): 1,
+                (122142, 122142, 21): 1,
+                (124409, 124410, 18): 1,
             },
         ),
     }
 )
+REVIEWED_DIRECT_STRICT_LOOT_GENERATIONS = {
+    "Workman Striker": (
+        ("20260720-042205", "2026-07-20T09:22:19.1573977Z", "(Corpse:00F74005)", "(SimpleChar:79803685)", 203854, 14, 85, ((121684, 121685, 15),)),
+        ("20260720-042205", "2026-07-20T09:22:25.9011275Z", "(Corpse:00F74006)", "(SimpleChar:79803682)", 203854, 16, 98, ()),
+        ("20260720-042205", "2026-07-20T09:22:36.9775580Z", "(Corpse:00F74001)", "(SimpleChar:79803688)", 203854, 15, 92, ()),
+        ("20260720-042205", "2026-07-20T09:22:47.6893714Z", "(Corpse:00F74001)", "(SimpleChar:79803683)", 203854, 15, 92, ((85596, 85595, 18),)),
+        ("20260720-042205", "2026-07-20T09:23:04.6089597Z", "(Corpse:00F74001)", "(SimpleChar:79803689)", 203854, 15, 92, ((85655, 22104, 19),)),
+        ("20260720-042205", "2026-07-20T09:23:32.3262509Z", "(Corpse:00F74001)", "(SimpleChar:79803680)", 203854, 15, 92, ((124042, 124043, 17),)),
+        ("20260720-042205", "2026-07-20T09:23:43.3196234Z", "(Corpse:00F74006)", "(SimpleChar:7980368C)", 203854, 14, 85, ((122539, 122540, 14),)),
+        ("20260720-042205", "2026-07-20T09:24:10.1189711Z", "(Corpse:00F74001)", "(SimpleChar:7980F07D)", 203854, 15, 92, ((124241, 124242, 12),)),
+        ("20260720-043018", "2026-07-20T09:30:32.9942280Z", "(Corpse:00F74001)", "(SimpleChar:7980F08D)", 203854, 15, 92, ()),
+        ("20260720-043018", "2026-07-20T09:30:45.4186047Z", "(Corpse:00F74005)", "(SimpleChar:7980F088)", 203854, 15, 92, ((234876, 234876, 1), (301718, 301718, 1))),
+        ("20260720-043018", "2026-07-20T09:31:01.0000598Z", "(Corpse:00F74005)", "(SimpleChar:7980F08F)", 203854, 14, 85, ()),
+        ("20260720-043018", "2026-07-20T09:31:12.7947819Z", "(Corpse:00F74005)", "(SimpleChar:7980F07E)", 203854, 16, 98, ((301709, 301709, 1),)),
+        ("20260720-043018", "2026-07-20T09:31:19.2838723Z", "(Corpse:00F74007)", "(SimpleChar:7980F08C)", 203854, 14, 85, ()),
+        ("20260720-043018", "2026-07-20T09:31:45.7655020Z", "(Corpse:00F74003)", "(SimpleChar:7980F089)", 203854, 15, 92, ((234874, 234874, 1), (202719, 202720, 15))),
+        ("20260720-043018", "2026-07-20T09:31:48.2636723Z", "(Corpse:00F74007)", "(SimpleChar:7980F094)", 203854, 15, 92, ()),
+        ("20260720-043018", "2026-07-20T09:32:37.1261153Z", "(Corpse:00F74004)", "(SimpleChar:7980F096)", 203854, 16, 98, ((234875, 234875, 1),)),
+        ("20260720-043018", "2026-07-20T09:33:48.3385813Z", "(Corpse:00F74001)", "(SimpleChar:7980F099)", 203854, 16, 98, ((234875, 234875, 1), (123457, 123458, 15))),
+    ),
+    "Infector": (
+        ("20260720-044358", "2026-07-20T09:44:40.2869613Z", "(Corpse:00F7400A)", "(SimpleChar:79803754)", 31909, 16, 98, ()),
+        ("20260720-044358", "2026-07-20T09:44:56.3098325Z", "(Corpse:00F7400A)", "(SimpleChar:798036B7)", 31909, 17, 105, ((112871, 112872, 20),)),
+        ("20260720-044358", "2026-07-20T09:45:08.7209234Z", "(Corpse:00F74001)", "(SimpleChar:798036BC)", 31909, 18, 111, ()),
+        ("20260720-044610", "2026-07-20T09:46:37.6354654Z", "(Corpse:00F74005)", "(SimpleChar:798036BD)", 31909, 18, 111, ()),
+        ("20260720-044610", "2026-07-20T09:47:21.3665182Z", "(Corpse:00F74003)", "(SimpleChar:798035B8)", 31909, 16, 98, ((109374, 109375, 16),)),
+        ("20260720-044610", "2026-07-20T09:47:24.3770751Z", "(Corpse:00F74004)", "(SimpleChar:798035FA)", 31909, 17, 105, ((104127, 104128, 16),)),
+        ("20260720-044610", "2026-07-20T09:47:27.7564763Z", "(Corpse:00F74005)", "(SimpleChar:7980371A)", 31909, 18, 111, ()),
+    ),
+    "Lost Thought": (
+        ("20260720-044610", "2026-07-20T09:48:53.7012774Z", "(Corpse:00F74003)", "(SimpleChar:798036C7)", 96193, 18, 23, ((111347, 111348, 21),)),
+        ("20260720-044610", "2026-07-20T09:48:54.8147921Z", "(Corpse:00F7400B)", "(SimpleChar:798037EF)", 96193, 19, 24, ((290619, 202727, 19),)),
+    ),
+    "Neural Burnout": (
+        ("20260720-044610", "2026-07-20T09:47:26.1169329Z", "(Corpse:00F7400D)", "(SimpleChar:798036C0)", 203730, 17, 105, ((124409, 124410, 18),)),
+        ("20260720-044610", "2026-07-20T09:49:20.1025775Z", "(Corpse:00F7400E)", "(SimpleChar:798036BF)", 203730, 18, 111, ((122142, 122142, 21),)),
+    ),
+    "Uncontrollable Anger": (
+        ("20260720-044610", "2026-07-20T09:47:08.0281549Z", "(Corpse:00F74004)", "(SimpleChar:798036BE)", 96195, 19, 24, ((234877, 234877, 1),)),
+    ),
+}
 CAPTURE_CORPSE_EVIDENCE_FILTERS = {
     "20260708-004038": frozenset(("Discarded Pet", "Filth Flea", "Thief")),
     "20260708-143600": frozenset(
@@ -1196,6 +1296,19 @@ CAPTURE_CORPSE_EVIDENCE_FILTERS = {
     "20260720-032106": frozenset(("Architect Striker",)),
     "20260720-033749": frozenset(
         ("Infected Attendant", "Uncontrollable Anger")
+    ),
+    "20260720-042205": frozenset(("Workman Striker",)),
+    "20260720-043018": frozenset(("Workman Striker",)),
+    "20260720-044358": frozenset(("Infector",)),
+    "20260720-044610": frozenset(
+        (
+            "Infector",
+            "Lost Thought",
+            "Neural Burnout",
+            "Premature Pattern",
+            "Slum Runner",
+            "Uncontrollable Anger",
+        )
     ),
 }
 CAPTURE_CORPSE_IDENTITY_FILTERS = {
@@ -1395,6 +1508,41 @@ CAPTURE_CORPSE_IDENTITY_FILTERS = {
     ),
     "20260719-021022": frozenset(("(SimpleChar:797B889D)",)),
     "20260720-031025": frozenset(("(SimpleChar:79803651)",)),
+    "20260720-042205": frozenset(
+        (
+            "(SimpleChar:79803680)", "(SimpleChar:79803682)",
+            "(SimpleChar:79803683)", "(SimpleChar:79803685)",
+            "(SimpleChar:79803688)", "(SimpleChar:79803689)",
+            "(SimpleChar:7980368C)", "(SimpleChar:7980F07D)",
+        )
+    ),
+    "20260720-043018": frozenset(
+        (
+            "(SimpleChar:7980F07E)", "(SimpleChar:7980F088)",
+            "(SimpleChar:7980F089)", "(SimpleChar:7980F08C)",
+            "(SimpleChar:7980F08D)", "(SimpleChar:7980F08F)",
+            "(SimpleChar:7980F094)", "(SimpleChar:7980F096)",
+            "(SimpleChar:7980F099)",
+        )
+    ),
+    "20260720-044358": frozenset(
+        (
+            "(SimpleChar:798036B6)", "(SimpleChar:798036B7)",
+            "(SimpleChar:798036BC)", "(SimpleChar:79803754)",
+        )
+    ),
+    "20260720-044610": frozenset(
+        (
+            "(SimpleChar:798035B8)", "(SimpleChar:798035FA)",
+            "(SimpleChar:798036BD)", "(SimpleChar:798036BE)",
+            "(SimpleChar:798036BF)", "(SimpleChar:798036C0)",
+            "(SimpleChar:798036C2)", "(SimpleChar:798036C3)",
+            "(SimpleChar:798036C7)", "(SimpleChar:7980371A)",
+            "(SimpleChar:79803722)", "(SimpleChar:79803724)",
+            "(SimpleChar:79803763)", "(SimpleChar:798037A0)",
+            "(SimpleChar:798037EF)", "(SimpleChar:7980F0BA)",
+        )
+    ),
 }
 CAPTURE_LIFECYCLE_DEATH_LEVEL_FILTERS = {
     "20260712-160257": frozenset(("(SimpleChar:795EC78A)",)),
@@ -1735,11 +1883,11 @@ def validate_combat_overlap_dedup(
     raw_workman = [row for row in raw_rows if row["name"] == "Workman Striker"]
     workman = [row for row in rows if row["name"] == "Workman Striker"]
     if Counter(row["hitType"] for row in raw_workman) != Counter(
-        {"normal": 89, "critical": 10}
+        {"normal": 92, "critical": 11}
     ):
         raise ValueError("Workman Striker raw combat evidence drifted")
     if Counter(row["hitType"] for row in workman) != Counter(
-        {"normal": 56, "critical": 6}
+        {"normal": 59, "critical": 7}
     ):
         raise ValueError("Workman Striker distinct hit counts drifted")
     intervals = combat_intervals(workman)
@@ -3185,7 +3333,7 @@ def combat_profiles() -> dict[str, dict[str, object]]:
 def validate_workman_striker_empty_inventory_evidence() -> None:
     if (
         len(WORKMAN_STRIKER_EMPTY_INVENTORY_GENERATIONS)
-        != WORKMAN_STRIKER_STRICT_EMPTY_CORPSES
+        != WORKMAN_STRIKER_STRICT_LEGACY_EMPTY_CORPSES
     ):
         raise ValueError("Workman Striker explicit empty evidence count drifted")
     event_lines = Counter(
@@ -3280,10 +3428,83 @@ def parse_reviewed_raw_inventory_update(line: str) -> dict[str, object] | None:
     }
 
 
+def reviewed_direct_strict_open_generations(
+    name: str,
+) -> list[dict[str, object]]:
+    expected = REVIEWED_DIRECT_STRICT_LOOT_GENERATIONS.get(name, ())
+    if not expected:
+        return []
+    expected_fingerprints = Counter(expected)
+    observed = []
+    for capture in sorted({row[0] for row in expected}):
+        for row in read_csv(
+            CAPTURE_ROOT / capture / "corpse-loot-observations.csv"
+        ):
+            if (
+                row.get("EnemyName") != name
+                or row.get("InitialSnapshot", "").lower() != "true"
+                or not row.get("CorrelationStatus", "").startswith("linked")
+            ):
+                continue
+            try:
+                monster_data = int(row.get("MonsterData", ""))
+                enemy_level = int(row.get("EnemyLevel", ""))
+                credits = int(row.get("CorpseCredits", ""))
+            except ValueError:
+                continue
+            items = []
+            for item in row.get("Items", "").split(";"):
+                if not item:
+                    continue
+                low, high, quality, count = (
+                    int(value) for value in item.split(":")
+                )
+                items.extend([(low, high, quality)] * count)
+            observed.append(
+                (
+                    capture,
+                    row.get("CapturedUtc", ""),
+                    normalize_identity(row.get("CorpseIdentity", "")),
+                    normalize_identity(row.get("DeadNpcIdentity", "")),
+                    monster_data,
+                    enemy_level,
+                    credits,
+                    tuple(items),
+                )
+            )
+    if Counter(observed) != expected_fingerprints:
+        raise ValueError("Reviewed direct strict-open evidence drifted: " + name)
+    return [
+        {
+            "capture": capture,
+            "cfuCapturedUtc": captured_utc,
+            "corpseIdentity": corpse_identity,
+            "deadNpcIdentity": dead_npc_identity,
+            "capturedUtc": captured_utc,
+            "sequence": 0,
+            "monsterData": monster_data,
+            "enemyLevel": enemy_level,
+            "credits": credits,
+            "items": items,
+            "slots": (),
+        }
+        for (
+            capture,
+            captured_utc,
+            corpse_identity,
+            dead_npc_identity,
+            monster_data,
+            enemy_level,
+            credits,
+            items,
+        ) in expected
+    ]
+
+
 def reviewed_legacy_strict_open_generations() -> dict[str, list[dict[str, object]]]:
     reviewed = {}
     for name, definition in REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.items():
-        observed = []
+        legacy_observed = []
         monster_data = int(definition["monster_data"])
         for capture in definition["captures"]:
             capture_path = CAPTURE_ROOT / capture
@@ -3350,7 +3571,7 @@ def reviewed_legacy_strict_open_generations() -> dict[str, list[dict[str, object
                     raise ValueError(
                         f"Reviewed legacy strict-open monster data drifted: {name} {generation_key}"
                     )
-                observed.append(
+                legacy_observed.append(
                     {
                         "capture": capture,
                         "cfuCapturedUtc": generation["capturedUtc"],
@@ -3364,6 +3585,8 @@ def reviewed_legacy_strict_open_generations() -> dict[str, list[dict[str, object
                     }
                 )
 
+        direct_observed = reviewed_direct_strict_open_generations(name)
+        observed = legacy_observed + direct_observed
         actual_fingerprints = sorted(
             (
                 row["capture"],
@@ -3374,7 +3597,7 @@ def reviewed_legacy_strict_open_generations() -> dict[str, list[dict[str, object
                 row["sequence"],
                 row["items"],
             )
-            for row in observed
+            for row in legacy_observed
         )
         if "generations" in definition:
             generations_match = Counter(actual_fingerprints) == Counter(
@@ -3449,7 +3672,7 @@ def loot_profiles() -> dict[str, list[dict[str, int]]]:
             name = row.get("EnemyName", "")
             if (
                 row.get("InitialSnapshot", "").lower() != "true"
-                or not row.get("CorrelationStatus", "").startswith("linked-")
+                or not row.get("CorrelationStatus", "").startswith("linked")
                 or name not in ARCHETYPES
                 or name in REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS
                 or not capture_allows_archetype(capture, name)
@@ -3471,14 +3694,10 @@ def loot_profiles() -> dict[str, list[dict[str, int]]]:
             )
         opened_by_name[name] = [list(row["items"]) for row in generations]
 
-    if opened_by_name.get("Workman Striker"):
-        raise ValueError(
-            "Workman Striker gained direct strict snapshots; reconcile them with the audited legacy denominator"
-        )
     workman_outcomes = [
         row
         for row in loot_outcome_profiles().get("Workman Striker", [])
-        if row["capture"] in WORKMAN_STRIKER_STRICT_LOOT_CAPTURES
+        if row["capture"] in WORKMAN_STRIKER_STRICT_LEGACY_LOOT_CAPTURES
     ]
     workman_by_corpse = defaultdict(list)
     for row in workman_outcomes:
@@ -3490,6 +3709,18 @@ def loot_profiles() -> dict[str, list[dict[str, int]]]:
                 row["deadNpcIdentity"],
             )
         ].append((row["low"], row["high"], row["quality"]))
+    for row in reviewed_direct_strict_open_generations("Workman Striker"):
+        if not row["items"]:
+            continue
+        key = (
+            row["capture"],
+            row["capturedUtc"],
+            row["corpseIdentity"],
+            row["deadNpcIdentity"],
+        )
+        if key in workman_by_corpse:
+            raise ValueError("Workman Striker direct strict evidence duplicated")
+        workman_by_corpse[key].extend(row["items"])
     if len(workman_by_corpse) != WORKMAN_STRIKER_STRICT_POSITIVE_CORPSES:
         raise ValueError("Workman Striker positive complete-open count drifted")
     if Counter(key[0] for key in workman_by_corpse) != Counter(
@@ -3497,6 +3728,8 @@ def loot_profiles() -> dict[str, list[dict[str, int]]]:
             "20260709-212336": 2,
             "20260709-220439": 6,
             "20260720-031855": 3,
+            "20260720-042205": 6,
+            "20260720-043018": 5,
         }
     ):
         raise ValueError("Workman Striker complete-open capture allocation drifted")
@@ -3550,7 +3783,17 @@ def strict_loot_profile_summaries(
                 "positive": int(definition["positive"]),
                 "empty": int(definition["empty"]),
                 "itemPoolComplete": False,
-                "captures": tuple(definition["captures"]),
+                "captures": tuple(
+                    sorted(
+                        set(definition["captures"])
+                        | {
+                            row[0]
+                            for row in REVIEWED_DIRECT_STRICT_LOOT_GENERATIONS.get(
+                                name, ()
+                            )
+                        }
+                    )
+                ),
                 "entries": entries,
             }
         )
@@ -4284,17 +4527,15 @@ def validate_content(
             for field in ("min", "max", "recharge", "slot", "unknown", "instance")
         ):
             raise ValueError("unobserved combat contains invented values: " + name)
-    for name in RUNTIME_INCOMPLETE_FIXED_COMBAT:
+    for name, expected_rows in RUNTIME_INCOMPLETE_FIXED_COMBAT.items():
         evidence = combat[name]
         if (
             not evidence["observed"]
             or evidence["runtimeReady"]
-            or evidence["rows"] != 1
+            or evidence["rows"] != expected_rows
             or evidence["recharge"] is not None
         ):
             raise ValueError(name + " incomplete fixed-combat boundary drifted")
-    if combat["Lost Thought"]["observed"] or combat["Lost Thought"]["runtimeReady"]:
-        raise ValueError("Lost Thought non-local combat entered runtime evidence")
 
     expected_level_credits = {
         "Architect Striker": Counter(
@@ -4337,9 +4578,9 @@ def validate_content(
         ),
         "Infector": Counter(
             {
-                (16, 98): 2,
-                (17, 105): 2,
-                (18, 111): 1,
+                (16, 98): 5,
+                (17, 105): 4,
+                (18, 111): 4,
                 (19, 118): 3,
                 (24, 150): 5,
                 (25, 156): 2,
@@ -4347,7 +4588,13 @@ def validate_content(
         ),
         "Looter": Counter({(9, 53): 2, (10, 59): 9}),
         "Lost Thought": Counter(
-            {(16, 20): 1, (18, 23): 1, (21, 26): 1, (22, 28): 1}
+            {
+                (16, 20): 1,
+                (18, 23): 2,
+                (19, 24): 1,
+                (21, 26): 1,
+                (22, 28): 1,
+            }
         ),
         "Melded Patterns": Counter(
             {(18, 111): 2, (20, 124): 1, (21, 131): 3, (24, 150): 1, (25, 156): 3}
@@ -4367,14 +4614,14 @@ def validate_content(
         "Neural Burnout": Counter(
             {
                 (16, 98): 1,
-                (17, 105): 1,
-                (18, 111): 2,
+                (17, 105): 2,
+                (18, 111): 3,
                 (23, 144): 1,
                 (25, 156): 2,
             }
         ),
         "Premature Pattern": Counter(
-            {(17, 105): 1, (18, 111): 1, (23, 144): 2}
+            {(17, 105): 1, (18, 111): 2, (23, 144): 2}
         ),
         "Redundant Scan": Counter(
             {(19, 118): 1, (20, 124): 1, (21, 131): 1, (22, 137): 1}
@@ -4397,9 +4644,9 @@ def validate_content(
                 (11, 66): 1,
                 (12, 72): 3,
                 (15, 92): 1,
-                (16, 98): 4,
-                (17, 105): 3,
-                (18, 111): 1,
+                (16, 98): 5,
+                (17, 105): 6,
+                (18, 111): 3,
                 (20, 124): 1,
                 (21, 131): 2,
                 (22, 137): 2,
@@ -4415,6 +4662,7 @@ def validate_content(
                 (11, 14): 1,
                 (12, 15): 2,
                 (13, 16): 2,
+                (19, 24): 1,
                 (20, 25): 1,
                 (21, 26): 1,
             }
@@ -4423,9 +4671,9 @@ def validate_content(
         "Workman Striker": Counter(
             {
                 (13, 79): 3,
-                (14, 85): 7,
-                (15, 92): 3,
-                (16, 98): 4,
+                (14, 85): 11,
+                (15, 92): 12,
+                (16, 98): 8,
                 (17, 105): 3,
                 (18, 111): 2,
                 (25, 156): 1,
