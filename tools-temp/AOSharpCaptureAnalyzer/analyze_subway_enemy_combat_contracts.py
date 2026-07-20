@@ -55,6 +55,8 @@ CAPTURES = (
     "20260720-043018",
     "20260720-044358",
     "20260720-044610",
+    "20260720-053542",
+    "20260720-053802",
 )
 CAPTURE_ENEMY_FILTERS = {
     "20260708-004038": frozenset({"Filth Flea"}),
@@ -102,6 +104,8 @@ CAPTURE_ENEMY_FILTERS = {
             "Uncontrollable Anger",
         }
     ),
+    "20260720-053542": frozenset({"Vergil Aeneid"}),
+    "20260720-053802": frozenset({"Abmouth Supremus"}),
 }
 CAPTURE_ENEMY_SOURCE_FILTERS = {
     "20260720-042205": {
